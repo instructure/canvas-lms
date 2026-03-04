@@ -212,7 +212,7 @@ describe ContentMigration do
 
   it "excludes user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
-    expect(ContentMigration.migration_plugins(true)).not_to include(ab)
+    expect(ContentMigration.migration_plugins(exclude_hidden: true)).not_to include(ab)
   end
 
   context "zip file import" do

@@ -307,7 +307,7 @@ class AccessToken < ActiveRecord::Base
     @full_token = nil
   end
 
-  def generate_token(overwrite = false)
+  def generate_token(overwrite: false)
     if overwrite || !crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
@@ -331,7 +331,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def regenerate_access_token
-    generate_token(true)
+    generate_token(overwrite: true)
     save
   end
 

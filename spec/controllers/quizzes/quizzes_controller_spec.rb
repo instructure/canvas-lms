@@ -883,7 +883,7 @@ describe Quizzes::QuizzesController do
       @quiz.publish!
 
       sub_manager = Quizzes::SubmissionManager.new(@quiz)
-      submission = sub_manager.find_or_create_submission(@student, nil, "settings_only")
+      submission = sub_manager.find_or_create_submission(@student, state: "settings_only")
       submission.manually_unlocked = true
       submission.save!
 
@@ -1064,7 +1064,7 @@ describe Quizzes::QuizzesController do
       quiz = quiz_model(course: @course)
       quiz.publish!
 
-      quiz_submission = quiz.generate_submission(@teacher, true)
+      quiz_submission = quiz.generate_submission(@teacher, preview: true)
       quiz_submission.complete!
 
       get "managed_quiz_data", params: { course_id: @course.id, quiz_id: quiz.id }
@@ -1397,7 +1397,7 @@ describe Quizzes::QuizzesController do
       course_quiz(active: true)
       @quiz.locked = true
       @quiz.save!
-      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, "settings_only")
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, state: "settings_only")
       @sub.manually_unlocked = true
       @sub.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
@@ -1421,7 +1421,7 @@ describe Quizzes::QuizzesController do
       course_quiz(active: true)
       @quiz.time_limit = 60
       @quiz.save!
-      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, "settings_only")
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, state: "settings_only")
       @sub.extra_time = 30
       @sub.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }

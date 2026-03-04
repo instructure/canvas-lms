@@ -1585,7 +1585,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["due_date"]).to be_nil
 
       # overridden date for active enrollment; override gets used
-      @course.enrollments.find_by(user: student1, course_section: section1).accept(:force)
+      @course.enrollments.find_by(user: student1, course_section: section1).accept(force: true)
       get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
       json = json_parse(response.body)
       expect(json[@tag.id.to_s]["due_date"].to_date).to eq new_due_date.to_date

@@ -562,7 +562,7 @@ describe UsersController, type: :request do
       @teacher = course_with_teacher(active_all: true).user
       @teacher_course = @course
       @student_course = course_factory(active_course: true)
-      @student_course.enroll_student(@teacher).accept(true)
+      @student_course.enroll_student(@teacher).accept(force: true)
       # an assignment i need to submit (needs_submitting)
       batch = [120, 13, 147, 79, 161, 119, 81, 57, 134, 21].map do |i|
         {
@@ -698,7 +698,7 @@ describe UsersController, type: :request do
       assignment.submit_homework(@user, submission_type: "online_text_entry", body: "done")
       # one assignment ignored
       assignment = @student_course.assignments[1]
-      @user.ignore_item!(assignment, "submitting", true)
+      @user.ignore_item!(assignment, "submitting", permanent: true)
 
       # an assignment i created, and a student who submits the assignment (needs_grading)
       @me = @user
@@ -723,7 +723,7 @@ describe UsersController, type: :request do
       submission.save!
       # one assignment ignored
       assignment = @teacher_course.assignments[1]
-      @user.ignore_item!(assignment, "grading", true)
+      @user.ignore_item!(assignment, "grading", permanent: true)
     end
 
     it "checks for auth" do

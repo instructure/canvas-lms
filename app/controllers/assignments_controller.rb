@@ -906,7 +906,7 @@ class AssignmentsController < ApplicationController
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
-      @assignment.ensure_assignment_group(false)
+      @assignment.ensure_assignment_group(save: false)
       if @context.root_account.suppress_assignments?
         @assignment.suppress_assignment = value_to_boolean(params[:suppress_assignment]) if params.key?(:suppress_assignment)
       end

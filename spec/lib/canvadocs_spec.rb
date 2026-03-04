@@ -40,8 +40,8 @@ describe Canvadocs do
     let(:user_filter) { session_params[:user_filter] }
 
     before do
-      course.enroll_student(student).accept(true)
-      course.enroll_teacher(teacher).accept(true)
+      course.enroll_student(student).accept(force: true)
+      course.enroll_teacher(teacher).accept(force: true)
       attachment.associate_with(submission)
       @current_user = student
     end
@@ -132,7 +132,7 @@ describe Canvadocs do
 
         context "when an assignment posts manually and a submission is unposted" do
           before do
-            course.enroll_student(peer_reviewer).accept(true)
+            course.enroll_student(peer_reviewer).accept(force: true)
             assignment.post_policy.update!(post_manually: true)
             assignment.hide_submissions
           end
@@ -248,7 +248,7 @@ describe Canvadocs do
 
         context "when an assignment posts manually and a submission is posted" do
           before do
-            course.enroll_student(peer_reviewer).accept(true)
+            course.enroll_student(peer_reviewer).accept(force: true)
             assignment.post_policy.update!(post_manually: true)
             assignment.post_submissions
           end
@@ -394,7 +394,7 @@ describe Canvadocs do
           before do
             assignment.update!(moderated_grading: true, final_grader:, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
-            course.enroll_ta(provisional_grader).accept(true)
+            course.enroll_ta(provisional_grader).accept(force: true)
             assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
           end
 
@@ -689,7 +689,7 @@ describe Canvadocs do
           before do
             assignment.update!(moderated_grading: true, final_grader:, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
-            course.enroll_ta(provisional_grader).accept(true)
+            course.enroll_ta(provisional_grader).accept(force: true)
             assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
           end
 

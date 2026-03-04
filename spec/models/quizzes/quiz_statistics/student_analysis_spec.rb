@@ -142,7 +142,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect do
       quiz.quiz_statistics.build(report_type: "student_analysis",
                                  includes_all_versions: true,
-                                 anonymous: true).report.generate(false)
+                                 anonymous: true).report.generate(legacy: false)
     end.not_to raise_error
   end
 
@@ -151,7 +151,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect do
       @quiz.quiz_statistics.build(report_type: "student_analysis",
                                   includes_all_versions: true,
-                                  anonymous: false).report.generate(false)
+                                  anonymous: false).report.generate(legacy: false)
     end.not_to raise_error
   end
 
@@ -276,7 +276,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       stats = @quiz.quiz_statistics.build(
         report_type: "student_analysis",
         includes_all_versions: true
-      ).report.generate(true, { section_ids: section2.id })
+      ).report.generate(legacy: true, section_ids: section2.id)
       expect(stats[:questions][0][1]["answers"][0]["responses"]).to eq 1
     end
 
@@ -512,7 +512,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.quiz_questions.create!(question_data: { :name => "q2", :points_possible => 1, "question_type" => "multiple_answers_question", "answers" => [{ "answer_text" => "", "answer_html" => "<a href='http://example.com/caturday.gif'>lolcats</a>", "answer_weight" => "100" }, { "answer_text" => "lolrus", "answer_weight" => "100" }] })
     q.generate_quiz_data
     q.save
-    qs = q.generate_submission(@teacher, true)
+    qs = q.generate_submission(@teacher, preview: true)
     qs.submission_data = {
       "question_#{q.quiz_data[0][:id]}" => q.quiz_data[0][:answers][0][:id].to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
@@ -574,7 +574,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         .with(question_data, responses)
         .and_return({ some_metric: 5 })
 
-      output = subject.send(:stats_for_question, question_data, responses, false)
+      output = subject.send(:stats_for_question, question_data, responses, legacy: false)
       expect(output).to eq({
                              question_type: "essay_question",
                              some_metric: 5

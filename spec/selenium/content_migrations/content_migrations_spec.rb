@@ -254,7 +254,7 @@ describe "content migrations", :non_parallel do
       #  you run it with the whole suite
       #  because of a cached default account
       #  that no longer exists in the db
-      Account.clear_special_account_cache!(true)
+      Account.clear_special_account_cache!(force: true)
       @copy_from = course_factory
       @copy_from.update_attribute(:name, "copy from me")
       data = File.read(File.dirname(__FILE__) + "/../../fixtures/migration/cc_full_test_smaller.zip")

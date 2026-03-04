@@ -426,7 +426,7 @@ describe Quizzes::QuizSubmission do
         @quiz.scoring_policy = "keep_highest"
         @quiz.save!
         @assignment = @quiz.assignment
-        @quiz_sub = @quiz.generate_submission @user, false
+        @quiz_sub = @quiz.generate_submission @user, preview: false
         @quiz_sub.workflow_state = "complete"
         @quiz_sub.save!
         @quiz_sub.score = 5
@@ -819,7 +819,7 @@ describe Quizzes::QuizSubmission do
         quiz
       end
       let(:assignment) { quiz.assignment }
-      let(:quiz_submission) { quiz.generate_submission(@user, false) }
+      let(:quiz_submission) { quiz.generate_submission(@user) }
       let(:submission) { quiz_submission.submission }
 
       def save_quiz_submission
@@ -1400,7 +1400,7 @@ describe Quizzes::QuizSubmission do
 
           submission = @quiz.generate_submission(@student)
           submission.end_at = @quiz.due_at
-          expect(submission.needs_grading?(true)).to be_truthy
+          expect(submission.needs_grading?(strict: true)).to be_truthy
         end
 
         it "returns false if it isn't overdue" do
@@ -1408,7 +1408,7 @@ describe Quizzes::QuizSubmission do
           @quiz.save!
 
           submission = @quiz.generate_submission(@student)
-          expect(submission.needs_grading?(true)).to be_falsey
+          expect(submission.needs_grading?(strict: true)).to be_falsey
         end
       end
 
@@ -1664,7 +1664,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not create quiz submission event on preview quiz submission" do
-        quiz_submission = @quiz.generate_submission(@student, true)
+        quiz_submission = @quiz.generate_submission(@student, preview: true)
         event = quiz_submission.events.last
         expect(event).to be_nil
       end
@@ -1845,8 +1845,8 @@ describe Quizzes::QuizSubmission do
     end
 
     it "returns true if strictly overdue?" do
-      expect(subject).to receive(:overdue?).with(true).and_return(true)
-      expect(subject.overdue_and_needs_submission?(true)).to be(true)
+      expect(subject).to receive(:overdue?).with(strict: true).and_return(true)
+      expect(subject.overdue_and_needs_submission?(strict: true)).to be(true)
     end
 
     it "returns false if untaken" do
@@ -1883,13 +1883,13 @@ describe Quizzes::QuizSubmission do
 
     it "allows a 1 minute grace if strict" do
       subject.end_at = 50.seconds.ago
-      expect(subject.overdue?(true)).to be(false)
+      expect(subject.overdue?(strict: true)).to be(false)
 
       subject.end_at = 3.minutes.ago
-      expect(subject.overdue?(true)).to be(true)
+      expect(subject.overdue?(strict: true)).to be(true)
 
       subject.end_at = 6.minutes.ago
-      expect(subject.overdue?(true)).to be(true)
+      expect(subject.overdue?(strict: true)).to be(true)
     end
 
     it "allows a 5 minute grace if not strict" do
@@ -1995,7 +1995,7 @@ describe Quizzes::QuizSubmission do
                                                                          data: snapshot_data.merge(subject.submission_data).with_indifferent_access
                                                                        })
 
-      subject.snapshot! snapshot_data, true
+      subject.snapshot! snapshot_data, full_snapshot: true
     end
   end
 

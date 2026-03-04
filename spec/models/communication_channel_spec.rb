@@ -188,7 +188,7 @@ describe CommunicationChannel do
   it "is able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
-    @cc.set_confirmation_code(true)
+    @cc.set_confirmation_code(reset: true)
     expect(@cc.confirmation_code).not_to eql(old_cc)
   end
 
@@ -223,7 +223,7 @@ describe CommunicationChannel do
   it "uses a 4-digit confirmation_code for settings other than email" do
     communication_channel_model
     @cc.path_type = "sms"
-    @cc.set_confirmation_code(true)
+    @cc.set_confirmation_code(reset: true)
     expect(@cc.confirmation_code.size).to be(4)
   end
 

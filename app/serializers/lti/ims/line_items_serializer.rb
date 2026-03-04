@@ -19,7 +19,7 @@
 
 module Lti::IMS
   class LineItemsSerializer
-    def initialize(line_item, line_item_url, include_launch_url = false)
+    def initialize(line_item, line_item_url, include_launch_url: false)
       @line_item = line_item
       @line_item_url = line_item_url
       @include_launch_url = include_launch_url

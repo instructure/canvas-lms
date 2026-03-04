@@ -975,13 +975,12 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def confirm_valid_requirements(do_save = false)
+  def confirm_valid_requirements
     return if @already_confirmed_valid_requirements
 
     @already_confirmed_valid_requirements = true
     # the write accessor validates for us
     self.completion_requirements = completion_requirements || []
-    save if do_save && completion_requirements_changed?
     completion_requirements
   end
 

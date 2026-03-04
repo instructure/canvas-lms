@@ -343,7 +343,7 @@ module Types
       argument :check_extra_permissions, Boolean, "Check extra permissions in RQD method", required: false
     end
     def restrict_quantitative_data(check_extra_permissions: false)
-      assignment.restrict_quantitative_data?(current_user, check_extra_permissions)
+      assignment.restrict_quantitative_data?(current_user, check_extra_permissions:)
     end
 
     field :provisional_grading_locked, Boolean, "Indicates if the user is locked out of provisional grading for this assignment.", null: false

@@ -196,7 +196,7 @@ module Importers
 
       Lti::ContextToolFinder.all_tools_for(migration.context).each do |tool|
         # check if tool is compatible
-        next unless matching_settings?(migration, hash, tool, settings, true)
+        next unless matching_settings?(migration, hash, tool, settings, preexisting_tool: true)
 
         if tool.url.blank? && tool.domain.present?
           if domain && domain == tool.domain
@@ -236,7 +236,7 @@ module Importers
       end
     end
 
-    def self.matching_settings?(migration, hash, tool, settings, preexisting_tool = false)
+    def self.matching_settings?(migration, hash, tool, settings, preexisting_tool: false)
       return false if hash[:privacy_level] && tool.privacy_level != hash[:privacy_level]
       return false if migration.migration_type == "canvas_cartridge_importer" && hash[:title] && tool.name != hash[:title]
 

@@ -56,7 +56,7 @@ describe Quizzes::QuizStatisticsSerializer do
       analysis.quiz = quiz
     end
 
-    Quizzes::QuizStatisticsSerializer::Input.new(quiz, {}, *analyses)
+    Quizzes::QuizStatisticsSerializer::Input.new(quiz, nil, *analyses)
   end
 
   let(:user) { User.new }

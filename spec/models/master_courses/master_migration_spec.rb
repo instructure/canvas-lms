@@ -1233,7 +1233,7 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!(workflow_state: "unpublished")
       qq = quiz.quiz_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question", "points_possible" => 1 })
-      quiz.root_entries(true)
+      quiz.root_entries(force_check: true)
       quiz.save!
 
       run_master_migration
@@ -1244,7 +1244,7 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(2.minutes.from_now) do
         qq.update_attribute(:question_data, qq.question_data.merge(points_possible: 2))
-        quiz.root_entries(true)
+        quiz.root_entries(force_check: true)
         quiz.save!
         expect(quiz.points_possible).to eq 2
       end

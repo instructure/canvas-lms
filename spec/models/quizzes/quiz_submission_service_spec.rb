@@ -160,7 +160,7 @@ describe Quizzes::QuizSubmissionService do
 
   describe "#create_preview" do
     it "utilizes the user code instead of the user" do
-      expect(quiz).to receive(:generate_submission).with(participant.user_code, true)
+      expect(quiz).to receive(:generate_submission).with(participant.user_code, preview: true)
       allow(quiz).to receive(:grants_right?).and_return true
 
       subject.create_preview quiz, nil

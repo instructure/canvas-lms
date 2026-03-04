@@ -523,7 +523,7 @@ module Api::V1::Assignment
       hash["ab_guid"] = assignment.ab_guid.presence || assignment.ab_guid_through_rubric
     end
 
-    hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
+    hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, check_extra_permissions: true) || false
 
     if opts[:migrated_urls_content_migration_id]
       hash["migrated_urls_content_migration_id"] = opts[:migrated_urls_content_migration_id]
@@ -1413,7 +1413,7 @@ module Api::V1::Assignment
       batch_update_assignment_overrides(assignment, overrides, user)
     end
 
-    assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
+    assignment.do_notifications!(prepared_update[:old_assignment], notify: prepared_update[:notify_of_update])
     :created
   end
 
@@ -1459,7 +1459,7 @@ module Api::V1::Assignment
       perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end
 
-    assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
+    assignment.do_notifications!(prepared_update[:old_assignment], notify: prepared_update[:notify_of_update])
     :ok
   end
 

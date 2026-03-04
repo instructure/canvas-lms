@@ -240,8 +240,8 @@ class Role < ActiveRecord::Base
   #             :asset_string => "role_4"
   #             :label => "weirdstudent"}]},
   # ]
-  def self.all_enrollment_roles_for_account(account, include_inactive = false)
-    custom_roles = account.available_custom_course_roles(include_inactive)
+  def self.all_enrollment_roles_for_account(account, include_inactive: false)
+    custom_roles = account.available_custom_course_roles(include_inactive:)
     RoleOverride.enrollment_type_labels(account).map do |br|
       new = br.clone
       new[:id] = Role.get_built_in_role(br[:name], root_account_id: account.resolved_root_account_id).id
@@ -256,7 +256,7 @@ class Role < ActiveRecord::Base
 
   # returns same hash as all_enrollment_roles_for_account but adds enrollment
   # counts for the given course to each item
-  def self.custom_roles_and_counts_for_course(course, user, include_inactive = false)
+  def self.custom_roles_and_counts_for_course(course, user, include_inactive: false)
     users_scope = course.users_visible_to(user)
     built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
     base_counts = users_scope.where(enrollments: { role_id: built_in_role_ids })
@@ -264,7 +264,7 @@ class Role < ActiveRecord::Base
     role_counts = users_scope.where.not(enrollments: { role_id: built_in_role_ids })
                              .group("enrollments.role_id").select("users.id").distinct.count
 
-    @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
+    @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive:)
     @enrollment_types.each do |base_type|
       base_type[:count] = base_counts[base_type[:name]] || 0
       base_type[:custom_roles].each do |custom_role|
@@ -315,8 +315,8 @@ class Role < ActiveRecord::Base
     end
   end
 
-  def self.role_data(course, user, include_inactive = false)
-    role_data = custom_roles_and_counts_for_course(course, user, include_inactive)
+  def self.role_data(course, user, include_inactive: false)
+    role_data = custom_roles_and_counts_for_course(course, user, include_inactive:)
     compile_manageable_roles(role_data, user, course)
   end
 

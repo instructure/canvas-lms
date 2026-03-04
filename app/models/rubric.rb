@@ -371,7 +371,7 @@ class Rubric < ActiveRecord::Base
     self
   end
 
-  def update_mastery_scales(save = true)
+  def update_mastery_scales(save: true)
     return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
 
     mastery_scale = context.resolved_outcome_proficiency

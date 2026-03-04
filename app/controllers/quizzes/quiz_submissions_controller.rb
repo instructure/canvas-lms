@@ -47,10 +47,10 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
         @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(generate: false), user_id: nil).first
-        @submission ||= @quiz.generate_submission(temporary_user_code(generate: false) || @current_user, is_previewing?)
+        @submission ||= @quiz.generate_submission(temporary_user_code(generate: false) || @current_user, preview: is_previewing?)
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first if @current_user.present?
-        @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
+        @submission ||= @quiz.generate_submission(@current_user, preview: is_previewing?)
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           flash[:error] = t("errors.invalid_submissions", "This quiz submission could not be verified as belonging to you.  Please try again.")
           return redirect_to course_quiz_url(@context, @quiz, previewing_params)
@@ -147,8 +147,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   def extensions
-    @student = @context.users_visible_to(@current_user, false, include_inactive: true).find(params[:user_id])
-    @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, nil, "settings_only")
+    @student = @context.users_visible_to(@current_user, include_inactive: true).find(params[:user_id])
+    @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, state: "settings_only")
     if authorized_action(@submission, @current_user, :add_attempts)
       @submission.extra_attempts ||= 0
       @submission.extra_attempts = params[:extra_attempts].to_i if params[:extra_attempts]

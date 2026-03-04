@@ -138,7 +138,7 @@ class QuestionBanksController < ApplicationController
     @bank = AssessmentQuestionBank.find(params[:question_bank_id])
 
     if params[:unbookmark] == "1"
-      render json: @bank.bookmark_for(@current_user, false)
+      render json: @bank.bookmark_for(@current_user, do_bookmark: false)
     elsif authorized_action(@bank, @current_user, :update)
       render json: @bank.bookmark_for(@current_user)
     end

@@ -2939,12 +2939,12 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
 
         # With include_concluded: true (default), should see both sections
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: true)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: true)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).to include(section2.asset_string)
       end
@@ -2973,7 +2973,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3002,7 +3002,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3031,7 +3031,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -4493,7 +4493,7 @@ describe User do
 
     it "optionally does not include concluded courses" do
       @enrollment.update_attribute(:workflow_state, "completed")
-      expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
+      expect(@user.conversation_context_codes(include_concluded_codes: false)).not_to include(@course.asset_string)
     end
 
     it "includes groups" do
@@ -4522,7 +4522,7 @@ describe User do
       it "optionally does not include concluded courses on other shards" do
         course_with_student(account: @shard1_account, user: @user, active_all: true)
         @enrollment.update_attribute(:workflow_state, "completed")
-        expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
+        expect(@user.conversation_context_codes(include_concluded_codes: false)).not_to include(@course.asset_string)
       end
 
       it "includes groups on other shards" do

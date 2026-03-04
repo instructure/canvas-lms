@@ -1769,7 +1769,7 @@ class Attachment < ActiveRecord::Base
   def self.create_data_attachment(context, data, display_name = nil)
     context.shard.activate do
       Attachment.new.tap do |att|
-        Attachment.skip_3rd_party_submits(true)
+        Attachment.skip_3rd_party_submits(skip: true)
         att.context = context
         att.display_name = display_name if display_name
         Attachments::Storage.store_for_attachment(att, data)
@@ -1777,7 +1777,7 @@ class Attachment < ActiveRecord::Base
       end
     end
   ensure
-    Attachment.skip_3rd_party_submits(false)
+    Attachment.skip_3rd_party_submits(skip: false)
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -2139,7 +2139,7 @@ class Attachment < ActiveRecord::Base
     Attachment.where(id: ids).find_each(&:submit_to_canvadocs)
   end
 
-  def self.skip_3rd_party_submits(skip = true)
+  def self.skip_3rd_party_submits(skip: true)
     @skip_3rd_party_submits = skip
   end
 

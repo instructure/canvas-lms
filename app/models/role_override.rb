@@ -187,15 +187,15 @@ class RoleOverride < ActiveRecord::Base
     Setting.get("role_override_local_cache_ttl_seconds", "300").to_i.seconds
   end
 
-  def self.permission_for(context, permission, role_or_role_id, role_context = :role_account, no_caching = false, preloaded_overrides: nil)
+  def self.permission_for(context, permission, role_or_role_id, role_context = :role_account, caching: true, preloaded_overrides: nil)
     # we can avoid a query since we're just using it for the batched keys on redis
-    permissionless_base_key = ["role_override_calculation2", Shard.global_id_for(role_or_role_id)].join("/") unless no_caching
+    permissionless_base_key = ["role_override_calculation2", Shard.global_id_for(role_or_role_id)].join("/") if caching
     account = context.is_a?(Account) ? context : Account.new(id: context.account_id)
     default_data = permissions[permission]
 
-    if default_data[:account_allows] || no_caching
+    if default_data[:account_allows] || !caching
       # could depend on anything - can't cache (but that's okay because it's not super common)
-      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching, preloaded_overrides:)
+      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching:, preloaded_overrides:)
     else
       full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
       LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
@@ -203,7 +203,7 @@ class RoleOverride < ActiveRecord::Base
                                             batch_object: account,
                                             batched_keys: [:account_chain, :role_overrides],
                                             skip_cache_if_disabled: true) do
-          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, false, preloaded_overrides:)
+          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching: true, preloaded_overrides:)
         end
       end
     end.freeze
@@ -311,7 +311,7 @@ class RoleOverride < ActiveRecord::Base
                                    account,
                                    permissionless_base_key,
                                    default_data,
-                                   no_caching = false,
+                                   caching: true,
                                    preloaded_overrides: nil)
     role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
 
@@ -363,9 +363,7 @@ class RoleOverride < ActiveRecord::Base
     # cannot be overridden; don't bother looking for overrides
     return generated_permission if locked
 
-    overrides = if no_caching
-                  uncached_overrides_for(context, role, role_context, preloaded_overrides:, only_permission: permission.to_s)
-                else
+    overrides = if caching
                   RequestCache.cache(permissionless_base_key, account) do
                     LocalCache.fetch([permissionless_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
                       Rails.cache.fetch_with_batched_keys(permissionless_base_key,
@@ -376,6 +374,8 @@ class RoleOverride < ActiveRecord::Base
                       end
                     end
                   end
+                else
+                  uncached_overrides_for(context, role, role_context, preloaded_overrides:, only_permission: permission.to_s)
                 end
 
     # walk the overrides from most general (site admin, root account) to most specific (the role's account)

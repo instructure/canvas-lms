@@ -166,7 +166,7 @@ class DiscussionEntriesController < ApplicationController
       return
     end
     if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
-      @discussion_entries = @topic.entries_for_feed(@current_user, request.format == :rss)
+      @discussion_entries = @topic.entries_for_feed(@current_user, podcast_feed: request.format == :rss)
       respond_to do |format|
         format.atom do
           title = t :posts_feed_title, "%{title} Posts Feed", title: @topic.title

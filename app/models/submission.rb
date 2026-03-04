@@ -409,7 +409,7 @@ class Submission < ActiveRecord::Base
   end
 
   # see .needs_grading_conditions
-  def needs_grading?(was = false)
+  def needs_grading?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     !send(:"submission_type#{suffix}").nil? &&
@@ -441,7 +441,7 @@ class Submission < ActiveRecord::Base
   end
 
   def needs_grading_changed?
-    needs_grading? != needs_grading?(:was)
+    needs_grading? != needs_grading?(was: true)
   end
 
   def submitted_changed?
@@ -1158,7 +1158,7 @@ class Submission < ActiveRecord::Base
 
   # this function will check if the score needs to be updated and update/save the new score if so,
   # otherwise, it just returns the vericite_data_hash
-  def vericite_data(lookup_data = false)
+  def vericite_data(lookup_data: false)
     self.vericite_data_hash ||= {}
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
@@ -1792,7 +1792,7 @@ class Submission < ActiveRecord::Base
         model = version.model
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if vericiteable?
-          model.turnitin_data = vericite_data(true)
+          model.turnitin_data = vericite_data(lookup_data: true)
         # only use originality data if it's loaded, we want to avoid making N+1 queries
         elsif association(:originality_reports).loaded?
           model.turnitin_data = originality_data

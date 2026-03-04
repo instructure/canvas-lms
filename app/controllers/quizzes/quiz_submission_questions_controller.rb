@@ -310,7 +310,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
                              @quiz_submission,
                              params[:attempt],
                              # we don't want a snapshot generated for each flagging action
-                             false)
+                             snapshot: false)
   end
 
   def extract_includes(key = :include, hash = params)

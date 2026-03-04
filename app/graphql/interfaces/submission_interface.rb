@@ -469,11 +469,11 @@ module Interfaces::SubmissionInterface
   field :vericite_data, [Types::VericiteDataType], null: true
   def vericite_data
     load_association(:assignment).then do
-      next nil unless object.vericite_data(false).present? &&
+      next nil unless object.vericite_data(lookup_data: false).present? &&
                       object.grants_right?(current_user, :view_vericite_report) &&
                       object.assignment.vericite_enabled
 
-      object.vericite_data(false)
+      object.vericite_data(lookup_data: false)
             .except(
               :provider,
               :last_processed_attempt,
