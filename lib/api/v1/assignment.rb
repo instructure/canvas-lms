@@ -773,17 +773,19 @@ module Api::V1::Assignment
             peer_review_result = true
 
             if has_peer_reviews
-              peer_review_result = if prepared_update[:assignment].peer_review_sub_assignment.present?
-                                     update_api_peer_review_sub_assignment(
-                                       prepared_update[:assignment],
-                                       assignment_params[:peer_review]
-                                     )
-                                   else
-                                     create_api_peer_review_sub_assignment(
-                                       prepared_update[:assignment],
-                                       assignment_params[:peer_review]
-                                     )
-                                   end
+              if prepared_update[:assignment].peer_review_sub_assignment.present?
+                peer_review_result = update_api_peer_review_sub_assignment(
+                  prepared_update[:assignment],
+                  assignment_params[:peer_review]
+                )
+              # Do not create peer review sub assignment for assignments with legacy peer reviews
+              # Only create when peer_reviews is being newly enabled (old_assignment had peer_reviews=false)
+              elsif prepared_update[:old_assignment].nil? || !prepared_update[:old_assignment].peer_reviews
+                peer_review_result = create_api_peer_review_sub_assignment(
+                  prepared_update[:assignment],
+                  assignment_params[:peer_review]
+                )
+              end
 
               if peer_review_result.is_a?(Hash)
                 peer_review_overrides_affected = peer_review_result[:overrides_affected] || 0
