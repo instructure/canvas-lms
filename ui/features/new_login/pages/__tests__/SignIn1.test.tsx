@@ -141,6 +141,25 @@ describe('SignIn', () => {
       })
     })
 
+    it('calls performSignIn with a plain username (non-email)', async () => {
+      vi.mocked(windowPathname).mockReturnValue('/login/canvas')
+      const {getByTestId} = setup()
+      const usernameInput = getByTestId('username-input')
+      const passwordInput = getByTestId('password-input')
+      const loginButton = getByTestId('login-button')
+      await userEvent.type(usernameInput, 'testuser')
+      await userEvent.type(passwordInput, 'password123')
+      await userEvent.click(loginButton)
+      await waitFor(() => {
+        expect(performSignIn).toHaveBeenCalledWith(
+          'testuser',
+          'password123',
+          false,
+          '/login/canvas',
+        )
+      })
+    })
+
     // Skip: Error message doesn't render properly with current mock setup
     it.skip('displays a login error alert when invalid credentials are submitted', async () => {
       vi.mocked(performSignIn).mockRejectedValueOnce({response: {status: 400}})
