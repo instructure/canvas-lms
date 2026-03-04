@@ -22,7 +22,7 @@ class OutcomesController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::Role
 
-  before_action :require_context, except: [:build_outcomes]
+  before_action :require_context
 
   include HorizonMode
 

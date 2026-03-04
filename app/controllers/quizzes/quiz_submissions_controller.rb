@@ -25,8 +25,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   protect_from_forgery except: %i[create backup record_answer], with: :exception
   before_action :require_context
-  before_action :require_quiz, only: %i[index create extensions show update log]
-  before_action :require_quiz_submission, only: [:show, :log]
+  before_action :require_quiz, only: %i[index create extensions show update]
+  before_action :require_quiz_submission, only: :show
   batch_jobs_in_actions only: [:update, :create], batch: { priority: Delayed::LOW_PRIORITY }
 
   def index

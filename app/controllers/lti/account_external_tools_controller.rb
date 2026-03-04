@@ -30,7 +30,7 @@ module Lti
     include ::Lti::IMS::Concerns::AdvantageServices
     include Api::V1::ExternalTools
 
-    before_action :verify_target_developer_key, only: [:create, :update]
+    before_action :verify_target_developer_key, only: :create
 
     MIME_TYPE = "application/vnd.canvas.contextexternaltools+json"
 
