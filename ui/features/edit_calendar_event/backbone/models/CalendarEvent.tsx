@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {Spinner} from '@instructure/ui-spinner'
 import $ from 'jquery'
 import {pick, each, find, compact, filter, map} from 'es-toolkit/compat'
@@ -154,7 +154,7 @@ export default class CalendarEvent extends Backbone.Model {
         // @ts-expect-error TS2683 (typescriptify)
         this.loadingState = LOADING_STATE.SPINNER_UP
 
-        ReactDOM.render(
+        legacyRender(
           <div>
             <Spinner renderTitle={I18n.t('Loading')} size="medium" />
           </div>,
@@ -177,7 +177,7 @@ export default class CalendarEvent extends Backbone.Model {
     this.loadingState = LOADING_STATE.LOADED
 
     // @ts-expect-error TS2339 (typescriptify)
-    if (curState === LOADING_STATE.SPINNER_UP) ReactDOM.unmountComponentAtNode(this.view.el)
+    if (curState === LOADING_STATE.SPINNER_UP) legacyUnmountComponentAtNode(this.view.el)
   }
 
   // @ts-expect-error TS7006 (typescriptify)
