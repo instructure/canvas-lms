@@ -59,9 +59,11 @@ export const TraditionalViewCriterionRatings: FC<TraditionalViewCriterionRatings
 
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
 
-  const criterionRatings = useMemo(() => {
-    return ratingOrder === 'ascending' ? [...criterion.ratings].reverse() : criterion.ratings
-  }, [criterion.ratings, ratingOrder])
+  useEffect(() => {
+    if (shouldFocusFirstRating && firstRatingRef.current) {
+      firstRatingRef.current.focus()
+    }
+  }, [shouldFocusFirstRating])
 
   const selectedRatingId = findCriterionMatchingRatingId(
     criterion.ratings,
@@ -74,11 +76,8 @@ export const TraditionalViewCriterionRatings: FC<TraditionalViewCriterionRatings
     criterionSelfAssessment,
   )
 
-  useEffect(() => {
-    if (shouldFocusFirstRating && firstRatingRef.current) {
-      firstRatingRef.current.focus()
-    }
-  }, [shouldFocusFirstRating])
+  const lastRatingIndex = criterion.ratings.length - 1
+  const flexDirection = ratingOrder === 'ascending' ? 'row-reverse' : 'row'
 
   return (
     <View
@@ -97,13 +96,20 @@ export const TraditionalViewCriterionRatings: FC<TraditionalViewCriterionRatings
         borderColor={hasValidationError ? 'danger' : 'transparent'}
         borderRadius="medium"
       >
-        <Flex as="div" direction="row" alignItems="stretch" height="100%">
-          {criterionRatings.map((rating, index) => {
+        <Flex
+          data-testid="traditional-view-criterion-ratings"
+          data-direction={flexDirection}
+          as="div"
+          alignItems="stretch"
+          height="100%"
+          direction={flexDirection}
+        >
+          {criterion.ratings.map((rating, index) => {
             const isHovered = hoveredRatingIndex === index
             const isSelected = !!rating.id && selectedRatingId === rating.id
             const isSelfAssessmentSelected =
               !!rating.id && selectedSelfAssessmentRatingId === rating.id
-            const isLastRatingIndex = criterionRatings.length - 1 === index
+            const isLastRatingIndex = lastRatingIndex === index
 
             const onClickRating = (ratingId: string) => {
               if (selectedRatingId === ratingId) {
@@ -120,10 +126,10 @@ export const TraditionalViewCriterionRatings: FC<TraditionalViewCriterionRatings
             }
 
             const min = criterion.criterionUseRange
-              ? rangingFrom(criterionRatings, index, ratingOrder, true)
+              ? rangingFrom(criterion.ratings, index)
               : undefined
 
-            const ratingCellMinWidth = `${ratingsColumnMinWidth / criterionRatings.length}rem`
+            const ratingCellMinWidth = `${ratingsColumnMinWidth / criterion.ratings.length}rem`
 
             return (
               <TraditionalViewCriterionRating

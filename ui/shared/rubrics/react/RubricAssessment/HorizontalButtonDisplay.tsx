@@ -62,9 +62,7 @@ export const HorizontalButtonDisplay = ({
   const selectedSelfAssessmentRatingIndex = selectedSelfAssessmentRating
     ? ratings.indexOf(selectedSelfAssessmentRating)
     : -1
-  const min = criterionUseRange
-    ? rangingFrom(ratings, selectedRatingIndex, undefined, true)
-    : undefined
+  const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
 
   useEffect(() => {
     if (shouldFocusFirstRating && firstRatingRef.current) {

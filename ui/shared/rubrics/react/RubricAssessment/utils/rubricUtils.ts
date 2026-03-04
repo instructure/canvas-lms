@@ -37,51 +37,15 @@ export const escapeNewLineText = (text?: string) => {
   }
 }
 
-export const rangingFrom = (
-  ratings: RubricRating[],
-  index: number,
-  ratingOrder?: string,
-  includeZeroFrom?: boolean,
-) => {
-  const previousRatingPoints = ratings[index - 1]?.points
-  const previousPointModifier = getAdjustedDecimalRatingModifier(previousRatingPoints)
-  const nextRatingPoints = ratings[index + 1]?.points
-  const nextPointModifier = getAdjustedDecimalRatingModifier(nextRatingPoints)
+export const rangingFrom = (ratings: RubricRating[], index: number): number | undefined => {
   const currentRatingPoints = ratings[index]?.points
+  const nextRatingPoints = ratings[index + 1]?.points
 
-  if (ratingOrder === 'ascending') {
-    if (currentRatingPoints === previousRatingPoints) {
-      return undefined
-    }
-
-    if (includeZeroFrom && index === 0) {
-      return 0
-    }
-
-    return index > 0
-      ? roundToTwoDecimalPlaces(previousRatingPoints + previousPointModifier)
-      : undefined
-  }
-
-  if (currentRatingPoints === nextRatingPoints) {
+  if (currentRatingPoints === nextRatingPoints || currentRatingPoints === 0) {
     return undefined
   }
 
-  if (includeZeroFrom && index === ratings.length - 1) {
-    return 0
-  }
-
-  return index < ratings.length - 1
-    ? roundToTwoDecimalPlaces(nextRatingPoints + nextPointModifier)
-    : undefined
-}
-
-const getAdjustedDecimalRatingModifier = (points: number) => {
-  if (points == null) {
-    return 0
-  }
-  const twoDecimalRegex = /^\d+\.\d{2}$/
-  return twoDecimalRegex.test(points.toString()) ? 0.01 : 0.1
+  return roundToTwoDecimalPlaces(nextRatingPoints ?? 0)
 }
 
 const roundToTwoDecimalPlaces = (num: number) => {
