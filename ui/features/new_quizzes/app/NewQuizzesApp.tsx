@@ -61,6 +61,7 @@ export function NewQuizzesApp() {
             basename,
             fetchToken: () => fetchNewQuizzesToken(accountId),
             moduleNavigation,
+            launchType: 'regular',
           })
         } else {
           captureException(new Error('Remote module does not have a render function'))
