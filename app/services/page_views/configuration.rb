@@ -21,11 +21,23 @@ module PageViews
   class Configuration
     attr_reader :uri
 
-    def initialize
+    def initialize(region: nil)
       config = ConfigFile.load("pv5")
-      raise Common::ConfigurationError, "Missing or invalid 'uri' in pv5 config file" unless config["uri"].is_a?(String) && !config["uri"].strip.empty?
+      regional_config = get_regional_config(config, region) || {}
+      @uri = URI.parse(regional_config["uri"] || config["uri"])
+    rescue URI::InvalidURIError => e
+      raise Common::ConfigurationError, "Invalid URI in pv5 config: #{e.message}"
+    end
 
-      @uri = URI.parse(config["uri"])
+    private
+
+    def get_regional_config(config, region)
+      return unless config["regions"].is_a?(Hash)
+
+      regional_config = config["regions"][region]
+      return unless regional_config.is_a?(Hash)
+
+      regional_config
     end
   end
 end
