@@ -149,7 +149,7 @@ module Canvas::OAuth
     describe "#create_access_token_if_needed" do
       it "deletes existing tokens for the same key when requested" do
         old_token = user.access_tokens.create! developer_key: key
-        token.create_access_token_if_needed(true)
+        token.create_access_token_if_needed(replace_tokens: true)
         expect(AccessToken.not_deleted.where(id: old_token.id).exists?).to be(false)
       end
 

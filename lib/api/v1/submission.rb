@@ -37,7 +37,7 @@ module Api::V1::Submission
     context = nil,
     includes = [],
     params = {},
-    avatars = false,
+    avatars: false,
     preloaded_enrollments_by_user_id: nil
   )
     context ||= assignment.context
@@ -53,7 +53,7 @@ module Api::V1::Submission
         result = Checkpoints::SubAssignmentSubmissionSerializer.serialize(assignment:, user_id: submission.user_id)
 
         sub_assignment_submissions = result[:submissions]&.filter_map do |sub_assignment_submission|
-          sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, current_user, session, context, includes, params, avatars)
+          sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, current_user, session, context, includes, params, avatars:)
         end
 
         hash["has_sub_assignment_submissions"] = result[:has_active_submissions]
@@ -69,7 +69,7 @@ module Api::V1::Submission
         result = PeerReview::PeerReviewSubmissionSerializer.serialize(assignment:, user_id: submission.user_id)
 
         peer_review_submission_data = if result[:submission]
-                                        peer_review_submission_json(result[:submission], result[:submission].assignment, current_user, session, context, includes, params, avatars)
+                                        peer_review_submission_json(result[:submission], result[:submission].assignment, current_user, session, context, includes, params, avatars:)
                                       end
 
         hash["has_peer_review_submission"] = result[:has_peer_review_submission]
@@ -450,9 +450,9 @@ module Api::V1::Submission
     context = nil,
     includes = [],
     params = {},
-    avatars = false
+    avatars: false
   )
-    json = submission_json(submission, assignment, current_user, session, context, includes, params, avatars)
+    json = submission_json(submission, assignment, current_user, session, context, includes, params, avatars:)
 
     # we want to make a clear distinction between a submission and a sub assignment submission, we will do this by
     # keeping the sub assignment submission json as minimal as possible, only keeping exactly what clients need
@@ -486,11 +486,11 @@ module Api::V1::Submission
     context = nil,
     includes = [],
     params = {},
-    avatars = false
+    avatars: false
   )
     # Remove peer_review_submissions from includes to prevent infinite recursion
     filtered_includes = includes.reject { |inc| inc == "peer_review_submissions" }
-    submission_json(submission, assignment, current_user, session, context, filtered_includes, params, avatars)
+    submission_json(submission, assignment, current_user, session, context, filtered_includes, params, avatars:)
   end
 
   # Create an attachment with a ZIP archive of an assignment's submissions.

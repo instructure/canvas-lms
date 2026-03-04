@@ -519,7 +519,7 @@ describe UserContent, type: :request do
         end
 
         it "adds mathml in a span" do
-          escaped = UserContent.escape(@html, nil, false)
+          escaped = UserContent.escape(@html, nil, use_updated_math_rendering: false)
           node = Nokogiri::HTML5.fragment(escaped).css("img").first.next_sibling
           expect(node.node_name).to eql("span")
           expect(node.inner_html).to eql(Ritex::Parser.new.parse(@latex))

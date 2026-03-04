@@ -128,7 +128,7 @@ module Api::V1::Quiz
     quiz_params.permit(*API_ALLOWED_QUIZ_INPUT_FIELDS[:only])
   end
 
-  def update_api_quiz(quiz, params, save = true)
+  def update_api_quiz(quiz, params, save: true)
     quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
     return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(ActionController::Parameters)
 

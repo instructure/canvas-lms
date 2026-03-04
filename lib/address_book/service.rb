@@ -31,13 +31,13 @@ module AddressBook
 
       if admin_context?(options[:context])
         # users any admin over the specified context knows
-        common_contexts = Services::AddressBook.roles_in_context(options[:context], user_ids, @ignore_result)
+        common_contexts = Services::AddressBook.roles_in_context(options[:context], user_ids, ignore_result: @ignore_result)
       elsif options[:context]
         # any of the users I know through the specified context
-        _, common_contexts = Services::AddressBook.known_in_context(@sender, options[:context], user_ids, @ignore_result)
+        _, common_contexts = Services::AddressBook.known_in_context(@sender, options[:context], user_ids, ignore_result: @ignore_result)
       else
         # any of the users I know at all
-        common_contexts = Services::AddressBook.common_contexts(@sender, user_ids, @ignore_result)
+        common_contexts = Services::AddressBook.common_contexts(@sender, user_ids, ignore_result: @ignore_result)
       end
 
       # whitelist just those users I know
@@ -67,14 +67,14 @@ module AddressBook
 
     def known_in_context(context, _options = {})
       # just query, hydrate, and cache
-      user_ids, common_contexts = Services::AddressBook.known_in_context(@sender, context, nil, @ignore_result)
+      user_ids, common_contexts = Services::AddressBook.known_in_context(@sender, context, nil, ignore_result: @ignore_result)
       users = hydrate(user_ids)
       cache_contexts(users, common_contexts) unless @ignore_result
       users
     end
 
     def count_in_contexts(contexts)
-      Services::AddressBook.count_in_contexts(@sender, contexts, @ignore_result)
+      Services::AddressBook.count_in_contexts(@sender, contexts, ignore_result: @ignore_result)
     end
 
     class Bookmarker
@@ -126,7 +126,7 @@ module AddressBook
         end
 
         # query, hydrate, and cache
-        user_ids, common_contexts, cursors = Services::AddressBook.search_users(sender, options, service_options, @ignore_result)
+        user_ids, common_contexts, cursors = Services::AddressBook.search_users(sender, options, service_options, ignore_result: @ignore_result)
         bookmarker.update(user_ids, cursors)
         users = hydrate(user_ids)
         cache_contexts(users, common_contexts) unless @ignore_result
@@ -146,7 +146,7 @@ module AddressBook
 
       # query only those directly known, but all are "whitelisted" for caching
       global_user_ids = users.map(&:global_id)
-      common_contexts = Services::AddressBook.common_contexts(@sender, global_user_ids, @ignore_result)
+      common_contexts = Services::AddressBook.common_contexts(@sender, global_user_ids, ignore_result: @ignore_result)
       cache_contexts(users, common_contexts) unless @ignore_result
     end
 

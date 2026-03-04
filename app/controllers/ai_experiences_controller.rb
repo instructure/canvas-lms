@@ -289,7 +289,7 @@ class AiExperiencesController < ApplicationController
     ActiveRecord::Associations.preload(students, enrollments: :sis_pseudonym)
 
     # Preload user associations for user_json
-    user_json_preloads(students, false, accounts: true, pseudonyms: true, profile: true)
+    user_json_preloads(students, accounts: true, pseudonyms: true, profile: true)
 
     # Build enrollment lookup hash: user_id => enrollment
     enrollments_by_user = students.flat_map(&:enrollments)

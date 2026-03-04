@@ -36,7 +36,7 @@ describe "ZipPackage" do
 
   before do
     @module = @course.context_modules.create!(name: "first_module")
-    @exporter = CC::Exporter::WebZip::Exporter.new(File.open(@cartridge_path), false, :web_zip)
+    @exporter = CC::Exporter::WebZip::Exporter.new(File.open(@cartridge_path), export_type: :web_zip)
   end
 
   context "parse_module_data" do
@@ -611,7 +611,7 @@ describe "ZipPackage" do
       export.user = @student
       export.save
       export.export_course
-      exporter = CC::Exporter::WebZip::Exporter.new(export.attachment.open, false, :web_zip, global_identifiers: true)
+      exporter = CC::Exporter::WebZip::Exporter.new(export.attachment.open, export_type: :web_zip, global_identifiers: true)
       CC::Exporter::WebZip::ZipPackage.new(exporter, @course, @student, @cache_key)
     end
 

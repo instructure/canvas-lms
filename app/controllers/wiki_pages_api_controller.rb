@@ -358,7 +358,11 @@ class WikiPagesApiController < ApplicationController
       if @context.wiki.grants_right?(@current_user, :update)
         mc_status = setup_master_course_restrictions(wiki_pages, @context)
       end
-      render json: wiki_pages_json(wiki_pages, @current_user, session, includes.include?("body"), master_course_status: mc_status)
+      render json: wiki_pages_json(wiki_pages,
+                                   @current_user,
+                                   session,
+                                   include_body: includes.include?("body"),
+                                   master_course_status: mc_status)
     end
   end
 
@@ -593,7 +597,11 @@ class WikiPagesApiController < ApplicationController
                           end
         output_json = nil
         begin
-          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+          output_json = wiki_page_revision_json(revision,
+                                                @current_user,
+                                                session,
+                                                include_content:,
+                                                latest_version: @page.current_version)
         rescue Psych::SyntaxError => e
           # TODO: This should be temporary.  For a long time
           # course exports/imports would corrupt the yaml in the first version
@@ -608,7 +616,11 @@ class WikiPagesApiController < ApplicationController
             revision.yaml = clean_version_yaml
             revision.save
           end
-          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+          output_json = wiki_page_revision_json(revision,
+                                                @current_user,
+                                                session,
+                                                include_content:,
+                                                latest_version: @page.current_version)
         end
         render json: output_json
       end
@@ -639,7 +651,11 @@ class WikiPagesApiController < ApplicationController
       @page.user_id = @current_user.id if @current_user
       @page.saving_user = @current_user
       if @page.save
-        render json: wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
+        render json: wiki_page_revision_json(@page.versions.current,
+                                             @current_user,
+                                             session,
+                                             include_content: true,
+                                             latest_version: @page.current_version)
       else
         render json: @page.errors, status: :bad_request
       end

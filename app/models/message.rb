@@ -793,7 +793,7 @@ self.user,
           notification_message,
           path_type,
           target,
-          notification&.priority?
+          priority: notification&.priority?
         )
       end
       complete_dispatch

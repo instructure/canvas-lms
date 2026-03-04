@@ -358,7 +358,7 @@ class AccountsController < ApplicationController
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
-        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
       end
     end
   end
@@ -392,7 +392,7 @@ class AccountsController < ApplicationController
     ActiveRecord::Associations.preload(@accounts, :root_account)
 
     includes = params[:include] || params[:includes]
-    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
   end
 
   # @API Get accounts that admins can manage
@@ -411,7 +411,7 @@ class AccountsController < ApplicationController
       end
     end
     @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
-    render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
+    render json: @all_accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
   # @API Get accounts that users can create courses in
@@ -464,7 +464,7 @@ class AccountsController < ApplicationController
     account_active_records = Account.where(id: accounts)
     accounts_json = accounts.map do |a|
       a = account_active_records.find { |ar| ar.id == a }
-      hash = account_json(a, @current_user, session, [], false)
+      hash = account_json(a, @current_user, session, [])
       hash[:adminable] = adminable_accounts.include?(a) if Account.site_admin.feature_enabled?(:enhanced_course_creation_account_fetching)
       hash
     end
@@ -490,7 +490,7 @@ class AccountsController < ApplicationController
       @accounts = []
     end
     ActiveRecord::Associations.preload(@accounts, :root_account)
-    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], read_only: true) }
   end
 
   # @API Get a single account
@@ -512,7 +512,7 @@ class AccountsController < ApplicationController
                                   @current_user,
                                   session,
                                   params[:includes] || [],
-                                  !@account.grants_right?(@current_user, session, :manage))
+                                  read_only: !@account.grants_right?(@current_user, session, :manage))
       end
     end
   end
@@ -707,7 +707,7 @@ class AccountsController < ApplicationController
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account
     read_only = !account.grants_right?(@current_user, session, :read)
-    render json: account_json(account, @current_user, session, [], read_only)
+    render json: account_json(account, @current_user, session, [], read_only:)
   end
 
   include Api::V1::Course

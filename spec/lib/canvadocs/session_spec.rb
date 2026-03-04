@@ -141,12 +141,12 @@ describe Canvadocs::Session do
     end
 
     it "returns 'read' permissions when read_only is true" do
-      permissions = canvadoc_permissions_for_user(@student, true, true)
+      permissions = canvadoc_permissions_for_user(@student, true, read_only: true)
       expect(permissions[:permissions]).to eq "read"
     end
 
     it "does not return 'read' permissions when read_only is false" do
-      permissions = canvadoc_permissions_for_user(@student, true, false)
+      permissions = canvadoc_permissions_for_user(@student, true, read_only: false)
       expect(permissions[:permissions]).not_to eq "read"
     end
 

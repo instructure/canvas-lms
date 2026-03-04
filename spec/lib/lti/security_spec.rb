@@ -29,7 +29,7 @@ describe Lti::Security do
 
     context "disable_lti_post_only" do
       it "generates a correct signature" do
-        signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret, true)
+        signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret, disable_lti_post_only: true)
         nonce = signed_params["oauth_nonce"]
         timestamp = signed_params["oauth_timestamp"]
 
@@ -46,7 +46,7 @@ describe Lti::Security do
       end
 
       it "doesn't copy query params" do
-        signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret, true)
+        signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret, disable_lti_post_only: true)
         expect(signed_params).not_to have_key("test")
       end
 
@@ -54,7 +54,7 @@ describe Lti::Security do
         allow(Lti::Logging).to receive(:lti_1_launch_generated)
 
         url = "http://test.example:3000/launch"
-        signed_params = Lti::Security.signed_post_params(params, url, consumer_key, consumer_secret, true)
+        signed_params = Lti::Security.signed_post_params(params, url, consumer_key, consumer_secret, disable_lti_post_only: true)
 
         expect(Lti::Logging).to have_received(:lti_1_launch_generated).with(%W[
           POST&http%3A%2F%2Ftest.example%3A3000%2Flaunch&custom_a%3D1%26custom_b%3D2%26
@@ -75,7 +75,7 @@ describe Lti::Security do
           "http://example.com/",
           consumer_key,
           consumer_secret,
-          true
+          disable_lti_post_only: true
         )
       end
     end

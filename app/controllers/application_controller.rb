@@ -2826,7 +2826,7 @@ class ApplicationController < ActionController::Base
     end
     rewriter.set_handler("files", &file_handler)
     rewriter.set_handler("media_attachments_iframe", &file_handler)
-    UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_updated_math_rendering: use_new_math_equation_handling?)
   end
   helper_method :user_content
 
@@ -3250,7 +3250,7 @@ class ApplicationController < ActionController::Base
         mc_status = setup_master_course_restrictions(@page, @context, user_can_edit: true)
       end
 
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, deep_check_if_needed: true, master_course_status: mc_status)
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, include_body: true, deep_check_if_needed: true, master_course_status: mc_status)
       version_number = Rails.cache.fetch(["page_version", @page].cache_key) { @page.versions.maximum(:number) }
       hash[:WIKI_PAGE_REVISION] = version_number && StringifyIds.stringify_id(version_number)
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)

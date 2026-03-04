@@ -930,7 +930,7 @@ describe CommunicationChannel do
         anything,
         "sms",
         cc.e164_path,
-        true
+        priority: true
       )
       expect(cc).not_to receive(:send_otp_via_sms_gateway!)
       cc.send_otp!("123456", account)

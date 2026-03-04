@@ -79,8 +79,8 @@ class MessageableUser
       # they're definitely messageable
       other_users = users.reject { |u| u.id == @user.id }
       if other_users.present?
-        load_common_courses_with_users(other_users, include_course_id, strict_checks)
-        load_common_groups_with_users(other_users, include_group_id, strict_checks)
+        load_common_courses_with_users(other_users, include_course_id, strict_checks:)
+        load_common_groups_with_users(other_users, include_group_id, strict_checks:)
       end
 
       # keep only the ones that look messageable (have a shared context, are
@@ -280,7 +280,7 @@ class MessageableUser
     #
     # the optional strict_checks parameter (default: true) is passed down to
     # the queried scopes (see enrollment_scope and visible_account_user_scope).
-    def load_common_courses_with_users(users, include_course_id = nil, strict_checks = true)
+    def load_common_courses_with_users(users, include_course_id = nil, strict_checks: true)
       scope_options = { strict_checks:, include_deleted: !strict_checks }
       users.each { |u| u.global_common_courses = {} }
 
@@ -333,7 +333,7 @@ class MessageableUser
     #
     # the optional strict_checks parameter (default: true) is passed down to
     # the queried scopes (see group_user_scope).
-    def load_common_groups_with_users(users, include_group_id = nil, strict_checks = true)
+    def load_common_groups_with_users(users, include_group_id = nil, strict_checks: true)
       scope_options = { strict_checks:, include_deleted: !strict_checks }
       users.each { |u| u.global_common_groups = {} }
 

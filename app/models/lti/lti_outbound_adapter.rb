@@ -97,7 +97,7 @@ module Lti
           @tool_launch.url,
           @tool.consumer_key,
           @tool.shared_secret,
-          disable_post_only?
+          disable_lti_post_only: disable_post_only?
         )
       rescue URI::InvalidURIError
         raise ::Lti::Errors::InvalidLaunchUrlError, "Invalid launch url: #{@tool_launch.url}"
