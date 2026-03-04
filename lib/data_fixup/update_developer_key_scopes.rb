@@ -23,8 +23,22 @@ module DataFixup
       # examples:
       # "url:POST|/api/v1/courses/:course_id/pages/:url/duplicate" => "url:POST|/api/v1/courses/:course_id/pages/:url_or_id/duplicate",
       # "url:GET|/api/v1/image_search" => "DELETED",
-      "url:GET|api/v1/courses/:course_id/pages/:page_id/date_details" => "url:GET|api/v1/courses/:course_id/pages/:url_or_id/date_details",
-      "url:PUT|api/v1/courses/:course_id/pages/:page_id/date_details" => "url:PUT|api/v1/courses/:course_id/pages/:url_or_id/date_details",
+      "url:GET|/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews" => "DELETED",
+      "url:GET|/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self" => "DELETED",
+      "url:POST|/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self" => "DELETED",
+      "url:GET|/api/v1/accounts/:account_id/outcome_groups/:id/available_outcomes" => "DELETED",
+      "url:POST|/api/v1/accounts/:account_id/outcome_groups/:id/batch" => "DELETED",
+      "url:GET|/api/v1/courses/:course_id/app_center/apps/:app_id/reviews" => "DELETED",
+      "url:GET|/api/v1/courses/:course_id/app_center/apps/:app_id/reviews/self" => "DELETED",
+      "url:POST|/api/v1/courses/:course_id/app_center/apps/:app_id/reviews/self" => "DELETED",
+      "url:GET|/api/v1/courses/:course_id/outcome_groups/:id/available_outcomes" => "DELETED",
+      "url:POST|/api/v1/courses/:course_id/outcome_groups/:id/batch" => "DELETED",
+      "url:GET|/api/v1/global/outcome_groups/:id/available_outcomes" => "DELETED",
+      "url:POST|/api/v1/global/outcome_groups/:id/batch" => "DELETED",
+      "url:DELETE|/api/v1/groups/:group_id/followers/self" => "DELETED",
+      "url:PUT|/api/v1/groups/:group_id/followers/self" => "DELETED",
+      "url:DELETE|/api/v1/users/:user_id/followers/self" => "DELETED",
+      "url:PUT|/api/v1/users/:user_id/followers/self" => "DELETED",
     }.freeze
 
     def self.create_scope_query(old_route)
