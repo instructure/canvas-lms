@@ -270,11 +270,11 @@ module FilesPage
   end
 
   def date_input_available_from
-    ff("span[aria-label='Edit Permissions'] input[aria-haspopup='listbox']")[2]
+    f("[data-testid='permissions-unlock-at'] input")
   end
 
   def date_input_until
-    ff("span[aria-label='Edit Permissions'] input[aria-haspopup='listbox']")[4]
+    f("[data-testid='permissions-lock-at'] input")
   end
 
   def permission_save_button
@@ -309,6 +309,7 @@ module FilesPage
       date_input_until.send_keys(:enter)
     end
     permission_save_button.click
+    wait_for_ajaximations
   end
 
   def select_item_to_edit_from_kebab_menu(item)
