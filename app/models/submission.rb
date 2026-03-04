@@ -2711,10 +2711,13 @@ class Submission < ActiveRecord::Base
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
 
-    if res.new_record? && assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
+    # To maintain backward compatibility with legacy peer reviews, we link the assessment
+    # request to the peer_review_sub_assignment regardless of the feature flag state
+    peer_review_sub = assignment.peer_review_sub_assignment
+    if res.new_record? &&
        assignment.peer_reviews? &&
-       assignment.peer_review_sub_assignment.present?
-      res.peer_review_sub_assignment_id = assignment.peer_review_sub_assignment.id
+       peer_review_sub.present?
+      res.peer_review_sub_assignment_id = peer_review_sub.id
     end
 
     res.send_reminder! # this method also saves the assessment_request

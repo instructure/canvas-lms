@@ -474,6 +474,20 @@ describe AssessmentRequest do
 
       @request.complete!
     end
+
+    context "with feature flag disabled but peer_review_sub_assignment present" do
+      it "calls PeerReviewSubmitterService even when feature flag is disabled" do
+        @assignment.context.disable_feature!(:peer_review_allocation_and_grading)
+        service_double = instance_double(PeerReview::PeerReviewSubmitterService)
+
+        expect(PeerReview::PeerReviewSubmitterService).to receive(:new)
+          .with(parent_assignment: @assignment, assessor: @review_student)
+          .and_return(service_double)
+        expect(service_double).to receive(:call)
+
+        @request.complete!
+      end
+    end
   end
 
   describe "#assessment_request_was_completed?" do
@@ -540,17 +554,34 @@ describe AssessmentRequest do
 
     context "when peer_review_allocation_and_grading feature flag is disabled" do
       before :once do
-        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
-          title: "Test Peer Review",
-          context: @course,
-          parent_assignment: @assignment
-        )
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
       end
 
-      it "does not link assessment request when feature flag is disabled" do
+      it "links assessment request to peer_review_sub_assignment even when feature flag is disabled" do
         assessment_request = @assignment.assign_peer_review(reviewer, reviewee)
 
-        expect(assessment_request.peer_review_sub_assignment_id).to be_nil
+        expect(assessment_request.peer_review_sub_assignment_id).to eq(@peer_review_sub_assignment.id)
+        expect(assessment_request.peer_review_sub_assignment).to eq(@peer_review_sub_assignment)
+      end
+    end
+
+    context "legacy mode backward compatibility" do
+      it "maintains peer_review_sub_assignment linkage when feature flag is toggled off" do
+        @assignment.update!(peer_reviews: true)
+
+        peer_review_sub = peer_review_model(parent_assignment: @assignment)
+
+        first_request = @assignment.assign_peer_review(reviewer, reviewee)
+        expect(first_request.peer_review_sub_assignment_id).to eq(peer_review_sub.id)
+
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        new_reviewer = student_in_course(active_all: true, course: @course).user
+        second_request = @assignment.assign_peer_review(new_reviewer, reviewee)
+
+        expect(second_request.peer_review_sub_assignment_id).to eq(peer_review_sub.id)
+        expect(second_request.peer_review_sub_assignment).to eq(peer_review_sub)
       end
     end
 
