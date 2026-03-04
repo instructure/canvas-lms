@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
@@ -154,7 +154,7 @@ ready(() => {
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
-    ReactDOM.render(
+    legacyRender(
       <div
         style={{
           position: 'fixed',
@@ -182,7 +182,7 @@ ready(() => {
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   // @ts-expect-error
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
-    ReactDOM.render(
+    legacyRender(
       <GenericErrorPage
         imageUrl={errorShipUrl}
         errorMessage={
@@ -211,7 +211,7 @@ ready(() => {
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
 
-      ReactDOM.render(
+      legacyRender(
         <GenericErrorPage
           imageUrl={errorShipUrl}
           errorMessage={error.message}
