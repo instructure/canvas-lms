@@ -14,7 +14,11 @@
 .mutagen
 .swc
 .idea/
-/.claude/
+.claude/settings.local.json
+.claude/worktrees/
+.claude/agents/*.local.md
+.claude/commands/*.local.md
+.claude/skills/*.local/
 CLAUDE.local.md
 /.yardoc/
 /.ruby-version
