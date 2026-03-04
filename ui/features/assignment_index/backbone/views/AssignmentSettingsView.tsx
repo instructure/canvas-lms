@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
