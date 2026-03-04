@@ -140,18 +140,14 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.from_attributes(attrs, new_record = false)
+  def self.from_attributes(attrs)
     @blank_template ||= columns.each_with_object({}) do |c, h|
       h[c.name] = nil
     end
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
     shard.activate do
-      if new_record
-        new { |pv| pv.assign_attributes(attrs) }
-      else
-        instantiate(@blank_template.merge(attrs))
-      end
+      instantiate(@blank_template.merge(attrs))
     end
   end
 

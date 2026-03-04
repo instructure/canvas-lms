@@ -1325,9 +1325,8 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       includes = Array(params[:include])
-      users = api_find_all(@context.users_visible_to(@current_user, {
-                                                       include_inactive: includes.include?("inactive_enrollments")
-                                                     }),
+      users = api_find_all(@context.users_visible_to(@current_user,
+                                                     include_inactive: includes.include?("inactive_enrollments")),
                            [params[:id]])
 
       user_json_preloads(users, preload_email: includes.include?("email"))
@@ -1607,7 +1606,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_as_admin)
       load_all_contexts(context: @context)
 
-      @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
+      @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, include_inactive: true)
 
       @invited_count = @context.invited_count_visible_to(@current_user)
 
@@ -2525,7 +2524,7 @@ class CoursesController < ApplicationController
             @contexts += @user_groups
           end
           web_conferences = @context.web_conferences.active.to_a
-          @current_conferences = web_conferences.select { |c| c.active?(false, false) && c.users.include?(@current_user) }
+          @current_conferences = web_conferences.select { |c| c.active?(allow_check: false) && c.users.include?(@current_user) }
           @scheduled_conferences = web_conferences.select { |c| c.scheduled? && c.users.include?(@current_user) }
           @stream_items = @current_user.try(:cached_recent_stream_items, { contexts: @contexts }) || []
         end

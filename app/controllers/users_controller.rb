@@ -808,9 +808,9 @@ class UsersController < ApplicationController
     @courses = []
     Shard.with_each_shard(@context.in_region_associated_shards) do
       scope = if @query.present?
-                @context.manageable_courses_by_query(@query, include_concluded)
+                @context.manageable_courses_by_query(@query, include_concluded:)
               else
-                @context.manageable_courses(include_concluded).limit(limit)
+                @context.manageable_courses(include_concluded:).limit(limit)
               end
       @courses += scope.select("courses.*,#{Course.best_unicode_collation_key("name")} AS sort_key").order(:sort_key).preload(:enrollment_term).to_a
     end
@@ -1180,7 +1180,7 @@ class UsersController < ApplicationController
 
     @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ["Assignment", "AssessmentRequest", "Quizzes::Quiz", "SubAssignment", "PeerReviewSubAssignment"]),
                                params[:purpose],
-                               params[:permanent] == "1")
+                               permanent: params[:permanent] == "1")
     render json: { ignored: true }
   end
 

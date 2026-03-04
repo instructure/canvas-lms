@@ -37,7 +37,7 @@ module UserLearningObjectScopes
     param_values
   end
 
-  def ignore_item!(asset, purpose, permanent = false)
+  def ignore_item!(asset, purpose, permanent: false)
     asset.ignores.upsert(
       { user_id: id, purpose:, permanent: },
       unique_by: %i[asset_id asset_type user_id purpose],

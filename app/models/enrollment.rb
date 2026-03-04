@@ -183,7 +183,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   # see .active_student_conditions
-  def active_student?(was = false)
+  def active_student?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     %w[StudentEnrollment StudentViewEnrollment].include?(send(:"type#{suffix}")) &&
@@ -191,7 +191,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def active_student_changed?
-    active_student? != active_student?(:was)
+    active_student? != active_student?(was: true)
   end
 
   def clear_needs_grading_count_cache
@@ -518,7 +518,7 @@ class Enrollment < ActiveRecord::Base
       enrollment ||= observer.observer_enrollments.build
       enrollment.associated_user_id = user_id
       enrollment.shard = shard if enrollment.new_record?
-      enrollment.update_from(self, !!@skip_broadcasts)
+      enrollment.update_from(self, skip_broadcasts: !!@skip_broadcasts)
     end
   end
 
@@ -556,7 +556,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def update_from(other, skip_broadcasts = false)
+  def update_from(other, skip_broadcasts: false)
     self.course_id = other.course_id
     self.workflow_state = if type == "ObserverEnrollment" && other.workflow_state == "invited"
                             "active"
@@ -738,7 +738,7 @@ class Enrollment < ActiveRecord::Base
     res
   end
 
-  def accept(force = false)
+  def accept(force: false)
     GuardRail.activate(:primary) do
       return false unless force || invited?
 
@@ -1547,7 +1547,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def touch_graders_if_needed
-    if !active_student? && active_student?(:was) && course.submissions.where(user_id:).exists?
+    if !active_student? && active_student?(was: true) && course.submissions.where(user_id:).exists?
       self.class.connection.after_transaction_commit do
         course.admins.clear_cache_keys(:todo_list)
       end

@@ -170,7 +170,7 @@ class TokensController < ApplicationController
         return render json: { errors: { message: "cannot regenerate an expired token without a new expiration date" } }, status: :bad_request
       end
 
-      @token.generate_token(true)
+      @token.generate_token(overwrite: true)
       # if it's regenerated while masquerading, set it back to pending
       @token.workflow_state = "pending" unless @context == logged_in_user
     end

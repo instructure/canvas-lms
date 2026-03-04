@@ -110,7 +110,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
         token = access_token_for_user(@user)
         headers["HTTP_AUTHORIZATION"] = "Bearer #{token}"
         account = opts[:domain_root_account] || Account.default
-        p = @user.all_active_pseudonyms(:reload) && SisPseudonym.for(@user, account, type: :implicit, require_sis: false)
+        p = @user.all_active_pseudonyms(reload: true) && SisPseudonym.for(@user, account, type: :implicit, require_sis: false)
         p ||= account.pseudonyms.create!(unique_id: "#{@user.id}@example.com", user: @user)
         allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
       end

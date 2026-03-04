@@ -229,9 +229,9 @@ class SubmissionSearch
 
   def allowed_users
     users = if @options[:apply_gradebook_enrollment_filters]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
             elsif @options[:include_concluded] || @options[:include_deactivated]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
             else
               @course.users_visible_to(@searcher)
             end

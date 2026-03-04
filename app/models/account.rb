@@ -155,7 +155,7 @@ class Account < ActiveRecord::Base
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
-  def inherited_assessment_question_banks(include_self = false, *additional_contexts)
+  def inherited_assessment_question_banks(*additional_contexts, include_self: false)
     sql, conds = [], []
     contexts = additional_contexts + account_chain
     contexts.delete(self) unless include_self
@@ -1324,9 +1324,7 @@ class Account < ActiveRecord::Base
     Account.limit(limit).offset(offset).sub_accounts_recursive(id)
   end
 
-  def self.sub_accounts_recursive(parent_account_id, pluck = false)
-    raise ArgumentError unless [false, :pluck].include?(pluck)
-
+  def self.sub_accounts_recursive(parent_account_id, pluck: false)
     original_shard = Shard.current
     result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
@@ -1384,7 +1382,7 @@ class Account < ActiveRecord::Base
 
   # a common helper
   def self.sub_account_ids_recursive(parent_account_id)
-    active.select(:id).sub_accounts_recursive(parent_account_id, :pluck)
+    active.select(:id).sub_accounts_recursive(parent_account_id, pluck: true)
   end
 
   # compat for reports
@@ -1469,12 +1467,12 @@ class Account < ActiveRecord::Base
     account_users.active.where(user_id: user).first if user
   end
 
-  def available_custom_account_roles(include_inactive = false)
-    available_custom_roles(include_inactive).for_accounts.to_a
+  def available_custom_account_roles(include_inactive: false)
+    available_custom_roles(include_inactive:).for_accounts.to_a
   end
 
-  def available_account_roles(include_inactive = false, user = nil)
-    account_roles = available_custom_account_roles(include_inactive)
+  def available_account_roles(include_inactive: false, user: nil)
+    account_roles = available_custom_account_roles(include_inactive:)
     account_roles << Role.get_built_in_role("AccountAdmin", root_account_id: resolved_root_account_id)
     if user
       account_roles.select! do |role|
@@ -1489,8 +1487,8 @@ class Account < ActiveRecord::Base
   # returns active roles first, then ordered by their place in the account chain.
   # this provides determinism when multiple roles with the same name exist
   # in the account chain - just pick the first matching one you find
-  def available_custom_course_roles(include_inactive = false)
-    roles = available_custom_roles(include_inactive).for_courses.to_a
+  def available_custom_course_roles(include_inactive: false)
+    roles = available_custom_roles(include_inactive:).for_courses.to_a
 
     shard.activate do
       account_positions = account_chain_ids(include_federated_parent_id: true).each_with_index.to_h
@@ -1501,13 +1499,13 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def available_course_roles(include_inactive = false)
-    course_roles = available_custom_course_roles(include_inactive)
+  def available_course_roles(include_inactive: false)
+    course_roles = available_custom_course_roles(include_inactive:)
     course_roles += Role.built_in_course_roles(root_account_id: resolved_root_account_id)
     course_roles
   end
 
-  def available_custom_roles(include_inactive = false)
+  def available_custom_roles(include_inactive: false)
     scope = if root_account.primary_settings_root_account?
               Role.where(account_id: account_chain_ids)
             else
@@ -1516,8 +1514,8 @@ class Account < ActiveRecord::Base
     include_inactive ? scope.not_deleted : scope.active
   end
 
-  def available_roles(include_inactive = false)
-    available_account_roles(include_inactive) + available_course_roles(include_inactive)
+  def available_roles(include_inactive: false)
+    available_account_roles(include_inactive:) + available_course_roles(include_inactive:)
   end
 
   def get_account_role_by_name(role_name)
@@ -1989,7 +1987,7 @@ class Account < ActiveRecord::Base
       @special_account_list ||= []
     end
 
-    def clear_special_account_cache!(force = false)
+    def clear_special_account_cache!(force: false)
       special_account_timed_cache.clear(force:)
     end
 
@@ -1997,8 +1995,8 @@ class Account < ActiveRecord::Base
       name ||= key.to_s.titleize
       special_account_list << key
       instance_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def self.#{key}(force_create = false)
-          get_special_account(:#{key}, #{name.inspect}, force_create)
+        def self.#{key}(force_create: false)
+          get_special_account(:#{key}, #{name.inspect}, force_create:)
         end
       RUBY
     end
@@ -2012,7 +2010,7 @@ class Account < ActiveRecord::Base
 
   def clear_special_account_cache_if_special
     if shard == Shard.birth && Account.special_account_ids.values.map(&:to_i).include?(id)
-      Account.clear_special_account_cache!(true)
+      Account.clear_special_account_cache!(force: true)
     end
   end
 
@@ -2040,7 +2038,7 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def self.get_special_account(special_account_type, default_account_name, force_create = false)
+  def self.get_special_account(special_account_type, default_account_name, force_create: false)
     Shard.birth.activate do
       account = special_accounts[special_account_type]
       unless account
@@ -2605,7 +2603,7 @@ class Account < ActiveRecord::Base
     work = lambda do
       default_enrollment_term
       enable_canvas_authentication
-      TermsOfService.ensure_terms_for_account(self, true) if root_account? && !TermsOfService.skip_automatic_terms_creation
+      TermsOfService.ensure_terms_for_account(self, is_new_account: true) if root_account? && !TermsOfService.skip_automatic_terms_creation
       create_built_in_roles if root_account?
     end
     return work.call if Rails.env.test?
@@ -2776,7 +2774,7 @@ class Account < ActiveRecord::Base
   def roles_with_enabled_permission(permission)
     roles = available_roles
     roles.select do |role|
-      RoleOverride.permission_for(self, permission, role, self, true)[:enabled]
+      RoleOverride.permission_for(self, permission, role, self, caching: false)[:enabled]
     end
   end
 

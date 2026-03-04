@@ -1794,7 +1794,7 @@ describe Course do
     end
 
     it "filters users by section_ids" do
-      visible_users = @course.users_visible_to(@teacher, false, section_ids: [@section1.id, @section2.id])
+      visible_users = @course.users_visible_to(@teacher, section_ids: [@section1.id, @section2.id])
       expect(visible_users.pluck(:id)).to include(@student1.id, @student2.id)
       expect(visible_users.pluck(:id)).not_to include(@student3.id)
     end
@@ -1805,7 +1805,7 @@ describe Course do
     end
 
     it "returns empty when filtering by non-existent section" do
-      visible_users = @course.users_visible_to(@teacher, false, section_ids: [99_999])
+      visible_users = @course.users_visible_to(@teacher, section_ids: [99_999])
       expect(visible_users.count).to eq(0)
     end
 
@@ -1813,7 +1813,6 @@ describe Course do
       @course.enrollments.where(user_id: @student2.id).first.conclude
       visible_users = @course.users_visible_to(
         @teacher,
-        false,
         section_ids: [@section1.id, @section2.id],
         exclude_enrollment_state: "completed"
       )
@@ -5725,10 +5724,10 @@ describe Course do
     it "includes the course's banks if include_self is true" do
       @account = Account.create
       @course = Course.create(account: @account)
-      expect(@course.inherited_assessment_question_banks(true)).to be_empty
+      expect(@course.inherited_assessment_question_banks(include_self: true)).to be_empty
 
       bank = @course.assessment_question_banks.create
-      expect(@course.inherited_assessment_question_banks(true)).to eq [bank]
+      expect(@course.inherited_assessment_question_banks(include_self: true)).to eq [bank]
     end
 
     it "includes all banks in the account hierarchy" do
@@ -5756,7 +5755,7 @@ describe Course do
       @course = Course.create(account: @account)
       bank = @course.assessment_question_banks.create
 
-      banks = @course.inherited_assessment_question_banks(true)
+      banks = @course.inherited_assessment_question_banks(include_self: true)
       expect(banks.order(:id)).to eq [root_bank, account_bank, bank]
       expect(banks.where(id: bank).first).to eql bank
       expect(banks.where(id: account_bank).first).to eql account_bank
@@ -5842,7 +5841,7 @@ describe Course do
         enrollment = @course.enrollments.where(user: @student2).first
         enrollment.deactivate
 
-        expect(@course.users_visible_to(@teacher, include: [:inactive])).to include(@student2)
+        expect(@course.users_visible_to(@teacher, include_priors: true)).to include(@student2)
       end
 
       it "does not return inactive users when not included from all sections" do
@@ -5856,7 +5855,7 @@ describe Course do
         enrollment = @course.enrollments.where(user: @student2).first
         enrollment.conclude
 
-        expect(@course.users_visible_to(@teacher, include: [:completed])).to include(@student2)
+        expect(@course.users_visible_to(@teacher, include_priors: true)).to include(@student2)
       end
 
       it "does not return concluded users when not included from all sections" do

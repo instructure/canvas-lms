@@ -1202,7 +1202,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.position = position_was if will_save_change_to_position? && position.nil? # don't allow setting to nil
 
     if !assignment_group || (assignment_group.deleted? && !deleted?)
-      ensure_assignment_group(false)
+      ensure_assignment_group(save: false)
     end
 
     self.title ||= assignment_group.default_assignment_name || "Assignment"
@@ -1246,14 +1246,14 @@ class AbstractAssignment < ActiveRecord::Base
   end
   protected :default_values
 
-  def ensure_assignment_group(do_save = true)
+  def ensure_assignment_group(save: true)
     return if assignment_group_id
 
     return if skip_assignment_group_for_wiki_page?
 
     context.require_assignment_group
     self.assignment_group = context.assignment_groups.active.first
-    if do_save
+    if save
       GuardRail.activate(:primary) { save! }
     end
   end
@@ -1571,7 +1571,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
-  def do_notifications!(prior_version = nil, notify = false)
+  def do_notifications!(prior_version = nil, notify: false)
     # TODO: this will blow up if the group_category string is set on the
     # previous version, because it gets confused between the db string field
     # and the association.  one more reason to drop the db column
@@ -1759,7 +1759,7 @@ class AbstractAssignment < ActiveRecord::Base
       GradingStandard.default_instance
   end
 
-  def score_to_grade(score = 0.0, given_grade = nil, force_letter_grade = false)
+  def score_to_grade(score = 0.0, given_grade = nil, force_letter_grade: false)
     result = score.to_f
     case force_letter_grade ? "letter_grade" : self.grading_type
     when "percent"

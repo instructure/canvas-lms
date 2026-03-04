@@ -369,13 +369,13 @@ describe Enrollment do
     let(:student) { User.create! }
     let(:teacher) do
       user = User.create!
-      @course.enroll_teacher(user).accept(true)
+      @course.enroll_teacher(user).accept(force: true)
       user
     end
 
     before do
       original_enrollment = @course.enroll_student(student)
-      original_enrollment.accept(true)
+      original_enrollment.accept(force: true)
       assignment.grade_student(student, grade: "10", grader: teacher)
       original_enrollment.destroy!
     end

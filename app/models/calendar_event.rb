@@ -438,7 +438,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
-  def destroy(update_context_or_parent = true)
+  def destroy(update_context_or_parent: true)
     transaction do
       self.workflow_state = "deleted"
       self.deleted_at = Time.now.utc
@@ -447,7 +447,7 @@ class CalendarEvent < ActiveRecord::Base
       child_events.find_each do |e|
         e.cancel_reason = cancel_reason
         e.updating_user = updating_user
-        e.destroy(false)
+        e.destroy(update_context_or_parent: false)
       end
       next unless update_context_or_parent
 

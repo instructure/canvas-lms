@@ -311,7 +311,7 @@ class ContentTag < ActiveRecord::Base
     direct_share_type.pluralize
   end
 
-  def content_type_class(is_student = false)
+  def content_type_class(is_student: false)
     case content_type
     when "Assignment"
       if content && content.submission_types == "online_quiz"

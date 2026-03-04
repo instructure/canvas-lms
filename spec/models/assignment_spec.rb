@@ -4336,13 +4336,13 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
-    context "when force_letter_grade(the third argument of score_to_grade) is true" do
+    context "when force_letter_grade is true" do
       it "returns letter grading standard grade for points" do
         @assignment.grading_type = "points"
         @assignment.points_possible = 10
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: "9", grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A-"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "A-"
       end
 
       it "returns 'complete' for 0/0" do
@@ -4350,7 +4350,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: "0", grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "complete"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "complete"
       end
 
       it "returns given grade for -1/0" do
@@ -4358,7 +4358,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: -1, grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "-1"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "-1"
       end
 
       it "returns highest grading scheme grade when 1/0" do
@@ -4366,7 +4366,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: 1, grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "A"
       end
     end
 

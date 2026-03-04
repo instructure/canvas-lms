@@ -599,7 +599,7 @@ describe Quizzes::Quiz do
     q.quiz_questions.create!
     q.quiz_questions.create!(question_data: { question_type: "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
-    q.root_entries(true)
+    q.root_entries(force_check: true)
     q.save
     expect(q.question_count).to be(0)
     expect(q.unpublished_question_count).to be(3)
@@ -639,7 +639,7 @@ describe Quizzes::Quiz do
     expect(q.quiz_groups.length).to be(1)
     expect(g.quiz_questions.reload.active.size).to be(2)
 
-    entries = q.root_entries(true)
+    entries = q.root_entries(force_check: true)
     expect(entries.length).to be(3)
     expect(entries[0][:questions]).not_to be_nil
     expect(entries[1][:answers]).not_to be_nil
@@ -780,7 +780,7 @@ describe Quizzes::Quiz do
       q.quiz_questions.create!(question_data: question_data.merge(name: "root #{i}"))
     end
 
-    possible = Quizzes::Quiz.count_points_possible(q.root_entries(true))
+    possible = Quizzes::Quiz.count_points_possible(q.root_entries(force_check: true))
     expect(possible).to eq 9.9
   end
 
@@ -859,7 +859,7 @@ describe Quizzes::Quiz do
       lock_at = 1.day.ago
       u = User.create!(name: "Fred Colon")
       q = @course.quizzes.create!(title: "locked yesterday", lock_at:)
-      sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, "settings_only")
+      sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, state: "settings_only")
       sub.manually_unlocked = true
       sub.save!
       sub2 = q.generate_submission(u)
@@ -2299,13 +2299,13 @@ describe Quizzes::Quiz do
     end
 
     it "links the generated QS to a user" do
-      expect(subject).to receive(:generate_submission).with(participant.user, false)
+      expect(subject).to receive(:generate_submission).with(participant.user, preview: false)
 
       subject.generate_submission_for_participant(participant)
     end
 
     it "links the generated QS to a temporary user code" do
-      expect(subject).to receive(:generate_submission).with(participant.user_code, false)
+      expect(subject).to receive(:generate_submission).with(participant.user_code, preview: false)
 
       allow(participant).to receive(:anonymous?).and_return true
       subject.generate_submission_for_participant(participant)

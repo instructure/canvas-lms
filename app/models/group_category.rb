@@ -481,7 +481,7 @@ class GroupCategory < ActiveRecord::Base
     calculate_group_count_by_membership(by_section:) if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count
     if @assign_unassigned_members && @create_group_count
-      assign_unassigned_members(by_section)
+      assign_unassigned_members(by_section:)
     end
     @create_group_count = @assign_unassigned_members = nil
   end
@@ -510,7 +510,7 @@ class GroupCategory < ActiveRecord::Base
     context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
   end
 
-  def assign_unassigned_members(by_section = false, updating_user: nil)
+  def assign_unassigned_members(by_section: false, updating_user: nil)
     Delayed::Batch.serial_batch do
       SubmissionLifecycleManager.with_executing_user(updating_user) do
         if by_section
@@ -536,9 +536,9 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
-  def assign_unassigned_members_in_background(by_section = false, updating_user: nil)
+  def assign_unassigned_members_in_background(by_section: false, updating_user: nil)
     start_progress
-    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section, updating_user:)
+    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section:, updating_user:)
   end
 
   def clone_groups_and_memberships(new_group_category)

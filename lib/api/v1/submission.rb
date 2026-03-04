@@ -316,10 +316,10 @@ module Api::V1::Submission
                                                                                       .include?("webhook_info")
     end
 
-    if attempt.vericite_data(false).present? &&
+    if attempt.vericite_data(lookup_data: false).present? &&
        attempt.can_view_plagiarism_report("vericite", @current_user, session) &&
        attempt.assignment.vericite_enabled?
-      vericite_hash = attempt.vericite_data(false).dup
+      vericite_hash = attempt.vericite_data(lookup_data: false).dup
       hash["vericite_data"] = vericite_hash.except(:last_processed_attempt, :webhook_info)
     end
 

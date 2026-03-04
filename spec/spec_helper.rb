@@ -484,7 +484,7 @@ RSpec.configure do |config|
     ReadOnlySecondaryStub.reset
     Time.zone = "UTC"
     LoadAccount.force_special_account_reload = true
-    Account.clear_special_account_cache!(true)
+    Account.clear_special_account_cache!(force: true)
     PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!

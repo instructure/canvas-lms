@@ -2574,11 +2574,11 @@ describe Submission do
 
         user = account_admin_user
         communication_channel(user, { username: "admin@example.com" })
-        submission = quiz.generate_submission(user, false)
+        submission = quiz.generate_submission(user)
         Quizzes::SubmissionGrader.new(submission).grade_submission
 
         communication_channel(@teacher, { username: "chang@example.com" })
-        submission2 = quiz.generate_submission(@teacher, false)
+        submission2 = quiz.generate_submission(@teacher)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
         expect(submission.submission.messages_sent).not_to include("Submission Graded")
@@ -4554,7 +4554,7 @@ describe Submission do
     # set up the data to have a submission with a quiz submission with multiple versions
     course_factory
     quiz = @course.quizzes.create!
-    quiz_submission = quiz.generate_submission @user, false
+    quiz_submission = quiz.generate_submission @user, preview: false
     quiz_submission.save
 
     @assignment.submissions.find_by!(user: @user).update!(quiz_submission_id: quiz_submission.id)
@@ -7044,7 +7044,7 @@ describe Submission do
     end
 
     it "returns a collection of moderated grading ids" do
-      moderated_grading_ids = @student.moderated_grading_ids(false)
+      moderated_grading_ids = @student.moderated_grading_ids
       expect(@submission.moderated_grading_allow_list.first).to eq moderated_grading_ids
     end
 

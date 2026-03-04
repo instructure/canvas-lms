@@ -951,7 +951,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def standard_url(use_environment_overrides = false)
+  def standard_url(use_environment_overrides: false)
     standard_url = ContextExternalTool.standardize_url(url)
 
     if use_environment_overrides
@@ -967,14 +967,14 @@ class ContextExternalTool < ActiveRecord::Base
   # This method checks both the domain and url
   # host when attempting to match host.
   def matches_host?(url, use_environment_overrides: false)
-    standard_url = standard_url(use_environment_overrides)
+    standard_url = standard_url(use_environment_overrides:)
     matches_tool_domain?(url) ||
       (standard_url.present? &&
         standard_url.host == ContextExternalTool.standardize_url(url)&.host)
   end
 
-  def matches_url?(url, match_queries_exactly = true, use_environment_overrides: false)
-    tool_url = standard_url(use_environment_overrides)
+  def matches_url?(url, match_queries_exactly: true, use_environment_overrides: false)
+    tool_url = standard_url(use_environment_overrides:)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
       url == tool_url

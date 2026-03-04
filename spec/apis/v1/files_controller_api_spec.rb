@@ -1680,7 +1680,7 @@ describe "Files API", type: :request do
       course_with_student(active_all: true)
       quiz_model(course: @course)
       @quiz.update_attribute :one_question_at_a_time, true
-      @qs = @quiz.generate_submission(@student, false)
+      @qs = @quiz.generate_submission(@student)
 
       account_admin_user(account: @account)
       @att.context = @qs

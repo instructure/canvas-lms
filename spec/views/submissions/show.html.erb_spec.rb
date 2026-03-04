@@ -466,8 +466,8 @@ describe "submissions/show" do
       before do
         assign(:context, course)
 
-        course.enroll_teacher(teacher).accept(true)
-        course.enroll_student(student).accept(true)
+        course.enroll_teacher(teacher).accept(force: true)
+        course.enroll_student(student).accept(force: true)
 
         muted_submission.add_comment(author: student, comment: "I did a great job!")
         muted_submission.add_comment(author: teacher, comment: "No, you did not", hidden: true)

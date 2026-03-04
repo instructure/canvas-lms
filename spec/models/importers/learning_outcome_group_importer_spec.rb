@@ -49,7 +49,7 @@ describe "Importing Learning Outcome Groups" do
   it "does not import an outcome group if skip import enabled" do
     log_data = group_data
     expect do
-      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, nil, true)
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, skip_import: true)
     end.not_to change { @context.learning_outcome_groups.count }
   end
 
@@ -62,7 +62,7 @@ describe "Importing Learning Outcome Groups" do
                               ]
                             )
                           ])
-    Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, nil, true)
+    Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, skip_import: true)
     expect(@context.learning_outcome_groups.count).to eq 2
     expect(@context.learning_outcomes.count).to eq 2
   end

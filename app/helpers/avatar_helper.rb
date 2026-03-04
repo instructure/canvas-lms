@@ -111,7 +111,7 @@ module AvatarHelper
                             (root_account && root_account.settings[:avatars]) || "enabled",
                             default_avatar,
                             request,
-                            use_fallback)
+                            use_fallback:)
           else
             default_avatar
           end

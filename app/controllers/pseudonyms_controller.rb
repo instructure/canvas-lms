@@ -217,7 +217,7 @@ class PseudonymsController < ApplicationController
           # If they changed the password (and we subsequently log them in) then
           # we're pretty confident this is the right user, and the communication
           # channel is valid, so register the user and approve the channel.
-          @cc.set_confirmation_code(true)
+          @cc.set_confirmation_code(reset: true)
           @cc.confirm
           @cc.save
           @pseudonym.user.register

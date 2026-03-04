@@ -100,7 +100,7 @@ module UserSearch
         users
       when Course
         context.users_visible_to(searcher,
-                                 include_prior_enrollments,
+                                 include_priors: include_prior_enrollments,
                                  enrollment_state: enrollment_states,
                                  include_inactive: include_inactive_enrollments,
                                  section_ids: options[:section_ids]).distinct

@@ -70,7 +70,7 @@ describe AccountNotification do
       @teacher = @user
       account_admin_user(account: @account)
       @admin = @user
-      course_with_student(course: @course).accept(true)
+      course_with_student(course: @course).accept(force: true)
       @student = @user
     end
 
@@ -173,7 +173,7 @@ describe AccountNotification do
     @teacher = @user
     account_admin_user(account: @account)
     @admin = @user
-    course_with_student(course: @course).accept(true)
+    course_with_student(course: @course).accept(force: true)
     @student = @user
 
     expect(AccountNotification.for_user_and_account(@teacher, @account)).to eq [@a3, @a1]
@@ -361,14 +361,14 @@ describe AccountNotification do
 
     it "scopes to active enrollment accounts" do
       sub_announcement = sub_account_notification(subject: "blah", account: @sub_account)
-      course_with_student(user: @user, account: @sub_account, active_all: true).accept(true)
+      course_with_student(user: @user, account: @sub_account, active_all: true).accept(force: true)
       other_root_account = Account.create!
       other_announcement = account_notification(account: other_root_account)
-      course_with_student(user: @user, account: other_root_account, active_all: true).accept(true)
+      course_with_student(user: @user, account: other_root_account, active_all: true).accept(force: true)
       nother_root_account = Account.create!(name: "nother account")
       nother_announcement = account_notification(account: nother_root_account)
       # not an active course and will be excluded
-      course_with_student(user: @user, account: nother_root_account).accept(true)
+      course_with_student(user: @user, account: nother_root_account).accept(force: true)
 
       notes = AccountNotification.for_user_and_account(@user, Account.default)
       expect(notes).to include sub_announcement
@@ -389,7 +389,7 @@ describe AccountNotification do
     it "still show sub-account announcements even if the course is unpublished" do
       # because that makes sense i guess?
       unpub_sub_announcement = sub_account_notification(subject: "blah", account: @sub_account)
-      course_with_student(user: @user, account: @sub_account).accept(true)
+      course_with_student(user: @user, account: @sub_account).accept(force: true)
 
       notes = AccountNotification.for_user_and_account(@user, Account.default)
       expect(notes).to include unpub_sub_announcement
@@ -464,12 +464,12 @@ describe AccountNotification do
         @unenrolled = @user
         course_with_teacher(account: @a1)
         @student_teacher = @user
-        course_with_student(course: @course, user: @student_teacher).accept(true)
+        course_with_student(course: @course, user: @student_teacher).accept(force: true)
         course_with_teacher(course: @course, account: @a1)
         @teacher = @user
         account_admin_user(account: @a1)
         @admin = @user
-        course_with_student(course: @course).accept(true)
+        course_with_student(course: @course).accept(force: true)
         @student = @user
       end
 

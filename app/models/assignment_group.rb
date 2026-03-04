@@ -117,7 +117,7 @@ class AssignmentGroup < ActiveRecord::Base
     can :delete
   end
 
-  def restore(try_to_selectively_undelete_assignments = true)
+  def restore(try_to_selectively_undelete_assignments: true)
     to_restore = assignments.include_submittables
     if try_to_selectively_undelete_assignments
       # It's a pretty good guess that if an assignment was modified at the same

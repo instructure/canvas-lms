@@ -388,7 +388,7 @@ module Lti
         # If exactly match doesn't work, try to match by ignoring extra query parameters
         match ||= find_tool_match(
           sorted_external_tools,
-          ->(t) { t.matches_url?(url, false) },
+          ->(t) { t.matches_url?(url, match_queries_exactly: false) },
           ->(t) { t.url.present? }
         )
 
@@ -409,7 +409,7 @@ module Lti
 
           match ||= find_tool_match(
             sorted_external_tools,
-            ->(t) { t.matches_url?(url, false, use_environment_overrides: true) },
+            ->(t) { t.matches_url?(url, match_queries_exactly: false, use_environment_overrides: true) },
             ->(t) { t.url.present? }
           )
 

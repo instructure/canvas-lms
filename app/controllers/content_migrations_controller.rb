@@ -178,7 +178,7 @@ class ContentMigrationsController < ApplicationController
       if api_request?
         render json: content_migration_json_hash
       else # Block below should be removed when instui_for_import_page FF stops begin a thing
-        @plugins = ContentMigration.migration_plugins(true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
+        @plugins = ContentMigration.migration_plugins(exclude_hidden: true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
 
         options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
 
@@ -473,7 +473,7 @@ class ContentMigrationsController < ApplicationController
   def available_migrators
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
+    systems = ContentMigration.migration_plugins(exclude_hidden: true).select { |sys| migration_plugin_supported?(sys) }
     json = systems.map do |p|
       {
         type: p.id,
@@ -685,7 +685,7 @@ class ContentMigrationsController < ApplicationController
     if @current_user.adminable_accounts.any?
       false # assume that if they're an account admin they're probably managing so many courses it's not worth it to even try the count
     else
-      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(true).count }.sum
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(include_concluded: true).count }.sum
       course_count <= 100
     end
   end

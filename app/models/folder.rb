@@ -163,7 +163,7 @@ class Folder < ActiveRecord::Base
     name
   end
 
-  def full_name(reload = false)
+  def full_name(reload: false)
     return super() if !reload && super()
 
     folder = self
@@ -190,7 +190,7 @@ class Folder < ActiveRecord::Base
     self.parent_folder_id = nil if !parent_folder || parent_folder.context != context || parent_folder_id == id
     self.context = parent_folder.context if parent_folder
     prevent_duplicate_name
-    self.full_name = full_name(true)
+    self.full_name = full_name(reload: true)
     if parent_folder_id_changed? || !parent_folder_id || full_name_changed? || name_changed?
       @update_sub_folders = true
     end
@@ -233,7 +233,7 @@ class Folder < ActiveRecord::Base
 
     sub_folders.each do |f|
       f.reload
-      f.full_name = f.full_name(true)
+      f.full_name = f.full_name(reload: true)
       f.save
     end
   end
@@ -553,7 +553,7 @@ class Folder < ActiveRecord::Base
     nil
   end
 
-  def self.resolve_path(context, path, include_hidden_and_locked = true)
+  def self.resolve_path(context, path, include_hidden_and_locked: true)
     path_components = case path
                       when Array
                         path

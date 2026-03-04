@@ -205,7 +205,7 @@ class RoleOverridesController < ApplicationController
       roles = []
       roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?("active")
 
-      scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(true) : @context.roles
+      scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(include_inactive: true) : @context.roles
       roles += scope.where(workflow_state: states).order(:id).to_a
 
       roles = Api.paginate(roles, self, route)
@@ -451,9 +451,9 @@ class RoleOverridesController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
       roles = if params[:account_roles] || @context == Account.site_admin
-                @context.available_account_roles(true)
+                @context.available_account_roles(include_inactive: true)
               else
-                @context.available_course_roles(true)
+                @context.available_course_roles(include_inactive: true)
               end
       if params[:permissions]
         RoleOverride.permissions.each_key do |key|
