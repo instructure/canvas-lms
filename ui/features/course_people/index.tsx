@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import ready from '@instructure/ready'
 import {CoursePeopleApp} from './react/index'
 
 ready(() => {
-  ReactDOM.render(<CoursePeopleApp />, document.getElementById('content'))
+  legacyRender(<CoursePeopleApp />, document.getElementById('content'))
 })
