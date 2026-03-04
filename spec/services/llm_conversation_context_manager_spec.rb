@@ -468,9 +468,40 @@ describe LLMConversationContextManager do
           .with(body: hash_including("url" => "http://localhost:3000/files/1/download", "sourceType" => "file"))
       end
 
-      it "sets context_index_status to 'processing'" do
+      it "sets context_index_status to 'in_progress'" do
         described_class.trigger_indexing(ai_experience:)
         expect(ai_experience.reload.context_index_status).to eq("in_progress")
+      end
+
+      it "stores the returned document id on the context file record" do
+        described_class.trigger_indexing(ai_experience:)
+
+        context_file = AiExperienceContextFile.find_by(ai_experience:, attachment:)
+        expect(context_file.llm_conversation_service_document_id).to eq("doc-1")
+      end
+
+      it "skips deleted attachments" do
+        attachment.update_column(:file_state, "deleted")
+
+        described_class.trigger_indexing(ai_experience:)
+
+        expect(WebMock).not_to have_requested(:post, documents_url)
+      end
+    end
+
+    context "with context_file_ids specified" do
+      let(:attachment2) { attachment_model(context: course, filename: "slides.pdf") }
+      let!(:context_file2) { AiExperienceContextFile.create!(ai_experience:, attachment: attachment2) }
+
+      before do
+        stub_request(:post, documents_url)
+          .to_return(status: 201, body: { "id" => "doc-2", "status" => "pending" }.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "only indexes the specified files, not all files" do
+        described_class.trigger_indexing(ai_experience:, context_file_ids: [context_file2.id])
+
+        expect(WebMock).to have_requested(:post, documents_url).once
       end
     end
 
@@ -480,9 +511,73 @@ describe LLMConversationContextManager do
           .to_return(status: 503, body: "Service Unavailable")
       end
 
-      it "logs a warning and does not raise" do
-        expect(Rails.logger).to receive(:warn).with(/Document indexing trigger failed/)
-        expect { described_class.trigger_indexing(ai_experience:) }.not_to raise_error
+      it "raises ConversationError" do
+        expect { described_class.trigger_indexing(ai_experience:) }
+          .to raise_error(LlmConversation::Errors::ConversationError, /Failed to trigger indexing/)
+      end
+    end
+  end
+
+  describe ".remove_documents" do
+    let(:attachment) { attachment_model(context: course, filename: "syllabus.pdf") }
+    let(:context_file) do
+      AiExperienceContextFile.create!(ai_experience:, attachment:).tap do |cf|
+        cf.update_column(:llm_conversation_service_document_id, "doc-uuid-1")
+      end
+    end
+    let(:remove_url) { "http://localhost:3001/contexts/context-uuid/documents/doc-uuid-1" }
+
+    before do
+      ai_experience.update_column(:llm_conversation_context_id, "context-uuid")
+      course.enable_feature!(:ai_experiences_context_file_upload)
+    end
+
+    context "when context_id is not present" do
+      before { ai_experience.update_column(:llm_conversation_context_id, nil) }
+
+      it "does not make any requests" do
+        described_class.remove_documents(ai_experience:, context_files: [context_file])
+        expect(WebMock).not_to have_requested(:delete, %r{/documents/})
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before { course.disable_feature!(:ai_experiences_context_file_upload) }
+
+      it "does not make any requests" do
+        described_class.remove_documents(ai_experience:, context_files: [context_file])
+        expect(WebMock).not_to have_requested(:delete, %r{/documents/})
+      end
+    end
+
+    context "with context files that have a document id" do
+      before do
+        stub_request(:delete, remove_url)
+          .to_return(status: 200, body: { "success" => true }.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "DELETEs each document from the service" do
+        described_class.remove_documents(ai_experience:, context_files: [context_file])
+        expect(WebMock).to have_requested(:delete, remove_url)
+      end
+
+      it "skips context files with no document id" do
+        context_file.update_column(:llm_conversation_service_document_id, nil)
+
+        described_class.remove_documents(ai_experience:, context_files: [context_file])
+        expect(WebMock).not_to have_requested(:delete, %r{/documents/})
+      end
+    end
+
+    context "when the API call fails" do
+      before do
+        stub_request(:delete, remove_url)
+          .to_return(status: 500, body: "Internal Server Error")
+      end
+
+      it "raises ConversationError" do
+        expect { described_class.remove_documents(ai_experience:, context_files: [context_file]) }
+          .to raise_error(LlmConversation::Errors::ConversationError)
       end
     end
   end
