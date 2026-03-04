@@ -97,8 +97,7 @@ describe('AIExperienceForm', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       expect(screen.getByText('Cancel')).toBeInTheDocument()
-      expect(screen.getByText('Preview')).toBeInTheDocument()
-      expect(screen.getByText('Save as draft')).toBeInTheDocument()
+      expect(screen.getByText('Save to preview')).toBeInTheDocument()
     })
 
     it('renders not published status', () => {
@@ -124,7 +123,7 @@ describe('AIExperienceForm', () => {
   })
 
   describe('form submission', () => {
-    it('calls onSubmit with form data when Save as draft is clicked', async () => {
+    it('calls onSubmit with form data when Save to preview button is clicked', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
@@ -143,7 +142,7 @@ describe('AIExperienceForm', () => {
       fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
       fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -178,103 +177,11 @@ describe('AIExperienceForm', () => {
     })
   })
 
-  describe('preview menu', () => {
-    it('opens preview menu when Preview button is clicked', async () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      const previewButton = screen.getByText('Preview')
-      fireEvent.click(previewButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Preview experience')).toBeInTheDocument()
-        expect(screen.getByText('Run chat simulation')).toBeInTheDocument()
-        expect(screen.getByText('Coming soon')).toBeInTheDocument()
-      })
-    })
-
-    it('Run chat simulation is disabled', async () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      const previewButton = screen.getByText('Preview')
-      fireEvent.click(previewButton)
-
-      await waitFor(() => {
-        const runSimulationItem = screen
-          .getByText('Run chat simulation')
-          .closest('[role="menuitem"]')
-        expect(runSimulationItem).toHaveAttribute('aria-disabled', 'true')
-      })
-    })
-
-    it('opens preview confirmation modal when Preview experience is clicked', async () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      const previewButton = screen.getByText('Preview')
-      fireEvent.click(previewButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Preview experience')).toBeInTheDocument()
-      })
-
-      const previewExperienceItem = screen.getByText('Preview experience')
-      fireEvent.click(previewExperienceItem)
-
-      await waitFor(() => {
-        expect(screen.getByText('Preview AI experience')).toBeInTheDocument()
-        expect(
-          screen.getByText(
-            'We will save this experience as a draft so you can preview it. Please confirm to proceed.',
-          ),
-        ).toBeInTheDocument()
-      })
-    })
-
-    it('calls onSubmit when preview is confirmed', async () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      // Fill in required fields
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
-      const factsInput = screen.getByLabelText(/Text source/) as HTMLTextAreaElement
-      const learningObjectivesInput = screen.getByLabelText(
-        /Learning objective targets/,
-      ) as HTMLTextAreaElement
-      const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Customize agent/,
-      ) as HTMLTextAreaElement
-
-      fireEvent.change(titleInput, {target: {value: 'Preview Title'}})
-      fireEvent.change(factsInput, {target: {value: 'Preview Facts'}})
-      fireEvent.change(learningObjectivesInput, {target: {value: 'Preview Objectives'}})
-      fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'Preview Guidance'}})
-
-      const previewButton = screen.getByText('Preview')
-      fireEvent.click(previewButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Preview experience')).toBeInTheDocument()
-      })
-
-      const previewExperienceItem = screen.getByText('Preview experience')
-      fireEvent.click(previewExperienceItem)
-
-      await waitFor(() => {
-        expect(screen.getByText('Confirm')).toBeInTheDocument()
-      })
-
-      const confirmButton = screen.getByText('Confirm')
-      fireEvent.click(confirmButton)
-
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalled()
-      })
-    })
-  })
-
   describe('form validation', () => {
     it('shows error when title is empty on submission', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -290,7 +197,7 @@ describe('AIExperienceForm', () => {
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -306,7 +213,7 @@ describe('AIExperienceForm', () => {
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -324,7 +231,7 @@ describe('AIExperienceForm', () => {
       const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -337,7 +244,7 @@ describe('AIExperienceForm', () => {
     it('shows error banner when validation fails', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -365,7 +272,7 @@ describe('AIExperienceForm', () => {
     it('clears error when field is filled', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -378,37 +285,6 @@ describe('AIExperienceForm', () => {
       await waitFor(() => {
         expect(screen.queryByText('Title required')).not.toBeInTheDocument()
       })
-    })
-
-    it('validates before preview', async () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      const previewButton = screen.getByText('Preview')
-      fireEvent.click(previewButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Preview experience')).toBeInTheDocument()
-      })
-
-      const previewExperienceItem = screen.getByText('Preview experience')
-      fireEvent.click(previewExperienceItem)
-
-      await waitFor(() => {
-        expect(screen.getByText('Preview AI experience')).toBeInTheDocument()
-      })
-
-      const confirmButton = screen.getByText('Confirm')
-      fireEvent.click(confirmButton)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Some required information is missing. Please complete all highlighted fields before saving.',
-          ),
-        ).toBeInTheDocument()
-      })
-
-      expect(mockOnSubmit).not.toHaveBeenCalled()
     })
 
     it('submits successfully when all required fields are filled', async () => {
@@ -428,7 +304,7 @@ describe('AIExperienceForm', () => {
       fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
       fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
 
-      const saveButton = screen.getByText('Save as draft')
+      const saveButton = screen.getByText('Save to preview')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -457,7 +333,7 @@ describe('AIExperienceForm', () => {
     it('includes context_file_ids as empty array in submit payload when no files', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
       fillRequiredFields()
-      fireEvent.click(screen.getByText('Save as draft'))
+      fireEvent.click(screen.getByText('Save to preview'))
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({context_file_ids: []}))
@@ -493,47 +369,11 @@ describe('AIExperienceForm', () => {
         />,
       )
 
-      fireEvent.click(screen.getByText('Save as draft'))
+      fireEvent.click(screen.getByText('Save to preview'))
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           expect.objectContaining({context_file_ids: ['42', '99']}),
-        )
-      })
-    })
-
-    it('includes context_file_ids in preview submit payload', async () => {
-      const aiExperienceWithFiles: AIExperience = {
-        ...mockAiExperience,
-        context_files: [
-          {
-            id: '55',
-            display_name: 'notes.pdf',
-            url: 'https://example.com/55',
-            size: 512,
-            content_type: 'application/pdf',
-          },
-        ],
-      }
-
-      render(
-        <AIExperienceForm
-          aiExperience={aiExperienceWithFiles}
-          onSubmit={mockOnSubmit}
-          isLoading={false}
-        />,
-      )
-
-      fireEvent.click(screen.getByText('Preview'))
-      await waitFor(() => expect(screen.getByText('Preview experience')).toBeInTheDocument())
-      fireEvent.click(screen.getByText('Preview experience'))
-      await waitFor(() => expect(screen.getByText('Confirm')).toBeInTheDocument())
-      fireEvent.click(screen.getByText('Confirm'))
-
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalledWith(
-          expect.objectContaining({context_file_ids: ['55']}),
-          true,
         )
       })
     })
