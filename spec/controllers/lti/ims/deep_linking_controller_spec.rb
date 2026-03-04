@@ -1089,7 +1089,7 @@ module Lti
             it "does not create a resource link" do
               expect do
                 subject
-              end.to_not change { Lti::ResourceLink.count }
+              end.not_to change { Lti::ResourceLink.count }
             end
 
             it "includes tool_id in the js_env deep_link_response" do
@@ -1124,13 +1124,13 @@ module Lti
             it "does not create a resource link" do
               expect do
                 subject
-              end.to_not change { Lti::ResourceLink.count }
+              end.not_to change { Lti::ResourceLink.count }
             end
 
             it "does not create an Lti::AssetProcessor" do
               expect do
                 subject
-              end.to_not change { Lti::AssetProcessor.count }
+              end.not_to change { Lti::AssetProcessor.count }
             end
 
             it "includes tool_id and ltiAssetProcessor type content items in the js_env deep_link_response" do
@@ -1165,13 +1165,13 @@ module Lti
             it "does not create a resource link" do
               expect do
                 subject
-              end.to_not change { Lti::ResourceLink.count }
+              end.not_to change { Lti::ResourceLink.count }
             end
 
             it "does not create an Lti::AssetProcessor" do
               expect do
                 subject
-              end.to_not change { Lti::AssetProcessor.count }
+              end.not_to change { Lti::AssetProcessor.count }
             end
 
             it "includes tool_id and ltiAssetProcessorContribution type content items in the js_env deep_link_response" do

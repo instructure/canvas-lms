@@ -67,11 +67,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, ["html_url"], [])).to include({
                                                                                       "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
                                                                                     })
-      expect(@test_api.course_json(@course1, @me, {}, [], [])).to_not include "html_url"
+      expect(@test_api.course_json(@course1, @me, {}, [], [])).not_to include "html_url"
     end
 
     it "only includes needs_grading_count if requested" do
-      expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).to_not include "needs_grading_count"
+      expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).not_to include "needs_grading_count"
     end
 
     it "only includes is_favorite if requested" do
@@ -94,7 +94,7 @@ describe Api::V1::Course do
     it "does not honor needs_grading_count for designers" do
       @designer_enrollment = @course1.enroll_designer(@me)
       @designer_enrollment.accept!
-      expect(@test_api.course_json(@course1, @me, {}, ["needs_grading_count"], [@designer_enrollment])).to_not include "needs_grading_count"
+      expect(@test_api.course_json(@course1, @me, {}, ["needs_grading_count"], [@designer_enrollment])).not_to include "needs_grading_count"
     end
 
     it "includes apply_assignment_group_weights" do
@@ -2142,7 +2142,7 @@ describe CoursesController, type: :request do
           expect do
             api_call(:put, @path, @params, course: { grading_standard_id: 123 })
             @course.reload
-          end.to_not change { @course.grading_standard_id }
+          end.not_to change { @course.grading_standard_id }
         end
 
         context "when an assignment is due in a closed grading period" do
@@ -3061,7 +3061,7 @@ describe CoursesController, type: :request do
            "not requested, even if 'current_grading_period_scores' are requested" do
           json_response = courses_api_index_call(includes: ["current_grading_period_scores"])
           enrollment_json = enrollment(json_response)
-          expect(enrollment_json).to_not include(*grading_period_score_keys)
+          expect(enrollment_json).not_to include(*grading_period_score_keys)
         end
 
         it "does not include current grading period scores if final grades are hidden, even if 'total_scores' and 'current_grading_period_scores' are requested" do
@@ -3153,13 +3153,13 @@ describe CoursesController, type: :request do
               json_response = courses_api_index_call(includes: ["total_scores", "current_grading_period_scores"])
               enrollment_json = enrollment(json_response)
               expect(enrollment_json["current_period_computed_current_score"])
-                .to_not eq(enrollment_json["computed_current_score"])
+                .not_to eq(enrollment_json["computed_current_score"])
               expect(enrollment_json["current_period_computed_final_score"])
-                .to_not eq(enrollment_json["computed_final_score"])
+                .not_to eq(enrollment_json["computed_final_score"])
               expect(enrollment_json["current_period_computed_current_grade"])
-                .to_not eq(enrollment_json["computed_current_grade"])
+                .not_to eq(enrollment_json["computed_current_grade"])
               expect(enrollment_json["current_period_computed_final_grade"])
-                .to_not eq(enrollment_json["computed_final_grade"])
+                .not_to eq(enrollment_json["computed_final_grade"])
             end
 
             it "current grading period scores are correct" do
@@ -4874,7 +4874,7 @@ describe CoursesController, type: :request do
       it "includes permissions" do
         # Make sure it only returns permissions when asked
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json", { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
-        expect(json).to_not include "permissions"
+        expect(json).not_to include "permissions"
 
         # When its asked to return permissions make sure they are there
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=permissions", { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["permissions"] })

@@ -25,7 +25,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
   let(:question_data) { QuestionHelpers.fixture("multiple_choice_question") }
 
   it "does not blow up when no responses are provided" do
-    expect { expect(subject.run([])).to be_present }.to_not raise_error
+    expect { expect(subject.run([])).to be_present }.not_to raise_error
   end
 
   describe "[:responses]" do

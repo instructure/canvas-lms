@@ -40,7 +40,7 @@ describe CC::Qti::NewQuizzesGenerator do
       @doc.resources do |resource_node|
         new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
 
-        expect(@manifest.export_dir).to_not be_nil
+        expect(@manifest.export_dir).not_to be_nil
         expect(new_quizzes_generator.export_dir).to eq(@manifest.export_dir)
       end
     end

@@ -140,7 +140,7 @@ module Turnitin
           it "creates a submission if we got an uploaded at" do
             process
             expect(sub.workflow_state).to eq("submitted")
-            expect(sub.submitted_at).to_not be_nil
+            expect(sub.submitted_at).not_to be_nil
             expect(sub.submitted_at).to eq(subject.turnitin_client.uploaded_at)
             expect(sub.turnitin_data).to eq(
               "attachment_#{lti_assignment.attachments.first.id}" => {
@@ -247,11 +247,11 @@ module Turnitin
 
     describe "#resubmit" do
       it "doesn't serialize the whole TII client" do
-        expect(subject.turnitin_client).to_not be_nil
+        expect(subject.turnitin_client).not_to be_nil
         submission = Submission.new(id: 1)
         subject.resubmit(submission, "asset_string")
         output_job = Delayed::Job.where(tag: "Turnitin::OutcomeResponseProcessor#update_originality_data").last
-        expect(output_job.handler).to_not include("ruby/object:Turnitin::TiiClient")
+        expect(output_job.handler).not_to include("ruby/object:Turnitin::TiiClient")
       end
     end
   end

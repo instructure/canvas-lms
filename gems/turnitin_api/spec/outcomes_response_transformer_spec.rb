@@ -137,8 +137,8 @@ describe TurnitinApi::OutcomesResponseTransformer do
     end
 
     it "returns proper keys" do
-      expect(subject.originality_data["breakdown"]).to_not be_nil
-      expect(subject.originality_data["numeric"]).to_not be_nil
+      expect(subject.originality_data["breakdown"]).not_to be_nil
+      expect(subject.originality_data["numeric"]).not_to be_nil
     end
 
     it "breakdown is set correctly" do

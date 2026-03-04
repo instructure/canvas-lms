@@ -1572,7 +1572,7 @@ describe SIS::CSV::UserImporter do
       user: sis_user
     )
     @badmin.reload
-    expect(@badmin.account_users.active.pluck(:id)).to_not include(@badmin.id)
+    expect(@badmin.account_users.active.pluck(:id)).not_to include(@badmin.id)
   end
 
   it "removes subaccount memberships when a user is deleted" do
@@ -1586,7 +1586,7 @@ describe SIS::CSV::UserImporter do
       user: sis_user
     )
     @badmin.reload
-    expect(@badmin.account_users.active.pluck(:id)).to_not include(@badmin.id)
+    expect(@badmin.account_users.active.pluck(:id)).not_to include(@badmin.id)
   end
 
   context "account associations" do

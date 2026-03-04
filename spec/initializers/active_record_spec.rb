@@ -129,7 +129,7 @@ module ActiveRecord
           expect do
             User.find_each { nil }
             User.find_each { nil } # rubocop:disable Style/CombinableLoops
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -173,7 +173,7 @@ module ActiveRecord
             User.select(:name).find_in_batches do
               User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
             end
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "does not use a temp table for a plain query" do
@@ -205,7 +205,7 @@ module ActiveRecord
           expect do
             User.find_in_batches(strategy: :temp_table) { nil }
             User.find_in_batches(strategy: :temp_table) { nil }
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -298,7 +298,7 @@ module ActiveRecord
                                   "created_at" => 1.month.from_now
                                 })
         ar_type = Auditors::ActiveRecord::AuthenticationRecord
-        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
+        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.not_to raise_error
         conn = ar_type.connection
         root_partition_count = conn.execute("select count(*) from only #{ar_type.quoted_table_name};")[0]["count"]
         expect(root_partition_count).to eq(0)
@@ -321,7 +321,7 @@ module ActiveRecord
           expect do
             User.joins("INNER JOIN #{User.quoted_table_name} u ON users.sortable_name = u.sortable_name")
                 .where("u.sortable_name <> users.sortable_name").delete_all
-          end.to_not raise_error
+          end.not_to raise_error
         end
       end
 

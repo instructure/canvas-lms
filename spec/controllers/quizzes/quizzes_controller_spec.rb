@@ -250,7 +250,7 @@ describe Quizzes::QuizzesController do
 
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
-      expect(controller.remote_env[:ams]).to_not be_nil
+      expect(controller.remote_env[:ams]).not_to be_nil
       expect(controller.remote_env[:ams][:launch_url]).to eq(Services::Ams.launch_url)
       expect(controller.remote_env[:ams][:API_URL]).to eq(Services::Ams.api_url)
 
@@ -696,7 +696,7 @@ describe Quizzes::QuizzesController do
       it "uses the ams service logic with a quiz id" do
         get "show", params: { course_id: @course.id, id: @quiz.id }
         expect(response).to be_successful
-        expect(controller.remote_env[:ams]).to_not be_nil
+        expect(controller.remote_env[:ams]).not_to be_nil
 
         expect(controller.js_env[:QUIZZES]).to be_nil
         expect(controller.js_env[:context_url]).to eq("/courses/#{@course.id}/quizzes")
@@ -705,7 +705,7 @@ describe Quizzes::QuizzesController do
       it "uses the ams service logic without a valid quiz id" do
         get "show", params: { course_id: @course.id, id: "some_id" }
         expect(response).to be_successful
-        expect(controller.remote_env[:ams]).to_not be_nil
+        expect(controller.remote_env[:ams]).not_to be_nil
 
         expect(controller.js_env[:QUIZZES]).to be_nil
       end
@@ -746,7 +746,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:context_url]).to eq("/courses/#{shard_id}~#{local_course_id}/quizzes")
           # Verify it contains the shard prefix (format: <shard_id>~<course_id>)
           expect(controller.js_env[:context_url]).to match(%r{^/courses/\d+~\d+/quizzes$})
-          expect(controller.remote_env[:ams]).to_not be_nil
+          expect(controller.remote_env[:ams]).not_to be_nil
         end
 
         it "generates context_url with shard-aware ID format for cross-shard courses in index action" do
@@ -759,7 +759,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:context_url]).to eq("/courses/#{shard_id}~#{local_course_id}/quizzes")
           # Verify it contains the shard prefix (format: <shard_id>~<course_id>)
           expect(controller.js_env[:context_url]).to match(%r{^/courses/\d+~\d+/quizzes$})
-          expect(controller.remote_env[:ams]).to_not be_nil
+          expect(controller.remote_env[:ams]).not_to be_nil
         end
 
         it "generates regular context_url without shard prefix for same-shard courses" do

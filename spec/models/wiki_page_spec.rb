@@ -58,7 +58,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     p.update(body: "Awgawg")
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not include(@student)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).not_to include(@student)
   end
 
   it "only sends page updated notifications to students assigned to the page" do
@@ -384,7 +384,7 @@ describe WikiPage do
     p1.save
 
     # doesn't delete the lookups
-    expect(p1.current_lookup).to_not be_nil
+    expect(p1.current_lookup).not_to be_nil
 
     # therefore we can't reuse the url
     p2 = @course.wiki_pages.create(title: "Asdf")

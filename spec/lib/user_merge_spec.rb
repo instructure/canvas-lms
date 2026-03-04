@@ -571,7 +571,7 @@ describe UserMerge do
       context_module.update_for(user2, :read, tag)
 
       # it should work
-      expect { UserMerge.from(user1).into(user2) }.to_not raise_error
+      expect { UserMerge.from(user1).into(user2) }.not_to raise_error
 
       # it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
       expect(ContextModuleProgression.where(user_id: user1, context_module_id: [context_module, context_module2]).count).to eq 0
@@ -1077,7 +1077,7 @@ describe UserMerge do
         @user2 = user_model
         user_service_model(user: @user2)
       end
-      expect { UserMerge.from(@user2).into(user1) }.to_not raise_error
+      expect { UserMerge.from(@user2).into(user1) }.not_to raise_error
     end
 
     it "merges a user across shards" do

@@ -1523,7 +1523,7 @@ describe "Users API", type: :request do
       expect(response.headers["Link"]).to include("rel=\"next\"")
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: u.id.to_s, per_page: "1", page: "2" })
       expect(json).to be_empty
-      expect(response.headers["Link"]).to_not include("rel=\"next\"")
+      expect(response.headers["Link"]).not_to include("rel=\"next\"")
     end
 
     it "does not return a next-page link on the last page for session-authenticated requests" do
@@ -1539,7 +1539,7 @@ describe "Users API", type: :request do
                       {},
                       { skip_token_auth: true, expected_status: 200 })
       expect(json.length).to eq 1
-      expect(response.headers["Link"]).to_not include("rel=\"next\"")
+      expect(response.headers["Link"]).not_to include("rel=\"next\"")
     end
 
     it "does bookmarked pagination when sorting by id" do
@@ -1883,7 +1883,7 @@ describe "Users API", type: :request do
           other_user.reload
           @pseudonym.reload
           expect(other_user).to be_registered
-          expect(other_user.user_account_associations.where(account_id: Account.default).first).to_not be_nil
+          expect(other_user.user_account_associations.where(account_id: Account.default).first).not_to be_nil
           expect(@pseudonym).to be_active
           expect(other_user.communication_channel).to be_present
           expect(other_user.communication_channel.workflow_state).to eq("active")
@@ -2679,7 +2679,7 @@ describe "Users API", type: :request do
       it "cannot see avatar_state" do
         raw_api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id), { email: "test@example.com" })
         expect(response).to have_http_status :ok
-        expect(JSON.parse(response.body)).to_not have_key("avatar_state")
+        expect(JSON.parse(response.body)).not_to have_key("avatar_state")
       end
     end
 

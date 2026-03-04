@@ -696,7 +696,7 @@ describe GradingStandard do
       expect(grading_standard.halted?)
         .to be(true)
       expect(grading_standard.halted_because)
-        .to_not be_nil
+        .not_to be_nil
     end
   end
 
@@ -719,7 +719,7 @@ describe GradingStandard do
       expect(grading_standard.halted?)
         .to be(true)
       expect(grading_standard.halted_because)
-        .to_not be_nil
+        .not_to be_nil
     end
   end
 

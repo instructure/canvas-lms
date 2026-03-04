@@ -218,7 +218,7 @@ describe Login::CasController do
       ap.update_attribute(:jit_provisioning, true)
       unique_id = "foo@example.com"
 
-      expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+      expect(account.pseudonyms.active.by_unique_id(unique_id)).not_to be_exists
       get "new", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(session[:cas_session]).to eq "ST-abcd"
@@ -240,7 +240,7 @@ describe Login::CasController do
     session[:sentinel] = true
     get "new", params: { ticket: "ST-abcd" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_blank
+    expect(flash[:delegated_message]).not_to be_blank
     expect(Time.now.utc - start).to be < 1
     expect(session[:sentinel]).to be true
     expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(

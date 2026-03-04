@@ -44,7 +44,7 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
     it "is creatable from an event_stream record of the correct type" do
       submission_record.update!(grading_period:)
       ar_rec = Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(es_record)
-      expect(ar_rec.id).to_not be_nil
+      expect(ar_rec.id).not_to be_nil
       expect(ar_rec.uuid).to eq(es_record.id)
       course = submission_record.assignment.context
       expect(ar_rec.grade_after).to eq(es_record.grade_after)
@@ -61,7 +61,7 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       expect(ar_rec.submission_id).to eq(submission_record.id)
       expect(ar_rec.submission_version_number).to eq(submission_record.version_number)
       expect(ar_rec.version_number).to eq(submission_record.version_number)
-      expect(ar_rec.created_at).to_not be_nil
+      expect(ar_rec.created_at).not_to be_nil
       expect(ar_rec.grading_period_id).to eq(grading_period.id)
     end
 

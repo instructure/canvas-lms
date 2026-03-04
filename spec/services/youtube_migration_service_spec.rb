@@ -742,7 +742,7 @@ RSpec.describe YoutubeMigrationService do
       resources = service.scan_course_for_embeds
 
       quiz_key = "Quizzes::Quiz|#{quiz.id}"
-      expect(resources[quiz_key]).to_not be_present
+      expect(resources[quiz_key]).not_to be_present
 
       aq_key = "AssessmentQuestion|#{assessment_question.id}"
       expect(resources[aq_key][:count]).to eq(1)

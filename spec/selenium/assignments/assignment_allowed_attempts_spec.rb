@@ -46,7 +46,7 @@ describe "allowed_attempts feature for assignments" do
         it "allows submitting if the student has not exceeded the max number of attempts" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expect(f(".student-assignment-overview")).to include_text("Allowed Attempts")
-          expect(f(".submit_assignment_link")).to_not be_disabled
+          expect(f(".submit_assignment_link")).not_to be_disabled
         end
       end
 
@@ -58,8 +58,8 @@ describe "allowed_attempts feature for assignments" do
 
         it "does not show the attempt data" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          expect(f(".student-assignment-overview")).to_not include_text("Allowed Attempts")
-          expect(f(".submit_assignment_link")).to_not be_disabled
+          expect(f(".student-assignment-overview")).not_to include_text("Allowed Attempts")
+          expect(f(".submit_assignment_link")).not_to be_disabled
         end
       end
     end
@@ -82,7 +82,7 @@ describe "allowed_attempts feature for assignments" do
         it "allows submitting if the student has not exceeded the max number of attempts" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
           expect(f(".submission-details-header__info")).to include_text("Allowed Attempts")
-          expect(fln("Re-submit Assignment")).to_not be_disabled
+          expect(fln("Re-submit Assignment")).not_to be_disabled
         end
       end
 
@@ -95,8 +95,8 @@ describe "allowed_attempts feature for assignments" do
 
         it "does not show the attempt data and allows submitting" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-          expect(f(".submission-details-header__info")).to_not include_text("Allowed Attempts")
-          expect(fln("Re-submit Assignment")).to_not be_disabled
+          expect(f(".submission-details-header__info")).not_to include_text("Allowed Attempts")
+          expect(fln("Re-submit Assignment")).not_to be_disabled
         end
       end
     end

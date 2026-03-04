@@ -1360,7 +1360,7 @@ describe ExternalToolsController do
 
         it "if parent_frame_context is not given it does not include it in lti_message_hint" do
           get_page
-          expect(decoded_jwt).to_not include("parent_frame_context")
+          expect(decoded_jwt).not_to include("parent_frame_context")
         end
 
         context "when the parent parent_frame_context is passed" do
@@ -2446,7 +2446,7 @@ describe ExternalToolsController do
         enable_developer_key_account_binding!(developer_key)
       end
 
-      it { is_expected.to_not be_nil }
+      it { is_expected.not_to be_nil }
 
       context "with invalid client id" do
         let(:params) { super().merge(client_id: "bad client id") }
@@ -3562,7 +3562,7 @@ describe ExternalToolsController do
 
         it "returns a 401" do
           get(:generate_sessionless_launch, params:)
-          expect(response).to_not be_successful
+          expect(response).not_to be_successful
           expect(response.code.to_i).to eq(401)
         end
       end

@@ -57,7 +57,7 @@ describe Bookmarks::BookmarksController do
         u2 = user_factory
         bookmark2 = Bookmarks::Bookmark.create(user_id: u2.id, name: "bio 101", url: "/courses/1")
         get "show", params: { id: bookmark2.id }, format: "json"
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
       end
     end
 
@@ -90,12 +90,12 @@ describe Bookmarks::BookmarksController do
 
       it "sets position" do
         post "create", params: params.merge(position: 1), format: "json"
-        expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
+        expect(Bookmarks::Bookmark.order(:id).last).not_to be_last
       end
 
       it "handles position strings" do
         post "create", params: params.merge(position: "1"), format: "json"
-        expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
+        expect(Bookmarks::Bookmark.order(:id).last).not_to be_last
       end
     end
 

@@ -511,7 +511,7 @@ describe Mutations::CreateAssignment do
       courseId: "#{@course.to_param}"
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors.first["message"]).to include "Argument 'name' on InputObject 'CreateAssignmentInput' is required"
   end
 
@@ -529,7 +529,7 @@ describe Mutations::CreateAssignment do
       name: "nope"
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors[0]["message"]).to include "invalid course"
   end
 
@@ -539,7 +539,7 @@ describe Mutations::CreateAssignment do
       name: "I don't have permission to create this"
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors[0]["message"]).to include "invalid course"
   end
 

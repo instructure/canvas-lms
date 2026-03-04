@@ -949,7 +949,7 @@ describe "people" do
       expect_instui_flash_message "Successfully updated roles"
 
       expect(@enrollment.reload).to be_deleted
-      expect(enrollment2.reload).to_not be_deleted
+      expect(enrollment2.reload).not_to be_deleted
     end
 
     it "works with multiple enrollments in one section" do
@@ -1101,7 +1101,7 @@ describe "people" do
     Account.default.role_overrides.create!(permission: "remove_student_from_course", enabled: false, role: admin_role)
     refresh_page
 
-    expect(f("#courses")).to_not contain_css(".unenroll_link")
+    expect(f("#courses")).not_to contain_css(".unenroll_link")
   end
 
   context "Differentiation Tags" do

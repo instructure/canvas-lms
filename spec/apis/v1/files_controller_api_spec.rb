@@ -1840,7 +1840,7 @@ describe "Files API", type: :request do
       old_uuid = @att.uuid
       account_admin_user(account: @account)
       api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 200)
-      expect(@att.reload.uuid).to_not eq old_uuid
+      expect(@att.reload.uuid).not_to eq old_uuid
     end
 
     it "does not let non-admin users reset verifiers" do

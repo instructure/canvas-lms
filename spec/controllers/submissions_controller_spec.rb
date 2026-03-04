@@ -362,7 +362,7 @@ describe SubmissionsController do
       request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
       post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "basic_lti_launch", url: "http://www.google.com" } }
       expect(response).to be_redirect
-      expect(assigns[:submission]).to_not be_nil
+      expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].submission_type).to eq "basic_lti_launch"
       expect(assigns[:submission].url).to eq "http://www.google.com"
     end
@@ -686,7 +686,7 @@ describe SubmissionsController do
               submission: { submission_type: "online_url", url: "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[?&]confetti=true/)
+            expect(response).not_to redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -700,7 +700,7 @@ describe SubmissionsController do
         it "redirects without confetti" do
           post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "online_url", url: "url" } }
           expect(response).to be_redirect
-          expect(response).to_not redirect_to(/[?&]confetti=true/)
+          expect(response).not_to redirect_to(/[?&]confetti=true/)
         end
       end
 
@@ -728,7 +728,7 @@ describe SubmissionsController do
               submission: { submission_type: "online_url", url: "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[?&]confetti=true/)
+            expect(response).not_to redirect_to(/[?&]confetti=true/)
           end
         end
       end

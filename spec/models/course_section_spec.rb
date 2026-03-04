@@ -302,7 +302,7 @@ describe CourseSection do
       it "must not have any effect when the section's workflow_state is not 'deleted'" do
         section.delete_enrollments_if_deleted
         enrollment_states = section.enrollments.pluck(:workflow_state)
-        expect(enrollment_states).to_not include "deleted"
+        expect(enrollment_states).not_to include "deleted"
       end
 
       it "must mark the enrollments as deleted if the section's workflow_state is 'deleted'" do

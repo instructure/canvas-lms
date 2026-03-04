@@ -923,13 +923,13 @@ describe "security" do
         expect(response.body).to match(/Copy this Course/)
         expect(response.body).not_to match(/Import Course Content/)
         expect(response.body).to match(/Export Course Content/)
-        expect(response.body).to_not match(/Delete this Course/)
+        expect(response.body).not_to match(/Delete this Course/)
 
         add_permission :manage_courses_admin
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to_not match(/Delete this Course/)
+        expect(response.body).not_to match(/Delete this Course/)
 
         html = Nokogiri::HTML5(response.body)
         expect(html.css("#course_account_id")).not_to be_empty

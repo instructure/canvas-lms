@@ -91,10 +91,10 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
-          expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
-          expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
-          expect(assigns[:js_env][:NEW_USER_TUTORIALS]).to_not be_nil
-          expect(assigns[:js_env][:NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT]).to_not be_nil
+          expect(assigns[:js_env][:OLD_START_DATE]).not_to be_nil
+          expect(assigns[:js_env][:OLD_END_DATE]).not_to be_nil
+          expect(assigns[:js_env][:NEW_USER_TUTORIALS]).not_to be_nil
+          expect(assigns[:js_env][:NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT]).not_to be_nil
         end
 
         it "exports proper environment variables with the flag ON" do
@@ -107,15 +107,15 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:COURSE_ID]).not_to be_nil
           expect(assigns[:js_env][:CONTENT_MIGRATIONS]).to be_nil
           expect(assigns[:js_env][:SHOW_SELECT]).not_to be_nil
-          expect(assigns[:js_env][:CONTENT_MIGRATIONS_EXPIRE_DAYS]).to_not be_nil
+          expect(assigns[:js_env][:CONTENT_MIGRATIONS_EXPIRE_DAYS]).not_to be_nil
           expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
-          expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
-          expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
+          expect(assigns[:js_env][:OLD_START_DATE]).not_to be_nil
+          expect(assigns[:js_env][:OLD_END_DATE]).not_to be_nil
         end
       end
     end

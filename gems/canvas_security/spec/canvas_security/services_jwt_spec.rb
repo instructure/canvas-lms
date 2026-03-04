@@ -128,7 +128,7 @@ module CanvasSecurity
 
           it "can return just the encrypted token without base64 encoding" do
             jwt = ServicesJwt.generate({ sub: 1 }, false)
-            expect(jwt).to_not match(base64_regex)
+            expect(jwt).not_to match(base64_regex)
           end
 
           it "allows the introduction of arbitrary data" do

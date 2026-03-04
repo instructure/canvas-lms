@@ -619,7 +619,7 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
       path = "web_resources/Uploaded Media/cn_image.jpg"
       expect(@zip_file.find_entry(path)).not_to be_nil
-      expect(@manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")).to_not be_nil
+      expect(@manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")).not_to be_nil
       expect(@zip_file.read("course_settings/files_meta.xml")).to include "<folder path=\"Uploaded Media\">\n      <hidden>true</hidden>\n    </folder>"
     end
 
@@ -687,7 +687,7 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("presentation material mattext").text).to match_ignoring_whitespace export_html
 
       resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")
-      expect(resource_node).to_not be_nil
+      expect(resource_node).not_to be_nil
       path = resource_node["href"]
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
@@ -1733,7 +1733,7 @@ describe "Common Cartridge exporting" do
           assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
 
           doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
-          expect(doc).to_not be_nil
+          expect(doc).not_to be_nil
         end
       end
 
@@ -1779,7 +1779,7 @@ describe "Common Cartridge exporting" do
             assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
 
             doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
-            expect(doc).to_not be_nil
+            expect(doc).not_to be_nil
           end
         end
       end

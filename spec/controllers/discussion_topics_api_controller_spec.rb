@@ -98,7 +98,7 @@ describe DiscussionTopicsApiController do
                      attachment: default_uploaded_data },
            format: "json"
 
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
       expect(response.body).to include("User storage quota exceeded")
     end
 

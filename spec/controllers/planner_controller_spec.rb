@@ -155,8 +155,8 @@ describe PlannerController do
         get :index
         response_json = json_parse(response.body)
         expect(response_json.length).to eq 2
-        expect(response_json.find { |i| i["plannable_id"] == course1_event.id }).to_not be_nil
-        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).to_not be_nil
+        expect(response_json.find { |i| i["plannable_id"] == course1_event.id }).not_to be_nil
+        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).not_to be_nil
 
         @student1_enrollment.deactivate
         @student1 = User.find(@student1.id)
@@ -166,7 +166,7 @@ describe PlannerController do
         response_json = json_parse(response.body)
         expect(response_json.length).to eq 1
         expect(response_json.find { |i| i["plannable_id"] == course1_event.id }).to be_nil
-        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).to_not be_nil
+        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).not_to be_nil
       end
 
       it "shows the appropriate section-specific event for the user" do

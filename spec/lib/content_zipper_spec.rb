@@ -178,7 +178,7 @@ describe ContentZipper do
         content = f.get_input_stream.read if f.file?
       end
       expect(content).to include("hai this is my answer")
-      expect(content).to_not include(@student.name)
+      expect(content).not_to include(@student.name)
       expect(content).to include("Anonymous User")
     end
 
@@ -519,7 +519,7 @@ describe ContentZipper do
       )
       expect do
         ContentZipper.new.zip_eportfolio(attachment, eportfolio)
-      end.to_not raise_error
+      end.not_to raise_error
     end
 
     context "with restricted permissions" do

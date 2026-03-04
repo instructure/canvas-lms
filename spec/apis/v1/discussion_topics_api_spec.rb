@@ -1760,7 +1760,7 @@ describe DiscussionTopicsController, type: :request do
 
         gtopic.reload
         expect(gtopic.allow_rating).to be_truthy
-        expect(gtopic.require_initial_post).to_not be_truthy
+        expect(gtopic.require_initial_post).not_to be_truthy
       end
 
       it "does not allow updating certain attributes for group sub-discussions" do
@@ -4153,9 +4153,9 @@ describe DiscussionTopicsController, type: :request do
                         { controller: "discussion_topics_api", action: "view", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s },
                         { include_new_entries: "1" })
 
-        expect(json["view"].first["message"]).to_not start_with(@tag)
-        expect(json["view"].first["replies"].first["message"]).to_not start_with(@tag)
-        expect(json["new_entries"].first["message"]).to_not start_with(@tag)
+        expect(json["view"].first["message"]).not_to start_with(@tag)
+        expect(json["view"].first["replies"].first["message"]).not_to start_with(@tag)
+        expect(json["new_entries"].first["message"]).not_to start_with(@tag)
       end
     end
 
@@ -4246,10 +4246,10 @@ describe DiscussionTopicsController, type: :request do
 
       new_entry = json["new_entries"].first
       message = new_entry["message"]
-      expect(message).to_not include("placeholder.invalid")
+      expect(message).not_to include("placeholder.invalid")
       expect(message).to include("www.example.com#{link}")
       att_url = new_entry["attachments"].first["url"]
-      expect(att_url).to_not include("placeholder.invalid")
+      expect(att_url).not_to include("placeholder.invalid")
       expect(att_url).to include("www.example.com")
     end
   end

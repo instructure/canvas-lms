@@ -845,7 +845,7 @@ describe CommunicationChannel do
           .exactly(5).times
         cc.update!(path: "foo" + cc.path)
         cc.update!(position: cc.position + 1)
-        expect(cc.workflow_state).to_not eq("active")
+        expect(cc.workflow_state).not_to eq("active")
         cc.update!(workflow_state: "active")
         cc.update!(path_type: described_class::TYPE_PUSH)
         cc.update!(path_type: described_class::TYPE_EMAIL)
@@ -853,13 +853,13 @@ describe CommunicationChannel do
 
       it "doesn't flag old mappings if path type is not email" do
         cc.update!(path_type: described_class::TYPE_SMS, path: "8005551212")
-        expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
+        expect(MicrosoftSync::UserMapping).not_to receive(:flag_as_needs_updating_if_using_email)
         cc.update!(path_type: described_class::TYPE_PUSH)
         cc.update!(path: "instructure")
       end
 
       it "doesn't flag old mappings if nothing relevant has changed" do
-        expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
+        expect(MicrosoftSync::UserMapping).not_to receive(:flag_as_needs_updating_if_using_email)
         cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.zone.now)
       end
     end

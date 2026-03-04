@@ -297,7 +297,7 @@ describe "content migrations", :non_parallel do
       click_option("#courseSelect", @copy_from.id.to_s, :value)
       wait_for_ajaximations
 
-      expect(ContentMigrationPage.course_select_warning).to_not be_displayed
+      expect(ContentMigrationPage.course_select_warning).not_to be_displayed
     end
 
     it "selects by drop-down or by search box", priority: "2" do
@@ -725,7 +725,7 @@ describe "content migrations", :non_parallel do
     submod.find_element(:css, "a.checkbox-caret").click
     wait_for_ajaximations
 
-    expect(submod.find_element(:css, ".module_options")).to_not be_displayed
+    expect(submod.find_element(:css, ".module_options")).not_to be_displayed
 
     sub_submod = submod.find_element(:css, "li.normal-treeitem")
     expect(sub_submod).to include_text("Study Guide")

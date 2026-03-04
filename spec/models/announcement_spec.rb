@@ -105,7 +105,7 @@ describe Announcement do
       Timecop.freeze(2.weeks.from_now) do
         run_jobs
         expect(announcement.reload).to be_active
-        expect(att.reload).to_not be_locked
+        expect(att.reload).not_to be_locked
       end
     end
   end
@@ -336,7 +336,7 @@ describe Announcement do
       announcement_model(user: @teacher)
       to_users = @a.messages_sent[notification_name].map(&:user)
       expect(to_users).to include(@student)
-      expect(to_users).to_not include(other_student)
+      expect(to_users).not_to include(other_student)
     end
 
     it "does not broadcast if it just got edited to active, if notify_users is false" do

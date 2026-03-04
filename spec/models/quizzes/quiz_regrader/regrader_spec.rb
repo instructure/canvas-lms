@@ -103,7 +103,7 @@ describe Quizzes::QuizRegrader::Regrader do
       submissions << uncompleted_submission
 
       expect(quiz_regrader.submissions.length).to eq 5
-      expect(quiz_regrader.submissions.detect { |s| s.id == 5 }).to_not be_nil
+      expect(quiz_regrader.submissions.detect { |s| s.id == 5 }).not_to be_nil
     end
   end
 

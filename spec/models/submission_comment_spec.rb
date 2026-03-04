@@ -261,15 +261,15 @@ RSpec.describe SubmissionComment do
     it "does not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@course).to_not be_available
-      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
+      expect(@course).not_to be_available
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create for provisional comments" do
@@ -1013,7 +1013,7 @@ RSpec.describe SubmissionComment do
       @assignment.post_policy.update_attribute(:post_manually, true)
       @assignment.hide_submissions(submission_ids: [@submission.id])
 
-      expect(ContentParticipation).to_not receive(:create_or_update)
+      expect(ContentParticipation).not_to receive(:create_or_update)
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
 
@@ -1024,7 +1024,7 @@ RSpec.describe SubmissionComment do
     end
 
     it "does not update participation for a draft comment" do
-      expect(ContentParticipation).to_not receive(:create_or_update)
+      expect(ContentParticipation).not_to receive(:create_or_update)
         .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment", draft_comment: true)
     end

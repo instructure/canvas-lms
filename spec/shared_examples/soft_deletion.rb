@@ -50,7 +50,7 @@ shared_examples "soft deletion" do
     end
 
     it "does not include inactive associations" do
-      expect(active_scope).to_not include second
+      expect(active_scope).not_to include second
     end
   end
 

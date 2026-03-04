@@ -29,6 +29,6 @@ describe "Rack::Utils" do
 
     expect do
       Rack::Utils.parse_nested_query("foo#{"[a]" * (len - 1)}=bar")
-    end.to_not raise_error
+    end.not_to raise_error
   end
 end

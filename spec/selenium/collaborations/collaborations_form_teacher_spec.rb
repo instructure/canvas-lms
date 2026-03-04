@@ -75,7 +75,7 @@ describe "collaborations" do
         get "/courses/#{@course.id}/collaborations"
 
         expect(ff(".available-users li").length).to eq 2
-        expect(f(".available-users")).to_not include_text("inactive")
+        expect(f(".available-users")).not_to include_text("inactive")
       end
 
       it "selects from all course groups", priority: "1" do

@@ -166,7 +166,7 @@ describe AuthenticationProvidersController do
         put "start_debugging", params: { account_id: account.id, authentication_provider_id: account.canvas_authentication_provider.id }, format: :json
         expect(response).to have_http_status :bad_request
         expect(response.body).to match("Unsupported authentication type")
-        expect(account.canvas_authentication_provider).to_not be_debugging
+        expect(account.canvas_authentication_provider).not_to be_debugging
       end
     end
 

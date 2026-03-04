@@ -116,7 +116,7 @@ describe ReleaseNotesController do
   describe "update" do
     it "updates an existing note in the expected way" do
       the_note = ReleaseNote.find(note.id)
-      expect(the_note.target_roles).to_not be_nil
+      expect(the_note.target_roles).not_to be_nil
       put "update",
           params: {
             id: the_note.id,
@@ -143,7 +143,7 @@ describe ReleaseNotesController do
 
     it "works when not updating anything" do
       the_note = ReleaseNote.find(note.id)
-      expect(the_note.target_roles).to_not be_nil
+      expect(the_note.target_roles).not_to be_nil
       put "update", params: { id: the_note.id }
       expect(response).to have_http_status(:ok)
       res = response.parsed_body
@@ -165,7 +165,7 @@ describe ReleaseNotesController do
   describe "destroy" do
     it "removes an existing note" do
       the_note = ReleaseNote.find(note.id)
-      expect(the_note).to_not be_nil
+      expect(the_note).not_to be_nil
       delete "destroy", params: { id: the_note.id }
       expect { ReleaseNote.find(note.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end

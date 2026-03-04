@@ -62,7 +62,7 @@ RSpec.describe ApiRouteSet, type: :request do
 
     def expect_no_route_matches(url)
       get(url.to_s)
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
     end
 
     def expect_route_matches(url, expected_response)

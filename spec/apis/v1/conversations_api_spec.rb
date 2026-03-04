@@ -197,7 +197,7 @@ describe ConversationsController, type: :request do
                         include: ["participant_avatars"] })
       json.each do |conversation|
         conversation["participants"].each do |user|
-          expect(user).to_not have_key "avatar_url"
+          expect(user).not_to have_key "avatar_url"
         end
       end
     end
@@ -378,7 +378,7 @@ describe ConversationsController, type: :request do
                                    "/api/v1/conversations.json?filter=#{@course_1.asset_string}",
                                    { controller: "conversations", action: "index", format: "json", filter: @course_1.asset_string, scope: "default" })
 
-          expect(json_course_1[0]["context_code"]).to_not eq(Account.default.asset_string)
+          expect(json_course_1[0]["context_code"]).not_to eq(Account.default.asset_string)
           expect(json_course_1[0]["context_code"]).to eq(@course_1.asset_string)
         end
       end
@@ -750,7 +750,7 @@ describe ConversationsController, type: :request do
                          "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", context_code: "course_#{course2.id}" })
-        expect(json3.first["id"]).to_not eq conv1.id # should make a new one
+        expect(json3.first["id"]).not_to eq conv1.id # should make a new one
       end
 
       it "creates a new conversation if force_new parameter is provided" do
@@ -765,7 +765,7 @@ describe ConversationsController, type: :request do
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", subject: "subject_2", force_new: "true" })
         conv2 = Conversation.find(json2.first["id"])
-        expect(conv2.id).to_not eq conv1.id # should make a new one
+        expect(conv2.id).not_to eq conv1.id # should make a new one
       end
 
       it "does not break trying to pull cached conversations for re-use" do
@@ -1680,7 +1680,7 @@ describe ConversationsController, type: :request do
                       "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
 
-      expect(json["cannot_reply"]).to_not be_truthy
+      expect(json["cannot_reply"]).not_to be_truthy
     end
 
     context "with testing verifiers with disable_adding_uuid_verifier_in_api ff" do

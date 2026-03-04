@@ -47,23 +47,23 @@ describe Quizzes::QuizEligibility do
     it "returns false if no course is provided" do
       allow(@eligibility).to receive(:course).and_return(nil)
 
-      expect(@eligibility).to_not be_eligible
-      expect(@eligibility).to_not be_potentially_eligible
+      expect(@eligibility).not_to be_eligible
+      expect(@eligibility).not_to be_potentially_eligible
     end
 
     it "returns false if the student is inactive" do
       allow(@user).to receive(:workflow_state).and_return("deleted")
 
-      expect(@eligibility).to_not be_eligible
-      expect(@eligibility).to_not be_potentially_eligible
+      expect(@eligibility).not_to be_eligible
+      expect(@eligibility).not_to be_potentially_eligible
     end
 
     it "returns false if a user cannot submit or read as an admin" do
       allow(@quiz).to receive(:grants_right?).and_return(false)
       allow(@course).to receive(:grants_right?).and_return(false)
 
-      expect(@eligibility).to_not be_eligible
-      expect(@eligibility).to_not be_potentially_eligible
+      expect(@eligibility).not_to be_eligible
+      expect(@eligibility).not_to be_potentially_eligible
     end
 
     it "returns true if a user can read as an admin" do
@@ -81,14 +81,14 @@ describe Quizzes::QuizEligibility do
     it "returns false if a quiz is access code restricted (but is still potentially_eligible)" do
       @quiz.access_code = "x"
 
-      expect(@eligibility).to_not be_eligible
+      expect(@eligibility).not_to be_eligible
       expect(@eligibility).to be_potentially_eligible
     end
 
     it "returns false if a quiz is ip restricted (but is still potentially_eligible)" do
       @quiz.ip_filter = "1.1.1.1"
 
-      expect(@eligibility).to_not be_eligible
+      expect(@eligibility).not_to be_eligible
       expect(@eligibility).to be_potentially_eligible
     end
 
@@ -97,8 +97,8 @@ describe Quizzes::QuizEligibility do
       @course.enroll_student(other_user, enrollment_state: "complete")
       allow(@eligibility).to receive(:user).and_return(other_user)
 
-      expect(@eligibility).to_not be_eligible
-      expect(@eligibility).to_not be_potentially_eligible
+      expect(@eligibility).not_to be_eligible
+      expect(@eligibility).not_to be_potentially_eligible
     end
 
     it "otherwise returns true" do
@@ -125,12 +125,12 @@ describe Quizzes::QuizEligibility do
 
   describe "#locked?" do
     it "returns false the quiz is not locked" do
-      expect(@eligibility).to_not be_locked
+      expect(@eligibility).not_to be_locked
     end
 
     it "returns false if quiz explicitly grant access to the user" do
       allow(@quiz).to receive_messages(locked_for?: true, grants_right?: true)
-      expect(@eligibility).to_not be_locked
+      expect(@eligibility).not_to be_locked
     end
 
     it "returns true if the quiz is locked and access is not granted" do

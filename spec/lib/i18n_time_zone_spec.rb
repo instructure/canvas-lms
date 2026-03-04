@@ -45,7 +45,7 @@ describe I18nTimeZone do
 
     it "has an entry in en locale for every time zone" do
       I18nTimeZone.all.each do |zone|
-        expect(zone.to_s).to_not include("translation missing")
+        expect(zone.to_s).not_to include("translation missing")
       end
     end
   end

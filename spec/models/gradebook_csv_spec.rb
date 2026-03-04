@@ -60,7 +60,7 @@ describe GradebookCSV do
 
       it "returns false if the associated progress object has not failed" do
         csv = csv(course: @course, user: @teacher)
-        expect(csv).to_not be_failed
+        expect(csv).not_to be_failed
       end
     end
   end

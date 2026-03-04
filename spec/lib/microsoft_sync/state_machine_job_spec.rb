@@ -386,7 +386,7 @@ module MicrosoftSync
             end
 
             it "does not send anything to Canvas::Errors" do
-              expect(Canvas::Errors).to_not receive(:capture)
+              expect(Canvas::Errors).not_to receive(:capture)
               subject.send(:run, :step_initial, nil)
             end
           end
@@ -822,7 +822,7 @@ module MicrosoftSync
                   expect(state_record.job_state[:step]).to eq(:step_initial)
                   expect(steps_object).not_to receive(:step_initial)
                   expect { subject.send(:run, nil, mem_state1) }
-                    .to_not change { state_record.reload.attributes }
+                    .not_to change { state_record.reload.attributes }
                 end
               end
 
@@ -836,7 +836,7 @@ module MicrosoftSync
                   subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state2)
                   expect(steps_object).not_to receive(:step_initial)
                   steps_object.steps_run.clear
-                  expect { subject.send(:run, nil, mem_state1) }.to_not change { state_record.reload.attributes }
+                  expect { subject.send(:run, nil, mem_state1) }.not_to change { state_record.reload.attributes }
                   expect(steps_object.steps_run).to eq([
                                                          [:delay_run, [{ strand:, run_at: 61.seconds.from_now }], [nil, mem_state1]]
                                                        ])

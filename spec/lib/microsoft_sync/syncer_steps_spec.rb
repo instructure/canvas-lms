@@ -42,14 +42,14 @@ describe MicrosoftSync::SyncerSteps do
 
   def expect_next_step(result, step, memory_state = nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::NextStep)
-    expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+    expect { syncer_steps.method(step.to_sym) }.not_to raise_error
     expect(result.step).to eq(step)
     expect(result.memory_state).to eq(memory_state)
   end
 
   def expect_delayed_next_step(result, step, delay_amount, job_state_data = nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::DelayedNextStep)
-    expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+    expect { syncer_steps.method(step.to_sym) }.not_to raise_error
     expect(result.step).to eq(step)
     expect(result.delay_amount).to eq(delay_amount)
     expect(result.job_state_data).to eq(job_state_data)
@@ -66,7 +66,7 @@ describe MicrosoftSync::SyncerSteps do
     expect(result.job_state_data).to eq(job_state_data)
     expect(result.step).to eq(step)
     if step
-      expect { syncer_steps.method(step.to_sym) }.to_not raise_error
+      expect { syncer_steps.method(step.to_sym) }.not_to raise_error
     end
   end
 
@@ -306,7 +306,7 @@ describe MicrosoftSync::SyncerSteps do
         let(:education_class_ids) { ["newid2"] }
 
         it 'goes to the "update group" step with the remote group ID' do
-          expect(graph_service_helpers).to_not receive(:create_education_class)
+          expect(graph_service_helpers).not_to receive(:create_education_class)
 
           expect_delayed_next_step(
             subject, :step_update_group_with_course_data, 8.seconds, "newid2"
@@ -326,8 +326,8 @@ describe MicrosoftSync::SyncerSteps do
 
       shared_examples_for "missing the correct account settings" do
         it "raises a graceful cleanup error with a end-user-friendly message" do
-          expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
-          expect(syncer_steps).to_not receive(:ensure_class_group_exists)
+          expect(MicrosoftSync::GraphServiceHelpers).not_to receive(:new)
+          expect(syncer_steps).not_to receive(:ensure_class_group_exists)
           klass = described_class::TenantMissingOrSyncDisabled
           msg =
             "Tenant missing or sync disabled. " \
@@ -362,9 +362,9 @@ describe MicrosoftSync::SyncerSteps do
         let(:education_class_ids) { ["oldid"] }
 
         it "does not modify or create any group" do
-          expect(graph_service_helpers).to_not receive(:create_education_class)
-          expect(graph_service_helpers).to_not receive(:update_group_with_course_data)
-          expect { subject }.to_not change { group.reload.ms_group_id }
+          expect(graph_service_helpers).not_to receive(:create_education_class)
+          expect(graph_service_helpers).not_to receive(:update_group_with_course_data)
+          expect { subject }.not_to change { group.reload.ms_group_id }
           expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
         end
       end
@@ -465,7 +465,7 @@ describe MicrosoftSync::SyncerSteps do
         it "doesn't add any UserMappings" do
           expect(graph_service_helpers).to receive(:users_uluvs_to_aads)
             .at_least(:once).and_return({})
-          expect { subject }.to_not change { MicrosoftSync::UserMapping.count }.from(0)
+          expect { subject }.not_to change { MicrosoftSync::UserMapping.count }.from(0)
         end
       end
 
@@ -518,7 +518,7 @@ describe MicrosoftSync::SyncerSteps do
             {}
           end
           expect_next_step(subject, :step_generate_diff)
-          expect(uluvs_looked_up).to_not include("student0@example.com")
+          expect(uluvs_looked_up).not_to include("student0@example.com")
           expect(uluvs_looked_up).to include("student1@example.com")
         end
       end
@@ -829,7 +829,7 @@ describe MicrosoftSync::SyncerSteps do
         course.enrollments.to_a.each do |e|
           e.destroy if /^Teacher|Ta|Designer/.match?(e.type)
         end
-        expect(graph_service.teams).to_not receive(:team_exists?)
+        expect(graph_service.teams).not_to receive(:team_exists?)
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
       end
     end
@@ -913,7 +913,7 @@ describe MicrosoftSync::SyncerSteps do
         let(:error_step) { :step_create_team }
 
         it "doesn't run but returns IGNORE" do
-          expect(MicrosoftSync::PartialSyncChange).to_not receive(:where)
+          expect(MicrosoftSync::PartialSyncChange).not_to receive(:where)
           expect(subject).to eq(MicrosoftSync::StateMachineJob::IGNORE)
         end
       end
@@ -1052,7 +1052,7 @@ describe MicrosoftSync::SyncerSteps do
           it "ignores #{state} enrollments" do
             Enrollment.where(course:, user: students[0]).update_all(workflow_state: state)
             subject
-            expect(diff).to_not have_received(:set_local_member).with(students[0].id, "StudentEnrollment")
+            expect(diff).not_to have_received(:set_local_member).with(students[0].id, "StudentEnrollment")
             expect(diff).to have_received(:set_local_member).with(students[2].id, "StudentEnrollment")
           end
         end
@@ -1060,7 +1060,7 @@ describe MicrosoftSync::SyncerSteps do
         it "ignores StudentViewEnrollment (fake) enrollments" do
           Enrollment.where(course:, user: students[0]).update_all(type: "StudentViewEnrollment")
           subject
-          expect(diff).to_not have_received(:set_local_member).with(students[0].id, anything)
+          expect(diff).not_to have_received(:set_local_member).with(students[0].id, anything)
         end
 
         it_behaves_like "a step that executes a diff" do

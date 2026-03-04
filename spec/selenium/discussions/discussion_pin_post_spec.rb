@@ -50,7 +50,7 @@ describe "Discussion Pin Post" do
 
       f("button[data-testid='threading-toolbar-pin']").click
       expect(f("[data-testid='threading-toolbar-pin']").text).to include "Pin"
-      expect(f("body")).to_not contain_jqcss("[data-testid='pinned-by-user-text']")
+      expect(f("body")).not_to contain_jqcss("[data-testid='pinned-by-user-text']")
     end
   end
 
@@ -76,7 +76,7 @@ describe "Discussion Pin Post" do
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
 
       expect(f("body")).not_to contain_jqcss("[data-testid='threading-toolbar-pin']")
-      expect(f("body")).to_not contain_jqcss("[data-testid='pinned-by-user-text']")
+      expect(f("body")).not_to contain_jqcss("[data-testid='pinned-by-user-text']")
     end
   end
 end

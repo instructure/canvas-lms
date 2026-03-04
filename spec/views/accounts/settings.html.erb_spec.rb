@@ -167,14 +167,14 @@ describe "accounts/settings" do
         Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
       end
 
       it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
         Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
       end
     end
 
@@ -201,14 +201,14 @@ describe "accounts/settings" do
       it "does not show the setting by default" do
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
 
       it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
         Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
     end
   end
@@ -541,7 +541,7 @@ describe "accounts/settings" do
       Account.site_admin.disable_feature!(:new_quizzes_separators)
       render
 
-      expect(response).to_not have_tag("select#account_settings_decimal_separator_value")
+      expect(response).not_to have_tag("select#account_settings_decimal_separator_value")
     end
 
     it "does not show up if new quizzes is not provisioned" do
@@ -549,7 +549,7 @@ describe "accounts/settings" do
       account.save!
       render
 
-      expect(response).to_not have_tag("select#account_settings_decimal_separator_value")
+      expect(response).not_to have_tag("select#account_settings_decimal_separator_value")
     end
   end
 
@@ -797,7 +797,7 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       options = doc.css("#account_course_template_id option[selected]")
-      expect(options.map(&:text)).to_not include("Unnamed Course")
+      expect(options.map(&:text)).not_to include("Unnamed Course")
       expect(options.count).to eq 1
     end
 

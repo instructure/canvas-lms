@@ -163,7 +163,7 @@ describe ConditionalRelease::Service do
           old_data = described_class.active_rules(@course, @teacher, nil)
           @set1_assmt1.destroy
           data = described_class.active_rules(@course, @teacher, nil)
-          expect(data).to_not eq old_data
+          expect(data).not_to eq old_data
           expect(data.first["scoring_ranges"].first["assignment_sets"].first["assignment_set_associations"]).to eq []
         end
       end
@@ -220,7 +220,7 @@ describe ConditionalRelease::Service do
         it "invalidates cache on submission change" do
           data = described_class.rules_for(@course, @student, nil)
           @trigger_assmt.grade_student(@student, grade: 8, grader: @teacher)
-          expect(described_class.rules_for(@course, @student, nil)).to_not eq data
+          expect(described_class.rules_for(@course, @student, nil)).not_to eq data
         end
       end
     end

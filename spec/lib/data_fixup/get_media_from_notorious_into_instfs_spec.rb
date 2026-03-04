@@ -89,7 +89,7 @@ describe DataFixup::GetMediaFromNotoriousIntoInstfs do
       expect(CanvasHttp).to receive(:get).with("http://example.com/asset").and_raise ArgumentError
       expect do
         DataFixup::GetMediaFromNotoriousIntoInstfs.send(:get_it_to_intfs, "m-frommediaobject-3")
-      end.to_not raise_error
+      end.not_to raise_error
     end
   end
 end

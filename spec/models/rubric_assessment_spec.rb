@@ -626,7 +626,7 @@ describe RubricAssessment do
                                   }
                                 }
                               })
-        end.to_not change { LearningOutcomeResult.count }
+        end.not_to change { LearningOutcomeResult.count }
       end
 
       it "does not update outcomes on a provisional grade" do
@@ -645,7 +645,7 @@ describe RubricAssessment do
                                   }
                                 }
                               })
-        end.to_not change { LearningOutcomeResult.count }
+        end.not_to change { LearningOutcomeResult.count }
       end
     end
 
@@ -1063,7 +1063,7 @@ describe RubricAssessment do
                                          }
                                        })
 
-      expect(assessment.root_account_id).to_not be_nil
+      expect(assessment.root_account_id).not_to be_nil
       expect(assessment.root_account_id).to eq @rubric.root_account_id
     end
   end

@@ -6300,7 +6300,7 @@ describe AssignmentsApiController, type: :request do
       api_create_assignment_in_course(@course, { description: "description",
                                                  allowed_extensions: "--docx" * 50 })
       json = JSON.parse response.body
-      expect(json["errors"]).to_not be_nil
+      expect(json["errors"]).not_to be_nil
       expect(json["errors"]&.keys).to eq ["assignment[allowed_extensions]"]
       expect(json["errors"]["assignment[allowed_extensions]"].first["message"]).to eq("Value too long, allowed length is 255")
     end
@@ -6327,7 +6327,7 @@ describe AssignmentsApiController, type: :request do
       api_create_assignment_in_course(@course, { "description" => "description",
                                                  "secure_params" => jwt })
       json = JSON.parse response.body
-      expect(json["errors"]).to_not be_nil
+      expect(json["errors"]).not_to be_nil
       expect(json["errors"]&.keys).to eq ["assignment[lti_context_id]"]
       expect(json["errors"]["assignment[lti_context_id]"].first["message"]).to eq("lti_context_id should be unique")
     end
@@ -7571,7 +7571,7 @@ describe AssignmentsApiController, type: :request do
 
         json = api_create_assignment_in_course(@course, assignment_params)
 
-        expect(json["errors"]).to_not be_nil
+        expect(json["errors"]).not_to be_nil
         expect(json["errors"]&.keys).to eq ["title"]
         expect(json["errors"]["title"].first["message"]).to eq("The title cannot be longer than 10 characters")
       end
@@ -8644,7 +8644,7 @@ describe AssignmentsApiController, type: :request do
                    { assignment: { assignment_overrides: { 0 => { course_section_id: @course.default_section.id, due_at: @section_due_at.iso8601 } } } },
                    {},
                    { expected_status: 403 })
-          expect(@assignment.assignment_overrides).to_not be_exists
+          expect(@assignment.assignment_overrides).not_to be_exists
 
           tag.update_attribute(:restrictions, { content: true }) # unrestrict due_dates
 
@@ -11534,7 +11534,7 @@ describe AssignmentsApiController, type: :request do
                           "id" => @a0.id,
                           "all_dates" => [{ "base" => true, "due_at" => @new_dates[1].iso8601 }]
                         }])
-        expect(@a0.cache_key(:availability)).to_not eq old_key
+        expect(@a0.cache_key(:availability)).not_to eq old_key
       end
 
       it "clears cache register values for quizzes" do
@@ -11543,7 +11543,7 @@ describe AssignmentsApiController, type: :request do
                           "id" => @q0.assignment.id,
                           "all_dates" => [{ "base" => true, "due_at" => @new_dates[1].iso8601 }]
                         }])
-        expect(@q0.cache_key(:availability)).to_not eq old_key
+        expect(@q0.cache_key(:availability)).not_to eq old_key
       end
     end
 

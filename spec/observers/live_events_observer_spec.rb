@@ -268,7 +268,7 @@ describe LiveEventsObserver do
     end
 
     it "does not post a create event when a submission is first created in an unsubmitted state" do
-      expect(Canvas::LiveEvents).to_not receive(:submission_created)
+      expect(Canvas::LiveEvents).not_to receive(:submission_created)
       Submission.create!(assignment: assignment_model, user: user_model, workflow_state: "unsubmitted", submitted_at: Time.zone.now)
     end
 

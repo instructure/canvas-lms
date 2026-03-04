@@ -496,12 +496,12 @@ describe "API Authentication", type: :request do
 
         it "gives first token" do
           json = trusted_exchange
-          expect(json["access_token"]).to_not be_nil
+          expect(json["access_token"]).not_to be_nil
         end
 
         it "gives second token if not force_token_reuse" do
           json = trusted_exchange(create_token: true)
-          expect(json["access_token"]).to_not be_nil
+          expect(json["access_token"]).not_to be_nil
           expect(@user.access_tokens.count).to eq 2
         end
 

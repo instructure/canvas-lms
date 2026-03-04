@@ -1701,7 +1701,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not include concluded teachers" do
-        expect(@quiz_submission.teachers).to_not include @concluded_teacher
+        expect(@quiz_submission.teachers).not_to include @concluded_teacher
       end
 
       it "includes teachers that were concluded and then later unconcluded" do
@@ -1711,12 +1711,12 @@ describe Quizzes::QuizSubmission do
 
       it "does not include teachers with deleted enrollments" do
         @active_enrollment.destroy
-        expect(@quiz_submission.teachers).to_not include @active_teacher
+        expect(@quiz_submission.teachers).not_to include @active_teacher
       end
 
       it "does not include inactive enrollments" do
         @active_enrollment.deactivate
-        expect(@quiz_submission.teachers).to_not include @active_teacher
+        expect(@quiz_submission.teachers).not_to include @active_teacher
       end
 
       it "includes teachers that were deactivated and then later reactivated" do
@@ -1730,7 +1730,7 @@ describe Quizzes::QuizSubmission do
         other_teacher = User.create!
         other_enrollment = @course.enroll_teacher(other_teacher, section: other_section, limit_privileges_to_course_section: true)
         other_enrollment.accept
-        expect(@quiz_submission.teachers).to_not include other_teacher
+        expect(@quiz_submission.teachers).not_to include other_teacher
       end
     end
 
@@ -1825,7 +1825,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "returns the correct soft (when the Attempt will timeout) time left" do
-        expect(subject.quiz).to_not receive(:timer_autosubmit_disabled?)
+        expect(subject.quiz).not_to receive(:timer_autosubmit_disabled?)
         expect(subject.time_left).to eql(60 * 60)
       end
 
@@ -1901,7 +1901,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "uses end_at by default" do
-      expect(subject).to_not receive(:end_at_without_time_limit)
+      expect(subject).not_to receive(:end_at_without_time_limit)
 
       subject.end_at = 3.minutes.ago
       expect(subject.overdue?).to be(false)

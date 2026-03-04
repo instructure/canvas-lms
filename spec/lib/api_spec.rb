@@ -818,15 +818,15 @@ describe Api do
 
   context "ISO8601 regex" do
     it "does not allow invalid dates" do
-      expect(Api::ISO8601_REGEX).to_not match "10/01/2014"
+      expect(Api::ISO8601_REGEX).not_to match "10/01/2014"
     end
 
     it "does not allow non ISO8601 dates" do
-      expect(Api::ISO8601_REGEX).to_not match "2014-10-01"
+      expect(Api::ISO8601_REGEX).not_to match "2014-10-01"
     end
 
     it "does not allow garbage dates" do
-      expect(Api::ISO8601_REGEX).to_not match "bad_data"
+      expect(Api::ISO8601_REGEX).not_to match "bad_data"
     end
 
     it "allows valid dates" do
@@ -834,7 +834,7 @@ describe Api do
     end
 
     it "does not allow valid dates BC" do
-      expect(Api::ISO8601_REGEX).to_not match "-2014-10-01T00:00:00-06:00"
+      expect(Api::ISO8601_REGEX).not_to match "-2014-10-01T00:00:00-06:00"
     end
   end
 
@@ -854,16 +854,16 @@ describe Api do
     end
 
     it "does not match invalid formats" do
-      expect(regex).to_not match "abc"
-      expect(regex).to_not match "~123"
-      expect(regex).to_not match "123~"
-      expect(regex).to_not match "a~b"
-      expect(regex).to_not match "123~abc"
+      expect(regex).not_to match "abc"
+      expect(regex).not_to match "~123"
+      expect(regex).not_to match "123~"
+      expect(regex).not_to match "a~b"
+      expect(regex).not_to match "123~abc"
     end
 
     it "does not match negative numbers" do
-      expect(regex).to_not match "-123"
-      expect(regex).to_not match "2~-123"
+      expect(regex).not_to match "-123"
+      expect(regex).not_to match "2~-123"
     end
   end
 

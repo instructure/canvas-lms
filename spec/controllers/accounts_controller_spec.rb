@@ -129,7 +129,7 @@ describe AccountsController do
         post "remove_user", params: { account_id: @account.id, user_id: @user.id }, format: "json"
         expect(flash[:notice]).to match(/successfully deleted/)
         expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
-        expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
+        expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
       end
     end
 
@@ -213,7 +213,7 @@ describe AccountsController do
         expect(progress.reload.workflow_state).to eq "completed"
         expect(progress.results[:errors]).to have_key("9999")
         expect(@account.reload.users.find_by(name: "Alice")).to be_nil
-        expect(@account.reload.users.find_by(name: "Bob")).to_not be_nil
+        expect(@account.reload.users.find_by(name: "Bob")).not_to be_nil
       end
 
       it "returns bad request if user_ids are over the limit" do
@@ -394,7 +394,7 @@ describe AccountsController do
       expect(response).to be_successful
 
       new_admin = CommunicationChannel.find_by(path: "testadmin@example.com").user
-      expect(new_admin).to_not be_nil
+      expect(new_admin).not_to be_nil
       @account.reload
       expect(@account.account_users.map(&:user)).to include(new_admin)
       expect(@account.account_users.find_by(role_id: role.id).user).to eq new_admin
@@ -1495,7 +1495,7 @@ describe AccountsController do
                                  } } }
         @account.reload
         eik = @account.external_integration_keys.where(key_type: :external_key2).first
-        expect(eik).to_not be_nil
+        expect(eik).not_to be_nil
         expect(eik.key_value).to eq "2142"
       end
 

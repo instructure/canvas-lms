@@ -238,7 +238,7 @@ describe Role do
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
       end
 
-      expect { Role.all_enrollment_roles_for_account(@sub_account) }.to_not raise_error
+      expect { Role.all_enrollment_roles_for_account(@sub_account) }.not_to raise_error
     end
 
     it "gets counts for all roles" do

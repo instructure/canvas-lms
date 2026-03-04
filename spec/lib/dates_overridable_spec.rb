@@ -516,7 +516,7 @@ shared_examples_for "all learning objects" do
         @override_student.user = @student_visible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher)).to_not be_empty
+        expect(overridable.overrides_for(@teacher)).not_to be_empty
       end
 
       it "returns the correct student for override with students in same and different section" do
@@ -554,7 +554,7 @@ shared_examples_for "all learning objects" do
         @override_student.user = @student_invisible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher)).to_not be_empty
+        expect(overridable.overrides_for(@teacher)).not_to be_empty
       end
 
       it "returns not empty for overrides of student in same section" do
@@ -563,7 +563,7 @@ shared_examples_for "all learning objects" do
         @override_student.user = @student_visible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher)).to_not be_empty
+        expect(overridable.overrides_for(@teacher)).not_to be_empty
       end
 
       it "returns single override for students in different sections" do

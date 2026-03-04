@@ -143,7 +143,7 @@ describe ContextModulesController do
       user_session(@student)
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
-      expect(@mod1.reload.updated_at.to_i).to_not eq time.to_i # should be touched in case view for old unlock time was cached
+      expect(@mod1.reload.updated_at.to_i).not_to eq time.to_i # should be touched in case view for old unlock time was cached
       expect(@mod2.reload.updated_at.to_i).to eq time.to_i # should not be touched since the unlock_at was already in the past the last time it was updated
     end
 
@@ -1371,7 +1371,7 @@ describe ContextModulesController do
           it "does create estimated_duration" do
             @assignment_item.reload.estimated_duration.destroy!
             put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 30 } }
-            expect(@assignment_item.reload.estimated_duration).to_not be_nil
+            expect(@assignment_item.reload.estimated_duration).not_to be_nil
           end
         end
 

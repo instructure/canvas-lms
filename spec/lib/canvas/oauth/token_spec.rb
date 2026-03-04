@@ -206,7 +206,7 @@ module Canvas::OAuth
         access_token = AccessToken.authenticate(json["access_token"])
         # setup new token with existing access token
         new_token = Token.new(token.key, token.code, access_token)
-        expect(new_token.as_json.keys).to_not include "refresh_token"
+        expect(new_token.as_json.keys).not_to include "refresh_token"
       end
 
       it "grabs the user json as well" do

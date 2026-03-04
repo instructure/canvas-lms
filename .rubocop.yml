@@ -364,9 +364,6 @@ RSpec/MultipleDescribes:
   Severity: convention
 RSpec/NamedSubject:
   Enabled: false
-RSpec/NotToNot:
-  Enabled: false
-  AutoCorrect: false
 RSpec/OverwritingSetup:
   Severity: convention
 RSpec/PendingWithoutReason:

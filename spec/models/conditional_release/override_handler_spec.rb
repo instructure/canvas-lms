@@ -29,7 +29,7 @@ module ConditionalRelease
     context "handle_grade_change" do
       it "checks that the assignment is actually a trigger assignment" do
         @rule.destroy!
-        expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
+        expect(ConditionalRelease::OverrideHandler).not_to receive(:handle_grade_change)
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
         run_jobs
       end
@@ -39,7 +39,7 @@ module ConditionalRelease
         run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set1_assmt1)
-        expect(visible_assmts).to_not include(@set2_assmt1) # and only the top set
+        expect(visible_assmts).not_to include(@set2_assmt1) # and only the top set
       end
 
       it "automatically unassigns if the grade changes" do
@@ -53,7 +53,7 @@ module ConditionalRelease
         run_jobs
 
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
-        expect(visible_assmts).to_not include(@set1_assmt1)
+        expect(visible_assmts).not_to include(@set1_assmt1)
         expect(visible_assmts).to include(@set2_assmt1)
         expect(visible_assmts).to include(@set2_assmt2) # assign to both
       end
@@ -70,7 +70,7 @@ module ConditionalRelease
 
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # now unassign
         run_jobs
-        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set1_assmt1)
+        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).not_to include(@set1_assmt1)
         expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set1_assmt1)
       end
 
@@ -78,8 +78,8 @@ module ConditionalRelease
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher)
         run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
-        expect(visible_assmts).to_not include(@set3a_assmt)
-        expect(visible_assmts).to_not include(@set3b_assmt)
+        expect(visible_assmts).not_to include(@set3a_assmt)
+        expect(visible_assmts).not_to include(@set3b_assmt)
       end
 
       it "does not accidentally relock an assignment if the same item is in two ranges we're switching between" do
@@ -290,7 +290,7 @@ module ConditionalRelease
         expect(assignment_ids).to eq [@set3a_assmt.id]
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set3a_assmt)
-        expect(visible_assmts).to_not include(@set3b_assmt)
+        expect(visible_assmts).not_to include(@set3b_assmt)
       end
 
       it "is able to switch" do
@@ -298,7 +298,7 @@ module ConditionalRelease
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_b.id)
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set3b_assmt)
-        expect(visible_assmts).to_not include(@set3a_assmt)
+        expect(visible_assmts).not_to include(@set3a_assmt)
       end
 
       it "reuses an existing override when assigning (and leave it be when unassigning)" do
@@ -313,7 +313,7 @@ module ConditionalRelease
         expect(@set3a_assmt.assignment_overrides.first.assignment_override_students.count).to eq 2
 
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_b.id) # now unassign
-        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set3a_assmt)
+        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).not_to include(@set3a_assmt)
         expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set3a_assmt)
       end
 
