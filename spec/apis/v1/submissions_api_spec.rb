@@ -1351,7 +1351,7 @@ describe "Submissions API", type: :request do
     Quizzes::SubmissionGrader.new(qs).grade_submission
     qs.reload
     qs.attempt = 2
-    qs.with_versioning(true, &:save)
+    qs.with_versioning(&:save)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",

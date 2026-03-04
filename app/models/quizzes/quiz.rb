@@ -521,7 +521,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
       a.notify_of_update = @notify_of_update
       a.mark_as_importing!(@importing_migration) if @importing_migration
-      a.with_versioning(false) do
+      a.without_versioning do
         @notify_of_update ? a.save : a.save_without_broadcasting!
       end
       self.assignment_id = a.id
@@ -786,7 +786,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       if preview || submission.untaken?
         submission.save!
       else
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
       end
     end
     submission.record_creation_event unless preview

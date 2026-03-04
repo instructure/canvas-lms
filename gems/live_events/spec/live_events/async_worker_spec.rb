@@ -51,7 +51,7 @@ describe LiveEvents::AsyncWorker do
     LiveEvents.retry_throttled_events = -> { true }
     LiveEvents.statsd = nil
     allow(LiveEvents).to receive(:logger).and_return(instance_double(Logger, info: nil, error: nil, debug: nil))
-    @worker = LiveEvents::AsyncWorker.new(false, stream_client:, stream_name:, retry_throttled_events: true)
+    @worker = LiveEvents::AsyncWorker.new(start_thread: false, stream_client:, stream_name:, retry_throttled_events: true)
     allow(@worker).to receive(:at_exit)
     expect(LiveEvents.logger).not_to receive(:error).with(/Exception making LiveEvents async call/)
     LiveEvents.statsd = statsd_double

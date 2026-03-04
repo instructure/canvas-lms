@@ -35,12 +35,12 @@ module AccountReports
     def outcome_export
       enable_i18n_features = true
       if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
-        write_report NO_SCORE_HEADERS, enable_i18n_features do |csv|
+        write_report NO_SCORE_HEADERS, enable_i18n_features: do |csv|
           export_outcome_groups(csv, NO_SCORE_HEADERS)
           export_outcomes(csv, NO_SCORE_HEADERS, false)
         end
       else
-        write_report OUTCOME_EXPORT_HEADERS, enable_i18n_features do |csv|
+        write_report OUTCOME_EXPORT_HEADERS, enable_i18n_features: do |csv|
           export_outcome_groups(csv, OUTCOME_EXPORT_SCALAR_HEADERS)
           export_outcomes(csv, OUTCOME_EXPORT_SCALAR_HEADERS, true)
         end

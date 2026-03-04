@@ -83,7 +83,7 @@ module AccountReports
 
         os_scope = config_options[:new_quizzes_scope]
 
-        write_report headers, enable_i18n_features do |csv|
+        write_report headers, enable_i18n_features: do |csv|
           write_row = lambda do |row|
             row["assignment url"] = "https://#{host}" \
                                     "/courses/#{row["course id"]}" \

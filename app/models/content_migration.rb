@@ -747,7 +747,7 @@ class ContentMigration < ActiveRecord::Base
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
-    Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(data, force_utf8: true)
     data["all_files_export"] ||= {}
     data
   end

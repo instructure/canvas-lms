@@ -541,7 +541,7 @@ class YoutubeMigrationService
     studio_url = "#{uri.scheme}://#{uri.host}"
 
     account = course.account
-    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid, user_uuid: }, false, encrypt: false)
+    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid, user_uuid: }, base64: false, encrypt: false)
     headers = { "Authorization" => "Bearer #{token}" }
 
     body = {

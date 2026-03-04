@@ -382,12 +382,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     it "sends an 'Assignment Submitted' notification for the first attempt that is submitted" do
       expect(submission).to receive(:without_versioning).once.and_call_original
-      expect(submission).to receive(:with_versioning).with(false).once.and_call_original
+      expect(submission).to receive(:with_versioning).with(enabled: false).once.and_call_original
 
       # :with_versioning calls:
       # 1 - initialize_version
       # 2 - save_submission!
-      expect(submission).to receive(:with_versioning).with({ explicit: true }).twice.and_call_original
+      expect(submission).to receive(:with_versioning).with(explicit: true).twice.and_call_original
 
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
         submission,

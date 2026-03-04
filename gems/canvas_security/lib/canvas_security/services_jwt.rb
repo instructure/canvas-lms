@@ -27,7 +27,7 @@ class CanvasSecurity::ServicesJwt
 
   attr_reader :token_string, :is_wrapped
 
-  def initialize(raw_token_string, wrapped = true)
+  def initialize(raw_token_string, wrapped: true)
     @is_wrapped = wrapped
     if raw_token_string.nil?
       raise ArgumentError, "Cannot decode nil token string"
@@ -74,7 +74,7 @@ class CanvasSecurity::ServicesJwt
   end
 
   # Symmetric services JWTs are now deprecated
-  def self.generate(payload_data, base64 = true, symmetric: false, encrypt: true)
+  def self.generate(payload_data, base64: true, symmetric: false, encrypt: true)
     raise ArgumentError, "Cannot generate a symmetric, non-encrypted JWT" if symmetric && !encrypt
 
     payload = create_payload(payload_data)
@@ -126,12 +126,12 @@ class CanvasSecurity::ServicesJwt
     if root_account_uuid
       payload[:root_account_uuid] = root_account_uuid
     end
-    generate(payload, base64, symmetric:, encrypt:)
+    generate(payload, base64:, symmetric:, encrypt:)
   end
 
   def self.refresh_for_user(jwt, domain, user, real_user: nil, symmetric: false)
     begin
-      payload = new(jwt, false).original_token(ignore_expiration: true)
+      payload = new(jwt, wrapped: false).original_token(ignore_expiration: true)
     rescue JSON::JWT::InvalidFormat
       raise InvalidRefresh, "invalid token"
     end

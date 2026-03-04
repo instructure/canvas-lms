@@ -1626,7 +1626,7 @@ describe SubmissionsController do
         qsub.workflow_state = "complete"
         qsub.submission = quiz.assignment.find_or_create_submission(first_student)
         qsub.submission.audit_grade_changes = true
-        qsub.with_versioning(true) { qsub.save! }
+        qsub.with_versioning { qsub.save! }
 
         quiz
       end

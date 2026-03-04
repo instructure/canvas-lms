@@ -96,7 +96,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.submission_data = [{ points: 10, text: "", correct: "undefined", question_id: question.id }]
     # simulate a positive fudge of 5 points:
     sub.score = 15
-    sub.with_versioning(true, &:save!)
+    sub.with_versioning(&:save!)
     stats = q.statistics
     expect(stats[:submission_score_average]).to eq 15
     expect(stats[:submission_score_high]).to eq 15
@@ -107,7 +107,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.workflow_state = "complete"
     sub.submission_data = [{ points: 17, text: "", correct: "undefined", question_id: question.id }]
     sub.score = 17
-    sub.with_versioning(true, &:save!)
+    sub.with_versioning(&:save!)
     stats = q.statistics
     expect(stats[:submission_score_average]).to eq 16
     expect(stats[:submission_score_high]).to eq 17
@@ -118,7 +118,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.workflow_state = "complete"
     sub.submission_data = [{ points: 20, text: "", correct: "undefined", question_id: question.id }]
     sub.score = 20
-    sub.with_versioning(true, &:save!)
+    sub.with_versioning(&:save!)
     stats = q.statistics
     expect(stats[:submission_score_average]).to be_within(0.0000000001).of(17 + (1.0 / 3))
     expect(stats[:submission_score_high]).to eq 20

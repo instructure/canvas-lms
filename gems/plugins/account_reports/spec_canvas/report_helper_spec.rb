@@ -257,7 +257,7 @@ describe "report helper" do
       end
 
       it "uses i18n compatibility when enabled" do
-        file = report.generate_and_run_report(["h1", "h2"], "csv", true) do |csv|
+        file = report.generate_and_run_report(["h1", "h2"], "csv", enable_i18n_features: true) do |csv|
           csv << ["val1", "val2"]
         end
         contents = File.read(file)

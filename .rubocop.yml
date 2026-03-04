@@ -455,8 +455,6 @@ Style/MultipleComparison:
   AutoCorrect: false
 Style/OptionalArguments:
   Severity: convention
-Style/OptionalBooleanParameter:
-  Severity: convention
 Style/StringConcatenation:
   Enabled: false
   AutoCorrect: false

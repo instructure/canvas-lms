@@ -57,7 +57,7 @@ class WikiPagesController < ApplicationController
       js_env({
                WIKI_PAGE_PANDAPUB: {
                  CHANNEL: channel,
-                 TOKEN: CanvasPandaPub.generate_token(channel, true)
+                 TOKEN: CanvasPandaPub.generate_token(channel, read: true)
                }
              })
     end
