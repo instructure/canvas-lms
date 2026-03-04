@@ -37,8 +37,12 @@ class LLMConversationContextManager
     new(ai_experience:).sync_index_status
   end
 
-  def self.trigger_indexing(ai_experience:)
-    new(ai_experience:).send(:trigger_document_indexing)
+  def self.trigger_indexing(ai_experience:, context_file_ids: nil)
+    new(ai_experience:).trigger_indexing(context_file_ids)
+  end
+
+  def self.remove_documents(ai_experience:, context_files:)
+    new(ai_experience:).remove_documents(context_files)
   end
 
   def initialize(ai_experience:)
@@ -124,29 +128,50 @@ class LLMConversationContextManager
     Rails.logger.warn("Document index status sync failed for ai_experience #{@ai_experience.id}: #{e.message}")
   end
 
-  private
-
-  def trigger_document_indexing
+  def trigger_indexing(context_file_ids = nil)
     context_id = @ai_experience.llm_conversation_context_id
     return unless context_id.present?
 
-    # Reload to bypass stale association cache set before after_save callbacks ran
-    files = @ai_experience.context_files.reload
-    return if files.empty?
+    scope = @ai_experience.ai_experience_context_files
+    scope = scope.where(id: context_file_ids) if context_file_ids.present?
+    context_file_records = scope.preload(:attachment)
+    return if context_file_records.empty?
 
-    files.each do |file|
-      make_request(
+    context_file_records.each do |context_file|
+      file = context_file.attachment
+      next if file.nil? || file.file_state == "deleted"
+
+      response = make_request(
         method: :post,
         path: "/contexts/#{context_id}/documents",
         payload: { url: file.public_url, sourceType: "file" },
         error_message: "Failed to trigger indexing for file #{file.id}"
       )
+
+      doc_id = response["id"]
+      context_file.update_column(:llm_conversation_service_document_id, doc_id) if doc_id.present?
     end
 
     @ai_experience.update_column(:context_index_status, "in_progress")
-  rescue LlmConversation::Errors::ConversationError => e
-    Rails.logger.warn("Document indexing trigger failed for ai_experience #{@ai_experience.id}: #{e.message}")
   end
+
+  def remove_documents(context_files)
+    context_id = @ai_experience.llm_conversation_context_id
+    return unless context_id.present?
+    return unless @ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
+
+    context_files.each do |context_file|
+      next if context_file.llm_conversation_service_document_id.blank?
+
+      make_request(
+        method: :delete,
+        path: "/contexts/#{context_id}/documents/#{context_file.llm_conversation_service_document_id}",
+        error_message: "Failed to remove document #{context_file.llm_conversation_service_document_id}"
+      )
+    end
+  end
+
+  private
 
   def context_data
     data = {
@@ -223,7 +248,7 @@ class LLMConversationContextManager
       raise LlmConversation::Errors::ConversationError, "#{error_message}: #{response.code} - #{response.body}"
     end
 
-    JSON.parse(response.body)
+    response.body.present? ? JSON.parse(response.body) : {}
   rescue LlmConversation::Errors::ConversationError
     raise
   rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError, JSON::ParserError, EOFError, Net::HTTPBadResponse, Net::ProtocolError => e

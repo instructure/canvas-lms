@@ -171,9 +171,9 @@ describe AiExperience do
         stub_request(:post, "http://localhost:3001/conversation-context")
           .to_return(status: 500, body: "Internal Server Error")
 
-        expect(Rails.logger).to receive(:error).with(/Failed to create conversation context/)
-
+        allow(Rails.logger).to receive(:error)
         AiExperience.create!(valid_attributes)
+        expect(Rails.logger).to have_received(:error).with(/Failed to create conversation context/)
       end
 
       context "with ai_experiences_context_file_upload feature flag enabled" do
@@ -184,6 +184,9 @@ describe AiExperience do
         before do
           stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
             .to_return(status: 200, body: { "success" => true }.to_json, headers: { "Content-Type" => "application/json" })
+
+          stub_request(:post, "http://localhost:3001/contexts/context-uuid/documents")
+            .to_return(status: 201, body: { "id" => "doc-1", "status" => "pending" }.to_json, headers: { "Content-Type" => "application/json" })
         end
 
         it "updates conversation_context with context_files when created with files" do
@@ -255,6 +258,11 @@ describe AiExperience do
 
         before { course.enable_feature!(:ai_experiences_context_file_upload) }
 
+        before do
+          stub_request(:post, "http://localhost:3001/contexts/context-uuid/documents")
+            .to_return(status: 201, body: { "id" => "doc-1", "status" => "pending" }.to_json, headers: { "Content-Type" => "application/json" })
+        end
+
         it "updates conversation_context when context_file_ids change" do
           experience.update!(context_file_ids: [attachment.id.to_s])
 
@@ -283,6 +291,94 @@ describe AiExperience do
 
           expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
         end
+
+        it "calls remove_documents when a file is removed" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          expect(LLMConversationContextManager).to receive(:remove_documents)
+            .with(ai_experience: experience, context_files: array_including(have_attributes(attachment_id: attachment.id)))
+
+          experience.update!(context_file_ids: [])
+        end
+
+        it "does not call remove_documents when only adding files" do
+          attachment2 = attachment_model(context: course)
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          expect(LLMConversationContextManager).not_to receive(:remove_documents)
+
+          experience.update!(context_file_ids: [attachment.id.to_s, attachment2.id.to_s])
+        end
+
+        it "only indexes newly added files when updating context_file_ids" do
+          attachment2 = attachment_model(context: course)
+          existing_context_file = AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          expect(LLMConversationContextManager).to receive(:trigger_indexing) do |ai_experience:, context_file_ids:|
+            new_context_file = AiExperienceContextFile.find_by(ai_experience:, attachment: attachment2)
+            expect(context_file_ids).to eq([new_context_file.id])
+            expect(context_file_ids).not_to include(existing_context_file.id)
+          end
+
+          experience.update!(context_file_ids: [attachment.id.to_s, attachment2.id.to_s])
+        end
+
+        it "does not trigger indexing when only removing files" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+          attachment2 = attachment_model(context: course)
+          AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment2)
+
+          expect(LLMConversationContextManager).not_to receive(:trigger_indexing)
+
+          experience.update!(context_file_ids: [attachment.id.to_s])
+        end
+
+        context "when file indexing fails" do
+          before do
+            stub_request(:post, "http://localhost:3001/contexts/context-uuid/documents")
+              .to_return(status: 503, body: "Service Unavailable")
+          end
+
+          it "returns false and does not persist added files" do
+            result = experience.update(context_file_ids: [attachment.id.to_s])
+
+            expect(result).to be false
+            expect(experience.reload.ai_experience_context_files).to be_empty
+          end
+
+          it "adds an error to the experience" do
+            experience.update(context_file_ids: [attachment.id.to_s])
+
+            expect(experience.errors[:base]).not_to be_empty
+          end
+        end
+
+        context "when file removal from LLM service fails" do
+          let(:context_file) do
+            AiExperienceContextFile.create!(ai_experience: experience, attachment:).tap do |cf|
+              cf.update_column(:llm_conversation_service_document_id, "doc-uuid-1")
+            end
+          end
+
+          before do
+            context_file
+            stub_request(:delete, "http://localhost:3001/contexts/context-uuid/documents/doc-uuid-1")
+              .to_return(status: 500, body: "Internal Server Error")
+          end
+
+          it "returns false and does not remove files" do
+            result = experience.update(context_file_ids: [])
+
+            expect(result).to be false
+            expect(experience.reload.ai_experience_context_files).not_to be_empty
+          end
+
+          it "adds an error to the experience" do
+            experience.update(context_file_ids: [])
+
+            expect(experience.errors[:base]).not_to be_empty
+          end
+        end
       end
 
       it "does not update conversation_context if context_id is not set" do
@@ -306,9 +402,9 @@ describe AiExperience do
         stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
           .to_return(status: 500, body: "Internal Server Error")
 
-        expect(Rails.logger).to receive(:error).with(/Failed to update conversation context/)
-
+        allow(Rails.logger).to receive(:error)
         experience.update!(pedagogical_guidance: "Updated scenario")
+        expect(Rails.logger).to have_received(:error).with(/Failed to update conversation context/)
       end
     end
 
@@ -353,9 +449,9 @@ describe AiExperience do
         stub_request(:delete, "http://localhost:3001/conversation-context/context-uuid")
           .to_return(status: 500, body: "Internal Server Error")
 
-        expect(Rails.logger).to receive(:error).with(/Failed to delete conversation context/)
-
+        allow(Rails.logger).to receive(:error)
         experience.destroy
+        expect(Rails.logger).to have_received(:error).with(/Failed to delete conversation context/)
       end
     end
   end
@@ -378,6 +474,76 @@ describe AiExperience do
       AiExperienceContextFile.create!(ai_experience: experience, attachment: deleted)
 
       expect(experience.context_files).to contain_exactly(active)
+    end
+  end
+
+  describe "#sync_context_files" do
+    let(:experience) { AiExperience.create!(valid_attributes) }
+    let(:attachment_a) { attachment_model(context: course, filename: "a.pdf") }
+    let(:attachment_b) { attachment_model(context: course, filename: "b.pdf") }
+    let(:attachment_c) { attachment_model(context: course, filename: "c.pdf") }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      allow(LLMConversationContextManager).to receive(:remove_documents)
+    end
+
+    it "adds files when given new context_file_ids" do
+      experience.update!(context_file_ids: [attachment_a.id.to_s, attachment_b.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a, attachment_b)
+    end
+
+    it "does not create duplicate records when the same id is saved again" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+
+      experience.update!(context_file_ids: [attachment_a.id.to_s])
+
+      expect(experience.ai_experience_context_files.where(attachment: attachment_a).count).to eq(1)
+    end
+
+    it "removes files that are no longer in the list" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_b)
+
+      experience.update!(context_file_ids: [attachment_a.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a)
+    end
+
+    it "preserves existing files when adding new ones" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+
+      experience.update!(context_file_ids: [attachment_a.id.to_s, attachment_b.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a, attachment_b)
+    end
+
+    it "removes all files when context_file_ids is empty" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_b)
+
+      experience.update!(context_file_ids: [])
+
+      expect(experience.reload.context_files).to be_empty
+    end
+
+    it "does not touch files when context_file_ids is not provided" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+
+      experience.update!(title: "New title")
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a)
+    end
+
+    it "can replace all files in one save" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_b)
+
+      experience.update!(context_file_ids: [attachment_c.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_c)
     end
   end
 
