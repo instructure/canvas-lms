@@ -126,7 +126,9 @@ describe('RubricAssessmentTray Tests', () => {
     it('should display points when hidePoints is false', () => {
       const {getByTestId} = renderComponent({hidePoints: false})
       expect(getByTestId('rubric-assessment-instructor-score')).toBeInTheDocument()
-      expect(getByTestId('traditional-criterion-1-ratings-0-points')).toHaveTextContent('4 pts')
+      expect(getByTestId('traditional-criterion-1-ratings-0-points')).toHaveTextContent(
+        '4 to >3 pts',
+      )
     })
 
     it('should not display points when hidePoints is true in modern view', () => {

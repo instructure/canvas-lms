@@ -79,7 +79,7 @@ export const VerticalButtonDisplay = ({
         const isSelfAssessmentSelected =
           rating.id != null && rating.id === selectedSelfAssessmentRatingId
 
-        const min = criterionUseRange ? rangingFrom(ratings, index, undefined, true) : undefined
+        const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
         const getPossibleText = (points?: number) => {
           return min != null ? possibleStringRange(min, points) : possibleString(points)

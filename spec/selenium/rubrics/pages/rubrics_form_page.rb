@@ -83,6 +83,10 @@ class RubricsForm
       f("[data-testid^='traditional-criterion-'][data-testid$='-ratings-#{index}']")
     end
 
+    def criterion_ratings_flex_direction
+      f("[data-testid='traditional-view-criterion-ratings']")["data-direction"]
+    end
+
     def criterion_description_input
       f("[data-testid='rubric-criterion-description-input']")
     end

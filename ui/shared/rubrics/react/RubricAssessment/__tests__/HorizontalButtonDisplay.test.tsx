@@ -101,7 +101,7 @@ describe('HorizontalButtonDisplay', () => {
     )
 
     const ratingDetails = screen.getByTestId('rating-details-2')
-    expect(ratingDetails).toHaveTextContent('0.1 to 3 pts')
+    expect(ratingDetails).toHaveTextContent('3 to >0 pts')
   })
 
   it('shows exact points when criterionUseRange is false', () => {

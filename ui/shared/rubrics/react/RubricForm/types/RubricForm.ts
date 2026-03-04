@@ -70,7 +70,7 @@ export type RatingRowProps = {
   errorMessage: FormMessage[]
   hidePoints: boolean
   index: number
-  rangeStart: number
+  rangeStart?: number
   rating: RubricRating
   ratingInputRefs: MutableRefObject<HTMLInputElement[]>
   scale: number
