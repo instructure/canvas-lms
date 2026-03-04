@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {Pill} from '@instructure/ui-pill'
 import {IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {extend} from '@canvas/backbone/utils'
@@ -89,7 +89,7 @@ EditHeaderView.prototype.afterRender = function () {
   }
   // EVAL-3711 Remove ICE feature flag
   if (ENV.FEATURES?.instui_nav) {
-    ReactDOM.render(
+    legacyRender(
       <Pill
         renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}
         color={this.model.published() ? 'success' : 'primary'}
