@@ -331,6 +331,17 @@ module Interfaces::SubmissionInterface
     Loaders::HasAutoGradeResultsLoader.load(submission)
   end
 
+  field :ai_grade_result, Types::AiGradeResultType, null: true, description: "The AI grading result for the current submission attempt, if any."
+  def ai_grade_result
+    load_association(:course).then do |course|
+      next nil unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+
+      load_association(:auto_grade_results).then do |results|
+        results.find { |r| r.attempt == (object.attempt || 1) }
+      end
+    end
+  end
+
   field :has_sub_assignment_submissions, Boolean, null: true
   def has_sub_assignment_submissions
     load_association(:assignment).then do
