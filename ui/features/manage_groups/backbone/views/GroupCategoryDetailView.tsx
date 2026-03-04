@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
@@ -136,7 +136,7 @@ export default class GroupCategoryDetailView extends View {
   addGroup(e, open = true) {
     if (e) e.preventDefault()
 
-    ReactDOM.render(
+    legacyRender(
       <GroupModal
         // @ts-expect-error - Backbone View property
         groupCategory={{id: this.model.get('id')}}
@@ -171,7 +171,7 @@ export default class GroupCategoryDetailView extends View {
     if (e) e.preventDefault()
     const parent = document.getElementById('group-import-modal-mount-point')
 
-    ReactDOM.render(
+    legacyRender(
       <GroupImportModal
         setProgress={this.setProgress.bind(this)}
         // @ts-expect-error - Backbone View property
@@ -201,7 +201,7 @@ export default class GroupCategoryDetailView extends View {
   cloneCategory(e, open = true) {
     if (e) e.preventDefault()
 
-    ReactDOM.render(
+    legacyRender(
       <GroupCategoryCloneModal
         // implicitly rendered with openedFromCaution: false
         groupCategory={{
@@ -236,7 +236,7 @@ export default class GroupCategoryDetailView extends View {
         // @ts-expect-error - Legacy Backbone typing
         .map(user => ({id: user.get('id'), short_name: user.get('short_name')}))
       const dialog = () => {
-        ReactDOM.render(
+        legacyRender(
           <GroupCategoryMessageAllUnassignedModal
             // @ts-expect-error - Backbone View property
             groupCategory={{name: this.model.get('name')}}
