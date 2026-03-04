@@ -118,7 +118,8 @@ export default defineConfig({
     jsx: 'automatic',
   },
   test: {
-    testTimeout: 15000,
+    testTimeout: 30000,
+    hookTimeout: 30000,
     environment: 'jsdom',
     // Use forks pool for better memory isolation between tests
     // Limit to 4 workers to balance parallelism with memory pressure
