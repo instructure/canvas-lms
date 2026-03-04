@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconMoreLine, IconDocumentLine} from '@instructure/ui-icons'
+import {IconAiLine, IconMoreLine, IconDocumentLine, IconClockLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Modal} from '@instructure/ui-modal'
+import {Tooltip} from '@instructure/ui-tooltip'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience} from '../../types'
@@ -40,6 +41,7 @@ interface AIExperienceShowProps {
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const canManage = aiExperience.can_manage
+  const isIndexing = !(aiExperience.context_ready ?? true)
   const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
     const params = new URLSearchParams(window.location.search)
@@ -53,13 +55,6 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const previewCardRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('preview') === 'true') {
-      setIsPreviewExpanded(true)
-    }
-  }, [])
 
   const handleEdit = () => {
     window.location.href = `/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`
@@ -98,18 +93,33 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   courseId={aiExperience.course_id!}
                   isPublished={workflowState === 'published'}
                   canUnpublish={aiExperience.can_unpublish ?? true}
-                  canPublish={aiExperience.can_publish ?? true}
+                  contextReady={aiExperience.context_ready ?? true}
                   onPublishChange={setWorkflowState}
                 />
               </Flex.Item>
               <Flex.Item>
-                <Button
-                  color="primary"
-                  href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
-                  data-testid="ai-experience-show-ai-conversations-button"
-                >
-                  {I18n.t('AI Conversations')}
-                </Button>
+                {isIndexing ? (
+                  <Tooltip
+                    renderTip={I18n.t('Source files are still being processed')}
+                    on={['hover', 'focus']}
+                  >
+                    <Button
+                      color="primary"
+                      interaction="disabled"
+                      data-testid="ai-experience-show-ai-conversations-button"
+                    >
+                      {I18n.t('AI Conversations')}
+                    </Button>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    color="primary"
+                    href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
+                    data-testid="ai-experience-show-ai-conversations-button"
+                  >
+                    {I18n.t('AI Conversations')}
+                  </Button>
+                )}
               </Flex.Item>
               <Flex.Item>
                 <Menu
@@ -186,20 +196,48 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         {I18n.t('Experience')}
       </Heading>
 
-      <LLMConversationView
-        isOpen={true}
-        onClose={() => setIsPreviewExpanded(false)}
-        returnFocusRef={previewCardRef}
-        courseId={aiExperience.course_id}
-        aiExperienceId={aiExperience.id}
-        aiExperienceTitle={aiExperience.title}
-        facts={aiExperience.facts}
-        learningObjectives={aiExperience.learning_objective}
-        scenario={aiExperience.pedagogical_guidance}
-        isExpanded={isPreviewExpanded}
-        onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
-        isTeacherPreview={canManage}
-      />
+      {canManage && isIndexing ? (
+        <View
+          as="div"
+          padding="large"
+          background="secondary"
+          borderWidth="small"
+          borderRadius="medium"
+          textAlign="center"
+          data-testid="ai-experience-show-indexing-notice"
+        >
+          <Flex direction="column" alignItems="center" gap="small">
+            <Flex.Item>
+              <IconClockLine size="medium" color="secondary" />
+            </Flex.Item>
+            <Flex.Item>
+              <Text weight="bold">{I18n.t('Source files are still being processed')}</Text>
+            </Flex.Item>
+            <Flex.Item>
+              <Text color="secondary">
+                {I18n.t(
+                  'Preview and AI Conversations will be available once processing is complete. Check back later.',
+                )}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        </View>
+      ) : (
+        <LLMConversationView
+          isOpen={true}
+          onClose={() => setIsPreviewExpanded(false)}
+          returnFocusRef={previewCardRef}
+          courseId={aiExperience.course_id}
+          aiExperienceId={aiExperience.id}
+          aiExperienceTitle={aiExperience.title}
+          facts={aiExperience.facts}
+          learningObjectives={aiExperience.learning_objective}
+          scenario={aiExperience.pedagogical_guidance}
+          isExpanded={isPreviewExpanded}
+          onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
+          isTeacherPreview={canManage}
+        />
+      )}
 
       {canManage && (
         <>

@@ -120,6 +120,52 @@ describe Api::V1::AiExperience do
       expect(json).not_to have_key(:can_unpublish)
     end
 
+    context "context_ready" do
+      before { @course.enable_feature!(:ai_experiences_context_file_upload) }
+
+      it "includes context_ready when can_manage is true" do
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+        expect(json).to have_key(:context_ready)
+      end
+
+      it "does not include context_ready when can_manage is false" do
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: false)
+        expect(json).not_to have_key(:context_ready)
+      end
+
+      it "is true when no context files are attached" do
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+        expect(json[:context_ready]).to be true
+      end
+
+      it "is true when context files are attached and indexing is completed" do
+        attachment = attachment_model(context: @course)
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment:)
+        @ai_experience.update_column(:context_index_status, "completed")
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+        expect(json[:context_ready]).to be true
+      end
+
+      it "is false when context files are attached and indexing is in_progress" do
+        attachment = attachment_model(context: @course)
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment:)
+        @ai_experience.update_column(:context_index_status, "in_progress")
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+        expect(json[:context_ready]).to be false
+      end
+
+      it "is false when context files are attached and indexing has failed" do
+        attachment = attachment_model(context: @course)
+        AiExperienceContextFile.create!(ai_experience: @ai_experience, attachment:)
+        @ai_experience.update_column(:context_index_status, "failed")
+
+        json = api.ai_experience_json(@ai_experience, @teacher, session, can_manage: true)
+        expect(json[:context_ready]).to be false
+      end
+    end
+
     context "with ai_experiences_context_file_upload feature flag enabled" do
       before { @course.enable_feature!(:ai_experiences_context_file_upload) }
 

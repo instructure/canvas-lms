@@ -39,7 +39,7 @@ interface AIExperiencePublishButtonProps {
   courseId: string | number
   isPublished: boolean
   canUnpublish: boolean
-  canPublish: boolean
+  contextReady: boolean
   onPublishChange: (newState: 'published' | 'unpublished') => void
 }
 
@@ -48,14 +48,14 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
   courseId,
   isPublished,
   canUnpublish,
-  canPublish,
+  contextReady,
   onPublishChange,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
 
   // Determine if the button should be disabled based on current state and permissions
-  const isDisabled = isUpdating || (isPublished && !canUnpublish) || (!isPublished && !canPublish)
+  const isDisabled = isUpdating || (isPublished && !canUnpublish) || (!isPublished && !contextReady)
 
   // Get the reason why the button is disabled (for screen reader and tooltip)
   const getDisabledReason = () => {
@@ -65,7 +65,7 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
         'Cannot change state: students have conversations or source files are still processing',
       )
     }
-    if (!isPublished && !canPublish) {
+    if (!isPublished && !contextReady) {
       return I18n.t('Cannot publish: source files are still processing')
     }
     return ''
@@ -145,7 +145,7 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
     >
       <Menu.Group label={I18n.t('State')} />
       <Menu.Item
-        disabled={isPublished || !canPublish}
+        disabled={isPublished || !contextReady}
         onClick={() => handlePublish('published')}
         data-testid="publish-option"
         themeOverride={{
@@ -159,7 +159,7 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
             </Flex.Item>
             <Flex.Item>{I18n.t('Publish')}</Flex.Item>
           </Flex>
-          {!canPublish && !isPublished && (
+          {!contextReady && !isPublished && (
             <Flex.Item>
               <Text size="x-small" color="secondary">
                 {I18n.t('(Context files are being indexed)')}

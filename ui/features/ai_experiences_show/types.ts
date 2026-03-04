@@ -30,8 +30,7 @@ export interface AIExperience {
   can_manage: boolean
   can_unpublish?: boolean
   context_files?: ContextFile[]
-  can_publish?: boolean
-  context_index_status?: 'not_started' | 'in_progress' | 'completed' | 'failed'
+  context_ready?: boolean
 }
 
 export interface AIExperienceShowProps {

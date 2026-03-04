@@ -65,7 +65,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
     fetchAIExperience()
   }, [])
 
-  const handleSubmit = async (formData: AIExperienceFormData, shouldPreview = false) => {
+  const handleSubmit = async (formData: AIExperienceFormData) => {
     setIsLoading(true)
     try {
       const courseId = ENV.COURSE_ID
@@ -94,10 +94,8 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
       const updatedExperience = json as AIExperience
       setAIExperience(updatedExperience)
 
-      // Redirect to the show page, optionally with preview parameter
       if (updatedExperience.id) {
-        const previewParam = shouldPreview ? '?preview=true' : ''
-        window.location.href = `/courses/${courseId}/ai_experiences/${updatedExperience.id}${previewParam}`
+        window.location.href = `/courses/${courseId}/ai_experiences/${updatedExperience.id}`
       }
     } catch (error) {
       let message = I18n.t('An unexpected error occurred. Please try again.')
