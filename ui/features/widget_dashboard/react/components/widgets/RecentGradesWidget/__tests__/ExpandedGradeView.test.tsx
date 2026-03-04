@@ -185,6 +185,56 @@ describe('ExpandedGradeView', () => {
     expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: 88%')
   })
 
+  it('displays course grade as letter grade when grading scheme is a letter grade scale', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+    })
+    const letterGradeSchemeData = [
+      {
+        ...mockSharedCourseData[0],
+        currentGrade: 88,
+        gradingScheme: [
+          ['A', 0.94],
+          ['B', 0.84],
+          ['C', 0.74],
+          ['D', 0.64],
+          ['F', 0],
+        ] as Array<[string, number]>,
+      },
+    ]
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={letterGradeSchemeData}>
+          <ExpandedGradeView submission={mockSubmission} />
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
+    expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: B')
+  })
+
+  it('floors the percentage when displaying a percentage course grade', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+    })
+    const fractionalGradeData = [
+      {
+        ...mockSharedCourseData[0],
+        currentGrade: 88.7,
+        gradingScheme: 'percentage' as const,
+      },
+    ]
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={fractionalGradeData}>
+          <ExpandedGradeView submission={mockSubmission} />
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
+    expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: 88%')
+  })
+
   it('displays rubric and feedback sections with data', async () => {
     server.use(
       http.post('/api/graphql', () => {
