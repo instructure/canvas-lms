@@ -150,6 +150,7 @@ module Services
           ).build_with_signature
 
           signed_data[:basename] = basename
+          signed_data[:launchType] = "regular"
           signed_data
         end
         private_class_method :build_signed_launch_data
