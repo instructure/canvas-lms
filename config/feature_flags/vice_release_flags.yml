@@ -91,14 +91,6 @@ apollo_caching:
     Allow for Apollo to cache graphQL queries on a users browser to speed up their experience
   applies_to: SiteAdmin
 
-react_people_page:
-  state: hidden
-  display_name: People Page Upgrade
-  description: |-
-    This feature flag enables the React/InstUI and GraphQL People page upgrade.
-  applies_to: RootAccount
-  shadow: true
-
 discussion_checkpoints:
   state: allowed
   display_name: Discussion Checkpoints
