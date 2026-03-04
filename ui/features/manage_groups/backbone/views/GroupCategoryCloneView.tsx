@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -144,8 +144,12 @@ GroupCategoryCloneView.prototype.showErrors = function (errors) {
     }
     const errorsContainer = this.$el.find('#cloned_category_name_errors')[0]
     if (errorsContainer) {
-      if (!this.errorRoot) this.errorRoot = createRoot(errorsContainer)
-      this.errorRoot.render(<FormattedErrorMessage message={msg} margin="x-small 0 0 0" />)
+      if (!this.errorRoot)
+        this.errorRoot = render(
+          <FormattedErrorMessage message={msg} margin="x-small 0 0 0" />,
+          errorsContainer,
+        )
+      else rerender(this.errorRoot, <FormattedErrorMessage message={msg} margin="x-small 0 0 0" />)
     }
   }
 }
