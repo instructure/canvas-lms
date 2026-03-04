@@ -3089,6 +3089,57 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "show_learning_agent_button? helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before do
+      user_session(@student)
+      controller.instance_variable_set(:@context, @course)
+      controller.instance_variable_set(:@context_enrollment, @enrollment)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "returns false when context is not a Course" do
+      controller.instance_variable_set(:@context, Account.default)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns false when enrollment is not a StudentEnrollment" do
+      controller.instance_variable_set(:@context_enrollment, nil)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns false when feature flag is off" do
+      @course.disable_feature!(:athena_learning_agent_button)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns true when all conditions are met" do
+      @course.enable_feature!(:athena_learning_agent_button)
+      expect(controller.send(:show_learning_agent_button?)).to be true
+    end
+  end
+
+  describe "load_learning_agent_env helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before do
+      user_session(@student)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "sets ATHENA in js_env via public_app_config" do
+      config = { authenticated: true, launch_domain: "athena.example.com", launch_path: "/agent" }
+      allow(Services::Athena).to receive(:public_app_config).with(@student).and_return(config)
+      expect(controller).to receive(:js_env).with({ ATHENA: config })
+      controller.send(:load_learning_agent_env)
+    end
+  end
+
   describe "show_immersive_reader? helper" do
     before(:once) do
       course_with_student(active_all: true)

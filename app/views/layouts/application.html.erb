@@ -35,6 +35,12 @@
     })
   end
 
+  @show_learning_agent = show_learning_agent_button?
+  if @show_learning_agent
+    load_learning_agent_env
+    js_bundle(:learning_agent)
+  end
+
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
@@ -166,6 +172,9 @@
           <div class="right-of-crumbs right-of-crumbs-no-reverse">
             <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
               <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+            <% end %>
+            <% if @show_learning_agent %>
+              <div id="learning_agent_mount_point"></div>
             <% end %>
             <% if show_student_view_button? %>
               <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
