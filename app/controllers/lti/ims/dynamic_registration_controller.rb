@@ -354,7 +354,7 @@ module Lti
         unless registration.root_account.feature_enabled?(:lti_dr_registrations_update)
           respond_to do |format|
             format.html { render "shared/errors/404_message", status: :not_found }
-            format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+            format.json { respond_with_error(:not_found, "The specified resource does not exist.") }
           end
           return
         end
