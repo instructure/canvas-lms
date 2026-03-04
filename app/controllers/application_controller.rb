@@ -1355,7 +1355,7 @@ class ApplicationController < ActionController::Base
       end
       format.all do
         flash[:warning] = flash_message
-        redirect_to_referrer_or_default(root_url)
+        redirect_back_or_to root_url
       end
     end
     set_no_cache_headers

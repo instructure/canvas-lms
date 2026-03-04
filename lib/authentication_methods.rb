@@ -392,10 +392,6 @@ module AuthenticationMethods
   end
   protected :redirect_back_or_default
 
-  def redirect_to_referrer_or_default(default)
-    redirect_back(fallback_location: default)
-  end
-
   def redirect_to_login
     return unless fix_ms_office_redirects
 
