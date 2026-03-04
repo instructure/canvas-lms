@@ -39,7 +39,7 @@ describe('AIExperiencePublishButton', () => {
     courseId: '123',
     isPublished: false,
     canUnpublish: true,
-    canPublish: true,
+    contextReady: true,
     onPublishChange: vi.fn(),
   }
 
@@ -191,8 +191,8 @@ describe('AIExperiencePublishButton', () => {
     })
   })
 
-  it('disables entire button when canPublish is false and unpublished', () => {
-    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} canPublish={false} />)
+  it('disables entire button when contextReady is false and unpublished', () => {
+    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} contextReady={false} />)
     const button = screen.getByTestId('ai-experience-publish-button')
     expect(button).toBeDisabled()
   })
@@ -203,9 +203,9 @@ describe('AIExperiencePublishButton', () => {
     expect(button).toBeDisabled()
   })
 
-  it('shows tooltip when canPublish is false and unpublished', () => {
+  it('shows tooltip when contextReady is false and unpublished', () => {
     const {container} = render(
-      <AIExperiencePublishButton {...defaultProps} isPublished={false} canPublish={false} />,
+      <AIExperiencePublishButton {...defaultProps} isPublished={false} contextReady={false} />,
     )
     // Tooltip content is rendered but may not be visible until hover
     expect(container).toBeInTheDocument()
@@ -219,8 +219,8 @@ describe('AIExperiencePublishButton', () => {
     expect(container).toBeInTheDocument()
   })
 
-  it('allows button to be clicked when canPublish is true and unpublished', () => {
-    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} canPublish={true} />)
+  it('allows button to be clicked when contextReady is true and unpublished', () => {
+    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} contextReady={true} />)
     const button = screen.getByTestId('ai-experience-publish-button')
     expect(button).not.toBeDisabled()
   })

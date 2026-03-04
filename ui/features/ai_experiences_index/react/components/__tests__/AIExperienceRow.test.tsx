@@ -27,7 +27,7 @@ const defaultProps = {
   title: 'Customer Service Training',
   workflowState: 'published' as const,
   canUnpublish: true,
-  canPublish: true,
+  contextReady: true,
   createdAt: '2025-01-15T10:30:00Z',
   onEdit: vi.fn(),
   onTestConversation: vi.fn(),
@@ -260,15 +260,15 @@ describe('AIExperienceRow', () => {
   })
 
   describe('Publish state restrictions', () => {
-    it('disables publish toggle when canPublish is false and unpublished', () => {
-      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" canPublish={false} />)
+    it('disables publish toggle when contextReady is false and unpublished', () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" contextReady={false} />)
 
       const toggleButton = screen.getByTestId('ai-experience-publish-toggle')
       expect(toggleButton).toHaveAttribute('disabled')
     })
 
-    it('shows indexing tooltip when canPublish is false', async () => {
-      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" canPublish={false} />)
+    it('shows indexing tooltip when contextReady is false', async () => {
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" contextReady={false} />)
 
       expect(
         screen.getByText('Cannot publish: source files are still processing'),
@@ -292,9 +292,9 @@ describe('AIExperienceRow', () => {
       ).toBeInTheDocument()
     })
 
-    it('allows publish when canPublish is true and unpublished', async () => {
+    it('allows publish when contextReady is true and unpublished', async () => {
       const user = userEvent.setup()
-      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" canPublish={true} />)
+      render(<AIExperienceRow {...defaultProps} workflowState="unpublished" contextReady={true} />)
 
       const publishButton = screen.getByTestId('ai-experience-publish-toggle')
       await user.click(publishButton)
@@ -312,14 +312,14 @@ describe('AIExperienceRow', () => {
       expect(defaultProps.onPublishToggle).toHaveBeenCalledWith(1, 'unpublished')
     })
 
-    it('does not call onPublishToggle when canPublish is false', async () => {
+    it('does not call onPublishToggle when contextReady is false', async () => {
       const user = userEvent.setup()
       const onPublishToggle = vi.fn()
       render(
         <AIExperienceRow
           {...defaultProps}
           workflowState="unpublished"
-          canPublish={false}
+          contextReady={false}
           onPublishToggle={onPublishToggle}
         />,
       )

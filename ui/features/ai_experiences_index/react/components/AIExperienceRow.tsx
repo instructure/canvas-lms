@@ -35,7 +35,7 @@ interface AIExperienceRowProps {
   title: string
   workflowState: 'published' | 'unpublished'
   canUnpublish: boolean
-  canPublish: boolean
+  contextReady: boolean
   createdAt: string
   submissionStatus?: 'not_started' | 'in_progress' | 'submitted'
   onEdit: (id: number) => void
@@ -50,7 +50,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   title,
   workflowState,
   canUnpublish,
-  canPublish,
+  contextReady,
   createdAt,
   submissionStatus,
   onEdit,
@@ -109,7 +109,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
 
   const handlePublishToggle = () => {
     // Only allow toggle if published and can unpublish, or if unpublished and can publish
-    if ((isPublished && !canUnpublish) || (!isPublished && !canPublish)) return
+    if ((isPublished && !canUnpublish) || (!isPublished && !contextReady)) return
 
     const newState = isPublished ? 'unpublished' : 'published'
     onPublishToggle(id, newState)
@@ -180,7 +180,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                 </Text>
               </Flex.Item>
               <Flex.Item>
-                {(isPublished && !canUnpublish) || (!isPublished && !canPublish) ? (
+                {(isPublished && !canUnpublish) || (!isPublished && !contextReady) ? (
                   <Tooltip
                     renderTip={
                       isPublished
