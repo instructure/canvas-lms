@@ -151,12 +151,10 @@ module CanvasSecurity
         end
 
         describe "via .for_user" do
-          # rubocop:disable RSpec/VerifiedDoubles -- models don't exist
           let(:user) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
           let(:ctx) { instance_double(ServicesJwtContext, id: 47) }
           let(:host) { "example.instructure.com" }
           let(:masq_user) { double(global_id: 24) }
-          # rubocop:enable RSpec/VerifiedDoubles
 
           it "can build from a user and host" do
             jwt = ServicesJwt.for_user(host, user)
@@ -261,11 +259,9 @@ module CanvasSecurity
         end
 
         describe "refresh_for_user" do
-          # rubocop:disable RSpec/VerifiedDoubles -- models don't exist
           let(:user1) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
           let(:user2) { double(global_id: 43, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ee") }
           let(:host) { "testhost" }
-          # rubocop:enable RSpec/VerifiedDoubles
 
           it "is invalid if jwt cannot be decoded" do
             expect { ServicesJwt.refresh_for_user("invalidjwt", host, user1) }
@@ -285,7 +281,7 @@ module CanvasSecurity
           end
 
           it "is invalid if masquerading user is different" do
-            masq_user = double(global_id: 44) # rubocop:disable RSpec/VerifiedDoubles -- models don't exist
+            masq_user = double(global_id: 44)
             jwt = ServicesJwt.for_user(host, user1, real_user: masq_user)
             expect { ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
               .to raise_error(ServicesJwt::InvalidRefresh)
