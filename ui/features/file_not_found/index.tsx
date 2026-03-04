@@ -18,14 +18,13 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import FileNotFound from './react/FileNotFound'
 import ready from '@instructure/ready'
 
 ready(() => {
   const container = $('#sendMessageForm')[0]
   if (container) {
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(<FileNotFound contextCode={window.ENV.context_asset_string} />, container)
+    legacyRender(<FileNotFound contextCode={window.ENV.context_asset_string} />, container)
   }
 })
