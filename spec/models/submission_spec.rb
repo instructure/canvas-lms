@@ -5564,6 +5564,41 @@ describe Submission do
         expect(submission.seconds_late).to eq 0
       end
 
+      it "fetches checkpoint completion time using user_id rather than the user AR association" do
+        topic = DiscussionTopic.create_graded_topic!(course: @checkpoint_course, title: "Test Discussion", user: @teacher)
+        topic.create_checkpoints(
+          reply_to_topic_points: 5,
+          reply_to_entry_points: 10,
+          reply_to_entry_required_count: 2
+        )
+        topic.reply_to_entry_checkpoint.update!(due_at: 1.day.ago)
+        topic.ensure_submission(@student)
+        submission = topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+
+        # Remove the user AR association from this instance to prove the code path
+        # uses user_id only. If user_id is ever changed back to user, this raises.
+        submission.singleton_class.undef_method(:user)
+
+        result = submission.send(:fetch_checkpoint_completion_time)
+        expect(result).to be_nil
+      end
+
+      it "computes seconds_late via public interface using user_id rather than the user AR association" do
+        topic = DiscussionTopic.create_graded_topic!(course: @checkpoint_course, title: "Test Discussion", user: @teacher)
+        topic.create_checkpoints(
+          reply_to_topic_points: 5,
+          reply_to_entry_points: 10,
+          reply_to_entry_required_count: 2
+        )
+        topic.reply_to_entry_checkpoint.update!(due_at: 1.day.ago)
+        topic.ensure_submission(@student)
+        submission = topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+
+        submission.singleton_class.undef_method(:user)
+
+        expect { submission.seconds_late }.not_to raise_error
+      end
+
       it "uses earliest reply time for non-checkpoint submissions" do
         due_date = 2.days.from_now
         topic = @checkpoint_course.discussion_topics.create!(
