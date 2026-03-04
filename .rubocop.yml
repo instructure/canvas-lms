@@ -312,8 +312,6 @@ Rails/FindByOrAssignmentMemoization:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/LexicallyScopedActionFilter:
-  Severity: convention
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false

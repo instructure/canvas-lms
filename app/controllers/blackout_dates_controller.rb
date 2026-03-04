@@ -61,7 +61,7 @@
 #
 class BlackoutDatesController < ApplicationController
   before_action :require_context
-  before_action :load_blackout_date, only: %i[show edit update destroy]
+  before_action :load_blackout_date, only: %i[show update destroy]
 
   # @API List blackout dates
   # Returns the list of blackout dates for the current context.

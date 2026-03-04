@@ -26,8 +26,8 @@
 
 class CspSettingsController < ApplicationController
   before_action :require_context, :require_user
-  before_action :require_read_permissions, only: [:get_csp_settings, :csp_log]
-  before_action :require_permissions, except: [:get_csp_settings, :csp_log]
+  before_action :require_read_permissions, only: :get_csp_settings
+  before_action :require_permissions, except: :get_csp_settings
   before_action :get_domain, only: [:add_domain, :remove_domain]
 
   after_action :set_sentry_context, only: [:set_csp_setting]
@@ -46,7 +46,7 @@ class CspSettingsController < ApplicationController
   # @response_field current_account_whitelist (Account-only) Lists the current list of domains
   #   explicitly allowed by this account. (Note: this list will not take effect unless
   #   CSP is explicitly enabled on this account)
-  def get_csp_settings
+  def get_csp_settings # rubocop:disable Naming/AccessorMethodName
     render json: csp_settings_json
   end
 
