@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
@@ -26,7 +26,7 @@ import EnhancedIndividualGradebookWrapper from './react/components/EnhancedIndiv
 const matches = window.location.pathname.match(/(.*\/gradebook)/)
 const baseUrl = (matches && matches[0]) || ''
 
-ReactDOM.render(
+legacyRender(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter basename={baseUrl}>
       <Routes>
@@ -34,5 +34,5 @@ ReactDOM.render(
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>,
-  document.getElementById('content'),
+  document.getElementById('content')!,
 )
