@@ -289,6 +289,71 @@ describe('AIExperienceShow', () => {
     expect(menuButton).not.toBeInTheDocument()
   })
 
+  describe('indexing notice', () => {
+    it('shows indexing notice instead of preview when context_ready is false and can_manage', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+        />,
+      )
+      expect(screen.getByTestId('ai-experience-show-indexing-notice')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Preview and AI Conversations will be available once processing is complete. Check back later.',
+        ),
+      ).toBeInTheDocument()
+      // Preview chat is hidden — replaced by the notice
+      expect(screen.queryByText('Preview')).not.toBeInTheDocument()
+    })
+
+    it('disables AI Conversations button when context_ready is false', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+        />,
+      )
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).toHaveAttribute('disabled')
+    })
+
+    it('does not show indexing notice when context_ready is true', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: true, can_manage: true}}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+    })
+
+    it('shows preview and enables AI Conversations button when context_ready is true', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: true, can_manage: true}}
+        />,
+      )
+      // LLMConversationView is shown
+      expect(screen.getByText('Preview')).toBeInTheDocument()
+      // AI Conversations button is enabled (has href, not disabled)
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).not.toHaveAttribute('disabled')
+      expect(aiConversationsButton).toHaveAttribute(
+        'href',
+        `/courses/${mockAiExperience.course_id}/ai_experiences/${mockAiExperience.id}/ai_conversations`,
+      )
+    })
+
+    it('students always see the preview even when context_ready is false', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: false, can_manage: false}}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+      // Students see the conversation view (not the teacher's "Preview" panel)
+      expect(screen.getByText('Conversation')).toBeInTheDocument()
+    })
+  })
+
   describe('context files table', () => {
     const mockFiles = [
       {

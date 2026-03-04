@@ -25,7 +25,6 @@ import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience, AIExperienceFormData} from '../../../types'
-import PreviewConfirmationModal from './PreviewConfirmationModal'
 import DeleteConfirmationModal from './DeleteConfirmationModal'
 import FormHeader from './FormHeader'
 import ConfigurationSection from './ConfigurationSection'
@@ -36,7 +35,7 @@ const I18n = createI18nScope('ai_experiences_edit')
 
 interface AIExperienceFormProps {
   aiExperience?: AIExperience | null
-  onSubmit: (data: AIExperienceFormData, shouldPreview?: boolean) => void
+  onSubmit: (data: AIExperienceFormData) => void
   isLoading: boolean
   onCancel?: () => void
 }
@@ -55,7 +54,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     pedagogical_guidance: '',
   })
   const [contextFiles, setContextFiles] = useState<ContextFile[]>([])
-  const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -151,30 +149,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     }
   }
 
-  const handlePreviewExperience = () => {
-    setShowPreviewModal(true)
-  }
-
-  const handleConfirmPreview = () => {
-    const validationErrors = validateForm()
-    setErrors(validationErrors)
-
-    if (Object.keys(validationErrors).length > 0) {
-      setShowErrors(true)
-      setShowErrorBanner(true)
-      setShowPreviewModal(false)
-      return
-    }
-
-    setShowPreviewModal(false)
-    // Save as draft first, then redirect to preview
-    const dataToSubmit: AIExperienceFormData = {
-      ...formData,
-      context_file_ids: contextFiles.map(f => f.id),
-    }
-    onSubmit(dataToSubmit, true)
-  }
-
   const handleDeleteClick = () => {
     if (isEdit) {
       setShowDeleteModal(true)
@@ -254,18 +228,8 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           courseId={((window as any).ENV?.COURSE_ID || '').toString()}
         />
 
-        <FormActions
-          isLoading={isLoading}
-          onCancel={handleCancel}
-          onPreview={handlePreviewExperience}
-        />
+        <FormActions isLoading={isLoading} onCancel={handleCancel} />
       </form>
-
-      <PreviewConfirmationModal
-        open={showPreviewModal}
-        onDismiss={() => setShowPreviewModal(false)}
-        onConfirm={handleConfirmPreview}
-      />
 
       <DeleteConfirmationModal
         open={showDeleteModal}

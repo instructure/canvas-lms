@@ -35,6 +35,7 @@ export interface AIExperience {
   pedagogical_guidance: string
   workflow_state?: string
   context_files?: ContextFile[]
+  context_ready?: boolean
 }
 
 export interface AIExperienceFormData {
