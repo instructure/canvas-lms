@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {Provider} from 'react-redux'
 import type {Store} from 'redux'
 
@@ -70,14 +70,14 @@ export default class ChildCourse {
   }
 
   unmount(): void {
-    ReactDOM.unmountComponentAtNode(this.root)
+    legacyUnmountComponentAtNode(this.root)
     this.router.stop()
   }
 
   render(): void {
     const routeTo = isBlueprintShabang() ? this.router.page : noop
 
-    ReactDOM.render(
+    legacyRender(
       <Provider store={this.store}>
         {/* @ts-expect-error - ConnectedChildContent props are provided by Redux store */}
         <ChildContent
