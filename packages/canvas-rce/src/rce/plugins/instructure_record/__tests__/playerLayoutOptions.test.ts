@@ -18,14 +18,13 @@
 
 import {
   CUSTOM,
-  getPlayerLayoutSizes,
   LARGE,
   labelForPlayerLayoutSize,
   MEDIUM,
   SMALL,
   scalePlayerLayoutForHeight,
   scalePlayerLayoutForWidth,
-  WITH_TRANSCRIPT,
+  EXTRA_LARGE,
 } from '../playerLayoutOptions'
 
 describe('playerLayoutOptions', () => {
@@ -66,7 +65,7 @@ describe('playerLayoutOptions', () => {
       [SMALL, '400', '273'],
       [MEDIUM, '480', '318'],
       [LARGE, '700', '442'],
-      [WITH_TRANSCRIPT, '850', '357'],
+      [EXTRA_LARGE, '850', '357'],
     ])('returns a label containing %s dimensions', (size, width, height) => {
       const label = labelForPlayerLayoutSize(size)
       expect(label).toContain(width)
@@ -79,19 +78,6 @@ describe('playerLayoutOptions', () => {
 
     it('returns "Custom" for unknown sizes', () => {
       expect(labelForPlayerLayoutSize('unknown')).toEqual('Custom')
-    })
-  })
-
-  describe('getPlayerLayoutSizes', () => {
-    it('includes With Transcript for non-Studio media', () => {
-      expect(getPlayerLayoutSizes(false)).toContain(WITH_TRANSCRIPT)
-    })
-
-    it('excludes With Transcript for Studio media', () => {
-      const sizes = getPlayerLayoutSizes(true)
-      expect(sizes).not.toContain(WITH_TRANSCRIPT)
-      expect(sizes).toContain(SMALL)
-      expect(sizes).toContain(CUSTOM)
     })
   })
 })

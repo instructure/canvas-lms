@@ -155,6 +155,7 @@ export default class TrayController {
       attachment_id: audioOptions.attachment_id,
       subtitles: audioOptions.subtitles,
       skipCaptionUpdate: isCaptionImprovements,
+      viewerRestrictions: audioOptions.viewerRestrictions,
     }
 
     return audioOptions

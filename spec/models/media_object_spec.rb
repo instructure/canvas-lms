@@ -667,4 +667,34 @@ describe MediaObject do
       end.not_to raise_error
     end
   end
+
+  describe "viewer_restrictions validation" do
+    it "is valid with an empty hash" do
+      mo = MediaObject.new(media_id: "x", workflow_state: "active", viewer_restrictions: {})
+      expect(mo).to be_valid
+    end
+
+    it "is valid with only known keys" do
+      mo = MediaObject.new(media_id: "x",
+                           workflow_state: "active",
+                           viewer_restrictions: { "show_rolling_transcript" => true })
+      expect(mo).to be_valid
+    end
+
+    it "is invalid with unknown keys" do
+      mo = MediaObject.new(media_id: "x",
+                           workflow_state: "active",
+                           viewer_restrictions: { "unknown_key" => true })
+      expect(mo).not_to be_valid
+      expect(mo.errors[:viewer_restrictions]).to be_present
+    end
+
+    it "is invalid with non-boolean values" do
+      mo = MediaObject.new(media_id: "x",
+                           workflow_state: "active",
+                           viewer_restrictions: { "show_rolling_transcript" => "yoho" })
+      expect(mo).not_to be_valid
+      expect(mo.errors[:viewer_restrictions]).to be_present
+    end
+  end
 end

@@ -18,6 +18,7 @@
 
 import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
@@ -33,6 +34,7 @@ import RceApiSource, {originFromHost} from '../../../../rcs/api'
 import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {StoreProvider} from '../../shared/StoreContext'
 import {getTrayHeight} from '../../shared/trayUtils'
+import {mapViewerRestrictions, readViewerRestrictions} from '../utils'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
@@ -52,6 +54,10 @@ export default function AudioOptionsTray({
   const api = new RceApiSource(trayProps)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const fetchedFromIframeRef = useRef(false)
+
+  const [viewerRestrictions, setViewerRestrictions] = useState(() =>
+    readViewerRestrictions(audioOptions.viewerRestrictions),
+  )
 
   useEffect(() => {
     if (!isLoading && subtitles.length === 0 && !fetchedFromIframeRef.current) {
@@ -73,6 +79,7 @@ export default function AudioOptionsTray({
       subtitles,
       attachment_id: audioOptions.attachmentId,
       updateMediaObject: contentProps.updateMediaObject,
+      viewerRestrictions: mapViewerRestrictions(viewerRestrictions),
     })
   }
 
@@ -123,6 +130,22 @@ export default function AudioOptionsTray({
                 <Flex justifyItems="space-between" direction="column" height="100%">
                   <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
                     <Flex direction="column">
+                      {isAsrCaptioningImprovements && (
+                        <Flex.Item padding="small">
+                          <CheckboxGroup
+                            name="viewer-restrictions"
+                            onChange={setViewerRestrictions}
+                            defaultValue={viewerRestrictions}
+                            description={formatMessage('Viewer Restrictions')}
+                          >
+                            <Checkbox
+                              variant="toggle"
+                              label={formatMessage('Show Rolling Transcript')}
+                              value="show_rolling_transcript"
+                            />
+                          </CheckboxGroup>
+                        </Flex.Item>
+                      )}
                       <Flex.Item padding="small">
                         <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
                           {!isAsrCaptioningImprovements ? (
@@ -223,6 +246,9 @@ AudioOptionsTray.propTypes = {
         locale: string.isRequired,
       }),
     ),
+    viewerRestrictions: shape({
+      show_rolling_transcript: bool,
+    }),
   }).isRequired,
   onCaptionsModified: func,
   isLoading: bool,

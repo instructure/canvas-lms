@@ -224,7 +224,7 @@ class RceApiSource {
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
   }
 
-  updateMediaObject(apiProps, {media_object_id, title, attachment_id}) {
+  updateMediaObject(apiProps, {media_object_id, title, attachment_id, viewerRestrictions = {}}) {
     const uri = attachment_id
       ? `${this.baseUri(
           'media_attachments',
@@ -234,7 +234,10 @@ class RceApiSource {
           'media_objects',
           apiProps.host,
         )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
-    return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
+
+    const body = { viewer_restrictions: viewerRestrictions }
+
+    return this.apiPost(uri, headerFor(this.jwt), body, 'PUT')
   }
 
   // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]

@@ -260,7 +260,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         await screen.findByText('Large (700 x 442px)', {selector: '[role="option"]'}),
       ).toBeInTheDocument()
       expect(
-        await screen.findByText('With Transcript (850 x 357px)', {selector: '[role="option"]'}),
+        await screen.findByText('Extra Large (850 x 357px)', {selector: '[role="option"]'}),
       ).toBeInTheDocument()
       expect(await screen.findByText('Custom', {selector: '[role="option"]'})).toBeInTheDocument()
     })
@@ -276,7 +276,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       ['Small (400 x 273px)', 400, 273],
       ['Medium (480 x 318px)', 480, 318],
       ['Large (700 x 442px)', 700, 442],
-      ['With Transcript (850 x 357px)', 850, 357],
+      ['Extra Large (850 x 357px)', 850, 357],
     ])('selecting %s saves correct dimensions', async (label, expectedWidth, expectedHeight) => {
       render(<VideoOptionsTray {...props} />)
       fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
@@ -295,7 +295,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
     it.each([
       [400, 'Small (400 x 273px)'],
       [480, 'Medium (480 x 318px)'],
-      [850, 'With Transcript (850 x 357px)'],
+      [850, 'Extra Large (850 x 357px)'],
     ])('appliedWidth %i pre-selects %s on re-open', async (appliedWidth, expectedLabel) => {
       props.videoOptions.appliedWidth = appliedWidth
       render(<VideoOptionsTray {...props} />)
@@ -305,24 +305,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       ).toBeInTheDocument()
     })
 
-    it('does not show "With Transcript" for Studio media', async () => {
-      props.studioOptions = {resizable: true, convertibleToLink: true}
-      render(<VideoOptionsTray {...props} />)
-      fireEvent.click(screen.getByLabelText('Player layout'))
-      await screen.findByText('Small (400 x 273px)', {selector: '[role="option"]'})
-      expect(screen.queryByText(/With Transcript/)).not.toBeInTheDocument()
-    })
-
-    it('shows DimensionsInput with transcript hint when Custom is selected', async () => {
-      props.videoOptions.appliedWidth = 640
-      props.videoOptions.appliedHeight = 480
-      render(<VideoOptionsTray {...props} />)
-      fireEvent.click(screen.getByLabelText('Player layout'))
-      fireEvent.click(await screen.findByText('Custom', {selector: '[role="option"]'}))
-      const message = await screen.findByTestId('message')
-      expect(message.textContent).toContain('Transcript panel is available at widths above 720px.')
-    })
-
     it('shows minimum error message as 400 x 273px for below-minimum custom size', async () => {
       props.videoOptions.appliedWidth = 300
       props.videoOptions.appliedHeight = 200
@@ -330,6 +312,33 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       render(<VideoOptionsTray {...props} />)
       const message = await screen.findByTestId('message')
       expect(message.textContent).toContain('400 x 273px')
+    })
+
+    it('renders the Viewer Restrictions checkbox', () => {
+      render(<VideoOptionsTray {...props} />)
+      expect(screen.getByText('Viewer Restrictions')).toBeInTheDocument()
+      expect(screen.getByText('Show Rolling Transcript')).toBeInTheDocument()
+    })
+
+    it('includes viewerRestrictions: { show_rolling_transcript: false } in onSave when none is pre-set', () => {
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
+        target: {value: 'A title'},
+      })
+      fireEvent.click(screen.getByText('Done'))
+      const [{viewerRestrictions}] = props.onSave.mock.calls[0]
+      expect(viewerRestrictions).toEqual({ show_rolling_transcript: false })
+    })
+
+    it('includes viewerRestrictions with show_rolling_transcript when pre-set', () => {
+      props.videoOptions.viewerRestrictions = {show_rolling_transcript: true}
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
+        target: {value: 'A title'},
+      })
+      fireEvent.click(screen.getByText('Done'))
+      const [{viewerRestrictions}] = props.onSave.mock.calls[0]
+      expect(viewerRestrictions).toEqual({show_rolling_transcript: true})
     })
 
     describe('Custom layout formula', () => {
@@ -383,11 +392,16 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       expect(screen.queryByText('Player layout')).not.toBeInTheDocument()
     })
 
-    it('does not include "With Transcript" in the size options', async () => {
+    it('does not include "Extra Large" in the size options', async () => {
       render(<VideoOptionsTray {...props} />)
       fireEvent.click(screen.getByRole('combobox'))
       await screen.findByText('Small', {selector: '[role="option"]'})
-      expect(screen.queryByText(/With Transcript/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Extra Large/)).not.toBeInTheDocument()
+    })
+
+    it('does not render the Viewer Restrictions checkbox', () => {
+      render(<VideoOptionsTray {...props} />)
+      expect(screen.queryByText('Viewer Restrictions')).not.toBeInTheDocument()
     })
   })
 
