@@ -57,16 +57,13 @@ class PeerReview::PeerReviewSubmitterService < ApplicationService
     @assessor.present? && @assessor.workflow_state != "deleted"
   end
 
-  def feature_enabled?
-    @parent_assignment&.context&.feature_enabled?(:peer_review_allocation_and_grading)
-  end
-
+  # To maintain backward compatibility with legacy peer reviews, we
+  # create peer review submissions regardless of the feature flag state
   def peer_review_submission_supported?
     parent_assignment_active? &&
       peer_reviews_enabled? &&
       peer_review_sub_assignment_active? &&
-      assessor_active? &&
-      feature_enabled?
+      assessor_active?
   end
 
   def peer_review_unsubmitted?

@@ -222,6 +222,18 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
           expect(result.submitted_at).to eq later_time
         end
       end
+
+      context "when legacy mode is enabled" do
+        before do
+          setup_submission_comments
+          course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "sets submitted_at correctly" do
+          result = service.call
+          expect(result.submitted_at).to eq(earliest_time)
+        end
+      end
     end
 
     context "when peer review submission is not supported" do
@@ -254,9 +266,17 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
         expect(service.call).to be_nil
       end
 
-      it "returns nil when feature is disabled" do
+      it "creates submission if peer_review_sub_assignment exists even when feature is disabled" do
+        peer_review_sub_assignment
+        setup_basic_assessment_requests
+
         course.disable_feature!(:peer_review_allocation_and_grading)
-        expect(service.call).to be_nil
+
+        result = service.call
+        expect(result).to be_a(Submission)
+        expect(result.assignment).to eq(peer_review_sub_assignment)
+        expect(result.user).to eq(assessor)
+        expect(result.workflow_state).to eq("submitted")
       end
     end
 
@@ -378,17 +398,6 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
       end
     end
 
-    describe "#feature_enabled?" do
-      it "returns true when feature is enabled" do
-        expect(service.send(:feature_enabled?)).to be true
-      end
-
-      it "returns false when feature is disabled" do
-        course.disable_feature!(:peer_review_allocation_and_grading)
-        expect(service.send(:feature_enabled?)).to be false
-      end
-    end
-
     describe "#peer_review_submission_supported?" do
       it "returns true when all conditions are met" do
         peer_review_sub_assignment
@@ -421,11 +430,6 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
 
       it "returns false when assessor is not active" do
         service.instance_variable_set(:@assessor, nil)
-        expect(service.send(:peer_review_submission_supported?)).to be false
-      end
-
-      it "returns false when feature is disabled" do
-        course.disable_feature!(:peer_review_allocation_and_grading)
         expect(service.send(:peer_review_submission_supported?)).to be false
       end
     end
