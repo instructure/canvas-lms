@@ -58,7 +58,7 @@ module Factories
     else
       @qsub.submission_data = {}
     end
-    @qsub.with_versioning(true) do
+    @qsub.with_versioning do
       @qsub.save!
     end
     @qsub
@@ -512,7 +512,7 @@ module Factories
     @qsub.score = 0
     @qsub.finished_at = Time.now.utc
     @qsub.workflow_state = "complete"
-    @qsub.with_versioning(true) do
+    @qsub.with_versioning do
       @qsub.save!
     end
   end

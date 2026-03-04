@@ -34,12 +34,12 @@ module Utf8Cleaner
     string.tr("\b\x7F", "")
   end
 
-  def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)
+  def self.recursively_strip_invalid_utf8!(object, force_utf8: false)
     case object
     when Hash
-      object.each_value { |o| recursively_strip_invalid_utf8!(o, force_utf8) }
+      object.each_value { |o| recursively_strip_invalid_utf8!(o, force_utf8:) }
     when Array
-      object.each { |o| recursively_strip_invalid_utf8!(o, force_utf8) }
+      object.each { |o| recursively_strip_invalid_utf8!(o, force_utf8:) }
     when String
       if object.encoding == Encoding::ASCII_8BIT && force_utf8
         object.force_encoding(Encoding::UTF_8)

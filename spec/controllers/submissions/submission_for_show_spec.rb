@@ -99,7 +99,7 @@ describe Submissions::SubmissionForShow do
           it "ignores version params" do
             quiz = course.quizzes.create!
             quiz_submission = quiz.quiz_submissions.create!(user: student)
-            quiz_submission.with_versioning(true) do
+            quiz_submission.with_versioning do
               quiz_submission.update_attribute(:finished_at, 1.hour.ago)
             end
             version = quiz_submission.versions.last.number

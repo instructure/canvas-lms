@@ -116,7 +116,7 @@ module CanvasQuizStatistics::Analyzers
         stats[:answers] = matches.map do |match|
           build_answer(match[:match_id],
                        match[:text],
-                       answer[:match_id].to_s == match[:match_id].to_s)
+                       correct: answer[:match_id].to_s == match[:match_id].to_s)
         end
       end
 

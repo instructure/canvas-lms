@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ActiveModelErrors
-  def to_hash(full_messages = false)
+  def to_hash(full_messages = false) # rubocop:disable Style/OptionalBooleanParameter
     if Rails.env.local?
       raise "ActiveModel::Errors#to_hash is deprecated, use Api::Errors::Reporter.to_json instead"
     else

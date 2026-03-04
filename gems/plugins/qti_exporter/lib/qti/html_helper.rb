@@ -24,11 +24,11 @@ module Qti
   module HtmlHelper
     WEBCT_REL_REGEX = "/webct/RelativeResourceManager/Template/"
 
-    def sanitize_html_string(string, remove_extraneous_nodes = false)
-      sanitize_html!(Nokogiri::HTML5.fragment(string), remove_extraneous_nodes)
+    def sanitize_html_string(string, remove_extraneous_nodes: false)
+      sanitize_html!(Nokogiri::HTML5.fragment(string), remove_extraneous_nodes:)
     end
 
-    def sanitize_html!(node, remove_extraneous_nodes = false)
+    def sanitize_html!(node, remove_extraneous_nodes: false)
       # root may not be an html element, so we just sanitize its children so we
       # don't blow away the whole thing
       node.children.each do |child|
@@ -120,7 +120,7 @@ module Qti
       html_node = node.at_css("div.html") || (node.name.casecmp?("div") && node["class"] =~ /\bhtml\b/) || @flavor == Qti::Flavors::ANGEL
       is_html = html_node && @flavor == Qti::Flavors::CANVAS
       # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
-      sanitized = sanitize_html!(html_node ? Nokogiri::HTML5.fragment(node.text) : node, true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
+      sanitized = sanitize_html!(html_node ? Nokogiri::HTML5.fragment(node.text) : node, remove_extraneous_nodes: true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
       if sanitized.present?
         if is_html
           html = sanitized

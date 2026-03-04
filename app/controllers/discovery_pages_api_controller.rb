@@ -238,7 +238,7 @@ class DiscoveryPagesApiController < ApplicationController
     claims = @domain_root_account.discovery_page_claims_for(@current_user, config)
 
     payload = claims.merge(iat: now, exp: now + 30, scope: "discovery.preview")
-    render json: { token: CanvasSecurity::ServicesJwt.generate(payload, false, encrypt: false) }
+    render json: { token: CanvasSecurity::ServicesJwt.generate(payload, base64: false, encrypt: false) }
   end
 
   private

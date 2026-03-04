@@ -156,17 +156,11 @@ module SimplyVersioned
     # Invoke the supplied block passing the receiver as the sole block argument with
     # versioning enabled or disabled depending upon the value of the +enabled+ parameter
     # for the duration of the block.
-    def with_versioning(enabled = true)
+    def with_versioning(enabled: true, explicit: false)
       versioning_was_enabled = versioning_enabled?
       explicit_versioning_was_enabled = @simply_versioned_explicit_enabled
-      explicit_enabled = false
-      if enabled.is_a?(Hash)
-        opts = enabled
-        enabled = true
-        explicit_enabled = true if opts[:explicit]
-      end
       self.versioning_enabled = enabled
-      @simply_versioned_explicit_enabled = explicit_enabled
+      @simply_versioned_explicit_enabled = explicit
       # INSTRUCTURE: always create a version if explicitly told to do so
       @versioning_explicitly_enabled = enabled == true
       begin
@@ -179,7 +173,7 @@ module SimplyVersioned
     end
 
     def without_versioning(&)
-      with_versioning(false, &)
+      with_versioning(enabled: false, &)
     end
 
     def unversioned?

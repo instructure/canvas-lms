@@ -59,7 +59,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def make_second_attempt
     @quiz_submission.attempt = 2
-    @quiz_submission.with_versioning(true, &:save!)
+    @quiz_submission.with_versioning(&:save!)
   end
 
   def normalize(value)

@@ -96,7 +96,7 @@ class CanvasUnzip
           name = entry.name
           name = name.sub(nested_dir, "") if nested_dir # pretend the dir doesn't exist
           f_path = File.join(dest_folder, name)
-          entry.extract(f_path, false, bytes_left) do |size|
+          entry.extract(f_path, maximum_size: bytes_left) do |size|
             bytes_left -= size
             raise SizeLimitExceeded if bytes_left < 0
           end
@@ -206,7 +206,7 @@ class CanvasUnzip
     end
 
     # yields byte count
-    def extract(dest_path, overwrite = false, maximum_size = DEFAULT_BYTE_LIMIT)
+    def extract(dest_path, overwrite: false, maximum_size: DEFAULT_BYTE_LIMIT)
       dir = directory? ? dest_path : File.dirname(dest_path)
       FileUtils.mkdir_p(dir)
       return unless file?

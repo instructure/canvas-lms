@@ -126,7 +126,7 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open do |f|
           file_size = 0
-          sha512 = entry.extract(f.path, true) do |bytes|
+          sha512 = entry.extract(f.path, overwrite: true) do |bytes|
             file_size += bytes
           end
           zip_stats.charge_quota(file_size)

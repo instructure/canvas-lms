@@ -45,7 +45,7 @@ module CanvasSecurity
   # In this instance, it's expected that canvas is going to inject
   # the Setting class, but we want to break depednencies that directly
   # point to canvas.
-  def self.settings_store(safe_invoke = false)
+  def self.settings_store(safe_invoke: false)
     return @@settings_store if @@settings_store
     return nil if safe_invoke
 
@@ -337,7 +337,7 @@ module CanvasSecurity
     Base64.decode64(utf8_string.encode("ascii-8bit"))
   end
 
-  def self.validate_encryption_key(overwrite = false)
+  def self.validate_encryption_key(overwrite: false)
     begin
       db_hash = settings_store.get("encryption_key_hash", nil)
     rescue

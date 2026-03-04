@@ -31,7 +31,7 @@ module LiveEvents
     KINESIS_RECORD_LIMIT = 500
     RETRY_LIMIT = 3
 
-    def initialize(start_thread = true, stream_client:, stream_name:, retry_throttled_events:)
+    def initialize(stream_client:, stream_name:, retry_throttled_events:, start_thread: true)
       @queue = Queue.new
       @logger = LiveEvents.logger
       @stream_client = stream_client

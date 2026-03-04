@@ -532,7 +532,7 @@ class Quizzes::QuizzesController < ApplicationController
       created_quiz = @quiz.created?
 
       Assignment.suspend_due_date_caching do
-        @quiz.with_versioning(false) do
+        @quiz.without_versioning do
           @quiz.did_edit if @quiz.created?
         end
       end
@@ -563,7 +563,7 @@ class Quizzes::QuizzesController < ApplicationController
 
             auto_publish = @quiz.published?
 
-            @quiz.with_versioning(auto_publish) do
+            @quiz.with_versioning(enabled: auto_publish) do
               # using attributes= here so we don't need to make an extra
               # database call to get the times right after save!
               @quiz.attributes = quiz_params

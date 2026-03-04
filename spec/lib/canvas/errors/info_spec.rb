@@ -104,7 +104,7 @@ module Canvas
                                 request_parameters: {})
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect do
-            Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, true)
+            Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, force_utf8: true)
           end.not_to raise_error
         end
 

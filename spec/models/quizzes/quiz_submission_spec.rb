@@ -432,7 +432,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.score = 5
         @quiz_sub.fudge_points = 0
         @quiz_sub.kept_score = 5
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
         @submission = @quiz_sub.submission
       end
 
@@ -453,7 +453,7 @@ describe Quizzes::QuizSubmission do
       it "uses the explicit grade even if it isn't the highest score" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
 
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 4
@@ -477,7 +477,7 @@ describe Quizzes::QuizSubmission do
       it "does not have manually_scored set when updated normally" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
         @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @quiz_sub.reload
         expect(@quiz_sub.manually_scored).to be_truthy
@@ -507,7 +507,7 @@ describe Quizzes::QuizSubmission do
       it "only updates the last completed quiz submission" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
         @quiz.generate_submission(@user)
         @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
@@ -542,13 +542,13 @@ describe Quizzes::QuizSubmission do
       s.workflow_state = "complete"
       s.score = 5.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.score).to be(5.0)
       expect(s.kept_score).to be(5.0)
 
       s.score = 4.0
       s.attempt = 2
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(2)
       expect(s.kept_score).to be(4.0)
 
@@ -556,12 +556,12 @@ describe Quizzes::QuizSubmission do
       s.reload
       s.score = 3.0
       s.attempt = 3
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.kept_score).to be(5.0)
 
       q.update!(scoring_policy: "keep_average")
       s.reload
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.kept_score).to be(4.0)
 
       q.update!(scoring_policy: "keep_highest")
@@ -575,32 +575,32 @@ describe Quizzes::QuizSubmission do
       s.workflow_state = "complete"
       s.score = 2.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
 
       s.score = 4.0
       s.attempt = 2
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(2)
 
       s.score = 5.0
       s.attempt = 3
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(3)
 
       s.score = 6.0
       s.attempt = 4
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(4)
       expect(s.kept_score).to be(4.25)
 
       s.score = 7.0
       s.attempt = 5
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(5)
 
       s.score = 8.0
       s.attempt = 6
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(6)
       expect(s.kept_score).to be(5.33)
     end
@@ -612,7 +612,7 @@ describe Quizzes::QuizSubmission do
       s.workflow_state = "complete"
       s.score = 5.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(1)
       expect(s.score).to be(5.0)
       expect(s.kept_score).to be(5.0)
@@ -621,14 +621,14 @@ describe Quizzes::QuizSubmission do
       s.score_before_regrade = 5.0
       s.score = 4.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(2)
       expect(s.kept_score).to be(4.0)
 
       # new attempt
       s.score = 3.0
       s.attempt = 2
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(3)
       expect(s.kept_score).to be(4.0)
     end
@@ -828,7 +828,7 @@ describe Quizzes::QuizSubmission do
         quiz_submission.score = 5
         quiz_submission.fudge_points = 0
         quiz_submission.kept_score = 5
-        quiz_submission.with_versioning(true, &:save!)
+        quiz_submission.with_versioning(&:save!)
       end
 
       before do
@@ -1275,12 +1275,12 @@ describe Quizzes::QuizSubmission do
       let_once(:submission) { @quiz.quiz_submissions.create! }
 
       before do
-        submission.with_versioning(true) do |s|
+        submission.with_versioning do |s|
           s.score = 10
           s.save(validate: false)
         end
 
-        submission.with_versioning(true) do |s|
+        submission.with_versioning do |s|
           s.score = 15
           s.save(validate: false)
         end
@@ -1316,7 +1316,7 @@ describe Quizzes::QuizSubmission do
         submission.workflow_state = "complete"
         submission.score = 5.0
         submission.attempt = 1
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
         expect(submission.version_number).to be(1)
         expect(submission.score).to be(5.0)
 
@@ -1324,13 +1324,13 @@ describe Quizzes::QuizSubmission do
         submission.score_before_regrade = 5.0
         submission.score = 4.0
         submission.attempt = 1
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
         expect(submission.version_number).to be(2)
 
         # new attempt
         submission.score = 3.0
         submission.attempt = 2
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
         expect(submission.version_number).to be(3)
 
         attempts = submission.attempts
@@ -1495,7 +1495,7 @@ describe Quizzes::QuizSubmission do
         @submission.workflow_state = "complete"
         @submission.score = 5.0
         @submission.attempt = 1
-        @submission.with_versioning(true, &:save!)
+        @submission.with_versioning(&:save!)
         @submission.save
       end
 
