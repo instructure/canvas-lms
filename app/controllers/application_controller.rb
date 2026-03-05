@@ -499,7 +499,6 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
-    rce_asr_captioning_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
@@ -550,6 +549,7 @@ class ApplicationController < ActionController::Base
     open_tools_in_new_tab
     pendo_extended
     product_tours
+    rce_asr_captioning_improvements
     rce_lite_enabled_speedgrader_comments
     rce_transform_loaded_content
     react_discussions_post
