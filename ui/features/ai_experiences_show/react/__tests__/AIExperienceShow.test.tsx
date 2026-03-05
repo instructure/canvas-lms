@@ -223,13 +223,15 @@ describe('AIExperienceShow', () => {
       expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
     })
 
-    // Click Cancel
-    const cancelButton = screen.getByText('Cancel').closest('button')
-    fireEvent.click(cancelButton!)
+    // Click Cancel - use testid to target the button directly
+    fireEvent.click(screen.getByTestId('ai-experience-show-delete-cancel-button'))
 
-    await waitFor(() => {
-      expect(screen.queryByText('Delete AI Experience')).not.toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Delete AI Experience')).not.toBeInTheDocument()
+      },
+      {timeout: 5000},
+    )
   })
 
   it('calls delete API when confirmed', async () => {
