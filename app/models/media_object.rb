@@ -262,6 +262,7 @@ class MediaObject < ActiveRecord::Base
       self.duration = entry[:duration].to_i
       data[:plays] = entry[:plays].to_i
       data[:download_url] = entry[:downloadUrl]
+      data[:status] = CanvasKaltura::ClientV3::Enums::KalturaEntryStatus[entry[:status]].to_s
       tags = (entry[:tags] || "").split(",").map(&:strip)
       old_id = tags.detect { |t| t.include?("old_id_") }
       self.old_media_id = old_id.sub("old_id_", "") if old_id

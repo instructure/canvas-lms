@@ -65,6 +65,7 @@ export default function CanvasMediaPlayer(props) {
   const [media_tracks] = useState(tracks)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
+  const [mediaObjFailed, setMediaObjFailed] = useState(false)
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
   // media_player_iframe_content.js where the CanvasMediaPlayer is rendered
@@ -141,10 +142,15 @@ export default function CanvasMediaPlayer(props) {
       let resp
       try {
         setMediaObjNetworkErr(null)
+        setMediaObjFailed(false)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e) {
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
+        return
+      }
+      if (resp?.status === 'ERROR_IMPORTING' || resp?.status === 'ERROR_CONVERTING') {
+        setMediaObjFailed(true)
         return
       }
       if (resp?.media_sources?.length) {
@@ -188,6 +194,15 @@ export default function CanvasMediaPlayer(props) {
     (document.fullscreenEnabled || document.webkitFullscreenEnabled) && props.type === 'video'
 
   function renderNoPlayer() {
+    if (mediaObjFailed) {
+      return (
+        <Alert key="failedalert" variant="error" margin="small" liveRegion={liveRegion}>
+          {I18n.t(
+            "This file couldn't be processed. It may be corrupted or in an unsupported format. Please upload a different file.",
+          )}
+        </Alert>
+      )
+    }
     if (mediaObjNetworkErr) {
       if (props.is_attachment) {
         return (

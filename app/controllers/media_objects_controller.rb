@@ -372,9 +372,7 @@ class MediaObjectsController < ApplicationController
   private
 
   def load_media_object_from_service
-    return unless params[:media_object_id].present?
-
-    unless @media_object
+    if params[:media_object_id].present? && !@media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
       @media_object = MediaObject.create_if_id_exists(params[:media_object_id])
@@ -384,6 +382,6 @@ class MediaObjectsController < ApplicationController
       increment_request_cost(MISSED_MEDIA_ADDITIONAL_COST)
     end
 
-    @media_object.viewed!
+    @media_object&.viewed!
   end
 end

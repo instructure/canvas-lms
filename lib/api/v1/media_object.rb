@@ -30,6 +30,7 @@ module Api::V1::MediaObject
       json["media_sources"] = media_sources_json(media_object) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_object_iframe_url(media_object.media_id)
       json["auto_caption_status"] = media_object.auto_caption_status
+      json["status"] = media_object.data[:status] if media_object.data[:status].present?
 
       unless exclude.include?("tracks")
         json["media_tracks"] = media_object.media_tracks.map do |track|
@@ -49,6 +50,7 @@ module Api::V1::MediaObject
       json["media_sources"] = media_sources_json(media_object, attachment:, verifier:, access_token:, instfs_id:, location:) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_attachment_iframe_url(attachment.id)
       json["auto_caption_status"] = media_object.auto_caption_status
+      json["status"] = media_object.data[:status] if media_object.data[:status].present?
 
       unless exclude.include?("tracks")
         json["media_tracks"] = attachment.media_tracks_include_originals.map do |track|
