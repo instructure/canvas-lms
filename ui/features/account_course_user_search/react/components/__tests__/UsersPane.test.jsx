@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import UsersPane, {SEARCH_DEBOUNCE_TIME} from '../UsersPane'
 import UserActions from '../../actions/UserActions'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -55,12 +56,14 @@ const fakeStore = () => ({
 
 const renderUsersPane = store =>
   render(
-    <UsersPane
-      store={store}
-      roles={[{id: 'id', label: 'label'}]}
-      queryParams={{}}
-      onUpdateQueryParams={function () {}}
-    />,
+    <MockedQueryProvider>
+      <UsersPane
+        store={store}
+        roles={[{id: 'id', label: 'label'}]}
+        queryParams={{}}
+        onUpdateQueryParams={function () {}}
+      />
+    </MockedQueryProvider>,
   )
 
 describe('Account Course User Search UsersPane View', () => {
