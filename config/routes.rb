@@ -367,6 +367,7 @@ CanvasRails::Application.routes.draw do
         get "taking(/*path)", action: :launch, as: :new_quizzes_taking
         get "observing(/*path)", action: :launch, as: :new_quizzes_observing
         get "errors(/*path)", action: :launch, as: :new_quizzes_errors
+        get "settings(/*path)", action: :launch, as: :new_quizzes_settings
         get "version", action: :launch, as: :new_quizzes_version
         get "course_concluded", action: :launch, as: :new_quizzes_course_concluded
         get "banks(/*path)", action: :launch, as: :new_quizzes_assignment_banks
