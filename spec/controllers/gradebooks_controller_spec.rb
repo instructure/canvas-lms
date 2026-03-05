@@ -3601,6 +3601,34 @@ describe GradebooksController do
         expect(assigns[:js_env].fetch(:VIEW_ALL_GRADES)).to be false
       end
 
+      it "includes can_delete_attachments in js_env for platform speedgrader" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+
+        admin = User.create!
+        @course.root_account.account_users.create!(user: admin)
+        @course.enroll_teacher(admin)
+
+        user_session(admin)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:can_delete_attachments)).to be true
+      end
+
+      it "sets can_delete_attachments to false for users without become_user permission" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+
+        admin = User.create!
+        @course.root_account.account_users.create!(user: admin)
+        role = admin.account_users.first.role
+        @course.root_account.role_overrides.create!(permission: :become_user, enabled: false, role:)
+        @course.root_account.role_overrides.create!(permission: :manage_grades, enabled: true, role:)
+
+        user_session(admin)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:can_delete_attachments)).to be false
+      end
+
       it "includes PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env when feature is enabled" do
         @assignment.publish
         @course.enable_feature!(:platform_service_speedgrader)

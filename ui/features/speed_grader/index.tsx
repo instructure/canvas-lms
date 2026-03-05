@@ -76,6 +76,7 @@ ready(() => {
         mediaSettings: window.INST.kalturaSettings,
         lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
         currentUserIsAdmin: ENV.current_user_is_admin ?? false,
+        canDeleteAttachments: window.ENV.can_delete_attachments,
         themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
         useHighContrast: window.ENV.use_high_contrast ?? false,
         commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
