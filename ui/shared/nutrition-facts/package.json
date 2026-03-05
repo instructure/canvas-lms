@@ -7,6 +7,6 @@
   "module": "./index.tsx",
   "owner": "CFA",
   "dependencies": {
-    "@instructure.ai/aiinfo": "^2.0.0"
+    "@instructure.ai/aiinfo": "^2.11.1"
   }
 }
