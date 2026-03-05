@@ -88,17 +88,23 @@ interface Props {
   }
   roles: Role[]
   handleSubmitEditUserForm?: () => void
+  temporaryEnrollmentStatus?: TemporaryEnrollmentStatus
 }
 
 export default function TempEnrollUsersListRow(props: Props) {
   const [editMode, setEditMode] = useState(false)
-  const [status, setStatus] = useState<TemporaryEnrollmentStatus>({
+  const [fetchedStatus, setFetchedStatus] = useState<TemporaryEnrollmentStatus>({
     is_provider: false,
     is_recipient: false,
     can_provide: false,
   })
 
-  const setEnrollmentState = useCallback((json: TemporaryEnrollmentStatus) => setStatus(json), [])
+  const status = props.temporaryEnrollmentStatus ?? fetchedStatus
+
+  const setEnrollmentState = useCallback(
+    (json: TemporaryEnrollmentStatus) => setFetchedStatus(json),
+    [],
+  )
 
   const modifyPermissions = {
     canAdd: props.permissions.can_add_temporary_enrollments,
@@ -123,8 +129,9 @@ export default function TempEnrollUsersListRow(props: Props) {
         () => showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
         [],
       ),
+      forceResult: props.temporaryEnrollmentStatus,
     },
-    [props.user.id],
+    [props.user.id, props.temporaryEnrollmentStatus],
   )
 
   function renderTempEnrollModal(

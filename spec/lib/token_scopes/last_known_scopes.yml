@@ -2251,6 +2251,8 @@
   path: '/api/v1/support_helpers/turnitin/refresh_lti_attachment'
 - verb: GET
   path: '/api/v1/support_helpers/turnitin/shard'
+- verb: GET
+  path: '/api/v1/temporary_enrollment_status'
 - verb: DELETE
   path: '/api/v1/users/:id'
 - verb: GET

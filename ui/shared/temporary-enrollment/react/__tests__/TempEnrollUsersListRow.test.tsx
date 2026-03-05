@@ -166,6 +166,49 @@ describe('TempEnrollUsersListRow', () => {
     })
   })
 
+  describe('with pre-fetched temporaryEnrollmentStatus', () => {
+    it('uses pre-fetched status without making an API call', async () => {
+      let apiCalled = false
+      server.use(
+        http.get(STATUS_URL, () => {
+          apiCalled = true
+          return HttpResponse.json({is_provider: false, is_recipient: false, can_provide: false})
+        }),
+      )
+      const {findAllByText} = render(
+        <TempEnrollUsersListRow
+          {...defaultProps}
+          temporaryEnrollmentStatus={{is_provider: true, is_recipient: false, can_provide: true}}
+        />,
+      )
+      // 2 matches: one from Tooltip content, one from ScreenReaderContent label
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`),
+      ).toHaveLength(2)
+      expect(apiCalled).toBe(false)
+    })
+
+    it('renders both provider and recipient tooltips from pre-fetched status', async () => {
+      const {findAllByTestId} = render(
+        <TempEnrollUsersListRow
+          {...defaultProps}
+          temporaryEnrollmentStatus={{is_provider: true, is_recipient: true, can_provide: true}}
+        />,
+      )
+      expect(await findAllByTestId('user-list-row-tooltip')).toHaveLength(2)
+    })
+
+    it('renders nothing when pre-fetched status has no roles', () => {
+      const {queryByTestId} = render(
+        <TempEnrollUsersListRow
+          {...defaultProps}
+          temporaryEnrollmentStatus={{is_provider: false, is_recipient: false, can_provide: false}}
+        />,
+      )
+      expect(queryByTestId('user-list-row-tooltip')).toBeNull()
+    })
+  })
+
   describe('permissions', () => {
     beforeEach(() => {
       server.use(
