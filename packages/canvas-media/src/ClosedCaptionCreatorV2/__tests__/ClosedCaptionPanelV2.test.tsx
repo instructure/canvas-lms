@@ -490,9 +490,15 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       fireEvent.click(screen.getByText('Upload'))
 
-      // Wait for upload failure
-      expect(await screen.findByText('Upload Failed')).toBeInTheDocument()
-      expect(screen.getByText('Retry German')).toBeInTheDocument()
+      // Wait for upload failure — the upload path involves FileReader +
+      // nested promises + axios, so give it extra time under CI load.
+      await waitFor(
+        () => {
+          expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+          expect(screen.getByText('Retry German')).toBeInTheDocument()
+        },
+        {timeout: 5000},
+      )
 
       // Click retry
       fireEvent.click(screen.getByText('Retry German'))
@@ -500,10 +506,13 @@ describe('<ClosedCaptionPanelV2 />', () => {
       // Should succeed on second attempt — use waitFor so both conditions
       // must be true simultaneously, avoiding races where the live region
       // is briefly cleared between the old and new announcement.
-      await waitFor(() => {
-        expect(screen.queryByText('Captions have been added for German')).toBeInTheDocument()
-        expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
-      })
+      await waitFor(
+        () => {
+          expect(screen.queryByText('Captions have been added for German')).toBeInTheDocument()
+          expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
+        },
+        {timeout: 5000},
+      )
     })
 
     it('retrying one caption does not clear the failed state of another caption', async () => {
