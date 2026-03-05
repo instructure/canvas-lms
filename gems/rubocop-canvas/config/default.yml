@@ -72,6 +72,12 @@ Migration/FunctionUnqualifiedTable:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/PolymorphicAssociations:
+  Enabled: true
+  Severity: error
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/Predeploy:
   Enabled: true
   Include:
