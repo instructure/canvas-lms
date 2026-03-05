@@ -1113,6 +1113,7 @@ class GradebooksController < ApplicationController
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
         VIEW_ALL_GRADES: @context.grants_right?(@current_user, session, :view_all_grades),
+        can_delete_attachments: @context.root_account.grants_right?(@current_user, session, :become_user),
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
