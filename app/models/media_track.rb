@@ -95,7 +95,7 @@ class MediaTrack < ActiveRecord::Base
   end
 
   def sync_kaltura_caption_asset(caption_asset_status, kaltura_client:)
-    case CanvasKaltura::ClientV3::ASSET_STATUSES[caption_asset_status]
+    case CanvasKaltura::ClientV3::Enums::KalturaCaptionAssetStatus[caption_asset_status]
     when :READY
       caption_asset_contents = kaltura_client.caption_asset_contents(external_id)
       assign_attributes(workflow_state: "ready", content: caption_asset_contents)

@@ -25,6 +25,19 @@ export type MediaInfo = {
   media_sources: any[]
   media_tracks: MediaTrack[]
   media_type: string
+  status?:
+    | 'ERROR_IMPORTING'
+    | 'ERROR_CONVERTING'
+    | 'SCAN_FAILURE'
+    | 'IMPORT'
+    | 'INFECTED'
+    | 'PRECONVERT'
+    | 'READY'
+    | 'DELETED'
+    | 'PENDING'
+    | 'MODERATE'
+    | 'BLOCKED'
+    | 'NO_CONTENT'
   title: string
 }
 
