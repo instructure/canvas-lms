@@ -90,6 +90,50 @@ module Services
       end
     end
 
+    describe ".importing_timeout_in_minutes" do
+      context "when config has a valid integer value" do
+        before do
+          allow(DynamicSettings).to receive(:find)
+            .with(tree: :private)
+            .and_return(DynamicSettings::FallbackProxy.new({
+                                                             "new_quizzes.yml" => {
+                                                               NewQuizzes::NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY => "120"
+                                                             }.to_yaml
+                                                           }))
+        end
+
+        it "returns the configured value as minutes" do
+          expect(NewQuizzes.importing_timeout_in_minutes).to eq(120.minutes)
+        end
+      end
+
+      context "when config value is nil (key not set)" do
+        it "logs an error, captures to Sentry, and returns 30 minutes" do
+          expect(Rails.logger).to receive(:error).twice
+          expect(Sentry).to receive(:capture_exception)
+          expect(NewQuizzes.importing_timeout_in_minutes).to eq(30.minutes)
+        end
+      end
+
+      context "when config value is not a valid integer string" do
+        before do
+          allow(DynamicSettings).to receive(:find)
+            .with(tree: :private)
+            .and_return(DynamicSettings::FallbackProxy.new({
+                                                             "new_quizzes.yml" => {
+                                                               NewQuizzes::NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY => "not_a_number"
+                                                             }.to_yaml
+                                                           }))
+        end
+
+        it "logs an error, captures to Sentry, and returns 30 minutes" do
+          expect(Rails.logger).to receive(:error).twice
+          expect(Sentry).to receive(:capture_exception)
+          expect(NewQuizzes.importing_timeout_in_minutes).to eq(30.minutes)
+        end
+      end
+    end
+
     describe ".ui_version" do
       it "returns region" do
         expect(NewQuizzes.ui_version).to eq("us-west-2")

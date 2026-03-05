@@ -185,6 +185,7 @@ development:
       #   new_quizzes_cloudfront_host_production: http://quizzes-ui-app.inseng.test:8082
       #   new_quizzes_cloudfront_host_beta: http://quizzes-ui-app.inseng.test:8082
       #   new_quizzes_cloudfront_host_edge: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_importing_timeout_in_minutes: 360
 
   store:
     canvas:

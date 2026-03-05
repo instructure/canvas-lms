@@ -68,7 +68,6 @@ class AbstractAssignment < ActiveRecord::Base
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
   QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
   QUIZZES_NEXT_TIMEOUT = 15.minutes
-  QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
   QUIZZES_NEXT_QUIZ_TYPES = %w[graded_quiz graded_survey ungraded_survey].freeze
   QUIZZES_NEXT_SURVEY_TYPES = %w[graded_survey ungraded_survey].freeze
   ROLLCALL_ASSIGNMENT_TITLE = "Roll Call Attendance"
@@ -3494,7 +3493,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      QUIZZES_NEXT_IMPORTING_TIMEOUT.ago
+      Services::NewQuizzes.importing_timeout_in_minutes.ago
     )
   }
 
