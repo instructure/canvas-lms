@@ -2668,10 +2668,10 @@
   resolved "https://registry.yarnpkg.com/@inquirer/type/-/type-3.0.6.tgz#2500e435fc2014c5250eec3279f42b70b64089bd"
   integrity sha512-/mKVCtVpyBu3IDarv0G+59KC4stsD5mDsGpYh+GKs1NZT88Jh52+cuoA1AtLk2Q0r/quNl+1cSUyLRHBFeD0XA==
 
-"@instructure.ai/aiinfo@^2.0.0":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@instructure.ai/aiinfo/-/aiinfo-2.0.2.tgz#f77cab0ff1e420329e85e8aa5961d7b606ca2013"
-  integrity sha512-mFdHxbT/dmX3Ht3vvZw7QdMCoypsgUCxQ2b21gPEQtEFhKn6EIMuFW/Ob2AEfV+cO7l+9yOE2oEiQEr70R/MQQ==
+"@instructure.ai/aiinfo@^2.11.1":
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/@instructure.ai/aiinfo/-/aiinfo-2.11.1.tgz#8daee7e8340c9fcc603f660fb9ec0f7e2e14ea1f"
+  integrity sha512-JdkFWcX8gAUX+b9wikL8UI1zXOqVocyd+KedmNeLsbSYMZ1R1DhgaeQLhy38+BVRYiTWolgHvTxr+BEh7OM1NA==
 
 "@instructure/brandable_css@^3":
   version "3.0.1"
