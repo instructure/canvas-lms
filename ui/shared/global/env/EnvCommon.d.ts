@@ -356,6 +356,7 @@ export type RootAccountFeatureId =
   | 'lti_registrations_usage_data_dev'
   | 'lti_registrations_usage_data_low_usage'
   | 'lti_registrations_usage_tab'
+  | 'lti_deactivate_registrations'
   | 'mobile_offline_mode'
   | 'modules_requirements_allow_percentage'
   | 'nav_menu_links'
