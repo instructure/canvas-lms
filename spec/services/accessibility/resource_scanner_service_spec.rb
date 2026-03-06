@@ -617,10 +617,20 @@ describe Accessibility::ResourceScannerService do
         wiki_page.update!(body: "<p>content</p>")
       end
 
-      it "calls ErrorReport.log_exception with the rule error tag and contextual info" do
-        expect(ErrorReport).to receive(:log_exception).with(
+      it "calls Sentry.capture_exception with the rule error tag and contextual info" do
+        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+
+        subject.scan_resource(scan:)
+      end
+
+      it "sets the Sentry scope context with the rule error tag and contextual info" do
+        scope = instance_double(Sentry::Scope)
+        allow(Sentry).to receive(:with_scope).and_yield(scope)
+        allow(Sentry).to receive(:capture_exception)
+
+        expect(scope).to receive(:set_context).with(
           "accessibility_rule_error",
-          instance_of(StandardError),
           hash_including(
             rule_id: Accessibility::Rules::HeadingsStartAtH2Rule.id,
             resource_type: "WikiPage",
@@ -629,21 +639,14 @@ describe Accessibility::ResourceScannerService do
             context_id: course.global_id,
             account_id: course.account.global_id
           )
-        ).and_return(instance_double(ErrorReport, id: 1))
-
-        subject.scan_resource(scan:)
-      end
-
-      it "calls Sentry.capture_exception with the raised error" do
-        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
-
-        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+        )
 
         subject.scan_resource(scan:)
       end
 
       it "completes the scan successfully despite the rule error" do
-        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
+        allow(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        allow(Sentry).to receive(:capture_exception)
 
         subject.scan_resource(scan:)
 
@@ -657,10 +660,20 @@ describe Accessibility::ResourceScannerService do
         wiki_page.update!(body: "<p>content</p>")
       end
 
-      it "calls ErrorReport.log_exception with the parse error tag and contextual info" do
-        expect(ErrorReport).to receive(:log_exception).with(
+      it "calls Sentry.capture_exception with the parse error" do
+        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+
+        subject.scan_resource(scan:)
+      end
+
+      it "sets the Sentry scope context with the parse error tag and contextual info" do
+        scope = instance_double(Sentry::Scope)
+        allow(Sentry).to receive(:with_scope).and_yield(scope)
+        allow(Sentry).to receive(:capture_exception)
+
+        expect(scope).to receive(:set_context).with(
           "accessibility_html_parse_error",
-          instance_of(StandardError),
           hash_including(
             resource_type: "WikiPage",
             resource_id: wiki_page.global_id,
@@ -668,21 +681,14 @@ describe Accessibility::ResourceScannerService do
             context_id: course.global_id,
             account_id: course.account.global_id
           )
-        ).and_return(instance_double(ErrorReport, id: 1))
-
-        subject.scan_resource(scan:)
-      end
-
-      it "calls Sentry.capture_exception" do
-        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
-
-        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+        )
 
         subject.scan_resource(scan:)
       end
 
       it "completes the scan with issue_count of 0" do
-        allow(ErrorReport).to receive(:log_exception).and_return(instance_double(ErrorReport, id: 1))
+        allow(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        allow(Sentry).to receive(:capture_exception)
 
         subject.scan_resource(scan:)
 
@@ -700,14 +706,17 @@ describe Accessibility::ResourceScannerService do
         allow_any_instance_of(described_class).to receive(:parse_html_content).and_raise(StandardError, "parse error")
       end
 
-      it "calls ErrorReport.log_exception with context_type of Course" do
-        expect(ErrorReport).to receive(:log_exception).with(
+      it "sets the Sentry scope context with context_type of Course" do
+        scope = instance_double(Sentry::Scope)
+        allow(Sentry).to receive(:with_scope).and_yield(scope)
+        allow(Sentry).to receive(:capture_exception)
+
+        expect(scope).to receive(:set_context).with(
           "accessibility_html_parse_error",
-          instance_of(StandardError),
           hash_including(
             context_type: "Course"
           )
-        ).and_return(instance_double(ErrorReport, id: 1))
+        )
 
         subject.scan_resource(scan:)
       end
