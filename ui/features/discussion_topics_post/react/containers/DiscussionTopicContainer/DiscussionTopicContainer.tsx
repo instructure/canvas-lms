@@ -53,8 +53,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-// @ts-expect-error TS7016 (typescriptify)
-import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
+import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
@@ -433,8 +432,7 @@ export const DiscussionTopicContainer = ({
           },
         },
       }}
-      // @ts-expect-error TS7006 (typescriptify)
-      render={(responsiveProps, matches) => (
+      render={(responsiveProps, matches = []) => (
         <>
           <TopNavPortalWithDefaults
             getBreadCrumbSetter={handleBreadCrumbSetter}
@@ -623,7 +621,7 @@ export const DiscussionTopicContainer = ({
                               <>
                                 <Flex
                                   width="100%"
-                                  direction={responsiveProps.direction}
+                                  direction={responsiveProps?.direction}
                                   wrap="wrap"
                                   gap="small"
                                   margin="small 0 0 0"
@@ -636,7 +634,7 @@ export const DiscussionTopicContainer = ({
                                         onClick={onOpenTopicReply}
                                         data-testid="discussion-topic-reply"
                                       >
-                                        <Text weight="bold" size={responsiveProps.textSize}>
+                                        <Text weight="bold" size={responsiveProps?.textSize}>
                                           {I18n.t('Reply')}
                                         </Text>
                                       </Button>

@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import PropTypes, {array, func, instanceOf} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -35,14 +35,18 @@ export function showImportOutcomesModal(props) {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'import-outcomes-modal-container')
   document.body.appendChild(parent)
-  const root = createRoot(parent)
-
   function showImportOutcomesRef(modal) {
     if (modal) modal.show()
   }
 
-  root.render(
-    <ImportOutcomesModal {...props} parent={parent} root={root} ref={showImportOutcomesRef} />,
+  const root = render(
+    <ImportOutcomesModal
+      {...props}
+      parent={parent}
+      root={{unmount: () => root.unmount()}}
+      ref={showImportOutcomesRef}
+    />,
+    parent,
   )
 }
 

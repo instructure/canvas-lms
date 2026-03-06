@@ -17,8 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
-import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new'
+import {ScreenCapture, canUseScreenCapture, canUseMediaCapture} from '@instructure/media-capture'
 import $ from 'jquery'
 import {func, string} from 'prop-types'
 import React from 'react'
@@ -283,7 +282,11 @@ export default class CanvasMediaRecorder extends React.Component {
     return (
       <div>
         {canUseMediaCapture() && (
-          <MediaCapture translations={translations} onCompleted={this.saveFile} />
+          <ScreenCapture
+            translations={translations}
+            onCompleted={this.saveFile}
+            noScreenSharing={true}
+          />
         )}
       </div>
     )

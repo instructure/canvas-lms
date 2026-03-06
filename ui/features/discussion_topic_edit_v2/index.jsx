@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import {DiscussionTopicEdit} from './react/index'
 import React from 'react'
-import ReactDom from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 $(() => {
-  ReactDom.render(<DiscussionTopicEdit />, $('#content')[0])
+  legacyRender(<DiscussionTopicEdit />, $('#content')[0])
 })

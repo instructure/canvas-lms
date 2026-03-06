@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render as canvasRender, rerender} from '@canvas/react'
 import {Provider} from 'react-redux'
 
 // TODO: we probably want this one eventually
@@ -29,21 +29,26 @@ import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
 export default function createPermissionsIndex(root, data = {}) {
   const store = createStore(data)
-  const rootElement = createRoot(root)
+  let rootInstance = null
 
   function unmount() {
-    rootElement.unmount()
+    rootInstance?.unmount()
   }
 
   function render() {
-    rootElement.render(
+    const element = (
       <>
         <TopNavPortal />
         <Provider store={store}>
           <ConnectedPermissionsIndex />
         </Provider>
-      </>,
+      </>
     )
+    if (!rootInstance) {
+      rootInstance = canvasRender(element, root)
+    } else {
+      rerender(rootInstance, element)
+    }
   }
 
   // For some reason this is not working  TODO figure this out

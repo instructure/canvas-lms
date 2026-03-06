@@ -205,6 +205,8 @@ interface RCEWrapperProps {
   tinymce: typeof tinymce
   trayProps: RCETrayProps
   use_rce_icon_maker?: boolean
+  useHighContrast?: boolean
+  fontFamily?: string
   userCacheKey?: string
 }
 
@@ -285,7 +287,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
 
   constructor(props: RCEWrapperProps) {
     super(props)
-    this.style = buildStyle()
+    this.style = buildStyle(!!props.useHighContrast, props.fontFamily)
 
     // Set up some limited global state that can be referenced
     // as needed in RCE's components and function / plugin definitions

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,17 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {legacyRender} from '@canvas/react'
-import CollectionView from './react/CollectionView'
-import ready from '@instructure/ready'
-import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
-
-ready(() => {
-  initializeTopNavPortal()
-
-  legacyRender(
-    <CollectionView {...window.ENV.brandConfigStuff} />,
-    document.getElementById('content'),
-  )
-})
+module.exports = {
+  MediaPlayer: () => null,
+}

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
@@ -180,7 +181,7 @@ describe('InheritanceStateControl', () => {
 
     const item = screen.getByText('Off')
 
-    fireEvent.click(item)
+    await userEvent.click(item)
 
     await waitFor(() => {
       const updatedDevKey = store.getState().listDeveloperKeys.list[0]
@@ -214,7 +215,7 @@ describe('InheritanceStateControl', () => {
     const item = screen.getByRole('checkbox')
     expect(item.checked).toBe(true)
 
-    fireEvent.click(item)
+    await userEvent.click(item)
 
     await waitFor(() => {
       const updatedDevKey = store.getState().listDeveloperKeys.list[0]

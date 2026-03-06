@@ -210,8 +210,8 @@ export default class DeveloperKeyStateControl extends React.Component {
           checked={this.radioGroupValue() === 'on'}
           disabled={this.isDisabled()}
           name={this.props.developerKey.id}
-          onChange={e => {
-            const newValue = e.target.checked ? 'on' : 'off'
+          onChange={() => {
+            const newValue = this.radioGroupValue() === 'on' ? 'off' : 'on'
             this.setBindingState(newValue)
           }}
         />

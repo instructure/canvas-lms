@@ -18,8 +18,8 @@
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {IconAudioSolid, IconVideoCameraSolid} from '@instructure/ui-icons'
-// @ts-expect-error TS7016 (typescriptify)
-import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
+// @ts-expect-error no types available for media-capture
+import {ScreenCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {Modal} from '@instructure/ui-modal'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -95,10 +95,10 @@ export function MediaUploadModal({
         <Tabs onRequestTabChange={handleTabChange}>
           <Tabs.Panel renderTitle={I18n.t('Record Media')} isSelected={selectedTab === 0}>
             {canUseMediaCapture() && (
-              <MediaCapture
+              <ScreenCapture
                 onCompleted={onRecordingSave}
-                // @ts-expect-error TS7006 (typescriptify)
-                translations={mapObject(translations, f => f.call())}
+                noScreenSharing={true}
+                translations={mapObject(translations, (f: () => string) => f.call(null))}
               />
             )}
           </Tabs.Panel>

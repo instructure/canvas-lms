@@ -43,8 +43,8 @@ const queryFn = async ({queryKey}: {queryKey: [string, number, string]}) => {
 export function useAssetProcessorsToolsList(
   courseId: number,
   type: AssetProcessorType,
-): UseQueryResult<LtiLaunchDefinition[], Error> {
-  const res: UseQueryResult<LtiLaunchDefinition[], Error> = useQuery({
+): UseQueryResult<LtiLaunchDefinition[] | undefined, Error> {
+  const res: UseQueryResult<LtiLaunchDefinition[] | undefined, Error> = useQuery({
     queryKey: ['assetProcessors', courseId, type.toString()],
     queryFn,
   })
