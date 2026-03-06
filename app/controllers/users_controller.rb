@@ -487,6 +487,8 @@ class UsersController < ApplicationController
                                  .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
            })
 
+    @js_env[:FEATURES][:educator_dashboard] = should_show_educator_dashboard?
+
     # prefetch dashboard cards with the right observer url param
     if @current_user.roles(@domain_root_account).include?("observer")
       @cards_prefetch_observed_param = @selected_observed_user&.id
@@ -3562,5 +3564,21 @@ class UsersController < ApplicationController
       return true
     end
     false
+  end
+
+  def should_show_educator_dashboard?
+    return false if k5_user?
+    return false unless @domain_root_account&.feature_enabled?(:educator_dashboard)
+
+    Rails.cache.fetch(
+      ["should_show_educator_dashboard", @current_user.global_id],
+      expires_in: 1.hour
+    ) do
+      @current_user.enrollments
+                   .shard(@current_user.in_region_associated_shards)
+                   .where(type: "TeacherEnrollment")
+                   .active_or_pending
+                   .exists?
+    end
   end
 end
