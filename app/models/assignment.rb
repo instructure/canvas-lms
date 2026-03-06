@@ -268,11 +268,18 @@ class Assignment < AbstractAssignment
 
   def peer_reviews_changes_ok?
     return true unless peer_reviews_change_to_be_saved == [true, false]
-    return true unless context&.feature_enabled?(:peer_review_allocation_and_grading)
 
-    if peer_review_submissions?
+    graded_peer_reviews_enabled = context.feature_enabled?(:peer_review_allocation_and_grading)
+
+    if graded_peer_reviews_enabled && peer_review_submissions?
       errors.add :peer_reviews,
                  I18n.t("cannot be disabled when students have already submitted reviews")
+    end
+
+    # For backward compatibility, prevent disabling peer reviews for assignments with graded peer reviews in legacy mode
+    if !graded_peer_reviews_enabled && peer_review_sub_assignment.present?
+      errors.add :peer_reviews,
+                 I18n.t("cannot be disabled for assignments with graded peer reviews in legacy mode")
     end
   end
 
