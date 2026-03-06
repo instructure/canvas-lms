@@ -46,6 +46,7 @@ export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss}) => {
 
   return (
     <Grid
+      key={getFeatureInfo ? 'with-ai' : 'without-ai'}
       templateColumns={templateColumns}
       templateAreas={templateAreas}
       rowGap="0"
