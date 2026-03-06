@@ -3404,6 +3404,7 @@ tr:
   allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Kullanıcıların mevcut bir geçici kaydı düzenlemesine izin verir."
   allows_users_to_edit_conferences_2d3c960c: "Canlı derslerin düzenlenmesine izin ver."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Kullanıcıların Not Defteri'nde “Launch SpeedGrader Filtered by Stude...book” seçeneğini etkinleştirmesine izin verir; etkinleştirildiğinde SpeedGrader yalnızca seçili gruptaki öğrencileri yükler."
+  allows_users_to_enable_the_rolling_transcript_for__fc94d9e1: "Kullanıcıların Canvas medyası için akışkan transkripti etkinleştirmesine ve RCE içeriğine eklenen medya için altyazı talep etmesine olanak tanır."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Kullanıcıların bir derste grupları içe aktarmasına izin verir."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Kullanıcıların (doğru kimlik bilgilerine sahip olmaları kaydıyla) birden fazla hesabı birbiriyle birleştirmesine (merge) izin verir."
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "Kullanıcıların SpeedGrader’da kullanılmak üzere sık kullanılan geri bildirimleri bir yorum kütüphanesinde kaydetmesine ve aramasına izin verir."
@@ -3623,6 +3624,7 @@ tr:
   an_unexpected_error_happened_while_loading_the_ign_fce4bac6: "Ignite Agent yüklenirken beklenmeyen bir hata oluştu."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Beklenmeyen bir hata oluştu: %{id} hata raporuna bakın."
   an_unexpected_error_occurred_15bae9ec: "Beklenmeyen bir hata oluştu"
+  an_unexpected_error_occurred_please_try_again_a06e425f: "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
   an_unexpected_error_occurred_please_try_again_late_19f6d055: "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
   an_unexpected_error_occurred_please_try_again_late_c58da3e4: "Beklenmeyen bir hata oluştu, lütfen daha sonra tekrar deneyin."
   an_unexpected_error_occurred_while_grading_570e2035: "Notlandırma yapılırken beklenmeyen bir hata oluştu."
@@ -7091,7 +7093,7 @@ tr:
         collaboration_members: "Çalışma ekibi üyeleri"
         groups: Gruplar
         loading: Yükleniyor
-        people: Katılımcılar
+        people: Kullanıcılar
         remove_all: "Hepsini Sil"
       member_instructions: "Ortak çalışan eklemek için sol sütundan bir kullanıcı veya grubu tıklayınız veya dokunuz."
     delete_button: 
@@ -8055,7 +8057,7 @@ tr:
       headings: 
         prior_users: "Önceki Kullanıcılar"
       links: 
-        back_to_people: "Katılımcılar'a Geri Dön"
+        back_to_people: "Kullanıcılar'a Geri Dön"
       titles: 
         prior_users: "Önceki Kullanıcılar"
     roster: 
@@ -8937,11 +8939,11 @@ tr:
   count_participations_ac8f82b7: 
     one: "1 katılım"
     other: "%{count} katılım"
-  count_people_489946e7: "%{count} katılımcı"
+  count_people_489946e7: "%{count} kullanıcı"
   count_people_found_1ab374c0: 
     one: "1 kişi bulundu"
-    other: "%{count} kişi bulundu"
-    zero: "Hiç katılımcı bulunamadı"
+    other: "%{count} kullanıcı bulundu"
+    zero: "Hiç kullanıcı bulunamadı"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} başarılı bir şekilde *%{course_name}* dersine kaydoldu."
     other: "%{count} kişi başarılı bir şekilde *%{course_name}* dersine kaydoldu."
@@ -9430,7 +9432,7 @@ tr:
   course_participation_is_limited_to_course_start_an_7315866d: "Derse katılım, *ders* başlangıç ve bitiş tarihleriyle sınırlıdır. Derste oluşturulan ders bölümü tarihleri ders tarihlerini geçersiz kılabilir."
   course_participation_is_set_to_expire_at_midnight__b05fb48e: "Derse katılım gece yarısında sona erecek şekilde ayarlanmıştır; bu nedenle bir önceki gün, bu dersin etkin olacağı son gündür."
   course_people_3058c948: "Ders Katılımcıları"
-  course_people_error_page_530cd96: "Ders Kişiler Hata Sayfası"
+  course_people_error_page_530cd96: "Ders Katılımcıları Hata Sayfası"
   course_quiz_export_1f59f15: "Ders Sınav Dışa Aktarma"
   course_quiz_extensions_4102f98f: "Ders Sınav Uzatmaları"
   course_quizzes_c337653c: "Ders Kısa Sınavları"
@@ -9800,12 +9802,12 @@ tr:
         edit_sections_desc: "Bölümler kullanıcıları bütünleştirmenin ilave bir yoludur. Aynı ders içerisinde çoklu öğretim sınıflarına izin verilir, bu sayede tüm ders içerikleri tek bir yerde bulunur. Kullanıcıyı farklı bölüme taşımak veya bölüm kayıdı eklemek/silme işlemlerini yapabilirsiniz. Kullanıcılar en az bir bölümde olmalıdırlar."
       index: 
         cannot_add_users: "Yeni kullanıcılar ders sonlandırıldığından dolayı eklenemiyor"
-        filter_field_description: "Kişileri arayın. Bu alana yazmaya başladıkça girdiğiniz isimlere uyanlar otomatik olarak filtrelenecektir."
+        filter_field_description: "Kullanıcı arayın. Bu alana yazmaya başladıkça girdiğiniz isimlere uyanlar otomatik olarak filtrelenecektir."
         group_set: "Grup Seti"
-        people: Katılımcılar
+        people: Kullanıcılar
         role_to_search: "Aramayı şu rolle sınırla"
-        search_people: "Kişi ara"
-        title_add_people: "Katılımcı Ekle"
+        search_people: "Kullanıcı ara"
+        title_add_people: "Kullanıcı Ekle"
       invitations_view: 
         accepted_invitation: "%{name} derse katılım davetini zaten aldı ve onayladı, fakat gerekirse davetiye tekrar gönderilebilir."
         admin_invitation_unaccepted: "%{name} derse katılım davetinizi henüz onaylamadı. Davetiniz şu zaman yollandı: %{time}"
@@ -9842,7 +9844,7 @@ tr:
         login_name: "Giriş ID"
         login_name_or_sis_id: "Oturum Aç / ÖBS ID"
         name: İsim
-        no_people_found: "Hiç kişi bulunamadı"
+        no_people_found: "Hiç kullanıcı bulunamadı"
         role: Rol
         section: Bölüm
         total_activity: "Toplam Etkinlik"
@@ -9934,7 +9936,7 @@ tr:
         grading_standard_enabled: "Ders notlandırma şemasını etkinleştir"
         hide_distribution_graphs: "Öğrencilerin not dağılım grafiklerini gizle"
         hide_final_grades: "Öğrenci değerlendirme özeti toplamını gizle"
-        hide_sections_on_course_users_page: "Kişiler sayfasında ders bölümlerini öğrencilerden gizle"
+        hide_sections_on_course_users_page: "Kullanıcılar sayfasında ders bölümlerini öğrencilerden gizle"
         home_page_announcement_limit: "Ana sayfada gösterilecek duyuru sayısı"
         homeroom_course: "Homeroom dersi olarak etkinleştir"
         homeroom_course_header: "Homeroom Dersi"
@@ -10383,7 +10385,7 @@ tr:
     modules: Modüller
     new_ai_experience: "Yeni Yapay Zekâ Deneyimi"
     outcomes: "Öğrenme Çıktıları"
-    people: Katılımcılar
+    people: Kullanıcılar
     plugins: Eklentiler
     prior_users: "Önceki Kullanıcılar"
     question_banks: "Soru Bankaları"
@@ -11112,7 +11114,7 @@ tr:
   descending_scores_2c3bf434: "Azalan puanlar"
   describe_the_role_or_style_of_the_ai_e_g_friendly__10fde448: "Rubrik değerlendirme açıklamasının düzenlenmesi devre dışı bırakıldı."
   describe_what_s_on_the_picture_c4791974: "Bu durumdaki etkinlik için rubrik değerlendirme açıklamasını düzenleyemezsiniz."
-  describe_what_this_image_conveys_within_this_resou_32d5874a: "Bu görselin, bu kaynağın içinde ne anlattığını; göremeyen veya yükleyemeyen kişiler için açıklayın."
+  describe_what_this_image_conveys_within_this_resou_32d5874a: "Bu görselin, bu kaynağın içinde ne anlattığını; göremeyen veya yükleyemeyen kullanıcılar için açıklayın."
   describe_what_this_image_is_meant_to_convey_f13950d5: "Bu görselin ne anlatması amaçlandığını açıklayın."
   description_436c48d7: Açıklama
   description_709b38db: "Açıklama:"
@@ -11757,6 +11759,7 @@ tr:
   displayname_loading_in_progress_2be325fd: "%{displayName} yükleniyor"
   displayname_loading_pending_3aa2723e: "%{displayName} yükleme beklemede"
   displayname_loading_success_8177d735: "%{displayName} yükleme başarılı"
+  displays_a_button_to_launch_the_learning_agent_in__27abfa89: "Öğrenme Ajanını ayrı bir sekmede başlatmak için bir buton gösterir."
   displays_a_survey_link_for_discussion_translate_an_87959f5c: "Tartışma Çevirisi ve Tartışma Fikirleri için anket bağlantısı gösterir"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: "Bir derste bağlantı doğrulayıcıyı çalıştıran ve sorun bulunmayan öğretim elemanları için konfeti gösterir."
   displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: "Belirlenen son teslim tarihinden önce ödev teslim eden kullanıcılar için konfeti gösterir."
@@ -12935,7 +12938,7 @@ tr:
       no_files: "Yüklenen Dosya Yok"
       no_submissions: "Hiç Gönderi Bulunamadı"
       private_comments: "Şu anda sadece bu sayfa için yorumları görebilirsiniz. *bu sayfanın ayarlarını değiştir*'e tıklayarak yorumları herkese açık yapabilirsiniz."
-      private_eportfolio: "Bu durumda insanlar onu bulamaz hatta izin olmadan göremez. Sizin portfolyonuz olduğu siz görebilirsiniz, fakat birilerinin görmesini istiyorsanız aşağıdaki özel bağlantıyı kopyalayıp görmesini istediklerinizle paylaşmalısınız:"
+      private_eportfolio: "Bu durumda kullanıcılar onu bulamaz hatta izin olmadan göremez. Sizin portfolyonuz olduğu siz görebilirsiniz, fakat birilerinin görmesini istiyorsanız aşağıdaki özel bağlantıyı kopyalayıp görmesini istediklerinizle paylaşmalısınız:"
       public_eportfolio: "Bu durumda portfolyonuzun adresini bilen herkes onu görebilir. *eportfolyo ayarlarınızı değiştirin*'e tıklayarak portfolyonuzu özel yapabilirsiniz."
       recent_submissions: "ePortfolyonuzdaki yeni sayfaya eklemek için bir gönderiye tıklayın."
       titles: 
@@ -13411,6 +13414,7 @@ tr:
   expand_collapse_title_outcome_group_student_meets__46ffef48: "%{title} Öğrenme Çıktısı Grubunu genişlet/daralt; öğrenci %{count} öğrenme çıktısından %{mastery_count} tanesinde yeterlik düzeyine ulaştı"
   expand_description_for_outcome_title_abc8f30: "%{title} öğrenme çıktısı açıklamasını genişlet"
   expand_discussion_thread_from_author_829cfae1: "%{author} tarafından başlatılan tartışma dizisini genişlet"
+  expand_distribution_for_outcome_735c9dee: "%{outcome} için dağıtımı genişlet."
   expand_global_navigation_2c28d5d4: "Global gezintiyi genişlet"
   expand_grade_details_1c6f21d9: "Not ayrıntılarını genişlet"
   expand_group_53765272: "Grubu Genişlet"
@@ -13830,7 +13834,7 @@ tr:
   failed_to_log_in_7ceec561: "Oturum Açma Başarısız"
   failed_to_mark_announcements_as_read_1df1f789: "Duyurular okundu olarak işaretlenemedi"
   failed_to_merge_users_please_try_again_35d0f0db: "Kullanıcılar birleştirilemedi. Lütfen tekrar deneyin."
-  failed_to_open_the_add_people_dialog_1d47958f: "Kişi Ekle iletişim kutusu açılamadı"
+  failed_to_open_the_add_people_dialog_1d47958f: "Kullanıcı Ekle iletişim kutusu açılamadı"
   failed_to_open_the_outcome_dialog_1e7c39b: "Öğrenme çıktısı iletişim kutusu açılamadı"
   failed_to_opt_out_of_the_canvas_for_elementary_das_cf7210f0: "Canvas İlkokul kontrol panelinden çıkılamadı"
   failed_to_perform_search_c918100f: "Arama gerçekleştirilemedi"
@@ -13855,6 +13859,7 @@ tr:
   failed_to_retrieve_temporary_enrollment_pairing_du_fc18a97b: "Bilinmeyen bir hata nedeniyle geçici kayıt eşleştirmesi alınamadı"
   failed_to_retrieve_temporary_enrollment_pairing_ecb274d: "Geçici kayıt eşleştirmesi alınamadı"
   failed_to_revert_account_please_try_again_6ef1f42c: "Hesap geri alınamadı. Lütfen tekrar deneyin."
+  failed_to_save_ai_experience_error_ae7e1de2: "Yapay zekâ deneyimi kaydedilemedi: %{error}"
   failed_to_save_dashboard_selection_32e71c72: "Kontrol paneli seçimi kaydedilemedi"
   failed_to_save_outcome_order_e233ecb0: "Öğrenme çıktısı sırası kaydedilemedi"
   failed_to_save_please_try_again_later_bb7070fb: "Kaydetme başarısız, lütfen daha sonra tekrar deneyin"
@@ -14204,7 +14209,7 @@ tr:
   filter_messages_by_course_21a53fc4: "Mesajları derse göre sırala"
   filter_options_388d7287: "Filtre Seçenekleri"
   filter_outcomes_e91aa331: "Çıktıları Filtrele"
-  filter_people_by_role_or_tag_use_key_down_arrow_to_ac7538b: "Kişileri role veya etikete göre filtreleyin. Seçenekleri seçmek için aşağı ok tuşunu kullanın"
+  filter_people_by_role_or_tag_use_key_down_arrow_to_ac7538b: "Kullanıcıları role veya etikete göre filtreleyin. Seçenekleri seçmek için aşağı ok tuşunu kullanın"
   filter_preset_name_9ce8f057: "Filtre ön ayar adı"
   filter_recent_user_accesses_by_term_30812659: "Son kullanıcı erişimlerini döneme göre filtrele."
   filter_replies_by_unread_342e8e90: "Yanıtları okunmamışlara göre filtrele"
@@ -15452,7 +15457,7 @@ tr:
       files: Dosyalar
       home: "Ana Sayfa"
       pages: Sayfalar
-      people: Katılımcılar
+      people: Kullanıcılar
   group_a8f5ed9c: Grup
   group_add_permission_is_needed_to_create_a_new_gro_3cd0d1b5: "Yeni bir Grup Kategorisi oluşturmak için Grup Ekle izni gerekir"
   group_announcements_f6e0fc8c: "Grup Duyuruları"
@@ -15553,7 +15558,7 @@ tr:
   group_not_found_59f8bb27: "Grup bulunamadı"
   group_not_found_d13d85b9: "grup bulunamadı"
   group_pages_656556f3: "Grup Sayfaları"
-  group_people_50e9785b: "Grup Kişileri"
+  group_people_50e9785b: "Grup Katılımcıları"
   group_quota_290dbc6b: "Grup Kotası"
   group_quota_is_required_2e92b02e: "Grup kotası zorunludur."
   group_quota_must_be_an_integer_31d7b890: "Grup kotası bir tam sayı olmalıdır."
@@ -15752,7 +15757,7 @@ tr:
       add_unassigned_menu: 
         add_unassigned_student: "Atanmamış Öğrenci Ekle"
         add_unassigned_user: "Atanmamış Kullanıcı Ekle"
-        search_people: "Kişi ara"
+        search_people: "Kullanıcı ara"
       add_unassigned_user: 
         add_to_group: "Gruba kullanıcı ekle"
         add_user_to_group: "Bu gruba %{name} kullanıcısını ekle"
@@ -16346,7 +16351,7 @@ tr:
   how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Not Defteri'nden bir derste öğrenme çıktısı sonuçlarını görüntülemek için Öğrenme Ustalığı Not Defteri'ni nasıl kullanırım?"
   how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Bir derste Öğrenme Çıktıları sayfasını nasıl kullanırım?"
   how_do_i_use_the_pages_index_page_dafb986c: "Sayfalar Dizin Sayfasını nasıl kullanırım?"
-  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Öğretim elemanı olarak bir derste Kişiler sayfasını nasıl kullanırım?"
+  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Öğretim elemanı olarak bir derste Kullanıcılar sayfasını nasıl kullanırım?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Sınavlar Dizin Sayfasını nasıl kullanırım?"
   how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Öğretim elemanı olarak Ders İzlencesi'ni nasıl kullanırım?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Bir derste öğrenci bağlam kartını nasıl görüntülerim?"
@@ -16606,13 +16611,13 @@ tr:
   if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Özellik seçeneği etkinse ve bu izin etkinse, Öğrenme Çıktıları sayfası üç sekme içerir: Yönet, Yeterlik ve Hesaplama."
   if_the_open_registration_account_setting_is_enable_10b1965c: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, tasarımcı zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse tasarımcı ekleyebilir."
   if_the_open_registration_account_setting_is_enable_1e679e07: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, asistan zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse asistan ekleyebilir."
-  if_the_open_registration_account_setting_is_enable_2f43fcc0: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğrenci zaten Canvas hesabına sahip olmasa bile Kişiler sayfasından e-posta adresi veya giriş ID üzerinden derse öğrenci ekleyebilir."
-  if_the_open_registration_account_setting_is_enable_474c98c2: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, tasarımcı zaten Canvas hesabına sahip olmasa bile Kişiler sayfasından e-posta adresi veya giriş ID üzerinden derse tasarımcı ekleyebilir."
+  if_the_open_registration_account_setting_is_enable_2f43fcc0: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğrenci zaten Canvas hesabına sahip olmasa bile Kullanıcılar sayfasından e-posta adresi veya giriş ID üzerinden derse öğrenci ekleyebilir."
+  if_the_open_registration_account_setting_is_enable_474c98c2: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, tasarımcı zaten Canvas hesabına sahip olmasa bile Katılımcılar sayfasından e-posta adresi veya giriş ID üzerinden derse tasarımcı ekleyebilir."
   if_the_open_registration_account_setting_is_enable_87662428: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, gözlemci zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse gözlemci ekleyebilir."
   if_the_open_registration_account_setting_is_enable_99a8a04a: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğrenci zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse öğrenci ekleyebilir."
-  if_the_open_registration_account_setting_is_enable_9ca710e2: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğretim elemanı zaten Canvas hesabına sahip olmasa bile Kişiler sayfasından e-posta adresi veya giriş ID üzerinden derse öğretim elemanı ekleyebilir."
-  if_the_open_registration_account_setting_is_enable_9e63fda6: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, gözlemci zaten Canvas hesabına sahip olmasa bile Kişiler sayfasından e-posta adresi veya giriş ID üzerinden derse gözlemci ekleyebilir."
-  if_the_open_registration_account_setting_is_enable_b6fdaab4: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, asistan zaten Canvas hesabına sahip olmasa bile Kişiler sayfasından e-posta adresi veya giriş ID üzerinden derse asistan ekleyebilir."
+  if_the_open_registration_account_setting_is_enable_9ca710e2: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğretim elemanı zaten Canvas hesabına sahip olmasa bile Katılımcılar sayfasından e-posta adresi veya giriş ID üzerinden derse öğretim elemanı ekleyebilir."
+  if_the_open_registration_account_setting_is_enable_9e63fda6: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, gözlemci zaten Canvas hesabına sahip olmasa bile Kullanıcılar sayfasından e-posta adresi veya giriş ID üzerinden derse gözlemci ekleyebilir."
+  if_the_open_registration_account_setting_is_enable_b6fdaab4: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, asistan zaten Canvas hesabına sahip olmasa bile Kullanıcılar sayfasından e-posta adresi veya giriş ID üzerinden derse asistan ekleyebilir."
   if_the_open_registration_account_setting_is_enable_e7f97cf0: "Açık Kayıt hesap ayarı etkinse, bu izne sahip kullanıcılar, öğretim elemanı zaten Canvas hesabına sahip olmasa bile Dersler sayfasından e-posta adresi veya giriş ID üzerinden derse öğretim elemanı ekleyebilir."
   if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Bir tartışmada, yanıtları görmeden önce gönderi paylaşma seçeneği seçiliyse, Tartışmalar - yönet de etkin değilse kullanıcılar tüm gönderileri görüntülemek için bir yanıt göndermelidir."
   if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Sayfalar - Güncelle izni devre dışıysa, kullanıcı Blueprint Ana Derste tek tek sayfalardaki içerik kilidi ayarlarını yine de düzenleyebilir."
@@ -17788,6 +17793,7 @@ tr:
   learn_more_about_video_conferencing_5f0e76e4: "Video Konferans kullanımı hakkında daha fazla bilgi edinin"
   learn_more_bdd42bd8: "Daha fazla bilgi..."
   learn_more_in_the_canvas_community_3bba7b11: "Canvas Community'de daha fazlasını öğrenin"
+  learning_agent_button_5b3f09c8: "Öğrenme Ajanı butonu"
   learning_design_7a7cac04: "Öğrenme Tasarımı"
   learning_mastery_5fc34276: "Öğrenme Yeterliği"
   learning_mastery_6ed4fd63: "Öğrenme Yeterliği"
@@ -18230,7 +18236,7 @@ tr:
   loading_page_please_wait_f1349009: "Sayfa yükleniyor, lütfen bekleyin..."
   loading_past_items_ca499e75: "Önceki öğeler yükleniyor"
   loading_peer_review_configuration_e5b07e99: "Akran değerlendirmesi yapılandırması yükleniyor"
-  loading_people_data_21583b97: "Katılımcılar verileri yükleniyor..."
+  loading_people_data_21583b97: "Kullanıcı verileri yükleniyor..."
   loading_planner_items_947a813d: "Planlayıcı öğeleri yükleniyor"
   loading_preview_3f1c83a1: "Ön izleme yükleniyor..."
   loading_progress_4fa90ea3: "İlerleme yükleniyor"
@@ -19759,7 +19765,7 @@ tr:
             
             Hazırlanmak için neler yapabilirsiniz?
             
-            Canvas ağ profilinizi oluşturmadıysanız giriş yapıp Canvas.net'te oluşturabilirsiniz. Profil bilgileriniz dersteki diğer insnaların sizin kim olduğunuzu bilmelerine yardımcı olacaktır. Orada bildirim tercihlerinizi de ayarlayabilirsiniz.
+            Canvas ağ profilinizi oluşturmadıysanız giriş yapıp Canvas.net'te oluşturabilirsiniz. Profil bilgileriniz dersteki diğer kullanıcıların sizin kim olduğunuzu bilmelerine yardımcı olacaktır. Orada bildirim tercihlerinizi de ayarlayabilirsiniz.
             
             Son olarak, dersiniz için gerekli materyalleri ve açıklamaları burada bulabilirsiniz: %{url}
             
@@ -21222,7 +21228,7 @@ tr:
   more_options_for_message_from_authorname_4001ddda: "%{authorName} tarafından gönderilen mesaj için daha fazla seçenek"
   more_options_for_subject_e18d421: "%{subject} için daha fazla seçenek"
   more_outcomes_have_been_loaded_9acafe9c: "Daha Fazla Öğrenme Çıktısı Yüklendi"
-  more_people_options_730e9686: "Daha Fazla Kişi Seçeneği"
+  more_people_options_730e9686: "Daha Fazla Kullanıcı Seçeneği"
   more_registration_options_for_name_fc0fa604: "%{name} için daha fazla kayıt seçeneği"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Sayfanın altına daha fazla sonuç eklendi."
   more_search_results_have_been_loaded_13f3872a: "Daha Fazla Arama Sonucu Yüklendi"
@@ -21536,7 +21542,7 @@ tr:
   nav_text_active_a924ae88: "Gezinme Metni Aktif"
   navigate_to_speedgrader_for_name_c6408892: "%{name} için SpeedGrader'a git"
   navigate_to_speedgrader_for_title_assignment_47da92db: "%{title} ödevi için SpeedGrader'a git"
-  navigation_allows_user_to_view_the_people_link_in__dd533d29: "Gezinti, kullanıcının ders gezintisinde Kişiler bağlantısını görüntülemesine izin verir."
+  navigation_allows_user_to_view_the_people_link_in__dd533d29: "Gezinti, kullanıcının ders gezintisinde Kullanıcılar bağlantısını görüntülemesine izin verir."
   navigation_ee9af92d: Gezinme
   navigation_menu_fd782ff8: "Gezinti Menüsü"
   navigation_menu_is_now_closed_a68b6eed: "Gezinti menüsü artık kapalı"
@@ -21891,7 +21897,7 @@ tr:
   no_password_was_given_472222e5: "Şifre verilmedi"
   no_peer_reviews_available_6e7e45a5: "Kullanılabilir akran değerlendirmesi yok"
   no_pending_changes_65d4b8ef: "Bekleyen değişiklik yok"
-  no_people_found_67a8ee2f: "Hiç kişi bulunamadı"
+  no_people_found_67a8ee2f: "Hiç katılımcı bulunamadı"
   no_permissions_requested_98cc9658: "İzin istenmedi"
   no_placements_enabled_bc82878d: "Etkin yerleşim yok."
   no_placements_enabled_f705f28: "Etkin Yerleşim Yok"
@@ -23395,19 +23401,19 @@ tr:
   pending_message_2d9a8796: "Beklemede: %{message}"
   pending_review_8f6e7c47: "İnceleme Bekliyor"
   pendo_extended_metadata_97784de0: "Pendo Genişletilmiş Meta Verileri"
-  people_account_30bbffec: "Katılımcılar (Hesap)"
-  people_account_course_97b2bbb6: "Katılımcılar (Hesap, Ders)"
-  people_b4ebb13c: Kişi
-  people_body_3ce556e3: "Katılımcılar ve İçerik"
-  people_course_ddd9a66: "Katılımcılar (Ders)"
-  people_navigation_tabs_631401fe: "Katılımcılar gezinti sekmeleri"
+  people_account_30bbffec: "Kullanıcılar (Hesap)"
+  people_account_course_97b2bbb6: "Kullanıcılar (Hesap, Ders)"
+  people_b4ebb13c: Kullanıcılar
+  people_body_3ce556e3: "Kullanıcılar ve İçerik"
+  people_course_ddd9a66: "Kullanıcılar (Ders)"
+  people_navigation_tabs_631401fe: "Kullanıcılar gezinti sekmeleri"
   people_options_cfb419a6: "Kişi Seçenekleri"
-  people_page_modernization_782cfb80: "Katılımcılar sayfası modernizasyonu"
-  people_page_modernization_96140845: "Katılımcılar Sayfası Modernizasyonu"
-  people_page_upgrade_4adc3c37: "Katılımcılar Sayfası Yükseltmesi"
+  people_page_modernization_782cfb80: "Kullanıcılar sayfası modernizasyonu"
+  people_page_modernization_96140845: "Kullanıcılar Sayfası Modernizasyonu"
+  people_page_upgrade_4adc3c37: "Kullanıcılar Sayfası Yükseltmesi"
   people_totalrecipientcount_5ec1456a: "Katılımcılar: %{totalRecipientCount}"
-  people_tutorial_tray_a87a6c48: "Katılımcılar Yönerge Yan Menüsü"
-  people_will_see_this_name_in_discussions_messages__2b7c0e63: "Katılımcılar bu adı tartışmalarda, iletilerde ve yorumlarda görecek"
+  people_tutorial_tray_a87a6c48: "Kullanıcı Kılavuzu Yan Menüsü"
+  people_will_see_this_name_in_discussions_messages__2b7c0e63: "Kullanıcılar bu adı tartışmalarda, iletilerde ve yorumlarda görecek"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Bu isim tartışmalar, mesajlar ve yorumlarda görüntülenecek."
   percent_448ea947: yüzde
   percent_8b3390db: Yüzde
@@ -24432,6 +24438,7 @@ tr:
   preview_9cbd064e: önizleme
   preview_a3f8f854: "ÖN İZLEME"
   preview_ai_experience_51e65049: "Yapay zekâ deneyimini ön izle"
+  preview_and_ai_conversations_will_be_available_onc_e0ad1fa7: "Önizleme ve Yapay Zekâ Sohbetleri, süreç tamamlandıktan sonra kullanılabilir olacaktır. Lütfen daha sonra tekrar kontrol edin."
   preview_confirm_8b9986a8: "Ön İzle ve Onayla"
   preview_experience_6fdb7129: "Deneyimi ön izle"
   preview_filename_f1b58572: "%{filename} ön izle"
@@ -24645,7 +24652,7 @@ tr:
         expires_at: "boş bırakırsanız sona ermez"
         language: "Herhangi bir tarayıcı veya hesap ayarının üzerine yazılacaktır."
         name: "Bu isim puanlandırmada  kullanılacaktır."
-        short_name: "Bu isim tartışmalar, mesajlar ve yorumlarda görüntülenecek."
+        short_name: "Kullanıcılar bu ismi tartışmalar, mesajlar ve yorumlarda görüntüleyecek."
         sortable_name: "Bu isim sıralanmış listelerde görünür."
       labels: 
         change_password: "Şifre Değiştir"
@@ -26614,7 +26621,7 @@ tr:
   rather_than_automatically_placing_manually_created_35195e72: |-
       El ile oluşturulan dersleri otomatik olarak
       "Manually Created Courses" alt hesabına yerleştirmek yerine, bu özellik etkinleştirildiğinde
-      el ile ders oluşturabilen kişilerin bu dersleri, kayıtlarının olduğu herhangi bir alt hesaba
+      el ile ders oluşturabilen katılımcıların bu dersleri, kayıtlarının olduğu herhangi bir alt hesaba
       yerleştirmesine izin verir.
   rating_button_buttonlabel_selectedtext_8f62e964: "Derecelendirme Düğmesi %{buttonLabel} %{selectedText}"
   rating_description_db6adf39: "Derecelendirme Açıklaması"
@@ -26637,6 +26644,7 @@ tr:
   raw_html_editor_e3993e41: "Ham HTML Düzenleyicisi"
   rce_accessible_resize_2a489392: "RCE Erişilebilir Yeniden Boyutlandırma"
   rce_asr_captioning_improvements_551a4d79: "RCE ASR Altyazı İyileştirmeleri"
+  rce_automated_captioning_765ddc54: "RCE Otomatik Altyazı Gösterimi"
   rce_contents_replace_description: "LTI araçlarından RCE tam metin değiştirmeyi etkinleştir"
   rce_contents_replace_display_name: "RCE İçerik Değiştirme"
   rce_def7e89: RCE
@@ -27774,6 +27782,7 @@ tr:
   save_theme_f706116e: "Temayı Kaydet"
   save_this_comment_for_reuse_5eda0b70: "Bu yorumu yeniden kullanım için kaydet"
   save_this_pace_as_a_draft_without_publishing_b40c9f0d: "Bu ders ilerleme planını yayımlamadan taslak olarak kaydet."
+  save_to_preview_30f60b4d: "Önizlemeye kaydet"
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Yalnızca ders içeriğinize özel öğrenme çıktılarını ekleyerek büyük ölçüde zaman kazanın."
   saved_3cd67a7c: Kaydedildi
   saved_comments_2f6ba95: "Kaydedilmiş Yorumlar"
@@ -28059,7 +28068,7 @@ tr:
   search_for_assignment_8149cb1: "Ödevlerde Ara"
   search_for_course_e1a1dfc6: "Ders ara"
   search_for_files_7541fb28: "Dosyaları ara"
-  search_for_people_by_id_or_name_36107593: "İsme veya ID'ye göre kişileri ara"
+  search_for_people_by_id_or_name_36107593: "İsme veya ID'ye göre katılımcı ara"
   search_for_sections_62e90cf4: "Ders bölümlerini ara"
   search_for_students_2fb28d94: "Öğrencileri ara..."
   search_for_students_ed16c2de: "Öğrencileri ara"
@@ -28067,14 +28076,14 @@ tr:
   search_form_fcaa38f7: "Arama Formu"
   search_grading_periods_e947a3e9: "Notlandırma Peryotlarında Ara"
   search_groups_9ff9344c: "Gruplarda Ara"
-  search_groups_or_people_6c15d6ad: "Grupları veya İnsanları Ara"
+  search_groups_or_people_6c15d6ad: "Gruplarda veya Kullanıcılarda Ara"
   search_logs_5ead03e4: "Günlüklerde Ara"
   search_names_nicknames_5f837825: "Ad ve takma adlarda ara"
   search_outcomes_3d546f72: "Öğrenme çıktılarında ara"
-  search_people_402e622c: "Kişi ara"
-  search_people_44f36cd2: "Kişi ara ..."
-  search_people_4782671a: "Kişi Ara"
-  search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Kişilerde ara. Bu alana yazdıkça, kişi listesi otomatik olarak filtrelenir ve yalnızca adı girişinizle eşleşen kişiler gösterilir."
+  search_people_402e622c: "Kullanıcı ara"
+  search_people_44f36cd2: "Kullanıcı ara ..."
+  search_people_4782671a: "Kullanıcı Ara"
+  search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Kullanıcı ara. Bu alana yazdıkça, kullanıcı listesi otomatik olarak filtrelenir ve yalnızca adı girişinizle eşleşen kullanıcılar gösterilir."
   search_permissions_915bbd09: "İzinlerde Ara"
   search_questions_836a821a: "Sorularda Ara"
   search_questions_e3356d9f: "Sorularda ara..."
@@ -29961,6 +29970,7 @@ tr:
   source_code_2395ca74: "Kaynak kodu"
   source_context_does_not_match_group_context_4b55cee4: "kaynak bağlam grup bağlamıyla eşleşmiyor"
   source_files_127d642f: "Kaynak Dosyalar"
+  source_files_are_still_being_processed_a4477749: "Kaynak dosyalar hâlâ işleniyor."
   source_link_c21ecc23: "Kaynak Bağlantı"
   source_materials_4124431c: "Kaynak materyaller"
   sourcecontextid_required_if_sourcecontexttype_prov_473c67b1: "sourceContextType sağlanmışsa sourceContextId zorunludur"
@@ -30965,7 +30975,7 @@ tr:
     outcomes: Çıktılar
     pages: Sayfalar
     past_global_announcements: "Genel Duyurular"
-    people: Katılımcılar
+    people: Kullanıcılar
     profile: Profil
     qr_mobile_login: "Mobil Giriş için QR"
     quizzes: "Kısa sınavlar"
@@ -31948,7 +31958,7 @@ tr:
       Bu özellik bayrağı, içerik taşıma sırasında tarihleri kaydırılmış şekilde ödev ve klasik sınav oluşturmayı etkinleştirir.
       Orijinal akış, tarih kaydırmayı ödev oluşturulduktan sonra bir güncelleme işlemi olarak yapar.
   this_feature_flag_enables_the_copy_link_option_in__1560eecc: "Bu özellik bayrağı, Tartışmalar yeniden tasarımında Bağlantıyı Kopyala seçeneğini etkinleştirir"
-  this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Bu özellik bayrağı, Kişiler sayfasının React/InstUI ve GraphQL yükseltmesini etkinleştirir."
+  this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Bu özellik bayrağı, Kullanıcılar sayfasının React/InstUI ve GraphQL yükseltmesini etkinleştirir."
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Bu özellik bayrağı, güncellenmiş
       tartışma oluşturma/düzenleme sayfasının kullanılmasını etkinleştirir
@@ -32546,7 +32556,7 @@ tr:
   tls_7a2eaba5: TLS
   to_35c6baa2: a
   to_51406be9: Kime
-  to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "Dersin Kişiler sayfasına erişmek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
+  to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "Dersin Kullanıcı sayfasına erişmek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
   to_access_account_settings_account_level_settings__860fce80: "Hesap ayarlarına erişebilmek için Hesap düzeyi ayarlar – yönet izninin de etkinleştirilmesi gerekir."
   to_access_course_settings_courses_manage_must_be_e_dd11803: "Ders ayarlarına erişmek için Dersler - yönet izninin etkinleştirilmiş olması gerekir."
   to_access_item_banks_for_a_course_item_banks_manag_a60a144f: "Bir ders için öğe bankalarına erişmek için Öğe Bankaları - hesabı yönet izni de etkin olmalıdır."
@@ -32559,8 +32569,8 @@ tr:
   to_access_the_courses_link_in_account_navigation_c_a2c556e6: "Hesap gezintisindeki Dersler bağlantısına erişmek için Dersler - yönet ve Dersler - listeyi görüntüle izinleri etkin olmalıdır."
   to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "Bir dersin Sınavlar Dizin Sayfasındaki Soru Bankalarını Yönet bağlantısına erişmek için Ders İçeriği - görüntüle ve Ödevler ve Sınavlar - yönet / düzenle izinleri de etkin olmalıdır."
   to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "Yeterlik sekmesine erişmek için Öğrenme Çıktısı Yeterlik Ölçekleri - ekle / düzenle izni de etkin olmalıdır. Yönet sekmesine erişmek için Öğrenme Çıktıları - ekle / düzenle / sil izni de etkin olmalıdır."
-  to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "Kişiler sayfasına erişmek ve ders gruplarını görüntülemek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
-  to_access_the_people_page_users_view_list_must_be__5dfdbe23: "Kişiler sayfasına erişmek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
+  to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "Kullanıcılar sayfasına erişmek ve ders gruplarını görüntülemek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
+  to_access_the_people_page_users_view_list_must_be__5dfdbe23: "Kullanıcılar sayfasına erişmek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
   to_access_the_people_page_users_view_list_must_be__6f42bf9e: "Kişiler sayfasına erişmek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
   to_access_the_quizzes_index_page_course_content_vi_d9607c01: "Sınavlar Dizin Sayfasına erişmek için Ders İçeriği - görüntüle izni etkin olmalıdır."
   to_access_the_student_interactions_report_grades_v_69105662: "Öğrenci Görüşmeleri raporuna erişmek için Notlar - tüm notları görüntüle izni de etkin olmalıdır."
@@ -32576,7 +32586,7 @@ tr:
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Toplu kullanıcı, ders ve kayıt eklemek için ÖBS İçe Aktarmaları’na tıklayın."
   to_add_groups_groups_add_must_also_be_enabled_33680f91: "Grup eklemek için Gruplar - ekle izni de etkin olmalıdır."
   to_add_individual_courses_click_courses_c5355180: "Tek tek ders eklemek için Dersler’e tıklayın."
-  to_add_individual_users_click_people_4d6de56a: "Tek tek kullanıcı eklemek için Kişiler’e tıklayın."
+  to_add_individual_users_click_people_4d6de56a: "Tek tek kullanıcı eklemek için Kullanıcılara tıklayın."
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "Bir öğrenciyi derse eklemek veya dersten kaldırmak için Kullanıcılar - Öğrenci izni etkin olmalıdır."
   to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "Bir öğrenciyi derse eklemek veya dersten kaldırmak için Kullanıcılar - Öğrenciler izinleri etkin olmalıdır."
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "Kullanıcıları bir derse eklemek veya dersten kaldırmak için uygun Kullanıcılar izni etkin olmalıdır (örn. Kullanıcılar - Öğretmenler)."
@@ -32725,7 +32735,7 @@ tr:
   to_search_by_grader_or_student_id_users_view_must__4639a825: "Notlandırıcı veya öğrenci ID ile arama yapmak için Kullanıcılar - görüntüle izni de etkin olmalıdır."
   to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "Dersleri Geri Yükle sekmesinde ders aramak için Ders İçeriği - görüntüle izni de etkin olmalıdır."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "Not değişiklik günlüklerini aramak için Notlar - değişiklik günlüklerini görüntüle izni de etkin olmalıdır."
-  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "Kişiler sayfasından kullanıcı yan çubuğunda Analitik bağlantısını görmek için hesabınızda Profiller devre dışı olmalıdır."
+  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "Kullanıcılar sayfasından kullanıcı yan çubuğunda Analitik bağlantısını görmek için hesabınızda Profiller devre dışı olmalıdır."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "Bir kullanıcıya tekil mesaj göndermek için Görüşmeler - tek tek ders üyelerine mesaj gönder izni de etkin olmalıdır."
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "Bir tartışmayı Commons'ta paylaşmak için Ders İçeriği - ekle / düzenle / sil izni de etkin olmalıdır."
   to_share_a_discussion_to_commons_courses_manage_mu_addad8ba: "Bir tartışmayı Commons'ta paylaşmak için Dersler - yönet izni de etkin olmalıdır."
@@ -32753,7 +32763,7 @@ tr:
   to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "Bir dersteki tartışmaları görüntülemek için Tartışmalar - görüntüle izni de etkin olmalıdır."
   to_view_feature_options_for_an_account_feature_opt_14b0cea0: "Bir hesap için Özellik Seçeneklerini görüntülemek için Özellik Seçenekleri - etkinleştir / devre dışı bırak izni de etkin olmalıdır."
   to_view_grades_in_a_course_courses_manage_and_grad_c1ab5515: "Bir dersteki notları görüntülemek için Dersler - yönet ve Notlar - tüm notları görüntüle izinleri de etkin olmalıdır."
-  to_view_last_activity_and_total_activity_informati_473265d8: "Ders Kişiler sayfasında Son Etkinlik ve Toplam Etkinlik bilgilerini görüntülemek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
+  to_view_last_activity_and_total_activity_informati_473265d8: "Ders Kullanıcıları sayfasında Son Etkinlik ve Toplam Etkinlik bilgilerini görüntülemek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
   to_view_login_ids_users_allow_administrative_actio_1b5789db: "Giriş ID'lerini görüntülemek için Kullanıcılar - derslerde yönetsel işlemlere izin ver izni de etkin olmalıdır."
   to_view_module_progression_grades_view_all_grades__1acc0880: "Modül ilerlemesini görüntülemek için Notlar - tüm notları görüntüle izni de etkin olmalıdır."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9a8aef8b: "Bir kullanıcının ÖBS ID veya Entegrasyon ID bilgisini görüntülemek veya düzenlemek için Kullanıcılar - listeyi görüntüle ve Kullanıcılar - oturum açma ayrıntılarını yönet izinlerinin ikisi de etkin olmalıdır."
@@ -32766,13 +32776,13 @@ tr:
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "Ders analitiğinde öğrenci analitiğini görüntülemek için Notlar - tüm notları görüntüle izni de etkin olmalıdır"
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "Öğrenci analitiğini görüntülemek için Kullanıcılar - listeyi görüntüle ve Analitik - görüntüle izinleri de etkin olmalıdır."
   to_view_student_analytics_users_view_list_and_grad_44aa0d9d: "Öğrenci analitiğini görüntülemek için Kullanıcılar - listeyi görüntüle ve Notlar - tüm notları görüntüle izni de etkin olmalıdır."
-  to_view_the_account_people_page_users_view_list_mu_9d0bdb80: "Hesap Kişiler sayfasını görüntülemek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
+  to_view_the_account_people_page_users_view_list_mu_9d0bdb80: "Hesap Kullanıcıları sayfasını görüntülemek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
   to_view_the_gradebook_course_content_view_must_als_45c2e607: "Not Defterini görüntülemek için Ders İçeriği - görüntüle izni de etkin olmalıdır."
   to_view_the_gradebook_grades_view_all_grades_must__7ead435: "Not Defterini görüntülemek için Notlar - tüm notları görüntüle izni de etkin olmalıdır."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "Bir hesaptaki kullanıcı listesini görüntülemek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
   to_view_the_list_of_users_in_the_course_users_view_20278cf: "Dersteki kullanıcı listesini görüntülemek için Kullanıcılar - listeyi görüntüle izni etkin olmalıdır."
   to_view_the_list_of_users_in_the_course_users_view_b7b9b4ef: "Dersteki kullanıcı listesini görüntülemek için Kullanıcılar - listeyi görüntüle izni de etkin olmalıdır."
-  to_view_the_people_page_courses_view_list_must_be__c1d54670: "Kişiler sayfasını görüntülemek için Dersler - listeyi görüntüle izni etkin olmalıdır."
+  to_view_the_people_page_courses_view_list_must_be__c1d54670: "Kullanıcılar sayfasını görüntülemek için Dersler - listeyi görüntüle izni etkin olmalıdır."
   to_view_the_reports_tab_reports_manage_must_also_b_8ebde0f3: "Raporlar sekmesini görüntülemek için Raporlar - yönet izni de etkin olmalıdır."
   to_view_the_submission_log_quizzes_view_submission_b8353d6e: "Gönderim günlüğünü görüntülemek için Sınavlar - gönderim günlüğünü görüntüle izni de etkin olmalıdır."
   to_view_the_user_sis_id_column_in_the_quiz_item_an_2bf433fa: "Sınav Öğesi Analizi CSV dosyasında kullanıcının ÖBS ID sütununu görüntülemek için ÖBS Verileri - oku izni de etkin olmalıdır."
@@ -33531,8 +33541,8 @@ tr:
   use_this_grading_scheme_52aa4ecf: "Bu Notlandırma Şemasını Kullan"
   use_this_license_9d339145: "Bu Lisansı Kullan"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Atanmış öğrencileri kaldırmak için bu listeyi kullanın. Listenin ardından birleşik kutuyu kullanarak yeni öğrenciler ekleyin."
-  use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Yinelenen sonuçları veya aramanızla bulunamayan kişileri çözmek için bu paneli kullanın."
-  use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Bu derse eklemek istediğiniz kişileri aramak için bu paneli kullanın."
+  use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Aramanızda çıkan yinelenen sonuçları veya bulunamayan kullanıcıları çözümlemek için bu paneli kullanın."
+  use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Bu derse eklemek istediğiniz kullanıcıları aramak için bu paneli kullanın."
   use_this_photo_3a594830: "Bu Fotoğrafı Kullan"
   use_this_rubric_for_assignment_grading_a02fd079: "Ödev değerlendirmesi için bu ölçeği kullan"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Tekrar gönderimde aynı notu kullan"
@@ -34471,7 +34481,7 @@ tr:
   what_layout_options_are_available_in_the_course_ho_5d364ce3: "Öğretim elemanı olarak Ders Ana Sayfasında hangi düzen seçenekleri kullanılabilir?"
   what_options_can_i_set_in_a_quiz_53522d76: "Bir sınavda hangi seçenekleri ayarlayabilirim?"
   what_s_a_class_without_people_to_take_and_lead_it__4470b81a: |-
-      İnsanlar olmadan sınıf olur mu? Kişiler sayfası
+      Kullanıcılar olmadan sınıf olur mu? Kullanıcılar sayfası
       dersinizdeki kullanıcıların listesini gösterir. Yetkilerinize bağlı olarak,
       dersinize öğrenci, öğretim yardımcısı ve gözlemci ekleyebilirsiniz.
       Ayrıca grup ödevlerini, tartışmaları ve dosyaları düzenlemek için öğrenci grupları oluşturabilirsiniz.
@@ -34545,7 +34555,7 @@ tr:
   when_importing_content_to_a_course_the_tool_can_be_e1d96093: "Bir derse içerik içe aktarırken araç, içerik türü açılır listesinden seçilebilir ve Ders Bul düğmesi aracı başlatır"
   when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: "Ders Yönetici Rollerini (Öğretmen/Öğretim Yardımcısı/Tasarımcı temel rolü) taklit ederken Canvas, taklit eden kullanıcının hedef kullanıcıyla aynı veya daha fazla yetkiye sahip olmasını sağlar."
   when_mastery_path_changes_assignment_visibility_in_af2ab612: "Yeterlik yolu ödev görünürlüğünü değiştirdiğinde o kullanıcı için ödev görünürlüğü önbelleğini geçersiz kıl"
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "İnsnalar dersi ziyaret ettiğinde bu sayfayı görecekler. Bu sayfayı etkinlik akışını, ders modüllerinin bir listesini, ders izlencesini veya sizin oluşturduğunuz bir sayfayı gösterecek şekilde ayarlayabilirsiniz. Varsayılan olarak ders etkinlik akışı ayarlıdır."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Kullanıcılar dersi ziyaret ettiğinde bu sayfayı görecekler. Bu sayfayı etkinlik akışını, ders modüllerinin bir listesini, ders izlencesini veya sizin oluşturduğunuz bir sayfayı gösterecek şekilde ayarlayabilirsiniz. Varsayılan olarak ders etkinlik akışı ayarlıdır."
   when_possible_the_lti_tool_finding_logic_will_pref_d34bf1b9: |-
       Mümkün olduğunda LTI araç bulma mantığı, özgün araçla aynı
       geliştirici anahtarından yüklenmiş araçları tercih eder. Bu, birden fazla geliştirici
