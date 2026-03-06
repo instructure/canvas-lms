@@ -492,7 +492,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    css_parser (1.21.1)
+    css_parser (2.0.0)
       addressable
     csv (3.3.5)
     database_cleaner (2.1.0)
@@ -1358,7 +1358,7 @@ DEPENDENCIES
   colorize (~> 1.0)
   config_file!
   crystalball!
-  css_parser (~> 1.17)
+  css_parser (~> 2.0)
   csv_diff!
   database_cleaner (~> 2.0)
   datadog (~> 2.1)
