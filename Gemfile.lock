@@ -1057,7 +1057,7 @@ GEM
     rspec-mocks (3.13.8)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-openapi (0.16.1)
+    rspec-openapi (0.25.0)
       actionpack (>= 5.2.0)
       rails-dom-testing
       rspec-core
@@ -1461,7 +1461,7 @@ DEPENDENCIES
   rrule (~> 0.5)
   rspec (~> 3.12)
   rspec-collection_matchers (~> 1.2)
-  rspec-openapi (= 0.16.1)
+  rspec-openapi (~> 0.25)
   rspec-rails (~> 8.0)
   rspec_around_all (= 0.2.0)
   rspecq!
