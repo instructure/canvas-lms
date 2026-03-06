@@ -899,7 +899,7 @@ GEM
       term-ansicolor (~> 1.7)
       thor (>= 0.20, < 2.0)
     parallel (1.27.0)
-    parser (3.3.10.1)
+    parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
     parslet (2.0.0)
