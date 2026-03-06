@@ -60,6 +60,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     liveRegion.id = LIVE_REGION_ID
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
+    server.use(http.post('**/asr', () => new HttpResponse(null, {status: 202})))
   })
 
   const ADD_NEW_BUTTON_TEXT = 'Add New'
@@ -653,6 +654,161 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       await waitFor(() => {
         expect(screen.queryByText('French')).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Pendo tracking', () => {
+    const mockTrack = vi.fn()
+
+    beforeEach(() => {
+      ;(window as any).canvasUsageMetrics = {track: mockTrack}
+    })
+
+    afterEach(() => {
+      delete (window as any).canvasUsageMetrics
+    })
+
+    it('fires canvas_caption_submitted when manual caption upload is confirmed', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+      fireEvent.click(screen.getByText('Upload'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_submitted', {
+          type: 'track',
+          flow_type: 'upload_file',
+          language: 'en',
+        })
+      })
+    })
+
+    it('fires canvas_caption_submitted when ASR request is confirmed', async () => {
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_submitted', {
+          type: 'track',
+          flow_type: 'request_auto',
+          language: 'es',
+        })
+      })
+    })
+
+    it('fires canvas_caption_result success when upload succeeds', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_result', {
+          type: 'track',
+          flow_type: 'upload_file',
+          result: 'success',
+          language: 'en',
+        })
+      })
+    })
+
+    it('fires canvas_caption_result failed when upload fails', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'fail'}, {status: 400}),
+        ),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('German'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+      await screen.findByText('Upload Failed')
+      expect(mockTrack).toHaveBeenCalledWith('canvas_caption_result', {
+        type: 'track',
+        flow_type: 'upload_file',
+        result: 'failed',
+      })
+    })
+
+    it('fires canvas_caption_retry_clicked when retry is clicked after upload failure', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => {
+          return HttpResponse.json({error: 'fail'}, {status: 500})
+        }),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByText('German'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+      await waitFor(() => expect(screen.getByText('Retry German')).toBeInTheDocument(), {
+        timeout: 200,
+      })
+      fireEvent.click(screen.getByText('Retry German'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_retry_clicked', {
+          type: 'track',
+          flow_type: 'upload_file',
+        })
+      })
+    })
+
+    it('fires canvas_caption_item_action delete when delete button clicked', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText('Delete English'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_item_action', {
+          type: 'track',
+          action: 'delete',
+          caption_source: 'uploaded',
+          language: 'en',
+        })
+      })
+    })
+
+    it('fires canvas_caption_validation_error with delete_failed on delete error', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'fail'}, {status: 400}),
+        ),
+      )
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText('Delete French'))
+      await screen.findByText('Delete Failed')
+      expect(mockTrack).toHaveBeenCalledWith('canvas_caption_validation_error', {
+        type: 'track',
+        flow_type: 'upload_file',
+        error_type: 'delete_failed',
       })
     })
   })

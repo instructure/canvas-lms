@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {trackPendoEvent} from '@instructure/canvas-media'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import RCEGlobals from '../../../../../rce/RCEGlobals'
@@ -24,6 +25,11 @@ import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegi
 
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
+
+jest.mock('@instructure/canvas-media', () => ({
+  ...jest.requireActual('@instructure/canvas-media'),
+  trackPendoEvent: jest.fn(),
+}))
 
 jest.useFakeTimers()
 
@@ -327,7 +333,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       })
       fireEvent.click(screen.getByText('Done'))
       const [{viewerRestrictions}] = props.onSave.mock.calls[0]
-      expect(viewerRestrictions).toEqual({ show_rolling_transcript: false })
+      expect(viewerRestrictions).toEqual({show_rolling_transcript: false})
     })
 
     it('includes viewerRestrictions with show_rolling_transcript when pre-set', () => {
@@ -339,6 +345,29 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       fireEvent.click(screen.getByText('Done'))
       const [{viewerRestrictions}] = props.onSave.mock.calls[0]
       expect(viewerRestrictions).toEqual({show_rolling_transcript: true})
+    })
+
+    describe('Pendo analytics', () => {
+      it('tracks canvas_media_options_opened when opened', () => {
+        trackPendoEvent.mockClear()
+        render(<VideoOptionsTray {...props} />)
+        expect(trackPendoEvent).toHaveBeenCalledWith('canvas_media_options_opened', {
+          entry_point: 'quick_menu',
+          media_kind: 'video',
+        })
+      })
+
+      it('tracks canvas_player_layout_selected on save', () => {
+        trackPendoEvent.mockClear()
+        render(<VideoOptionsTray {...props} />)
+        fireEvent.change(screen.getByPlaceholderText('Enter a media title'), {
+          target: {value: 'A title'},
+        })
+        fireEvent.click(screen.getByText('Done'))
+        expect(trackPendoEvent).toHaveBeenCalledWith('canvas_player_layout_selected', {
+          layout_type: 'medium',
+        })
+      })
     })
 
     describe('Custom layout formula', () => {

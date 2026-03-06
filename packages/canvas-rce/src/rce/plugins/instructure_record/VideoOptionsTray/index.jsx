@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
+import {
+  ClosedCaptionPanel,
+  ClosedCaptionPanelV2,
+  CONSTANTS,
+  trackPendoEvent,
+} from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -171,6 +176,15 @@ export default function VideoOptionsTray({
     }
   }, [isLoading, subtitles.length, requestSubtitlesFromIframe])
 
+  useEffect(() => {
+    if (open && isAsrCaptioningImprovements) {
+      trackPendoEvent('canvas_media_options_opened', {
+        entry_point: 'quick_menu',
+        media_kind: 'video',
+      })
+    }
+  }, [open, isAsrCaptioningImprovements])
+
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
   }
@@ -228,6 +242,11 @@ export default function VideoOptionsTray({
     if (videoSize === CUSTOM) {
       appliedHeight = dimensionsState.height
       appliedWidth = dimensionsState.width
+    }
+    if (isAsrCaptioningImprovements) {
+      trackPendoEvent('canvas_player_layout_selected', {
+        layout_type: videoSize.replace('-', '_'),
+      })
     }
     onSave({
       media_object_id: videoOptions.id,

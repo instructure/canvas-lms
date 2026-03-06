@@ -143,6 +143,30 @@ describe('<AutoCaptioning />', () => {
     expect(screen.getByText('Request')).toBeInTheDocument()
   })
 
+  describe('Pendo tracking', () => {
+    const mockTrack = vi.fn()
+
+    beforeEach(() => {
+      ;(window as any).canvasUsageMetrics = {track: mockTrack}
+    })
+
+    afterEach(() => {
+      delete (window as any).canvasUsageMetrics
+    })
+
+    it('fires canvas_caption_validation_error missing_language when Request clicked with no language', async () => {
+      renderComponent()
+      fireEvent.click(screen.getByText('Request'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_validation_error', {
+          type: 'track',
+          flow_type: 'request_auto',
+          error_type: 'missing_language',
+        })
+      })
+    })
+  })
+
   describe('.onDirtyStateChanged', () => {
     describe('called with true', () => {
       it('when language is selected', async () => {

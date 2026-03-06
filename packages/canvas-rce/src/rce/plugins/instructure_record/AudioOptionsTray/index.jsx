@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
+import {
+  ClosedCaptionPanel,
+  ClosedCaptionPanelV2,
+  CONSTANTS,
+  trackPendoEvent,
+} from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -68,6 +73,15 @@ export default function AudioOptionsTray({
   }, [isLoading, subtitles.length, requestSubtitlesFromIframe])
 
   const isAsrCaptioningImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
+
+  useEffect(() => {
+    if (open && isAsrCaptioningImprovements) {
+      trackPendoEvent('canvas_media_options_opened', {
+        entry_point: 'quick_menu',
+        media_kind: 'audio',
+      })
+    }
+  }, [open, isAsrCaptioningImprovements])
 
   const handleUpdateSubtitles = newSubtitles => {
     setSubtitles(newSubtitles)

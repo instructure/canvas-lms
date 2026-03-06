@@ -22,8 +22,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import formatMessage from 'format-message'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
+import {trackPendoEvent} from '../utils/trackPendoEvent'
 
 interface AutoCaptioningProps {
   onCancel: () => void
@@ -55,6 +56,10 @@ export const AutoCaptioning = ({
 
   const handlePrimaryClick = () => {
     if (!selectedLanguageId) {
+      trackPendoEvent('canvas_caption_validation_error', {
+        flow_type: 'request_auto',
+        error_type: 'missing_language',
+      })
       setShowLanguageError(true)
       return
     }

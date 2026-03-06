@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {trackPendoEvent} from '@instructure/canvas-media'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import RCEGlobals from '../../../../../rce/RCEGlobals'
@@ -23,48 +24,56 @@ import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegi
 import AudioOptionsTray from '..'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 
+jest.mock('@instructure/canvas-media', () => ({
+  ...jest.requireActual('@instructure/canvas-media'),
+  trackPendoEvent: jest.fn(),
+}))
+
+function getProps({audioOptions: audioOverrides, ...overrides} = {}) {
+  return {
+    onRequestClose: jest.fn(),
+    onSave: jest.fn(),
+    open: true,
+    requestSubtitlesFromIframe: jest.fn(),
+    audioOptions: {
+      id: 'm-audio-id',
+      titleText: 'Audio player',
+      tracks: [{locale: 'en', inherited: false}],
+      ...audioOverrides,
+    },
+    trayProps: {
+      host: 'localhost:3001',
+      jwt: 'someuglyvalue',
+    },
+    ...overrides,
+  }
+}
+
 describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
-  let props
   let tray
 
   beforeEach(() => {
     createLiveRegion()
-
-    props = {
-      onRequestClose: jest.fn(),
-      onSave: jest.fn(),
-      open: true,
-      requestSubtitlesFromIframe: jest.fn(),
-      audioOptions: {
-        id: 'm-audio-id',
-        titleText: 'Audio player',
-        tracks: [{locale: 'en', inherited: false}],
-      },
-      trayProps: {
-        host: 'localhost:3001',
-        jwt: 'someuglyvalue',
-      },
-    }
   })
 
   afterEach(() => {
     removeLiveRegion()
   })
 
-  function renderComponent() {
+  function renderComponent(overrides) {
+    const props = getProps(overrides)
     render(<AudioOptionsTray {...props} />)
     tray = AudioOptionsTrayDriver.find()
+    return props
   }
 
   it('is optionally rendered open', () => {
-    props.open = true
-    renderComponent()
+    renderComponent({open: true})
     expect(tray).not.toBeNull()
   })
 
   it('is optionally rendered closed', () => {
-    props.open = false
-    renderComponent()
+    renderComponent({open: false})
     expect(tray).toBeNull()
   })
 
@@ -74,20 +83,19 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
   })
 
   it('when clicked calls the .onSave prop', () => {
-    renderComponent()
+    const props = renderComponent()
     tray.$doneButton.click()
     expect(props.onSave).toHaveBeenCalledTimes(1)
   })
 
   describe('requestSubtitlesFromIframe', () => {
     it('is not called when subtitles are present', () => {
-      renderComponent()
+      const props = renderComponent()
       expect(props.requestSubtitlesFromIframe).not.toHaveBeenCalled()
     })
 
     it('is called when no subtitles present', () => {
-      props.audioOptions.tracks = null
-      renderComponent()
+      const props = renderComponent({audioOptions: {tracks: null}})
       expect(props.requestSubtitlesFromIframe).toHaveBeenCalledTimes(1)
     })
   })
@@ -99,7 +107,6 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
     }
 
     const renderLoadedComponent = async () => {
-      props.open = true
       renderComponent()
       await waitFor(() => {
         expect(tray.$manualCaptionsAddNewButton).toBeInTheDocument()
@@ -185,6 +192,29 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
           expectTooltip()
         })
       })
+    })
+  })
+
+  describe('Pendo analytics', () => {
+    beforeEach(() => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_asr_captioning_improvements: true})
+      trackPendoEvent.mockClear()
+    })
+
+    it('tracks canvas_media_options_opened when opened', () => {
+      renderComponent()
+      expect(trackPendoEvent).toHaveBeenCalledWith('canvas_media_options_opened', {
+        entry_point: 'quick_menu',
+        media_kind: 'audio',
+      })
+    })
+
+    it('does not track when flag is disabled', () => {
+      jest
+        .spyOn(RCEGlobals, 'getFeatures')
+        .mockReturnValue({rce_asr_captioning_improvements: false})
+      renderComponent()
+      expect(trackPendoEvent).not.toHaveBeenCalled()
     })
   })
 })
