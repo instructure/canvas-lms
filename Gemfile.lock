@@ -857,7 +857,7 @@ GEM
     outrigger (3.2.0)
       activerecord (>= 6.0, < 8.2)
       railties (>= 6.0, < 8.2)
-    packs-specification (0.0.10)
+    packs-specification (0.0.11)
       sorbet-runtime
     pact (1.67.3)
       jsonpath (~> 1.0)
