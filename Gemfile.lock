@@ -1120,11 +1120,11 @@ GEM
       activesupport (>= 3.0.0)
       i18n
       iso8601
-    ruby-lsp (0.26.5)
+    ruby-lsp (0.26.7)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)
-    ruby-lsp-rspec (0.1.28)
+    ruby-lsp-rspec (0.1.29)
       ruby-lsp (~> 0.26.0)
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
