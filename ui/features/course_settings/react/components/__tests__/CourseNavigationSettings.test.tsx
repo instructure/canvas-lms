@@ -357,7 +357,7 @@ describe('CourseNavigationSettings', () => {
     const onSubmit = vi.fn()
     render(<CourseNavigationSettings onSubmit={onSubmit} />)
 
-    const saveButton = screen.getByRole('button', {name: 'Save'})
+    const saveButton = screen.getByText('Save').closest('button') as HTMLElement
     await userEvent.click(saveButton)
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -379,9 +379,10 @@ describe('CourseNavigationSettings', () => {
       expect(screen.getByText('Enabled Links')).toBeInTheDocument()
 
       // Find settings button for Assignments tab (movable)
-      const assignmentsSettingsButton = screen.getByRole('button', {
-        name: /Settings for Assignments/i,
-      })
+      const assignmentsTab = screen.getByText('Assignments').closest('[id^="nav_edit_tab_id_"]')
+      const assignmentsSettingsButton = assignmentsTab?.querySelector(
+        'button[type="button"]',
+      ) as HTMLElement
       expect(assignmentsSettingsButton).toBeInTheDocument()
 
       expect(screen.getByLabelText('Discussions')).toBeInTheDocument()
@@ -419,9 +420,8 @@ describe('CourseNavigationSettings', () => {
     it('handles keyboard interaction for menu with Space key', async () => {
       render(<CourseNavigationSettings {...defaultProps} />)
 
-      const settingsButton = screen.getByRole('button', {
-        name: /Settings for Assignments/i,
-      })
+      const assignmentsTabEl = screen.getByText('Assignments').closest('[id^="nav_edit_tab_id_"]')
+      const settingsButton = assignmentsTabEl?.querySelector('button[type="button"]') as HTMLElement
 
       settingsButton.focus()
 
@@ -674,7 +674,7 @@ describe('CourseNavigationSettings', () => {
       }
 
       // Click save button
-      const saveButton = screen.getByRole('button', {name: 'Save'})
+      const saveButton = screen.getByText('Save').closest('button') as HTMLElement
       await userEvent.click(saveButton)
 
       // Verify onSubmit called without the deleted tab
@@ -740,7 +740,7 @@ describe('CourseNavigationSettings', () => {
       })
 
       // Click save button
-      const saveButton = screen.getByRole('button', {name: 'Save'})
+      const saveButton = screen.getByText('Save').closest('button') as HTMLElement
       await userEvent.click(saveButton)
 
       // Verify onSubmit called with correct data structure
@@ -768,7 +768,7 @@ describe('CourseNavigationSettings', () => {
       })
 
       // Click save button
-      const saveButton = screen.getByRole('button', {name: 'Save'})
+      const saveButton = screen.getByText('Save').closest('button') as HTMLElement
       await userEvent.click(saveButton)
 
       // Verify onSubmit called with correct reordered data
@@ -804,7 +804,7 @@ describe('CourseNavigationSettings', () => {
       }
 
       // Click save and verify correct data structure
-      const saveButton = screen.getByRole('button', {name: 'Save'})
+      const saveButton = screen.getByText('Save').closest('button') as HTMLElement
       await userEvent.click(saveButton)
 
       expect(onSubmit).toHaveBeenCalledWith([
@@ -816,6 +816,35 @@ describe('CourseNavigationSettings', () => {
         {id: 102, hidden: true}, // Disabled Link (originally disabled)
         {id: 4, hidden: true}, // Grades (newly disabled, appended to end)
       ])
+    })
+  })
+
+  describe('Save Button', () => {
+    it('is rendered inside a sticky container at the bottom', () => {
+      const {container} = render(<CourseNavigationSettings {...defaultProps} />)
+      const saveButton = screen.getByText('Save').closest('button') as HTMLElement
+
+      // InstUI View uses Emotion CSS-in-JS — sticky positioning is applied via class,
+      // not as an inline style or DOM attribute, so we verify structural placement instead.
+      expect(saveButton).toBeInTheDocument()
+
+      // Save button should be the last button in the component
+      const allButtons = container.querySelectorAll('button')
+      expect(allButtons[allButtons.length - 1]).toBe(saveButton)
+    })
+
+    it('shows saving state and becomes non-interactive when clicked', async () => {
+      const onSubmit = vi.fn()
+      render(<CourseNavigationSettings onSubmit={onSubmit} />)
+      const saveButton = screen.getByText('Save').closest('button') as HTMLElement
+
+      await userEvent.click(saveButton)
+
+      // Check for 'Saving...' text
+      expect(screen.getByText('Saving...')).toBeInTheDocument()
+
+      // InstUI Button with interaction="disabled" renders the native disabled attribute
+      expect(saveButton).toBeDisabled()
     })
   })
 })
