@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {trackPendoEvent} from '@instructure/canvas-media'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
-import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
 import {headerFor, originFromHost} from '../../../rcs/api'
 import {instuiPopupMountNodeFn} from '../../../util/fullscreenHelpers'
 import RCEGlobals from '../../RCEGlobals'
+import {StoreProvider} from '../shared/StoreContext'
 
 export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark) => {
   let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
@@ -95,9 +96,25 @@ export default function (ed, document) {
             open={true}
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}
-            onUploadComplete={(err, data) =>
+            onUploadComplete={(err, data) => {
+              if (!err && data) {
+                if (RCEGlobals.getFeatures()?.rce_asr_captioning_improvements) {
+                  const fileType = data?.uploadedFile?.type ?? ''
+                  trackPendoEvent('canvas_native_media_embedded', {
+                    insertion_method: 'insert_menu',
+                    media_id: data?.mediaObject?.media_object?.media_id,
+                    media_kind: fileType.startsWith('audio/')
+                      ? 'audio'
+                      : fileType.startsWith('video/')
+                        ? 'video'
+                        : undefined,
+                    resourceType: ed.settings.canvas_rce_user_context.type,
+                    resourceId: ed.settings.canvas_rce_user_context.id,
+                  })
+                }
+              }
               handleUpload(err, data, contentProps.mediaUploadComplete, uploadBookmark)
-            }
+            }}
             onDismiss={handleDismiss}
             tabs={{record: true, upload: true}}
             uploadMediaTranslations={Bridge.uploadMediaTranslations}

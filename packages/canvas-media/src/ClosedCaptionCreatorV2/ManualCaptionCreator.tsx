@@ -28,6 +28,8 @@ import {View} from '@instructure/ui-view'
 import formatMessage from 'format-message'
 import {useRef, useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
+import {CC_FILE_MAX_BYTES} from '../shared/constants'
+import {trackPendoEvent} from '../utils/trackPendoEvent'
 import {validateCaptionFile} from './utils/validation'
 
 interface ManualCaptionCreatorProps {
@@ -68,6 +70,12 @@ export function ManualCaptionCreator({
 
     const validation = validateCaptionFile(file)
     if (!validation.valid) {
+      if (file.size > CC_FILE_MAX_BYTES) {
+        trackPendoEvent('canvas_caption_validation_error', {
+          flow_type: 'upload_file',
+          error_type: 'file_too_large',
+        })
+      }
       setFileValidationError(validation.error || '')
       setSelectedFile(null)
     } else {
@@ -78,10 +86,18 @@ export function ManualCaptionCreator({
 
   const handleUploadClick = () => {
     if (!selectedLanguageId) {
+      trackPendoEvent('canvas_caption_validation_error', {
+        flow_type: 'upload_file',
+        error_type: 'missing_language',
+      })
       setShowLanguageError(true)
     }
 
     if (!selectedFile) {
+      trackPendoEvent('canvas_caption_validation_error', {
+        flow_type: 'upload_file',
+        error_type: 'missing_file',
+      })
       setFileValidationError(`Please select a file before uploading.`)
     }
 

@@ -23,6 +23,7 @@ import formatMessage from 'format-message'
 import {useMemo} from 'react'
 import {sortedAsrLanguageList} from '../asrClosedCaptionLanguages'
 import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
+import {trackPendoEvent} from '../utils/trackPendoEvent'
 import {AutoCaptioning} from './AutoCaptioning'
 import {CaptionCreationModePicker} from './CaptionCreationModePicker'
 import {CaptionRow} from './CaptionRow'
@@ -97,10 +98,16 @@ export function ClosedCaptionPanelV2({
     uploadConfig,
     subtitles: state.subtitles,
     onUploadSuccess: subtitle => {
+      trackPendoEvent('canvas_caption_result', {
+        flow_type: 'upload_file',
+        result: 'success',
+        language: subtitle.locale,
+      })
       state.handleCaptionUploaded(subtitle)
       onCaptionUploaded?.(subtitle)
     },
     onUploadError: (_error, locale) => {
+      trackPendoEvent('canvas_caption_result', {flow_type: 'upload_file', result: 'failed'})
       state.handleCaptionUploadFailed(locale, 'upload')
     },
     onDeleteSuccess: locale => {
@@ -108,6 +115,10 @@ export function ClosedCaptionPanelV2({
       onCaptionDeleted?.(locale)
     },
     onDeleteError: (_error, locale) => {
+      trackPendoEvent('canvas_caption_validation_error', {
+        flow_type: 'upload_file',
+        error_type: 'delete_failed',
+      })
       state.handleCaptionUploadFailed(locale, 'delete')
     },
   })
@@ -132,6 +143,9 @@ export function ClosedCaptionPanelV2({
     if (!retryAction) return undefined
 
     return () => {
+      trackPendoEvent('canvas_caption_retry_clicked', {
+        flow_type: failedOperation === 'upload' ? 'upload_file' : 'request_auto',
+      })
       state.handleCaptionRetrying(locale)
       retryAction()
     }
@@ -167,7 +181,14 @@ export function ClosedCaptionPanelV2({
                 errorMessage={subtitle.errorMessage}
                 onRetry={getRetryHandler(subtitle)}
                 isInherited={subtitle.inherited}
-                onDelete={() => upload.deleteCaption(subtitle.locale)}
+                onDelete={() => {
+                  trackPendoEvent('canvas_caption_item_action', {
+                    action: 'delete',
+                    caption_source: subtitle.asr ? 'automatic' : 'uploaded',
+                    language: subtitle.locale,
+                  })
+                  upload.deleteCaption(subtitle.locale)
+                }}
               />
             )
           })}
@@ -193,6 +214,10 @@ export function ClosedCaptionPanelV2({
           onPrimary={(languageId: string, file: File) => {
             const language = closedCaptionLanguages.find(l => l.id === languageId)
             if (language) {
+              trackPendoEvent('canvas_caption_submitted', {
+                flow_type: 'upload_file',
+                language: languageId,
+              })
               state.handleCaptionProcessing({locale: languageId, file})
               upload.uploadCaption(languageId, file)
             }
@@ -214,8 +239,17 @@ export function ClosedCaptionPanelV2({
           onPrimary={(languageId: string) => {
             const language = asrLanguages.find(l => l.id === languageId)
             if (language) {
+              trackPendoEvent('canvas_caption_submitted', {
+                flow_type: 'request_auto',
+                language: languageId,
+              })
               state.handleCaptionProcessing({locale: languageId, isAsr: true})
               doAsrRequest(uploadConfig, languageId).catch(() => {
+                trackPendoEvent('canvas_caption_result', {
+                  flow_type: 'request_auto',
+                  result: 'failed',
+                  language: languageId,
+                })
                 state.handleCaptionUploadFailed(languageId, 'asr')
               })
             }
