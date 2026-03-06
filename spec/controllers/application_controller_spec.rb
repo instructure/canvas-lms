@@ -367,6 +367,11 @@ RSpec.describe ApplicationController do
               course2.enroll_student(@user).tap(&:accept!)
               expect(controller.js_env[:widget_dashboard_overridable]).to be false
             end
+
+            it "is not set for account admins" do
+              Account.default.account_users.create!(user: @user)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
           end
         end
       end
