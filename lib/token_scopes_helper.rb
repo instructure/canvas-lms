@@ -23,6 +23,6 @@ module TokenScopesHelper
   end
 
   def self.path_without_format(route)
-    route.path.spec.to_s.gsub(/\(\.:format\)$/, "")
+    route.path.spec.to_s.gsub(/(.:type)?\(\.:format\)$/, "")
   end
 end

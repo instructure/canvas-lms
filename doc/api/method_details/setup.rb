@@ -46,6 +46,7 @@ def get_routes
   @action = object.path.sub(/^.*#/, "")
   @action = @action.sub(/_with_.*$/, "")
   @routes = ApiRouteSet.api_methods_for_controller_and_action(@controller, @action)
+  @routes += CanvasRails::Application.routes.set.select { |r| %r{/files/:(?:file_)?id/(download|preview)(?:\.:type)?\(\.:format\)$} =~ r.path.spec.to_s }
   @route = @routes.first
   raise "Could not find route for #{object}" unless @route
 

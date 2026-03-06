@@ -650,6 +650,18 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Download file
+  # Downloads the file
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/files/<file_id>/download' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  #   curl 'https://<canvas>/courses/<course_id>/files/<file_id>/download' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
   def show
     # Ensure these links are not indexed by search engines
     response.headers["X-Robots-Tag"] = "noindex, nofollow" unless @allow_robot_indexing
