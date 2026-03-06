@@ -97,13 +97,13 @@ describe MediaTracksController do
 
       context "feature flag" do
         it "returns 404 when feature flag is disabled" do
-          Account.site_admin.disable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.disable_feature!(:rce_asr_captioning_improvements)
           post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
           expect(response).to have_http_status(:not_found)
         end
 
         it "proceeds when feature flag is enabled" do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
           expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
           post "create_asr", params: { media_object_id: @mo.media_id, locale: "en" }
           expect(response).to be_successful
@@ -112,7 +112,7 @@ describe MediaTracksController do
 
       context "authorization" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "requires proper permissions" do
@@ -131,7 +131,7 @@ describe MediaTracksController do
 
       context "locale validation" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "accepts valid locales" do
@@ -162,7 +162,7 @@ describe MediaTracksController do
 
       context "Kaltura integration" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "successfully creates caption asset" do
@@ -203,7 +203,7 @@ describe MediaTracksController do
 
       context "MediaTrack creation" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "creates track with correct external_id" do
@@ -261,7 +261,7 @@ describe MediaTracksController do
 
       context "response format" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "returns media_object_api_json for media_object context" do
@@ -561,13 +561,13 @@ describe MediaTracksController do
 
       context "feature flag" do
         it "returns 404 when feature flag is disabled" do
-          Account.site_admin.disable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.disable_feature!(:rce_asr_captioning_improvements)
           post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
           expect(response).to have_http_status(:not_found)
         end
 
         it "proceeds when feature flag is enabled" do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
           post "create_asr", params: { attachment_id: @attachment.id, locale: "en" }
           expect(response).to be_successful
         end
@@ -575,7 +575,7 @@ describe MediaTracksController do
 
       context "authorization" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "gives an error if you don't have permission to change the attachment" do
@@ -608,7 +608,7 @@ describe MediaTracksController do
 
       context "locale validation" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "accepts valid locales" do
@@ -633,7 +633,7 @@ describe MediaTracksController do
 
       context "Kaltura integration" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "successfully creates caption asset" do
@@ -673,7 +673,7 @@ describe MediaTracksController do
 
       context "MediaTrack creation" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "creates track with correct external_id" do
@@ -728,7 +728,7 @@ describe MediaTracksController do
 
       context "response format" do
         before do
-          Account.site_admin.enable_feature!(:rce_asr_captioning_improvements)
+          @course.root_account.enable_feature!(:rce_asr_captioning_improvements)
         end
 
         it "returns media_track_api_json for attachment context" do

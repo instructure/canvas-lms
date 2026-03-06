@@ -150,7 +150,7 @@ class MediaTracksController < ApplicationController
   #
   # @returns MediaObject | MediaTrack
   def create_asr
-    return not_found unless Account.site_admin.feature_enabled?(:rce_asr_captioning_improvements)
+    return not_found unless @domain_root_account.feature_enabled?(:rce_asr_captioning_improvements)
 
     return unless authorized_action?(@attachment || @media_object, @current_user, :add_captions)
 
