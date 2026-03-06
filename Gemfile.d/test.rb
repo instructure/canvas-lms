@@ -38,7 +38,7 @@ group :test do
 
   gem "webmock", "~> 3.18", require: false
   gem "timecop", "~> 0.9"
-  gem "headless", "2.3.1", require: false
+  gem "headless", "~> 3.0", require: false
   gem "escape_code", "0.2", require: false
   gem "luminosity_contrast", "0.2.1"
   # if pact is removed, please remove gems/autoextend/lib/rack/

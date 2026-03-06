@@ -650,7 +650,7 @@ GEM
     hashery (2.1.2)
     hashie (5.1.0)
       logger
-    headless (2.3.1)
+    headless (3.0.0)
     highline (3.1.2)
       reline
     httparty (0.24.2)
@@ -1388,7 +1388,7 @@ DEPENDENCIES
   graphql-batch (~> 0.5)
   guardrail (~> 3.0)
   hashdiff (~> 1.1)
-  headless (= 2.3.1)
+  headless (~> 3.0)
   highline (~> 3.0)
   html_text_helper!
   httparty (~> 0.24)
