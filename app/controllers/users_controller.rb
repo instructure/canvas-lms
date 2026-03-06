@@ -3558,7 +3558,7 @@ class UsersController < ApplicationController
     if @current_user.observer_enrollments.active_or_pending.any?
       # only show widget dashboard if observer is actively observing a student
       return true if @selected_observed_user && @selected_observed_user != @current_user
-    elsif !@current_user.active_non_student_enrollment?
+    elsif !@current_user.active_non_student_enrollment? && !@current_user.account_membership?
       return true
     end
     false

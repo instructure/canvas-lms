@@ -3530,6 +3530,16 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).to include :dashboard
         end
 
+        it "shows legacy dashboard to account admins even when opted in" do
+          account_admin_user
+          @admin.preferences[:widget_dashboard_user_preference] = true
+          @admin.save!
+          user_session(@admin)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
+
         it "respects user preference when feature is allowed (can override)" do
           user_session(@student)
           @student.preferences[:widget_dashboard_user_preference] = false
