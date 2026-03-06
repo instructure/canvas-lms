@@ -27,7 +27,6 @@ gem "sqlite3", "~> 2.6"
 gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
-gem "irb", "~> 1.7"
 
 gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model_serializers", "~> 0.9.9"
