@@ -180,7 +180,7 @@ module MicrosoftSync
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state = nil)
       run_with_delay(initial_mem_state:, synchronous: true)
-    rescue IRB::Abort => e
+    rescue AbortExceptionMatcher => e
       update_state_record_to_errored_and_cleanup(error: e, step: nil)
       raise
     end

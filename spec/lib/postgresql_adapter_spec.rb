@@ -19,6 +19,7 @@
 #
 
 require_relative "../spec_helper"
+require "irb"
 
 describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
   it "aborts a query when interrupted" do

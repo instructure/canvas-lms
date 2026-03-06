@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "abort_exception_matcher" # we can't rely on autoloading since this is running during boot
 require "active_record/pg_extensions/all"
 
 class QuotedValue < String
@@ -374,14 +375,6 @@ module PostgreSQLAdapterExtensions
     end
   ensure
     @collations = nil
-  end
-
-  class AbortExceptionMatcher
-    def self.===(other)
-      return true if defined?(IRB::Abort) && other.is_a?(IRB::Abort)
-
-      false
-    end
   end
 
   def execute(...)

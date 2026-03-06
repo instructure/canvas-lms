@@ -1339,7 +1339,6 @@ DEPENDENCIES
   inst_access (= 0.4.4)
   inst_llm (~> 0.2.4)
   inst_statsd (~> 3.0)
-  irb (~> 1.7)
   json-jwt (~> 1.13)
   json-schema (~> 6.0)
   json_schemer (~> 2.0)
