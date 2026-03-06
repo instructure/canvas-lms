@@ -436,7 +436,7 @@ GEM
     bigdecimal (3.3.1)
     bindata (2.5.1)
     bluecloth (2.2.0)
-    bootsnap (1.21.1)
+    bootsnap (1.23.0)
       msgpack (~> 1.2)
     brakeman (7.1.2)
       racc
