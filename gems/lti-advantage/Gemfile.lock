@@ -32,7 +32,7 @@ GEM
     connection_pool (3.0.2)
     diff-lcs (1.6.2)
     drb (2.2.3)
-    faraday (2.14.0)
+    faraday (2.14.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
