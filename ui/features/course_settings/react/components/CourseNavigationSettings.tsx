@@ -225,10 +225,17 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
-        <View as="div" margin="medium 0 0 0">
-          <Button type="button" color="primary" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? I18n.t('Saving...') : I18n.t('buttons.save', 'Save')}
-          </Button>
+        <View as="div" position="sticky" insetBlockEnd="0" background="secondary">
+          <View as="div" textAlign="end" padding="small">
+            <Button
+              type="button"
+              color="primary"
+              onClick={handleSave}
+              interaction={isSaving ? 'disabled' : 'enabled'}
+            >
+              {isSaving ? I18n.t('Saving...') : I18n.t('buttons.save', 'Save')}
+            </Button>
+          </View>
         </View>
       </DragDropContext>
     </>
