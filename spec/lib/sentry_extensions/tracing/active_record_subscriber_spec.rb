@@ -24,7 +24,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
       config.transport.transport_class = Sentry::DummyTransport
       # for sending events synchronously
       config.background_worker_threads = 0
-      config.capture_exception_frame_locals = true
+      config.include_local_variables = true
       yield(config) if block_given?
     end
 
@@ -39,7 +39,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
   end
 
   def perform_transaction(sampled: true)
-    transaction = Sentry::Transaction.new(sampled:, hub: Sentry.get_current_hub)
+    transaction = Sentry::Transaction.new(sampled:)
     Sentry.get_current_scope.set_span(transaction)
 
     yield
@@ -65,7 +65,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
 
       expect(transport.events.count).to eq(1)
 
-      transaction = transport.events.first.to_hash
+      transaction = transport.events.first.to_h
       expect(transaction[:type]).to eq("transaction")
       expect(transaction[:spans].count).to eq(1)
 
@@ -80,7 +80,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
 
       expect(transport.events.count).to eq(1)
 
-      span = transport.events.first.to_hash[:spans][0]
+      span = transport.events.first.to_h[:spans][0]
       expect(span[:description]).to eq(User.where(name: "Taylor Swift").to_sql.gsub("'Taylor Swift'", "$1"))
     end
 
@@ -98,7 +98,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
 
       expect(transport.events.count).to eq(1)
 
-      span = transport.events.first.to_hash[:spans][0]
+      span = transport.events.first.to_h[:spans][0]
       expect(span[:description]).to eq("<sql hidden; error during normalization>")
     end
 
@@ -119,7 +119,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
 
         expect(transport.events.count).to eq(1)
 
-        span = transport.events.first.to_hash[:spans][0]
+        span = transport.events.first.to_h[:spans][0]
         expect(span[:description]).to eq(query)
       end
     end
