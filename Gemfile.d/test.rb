@@ -32,7 +32,7 @@ group :test do
 
   gem "once-ler", "~> 2.0"
 
-  gem "rspec-openapi", "0.16.1" # pinned for now, because it breaks specs
+  gem "rspec-openapi", "~> 0.25"
   gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
