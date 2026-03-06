@@ -373,7 +373,6 @@ GEM
       activerecord (>= 5.2)
       activesupport (>= 5.2)
     ast (2.4.3)
-    awesome_print (1.9.2)
     aws-eventstream (1.4.0)
     aws-partitions (1.1222.0)
     aws-sdk-applicationautoscaling (1.118.0)
@@ -522,7 +521,6 @@ GEM
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.6.2)
-    dig_rb (1.0.1)
     digest-murmurhash (1.1.1)
     diplomat (2.6.5)
       deep_merge (~> 1.2)
@@ -547,8 +545,6 @@ GEM
     escape_code (0.2)
     et-orbi (1.4.0)
       tzinfo
-    expgen (0.1.1)
-      parslet
     factory_bot (6.5.6)
       activesupport (>= 6.1.0)
     faraday (2.14.1)
@@ -576,7 +572,6 @@ GEM
     ffi-icu (0.5.3)
       ffi (~> 1.0, >= 1.0.9)
     fiber-storage (1.0.1)
-    find_a_port (1.0.1)
     flakey_spec_catcher (0.12.1)
       rspec (~> 3.10)
       timecop (~> 0.9)
@@ -734,8 +729,6 @@ GEM
       hana (~> 1.3)
       regexp_parser (~> 2.0)
       simpleidn (~> 0.2)
-    jsonpath (1.1.5)
-      multi_json
     jwt (3.1.2)
       base64
     language_server-protocol (3.17.0.5)
@@ -788,7 +781,6 @@ GEM
     minitest (6.0.2)
       drb (~> 2.0)
       prism (~> 1.5)
-    mize (0.6.1)
     moodle2cc (0.2.47)
       builder
       instructure-happymapper (~> 0.5.10)
@@ -859,45 +851,6 @@ GEM
       railties (>= 6.0, < 8.2)
     packs-specification (0.0.11)
       sorbet-runtime
-    pact (1.67.3)
-      jsonpath (~> 1.0)
-      pact-mock_service (~> 3.0, >= 3.3.1)
-      pact-support (~> 1.21, >= 1.21.2)
-      rack
-      rack-proxy
-      rack-test (>= 0.6.3, < 3.0.0)
-      rainbow (~> 3.1)
-      rspec (~> 3.0)
-      string_pattern (~> 2.0)
-      thor (>= 0.20, < 2.0)
-      webrick (~> 1.8)
-      zeitwerk (~> 2.3)
-    pact-messages (0.2.0)
-      pact (~> 1.9)
-    pact-mock_service (3.12.4)
-      find_a_port (~> 1.0.1)
-      json
-      logger (< 2.0)
-      pact-support (~> 1.16, >= 1.16.4)
-      rack (>= 3.0, < 4.0)
-      rackup (~> 2.0)
-      rspec (>= 2.14)
-      thor (>= 0.19, < 2.0)
-      webrick (~> 1.8)
-    pact-support (1.21.2)
-      awesome_print (~> 1.9)
-      diff-lcs (~> 1.5)
-      expgen (~> 0.1)
-      jsonpath (~> 1.0)
-      rainbow (~> 3.1.1)
-      string_pattern (~> 2.0)
-    pact_broker-client (1.72.0)
-      dig_rb (~> 1.0)
-      httparty (>= 0.21.0, < 1.0.0)
-      rake (~> 13.0)
-      table_print (~> 1.5)
-      term-ansicolor (~> 1.7)
-      thor (>= 0.20, < 2.0)
     parallel (1.27.0)
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -951,8 +904,6 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.5)
-    rack-proxy (0.7.7)
-      rack
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -1010,8 +961,6 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    readline (0.0.4)
-      reline
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
@@ -1212,8 +1161,6 @@ GEM
       axe-core-rspec (~> 4.1)
       axe-core-selenium (~> 4.1)
       rspec (~> 3.8)
-    string_pattern (2.3.0)
-      regexp_parser (~> 2.5, >= 2.5.0)
     stringio (3.2.0)
     swagger_yard (1.1.1)
       parslet
@@ -1229,12 +1176,8 @@ GEM
       parallel (>= 1.19)
       railties (>= 7.0, < 8.1)
       switchman (>= 3.5.14, < 5.0)
-    sync (0.5.0)
     syslog (0.4.0)
       logger
-    table_print (1.5.7)
-    term-ansicolor (1.11.3)
-      tins (~> 1)
     testrail_client (0.0.1)
     testrailtagging (0.3.8.7)
       parser
@@ -1244,11 +1187,6 @@ GEM
     thread_safe (0.3.6)
     timecop (0.9.10)
     timeout (0.6.0)
-    tins (1.51.1)
-      bigdecimal
-      mize (~> 0.6)
-      readline
-      sync
     track_open_instances (0.1.15)
     trailblazer-option (0.1.2)
     tsort (0.2.0)
@@ -1286,7 +1224,6 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    webrick (1.9.2)
     websocket (1.2.11)
     websocket-driver (0.8.0)
       base64
@@ -1431,9 +1368,6 @@ DEPENDENCIES
   oj (~> 3.16)
   once-ler (~> 2.0)
   outrigger (~> 3.0)
-  pact (~> 1.57)
-  pact-messages (= 0.2.0)
-  pact_broker-client (= 1.72)
   paginated_collection!
   parallel (~> 1.23)
   pdf-reader (~> 2.11)
