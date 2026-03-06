@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Sjálfvirkur myndatexti"
+    },
     "available_folders_694d0436": {
         "message": "Tiltækar möppur"
     },
@@ -1304,6 +1307,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Tungumálalistar tákn"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Tungumál sem talað er í þessu margmiðlunarefni*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (sjálfvirkur)"
+    },
     "languages_icon_9d20539": {
         "message": "Tungumála tákn"
     },
@@ -1420,6 +1429,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Tenglar á ytra svæði."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Listi dreginn saman."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Listi víkkaður út."
     },
     "lists_cd1336fc": {
         "message": "Listar"
@@ -1765,6 +1780,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Aðra flýtivísa ritils má finna á"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Tæknin okkar býr til ~85% nákvæma skjátexta."
     },
     "outline_color_3ef2cea7": {
         "message": "Útlínulitur"

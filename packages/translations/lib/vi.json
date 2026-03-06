@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Nội dung tự động lưu tồn tại. Bạn có muốn tải nội dung tự động lưu để thay thế không?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Tạo phụ đề tự động"
+    },
     "available_folders_694d0436": {
         "message": "Thư Mục Khả Dụng"
     },
@@ -1304,6 +1307,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Biểu Tượng Nghệ Thuật Ngôn Ngữ"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Ngôn Ngữ Được Sử Dụng trong Phương Tiện Này*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Tự động)"
+    },
     "languages_icon_9d20539": {
         "message": "Biểu Tượng Ngôn Ngữ"
     },
@@ -1420,6 +1429,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Liên kết đến một trang bên ngoài."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Đã thu gọn danh sách."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Đã mở rộng danh sách."
     },
     "lists_cd1336fc": {
         "message": "Danh Sách"
@@ -1765,6 +1780,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Các phím tắt trình chỉnh sửa khác có trong"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Công nghệ của chúng tôi tạo phụ đề chính xác ~85%."
     },
     "outline_color_3ef2cea7": {
         "message": "Màu Viền"
