@@ -22,7 +22,7 @@ import {render} from '@canvas/react'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
 
 const I18n = createI18nScope('progress_pill')
 
@@ -42,7 +42,7 @@ function progressIcon(presenterObject: Element): ProgressIconReturn {
 ready(() => {
   const presenter = document.querySelectorAll('.assignment_presenter_for_submission')
   const progressElements = document.querySelectorAll('.react_pill_container')
-  const roots: ReturnType<typeof createRoot>[] = []
+  const roots: Root[] = []
 
   for (let i = 0; i < progressElements.length; i++) {
     const icon = progressIcon(presenter[i])
