@@ -1,5 +1,7 @@
 ---
 - verb: GET
+  path: '/accounts/:account_id/files/:file_id/download'
+- verb: GET
   path: '/api/sis/accounts/:account_id/assignments'
 - verb: GET
   path: '/api/sis/courses/:course_id/assignments'
@@ -2575,3 +2577,19 @@
   path: '/api/v1/users/self/todo_item_count'
 - verb: GET
   path: '/api/v1/users/self/upcoming_events'
+- verb: GET
+  path: '/assessment_questions/:assessment_question_id/files/:file_id/download'
+- verb: GET
+  path: '/assignments/:assignment_id/files/:id/download'
+- verb: GET
+  path: '/courses/:course_id/files/:file_id/download'
+- verb: GET
+  path: '/files/:file_id/download'
+- verb: GET
+  path: '/groups/:group_id/files/:file_id/download'
+- verb: GET
+  path: '/quiz_statistics/:quiz_statistics_id/files/:file_id/download'
+- verb: GET
+  path: '/quizzes/quiz_submissions/:quiz_submission_id/files/:file_id/download'
+- verb: GET
+  path: '/users/:user_id/files/:file_id/download'
