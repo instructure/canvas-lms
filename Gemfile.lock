@@ -11,7 +11,7 @@ GIT
 
 GIT
   remote: https://github.com/instructure/rspecq.git
-  revision: 34c2f3c2d7cbc6d546c347e6bffb82ef91e7429d
+  revision: 2017a6e745790ee25decf74511a08607e8b2b56b
   specs:
     rspecq (0.7.1)
       redis (>= 4.0, < 6.0)
