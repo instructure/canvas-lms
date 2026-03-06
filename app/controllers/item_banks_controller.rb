@@ -23,6 +23,7 @@ class ItemBanksController < ApplicationController
 
   add_crumb(proc { t("#crumbs.item_banks", "Item Banks") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_item_banks_url }
   before_action { |c| c.active_tab = "item_banks" }
+  before_action :rce_js_env, only: [:show]
 
   def show
     return unless authorized_action(@context, @current_user, :read)
