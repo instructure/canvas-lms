@@ -67,7 +67,6 @@ module Accessibility
             resource_id: @resource.global_id
           )
 
-          ErrorReport.log_exception(tag, error, info)
           Sentry.with_scope do |scope|
             scope.set_context(tag, info)
             Sentry.capture_exception(error, level: :error)
