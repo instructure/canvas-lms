@@ -437,18 +437,6 @@ RSpec.configure do |config|
   config.order = :random
   config.filter_run_when_matching :focus
 
-  # The Pact specs have prerequisite setup steps so we exclude them by default
-  config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
-
-  if ENV["CRYSTALBALL_MAP"] == "1"
-    config.filter_run_excluding :pact_live_events
-    config.filter_run_excluding :pact
-  end
-
-  # The Pact build needs RspecJunitFormatter and does not run RSpecQ
-  file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
-  config.add_formatter "RspecJunitFormatter", file if (ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]) || ENV["CRYSTALBALL_MAP"] == "1"
-
   config.include Helpers
   config.include Factories
   config.include RequestHelper, type: :request
