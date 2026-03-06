@@ -3582,6 +3582,61 @@ describe UsersController do
     end
   end
 
+  describe "#should_show_educator_dashboard?" do
+    let(:account) { Account.default }
+
+    before do
+      account.enable_feature!(:educator_dashboard)
+    end
+
+    it "returns false when feature flag is off" do
+      account.disable_feature!(:educator_dashboard)
+      course_with_teacher_logged_in(active_all: true)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+    end
+
+    it "returns false for K5 teacher" do
+      course_with_teacher_logged_in(active_all: true)
+      allow(controller).to receive(:k5_user?).and_return(true)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+    end
+
+    it "returns true for teacher" do
+      course_with_teacher_logged_in(active_all: true)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be true
+    end
+
+    it "returns false for TA" do
+      course_with_ta(active_all: true)
+      user_session(@ta)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+    end
+
+    it "returns true for multi-role user with teacher and student enrollments" do
+      course_with_teacher_logged_in(active_all: true)
+      @course.enroll_student(@user, enrollment_state: "active")
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be true
+    end
+
+    it "returns false for teacher with only completed enrollments" do
+      course_with_teacher_logged_in(active_all: true)
+      @enrollment.update!(workflow_state: "completed")
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+    end
+
+    it "returns false for student-only user" do
+      course_with_student_logged_in(active_all: true)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+    end
+  end
+
   describe "#dashboard_stream_items" do
     before :once do
       @course1 = course_factory(active_all: true)

@@ -27,6 +27,19 @@ deprecate_context_groups_old_view:
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
+educator_dashboard:
+  state: hidden
+  display_name: Educator Dashboard
+  description: |-
+    When enabled, teachers with active enrollments see an Educator Dashboard
+    with cross-course task management, content quality insights, and student
+    activity summaries.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed
 peer_review_allocation_and_grading:
   state: hidden
   applies_to: Course
