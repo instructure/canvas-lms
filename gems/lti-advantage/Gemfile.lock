@@ -51,7 +51,8 @@ GEM
       faraday (~> 2.0)
       faraday-follow_redirects
     logger (1.7.0)
-    minitest (6.0.1)
+    minitest (6.0.2)
+      drb (~> 2.0)
       prism (~> 1.5)
     net-http (0.9.1)
       uri (>= 0.11.1)
