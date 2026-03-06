@@ -797,7 +797,7 @@ GEM
       rubyzip (>= 2.4.1)
       thor
     msgpack (1.8.0)
-    multi_json (1.15.0)
+    multi_json (1.19.1)
     multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
@@ -1422,7 +1422,7 @@ DEPENDENCIES
   mimemagic (~> 0.4.3)
   mini_magick (~> 5.0)
   moodle_importer!
-  multi_json (= 1.15.0)
+  multi_json (~> 1.19)
   net-http (~> 0.1)
   net-ldap (~> 0.18)
   oauth (~> 1.1)

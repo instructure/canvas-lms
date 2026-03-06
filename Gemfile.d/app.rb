@@ -78,7 +78,7 @@ gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
 gem "mimemagic", "~> 0.4.3"
 gem "mini_magick", "~> 5.0"
-gem "multi_json", "1.15.0"
+gem "multi_json", "~> 1.19"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
 gem "oauth", "~> 1.1", require: false
