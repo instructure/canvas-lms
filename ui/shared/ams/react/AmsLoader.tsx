@@ -64,9 +64,10 @@ export function AmsLoader({
     let stillMounting = true
 
     // Set window variables for AMS to consume
-    if (REMOTES?.ams?.api_url) {
+    if (REMOTES?.ams?.api_url || ENV.RICH_CONTENT_APP_HOST) {
       window.AMS_CONFIG = {
-        API_URL: REMOTES?.ams?.api_url,
+        API_URL: REMOTES?.ams?.api_url || '',
+        ...(ENV.RICH_CONTENT_APP_HOST && {RCS_HOST: ENV.RICH_CONTENT_APP_HOST}),
       }
     }
 
