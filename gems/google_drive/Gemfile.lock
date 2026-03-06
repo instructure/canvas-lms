@@ -86,7 +86,7 @@ GEM
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
-    retriable (3.1.2)
+    retriable (3.3.0)
     rexml (3.4.4)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
