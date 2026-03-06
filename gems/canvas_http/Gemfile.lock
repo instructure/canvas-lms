@@ -113,7 +113,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0113)
+    mime-types-data (3.2026.0303)
     minitest (6.0.1)
       prism (~> 1.5)
     nokogiri (1.19.1-aarch64-linux-gnu)
