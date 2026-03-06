@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatic captioning"
+    },
     "available_folders_694d0436": {
         "message": "Available folders"
     },
@@ -1304,6 +1307,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Language Arts Icon"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Language Spoken in This Media*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automatic)"
+    },
     "languages_icon_9d20539": {
         "message": "Languages Icon"
     },
@@ -1420,6 +1429,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Links to an external site."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "List collapsed."
+    },
+    "list_expanded_efec2d0": {
+        "message": "List expanded."
     },
     "lists_cd1336fc": {
         "message": "Lists"
@@ -1765,6 +1780,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Other editor shortcuts may be found at"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Our technology generates ~85% accurate captions."
     },
     "outline_color_3ef2cea7": {
         "message": "Outline Colour"

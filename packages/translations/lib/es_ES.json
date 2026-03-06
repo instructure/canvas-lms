@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Hay contenido guardado automáticamente. ¿Quieres cargar el contenido guardado automáticamente?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Subtítulos automáticos"
+    },
     "available_folders_694d0436": {
         "message": "Carpetas disponibles"
     },
@@ -1304,6 +1307,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Icono plástica e idiomas"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Idioma hablado en este contenido multimedia*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automático)"
+    },
     "languages_icon_9d20539": {
         "message": "Icono idiomas"
     },
@@ -1420,6 +1429,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Enlaces a un sitio externo."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Lista colapsada."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lista expandida."
     },
     "lists_cd1336fc": {
         "message": "Listas"
@@ -1765,6 +1780,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Puedes encontrar otros métodos abreviados del editor en"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Nuestra tecnología genera subtítulos con una precisión aproximada del 85 %."
     },
     "outline_color_3ef2cea7": {
         "message": "Color de contorno"

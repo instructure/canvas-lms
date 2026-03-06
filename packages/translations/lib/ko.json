@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "자동 저장된 콘텐츠가 있습니다. 대신에 자동 저장된 콘텐츠를 로드하시겠습니까?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "자동 캡션"
+    },
     "available_folders_694d0436": {
         "message": "사용 가능한 폴더"
     },
@@ -1304,6 +1307,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "어학 아이콘"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "이 미디어에서 구사하는 언어*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (자동)"
+    },
     "languages_icon_9d20539": {
         "message": "언어 아이콘"
     },
@@ -1420,6 +1429,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "외부 사이트로 링크입니다."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "목록이 접혔습니다."
+    },
+    "list_expanded_efec2d0": {
+        "message": "목록이 펼쳐졌습니다."
     },
     "lists_cd1336fc": {
         "message": "목록"
@@ -1765,6 +1780,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "다음에서 기타 편집기 바로 가기를 찾을 수 있습니다"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "이 기술은 약 85% 정확한 캡션을 생성합니다."
     },
     "outline_color_3ef2cea7": {
         "message": "윤곽 색"
