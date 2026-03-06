@@ -677,13 +677,13 @@ GEM
     ice_cube (0.17.0)
     ice_nine (0.11.2)
     idn-ruby (0.1.5)
-    ims-lti (2.3.6)
+    ims-lti (2.3.7)
       addressable (~> 2.5, >= 2.5.1)
       builder (~> 3.2)
       faraday (< 3.0)
       json-jwt (~> 1.17)
       rexml
-      simple_oauth (~> 0.3.1)
+      simple_oauth (~> 0.3, >= 0.3.1)
     inst-jobs (3.3.2)
       activerecord (>= 7.1)
       activerecord-pg-extensions (~> 0.4)
@@ -1173,7 +1173,9 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
-    simple_oauth (0.3.1)
+    simple_oauth (0.4.0)
+      base64
+      cgi
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
