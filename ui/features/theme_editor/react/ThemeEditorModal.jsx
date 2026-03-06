@@ -45,7 +45,7 @@ function SubAccountProgressBar({message, completion}) {
 }
 SubAccountProgressBar.propTypes = {
   message: PropTypes.string,
-  completion: PropTypes.number.isRequired,
+  completion: PropTypes.number,
 }
 
 export default function ThemeEditorModal(props) {

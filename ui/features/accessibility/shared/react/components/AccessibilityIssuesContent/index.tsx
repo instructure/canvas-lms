@@ -22,7 +22,7 @@ import {useShallow} from 'zustand/react/shallow'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import {canvasThemeLocal} from '@instructure/ui-themes'
+import {canvas} from '@instructure/ui-themes'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -749,8 +749,8 @@ export const AccessibilityWizard = () => {
             elementRef={(el: Element | null) => {
               if (el instanceof HTMLElement) {
                 el.style.zIndex = '10'
-                el.style.background = canvasThemeLocal.colors.contrasts.white1010
-                el.style.borderBottom = `1px solid ${canvasThemeLocal.colors.contrasts.grey1214}`
+                el.style.background = canvas.colors.contrasts.white1010
+                el.style.borderBottom = `1px solid ${canvas.colors.contrasts.grey1214}`
               }
             }}
           >

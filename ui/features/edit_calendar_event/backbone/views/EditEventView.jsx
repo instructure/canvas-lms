@@ -23,7 +23,7 @@ import * as tz from '@instructure/moment-utils'
 import moment from 'moment-timezone'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import '@canvas/jquery/jquery.instructure_forms'
 import editCalendarEventFullTemplate from '../../jst/editCalendarEventFull.handlebars'
 import MissingDateDialogView from '@canvas/due-dates/backbone/views/MissingDateDialogView'
@@ -239,7 +239,7 @@ export default class EditCalendarEventView extends Backbone.View {
     } else {
       conferenceNode.closest('fieldset').className = ''
 
-      ReactDOM.render(
+      legacyRender(
         <CalendarConferenceWidget
           key={this.conferencesKey}
           context={this.model.get('context_code')}
@@ -285,7 +285,7 @@ export default class EditCalendarEventView extends Backbone.View {
         ? I18n.t('Create New Calendar Event')
         : I18n.t('Edit %{title}', {title: this.model.get('title')})
 
-    ReactDOM.render(
+    legacyRender(
       <EditCalendarEventHeader title={title} />,
       document.getElementById('header_component_root'),
     )
@@ -308,7 +308,7 @@ export default class EditCalendarEventView extends Backbone.View {
           : this.course.get('term')?.end_at
       }
 
-      ReactDOM.render(
+      legacyRender(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPickerErrorBoundary>
             <FrequencyPicker
@@ -443,11 +443,11 @@ export default class EditCalendarEventView extends Backbone.View {
     renderDeleteCalendarEventDialog(delModalContainer, {
       isOpen: true,
       onCancel: () => {
-        ReactDOM.unmountComponentAtNode(delModalContainer)
+        legacyUnmountComponentAtNode(delModalContainer)
       },
       onDeleting: () => {},
       onDeleted: () => {
-        ReactDOM.unmountComponentAtNode(delModalContainer)
+        legacyUnmountComponentAtNode(delModalContainer)
         this.redirectWithMessage(
           I18n.t('event_deleted', '%{event_title} deleted successfully', {
             event_title: this.model.get('title'),

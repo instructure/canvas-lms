@@ -54,7 +54,6 @@ export function AssignmentAvailabilityWindow({...props}) {
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
         tablet: {

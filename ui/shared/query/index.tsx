@@ -60,7 +60,7 @@ export function useAllPages<
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
->(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>) {
+>(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
   if (process.env.NODE_ENV === 'development') {
     console.warn('useAllPages is not recommended and may be deprecated')
   }

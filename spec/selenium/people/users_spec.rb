@@ -89,13 +89,13 @@ describe "users" do
     end
 
     it "end date filter" do
-      old_date = 2.days.ago.beginning_of_day
+      old_date = 5.days.ago.beginning_of_day
       page_view(user: @student, course: @course, url: "recent", created_at: 5.minutes.ago)
       page_view(user: @student, course: @course, url: "older", created_at: old_date + 1.minute)
       get "/users/#{@student.id}"
       wait_for_ajaximations
       expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "recent"
-      replace_content(f(%([data-testid="page-views-date-end-filter"])), format_date_for_view(old_date + 1.day, "%Y-%m-%d"))
+      replace_content(f(%([data-testid="page-views-date-end-filter"])), format_date_for_view(3.days.ago, "%Y-%m-%d"))
       driver.action.send_keys(:tab).perform
       wait_for_ajaximations
       expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "older"

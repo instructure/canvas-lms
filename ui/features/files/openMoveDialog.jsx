@@ -18,7 +18,7 @@
 
 import {find} from 'es-toolkit/compat'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import MoveDialog from './react/components/MoveDialog'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import $ from 'jquery'
@@ -35,7 +35,7 @@ function openMoveDialog(
   })
 
   const $moveDialog = $('<div>').appendTo(document.body)
-  const root = createRoot($moveDialog[0])
+  let root
 
   const handleClose = () => {
     root.unmount()
@@ -47,13 +47,14 @@ function openMoveDialog(
     onMove(models) && clearSelectedItems()
   }
 
-  root.render(
+  root = render(
     <MoveDialog
       thingsToMove={thingsToMove}
       rootFoldersToShow={filesEnv.showingAllContexts ? filesEnv.rootFolders : [rootFolderToShow]}
       onClose={handleClose}
       onMove={handleMove}
     />,
+    $moveDialog[0],
   )
 }
 

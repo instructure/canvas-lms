@@ -21,6 +21,7 @@
 const esModules = ['text-field-edit', '@instructure\\/ui-icons', 'msw'].join('|')
 
 module.exports = {
+  resolver: '<rootDir>/jest-instui-resolver.js',
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   reporters: [
     'default',
@@ -55,6 +56,8 @@ module.exports = {
     'crypto-es': '<rootDir>/src/rce/__mocks__/_mockCryptoEs.ts',
     '@instructure/studio-player':
       '<rootDir>/__mocks__/@instructure/studio-player/_mockStudioPlayer.js',
+    '@instructure/ui-media-player':
+      '<rootDir>/__mocks__/@instructure/ui-media-player/_mockUiMediaPlayer.js',
   },
 
   transform: {

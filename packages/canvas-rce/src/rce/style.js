@@ -19,14 +19,15 @@
 import {getThemeVars} from '../getThemeVars'
 import {darken, lighten, alpha} from '@instructure/ui-color-utils'
 
-export default function buildStyle() {
+/** @param {boolean} useHighContrast @param {string} [fontFamily] */
+export default function buildStyle(useHighContrast = false, fontFamily) {
   /*
    * If the theme variables to be used when generating the styles below
    * are dependent on the actual theme in use, you can also pull out the
    * `key` property from the return from `getThemeVars()` and do a bit of
    * if or switch statement logic to get the result you want.
    */
-  const {variables, key} = getThemeVars()
+  const {variables, key} = getThemeVars(useHighContrast, fontFamily)
 
   let themeCanvasLinkColor = ''
   let themeCanvasLinkDecoration = ''

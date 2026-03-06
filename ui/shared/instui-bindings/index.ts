@@ -17,8 +17,8 @@
  */
 
 import {
-  canvasThemeLocal as canvasBaseTheme,
-  canvasHighContrastThemeLocal as canvasHighContrastTheme,
+  canvas as canvasBaseTheme,
+  canvasHighContrast as canvasHighContrastTheme,
 } from '@instructure/ui-themes'
 
 const EMPTY_OBJ = {}
@@ -92,6 +92,8 @@ function getTheme_(
     : {
         ...canvasBaseTheme,
         ...brandVariables_,
+        // transitionOverride MUST be spread after brandVariables_ so that 0ms
+        // transitions aren't overwritten. Moving it earlier causes flaky Selenium tests.
         ...transitionOverride,
         typography: {
           ...canvasBaseTheme.typography,

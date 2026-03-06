@@ -19,8 +19,8 @@
 import canvas from '@instructure/canvas-theme'
 import {canvasHighContrast} from '@instructure/ui-themes'
 
-const {variables} = ENV.use_high_contrast ? canvasHighContrast : canvas
-const {colors} = variables
+const theme = ENV.use_high_contrast ? canvasHighContrast : canvas
+const {colors} = theme
 
 // Note: there are a few more style overrides set in account_calendar_settings.scss
 

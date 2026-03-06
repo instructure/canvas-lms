@@ -657,7 +657,6 @@ export const DiscussionThreadContainer = props => {
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         // If you change the padding notation on these, please update the getReplyLeftMargin function

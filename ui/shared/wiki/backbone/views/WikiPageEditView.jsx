@@ -27,7 +27,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
-import {legacyRender, render as canvasRender} from '@canvas/react'
+import {legacyRender, render} from '@canvas/react'
 import template from '../../jst/WikiPageEdit.handlebars'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
@@ -312,7 +312,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         const blockContentEditorToolbarReorder =
           ENV?.FEATURES?.block_content_editor_toolbar_reorder ?? false
 
-        canvasRender(
+        render(
           <BlockContentEditor
             data={data}
             onInit={handler => {
@@ -336,7 +336,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       container.style.width = '100%'
       container.style.transition = 'width 0.3s ease-in-out'
 
-      canvasRender(
+      render(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
             course_id={ENV.COURSE_ID}

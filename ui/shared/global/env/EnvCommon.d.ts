@@ -244,6 +244,7 @@ export interface EnvCommon {
   lolcalize: boolean
   rce_auto_save_max_age_ms: number
   K5_USER: boolean
+  K5_FONT_ONLY?: boolean
   USE_CLASSIC_FONT: string
   K5_HOMEROOM_COURSE: string
   K5_SUBJECT_COURSE: string
