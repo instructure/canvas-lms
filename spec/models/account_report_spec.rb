@@ -95,6 +95,22 @@ describe AccountReport do
     end
   end
 
+  describe ".last_reports" do
+    let_once(:account) { account_model }
+    let_once(:admin) { user_model }
+
+    it "preloads attachments" do
+      report_type = AccountReport.available_reports.keys.first
+      report = AccountReport.create!(account:, user: admin, report_type:, workflow_state: "complete")
+      report.create_attachment!(context: account, filename: "report.csv", content_type: "text/csv")
+
+      results = AccountReport.last_reports(account:)
+      returned = results[report_type]
+      expect(returned).to eq report
+      expect(returned.association(:attachment)).to be_loaded
+    end
+  end
+
   describe ".recent_for" do
     let(:account) { account_model }
     let(:admin) { user_model }

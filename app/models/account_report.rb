@@ -170,6 +170,7 @@ class AccountReport < ActiveRecord::Base
       AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
                 LATERAL (#{scope.to_sql}) account_reports ")
                    .order("report_types.name")
+                   .preload(:attachment)
                    .index_by(&:report_type)
     end
   end
