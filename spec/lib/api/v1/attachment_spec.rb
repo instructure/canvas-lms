@@ -78,6 +78,17 @@ describe Api::V1::Attachment do
     end
   end
 
+  describe "#attachments_json" do
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course_with_user("TeacherEnrollment", course:, active_all: true).user }
+
+    it "preloads last_attachment_upload_status" do
+      file = attachment_model(content_type: "application/pdf", context: course)
+      attachments_json([file], teacher, {}, { skip_permission_checks: true })
+      expect(file.association(:last_attachment_upload_status)).to be_loaded
+    end
+  end
+
   describe "#infer_upload_filename" do
     it { expect(infer_upload_filename(nil)).to be_nil }
 
