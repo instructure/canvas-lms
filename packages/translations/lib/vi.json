@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Mô tả { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Mô tả video)"
-    },
     "description_436c48d7": {
         "message": "Mô Tả"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Được trình đọc màn hình sử dụng để mô tả nội dung của hình ảnh"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Được trình đọc màn hình sử dụng để mô tả video"
     },
     "user_documents_c206e61f": {
         "message": "Tài Liệu Người Dùng"

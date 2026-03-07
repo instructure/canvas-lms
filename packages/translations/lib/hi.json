@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "({ TYPE } का वर्णन करें)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(वीडियो का वर्णन करें)"
-    },
     "description_436c48d7": {
         "message": "विवरण"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "छवि की सामग्री का वर्णन करने के लिए स्क्रीन रीडर द्वारा उपयोग किया जाता है"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "वीडियो का वर्णन करने के लिए स्क्रीन रीडर द्वारा उपयोग किया जाता है"
     },
     "user_documents_c206e61f": {
         "message": "उपयोगकर्ता दस्तावेज़"

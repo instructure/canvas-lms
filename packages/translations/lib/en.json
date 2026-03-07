@@ -257,11 +257,17 @@
   "cap_product_3a5265a6": {
     "message": "Cap Product"
   },
+  "caption_generation_failed_7312f917": {
+    "message": "Caption generation failed"
+  },
   "caption_manager_aae0906f": {
     "message": "Caption Manager"
   },
   "captionname_caption_delete_failed_3afa617e": {
     "message": "{ captionName } caption delete failed"
+  },
+  "captionname_caption_generation_failed_6fd29bfe": {
+    "message": "{ captionName } caption generation failed"
   },
   "captionname_caption_upload_failed_fa0f13a4": {
     "message": "{ captionName } caption upload failed"
@@ -593,9 +599,6 @@
   "describe_the_type_ff448da5": {
     "message": "(Describe the { TYPE })"
   },
-  "describe_the_video_2fe8f46a": {
-    "message": "(Describe the video)"
-  },
   "description_436c48d7": {
     "message": "Description"
   },
@@ -787,6 +790,9 @@
   },
   "english_united_kingdom_a613f831": {
     "message": "English (United Kingdom)"
+  },
+  "enter_a_media_title_81b490ec": {
+    "message": "Enter a media title"
   },
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Enter at least 3 characters to search"
@@ -2595,6 +2601,9 @@
   "timebar_a4d18443": {
     "message": "Timebar"
   },
+  "title_can_t_be_blank_eb4021d7": {
+    "message": "Title can''t be blank"
+  },
   "title_ee03d132": {
     "message": "Title"
   },
@@ -2792,9 +2801,6 @@
   },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Used by screen readers to describe the content of an image"
-  },
-  "used_by_screen_readers_to_describe_the_video_37ebad25": {
-    "message": "Used by screen readers to describe the video"
   },
   "user_documents_c206e61f": {
     "message": "User Documents"

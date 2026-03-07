@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "（描述{ TYPE }）"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "（视频说明）"
-    },
     "description_436c48d7": {
         "message": "说明"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "屏幕阅读器用它来描述图像内容"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "被屏幕阅读器用来描述视频"
     },
     "user_documents_c206e61f": {
         "message": "用户文档"

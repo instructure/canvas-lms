@@ -509,9 +509,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Beskriv { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Skildre videoen)"
-    },
     "description_436c48d7": {
         "message": "Skildring"
     },
@@ -2428,9 +2425,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Skjermlesarar brukar dette for å skildre innhaldet i eit bilde"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Brukt av skjermlesarar for å skildre videoen"
     },
     "user_documents_c206e61f": {
         "message": "Brukardokument"

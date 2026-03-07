@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "({ TYPE } 설명)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(동영상 설명)"
-    },
     "description_436c48d7": {
         "message": "설명"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "이미지의 콘텐츠를 설명하기 위해 화면 읽기 프로그램에서 사용"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "동영상의 콘텐츠를 설명하기 위해 화면 읽기 프로그램에서 사용"
     },
     "user_documents_c206e61f": {
         "message": "사용자 문서"

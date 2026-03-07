@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(beschreiben Sie den { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Beschreiben Sie das Video)"
-    },
     "description_436c48d7": {
         "message": "Beschreibung"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Verwendet von einem Screen-Reader zur Beschreibung des Inhalts eines Bilds"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Wird von Screenreadern verwendet, um das Video zu beschreiben."
     },
     "user_documents_c206e61f": {
         "message": "Meine Dokumente"

@@ -509,9 +509,6 @@
     "describe_the_icon_f6a18823": {
         "message": "(Írja le az ikont)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(A videó leírása)"
-    },
     "description_436c48d7": {
         "message": "Leírás"
     },
@@ -2473,9 +2470,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Képernyőolvasók által a videó leírásához használt szöveg"
     },
     "user_documents_c206e61f": {
         "message": "A felhasználó dokumentumai"
