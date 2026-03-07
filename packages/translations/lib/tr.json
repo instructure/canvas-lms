@@ -593,9 +593,6 @@
     "describe_the_type_ff448da5": {
         "message": "({ TYPE } öğesini tanımlayın)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Videoyu tanımlayın)"
-    },
     "description_436c48d7": {
         "message": "Açıklama"
     },
@@ -2791,9 +2788,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Ekran okuyucuları tarafından videoyu açıklamak için kullanılır"
     },
     "user_documents_c206e61f": {
         "message": "Kullanıcı Belgeleri"

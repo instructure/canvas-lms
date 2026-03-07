@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Déan cur síos ar an { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Déan cur síos ar an bhfíseán)"
-    },
     "description_436c48d7": {
         "message": "Cur síos"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Úsáidte ag léitheoirí scáileáin chun cur síos a dhéanamh ar ábhar íomhá"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Úsáidte ag léitheoirí scáileáin chun cur síos a dhéanamh ar an bhfíseán"
     },
     "user_documents_c206e61f": {
         "message": "Doiciméid Úsáideora"

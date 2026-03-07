@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Décrire le { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Décrivez la vidéo)"
-    },
     "description_436c48d7": {
         "message": "Description"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Utilisé par les lecteurs d''écran pour décrire le contenu d''une image"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Utilisé par les lecteurs d''écran pour décrire la vidéo"
     },
     "user_documents_c206e61f": {
         "message": "Documents de l’utilisateur"

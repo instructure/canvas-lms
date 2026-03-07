@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(ระบุรายละเอียด { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(ระบุรายละเอียดวิดีโอ)"
-    },
     "description_436c48d7": {
         "message": "รายละเอียด"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "ใช้โดยโปรแกรมอ่านหน้าจอเพื่อระบุเนื้อหาของภาพ"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "ใช้โดยโปรแกรมอ่านหน้าจอเพื่อระบุวิดีโอ"
     },
     "user_documents_c206e61f": {
         "message": "เอกสารของผู้ใช้"

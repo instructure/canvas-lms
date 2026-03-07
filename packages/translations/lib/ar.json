@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(اذكر وصفًا لـ { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(وصف الفيديو)"
-    },
     "description_436c48d7": {
         "message": "الوصف"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف محتوى الصور"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف الفيديو"
     },
     "user_documents_c206e61f": {
         "message": "مستندات المستخدم"

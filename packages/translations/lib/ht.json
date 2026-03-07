@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Dekri { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Dekri videyo a)"
-    },
     "description_436c48d7": {
         "message": "Deskripsyon"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Itilize pa lektè ekran yo pou dekri kontni yon imaj"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Itilize pa lektè ekran pou dekri videyo a"
     },
     "user_documents_c206e61f": {
         "message": "Dokiman Itilizatè"

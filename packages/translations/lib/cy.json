@@ -584,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Disgrifiwch y { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Disgrifiwch y fideo)"
-    },
     "description_436c48d7": {
         "message": "Disgrifiad"
     },
@@ -2758,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Yn cael ei ddefnyddio gan ddarllenwyr sgrin i ddisgrifio cynnwys delwedd"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Yn cael ei ddefnyddio gan ddarllenwyr sgrin i ddisgrifio’r fideo"
     },
     "user_documents_c206e61f": {
         "message": "Dogfennau Defnyddiwr"
