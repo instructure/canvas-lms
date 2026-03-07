@@ -99,7 +99,7 @@ describe AccountReport do
     let_once(:account) { account_model }
     let_once(:admin) { user_model }
 
-    it "preloads attachments" do
+    it "preloads attachments with upload statuses" do
       report_type = AccountReport.available_reports.keys.first
       report = AccountReport.create!(account:, user: admin, report_type:, workflow_state: "complete")
       report.create_attachment!(context: account, filename: "report.csv", content_type: "text/csv")
@@ -108,6 +108,24 @@ describe AccountReport do
       returned = results[report_type]
       expect(returned).to eq report
       expect(returned.association(:attachment)).to be_loaded
+      expect(returned.attachment.association(:last_attachment_upload_status)).to be_loaded
+    end
+  end
+
+  describe ".last_complete_reports" do
+    let_once(:account) { account_model }
+    let_once(:admin) { user_model }
+
+    it "preloads attachments with upload statuses" do
+      report_type = AccountReport.available_reports.keys.first
+      report = AccountReport.create!(account:, user: admin, report_type:, workflow_state: "complete", progress: 100)
+      report.create_attachment!(context: account, filename: "report.csv", content_type: "text/csv")
+
+      results = AccountReport.last_complete_reports(account:)
+      returned = results[report_type]
+      expect(returned).to eq report
+      expect(returned.association(:attachment)).to be_loaded
+      expect(returned.attachment.association(:last_attachment_upload_status)).to be_loaded
     end
   end
 

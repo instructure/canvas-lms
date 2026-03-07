@@ -41,7 +41,7 @@ module Api::V1::Attachment
       options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
     end
 
-    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account]).call
+    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account, :last_attachment_upload_status]).call
 
     files.map do |f|
       attachment_json(f, user, url_options, options)
