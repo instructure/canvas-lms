@@ -187,6 +187,7 @@ export default function AudioOptionsTray({
                       placement="top"
                       on={['hover', 'focus']}
                       preventTooltip={!hasUnsavedChanges}
+                      mountNode={instuiPopupMountNodeFn}
                     >
                       <Button onClick={e => handleSave(e, contentProps)} color="primary">
                         {formatMessage('Done')}
