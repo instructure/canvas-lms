@@ -515,6 +515,7 @@ export default function VideoOptionsTray({
                       placement="top"
                       on={['hover', 'focus']}
                       preventTooltip={!hasUnsavedChanges}
+                      mountNode={instuiPopupMountNodeFn}
                     >
                       <Button
                         interaction={saveDisabled ? 'disabled' : 'enabled'}
