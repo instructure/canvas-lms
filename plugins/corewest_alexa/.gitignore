@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# User data (generated at runtime)
+auth/users.json
