@@ -591,6 +591,38 @@ describe AssignmentsApiController, type: :request do
       expect(json.pluck("id").sort).to eq ids.sort
     end
 
+    it "searches for assignments by a single character" do
+      matching = @course.assignments.create!(title: "Fibonacci")
+      non_matching = @course.assignments.create!(title: "Other")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments.json?search_term=F",
+                      {
+                        controller: "assignments_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        search_term: "F"
+                      })
+      expect(json.pluck("id")).to include(matching.id)
+      expect(json.pluck("id")).not_to include(non_matching.id)
+    end
+
+    it "returns all assignments for an empty search_term" do
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/assignments.json?search_term=",
+               {
+                 controller: "assignments_api",
+                 action: "index",
+                 format: "json",
+                 course_id: @course.id.to_s,
+                 search_term: ""
+               },
+               {},
+               {},
+               { expected_status: 200 })
+    end
+
     it "allows filtering based on assignment_ids[] parameter" do
       5.times { |i| @course.assignments.create!(title: "a_#{i}") }
       all_ids = @course.assignments.pluck(:id).map(&:to_s)
