@@ -166,6 +166,11 @@ const WidgetDashboardContainer: React.FC = () => {
                 )}
               </>
             )}
+            {ENV.add_oak_mount_point && (
+              <Flex.Item>
+                <div id="oak-mount-point"></div>
+              </Flex.Item>
+            )}
             <Flex.Item>
               <FeedbackQuestionTile />
             </Flex.Item>
