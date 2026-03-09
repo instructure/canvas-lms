@@ -165,7 +165,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def attachment_associations_enabled?
     Account.where(id: root_account_ids&.split(",")).any? do |acc|
-      acc.feature_enabled?(:file_association_access)
+      acc.feature_enabled?(:file_association_access_conversation)
     end
   end
 

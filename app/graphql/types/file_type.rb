@@ -165,7 +165,7 @@ module Types
         download_frd: "1",
         host: context[:request].host_with_port,
         protocol: context[:request].protocol,
-        location: (context[:asset_location] if context[:domain_root_account]&.feature_enabled?(:file_association_access))
+        location: (context[:asset_location] if context[:domain_root_account]&.feature_enabled?(:file_association_access_conversation) || context[:domain_root_account]&.feature_enabled?(:file_association_access))
       }
 
       unless context[:domain_root_account]&.feature_enabled?(:disable_adding_uuid_verifier_in_api)
