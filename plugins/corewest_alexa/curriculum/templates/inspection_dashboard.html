@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core West College — Inspection Readiness Dashboard</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #1a237e;
+      --navy-d:  #0d1257;
+      --navy-l:  #283593;
+      --gold:    #ffd700;
+      --gold-d:  #f9a825;
+      --white:   #ffffff;
+      --bg:      #f0f2f9;
+      --card:    #ffffff;
+      --border:  #dde3f4;
+      --text:    #1a1a2e;
+      --muted:   #5c6699;
+
+      --green:   #2e7d32;
+      --green-l: #e8f5e9;
+      --blue:    #1565c0;
+      --blue-l:  #e3f2fd;
+      --amber:   #e65100;
+      --amber-l: #fff3e0;
+      --red:     #b71c1c;
+      --red-l:   #ffebee;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--navy-d) 0%, var(--navy) 60%, var(--navy-l) 100%);
+      color: var(--white);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.35);
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 1rem;
+    }
+    .header-brand { display: flex; align-items: center; gap: .75rem; }
+    .header-brand .crest {
+      width: 44px; height: 44px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.1rem; color: var(--navy);
+      flex-shrink: 0;
+    }
+    .header-brand h1 { font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+    .header-brand p  { font-size: .75rem; opacity: .8; }
+    .header-meta { font-size: .8rem; opacity: .75; text-align: right; }
+    #last-updated { display: block; }
+
+    /* ── Layout ── */
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── Framework Tabs ── */
+    .tab-bar {
+      display: flex; gap: .5rem; margin-bottom: 1.75rem; flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: .55rem 1.5rem;
+      border: 2px solid var(--navy);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--navy);
+      font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .tab-btn.active {
+      background: var(--navy); color: var(--gold);
+    }
+    .tab-btn:hover:not(.active) { background: var(--navy); color: var(--white); }
+
+    /* ── Grid helpers ── */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+    @media (max-width: 1100px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 780px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(26,35,126,.08);
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted); margin-bottom: .75rem;
+    }
+
+    /* ── Gauge ── */
+    .gauge-wrapper {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 1rem 0;
+    }
+    .gauge-svg { width: 220px; height: 130px; overflow: visible; }
+    .gauge-track { fill: none; stroke: #e0e7f7; stroke-width: 22; }
+    .gauge-fill  { fill: none; stroke-width: 22; stroke-linecap: round;
+                   transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+    .gauge-pct { font-size: 2.6rem; font-weight: 800; fill: var(--navy); }
+    .gauge-lbl { font-size: .85rem; fill: var(--muted); }
+    .gauge-grade-badge {
+      margin-top: .75rem;
+      padding: .35rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 700; font-size: .95rem;
+    }
+
+    /* ── Judgment area cards ── */
+    .area-card {
+      border-radius: 10px; padding: 1.1rem 1.25rem;
+      border-left: 5px solid;
+    }
+    .area-card.outstanding { border-color: var(--green); background: var(--green-l); }
+    .area-card.good        { border-color: var(--blue);  background: var(--blue-l);  }
+    .area-card.ri          { border-color: var(--amber); background: var(--amber-l); }
+    .area-card.inadequate  { border-color: var(--red);   background: var(--red-l);   }
+
+    .area-card .area-title { font-weight: 700; font-size: .95rem; margin-bottom: .3rem; }
+    .area-card .area-grade {
+      display: inline-block; font-size: .8rem; font-weight: 700;
+      padding: .2rem .7rem; border-radius: 999px; margin-bottom: .5rem;
+    }
+    .area-card.outstanding .area-grade { background: var(--green); color: #fff; }
+    .area-card.good        .area-grade { background: var(--blue);  color: #fff; }
+    .area-card.ri          .area-grade { background: var(--amber); color: #fff; }
+    .area-card.inadequate  .area-grade { background: var(--red);   color: #fff; }
+
+    .area-score { font-size: 1.6rem; font-weight: 800; }
+    .area-sub   { font-size: .8rem; color: var(--muted); margin-top: .25rem; }
+
+    /* ── Bar chart ── */
+    .bar-chart { display: flex; flex-direction: column; gap: .6rem; }
+    .bar-row { display: flex; align-items: center; gap: .75rem; }
+    .bar-label { width: 180px; font-size: .82rem; font-weight: 600; flex-shrink: 0;
+                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track {
+      flex: 1; height: 18px; background: #e8ecf8;
+      border-radius: 999px; overflow: hidden; position: relative;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 999px;
+      transition: width 1s cubic-bezier(.4,0,.2,1);
+      background: linear-gradient(90deg, var(--navy) 0%, var(--navy-l) 100%);
+    }
+    .bar-fill.warn { background: linear-gradient(90deg, var(--amber) 0%, var(--gold-d) 100%); }
+    .bar-fill.ok   { background: linear-gradient(90deg, var(--green) 0%, #66bb6a 100%); }
+    .bar-pct { width: 42px; font-size: .8rem; font-weight: 700; text-align: right; flex-shrink: 0; }
+
+    /* ── Priority actions ── */
+    .action-list { list-style: none; display: flex; flex-direction: column; gap: .75rem; }
+    .action-item {
+      display: flex; align-items: flex-start; gap: .85rem;
+      padding: .85rem 1rem; border-radius: 8px; background: #f7f9ff;
+      border: 1px solid var(--border);
+    }
+    .action-num {
+      min-width: 26px; height: 26px; border-radius: 50%;
+      background: var(--navy); color: var(--gold);
+      font-weight: 800; font-size: .8rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .action-body .action-title { font-weight: 700; font-size: .9rem; }
+    .action-body .action-desc  { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
+    .priority-badge {
+      font-size: .7rem; font-weight: 700; padding: .15rem .55rem;
+      border-radius: 999px; margin-left: .5rem; vertical-align: middle;
+    }
+    .priority-badge.critical { background: var(--red);   color: #fff; }
+    .priority-badge.high     { background: var(--amber); color: #fff; }
+    .priority-badge.medium   { background: var(--blue);  color: #fff; }
+
+    /* ── Evidence status ── */
+    .evidence-grid { display: flex; flex-direction: column; gap: .5rem; }
+    .evidence-row  {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .5rem; font-size: .82rem; padding: .5rem .75rem;
+      background: #f7f9ff; border-radius: 6px; border: 1px solid var(--border);
+    }
+    .evidence-name { flex: 1; font-weight: 600; }
+    .ev-badge {
+      padding: .2rem .65rem; border-radius: 999px;
+      font-size: .72rem; font-weight: 700; white-space: nowrap;
+    }
+    .ev-badge.complete { background: var(--green-l); color: var(--green); border: 1px solid var(--green); }
+    .ev-badge.partial  { background: var(--amber-l); color: var(--amber); border: 1px solid var(--amber); }
+    .ev-badge.missing  { background: var(--red-l);   color: var(--red);   border: 1px solid var(--red); }
+
+    /* ── Performance snapshot ── */
+    .metric-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem 0; border-bottom: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-label { color: var(--muted); }
+    .metric-value { font-weight: 700; color: var(--navy); }
+
+    /* ── Standards comparison ── */
+    .compare-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .compare-table th {
+      background: var(--navy); color: var(--gold);
+      padding: .55rem .85rem; text-align: left; font-weight: 700;
+    }
+    .compare-table td {
+      padding: .5rem .85rem; border-bottom: 1px solid var(--border);
+    }
+    .compare-table tr:nth-child(even) td { background: #f5f7ff; }
+    .compare-table .grade-cell { font-weight: 700; }
+    .grade-outstanding, .grade-proficient { color: var(--green); }
+    .grade-good, .grade-developing        { color: var(--blue);  }
+    .grade-ri                             { color: var(--amber); }
+    .grade-inadequate, .grade-not-met     { color: var(--red);   }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: 1.1rem; font-weight: 800; color: var(--navy);
+      margin-bottom: 1rem; padding-bottom: .5rem;
+      border-bottom: 3px solid var(--gold);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .section-heading .icon { font-size: 1.2rem; }
+
+    /* ── Loading / error states ── */
+    .loading { color: var(--muted); font-size: .9rem; padding: 1rem 0; }
+    .error-msg { color: var(--red); font-size: .9rem; padding: 1rem 0; }
+
+    /* ── Trend sparkline ── */
+    .trend-container { overflow-x: auto; }
+    .trend-svg { width: 100%; min-width: 300px; height: 90px; }
+    .trend-line { fill: none; stroke: var(--navy); stroke-width: 2.5; stroke-linejoin: round; }
+    .trend-area { fill: url(#trendGrad); opacity: .25; }
+
+    /* ── Safeguarding badge ── */
+    .safeguarding-banner {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .85rem 1.25rem; border-radius: 10px;
+      margin-bottom: 1.5rem; font-weight: 700;
+    }
+    .safeguarding-banner.effective   { background: var(--green-l); color: var(--green); border: 1.5px solid var(--green); }
+    .safeguarding-banner.ineffective { background: var(--red-l);   color: var(--red);   border: 1.5px solid var(--red);   }
+
+    /* ── Framework tab panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Utility ── */
+    .mt-2 { margin-top: 1.5rem; }
+    .mb-1 { margin-bottom: .75rem; }
+    .text-sm { font-size: .82rem; }
+    .text-muted { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="crest">CW</div>
+      <div>
+        <h1>Core West College</h1>
+        <p>Inspection Readiness Dashboard</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span id="last-updated">Loading…</span>
+      <span>Academic Year 2025–26</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+
+  <!-- Framework tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="ofsted">🇬🇧 Ofsted (EIF)</button>
+    <button class="tab-btn" data-tab="cognia">🇺🇸 Cognia</button>
+    <button class="tab-btn" data-tab="coverage">📚 Curriculum</button>
+    <button class="tab-btn" data-tab="performance">📊 Performance</button>
+    <button class="tab-btn" data-tab="compare">⚖️ Standards Comparison</button>
+  </div>
+
+  <!-- ─────────── OFSTED PANEL ─────────── -->
+  <div class="tab-panel active" id="panel-ofsted">
+
+    <!-- Safeguarding banner -->
+    <div id="safeguarding-banner" class="safeguarding-banner effective">
+      <span style="font-size:1.5rem">🛡️</span>
+      <span id="safeguarding-text">Safeguarding: Loading…</span>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.5rem">
+
+      <!-- Overall gauge card -->
+      <div class="card" style="display:flex;flex-direction:column;align-items:center">
+        <div class="card-title">Overall Ofsted Readiness</div>
+        <div class="gauge-wrapper">
+          <svg class="gauge-svg" viewBox="-10 -10 240 150">
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#ffd700"/>
+                <stop offset="100%" stop-color="#1a237e"/>
+              </linearGradient>
+            </defs>
+            <path id="gauge-track" class="gauge-track"
+              d="M 10 120 A 100 100 0 0 1 210 120" />
+            <path id="gauge-fill" class="gauge-fill"
+              stroke="url(#gaugeGrad)"
+              d="M 10 120 A 100 100 0 0 1 210 120"
+              stroke-dasharray="0 314" />
+            <text id="gauge-pct-text" class="gauge-pct" x="110" y="100" text-anchor="middle">–</text>
+            <text class="gauge-lbl" x="110" y="125" text-anchor="middle">Readiness Score</text>
+          </svg>
+          <span id="gauge-grade-badge" class="gauge-grade-badge"
+                style="background:#e8ecf8;color:#5c6699">Loading…</span>
+        </div>
+        <p id="ready-for-inspection" class="text-sm text-muted" style="text-align:center;margin-top:.5rem"></p>
+      </div>
+
+      <!-- Trend sparkline -->
+      <div class="card">
+        <div class="card-title">90-Day Readiness Trend</div>
+        <div class="trend-container mt-2">
+          <svg id="trend-svg" class="trend-svg" viewBox="0 0 600 90" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#1a237e" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#1a237e" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path id="trend-area" class="trend-area" d=""/>
+            <path id="trend-line" class="trend-line" d=""/>
+          </svg>
+        </div>
+        <p class="text-sm text-muted mt-2">Readiness score trending upward — consistent improvement over past 90 days.</p>
+      </div>
+    </div>
+
+    <!-- Judgment area cards -->
+    <div class="section-heading"><span class="icon">📋</span> Ofsted Judgement Areas</div>
+    <div id="ofsted-areas" class="grid-4 mb-1">
+      <div class="loading">Loading judgment areas…</div>
+    </div>
+
+    <div class="grid-2 mt-2">
+      <!-- Priority actions -->
+      <div class="card">
+        <div class="section-heading"><span class="icon">🎯</span> Top Priority Actions</div>
+        <ol class="action-list" id="priority-actions">
+          <li class="loading">Loading actions…</li>
+        </ol>
+      </div>
+
+      <!-- Evidence tracker -->
+      <div class="card">
+        <div class="section-heading"><span class="icon">📎</span> Evidence Status</div>
+        <div id="evidence-summary" class="mb-1 text-sm text-muted"></div>
+        <div class="evidence-grid" id="evidence-tracker">
+          <div class="loading">Loading evidence…</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end #panel-ofsted -->
+
+  <!-- ─────────── COGNIA PANEL ─────────── -->
+  <div class="tab-panel" id="panel-cognia">
+    <div class="grid-2" style="margin-bottom:1.5rem">
+      <div class="card" style="display:flex;flex-direction:column;align-items:center">
+        <div class="card-title">Overall Cognia Readiness</div>
+        <div class="gauge-wrapper">
+          <svg class="gauge-svg" viewBox="-10 -10 240 150">
+            <path class="gauge-track" d="M 10 120 A 100 100 0 0 1 210 120" />
+            <path id="cognia-gauge-fill" class="gauge-fill"
+              stroke="#1565c0"
+              d="M 10 120 A 100 100 0 0 1 210 120"
+              stroke-dasharray="0 314" />
+            <text id="cognia-gauge-pct" class="gauge-pct" x="110" y="100" text-anchor="middle">–</text>
+            <text class="gauge-lbl" x="110" y="125" text-anchor="middle">Cognia Score</text>
+          </svg>
+          <span id="cognia-grade-badge" class="gauge-grade-badge"
+                style="background:#e8ecf8;color:#5c6699">Loading…</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cognia Standards Overview</div>
+        <div id="cognia-standards-list" class="mt-2">
+          <div class="loading">Loading…</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-heading"><span class="icon">📋</span> Cognia Standard Areas</div>
+    <div id="cognia-areas" class="grid-4 mb-1">
+      <div class="loading">Loading Cognia areas…</div>
+    </div>
+  </div><!-- end #panel-cognia -->
+
+  <!-- ─────────── CURRICULUM COVERAGE PANEL ─────────── -->
+  <div class="tab-panel" id="panel-coverage">
+    <div class="section-heading"><span class="icon">📚</span> Curriculum Coverage by Subject</div>
+    <div class="card">
+      <div id="coverage-chart" class="bar-chart">
+        <div class="loading">Loading coverage data…</div>
+      </div>
+    </div>
+    <div class="grid-2 mt-2">
+      <div class="card">
+        <div class="section-heading"><span class="icon">⚠️</span> Curriculum Gaps</div>
+        <div id="gaps-list"><div class="loading">Loading gaps…</div></div>
+      </div>
+      <div class="card">
+        <div class="section-heading"><span class="icon">🏢</span> Department Overview</div>
+        <div id="dept-overview"><div class="loading">Loading departments…</div></div>
+      </div>
+    </div>
+  </div><!-- end #panel-coverage -->
+
+  <!-- ─────────── PERFORMANCE PANEL ─────────── -->
+  <div class="tab-panel" id="panel-performance">
+    <div class="section-heading"><span class="icon">📊</span> Performance Snapshot</div>
+    <div class="grid-4" style="margin-bottom:1.5rem">
+      <div class="card">
+        <div class="card-title">Avg Attendance</div>
+        <div id="stat-attendance" class="area-score" style="color:var(--navy)">–</div>
+        <div class="area-sub">School-wide average</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Avg GPA (American)</div>
+        <div id="stat-gpa" class="area-score" style="color:var(--navy)">–</div>
+        <div class="area-sub">0.0–4.0 scale</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Progress 8 (British)</div>
+        <div id="stat-p8" class="area-score" style="color:var(--navy)">–</div>
+        <div class="area-sub">vs national avg (0.0)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">At-Risk Students</div>
+        <div id="stat-risk" class="area-score" style="color:var(--red)">–</div>
+        <div class="area-sub">Require intervention</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-heading"><span class="icon">📈</span> Subject Pass Rates</div>
+        <div id="subject-perf-chart" class="bar-chart">
+          <div class="loading">Loading…</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-heading"><span class="icon">👩‍🏫</span> Teacher Grades Distribution</div>
+        <div id="teacher-grades"><div class="loading">Loading…</div></div>
+      </div>
+    </div>
+  </div><!-- end #panel-performance -->
+
+  <!-- ─────────── STANDARDS COMPARISON PANEL ─────────── -->
+  <div class="tab-panel" id="panel-compare">
+    <div class="section-heading"><span class="icon">⚖️</span> British vs American Standards Mapping</div>
+    <div class="card">
+      <table class="compare-table" id="compare-table">
+        <thead>
+          <tr>
+            <th>British (Ofsted)</th>
+            <th>Ofsted Grade</th>
+            <th>American (Cognia)</th>
+            <th>Cognia Level</th>
+          </tr>
+        </thead>
+        <tbody id="compare-tbody">
+          <tr><td colspan="4" class="loading">Loading comparison…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card mt-2">
+      <div class="section-heading"><span class="icon">📐</span> Framework Summary</div>
+      <div class="grid-2">
+        <div>
+          <h3 style="color:var(--navy);margin-bottom:.75rem">🇬🇧 British Standards</h3>
+          <p class="text-sm"><strong>Ofsted EIF:</strong> Outstanding · Good · Requires Improvement · Inadequate</p>
+          <p class="text-sm" style="margin-top:.5rem"><strong>National Curriculum:</strong> EYFS · KS1 · KS2 · KS3 · KS4 · KS5</p>
+          <p class="text-sm" style="margin-top:.5rem"><strong>Teacher Eval:</strong> No formal national framework (school-led)</p>
+        </div>
+        <div>
+          <h3 style="color:var(--blue);margin-bottom:.75rem">🇺🇸 American Standards</h3>
+          <p class="text-sm"><strong>Cognia:</strong> Exemplary · Proficient · Developing · Not Met</p>
+          <p class="text-sm" style="margin-top:.5rem"><strong>Common Core:</strong> K · 1–8 · 9–12 (ELA & Math)</p>
+          <p class="text-sm" style="margin-top:.5rem"><strong>Teacher Eval:</strong> Danielson Framework — 4 Domains</p>
+        </div>
+      </div>
+    </div>
+  </div><!-- end #panel-compare -->
+
+</main>
+
+<script>
+  // ══════════════════════════════════════════════════════════════════
+  // Configuration
+  // ══════════════════════════════════════════════════════════════════
+  const API_BASE = '';   // Same origin; adjust if API is on a different host
+
+  // ══════════════════════════════════════════════════════════════════
+  // Utilities
+  // ══════════════════════════════════════════════════════════════════
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+  function gradeClass(grade) {
+    if (!grade) return '';
+    const g = grade.toLowerCase();
+    if (g.includes('outstanding') || g.includes('exemplary')) return 'outstanding';
+    if (g.includes('good')        || g.includes('proficient')) return 'good';
+    if (g.includes('requires')    || g.includes('developing')) return 'ri';
+    if (g.includes('inadequate')  || g.includes('not met'))    return 'inadequate';
+    return 'good';
+  }
+
+  function gradeColorClass(grade) {
+    const g = (grade||'').toLowerCase();
+    if (g.includes('outstanding') || g.includes('exemplary')) return 'grade-outstanding';
+    if (g.includes('good')        || g.includes('proficient')) return 'grade-good';
+    if (g.includes('requires')    || g.includes('developing')) return 'grade-ri';
+    if (g.includes('inadequate')  || g.includes('not met'))    return 'grade-inadequate';
+    return '';
+  }
+
+  function gaugeBadgeStyle(grade) {
+    const g = (grade||'').toLowerCase();
+    if (g.includes('outstanding') || g.includes('exemplary'))
+      return 'background:var(--green-l);color:var(--green);border:2px solid var(--green)';
+    if (g.includes('good')        || g.includes('proficient'))
+      return 'background:var(--blue-l);color:var(--blue);border:2px solid var(--blue)';
+    if (g.includes('requires')    || g.includes('developing'))
+      return 'background:var(--amber-l);color:var(--amber);border:2px solid var(--amber)';
+    return 'background:var(--red-l);color:var(--red);border:2px solid var(--red)';
+  }
+
+  // Render a gauge arc given a percentage
+  function setGauge(fillEl, pctTextEl, pct) {
+    // Arc length for a 180° semicircle of radius 100 ≈ 314
+    const MAX_ARC = 314;
+    const filled = (pct / 100) * MAX_ARC;
+    fillEl.setAttribute('stroke-dasharray', `${filled} ${MAX_ARC}`);
+    pctTextEl.textContent = pct + '%';
+  }
+
+  // Async fetch helper — returns null on error
+  async function apiFetch(path) {
+    try {
+      const res = await fetch(API_BASE + path);
+      if (!res.ok) throw new Error(res.statusText);
+      return await res.json();
+    } catch (e) {
+      console.warn('API fetch failed for', path, e.message);
+      return null;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Tab system
+  // ══════════════════════════════════════════════════════════════════
+  $$('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab-btn').forEach(b => b.classList.remove('active'));
+      $$('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      $(`#panel-${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  // ══════════════════════════════════════════════════════════════════
+  // Trend sparkline (uses data from API or fallback)
+  // ══════════════════════════════════════════════════════════════════
+  function renderTrend(data) {
+    if (!data || !data.length) return;
+    const scores = data.map(d => d.score);
+    const min = Math.min(...scores) - 2;
+    const max = Math.max(...scores) + 2;
+    const W = 600, H = 80;
+    const pts = scores.map((s, i) => {
+      const x = (i / (scores.length - 1)) * W;
+      const y = H - ((s - min) / (max - min)) * H;
+      return [x, y];
+    });
+    const linePath = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+    const areaPath = linePath + ` L${W},${H} L0,${H} Z`;
+    $('#trend-line').setAttribute('d', linePath);
+    $('#trend-area').setAttribute('d', areaPath);
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Ofsted panel
+  // ══════════════════════════════════════════════════════════════════
+  async function loadOfsted() {
+    const [readiness, priorities, evidence, trend] = await Promise.all([
+      apiFetch('/inspection/readiness/ofsted'),
+      apiFetch('/inspection/priorities?framework=ofsted&limit=8'),
+      apiFetch('/inspection/evidence'),
+      apiFetch('/inspection/trend?days=90'),
+    ]);
+
+    // Gauge
+    if (readiness) {
+      setGauge(
+        $('#gauge-fill'), $('#gauge-pct-text'),
+        Math.round(readiness.overall_score)
+      );
+      const badge = $('#gauge-grade-badge');
+      badge.textContent = readiness.overall_grade || '—';
+      badge.setAttribute('style', gaugeBadgeStyle(readiness.overall_grade));
+
+      const ready = readiness.ready_for_inspection;
+      $('#ready-for-inspection').textContent = ready
+        ? '✅ Ready for inspection'
+        : '⚠️ Further preparation needed';
+
+      // Safeguarding
+      const sfEl = $('#safeguarding-banner');
+      const sfText = $('#safeguarding-text');
+      if (readiness.safeguarding_effective) {
+        sfEl.className = 'safeguarding-banner effective';
+        sfText.textContent = 'Safeguarding: Effective — All checks and training up to date';
+      } else {
+        sfEl.className = 'safeguarding-banner ineffective';
+        sfText.textContent = 'Safeguarding: Requires Attention — Review single central record and training';
+      }
+
+      // Judgment area cards
+      const areaEl = $('#ofsted-areas');
+      const areaNames = {
+        quality_of_education: 'Quality of Education',
+        behaviour_and_attitudes: 'Behaviour & Attitudes',
+        personal_development: 'Personal Development',
+        leadership_and_management: 'Leadership & Management',
+      };
+      if (readiness.areas) {
+        areaEl.innerHTML = Object.entries(readiness.areas).map(([key, area]) => `
+          <div class="area-card ${gradeClass(area.grade)}">
+            <div class="area-title">${areaNames[key] || key}</div>
+            <span class="area-grade">${area.grade}</span>
+            <div class="area-score">${Math.round(area.score)}%</div>
+            <div class="area-sub">${area.criteria_count} criteria assessed</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Trend
+    if (trend && trend.trend) renderTrend(trend.trend);
+
+    // Priority actions
+    if (priorities && priorities.actions) {
+      $('#priority-actions').innerHTML = priorities.actions.map((a, i) => `
+        <li class="action-item">
+          <span class="action-num">${i+1}</span>
+          <div class="action-body">
+            <span class="action-title">${a.criterion}
+              <span class="priority-badge ${a.priority}">${a.priority.toUpperCase()}</span>
+            </span>
+            <div class="action-desc">${a.description}</div>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    // Evidence tracker
+    if (evidence) {
+      const s = evidence.summary || {};
+      $('#evidence-summary').textContent =
+        `${s.total_criteria || 0} criteria | ✅ ${s.complete || 0} complete · ⚠️ ${s.partial || 0} partial · ❌ ${s.missing || 0} missing`;
+
+      const tracker = evidence.evidence || {};
+      const items = Object.values(tracker).slice(0, 15);
+      $('#evidence-tracker').innerHTML = items.map(item => `
+        <div class="evidence-row">
+          <span class="evidence-name">${item.criterion}</span>
+          <span class="ev-badge ${item.evidence_status}">${item.evidence_status}</span>
+        </div>
+      `).join('') || '<p class="text-muted text-sm">No evidence items found.</p>';
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Cognia panel
+  // ══════════════════════════════════════════════════════════════════
+  async function loadCognia() {
+    const readiness = await apiFetch('/inspection/readiness/cognia');
+    if (!readiness) return;
+
+    setGauge(
+      $('#cognia-gauge-fill'), $('#cognia-gauge-pct'),
+      Math.round(readiness.overall_score)
+    );
+    const badge = $('#cognia-grade-badge');
+    badge.textContent = readiness.overall_grade || '—';
+    badge.setAttribute('style', gaugeBadgeStyle(readiness.overall_grade));
+
+    const standardsNames = {
+      culture_of_learning: 'Culture of Learning',
+      leadership_for_learning: 'Leadership for Learning',
+      engagement_of_learning: 'Engagement of Learning',
+      growth_in_learning: 'Growth in Learning',
+    };
+
+    if (readiness.areas) {
+      $('#cognia-areas').innerHTML = Object.entries(readiness.areas).map(([key, area]) => `
+        <div class="area-card ${gradeClass(area.grade)}">
+          <div class="area-title">${standardsNames[key] || key}</div>
+          <span class="area-grade">${area.grade}</span>
+          <div class="area-score">${Math.round(area.score)}%</div>
+          <div class="area-sub">${area.criteria_count} indicators assessed</div>
+        </div>
+      `).join('');
+
+      $('#cognia-standards-list').innerHTML = Object.entries(readiness.areas).map(([key, area]) => `
+        <div class="metric-row">
+          <span class="metric-label">${standardsNames[key] || key}</span>
+          <span class="metric-value ${gradeColorClass(area.grade)}">${area.grade}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Curriculum coverage panel
+  // ══════════════════════════════════════════════════════════════════
+  async function loadCoverage() {
+    const [coverage, gaps, report] = await Promise.all([
+      apiFetch('/curriculum/coverage'),
+      apiFetch('/curriculum/gaps'),
+      apiFetch('/curriculum/coverage'),
+    ]);
+
+    if (coverage && coverage.coverage) {
+      const subjects = Object.entries(coverage.coverage)
+        .sort((a, b) => b[1].coverage_pct - a[1].coverage_pct);
+
+      $('#coverage-chart').innerHTML = subjects.map(([subj, data]) => {
+        const pct = data.coverage_pct || 0;
+        const cls = pct >= 80 ? 'ok' : (pct >= 60 ? '' : 'warn');
+        return `
+          <div class="bar-row">
+            <span class="bar-label">${subj}</span>
+            <div class="bar-track">
+              <div class="bar-fill ${cls}" style="width:${pct}%"></div>
+            </div>
+            <span class="bar-pct">${pct}%</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (gaps && gaps.gaps) {
+      const grouped = {};
+      gaps.gaps.forEach(g => {
+        if (!grouped[g.subject]) grouped[g.subject] = [];
+        grouped[g.subject].push(g);
+      });
+      $('#gaps-list').innerHTML = Object.entries(grouped).slice(0, 8).map(([subj, items]) => `
+        <div style="margin-bottom:.75rem">
+          <strong style="color:var(--navy)">${subj}</strong>
+          <ul style="margin-top:.25rem;padding-left:1.2rem;font-size:.8rem">
+            ${items.slice(0, 3).map(g => `
+              <li style="margin-bottom:.2rem">
+                <code style="background:#eef;padding:.1rem .3rem;border-radius:3px;font-size:.75rem">${g.code}</code>
+                ${g.description}
+                <span style="color:var(--amber);font-size:.72rem;margin-left:.3rem">[${g.status}]</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `).join('') || '<p class="text-muted text-sm">No gaps identified.</p>';
+    }
+
+    // Dept overview — derive from coverage data
+    if (coverage && coverage.coverage) {
+      const depts = {
+        STEM: ['Mathematics','Science','Computing'],
+        Humanities: ['English','History','Geography'],
+        Languages: ['Modern Foreign Languages'],
+        'Creative Arts': ['Art','Music'],
+        'Physical Ed.': ['PE'],
+        'Personal Dev.': ['PSHE'],
+      };
+      $('#dept-overview').innerHTML = Object.entries(depts).map(([dept, subjects]) => {
+        const scores = subjects
+          .map(s => (coverage.coverage[s] || {}).coverage_pct || 0)
+          .filter(Boolean);
+        const avg = scores.length
+          ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)
+          : 0;
+        const cls = avg >= 80 ? 'ok' : (avg >= 60 ? '' : 'warn');
+        return `
+          <div class="bar-row">
+            <span class="bar-label">${dept}</span>
+            <div class="bar-track">
+              <div class="bar-fill ${cls}" style="width:${avg}%"></div>
+            </div>
+            <span class="bar-pct">${avg}%</span>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Performance panel
+  // ══════════════════════════════════════════════════════════════════
+  async function loadPerformance() {
+    const [summary, subjects, teachers] = await Promise.all([
+      apiFetch('/curriculum/performance'),
+      apiFetch('/curriculum/performance/subjects'),
+      apiFetch('/curriculum/performance/teachers'),
+    ]);
+
+    if (summary) {
+      $('#stat-attendance').textContent = (summary.avg_attendance_pct || '—') + '%';
+      $('#stat-gpa').textContent        = summary.avg_gpa || '—';
+      $('#stat-p8').textContent         = summary.avg_progress_8 || '—';
+      const risk = (summary.at_risk_summary || {});
+      $('#stat-risk').textContent       = risk.high ? `${risk.high} high` : '—';
+    }
+
+    if (subjects) {
+      const rows = Object.entries(subjects)
+        .sort((a, b) => b[1].overall_pass_rate - a[1].overall_pass_rate);
+      $('#subject-perf-chart').innerHTML = rows.map(([subj, data]) => {
+        const pct = data.overall_pass_rate || 0;
+        const vs = data.national_comparison || 0;
+        const cls = vs >= 0 ? 'ok' : 'warn';
+        return `
+          <div class="bar-row">
+            <span class="bar-label">${subj}</span>
+            <div class="bar-track">
+              <div class="bar-fill ${cls}" style="width:${pct}%"></div>
+            </div>
+            <span class="bar-pct">${pct}%</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (teachers && teachers.teachers) {
+      const t = teachers.teachers;
+      const outstanding = t.filter(x => x.ofsted_grade === 1).length;
+      const good        = t.filter(x => x.ofsted_grade === 2).length;
+      const ri          = t.filter(x => x.ofsted_grade === 3).length;
+      const total       = t.length;
+      $('#teacher-grades').innerHTML = `
+        <div class="metric-row">
+          <span class="metric-label">Outstanding (Grade 1)</span>
+          <span class="metric-value grade-outstanding">${outstanding} / ${total}</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Good (Grade 2)</span>
+          <span class="metric-value grade-good">${good} / ${total}</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Requires Improvement (Grade 3)</span>
+          <span class="metric-value grade-ri">${ri} / ${total}</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">CPD on track</span>
+          <span class="metric-value">${t.filter(x=>x.cpd_status==='on_track').length} / ${total}</span>
+        </div>
+      `;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Standards comparison panel
+  // ══════════════════════════════════════════════════════════════════
+  async function loadComparison() {
+    const mapping = [
+      { ofsted_area: 'Quality of Education',      ofsted_grade: 'Good',                 cognia_area: 'Engagement of Learning',  cognia_level: 'Proficient'  },
+      { ofsted_area: 'Behaviour & Attitudes',      ofsted_grade: 'Good',                 cognia_area: 'Culture of Learning',     cognia_level: 'Proficient'  },
+      { ofsted_area: 'Personal Development',       ofsted_grade: 'Good',                 cognia_area: 'Culture of Learning',     cognia_level: 'Proficient'  },
+      { ofsted_area: 'Leadership & Management',    ofsted_grade: 'Requires Improvement', cognia_area: 'Leadership for Learning', cognia_level: 'Developing'  },
+      { ofsted_area: 'Curriculum Implementation',  ofsted_grade: 'Requires Improvement', cognia_area: 'Engagement of Learning',  cognia_level: 'Developing'  },
+      { ofsted_area: 'Student Outcomes (Overall)', ofsted_grade: 'Good',                 cognia_area: 'Growth in Learning',      cognia_level: 'Proficient'  },
+      { ofsted_area: 'Safeguarding',               ofsted_grade: 'Effective',            cognia_area: 'Culture of Learning',     cognia_level: 'Proficient'  },
+    ];
+
+    $('#compare-tbody').innerHTML = mapping.map(row => `
+      <tr>
+        <td>${row.ofsted_area}</td>
+        <td class="grade-cell ${gradeColorClass(row.ofsted_grade)}">${row.ofsted_grade}</td>
+        <td>${row.cognia_area}</td>
+        <td class="grade-cell ${gradeColorClass(row.cognia_level)}">${row.cognia_level}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Boot — load all data
+  // ══════════════════════════════════════════════════════════════════
+  (async function init() {
+    $('#last-updated').textContent = 'Last updated: ' + new Date().toLocaleString('en-GB', {
+      day:'2-digit', month:'short', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    });
+
+    // Load all panels in parallel
+    await Promise.all([
+      loadOfsted(),
+      loadCognia(),
+      loadCoverage(),
+      loadPerformance(),
+      loadComparison(),
+    ]);
+  })();
+</script>
+</body>
+</html>
