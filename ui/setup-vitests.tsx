@@ -32,7 +32,11 @@ const originalClearTimeout = globalThis.clearTimeout
 const originalClearInterval = globalThis.clearInterval
 
 // Wrap setTimeout to track pending timers
-globalThis.setTimeout = ((callback: (...args: unknown[]) => void, ms?: number, ...args: unknown[]) => {
+globalThis.setTimeout = ((
+  callback: (...args: unknown[]) => void,
+  ms?: number,
+  ...args: unknown[]
+) => {
   const id = originalSetTimeout(() => {
     pendingTimeouts.delete(id)
     callback(...args)
@@ -42,7 +46,11 @@ globalThis.setTimeout = ((callback: (...args: unknown[]) => void, ms?: number, .
 }) as typeof setTimeout
 
 // Wrap setInterval to track pending intervals
-globalThis.setInterval = ((callback: (...args: unknown[]) => void, ms?: number, ...args: unknown[]) => {
+globalThis.setInterval = ((
+  callback: (...args: unknown[]) => void,
+  ms?: number,
+  ...args: unknown[]
+) => {
   const id = originalSetInterval(callback, ms, ...args)
   pendingIntervals.add(id)
   return id
@@ -254,10 +262,9 @@ const ignoredWarnings = [
   /No more mocked responses for the query/,
   /Consumer uses the legacy contextTypes API/,
   /Warning: ReactDOM.render is no longer supported in React 18/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
 ]
-const ignoredLogs = [
-  /JQMIGRATE:/,
-]
+const ignoredLogs = [/JQMIGRATE:/]
 const originalError = console.error
 const originalWarn = console.warn
 const originalLog = console.log
@@ -356,10 +363,18 @@ if (!window.HTMLElement.prototype.scrollIntoView) {
 // Fullscreen API mock - needed for media player tests
 // jsdom doesn't implement the Fullscreen API
 if (!document.fullscreenEnabled) {
-  Object.defineProperty(document, 'fullscreenEnabled', {value: true, writable: true, configurable: true})
+  Object.defineProperty(document, 'fullscreenEnabled', {
+    value: true,
+    writable: true,
+    configurable: true,
+  })
 }
 if (!document.fullscreenElement) {
-  Object.defineProperty(document, 'fullscreenElement', {value: null, writable: true, configurable: true})
+  Object.defineProperty(document, 'fullscreenElement', {
+    value: null,
+    writable: true,
+    configurable: true,
+  })
 }
 if (!document.exitFullscreen) {
   document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
@@ -369,7 +384,11 @@ if (!HTMLElement.prototype.requestFullscreen) {
 }
 // Safari-specific fullscreen API
 if (!(document as any).webkitFullscreenEnabled) {
-  Object.defineProperty(document, 'webkitFullscreenEnabled', {value: true, writable: true, configurable: true})
+  Object.defineProperty(document, 'webkitFullscreenEnabled', {
+    value: true,
+    writable: true,
+    configurable: true,
+  })
 }
 if (!(HTMLVideoElement.prototype as any).webkitEnterFullscreen) {
   ;(HTMLVideoElement.prototype as any).webkitEnterFullscreen = vi.fn()
