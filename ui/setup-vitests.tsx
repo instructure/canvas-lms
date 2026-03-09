@@ -18,8 +18,38 @@
 
 import '@testing-library/jest-dom'
 import {cleanup} from '@testing-library/react'
-import {vi, afterEach} from 'vitest'
+import {vi, afterEach, beforeEach} from 'vitest'
 import $ from 'jquery'
+import axios from 'axios'
+
+// In CI there is no dev server. Axios XHR requests to Canvas API endpoints fail
+// immediately with ECONNREFUSED, causing optimistic Redux store updates to revert
+// before waitFor can check them. jsdom logs the ECONNREFUSED error via console.error
+// (at xhr-utils.js:63) BEFORE the XHR error event fires and axios processes it.
+// We intercept console.error to count pending ECONNREFUSED errors, then absorb the
+// matching ERR_NETWORK from axios. MSW's HttpResponse.error() never goes through the
+// jsdom TCP layer so it does NOT trigger console.error — those errors propagate normally.
+let pendingEconnrefusedCount = 0
+const _originalConsoleError = console.error.bind(console)
+console.error = (...args: unknown[]) => {
+  const first = args[0]
+  const msg = first instanceof Error ? first.message : String(first ?? '')
+  if (msg.includes('ECONNREFUSED')) {
+    pendingEconnrefusedCount++
+  }
+  _originalConsoleError(...args)
+}
+
+axios.interceptors.response.use(
+  response => response,
+  (error: {code?: string}) => {
+    if (error?.code === 'ERR_NETWORK' && pendingEconnrefusedCount > 0) {
+      pendingEconnrefusedCount--
+      return new Promise(() => {})
+    }
+    return Promise.reject(error)
+  },
+)
 
 // Track all timers created during tests so we can clean them up
 // This prevents memory leaks from InstUI transitions and other timer-based code
@@ -71,6 +101,11 @@ globalThis.clearInterval = ((id?: ReturnType<typeof setInterval>) => {
     originalClearInterval(id)
   }
 }) as typeof clearInterval
+
+// Reset ECONNREFUSED counter before each test to prevent test interference
+beforeEach(() => {
+  pendingEconnrefusedCount = 0
+})
 
 // Global cleanup after each test to prevent memory leaks and timer issues
 // This is especially important for InstUI components that use transitions with setTimeout
