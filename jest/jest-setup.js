@@ -154,7 +154,7 @@ if (!Array.prototype.flatMap) {
   Object.defineProperty(Array.prototype, 'flatMap', {
     configurable: true,
     value: function flatMap(_cb) {
-      // biome-ignore lint/style/noArguments: <explanation>
+      // biome-ignore lint/complexity/noArguments: uses arguments for flatMap polyfill compatibility
       return Array.prototype.map.apply(this, arguments).flat()
     },
     writable: true,
