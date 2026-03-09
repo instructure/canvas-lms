@@ -144,6 +144,8 @@ describe('SyllabusView', () => {
 
   afterEach(() => {
     fakeENV.teardown()
+    view?.remove()
+    vi.clearAllTimers()
     vi.useRealTimers()
     fixtures.remove()
     tzInTest.restore()
