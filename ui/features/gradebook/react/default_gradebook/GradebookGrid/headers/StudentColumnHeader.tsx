@@ -84,10 +84,8 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys))
       .isRequired,
     onToggleEnrollmentFilter: func.isRequired,
-    // @ts-expect-error
-    disabled: Menu.propTypes.disabled.isRequired,
-    // @ts-expect-error
-    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
+    disabled: bool.isRequired,
+    onMenuDismiss: func.isRequired,
     ...ColumnHeader.propTypes,
   }
 

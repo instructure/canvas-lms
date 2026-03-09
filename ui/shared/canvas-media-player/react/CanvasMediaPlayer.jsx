@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {bool, number, oneOf, string} from 'prop-types'
+import {arrayOf, bool, number, oneOf, shape, string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 import {MediaPlayer} from '@instructure/ui-media-player'
@@ -331,8 +331,8 @@ export function formatTracksForMediaPlayer(tracks) {
 CanvasMediaPlayer.propTypes = {
   fluidHeight: bool,
   media_id: string.isRequired,
-  media_sources: MediaPlayer.propTypes.sources,
-  media_tracks: MediaPlayer.propTypes.tracks,
+  media_sources: arrayOf(shape({label: string, src: string, type: string})),
+  media_tracks: arrayOf(shape({label: string, src: string, language: string, type: string})),
   resizeContainer: bool,
   type: oneOf(['audio', 'video']),
   MAX_RETRY_ATTEMPTS: number,
