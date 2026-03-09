@@ -188,7 +188,7 @@ describe "manage groups" do
       f("[data-testid=groupUserMenu]").click
       f("[data-testid=moveTo]").click
       f("div[aria-label='Move Student']") # wait for element
-      f(".move-select .move-select__group option:last-child").click
+      click_option(".move-select .move-select__group select", groups[1].name)
       expect(f("body")).to contain_jqcss(".move-select button[type='submit']:visible")
       f(".move-select button[type='submit']").click
       # wait for tray to not exist
@@ -200,7 +200,7 @@ describe "manage groups" do
       f("[data-testid=groupUserMenu]").click
       f("[data-testid=moveTo]").click
       f("div[aria-label='Move Student']") # wait for element
-      ff(".move-select .move-select__group option").last.click
+      click_option(".move-select .move-select__group select", groups[0].name)
       expect(f("body")).to contain_jqcss(".move-select button[type='submit']:visible")
       f(".move-select button[type='submit']").click
       # wait for tray to not exist
