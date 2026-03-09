@@ -417,6 +417,7 @@
     "@instructure/ui-truncate-text": "10.30.0",
     "@instructure/ui-view": "10.30.0",
     "@instructure/uid": "10.30.0",
+    "es-abstract": "^1.24.0",
     "jsdom": "25.0.1",
     "webpack-dev-server/webpack-dev-middleware": "5.3.4",
     "@microsoft/immersive-reader-sdk/minimatch": "3.1.5"
