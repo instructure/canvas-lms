@@ -38,8 +38,9 @@ import {
 import {Avatar} from '@instructure/ui-avatar'
 import MessageStudents from '@canvas/message-students-modal'
 import {Link} from '@instructure/ui-link'
-import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
+import TagAsModalManager from '@canvas/differentiation-tags/react/TagAsModal/TagAsModalManager'
 import {useAddTagMembership} from '@canvas/differentiation-tags/react/hooks/useAddTagMembership'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -228,19 +229,19 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   )
 
   const handleTagCreationSuccess = React.useCallback(
-    (newCategoryID: number) => {
-      setIsDifferentiationTagModalOpen(false)
-      if (!newCategoryID) {
-        return
-      }
+    (groupId: number) => {
+      if (!groupId) return
 
-      // Assign selected students to the new tag
       const studentIds = selectedStudents.map(student => parseInt(student.id, 10))
+      if (studentIds.length === 0) return
 
-      addTagMembership({
-        groupId: newCategoryID,
-        userIds: studentIds,
-      })
+      addTagMembership(
+        {groupId, userIds: studentIds},
+        {
+          onSuccess: () => showFlashSuccess(I18n.t('Students tagged successfully'))(),
+          onError: (error: Error) => showFlashError(error.message)(new Error()),
+        },
+      )
     },
     [selectedStudents, addTagMembership],
   )
@@ -281,11 +282,9 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
         />
       )}
       {isDifferentiationTagModalOpen && (
-        <DifferentiationTagModalManager
+        <TagAsModalManager
           isOpen={isDifferentiationTagModalOpen}
           onClose={() => setIsDifferentiationTagModalOpen(false)}
-          mode="create"
-          differentiationTagCategoryId={undefined}
           onCreationSuccess={handleTagCreationSuccess}
           courseId={Number(courseId)}
         />
