@@ -96,7 +96,6 @@ export const AuthProviderForm = React.forwardRef<HTMLDivElement, AuthProviderFor
               </SimpleSelect.Option>
             ))}
           </SimpleSelect>
-
           <Flex as="div" gap="small" direction="column">
             <Text weight="bold">{I18n.t('Icon')}</Text>
 
@@ -118,6 +117,7 @@ export const AuthProviderForm = React.forwardRef<HTMLDivElement, AuthProviderFor
                         aria-pressed={isSelected}
                       />
                     </Tooltip>
+
                     {isSelected && <SelectedBadge />}
                   </span>
                 )

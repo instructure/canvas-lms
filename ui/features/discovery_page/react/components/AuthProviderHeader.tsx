@@ -53,15 +53,19 @@ export function AuthProviderHeader({
 }: AuthProviderHeaderProps) {
   return (
     <Flex as="div" alignItems="center" justifyItems="space-between" gap="x-small">
-      <Flex alignItems="center" gap="x-small">
-        {iconUrl ? (
-          <img src={iconUrl} alt="" style={{width: '24px', height: '24px'}} />
-        ) : (
-          <PlaceholderIcon />
-        )}
+      <Flex.Item shouldShrink={true}>
+        <Flex alignItems="center" gap="x-small">
+          {iconUrl ? (
+            <img src={iconUrl} alt="" style={{width: '24px', height: '24px'}} />
+          ) : (
+            <PlaceholderIcon />
+          )}
 
-        <Text weight="bold">{label}</Text>
-      </Flex>
+          <Text weight="bold" wrap="break-word">
+            {label}
+          </Text>
+        </Flex>
+      </Flex.Item>
 
       <Flex alignItems="center" gap="xxx-small">
         <Tooltip renderTip={I18n.t('Delete')}>
