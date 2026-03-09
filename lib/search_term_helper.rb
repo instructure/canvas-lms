@@ -34,10 +34,12 @@ module SearchTermHelper
     # @returns A new scope with the search filter applied. If the given
     #   scope was something like an AR relation (i.e. responds to 'where')
     #   returns a new scope of the same type. Otherwise returns an Array
-    def search_by_attribute(scope, attr, search_term, normalize_unicode: false)
+    def search_by_attribute(scope, attr, search_term, normalize_unicode: false, min_length: SearchTermHelper::MIN_SEARCH_TERM_LENGTH)
+      raise ArgumentError, "min_length must be a positive integer" unless min_length.is_a?(Integer) && min_length > 0
+
       return scope unless search_term.present?
 
-      SearchTermHelper.validate_search_term(search_term)
+      SearchTermHelper.validate_search_term(search_term, min_length:)
       filtered_scope(scope, attr, search_term, normalize_unicode)
     end
 
@@ -93,6 +95,11 @@ module SearchTermHelper
   end
 
   class SearchTermTooShortError < ArgumentError
+    def initialize(min_length = SearchTermHelper::MIN_SEARCH_TERM_LENGTH)
+      @min_length = min_length
+      super()
+    end
+
     def response_status
       :bad_request
     end
@@ -102,18 +109,20 @@ module SearchTermHelper
         "errors" => [{
           "field" => "search_term",
           "code" => "invalid",
-          "message" => "#{SearchTermHelper::MIN_SEARCH_TERM_LENGTH} or more characters is required"
+          "message" => "#{@min_length} or more characters is required"
         }]
       }
     end
   end
 
-  def self.valid_search_term?(search_term)
-    search_term.is_a?(String) && search_term.length >= MIN_SEARCH_TERM_LENGTH
+  def self.valid_search_term?(search_term, min_length: MIN_SEARCH_TERM_LENGTH)
+    search_term.is_a?(String) && search_term.length >= min_length
   end
 
-  def self.validate_search_term(search_term)
-    raise SearchTermTooShortError unless valid_search_term?(search_term)
+  def self.validate_search_term(search_term, min_length: MIN_SEARCH_TERM_LENGTH)
+    return if valid_search_term?(search_term, min_length:)
+
+    raise SearchTermTooShortError, min_length
   end
 
   def matches_attribute?(attr, search_term)

@@ -1001,7 +1001,8 @@ class AssignmentsApiController < ApplicationController
                                        .eager_load(:assignment_group)
                                        .preload(:rubric_association, :rubric)
                                        .reorder("assignment_groups.position, assignments.position, assignments.id")
-      scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
+      assignment_search_min_length = 1
+      scope = Assignment.search_by_attribute(scope, :title, params[:search_term], min_length: assignment_search_min_length)
       include_params = Array(params[:include])
 
       if params[:bucket]
