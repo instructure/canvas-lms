@@ -115,3 +115,4 @@ coverage-karma
 # Allows devs to create their own devcontainer files
 /.devcontainer/*
 /!.devcontainer/.keep
+.claude/scheduled_tasks.lock
