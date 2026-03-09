@@ -450,6 +450,7 @@ project_lhotse:
   root_opt_in: true
   description: Enables the new IgniteAI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
+  visible_on: project_lhotse_visible_on_hook
 performance_improvements_for_gradebook:
   state: hidden
   applies_to: Course
