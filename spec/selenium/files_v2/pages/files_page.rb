@@ -240,12 +240,12 @@ module FilesPage
   end
 
   def all_item_published?
-    expect(published_status_button).to be_present
+    expect(f(all_files_table_row)).to contain_css("[data-testid='published-button-icon']")
     expect(f(all_files_table_row)).not_to contain_css("[data-testid='unpublished-button-icon']")
   end
 
   def all_item_unpublished?
-    expect(unpublished_status_button).to be_present
+    expect(f(all_files_table_row)).to contain_css("[data-testid='unpublished-button-icon']")
     expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']")
   end
 
@@ -334,6 +334,7 @@ module FilesPage
     file_name_textbox_el = rename_folder_component("input-folder-name")
     replace_content(file_name_textbox_el, file_name_new)
     file_name_textbox_el.send_keys(:return)
+    wait_for_ajaximations
   end
 
   def delete_file_from(item = 1, way = :kebab_menu)
