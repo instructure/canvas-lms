@@ -394,6 +394,98 @@ describe Context do
       expect(sorted_rubrics[1].rubric.title).to eq("Rubric 2 Active")
       expect(sorted_rubrics[2].rubric.title).to eq("Rubric 4 Active")
     end
+
+    it "excludes non-bookmarked associations" do
+      rubric = Rubric.create!(context: @course, title: "Non-bookmarked Rubric")
+      RubricAssociation.create!(
+        context: @course,
+        rubric:,
+        association_object: @course,
+        purpose: :grading,
+        bookmarked: false
+      )
+
+      result = Context.sorted_rubrics(@course)
+      expect(result.map { |ra| ra.rubric.title }).not_to include("Non-bookmarked Rubric")
+    end
+
+    it "excludes deleted associations" do
+      rubric = Rubric.create!(context: @course, title: "Deleted Association Rubric")
+      ra = RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+      ra.update_columns(workflow_state: "deleted")
+
+      result = Context.sorted_rubrics(@course)
+      expect(result.map { |ra| ra.rubric.title }).not_to include("Deleted Association Rubric")
+    end
+
+    it "deduplicates associations with the same rubric_id" do
+      rubric = Rubric.create!(context: @course, title: "Duplicate Rubric")
+      2.times do
+        RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+      end
+
+      result = Context.sorted_rubrics(@course)
+      expect(result.count { |ra| ra.rubric_id == rubric.id }).to eq(1)
+    end
+
+    it "sorts nil-title rubrics last" do
+      named = Rubric.create!(context: @course, title: "Named Rubric")
+      # Create associations before setting nil to prevent populate_rubric_title
+      # from resetting the title during the after_create :update_rubric callback
+      untitled = Rubric.create!(context: @course, title: "Temp")
+      [named, untitled].each do |r|
+        RubricAssociation.create!(context: @course, rubric: r, association_object: @course, purpose: :bookmark)
+      end
+      untitled.update_columns(title: nil)
+
+      result = Context.sorted_rubrics(@course)
+      titled_results = result.select { |ra| ra.rubric.title.present? }
+      nil_results = result.select { |ra| ra.rubric.title.nil? }
+      expect(titled_results).to all(satisfy { |ra| result.index(ra) < result.index(nil_results.first) })
+    end
+
+    it "returns RubricAssociation objects with preloaded rubric" do
+      result = Context.sorted_rubrics(@course)
+
+      expect(result).to all(be_a(RubricAssociation))
+      expect(result.first.association(:rubric)).to be_loaded
+    end
+
+    it "returns an empty array for a context with no associations" do
+      empty_course = Course.create!
+      expect(Context.sorted_rubrics(empty_course)).to eq([])
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "returns rubrics for a cross-shard context" do
+        cs_course = @shard1.activate do
+          a = Account.create!
+          c = Course.create!(account: a, name: "CS Course")
+          r = Rubric.create!(context: c, title: "CS Rubric")
+          RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+          c
+        end
+
+        result = @shard1.activate { Context.sorted_rubrics(cs_course) }
+        expect(result.length).to eq(1)
+        expect(result.first.rubric.title).to eq("CS Rubric")
+      end
+
+      it "returns associations scoped to the cross-shard context" do
+        cs_course = @shard1.activate do
+          a = Account.create!
+          c = Course.create!(account: a)
+          r = Rubric.create!(context: c, title: "CS Rubric")
+          RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+          c
+        end
+
+        result = @shard1.activate { Context.sorted_rubrics(cs_course) }
+        expect(result.first.context.asset_string).to eq(cs_course.asset_string)
+      end
+    end
   end
 
   describe "#active_record_types" do
