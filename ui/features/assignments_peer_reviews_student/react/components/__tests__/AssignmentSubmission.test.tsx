@@ -957,6 +957,177 @@ describe('AssignmentSubmission', () => {
     })
   })
 
+  describe('accessibility', () => {
+    const createAssignmentWithRubric = () =>
+      createAssignment({
+        rubric: createRubric(),
+        rubricAssociation: createRubricAssociation(),
+      })
+
+    describe('ARIA attributes on toggle buttons', () => {
+      it('comments button has aria-expanded true when comments are shown', () => {
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const toggleButton = screen.getByTestId('toggle-comments-button')
+        expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
+      })
+
+      it('comments button has aria-expanded false when comments are hidden', async () => {
+        const user = userEvent.setup()
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const toggleButton = screen.getByTestId('toggle-comments-button')
+        await user.click(toggleButton)
+
+        expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
+      })
+
+      it('rubric button has aria-expanded false initially', () => {
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        const toggleButton = screen.getByTestId('toggle-rubric-button')
+        expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
+      })
+
+      it('rubric button has aria-expanded true when rubric is shown', async () => {
+        const user = userEvent.setup()
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        const toggleButton = screen.getByTestId('toggle-rubric-button')
+        await user.click(toggleButton)
+
+        expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
+      })
+
+      it('comments button has aria-controls referencing comments panel', () => {
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const toggleButton = screen.getByTestId('toggle-comments-button')
+        expect(toggleButton).toHaveAttribute('aria-controls', 'comments-panel')
+      })
+
+      it('rubric button has aria-controls referencing rubric panel', () => {
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        const toggleButton = screen.getByTestId('toggle-rubric-button')
+        expect(toggleButton).toHaveAttribute('aria-controls', 'rubric-panel')
+      })
+
+      it('comments button has aria-haspopup', () => {
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const toggleButton = screen.getByTestId('toggle-comments-button')
+        expect(toggleButton).toHaveAttribute('aria-haspopup', 'dialog')
+      })
+
+      it('rubric button has aria-haspopup', () => {
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        const toggleButton = screen.getByTestId('toggle-rubric-button')
+        expect(toggleButton).toHaveAttribute('aria-haspopup', 'dialog')
+      })
+    })
+
+    describe('panel IDs for aria-controls', () => {
+      it('comments panel has id matching aria-controls', () => {
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        expect(document.getElementById('comments-panel')).toBeInTheDocument()
+      })
+
+      it('rubric panel has id matching aria-controls', async () => {
+        const user = userEvent.setup()
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        await user.click(screen.getByTestId('toggle-rubric-button'))
+
+        expect(document.getElementById('rubric-panel')).toBeInTheDocument()
+      })
+    })
+
+    describe('focus management', () => {
+      it('does not steal focus on initial page load when comments panel is open by default', () => {
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const closeButton = screen.getByTestId('close-comments-button').querySelector('button')
+        expect(closeButton).not.toHaveFocus()
+      })
+
+      it('moves focus to close button when comments panel opens', async () => {
+        const user = userEvent.setup()
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const toggleButton = screen.getByTestId('toggle-comments-button')
+        await user.click(toggleButton) // hide
+        await user.click(toggleButton) // show
+
+        const closeButton = screen.getByTestId('close-comments-button').querySelector('button')
+        expect(closeButton).toHaveFocus()
+      })
+
+      it('moves focus to close button when rubric panel opens', async () => {
+        const user = userEvent.setup()
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        await user.click(screen.getByTestId('toggle-rubric-button'))
+
+        const closeButton = screen.getByTestId('close-rubric-button').querySelector('button')
+        expect(closeButton).toHaveFocus()
+      })
+
+      it('returns focus to comments toggle button when comments panel is closed', async () => {
+        const user = userEvent.setup()
+        render(<AssignmentSubmission {...createDefaultProps()} />)
+
+        const closeButton = screen.getByTestId('close-comments-button').querySelector('button')
+        await user.click(closeButton!)
+
+        const toggleButton = screen.getByTestId('toggle-comments-button')
+        expect(toggleButton).toHaveFocus()
+      })
+
+      it('returns focus to rubric toggle button when rubric panel is closed', async () => {
+        const user = userEvent.setup()
+        render(
+          <AssignmentSubmission
+            {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+          />,
+        )
+
+        await user.click(screen.getByTestId('toggle-rubric-button'))
+        const closeButton = screen.getByTestId('close-rubric-button').querySelector('button')
+        await user.click(closeButton!)
+
+        const toggleButton = screen.getByTestId('toggle-rubric-button')
+        expect(toggleButton).toHaveFocus()
+      })
+    })
+  })
+
   describe('error alerts', () => {
     const createAssignmentWithRubric = () =>
       createAssignment({
