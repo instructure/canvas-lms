@@ -16,13 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@canvas/react'
-import ready from '@instructure/ready'
-import {LearningAgentButton} from '@canvas/learning-agent'
-
-ready(() => {
-  const mount = document.getElementById('learning_agent_mount_point')
-  if (!mount) return
-
-  render(<LearningAgentButton />, mount)
-})
+export {default as LearningAgentButton} from './LearningAgentButton'

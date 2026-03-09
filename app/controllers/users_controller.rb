@@ -446,6 +446,8 @@ class UsersController < ApplicationController
     check_incomplete_registration
     get_context
 
+    load_dashboard_learning_agent_env
+
     # dont show crumbs on dashboard because it does not make sense to have a breadcrumb
     # trail back to home if you are already home
     clear_crumbs
@@ -3014,6 +3016,25 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def load_dashboard_learning_agent_env
+    return unless @current_user
+    return unless @current_user.associated_root_accounts
+                               .any? { |a| a.feature_allowed?(:athena_learning_agent_button) }
+
+    has_flagged_course = Rails.cache.fetch_with_batched_keys(
+      "learning_agent_dashboard/v1",
+      batch_object: @current_user,
+      batched_keys: :enrollments
+    ) do
+      @current_user.enrollments
+                   .active_by_date
+                   .where(type: "StudentEnrollment")
+                   .preload(:course)
+                   .any? { |e| e.course.feature_enabled?(:athena_learning_agent_button) }
+    end
+    load_learning_agent_env if has_flagged_course
+  end
 
   def google_drive_client
     settings = Canvas::Plugin.find(:google_drive).try(:settings) || {}
