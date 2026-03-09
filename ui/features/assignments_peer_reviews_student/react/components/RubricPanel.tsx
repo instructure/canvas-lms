@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -42,6 +42,7 @@ interface RubricPanelProps {
   onSubmit: (assessment: RubricAssessmentData[]) => void
   onViewModeChange: (mode: ViewMode) => void
   isReadOnly?: boolean
+  autoFocusCloseButton?: boolean
 }
 
 export const RubricPanel: React.FC<RubricPanelProps> = ({
@@ -54,7 +55,16 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
   onSubmit,
   onViewModeChange,
   isReadOnly = false,
+  autoFocusCloseButton = false,
 }) => {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (autoFocusCloseButton) {
+      closeButtonRef.current?.focus()
+    }
+  }, [autoFocusCloseButton])
+
   if (!assignment.rubric) {
     return null
   }
@@ -67,6 +77,7 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
       height="100%"
       padding="small"
       overflowY="auto"
+      id="rubric-panel"
     >
       <Flex as="div" direction="column" justifyItems="space-between" height="100%">
         <Flex.Item>
@@ -78,6 +89,9 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
             </Flex.Item>
             <Flex.Item padding="xx-small">
               <CloseButton
+                elementRef={(el: Element | null) => {
+                  closeButtonRef.current = el as HTMLButtonElement
+                }}
                 screenReaderLabel={I18n.t('Close Rubric')}
                 size="small"
                 onClick={onClose}
