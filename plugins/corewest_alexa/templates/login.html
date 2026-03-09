@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Core West College</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    /* Standalone login page overrides */
+    body {
+      padding-top: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--color-navy-dark) 0%, var(--color-navy-light) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: var(--color-white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+    }
+    .login-logo {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-navy-dark);
+      margin-bottom: .25rem;
+      letter-spacing: -.02em;
+    }
+    .login-logo span { color: var(--color-gold-muted); }
+    .login-subtitle {
+      font-size: .875rem;
+      color: var(--color-text-mid);
+      margin-bottom: 2rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .login-divider {
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-gold-bright), var(--color-gold-muted));
+      border-radius: var(--radius-full);
+      margin: 1.5rem 0 1.75rem;
+    }
+    .login-footer {
+      color: rgba(255,255,255,.5);
+      font-size: .78rem;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .forgot-link {
+      font-size: .85rem;
+      color: var(--color-navy-light);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .forgot-link:hover { color: var(--color-gold-muted); }
+    #login-error {
+      color: var(--color-danger);
+      font-size: .875rem;
+      margin-bottom: 1rem;
+      min-height: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card" role="main">
+
+    <!-- Logo -->
+    <div class="login-logo">🎓 CORE WEST<span> COLLEGE</span></div>
+    <p class="login-subtitle">Admin Portal — Secure Access</p>
+    <div class="login-divider"></div>
+
+    <!-- Error message -->
+    <p id="login-error" role="alert"></p>
+
+    <!-- Login Form -->
+    <form id="login-form" novalidate>
+      <div class="form-group" style="text-align:left;">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control"
+          placeholder="Enter your username"
+          autocomplete="username"
+          required>
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required>
+      </div>
+      <div class="form-check" style="justify-content:space-between;margin-bottom:1.5rem;">
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.875rem;cursor:pointer;">
+          <input type="checkbox" id="remember-me" name="remember"> Remember Me
+        </label>
+        <a href="#" class="forgot-link">Forgot Password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg w-full" style="font-size:1rem;">
+        Sign In 🔐
+      </button>
+    </form>
+
+    <div class="login-divider" style="margin:1.75rem 0 1rem;"></div>
+    <p style="font-size:.8rem;color:var(--color-text-mid);">
+      🛡️ This portal is for authorised Core West College staff only.<br>
+      All access is logged and monitored.
+    </p>
+
+  </div>
+
+  <p class="login-footer">Core West College AI LMS — Secure Access &copy; 2026</p>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

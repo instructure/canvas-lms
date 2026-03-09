@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Command Center | Core West College</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-page" style="padding-top:0;background:var(--color-gray-light);">
+
+  <!-- ── Dashboard Header ───────────────────────────────── -->
+  <header class="dash-header" role="banner">
+    <div class="dash-logo">
+      <span style="font-size:1.75rem;">🎓</span>
+      <div>
+        <span>Core West College</span>
+        <small>AI Command Center</small>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <a href="/" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">🏫 School Site</a>
+      <a href="/inspection-dashboard" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">✅ Inspection</a>
+      <a href="/curriculum-dashboard" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">📚 Curriculum</a>
+      <a href="/login" class="btn btn-danger btn-sm" onclick="localStorage.removeItem('cwc_jwt');">Logout</a>
+    </div>
+  </header>
+
+  <main class="dash-main" role="main">
+
+    <!-- ── Welcome Banner ───────────────────────────────── -->
+    <div class="dash-welcome">
+      <div>
+        <h2>Welcome back, Administrator 👋</h2>
+        <p>Here's your school intelligence overview for today.</p>
+      </div>
+      <div>
+        <p class="dash-date" id="current-date"></p>
+        <p style="color:rgba(255,255,255,.7);font-size:.8rem;margin:0;">📍 Core West College, Sheikh Zayed</p>
+      </div>
+    </div>
+
+    <!-- ── Metric Cards ──────────────────────────────────── -->
+    <div class="grid grid-3" style="margin-bottom:2rem;">
+
+      <!-- Inspection Readiness with Gauge -->
+      <div class="metric-card" style="border-top-color:var(--color-gold-bright);">
+        <span class="metric-icon">📊</span>
+        <div class="gauge-wrap">
+          <div class="gauge" aria-label="Inspection readiness gauge">
+            <svg viewBox="0 0 120 120" width="120" height="120">
+              <circle class="gauge-bg" cx="60" cy="60" r="54"/>
+              <circle class="gauge-fill" cx="60" cy="60" r="54"/>
+            </svg>
+            <div class="gauge-label">
+              <div class="gauge-value" id="stat-inspection">78%</div>
+              <div class="gauge-unit">Ready</div>
+            </div>
+          </div>
+        </div>
+        <span class="metric-label">Inspection Readiness</span>
+      </div>
+
+      <!-- Curriculum Coverage -->
+      <div class="metric-card" style="border-top-color:var(--color-navy-light);">
+        <span class="metric-icon">📚</span>
+        <span class="metric-value" id="stat-curriculum">85%</span>
+        <span class="metric-label">Curriculum Coverage</span>
+        <div style="width:100%;margin-top:.5rem;">
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" data-progress="curriculum_coverage" style="width:85%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teachers -->
+      <div class="metric-card" style="border-top-color:var(--color-success);">
+        <span class="metric-icon">👨‍🏫</span>
+        <span class="metric-value" id="stat-teachers">52</span>
+        <span class="metric-label">Teachers</span>
+      </div>
+
+      <!-- Students -->
+      <div class="metric-card" style="border-top-color:var(--color-navy-dark);">
+        <span class="metric-icon">👨‍🎓</span>
+        <span class="metric-value" id="stat-students">487</span>
+        <span class="metric-label">Students Enrolled</span>
+      </div>
+
+      <!-- Open Tasks -->
+      <div class="metric-card" style="border-top-color:var(--color-warning);">
+        <span class="metric-icon">✅</span>
+        <span class="metric-value" id="stat-tasks">14</span>
+        <span class="metric-label">Open Tasks</span>
+      </div>
+
+      <!-- Incidents -->
+      <div class="metric-card" style="border-top-color:var(--color-danger);">
+        <span class="metric-icon">⚠️</span>
+        <span class="metric-value" id="stat-incidents">3</span>
+        <span class="metric-label">Active Incidents</span>
+      </div>
+
+    </div>
+
+    <!-- ── Quick Actions + Activity ─────────────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+
+      <!-- Quick Actions -->
+      <div>
+        <h3 style="margin-bottom:1rem;">⚡ Quick Actions</h3>
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <a href="/inspection-dashboard" class="quick-action-btn">
+            <span class="quick-action-icon">✅</span>
+            <div>
+              <div>View Inspection Dashboard</div>
+              <small style="color:var(--color-text-mid);">Review readiness scores and frameworks</small>
+            </div>
+          </a>
+          <a href="/curriculum-dashboard" class="quick-action-btn">
+            <span class="quick-action-icon">📚</span>
+            <div>
+              <div>View Curriculum Report</div>
+              <small style="color:var(--color-text-mid);">Coverage analysis and gap reports</small>
+            </div>
+          </a>
+          <button class="quick-action-btn" onclick="alert('Alexa voice integration — connect your Echo device.')">
+            <span class="quick-action-icon">🤖</span>
+            <div>
+              <div>Ask Alexa</div>
+              <small style="color:var(--color-text-mid);">Voice-powered school assistant</small>
+            </div>
+          </button>
+          <button class="quick-action-btn" onclick="alert('Generating report… This feature requires a connected backend.')">
+            <span class="quick-action-icon">📄</span>
+            <div>
+              <div>Generate Report</div>
+              <small style="color:var(--color-text-mid);">Export PDF school summary report</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div>
+        <h3 style="margin-bottom:1rem;">🕐 Recent Activity</h3>
+        <div class="card">
+          <div class="card-body" style="padding:1.25rem;">
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--color-success);"></div>
+              <div>
+                <div style="font-size:.9rem;font-weight:600;">Inspection checklist updated</div>
+                <div class="activity-time">Today, 09:15 AM — British Division</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot"></div>
+              <div>
+                <div style="font-size:.9rem;font-weight:600;">New student enrolled — Grade 7</div>
+                <div class="activity-time">Today, 08:42 AM — American Division</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--color-warning);"></div>
+              <div>
+                <div style="font-size:.9rem;font-weight:600;">Curriculum gap flagged — Science</div>
+                <div class="activity-time">Yesterday, 02:30 PM — National Division</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--color-navy-light);"></div>
+              <div>
+                <div style="font-size:.9rem;font-weight:600;">Monthly report generated</div>
+                <div class="activity-time">Yesterday, 11:00 AM — All Divisions</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--color-danger);"></div>
+              <div>
+                <div style="font-size:.9rem;font-weight:600;">Incident logged — Playground</div>
+                <div class="activity-time">2 days ago, 01:15 PM — Campus Security</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--color-success);"></div>
+              <div>
+                <div style="font-size:.9rem;font-weight:600;">Teacher CPD session completed</div>
+                <div class="activity-time">3 days ago, 04:00 PM — All Staff</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title }} | Core West College</title>
+  <meta name="description" content="Core West College — Excellence in International, American, British & National Education in Sheikh Zayed City, Egypt.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- ── Top Bar ──────────────────────────────────────────── -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="top-bar-left">
+        <span>📞 01201022222 | 01210211111</span>
+        <span>✉️ info@corewestcollege.com</span>
+        <span>🕐 Sun–Thu: 08:00 AM – 03:00 PM</span>
+      </div>
+      <div class="top-bar-right">
+        <a href="https://www.facebook.com" target="_blank" rel="noopener" aria-label="Facebook">📘</a>
+        <a href="https://www.instagram.com" target="_blank" rel="noopener" aria-label="Instagram">📸</a>
+        <a href="https://www.youtube.com/watch?v=63Xk2xMBve0" target="_blank" rel="noopener" aria-label="YouTube">▶️</a>
+        <a href="https://www.linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn">💼</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Navigation ───────────────────────────────────────── -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container">
+      <a href="/" class="navbar-brand">
+        🎓 <span class="brand-core">CORE WEST</span><span class="brand-college">&nbsp;COLLEGE</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <div class="dropdown">
+          <a href="/about" class="nav-link">About Us ▾</a>
+          <div class="dropdown-menu">
+            <a href="/about#who-we-are">Who We Are</a>
+            <a href="/about#chairman">Chairman &amp; CEO</a>
+            <a href="/about#leadership">Leadership Team</a>
+          </div>
+        </div>
+        <a href="/divisions" class="nav-link">Divisions</a>
+        <a href="/teaching-learning" class="nav-link">Teaching &amp; Learning</a>
+        <a href="/facilities" class="nav-link">Facilities</a>
+        <a href="/admission" class="nav-link">Admission</a>
+        <a href="/events" class="nav-link">Events</a>
+        <a href="/careers" class="nav-link">Careers</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="/admission" class="btn btn-primary btn-sm">Enroll Now</a>
+        <a href="/dashboard" class="btn btn-secondary btn-sm">AI Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Page Content ─────────────────────────────────────── -->
+  {% block content %}{% endblock %}
+
+  <!-- ── Footer ───────────────────────────────────────────── -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">🎓 CORE WEST COLLEGE</div>
+          <p>A leading international school in Sheikh Zayed City, Egypt. Inspiring minds and building futures.</p>
+          <p class="footer-tagline">Established by educators and investors since 1988</p>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/divisions">Divisions</a></li>
+            <li><a href="/teaching-learning">Teaching &amp; Learning</a></li>
+            <li><a href="/facilities">Facilities</a></li>
+            <li><a href="/admission">Admission</a></li>
+            <li><a href="/events">Events</a></li>
+            <li><a href="/careers">Careers</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact Info</h4>
+          <p>📍 1st Neighborhood, District 13, El Sheikh Zayed, Egypt</p>
+          <p>📞 01201022222, 01210211111</p>
+          <p>✉️ info@corewestcollege.com</p>
+          <p>✉️ admission@corewestcollege.com</p>
+          <p>🕐 Sun–Thu: 08:00 AM – 03:00 PM</p>
+        </div>
+        <div class="footer-col">
+          <h4>Newsletter</h4>
+          <p>Stay updated with school news, events, and announcements.</p>
+          <form class="newsletter-form" novalidate>
+            <input type="email" placeholder="Your email address" required aria-label="Email address">
+            <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Core West College. All Rights Reserved.</p>
+        <p>Powered by Core West AI LMS</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

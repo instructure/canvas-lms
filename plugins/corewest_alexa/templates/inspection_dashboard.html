@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspection Dashboard | Core West College</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body style="padding-top:0;background:var(--color-gray-light);">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header class="dash-header" role="banner">
+    <div class="dash-logo">
+      <span style="font-size:1.75rem;">🎓</span>
+      <div>
+        <span>Core West College</span>
+        <small>Inspection Readiness Dashboard</small>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <a href="/dashboard" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">← Dashboard</a>
+      <a href="/curriculum-dashboard" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">📚 Curriculum</a>
+      <a href="/login" class="btn btn-danger btn-sm" onclick="localStorage.removeItem('cwc_jwt');">Logout</a>
+    </div>
+  </header>
+
+  <main style="padding:2rem 1.5rem;max-width:1200px;margin:0 auto;" role="main">
+
+    <!-- ── Page Title ──────────────────────────────────── -->
+    <div style="margin-bottom:2rem;">
+      <h1 style="font-size:1.8rem;color:var(--color-navy-dark);">✅ Inspection Readiness</h1>
+      <p style="color:var(--color-text-mid);">Track and improve school readiness against Ofsted, Cognia, and Ministry of Education frameworks.</p>
+    </div>
+
+    <!-- ── Overall Gauge + Summary ──────────────────────── -->
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:2.5rem;align-items:center;background:white;border-radius:var(--radius-xl);padding:2.5rem;box-shadow:var(--shadow-md);margin-bottom:2rem;border-top:5px solid var(--color-gold-bright);">
+      <div class="gauge-wrap">
+        <div class="gauge" style="width:180px;height:180px;" aria-label="Overall inspection readiness">
+          <svg viewBox="0 0 120 120" width="180" height="180">
+            <circle class="gauge-bg" cx="60" cy="60" r="54"/>
+            <circle class="gauge-fill" cx="60" cy="60" r="54" style="stroke:var(--color-gold-bright);stroke-dashoffset:84.8;"/>
+          </svg>
+          <div class="gauge-label">
+            <div class="gauge-value" style="font-size:2.2rem;">78%</div>
+            <div class="gauge-unit">Overall</div>
+          </div>
+        </div>
+        <span class="badge badge-warning" style="font-size:.85rem;padding:.4rem .9rem;">Good — Approaching Outstanding</span>
+      </div>
+      <div>
+        <h2 style="color:var(--color-navy-dark);margin-bottom:.5rem;">Overall Inspection Readiness: 78%</h2>
+        <p>Core West College is performing well across all inspection frameworks. Key strengths include teaching quality, student behaviour, and leadership. Continued focus on curriculum documentation and safeguarding evidence will push the school towards outstanding.</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.25rem;">
+          <span class="badge badge-success">Teaching Quality ✅</span>
+          <span class="badge badge-success">Leadership ✅</span>
+          <span class="badge badge-warning">Curriculum Docs ⚠️</span>
+          <span class="badge badge-success">Safeguarding ✅</span>
+          <span class="badge badge-warning">SEND Provision ⚠️</span>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-primary" onclick="alert('Generating PDF inspection readiness report…')">📄 Generate Report</button>
+          <a href="/curriculum-dashboard" class="btn btn-secondary" style="margin-left:.75rem;">📚 View Curriculum Report</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Framework Cards ────────────────────────────── -->
+    <div class="grid grid-2" style="margin-bottom:2rem;">
+
+      <!-- Ofsted -->
+      <div class="card">
+        <div class="card-header" style="background:linear-gradient(90deg,#0d47a1,#1565c0);color:white;font-size:1rem;">
+          🇬🇧 Ofsted Outstanding Criteria — British Division
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+              <div class="progress-label"><span>Quality of Education</span><span>82%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:82%;"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Behaviour &amp; Attitudes</span><span>88%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Personal Development</span><span>75%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:75%;"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Leadership &amp; Management</span><span>85%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:85%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Early Years Provision</span><span>90%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:90%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cognia -->
+      <div class="card">
+        <div class="card-header" style="background:linear-gradient(90deg,#1a237e,#283593);color:white;font-size:1rem;">
+          🌐 Cognia Accreditation Standards — All Divisions
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+              <div class="progress-label"><span>Learner Performance</span><span>80%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:80%;"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Resource Utilisation</span><span>72%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--color-warning),#ffb300);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Governance &amp; Leadership</span><span>86%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:86%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Stakeholder Engagement</span><span>79%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:79%;"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Continuous Improvement</span><span>70%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:70%;background:linear-gradient(90deg,var(--color-warning),#ffb300);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Checklist ──────────────────────────────────── -->
+    <div class="card" style="margin-bottom:2rem;">
+      <div class="card-header" style="font-size:1rem;">📋 Inspection Checklist — Key Evidence Items</div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem 2rem;">
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Curriculum policy documents up to date</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Safeguarding policy current and signed</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Teacher performance reviews completed</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">SEND register updated for all divisions</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Attendance tracking system operational</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Scheme of work for all subjects filed</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Staff DBS / clearance certificates on file</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Health &amp; Safety audit completed</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Parent satisfaction survey distributed</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.75rem;padding:.5rem;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--color-navy-dark);width:1.1rem;height:1.1rem;">
+            <span style="font-size:.9rem;">Student progress data analysed (termly)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Action Button ──────────────────────────────── -->
+    <div style="text-align:center;">
+      <button class="btn btn-primary btn-lg" onclick="alert('Generating full inspection readiness PDF report…')">
+        📄 Generate Full Inspection Report
+      </button>
+    </div>
+
+  </main>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

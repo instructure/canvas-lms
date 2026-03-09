@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ── Page Hero ─────────────────────────────────────────── -->
+<section class="page-hero">
+  <div class="container">
+    <h1>Contact Us</h1>
+    <div class="gold-accent"></div>
+    <p>We'd love to hear from you — reach out to the Core West College team</p>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Contact</span>
+    </nav>
+  </div>
+</section>
+
+<!-- ── Contact Cards ──────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="grid grid-3" style="margin-bottom:3rem;">
+      <div class="info-card">
+        <span class="info-icon">📍</span>
+        <h3>Visit Us</h3>
+        <p>1st Neighborhood, District 13<br>El Sheikh Zayed, Egypt</p>
+        <a href="https://maps.google.com/maps?q=Sheikh+Zayed+City,+Egypt" target="_blank" rel="noopener" class="btn btn-secondary btn-sm mt-2">Get Directions</a>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">📞</span>
+        <h3>Call Us</h3>
+        <p>
+          <a href="tel:+201201022222" style="color:var(--color-navy-light);">01201022222</a><br>
+          <a href="tel:+201210211111" style="color:var(--color-navy-light);">01210211111</a>
+        </p>
+        <p style="font-size:.875rem;margin-top:.75rem;">Sunday – Thursday<br>08:00 AM – 03:00 PM</p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">✉️</span>
+        <h3>Email Us</h3>
+        <p>
+          <strong>General:</strong><br>
+          <a href="mailto:info@corewestcollege.com" style="color:var(--color-navy-light);">info@corewestcollege.com</a>
+        </p>
+        <p>
+          <strong>Admissions:</strong><br>
+          <a href="mailto:admission@corewestcollege.com" style="color:var(--color-navy-light);">admission@corewestcollege.com</a>
+        </p>
+        <p>
+          <strong>HR &amp; Careers:</strong><br>
+          <a href="mailto:hr@corewestcollege.com" style="color:var(--color-navy-light);">hr@corewestcollege.com</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Working Hours -->
+    <div class="alert alert-info" style="max-width:500px;margin:0 auto 3rem;">
+      🕐 <strong>Office Hours:</strong> Sunday – Thursday, 08:00 AM – 03:00 PM<br>
+      <small>Friday and Saturday: Closed</small>
+    </div>
+
+    <!-- Contact Form & Map -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;">
+
+      <!-- Contact Form -->
+      <div>
+        <h2>Send Us a Message</h2>
+        <div class="gold-accent gold-accent-left"></div>
+        <form id="contact-form" novalidate>
+          <div class="form-group">
+            <label for="contact-name">Full Name *</label>
+            <input type="text" id="contact-name" name="name" class="form-control" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email Address *</label>
+            <input type="email" id="contact-email" name="email" class="form-control" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-phone">Phone Number</label>
+            <input type="tel" id="contact-phone" name="phone" class="form-control" placeholder="01xxxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label for="contact-subject">Subject *</label>
+            <select id="contact-subject" name="subject" class="form-control" required>
+              <option value="">— Please select a subject —</option>
+              <option value="admission">Admission Enquiry</option>
+              <option value="general">General Information</option>
+              <option value="careers">Careers</option>
+              <option value="fees">Fees &amp; Payments</option>
+              <option value="feedback">Feedback / Complaint</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contact-message">Message *</label>
+            <textarea id="contact-message" name="message" class="form-control" rows="5" placeholder="Write your message here…" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-full">Send Message 📤</button>
+        </form>
+      </div>
+
+      <!-- Map -->
+      <div>
+        <h2>Find Us on the Map</h2>
+        <div class="gold-accent gold-accent-left"></div>
+        <div style="border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);">
+          <iframe
+            src="https://maps.google.com/maps?q=Sheikh+Zayed+City,+Egypt&output=embed"
+            width="100%"
+            height="400"
+            style="border:0;display:block;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Core West College location — Sheikh Zayed City, Egypt">
+          </iframe>
+        </div>
+        <div class="alert alert-info mt-3">
+          <p style="margin:0;"><strong>📍 Core West College</strong><br>
+          1st Neighborhood, District 13<br>
+          El Sheikh Zayed, Giza Governorate, Egypt</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

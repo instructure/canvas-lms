@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ── Page Hero ─────────────────────────────────────────── -->
+<section class="page-hero">
+  <div class="container">
+    <h1>Events &amp; Activities</h1>
+    <div class="gold-accent"></div>
+    <p>Celebrating learning, creativity, and community at Core West College</p>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Events</span>
+    </nav>
+  </div>
+</section>
+
+<!-- ── Events Grid ────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>School Events 2025–2026</h2>
+      <p>A vibrant calendar of learning experiences, celebrations, and community moments</p>
+      <div class="gold-rule"></div>
+    </div>
+    <div class="grid grid-3">
+
+      <article class="event-card">
+        <div class="event-img ev1">📚</div>
+        <div class="event-body">
+          <p class="event-date">📅 March 2026 — All Divisions</p>
+          <h4>DEAR Week Celebration</h4>
+          <p>
+            Drop Everything and Read — a school-wide literacy celebration encouraging students of all
+            ages to discover the joy of reading. Special author visits, reading challenges, and a
+            school-wide read-aloud event make this a highlight of the academic calendar.
+          </p>
+          <span class="badge badge-gold">Literacy</span>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-img ev2">🎉</div>
+        <div class="event-body">
+          <p class="event-date">📅 February 2026 — Early Years &amp; KG</p>
+          <h4>100 Days of Learning</h4>
+          <p>
+            Early Years and KG students celebrated their 100th day of school with themed activities,
+            counting games, creative projects, and costumes — a beloved tradition that marks a major
+            milestone in the school year.
+          </p>
+          <span class="badge badge-gold">Milestone</span>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-img ev3">🔬</div>
+        <div class="event-body">
+          <p class="event-date">📅 April 2026 — Grades 5–11</p>
+          <h4>Science Fair 2026</h4>
+          <p>
+            Students from Grades 5–11 showcased their innovative science experiments and research
+            projects before a panel of judges. Projects ranged from environmental sustainability
+            to robotics, demonstrating the breadth of scientific thinking at Core West.
+          </p>
+          <span class="badge badge-gold">STEM</span>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-img ev4">🌙</div>
+        <div class="event-body">
+          <p class="event-date">📅 October 2025 — All Divisions</p>
+          <h4>National Day Celebration</h4>
+          <p>
+            A joyful school-wide celebration of Egyptian national pride, featuring traditional
+            costumes, cultural performances, food stalls, and a special assembly honouring
+            Egypt's rich heritage and history.
+          </p>
+          <span class="badge badge-gold">Culture</span>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-img ev5">🌍</div>
+        <div class="event-body">
+          <p class="event-date">📅 November 2025 — All Divisions</p>
+          <h4>International Day</h4>
+          <p>
+            Students and families from over 20 nationalities came together to celebrate the diversity
+            of our school community. Each class represented a different country with displays,
+            performances, and traditional foods shared with the whole school family.
+          </p>
+          <span class="badge badge-gold">Community</span>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-img ev6">🎓</div>
+        <div class="event-body">
+          <p class="event-date">📅 June 2026 — All Divisions</p>
+          <h4>End of Year Ceremony</h4>
+          <p>
+            The annual End of Year Ceremony brings together students, parents, and staff to celebrate
+            academic achievements, present awards, honour graduating students, and reflect on a year
+            full of growth, learning, and memorable moments.
+          </p>
+          <span class="badge badge-gold">Graduation</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Stay Updated ───────────────────────────────────────── -->
+<section class="section section-alt">
+  <div class="container">
+    <div style="max-width:600px;margin:0 auto;text-align:center;">
+      <h2>Stay Updated</h2>
+      <div class="gold-accent"></div>
+      <p class="lead">Never miss a Core West College event. Subscribe to our newsletter for the latest news, upcoming events, and school announcements.</p>
+      <form class="newsletter-form" style="flex-direction:row;max-width:480px;margin:1.5rem auto 0;" novalidate>
+        <input type="email" placeholder="Enter your email address" required aria-label="Email">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+      <p style="font-size:.8rem;margin-top:.75rem;">Or follow us on social media for real-time updates and photos from school life.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
