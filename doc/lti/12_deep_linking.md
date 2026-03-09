@@ -89,6 +89,26 @@ When this process is complete, Canvas now knows about and is displaying the sele
 
 5. If needed, add the backend work to create database objects to the deep linking controller. This is already done for module items and all resource links (links to tool content), and possibly could be helpful for the placement and records you are adding.
 
+### Canvas Extensions to the Deep Linking Response
+
+Canvas supports the following non-standard claims in the `LtiDeepLinkingResponse` JWT, which tools may optionally include to influence Canvas-specific behavior.
+
+#### `https://canvas.instructure.com/lti/module_name`
+
+**Type:** string | absent
+
+**Applicable placements:** `module_index_menu_modal`, `course_assignments_menu`
+
+When Canvas creates a new module as part of processing a deep linking response (i.e. the placement triggers automatic module creation), this claim sets the name of that module. If omitted or blank, Canvas defaults to _"New Content From App"_.
+
+**Example:**
+
+```json
+{
+  "https://canvas.instructure.com/lti/module_name": "Week 3 Activities"
+}
+```
+
 ### Relevant Code
 
 [`Lti::Messages::DeepLinkingRequest`](/lib/lti/messages/deep_linking_request.rb) builds the LTI message that gets sent during a deep linking request, and also houses the per-placement configuration for allowing deep linking.
