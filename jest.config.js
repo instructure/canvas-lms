@@ -19,9 +19,17 @@
 const {defaults} = require('jest-config')
 const {swc} = require('./ui-build/webpack/webpack.rules')
 
-const esModules = ['chai', 'mime', 'react-dnd', 'dnd-core', '@react-dnd', 'graphql-request'].join(
-  '|',
-)
+const esModules = [
+  'chai',
+  'mime',
+  'react-dnd',
+  'dnd-core',
+  '@react-dnd',
+  'graphql-request',
+  'p-queue',
+  'p-timeout',
+  'eventemitter3',
+].join('|')
 
 const baseSetupFilesAfterEnv = [
   '<rootDir>/jest/stubInstUi.js',
