@@ -4498,11 +4498,19 @@ describe GradebooksController do
   end
 
   describe "#grading_rubrics" do
+    def create_rubric_with_association(title: "Test Rubric", context: nil)
+      ctx = context || @course
+      rubric = Rubric.create!(context: ctx, title:)
+      RubricAssociation.create!(context: ctx, rubric:, association_object: ctx, purpose: :bookmark)
+      rubric
+    end
+
     context "sharding" do
       specs_require_sharding
 
+      before { user_session(@teacher) }
+
       it "fetches rubrics from a cross-shard course" do
-        user_session(@teacher)
         @shard1.activate do
           a = Account.create!
           @cs_course = Course.create!(name: "cs_course", account: a)
@@ -4515,6 +4523,39 @@ describe GradebooksController do
         json = json_parse(response.body)
         expect(json.first["rubric_association"]["rubric_id"]).to eq @rubric.global_id.to_s
         expect(json.first["rubric_association"]["context_code"]).to eq @cs_course.global_asset_string
+      end
+
+      it "lists cross-shard courses in rubric contexts without context_code" do
+        @shard1.activate do
+          a = Account.create!
+          @cs_course = Course.create!(name: "CS Course", account: a)
+          r = Rubric.create!(context: @cs_course, title: "CS Rubric")
+          RubricAssociation.create!(context: @cs_course, rubric: r, purpose: :bookmark, association_object: @cs_course)
+          @cs_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+        end
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        context_codes = json.pluck("context_code")
+        expect(context_codes).to include(@cs_course.global_asset_string)
+      end
+
+      it "reports correct rubric count for cross-shard course without context_code" do
+        @shard1.activate do
+          a = Account.create!
+          @cs_course = Course.create!(name: "CS Course", account: a)
+          2.times do |i|
+            r = Rubric.create!(context: @cs_course, title: "CS Rubric #{i}")
+            RubricAssociation.create!(context: @cs_course, rubric: r, purpose: :bookmark, association_object: @cs_course)
+          end
+          @cs_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+        end
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        cs_entry = json.find { |c| c["context_code"] == @cs_course.global_asset_string }
+        expect(cs_entry).not_to be_nil
+        expect(cs_entry["rubrics"]).to eq(2)
       end
     end
 
@@ -4533,8 +4574,24 @@ describe GradebooksController do
         expect(response).to be_successful
       end
 
+      it "allows TAs to view rubrics" do
+        ta = User.create!
+        @course.enroll_user(ta, "TaEnrollment", enrollment_state: "active")
+        user_session(ta)
+
+        get "grading_rubrics", params: { course_id: @course }
+        expect(response).to be_successful
+      end
+
       it "forbids viewing if the user lacks appropriate permissions" do
         user_session(@student)
+
+        get "grading_rubrics", params: { course_id: @course }
+        expect(response).to be_unauthorized
+      end
+
+      it "forbids observers from viewing rubrics" do
+        user_session(@observer)
 
         get "grading_rubrics", params: { course_id: @course }
         expect(response).to be_unauthorized
@@ -4544,6 +4601,289 @@ describe GradebooksController do
         get "grading_rubrics", params: { course_id: @course }
 
         expect(response).to redirect_to(login_url)
+      end
+    end
+
+    context "without context_code param" do
+      before { user_session(@teacher) }
+
+      it "returns an empty array when no rubric associations exist" do
+        get "grading_rubrics", params: { course_id: @course }
+        expect(json_parse(response.body)).to eq([])
+      end
+
+      it "returns context summaries with rubrics, context_code, and name keys" do
+        create_rubric_with_association
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        expect(json.length).to eq(1)
+        # name uses context.short_name, not context.name
+        expect(json.first).to include(
+          "rubrics" => 1,
+          "context_code" => @course.asset_string,
+          "name" => @course.short_name
+        )
+      end
+
+      it "reflects the count of bookmarked active associations in rubrics" do
+        3.times { |i| create_rubric_with_association(title: "Rubric #{i}") }
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        course_entry = json.find { |c| c["context_code"] == @course.asset_string }
+        expect(course_entry["rubrics"]).to eq(3)
+      end
+
+      it "returns contexts sorted by name" do
+        # course_code becomes short_name, which rubric_contexts uses for the name field
+        a_course = Course.create!(name: "A Course", course_code: "AAA Course", workflow_state: "available")
+        z_course = Course.create!(name: "Z Course", course_code: "ZZZ Course", workflow_state: "available")
+        [a_course, z_course].each do |c|
+          c.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+          rubric = Rubric.create!(context: c, title: "Rubric")
+          RubricAssociation.create!(context: c, rubric:, association_object: c, purpose: :bookmark)
+        end
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        a_idx = json.index { |c| c["context_code"] == a_course.asset_string }
+        z_idx = json.index { |c| c["context_code"] == z_course.asset_string }
+        expect(a_idx).not_to be_nil
+        expect(z_idx).not_to be_nil
+        expect(a_idx).to be < z_idx
+      end
+
+      it "excludes non-bookmarked rubric associations" do
+        rubric = Rubric.create!(context: @course, title: "Test Rubric")
+        RubricAssociation.create!(
+          context: @course,
+          rubric:,
+          association_object: @course,
+          purpose: :grading,
+          bookmarked: false
+        )
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        course_entry = json.find { |c| c["context_code"] == @course.asset_string }
+        expect(course_entry).to be_nil
+      end
+
+      it "excludes deleted rubric associations" do
+        rubric = Rubric.create!(context: @course, title: "Test Rubric")
+        ra = RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        ra.update_columns(workflow_state: "deleted")
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        course_entry = json.find { |c| c["context_code"] == @course.asset_string }
+        expect(course_entry).to be_nil
+      end
+
+      it "excludes associations with non-active rubrics" do
+        %w[archived deleted].each do |state|
+          rubric = Rubric.create!(context: @course, title: "#{state} Rubric", workflow_state: state)
+          RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        end
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        course_entry = json.find { |c| c["context_code"] == @course.asset_string }
+        expect(course_entry).to be_nil
+      end
+
+      it "deduplicates multiple associations for the same rubric_id within a context" do
+        rubric = Rubric.create!(context: @course, title: "Test Rubric")
+        2.times do
+          RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        end
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        course_entry = json.find { |c| c["context_code"] == @course.asset_string }
+        expect(course_entry["rubrics"]).to eq(1)
+      end
+
+      it "includes contexts from the parent account hierarchy" do
+        account = @course.account
+        create_rubric_with_association(context: account, title: "Account Rubric")
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        account_entry = json.find { |c| c["context_code"] == account.asset_string }
+        expect(account_entry).not_to be_nil
+        expect(account_entry["rubrics"]).to eq(1)
+      end
+
+      it "includes contexts from concluded instructor courses" do
+        concluded_course = Course.create!(workflow_state: "available")
+        enrollment = concluded_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+        enrollment.update_columns(workflow_state: "completed")
+
+        create_rubric_with_association(context: concluded_course, title: "Old Rubric")
+
+        get "grading_rubrics", params: { course_id: @course }
+        json = json_parse(response.body)
+        cc_entry = json.find { |c| c["context_code"] == concluded_course.asset_string }
+        expect(cc_entry).not_to be_nil
+        expect(cc_entry["rubrics"]).to eq(1)
+      end
+    end
+
+    context "with context_code param" do
+      before { user_session(@teacher) }
+
+      it "returns rubric associations with embedded rubric and context_name" do
+        rubric = create_rubric_with_association
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        json = json_parse(response.body)
+        ra_json = json.first["rubric_association"]
+        expect(ra_json["rubric_id"]).to eq(rubric.id.to_s)
+        expect(ra_json["rubric"]).to be_present
+        expect(ra_json["context_name"]).to eq(@course.short_name)
+      end
+
+      it "stringifies all IDs in the response" do
+        create_rubric_with_association
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        ra_json = json_parse(response.body).first["rubric_association"]
+        expect(ra_json["id"]).to be_a(String)
+        expect(ra_json["rubric_id"]).to be_a(String)
+        expect(ra_json["context_id"]).to be_a(String)
+        expect(ra_json["rubric"]["id"]).to be_a(String)
+      end
+
+      it "sets shard-aware context_code on rubric_association" do
+        create_rubric_with_association
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        ra_json = json_parse(response.body).first["rubric_association"]
+        expect(ra_json["context_code"]).to eq(@course.asset_string)
+      end
+
+      it "sets shard-aware context_code on the nested rubric" do
+        create_rubric_with_association
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        ra_json = json_parse(response.body).first["rubric_association"]
+        expect(ra_json["rubric"]["context_code"]).to eq(@course.asset_string)
+      end
+
+      it "returns an empty array when context has no bookmarked active associations" do
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        expect(json_parse(response.body)).to eq([])
+      end
+
+      it "falls back to the current course when context_code is not in rubric_contexts" do
+        rubric = create_rubric_with_association
+        other_course = Course.create! # teacher not enrolled, not in rubric_contexts
+
+        get "grading_rubrics", params: { course_id: @course, context_code: other_course.asset_string }
+        json = json_parse(response.body)
+        expect(json.length).to eq(1)
+        expect(json.first["rubric_association"]["rubric_id"]).to eq(rubric.id.to_s)
+      end
+
+      it "falls back to the current course when context_code refers to a nonexistent context" do
+        rubric = create_rubric_with_association
+        nonexistent_code = "course_0" # valid format but no such record
+
+        get "grading_rubrics", params: { course_id: @course, context_code: nonexistent_code }
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.length).to eq(1)
+        expect(json.first["rubric_association"]["rubric_id"]).to eq(rubric.id.to_s)
+      end
+
+      it "excludes non-bookmarked rubric associations" do
+        rubric = Rubric.create!(context: @course, title: "Test Rubric")
+        RubricAssociation.create!(
+          context: @course,
+          rubric:,
+          association_object: @course,
+          purpose: :grading,
+          bookmarked: false
+        )
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        expect(json_parse(response.body)).to eq([])
+      end
+
+      it "excludes deleted rubric associations" do
+        rubric = Rubric.create!(context: @course, title: "Test Rubric")
+        ra = RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        ra.update_columns(workflow_state: "deleted")
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        expect(json_parse(response.body)).to eq([])
+      end
+
+      it "excludes associations with non-active rubrics" do
+        %w[archived deleted].each do |state|
+          rubric = Rubric.create!(context: @course, title: "#{state} Rubric", workflow_state: state)
+          RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        end
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        expect(json_parse(response.body)).to eq([])
+      end
+
+      it "deduplicates multiple associations for the same rubric_id" do
+        rubric = Rubric.create!(context: @course, title: "Test Rubric")
+        2.times do
+          RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        end
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        expect(json_parse(response.body).length).to eq(1)
+      end
+
+      it "returns rubrics sorted alphabetically by title" do
+        %w[Zebra Apple Mango].each do |title|
+          create_rubric_with_association(title:)
+        end
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        titles = json_parse(response.body).map { |item| item["rubric_association"]["rubric"]["title"] }
+        expect(titles).to eq(%w[Apple Mango Zebra])
+      end
+
+      it "sorts nil-title rubrics last" do
+        titled = Rubric.create!(context: @course, title: "Named Rubric")
+        # Create association before setting nil to prevent populate_rubric_title
+        # from resetting the title during the after_create :update_rubric callback
+        untitled = Rubric.create!(context: @course, title: "Temp")
+        [titled, untitled].each do |r|
+          RubricAssociation.create!(context: @course, rubric: r, association_object: @course, purpose: :bookmark)
+        end
+        untitled.update_columns(title: nil)
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        titles = json_parse(response.body).map { |item| item["rubric_association"]["rubric"]["title"] }
+        expect(titles.last).to be_nil
+        expect(titles.first).to eq("Named Rubric")
+      end
+
+      it "returns all rubrics for the given context" do
+        3.times { |i| create_rubric_with_association(title: "Rubric #{i}") }
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+        expect(json_parse(response.body).length).to eq(3)
+      end
+
+      it "returns rubrics from an account context when context_code is an account" do
+        account = @course.account
+        rubric = Rubric.create!(context: account, title: "Account Rubric")
+        RubricAssociation.create!(context: account, rubric:, association_object: account, purpose: :bookmark)
+
+        get "grading_rubrics", params: { course_id: @course, context_code: account.asset_string }
+        json = json_parse(response.body)
+        expect(json.length).to eq(1)
+        expect(json.first["rubric_association"]["rubric_id"]).to eq(rubric.id.to_s)
+        expect(json.first["rubric_association"]["context_code"]).to eq(account.asset_string)
       end
     end
   end
