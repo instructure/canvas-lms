@@ -248,7 +248,7 @@ rce_a11y_resize:
 rce_asr_captioning_improvements:
   state: hidden
   applies_to: RootAccount
-  display_name: RCE Automated Captioning
+  display_name: Video Caption Generation
   description: |-
     Allows users to enable the rolling transcript for Canvas media and request captions for media added to RCE content.
 
