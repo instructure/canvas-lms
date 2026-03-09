@@ -69,6 +69,7 @@ describe('AddLinkModal', () => {
     expect(mockProps.onAdd).toHaveBeenCalledWith({
       label: 'TestLink',
       url: 'https://example.com',
+      placements: {course_nav: true, account_nav: false, user_nav: false},
     })
   })
 
@@ -161,5 +162,36 @@ describe('AddLinkModal', () => {
   it('shows required indicators on both fields', () => {
     expect(textInput).toBeRequired()
     expect(linkInput).toBeRequired()
+  })
+
+  describe('with multiple availablePlacements', () => {
+    it('shows placement checkboxes and submits selected placements', async () => {
+      const onAdd = jest.fn()
+      render(
+        <AddLinkModal
+          onDismiss={jest.fn()}
+          onAdd={onAdd}
+          availablePlacements={['course_nav', 'account_nav']}
+        />,
+      )
+
+      const [textIn, linkIn] = (await screen.findAllByRole('textbox')).slice(
+        -2,
+      ) as HTMLInputElement[]
+      fireEvent.change(textIn, {target: {value: 'My Link'}})
+      fireEvent.change(linkIn, {target: {value: 'https://example.com'}})
+
+      // course_nav is pre-checked; also check account_nav
+      const accountCheckbox = screen.getByRole('checkbox', {name: 'Account Navigation'})
+      await user.click(accountCheckbox)
+
+      await user.click(screen.getAllByRole('button', {name: 'Add'}).at(-1)!)
+
+      expect(onAdd).toHaveBeenCalledWith({
+        label: 'My Link',
+        url: 'https://example.com',
+        placements: {course_nav: true, account_nav: true, user_nav: false},
+      })
+    })
   })
 })

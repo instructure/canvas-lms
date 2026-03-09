@@ -112,16 +112,40 @@ describe NavMenuLink do
   describe ".as_existing_link_objects" do
     before do
       @link1 = NavMenuLink.create!(context: @account, label: "Link One", url: "https://example.com/1", course_nav: true)
-      @link2 = NavMenuLink.create!(context: @account, label: "Link Two", url: "https://example.com/2", course_nav: true)
+      @link2 = NavMenuLink.create!(context: @account, label: "Link Two", url: "https://example.com/2", account_nav: true)
       @link3 = NavMenuLink.create!(context: @account, label: "Link Three", url: "https://example.com/3", course_nav: true, workflow_state: :deleted)
     end
 
-    it "returns an array of link objects with type, id, and label" do
+    it "returns an array of link objects with type, id, label, and placements" do
       result = NavMenuLink.active.where(context: @account).order(:id).as_existing_link_objects
       expect(result).to eq([
-                             { type: "existing", id: @link1.id, label: "Link One" },
-                             { type: "existing", id: @link2.id, label: "Link Two" },
+                             { type: "existing", id: @link1.id, label: "Link One", placements: { course_nav: true, account_nav: false, user_nav: false } },
+                             { type: "existing", id: @link2.id, label: "Link Two", placements: { course_nav: false, account_nav: true, user_nav: false } },
                            ])
+    end
+
+    it "derives placements from account_nav" do
+      link = NavMenuLink.create!(context: @account, label: "Account Link", url: "https://example.com", account_nav: true)
+      result = NavMenuLink.where(id: link.id).as_existing_link_objects
+      expect(result.first[:placements]).to eq({ course_nav: false, account_nav: true, user_nav: false })
+    end
+
+    it "derives placements from user_nav" do
+      link = NavMenuLink.create!(context: @account, label: "User Link", url: "https://example.com", user_nav: true)
+      result = NavMenuLink.where(id: link.id).as_existing_link_objects
+      expect(result.first[:placements]).to eq({ course_nav: false, account_nav: false, user_nav: true })
+    end
+
+    it "includes course_nav in placements" do
+      link = NavMenuLink.create!(context: @account, label: "Course Link", url: "https://example.com", course_nav: true)
+      result = NavMenuLink.where(id: link.id).as_existing_link_objects
+      expect(result.first[:placements]).to eq({ course_nav: true, account_nav: false, user_nav: false })
+    end
+
+    it "includes multiple nav types in placements when multiple nav types enabled" do
+      link = NavMenuLink.create!(context: @account, label: "Multi Link", url: "https://example.com", account_nav: true, user_nav: true)
+      result = NavMenuLink.where(id: link.id).as_existing_link_objects
+      expect(result.first[:placements]).to eq({ course_nav: false, account_nav: true, user_nav: true })
     end
   end
 
@@ -150,8 +174,8 @@ describe NavMenuLink do
     it "handles both creating new links and removing old links" do
       link_objects = [
         { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
-        { type: "new", url: "https://example.com/new1", label: "New Link 1" },
-        { type: "new", url: "https://example.com/new2", label: "New Link 2" }
+        { type: "new", url: "https://example.com/new1", label: "New Link 1", placements: { course_nav: true } },
+        { type: "new", url: "https://example.com/new2", label: "New Link 2", placements: { course_nav: true } }
       ]
 
       expect do
@@ -166,7 +190,7 @@ describe NavMenuLink do
 
     it "handles string and symbol keys in link objects" do
       link_objects = [
-        { "type" => "new", "url" => "https://example.com/new", "label" => "New Link" }
+        { "type" => "new", "url" => "https://example.com/new", "label" => "New Link", "placements" => { "course_nav" => true } }
       ]
 
       expect do
@@ -175,6 +199,44 @@ describe NavMenuLink do
 
       new_link = NavMenuLink.active.where(context: @account).order(:id).last
       expect(new_link.label).to eq("New Link")
+    end
+
+    it "creates links with account_nav when placements has account_nav: true" do
+      link_objects = [
+        { type: "new", url: "https://example.com/new", label: "Account Nav Link", placements: { account_nav: true } }
+      ]
+
+      NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+
+      new_link = NavMenuLink.active.where(context: @account, label: "Account Nav Link").first
+      expect(new_link.account_nav).to be true
+      expect(new_link.course_nav).to be false
+      expect(new_link.user_nav).to be false
+    end
+
+    it "creates links with course_nav when placements has course_nav: true" do
+      link_objects = [
+        { type: "new", url: "https://example.com/new", label: "Course Nav Link", placements: { course_nav: true } }
+      ]
+
+      NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+
+      new_link = NavMenuLink.active.where(context: @account, label: "Course Nav Link").first
+      expect(new_link.course_nav).to be true
+      expect(new_link.account_nav).to be false
+    end
+
+    it "creates links with multiple nav types when placements has multiple nav types enabled" do
+      link_objects = [
+        { type: "new", url: "https://example.com/new", label: "Multi Nav Link", placements: { account_nav: true, user_nav: true } }
+      ]
+
+      NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+
+      new_link = NavMenuLink.active.where(context: @account, label: "Multi Nav Link").first
+      expect(new_link.account_nav).to be true
+      expect(new_link.user_nav).to be true
+      expect(new_link.course_nav).to be false
     end
 
     it "only affects links for the specified context" do
@@ -195,7 +257,7 @@ describe NavMenuLink do
         link_objects = [
           { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
           { type: "existing", id: @link2.id.to_s, label: "Existing Link 2" },
-          { type: "new", url: "https://example.com/new", label: "New Link" }
+          { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
         ]
 
         nav_cache = instance_double(Lti::NavigationCache)
@@ -220,7 +282,7 @@ describe NavMenuLink do
       it "invalidates navigation cache when links are both added and removed" do
         link_objects = [
           { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
-          { type: "new", url: "https://example.com/new", label: "New Link" }
+          { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
         ]
 
         nav_cache = instance_double(Lti::NavigationCache)
@@ -245,7 +307,7 @@ describe NavMenuLink do
         root_account = @account.root_account
         subaccount = Account.create!(parent_account: root_account)
         link_objects = [
-          { type: "new", url: "https://example.com/new", label: "New Link" }
+          { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
         ]
 
         nav_cache = instance_double(Lti::NavigationCache)

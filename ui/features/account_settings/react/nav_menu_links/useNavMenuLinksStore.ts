@@ -16,12 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvCommon} from '@canvas/global/env/EnvCommon';
+import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {create} from 'zustand'
 
+export type NavMenuPlacements = {course_nav: boolean; account_nav: boolean; user_nav: boolean}
+
 // See nav_menu_link.rb#as_existing_link_objects and #sync_with_link_objects
-export type ExistingNavMenuLink = {type: 'existing'; label: string; id: string}
-export type NewNavMenuLink = {type: 'new'; url: string; label: string}
+export type ExistingNavMenuLink = {
+  type: 'existing'
+  label: string
+  id: string
+  placements: NavMenuPlacements
+}
+export type NewNavMenuLink = {
+  type: 'new'
+  url: string
+  label: string
+  placements: NavMenuPlacements
+}
 export type NavMenuLink = ExistingNavMenuLink | NewNavMenuLink
 
 declare const ENV: EnvCommon & {

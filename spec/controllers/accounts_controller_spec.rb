@@ -3286,7 +3286,7 @@ describe AccountsController do
       # Update: keep one existing link, remove the other, and add a new link
       link_objects = [
         { type: "existing", id: link_to_keep.id.to_s, label: "Keep This" },
-        { type: "new", url: "https://example.com/new", label: "New Link" }
+        { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
       ].to_json
 
       expect do
@@ -3326,7 +3326,7 @@ describe AccountsController do
         @account.root_account.enable_feature!(:nav_menu_links)
 
         link_objects = [
-          { type: "new", url: "https://example.com/new", label: "New Link" }
+          { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
         ].to_json
 
         expect(NavMenuLink).to receive(:sync_with_link_objects_json)
@@ -3394,8 +3394,8 @@ describe AccountsController do
       get "settings", params: { account_id: @account.id }
 
       expect(assigns[:js_env][:NAV_MENU_LINKS]).to eq([
-                                                        { type: "existing", id: @link1.id, label: "Link One" },
-                                                        { type: "existing", id: @link2.id, label: "Link Two" }
+                                                        { type: "existing", id: @link1.id, label: "Link One", placements: { course_nav: true, account_nav: false, user_nav: false } },
+                                                        { type: "existing", id: @link2.id, label: "Link Two", placements: { course_nav: true, account_nav: false, user_nav: false } }
                                                       ])
     end
 

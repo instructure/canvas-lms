@@ -51,8 +51,8 @@ class NavMenuLink < ActiveRecord::Base
 
   # See useNavMenuLinksStore.ts
   def self.as_existing_link_objects
-    pluck(:id, :label).map do |(id, label)|
-      { type: "existing", id:, label: }
+    pluck(:id, :label, :course_nav, :account_nav, :user_nav).map do |(id, label, course_nav, account_nav, user_nav)|
+      { type: "existing", id:, label:, placements: { course_nav:, account_nav:, user_nav: } }
     end
   end
 
@@ -81,7 +81,11 @@ class NavMenuLink < ActiveRecord::Base
 
     transaction do
       new_links.each do |link|
-        NavMenuLink.create!(url: link[:url]&.to_s, label: link[:label]&.to_s, context:, course_nav: true)
+        placements = link[:placements] || {}
+        course_nav = placements[:course_nav] || false
+        account_nav = placements[:account_nav] || false
+        user_nav = placements[:user_nav] || false
+        NavMenuLink.create!(url: link[:url]&.to_s, label: link[:label]&.to_s, context:, course_nav:, account_nav:, user_nav:)
       end
       where(context:, id: link_ids_to_remove.to_a).destroy_all if link_ids_to_remove.any?
     end

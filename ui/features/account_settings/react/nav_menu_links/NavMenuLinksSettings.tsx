@@ -23,7 +23,11 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconMoreSolid, IconLinkLine, IconTrashLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Flex} from '@instructure/ui-flex'
-import {useNavMenuLinksStore} from './useNavMenuLinksStore'
+import {
+  useNavMenuLinksStore,
+  type NavMenuLink,
+  type NavMenuPlacements,
+} from './useNavMenuLinksStore'
 import {useState} from 'react'
 import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
 import {Tag} from '@instructure/ui-tag'
@@ -52,7 +56,12 @@ export default function NavMenuLinksSettings(): JSX.Element {
       <legend>{I18n.t('Custom Links')}</legend>
       <ul className="ic-Sortable-list">
         {links.map((link, index) => (
-          <NavMenuLink key={index} label={link.label} onDelete={() => deleteLink(index)} />
+          <NavMenuLink
+            key={index}
+            label={link.label}
+            placements={link.placements}
+            onDelete={() => deleteLink(index)}
+          />
         ))}
       </ul>
       {ENV.PERMISSIONS?.manage_nav_menu_links && (
@@ -61,7 +70,11 @@ export default function NavMenuLinksSettings(): JSX.Element {
             {I18n.t('Add a Link')}
           </Button>
           {isAddLinkModalOpen && (
-            <AddLinkModal onDismiss={() => setIsAddLinkModalOpen(false)} onAdd={appendLink} />
+            <AddLinkModal
+              onDismiss={() => setIsAddLinkModalOpen(false)}
+              onAdd={appendLink}
+              availablePlacements={['course_nav', 'account_nav']}
+            />
           )}
         </View>
       )}
@@ -70,12 +83,23 @@ export default function NavMenuLinksSettings(): JSX.Element {
   )
 }
 
+type NavMenuPlacementKey = keyof NavMenuPlacements
+
+const ALL_PLACEMENTS: NavMenuPlacementKey[] = ['course_nav', 'account_nav', 'user_nav']
+
+const PLACEMENT_LABELS: Record<NavMenuPlacementKey, () => string> = {
+  course_nav: () => I18n.t('Course Navigation'),
+  account_nav: () => I18n.t('Account Navigation'),
+  user_nav: () => I18n.t('User Navigation'),
+}
+
 type NavMenuLinkProps = {
   label: string
+  placements: NavMenuPlacements
   onDelete: () => void
 }
 
-function NavMenuLink({label, onDelete}: NavMenuLinkProps): JSX.Element {
+function NavMenuLink({label, placements, onDelete}: NavMenuLinkProps): JSX.Element {
   return (
     <li className="ic-Sortable-item">
       <div className="ic-Sortable-item__Text">
@@ -86,9 +110,14 @@ function NavMenuLink({label, onDelete}: NavMenuLinkProps): JSX.Element {
           <Flex.Item margin="0 xx-small 0 xxx-small" shouldGrow shouldShrink size="0">
             <Text wrap="break-word">{label}</Text>
           </Flex.Item>
-          <Flex.Item>
-            <Tag text={I18n.t('Course Navigation')} />
-          </Flex.Item>
+          {ALL_PLACEMENTS.map(
+            p =>
+              placements[p] && (
+                <Flex.Item key={p}>
+                  <Tag text={PLACEMENT_LABELS[p]()} />
+                </Flex.Item>
+              ),
+          )}
         </Flex>
       </div>
       {ENV.PERMISSIONS?.manage_nav_menu_links && (
@@ -118,4 +147,3 @@ function NavMenuLink({label, onDelete}: NavMenuLinkProps): JSX.Element {
     </li>
   )
 }
-NavMenuLink.displayName = 'NavMenuLink'
