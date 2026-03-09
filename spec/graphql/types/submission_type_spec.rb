@@ -2572,6 +2572,7 @@ describe Types::SubmissionType do
 
   describe "auto_grade_submission_issues" do
     before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
         .with(submission: @submission)
         .and_return({ level: "error", message: "Test error" })
@@ -2585,9 +2586,9 @@ describe Types::SubmissionType do
 
     it "returns issues when project_lhotse feature flag is enabled" do
       @course.enable_feature!(:project_lhotse)
-      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
       level = submission_type.resolve("autoGradeSubmissionIssues { level }")
       message = submission_type.resolve("autoGradeSubmissionIssues { message }")
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to have_received(:validate_submission).at_least(:once)
       expect(level).to eq "error"
       expect(message).to eq "Test error"
     end
@@ -2595,6 +2596,7 @@ describe Types::SubmissionType do
 
   describe "auto_grade_submission_errors" do
     before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
         .with(submission: @submission)
         .and_return({ level: "error", message: "Test error" })
@@ -2608,8 +2610,9 @@ describe Types::SubmissionType do
 
     it "returns error messages when project_lhotse feature flag is enabled" do
       @course.enable_feature!(:project_lhotse)
-      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
-      expect(submission_type.resolve("autoGradeSubmissionErrors")).to eq(["Test error"])
+      result = submission_type.resolve("autoGradeSubmissionErrors")
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to have_received(:validate_submission)
+      expect(result).to eq(["Test error"])
     end
   end
 
