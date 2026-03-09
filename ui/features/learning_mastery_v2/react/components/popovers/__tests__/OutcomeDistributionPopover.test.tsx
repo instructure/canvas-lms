@@ -65,32 +65,41 @@ vi.mock('@canvas/message-students-modal', () => {
   }
 })
 
-vi.mock(
-  '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager',
-  () => {
-    return {
-      default: function DifferentiationTagModalManager({
-        isOpen,
-        onClose,
-        onCreationSuccess,
-        courseId,
-      }: any) {
-        return isOpen ? (
-          <div data-testid="differentiation-tag-modal" data-course-id={courseId}>
-            <h2>Create Differentiation Tag</h2>
-            <button onClick={onClose}>Close Modal</button>
-            <button data-testid="create-tag-button" onClick={() => onCreationSuccess?.(123)}>
-              Create Tag
-            </button>
-            <button data-testid="create-tag-no-id-button" onClick={() => onCreationSuccess?.(0)}>
-              Create Tag No ID
-            </button>
-          </div>
-        ) : null
-      },
-    }
-  },
-)
+vi.mock('@canvas/differentiation-tags/react/TagAsModal/TagAsModalManager', () => {
+  return {
+    default: function DifferentiationTagModalManager({
+      isOpen,
+      onClose,
+      onCreationSuccess,
+      courseId,
+    }: any) {
+      return isOpen ? (
+        <div data-testid="differentiation-tag-modal" data-course-id={courseId}>
+          <h2>Create Differentiation Tag</h2>
+          <button onClick={onClose}>Close Modal</button>
+          <button
+            data-testid="create-tag-button"
+            onClick={() => {
+              onCreationSuccess?.(123)
+              onClose?.()
+            }}
+          >
+            Create Tag
+          </button>
+          <button
+            data-testid="create-tag-no-id-button"
+            onClick={() => {
+              onCreationSuccess?.(0)
+              onClose?.()
+            }}
+          >
+            Create Tag No ID
+          </button>
+        </div>
+      ) : null
+    },
+  }
+})
 
 const mockAddTagMembership = vi.fn()
 vi.mock('@canvas/differentiation-tags/react/hooks/useAddTagMembership', () => ({
@@ -99,9 +108,14 @@ vi.mock('@canvas/differentiation-tags/react/hooks/useAddTagMembership', () => ({
   }),
 }))
 
+vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: vi.fn(() => vi.fn()),
+  showFlashError: vi.fn(() => vi.fn()),
+}))
+
 describe('OutcomeDistributionPopover', () => {
   beforeEach(() => {
-    mockAddTagMembership.mockClear()
+    vi.clearAllMocks()
   })
 
   const outcome: Outcome = {
@@ -869,10 +883,13 @@ describe('OutcomeDistributionPopover', () => {
       const createTagButton = screen.getByTestId('create-tag-button')
       await user.click(createTagButton)
 
-      expect(mockAddTagMembership).toHaveBeenCalledWith({
-        groupId: 123,
-        userIds: [1, 2, 3],
-      })
+      expect(mockAddTagMembership).toHaveBeenCalledWith(
+        {groupId: 123, userIds: [1, 2, 3]},
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
+      )
 
       expect(screen.queryByTestId('differentiation-tag-modal')).not.toBeInTheDocument()
     })
