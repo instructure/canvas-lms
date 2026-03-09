@@ -2309,6 +2309,7 @@ class Account < ActiveRecord::Base
 
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
+    tabs += NavMenuLinkTabs.account_tabs(self) if root_account.feature_enabled?(:nav_menu_links)
     Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(tabs)
 
     if feature_enabled?(:new_quizzes_native_experience)

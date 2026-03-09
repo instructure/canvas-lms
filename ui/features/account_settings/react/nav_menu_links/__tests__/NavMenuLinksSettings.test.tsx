@@ -111,7 +111,14 @@ describe('NavMenuLinksSettings', () => {
   it('calls deleteLink when delete is clicked', () => {
     const mockDeleteLink = vi.fn()
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
-      links: [{type: 'existing', id: '1', label: 'Link to Delete'}],
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          label: 'Link to Delete',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
       appendLink: vi.fn(),
       deleteLink: mockDeleteLink,
     })
@@ -129,8 +136,18 @@ describe('NavMenuLinksSettings', () => {
 
   it('renders hidden input with serialized links JSON', () => {
     const links = [
-      {type: 'existing', id: '1', label: 'Link 1'},
-      {type: 'new', url: 'https://example.com/new', label: 'New Link'},
+      {
+        type: 'existing',
+        id: '1',
+        label: 'Link 1',
+        placements: {course_nav: true, account_nav: false, user_nav: false},
+      },
+      {
+        type: 'new',
+        url: 'https://example.com/new',
+        label: 'New Link',
+        placements: {course_nav: true, account_nav: false, user_nav: false},
+      },
     ]
 
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
@@ -149,9 +166,24 @@ describe('NavMenuLinksSettings', () => {
   it('renders links in correct order', () => {
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
       links: [
-        {type: 'existing', id: '1', label: 'First Link'},
-        {type: 'existing', id: '2', label: 'Second Link'},
-        {type: 'new', url: 'https://example.com', label: 'Third Link'},
+        {
+          type: 'existing',
+          id: '1',
+          label: 'First Link',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+        {
+          type: 'existing',
+          id: '2',
+          label: 'Second Link',
+          placements: {course_nav: false, account_nav: true, user_nav: false},
+        },
+        {
+          type: 'new',
+          url: 'https://example.com',
+          label: 'Third Link',
+          placements: {course_nav: false, account_nav: false, user_nav: true},
+        },
       ],
       appendLink: vi.fn(),
       deleteLink: vi.fn(),
