@@ -197,7 +197,9 @@ class SubmissionSearch
   end
 
   def order_by_username(search_scope:, direction:, sortable_name: false)
-    return order_by_anonymous_username(search_scope:, direction:) if @assignment.anonymize_students?
+    if @assignment.anonymize_students? || @assignment.new_quizzes_anonymous_participants?
+      return order_by_anonymous_username(search_scope:, direction:)
+    end
 
     order_clause = sortable_name ? User.sortable_name_order_by_clause("users") : User.name_order_by_clause("users")
     search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
