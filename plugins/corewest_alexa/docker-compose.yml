@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  alexa-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CANVAS_API_URL=${CANVAS_API_URL:-http://canvas-web:3000}
+      - CANVAS_API_TOKEN=${CANVAS_API_TOKEN:-}
+      - CACHE_TTL_SECONDS=${CACHE_TTL_SECONDS:-300}
+      - DEBUG=${DEBUG:-false}
+      - USE_MOCK_DATA=${USE_MOCK_DATA:-true}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+    restart: unless-stopped
+    networks:
+      - canvas-network
+
+networks:
+  canvas-network:
+    # Attach to the existing Canvas LMS network when running alongside Canvas.
+    # Change 'external: true' and set the correct name if Canvas runs in a
+    # separate compose project.
+    external: false
