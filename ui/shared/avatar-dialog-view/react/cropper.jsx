@@ -32,7 +32,7 @@ import Cropper from '@instructure/react-crop'
 //
 class CanvasCropper extends React.Component {
   static propTypes = {
-    imgFile: Cropper.propTypes.image, // selected image file object
+    imgFile: PropTypes.object, // selected image file object
     width: PropTypes.number, // desired cropped width
     height: PropTypes.number, // desired cropped height
     onImageLoaded: PropTypes.func, // if you care when the image is loaded

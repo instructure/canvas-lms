@@ -233,7 +233,7 @@ ready(() => {
     render(
       <CanvasMediaPlayer
         media_id={media_id || ''}
-        media_sources={href_source || media_object.media_sources}
+        media_sources={(href_source || media_object.media_sources) as any}
         media_tracks={mediaTracks}
         type={is_video ? 'video' : 'audio'}
         aria_label={aria_label}
