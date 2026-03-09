@@ -79,7 +79,7 @@ module Api::V1::Conversation
   def conversation_message_json(message, current_user, session)
     result = message.as_json
     result["participating_user_ids"] = message.conversation_message_participants.pluck(:user_id)
-    @file_association_access_enabled ||= message.root_account_feature_enabled?(:file_association_access)
+    @file_association_access_enabled ||= message.root_account_feature_enabled?(:file_association_access_conversation)
     url_opts = {}
     url_opts[:location] = message.asset_string if @file_association_access_enabled
     if result["media_comment"]
