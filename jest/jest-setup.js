@@ -80,6 +80,7 @@ const ignoredErrors = [
   /Warning: ReactDOMTestUtils is deprecated and will be removed in a future major release, because it exposes internal implementation details that are highly likely to change between releases. Upgrade to a modern testing library/,
   /Warning: %s: Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead./,
   /Warning: Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. We recommend using useRef\(\) or createRef\(\) instead. Learn more about using refs safely here: https:\/\/reactjs.org\/link\/strict-mode-string-ref/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
