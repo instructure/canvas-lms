@@ -3215,6 +3215,20 @@ describe Submission do
       end
     end
 
+    context "with NQ anonymous participants" do
+      before(:once) do
+        @assignment.update!(anonymous_participants: true)
+      end
+
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false when the user is not the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
+      end
+    end
+
     context "non-anonymous assignments" do
       it "returns true for any user" do
         student2 = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user

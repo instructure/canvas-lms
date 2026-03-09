@@ -759,7 +759,9 @@ class Submission < ActiveRecord::Base
   end
 
   def can_read_submission_user_name?(user, session)
-    return false if user_id != user.id && assignment.anonymize_students?
+    if user_id != user.id && (assignment.anonymize_students? || assignment.new_quizzes_anonymous_participants?)
+      return false
+    end
 
     !assignment.anonymous_peer_reviews? ||
       user_id == user.id ||
