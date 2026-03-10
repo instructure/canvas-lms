@@ -74,7 +74,7 @@ GEM
     psych (5.3.1)
       date
       stringio
-    public_suffix (7.0.2)
+    public_suffix (7.0.5)
     rake (13.3.1)
     rdoc (7.2.0)
       erb
