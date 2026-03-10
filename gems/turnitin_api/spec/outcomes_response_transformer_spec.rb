@@ -194,9 +194,9 @@ describe TurnitinApi::OutcomesResponseTransformer do
 
     it "allows subdomain URLs under turnitin.com" do
       transformer = described_class.new(oauth_key, oauth_secret, lti_params, {
-        "outcomes_tool_placement_url" => "https://api.turnitin.com/api/lti/1p0/outcome_tool_data/4321"
+        "outcomes_tool_placement_url" => "https://foo.turnitin.com/api/lti/1p0/outcome_tool_data/4321"
       })
-      stub_request(:post, "https://api.turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+      stub_request(:post, "https://foo.turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
       expect { transformer.response }.not_to raise_error
     end
