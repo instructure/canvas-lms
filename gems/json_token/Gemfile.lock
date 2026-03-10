@@ -10,7 +10,7 @@ GEM
   specs:
     base64 (0.3.0)
     diff-lcs (1.6.2)
-    json (2.19.0)
+    json (2.19.1)
     rake (13.3.1)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
