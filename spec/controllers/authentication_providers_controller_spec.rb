@@ -532,4 +532,39 @@ describe AuthenticationProvidersController do
       expect(account.discovery_page_active?).to be(false)
     end
   end
+
+  describe "#destroy with validation errors" do
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    before do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+      allow(Account.site_admin).to receive(:feature_enabled?)
+        .with(:new_login_ui_identity_discovery_page).and_return(true)
+      account.settings[:discovery_page] = {
+        active: true,
+        primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+        secondary: []
+      }
+      account.save!
+    end
+
+    context "HTML format" do
+      it "redirects with error flash" do
+        delete :destroy, params: { account_id: account.id, id: aac.id }
+
+        expect(response).to redirect_to(account_authentication_providers_path(account))
+        expect(flash[:error]).to include(match(/remove.*from the discovery page/))
+      end
+    end
+
+    context "JSON format" do
+      it "returns unprocessable_content with error messages" do
+        delete :destroy, params: { account_id: account.id, id: aac.id }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = response.parsed_body
+        expect(json["errors"]).to include(match(/remove.*from the discovery page/))
+      end
+    end
+  end
 end
