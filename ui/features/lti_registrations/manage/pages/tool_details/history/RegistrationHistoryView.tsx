@@ -57,6 +57,7 @@ const getAffectedFieldsSummary = (diff: LtiHistoryEntryWithDiff): string => {
   if (diff.internalConfig?.placements) categories.push(I18n.t('Placements'))
   if (diff.internalConfig?.naming) categories.push(I18n.t('Naming'))
   if (diff.internalConfig?.icons) categories.push(I18n.t('Icons'))
+  if (diff.internalConfig?.locked) categories.push(I18n.t('Lock Status'))
 
   if (categories.length === 0) {
     return I18n.t('Unknown')
