@@ -33,14 +33,14 @@ GEM
     globby (0.1.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    i18nliner (0.2.4)
+    i18nliner (0.3.0)
       activesupport (>= 6.0)
       erubi (~> 1.7)
       globby (>= 0.1.1)
       i18n (>= 1.8.6)
       nokogiri (>= 1.5.0)
+      prism (~> 1.8)
       ruby2ruby (~> 2.4)
-      ruby_parser (~> 3.10)
       sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
     logger (1.7.0)
@@ -73,9 +73,6 @@ GEM
     rspec-support (3.13.7)
     ruby2ruby (2.6.1)
       sexp_processor (~> 4.6)
-    ruby_parser (3.22.0)
-      racc (~> 1.5)
-      sexp_processor (~> 4.16)
     securerandom (0.4.1)
     sexp_processor (4.17.5)
     tzinfo (2.0.6)
@@ -92,7 +89,6 @@ PLATFORMS
 
 DEPENDENCIES
   i18n_extraction!
-  i18nliner (~> 0.2.4)
   rake
   rspec (~> 3.12)
 
