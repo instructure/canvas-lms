@@ -81,7 +81,7 @@ GEM
     rspec-support (3.13.7)
     securerandom (0.4.1)
     stringio (3.2.0)
-    timeout (0.6.0)
+    timeout (0.6.1)
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)

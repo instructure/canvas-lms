@@ -65,7 +65,7 @@ GEM
     sqlite3 (2.9.1-arm64-darwin)
     sqlite3 (2.9.1-x86_64-darwin)
     sqlite3 (2.9.1-x86_64-linux-gnu)
-    timeout (0.6.0)
+    timeout (0.6.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.1.1)
