@@ -522,9 +522,10 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.6.2)
     digest-murmurhash (1.1.1)
-    diplomat (2.6.5)
+    diplomat (2.6.6)
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
+      ostruct
     docile (1.4.1)
     docx (0.10.0)
       nokogiri (~> 1.13, >= 1.13.0)
