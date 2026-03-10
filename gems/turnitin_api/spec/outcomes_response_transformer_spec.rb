@@ -29,7 +29,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
     {
       "lis_result_sourcedid" => "6",
       "paperid" => "7",
-      "outcomes_tool_placement_url" => "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321"
+      "outcomes_tool_placement_url" => "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321"
     }
   end
 
@@ -51,7 +51,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
     end
 
     before do
-      stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+      stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(stubbed_response)
     end
 
@@ -105,7 +105,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
 
   describe "original_submission" do
     before do
-      stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+      stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
 
       stub_request(:post, "https://turnitin.com/api/lti/1p0/dow...72874634?lang=")
@@ -121,7 +121,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
 
   describe "originality report" do
     before do
-      stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+      stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
     end
 
@@ -132,7 +132,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
 
   describe "originality data" do
     before do
-      stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+      stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
     end
 
@@ -154,6 +154,51 @@ describe TurnitinApi::OutcomesResponseTransformer do
 
     it "returns uploaded_at" do
       expect(subject.uploaded_at).to eq "2015-10-24T19:48:40Z"
+    end
+  end
+
+  describe "validate_url! (SSRF protection)" do
+    it "raises InvalidUrlError when the URL uses HTTP instead of HTTPS" do
+      transformer = described_class.new(oauth_key, oauth_secret, lti_params, {
+        "outcomes_tool_placement_url" => "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321"
+      })
+      expect { transformer.response }.to raise_error(described_class::InvalidUrlError, /must use HTTPS/i)
+    end
+
+    it "raises InvalidUrlError when the host is not in the allowlist" do
+      transformer = described_class.new(oauth_key, oauth_secret, lti_params, {
+        "outcomes_tool_placement_url" => "https://evil.com/steal-credentials"
+      })
+      expect { transformer.response }.to raise_error(described_class::InvalidUrlError, /not in the list of allowed/i)
+    end
+
+    it "raises InvalidUrlError for internal/private addresses" do
+      transformer = described_class.new(oauth_key, oauth_secret, lti_params, {
+        "outcomes_tool_placement_url" => "https://localhost/internal"
+      })
+      expect { transformer.response }.to raise_error(described_class::InvalidUrlError, /not in the list of allowed/i)
+    end
+
+    it "raises InvalidUrlError for metadata service IP addresses" do
+      transformer = described_class.new(oauth_key, oauth_secret, lti_params, {
+        "outcomes_tool_placement_url" => "https://169.254.169.254/latest/meta-data"
+      })
+      expect { transformer.response }.to raise_error(described_class::InvalidUrlError, /not in the list of allowed/i)
+    end
+
+    it "allows valid HTTPS Turnitin URLs" do
+      stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+        .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
+      expect { subject.response }.not_to raise_error
+    end
+
+    it "allows subdomain URLs under turnitin.com" do
+      transformer = described_class.new(oauth_key, oauth_secret, lti_params, {
+        "outcomes_tool_placement_url" => "https://api.turnitin.com/api/lti/1p0/outcome_tool_data/4321"
+      })
+      stub_request(:post, "https://api.turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+        .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
+      expect { transformer.response }.not_to raise_error
     end
   end
 end

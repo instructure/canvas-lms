@@ -22,6 +22,7 @@ require "inst_statsd"
 require "active_support/core_ext/string/filters"
 require "faraday/follow_redirects"
 require "faraday/multipart"
+require "uri"
 
 module TurnitinApi
   class OutcomesResponseTransformer
@@ -32,6 +33,16 @@ module TurnitinApi
     attr_accessor :outcomes_response_json, :key, :lti_params
 
     class InvalidResponse < StandardError; end
+    class InvalidUrlError < StandardError; end
+
+    # Allowed hostnames for outbound Turnitin API requests.
+    # Restrict to only known Turnitin domains to prevent SSRF.
+    ALLOWED_HOSTS = %w[
+      turnitin.com
+      api.turnitin.com
+      www.turnitin.com
+      submittedwork.turnitin.com
+    ].freeze
 
     KNOWN_ERROR_MESSAGES = {
       api_login_failed: 'API Login failed: "oauth_signature" incorrect credentials and/or signature calculation',
@@ -89,6 +100,23 @@ module TurnitinApi
 
     private
 
+    # Validates that the URL is an absolute HTTPS URL pointing to an
+    # allowed Turnitin host, preventing Server-Side Request Forgery (SSRF).
+    def validate_url!(url)
+      uri = URI.parse(url.to_s)
+
+      unless uri.scheme == "https"
+        raise InvalidUrlError, "URL must use HTTPS: #{url.inspect}"
+      end
+
+      host = uri.host.to_s.downcase
+      unless ALLOWED_HOSTS.any? { |allowed| host == allowed || host.end_with?(".#{allowed}") }
+        raise InvalidUrlError, "URL host '#{host}' is not in the list of allowed Turnitin hosts"
+      end
+    rescue URI::InvalidURIError => e
+      raise InvalidUrlError, "Invalid URL: #{e.message}"
+    end
+
     def connection
       @connection ||= Faraday.new do |conn|
         conn.request :multipart
@@ -100,6 +128,8 @@ module TurnitinApi
     end
 
     def make_call(url)
+      validate_url!(url)  # SSRF guard: reject non-allowlisted hosts
+
       default_params = {
         "roles" => "Learner",
         "lti_message_type" => "basic-lti-launch-request",
