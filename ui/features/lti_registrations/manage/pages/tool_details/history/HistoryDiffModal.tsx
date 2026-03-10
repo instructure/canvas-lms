@@ -29,6 +29,7 @@ import {isEntryForConfigChange} from '../../../model/LtiRegistrationHistoryEntry
 import {ContextControlsDiff} from './diff_components/ContextControlsDiff'
 import {IconsDiff} from './diff_components/IconsDiff'
 import {LaunchSettingsDiff} from './diff_components/LaunchSettingsDiff'
+import {LockedDiff} from './diff_components/LockedDiff'
 import {NamingDiff} from './diff_components/NamingDiff'
 import {PermissionsDiff} from './diff_components/PermissionsDiff'
 import {PlacementsDiff} from './diff_components/PlacementsDiff'
@@ -186,6 +187,7 @@ const ConfigChangeBody = ({entry}: ConfigChangeBodyProps) => {
     entry.internalConfig?.placements,
     entry.internalConfig?.naming,
     entry.internalConfig?.icons,
+    entry.internalConfig?.locked,
   ].filter(Boolean)
 
   const fieldCount = changedSections.length
@@ -196,6 +198,7 @@ const ConfigChangeBody = ({entry}: ConfigChangeBodyProps) => {
       {entry.internalConfig?.launchSettings && (
         <LaunchSettingsDiff diff={entry.internalConfig.launchSettings} />
       )}
+      {entry.internalConfig?.locked && <LockedDiff diff={entry.internalConfig.locked} />}
       {entry.internalConfig?.permissions && (
         <PermissionsDiff diff={entry.internalConfig.permissions} />
       )}

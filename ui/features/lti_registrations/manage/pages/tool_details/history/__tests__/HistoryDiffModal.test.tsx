@@ -64,6 +64,7 @@ const mockConfigSnapshot = () => ({
     vendor: null,
     workflow_state: 'on' as const,
     description: null,
+    lock_deploying: false,
   },
   overlaid_internal_config: {
     custom_fields: {},
@@ -130,7 +131,8 @@ const mockConfigChangeEntryWithDiff = (
       ...(overrides.internalConfig?.placements || {}),
     },
     privacyLevel: null,
-    ...overrides.internalConfig,
+    locked: null,
+    ...(overrides.internalConfig ?? {}),
   },
   totalAdditions: 0,
   totalRemovals: 0,
@@ -161,6 +163,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: null,
@@ -202,6 +205,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: null,
@@ -245,6 +249,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: {
             redirectUris: {
               added: ['https://new.com/redirect', 'https://another.com/redirect'],
@@ -302,6 +307,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: {
             redirectUris: null,
             targetLinkUri: null,
@@ -351,6 +357,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: {
             redirectUris: null,
             targetLinkUri: null,
@@ -407,6 +414,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: {
             added: ['https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'],
@@ -458,6 +466,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: null,
@@ -528,6 +537,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: null,
@@ -622,6 +632,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: null,
@@ -677,6 +688,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: null,
@@ -724,6 +736,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: null,
           permissions: null,
           privacyLevel: {
@@ -827,6 +840,7 @@ describe('HistoryDiffModal', () => {
           },
         },
         internalConfig: {
+          locked: null,
           launchSettings: {
             redirectUris: {
               added: ['https://new.com/redirect'],
