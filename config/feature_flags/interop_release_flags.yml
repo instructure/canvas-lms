@@ -149,6 +149,17 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
+lock_lti_registrations:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Lock LTI Registrations
+  description: When enabled, admins can lock registrations to prevent deployment via client ID or course copy.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_deactivate_registrations:
   state: hidden
   shadow: true

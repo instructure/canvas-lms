@@ -558,6 +558,7 @@ class ApplicationController < ActionController::Base
     file_verifiers_for_quiz_links
     instui_nav
     login_registration_ui_identity
+    lock_lti_registrations
     lti_apps_page_ai_translation
     lti_apps_page_instructors
     lti_asset_processor

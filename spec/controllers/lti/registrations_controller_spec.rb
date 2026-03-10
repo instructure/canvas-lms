@@ -926,6 +926,28 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET show (lock_deploying field)", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+
+    let_once(:registration) { lti_registration_model(account:) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+
+    before do
+      account_binding
+      registration.manual_configuration = lti_tool_configuration_model
+    end
+
+    it "includes lock_deploying in the response" do
+      subject
+      expect(response_json).to have_key(:lock_deploying)
+    end
+
+    it "returns lock_deploying: false by default" do
+      subject
+      expect(response_json[:lock_deploying]).to be(false)
+    end
+  end
+
   describe "GET show_by_client_id", type: :request do
     subject { get "/api/v1/accounts/#{account.id}/lti_registration_by_client_id/#{developer_key.id}" }
 
@@ -1504,6 +1526,25 @@ RSpec.describe Lti::RegistrationsController do
 
       it "returns 403" do
         expect(subject).to be_forbidden
+      end
+    end
+
+    context "locking a registration" do
+      it "updates lock_deploying to true" do
+        put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}",
+            params: { lock_deploying: true },
+            as: :json
+        expect(response).to be_successful
+        expect(registration.reload.lock_deploying).to be(true)
+      end
+
+      it "updates lock_deploying to false" do
+        registration.update!(lock_deploying: true)
+        put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}",
+            params: { lock_deploying: false },
+            as: :json
+        expect(response).to be_successful
+        expect(registration.reload.lock_deploying).to be(false)
       end
     end
   end

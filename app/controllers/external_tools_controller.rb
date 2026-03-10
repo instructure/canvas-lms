@@ -1531,6 +1531,12 @@ class ExternalToolsController < ApplicationController
     if params.key?(:client_id)
       raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
 
+      if @context.root_account.feature_enabled?(:lock_lti_registrations) &&
+         developer_key.lti_registration&.lock_deploying?
+        return render json: { errors: [{ message: "This app has been locked by an administrator and cannot be installed via client ID." }] },
+                      status: :forbidden
+      end
+
       @tool = developer_key.lti_registration.new_external_tool(@context, verify_uniqueness:, current_user: @current_user)
     else
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
