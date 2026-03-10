@@ -66,7 +66,7 @@ module Lti
           for_user_id: discussion_entry_version.user.lti_id,
           notice_event_timestamp: Time.now.utc.iso8601,
           # Teacher comments do not belong to a submission; build claim id only when submission exists
-          submission_lti_claim_id: submission_claim_id(submission, discussion_entry_version),
+          submission_lti_claim_id: discussion_entry_version.lti_submission_claim_id(submission),
           user: current_user,
         }
       )
@@ -86,12 +86,5 @@ module Lti
       [text, attachment_asset].compact
     end
     private_class_method :create_assets_for_discussion_entry
-
-    def submission_claim_id(submission, discussion_entry_version)
-      return unless submission.present?
-
-      "#{submission.lti_id}:#{discussion_entry_version.id}:#{discussion_entry_version.discussion_entry.attachment_id}"
-    end
-    private_class_method :submission_claim_id
   end
 end
