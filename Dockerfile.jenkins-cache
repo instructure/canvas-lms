@@ -107,6 +107,7 @@ RUN --mount=target=/tmp/src \
         gems/plugins/**/app/stylesheets \
         gems/plugins/**/public \
         gems/plugins/**/spec_canvas/coffeescripts \
+        build/new-jenkins/js \
         jest \
         packages \
         public \
