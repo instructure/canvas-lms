@@ -72,8 +72,8 @@ namespace :db do
 
   desc "Create default accounts"
   task create_default_accounts: :environment do
-    Account.default(true)
-    Account.site_admin(true)
+    Account.default(force_create: true)
+    Account.site_admin(force_create: true)
 
     # This happens by default for all root accounts, but currently happens too
     # early in the migration run (in GrandfatherDefaultAccountInvitationPreviews)
@@ -225,7 +225,7 @@ namespace :db do
     Rake::Task["db:migrate"].invoke
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.descendants.reject { |m| m == Shard }.each(&:reset_column_information)
-    Account.clear_special_account_cache!(true)
+    Account.clear_special_account_cache!(force: true)
     Rake::Task["db:load_initial_data"].invoke
   end
 end # Namespace: db
