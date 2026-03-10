@@ -723,6 +723,43 @@ describe AccountsController do
       expect(@account.limit_parent_app_web_access?).to be_truthy
     end
 
+    it "does not allow non-site-admins to update impact_account_type" do
+      account_with_admin_logged_in
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 impact_account_type: "consortium"
+                               } } }
+      @account.reload
+      expect(@account.settings[:impact_account_type]).to be_nil
+    end
+
+    it "allows site_admin to update impact_account_type for root account" do
+      user_factory
+      user_session(@user)
+      @account = Account.create!
+      Account.site_admin.account_users.create!(user: @user)
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 impact_account_type: "consortium"
+                               } } }
+      @account.reload
+      expect(@account.settings[:impact_account_type]).to eq("consortium")
+    end
+
+    it "allows site_admin to update impact_account_type for subaccount" do
+      user_factory
+      user_session(@user)
+      @account = Account.create!
+      @subaccount = @account.sub_accounts.create!
+      Account.site_admin.account_users.create!(user: @user)
+      post "update", params: { id: @subaccount.id,
+                               account: { settings: {
+                                 impact_account_type: "subaccount"
+                               } } }
+      @subaccount.reload
+      expect(@subaccount.settings[:impact_account_type]).to eq("subaccount")
+    end
+
     it "does not allow anyone to set unexpected settings" do
       user_factory
       user_session(@user)
