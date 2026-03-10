@@ -553,11 +553,6 @@ describe Message do
     context "SMS" do
       before :once do
         user_model
-        @user.account.enable_feature!(:international_sms)
-      end
-
-      before do
-        allow(Canvas::Twilio).to receive(:enabled?).and_return(true)
       end
 
       it "doesn't allow sms notification" do

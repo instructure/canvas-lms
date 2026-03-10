@@ -1189,10 +1189,6 @@ GEM
     tsort (0.2.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
-    twilio-ruby (7.10.1)
-      faraday (>= 0.9, < 3.0)
-      jwt (>= 1.5, < 4.0)
-      nokogiri (>= 1.6, < 2.0)
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
@@ -1432,7 +1428,6 @@ DEPENDENCIES
   testrailtagging (= 0.3.8.7)
   timecop (~> 0.9)
   turnitin_api!
-  twilio-ruby (~> 7.0)
   utf8_cleaner!
   vault (~> 0.17)
   vericite_api (= 1.5.3)

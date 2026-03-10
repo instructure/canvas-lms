@@ -1093,39 +1093,21 @@ self.user,
     true
   end
 
-  # Internal: Send the message through SMS. This currently sends it via Twilio if the recipient is a E.164 phone
-  # number, or via email otherwise.
+  # Internal: Send the message through SMS.
   #
   # Returns nothing.
   def deliver_via_sms
     if /^\+[0-9]+$/.match?(to)
-      begin
-        unless user.account.feature_enabled?(:international_sms)
-          raise "International SMS is currently disabled for this user's account"
-        end
-
-        if Canvas::Twilio.enabled?
-          Canvas::Twilio.deliver(
-            to,
-            body,
-            from_recipient_country: true
-          )
-        end
-      rescue => e
-        logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-        Canvas::Errors.capture(
-          e,
-          message: "SMS delivery failed",
-          to:,
-          object: inspect,
-          tags: {
-            type: :sms_message
-          }
-        )
-        cancel
-      else
-        complete_dispatch
-      end
+      Canvas::Errors.capture(
+        "SMS delivery is disabled",
+        message: "SMS delivery failed",
+        to:,
+        object: inspect,
+        tags: {
+          type: :sms_message
+        }
+      )
+      cancel
     else
       deliver_via_email
     end
