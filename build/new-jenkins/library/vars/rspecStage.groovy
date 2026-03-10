@@ -163,6 +163,7 @@ def runRspecqSuite() {
             -e RSPECQ_WORKER_LIVENESS_SEC -e JOB_NAME -e COVERAGE \\
             -e BUILD_NAME -e BUILD_NUMBER -e CRYSTALBALL_MAP \\
             -e CI_NODE_INDEX -e CRYSTAL_BALL_SPECS \\
+            -e TEST_PATTERN -e EXCLUDE_TESTS \\
             canvas bash -c 'build/new-jenkins/rspecq-tests.sh' 2>&1 | \\
             tee worker_logs/${env.CI_NODE_INDEX}/worker_\$i.log | \\
             awk -v prefix="[worker-\$i]" '{ print prefix " " \$0; fflush() }'

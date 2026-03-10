@@ -75,6 +75,7 @@ def runVitestNode(index, additionalEnvVars = []) {
       def baseEnvVars = [
         "CI_NODE_INDEX=${index.toInteger() + 1}",
         "CI_NODE_TOTAL=${VITEST_NODE_COUNT}",
+        "COVERAGE=${env.COVERAGE ?: '0'}",
         "FORCE_FAILURE=${env.FORCE_FAILURE}",
         "RAILS_ENV=test",
         "TEST_RESULT_OUTPUT_DIR=js-results/vitest-${index}"

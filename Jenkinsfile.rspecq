@@ -167,7 +167,6 @@ env.RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold
 env.RSPECQ_WORKER_LIVENESS_SEC = commitMessageFlag('worker-liveness-sec').asType(Integer)
 env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
 env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
-env.EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
 env.RSPECQ_UPDATE_TIMINGS = "${env.RSPECQ_UPDATE_TIMINGS}"
 env.ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
 env.POSTGRES_PASSWORD = 'sekret'
