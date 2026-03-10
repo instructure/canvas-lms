@@ -611,6 +611,35 @@
           </div>
           <div id="terms_of_service_preview_link"></div>
         <% end %>
+        <% if Account.site_admin.grants_right?(@current_user, :manage) %>
+          <fieldset>
+            <legend><%= t("Impact settings") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <table class="formtable narrow">
+                <tr>
+                  <td><%= settings.blabel :impact_account_type, t("Impact Account Type") %></td>
+                  <td>
+                    <% if @account.root_account? %>
+                      <%= settings.select :impact_account_type,
+                        options_for_select([
+                          [t("Account (default)"), "account"],
+                          [t("Consortium"), "consortium"]
+                        ], @account.settings[:impact_account_type] || "account") %>
+                      <p class="aside"><%= t("Send the Salesforce ID as a partner account ID (oemAccountId). Use this for special cases like Impact purchased for a consortium.") %></p>
+                    <% else %>
+                      <%= settings.select :impact_account_type,
+                        options_for_select([
+                          [t("Account (default)"), "account"],
+                          [t("Sub-account"), "subaccount"]
+                        ], @account.settings[:impact_account_type] || "account") %>
+                      <p class="aside"><%= t("Send a unique ID as a partner account ID (oemAccountId). Use this for special cases like Impact purchased for a single sub-account.") %></p>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            <% end %>
+          </fieldset>
+        <% end %>
         <% if !@account.site_admin? &&
                @account.primary_settings_root_account? &&
                @account.feature_enabled?(:google_docs_domain_restriction) &&

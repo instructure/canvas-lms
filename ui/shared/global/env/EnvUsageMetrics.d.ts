@@ -45,5 +45,6 @@ export interface EnvUsageMetrics {
     course_enrollment_term_sis_id?: string
     course_enrollment_term_start_at?: string
     course_enrollment_term_end_at?: string
+    oem_account_id?: string | null
   }
 }

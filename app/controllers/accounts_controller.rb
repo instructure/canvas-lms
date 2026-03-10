@@ -1503,6 +1503,15 @@ class AccountsController < ApplicationController
           end
         end
 
+        # Handle impact_account_type setting (site admin only)
+        if Account.site_admin.grants_right?(@current_user, :manage)
+          impact_account_type = params[:account][:settings].try(:delete, :impact_account_type)
+          @account.settings[:impact_account_type] = impact_account_type if impact_account_type.present?
+        else
+          # Remove the field from params if user is not a site admin
+          params[:account][:settings].try(:delete, :impact_account_type)
+        end
+
         # For each inheritable setting, if the value for the account is the same as the inheritable value,
         # remove it from the settings hash on the account
         Account.inheritable_settings.each do |setting|
