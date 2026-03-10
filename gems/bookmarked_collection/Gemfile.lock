@@ -160,7 +160,7 @@ GEM
     sqlite3 (2.9.1-x86_64-linux-gnu)
     stringio (3.2.0)
     thor (1.5.0)
-    timeout (0.6.0)
+    timeout (0.6.1)
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
