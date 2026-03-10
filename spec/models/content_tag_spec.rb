@@ -770,6 +770,87 @@ describe ContentTag do
         expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
       end
     end
+
+    context "external urls in modules with section overrides" do
+      before do
+        @other_student = user_factory(active_all: true)
+        @course.enroll_student(@other_student, enrollment_state: "active")
+
+        @restricted_module = @course.context_modules.create!(name: "restricted module")
+        @restricted_module.assignment_overrides.create!(set: @section)
+
+        @tag = @restricted_module.add_item({
+                                             type: "ExternalUrl",
+                                             title: "external url",
+                                             url: "http://example.com",
+                                             new_tab: false
+                                           })
+      end
+
+      it "does not include external url items from modules not visible to student" do
+        expect(ContentTag.visible_to_students_in_course_with_da([@other_student.id], [@course.id])).not_to include(@tag)
+      end
+
+      it "includes external url items from modules visible to student" do
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+    end
+
+    context "external tools in modules with section overrides" do
+      before do
+        @other_student = user_factory(active_all: true)
+        @course.enroll_student(@other_student, enrollment_state: "active")
+
+        @restricted_module = @course.context_modules.create!(name: "restricted module")
+        @restricted_module.assignment_overrides.create!(set: @section)
+
+        tool = @course.context_external_tools.create!(
+          name: "test tool",
+          url: "http://example.com/tool",
+          consumer_key: "key",
+          shared_secret: "secret"
+        )
+        @tag = @restricted_module.add_item({
+                                             type: "context_external_tool",
+                                             id: tool.id,
+                                             url: tool.url
+                                           })
+      end
+
+      it "does not include external tool items from modules not visible to student" do
+        expect(ContentTag.visible_to_students_in_course_with_da([@other_student.id], [@course.id])).not_to include(@tag)
+      end
+
+      it "includes external tool items from modules visible to student" do
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+    end
+
+    context "file attachments in modules with section overrides" do
+      before do
+        @other_student = user_factory(active_all: true)
+        @course.enroll_student(@other_student, enrollment_state: "active")
+
+        @restricted_module = @course.context_modules.create!(name: "restricted module")
+        @restricted_module.assignment_overrides.create!(set: @section)
+
+        attachment = Attachment.create!(
+          filename: "test.txt",
+          uploaded_data: StringIO.new("test"),
+          folder: Folder.root_folders(@course).first,
+          context: @course
+        )
+        @tag = @restricted_module.add_item({ type: "attachment", id: attachment.id })
+      end
+
+      it "does not include file attachment items from modules not visible to student" do
+        expect(ContentTag.visible_to_students_in_course_with_da([@other_student.id], [@course.id])).not_to include(@tag)
+      end
+
+      it "includes file attachment items from modules visible to student" do
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+    end
   end
 
   describe "destroy" do
