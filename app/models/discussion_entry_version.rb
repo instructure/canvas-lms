@@ -28,4 +28,10 @@ class DiscussionEntryVersion < ActiveRecord::Base
   def message_intro
     HtmlTextHelper.strip_tags(message)[0..MESSAGE_INTRO_TRUNCATE_LENGTH]
   end
+
+  def lti_submission_claim_id(submission)
+    return nil unless submission
+
+    "#{submission.lti_id}:#{id}:#{discussion_entry.attachment_id}"
+  end
 end

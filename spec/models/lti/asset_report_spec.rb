@@ -152,6 +152,21 @@ RSpec.describe Lti::AssetReport do
     end
   end
 
+  describe "#launch_url_path" do
+    let(:report) { lti_asset_report_model(processing_progress: "Processed") }
+
+    it "returns nil when not Processed" do
+      report.processing_progress = "Processing"
+      expect(report.launch_url_path).to be_nil
+    end
+
+    it "includes the asset_processor_id and report_id" do
+      path = report.launch_url_path
+      expect(path).to include(report.lti_asset_processor_id.to_s)
+      expect(path).to include(report.id.to_s)
+    end
+  end
+
   describe "#resubmit_available?" do
     subject { standard_report.resubmit_available? }
 
