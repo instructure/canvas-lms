@@ -572,7 +572,7 @@ describe('RecentGradesWidget', () => {
     })
   })
 
-  it('does not show expand button for ungraded items', async () => {
+  it('shows expand button for ungraded items', async () => {
     server.use(
       http.post('/api/graphql', async () => {
         return HttpResponse.json({
@@ -626,7 +626,7 @@ describe('RecentGradesWidget', () => {
       expect(screen.getByTestId('grade-status-badge-sub-ungraded')).toHaveTextContent('Not graded')
     })
 
-    expect(screen.queryByTestId('expand-grade-sub-ungraded')).not.toBeInTheDocument()
+    expect(screen.getByTestId('expand-grade-sub-ungraded')).toBeInTheDocument()
   })
 
   it('renders grade items in a semantic list structure', async () => {

@@ -156,5 +156,13 @@ describe "student dashboard Recent grades & feedback widget", :ignore_js_errors 
       recent_grade_view_feedback_link(submission.id).click
       expect(driver.current_url).to include("/courses/#{@course2.id}/assignments/#{@graded_assignment.id}")
     end
+
+    it "shows expand button for ungraded submission with feedback" do
+      @submitted_assignment.submission_for_student(@student).add_comment(author: @teacher1, comment: "Please review your work.")
+      go_to_dashboard
+      submission = @submitted_assignment.submission_for_student(@student)
+
+      expect(recent_grade_expand_button(submission.id)).to be_displayed
+    end
   end
 end
