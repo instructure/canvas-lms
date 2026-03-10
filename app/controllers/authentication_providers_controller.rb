@@ -808,6 +808,14 @@ class AuthenticationProvidersController < ApplicationController
       format.html { redirect_to(account_authentication_providers_path(@account)) }
       format.json { render json: aac_json(aac) }
     end
+  rescue ActiveRecord::RecordInvalid
+    respond_to do |format|
+      format.html do
+        flash[:error] = aac.errors.full_messages
+        redirect_to(account_authentication_providers_path(@account))
+      end
+      format.json { render json: { errors: aac.errors.full_messages }, status: :unprocessable_content }
+    end
   end
 
   # @API Restore a deleted authentication provider
@@ -980,7 +988,17 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   def destroy_all
-    @account.authentication_providers.active.filter { |ap| ap.visible_to?(@current_user) }.each(&:destroy)
+    errors = []
+    @account.authentication_providers.active.filter { |ap| ap.visible_to?(@current_user) }.each do |ap|
+      unless ap.destroy
+        errors.concat(ap.errors.full_messages)
+      end
+    end
+
+    if errors.any?
+      flash[:error] = errors
+    end
+
     redirect_to :account_authentication_providers
   end
 
