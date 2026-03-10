@@ -11,8 +11,6 @@
 /ui/features/account_admin_tools/ @instructure/app-fundamentals
 /ui/features/account_calendar_settings/ @instructure/app-fundamentals
 /ui/features/account_course_user_search/ @instructure/app-fundamentals
-/ui/features/account_grading_settings/ @instructure/app-fundamentals
-/ui/features/account_grading_standards/ @instructure/app-fundamentals
 /ui/features/account_manage/ @instructure/app-fundamentals
 /ui/features/account_notification_settings/ @instructure/app-fundamentals
 /ui/features/account_reports/ @instructure/app-fundamentals
@@ -27,7 +25,6 @@
 /ui/features/change_password/ @instructure/app-fundamentals
 /ui/features/confirm_email/ @instructure/app-fundamentals
 /ui/features/context_undelete_item/ @instructure/app-fundamentals
-/ui/features/course_grading_standards/ @instructure/app-fundamentals
 /ui/features/course_link_validator/ @instructure/app-fundamentals
 /ui/features/course_notification_settings/ @instructure/app-fundamentals
 /ui/features/course_settings/ @instructure/app-fundamentals
@@ -346,6 +343,9 @@
 # Feedback, Gradebook, Grading, Moderated Grading, Rubrics, SpeedGrader,
 # Comment Library, Roll Call, Submission Stickers
 # =============================================================================
+/ui/features/account_grading_settings/ @instructure/evaluate
+/ui/features/account_grading_standards/ @instructure/evaluate
+/ui/features/course_grading_standards/ @instructure/evaluate
 /ui/features/edit_rubric/ @instructure/evaluate
 /ui/features/enhanced_individual_gradebook/ @instructure/evaluate
 /ui/features/grade_summary/ @instructure/evaluate
