@@ -1267,11 +1267,19 @@ describe AssignmentsController do
             expect(assigns[:js_env][:REVIEWER_SUBMISSION_ID]).to eq @student_submission_id
           end
 
-          it "sets peer_review_allocation_and_grading to true when feature is enabled" do
+          it "sets peer_review_allocation_and_grading to true when feature is enabled and peer_review_sub_assignment is present" do
             @course.enable_feature!(:peer_review_allocation_and_grading)
+            peer_review_model(parent_assignment: @assignment)
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id }
             expect(assigns[:js_env][:peer_review_allocation_and_grading]).to be true
+          end
+
+          it "sets peer_review_allocation_and_grading to false when feature is enabled but peer_review_sub_assignment is not present" do
+            @course.enable_feature!(:peer_review_allocation_and_grading)
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env][:peer_review_allocation_and_grading]).to be false
           end
 
           it "sets peer_review_allocation_and_grading to false when feature is disabled" do

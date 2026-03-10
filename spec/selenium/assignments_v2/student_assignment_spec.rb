@@ -1409,6 +1409,8 @@ describe "as a student" do
                                                      submission_types: "online_text_entry"
                                                    })
 
+        PeerReview::PeerReviewCreatorService.call(parent_assignment: @peer_review_assignment)
+
         @peer_review_assignment.assign_peer_review(@student1, @student3)
       end
 
@@ -1446,6 +1448,51 @@ describe "as a student" do
         wait_for_ajaximations
 
         expect(element_exists?("[data-testid='header-peer-review-link']")).to be_falsey
+      end
+
+      context "without a peer review sub assignment" do
+        before(:once) do
+          @legacy_assignment = assignment_model({
+                                                  course: @course,
+                                                  peer_reviews: true,
+                                                  automatic_peer_reviews: false,
+                                                  points_possible: 10,
+                                                  submission_types: "online_text_entry"
+                                                })
+
+          @legacy_assignment.assign_peer_review(@student1, @student3)
+          @legacy_assignment.assign_peer_review(@student1, @student2)
+        end
+
+        it "shows peer review details in modal after submitting" do
+          @legacy_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @legacy_assignment)
+          wait_for_ajaximations
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+          expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("You have 2 Peer Reviews to complete.\nPeer submissions ready for review: 1")
+        end
+
+        it "shows peer review counter and navigation link in header" do
+          @legacy_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @legacy_assignment)
+          wait_for_ajaximations
+
+          expect(element_exists?("[data-testid='header-peer-review-link']")).to be_truthy
+        end
       end
     end
 
