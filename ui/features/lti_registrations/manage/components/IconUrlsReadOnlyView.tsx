@@ -93,6 +93,15 @@ export const IconUrlsReadOnlyView = ({
                     {p.icon_url}
                   </div>
                 </>
+              ) : toolIconUrl ? (
+                <>
+                  <Flex.Item margin="0 xx-small 0 0">
+                    <img style={{height: '24px'}} src={toolIconUrl} alt={registrationName}></img>
+                  </Flex.Item>
+                  <Flex.Item margin="0 xx-small 0 0" data-testid={`icon-url-${p.placement}`}>
+                    <Text fontStyle="italic">{I18n.t('Default Icon')}</Text>
+                  </Flex.Item>
+                </>
               ) : isLtiPlacementWithDefaultIcon(p.placement) ? (
                 <>
                   <Flex.Item margin="0 xx-small 0 0">
