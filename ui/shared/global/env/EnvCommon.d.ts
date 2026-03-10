@@ -354,6 +354,7 @@ export type RootAccountFeatureId =
   | 'lti_asset_processor_discussions'
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_deactivate_registrations'
+  | 'lock_lti_registrations'
   | 'lti_registrations_next'
   | 'lti_registrations_templates'
   | 'lti_dr_registrations_update'

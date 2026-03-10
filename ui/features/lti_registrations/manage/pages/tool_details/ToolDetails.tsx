@@ -30,11 +30,21 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconCopyLine, IconTrashLine, IconRefreshLine} from '@instructure/ui-icons'
+import {
+  IconCopyLine,
+  IconTrashLine,
+  IconRefreshLine,
+  IconLockLine,
+  IconUnlockLine,
+} from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
-import {useRegistrationWithAllInfo, useDeleteRegistration} from '../../api/registrations'
+import {
+  useRegistrationWithAllInfo,
+  useDeleteRegistration,
+  useUpdateRegistration,
+} from '../../api/registrations'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {AccountId} from '../../model/AccountId'
 import type {LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
@@ -188,6 +198,7 @@ export const ToolDetailsInner = ({
   const route = useToolDetailsRoute()
 
   const deleteMutation = useDeleteRegistration()
+  const updateRegistration = useUpdateRegistration()
 
   useAppendBreadcrumb(registration.name, `/accounts/${accountId}/apps/manage/${registration.id}`)
 
@@ -204,6 +215,7 @@ export const ToolDetailsInner = ({
 
   const outletContext: ToolDetailsOutletContext = {registration}
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
+  const [lockTooltipShowing, setLockTooltipShowing] = React.useState(false)
   const canDelete = !registration.inherited
   const [tiiMigrationModalShowing, setTiiMigrationModalShowing] = React.useState(false)
 
@@ -272,6 +284,55 @@ export const ToolDetailsInner = ({
     [registration, navigate, deleteMutation],
   )
 
+  const handleToggleLock = React.useCallback(async () => {
+    const locked = registration.lock_deploying ?? false
+    const confirmed = await showConfirmationDialog({
+      label: locked ? I18n.t('Unlock App') : I18n.t('Lock App'),
+      body: (
+        <View>
+          {locked ? (
+            <Text>
+              {I18n.t(
+                'This app will become deployable via client ID and through course copy. You may always lock it later to prevent new deployments.',
+              )}
+            </Text>
+          ) : (
+            <Text>
+              {I18n.t(
+                'This app will no longer deployable by client ID or course copy. To deploy it at the root account or control availability, please use Canvas Apps. Existing deployments will not be affected. You will be able to unlock the app on this page at any time.',
+              )}
+            </Text>
+          )}
+        </View>
+      ),
+      confirmText: locked ? I18n.t('Unlock') : I18n.t('Lock'),
+      confirmColor: 'primary',
+      size: 'small',
+    })
+    if (confirmed) {
+      try {
+        await updateRegistration.mutateAsync({
+          accountId,
+          registrationId: registration.id,
+          lock_deploying: !locked,
+        })
+        showFlashAlert({
+          type: 'success',
+          message: locked
+            ? I18n.t('App unlocked successfully.')
+            : I18n.t('App locked successfully.'),
+        })
+      } catch {
+        showFlashAlert({
+          type: 'error',
+          message: locked
+            ? I18n.t('There was an error unlocking the app. Please try again.')
+            : I18n.t('There was an error locking the app. Please try again.'),
+        })
+      }
+    }
+  }, [accountId, registration, updateRegistration])
+
   React.useEffect(() => {
     document.getElementById('drawer-layout-content')?.scrollTo({
       top: 0,
@@ -330,9 +391,24 @@ export const ToolDetailsInner = ({
               <Text>{registration.description}</Text>
             </Flex>
             {HeaderDetailFields(registration)}
-            <Flex margin="0 0 small">
-              {/* Todo: change this based on registration info */}
+            <Flex margin="0 0 small" gap="small">
               <Pill>v1.3</Pill>
+              {window.ENV.FEATURES?.lock_lti_registrations &&
+                (registration.lock_deploying ? (
+                  <Pill color="success">
+                    <Flex direction="row" gap="xx-small">
+                      <IconLockLine />
+                      {I18n.t('App is locked')}
+                    </Flex>
+                  </Pill>
+                ) : (
+                  <Pill color="danger">
+                    <Flex direction="row" gap="xx-small">
+                      <IconUnlockLine />
+                      {I18n.t('App is unlocked')}
+                    </Flex>
+                  </Pill>
+                ))}
             </Flex>
             <Flex direction="column">
               <Flex gap="small" margin="0">
@@ -370,6 +446,35 @@ export const ToolDetailsInner = ({
                     {I18n.t('Delete App')}
                   </Button>
                 </Tooltip>
+
+                {window.ENV.FEATURES?.lock_lti_registrations && (
+                  <Tooltip
+                    renderTip={I18n.t(
+                      "This account does not own this app and therefore can't lock it.",
+                    )}
+                    isShowingContent={lockTooltipShowing}
+                    onShowContent={() => {
+                      setLockTooltipShowing(!canDelete)
+                    }}
+                    onHideContent={() => {
+                      setLockTooltipShowing(false)
+                    }}
+                  >
+                    <Button
+                      data-pendo="lti-registrations-toggle-lock"
+                      data-testid="toggle-lock"
+                      renderIcon={
+                        registration.lock_deploying ? <IconUnlockLine /> : <IconLockLine />
+                      }
+                      color="secondary"
+                      margin="0"
+                      interaction={canDelete ? 'enabled' : 'disabled'}
+                      onClick={handleToggleLock}
+                    >
+                      {registration.lock_deploying ? I18n.t('Unlock app') : I18n.t('Lock app')}
+                    </Button>
+                  </Tooltip>
+                )}
 
                 {window.ENV.LTI_DR_REGISTRATIONS_UPDATE && pendingUpdate ? (
                   <Button
