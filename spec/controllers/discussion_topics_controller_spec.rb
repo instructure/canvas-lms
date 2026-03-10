@@ -1547,6 +1547,25 @@ describe DiscussionTopicsController do
             expect(assigns[:js_env][:COURSE_ID]).to be_nil
           end
         end
+
+        context "when context is a group, not a course" do
+          before do
+            @group1.add_user(@teacher)
+            @group_topic = @group1.discussion_topics.create!(title: "group topic")
+            user_session(@teacher)
+          end
+
+          it "sets enhanced_rubrics_enabled to false" do
+            get "show", params: { group_id: @group1.id, id: @group_topic.id }
+            expect(assigns[:js_env][:enhanced_rubrics_enabled]).to be(false)
+          end
+
+          it "does not set enhanced rubrics assignment env variables" do
+            get "show", params: { group_id: @group1.id, id: @group_topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to be_nil
+            expect(assigns[:js_env][:COURSE_ID]).to be_nil
+          end
+        end
       end
 
       it "assigns groups from the topic's category" do
