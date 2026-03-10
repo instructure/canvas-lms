@@ -620,6 +620,9 @@ class User < ActiveRecord::Base
       # Skip if course is not published
       next false unless course.workflow_state == "available"
 
+      # Skip if course is concluded (term ended, course dates passed, etc.)
+      next false if course.concluded?
+
       # Skip completed or rejected
       next false if completed_states.include?(state)
 
