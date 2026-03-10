@@ -114,9 +114,10 @@ GEM
     deep_merge (1.2.2)
     diff-lcs (1.6.2)
     digest-murmurhash (1.1.1)
-    diplomat (2.6.5)
+    diplomat (2.6.6)
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
+      ostruct
     drb (2.2.3)
     erb (6.0.2)
     erubi (1.13.1)
@@ -181,6 +182,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.1-x86_64-linux-gnu)
       racc (~> 1.4)
+    ostruct (0.6.3)
     packs-specification (0.0.11)
       sorbet-runtime
     pp (0.6.3)
