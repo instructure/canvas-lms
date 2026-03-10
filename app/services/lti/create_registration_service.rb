@@ -52,7 +52,7 @@ module Lti
   # @return [Lti::Registration] the newly created registration
   class CreateRegistrationService < ApplicationService
     ALLOWED_DEVELOPER_KEY_PARAMS = %i[name email notes test_cluster_only client_credentials_audience scopes].freeze
-    ALLOWED_REGISTRATION_PARAMS = %i[name admin_nickname description vendor].freeze
+    ALLOWED_REGISTRATION_PARAMS = %i[name admin_nickname description vendor lock_deploying].freeze
 
     attr_reader :account,
                 :created_by,

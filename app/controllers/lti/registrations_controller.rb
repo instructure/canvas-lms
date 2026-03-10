@@ -1481,6 +1481,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument workflow_state [String, "on" | "off" | "allow"]
   #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
   # @argument comment [String | nil] A comment explaining why this change was made. Cannot exceed 2000 characters.
+  # @argument lock_deploying [Boolean] When true, no new deployments of this registration can be created.
   #
   # @example_request
   #
@@ -1513,7 +1514,13 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    registration_params = params.permit(:admin_nickname, :vendor, :name, :description).to_h
+    permitted_params = %i[admin_nickname vendor name description lock_deploying]
+
+    if @context.feature_enabled?(:lock_lti_registrations)
+      permitted_params << :lock_deploying
+    end
+
+    registration_params = params.permit(*permitted_params).to_h
 
     binding_params = {
       workflow_state: params[:workflow_state],

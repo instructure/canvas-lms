@@ -26,6 +26,7 @@ class Lti::Registration < ActiveRecord::Base
     vendor
     workflow_state
     description
+    lock_deploying
   ].freeze
 
   extend RootAccountResolver

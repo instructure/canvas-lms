@@ -2507,6 +2507,23 @@ describe ExternalToolsController do
           expect(response).to have_http_status :unprocessable_content
         end
       end
+
+      context "with a locked registration" do
+        before(:once) do
+          developer_key.lti_registration.update!(lock_deploying: true)
+        end
+
+        it "ignores the locked status if the appropriate flag is not enabled" do
+          account.disable_feature!(:lock_lti_registrations)
+          subject
+          expect(response).to have_http_status :ok
+        end
+
+        it "returns an 403 and error when trying to use a locked registration" do
+          subject
+          expect(response).to have_http_status :forbidden
+        end
+      end
     end
 
     context "tool duplication" do
