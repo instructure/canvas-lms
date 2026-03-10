@@ -60,8 +60,7 @@ describe "course copy" do
   it "finished calculating course dates for access before redirect" do
     course_with_teacher_logged_in
     @course.root_account.update!(settings: { teachers_can_create_courses: true })
-    past_term_id = EnrollmentTerm.create(end_at: 1.day.ago, root_account: @teacher.account).id
-    @course.update! enrollment_term_id: past_term_id, conclude_at: 5.days.from_now, restrict_enrollments_to_course_dates: true
+    @course.update! start_at: 2.days.ago, conclude_at: 5.days.from_now, restrict_enrollments_to_course_dates: true
     get "/courses/#{@course.id}/copy"
     expect_new_page_load { NewCourseCopyPage.create_course_button.click }
     expect(NewCourseCopyPage.body).not_to contain_css("#unauthorized_message")
