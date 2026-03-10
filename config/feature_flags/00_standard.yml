@@ -152,13 +152,6 @@ include_byte_order_mark_in_gradebook_exports:
   description: Optionally include a byte-order mark in compatible spreadsheet exports
     so they can be imported into Excel for users in some locales.
   applies_to: User
-international_sms:
-  state: hidden
-  display_name: International SMS
-  description: Allows users with international phone numbers to receive text messages
-    from Canvas.
-  applies_to: RootAccount
-  root_opt_in: true
 javascript_csp:
   type: setting
   state: allowed
