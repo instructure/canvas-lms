@@ -156,7 +156,7 @@ class SisPseudonym
 
     if type == :trusted
       trusted_local_account_ids_by_shard = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
-                                                       .transform_values { |ids| ids.map { |id| Shard.local_id_for(id).first } }
+                                                                           .transform_values { |ids| ids.map { |id| Shard.local_id_for(id).first } }
     end
 
     # try the user's home shard first if it's fast

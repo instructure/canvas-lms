@@ -4198,8 +4198,8 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def grader_ids_to_anonymous_ids
-    @grader_ids_to_anonymous_ids ||= moderation_graders.each_with_object({}) do |grader, map|
-      map[grader.user_id.to_s] = grader.anonymous_id
+    @grader_ids_to_anonymous_ids ||= moderation_graders.to_h do |grader|
+      [grader.user_id.to_s, grader.anonymous_id]
     end
   end
 
@@ -4736,8 +4736,8 @@ class AbstractAssignment < ActiveRecord::Base
 
     states = %w[inactive completed deleted invited]
     active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
-    provisional_grades.each_with_object({}) do |provisional_grade, hash|
-      hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
+    provisional_grades.to_h do |provisional_grade|
+      [provisional_grade.id, active_user_ids.include?(provisional_grade.scorer_id)]
     end
   end
 

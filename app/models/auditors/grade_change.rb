@@ -35,7 +35,7 @@ class Auditors::GradeChange
   end
   COURSE_OVERRIDE_ASSIGNMENT = DummyAssignment.new.freeze
 
-  OverrideGradeChange = Struct.new(:grader, :old_grade, :old_score, :score, keyword_init: true)
+  OverrideGradeChange = Struct.new(:grader, :old_grade, :old_score, :score)
 
   class Record < Auditors::Record
     attributes :account_id,

@@ -34,8 +34,8 @@ describe SisImportsApiController, type: :request do
   end
 
   def post_csv(*lines_or_opts)
-    lines = lines_or_opts.reject { |thing| thing.is_a? Hash }
-    opts = lines_or_opts.select { |thing| thing.is_a? Hash }.inject({}, :merge)
+    lines = lines_or_opts.grep_v(Hash)
+    opts = lines_or_opts.grep(Hash).inject({}, :merge)
 
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"

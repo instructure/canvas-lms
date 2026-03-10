@@ -54,11 +54,11 @@ module AssignmentOverrideApplicator
 
       overridden_section_ids = result_learning_object
                                .applied_overrides.select { |o| o.set_type == "CourseSection" }
-                               .map(&:set_id)
+                                                 .map(&:set_id)
       course_section_ids = context.active_course_sections.map(&:id)
       course_override_due_at = result_learning_object
                                .applied_overrides.find { |o| o.set_type == "Course" }
-                               &.due_at
+                                                 &.due_at
 
       if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz)
         result_learning_object.due_at =
@@ -515,7 +515,7 @@ module AssignmentOverrideApplicator
   def self.should_preload_override_students?(assignments, user, endpoint_key)
     return false unless user
 
-    assignment_key = Digest::SHA256.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(","))
+    assignment_key = Digest::SHA256.hexdigest(assignments.map(&:id).sort.join(","))
     key = ["should_preload_assignment_override_students", user.cache_key(:enrollments), user.cache_key(:groups), endpoint_key, assignment_key].cache_key
     # if the user has been touch we should preload all of the overrides because it's almost certain we'll need them all
     if Rails.cache.read(key)

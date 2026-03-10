@@ -53,13 +53,13 @@ module Api::V1::AiExperience
       json[:context_files] = ai_experience.context_files
                                           .order("ai_experience_context_files.position")
                                           .map do |attachment|
-                                            {
-                                              id: attachment.id.to_s,
-                                              display_name: attachment.display_name,
-                                              size: attachment.size,
-                                              content_type: attachment.content_type,
-                                              url: attachment.public_url
-                                            }
+        {
+          id: attachment.id.to_s,
+          display_name: attachment.display_name,
+          size: attachment.size,
+          content_type: attachment.content_type,
+          url: attachment.public_url
+        }
       end
     end
 

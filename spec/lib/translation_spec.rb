@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-TranslationResponse = Struct.new(:translation, :source_language, keyword_init: true)
+TranslationResponse = Struct.new(:translation, :source_language)
 
 describe Translation do
   let(:user) { User.create!(name: "Test User") }

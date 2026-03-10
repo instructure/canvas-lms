@@ -21,6 +21,7 @@
 module Mutations::LtiContentItems; end
 
 # rubocop:disable GraphQL/ExtractInputType
+
 class Mutations::LtiContentItems::LtiContentItemIframe < GraphQL::Schema::InputObject
   argument :height, Int, required: false
   argument :width, Int, required: false

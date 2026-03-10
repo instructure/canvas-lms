@@ -3803,7 +3803,7 @@ describe Attachment do
       )
     end
     let(:pine_client_mock) { class_double(PineClient) }
-    let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
+    let(:null_user) { Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil) }
 
     before do
       allow(pine_client_mock).to receive_messages(

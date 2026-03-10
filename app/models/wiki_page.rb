@@ -777,7 +777,7 @@ class WikiPage < ActiveRecord::Base
 
     # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
     # and the action is more of a system-initiated action than a user-initiated action
-    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
 
     PineClient.ingest_html(
       html_content: body,
@@ -808,7 +808,7 @@ class WikiPage < ActiveRecord::Base
 
     # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
     # and the action is more of a system-initiated action than a user-initiated action
-    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
 
     delay(
       n_strand: ["horizon_wiki_deletion", context.global_root_account_id],

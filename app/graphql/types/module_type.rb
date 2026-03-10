@@ -33,7 +33,7 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
       context_modules.each do |context_module|
         content_tags = context_module.content_tags_visible_to(@user)
         content_items = content_tags.filter_map(&:content)
-        quizzes = content_items.select { |item| item.is_a?(Quizzes::Quiz) }
+        quizzes = content_items.grep(Quizzes::Quiz)
         all_quizzes.concat(quizzes)
       end
 

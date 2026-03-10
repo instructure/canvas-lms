@@ -169,7 +169,7 @@ module Lti
           else
             ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS
           end
-        valid_placements.each_with_object({}) { |p, hsh| hsh[p.to_sym] = lti2_placement(message_handler) }
+        valid_placements.to_h { |p| [p.to_sym, lti2_placement(message_handler)] }
       end
 
       def lti2_placement(message_handler)
@@ -202,7 +202,7 @@ module Lti
       end
 
       def batch_load_context_names(collection)
-        tools = collection.select { |o| o.is_a?(ContextExternalTool) }
+        tools = collection.grep(ContextExternalTool)
         return {} if tools.empty?
 
         account_ids = tools.select { |t| t.context_type == "Account" }.map(&:context_id)

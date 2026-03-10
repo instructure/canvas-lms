@@ -427,7 +427,7 @@ class Submission < ActiveRecord::Base
     Submission.active.having_submission.where(user_id:)
               .where(assignment_id: SubAssignment.active.select(:id).where(parent_assignment_id: assignment_id))
               .find_each do |sub_assignment_submission|
-                return true if sub_assignment_submission.needs_grading?
+      return true if sub_assignment_submission.needs_grading?
     end
     false
   end
@@ -964,18 +964,19 @@ class Submission < ActiveRecord::Base
   def originality_data
     return {} if assignment.cpf_migrated?
 
-    data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
-      hash[originality_report.asset_key] = {
-        similarity_score: originality_report.originality_score&.round(2),
-        state: originality_report.state,
-        attachment_id: originality_report.attachment_id,
-        report_url: originality_report.report_launch_path(assignment),
-        view_report_url: view_report_url("originality_report", originality_report.asset_key),
-        status: originality_report.workflow_state,
-        error_message: originality_report.error_message,
-        created_at: originality_report.created_at,
-        updated_at: originality_report.updated_at,
-      }
+    data = originality_reports_for_display.to_h do |originality_report|
+      [originality_report.asset_key,
+       {
+         similarity_score: originality_report.originality_score&.round(2),
+         state: originality_report.state,
+         attachment_id: originality_report.attachment_id,
+         report_url: originality_report.report_launch_path(assignment),
+         view_report_url: view_report_url("originality_report", originality_report.asset_key),
+         status: originality_report.workflow_state,
+         error_message: originality_report.error_message,
+         created_at: originality_report.created_at,
+         updated_at: originality_report.updated_at,
+       }]
     end
 
     legacy_turnitin_data = turnitin_data.except(:webhook_info, :provider, :last_processed_attempt)

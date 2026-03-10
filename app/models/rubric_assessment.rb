@@ -317,7 +317,7 @@ class RubricAssessment < ActiveRecord::Base
         submission = rubric_association.association_object.find_asset_for_assessment(rubric_association, student).first
         { submission:,
           rubric_assessments: submission.rubric_assessments
-                                        .where.not(rubric_association: nil)
+                              .where.not(rubric_association: nil)
                                         .map { |ra| ra.as_json(methods: :assessor_name) } }
       end
     else

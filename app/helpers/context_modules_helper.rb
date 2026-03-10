@@ -90,10 +90,10 @@ module ContextModulesHelper
 
   def preload_can_unpublish(context, modules)
     items = modules.map(&:content_tags).flatten.map(&:content)
-    asmnts = items.select { |item| item.is_a?(Assignment) }
-    topics = items.select { |item| item.is_a?(DiscussionTopic) }
-    quizzes = items.select { |item| item.is_a?(Quizzes::Quiz) }
-    wiki_pages = items.select { |item| item.is_a?(WikiPage) }
+    asmnts = items.grep(Assignment)
+    topics = items.grep(DiscussionTopic)
+    quizzes = items.grep(Quizzes::Quiz)
+    wiki_pages = items.grep(WikiPage)
 
     assmnt_ids_with_subs = Assignment.assignment_ids_with_submissions(context.assignments.pluck(:id))
     Assignment.preload_can_unpublish(asmnts, assmnt_ids_with_subs)

@@ -48,7 +48,7 @@ describe Gradebook::ApplyScoreToUngradedSubmissions do
     }
 
     Gradebook::ApplyScoreToUngradedSubmissions::Options.new(
-      default_options.merge(overrides)
+      **default_options, **overrides
     )
   end
 

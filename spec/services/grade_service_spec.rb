@@ -19,7 +19,7 @@
 require "spec_helper"
 require_relative "../../app/services/grade_service"
 
-GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, keyword_init: true)
+GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance)
 
 RSpec.describe GradeService do
   # Test data setup

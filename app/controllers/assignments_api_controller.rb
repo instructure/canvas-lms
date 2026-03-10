@@ -1114,7 +1114,7 @@ class AssignmentsApiController < ApplicationController
       if @context.feature_enabled?(:peer_review_allocation_and_grading)
         # Only preload for Assignment instances since SubAssignment and PeerReviewSubAssignment
         # cannot have AssessmentRequests
-        assignment_instances = assignments.select { |a| a.is_a?(Assignment) }
+        assignment_instances = assignments.grep(Assignment)
         Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
       end
 

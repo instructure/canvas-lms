@@ -107,8 +107,8 @@ describe CC::LtiResourceLinks do
 
     it "sets the custom params" do
       expect(
-        subject.xpath("//blti:custom/lticm:property").each_with_object({}) do |el, h|
-          h[el.attribute("name").text] = el.text
+        subject.xpath("//blti:custom/lticm:property").to_h do |el|
+          [el.attribute("name").text, el.text]
         end
       ).to eq(custom.stringify_keys)
     end

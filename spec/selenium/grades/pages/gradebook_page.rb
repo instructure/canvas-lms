@@ -425,7 +425,7 @@ module Gradebook
   def self.wait_for_spinner
     begin
       spinner = loading_spinner
-      keep_trying_until(3) { (spinner.displayed? == false) }
+      keep_trying_until(3) { spinner.displayed? == false }
     rescue Selenium::WebDriver::Error::TimeoutError
       # ignore - sometimes spinner doesn't appear in Chrome
     end

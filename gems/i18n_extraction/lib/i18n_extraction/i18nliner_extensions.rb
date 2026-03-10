@@ -32,7 +32,7 @@ module I18nliner
   class AmbiguousTranslationKeyError < ExtractionError; end
 end
 
-module I18nExtraction; end
+module I18nExtraction; end # rubocop:disable Style/OneClassPerFile
 
 module I18nExtraction::Extensions
   module TranslateCall

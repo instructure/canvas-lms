@@ -93,8 +93,7 @@ module AcademicBenchmark::OutcomeData
       :user_id,
       :valid_contexts,
       :worker_class,
-      :worker,
-      keyword_init: true
+      :worker
     )
 
     def initialize(options = {})

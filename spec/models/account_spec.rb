@@ -2298,8 +2298,8 @@ describe Account do
       it "can handle lots of accounts" do
         accounts = Array.new(100) { Account.default.sub_accounts.create! }
         expect(Account.account_chain_ids_for_multiple_accounts(accounts.map(&:id))).to eq(
-          accounts.each_with_object({}) do |account, hash|
-            hash[account.id] = [account.id, Account.default.id]
+          accounts.to_h do |account|
+            [account.id, [account.id, Account.default.id]]
           end
         )
       end

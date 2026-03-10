@@ -1499,16 +1499,16 @@ describe "Common Cartridge exporting" do
 
       describe "custom values" do
         it "exports the custom hash" do
-          exported_hash = assignment_xml_doc.css("tool_setting custom property").each_with_object({}) do |el, hash|
-            hash[el.attr("name")] = el.text
+          exported_hash = assignment_xml_doc.css("tool_setting custom property").to_h do |el|
+            [el.attr("name"), el.text]
           end
 
           expect(exported_hash).to eq(custom)
         end
 
         it "exports the custom parameters hash" do
-          exported_hash = assignment_xml_doc.css("tool_setting custom_parameters property").each_with_object({}) do |el, hash|
-            hash[el.attr("name")] = el.text
+          exported_hash = assignment_xml_doc.css("tool_setting custom_parameters property").to_h do |el|
+            [el.attr("name"), el.text]
           end
 
           expect(exported_hash).to eq(custom_parameters)

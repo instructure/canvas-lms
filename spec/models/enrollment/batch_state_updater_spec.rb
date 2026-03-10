@@ -229,6 +229,6 @@ describe "Enrollment::BatchStateUpdater" do
       _notify_live_events_observer_for_after_save
       delete_student_allocation_rules_if_needed
     ]
-    expect(Enrollment._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
+    expect(Enrollment._save_callbacks.collect(&:filter).grep(Symbol) - accounted_for_callbacks).to eq []
   end
 end
