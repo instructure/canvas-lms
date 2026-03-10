@@ -58,7 +58,7 @@ gem "graphql-batch", "~> 0.5"
 gem "hashdiff", "~> 1.1", require: false
 gem "highline", "~> 3.0", require: false
 gem "httparty", "~> 0.24"
-gem "i18nliner", "~> 0.2.4"
+gem "i18nliner", "~> 0.3"
 gem "icalendar", "~> 2.9", require: false
 gem "diplomat", "~> 2.6", require: false
 gem "ims-lti", "~> 2.3", require: "ims"
