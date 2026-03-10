@@ -21,7 +21,7 @@ module CanvasPartmanTest
   AnimalAlias = Animal
 end
 
-class AddAnotherThingToPartmanAnimals < CanvasPartman::Migration
+class AddAnotherThingToPartmanAnimals < CanvasPartman::Migration # rubocop:disable Style/OneClassPerFile
   self.base_class = CanvasPartmanTest::AnimalAlias
 
   def self.up

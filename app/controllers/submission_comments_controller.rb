@@ -76,8 +76,8 @@ class SubmissionCommentsController < ApplicationController
   end
 
   def timestamps_by_id(submission_comments)
-    submission_comments.order(:created_at).each_with_object({}) do |comment, timestamps_map|
-      timestamps_map[comment.id] = I18n.t "(%{timestamp})", timestamp: datetime_string(comment.created_at, :full)
+    submission_comments.order(:created_at).to_h do |comment|
+      [comment.id, I18n.t("(%{timestamp})", timestamp: datetime_string(comment.created_at, :full))]
     end
   end
 end

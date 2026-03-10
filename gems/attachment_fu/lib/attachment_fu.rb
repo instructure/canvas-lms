@@ -108,7 +108,7 @@ module AttachmentFu # :nodoc:
       end
 
       extend ClassMethods unless (class << self; included_modules; end).include?(ClassMethods)
-      include InstanceMethods unless included_modules.include?(InstanceMethods)
+      include InstanceMethods unless include?(InstanceMethods)
 
       parent_options = attachment_options || {}
       # doing these shenanigans so that #attachment_options is available to processors and backends
@@ -130,7 +130,7 @@ module AttachmentFu # :nodoc:
       end
 
       storage_mod = AttachmentFu::Backends.const_get(:"#{options[:storage].to_s.classify}Backend")
-      include storage_mod unless included_modules.include?(storage_mod)
+      include storage_mod unless include?(storage_mod)
 
       unless parent_options[:processor]
         case attachment_options[:processor]
@@ -140,7 +140,7 @@ module AttachmentFu # :nodoc:
             if processors.any?
               attachment_options[:processor] = "#{processors.first}Processor"
               processor_mod = AttachmentFu::Processors.const_get(attachment_options[:processor])
-              prepend processor_mod unless included_modules.include?(processor_mod)
+              prepend processor_mod unless include?(processor_mod)
             end
           rescue Object
             raise unless load_related_exception?($!)
@@ -151,7 +151,7 @@ module AttachmentFu # :nodoc:
         else
           begin
             processor_mod = AttachmentFu::Processors.const_get(:"#{attachment_options[:processor].to_s.classify}Processor")
-            include processor_mod unless included_modules.include?(processor_mod)
+            include processor_mod unless include?(processor_mod)
           rescue Object
             raise unless load_related_exception?($!)
 

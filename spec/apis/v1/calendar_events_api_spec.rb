@@ -72,9 +72,9 @@ describe CalendarEventsApiController, type: :request do
         rrule
       ].freeze
     end
-    let(:expected_slot_fields) { (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code]) }
-    let(:expected_reservation_event_fields) { (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type]) }
-    let(:expected_reserved_fields) { (expected_slot_fields + ["reserved", "reserve_comments"]) }
+    let(:expected_slot_fields) { expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code] }
+    let(:expected_reservation_event_fields) { expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type] }
+    let(:expected_reserved_fields) { expected_slot_fields + ["reserved", "reserve_comments"] }
     let(:expected_reservation_fields) { expected_reservation_event_fields - ["child_events"] }
     let(:expected_series_fields) { expected_fields + ["series_head", "series_natural_language"] }
 

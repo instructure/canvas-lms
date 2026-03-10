@@ -413,7 +413,7 @@ module MicrosoftSync
 
           context "when delay is an array of integers" do
             it "uses delays based on the per-step retry count" do
-              delays = steps_object.steps_run.select { |step| step.is_a?(Array) }
+              delays = steps_object.steps_run.grep(Array)
               expect(delays).to eq([
                                      [:delay_run, [{ run_at: nil, strand: }], [:step_initial, nil]],
                                      [:delay_run, [{ run_at: nil, strand: }], [:step_initial, nil]],
@@ -432,7 +432,7 @@ module MicrosoftSync
             end
 
             let(:run_ats) do
-              delays = steps_object.steps_run.select { |step| step.is_a?(Array) }
+              delays = steps_object.steps_run.grep(Array)
               delays.map { |d| d[1][0][:run_at] }
             end
 

@@ -518,7 +518,7 @@ describe WikiPagesApiController, type: :request do
               end
 
               def self.generate_alt_text(*)
-                Struct.new(:image, keyword_init: true).new(image: { "altText" => "AI generated text." })
+                Struct.new(:image).new(image: { "altText" => "AI generated text." })
               end
             end)
             allow(CedarClient).to receive(:enabled?).and_return(true)

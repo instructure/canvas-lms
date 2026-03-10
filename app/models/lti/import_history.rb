@@ -50,20 +50,20 @@ class Lti::ImportHistory < ApplicationRecord
     GuardRail.activate(:secondary) do
       results = transaction do
         connection.statement_timeout = 30 # seconds
-        sql = <<-SQL.squish
-        WITH RECURSIVE history AS (
-          SELECT id, source_lti_id, target_lti_id, created_at
-          FROM #{quoted_table_name}
-          WHERE target_lti_id = $1
-        UNION ALL
-          SELECT lih.id, lih.source_lti_id, lih.target_lti_id, lih.created_at
-          FROM #{quoted_table_name} lih
-          INNER JOIN history h ON lih.target_lti_id = h.source_lti_id
-        ) SEARCH BREADTH FIRST BY id SET ordercol
-        SELECT source_lti_id
-        FROM history
-        ORDER BY ordercol, source_lti_id, created_at DESC
-        LIMIT $2
+        sql = <<~SQL.squish
+          WITH RECURSIVE history AS (
+            SELECT id, source_lti_id, target_lti_id, created_at
+            FROM #{quoted_table_name}
+            WHERE target_lti_id = $1
+          UNION ALL
+            SELECT lih.id, lih.source_lti_id, lih.target_lti_id, lih.created_at
+            FROM #{quoted_table_name} lih
+            INNER JOIN history h ON lih.target_lti_id = h.source_lti_id
+          ) SEARCH BREADTH FIRST BY id SET ordercol
+          SELECT source_lti_id
+          FROM history
+          ORDER BY ordercol, source_lti_id, created_at DESC
+          LIMIT $2
         SQL
         binds = [
           ActiveRecord::Relation::QueryAttribute.new(

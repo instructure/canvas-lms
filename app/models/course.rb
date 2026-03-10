@@ -1990,7 +1990,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.require_assignment_groups(contexts)
-    courses = contexts.select { |c| c.is_a?(Course) }
+    courses = contexts.grep(Course)
     groups = Shard.partition_by_shard(courses) do |shard_courses|
       AssignmentGroup.select("id, context_id, context_type").where(context_type: "Course", context_id: shard_courses)
     end.index_by(&:context_id)

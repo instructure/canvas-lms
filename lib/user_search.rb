@@ -292,8 +292,8 @@ module UserSearch
         users_scope =
           if context.is_a?(Account)
             users_scope.where(id: Enrollment.select(:user_id)
-                       .where.not(enrollments: { workflow_state: %i[rejected inactive deleted] })
-                       .where(role_id: role_ids))
+                                  .where.not(enrollments: { workflow_state: %i[rejected inactive deleted] })
+                                  .where(role_id: role_ids))
           else
             users_scope.where(enrollments: { role_id: role_ids }).distinct
           end

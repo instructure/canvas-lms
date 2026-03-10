@@ -460,8 +460,8 @@ class Rubric < ActiveRecord::Base
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
-  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, :title, :migration_id, :percentage, :order, :generated, keyword_init: true)
-  Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, :migration_id, :percentage, keyword_init: true)
+  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, :title, :migration_id, :percentage, :order, :generated)
+  Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, :migration_id, :percentage)
   # association_object is only needed for generating via llm
   def generate_criteria(params, association_object = nil)
     @used_ids = {}

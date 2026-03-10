@@ -1837,7 +1837,7 @@ describe WikiPage do
     end
     let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
     let(:pine_client_mock) { class_double(PineClient) }
-    let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
+    let(:null_user) { Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, delete_document: true)

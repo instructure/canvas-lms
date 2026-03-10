@@ -338,7 +338,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   FULLWIDTH = 150.0
-  GradeSummaryGraph = Struct.new(:high, :low, :lower_q, :upper_q, :median, :mean, :points_possible, :score, :legacy, keyword_init: true) do
+  GradeSummaryGraph = Struct.new(:high, :low, :lower_q, :upper_q, :median, :mean, :points_possible, :score, :legacy) do
     def low_pos
       pixels_for(legacy ? 0 : low)
     end

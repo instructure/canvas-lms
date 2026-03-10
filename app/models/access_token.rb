@@ -279,7 +279,7 @@ class AccessToken < ActiveRecord::Base
       # not only use optimistic locking, but also don't update if someone else
       # is already in the process of updating it
       updated = AccessToken.where(id: AccessToken.where(id: self, last_used_at: prior_last_used_at)
-                                                 .lock("FOR UPDATE SKIP LOCKED"))
+                                      .lock("FOR UPDATE SKIP LOCKED"))
                            .update_all(last_used_at: at, updated_at: at)
       changes_applied if updated == 1
     end

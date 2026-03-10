@@ -430,9 +430,9 @@ describe Quizzes::QuizzesController do
             get "index", params: { course_id: @course.id }
 
             controller.js_env[:QUIZZES][:assignment].select { |a| a[:quiz_type] == "quizzes.next" }
-                      .each do |assignment|
-                        expect(assignment["is_master_course_master_content"]).to be true
-                      end
+                                                    .each do |assignment|
+                                                      expect(assignment["is_master_course_master_content"]).to be true
+                                                    end
           end
         end
       end

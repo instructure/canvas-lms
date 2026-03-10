@@ -44,7 +44,7 @@ describe Accessibility::AiGenerationService do
   before do
     stub_const("CedarClient", Class.new do
       def self.generate_alt_text(*)
-        Struct.new(:image, keyword_init: true).new(image: { "altText" => "Generated alt text" })
+        Struct.new(:image).new(image: { "altText" => "Generated alt text" })
       end
     end)
   end

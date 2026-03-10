@@ -1794,9 +1794,9 @@ class Attachment < ActiveRecord::Base
         .where(attachments: { id: attachments, context_type: "User" })
         .where.not(attachments: { uuid: nil })
         .in_batches do |batch|
-          batch_ids = batch.pluck(:id)
-          batch.update_all(avatar_image_url: nil)
-          Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
+      batch_ids = batch.pluck(:id)
+      batch.update_all(avatar_image_url: nil)
+      Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
     end
     while SubmissionDraftAttachment.where(attachment_id: attachments).limit(1000).destroy_all.count > 0 do end
 
@@ -2603,7 +2603,7 @@ class Attachment < ActiveRecord::Base
 
     # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
     # and the action is more of a system-initiated action than a user-initiated action
-    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
 
     PineClient.ingest_url(
       url:,
@@ -2726,7 +2726,7 @@ class Attachment < ActiveRecord::Base
 
     # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
     # and the action is more of a system-initiated action than a user-initiated action
-    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
 
     delay(
       n_strand: ["horizon_file_deletion", context.global_root_account_id],

@@ -42,7 +42,7 @@ RSpec.describe Accessibility::GenerateController do
 
       stub_const("CedarClient", Class.new do
         def self.conversation(*)
-          Struct.new(:response, keyword_init: true).new(response: "Generated Caption")
+          Struct.new(:response).new(response: "Generated Caption")
         end
       end)
     end
@@ -141,7 +141,7 @@ RSpec.describe Accessibility::GenerateController do
 
       stub_const("CedarClient", Class.new do
         def self.generate_alt_text(*)
-          Struct.new(:image, keyword_init: true).new(image: { "altText" => "Generated alt text" })
+          Struct.new(:image).new(image: { "altText" => "Generated alt text" })
         end
       end)
     end

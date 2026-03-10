@@ -655,7 +655,7 @@ describe CommunicationChannel do
           consider_building_notification_policies
           initialize_synced_with_identity
         ]
-        expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
+        expect(CommunicationChannel._save_callbacks.collect(&:filter).grep(Symbol) - accounted_for_callbacks).to eq []
       end
 
       it "stores the details of the last soft bounce" do

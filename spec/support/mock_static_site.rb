@@ -33,9 +33,6 @@ require_relative "../spec_helper"
 
 MOCK_SITES_DIRECTORY = "mock_static_sites"
 
-class NonexistentMockSiteError < StandardError
-end
-
 class MockStaticSite
   attr_accessor :mock_site, :index_file, :root_dir_path
 
@@ -79,4 +76,7 @@ class MockStaticSite
       path
     end
   end
+end
+
+class NonexistentMockSiteError < StandardError # rubocop:disable Style/OneClassPerFile
 end

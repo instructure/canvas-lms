@@ -309,7 +309,7 @@ module IncomingMailProcessor
           if message
             @error_reporter.log_error(self.class.error_report_category, {
                                         message: "Error parsing email",
-                                        backtrace: message.errors.flatten.map(&:to_s).join("\n"),
+                                        backtrace: message.errors.flatten.join("\n"),
                                         from: message.from.try(:first),
                                         to: message.to.to_s,
                                       })

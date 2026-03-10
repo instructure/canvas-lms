@@ -57,13 +57,13 @@ class GradebookImporter
 
   class InvalidHeaderRow < StandardError; end
 
-  OverrideColumnInfo = Struct.new(:grading_period_id, :index, keyword_init: true)
-  OverrideScoreChange = Struct.new(:grading_period_id, :student_id, :current_score, :new_score, keyword_init: true) do
+  OverrideColumnInfo = Struct.new(:grading_period_id, :index)
+  OverrideScoreChange = Struct.new(:grading_period_id, :student_id, :current_score, :new_score) do
     def course_score?
       grading_period_id.nil?
     end
   end
-  OverrideStatusChange = Struct.new(:grading_period_id, :student_id, :current_grade_status, :new_grade_status, keyword_init: true) do
+  OverrideStatusChange = Struct.new(:grading_period_id, :student_id, :current_grade_status, :new_grade_status) do
     def course_score?
       grading_period_id.nil?
     end
@@ -225,14 +225,14 @@ class GradebookImporter
                                     .select(:id, :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, :updated_at, :workflow_state)
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
-                                      is_gradeable = gradeable?(submission:, is_admin:)
-                                      score = submission.excused? ? "EX" : submission.score.to_s
-                                      {
-                                        user_id: submission.user_id,
-                                        assignment_id: submission.assignment_id,
-                                        score:,
-                                        gradeable: is_gradeable
-                                      }
+      is_gradeable = gradeable?(submission:, is_admin:)
+      score = submission.excused? ? "EX" : submission.score.to_s
+      {
+        user_id: submission.user_id,
+        assignment_id: submission.assignment_id,
+        score:,
+        gradeable: is_gradeable
+      }
     end
 
     # cache the score on the existing object

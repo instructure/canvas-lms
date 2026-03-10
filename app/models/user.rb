@@ -2287,11 +2287,11 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("course_creating_teacher_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
       Shard.with_each_shard(in_region_associated_shards) do
         Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
-                                .select(:course_id)
-                                .where(type: %w[TeacherEnrollment DesignerEnrollment])
-                                .joins(:root_account)
-                                .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
-               .select(:account_id))
+                                           .select(:course_id)
+                                           .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                                           .joins(:root_account)
+                                           .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
+                          .select(:account_id))
       end
     end
   end
@@ -2300,11 +2300,11 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("course_creating_student_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
       Shard.with_each_shard(in_region_associated_shards) do
         Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
-                                .select(:course_id)
-                                .where(type: %w[StudentEnrollment ObserverEnrollment])
-                                .joins(:root_account)
-                                .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
-               .select(:account_id))
+                                           .select(:course_id)
+                                           .where(type: %w[StudentEnrollment ObserverEnrollment])
+                                           .joins(:root_account)
+                                           .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
+                          .select(:account_id))
       end
     end
   end
@@ -2728,7 +2728,7 @@ class User < ActiveRecord::Base
     ** # forwarded to submissions_for_course_ids
   )
     course_ids ||= if contexts
-                     contexts.select { |c| c.is_a?(Course) }.map(&:id)
+                     contexts.grep(Course).map(&:id)
                    else
                      participating_student_course_ids
                    end
@@ -3718,8 +3718,8 @@ class User < ActiveRecord::Base
     adminable_accounts_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     root_accounts = Account.active.where(
       id: Account.active
-               .where(id: adminable_accounts_ids)
-               .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
+          .where(id: adminable_accounts_ids)
+          .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
     )
 
     horizon_account_ids = Set.new

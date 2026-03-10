@@ -108,8 +108,8 @@ class HistoryController < ApplicationController
     auas = AssetUserAccess.where(id: page_views.map(&:asset_user_access_id)).preload(:context).to_a.index_by(&:id)
 
     render json: page_views
-      .select { |pv| auas.key?(pv.asset_user_access_id) }
-      .map { |pv| history_entry_json(pv, auas[pv.asset_user_access_id], @current_user, session) }
+                 .select { |pv| auas.key?(pv.asset_user_access_id) }
+                 .map { |pv| history_entry_json(pv, auas[pv.asset_user_access_id], @current_user, session) }
   rescue PageView::Pv4Client::Pv4BadRequest => e
     Canvas::Errors.capture_exception(:pv4, e, :warn)
     render json: { error: t("Page Views received an invalid or malformed request.") }, status: :bad_request

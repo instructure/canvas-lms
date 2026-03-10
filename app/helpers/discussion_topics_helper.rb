@@ -41,7 +41,7 @@ module DiscussionTopicsHelper
   def any_course_with_checkpoints_enabled?(contexts)
     return false unless contexts.is_a?(Array)
 
-    courses = contexts.select { |context| context.is_a?(Course) }
+    courses = contexts.grep(Course)
     return false if courses.empty?
 
     # Ensure we check each account once since discussion_checkpoints FF is at the account level

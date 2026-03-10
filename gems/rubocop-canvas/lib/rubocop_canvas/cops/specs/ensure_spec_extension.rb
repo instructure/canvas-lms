@@ -67,7 +67,7 @@ module RuboCop
         end
 
         def node_children(node)
-          node.children.select { |e| e.is_a? Parser::AST::Node }
+          node.children.grep(Parser::AST::Node)
         end
 
         def root_node

@@ -367,9 +367,9 @@ class AssignmentsController < ApplicationController
           js_env({ OBSERVER_OPTIONS: {
                    OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
                    CAN_ADD_OBSERVEE: @current_user
-                                      .profile
-                                      .tabs_available(@current_user, root_account: @domain_root_account)
-                                      .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                                     .profile
+                                     .tabs_available(@current_user, root_account: @domain_root_account)
+                                     .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
                  } })
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment

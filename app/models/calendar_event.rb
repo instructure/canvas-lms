@@ -506,7 +506,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_reserved_by_user
     to do
       appointment_group.instructors +
-        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.select { |c| c.is_a?(Course) })
+        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.grep(Course))
     end
     whenever do
       @updating_user && appointment_group && parent_event &&
@@ -518,7 +518,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_canceled_by_user
     to do
       appointment_group.instructors +
-        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.select { |c| c.is_a?(Course) })
+        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.grep(Course))
     end
     whenever do
       appointment_group && parent_event &&

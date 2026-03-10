@@ -203,6 +203,9 @@ Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/DoubleNegation:
   Enabled: false # we use double negation, even outside of return context, to get an actual true/false for various API results
+Style/EmptyClassDefinition:
+  # see also https://github.com/rubocop/rubocop/issues/14961
+  Enabled: false # all of our usages are for defining error subclasses
 Style/FetchEnvVar:
   Enabled: false # ENV vars are generally all optional, and it's expected to return nil
 Style/FloatDivision:
@@ -425,6 +428,8 @@ Style/CommentedKeyword:
   AutoCorrect: false
 Style/DocumentDynamicEvalDefinition:
   Severity: convention
+Style/FileOpen:
+  Severity: warning
 Style/FormatString:
   Severity: convention
   AutoCorrect: false
@@ -453,6 +458,8 @@ Style/ModuleFunction:
 Style/MultipleComparison:
   Severity: convention
   AutoCorrect: false
+Style/OneClassPerFile:
+  Severity: warning
 Style/OptionalArguments:
   Severity: convention
 Style/StringConcatenation:

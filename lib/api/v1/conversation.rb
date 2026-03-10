@@ -105,7 +105,7 @@ module Api::V1::Conversation
   end
 
   def conversation_recipients_json(recipients, current_user, session)
-    ActiveRecord::Associations.preload(recipients.select { |r| r.is_a?(User) },
+    ActiveRecord::Associations.preload(recipients.grep(User),
                                        { pseudonym: :account }) # for avatar_url
 
     preload_common_contexts(current_user, recipients)

@@ -20,6 +20,6 @@
 module QuizVisibility
   module Entities
     # When a quiz is visible to a (student) user
-    QuizVisibleToStudent = Struct.new(:course_id, :user_id, :quiz_id, keyword_init: true)
+    QuizVisibleToStudent = Struct.new(:course_id, :user_id, :quiz_id)
   end
 end

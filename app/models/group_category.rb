@@ -591,7 +591,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def max_diff_tag_validation_count
-    sql = <<-SQL.squish
+    sql = <<~SQL.squish
       SELECT
         SUM(
           (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted')

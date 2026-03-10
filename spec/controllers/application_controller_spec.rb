@@ -2644,7 +2644,7 @@ RSpec.describe ApplicationController do
 
       controller.instance_variable_set(:@context, student)
       controller.send(:get_all_pertinent_contexts)
-      expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Course) }).to eq [c2]
+      expect(controller.instance_variable_get(:@contexts).grep(Course)).to eq [c2]
     end
 
     it "doesn't touch the database if there are no valid courses" do
@@ -2678,7 +2678,7 @@ RSpec.describe ApplicationController do
           @group.add_user(@user)
         end
         controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
-        expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to eq [@group]
+        expect(controller.instance_variable_get(:@contexts).grep(Group)).to eq [@group]
       end
 
       it "does not include groups in courses the user doesn't have the ability to view yet" do
@@ -2694,7 +2694,7 @@ RSpec.describe ApplicationController do
         @group.add_user(@user)
 
         controller.send(:get_all_pertinent_contexts, include_groups: true)
-        expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to be_empty
+        expect(controller.instance_variable_get(:@contexts).grep(Group)).to be_empty
       end
 
       it "must select all cross-shard courses the user belongs to" do

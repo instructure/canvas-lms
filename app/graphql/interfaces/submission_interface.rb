@@ -495,26 +495,26 @@ module Interfaces::SubmissionInterface
               :status
             )
             .map do |asset_string, data|
-              # For submission asset strings, use current submission object instead of loading
-              # OriginalityReport#asset_key appends ISO8601 timestamp to submission asset strings
-              target_promise = if asset_string.to_s.start_with?("submission_")
-                                 Promise.resolve(object)
-                               else
-                                 Loaders::AssetStringLoader.load(asset_string.to_s)
-                               end
+        # For submission asset strings, use current submission object instead of loading
+        # OriginalityReport#asset_key appends ISO8601 timestamp to submission asset strings
+        target_promise = if asset_string.to_s.start_with?("submission_")
+                           Promise.resolve(object)
+                         else
+                           Loaders::AssetStringLoader.load(asset_string.to_s)
+                         end
 
-              target_promise.then do |target|
-                next if target.nil?
+        target_promise.then do |target|
+          next if target.nil?
 
-                {
-                  target:,
-                  asset_string:,
-                  report_url: data[:report_url],
-                  score: data[:similarity_score],
-                  status: data[:status],
-                  state: data[:state],
-                }
-              end
+          {
+            target:,
+            asset_string:,
+            report_url: data[:report_url],
+            score: data[:similarity_score],
+            status: data[:status],
+            state: data[:state],
+          }
+        end
       end
     end
   end

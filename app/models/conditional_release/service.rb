@@ -79,12 +79,13 @@ module ConditionalRelease
         rules.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
       end
       trigger_ids = rules_data.pluck("trigger_assignment_id")
-      trigger_assgs = course.assignments.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
-        assgs[a.id] = {
-          points_possible: a.points_possible,
-          grading_type: a.grading_type,
-          grading_scheme: a.uses_grading_standard ? a.grading_scheme : nil,
-        }
+      trigger_assgs = course.assignments.preload(:grading_standard).where(id: trigger_ids).to_h do |a|
+        [a.id,
+         {
+           points_possible: a.points_possible,
+           grading_type: a.grading_type,
+           grading_scheme: a.uses_grading_standard ? a.grading_scheme : nil,
+         }]
       end
       rules_data.each do |rule|
         rule["trigger_assignment_model"] = trigger_assgs[rule["trigger_assignment_id"]]

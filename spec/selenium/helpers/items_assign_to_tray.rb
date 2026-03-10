@@ -423,7 +423,7 @@ module ItemsAssignToTray
 
   def wait_for_assign_to_tray_spinner
     begin
-      keep_trying_until { (element_exists?(loading_spinner_selector) == false) }
+      keep_trying_until { element_exists?(loading_spinner_selector) == false }
     rescue Selenium::WebDriver::Error::TimeoutError
       # ignore - sometimes spinner doesn't appear in Chrome
     end
