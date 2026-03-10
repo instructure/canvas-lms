@@ -186,6 +186,12 @@ describe TurnitinApi::OutcomesResponseTransformer do
       expect { transformer.response }.to raise_error(described_class::InvalidUrlError, /not in the list of allowed/i)
     end
 
+    it "raises InvalidUrlError when a redirect points to a non-allowlisted host" do
+      stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
+        .to_return(status: 302, headers: { "Location" => "https://evil.com/steal-credentials" })
+      expect { subject.response }.to raise_error(described_class::InvalidUrlError, /not in the list of allowed/i)
+    end
+
     it "allows valid HTTPS Turnitin URLs" do
       stub_request(:post, "https://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })

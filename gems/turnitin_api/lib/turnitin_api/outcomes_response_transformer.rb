@@ -122,7 +122,7 @@ module TurnitinApi
         conn.request :multipart
         conn.request :url_encoded
         conn.response :json, preserve_raw: true
-        conn.response :follow_redirects
+        conn.response :follow_redirects, callback: ->(_, new_env) { validate_url!(new_env[:url].to_s) }
         conn.adapter :net_http
       end
     end
