@@ -111,13 +111,13 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       expect(updated_last_updated_text).not_to be_empty
     end
 
-    it "does not display grade badge for courses without grades" do
+    it "displays N/A grade badge for courses without a calculable grade" do
       course_with_student(user: @student, active_all: true, course_name: "No Grades Course")
       ungraded_course = @course
 
       go_to_dashboard
 
-      expect(element_exists?(course_grade_text_selector(ungraded_course.id))).to be_falsey
+      expect(course_grade_text(ungraded_course.id).text).to eq("N/A")
       expect(element_exists?(course_last_updated_selector(ungraded_course.id))).to be_falsey
     end
   end

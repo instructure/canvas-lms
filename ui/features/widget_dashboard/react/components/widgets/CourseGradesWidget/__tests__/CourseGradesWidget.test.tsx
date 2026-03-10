@@ -167,6 +167,25 @@ describe('CourseGradesWidget', () => {
     })
   })
 
+  it('displays N/A when course has no calculable grade', async () => {
+    const courseDataWithNullGrade: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course Without Grade',
+        currentGrade: null,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+    ]
+
+    setup({}, courseDataWithNullGrade)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('course-1-grade')).toHaveTextContent('N/A')
+    })
+  })
+
   it('displays grades when available', async () => {
     const courseDataWithGrade: SharedCourseData[] = [
       {
