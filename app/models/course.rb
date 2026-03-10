@@ -3778,8 +3778,10 @@ class Course < ActiveRecord::Base
       tabs += default_tabs
       tabs += external_tabs
 
-      item_bank_href_override = if root_account.feature_enabled?(:ams_root_account_integration) &&
-                                   feature_enabled?(:ams_course_integration)
+      is_ams = root_account.feature_enabled?(:ams_root_account_integration) &&
+               feature_enabled?(:ams_course_integration)
+
+      item_bank_href_override = if is_ams
                                   :course_item_banks_path
                                 elsif feature_enabled?(:new_quizzes_native_experience)
                                   :course_new_quizzes_banks_path
@@ -3791,7 +3793,8 @@ class Course < ActiveRecord::Base
         NewQuizzesHelper.override_item_banks_tab(
           tabs:,
           href: item_bank_href_override,
-          context: self
+          context: self,
+          css_class: is_ams ? "item_banks" : nil
         )
       end
 

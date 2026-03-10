@@ -123,7 +123,7 @@ describe NewQuizzesHelper do
     let(:tabs) do
       [
         { id: "home", label: "Home", css_class: "home", href: :course_path },
-        { id: "item_banks", label: "Item Banks", css_class: "item_banks", href: :some_original_path },
+        { id: "item_banks", label: "Item Banks", css_class: "context_external_tool_7", href: :some_original_path, args: [1, 7], external: true },
         { id: "assignments", label: "Assignments", css_class: "assignments", href: :course_assignments_path }
       ]
     end
@@ -140,6 +140,50 @@ describe NewQuizzesHelper do
         expect(item_banks_tab).to be_present
         expect(item_banks_tab[:href]).to eq(:course_new_quizzes_banks_path)
         expect(item_banks_tab[:label]).to eq("Item Banks")
+      end
+
+      it "sets external to false" do
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+
+        item_banks_tab = tabs.find { |t| t[:id] == Course::TAB_ITEM_BANKS }
+        expect(item_banks_tab[:external]).to be false
+      end
+
+      it "strips args from the original tab" do
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+
+        item_banks_tab = tabs.find { |t| t[:id] == Course::TAB_ITEM_BANKS }
+        expect(item_banks_tab).not_to have_key(:args)
+      end
+
+      it "preserves original css_class when none provided" do
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+
+        item_banks_tab = tabs.find { |t| t[:id] == Course::TAB_ITEM_BANKS }
+        expect(item_banks_tab[:css_class]).to eq("context_external_tool_7")
+      end
+
+      it "overrides css_class when provided" do
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_item_banks_path,
+          context: course,
+          css_class: "item_banks"
+        )
+
+        item_banks_tab = tabs.find { |t| t[:id] == Course::TAB_ITEM_BANKS }
         expect(item_banks_tab[:css_class]).to eq("item_banks")
       end
 
