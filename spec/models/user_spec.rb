@@ -6214,4 +6214,52 @@ describe User do
       expect(user.accessible_courses_by_sis_ids(["private_sis"])).to eq([])
     end
   end
+
+  describe "#current_course_ids_for_dashboard" do
+    before do
+      @student = user_factory(active_all: true)
+      @active_course = course_factory(active_all: true)
+      @active_course.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "includes courses with active enrollments" do
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+    end
+
+    it "excludes courses with past enrollment term" do
+      past_term = @active_course.account.enrollment_terms.create!(
+        name: "Past Term",
+        start_at: 6.months.ago,
+        end_at: 1.month.ago
+      )
+      past_course = course_factory(active_all: true, account: @active_course.account)
+      past_course.update!(enrollment_term: past_term)
+      past_course.enroll_student(@student, enrollment_state: "active")
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(past_course.id)
+    end
+
+    it "excludes courses with conclude_at in past" do
+      concluded_course = course_factory(active_all: true)
+      concluded_course.update!(conclude_at: 1.week.ago)
+      concluded_course.enroll_student(@student, enrollment_state: "active")
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(concluded_course.id)
+    end
+
+    it "excludes formally concluded courses" do
+      concluded_course = course_factory(active_all: true)
+      concluded_course.enroll_student(@student, enrollment_state: "active")
+      concluded_course.complete!
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(concluded_course.id)
+    end
+  end
 end

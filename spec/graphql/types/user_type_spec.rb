@@ -2872,6 +2872,45 @@ describe Types::UserType do
         expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
         expect(titles).not_to include("Unpublished Course Announcement")
       end
+
+      it "excludes announcements from courses with past enrollment term" do
+        past_term = @course1.account.enrollment_terms.create!(
+          name: "Past Term",
+          start_at: 6.months.ago,
+          end_at: 1.month.ago
+        )
+        past_term_course = course_factory(active_all: true, account: @course1.account)
+        past_term_course.update!(enrollment_term: past_term)
+        past_term_course.enroll_student(@student_user, enrollment_state: "active")
+
+        past_term_course.announcements.create!(
+          title: "Past Term Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Past Term Announcement")
+      end
+
+      it "excludes announcements from formally concluded courses" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_student(@student_user, enrollment_state: "active")
+        concluded_course.announcements.create!(
+          title: "Concluded Course Announcement",
+          message: "This should not appear"
+        )
+
+        concluded_course.complete!
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Concluded Course Announcement")
+      end
     end
   end
 
