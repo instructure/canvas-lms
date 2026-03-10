@@ -620,7 +620,11 @@ class ContentTag < ActiveRecord::Base
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     differentiable_classes = ["Assignment", "DiscussionTopic", "Quiz", "Quizzes::Quiz", "WikiPage"]
+    visible_module_ids = ModuleVisibility::ModuleVisibilityService
+                         .modules_visible_to_students(user_ids:, course_ids:)
+                         .map(&:context_module_id)
     scope = for_non_differentiable_classes(course_ids, differentiable_classes)
+            .where(context_module_id: visible_module_ids)
 
     visible_page_ids = WikiPage.visible_to_students_in_course_with_da(user_ids, course_ids).select(:id)
     scope = scope.union(where(content_id: visible_page_ids, context_id: course_ids, context_type: "Course", content_type: "WikiPage"))
