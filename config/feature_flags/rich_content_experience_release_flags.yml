@@ -190,6 +190,18 @@ files_a11y_rewrite_toggle:
     ci:
       state: allowed_on
 
+files_a11y_folder_duplicates:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Files A11y Folder Duplicates
+  description: |-
+    Enable duplicate folder detection and display within the same parent directory.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 media_links_use_attachment_id:
   state: hidden
   display_name: Use Attachment IDs in Media Links

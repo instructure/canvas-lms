@@ -789,4 +789,28 @@ class FoldersController < ApplicationController
       render json: folder_json(@folder, @current_user, session)
     end
   end
+
+  # internal API
+  def duplicates
+    return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite) &&
+                                           Account.site_admin.feature_enabled?(:files_a11y_folder_duplicates)
+
+    @folder = Folder.find(params[:id])
+    return render_unauthorized_action unless @folder.context == @context
+    return unless authorized_action(@folder, @current_user, :read_contents)
+
+    duplicate_folders = find_duplicate_folders(@folder)
+
+    render json: { duplicates: folders_json(duplicate_folders, @current_user, session) }
+  end
+
+  def find_duplicate_folders(folder)
+    return [] unless folder.parent_folder_id
+
+    folder.parent_folder.active_sub_folders
+          .where(name: folder.name)
+          .where.not(id: folder.id)
+          .to_a
+  end
+  private :find_duplicate_folders
 end
