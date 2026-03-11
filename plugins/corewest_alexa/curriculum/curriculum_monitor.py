@@ -9,6 +9,7 @@ Python 3.11+ compatible.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any
 
 from .models import CurriculumStandard
@@ -425,7 +426,10 @@ class CurriculumMonitor:
 
         return {
             "framework": framework,
-            "generated_at": "2026-03-09T08:34:00Z",
+            "generated_at": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z"),
             "overall_coverage": overall,
             "subject_breakdowns": subject_breakdowns,
             "department_overview": self.get_department_overview(),

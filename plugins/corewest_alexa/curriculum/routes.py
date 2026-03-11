@@ -1,15 +1,16 @@
 """
 FastAPI router for curriculum monitoring and inspection readiness endpoints.
 
-All /curriculum/* and /inspection/* routes are JWT-protected.
+All /curriculum/* and /inspection/* routes are intended to be JWT-protected
+when the auth plugin is available. If the auth dependency cannot be imported
+(e.g. during standalone testing without the auth plugin), the router degrades
+gracefully and these routes are exposed without authentication.
 
 Python 3.11+ compatible.
 """
 
 from __future__ import annotations
 
-import uuid
-from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -20,9 +21,7 @@ from .models import EvidenceUploadRequest
 from .performance_tracker import PerformanceTracker
 from .standards_framework import (
     get_all_frameworks,
-    get_curriculum_standards,
     get_framework,
-    map_cognia_to_ofsted,
     map_ofsted_to_cognia,
 )
 
@@ -333,16 +332,19 @@ def criteria_evidence(criteria_id: str) -> dict[str, Any]:
 @inspection_router.post("/evidence", summary="Upload/register evidence", status_code=201)
 def upload_evidence(payload: EvidenceUploadRequest) -> dict[str, Any]:
     """Register a new piece of evidence against an inspection criterion."""
-    evidence = _readiness.add_evidence(
-        {
-            "criteria_id": payload.criteria_id,
-            "title": payload.title,
-            "description": payload.description,
-            "evidence_type": payload.evidence_type,
-            "uploaded_by": payload.uploaded_by,
-            "tags": payload.tags,
-        }
-    )
+    try:
+        evidence = _readiness.add_evidence(
+            {
+                "criteria_id": payload.criteria_id,
+                "title": payload.title,
+                "description": payload.description,
+                "evidence_type": payload.evidence_type,
+                "uploaded_by": payload.uploaded_by,
+                "tags": payload.tags,
+            }
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     return {"status": "created", "evidence": evidence.model_dump()}
 
 

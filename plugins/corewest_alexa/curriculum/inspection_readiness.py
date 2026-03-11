@@ -418,6 +418,10 @@ class InspectionReadinessEngine:
         self._ofsted_criteria: list[dict[str, Any]] = _OFSTED_CRITERIA
         self._cognia_criteria: list[dict[str, Any]] = _COGNIA_CRITERIA
         self._evidence: list[dict[str, Any]] = list(_MOCK_EVIDENCE)
+        # Pre-computed combined criteria list used for evidence validation lookups.
+        self._all_criteria: list[dict[str, Any]] = (
+            self._ofsted_criteria + self._cognia_criteria
+        )
 
     def _get_criteria(self, framework: str) -> list[dict[str, Any]]:
         if framework.lower() == "cognia":
@@ -455,7 +459,7 @@ class InspectionReadinessEngine:
                 status = "ready" if avg >= 70 else "needs_attention"
                 area_scores[cat] = {
                     "score": avg,
-                    "grade": "Proficient" if avg >= 70 else "Developing",
+                    "grade": self._score_to_grade(avg, framework),
                     "status": status,
                     "criteria_count": len(items),
                 }
@@ -474,14 +478,10 @@ class InspectionReadinessEngine:
                     / len(area_criteria),
                     1,
                 )
-                grade = next(
-                    (c["grade"] for c in area_criteria),
-                    "Requires Improvement",
-                )
                 status = "ready" if avg >= 70 else ("needs_attention" if avg >= 45 else "critical")
                 area_scores[area] = {
                     "score": avg,
-                    "grade": grade,
+                    "grade": self._score_to_grade(avg, framework),
                     "status": status,
                     "criteria_count": len(area_criteria),
                 }
@@ -501,7 +501,10 @@ class InspectionReadinessEngine:
             "areas": area_scores,
             "safeguarding_effective": safeguarding_ok,
             "ready_for_inspection": overall >= 65 and safeguarding_ok,
-            "generated_at": "2026-03-09T08:34:00Z",
+            "generated_at": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z"),
         }
 
     def _score_to_grade(self, score: float, framework: str) -> str:
@@ -545,7 +548,7 @@ class InspectionReadinessEngine:
         action_items.sort(
             key=lambda x: (
                 priority_order.get(x.get("priority", "low"), 3),
-                -x.get("evidence_count", 0),
+                x.get("evidence_count", 0),
             )
         )
 
@@ -568,7 +571,7 @@ class InspectionReadinessEngine:
         self, area: str | None = None
     ) -> dict[str, Any]:
         """Return evidence tracking for each criterion."""
-        criteria = self._ofsted_criteria + self._cognia_criteria
+        criteria = self._all_criteria
         if area:
             criteria = [c for c in criteria if c.get("category") == area]
 
@@ -635,7 +638,10 @@ class InspectionReadinessEngine:
         return {
             "framework": framework,
             "institution": "Core West College",
-            "generated_at": "2026-03-09T08:34:00Z",
+            "generated_at": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z"),
             "overall_grade": readiness["overall_grade"],
             "overall_score": readiness["overall_score"],
             "sections": sections,
@@ -658,7 +664,19 @@ class InspectionReadinessEngine:
         return _generate_trend_data(days)
 
     def add_evidence(self, evidence_data: dict[str, Any]) -> InspectionEvidence:
-        """Register a new piece of evidence against a criterion."""
+        """Register a new piece of evidence against a criterion.
+
+        Raises:
+            ValueError: If ``criteria_id`` does not match any known criterion.
+        """
+        criteria_id = evidence_data.get("criteria_id", "")
+        matching = [c for c in self._all_criteria if c["id"] == criteria_id]
+        if not matching:
+            raise ValueError(
+                f"Unknown criteria_id '{criteria_id}'. "
+                "Evidence must be linked to an existing inspection criterion."
+            )
+
         new_evidence = {
             "id": str(uuid.uuid4()),
             "uploaded_at": datetime.now(timezone.utc).isoformat(),
@@ -667,11 +685,8 @@ class InspectionReadinessEngine:
         self._evidence.append(new_evidence)
 
         # Update evidence count on matching criterion
-        for criteria_list in (self._ofsted_criteria, self._cognia_criteria):
-            for criterion in criteria_list:
-                if criterion["id"] == new_evidence.get("criteria_id"):
-                    criterion["evidence_count"] = criterion.get("evidence_count", 0) + 1
-                    break
+        for criterion in matching:
+            criterion["evidence_count"] = criterion.get("evidence_count", 0) + 1
 
         return InspectionEvidence(**new_evidence)
 

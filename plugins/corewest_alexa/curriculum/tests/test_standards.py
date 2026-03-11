@@ -149,7 +149,7 @@ class TestCommonCore:
 # ---------------------------------------------------------------------------
 
 
-class TestDanisonFramework:
+class TestDanielsonFramework:
     def test_four_domains_present(self):
         for domain in ("domain_1", "domain_2", "domain_3", "domain_4"):
             assert domain in DANIELSON_FRAMEWORK, f"{domain} missing from Danielson framework"

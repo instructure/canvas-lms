@@ -539,6 +539,17 @@
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
 
+  // Escape HTML special characters to prevent XSS when building innerHTML.
+  function esc(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+  }
+
   function gradeClass(grade) {
     if (!grade) return '';
     const g = grade.toLowerCase();
@@ -579,9 +590,26 @@
   }
 
   // Async fetch helper — returns null on error
-  async function apiFetch(path) {
+  async function apiFetch(path, options = {}) {
     try {
-      const res = await fetch(API_BASE + path);
+      // Read JWT from localStorage using common key names.
+      let token = null;
+      try {
+        token =
+          localStorage.getItem('access_token') ||
+          localStorage.getItem('jwt') ||
+          localStorage.getItem('token');
+      } catch (_storageErr) {
+        // localStorage may be restricted — proceed without a token.
+        token = null;
+      }
+
+      const headers = new Headers(options.headers || {});
+      if (token) {
+        headers.set('Authorization', 'Bearer ' + token);
+      }
+
+      const res = await fetch(API_BASE + path, { ...options, headers });
       if (!res.ok) throw new Error(res.statusText);
       return await res.json();
     } catch (e) {
@@ -670,10 +698,10 @@
       if (readiness.areas) {
         areaEl.innerHTML = Object.entries(readiness.areas).map(([key, area]) => `
           <div class="area-card ${gradeClass(area.grade)}">
-            <div class="area-title">${areaNames[key] || key}</div>
-            <span class="area-grade">${area.grade}</span>
+            <div class="area-title">${esc(areaNames[key] || key)}</div>
+            <span class="area-grade">${esc(area.grade)}</span>
             <div class="area-score">${Math.round(area.score)}%</div>
-            <div class="area-sub">${area.criteria_count} criteria assessed</div>
+            <div class="area-sub">${esc(String(area.criteria_count))} criteria assessed</div>
           </div>
         `).join('');
       }
@@ -688,10 +716,10 @@
         <li class="action-item">
           <span class="action-num">${i+1}</span>
           <div class="action-body">
-            <span class="action-title">${a.criterion}
-              <span class="priority-badge ${a.priority}">${a.priority.toUpperCase()}</span>
+            <span class="action-title">${esc(a.criterion)}
+              <span class="priority-badge ${esc(a.priority)}">${esc(a.priority.toUpperCase())}</span>
             </span>
-            <div class="action-desc">${a.description}</div>
+            <div class="action-desc">${esc(a.description)}</div>
           </div>
         </li>
       `).join('');
@@ -707,8 +735,8 @@
       const items = Object.values(tracker).slice(0, 15);
       $('#evidence-tracker').innerHTML = items.map(item => `
         <div class="evidence-row">
-          <span class="evidence-name">${item.criterion}</span>
-          <span class="ev-badge ${item.evidence_status}">${item.evidence_status}</span>
+          <span class="evidence-name">${esc(item.criterion)}</span>
+          <span class="ev-badge ${esc(item.evidence_status)}">${esc(item.evidence_status)}</span>
         </div>
       `).join('') || '<p class="text-muted text-sm">No evidence items found.</p>';
     }
@@ -739,17 +767,17 @@
     if (readiness.areas) {
       $('#cognia-areas').innerHTML = Object.entries(readiness.areas).map(([key, area]) => `
         <div class="area-card ${gradeClass(area.grade)}">
-          <div class="area-title">${standardsNames[key] || key}</div>
-          <span class="area-grade">${area.grade}</span>
+          <div class="area-title">${esc(standardsNames[key] || key)}</div>
+          <span class="area-grade">${esc(area.grade)}</span>
           <div class="area-score">${Math.round(area.score)}%</div>
-          <div class="area-sub">${area.criteria_count} indicators assessed</div>
+          <div class="area-sub">${esc(String(area.criteria_count))} indicators assessed</div>
         </div>
       `).join('');
 
       $('#cognia-standards-list').innerHTML = Object.entries(readiness.areas).map(([key, area]) => `
         <div class="metric-row">
-          <span class="metric-label">${standardsNames[key] || key}</span>
-          <span class="metric-value ${gradeColorClass(area.grade)}">${area.grade}</span>
+          <span class="metric-label">${esc(standardsNames[key] || key)}</span>
+          <span class="metric-value ${gradeColorClass(area.grade)}">${esc(area.grade)}</span>
         </div>
       `).join('');
     }
@@ -774,7 +802,7 @@
         const cls = pct >= 80 ? 'ok' : (pct >= 60 ? '' : 'warn');
         return `
           <div class="bar-row">
-            <span class="bar-label">${subj}</span>
+            <span class="bar-label">${esc(subj)}</span>
             <div class="bar-track">
               <div class="bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
@@ -792,13 +820,13 @@
       });
       $('#gaps-list').innerHTML = Object.entries(grouped).slice(0, 8).map(([subj, items]) => `
         <div style="margin-bottom:.75rem">
-          <strong style="color:var(--navy)">${subj}</strong>
+          <strong style="color:var(--navy)">${esc(subj)}</strong>
           <ul style="margin-top:.25rem;padding-left:1.2rem;font-size:.8rem">
             ${items.slice(0, 3).map(g => `
               <li style="margin-bottom:.2rem">
-                <code style="background:#eef;padding:.1rem .3rem;border-radius:3px;font-size:.75rem">${g.code}</code>
-                ${g.description}
-                <span style="color:var(--amber);font-size:.72rem;margin-left:.3rem">[${g.status}]</span>
+                <code style="background:#eef;padding:.1rem .3rem;border-radius:3px;font-size:.75rem">${esc(g.code)}</code>
+                ${esc(g.description)}
+                <span style="color:var(--amber);font-size:.72rem;margin-left:.3rem">[${esc(g.status)}]</span>
               </li>
             `).join('')}
           </ul>
@@ -826,7 +854,7 @@
         const cls = avg >= 80 ? 'ok' : (avg >= 60 ? '' : 'warn');
         return `
           <div class="bar-row">
-            <span class="bar-label">${dept}</span>
+            <span class="bar-label">${esc(dept)}</span>
             <div class="bar-track">
               <div class="bar-fill ${cls}" style="width:${avg}%"></div>
             </div>
@@ -864,7 +892,7 @@
         const cls = vs >= 0 ? 'ok' : 'warn';
         return `
           <div class="bar-row">
-            <span class="bar-label">${subj}</span>
+            <span class="bar-label">${esc(subj)}</span>
             <div class="bar-track">
               <div class="bar-fill ${cls}" style="width:${pct}%"></div>
             </div>
@@ -917,10 +945,10 @@
 
     $('#compare-tbody').innerHTML = mapping.map(row => `
       <tr>
-        <td>${row.ofsted_area}</td>
-        <td class="grade-cell ${gradeColorClass(row.ofsted_grade)}">${row.ofsted_grade}</td>
-        <td>${row.cognia_area}</td>
-        <td class="grade-cell ${gradeColorClass(row.cognia_level)}">${row.cognia_level}</td>
+        <td>${esc(row.ofsted_area)}</td>
+        <td class="grade-cell ${gradeColorClass(row.ofsted_grade)}">${esc(row.ofsted_grade)}</td>
+        <td>${esc(row.cognia_area)}</td>
+        <td class="grade-cell ${gradeColorClass(row.cognia_level)}">${esc(row.cognia_level)}</td>
       </tr>
     `).join('');
   }

@@ -12,10 +12,11 @@ Integrates:
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 
@@ -38,9 +39,30 @@ except ImportError:  # pragma: no cover
 from curriculum.routes import curriculum_router, inspection_router  # noqa: E402
 from curriculum.curriculum_monitor import CurriculumMonitor          # noqa: E402
 from curriculum.inspection_readiness import InspectionReadinessEngine  # noqa: E402
+from curriculum.performance_tracker import PerformanceTracker          # noqa: E402
 
 _monitor = CurriculumMonitor()
 _readiness = InspectionReadinessEngine()
+_performance = PerformanceTracker()
+
+_logger = logging.getLogger(__name__)
+
+# Minimal fallback API key validator used when the auth module is unavailable.
+_FALLBACK_API_KEY = os.environ.get("ALEXA_API_KEY", "")
+
+
+async def _fallback_verify_api_key(request: Request) -> None:
+    """Require a valid API key header when the auth module is absent."""
+    if not _FALLBACK_API_KEY:
+        # No key configured — log a warning; allow in dev/test only.
+        _logger.warning(
+            "ALEXA_API_KEY is not set: /alexa/webhook is unauthenticated. "
+            "Set ALEXA_API_KEY in production to protect this endpoint."
+        )
+        return
+    api_key = request.headers.get("X-API-Key", "")
+    if api_key != _FALLBACK_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key.")
 
 # ---------------------------------------------------------------------------
 # App
@@ -59,10 +81,19 @@ app = FastAPI(
 # CORS
 # ---------------------------------------------------------------------------
 
+_cors_origins_raw = os.environ.get("CORS_ORIGINS", "").strip()
+if _cors_origins_raw:
+    _allowed_origins = [o.strip() for o in _cors_origins_raw.split(",") if o.strip()]
+else:
+    _allowed_origins = ["*"]
+
+# Credentialed requests are incompatible with the wildcard origin.
+_allow_credentials = "*" not in _allowed_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_credentials=True,
+    allow_origins=_allowed_origins,
+    allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -148,16 +179,21 @@ SUPPORTED_TYPES = [
 
 
 @app.get("/alexa/query")
-async def alexa_query(q: str = "", type: str = "today") -> JSONResponse:
+async def alexa_query(
+    q: str = "",
+    query_kind: str = Query("today", alias="type"),
+) -> JSONResponse:
     """Voice query endpoint — supports curriculum and inspection query types."""
-    query_type = (q or type).strip().lower()
+    query_type = (q or query_kind).strip().lower()
 
     speech_text: str
 
     if query_type in ("curriculum", "subjects", "gaps"):
         speech_text = _monitor.get_voice_summary(query_type)
-    elif query_type in ("inspection",):
+    elif query_type == "inspection":
         speech_text = _readiness.get_voice_summary()
+    elif query_type in ("teachers", "at_risk"):
+        speech_text = _performance.get_voice_summary(query_type)
     else:
         speech_text = f"Query type '{query_type}' received."
 
@@ -192,7 +228,7 @@ async def alexa_dashboard(
 @app.post("/alexa/webhook")
 async def alexa_webhook(
     payload: dict,
-    _key=Depends(verify_api_key) if _AUTH_AVAILABLE and verify_api_key else None,
+    _key=Depends(verify_api_key) if _AUTH_AVAILABLE and verify_api_key else Depends(_fallback_verify_api_key),
 ) -> JSONResponse:
     """Alexa webhook — handles skill intents including curriculum and inspection."""
     request_type = payload.get("request", {}).get("type", "")
@@ -214,26 +250,29 @@ async def alexa_webhook(
             "CurriculumCoverageIntent":  ("coverage",   _monitor.get_voice_summary),
             "SubjectPerformanceIntent":  ("subjects",   _monitor.get_voice_summary),
             "CurriculumGapsIntent":      ("gaps",       _monitor.get_voice_summary),
-            "TeacherSummaryIntent":      ("teachers",   _monitor.get_voice_summary),
-            "StudentRiskIntent":         ("at_risk",    _monitor.get_voice_summary),
+            "TeacherSummaryIntent":      ("teachers",   _performance.get_voice_summary),
+            "StudentRiskIntent":         ("at_risk",    _performance.get_voice_summary),
         }
 
         if intent_name in intent_map:
-            query_type, handler = intent_map[intent_name]
+            query_kind, handler = intent_map[intent_name]
             try:
                 # Handlers that take no args (e.g. get_voice_summary on InspectionEngine)
                 try:
                     speech = handler()  # type: ignore[call-arg]
                 except TypeError:
-                    speech = handler(query_type)  # type: ignore[call-arg]
-            except (AttributeError, ValueError) as exc:  # noqa: BLE001
-                import logging
-                logging.getLogger(__name__).error("Voice handler error for %s: %s", intent_name, exc)
-                speech = f"I was unable to retrieve the {query_type} summary."
+                    speech = handler(query_kind)  # type: ignore[call-arg]
+            except (AttributeError, ValueError) as exc:
+                _logger.error("Voice handler error for %s: %s", intent_name, exc)
+                speech = f"I was unable to retrieve the {query_kind} summary."
             return JSONResponse({"speech_text": speech, "intent": intent_name, "received": True})
 
+    # Fallback for unrecognised requests — do not echo full payload to avoid leaking data.
+    request_id = payload.get("request", {}).get("requestId")
     return JSONResponse({
         "speech_text": "Sorry, I did not understand that request.",
         "received": True,
-        "payload": payload,
+        "request_type": request_type or None,
+        "intent": intent_name or None,
+        "request_id": request_id,
     })

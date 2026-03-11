@@ -64,6 +64,36 @@ class TestInspectionReadiness:
             assert "grade" in area_data
             assert 0.0 <= area_data["score"] <= 100.0
 
+    def test_ofsted_area_grade_consistent_with_score(self, engine):
+        """Area grade must be derived from the score, not from an arbitrary criterion."""
+        result = engine.calculate_overall_readiness("ofsted")
+        for area_key, area_data in result["areas"].items():
+            score = area_data["score"]
+            grade = area_data["grade"]
+            if score >= 85:
+                assert grade == "Outstanding", f"{area_key}: score={score} grade={grade}"
+            elif score >= 65:
+                assert grade == "Good", f"{area_key}: score={score} grade={grade}"
+            elif score >= 45:
+                assert grade == "Requires Improvement", f"{area_key}: score={score} grade={grade}"
+            else:
+                assert grade == "Inadequate", f"{area_key}: score={score} grade={grade}"
+
+    def test_cognia_area_grade_consistent_with_score(self, engine):
+        """Cognia area grade must be derived from the score, not a hard-coded value."""
+        result = engine.calculate_overall_readiness("cognia")
+        for area_key, area_data in result["areas"].items():
+            score = area_data["score"]
+            grade = area_data["grade"]
+            if score >= 85:
+                assert grade == "Exemplary", f"{area_key}: score={score} grade={grade}"
+            elif score >= 65:
+                assert grade == "Proficient", f"{area_key}: score={score} grade={grade}"
+            elif score >= 45:
+                assert grade == "Developing", f"{area_key}: score={score} grade={grade}"
+            else:
+                assert grade == "Not Met", f"{area_key}: score={score} grade={grade}"
+
     def test_safeguarding_flag_present(self, engine):
         result = engine.calculate_overall_readiness("ofsted")
         assert "safeguarding_effective" in result
@@ -76,6 +106,13 @@ class TestInspectionReadiness:
     def test_generated_at_present(self, engine):
         result = engine.calculate_overall_readiness("ofsted")
         assert "generated_at" in result
+
+    def test_generated_at_is_not_hard_coded(self, engine):
+        """generated_at should be a dynamic ISO timestamp, not a hard-coded literal."""
+        result = engine.calculate_overall_readiness("ofsted")
+        ts = result["generated_at"]
+        assert ts != "2026-03-09T08:34:00Z", "generated_at must not be a hard-coded literal"
+        assert "T" in ts, "generated_at should be an ISO 8601 timestamp"
 
     # Checklist generation
 
@@ -215,6 +252,18 @@ class TestInspectionReadiness:
         tracker_after = engine.get_evidence_tracker(area="quality_of_education")
         count_after = tracker_after.get("OE-QE-001", {}).get("evidence_count", 0)
         assert count_after == count_before + 1
+
+    def test_add_evidence_invalid_criteria_id_raises(self, engine):
+        import pytest as _pytest
+        with _pytest.raises(ValueError, match="Unknown criteria_id"):
+            engine.add_evidence({
+                "criteria_id": "DOES-NOT-EXIST-999",
+                "title": "Orphan Evidence",
+                "description": "Should not be accepted",
+                "evidence_type": "document",
+                "uploaded_by": "Tester",
+                "tags": [],
+            })
 
     # Voice summary
 
