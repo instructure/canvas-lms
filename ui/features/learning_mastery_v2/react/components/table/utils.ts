@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CellProps} from './Cell'
+import {CellProps} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Cell'
 import {ColHeaderProps} from './ColHeader'
 
 export type Column = {
