@@ -20,9 +20,6 @@
 module Lti
   # @API LTI ContextControls
   #
-  # @beta
-  # @internal
-  #
   # Configure the availability of an LTI Registration in a specific context.
   # Used by the Canvas Apps page UI.
   #
