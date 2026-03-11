@@ -23,7 +23,11 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse, graphql} from 'msw'
 import CourseWorkCombinedWidget from '../CourseWorkCombinedWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {
+  defaultGraphQLHandlers,
+  clearWidgetDashboardCache,
+  PlatformTestWrapper,
+} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
@@ -206,11 +210,13 @@ const renderWithProviders = (component: React.ReactElement) => {
   })
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardEditProvider>
-        <WidgetLayoutProvider>{component}</WidgetLayoutProvider>
-      </WidgetDashboardEditProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>{component}</WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 

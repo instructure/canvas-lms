@@ -24,6 +24,7 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import {useWidgetDashboardEdit, WidgetDashboardEditProvider} from '../useWidgetDashboardEdit'
 import type {WidgetConfig} from '../../types'
+import {PlatformTestWrapper} from '../../__tests__/testHelpers'
 
 const server = setupServer()
 
@@ -54,9 +55,11 @@ describe('useWidgetDashboardEdit', () => {
   const createWrapper =
     () =>
     ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>
-        <WidgetDashboardEditProvider>{children}</WidgetDashboardEditProvider>
-      </QueryClientProvider>
+      <PlatformTestWrapper>
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardEditProvider>{children}</WidgetDashboardEditProvider>
+        </QueryClientProvider>
+      </PlatformTestWrapper>
     )
 
   describe('edit mode state management', () => {

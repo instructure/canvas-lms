@@ -23,7 +23,11 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import CourseWorkSummaryWidget from '../CourseWorkSummaryWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {defaultGraphQLHandlers, clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {
+  defaultGraphQLHandlers,
+  clearWidgetDashboardCache,
+  PlatformTestWrapper,
+} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
@@ -78,13 +82,15 @@ const setup = (props: Props = buildDefaultProps()) => {
   })
 
   const result = render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardEditProvider>
-        <WidgetLayoutProvider>
-          <CourseWorkSummaryWidget {...props} />
-        </WidgetLayoutProvider>
-      </WidgetDashboardEditProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>
+            <CourseWorkSummaryWidget {...props} />
+          </WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 
   return {
@@ -281,13 +287,15 @@ describe('CourseWorkSummaryWidget', () => {
     })
 
     const renderResult = render(
-      <QueryClientProvider client={queryClient}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <CourseWorkSummaryWidget {...buildDefaultProps()} />
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </QueryClientProvider>,
+      <PlatformTestWrapper>
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <CourseWorkSummaryWidget {...buildDefaultProps()} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </QueryClientProvider>
+      </PlatformTestWrapper>,
     )
 
     await waitFor(() => {

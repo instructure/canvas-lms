@@ -70,6 +70,7 @@ import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
 import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
+import {PlatformTestWrapper} from '../../__tests__/testHelpers'
 
 type Props = {
   config: WidgetConfig
@@ -86,17 +87,19 @@ const setUp = (props: Props, isEditMode = false) => {
   })
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider>
-        <ResponsiveProvider matches={matches}>
-          <WidgetDashboardEditProvider>
-            <WidgetLayoutProvider>
-              <WidgetGrid {...gridProps} isEditMode={isEditMode} />
-            </WidgetLayoutProvider>
-          </WidgetDashboardEditProvider>
-        </ResponsiveProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider>
+          <ResponsiveProvider matches={matches}>
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>
+                <WidgetGrid {...gridProps} isEditMode={isEditMode} />
+              </WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </ResponsiveProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 
