@@ -2038,6 +2038,12 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
 
+      is_site_admin = Account.site_admin.grants_right?(@current_user, :read) &&
+                      !@account.account_users.active.where(user_id: @current_user).exists?
+      js_env({
+               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin
+             })
+
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order(created_at: :desc).first
       respond_to do |format|

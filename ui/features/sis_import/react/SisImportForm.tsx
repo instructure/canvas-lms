@@ -18,7 +18,7 @@
 
 import {Button} from '@instructure/ui-buttons'
 import {FileDrop} from '@instructure/ui-file-drop'
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {IconUploadSolid} from '@instructure/ui-icons'
@@ -42,7 +42,7 @@ interface Props {
 export default function SisImportForm(props: Props) {
   const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [confirmed, setConfirmed] = useState(true)
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
   // form fields
   const [file, setFile] = useState<File | null>(null)
@@ -54,6 +54,9 @@ export default function SisImportForm(props: Props) {
 
   const fileRef = useRef<HTMLInputElement | null>(null)
 
+  const needsSiteAdminConfirmation = !!ENV.SHOW_SITE_ADMIN_CONFIRMATION
+  const needsConfirmation = needsSiteAdminConfirmation || fullChecked
+
   const overrideSisText = I18n.t(
     "By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes. See the documentation for details.",
   )
@@ -63,12 +66,6 @@ export default function SisImportForm(props: Props) {
   const clearSisText = I18n.t(
     'With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports.',
   )
-
-  useEffect(() => {
-    if (submitting && confirmed) {
-      handleSubmit()
-    }
-  }, [submitting, confirmed])
 
   const createRequestBody = (): SisImportRequestBody => {
     const requestBody: SisImportRequestBody = {
@@ -132,6 +129,7 @@ export default function SisImportForm(props: Props) {
   }
 
   const handleSubmit = async () => {
+    setSubmitting(true)
     if (validateFile()) {
       await startSisImport()
     }
@@ -148,7 +146,7 @@ export default function SisImportForm(props: Props) {
     }
   }
 
-  if (submitting && confirmed) {
+  if (submitting) {
     if (uploadProgress !== null) {
       return (
         <Flex direction="row" gap="small" alignItems="center">
@@ -212,7 +210,6 @@ export default function SisImportForm(props: Props) {
           id="batch_mode"
           checked={fullChecked}
           onChange={e => {
-            setConfirmed(!e.target.checked)
             setFullChecked(e.target.checked)
           }}
           label={I18n.t('This is a full batch update')}
@@ -264,7 +261,11 @@ export default function SisImportForm(props: Props) {
             onClick={e => {
               e.preventDefault()
               if (validateFile()) {
-                setSubmitting(true)
+                if (needsConfirmation) {
+                  setShowConfirmation(true)
+                } else {
+                  handleSubmit()
+                }
               }
             }}
             color="primary"
@@ -274,12 +275,16 @@ export default function SisImportForm(props: Props) {
         </Flex.Item>
       </Flex>
       <ConfirmationModal
-        isOpen={!confirmed && submitting}
+        isOpen={showConfirmation}
+        showSiteAdminConfirmation={needsSiteAdminConfirmation}
+        showBatchModeWarning={fullChecked}
+        accountName={ENV.current_context?.name || ''}
         onSubmit={() => {
-          setConfirmed(true)
+          setShowConfirmation(false)
+          handleSubmit()
         }}
         onRequestClose={() => {
-          setSubmitting(false)
+          setShowConfirmation(false)
         }}
       />
     </>
