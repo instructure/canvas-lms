@@ -9473,6 +9473,46 @@ describe Assignment do
       @assignment.update!(only_visible_to_overrides: false)
       expect(@assignment.enrollment_active_for_assignment?(student1)).to be_truthy
     end
+
+    it "returns true when assignment has ADHOC override and is in a module with ADHOC override for the same student" do
+      create_adhoc_override_for_assignment(@assignment, @student)
+      @assignment.update!(only_visible_to_overrides: true)
+
+      context_module = @course.context_modules.create!(name: "test module")
+      context_module.add_item(type: "assignment", id: @assignment.id)
+      module_override = context_module.assignment_overrides.create!(set_type: "ADHOC")
+      module_override.assignment_override_students.create!(user: @student)
+
+      expect(@assignment.enrollment_active_for_assignment?(@student)).to be_truthy
+    end
+
+    it "returns true when assignment is in a module with CourseSection override for the student's section" do
+      other_student = student_in_course(course: @course, active_all: true, user_name: "other student").user
+      create_adhoc_override_for_assignment(@assignment, other_student)
+      @assignment.update!(only_visible_to_overrides: true)
+
+      context_module = @course.context_modules.create!(name: "test module")
+      context_module.add_item(type: "assignment", id: @assignment.id)
+      context_module.assignment_overrides.create!(set_type: "CourseSection", set: @sec1)
+
+      expect(@assignment.enrollment_active_for_assignment?(@student)).to be_truthy
+    end
+
+    it "returns true when assignment is in a module with Group override and student is in that group" do
+      group_category = @course.group_categories.create!(name: "Test Category")
+      group = group_category.groups.create!(context: @course)
+      group.add_user(@student, "accepted")
+
+      other_student = student_in_course(course: @course, active_all: true, user_name: "other student").user
+      create_adhoc_override_for_assignment(@assignment, other_student)
+      @assignment.update!(only_visible_to_overrides: true)
+
+      context_module = @course.context_modules.create!(name: "test module")
+      context_module.add_item(type: "assignment", id: @assignment.id)
+      context_module.assignment_overrides.create!(set_type: "Group", set: group)
+
+      expect(@assignment.enrollment_active_for_assignment?(@student)).to be_truthy
+    end
   end
 
   describe "basic validation" do
