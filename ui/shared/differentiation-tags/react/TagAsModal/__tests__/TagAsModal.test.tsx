@@ -29,6 +29,7 @@ import type {DifferentiationTagCategory} from '../../types'
 
 vi.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: vi.fn(() => vi.fn()),
+  showFlashSuccess: vi.fn(() => vi.fn()),
 }))
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -162,8 +163,8 @@ describe('TagAsModal', () => {
       // Group label for the category
       expect(screen.getByText('Reading Groups')).toBeInTheDocument()
       // Individual variants as options
-      expect(screen.getByRole('option', {name: 'Variant A'})).toBeInTheDocument()
-      expect(screen.getByRole('option', {name: 'Variant B'})).toBeInTheDocument()
+      expect(await screen.findByRole('option', {name: 'Variant A'})).toBeInTheDocument()
+      expect(await screen.findByRole('option', {name: 'Variant B'})).toBeInTheDocument()
     })
 
     it('calls onCreationSuccess with a single tag group ID without an API call', async () => {
@@ -177,7 +178,7 @@ describe('TagAsModal', () => {
 
       renderComponent({categories: [singleTagCategoryTyped]})
       await user.click(screen.getByTestId('existing-tag-selector'))
-      await user.click(screen.getByRole('option', {name: 'Honors'}))
+      await user.click(await screen.findByRole('option', {name: 'Honors'}))
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(() => {
@@ -197,7 +198,7 @@ describe('TagAsModal', () => {
 
       renderComponent({categories: [multipleTagsCategoryTyped]})
       await user.click(screen.getByTestId('existing-tag-selector'))
-      await user.click(screen.getByRole('option', {name: 'Variant A'}))
+      await user.click(await screen.findByRole('option', {name: 'Variant A'}))
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(() => {
@@ -244,7 +245,7 @@ describe('TagAsModal', () => {
         expect(screen.getByText('Tag Set Name is required')).toBeInTheDocument()
       })
 
-      await user.type(screen.getByTestId('variant-name-input'), 'Level 1')
+      await user.type(screen.getByTestId('variant-name-input'), 'x')
 
       expect(screen.queryByText('Variant name is required')).not.toBeInTheDocument()
       expect(screen.getByText('Tag Set Name is required')).toBeInTheDocument()
@@ -285,8 +286,8 @@ describe('TagAsModal', () => {
       )
 
       renderComponent({categories: []})
-      await user.type(screen.getByTestId('variant-name-input'), 'Level 1')
-      await user.type(screen.getByTestId('tag-set-name-input'), 'Reading Levels')
+      await user.type(screen.getByTestId('variant-name-input'), 'x')
+      await user.type(screen.getByTestId('tag-set-name-input'), 'x')
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(() => {
@@ -417,8 +418,8 @@ describe('TagAsModal', () => {
   describe('switching radio options', () => {
     it('resets inputs when switching from "New tag with variants" to another option', async () => {
       renderComponent({categories: []})
-      await user.type(screen.getByTestId('variant-name-input'), 'Level 1')
-      await user.type(screen.getByTestId('tag-set-name-input'), 'Reading Levels')
+      await user.type(screen.getByTestId('variant-name-input'), 'x')
+      await user.type(screen.getByTestId('tag-set-name-input'), 'x')
 
       await user.click(screen.getByLabelText('New single tag'))
       await user.click(screen.getByLabelText('New tag with variants'))
@@ -454,7 +455,7 @@ describe('TagAsModal', () => {
 
     it('resets form state when closed', async () => {
       renderComponent({categories: []})
-      await user.type(screen.getByTestId('variant-name-input'), 'Some name')
+      await user.type(screen.getByTestId('variant-name-input'), 'x')
       await user.click(screen.getByTestId('cancel-button'))
       // Re-render to simulate reopening
       renderComponent({categories: []})
@@ -479,7 +480,7 @@ describe('TagAsModal', () => {
 
       renderComponent({categories: []})
       await user.click(screen.getByLabelText('New single tag'))
-      await user.type(screen.getByTestId('tag-name-input'), 'Honors')
+      await user.type(screen.getByTestId('tag-name-input'), 'x')
       await user.click(screen.getByTestId('submit-button'))
 
       expect(screen.getByTestId('submit-button')).toBeDisabled()
