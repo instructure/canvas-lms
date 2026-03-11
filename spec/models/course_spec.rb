@@ -1821,6 +1821,66 @@ describe Course do
     end
   end
 
+  describe "users_visible_to with temporary enrollments" do
+    before :once do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @provider = user_factory(active_all: true)
+      @course = course_with_teacher(active_all: true, user: @provider).course
+      @pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+    end
+
+    def create_temp_enrollment(user, start_at: nil, end_at: nil)
+      enrollment = @course.enroll_user(
+        user,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      enrollment.update!(start_at:, end_at:) if start_at
+      enrollment
+    end
+
+    it "excludes users with only future temporary enrollments" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).not_to include(recipient.id)
+    end
+
+    it "includes users with active temporary enrollments" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.ago, end_at: 1.week.from_now)
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).to include(recipient.id)
+    end
+
+    it "includes users with non-temporary enrollments" do
+      student = user_factory(active_all: true)
+      @course.enroll_student(student, enrollment_state: "active")
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).to include(student.id)
+    end
+
+    it "does not filter when feature flag is disabled" do
+      Account.default.disable_feature!(:temporary_enrollments)
+      recipient = user_factory(active_all: true)
+      # Create enrollment directly since feature is off
+      enrollment = @course.enroll_user(recipient, "TeacherEnrollment", { role: teacher_role })
+      enrollment.update_columns(temporary_enrollment_source_user_id: @provider.id,
+                                temporary_enrollment_pairing_id: @pairing.id)
+      enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).to include(recipient.id)
+    end
+  end
+
   describe "course_section_visibility" do
     before :once do
       @course = Account.default.courses.create!

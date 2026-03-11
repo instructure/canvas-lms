@@ -3327,6 +3327,34 @@ describe Enrollment do
       expect(@recipient_temp_enrollment.temporary_enrollment?).to be_truthy
       expect(@recipient2_temp_enrollment.temporary_enrollment?).to be_falsey
     end
+
+    describe ".excluding_pending_temporary_enrollments" do
+      it "includes non-temporary enrollments" do
+        student = user_factory(active_all: true)
+        enrollment = @course1.enroll_student(student, enrollment_state: "active")
+
+        expect(Enrollment.excluding_pending_temporary_enrollments).to include(enrollment)
+      end
+
+      it "includes temporary enrollments that have started" do
+        @recipient_temp_enrollment.update!(start_at: 1.day.ago, end_at: 1.week.from_now)
+
+        expect(@recipient_temp_enrollment.enrollment_state.state).to eq("active")
+        expect(Enrollment.excluding_pending_temporary_enrollments).to include(@recipient_temp_enrollment)
+      end
+
+      it "excludes temporary enrollments that have not started yet" do
+        @recipient_temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+        # Admin enrollments get 'inactive' when future (not view_restrictable?)
+        expect(@recipient_temp_enrollment.enrollment_state.state).to eq("inactive")
+        expect(Enrollment.excluding_pending_temporary_enrollments).not_to include(@recipient_temp_enrollment)
+      end
+
+      it "includes temporary enrollments with no date restrictions" do
+        expect(Enrollment.excluding_pending_temporary_enrollments).to include(@recipient_temp_enrollment)
+      end
+    end
   end
 
   describe "#can_be_deleted_by" do
