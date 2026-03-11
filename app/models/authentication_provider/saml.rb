@@ -21,6 +21,9 @@
 require "saml2"
 
 class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
+  # TODO: strip magic comment if included in manually uploaded metadata
+  GENERATED_METADATA_MAGIC_COMMENT = "<!-- CANVAS: Auto-generated IDP metadata; may not exactly match IDP metadata -->"
+
   def self.sti_name
     "saml"
   end
@@ -108,8 +111,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   before_validation :set_saml_defaults
   before_validation :download_metadata
+  before_validation :persist_metadata
 
   validate :validate_urls
+  validate :validate_metadata
 
   after_initialize do |ap|
     # default to the most secure signature we support, but only for new objects
@@ -152,6 +157,18 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       URI(log_out_url) if log_out_url
     rescue URI::InvalidURIError
       errors.add(:log_out_url, t("Log out URL is not a valid URI"))
+    end
+  end
+
+  def validate_metadata
+    if settings["metadata"].blank?
+      errors.add(:metadata, t("Metadata must be present"))
+      return
+    end
+
+    entity = SAML2::Entity.parse(settings["metadata"])
+    unless entity&.valid_schema?
+      errors.add(:metadata, t("Metadata does not parse as a valid SAML entity"))
     end
   end
 
@@ -198,6 +215,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     rescue => e
       ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
       errors.add(:metadata_uri, e.message)
+    end
+  end
+
+  def persist_metadata
+    if settings["metadata"].blank? || synthetic_metadata?
+      settings["metadata"] = synthetic_idp_metadata.to_xml.to_s + "\n" + GENERATED_METADATA_MAGIC_COMMENT
     end
   end
 
@@ -313,6 +336,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     raise "Must be a single Entity" unless entity.is_a?(SAML2::Entity)
 
     populate_from_metadata(entity)
+    # Only set this after all the above runs so that we catch any issues before overwriting the cached metadata
+    settings["metadata"] = xml
   end
   alias_method :metadata=, :populate_from_metadata_xml
 
@@ -326,33 +351,49 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     end
   end
 
-  # construct a metadata doc to represent the IdP
-  # TODO: eventually store the actual metadata we got from the IdP
   def idp_metadata
-    @idp_metadata ||= begin
-      entity = SAML2::Entity.new
-      entity.entity_id = idp_entity_id
+    @idp_metadata ||= if settings["metadata"].present?
+                        entity = SAML2::Entity.parse(settings["metadata"])
+                        if entity.is_a?(SAML2::Entity::Group) && idp_entity_id.present?
+                          entity = entity.find { |e| e.entity_id == idp_entity_id }
+                        end
+                        # fingerprints are not part of the SAML metadata XML schema, so they need to be restored after parsing
+                        # (but they should only be restored if the metadata is synthetic; real metadata must have real keys/certs)
+                        if synthetic_metadata? && certificate_fingerprint.present? && entity.identity_providers.first
+                          entity.identity_providers.first.fingerprints = certificate_fingerprint.split
+                        end
+                        # After we have finished migrating, this fallback should be removed
+                        entity&.valid_schema? ? entity : synthetic_idp_metadata
+                      else
+                        synthetic_idp_metadata
+                      end
+  end
 
-      idp = SAML2::IdentityProvider.new
-      idp.single_sign_on_services << SAML2::Endpoint.new(log_in_url,
-                                                         SAML2::Bindings::HTTPRedirect::URN)
-      if log_out_url.present?
-        idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
-                                                          SAML2::Bindings::HTTPRedirect::URN)
-      end
-      idp.fingerprints = (certificate_fingerprint || "").split
-      Array.wrap(settings["signing_certificates"]).each do |cert|
-        idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
-      end
-      Array.wrap(settings["signing_keys"]).each do |key|
-        key_descriptor = SAML2::KeyDescriptor.new(nil, SAML2::KeyDescriptor::Type::SIGNING)
-        key_descriptor.key = OpenSSL::PKey.read(key)
-        idp.keys << key
-      end
+  # construct a metadata doc to represent the IdP
+  # TODO: this can be removed after we start requiring uploading metadata if you don't use a url or federation
+  def synthetic_idp_metadata
+    entity = SAML2::Entity.new
+    entity.entity_id = idp_entity_id
 
-      entity.roles << idp
-      entity
+    idp = SAML2::IdentityProvider.new
+    idp.single_sign_on_services << SAML2::Endpoint.new(log_in_url,
+                                                       SAML2::Bindings::HTTPRedirect::URN)
+    if log_out_url.present?
+      idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
+                                                        SAML2::Bindings::HTTPRedirect::URN)
     end
+    idp.fingerprints = (certificate_fingerprint || "").split
+    Array.wrap(settings["signing_certificates"]).each do |cert|
+      idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
+    end
+    Array.wrap(settings["signing_keys"]).each do |key|
+      key_descriptor = SAML2::KeyDescriptor.new(nil, SAML2::KeyDescriptor::Type::SIGNING)
+      key_descriptor.key = OpenSSL::PKey.read(key)
+      idp.keys << key
+    end
+
+    entity.roles << idp
+    entity
   end
 
   def self.sp_metadata(entity_id, hosts, include_all_encryption_certificates: true)
@@ -571,5 +612,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     shard.activate do
       ::Canvas.redis.del(collected_responses_key)
     end
+  end
+
+  def synthetic_metadata?
+    settings["metadata"].present? && settings["metadata"].include?(GENERATED_METADATA_MAGIC_COMMENT)
   end
 end
