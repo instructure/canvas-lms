@@ -1699,7 +1699,7 @@ class CalendarEventsApiController < ApplicationController
       end
       # include manageable appointment group events for the specified contexts
       # and dates
-      ags = manageable_appointment_groups(user).to_a
+      ags = manageable_appointment_groups(user, codes).to_a
       @selected_contexts += ags
       @context_codes += ags.map(&:asset_string)
     end
@@ -1911,13 +1911,13 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def manageable_appointment_groups(user)
+  def manageable_appointment_groups(user, restrict_to_codes = nil)
     return [] unless user
 
     user.in_region_associated_shards.flat_map do |shard|
       shard.activate do
         AppointmentGroup
-          .manageable_by(user)
+          .manageable_by(user, restrict_to_codes)
           .intersecting(@start_date, @end_date).to_a
       end
     end

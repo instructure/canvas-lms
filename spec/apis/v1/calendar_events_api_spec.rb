@@ -1349,6 +1349,29 @@ describe CalendarEventsApiController, type: :request do
         expect(a2["child_events"]).to be_empty
       end
 
+      it "does not include appointment groups from other courses when context_codes filter is applied" do
+        course1 = course_with_teacher(active_all: true).course
+        teacher = @teacher
+        course2 = course_with_teacher(user: teacher, active_all: true).course
+
+        ag = AppointmentGroup.create!(title: "course1 appointments",
+                                      participants_per_appointment: 4,
+                                      new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]],
+                                      contexts: [course1])
+        ag.publish!
+
+        json = api_call_as_user(teacher, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{course2.asset_string}", {
+                                  controller: "calendar_events_api",
+                                  action: "index",
+                                  format: "json",
+                                  context_codes: [course2.asset_string],
+                                  start_date: "2012-01-01",
+                                  end_date: "2012-01-31"
+                                })
+        ag_ids = json.filter_map { |e| e["appointment_group_id"] }
+        expect(ag_ids).not_to include(ag.id)
+      end
+
       context "reservations" do
         def prepare(as_student: false)
           Notification.create! name: "Appointment Canceled By User", category: "TestImmediately"
