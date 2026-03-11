@@ -25,6 +25,7 @@ import {graphql, HttpResponse} from 'msw'
 import {WidgetLayoutProvider, useWidgetLayout} from '../useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
+import {PlatformTestWrapper} from '../../__tests__/testHelpers'
 
 const server = setupServer()
 
@@ -49,13 +50,15 @@ const createWrapper = ({children}: {children: React.ReactNode}) => {
   })
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>
   )
 }
 
@@ -393,22 +396,24 @@ describe('useWidgetLayout', () => {
         })
 
         return (
-          <QueryClientProvider client={queryClient}>
-            <WidgetDashboardProvider
-              preferences={{
-                dashboard_view: 'cards',
-                hide_dashcard_color_overlays: false,
-                custom_colors: {},
-                widget_dashboard_config: {
-                  layout: savedConfig,
-                },
-              }}
-            >
-              <WidgetDashboardEditProvider>
-                <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-              </WidgetDashboardEditProvider>
-            </WidgetDashboardProvider>
-          </QueryClientProvider>
+          <PlatformTestWrapper>
+            <QueryClientProvider client={queryClient}>
+              <WidgetDashboardProvider
+                preferences={{
+                  dashboard_view: 'cards',
+                  hide_dashcard_color_overlays: false,
+                  custom_colors: {},
+                  widget_dashboard_config: {
+                    layout: savedConfig,
+                  },
+                }}
+              >
+                <WidgetDashboardEditProvider>
+                  <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+                </WidgetDashboardEditProvider>
+              </WidgetDashboardProvider>
+            </QueryClientProvider>
+          </PlatformTestWrapper>
         )
       }
 
@@ -468,22 +473,24 @@ describe('useWidgetLayout', () => {
         })
 
         return (
-          <QueryClientProvider client={queryClient}>
-            <WidgetDashboardProvider
-              preferences={{
-                dashboard_view: 'cards',
-                hide_dashcard_color_overlays: false,
-                custom_colors: {},
-                widget_dashboard_config: {
-                  layout: initialConfig,
-                },
-              }}
-            >
-              <WidgetDashboardEditProvider>
-                <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-              </WidgetDashboardEditProvider>
-            </WidgetDashboardProvider>
-          </QueryClientProvider>
+          <PlatformTestWrapper>
+            <QueryClientProvider client={queryClient}>
+              <WidgetDashboardProvider
+                preferences={{
+                  dashboard_view: 'cards',
+                  hide_dashcard_color_overlays: false,
+                  custom_colors: {},
+                  widget_dashboard_config: {
+                    layout: initialConfig,
+                  },
+                }}
+              >
+                <WidgetDashboardEditProvider>
+                  <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+                </WidgetDashboardEditProvider>
+              </WidgetDashboardProvider>
+            </QueryClientProvider>
+          </PlatformTestWrapper>
         )
       }
 

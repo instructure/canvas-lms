@@ -27,7 +27,11 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
+import {
+  clearWidgetDashboardCache,
+  defaultGraphQLHandlers,
+  PlatformTestWrapper,
+} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
@@ -264,13 +268,15 @@ const setup = (
 
   const result = render(<AnnouncementsWidget {...props} />, {
     wrapper: ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>
-        <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
-          <WidgetDashboardEditProvider>
-            <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-          </WidgetDashboardEditProvider>
-        </WidgetDashboardProvider>
-      </QueryClientProvider>
+      <PlatformTestWrapper>
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </WidgetDashboardProvider>
+        </QueryClientProvider>
+      </PlatformTestWrapper>
     ),
   })
 

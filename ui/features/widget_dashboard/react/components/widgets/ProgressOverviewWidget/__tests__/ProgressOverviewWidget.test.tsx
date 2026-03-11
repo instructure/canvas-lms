@@ -26,7 +26,7 @@ import type {BaseWidgetProps, Widget} from '../../../../types'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 
 const mockWidget: Widget = {
   id: 'test-progress-overview',
@@ -110,15 +110,17 @@ const setup = (props: Partial<BaseWidgetProps> = {}, dashboardProps = {}) => {
   })
 
   const result = render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData} {...dashboardProps}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <ProgressOverviewWidget {...defaultProps} />
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData} {...dashboardProps}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <ProgressOverviewWidget {...defaultProps} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 
   return {

@@ -33,7 +33,7 @@ import {
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const mockWidget: Widget = {
@@ -100,13 +100,15 @@ const renderWithClient = (ui: React.ReactElement) => {
     },
   })
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 

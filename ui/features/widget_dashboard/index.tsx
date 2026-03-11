@@ -24,13 +24,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
-import {WidgetDashboardProvider} from './react/hooks/useWidgetDashboardContext'
-import {WidgetDashboardEditProvider} from './react/hooks/useWidgetDashboardEdit'
-import {WidgetLayoutProvider} from './react/hooks/useWidgetLayout'
+import {
+  WidgetDashboardProvider,
+  WidgetDashboardEditProvider,
+  WidgetLayoutProvider,
+  ResponsiveProvider,
+} from '@instructure/platform-widget-dashboard'
 import {Responsive} from '@instructure/ui-responsive'
-import {ResponsiveProvider} from './react/hooks/useResponsiveContext'
+import {PlatformBridge} from './react/platformBridge'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -53,7 +54,7 @@ ready(() => {
           />
         }
       >
-        <QueryClientProvider client={queryClient}>
+        <PlatformBridge>
           <WidgetDashboardProvider
             preferences={ENV.PREFERENCES}
             observedUsersList={ENV.OBSERVED_USERS_LIST}
@@ -78,7 +79,7 @@ ready(() => {
               </WidgetLayoutProvider>
             </WidgetDashboardEditProvider>
           </WidgetDashboardProvider>
-        </QueryClientProvider>
+        </PlatformBridge>
       </ErrorBoundary>,
       container,
     )
