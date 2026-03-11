@@ -45,6 +45,11 @@ vi.mock('@canvas/rubrics/react/RubricAssessment', () => ({
       </button>
     </div>
   ),
+  RubricAssessmentTray: (props: any) => (
+    <div data-testid="mocked-rubric-assessment-tray" data-props={JSON.stringify(props)}>
+      Mocked Rubric Assessment Tray
+    </div>
+  ),
 }))
 
 describe('RubricPanel', () => {
@@ -529,6 +534,51 @@ describe('RubricPanel', () => {
       const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
 
       expect(props.isPreviewMode).toBe(true)
+    })
+  })
+
+  describe('Mobile mode', () => {
+    it('renders RubricAssessmentTray when isMobile is true', () => {
+      render(<RubricPanel {...createDefaultProps({isMobile: true})} />)
+      expect(screen.getByTestId('mocked-rubric-assessment-tray')).toBeInTheDocument()
+      expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
+    })
+
+    it('renders inline RubricAssessmentContainerWrapper when isMobile is false', () => {
+      render(<RubricPanel {...createDefaultProps({isMobile: false})} />)
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+      expect(screen.queryByTestId('mocked-rubric-assessment-tray')).not.toBeInTheDocument()
+    })
+
+    it('passes correct rubric props to RubricAssessmentTray', () => {
+      render(<RubricPanel {...createDefaultProps({isMobile: true})} />)
+
+      const tray = screen.getByTestId('mocked-rubric-assessment-tray')
+      const props = JSON.parse(tray.getAttribute('data-props') || '{}')
+
+      expect(props.isOpen).toBe(true)
+      expect(props.isPeerReview).toBe(true)
+      expect(props.rubric.title).toBe('Test Rubric')
+      expect(props.rubric.pointsPossible).toBe(4)
+      expect(props.rubric.criteria).toHaveLength(1)
+      expect(props.rubric.criteria[0].id).toBe('1')
+    })
+
+    it('passes isPreviewMode correctly to RubricAssessmentTray', () => {
+      render(<RubricPanel {...createDefaultProps({isMobile: true, isPeerReviewCompleted: true})} />)
+
+      const tray = screen.getByTestId('mocked-rubric-assessment-tray')
+      const props = JSON.parse(tray.getAttribute('data-props') || '{}')
+
+      expect(props.isPreviewMode).toBe(true)
+    })
+
+    it('returns null when assignment has no rubric in mobile mode', () => {
+      const assignment = createAssignment({rubric: null})
+      const {container} = render(
+        <RubricPanel {...createDefaultProps({assignment, isMobile: true})} />,
+      )
+      expect(container.firstChild).toBeNull()
     })
   })
 })
