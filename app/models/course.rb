@@ -3331,6 +3331,10 @@ class Course < ApplicationRecord
               current_users
             end
 
+    if root_account.feature_enabled?(:temporary_enrollments)
+      scope = scope.merge(Enrollment.excluding_pending_temporary_enrollments)
+    end
+
     apply_enrollment_visibilities_internal(scope,
                                            user,
                                            visibilities,
