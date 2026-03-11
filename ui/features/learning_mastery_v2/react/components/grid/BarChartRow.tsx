@@ -26,7 +26,7 @@ import {
   STUDENT_COLUMN_WIDTH,
 } from '@canvas/outcomes/react/utils/constants'
 import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
-import {Row} from '../table/Row'
+import {Row} from '@instructure/outcomes-ui/es/components/Gradebook/table/Row'
 import {Cell} from '@instructure/outcomes-ui/es/components/Gradebook/table/Cell'
 import {
   OutcomeDistribution,
