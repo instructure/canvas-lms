@@ -1280,7 +1280,8 @@ class GradebooksController < ApplicationController
               domain_root_account: @domain_root_account
             )
 
-            setup_new_quizzes_env(signed_launch_data)
+            launch_url = Services::NewQuizzes.launch_url(tool_url: tool&.url)
+            setup_new_quizzes_env(signed_launch_data, launch_url:)
           else
             Rails.logger.error "Failed to find quiz_lti tool for New Quizzes SpeedGrader launch for assignment #{@assignment.id} in context #{@context.id}"
           end
