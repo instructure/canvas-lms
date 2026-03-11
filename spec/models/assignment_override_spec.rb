@@ -285,6 +285,23 @@ describe AssignmentOverride do
       expect(override.reload.notify_change?).to be false
     end
 
+    it "notifies of change for a course that is currently active with date restrictions" do
+      due_date_timestamp = Time.zone.now.iso8601
+      assignment = assignment_model(course: @course, created_at: 4.hours.ago)
+      override = assignment.assignment_overrides.create!(
+        due_at: due_date_timestamp,
+        due_at_overridden: true
+      )
+      override.assignment_override_students.create!(user: @student)
+      assignment.update(due_at: nil, only_visible_to_overrides: true)
+      @course.update!(
+        restrict_enrollments_to_course_dates: true,
+        start_at: 1.month.ago,
+        conclude_at: 1.month.from_now
+      )
+      expect(override.reload.notify_change?).to be true
+    end
+
     it "does not notify of change for course that has concluded" do
       due_date_timestamp = Time.zone.now.iso8601
       assignment = assignment_model(course: @course)
@@ -1618,6 +1635,29 @@ describe AssignmentOverride do
         enrollment.deactivate
 
         expect(override.applies_to_students).not_to include(student)
+      end
+    end
+
+    context "when the override belongs to a context module (no assignment)" do
+      it "returns the right students for ADHOC without raising an error" do
+        active_student = student_in_course(course: @course, active_all: true).user
+        context_module = @course.context_modules.create!(name: "test module")
+        override = context_module.assignment_overrides.create!(set_type: "ADHOC")
+        override.assignment_override_students.create!(user: active_student)
+
+        expect(override.applies_to_students).to match_array([active_student])
+      end
+
+      it "returns the right students for Group without raising an error" do
+        active_student = student_in_course(course: @course, active_all: true).user
+        group_category = @course.group_categories.create!(name: "Test Groups")
+        group = @course.groups.create!(group_category:, name: "Group 1")
+        group.add_user(active_student, "accepted")
+
+        context_module = @course.context_modules.create!(name: "test module")
+        override = context_module.assignment_overrides.create!(set_type: "Group", set: group)
+
+        expect(override.applies_to_students).to include(active_student)
       end
     end
   end
