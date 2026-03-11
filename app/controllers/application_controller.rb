@@ -506,6 +506,7 @@ class ApplicationController < ActionController::Base
     feature_flag_ui_sorting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
+    files_a11y_folder_duplicates
     horizon_course_setting
     instui_for_import_page
     instui_header

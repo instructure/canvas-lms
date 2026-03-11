@@ -1084,6 +1084,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/:id'
 - verb: GET
+  path: '/api/v1/courses/:course_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/courses/:course_id/folders/by_path'
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/by_path/*full_path'
@@ -1868,6 +1870,8 @@
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/:id'
 - verb: GET
+  path: '/api/v1/groups/:group_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/groups/:group_id/folders/by_path'
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/by_path/*full_path'
@@ -2405,6 +2409,8 @@
   path: '/api/v1/users/:user_id/folders'
 - verb: GET
   path: '/api/v1/users/:user_id/folders/:id'
+- verb: GET
+  path: '/api/v1/users/:user_id/folders/:id/duplicates'
 - verb: GET
   path: '/api/v1/users/:user_id/folders/by_path'
 - verb: GET

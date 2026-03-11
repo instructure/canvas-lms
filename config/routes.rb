@@ -1260,6 +1260,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/folders/by_path", controller: :folders, action: :resolve_path
       get "courses/:course_id/folders/icon_maker", controller: :folders, action: :icon_maker_folder
       get "courses/:course_id/folders/media", controller: :folders, action: :media_folder
+      get "courses/:course_id/folders/:id/duplicates", controller: :folders, action: :duplicates
       get "courses/:course_id/folders/:id", controller: :folders, action: :show, as: "course_folder"
       get "media_objects", controller: "media_objects", action: :index, as: :media_objects
       get "courses/:course_id/media_objects", controller: "media_objects", action: :index, as: :course_media_objects
@@ -1802,6 +1803,7 @@ CanvasRails::Application.routes.draw do
       post "users/:user_id/folders", controller: :folders, action: :create
       get "users/:user_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "users/:user_id/folders/by_path", controller: :folders, action: :resolve_path
+      get "users/:user_id/folders/:id/duplicates", controller: :folders, action: :duplicates
       get "users/:user_id/folders/:id", controller: :folders, action: :show, as: "user_folder"
 
       get "users/:id/settings", controller: "users", action: "settings"
@@ -2130,6 +2132,7 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "groups/:group_id/folders/by_path", controller: :folders, action: :resolve_path
       get "groups/:group_id/folders/media", controller: :folders, action: :media_folder
+      get "groups/:group_id/folders/:id/duplicates", controller: :folders, action: :duplicates
       get "groups/:group_id/folders/:id", controller: :folders, action: :show, as: "group_folder"
     end
 
