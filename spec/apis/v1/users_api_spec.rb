@@ -1615,12 +1615,17 @@ describe "Users API", type: :request do
                            }] })
     end
 
-    context "user profile preloading" do
+    context "preloading" do
       before(:once) do
         @account = Account.default
+        @ap1 = @account.authentication_providers.create!(auth_type: "ldap")
+        @ap2 = @account.authentication_providers.create!(auth_type: "saml")
         @user1 = user_with_pseudonym(active_all: true, account: @account, name: "User One")
+        @user1.pseudonym.update!(authentication_provider: @ap1)
         @user2 = user_with_pseudonym(active_all: true, account: @account, name: "User Two")
+        @user2.pseudonym.update!(authentication_provider: @ap2)
         @user3 = user_with_pseudonym(active_all: true, account: @account, name: "User Three")
+        @user3.pseudonym.update!(authentication_provider: @ap1)
       end
 
       before do
@@ -1637,7 +1642,6 @@ describe "Users API", type: :request do
           user.profile.update!(bio: "Bio for #{user.name}", title: "Title for #{user.name}")
         end
 
-        # Since profiles are preloaded, we expect 0 individual user_profile queries
         expect do
           api_call(:get,
                    "/api/v1/accounts/#{@account.id}/users",
@@ -1647,6 +1651,18 @@ describe "Users API", type: :request do
         expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json).to be_an(Array)
+        expect(json.length).to be >= 3
+      end
+
+      it "avoids N+1 queries for authentication_providers on pseudonyms" do
+        expect do
+          api_call(:get,
+                   "/api/v1/accounts/#{@account.id}/users",
+                   { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param })
+        end.not_to make_database_queries(matching: /SELECT.*authentication_providers.*WHERE.*authentication_providers.*"id" = \d/)
+
+        expect(response).to be_successful
+        json = JSON.parse(response.body)
         expect(json.length).to be >= 3
       end
     end
