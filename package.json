@@ -25,7 +25,7 @@
     "@instructure/emotion": "10.30.0",
     "@instructure/media-capture": "^9.0.0",
     "@instructure/media-capture-new": "npm:@instructure/media-capture@11.3.0",
-    "@instructure/outcomes-ui": "3.2.4",
+    "@instructure/outcomes-ui": "4.1.2",
     "@instructure/platform-learning-agent-launcher": "1.1.1",
     "@instructure/platform-provider": "0.1.1",
     "@instructure/platform-widget-dashboard": "0.2.1",
@@ -424,6 +424,7 @@
     "jsdom": "25.0.1",
     "webpack-dev-server/webpack-dev-middleware": "5.3.4",
     "@microsoft/immersive-reader-sdk/minimatch": "3.1.5",
+    "@tanstack/react-query": "5.74.4",
     "@tanstack/query-persist-client-core": "5.74.6"
   },
   "packageManager": "yarn@1.19.1+sha512.8019df6cbf6b618d391add1c8c986cfec8aa4171d89596a54e32b79d79f640edb4c5b90814fa1bf8b947e3830be3b19c478554f7fd9d61c93505614cd096afc7"
