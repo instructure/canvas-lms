@@ -315,17 +315,19 @@ describe('MessageStudentsWhoDialog', () => {
     it('does not include "Marked incomplete" or score-related options for ungraded assignments', async () => {
       makeMocks()
 
-      const {findAllByRole, findByLabelText} = render(
+      const {getAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps({assignment: ungradedAssignment})} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
       await userEvent.click(button)
-      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
-      expect(criteriaLabels).not.toContain('Marked incomplete')
-      expect(criteriaLabels).not.toContain('Scored more than')
-      expect(criteriaLabels).not.toContain('Scored less than')
+      await waitFor(() => {
+        const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+        expect(criteriaLabels).not.toContain('Marked incomplete')
+        expect(criteriaLabels).not.toContain('Scored more than')
+        expect(criteriaLabels).not.toContain('Scored less than')
+      })
     })
 
     it('includes "Have Submitted" and "Have not yet submitted" if the assignment accepts digital submissions', async () => {
@@ -462,7 +464,7 @@ describe('MessageStudentsWhoDialog', () => {
     it('is shown only when "Scored more than" or "Scored less than" is selected', async () => {
       makeMocks()
 
-      const {getByRole, findByTestId, getByTestId, queryByTestId} = render(
+      const {findByRole, findByTestId, getByTestId, queryByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedQueryClientProvider>,
@@ -474,16 +476,18 @@ describe('MessageStudentsWhoDialog', () => {
       const selector = await findByTestId('criterion-dropdown')
 
       await userEvent.click(selector)
-      await userEvent.click(getByRole('option', {name: 'Scored more than'}))
+      await userEvent.click(await findByRole('option', {name: 'Scored more than'}))
       expect(getByTestId('cutoff-input')).toBeInTheDocument()
 
       await userEvent.click(selector)
-      await userEvent.click(getByRole('option', {name: 'Scored less than'}))
+      await userEvent.click(await findByRole('option', {name: 'Scored less than'}))
       expect(getByTestId('cutoff-input')).toBeInTheDocument()
 
       await userEvent.click(selector)
-      await userEvent.click(getByRole('option', {name: 'Reassigned'}))
-      expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
+      await userEvent.click(await findByRole('option', {name: 'Reassigned'}))
+      await waitFor(() => {
+        expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
+      })
     })
 
     it('foot-note is rendered along with the cutoff-input', async () => {
