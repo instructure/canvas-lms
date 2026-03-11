@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import SisImportForm from '../SisImportForm'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -234,10 +234,115 @@ describe('SisImportForm', () => {
     )
   })
 
+  describe('site admin confirmation modal', () => {
+    const ACCOUNT_NAME = 'Stride Academy'
+
+    describe('when SHOW_SITE_ADMIN_CONFIRMATION is true', () => {
+      beforeEach(() => {
+        fakeENV.teardown()
+        fakeENV.setup({
+          ACCOUNT_ID,
+          SHOW_SITE_ADMIN_CONFIRMATION: true,
+          current_context: {name: ACCOUNT_NAME},
+        })
+      })
+
+      it('shows modal on submit', async () => {
+        const user = userEvent.setup()
+        const {getByTestId, getByText} = renderWithClient(
+          <SisImportForm onSuccess={vi.fn()} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+
+        getByText('Process Data').click()
+        expect(getByText('Confirm SIS Import')).toBeInTheDocument()
+        expect(getByText(`Account: ${ACCOUNT_NAME}`)).toBeInTheDocument()
+      })
+
+      it('proceeds with import after typing correct account name', async () => {
+        const onSuccess = vi.fn()
+        const user = userEvent.setup()
+        mockPost({batchMode: false, overrideSis: false})
+        const {getByTestId, getByText} = renderWithClient(
+          <SisImportForm onSuccess={onSuccess} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+
+        getByText('Process Data').click()
+        // Use fireEvent.change instead of user.type to avoid InstUI Modal
+        // focus management conflict with the space in the account name.
+        fireEvent.change(getByTestId('site-admin-confirm-input'), {target: {value: ACCOUNT_NAME}})
+        await user.click(getByTestId('site-admin-confirm-btn'))
+
+        await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
+        expect(onSuccess).toHaveBeenCalled()
+      })
+
+      it('does not proceed when cancelled', async () => {
+        const onSuccess = vi.fn()
+        const user = userEvent.setup()
+        const {getByTestId, getByText, queryByText} = renderWithClient(
+          <SisImportForm onSuccess={onSuccess} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+
+        getByText('Process Data').click()
+        await user.click(getByTestId('site-admin-cancel-btn'))
+
+        await waitFor(() => {
+          expect(queryByText('Confirm SIS Import')).toBeNull()
+          expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(false)
+          expect(onSuccess).not.toHaveBeenCalled()
+        })
+      })
+
+      it('shows both site admin and batch mode warnings in one modal when both apply', async () => {
+        const onSuccess = vi.fn()
+        const user = userEvent.setup()
+        mockPost({batchMode: true, overrideSis: false, termId: '1'})
+        const {getByTestId, getByText, getAllByText, findByTestId} = renderWithClient(
+          <SisImportForm onSuccess={onSuccess} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+        await user.click(getByTestId('batch_mode'))
+        await findByTestId('full-batch-dropdown')
+
+        // Click submit — unified modal appears with both sections
+        getByText('Process Data').click()
+        expect(getByText('Confirm SIS Import')).toBeInTheDocument()
+        expect(getByText(`Account: ${ACCOUNT_NAME}`)).toBeInTheDocument()
+        // Warning text appears both in FullBatchDropdown and in the modal
+        expect(getAllByText(/this will delete everything for this term/).length).toBeGreaterThanOrEqual(2)
+
+        // Use fireEvent.change instead of user.type to avoid InstUI Modal
+        // focus management conflict: re-rendering the batch mode Alert shifts
+        // focus to a button, and the space in the account name activates it.
+        fireEvent.change(getByTestId('site-admin-confirm-input'), {target: {value: ACCOUNT_NAME}})
+        await user.click(getByTestId('site-admin-confirm-btn'))
+        await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
+        expect(onSuccess).toHaveBeenCalled()
+      })
+    })
+
+    it('does not show modal when SHOW_SITE_ADMIN_CONFIRMATION is false', async () => {
+      const user = userEvent.setup()
+      mockPost({batchMode: false, overrideSis: false})
+      const onSuccess = vi.fn()
+      const {getByTestId, getByText, queryByText} = renderWithClient(
+        <SisImportForm onSuccess={onSuccess} />,
+      )
+      await uploadFile(user, getByTestId('file_drop'))
+
+      getByText('Process Data').click()
+      expect(queryByText('Confirm SIS Import')).toBeNull()
+      await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
+    })
+  })
+
   describe('opens confirmation modal', () => {
     it('if full batch checked', async () => {
       const user = userEvent.setup()
-      const {getByTestId, getByText, findByTestId} = renderWithClient(
+      const {getByTestId, getByText, getAllByText, findByTestId} = renderWithClient(
         <SisImportForm onSuccess={vi.fn()} />,
       )
       await uploadFile(user, getByTestId('file_drop'))
@@ -247,7 +352,9 @@ describe('SisImportForm', () => {
       await findByTestId('full-batch-dropdown')
 
       getByText('Process Data').click()
-      expect(getByText('Confirm Changes')).toBeInTheDocument()
+      expect(getByText('Confirm SIS Import')).toBeInTheDocument()
+      // Warning text appears both in FullBatchDropdown and in the modal
+      expect(getAllByText(/this will delete everything for this term/).length).toBeGreaterThanOrEqual(2)
     })
 
     it('calls onSuccess if confirmed', async () => {
@@ -285,7 +392,7 @@ describe('SisImportForm', () => {
       getByText('Process Data').click()
       getByText('Cancel').click()
       await waitFor(() => {
-        expect(queryByText('Confirm Changes')).toBeNull()
+        expect(queryByText('Confirm SIS Import')).toBeNull()
         expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(false)
         expect(onSuccess).not.toHaveBeenCalled()
       })

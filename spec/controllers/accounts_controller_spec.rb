@@ -3458,4 +3458,43 @@ describe AccountsController do
       end
     end
   end
+
+  describe "#sis_import" do
+    before do
+      @account = Account.default
+      @account.allow_sis_import = true
+      @account.save!
+    end
+
+    context "as a site admin" do
+      before do
+        @user = user_factory
+        Account.site_admin.account_users.create!(user: @user)
+        user_session(@user)
+      end
+
+      it "sets SHOW_SITE_ADMIN_CONFIRMATION to true" do
+        get "sis_import", params: { account_id: @account.id }
+        expect(assigns[:js_env][:SHOW_SITE_ADMIN_CONFIRMATION]).to be true
+      end
+
+      it "sets SHOW_SITE_ADMIN_CONFIRMATION to false when also a direct account admin" do
+        @account.account_users.create!(user: @user)
+        get "sis_import", params: { account_id: @account.id }
+        expect(assigns[:js_env][:SHOW_SITE_ADMIN_CONFIRMATION]).to be false
+      end
+    end
+
+    context "as an account admin who is not a site admin" do
+      before do
+        account_admin_user(account: @account)
+        user_session(@admin)
+      end
+
+      it "sets SHOW_SITE_ADMIN_CONFIRMATION to false" do
+        get "sis_import", params: { account_id: @account.id }
+        expect(assigns[:js_env][:SHOW_SITE_ADMIN_CONFIRMATION]).to be false
+      end
+    end
+  end
 end

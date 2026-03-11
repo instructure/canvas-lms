@@ -41,6 +41,8 @@ export interface EnvContentMigrations {
   MISSING_POLICY_ENABLED?: boolean
   current_context?: {
     id: string
+    name: string
     type: string
+    url: string
   }
 }
