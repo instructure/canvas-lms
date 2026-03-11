@@ -27,7 +27,7 @@ import {
 } from '@canvas/outcomes/react/utils/constants'
 import {Column} from '../table/utils'
 import {Row} from '../table/Row'
-import {Cell} from '../table/Cell'
+import {Cell} from '@instructure/outcomes-ui/es/components/Gradebook/table/Cell'
 import {
   OutcomeDistribution,
   RatingDistribution,

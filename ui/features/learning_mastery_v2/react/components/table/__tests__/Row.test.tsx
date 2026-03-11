@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {Row} from '../Row'
-import {Cell} from '../Cell'
+import {Cell} from '@instructure/outcomes-ui/es/components/Gradebook/table/Cell'
 import {Table} from '@instructure/ui-table'
 
 describe('Row', () => {
