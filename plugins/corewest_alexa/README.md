@@ -77,7 +77,7 @@ The curriculum module tracks educational standards coverage and prepares the col
 
 ## API Endpoints
 
-All curriculum and inspection endpoints require a valid JWT (Bearer token) from the auth module.
+Curriculum and inspection endpoints require a valid JWT (Bearer token) when the auth module is installed; if the auth module is not available, these routes are exposed as public endpoints.
 
 ### Authentication
 
