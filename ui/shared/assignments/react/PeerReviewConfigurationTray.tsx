@@ -23,6 +23,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
+import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
@@ -45,14 +46,16 @@ export const PeerReviewConfigurationTray = ({
     usePeerReviewConfiguration(assignmentId)
 
   const renderConfigRow = (label: string, value: string | number) => (
-    <Flex as="div" padding="x-small 0">
-      <Flex.Item width="10rem">
-        <Text weight="bold">{label}</Text>
-      </Flex.Item>
-      <Flex.Item>
-        <Text>{value}</Text>
-      </Flex.Item>
-    </Flex>
+    <List.Item data-testid="peer-review-config-row">
+      <Flex as="div" padding="x-small 0">
+        <Flex.Item width="10rem">
+          <Text weight="bold">{label}</Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Text>{value}</Text>
+        </Flex.Item>
+      </Flex>
+    </List.Item>
   )
 
   const renderContent = () => {
@@ -95,27 +98,33 @@ export const PeerReviewConfigurationTray = ({
     const pointsPerReview = totalPoints / peerReviews.count
 
     return (
-      <View as="div" padding="0 medium medium medium">
-        {renderConfigRow(I18n.t('Reviews Required'), peerReviews.count)}
-        {renderConfigRow(I18n.t('Points Per Review'), pointsPerReview)}
-        {renderConfigRow(I18n.t('Total Points'), totalPoints)}
-        {renderConfigRow(
-          I18n.t('Across Sections'),
-          peerReviews.acrossSections ? I18n.t('Allowed') : I18n.t('Not allowed'),
-        )}
-        {hasGroupCategory &&
-          renderConfigRow(
-            I18n.t('Within Groups'),
-            peerReviews.intraReviews ? I18n.t('Allowed') : I18n.t('Not allowed'),
+      <View as="div" padding="0 medium medium 0">
+        <List
+          isUnstyled
+          aria-label={I18n.t('Peer Review Configuration')}
+          data-testid="peer-review-config-list"
+        >
+          {renderConfigRow(I18n.t('Reviews Required'), peerReviews.count)}
+          {renderConfigRow(I18n.t('Points Per Review'), pointsPerReview)}
+          {renderConfigRow(I18n.t('Total Points'), totalPoints)}
+          {renderConfigRow(
+            I18n.t('Across Sections'),
+            peerReviews.acrossSections ? I18n.t('Allowed') : I18n.t('Not allowed'),
           )}
-        {renderConfigRow(
-          I18n.t('Submission Req'),
-          peerReviews.submissionRequired ? I18n.t('Required') : I18n.t('Not required'),
-        )}
-        {renderConfigRow(
-          I18n.t('Anonymity'),
-          peerReviews.anonymousReviews ? I18n.t('Anonymous') : I18n.t('Not anonymous'),
-        )}
+          {hasGroupCategory &&
+            renderConfigRow(
+              I18n.t('Within Groups'),
+              peerReviews.intraReviews ? I18n.t('Allowed') : I18n.t('Not allowed'),
+            )}
+          {renderConfigRow(
+            I18n.t('Submission Req'),
+            peerReviews.submissionRequired ? I18n.t('Required') : I18n.t('Not required'),
+          )}
+          {renderConfigRow(
+            I18n.t('Anonymity'),
+            peerReviews.anonymousReviews ? I18n.t('Anonymous') : I18n.t('Not anonymous'),
+          )}
+        </List>
       </View>
     )
   }
