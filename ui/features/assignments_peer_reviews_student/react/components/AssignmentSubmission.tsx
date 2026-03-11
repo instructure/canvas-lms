@@ -300,6 +300,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             onViewModeChange={setRubricViewMode}
             isReadOnly={isReadOnly}
             autoFocusCloseButton={pendingFocusPanel.current === 'rubric'}
+            isMobile={isMobile}
           />
         )}
         {showComments && (
