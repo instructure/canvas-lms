@@ -1559,17 +1559,16 @@ class Course < ActiveRecord::Base
     shard.activate do
       if workflow_state_changed? || (sis_batch && saved_change_to_workflow_state?)
         if completed?
-          enrollment_info = Enrollment.where(course_id: self, workflow_state: ["active", "invited"]).select(:id, :workflow_state).to_a
-          if enrollment_info.any?
-            data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "completed")
-            Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "completed", completed_at: Time.now.utc)
+          current_enrollments = enrollments.where(workflow_state: ["active", "invited"])
+          if current_enrollments.any?
+            data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: current_enrollments.select(:id, :workflow_state), updated_state: "completed")
+            current_enrollments.update_all(workflow_state: "completed", completed_at: Time.now.utc)
 
             EnrollmentState.transaction do
-              locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock("FOR NO KEY UPDATE").order(:enrollment_id).pluck(:enrollment_id)
-              EnrollmentState.where(enrollment_id: locked_ids)
-                             .update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "completed", true, false, Time.now.utc])
+              enroll_states = EnrollmentState.where(enrollment_id: current_enrollments).lock("FOR NO KEY UPDATE").order(:enrollment_id)
+              enroll_states.update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "completed", true, false, Time.now.utc])
             end
-            EnrollmentState.delay_if_production.process_states_for_ids(enrollment_info.map(&:id)) # recalculate access
+            EnrollmentState.delay_if_production.process_states_for_ids(current_enrollments.pluck(:id)) # recalculate access
           end
 
           appointment_participants.active.current.update_all(workflow_state: "deleted")
@@ -1577,14 +1576,12 @@ class Course < ActiveRecord::Base
         elsif deleted?
           user_ids = enrollments.group(:user_id).pluck(:user_id).uniq
           if user_ids.any?
-            enrollment_info = enrollments.select(:id, :workflow_state).to_a
-            if enrollment_info.any?
-              data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "deleted")
-              Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted", archived_at:)
+            if enrollments.any?
+              data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollments.select(:id, :workflow_state), updated_state: "deleted")
+              enrollments.update_all(workflow_state: "deleted", archived_at:)
               EnrollmentState.transaction do
-                locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock("FOR NO KEY UPDATE").order(:enrollment_id).pluck(:enrollment_id)
-                EnrollmentState.where(enrollment_id: locked_ids)
-                               .update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
+                enroll_states = EnrollmentState.where(enrollment_id: enrollments).lock("FOR NO KEY UPDATE").order(:enrollment_id)
+                enroll_states.update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
               end
             end
             User.delay_if_production.update_account_associations(user_ids)
