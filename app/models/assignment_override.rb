@@ -483,13 +483,11 @@ class AssignmentOverride < ActiveRecord::Base
     # because a higher-priority override exists
     case set_type
     when "ADHOC"
-      overridable.context.participating_students_by_date
-                 .where(id: assignment_override_students.select(:user_id))
+      set
     when "CourseSection", "Course"
-      set.participating_students_by_date
+      set.participating_students
     when "Group"
-      set.context.participating_students_by_date
-         .where(id: set.participating_group_memberships.select(:user_id))
+      set.participants
     else
       []
     end
@@ -508,7 +506,6 @@ class AssignmentOverride < ActiveRecord::Base
     assignment&.context&.available? &&
       assignment.published? &&
       !assignment.context.concluded? &&
-      assignment.context.active_now? &&
       assignment.created_at < 3.hours.ago &&
       !deleted? &&
       (saved_change_to_workflow_state? ||
