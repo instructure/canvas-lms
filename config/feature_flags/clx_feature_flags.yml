@@ -107,6 +107,13 @@ horizon_help_navigation:
   display_name: "Canvas Career: Help Navigation"
   description: |-
     Enables the help navigation menu in Canvas Career.
+horizon_study_tools:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Study Tools"
+  description: |-
+    Restricts AI study tools to Page and File learning object routes in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

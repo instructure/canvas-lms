@@ -70,6 +70,7 @@ class CareerController < ApplicationController
       horizon_course_academic_switcher
       horizon_syncable_objects_redesign
       horizon_help_navigation
+      horizon_study_tools
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end
