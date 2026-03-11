@@ -506,7 +506,7 @@ class RubricLLMService
   # - Sorting ratings by points desc
   def rebuild_regenerated_criterion(criterion_data, criterion_points, use_range)
     criterion_data = criterion_data.deep_symbolize_keys
-    criterion_id_final = determine_final_criterion_id(criterion_data)
+    criterion_id_final = resolve_item_id(criterion_data[:id])
 
     ratings = rebuild_regenerated_ratings(criterion_data, criterion_id_final, criterion_points)
 
@@ -530,22 +530,6 @@ class RubricLLMService
     result
   end
 
-  # Choose final criterion ID:
-  # - If it's a "_new_c_" placeholder or unused, map to a unique Canvas ID
-  # - Else keep the existing ID (it's from original criteria being preserved)
-  # - If no ID provided, generate a new unique ID
-  def determine_final_criterion_id(criterion_data)
-    if criterion_data[:id].present?
-      if criterion_data[:id].start_with?("_new_c_") || !@used_ids.key?(criterion_data[:id])
-        @rubric.unique_item_id(criterion_data[:id])
-      else
-        criterion_data[:id]
-      end
-    else
-      @rubric.unique_item_id
-    end
-  end
-
   # Rebuild ratings for a criterion while preserving IDs and generating a
   # descending points ladder based on the provided top points value.
   #
@@ -564,16 +548,7 @@ class RubricLLMService
 
     rating_values.each_with_index.map do |rating_data, index|
       rd = rating_data.deep_symbolize_keys
-      rating_id_final =
-        if rd[:id].present?
-          if rd[:id].start_with?("_new_r_") || !@used_ids.key?(rd[:id])
-            @rubric.unique_item_id(rd[:id])
-          else
-            rd[:id]
-          end
-        else
-          @rubric.unique_item_id
-        end
+      rating_id_final = resolve_item_id(rd[:id])
 
       {
         description: (rd[:description].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
@@ -668,15 +643,12 @@ class RubricLLMService
       if type == "criterion"
         next unless raw_id == criterion_id.to_s
 
-        new_criterion ||= {
-          "id" => raw_id,
-          "description" => "",
-          "long_description" => "",
-          "ratings" => [],
-          "points" => criterion_points,
-          "criterion_use_range" => original_criterion["criterion_use_range"] || false,
-          "generated" => true
-        }
+        new_criterion ||= build_blank_criterion(
+          id: raw_id,
+          points: criterion_points,
+          use_range: false,
+          original_criterion:
+        )
         new_criterion[field] = value
         updated = true
       elsif type == "rating"
@@ -685,13 +657,7 @@ class RubricLLMService
 
         rating = new_criterion["ratings"].find { |r| r["id"] == raw_id }
         unless rating
-          rating = {
-            "id" => raw_id,
-            "criterion_id" => new_criterion["id"],
-            "description" => "",
-            "long_description" => "",
-            "points" => 0
-          }
+          rating = build_blank_rating(id: raw_id, criterion_id: new_criterion["id"])
           new_criterion["ratings"] << rating
         end
         rating[field] = value
@@ -760,15 +726,12 @@ class RubricLLMService
           original_criterion = original["criteria"].find { |c| c["id"] == raw_id }
           original_criterion ||= original["criteria"][criterion_index]
 
-          current_crit = {
-            "id" => raw_id,
-            "description" => "",
-            "long_description" => "",
-            "ratings" => [],
-            "points" => criterion_points,
-            "criterion_use_range" => original_criterion&.[]("criterion_use_range") || use_range,
-            "generated" => true
-          }
+          current_crit = build_blank_criterion(
+            id: raw_id,
+            points: criterion_points,
+            use_range:,
+            original_criterion:
+          )
           new_criteria << current_crit
         end
         current_crit[field] = value
@@ -777,13 +740,7 @@ class RubricLLMService
 
         rating = current_crit["ratings"].find { |r| r["id"] == raw_id }
         unless rating
-          rating = {
-            "id" => raw_id,
-            "criterion_id" => current_crit["id"],
-            "description" => "",
-            "long_description" => "",
-            "points" => 0
-          }
+          rating = build_blank_rating(id: raw_id, criterion_id: current_crit["id"])
           current_crit["ratings"] << rating
         end
         rating[field] = value
@@ -944,6 +901,38 @@ class RubricLLMService
     rating[:id] = rating[:id].to_s if rating[:id].present?
     rating[:criterion_id] = rating[:criterion_id].to_s if rating[:criterion_id].present?
     rating
+  end
+
+  # Resolve a raw ID from LLM output to a stable Canvas ID:
+  # - Placeholder (_new_*) or unseen ID → generate a new unique ID
+  # - Known existing ID → preserve it as-is
+  # - Nil/blank → generate a new unique ID
+  def resolve_item_id(raw_id)
+    if raw_id.present?
+      if raw_id.start_with?("_new_") || !@used_ids.key?(raw_id)
+        @rubric.unique_item_id(raw_id)
+      else
+        raw_id
+      end
+    else
+      @rubric.unique_item_id
+    end
+  end
+
+  def build_blank_criterion(id:, points:, use_range:, original_criterion: nil)
+    {
+      "id" => id,
+      "description" => "",
+      "long_description" => "",
+      "ratings" => [],
+      "points" => points,
+      "criterion_use_range" => original_criterion&.[]("criterion_use_range") || use_range,
+      "generated" => true
+    }
+  end
+
+  def build_blank_rating(id:, criterion_id:)
+    { "id" => id, "criterion_id" => criterion_id, "description" => "", "long_description" => "", "points" => 0 }
   end
 
   def normalize_boolean_field!(hash, field)
