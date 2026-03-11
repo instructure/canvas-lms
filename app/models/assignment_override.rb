@@ -483,8 +483,8 @@ class AssignmentOverride < ActiveRecord::Base
     # because a higher-priority override exists
     case set_type
     when "ADHOC"
-      assignment.context.participating_students_by_date
-                .where(id: assignment_override_students.select(:user_id))
+      overridable.context.participating_students_by_date
+                 .where(id: assignment_override_students.select(:user_id))
     when "CourseSection", "Course"
       set.participating_students_by_date
     when "Group"
