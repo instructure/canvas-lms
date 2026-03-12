@@ -101,7 +101,7 @@ export function asLink($element, editor) {
 // and it's attributes, even though this could change with future
 // tinymce releases.
 // see https://github.com/tinymce/tinymce/issues/5181
-export function asVideoElement($element) {
+export function asVideoElement($element, isStudioVideo = false) {
   const $videoElem = findMediaPlayerIframe($element)
 
   if (!isVideoElement($videoElem) && !isStudioEmbeddedMedia($videoElem)) {
@@ -115,8 +115,9 @@ export function asVideoElement($element) {
     id:
       $videoElem.parentElement?.getAttribute('data-mce-p-data-media-id') ||
       $videoElem.getAttribute('data-mce-p-data-media-id'),
-    viewerRestrictions:
-      $videoElem.contentWindow?.['env'.toUpperCase()]?.media_object?.viewer_restrictions ?? {},
+    viewerRestrictions: isStudioVideo
+      ? {}
+      : $videoElem.contentWindow?.['env'.toUpperCase()]?.media_object?.viewer_restrictions ?? {},
   }
 }
 
