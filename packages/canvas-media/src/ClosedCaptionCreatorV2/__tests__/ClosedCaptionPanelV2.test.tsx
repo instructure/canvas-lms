@@ -53,7 +53,7 @@ function renderComponent(overrideProps = {}) {
 }
 
 describe('<ClosedCaptionPanelV2 />', () => {
-  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
+  beforeAll(() => server.listen({onUnhandledRequest: 'warn'}))
 
   beforeEach(() => {
     const liveRegion = document.createElement('div')
