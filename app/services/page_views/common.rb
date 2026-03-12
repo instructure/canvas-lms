@@ -68,5 +68,6 @@ module PageViews
     class InvalidResultError < StandardError; end
     class TooManyRequestsError < StandardError; end
     class NoContentError < StandardError; end
+    class ServiceUnavailable < StandardError; end
   end
 end

@@ -62,6 +62,8 @@ module PageViews
         raise Common::NoContentError, "Empty result, no content available"
       when 500
         raise Common::InternalServerError, "Internal server error"
+      when 503
+        raise Common::ServiceUnavailable, "Service temporarily unavailable"
       else
         raise "Unexpected response: #{response.code}"
       end
