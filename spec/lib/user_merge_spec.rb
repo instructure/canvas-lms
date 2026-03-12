@@ -107,6 +107,67 @@ describe UserMerge do
       expect(user1.account_users.first.id).to eq admin.id
     end
 
+    context "with conflicting account_users" do
+      let_once(:account1) { account_model }
+
+      it "soft-deletes conflicting account_users and creates audit records" do
+        merger = user_model(name: "merger_user")
+        account1.account_users.create!(user: user1)
+        from_admin = account1.account_users.create!(user: user2)
+
+        UserMerge.from(user2).into(user1, merger:)
+
+        from_admin.reload
+        expect(from_admin.workflow_state).to eq "deleted"
+        audit_record = from_admin.auditor_records.find_by(action: "deleted")
+        expect(audit_record).to be_present
+        expect(audit_record.performing_user_id).to eq merger.id
+      end
+
+      it "reactivates target's deleted admin when from_user has an active record for the same role" do
+        target_admin = account1.account_users.create!(user: user1)
+        target_admin.destroy
+        from_admin = account1.account_users.create!(user: user2)
+
+        UserMerge.from(user2).into(user1)
+
+        target_admin.reload
+        expect(target_admin.workflow_state).to eq "active"
+        from_admin.reload
+        expect(from_admin.workflow_state).to eq "deleted"
+        expect(from_admin.user_id).to eq user2.id
+
+        merge_data = UserMergeData.where(user_id: user1).first
+        record = merge_data.records.find_by(context_type: "AccountUser", context_id: target_admin.id)
+        expect(record).to be_present
+        expect(record.previous_user_id).to eq user1.id
+        expect(record.previous_workflow_state).to eq "deleted"
+      end
+
+      it "keeps target's deleted admin when from_user also has a deleted record for the same role" do
+        target_admin = account1.account_users.create!(user: user1)
+        target_admin.destroy
+        from_admin = account1.account_users.create!(user: user2)
+        from_admin.destroy
+
+        UserMerge.from(user2).into(user1)
+
+        target_admin.reload
+        expect(target_admin.workflow_state).to eq "deleted"
+        from_admin.reload
+        expect(from_admin.workflow_state).to eq "deleted"
+        expect(from_admin.user_id).to eq user2.id
+      end
+
+      it "clears user cache when soft-deleting conflicting account_users" do
+        account1.account_users.create!(user: user1)
+        account1.account_users.create!(user: user2)
+
+        expect_any_instance_of(AccountUser).to receive(:clear_user_cache).at_least(:once)
+        UserMerge.from(user2).into(user1)
+      end
+    end
+
     it "uses avatar information from merged user if none exists" do
       user2.avatar_image = { "type" => "external", "url" => "https://example.com/image.png" }
       user2.save!

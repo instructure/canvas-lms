@@ -44,6 +44,7 @@ class UserMerge
     raise "cannot merge a test student" if from_user.preferences[:fake_student] || target_user.preferences[:fake_student]
 
     @target_user = target_user
+    @merger = merger
     target_user.associate_with_shard(from_user.shard, :shadow)
     # we also store records for the from_user on the target shard for a split
     from_user.associate_with_shard(target_user.shard, :shadow)
@@ -133,15 +134,30 @@ class UserMerge
         Rails.logger.error "migrating discussions failed: #{e}"
       end
 
-      account_users = AccountUser.where(user_id: from_user)
+      account_users = AccountUser.where(user_id: from_user).to_a
       merge_data.add_more_data(account_users)
-      # soft-delete account_users that would violate the unique index, then move the rest
-      target_combos = AccountUser.where(user_id: target_user).pluck(:role_id, :account_id).to_set
-      conflicting_ids = account_users.filter_map { |au| au.id if target_combos.include?([au.role_id, au.account_id]) }
-      if conflicting_ids.any?
-        AccountUser.where(id: conflicting_ids).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+      # move account_users that won't violate the unique index, then soft-delete the rest
+      existing_target_au = AccountUser.where(user_id: target_user).index_by { |au| [au.role_id, au.account_id] }
+      movable_ids = account_users.filter_map { |au| au.id unless existing_target_au.key?([au.role_id, au.account_id]) }
+      if movable_ids.any?
+        AccountUser.where(id: movable_ids).update_all(user_id: target_user.id, updated_at: Time.now.utc)
       end
-      AccountUser.where(user_id: from_user).where.not(id: conflicting_ids).update_all(user_id: target_user.id, updated_at: Time.now.utc)
+      # for conflicting records, reactivate the target's if the from_user's was active
+      account_users.each do |au|
+        target_au = existing_target_au[[au.role_id, au.account_id]]
+        next unless target_au
+
+        if au.active? && !target_au.active?
+          merge_data.build_more_data([target_au], user: target_user, data:)
+          target_au.reactivate!
+        end
+      end
+      # soft-delete any remaining from_user account_users that couldn't be moved
+      AccountUser.where(user_id: from_user).find_each do |au|
+        au.current_user = @merger
+        au.destroy
+      end
+      target_user.clear_adminable_accounts_cache! if account_users.any?
 
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
