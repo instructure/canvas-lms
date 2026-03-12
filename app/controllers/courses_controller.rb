@@ -1983,7 +1983,9 @@ class CoursesController < ApplicationController
       @context.tab_configuration = NavMenuLinkTabs.sync_course_links_with_tabs(
         course: @context,
         tabs: JSON.parse(params[:tabs_json]).compact,
-        can_manage_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links)
+        can_manage_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links),
+        request_host: request.host,
+        request_port: request.port
       )
       @context.save
       respond_to do |format|

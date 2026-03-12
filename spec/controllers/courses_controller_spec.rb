@@ -6812,7 +6812,9 @@ describe CoursesController do
             { "id" => "assignments", "label" => "Assignments" },
             { "id" => "announcements", "label" => "Announcements", "hidden" => true }
           ],
-          can_manage_links: false
+          can_manage_links: false,
+          request_host: "test.host",
+          request_port: 80
         )
         .and_return(processed_tabs)
 

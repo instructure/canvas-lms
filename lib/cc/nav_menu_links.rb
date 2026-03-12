@@ -41,7 +41,8 @@ module CC
         scope.find_each do |nav_menu_link|
           links_node.navMenuLink(identifier: create_key(nav_menu_link)) do |link_node|
             link_node.label nav_menu_link.label
-            link_node.url nav_menu_link.url
+            # Translate internal links to migration ID placeholders
+            link_node.url @html_exporter.translate_url(nav_menu_link.url)
           end
         end
       end

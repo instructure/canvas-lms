@@ -31,21 +31,51 @@ class NavMenuLink < ApplicationRecord
 
   validates :label, presence: true, length: { maximum: 255 }
   validates :url, presence: true, length: { maximum: 2048 }
-  validates_as_url :url
+  validate :url_is_valid
 
   # See also corresponding Postgres check constraints
   validate :at_least_one_nav_type_enabled
   validate :nav_types_match_context
 
+  def url_is_valid
+    return if url.blank? # presence validation will catch this
+
+    if url.start_with?("/") && !url.start_with?("//")
+      # Allow relative URLs (e.g., /courses/123/assignments/456)
+      # Check for HTML tags before parsing to prevent XSS attacks
+      if url.match?(/[<>]/)
+        errors.add(:url, t("nav_menu_link.errors.url_html_tags", "is not a valid URL (cannot contain HTML tags)"))
+        return
+      end
+
+      begin
+        uri = URI.parse(url)
+        if uri.host.present? || uri.scheme.present? || uri.path.blank?
+          errors.add(:url, t("nav_menu_link.errors.url_relative_invalid", "is not a valid URL (links starting with slash must have path and no host or scheme)"))
+        end
+      rescue URI::Error
+        errors.add(:url, t("nav_menu_link.errors.url_invalid", "is not a valid URL"))
+      end
+    else
+      # absolute URLs -- validate and normalize as in validates_as_url
+      begin
+        value, = CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+        self.url = value # Update with normalized URL (e.g., add http:// if missing)
+      rescue CanvasHttp::Error, URI::Error, ArgumentError
+        errors.add(:url, t("nav_menu_link.errors.url_invalid", "is not a valid URL"))
+      end
+    end
+  end
+
   def at_least_one_nav_type_enabled
     unless course_nav || account_nav || user_nav
-      errors.add(:base, "at least one nav type must be enabled")
+      errors.add(:base, t("nav_menu_link.errors.nav_type_required", "at least one nav type must be enabled"))
     end
   end
 
   def nav_types_match_context
     if context_type == "Course" && (account_nav || user_nav)
-      errors.add(:base, "course-context link can only have course navigation enabled")
+      errors.add(:base, t("nav_menu_link.errors.course_context_nav_only", "course-context link can only have course navigation enabled"))
     end
   end
 

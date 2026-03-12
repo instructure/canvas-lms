@@ -37,11 +37,85 @@ describe NavMenuLink do
     )
   end
 
-  include_context "url validation tests"
-  it "checks url validity" do
-    cl = make_nav_menu_link(@account, account_nav: true)
-    cl.save!
-    test_url_validation(cl, nullable: false)
+  describe "url validation" do
+    it "accepts absolute URLs" do
+      link = make_nav_menu_link(@account, account_nav: true)
+      link.url = "https://example.com/path"
+      expect(link.save).to be true
+      expect(link.url).to eq "https://example.com/path"
+    end
+
+    it "normalizes URLs without scheme" do
+      link = make_nav_menu_link(@account, account_nav: true)
+      link.url = "example.com"
+      expect(link.save).to be true
+      expect(link.url).to eq "http://example.com"
+    end
+
+    it "accepts relative URLs for course content" do
+      link = make_nav_menu_link(@course, course_nav: true)
+      link.url = "/courses/123/assignments/456"
+      expect(link.save).to be true
+      expect(link.url).to eq "/courses/123/assignments/456"
+    end
+
+    it "rejects invalid URLs" do
+      link = make_nav_menu_link(@account, account_nav: true)
+      link.url = "not a url"
+      expect(link.save).to be false
+      expect(link.errors[:url]).to include("is not a valid URL")
+    end
+
+    it "rejects empty URLs" do
+      link = make_nav_menu_link(@account, account_nav: true)
+      link.url = ""
+      expect(link.save).to be false
+      expect(link.errors[:url]).to be_present
+    end
+
+    it "rejects URLs with invalid schemes" do
+      link = make_nav_menu_link(@account, account_nav: true)
+      link.url = "javascript:alert('xss')"
+      expect(link.save).to be false
+      expect(link.errors[:url]).to include("is not a valid URL")
+    end
+
+    describe "security validations" do
+      it "accepts URL-encoded paths" do
+        link = make_nav_menu_link(@course, course_nav: true)
+        link.url = "/courses/%20123"
+        expect(link.save).to be true
+        expect(link.url).to eq "/courses/%20123"
+      end
+
+      it "rejects relative URLs with HTML tags" do
+        link = make_nav_menu_link(@course, course_nav: true)
+        link.url = "/courses/<img src=x onerror=alert('xss')>"
+        expect(link.save).to be false
+        expect(link.errors[:url]).to include("is not a valid URL (cannot contain HTML tags)")
+      end
+
+      it "rejects data URLs" do
+        link = make_nav_menu_link(@account, account_nav: true)
+        link.url = "data:text/html,foo"
+        expect(link.save).to be false
+        expect(link.errors[:url]).to include("is not a valid URL")
+      end
+
+      it "rejects file URLs" do
+        link = make_nav_menu_link(@account, account_nav: true)
+        link.url = "file:///etc/passwd"
+        expect(link.save).to be false
+        expect(link.errors[:url]).to include("is not a valid URL")
+      end
+
+      it "rejects FTP URLs" do
+        link = make_nav_menu_link(@account, account_nav: true)
+        link.url = "ftp://ftp.example.com/file"
+        expect(link.save).to be false
+        expect(link.errors[:url]).to include("is not a valid URL")
+      end
+    end
   end
 
   describe "nav type validations" do

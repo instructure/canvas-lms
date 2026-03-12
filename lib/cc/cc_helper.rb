@@ -402,6 +402,10 @@ module CC
         File.join(WEB_CONTENT_TOKEN, info[:path])
       end
 
+      def translate_url(url)
+        @disable_content_rewriting ? url : @rewriter.translate_url(url)
+      end
+
       def html_content(html)
         return html if @disable_content_rewriting || html.blank?
 
