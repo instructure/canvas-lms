@@ -49,6 +49,8 @@ import {FilesGenericSessionExpired} from './FilesGenericSessionExpired'
 import {BasicPagination} from './BasicPagination'
 import {usePreviewHandler} from '../hooks/usePreviewHandler'
 import {FilePreviewModal} from './FileFolderTable/FilePreviewModal'
+import {DuplicateFoldersModal} from './DuplicateFoldersModal'
+import {useCheckDuplicateFolders} from '../hooks/useCheckDuplicateFolders'
 
 const I18n = createI18nScope('files_v2')
 
@@ -66,6 +68,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const [paginationAlert, setPaginationAlert] = useState<string>('')
   const [rowToFocus, setRowToFocus] = useState<number | SELECT_ALL_FOCUS_STRING | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
+  const [showDuplicatesModal, setShowDuplicatesModal] = useState(false)
+  const modalShownForFolderIdRef = useRef<string | null>(null)
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
   const fileDropRef = useRef<HTMLInputElement | null>(null)
   const selectAllRef = useRef<Checkbox | null>(null)
@@ -181,6 +185,24 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     contextId: contextId,
   })
 
+  const {data: duplicateFolders = []} = useCheckDuplicateFolders({
+    folderId,
+    contextType,
+    contextId,
+    enabled: !isLoading && !!filesEnv.isDuplicateFoldersFeatureEnabled,
+  })
+
+  useEffect(() => {
+    modalShownForFolderIdRef.current = null
+  }, [folderId])
+
+  useEffect(() => {
+    if (duplicateFolders.length > 0 && modalShownForFolderIdRef.current !== folderId) {
+      setShowDuplicatesModal(true)
+      modalShownForFolderIdRef.current = folderId
+    }
+  }, [folderId, duplicateFolders])
+
   return (
     <FileManagementProvider
       value={{
@@ -286,6 +308,11 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
               error={previewState.error}
             />
           )}
+          <DuplicateFoldersModal
+            open={showDuplicatesModal}
+            duplicateFolders={duplicateFolders}
+            onClose={() => setShowDuplicatesModal(false)}
+          />
         </RowsProvider>
       </RowFocusProvider>
       {selectionAnnouncement && (
