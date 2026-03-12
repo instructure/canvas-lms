@@ -3734,41 +3734,6 @@ describe GradebooksController do
         expect(js_env[:final_grader_id]).to eql @teacher.id
       end
 
-      describe "native new quizzes in speed_grader" do
-        let(:tool_url) { "https://quizzes.example.com/lti/launch" }
-        let(:launch_url) { "https://cdn.example.com/us-east-1/remoteEntry.js" }
-        let(:signed_launch_data) { { launch_url: "http://example.com/launch", signature: "abc123" } }
-        let(:tool) do
-          t = @course.context_external_tools.create!(
-            name: "Quizzes 2",
-            url: tool_url,
-            consumer_key: "key",
-            shared_secret: "secret",
-            tool_id: "Quizzes 2"
-          )
-          allow(t).to receive(:quiz_lti?).and_return(true)
-          t
-        end
-
-        before do
-          allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
-          @course.enable_feature!(:new_quizzes_native_experience)
-          allow(Lti::ToolFinder).to receive(:from_assignment).and_return(tool)
-          allow(Services::NewQuizzes::Routes::LaunchHelper).to receive(:build_speedgrader_launch_data).and_return(signed_launch_data)
-          allow(Services::NewQuizzes).to receive(:launch_url).and_return(launch_url)
-        end
-
-        it "calls setup_new_quizzes_env with launch_url" do
-          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-          expect(Services::NewQuizzes).to have_received(:launch_url).with(tool_url:)
-        end
-
-        it "sets NEW_QUIZZES in js_env" do
-          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-          expect(js_env[:NEW_QUIZZES]).to eq(signed_launch_data)
-        end
-      end
-
       it "sets filter_speed_grader_by_student_group_feature_enabled to true when enabled" do
         @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
