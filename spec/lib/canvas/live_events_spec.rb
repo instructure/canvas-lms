@@ -1317,6 +1317,59 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".quiz_created" do
+    before do
+      course_factory
+      @quiz = @course.quizzes.create!(
+        title: "Practice Quiz",
+        quiz_type: "practice_quiz",
+        workflow_state: "available"
+      )
+    end
+
+    it "triggers assignment_created event with quiz details" do
+      expect_event("assignment_created",
+                   hash_including({
+                     quiz_id: @quiz.global_id.to_s,
+                     quiz_type: "practice_quiz",
+                     context_id: @course.global_id.to_s,
+                     context_type: "Course",
+                     context_uuid: @course.uuid,
+                     workflow_state: @quiz.workflow_state,
+                     title: @quiz.title,
+                     submission_types: "online_quiz"
+                   })).once
+
+      Canvas::LiveEvents.quiz_created(@quiz)
+    end
+  end
+
+  describe ".quiz_updated" do
+    before do
+      course_factory
+      @quiz = @course.quizzes.create!(
+        title: "Practice Quiz",
+        quiz_type: "practice_quiz",
+        workflow_state: "available"
+      )
+    end
+
+    it "triggers assignment_updated event with quiz details" do
+      expect_event("assignment_updated",
+                   hash_including({
+                     quiz_id: @quiz.global_id.to_s,
+                     quiz_type: "practice_quiz",
+                     context_id: @course.global_id.to_s,
+                     context_type: "Course",
+                     workflow_state: @quiz.workflow_state,
+                     title: @quiz.title,
+                     submission_types: "online_quiz"
+                   })).once
+
+      Canvas::LiveEvents.quiz_updated(@quiz)
+    end
+  end
+
   describe "assignment_group_updated" do
     let(:course) do
       course_with_student_submissions
