@@ -2660,7 +2660,7 @@ class UsersController < ApplicationController
       into_user = api_find(User, params[:destination_user_id], account: destination_account)
 
       if authorized_action(into_user, @current_user, :merge)
-        UserMerge.from(user).into into_user
+        UserMerge.from(user).into(into_user, merger: @current_user)
         render(json: user_json(into_user,
                                @current_user,
                                session,

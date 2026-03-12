@@ -622,6 +622,21 @@ describe SplitUsers do
       expect(admin3.reload.user).to eq source_user
     end
 
+    it "restores reactivated admin to its prior workflow_state on split" do
+      target_admin = account1.account_users.create!(user: source_user)
+      target_admin.destroy
+      account1.account_users.create!(user: restored_user)
+
+      UserMerge.from(restored_user).into(source_user)
+      expect(target_admin.reload.workflow_state).to eq "active"
+
+      SplitUsers.split_db_users(source_user)
+
+      target_admin.reload
+      expect(target_admin.workflow_state).to eq "deleted"
+      expect(target_admin.user).to eq source_user
+    end
+
     context "sharding" do
       specs_require_sharding
       let!(:shard1_source_user) { @shard1.activate { user_model } }
