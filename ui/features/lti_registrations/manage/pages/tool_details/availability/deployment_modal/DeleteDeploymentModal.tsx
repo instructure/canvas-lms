@@ -38,6 +38,7 @@ import {findRootContextControl} from '../findRootContextControl'
 import type {LtiContextControl} from '../../../../model/LtiContextControl'
 import type {LtiRegistration} from '../../../../model/LtiRegistration'
 import {Text} from '@instructure/ui-text'
+import {AccountId} from '../../../../model/AccountId'
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -46,6 +47,7 @@ const listFormatter = Intl.ListFormat
 const I18n = createI18nScope('lti_registrations')
 
 export type DeleteDeploymentModalProps = {
+  accountId: AccountId
   deployment: LtiDeployment
   registration: LtiRegistration
   controlsByPath: Map<string, LtiContextControl>
@@ -59,6 +61,7 @@ export const DeleteDeploymentModal = ({
   deployment,
   registration,
   controlsByPath,
+  accountId,
 }: DeleteDeploymentModalProps) => {
   const cancelRef = useRef<Element | null>(null)
 
@@ -67,7 +70,7 @@ export const DeleteDeploymentModal = ({
     mutationFn: async (deployment: LtiDeployment) =>
       onDelete({
         registrationId: registration.id,
-        accountId: registration.account_id,
+        accountId: accountId,
         deploymentId: deployment.id,
       }),
     // We don't need an onError handler here because ApiResult is meant to be a discriminated union
