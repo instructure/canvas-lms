@@ -1533,6 +1533,11 @@ class FilesController < ApplicationController
 
   # @API Reset link verifier
   #
+  # @deprecated_method NOTICE 2026-04-08 EFFECTIVE 2026-07-07
+  #   The UUID-based verification method for file access is being deprecated.
+  #   This endpoint will no longer be available as UUID verification for file
+  #   access is being phased out.
+  #
   # Resets the link verifier. Any existing links to the file using
   # the previous hard-coded "verifier" parameter will no longer
   # automatically grant access.
