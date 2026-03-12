@@ -1611,47 +1611,101 @@ describe EnrollmentsApiController, type: :request do
         expect(response).to be_successful
       end
 
-      it "is able to return an enrollment object by id" do
-        json = api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
-        expect(json).to eq({
-                             "root_account_id" => @enrollment.root_account_id,
-                             "id" => @enrollment.id,
-                             "user_id" => @student.id,
-                             "course_section_id" => @enrollment.course_section_id,
-                             "sis_import_id" => @enrollment.sis_batch_id,
-                             "sis_account_id" => nil,
-                             "sis_course_id" => nil,
-                             "sis_section_id" => nil,
-                             "sis_user_id" => nil,
-                             "course_integration_id" => nil,
-                             "section_integration_id" => nil,
-                             "limit_privileges_to_course_section" => @enrollment.limit_privileges_to_course_section,
-                             "enrollment_state" => @enrollment.workflow_state,
-                             "course_id" => @course.id,
-                             "type" => @enrollment.type,
-                             "role" => @enrollment.role.name,
-                             "role_id" => @enrollment.role.id,
-                             "html_url" => course_user_url(@course, @student),
-                             "grades" => {
-                               "html_url" => course_student_grades_url(@course, @student),
-                               "final_score" => nil,
-                               "current_score" => nil,
-                               "final_grade" => nil,
-                               "current_grade" => nil,
-                               "unposted_final_score" => nil,
-                               "unposted_current_score" => nil,
-                               "unposted_final_grade" => nil,
-                               "unposted_current_grade" => nil
-                             },
-                             "associated_user_id" => @enrollment.associated_user_id,
-                             "updated_at" => @enrollment.updated_at.xmlschema,
-                             "created_at" => @enrollment.created_at.xmlschema,
-                             "start_at" => nil,
-                             "end_at" => nil,
-                             "last_activity_at" => nil,
-                             "last_attended_at" => nil,
-                             "total_activity_time" => 0
-                           })
+      describe "#show" do
+        before(:once) do
+          @sub_account = Account.default.sub_accounts.create!
+          @sub_course = @sub_account.courses.create(name: "Rocket Science 101")
+          @sub_enrollment = @sub_course.enroll_student(@student)
+          @sibling_sub_account = Account.default.sub_accounts.create!
+        end
+
+        def generate_enrollment_json(enrollment, course)
+          {
+            "root_account_id" => enrollment.root_account_id,
+            "id" => enrollment.id,
+            "user_id" => @student.id,
+            "course_section_id" => enrollment.course_section_id,
+            "sis_import_id" => enrollment.sis_batch_id,
+            "sis_account_id" => nil,
+            "sis_course_id" => nil,
+            "sis_section_id" => nil,
+            "sis_user_id" => nil,
+            "course_integration_id" => nil,
+            "section_integration_id" => nil,
+            "limit_privileges_to_course_section" => enrollment.limit_privileges_to_course_section,
+            "enrollment_state" => enrollment.workflow_state,
+            "course_id" => course.id,
+            "type" => enrollment.type,
+            "role" => enrollment.role.name,
+            "role_id" => enrollment.role.id,
+            "html_url" => course_user_url(course, @student),
+            "grades" => {
+              "html_url" => course_student_grades_url(course, @student),
+              "final_score" => nil,
+              "current_score" => nil,
+              "final_grade" => nil,
+              "current_grade" => nil,
+              "unposted_final_score" => nil,
+              "unposted_current_score" => nil,
+              "unposted_final_grade" => nil,
+              "unposted_current_grade" => nil
+            },
+            "associated_user_id" => enrollment.associated_user_id,
+            "updated_at" => enrollment.updated_at.xmlschema,
+            "created_at" => enrollment.created_at.xmlschema,
+            "start_at" => nil,
+            "end_at" => nil,
+            "last_activity_at" => nil,
+            "last_attended_at" => nil,
+            "total_activity_time" => 0
+          }
+        end
+
+        it "returns an enrollment object by id" do
+          json = api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
+          expect(json).to eq(generate_enrollment_json(@enrollment, @course))
+        end
+
+        it "returns an enrollment object by id in a subaccount" do
+          enroll_path = "/api/v1/accounts/#{@sub_account.id}/enrollments/#{@sub_enrollment.id}"
+          enroll_params = @enroll_params.merge({ account_id: @sub_account.id, id: @sub_enrollment.id })
+          json = api_call(:get, enroll_path, enroll_params)
+          expect(json).to eq(generate_enrollment_json(@sub_enrollment, @sub_course))
+        end
+
+        it "returns an enrollment in a nested subaccount" do
+          child_sub_account = @sub_account.sub_accounts.create!
+          child_course = child_sub_account.courses.create(name: "Biochemistry 500")
+          child_enrollment = child_course.enroll_student(@student)
+          enroll_path = "/api/v1/accounts/#{@sub_account.id}/enrollments/#{child_enrollment.id}"
+          enroll_params = @enroll_params.merge({ account_id: @sub_account.id, id: child_enrollment.id })
+          json = api_call(:get, enroll_path, enroll_params)
+          expect(json).to eq(generate_enrollment_json(child_enrollment, child_course))
+        end
+
+        it "does not return a non-existent enrollment" do
+          enroll_path = "/api/v1/accounts/#{@sub_account.id}/enrollments/999999"
+          enroll_params = @enroll_params.merge({ account_id: @sub_account.id, id: 999_999 })
+          api_call(:get, enroll_path, enroll_params, {}, {}, { expected_status: 404 })
+        end
+
+        it "does not return an enrollment belonging to a sibling account" do
+          enroll_path = "/api/v1/accounts/#{@sibling_sub_account.id}/enrollments/#{@sub_enrollment.id}"
+          enroll_params = @enroll_params.merge({ account_id: @sibling_sub_account.id, id: @sub_enrollment.id })
+          api_call(:get, enroll_path, enroll_params, {}, {}, { expected_status: 404 })
+        end
+
+        it "does not return an enrollment belonging to a parent account" do
+          bad_path = "/api/v1/accounts/#{@sub_account.id}/enrollments/#{@enrollment.id}"
+          enroll_params = {
+            controller: "enrollments_api",
+            action: "show",
+            account_id: @sub_account.id,
+            id: @enrollment.id,
+            format: "json"
+          }
+          api_call(:get, bad_path, enroll_params, {}, {}, { expected_status: 404 })
+        end
       end
 
       it "lists all of a user's enrollments in an account" do
@@ -2800,20 +2854,6 @@ describe EnrollmentsApiController, type: :request do
       it "returns 403 forbidden for a course listing with a specific user_if provided" do
         raw_api_call(:get, @path, @params.merge(user_id: @course.students.active.first.id))
         expect(response).to have_http_status :forbidden
-      end
-
-      it "returns 404 for a user querying from the wrong account" do
-        sub = @enrollment.root_account.sub_accounts.create!(name: "sub")
-        bad_path = "/api/v1/accounts/#{sub.id}/enrollments/#{@enrollment.id}"
-        enroll_params = {
-          controller: "enrollments_api",
-          action: "show",
-          account_id: sub.id,
-          id: @enrollment.id,
-          format: "json"
-        }
-        raw_api_call(:get, bad_path, enroll_params)
-        expect(response).to have_http_status :not_found
       end
     end
 

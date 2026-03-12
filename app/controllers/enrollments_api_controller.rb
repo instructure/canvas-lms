@@ -559,10 +559,18 @@ class EnrollmentsApiController < ApplicationController
   # @returns Enrollment
   def show
     GuardRail.activate(:secondary) do
-      enrollment = @context.all_enrollments.find(params[:id])
-      if enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
-        render json: enrollment_json(enrollment, @current_user, session)
+      # only root_account_id exists on enrollments so get the enrollment from the root account
+      # and make sure it belongs to a course associated with the account
+      enrollment = @context.root_account.all_enrollments.find(params[:id])
+
+      return unless enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
+
+      if !@context.root_account? && !enrollment.course.account_chain_ids.include?(@context.id)
+        # same error message as api_find
+        raise(ActiveRecord::RecordNotFound, "Couldn't find #{Enrollment.name} with API id '#{params[:id]}'")
       end
+
+      render json: enrollment_json(enrollment, @current_user, session)
     end
   end
 
