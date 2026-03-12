@@ -191,6 +191,115 @@ describe NavMenuLinkTabs do
         expect(links.length).to eq(2)
       end
     end
+
+    context "with request_host and request_port" do
+      it "strips matching host from new link URLs" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com/courses/123"], "label" => "Course Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/courses/123")
+        expect(new_link.label).to eq("Course Link")
+      end
+
+      it "preserves external URLs when host does not match" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://external-site.com/page"], "label" => "External Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("https://external-site.com/page")
+      end
+
+      it "handles relative URLs without stripping" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["/courses/123/pages/home"], "label" => "Relative Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/courses/123/pages/home")
+      end
+
+      it "works without request_host and request_port" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://example.com/page"], "label" => "Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("https://example.com/page")
+      end
+
+      it "preserves query strings when stripping host" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com/files/123?wrap=1"], "label" => "File Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/files/123?wrap=1")
+      end
+
+      it "preserves fragments when stripping host" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com/courses/123#section-2"], "label" => "Anchored Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/courses/123#section-2")
+      end
+    end
   end
 
   describe ".course_tabs" do
