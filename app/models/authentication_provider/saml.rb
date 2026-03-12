@@ -21,9 +21,6 @@
 require "saml2"
 
 class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
-  # TODO: strip magic comment if included in manually uploaded metadata
-  GENERATED_METADATA_MAGIC_COMMENT = "<!-- CANVAS: Auto-generated IDP metadata; may not exactly match IDP metadata -->"
-
   def self.sti_name
     "saml"
   end
@@ -219,8 +216,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def persist_metadata
-    if settings["metadata"].blank? || synthetic_metadata?
-      settings["metadata"] = synthetic_idp_metadata.to_xml.to_s + "\n" + GENERATED_METADATA_MAGIC_COMMENT
+    if settings["metadata"].blank? || synthetic_metadata? || (settings["metadata_source"] == "url" && metadata_uri.blank?)
+      settings["metadata"] = synthetic_idp_metadata.to_xml.to_s
+      settings["metadata_source"] = "generated"
     end
   end
 
@@ -326,7 +324,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     end
   end
 
-  def populate_from_metadata_xml(xml)
+  def populate_from_metadata_xml(xml, source: "manual")
     entity = SAML2::Entity.parse(xml)
     raise "Invalid schema" unless entity&.valid_schema?
 
@@ -338,6 +336,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     populate_from_metadata(entity)
     # Only set this after all the above runs so that we catch any issues before overwriting the cached metadata
     settings["metadata"] = xml
+    settings["metadata_source"] = source
   end
   alias_method :metadata=, :populate_from_metadata_xml
 
@@ -346,7 +345,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       CanvasHttp.get(url) do |response|
         # raise error unless it's a 2xx
         response.value
-        populate_from_metadata_xml(response.body)
+        populate_from_metadata_xml(response.body, source: "url")
       end
     end
   end
@@ -615,6 +614,6 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def synthetic_metadata?
-    settings["metadata"].present? && settings["metadata"].include?(GENERATED_METADATA_MAGIC_COMMENT)
+    settings["metadata_source"] == "generated"
   end
 end

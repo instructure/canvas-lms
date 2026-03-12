@@ -130,6 +130,10 @@ describe Login::SamlController do
     BASE64
   end
 
+  let(:signing_certificate_fixture) do
+    "MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMCTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYDVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xiZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2ZlaWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5vMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LONoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHISKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2QarQ4/67OZfHd7R+POBXhophSMv1ZOo"
+  end
+
   describe "#new" do
     let(:account) { account_with_saml(saml_log_in_url: "https://example.com/saml/login") }
 
@@ -1104,7 +1108,7 @@ describe Login::SamlController do
     @aac = @account.authentication_providers.first
     @aac.idp_entity_id = "http://phpsite/simplesaml/saml2/idp/metadata.php"
     @aac.login_attribute = "eduPersonPrincipalName"
-    @aac.settings["signing_certificates"] = ["MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMCTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYDVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xiZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2ZlaWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5vMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LONoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHISKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2QarQ4/67OZfHd7R+POBXhophSMv1ZOo"]
+    @aac.settings["signing_certificates"] = [signing_certificate_fixture]
     @aac.save
 
     user_with_pseudonym(active_all: true, username: unique_id)
@@ -1117,6 +1121,175 @@ describe Login::SamlController do
       post :create, params: { SAMLResponse: saml_response_fixture }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(session[:saml_unique_id]).to eq unique_id
+    end
+  end
+
+  context "certificate recording without real metadata" do
+    let(:account) { account_with_saml }
+    let(:aac) { account.authentication_providers.first }
+    let(:certificate) { OpenSSL::X509::Certificate.new(Base64.decode64(signing_certificate_fixture)) }
+    let(:fingerprint) { SAML2::KeyInfo.format_fingerprint(Digest::SHA1.hexdigest(certificate.to_der)) }
+
+    let(:signing_key) do
+      SAML2::KeyInfo.new(certificate.to_pem)
+    end
+
+    let(:saml_response) do
+      saml_response = SAML2::Response.new
+      saml_response.issuer = SAML2::NameID.new("saml_entity")
+      saml_response.assertions << (assertion = SAML2::Assertion.new)
+      assertion.subject = SAML2::Subject.new
+      assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+      saml_response
+    end
+
+    before do
+      user_with_pseudonym(active_all: 1, account:)
+      Account.site_admin.enable_feature!(:record_saml_certificates)
+      allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, nil]
+      )
+    end
+
+    def stub_signing_keys(response_key: nil, assertion_key: nil)
+      allow(saml_response).to receive(:signing_key).and_return(response_key)
+      allow(saml_response.assertions.first).to receive(:signing_key).and_return(assertion_key)
+    end
+
+    it "records the certificate from the response signing key" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "records the certificate from the assertion signing key when the response has none" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(assertion_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "collects certificates from both response and assertion signing keys" do
+      other_key = OpenSSL::PKey::RSA.generate(2048)
+      other_x509 = OpenSSL::X509::Certificate.new
+      other_x509.subject = OpenSSL::X509::Name.new([["CN", "other"]])
+      other_x509.issuer = other_x509.subject
+      other_x509.serial = 1
+      other_x509.public_key = other_key.public_key
+      other_x509.not_before = Time.zone.now
+      other_x509.not_after = Time.zone.now + 3600
+      other_x509.sign(other_key, OpenSSL::Digest.new("SHA256"))
+      other_signing_key = SAML2::KeyInfo.new(other_x509.to_pem)
+      other_fingerprint = SAML2::KeyInfo.format_fingerprint(Digest::SHA1.hexdigest(other_x509.to_der))
+
+      aac.certificate_fingerprint = "#{fingerprint} #{other_fingerprint}"
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key, assertion_key: other_signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to contain_exactly(signing_key.x509, other_signing_key.x509)
+    end
+
+    it "replaces a stale certificate when the fingerprint has changed" do
+      aac.certificate_fingerprint = fingerprint
+      # store a different (stale) certificate that doesn't match the current fingerprint
+      old_key = OpenSSL::PKey::RSA.generate(2048)
+      old_x509 = OpenSSL::X509::Certificate.new
+      old_x509.public_key = old_key.public_key
+      old_x509.not_before = Time.zone.now
+      old_x509.not_after = Time.zone.now + 3600
+      old_x509.sign(old_key, OpenSSL::Digest.new("SHA256"))
+      aac.settings["signing_certificates"] = [Base64.strict_encode64(old_x509.to_der)]
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "does not save when the certificate already matches" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = [signing_key.x509]
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      # certificate should remain unchanged
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "does not record the certificate when metadata is not synthetic" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.settings["metadata_source"] = "manual"
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq []
+    end
+
+    it "does not record the certificate when the fingerprint does not match" do
+      aac.certificate_fingerprint = "aa:bb:cc:dd"
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq []
+    end
+
+    it "does not record the certificate when the record_saml_certificates flag is disabled" do
+      Account.site_admin.disable_feature!(:record_saml_certificates)
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq []
     end
   end
 

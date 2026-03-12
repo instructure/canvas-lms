@@ -47,7 +47,7 @@ describe DataFixup::PopulateSamlMetadata do
     aac.reload
 
     expect(aac.settings["metadata"]).to be_present
-    expect(aac.settings["metadata"]).to include(AuthenticationProvider::SAML::GENERATED_METADATA_MAGIC_COMMENT)
+    expect(aac.settings["metadata_source"]).to eq("generated")
     expect(aac.settings["metadata"]).to include("https://idp.example.com")
   end
 end
