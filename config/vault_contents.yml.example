@@ -39,7 +39,8 @@ development:
         cedar_shared_secret: fake-secrete-key
         cedar_consumer_name: "canvas"
       content_service_client:
-        hostname: "http://content-service-api:3000"
+        hostname: "http://content-service-api:3010"
+        audience: "content-service-local"
       observe_api:
         host: "103443579803.observeinc.com"
         customer_id: "103443579803"
