@@ -32,7 +32,7 @@ interface Props {
   readonly portfolioId: number
   readonly sectionListNode: HTMLElement
   readonly pageListNode: HTMLElement
-  readonly submissionNode: HTMLElement
+  readonly submissionNode: HTMLElement | null
   readonly onPageUpdate: (json: ePortfolioPage) => void
 }
 
