@@ -860,6 +860,9 @@
   "extra_large_b6cdf1ff": {
     "message": "Extra Large"
   },
+  "extra_large_width_x_height_px_915571fa": {
+    "message": "Extra Large ({ width } x { height }px)"
+  },
   "extra_small_9ae33252": {
     "message": "Extra Small"
   },
@@ -2286,6 +2289,9 @@
   "show_link_options_545338fd": {
     "message": "Show link options"
   },
+  "show_rolling_transcript_d353aca4": {
+    "message": "Show Rolling Transcript"
+  },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
     "message": "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."
   },
@@ -2912,9 +2918,6 @@
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki Home"
-  },
-  "with_transcript_width_x_height_px_56626dfd": {
-    "message": "With Transcript ({ width } x { height }px)"
   },
   "word_count_c77fe3a6": {
     "message": "Word Count"
