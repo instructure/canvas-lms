@@ -713,7 +713,8 @@ class GroupCategoriesController < ApplicationController
       )
 
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
-        csv_string = CSV.generate do |csv|
+        csv_options = CSVWithI18n.csv_i18n_settings(@current_user)
+        csv_string = CSVWithI18n.generate(**csv_options.slice(:encoding, :col_sep, :include_bom)) do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
           users = @context.participating_students
                           .select(<<~SQL.squish)
@@ -756,7 +757,8 @@ class GroupCategoriesController < ApplicationController
       end
 
       include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
-      csv_string = CSV.generate do |csv|
+      csv_options = CSVWithI18n.csv_i18n_settings(@current_user)
+      csv_string = CSVWithI18n.generate(**csv_options.slice(:encoding, :col_sep, :include_bom)) do |csv|
         users = @context.participating_students
                         .select(<<~SQL.squish)
                           users.id, users.sortable_name,
