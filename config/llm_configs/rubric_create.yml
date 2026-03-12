@@ -88,9 +88,9 @@ template: |
   }
 
   Ensure the rubric is comprehensive, grade-appropriate, and integrates only relevant standard expectations.
-  Identify the language of the assignment (english, spanish, etc.) and use the same language throughout.
+  Use the same language as the assignment for all rubric text.
   Now, create the rubric in JSON with exactly <CRITERIA_COUNT_PLACEHOLDER> criteria, each containing exactly <RATING_COUNT_PLACEHOLDER> ratings. Do not include any additional criteria or ratings beyond this number.
-  **IMPORTANT**: Validate the created JSON object and verify there are no unexpected characters and every comma is in place before returning.
+  **IMPORTANT**: Return the JSON object only. Do not include any text, labels, or commentary before or after it. Validate the JSON and verify there are no unexpected characters and every comma is in place before returning.
 
 options:
   max_tokens: 5000
