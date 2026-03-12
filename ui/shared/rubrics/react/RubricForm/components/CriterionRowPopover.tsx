@@ -19,15 +19,7 @@
 import {useState, forwardRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
-import {
-  IconArrowDownLine,
-  IconArrowUpLine,
-  IconDuplicateLine,
-  IconEditLine,
-  IconMoreLine,
-  IconOutcomesLine,
-  IconTrashLine,
-} from '@instructure/ui-icons'
+import {IconArrowDownLine, IconArrowUpLine, IconMoreLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
@@ -39,37 +31,10 @@ type CriterionRowPopoverProps = {
   isLastIndex: boolean
   onMoveUp: () => void
   onMoveDown: () => void
-  isLearningOutcome?: boolean
-  isRegenerating?: boolean
-  onEditCriterion?: () => void
-  onDeleteCriterion?: () => void
-  onDuplicateCriterion?: () => void
 }
 export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopoverProps>(
-  (
-    {
-      isFirstIndex,
-      isLastIndex,
-      onMoveUp,
-      onMoveDown,
-      isLearningOutcome,
-      isRegenerating,
-      onEditCriterion,
-      onDeleteCriterion,
-      onDuplicateCriterion,
-    },
-    ref,
-  ) => {
+  ({isFirstIndex, isLastIndex, onMoveUp, onMoveDown}, ref) => {
     const [isPopoverOpen, setPopoverIsOpen] = useState(false)
-
-    const closeAndCall = (fn: () => void) => () => {
-      fn()
-      setPopoverIsOpen(false)
-    }
-
-    const editLabel = isLearningOutcome
-      ? I18n.t('View Outcome Criterion')
-      : I18n.t('Edit Criterion')
 
     return (
       <span ref={ref}>
@@ -102,7 +67,10 @@ export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopov
             <Menu.Item
               value="move-up"
               disabled={isFirstIndex}
-              onClick={closeAndCall(onMoveUp)}
+              onClick={() => {
+                onMoveUp()
+                setPopoverIsOpen(false)
+              }}
               data-testid="move-up-criterion-menu-item"
             >
               <IconArrowUpLine />
@@ -113,7 +81,10 @@ export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopov
             <Menu.Item
               value="move-down"
               disabled={isLastIndex}
-              onClick={closeAndCall(onMoveDown)}
+              onClick={() => {
+                onMoveDown()
+                setPopoverIsOpen(false)
+              }}
               data-testid="move-down-criterion-menu-item"
             >
               <IconArrowDownLine />
@@ -121,45 +92,6 @@ export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopov
                 {I18n.t('Move Down')}
               </View>
             </Menu.Item>
-            {onEditCriterion && <Menu.Separator />}
-            {onEditCriterion && (
-              <Menu.Item
-                value="edit"
-                onClick={closeAndCall(onEditCriterion)}
-                data-testid="edit-criterion-menu-item"
-              >
-                {isLearningOutcome ? <IconOutcomesLine /> : <IconEditLine />}
-                <View as="span" margin="0 0 0 x-small">
-                  {editLabel}
-                </View>
-              </Menu.Item>
-            )}
-            {onDeleteCriterion && (
-              <Menu.Item
-                value="delete"
-                disabled={isRegenerating}
-                onClick={closeAndCall(onDeleteCriterion)}
-                data-testid="delete-criterion-menu-item"
-              >
-                <IconTrashLine />
-                <View as="span" margin="0 0 0 x-small">
-                  {I18n.t('Delete Criterion')}
-                </View>
-              </Menu.Item>
-            )}
-            {onDuplicateCriterion && (
-              <Menu.Item
-                value="duplicate"
-                disabled={isRegenerating}
-                onClick={closeAndCall(onDuplicateCriterion)}
-                data-testid="duplicate-criterion-menu-item"
-              >
-                <IconDuplicateLine />
-                <View as="span" margin="0 0 0 x-small">
-                  {I18n.t('Duplicate Criterion')}
-                </View>
-              </Menu.Item>
-            )}
           </Menu>
         </Popover>
       </span>

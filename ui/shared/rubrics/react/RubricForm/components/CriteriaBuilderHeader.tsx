@@ -40,7 +40,7 @@ export const CriteriaBuilderHeader = ({
 }: CriteriaBuilderHeaderProps) => {
   return (
     <View as="div" margin="large 0 small 0">
-      <Flex wrap="wrap">
+      <Flex>
         <Flex.Item shouldGrow={true}>
           <Heading
             level="h2"

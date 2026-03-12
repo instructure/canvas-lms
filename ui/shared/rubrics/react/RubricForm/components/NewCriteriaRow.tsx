@@ -16,60 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconDragHandleLine, IconEditLine, IconOutcomesLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('rubrics-criteria-new-row')
 
 type NewCriteriaRowProps = {
-  isCompact: boolean
   rowIndex: number
   onEditCriterion: () => void
   onAddOutcome: () => void
 }
 
-export const NewCriteriaRow = ({
-  isCompact,
-  rowIndex,
-  onEditCriterion,
-  onAddOutcome,
-}: NewCriteriaRowProps) => {
+export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCriteriaRowProps) => {
   return (
-    <tr>
-      {!isCompact && (
-        <td className="criterion-cell criterion-cell--drag">
-          <IconDragHandleLine color="secondary" />
-        </td>
-      )}
-      <td className="criterion-cell criterion-cell--index">
-        <Text weight="bold">{rowIndex}.</Text>
-      </td>
-      <td colSpan={2} className="criterion-cell">
-        <Flex direction="row" gap="small" wrap="wrap">
-          <Flex.Item>
-            <Button
-              renderIcon={<IconEditLine />}
-              onClick={onEditCriterion}
-              data-testid="add-criterion-button"
-            >
-              {I18n.t('Draft New Criterion')}
-            </Button>
-          </Flex.Item>
-          <Flex.Item>
-            <Button
-              id="create-from-outcome"
-              renderIcon={<IconOutcomesLine />}
-              onClick={onAddOutcome}
-              data-testid="create-from-outcome-button"
-            >
-              {I18n.t('Create From Outcome')}
-            </Button>
-          </Flex.Item>
-        </Flex>
-      </td>
-    </tr>
+    <View as="div" padding="medium small">
+      <Flex>
+        <Flex.Item align="start">
+          <View as="div" cursor="pointer">
+            <IconDragHandleLine />
+          </View>
+        </Flex.Item>
+        <Flex.Item align="start">
+          <View as="div" margin="xxx-small 0 0 small" themeOverride={{marginSmall: '1.5rem'}}>
+            <Text weight="bold">{rowIndex}.</Text>
+          </View>
+        </Flex.Item>
+        <Flex.Item margin="0 small" align="start" shouldGrow={true}>
+          <Flex direction="row" gap="small" wrap="wrap">
+            <Flex.Item>
+              <Button
+                renderIcon={<IconEditLine />}
+                onClick={onEditCriterion}
+                data-testid="add-criterion-button"
+              >
+                {I18n.t('Draft New Criterion')}
+              </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                id="create-from-outcome"
+                renderIcon={<IconOutcomesLine />}
+                onClick={onAddOutcome}
+                data-testid="create-from-outcome-button"
+              >
+                {I18n.t('Create From Outcome')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 }
