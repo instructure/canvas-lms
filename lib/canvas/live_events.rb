@@ -337,6 +337,34 @@ module Canvas::LiveEvents
     post_event_stringified("assignment_updated", get_assignment_data(assignment))
   end
 
+  def self.get_quiz_data(quiz)
+    {
+      assignment_group_id: quiz.global_assignment_group_id,
+      context_id: quiz.global_context_id,
+      context_type: "Course",
+      context_uuid: quiz.context.uuid,
+      description: LiveEvents.truncate(quiz.description),
+      due_at: quiz.due_at,
+      lock_at: quiz.lock_at,
+      points_possible: quiz.points_possible,
+      quiz_id: quiz.global_id,
+      quiz_type: quiz.quiz_type,
+      submission_types: "online_quiz",
+      title: LiveEvents.truncate(quiz.title),
+      unlock_at: quiz.unlock_at,
+      updated_at: quiz.updated_at,
+      workflow_state: quiz.workflow_state
+    }
+  end
+
+  def self.quiz_created(quiz)
+    post_event_stringified("assignment_created", get_quiz_data(quiz))
+  end
+
+  def self.quiz_updated(quiz)
+    post_event_stringified("assignment_updated", get_quiz_data(quiz))
+  end
+
   def self.assignment_group_created(assignment_group)
     post_event_stringified("assignment_group_created", get_assignment_group_data(assignment_group))
   end

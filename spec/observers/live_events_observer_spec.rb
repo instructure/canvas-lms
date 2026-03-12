@@ -259,6 +259,27 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "quiz" do
+    before { course_factory }
+
+    it "posts quiz_created for practice_quiz" do
+      expect(Canvas::LiveEvents).to receive(:quiz_created).once
+      @course.quizzes.create!(title: "Practice Quiz", quiz_type: "practice_quiz")
+    end
+
+    it "posts quiz_updated for practice_quiz" do
+      quiz = @course.quizzes.create!(title: "Practice Quiz", quiz_type: "practice_quiz")
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).once
+      quiz.title = "Updated Title"
+      quiz.save!
+    end
+
+    it "does not post quiz_created for graded quiz with assignment" do
+      expect(Canvas::LiveEvents).not_to receive(:quiz_created)
+      @course.quizzes.create!(title: "Graded Quiz", quiz_type: "assignment")
+    end
+  end
+
   describe "assignment overrides" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:assignment_override_created).once

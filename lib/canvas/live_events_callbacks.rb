@@ -48,6 +48,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.wiki_page_created(obj)
     when Assignment
       Canvas::LiveEvents.assignment_created(obj)
+    when Quizzes::Quiz
+      Canvas::LiveEvents.quiz_created(obj) if obj.assignment_id.nil?
     when AssignmentGroup
       Canvas::LiveEvents.assignment_group_created(obj)
     when AssignmentOverride
@@ -137,6 +139,8 @@ module Canvas::LiveEventsCallbacks
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
+    when Quizzes::Quiz
+      Canvas::LiveEvents.quiz_updated(obj) if obj.assignment_id.nil?
     when AssignmentGroup
       Canvas::LiveEvents.assignment_group_updated(obj)
     when AssignmentOverride
