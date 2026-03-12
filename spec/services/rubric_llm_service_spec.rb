@@ -163,6 +163,10 @@ describe RubricLLMService do
           build_generate_dynamic_content(assignment, generate_options)
         end
 
+        def public_parse_and_transform_generated_criteria(response, generate_options)
+          parse_and_transform_generated_criteria(response, generate_options)
+        end
+
         def public_build_regenerate_dynamic_content(
           assignment,
           criteria_as_text,
@@ -2471,6 +2475,40 @@ describe RubricLLMService do
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("Write a 5-paragraph essay on climate change.")
+      end
+    end
+
+    describe "#parse_and_transform_generated_criteria" do
+      let(:base_options) { { total_points: 10, use_range: false } }
+      let(:single_criterion_response) do
+        '"criteria": [{"name": "Clarity", "description": "Clear writing", "ratings": [{"title": "Good", "description": "Well done"}, {"title": "Poor", "description": "Needs work"}]}]}'
+      end
+
+      it "parses a clean JSON response" do
+        result = service_with_access.public_parse_and_transform_generated_criteria(single_criterion_response, base_options)
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(1)
+        expect(result.first[:description]).to eq("Clarity")
+      end
+
+      it "strips trailing text after the closing brace" do
+        response_with_trailing = single_criterion_response + "\n\nLanguage: English"
+        result = service_with_access.public_parse_and_transform_generated_criteria(response_with_trailing, base_options)
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(1)
+      end
+
+      it "strips trailing whitespace and newlines after the closing brace" do
+        response_with_whitespace = single_criterion_response + "\n\n   \n"
+        result = service_with_access.public_parse_and_transform_generated_criteria(response_with_whitespace, base_options)
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(1)
+      end
+
+      it "raises a user-friendly error when the response is malformed JSON" do
+        expect do
+          service_with_access.public_parse_and_transform_generated_criteria("not json at all", base_options)
+        end.to raise_error(JSON::ParserError, /AI response.*not in the expected format/)
       end
     end
 

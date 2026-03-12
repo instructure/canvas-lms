@@ -239,7 +239,10 @@ class RubricLLMService
   end
 
   def parse_and_transform_generated_criteria(response, generate_options)
-    ai_rubric = JSON.parse("{" + response, symbolize_names: true)
+    json_str = "{" + response
+    last_index = json_str.rindex("}")
+    json_str = json_str[0..last_index] unless last_index.nil?
+    ai_rubric = JSON.parse(json_str, symbolize_names: true)
 
     criteria_count = ai_rubric[:criteria].length
     total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
