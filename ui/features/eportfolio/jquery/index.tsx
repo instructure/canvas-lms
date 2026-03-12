@@ -211,12 +211,12 @@ function renderCreateForm() {
   }
 }
 
-function renderPortal(portfolio_id: number) {
+export function renderPortal(portfolio_id: number) {
   const sectionListContainer = document.getElementById('section_list_mount')
   const submissionContainer = document.getElementById('recent_submission_mount')
   const pageListContainer = document.getElementById('page_list_mount')
 
-  if (sectionListContainer && submissionContainer && pageListContainer) {
+  if (sectionListContainer && pageListContainer) {
     return (
       <QueryClientProvider client={queryClient}>
         <PortfolioPortal
