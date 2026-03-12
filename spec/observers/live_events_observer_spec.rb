@@ -485,6 +485,57 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "quiz_question" do
+    context "quiz with assignment" do
+      it "posts assignment_updated when a question is created" do
+        allow(Canvas::LiveEvents).to receive(:assignment_updated)
+        quiz_model(quiz_type: "assignment")
+        assignment = @quiz.reload.assignment
+        expect(Canvas::LiveEvents).to receive(:assignment_updated).with(assignment)
+        @quiz.quiz_questions.create!(question_data: { name: "Q1", question_type: "true_false_question", points_possible: 1 })
+      end
+
+      it "posts assignment_updated when a question is updated" do
+        allow(Canvas::LiveEvents).to receive(:assignment_updated)
+        quiz_model(quiz_type: "assignment")
+        question = @quiz.quiz_questions.create!(question_data: { name: "Q1", question_type: "true_false_question", points_possible: 1 })
+        assignment = @quiz.reload.assignment
+        expect(Canvas::LiveEvents).to receive(:assignment_updated).with(assignment)
+        question.update!(question_data: { name: "Q1 updated", question_type: "true_false_question", points_possible: 1 })
+      end
+    end
+
+    context "quiz without assignment (practice_quiz)" do
+      before { course_factory }
+
+      it "posts quiz_updated when a question is created" do
+        allow(Canvas::LiveEvents).to receive(:quiz_updated)
+        quiz = @course.quizzes.create!(title: "Practice Quiz", quiz_type: "practice_quiz")
+        expect(Canvas::LiveEvents).to receive(:quiz_updated).with(quiz)
+        quiz.quiz_questions.create!(question_data: { name: "Q1", question_type: "true_false_question", points_possible: 1 })
+      end
+
+      it "posts quiz_updated when a question is updated" do
+        allow(Canvas::LiveEvents).to receive(:quiz_updated)
+        quiz = @course.quizzes.create!(title: "Practice Quiz", quiz_type: "practice_quiz")
+        question = quiz.quiz_questions.create!(question_data: { name: "Q1", question_type: "true_false_question", points_possible: 1 })
+        expect(Canvas::LiveEvents).to receive(:quiz_updated).with(quiz)
+        question.update!(question_data: { name: "Q1 updated", question_type: "true_false_question", points_possible: 1 })
+      end
+    end
+
+    context "quiz without assignment (survey)" do
+      before { course_factory }
+
+      it "posts quiz_updated when a question is created" do
+        allow(Canvas::LiveEvents).to receive(:quiz_updated)
+        quiz = @course.quizzes.create!(title: "Survey", quiz_type: "survey")
+        expect(Canvas::LiveEvents).to receive(:quiz_updated).with(quiz)
+        quiz.quiz_questions.create!(question_data: { name: "Q1", question_type: "true_false_question", points_possible: 1 })
+      end
+    end
+  end
+
   describe "content_migration_completed" do
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:content_migration_completed).once

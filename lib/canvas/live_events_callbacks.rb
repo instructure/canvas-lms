@@ -46,6 +46,15 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.group_membership_created(obj)
     when WikiPage
       Canvas::LiveEvents.wiki_page_created(obj)
+    when Quizzes::QuizQuestion
+      quiz = obj.quiz
+      if quiz
+        if quiz.assignment
+          Canvas::LiveEvents.assignment_updated(quiz.assignment)
+        else
+          Canvas::LiveEvents.quiz_updated(quiz)
+        end
+      end
     when Assignment
       Canvas::LiveEvents.assignment_created(obj)
     when Quizzes::Quiz
@@ -136,6 +145,15 @@ module Canvas::LiveEventsCallbacks
         Canvas::LiveEvents.wiki_page_updated(obj,
                                              changes["title"]&.first,
                                              changes["body"]&.first)
+      end
+    when Quizzes::QuizQuestion
+      quiz = obj.quiz
+      if quiz
+        if quiz.assignment
+          Canvas::LiveEvents.assignment_updated(quiz.assignment)
+        else
+          Canvas::LiveEvents.quiz_updated(quiz)
+        end
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
