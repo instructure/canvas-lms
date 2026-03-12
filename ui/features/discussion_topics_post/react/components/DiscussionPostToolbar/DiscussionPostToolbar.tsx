@@ -97,12 +97,13 @@ export const DiscussionPostToolbar = props => {
   const {translationLanguages, setShowTranslationControl, showTranslationControl} = useContext(
     DiscussionManagerUtilityContext,
   )
-
   const [showTranslate, setShowTranslate] = useState(false)
 
   const isTranslateAll = useTranslationStore(state => state.translateAll)
   const setActiveLanguage = useTranslationStore(state => state.setActiveLanguage)
   const clearTranslateAll = useTranslationStore(state => state.clearTranslateAll)
+  // @ts-expect-error TS2339 (typescriptify)
+  const discussionTranslationAvailable = ENV.discussion_translation_available
 
   const clearButton = () => {
     return getClearButton({
@@ -437,17 +438,19 @@ export const DiscussionPostToolbar = props => {
                   >
                     {renderSort(responsiveProps?.sortOrder?.width)}
                   </Flex.Item>
-                  {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
-                    <Flex.Item
-                      // @ts-expect-error TS18049 (typescriptify)
-                      padding={responsiveProps.padding}
-                      margin={responsiveProps?.translation?.margin}
-                      shouldGrow={responsiveProps?.translation?.shouldGrow}
-                      shouldShrink={responsiveProps?.translation?.shouldShrink}
-                    >
-                      {renderTranslate()}
-                    </Flex.Item>
-                  )}
+                  {discussionTranslationAvailable &&
+                    translationLanguages.current.length > 0 &&
+                    !isSpeedGraderInTopUrl && (
+                      <Flex.Item
+                        // @ts-expect-error TS18049 (typescriptify)
+                        padding={responsiveProps.padding}
+                        margin={responsiveProps?.translation?.margin}
+                        shouldGrow={responsiveProps?.translation?.shouldGrow}
+                        shouldShrink={responsiveProps?.translation?.shouldShrink}
+                      >
+                        {renderTranslate()}
+                      </Flex.Item>
+                    )}
                 </Flex>
               </Flex.Item>
             </Flex>
