@@ -118,17 +118,19 @@ const LabeledInput = ({
   children,
   errorMessage,
   padding = '0',
+  inputId,
 }: {
   label: string
   children: React.ReactNode
   errorMessage?: string
   padding?: string
+  inputId?: string
 }) => (
   <>
     <Flex.Item as="div" padding={padding}>
       <FlexRow>
         <Flex.Item as="div" margin="0 0 small large">
-          <Text size="contentSmall" weight="bold">
+          <Text id={inputId ? `${inputId}-label` : undefined} size="contentSmall" weight="bold">
             {label}
           </Text>
         </Flex.Item>
@@ -393,7 +395,7 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
         </Flex.Item>
       )}
       {peerReviewChecked && (
-        // There is no need to set onBlur handler on the parent div element since those events are handled in the NumberInput components
+        // There is no need to set onBlur handler on the parent div element since those events are handled in the TextInput components
         /* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */
         <div onMouseOut={handleMouseOut}>
           <SectionHeader title={I18n.t('Review Settings')} padding="none small small small" />
@@ -401,14 +403,17 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
             label={I18n.t('Reviews Required*')}
             padding="x-small 0 0 0"
             errorMessage={errorMessageReviewsRequired}
+            inputId="assignment_peer_reviews_count"
           >
             <NumberInput
               id="assignment_peer_reviews_count"
               name="peer_review_count"
               data-testid="reviews-required-input"
+              renderLabel={<ScreenReaderContent>{I18n.t('Reviews Required')}</ScreenReaderContent>}
               width="4.5rem"
               showArrows={false}
-              size="medium"
+              allowStringValue
+              textAlign="start"
               onChange={handleReviewsRequiredChange}
               onBlur={validateReviewsRequired}
               themeOverride={inputOverride}
@@ -416,23 +421,27 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
               interaction={hasPeerReviewSubmissions ? 'disabled' : 'enabled'}
               inputRef={(el: HTMLInputElement | null) => {
                 reviewsRequiredInputRef.current = el
+                if (el) el.style.marginLeft = '0'
               }}
-              renderLabel={
-                <ScreenReaderContent>{I18n.t('Number of reviews required')}</ScreenReaderContent>
-              }
             />
           </LabeledInput>
           <LabeledInput
             label={I18n.t('Points per Peer Review')}
             padding="x-small 0 0 0"
             errorMessage={errorMessagePointsPerReview}
+            inputId="assignment_peer_reviews_max_input"
           >
             <NumberInput
               id="assignment_peer_reviews_max_input"
               data-testid="points-per-review-input"
+              renderLabel={
+                <ScreenReaderContent>{I18n.t('Points per Peer Review')}</ScreenReaderContent>
+              }
               width="4.5rem"
               showArrows={false}
-              size="medium"
+              allowStringValue
+              textAlign="start"
+              inputMode="decimal"
               onChange={handlePointsPerReviewChange}
               onBlur={validatePointsPerReview}
               themeOverride={inputOverride}
@@ -440,12 +449,8 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
               interaction={hasPeerReviewSubmissions ? 'disabled' : 'enabled'}
               inputRef={(el: HTMLInputElement | null) => {
                 pointsPerReviewInputRef.current = el
+                if (el) el.style.marginLeft = '0'
               }}
-              renderLabel={
-                <ScreenReaderContent>
-                  {I18n.t('Number of Points per Peer Review')}
-                </ScreenReaderContent>
-              }
             />
           </LabeledInput>
           <Flex.Item as="div" padding="x-small 0 small 0">
