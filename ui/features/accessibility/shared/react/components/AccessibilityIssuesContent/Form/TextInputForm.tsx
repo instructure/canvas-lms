@@ -145,6 +145,9 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
                 handleGenerateClick={handleGenerateClick}
                 isLoading={generateLoading}
                 buttonLabels={TextInputFormButtonLabels}
+                pendoId="AiTableCaptionButtonPushed"
+                selectedItem={selectedItem}
+                ruleId={issue.ruleId}
               />
             )}
           </Flex>

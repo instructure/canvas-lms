@@ -219,6 +219,9 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                   isLoading={generateLoading}
                   buttonLabels={CheckboxTextButtonLabels}
                   isDisabled={isChecked || !issue.form.isCanvasImage}
+                  pendoId="AiAltTextButtonPushed"
+                  selectedItem={selectedItem}
+                  ruleId={issue.ruleId}
                 />
                 {!issue.form.isCanvasImage && (
                   <Text data-testid="alt-text-generation-not-available-message" size="small">
