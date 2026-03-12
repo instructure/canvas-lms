@@ -504,11 +504,7 @@ describe DiscussionTopicsApiController do
       before do
         @course.account.root_account.enable_feature!(:discussion_summary_with_cedar)
 
-        mock_response = Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
-          response: "cedar summary",
-          input_tokens: 100,
-          output_tokens: 200
-        )
+        mock_response = double(response: "cedar summary")
         stub_const("CedarClient", Class.new do
           define_singleton_method(:prompt) do |*|
             mock_response
@@ -535,6 +531,7 @@ describe DiscussionTopicsApiController do
 
       it "passes correct parameters to Cedar" do
         calls = []
+        mock_response = double(response: "cedar summary")
         stub_const("CedarClient", Class.new do
           define_singleton_method(:prompt) do |args|
             calls << args
@@ -542,11 +539,7 @@ describe DiscussionTopicsApiController do
             raise "Expected feature_slug to eq 'discussion-summary'" unless args[:feature_slug] == "discussion-summary"
             raise "Expected prompt to be present" unless args[:prompt].present?
 
-            Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
-              response: "cedar summary",
-              input_tokens: 100,
-              output_tokens: 200
-            )
+            mock_response
           end
         end)
 
