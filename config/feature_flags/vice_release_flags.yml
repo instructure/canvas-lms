@@ -131,7 +131,6 @@ discussion_insights:
   applies_to: Course
   display_name: IgniteAI Insights for Discussions
   root_opt_in: true
-  beta: true
   description: |-
     Allow access to discussion insights
 
