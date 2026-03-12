@@ -222,7 +222,8 @@ const DiscussionPostButtonsToolbar = props => {
         </Drilldown.Option>,
       )
     }
-    if (translationLanguages.current.length > 0) {
+    // @ts-expect-error TS2339 (typescriptify)
+    if (ENV.discussion_translation_available && translationLanguages.current.length > 0) {
       options.push(
         <Drilldown.Option
           id="translation"
