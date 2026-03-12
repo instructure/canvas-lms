@@ -42,7 +42,7 @@ ready(() => {
       contentRestore: ENV.PERMISSIONS.restore_course || ENV.PERMISSIONS.restore_user,
       viewMessages: ENV.PERMISSIONS.view_messages,
       logging: !!ENV.PERMISSIONS.logging,
-      bouncedEmails: ENV.bounced_emails_admin_tool,
+      bouncedEmails: ENV.BOUNCED_EMAILS_ADMIN_TOOL,
     },
     restoreContentPaneView: new RestoreContentPaneView({
       permissions: ENV.PERMISSIONS,
