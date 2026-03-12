@@ -31,6 +31,7 @@ import {AccessibilityResourceScan, ScanWorkflowState} from '../../../../../share
 import {useAccessibilityScansFetchUtils} from '../../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 import {useAccessibilityScansStore} from '../../../../../shared/react/stores/AccessibilityScansStore'
 import {CloseRemediationModal, shouldShowCloseRemediationModal} from './CloseRemediationModal'
+import {useA11yTracking} from '../../../../../shared/react/hooks/useA11yTracking'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -43,6 +44,7 @@ export const ActionsMenuCell = ({scan}: ActionsMenuCellProps) => {
   const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
     useAccessibilityScansFetchUtils()
   const isCloseIssuesEnabled = useAccessibilityScansStore(state => state.isCloseIssuesEnabled)
+  const {trackA11yEvent} = useA11yTracking()
 
   const isClosed = Boolean(scan.closedAt?.trim())
   const hasIssues = scan.issueCount > 0
@@ -63,6 +65,10 @@ export const ActionsMenuCell = ({scan}: ActionsMenuCellProps) => {
     },
     onSuccess: (_data, {close}) => {
       if (close) {
+        trackA11yEvent('ResourceClosed', {
+          resourceId: scan.id,
+          courseId: scan.courseId,
+        })
         if (!shouldShowCloseRemediationModal()) {
           showFlashAlert({
             message: I18n.t('Remediation closed successfully'),

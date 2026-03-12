@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {useA11yTracking} from '../../../../shared/react/hooks/useA11yTracking'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -26,6 +27,10 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {createMockCourses, createMockLinkHeaderString} from '../../../__tests__/factories'
 
+vi.mock('../../../../shared/react/hooks/useA11yTracking')
+
+const mockTrackA11yEvent = vi.fn()
+
 const server = setupServer()
 
 describe('AccessibilityCoursesPage', () => {
@@ -34,6 +39,14 @@ describe('AccessibilityCoursesPage', () => {
   beforeAll(() => {
     server.listen()
     window.ENV = {ACCOUNT_ID: '123'} as any
+  })
+
+  beforeEach(() => {
+    mockTrackA11yEvent.mockClear()
+    ;(useA11yTracking as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      trackA11yEvent: mockTrackA11yEvent,
+      trackA11yIssueEvent: vi.fn(),
+    })
   })
 
   beforeEach(() => {
@@ -71,6 +84,15 @@ describe('AccessibilityCoursesPage', () => {
 
     renderPage()
     expect(screen.getByRole('heading', {name: 'Accessibility report'})).toBeInTheDocument()
+  })
+
+  it('tracks ReportPageVisited with accountId on mount', () => {
+    server.use(http.get('/api/v1/accounts/123/courses', () => HttpResponse.json([])))
+
+    renderPage()
+
+    expect(mockTrackA11yEvent).toHaveBeenCalledWith('ReportPageVisited', {accountId: '123'})
+    expect(mockTrackA11yEvent).toHaveBeenCalledTimes(1)
   })
 
   it('shows loading spinner initially', () => {
@@ -209,7 +231,7 @@ describe('AccessibilityCoursesPage', () => {
       })
     })
 
-        it('updates page when pagination button is clicked', async () => {
+    it('updates page when pagination button is clicked', async () => {
       const user = userEvent.setup()
       let lastRequestParams: URLSearchParams | undefined
 

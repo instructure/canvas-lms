@@ -18,6 +18,8 @@
 import React, {useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconAiSolid} from '@instructure/ui-icons'
+import {AccessibilityResourceScan} from '../../types'
+import {useA11yTracking} from '../../hooks/useA11yTracking'
 
 export type ButtonState = 'initial' | 'loading' | 'loaded'
 export type ButtonLabelByState = Record<ButtonState, string>
@@ -48,6 +50,9 @@ export interface GenerateButtonProps {
   isLoading: boolean
   buttonLabels: ButtonLabelByState
   isDisabled?: boolean
+  pendoId: 'AiTableCaptionButtonPushed' | 'AiAltTextButtonPushed'
+  selectedItem: AccessibilityResourceScan | null
+  ruleId: string
 }
 
 export const GenerateButton: React.FC<GenerateButtonProps> = ({
@@ -55,12 +60,19 @@ export const GenerateButton: React.FC<GenerateButtonProps> = ({
   isLoading,
   buttonLabels,
   isDisabled,
+  pendoId,
+  selectedItem,
+  ruleId,
 }: GenerateButtonProps) => {
+  const {trackA11yIssueEvent} = useA11yTracking()
   const [hasGenerated, setHasGenerated] = useState(false)
   const buttonState: ButtonState = isLoading ? 'loading' : hasGenerated ? 'loaded' : 'initial'
 
   const handleOnClick = () => {
     if (isLoading) return
+    if (selectedItem) {
+      trackA11yIssueEvent(pendoId, selectedItem.resourceType, ruleId)
+    }
     handleGenerateClick()
     setHasGenerated(true)
   }
@@ -74,6 +86,7 @@ export const GenerateButton: React.FC<GenerateButtonProps> = ({
       aria-disabled={isLoading || isDisabled}
       aria-busy={isLoading}
       data-testid="generate-button"
+      {...(pendoId ? {'data-pendo': pendoId} : {})}
     >
       <StableWidthLabel labels={buttonLabels} state={buttonState} />
     </Button>
