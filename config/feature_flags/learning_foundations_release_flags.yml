@@ -299,3 +299,13 @@ platform_ui_unified_widgets_dashboard:
   display_name: Platform UI - Unified Widgets Dashboard
   description: Use dashboard imported from Platform UI.
   applies_to: SiteAdmin
+
+study_assist:
+  state: hidden
+  root_opt_in: true
+  applies_to: Course
+  display_name: Study Assist
+  description: |-
+    Enables Study Assist for courses. When enabled, students can access
+    AI-powered study tools within their course. Root account administrators
+    must enable this feature before subaccounts or courses can use it.
