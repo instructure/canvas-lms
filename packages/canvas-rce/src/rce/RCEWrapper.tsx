@@ -428,7 +428,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       rce_studio_embed_improvements = false,
       rce_asr_captioning_improvements = false,
       file_verifiers_for_quiz_links = false,
-      consolidated_media_player = false,
     } = this.props.features
 
     return {
@@ -439,7 +438,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       rce_asr_captioning_improvements,
       file_verifiers_for_quiz_links,
       rce_find_replace,
-      consolidated_media_player,
     }
   }
 

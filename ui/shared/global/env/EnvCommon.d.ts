@@ -387,10 +387,7 @@ export type RootAccountServiceId = 'account_survey_notifications'
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type BrandAccountFeatureId =
-  | 'embedded_release_notes'
-  | 'consolidated_media_player'
-  | 'discussion_checkpoints'
+export type BrandAccountFeatureId = 'embedded_release_notes' | 'discussion_checkpoints'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in

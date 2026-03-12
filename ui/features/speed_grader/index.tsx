@@ -117,7 +117,7 @@ ready(() => {
         enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
         // @ts-expect-error
         commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
-        consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
+        consolidatedMediaPlayerEnabled: true,
         // @ts-expect-error
         restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
         // @ts-expect-error

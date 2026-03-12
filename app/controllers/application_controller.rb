@@ -511,7 +511,6 @@ class ApplicationController < ActionController::Base
     a11y_checker_ga2_features
     block_content_editor_toolbar_reorder
     commons_new_quizzes
-    consolidated_media_player
     courses_popout_sisid
     create_external_apps_side_tray_overrides
     dashboard_graphql_integration

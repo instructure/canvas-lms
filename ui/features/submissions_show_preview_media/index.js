@@ -22,10 +22,6 @@ import React from 'react'
 import {render} from '@canvas/react'
 
 $(document).ready(() => {
-  function isConsolidatedMediaPlayerEnabled() {
-    return ENV?.FEATURES?.consolidated_media_player
-  }
-
   function renderStudioMediaPlayer(domId, media_id, type) {
     render(
       React.createElement(CanvasStudioPlayer, {
@@ -41,14 +37,10 @@ $(document).ready(() => {
     event.preventDefault()
     const id = $('.media_comment_id:first').text()
 
-    if (isConsolidatedMediaPlayerEnabled()) {
-      const type = $('.play_media_recording_link').data('media_comment_type')
-      const domId = 'box_content'
+    const type = $('.play_media_recording_link').data('media_comment_type')
+    const domId = 'box_content'
+    renderStudioMediaPlayer(domId, id, type)
 
-      renderStudioMediaPlayer(domId, id, type)
-    } else {
-      $('#media_recording_box .box_content').mediaComment('show_inline', id)
-    }
     $(this).remove()
   })
 

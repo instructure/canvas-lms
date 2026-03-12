@@ -133,72 +133,56 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         await tray.setSize('Large')
         tray.$doneButton.click()
         const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
-        expect(appliedWidth).toEqual(400)
-        const expectedHt = Math.round(
-          (props.videoOptions.naturalHeight / props.videoOptions.naturalWidth) * 400,
-        )
-        expect(appliedHeight).toEqual(expectedHt)
-      })
-    })
-  })
-
-  describe('when the consolidated media player flag is enabled', () => {
-    beforeEach(() => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: true})
-    })
-
-    afterAll(() => {
-      jest.restoreAllMocks()
-    })
-
-    it('includes the size to be applied for Small', async () => {
-      render(<VideoOptionsTray {...props} />)
-      const titleInput = screen.getByRole('textbox')
-      fireEvent.change(titleInput, {target: {value: 'A turtle in a party suit.'}})
-      const sizeSelect = screen.getByRole('combobox')
-      fireEvent.click(sizeSelect)
-      const smallOption = await screen.findByRole('option', {name: /small/i})
-      fireEvent.click(smallOption)
-      const doneButton = screen.getByRole('button', {name: /done/i})
-      fireEvent.click(doneButton)
-      await waitFor(() => {
-        const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
-        expect(appliedWidth).toEqual(320)
-        expect(appliedHeight).toEqual(254)
-      })
-    })
-
-    it('includes the size to be applied for Medium', async () => {
-      render(<VideoOptionsTray {...props} />)
-      const titleInput = screen.getByRole('textbox')
-      fireEvent.change(titleInput, {target: {value: 'A turtle in a party suit.'}})
-      const sizeSelect = screen.getByRole('combobox')
-      fireEvent.click(sizeSelect)
-      const smallOption = await screen.findByRole('option', {name: /medium/i})
-      fireEvent.click(smallOption)
-      const doneButton = screen.getByRole('button', {name: /done/i})
-      fireEvent.click(doneButton)
-      await waitFor(() => {
-        const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
-        expect(appliedWidth).toEqual(480)
-        expect(appliedHeight).toEqual(300)
-      })
-    })
-
-    it('includes the size to be applied for Large', async () => {
-      render(<VideoOptionsTray {...props} />)
-      const titleInput = screen.getByRole('textbox')
-      fireEvent.change(titleInput, {target: {value: 'A turtle in a party suit.'}})
-      const sizeSelect = screen.getByRole('combobox')
-      fireEvent.click(sizeSelect)
-      const smallOption = await screen.findByRole('option', {name: /large/i})
-      fireEvent.click(smallOption)
-      const doneButton = screen.getByRole('button', {name: /done/i})
-      fireEvent.click(doneButton)
-      await waitFor(() => {
-        const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
         expect(appliedWidth).toEqual(700)
         expect(appliedHeight).toEqual(441)
+      })
+
+      it('includes the size to be applied for Small', async () => {
+        const titleInput = screen.getByRole('textbox')
+        fireEvent.change(titleInput, {target: {value: 'A turtle in a party suit.'}})
+        const sizeSelect = screen.getByRole('combobox')
+        fireEvent.click(sizeSelect)
+        const smallOption = await screen.findByRole('option', {name: /small/i})
+        fireEvent.click(smallOption)
+        const doneButton = screen.getByRole('button', {name: /done/i})
+        fireEvent.click(doneButton)
+        await waitFor(() => {
+          const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(320)
+          expect(appliedHeight).toEqual(254)
+        })
+      })
+
+      it('includes the size to be applied for Medium', async () => {
+        const titleInput = screen.getByRole('textbox')
+        fireEvent.change(titleInput, {target: {value: 'A turtle in a party suit.'}})
+        const sizeSelect = screen.getByRole('combobox')
+        fireEvent.click(sizeSelect)
+        const smallOption = await screen.findByRole('option', {name: /medium/i})
+        fireEvent.click(smallOption)
+        const doneButton = screen.getByRole('button', {name: /done/i})
+        fireEvent.click(doneButton)
+        await waitFor(() => {
+          const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(480)
+          expect(appliedHeight).toEqual(300)
+        })
+      })
+
+      it('includes the size to be applied for Large', async () => {
+        const titleInput = screen.getByRole('textbox')
+        fireEvent.change(titleInput, {target: {value: 'A turtle in a party suit.'}})
+        const sizeSelect = screen.getByRole('combobox')
+        fireEvent.click(sizeSelect)
+        const smallOption = await screen.findByRole('option', {name: /large/i})
+        fireEvent.click(smallOption)
+        const doneButton = screen.getByRole('button', {name: /done/i})
+        fireEvent.click(doneButton)
+        await waitFor(() => {
+          const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(700)
+          expect(appliedHeight).toEqual(441)
+        })
       })
     })
   })
@@ -242,7 +226,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   describe('when rce_asr_captioning_improvements is enabled', () => {
     beforeEach(() => {
       jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
-        consolidated_media_player: true,
         rce_asr_captioning_improvements: true,
       })
     })
@@ -417,7 +400,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   describe('when rce_asr_captioning_improvements is disabled', () => {
     beforeEach(() => {
       jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
-        consolidated_media_player: true,
         rce_asr_captioning_improvements: false,
       })
     })

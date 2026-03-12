@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert} from '@instructure/ui-alerts'
 import {Avatar} from '@instructure/ui-avatar'
 import DateHelper from '@canvas/datetime/dateHelper'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState} from 'react'
+import React, {Suspense, useContext} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {IconPaperclipLine} from '@instructure/ui-icons'
@@ -31,11 +31,9 @@ import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
-import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
-import MediaPlayer from './MediaPlayer'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -187,23 +185,16 @@ export const MessageDetailItem = ({
               })}
             </List>
           )}
-          {mediaComment &&
-            (ENV.FEATURES?.consolidated_media_player ? (
-              <>
-                <div id={elementId} />
-                {/* @ts-expect-error TS2786 (typescriptify) */}
-                <MediaPlayer elementId={elementId} mediaId={mediaComment._id} />
-              </>
-            ) : (
-              <MediaAttachment
-                file={{
-                  mediaID: mediaComment._id,
-                  title: mediaComment.title,
-                  mediaTracks: mediaComment.media_tracks,
-                  mediaSources: mediaComment.mediaSources,
-                }}
-              />
-            ))}
+          {mediaComment && (
+            <div id={elementId}>
+              <Suspense>
+                <CanvasStudioPlayer
+                  media_id={mediaComment._id}
+                  explicitSize={{width: 550, height: 400}}
+                />
+              </Suspense>
+            </div>
+          )}
         </>
       )}
     />

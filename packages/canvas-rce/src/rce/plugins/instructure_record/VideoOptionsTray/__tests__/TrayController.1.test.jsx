@@ -23,7 +23,6 @@ import TrayController, {
   CONTAINER_ID,
   videoDefaultSize,
   STUDIO_PLAYER_VIDEO_SIZE_DEFAULT,
-  VIDEO_SIZE_DEFAULT,
 } from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
@@ -240,16 +239,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 })
 
 describe('#videoDefaultSize', () => {
-  describe('when the consolidated media player feature is enabled', () => {
-    it('returns the STUDIO_PLAYER_VIDEO_SIZE_DEFAULT', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: true})
-      expect(videoDefaultSize()).toEqual(STUDIO_PLAYER_VIDEO_SIZE_DEFAULT)
-    })
-  })
-  describe('when the consolidated media player feature is disabled', () => {
-    it('returns the VIDEO_SIZE_DEFAULT', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: false})
-      expect(videoDefaultSize()).toEqual(VIDEO_SIZE_DEFAULT)
-    })
+  it('returns the STUDIO_PLAYER_VIDEO_SIZE_DEFAULT', () => {
+    expect(videoDefaultSize()).toEqual(STUDIO_PLAYER_VIDEO_SIZE_DEFAULT)
   })
 })
