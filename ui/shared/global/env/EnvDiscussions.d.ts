@@ -43,5 +43,4 @@ export interface EnvDiscussions {
   assigned_rubric?: RubricUnderscoreType & {association_count: number}
   rubric_association?: RubricAssociationUnderscore
   rubric_self_assessment_ff_enabled: boolean
-  discussion_translation_available?: boolean
 }

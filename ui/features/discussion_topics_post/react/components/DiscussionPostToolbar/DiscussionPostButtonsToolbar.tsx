@@ -222,7 +222,7 @@ const DiscussionPostButtonsToolbar = props => {
         </Drilldown.Option>,
       )
     }
-    if (ENV.discussion_translation_available && translationLanguages.current.length > 0) {
+    if (translationLanguages.current.length > 0) {
       options.push(
         <Drilldown.Option
           id="translation"
