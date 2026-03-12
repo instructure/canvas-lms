@@ -102,7 +102,17 @@ export default class EquationEditorModal extends Component {
     }
   }
 
+  // Clear the math-field before the modal unmounts to prevent XSS.
+  // Mathlive's dispose method sets element.innerHTML = this.model.getValue(),
+  // which would parse any HTML in the formula as real DOM elements.
+  clearMathFieldBeforeDismiss = () => {
+    if (this.mathField) {
+      this.setMathField('')
+    }
+  }
+
   handleModalCancel = () => {
+    this.clearMathFieldBeforeDismiss()
     this.props.onModalDismiss()
   }
 
@@ -114,13 +124,14 @@ export default class EquationEditorModal extends Component {
       onEquationSubmit(output)
     }
 
+    this.clearMathFieldBeforeDismiss()
     onModalDismiss()
   }
 
   renderMathInAdvancedPreview = debounce(
     () => {
       if (this.previewElement.current) {
-        this.previewElement.current.innerHTML = String.raw`\(${this.state.workingFormula}\)`
+        this.previewElement.current.textContent = String.raw`\(${this.state.workingFormula}\)`
         this.mathml.processNewMathInElem(this.previewElement.current)
       }
     },
@@ -135,7 +146,7 @@ export default class EquationEditorModal extends Component {
     if (this.state.workingFormula) {
       this.renderMathInAdvancedPreview()
     } else {
-      this.previewElement.current.innerHTML = ''
+      this.previewElement.current.textContent = ''
     }
   }
 
