@@ -290,15 +290,21 @@ describe Canvas::LiveEvents do
       @page = @course.wiki_pages.create(title: "old title", body: "old body")
     end
 
-    def wiki_page_updated
-      Canvas::LiveEvents.wiki_page_updated(@page, @page.title_changed? ? @page.title_was : nil, @page.body_changed? ? @page.body_was : nil)
+    def wiki_page_updated(old_workflow_state: nil)
+      Canvas::LiveEvents.wiki_page_updated(
+        @page,
+        @page.title_changed? ? @page.title_was : nil,
+        @page.body_changed? ? @page.body_was : nil,
+        old_workflow_state
+      )
     end
 
-    it "does not set old_title or old_body if they don't change" do
+    it "does not set old_title, old_body, or old_workflow_state if they don't change" do
       expect_event("wiki_page_updated", {
                      wiki_page_id: @page.global_id.to_s,
                      title: "old title",
-                     body: "old body"
+                     body: "old body",
+                     workflow_state: @page.workflow_state
                    })
 
       wiki_page_updated
@@ -311,7 +317,8 @@ describe Canvas::LiveEvents do
                      wiki_page_id: @page.global_id.to_s,
                      title: "new title",
                      old_title: "old title",
-                     body: "old body"
+                     body: "old body",
+                     workflow_state: @page.workflow_state
                    })
 
       wiki_page_updated
@@ -324,10 +331,23 @@ describe Canvas::LiveEvents do
                      wiki_page_id: @page.global_id.to_s,
                      title: "old title",
                      body: "new body",
-                     old_body: "old body"
+                     old_body: "old body",
+                     workflow_state: @page.workflow_state
                    })
 
       wiki_page_updated
+    end
+
+    it "sets old_workflow_state if the workflow_state changed" do
+      expect_event("wiki_page_updated", {
+                     wiki_page_id: @page.global_id.to_s,
+                     title: "old title",
+                     body: "old body",
+                     workflow_state: @page.workflow_state,
+                     old_workflow_state: "unpublished"
+                   })
+
+      wiki_page_updated(old_workflow_state: "unpublished")
     end
   end
 

@@ -77,14 +77,14 @@ describe LiveEventsObserver do
 
     it "posts update events for title" do
       wiki_page_model(title: "old title")
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, "old title", nil)
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, "old title", nil, nil)
       @page.title = "new title"
       @page.save
     end
 
     it "posts update events for body" do
       wiki_page_model(body: "old body")
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, "old body")
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, "old body", nil)
       @page.body = "new body"
       @page.save
     end
@@ -109,13 +109,13 @@ describe LiveEventsObserver do
 
     it "posts update event when page is published" do
       wiki_page_model(workflow_state: "unpublished")
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil, "unpublished").once
       @page.publish!
     end
 
     it "posts update event when page is unpublished" do
       wiki_page_model
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil, "active").once
       @page.unpublish!
     end
   end

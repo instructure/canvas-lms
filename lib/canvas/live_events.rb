@@ -605,11 +605,12 @@ module Canvas::LiveEvents
                            })
   end
 
-  def self.wiki_page_updated(page, old_title, old_body)
+  def self.wiki_page_updated(page, old_title, old_body, old_workflow_state)
     payload = {
       wiki_page_id: page.global_id,
       title: LiveEvents.truncate(page.title),
-      body: LiveEvents.truncate(page.body)
+      body: LiveEvents.truncate(page.body),
+      workflow_state: page.workflow_state,
     }
 
     if old_title
@@ -618,6 +619,10 @@ module Canvas::LiveEvents
 
     if old_body
       payload[:old_body] = LiveEvents.truncate(old_body)
+    end
+
+    if old_workflow_state
+      payload[:old_workflow_state] = old_workflow_state
     end
 
     post_event_stringified("wiki_page_updated", payload)

@@ -133,7 +133,8 @@ module Canvas::LiveEventsCallbacks
       if changes["title"] || changes["body"] || changes["workflow_state"]
         Canvas::LiveEvents.wiki_page_updated(obj,
                                              changes["title"]&.first,
-                                             changes["body"]&.first)
+                                             changes["body"]&.first,
+                                             changes["workflow_state"]&.first)
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
