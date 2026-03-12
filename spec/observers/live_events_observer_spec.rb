@@ -262,21 +262,40 @@ describe LiveEventsObserver do
   describe "quiz" do
     before { course_factory }
 
-    it "posts quiz_created for practice_quiz" do
+    it "posts quiz_created when creating a practice_quiz" do
       expect(Canvas::LiveEvents).to receive(:quiz_created).once
       @course.quizzes.create!(title: "Practice Quiz", quiz_type: "practice_quiz")
     end
 
-    it "posts quiz_updated for practice_quiz" do
+    it "posts quiz_created when creating an ungraded survey" do
+      expect(Canvas::LiveEvents).to receive(:quiz_created).once
+      @course.quizzes.create!(title: "Survey", quiz_type: "survey")
+    end
+
+    it "posts quiz_updated when updating a practice_quiz" do
       quiz = @course.quizzes.create!(title: "Practice Quiz", quiz_type: "practice_quiz")
       expect(Canvas::LiveEvents).to receive(:quiz_updated).once
       quiz.title = "Updated Title"
       quiz.save!
     end
 
-    it "does not post quiz_created for graded quiz with assignment" do
+    it "posts quiz_updated when updating an ungraded survey" do
+      quiz = @course.quizzes.create!(title: "Survey", quiz_type: "survey")
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).once
+      quiz.title = "Updated Title"
+      quiz.save!
+    end
+
+    it "does not post quiz_created or quiz_updated for a graded quiz" do
       expect(Canvas::LiveEvents).not_to receive(:quiz_created)
+      expect(Canvas::LiveEvents).not_to receive(:quiz_updated)
       @course.quizzes.create!(title: "Graded Quiz", quiz_type: "assignment")
+    end
+
+    it "does not post quiz_created or quiz_updated for a graded survey" do
+      expect(Canvas::LiveEvents).not_to receive(:quiz_created)
+      expect(Canvas::LiveEvents).not_to receive(:quiz_updated)
+      @course.quizzes.create!(title: "Graded Survey", quiz_type: "graded_survey")
     end
   end
 
