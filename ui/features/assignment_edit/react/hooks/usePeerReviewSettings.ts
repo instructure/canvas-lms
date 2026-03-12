@@ -23,6 +23,11 @@ const I18n = createI18nScope('peer_review_settings')
 
 export const MAX_NUM_PEER_REVIEWS = 10
 
+const stringToNumber = (value: string): number | undefined => {
+  const num = Number(value)
+  return Number.isNaN(num) ? undefined : num
+}
+
 export interface PeerReviewSettings {
   reviewsRequired: number
   pointsPerReview: number
@@ -68,8 +73,23 @@ export const usePeerReviewSettings = (settings: PeerReviewSettings) => {
     useState<boolean>(settings.submissionRequiredBeforePeerReviews)
 
   useEffect(() => {
-    setTotalPoints(calculateTotalPoints())
-  }, [reviewsRequired, pointsPerReview]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (errorMessageReviewsRequired || errorMessagePointsPerReview) {
+      setTotalPoints('0')
+      return
+    }
+    const numReviewsRequired = stringToNumber(reviewsRequired)
+    const numPointsPerReview = stringToNumber(pointsPerReview)
+    if (numReviewsRequired === undefined || numPointsPerReview === undefined) {
+      setTotalPoints('0')
+      return
+    }
+    const total = numReviewsRequired * numPointsPerReview
+    if (!Number.isFinite(total)) {
+      setTotalPoints('0')
+      return
+    }
+    setTotalPoints(total % 1 === 0 ? total.toString() : total.toFixed(2))
+  }, [reviewsRequired, pointsPerReview, errorMessageReviewsRequired, errorMessagePointsPerReview])
 
   const handleReviewsRequiredChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
@@ -91,8 +111,7 @@ export const usePeerReviewSettings = (settings: PeerReviewSettings) => {
     const value = inputElement?.value !== undefined ? inputElement.value : reviewsRequired
     const numReviewsRequired = stringToNumber(value)
 
-    // Check if input is empty but user had entered invalid value (e.g. "-1e")
-    if (value === '' && inputElement?.validity && !inputElement.validity.valid) {
+    if (value !== '' && numReviewsRequired === undefined) {
       errorMessage = I18n.t('Please enter a valid number.')
     } else if (numReviewsRequired === undefined || value === '' || value === '0') {
       errorMessage = I18n.t('Number of peer reviews is required.')
@@ -129,7 +148,7 @@ export const usePeerReviewSettings = (settings: PeerReviewSettings) => {
     const value = inputElement?.value !== undefined ? inputElement.value : pointsPerReview
     const numPoints = stringToNumber(value)
 
-    if (value === '' && inputElement?.validity && !inputElement.validity.valid) {
+    if (value !== '' && numPoints === undefined) {
       errorMessage = I18n.t('Please enter a valid number.')
     } else if (numPoints !== undefined && numPoints < 0) {
       errorMessage = I18n.t('Points per review cannot be negative.')
@@ -146,15 +165,10 @@ export const usePeerReviewSettings = (settings: PeerReviewSettings) => {
   const calculateTotalPoints = () => {
     const numReviewsRequired = stringToNumber(reviewsRequired)
     const numPointsPerReview = stringToNumber(pointsPerReview)
-    if (
-      !numReviewsRequired ||
-      !numPointsPerReview ||
-      errorMessageReviewsRequired ||
-      errorMessagePointsPerReview
-    )
-      return '0'
+    if (numReviewsRequired === undefined || numPointsPerReview === undefined) return '0'
 
     const total = numReviewsRequired * numPointsPerReview
+    if (!Number.isFinite(total)) return '0'
     return total % 1 === 0 ? total.toString() : total.toFixed(2)
   }
 
@@ -188,11 +202,6 @@ export const usePeerReviewSettings = (settings: PeerReviewSettings) => {
     setUsePassFailGrading(false)
     setAnonymousPeerReviews(false)
     setSubmissionRequiredBeforePeerReviews(false)
-  }
-
-  const stringToNumber = (value: string): number | undefined => {
-    const num = Number(value)
-    return Number.isNaN(num) ? undefined : num
   }
 
   return {

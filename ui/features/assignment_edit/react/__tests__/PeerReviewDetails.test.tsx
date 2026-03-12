@@ -74,6 +74,28 @@ describe('PeerReviewDetails', () => {
     vi.clearAllMocks()
   })
 
+  describe('Accessibility', () => {
+    it('renders review count and points inputs as type text, not number', async () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+
+      const reviewsInput = screen.getByTestId('reviews-required-input')
+      const pointsInput = screen.getByTestId('points-per-review-input')
+      expect(reviewsInput).toHaveAttribute('type', 'text')
+      expect(pointsInput).toHaveAttribute('type', 'text')
+    })
+
+    it('programmatically associates visible labels with inputs', async () => {
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+      const checkbox = screen.getByTestId('peer-review-checkbox')
+      await user.click(checkbox)
+
+      expect(screen.getByLabelText('Reviews Required')).toBeInTheDocument()
+      expect(screen.getByLabelText('Points per Peer Review')).toBeInTheDocument()
+    })
+  })
+
   describe('Initial rendering', () => {
     it('renders the peer review checkbox', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
@@ -162,7 +184,7 @@ describe('PeerReviewDetails', () => {
       expect(checkbox).toBeChecked()
       expect(screen.getByText('Review Settings')).toBeInTheDocument()
       expect(screen.getByText('Reviews Required*')).toBeInTheDocument()
-      expect(screen.getByText('Points per Peer Review')).toBeInTheDocument()
+      expect(screen.getAllByText('Points per Peer Review').length).toBeGreaterThan(0)
       expect(screen.getByText('Advanced Peer Review Configurations')).toBeInTheDocument()
     })
 
@@ -227,8 +249,8 @@ describe('PeerReviewDetails', () => {
       const reviewsRequiredInputAfter = screen.getByTestId('reviews-required-input')
       const pointsPerReviewInputAfter = screen.getByTestId('points-per-review-input')
 
-      expect(reviewsRequiredInputAfter).toHaveValue(1)
-      expect(pointsPerReviewInputAfter).toHaveValue(0)
+      expect(reviewsRequiredInputAfter).toHaveValue('1')
+      expect(pointsPerReviewInputAfter).toHaveValue('0')
       expect(
         screen.queryByText('Number of peer reviews cannot be negative.'),
       ).not.toBeInTheDocument()
@@ -253,24 +275,26 @@ describe('PeerReviewDetails', () => {
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
       const totalPointsDisplay = screen.getByTestId('total-peer-review-points')
 
-      expect(reviewsRequiredInput).toHaveValue(1)
-      expect(pointsPerReviewInput).toHaveValue(0)
+      expect(reviewsRequiredInput).toHaveValue('1')
+      expect(pointsPerReviewInput).toHaveValue('0')
       expect(totalPointsDisplay).toHaveTextContent('0')
 
       await user.clear(reviewsRequiredInput)
       await user.type(reviewsRequiredInput, '3')
-      expect(reviewsRequiredInput).toHaveValue(3)
+      expect(reviewsRequiredInput).toHaveValue('3')
+      await user.click(pointsPerReviewInput)
       await user.clear(pointsPerReviewInput)
       await user.type(pointsPerReviewInput, '1.5')
-      expect(pointsPerReviewInput).toHaveValue(1.5)
+      expect(pointsPerReviewInput).toHaveValue('1.5')
       expect(totalPointsDisplay).toHaveTextContent('4.5')
 
       await user.clear(reviewsRequiredInput)
       await user.type(reviewsRequiredInput, '3')
-      expect(reviewsRequiredInput).toHaveValue(3)
+      expect(reviewsRequiredInput).toHaveValue('3')
+      await user.click(pointsPerReviewInput)
       await user.clear(pointsPerReviewInput)
       await user.type(pointsPerReviewInput, '2')
-      expect(pointsPerReviewInput).toHaveValue(2)
+      expect(pointsPerReviewInput).toHaveValue('2')
       expect(totalPointsDisplay).toHaveTextContent('6')
     })
 
@@ -283,19 +307,19 @@ describe('PeerReviewDetails', () => {
 
       await user.clear(reviewsRequiredInput)
       await user.tab()
-      expect(reviewsRequiredInput).toHaveValue(null)
+      expect(reviewsRequiredInput).toHaveValue('')
       expect(screen.getByText('Number of peer reviews is required.')).toBeInTheDocument()
 
       await user.clear(reviewsRequiredInput)
       await user.type(reviewsRequiredInput, '-2')
       await user.tab()
-      expect(reviewsRequiredInput).toHaveValue(-2)
+      expect(reviewsRequiredInput).toHaveValue('-2')
       expect(screen.getByText('Number of peer reviews cannot be negative.')).toBeInTheDocument()
 
       await user.clear(reviewsRequiredInput)
       await user.type(reviewsRequiredInput, `${MAX_NUM_PEER_REVIEWS + 1}`)
       await user.tab()
-      expect(reviewsRequiredInput).toHaveValue(MAX_NUM_PEER_REVIEWS + 1)
+      expect(reviewsRequiredInput).toHaveValue(String(MAX_NUM_PEER_REVIEWS + 1))
       expect(
         screen.getByText(`Number of peer reviews cannot exceed ${MAX_NUM_PEER_REVIEWS}.`),
       ).toBeInTheDocument()
@@ -303,8 +327,14 @@ describe('PeerReviewDetails', () => {
       await user.clear(reviewsRequiredInput)
       await user.type(reviewsRequiredInput, '2.5')
       await user.tab()
-      expect(reviewsRequiredInput).toHaveValue(2.5)
+      expect(reviewsRequiredInput).toHaveValue('2.5')
       expect(screen.getByText('Number of peer reviews must be a whole number.')).toBeInTheDocument()
+
+      await user.clear(reviewsRequiredInput)
+      await user.type(reviewsRequiredInput, 'abc')
+      await user.tab()
+      expect(reviewsRequiredInput).toHaveValue('abc')
+      expect(screen.getByText('Please enter a valid number.')).toBeInTheDocument()
     })
 
     it('displays errors for invalid inputs on "Points per Review" field', async () => {
@@ -317,8 +347,14 @@ describe('PeerReviewDetails', () => {
       await user.clear(pointsPerReviewInput)
       await user.type(pointsPerReviewInput, '-2')
       await user.tab()
-      expect(pointsPerReviewInput).toHaveValue(-2)
+      expect(pointsPerReviewInput).toHaveValue('-2')
       expect(screen.getByText('Points per review cannot be negative.')).toBeInTheDocument()
+
+      await user.clear(pointsPerReviewInput)
+      await user.type(pointsPerReviewInput, 'abc')
+      await user.tab()
+      expect(pointsPerReviewInput).toHaveValue('abc')
+      expect(screen.getByText('Please enter a valid number.')).toBeInTheDocument()
     })
 
     it('validates on blur for Reviews Required field', async () => {
@@ -782,7 +818,7 @@ describe('PeerReviewDetails', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
       const reviewsRequiredInput = screen.getByTestId('reviews-required-input')
-      expect(reviewsRequiredInput).toHaveValue(5)
+      expect(reviewsRequiredInput).toHaveValue('5')
     })
 
     it('calculates points per review from total points', () => {
@@ -798,7 +834,7 @@ describe('PeerReviewDetails', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
-      expect(pointsPerReviewInput).toHaveValue(5) // 20 / 4 = 5
+      expect(pointsPerReviewInput).toHaveValue('5') // 20 / 4 = 5
     })
 
     it('loads pass_fail grading type', () => {
@@ -1220,7 +1256,7 @@ describe('PeerReviewDetails', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
-      expect(pointsPerReviewInput).toHaveValue(1.23) // Should be rounded to 1.23
+      expect(pointsPerReviewInput).toHaveValue('1.23') // Should be rounded to 1.23
     })
 
     it('formats points as integer when value rounds to whole number', () => {
@@ -1236,7 +1272,7 @@ describe('PeerReviewDetails', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignmentWithData} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
-      expect(pointsPerReviewInput).toHaveValue(8) // Should show as "8" not "8.00"
+      expect(pointsPerReviewInput).toHaveValue('8') // Should show as "8" not "8.00"
     })
 
     it('formats points with 2 decimals after user input and blur', async () => {
@@ -1249,7 +1285,7 @@ describe('PeerReviewDetails', () => {
       await user.type(pointsPerReviewInput, '1.126')
       await user.tab()
 
-      expect(pointsPerReviewInput).toHaveValue(1.13) // Should round to 1.13
+      expect(pointsPerReviewInput).toHaveValue('1.13') // Should round to 1.13
     })
 
     it('formats integer input without decimals after blur', async () => {
@@ -1262,7 +1298,7 @@ describe('PeerReviewDetails', () => {
       await user.type(pointsPerReviewInput, '5')
       await user.tab()
 
-      expect(pointsPerReviewInput).toHaveValue(5)
+      expect(pointsPerReviewInput).toHaveValue('5')
     })
 
     it('shows zero as "0" without decimals', () => {
@@ -1270,7 +1306,7 @@ describe('PeerReviewDetails', () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const pointsPerReviewInput = screen.getByTestId('points-per-review-input')
-      expect(pointsPerReviewInput).toHaveValue(0)
+      expect(pointsPerReviewInput).toHaveValue('0')
     })
   })
 
