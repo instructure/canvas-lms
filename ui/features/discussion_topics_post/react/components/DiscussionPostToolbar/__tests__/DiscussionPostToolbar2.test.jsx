@@ -72,6 +72,7 @@ beforeEach(() => {
   window.ENV = {
     course_id: '1',
     SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
+    discussion_translation_available: true,
     DISCUSSION: {
       preferences: {
         discussions_splitscreen_view: false,
@@ -214,6 +215,16 @@ describe('DiscussionPostToolbar', () => {
     describe('when translationLanguages is empty', () => {
       it('does not render the translate button', () => {
         const {queryByTestId} = setup()
+        expect(queryByTestId('translate-button')).toBeNull()
+      })
+    })
+
+    describe('when discussion_translation_available is false', () => {
+      it('does not render the translate button even with languages', () => {
+        window.ENV.discussion_translation_available = false
+        const {queryByTestId} = setup(null, null, {
+          translationLanguages: {current: ['en', 'es']},
+        })
         expect(queryByTestId('translate-button')).toBeNull()
       })
     })
