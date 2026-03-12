@@ -65,6 +65,7 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_lookups, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
+  has_one :external_content_reference, dependent: :destroy, inverse_of: :wiki_page
   has_one :estimated_duration, dependent: :destroy, inverse_of: :wiki_page
   has_many :attachment_associations, as: :context, inverse_of: :context
 

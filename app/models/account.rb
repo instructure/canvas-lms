@@ -2925,6 +2925,12 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def horizon_block_content_editor?
+    horizon_account? &&
+      root_account.feature_enabled?(:horizon_block_content_editor) &&
+      ContentServiceClient.enabled?
+  end
+
   def horizon_account_locked?
     horizon_account[:locked] && horizon_account[:inherited]
   end

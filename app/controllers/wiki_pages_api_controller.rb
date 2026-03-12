@@ -182,6 +182,7 @@ class WikiPagesApiController < ApplicationController
   before_action :get_wiki_page, except: %i[create index check_title_availability ai_generate_alt_text]
   before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability ai_generate_alt_text]
   before_action :was_front_page, except: %i[index check_title_availability ai_generate_alt_text]
+  before_action :extract_block_editor_data, only: %i[create update]
   before_action only: %i[show update destroy revisions show_revision revert] do
     check_differentiated_assignments(@page)
   end
@@ -421,7 +422,9 @@ class WikiPagesApiController < ApplicationController
       @page.saving_user = @current_user
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
-        render json: wiki_page_json(@page, @current_user, session)
+        create_external_content_ref
+
+        render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
@@ -442,7 +445,7 @@ class WikiPagesApiController < ApplicationController
   def show
     if authorized_action(@page, @current_user, :read)
       log_asset_access(@page, "wiki", @wiki)
-      render json: wiki_page_json(@page, @current_user, session)
+      render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
     end
   end
 
@@ -512,7 +515,9 @@ class WikiPagesApiController < ApplicationController
 
         log_asset_access(@page, "wiki", @wiki, "participate")
         @page.context_module_action(@current_user, @context, :contributed)
-        render json: wiki_page_json(@page, @current_user, session)
+        update_external_content_ref
+
+        render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
@@ -923,5 +928,37 @@ class WikiPagesApiController < ApplicationController
     @page.errors.add(:body, error.message) if @page.present?
 
     render json: @page&.errors || {}, status: :bad_request
+  end
+
+  def create_external_content_ref
+    if @context.account.horizon_block_content_editor? && @block_editor_data
+      response = ContentServiceClient.create_content(
+        root_account_uuid: @context.root_account.uuid,
+        user_uuid: @current_user.uuid,
+        context_type: "WikiPage",
+        context_id: @page.id,
+        template_layout: @block_editor_data[:template_layout],
+        template_data: @block_editor_data[:template_data]
+      )
+
+      @page.create_external_content_reference(content_id: response.external_content_id)
+    end
+  end
+
+  def update_external_content_ref
+    external_ref = @page.external_content_reference
+    if @context.account.horizon_block_content_editor? && @block_editor_data && external_ref
+      ContentServiceClient.update_content(
+        root_account_uuid: @context.root_account.uuid,
+        user_uuid: @current_user.uuid,
+        external_content_id: external_ref.content_id,
+        template_layout: @block_editor_data[:template_layout],
+        template_data: @block_editor_data[:template_data]
+      )
+    end
+  end
+
+  def extract_block_editor_data
+    @block_editor_data = params[:wiki_page]&.delete(:block_editor_data)
   end
 end
