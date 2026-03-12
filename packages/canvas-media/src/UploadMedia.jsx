@@ -30,10 +30,7 @@ import ReactDOM from 'react-dom'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import formatMessage from './format-message'
 import getTranslations from './getTranslations'
-import saveMediaRecording, {
-  saveClosedCaptions,
-  saveClosedCaptionsForAttachment,
-} from './saveMediaRecording'
+import saveMediaRecording, {saveClosedCaptionsForAttachment} from './saveMediaRecording'
 import {CC_FILE_MAX_BYTES, mediaExtension} from './shared/constants'
 import LoadingIndicator from './shared/LoadingIndicator'
 import translationShape from './translationShape'
@@ -99,7 +96,6 @@ export class UploadMediaModal extends React.Component {
     // for testing
     computerFile: instanceOf(File),
     userLocale: string,
-    useStudioPlayer: bool,
   }
 
   static defaultProps = {
@@ -314,7 +310,6 @@ export class UploadMediaModal extends React.Component {
                 }}
                 bounds={this.state.modalBodySize}
                 mountNode={this.props.mountNode}
-                useStudioPlayer={this.props.useStudioPlayer}
               />
             </Suspense>
           </Tabs.Panel>

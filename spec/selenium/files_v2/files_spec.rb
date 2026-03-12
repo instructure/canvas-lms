@@ -390,23 +390,17 @@ describe "files index page", :ignore_js_errors do
             stub_kaltura
           end
 
-          context "when consolidated_media_player feature is enabled" do
-            before do
-              Account.site_admin.enable_feature! :consolidated_media_player
-            end
+          it "works in the user's files page" do
+            get "/files/folder/courses_#{@course.id}/"
+            get_item_files_table(1, 1).click
+            wait_for_ajaximations
+            expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
+          end
 
-            it "works in the user's files page" do
-              get "/files/folder/courses_#{@course.id}/"
-              get_item_files_table(1, 1).click
-              wait_for_ajaximations
-              expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
-            end
-
-            it "works in the course's files page" do
-              get_item_files_table(1, 1).click
-              wait_for_ajaximations
-              expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
-            end
+          it "works in the course's files page" do
+            get_item_files_table(1, 1).click
+            wait_for_ajaximations
+            expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
           end
         end
       end

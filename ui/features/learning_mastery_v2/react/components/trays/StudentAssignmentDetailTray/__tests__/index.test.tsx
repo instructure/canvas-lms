@@ -92,9 +92,6 @@ describe('StudentAssignmentDetailTray', () => {
       },
       EMOJIS_ENABLED: true,
       LOCALE: 'en',
-      FEATURES: {
-        consolidated_media_player: false,
-      },
     } as any
 
     // Mock the outcome alignments API call

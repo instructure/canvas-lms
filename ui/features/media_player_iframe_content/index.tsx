@@ -22,7 +22,6 @@ import {render} from '@canvas/react'
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {MediaInfo} from '@canvas/canvas-studio-player/react/types'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
@@ -39,9 +38,6 @@ declare const ENV: GlobalEnv & {
   attachment_id?: string
   attachment?: boolean
   current_user_roles?: string[]
-  FEATURES: {
-    consolidated_media_player_iframe?: boolean
-  }
 }
 
 interface AsrContext {
@@ -205,64 +201,48 @@ ready(() => {
   const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
   const showExpandView = isAsrEnabled && showRollingTranscript && is_video
 
-  if (ENV.FEATURES?.consolidated_media_player_iframe) {
-    render(
-      <CanvasStudioPlayer
-        media_id={media_id || ''}
-        media_sources={href_source || media_object.media_sources}
-        media_tracks={playerTracks}
-        type={is_video ? 'video' : 'audio'}
-        aria_label={aria_label}
-        is_attachment={is_attachment}
-        attachment_id={attachment_id}
-        explicitSize={explicitSize}
-        enableSidebar={isAsrEnabled && showRollingTranscript}
-        openSidebar={isAsrEnabled}
-        onTranscriptEdit={handleTranscriptEdit}
-        onConfirmEditChanges={handleConfirmEditChanges}
-        onTrackEvent={handleTrackEvent}
-        hideUploadCaptions
-        kebabMenuElements={
-          showExpandView
-            ? [
-                {
-                  id: 'expand-view',
-                  text: I18n.t('Expand View'),
-                  showInOverlay: true,
-                  overlayText: I18n.t('Expand'),
-                  ariaLabel: I18n.t('Open immersive view with all media tools'),
-                  icon: 'expand',
-                  onClick: () => {
-                    if (window.top) {
-                      window.top.location.href = `/media_attachments/${attachment_id}/immersive_view`
-                    }
-                  },
-                  order: 0,
+  render(
+    <CanvasStudioPlayer
+      media_id={media_id || ''}
+      media_sources={href_source || media_object.media_sources}
+      media_tracks={playerTracks}
+      type={is_video ? 'video' : 'audio'}
+      aria_label={aria_label}
+      is_attachment={is_attachment}
+      attachment_id={attachment_id}
+      explicitSize={explicitSize}
+      enableSidebar={isAsrEnabled && showRollingTranscript}
+      openSidebar={isAsrEnabled}
+      onTranscriptEdit={handleTranscriptEdit}
+      onConfirmEditChanges={handleConfirmEditChanges}
+      onTrackEvent={handleTrackEvent}
+      hideUploadCaptions
+      kebabMenuElements={
+        showExpandView
+          ? [
+              {
+                id: 'expand-view',
+                text: I18n.t('Expand View'),
+                showInOverlay: true,
+                overlayText: I18n.t('Expand'),
+                ariaLabel: I18n.t('Open immersive view with all media tools'),
+                icon: 'expand',
+                onClick: () => {
+                  if (window.top) {
+                    window.top.location.href = `/media_attachments/${attachment_id}/immersive_view`
+                  }
                 },
-              ]
-            : []
-        }
-        emptyTranscriptsComponent={
-          isAsrEnabled && is_video ? (
-            <NoTranscript isGenerating={isGenerating} canManageTranscripts={canManageTranscripts} />
-          ) : undefined
-        }
-      />,
-      container,
-    )
-  } else {
-    render(
-      <CanvasMediaPlayer
-        media_id={media_id || ''}
-        // @ts-expect-error href_source is string|string[] but prop expects object[]
-        media_sources={href_source || media_object.media_sources}
-        media_tracks={mediaTracks}
-        type={is_video ? 'video' : 'audio'}
-        aria_label={aria_label}
-        is_attachment={is_attachment}
-        attachment_id={attachment_id}
-      />,
-      container,
-    )
-  }
+                order: 0,
+              },
+            ]
+          : []
+      }
+      emptyTranscriptsComponent={
+        isAsrEnabled && is_video ? (
+          <NoTranscript isGenerating={isGenerating} canManageTranscripts={canManageTranscripts} />
+        ) : undefined
+      }
+    />,
+    container,
+  )
 })
