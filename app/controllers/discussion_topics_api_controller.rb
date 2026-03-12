@@ -1381,8 +1381,9 @@ class DiscussionTopicsApiController < ApplicationController
 
     [
       response.response,
-      response.input_tokens || 0,
-      response.output_tokens || 0,
+      # mock out input and outout tokens for cedar since we don't have that data (VICE-5912)
+      0, # input_tokens
+      0, # output_tokens
       time.real.round(2)
     ]
   end
