@@ -330,22 +330,6 @@ lti_link_to_apps_from_developer_keys:
       state: allowed_on
     ci:
       state: allowed_on
-lti_oidc_missing_cookie_retry:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Retry LTI OIDC launches that fail due to missing cookies
-  description: |-
-    If enabled, Canvas will retry LTI OIDC launches that fail due to missing cookies.
-    Safari tracking protection sometimes blocks cookies from being set to authorize the endpoint.
-    To fix this, we resubmit the request with a form.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_registrations_discover_page:
   state: hidden
   shadow: true
