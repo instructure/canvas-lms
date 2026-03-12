@@ -3303,6 +3303,53 @@ describe Account do
         expect(subaccount.horizon_account[:inherited]).to be true
       end
     end
+
+    describe "#horizon_block_content_editor?" do
+      before do
+        @account.enable_feature!(:horizon_course_setting)
+        @account.horizon_account = true
+        @account.save!
+        @account.enable_feature!(:horizon_block_content_editor)
+        allow(ContentServiceClient).to receive(:enabled?).and_return(true)
+      end
+
+      context "when all conditions are met" do
+        it "returns true" do
+          expect(@account.horizon_block_content_editor?).to be true
+        end
+      end
+
+      context "when it is not a horizon account" do
+        before do
+          @account.horizon_account = false
+          @account.save!
+        end
+
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
+
+      context "when the horizon_block_content_editor flag is disabled" do
+        before do
+          @account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
+
+      context "when ContentServiceClient is not enabled" do
+        before do
+          allow(ContentServiceClient).to receive(:enabled?).and_return(false)
+        end
+
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
+    end
   end
 
   describe "allow_assign_to_differentiation_tags?" do
