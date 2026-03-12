@@ -19,6 +19,7 @@
 import React, {useState, useEffect} from 'react'
 import {useQueryClient} from '@tanstack/react-query'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Tabs} from '@instructure/ui-tabs'
@@ -220,14 +221,17 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
         <Flex.Item shouldGrow={true}>
           <Flex direction="column">
             <Flex.Item>
-              <Text
-                size="x-large"
-                wrap="break-word"
-                data-testid="title"
-                weight={isMobile ? 'normal' : 'light'}
-              >
-                {I18n.t('%{name} Peer Review', {name: name})}
-              </Text>
+              <Heading level="h1" aria-labelledby="peer-review-heading">
+                <Text
+                  id="peer-review-heading"
+                  size="x-large"
+                  wrap="break-word"
+                  data-testid="title"
+                  weight={isMobile ? 'normal' : 'light'}
+                >
+                  {I18n.t('%{name} Peer Review', {name: name})}
+                </Text>
+              </Heading>
             </Flex.Item>
             {peerReviewDueAt && (
               <Flex.Item>
