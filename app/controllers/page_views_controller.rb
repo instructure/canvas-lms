@@ -459,6 +459,9 @@ class PageViewsController < ApplicationController
   rescue PageViews::Common::TooManyRequestsError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
+  rescue PageViews::Common::ServiceUnavailable => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Query queue is at capacity. Please wait and try again.") }, status: :service_unavailable
   end
 
   # @API BETA - Poll query status
@@ -707,6 +710,9 @@ class PageViewsController < ApplicationController
   rescue PageViews::Common::TooManyRequestsError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
+  rescue PageViews::Common::ServiceUnavailable => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Query queue is at capacity. Please wait and try again.") }, status: :service_unavailable
   rescue PageViews::Common::InvalidRequestError, ArgumentError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: e.message }, status: :bad_request

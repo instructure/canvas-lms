@@ -152,6 +152,16 @@ describe PageViews::EnqueueBatchQueryService do
     end
   end
 
+  it "raises ServiceUnavailable when PV5 API query queue is at capacity" do
+    response = instance_double(Net::HTTPResponse, code: 503)
+    allow(CanvasHttp).to receive(:post).and_yield(response)
+    expect do
+      service.call("2024-12-01", "2025-01-01", [user1, user2], "csv")
+    end.to raise_error(PageViews::Common::ServiceUnavailable) do |error|
+      expect(error.message).to eq("Service temporarily unavailable")
+    end
+  end
+
   it "raises InternalServerError when PV5 API returns internal server error" do
     response = double(code: 500)
     allow(CanvasHttp).to receive(:post).and_yield(response)

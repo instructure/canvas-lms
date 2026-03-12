@@ -236,6 +236,20 @@ describe PageViewsController do
 
         expect(response).to have_http_status(:too_many_requests)
       end
+
+      it "returns 503 Service Unavailable when query queue is at capacity" do
+        allow_any_instance_of(PageViews::EnqueueQueryService).to receive(:call).and_raise(PageViews::Common::ServiceUnavailable)
+
+        post "query", params: {
+          user_id: @user.id,
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :jsonl
+        }
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.parsed_body["error"]).to eq("Query queue is at capacity. Please wait and try again.")
+      end
     end
 
     describe "GET 'query'" do
@@ -469,6 +483,20 @@ describe PageViewsController do
         }
 
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns 503 Service Unavailable when query queue is at capacity" do
+        allow_any_instance_of(PageViews::EnqueueBatchQueryService).to receive(:call).and_raise(PageViews::Common::ServiceUnavailable)
+
+        post "batch_query", params: {
+          user_ids: [user1.id],
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.parsed_body["error"]).to eq("Query queue is at capacity. Please wait and try again.")
       end
     end
 
