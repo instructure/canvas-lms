@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 interface ModuleItem {
