@@ -758,7 +758,9 @@ describe "peer review student landing page" do
       fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-2']:eq(1)").click
       wait_for_ajaximations
 
-      f("[data-testid='save-rubric-assessment-button']").click
+      save_button = f("[data-testid='save-rubric-assessment-button']")
+      scroll_into_view(save_button)
+      save_button.click
       wait_for_ajaximations
 
       submission = @assignment.submissions.find_by(user: @student2)
@@ -805,7 +807,9 @@ describe "peer review student landing page" do
       fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-2']:eq(1)").click
       wait_for_ajaximations
 
-      f("[data-testid='save-rubric-assessment-button']").click
+      save_button = f("[data-testid='save-rubric-assessment-button']")
+      scroll_into_view(save_button)
+      save_button.click
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
