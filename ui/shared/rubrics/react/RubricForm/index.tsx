@@ -410,7 +410,7 @@ export const RubricForm = ({
               />
               <Flex.Item overflowX="hidden" overflowY="hidden" padding="0 xx-small">
                 <Flex margin="large 0 0 0" alignItems="start" wrap="wrap" gap="small">
-                  <Flex.Item size={isCompactTitle ? '100%' : '18.75rem'} shouldGrow shouldShrink>
+                  <Flex.Item size={isCompactTitle ? '100%' : '15rem'} shouldGrow shouldShrink>
                     <TextInput
                       data-testid="rubric-form-title"
                       renderLabel={I18n.t('Rubric Name')}
