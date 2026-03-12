@@ -86,7 +86,11 @@ export const addRubricToAssignment = async (
   )
 
   return {
-    rubricAssociation: mappedRubricAssociation,
+    rubricAssociation: {
+      ...mappedRubricAssociation,
+      canUpdate: result.rubric_association.permissions?.update,
+      canDelete: result.rubric_association.permissions?.delete,
+    },
     rubric: {
       ...mappedRubric,
       canUpdateRubric: result.rubric.permissions?.update,
