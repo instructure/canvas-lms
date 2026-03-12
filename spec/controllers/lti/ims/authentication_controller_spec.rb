@@ -321,11 +321,6 @@ describe Lti::IMS::AuthenticationController do
         end
 
         context "when hasn't retried yet" do
-          before do
-            account.root_account.settings[:lti_oidc_missing_cookie_retry] = true
-            account.root_account.save!
-          end
-
           it "renders a cookie fix page" do
             authorize
             expect(response).to have_http_status :ok
