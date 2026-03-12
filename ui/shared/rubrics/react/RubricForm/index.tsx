@@ -381,16 +381,21 @@ export const RubricForm = ({
     <Responsive
       match="media"
       query={{
-        compact: {maxWidth: '53.125rem'}, // Will use this to resize criterion rows
+        compact: {maxWidth: '53.125rem'},
         compactTitle: {maxWidth: '37.5rem'},
+        compactRatings: {maxWidth: '34.375rem'},
+        compactOutcome: {maxWidth: '28.125rem'},
+        compactFooter: {maxWidth: '40rem'},
         fullWidthModal: {minWidth: '50rem'},
-        large: {minWidth: '66.5rem'},
       }}
     >
       {(_props, matches) => {
         const isFullWidthModal = matches?.includes('fullWidthModal') ?? false
         const isCompactTitle = matches?.includes('compactTitle') ?? false
         const isCompact = matches?.includes('compact') ?? false
+        const isCompactFooter = matches?.includes('compactFooter') ?? false
+        const isCompactRatings = matches?.includes('compactRatings') ?? false
+        const isCompactOutcome = matches?.includes('compactOutcome') ?? false
 
         return (
           <View
@@ -486,6 +491,9 @@ export const RubricForm = ({
                 openOutcomeDialog={openOutcomeDialog}
                 onRegenerateCriterion={regenerateSingleCriterion}
                 isAIRubricsAvailable={isAIRubricsAvailable}
+                isCompact={isCompact}
+                isCompactRatings={isCompactRatings}
+                isCompactOutcome={isCompactOutcome}
                 isGenerating={criteriaBeingGenerated}
                 showCriteriaRegeneration={isAIRubricsAvailable}
               />
@@ -494,6 +502,7 @@ export const RubricForm = ({
             <RubricFormFooter
               assignmentId={assignmentId}
               hasRubricAssociations={rubricForm.hasRubricAssociations}
+              isCompact={isCompactFooter}
               rubricId={rubricId ?? rubric?.id}
               savePending={savePending}
               handleCancelButton={handleCancelButton}

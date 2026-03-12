@@ -52,14 +52,14 @@ export const OutcomePopoverDisplay = ({outcome}: OutcomePopoverDisplayProps) => 
     <Responsive
       match="media"
       query={{
-        compact: {maxWidth: '50rem'},
-        fullWidth: {minWidth: '50rem'},
-        large: {minWidth: '66.5rem'},
+        compact: {maxWidth: '400px'},
+        fullWidth: {minWidth: '800px'},
       }}
     >
       {(_props, matches) => {
         const isFullWidth = matches?.includes('fullWidth') ?? false
-        const maxWidth = isFullWidth ? '600px' : '300px'
+        const isCompact = matches?.includes('compact') ?? false
+        const maxWidth = isFullWidth ? '600px' : isCompact ? '200px' : '300px'
 
         return (
           <View as="div" display="block" data-testid="outcome-popover-display" maxWidth={maxWidth}>
