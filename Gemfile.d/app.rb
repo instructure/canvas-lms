@@ -75,7 +75,6 @@ gem "link_header", "0.0.8"
 gem "logger", "~> 1.5"
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
-gem "mimemagic", "~> 0.4.3"
 gem "mini_magick", "~> 5.0"
 gem "multi_json", "~> 1.19"
 gem "net-http", "~> 0.1", require: false
