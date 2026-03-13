@@ -493,9 +493,8 @@ export function setup(): void {
         'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
       if ($('.grading_value:visible').length > 0) {
-        formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade(
-          $('.grading_value').val(),
-        )($ as any).ajaxJSON(url, method, formData, submissionLoaded)
+        formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade($('.grading_value').val())
+        ;($ as any).ajaxJSON(url, method, formData, submissionLoaded)
       } else {
         $('.submission_header').loadingImage('remove')
         $('.save_comment_button').prop('disabled', false)
