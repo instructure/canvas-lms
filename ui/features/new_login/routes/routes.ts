@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// hard redirect entry point; resolves to the correct branded login
-export const LOGIN_ENTRY_URL = '/login'
-
 export const ROUTES = {
   FORGOT_PASSWORD: '/login/canvas/forgot-password',
   LDAP: '/login/ldap',
