@@ -158,10 +158,8 @@ module Lti
 
         if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && (output.is_a?(Numeric) || (@root_account.feature_enabled?(:custom_variables_booleans_as_strings) && [true, false].include?(output)))
           output&.to_s
-        elsif Account.site_admin.feature_enabled?(:disallow_null_custom_variables)
-          output.nil? ? v : output
         else
-          output
+          output.nil? ? v : output
         end
       end
     end
