@@ -18,13 +18,14 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import ReactDOM from 'react-dom'
+import ReactDOM, {flushSync} from 'react-dom'
 import {getTheme} from '@canvas/instui-bindings'
 import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 
 type Options = {
   highContrast?: boolean
   brandVariables?: Record<string, unknown>
+  sync?: boolean
 }
 
 export function legacyRender(
@@ -57,11 +58,13 @@ export function render(
   }
 
   const theme = getTheme(options.highContrast, options.brandVariables)
+  const wrapped = (
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>
+  )
 
   const root = createRoot(container)
-  root.render(
-    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
-  )
+  if (options.sync) flushSync(() => root.render(wrapped))
+  else root.render(wrapped)
   return root
 }
 
@@ -71,9 +74,12 @@ export function rerender(
   options: Options = {},
 ) {
   const theme = getTheme(options.highContrast, options.brandVariables)
-  root.render(
-    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
+  const wrapped = (
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>
   )
+
+  if (options.sync) flushSync(() => root.render(wrapped))
+  else root.render(wrapped)
 }
 
 export function legacyUnmountComponentAtNode(container: Element | null) {

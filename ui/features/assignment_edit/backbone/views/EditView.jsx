@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import {each, find, keys, includes, forEach, filter, pick} from 'es-toolkit/compat'
@@ -61,7 +61,6 @@ import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import {queryClient} from '@canvas/query'
-import {createRoot} from 'react-dom/client'
 import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
@@ -146,6 +145,12 @@ const ONLINE_SUBMISSION_CHECKBOXES_GROUP = 'online_submission_types[online_text_
 const DEFAULT_TOOL_LAUNCH_BUTTON = 'default-tool-launch-button'
 const SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON = 'assignment_submission_type_selection_launch_button'
 const USAGE_RIGHTS_SELECT = 'usage_rights_use_justification'
+
+function syncRender(existingRoot, element, container) {
+  if (!existingRoot) return render(element, container, {sync: true})
+  rerender(existingRoot, element, {sync: true})
+  return existingRoot
+}
 
 /*
 xsslint safeString.identifier srOnly
@@ -943,12 +948,13 @@ EditView.prototype.renderAnnotatedDocumentSelector = function () {
     })(this),
   }
   const element = React.createElement(AnnotatedDocumentSelector, props)
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(element, this.getAnnotatedDocumentContainer())
+  const container = this.getAnnotatedDocumentContainer()
+  this.annotatedDocumentRoot = syncRender(this.annotatedDocumentRoot, element, container)
 }
 
 EditView.prototype.unmountAnnotatedDocumentSelector = function () {
-  ReactDOM.unmountComponentAtNode(this.getAnnotatedDocumentContainer())
+  this.annotatedDocumentRoot?.unmount()
+  this.annotatedDocumentRoot = null
   return this.setAnnotatedDocument(null)
 }
 
@@ -1014,14 +1020,13 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
       $(document).trigger('validateUsageRightsSelectedValue', {error: false})
       this.hideErrors('usage_rights_use_justification_errors')
     }
-    ReactDOM.render(
-      React.createElement(UsageRightsSelectBox, {
-        contextType,
-        contextId,
-        hideErrors: clearUsageRightsErrors,
-      }),
-      document.querySelector(USAGE_RIGHTS_CONTAINER),
-    )
+    const element = React.createElement(UsageRightsSelectBox, {
+      contextType,
+      contextId,
+      hideErrors: clearUsageRightsErrors,
+    })
+    const container = document.querySelector(USAGE_RIGHTS_CONTAINER)
+    this.usageRightsRoot = syncRender(this.usageRightsRoot, element, container)
     $(USAGE_RIGHTS_CONTAINER + ' .UsageRightsSelectBox__container').addClass('edit-view')
     self = this
     return this.fetchAttachmentFile(
@@ -1041,7 +1046,8 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
 }
 
 EditView.prototype.unmountAnnotatedDocumentUsageRightsSelectBox = function () {
-  ReactDOM.unmountComponentAtNode(document.querySelector(USAGE_RIGHTS_CONTAINER))
+  this.usageRightsRoot?.unmount()
+  this.usageRightsRoot = null
   return this.setAnnotatedDocumentUsageRights(null)
 }
 
@@ -1075,11 +1081,9 @@ EditView.prototype.renderDefaultExternalTool = function () {
     previouslySelected: this.assignment.defaultToolSelected(),
     hideErrors: this.hideErrors,
   }
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(
-    React.createElement(DefaultToolForm, props),
-    document.querySelector('[data-component="DefaultToolForm"]'),
-  )
+  const element = React.createElement(DefaultToolForm, props)
+  const container = document.querySelector('[data-component="DefaultToolForm"]')
+  this.defaultToolFormRoot = syncRender(this.defaultToolFormRoot, element, container)
 }
 
 EditView.prototype.handleRestrictFileUploadsChange = function () {
@@ -1258,9 +1262,12 @@ EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
     onLaunchButtonClick: this.handleSubmissionTypeSelectionLaunch,
   }
 
-  ReactDOM.render(
-    React.createElement(AssignmentSubmissionTypeContainer, props),
-    document.querySelector('[data-component="AssignmentSubmissionTypeContainer"]'),
+  const element = React.createElement(AssignmentSubmissionTypeContainer, props)
+  const container = document.querySelector('[data-component="AssignmentSubmissionTypeContainer"]')
+  this.submissionTypeContainerRoot = syncRender(
+    this.submissionTypeContainerRoot,
+    element,
+    container,
   )
 }
 
@@ -1305,10 +1312,13 @@ EditView.prototype.renderSubmissionTypeSelectionDialog = function (open) {
     launchType: 'submission_type_selection',
     onExternalContentReady: this.handleExternalContentReady,
   }
-  const mountPoint = document.querySelector('#assignment_submission_type_selection_tool_dialog')
-  const dialog = React.createElement(ExternalToolModalLauncher, props)
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(dialog, mountPoint)
+  const container = document.querySelector('#assignment_submission_type_selection_tool_dialog')
+  const element = React.createElement(ExternalToolModalLauncher, props)
+  this.submissionTypeSelectionDialogRoot = syncRender(
+    this.submissionTypeSelectionDialogRoot,
+    element,
+    container,
+  )
 }
 
 EditView.prototype.handleExternalContentReady = function (data) {
@@ -1860,7 +1870,6 @@ EditView.prototype.showErrors = function (errors) {
     const errorsContainerID = `${key}_errors`
     const errorsContainer = document.getElementById(errorsContainerID)
     if (errorsContainer) {
-      const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
       const noMargin = [
         'allowed_attempts',
         'final_grader_id',
@@ -1876,14 +1885,18 @@ EditView.prototype.showErrors = function (errors) {
         GROUP_CATEGORY_SELECT,
         DEFAULT_TOOL_LAUNCH_BUTTON,
       ].includes(key)
-      root.render(
+      const errorElement = (
         <FormattedErrorMessage
           message={value[0].message}
           margin={noMargin ? '0' : marginTop ? 'xx-small 0 0 0' : '0 0 0 medium'}
           iconMargin={value[0].longMessage ? '0 xx-small medium 0' : '0 xx-small xxx-small 0'}
-        />,
+        />
       )
-      this.errorRoots[errorsContainerID] = root
+      this.errorRoots[errorsContainerID] = syncRender(
+        this.errorRoots[errorsContainerID],
+        errorElement,
+        errorsContainer,
+      )
       delete errors[key]
       const element = this.getElement(key)
       if (element) {
@@ -2518,10 +2531,9 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     hideNumberInputErrors: clearNumberInputErrors,
     hideFinalGraderErrors: clearFinalGraderSelectErrors,
   }
-  const formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
-  const mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(formFieldGroup, mountPoint)
+  const element = React.createElement(ModeratedGradingFormFieldGroup, props)
+  const container = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
+  this.moderatedGradingRoot = syncRender(this.moderatedGradingRoot, element, container)
 }
 
 EditView.prototype.renderAllowedAttempts = function () {
@@ -2538,9 +2550,9 @@ EditView.prototype.renderAllowedAttempts = function () {
     locked: !!this.lockedItems.settings,
     onHideErrors: clearErrors,
   }
-  const mountPoint = document.querySelector('#allowed-attempts-target')
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(React.createElement(AllowedAttemptsWithState, props), mountPoint)
+  const element = React.createElement(AllowedAttemptsWithState, props)
+  const container = document.querySelector('#allowed-attempts-target')
+  this.allowedAttemptsRoot = syncRender(this.allowedAttemptsRoot, element, container)
 }
 
 export default EditView
