@@ -112,7 +112,7 @@ export function isStudioEmbeddedMedia(element: Element): boolean {
 export function parseStudioOptions(element: Element | null): ParsedStudioOptions {
   const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
 
-  const embedOptions = {} as StudioEmbedOptions;
+  const embedOptions = {} as StudioEmbedOptions
   const href = tinymceIframeShim?.getAttribute('data-mce-p-src')
 
   if (href) {
@@ -122,9 +122,10 @@ export function parseStudioOptions(element: Element | null): ParsedStudioOptions
     const params = url.searchParams
 
     embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
-    embedOptions['enableTranscriptDownload'] = params.get('custom_arc_transcript_downloadable') === 'true'
-    embedOptions['lockSpeed']= params.get('custom_arc_lock_speed') === 'true'
-    embedOptions['isExternal']= params.get('custom_arc_is_external') === 'true'
+    embedOptions['enableTranscriptDownload'] =
+      params.get('custom_arc_transcript_downloadable') === 'true'
+    embedOptions['lockSpeed'] = params.get('custom_arc_lock_speed') === 'true'
+    embedOptions['isExternal'] = params.get('custom_arc_is_external') === 'true'
   }
 
   return {
@@ -161,7 +162,6 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
   }
 
   if (!outerIframe) {
-    // eslint-disable-next-line no-console
     console.error('No outer iframe found')
     return null
   }
@@ -189,7 +189,6 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
       }
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('>> Cannot access outer iframe content (cross-origin):', error)
     // Return the outer iframe as fallback since we can't access its contents
     return outerIframe
@@ -200,10 +199,7 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
 
 export type EmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
 
-export const notifyStudioEmbedTypeChange = (
-  editor: Editor,
-  embedType: EmbedType,
-) => {
+export const notifyStudioEmbedTypeChange = (editor: Editor, embedType: EmbedType) => {
   const studioIframe = findStudioLtiIframeFromSelection(editor.selection.getNode())
 
   if (studioIframe && studioIframe.contentWindow) {
@@ -311,20 +307,24 @@ const embedOptionsKeyMap: {[key in keyof StudioEmbedOptions]: string} = {
 
 export function validateStudioEmbedOptions(input: any): input is StudioEmbedOptions {
   return (
-    typeof input === 'object' && (
-      Object.keys(input).length === 0 ||
+    typeof input === 'object' &&
+    (Object.keys(input).length === 0 ||
       typeof input.enableMediaDownload === 'boolean' ||
       typeof input.enableTranscriptDownload === 'boolean' ||
-      typeof input.lockSpeed === 'boolean'
-    )
+      typeof input.lockSpeed === 'boolean')
   )
 }
 
-export function updateStudioEmbedOptions (editor: Editor, embedOptions: StudioEmbedOptions) {
-  const container = editor.getContainer()
-  const iframe = container.querySelector('iframe');
-  const mcseShim = iframe?.contentDocument?.querySelector('.mce-shim');
-  const tinymceIframeShim = mcseShim?.parentElement;
+export function updateStudioEmbedOptions(
+  editor: Editor,
+  embedOptions: StudioEmbedOptions,
+  videoContainer: Element | null,
+) {
+  if (videoContainer?.tagName !== 'IFRAME') {
+    return
+  }
+
+  const tinymceIframeShim = videoContainer.parentElement
 
   if (!tinymceIframeShim) {
     return
