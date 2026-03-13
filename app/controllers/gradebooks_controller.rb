@@ -1252,7 +1252,7 @@ class GradebooksController < ApplicationController
           grading_role: grading_role_for_user,
           grading_type: @assignment.grading_type,
           lti_retrieve_url: retrieve_course_external_tools_url(
-            @context.id, assignment_id: @assignment.id, display: "borderless"
+            @context.id, assignment_id: @assignment.id, display: "borderless", new_quizzes_native_experience_sessionless: false
           ),
           course_id: @context.id,
           assignment_id: @assignment.id,
