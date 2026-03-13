@@ -450,21 +450,6 @@ lti_usage_premium:
   description: >-
     This flag controls if an instance has access to premium LTI usage features.
     It should only be enabled in schools which have a contract paying for these features.
-lti_v2_turnitin_usage_log:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: "Send Turnitin LTI V2 usage logs to Pandata"
-  description: >-
-    If enabled, we'll send usage data about Turnitin LTI V2 launches to Pandata the same way
-    as we send usage data about LTI 1.3 launches.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 microsoft_group_enrollments_syncing:
   state: hidden
   display_name: Microsoft Group enrollment syncing
