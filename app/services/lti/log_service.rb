@@ -55,7 +55,6 @@ module Lti
     private
 
     def log_lti2
-      return unless @context.root_account.feature_enabled?(:lti_v2_turnitin_usage_log)
       return unless turnitin_url?
 
       PandataEvents.send_event(:lti_launch, log_lti2_data, for_user_id: @user&.global_id)
