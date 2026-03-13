@@ -336,6 +336,14 @@ module AssignmentOverridesSeleniumHelper
     expect(fj(".ui-tooltip:visible")).to include_text(message.to_s)
   end
 
+  def validate_quiz_tooltip_dates(context_selector, messages)
+    driver.action.move_to(fln("Multiple Dates", f(context_selector.to_s))).perform
+    tooltip = f("[role='tooltip']")
+    messages.each do |message|
+      expect(tooltip).to include_text(message.to_s)
+    end
+  end
+
   def create_assignment_override(assignment, section, due_date)
     override = assignment.assignment_overrides.build
     override.set = section

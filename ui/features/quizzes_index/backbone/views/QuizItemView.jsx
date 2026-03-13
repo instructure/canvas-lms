@@ -17,7 +17,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import DateAvailable from '@canvas/assignments/react/DateAvailable'
 import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
@@ -35,6 +35,7 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import {assignLocation} from '@canvas/util/globalUtils'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {render, rerender} from '@canvas/react'
 
 const I18n = createI18nScope('quizzes.index')
 
@@ -48,7 +49,6 @@ export default class ItemView extends Backbone.View {
     this.child('publishIconView', '[data-view=publish-icon]')
     this.child('lockIconView', '[data-view=lock-icon]')
     this.child('dateDueColumnView', '[data-view=date-due]')
-    this.child('dateAvailableColumnView', '[data-view=date-available]')
     this.child('sisButtonView', '[data-view=sis-button]')
 
     this.prototype.events = {
@@ -123,14 +123,50 @@ export default class ItemView extends Backbone.View {
     }
 
     this.dateDueColumnView = new DateDueColumnView({model: this.model})
-    return (this.dateAvailableColumnView = new DateAvailableColumnView({model: this.model}))
+  }
+
+  cleanupDateAvailableColumn() {
+    if (this._dateAvailableRoot) {
+      this._dateAvailableRoot.unmount()
+      this._dateAvailableRoot = null
+    }
+  }
+
+  renderDateAvailableColumn() {
+    const mountPoint = this.$el.find('[data-view=date-available]')[0]
+
+    if (!mountPoint) return
+
+    const group = this.model.defaultDates()
+    const data = this.model.toView()
+    const component = (
+      <DateAvailable
+        multipleDueDates={data.multipleDueDates}
+        allDates={this.model.allDates()}
+        defaultDates={group.toJSON()}
+        linkHref={this.model.htmlUrl()}
+      />
+    )
+
+    if (this._dateAvailableRoot) {
+      rerender(this._dateAvailableRoot, component)
+    } else {
+      this._dateAvailableRoot = render(component, mountPoint)
+    }
   }
 
   afterRender() {
     if (ENV.horizon_course) {
       this.publishIconView.$el.addClass('disabled')
     }
+    this.cleanupDateAvailableColumn()
+    this.renderDateAvailableColumn()
     return this.$el.toggleClass('quiz-loading-overrides', !!this.model.get('loadingOverrides'))
+  }
+
+  remove() {
+    this.cleanupDateAvailableColumn()
+    return super.remove()
   }
 
   // make clicks follow through to url for entire row

@@ -58,8 +58,7 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes"
       expect(f(".item-group-container .date-available")).to include_text "Multiple Dates"
       driver.action.move_to(f(".item-group-container .date-available")).perform
-      wait_for_ajaximations
-      tooltip = fj(".ui-tooltip:visible")
+      tooltip = f("[role='tooltip']")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
     end
