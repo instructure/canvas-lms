@@ -3678,9 +3678,16 @@ describe GradebooksController do
     describe "js_env" do
       let(:js_env) { assigns[:js_env] }
 
-      it "includes lti_retrieve_url" do
-        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-        expect(js_env[:lti_retrieve_url]).not_to be_nil
+      context "lti_retrieve_url" do
+        it "is present in js_env" do
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
+          expect(js_env[:lti_retrieve_url]).not_to be_nil
+        end
+
+        it "has new_quizzes_native_experience_sessionless=false" do
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
+          expect(js_env[:lti_retrieve_url]).to include("new_quizzes_native_experience_sessionless=false")
+        end
       end
 
       it "includes the grading_type" do

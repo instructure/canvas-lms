@@ -704,7 +704,11 @@ class ExternalToolsController < ApplicationController
         prefer_1_1: !!params[:prefer_1_1]
       )
       @tool = tool
-      if @tool.quiz_lti? && params[:assignment_id] && new_quizzes_native_experience_enabled? && new_quizzes_native_experience_sessionless_enabled?
+      native_nq_redirect = @tool.quiz_lti? &&
+                           params[:assignment_id] &&
+                           new_quizzes_native_experience_enabled? &&
+                           new_quizzes_native_experience_sessionless_enabled?
+      if native_nq_redirect
         @assignment = @context.assignments.find(params[:assignment_id])
         redirect_params = { context: @context, assignment: @assignment }
         redirect_params[:content_only] = true if params[:borderless] || params[:display] == "borderless"
@@ -2159,6 +2163,11 @@ class ExternalToolsController < ApplicationController
   end
 
   def new_quizzes_native_experience_sessionless_enabled?
+    param = params[:new_quizzes_native_experience_sessionless]
+    if param.present? && %w[true false].include?(param)
+      return param == "true"
+    end
+
     return false unless @context.respond_to?(:feature_enabled?)
 
     @context.feature_enabled?(:new_quizzes_native_experience_sessionless)
