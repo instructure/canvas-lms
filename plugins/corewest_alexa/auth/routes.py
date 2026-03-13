@@ -211,38 +211,9 @@ async def register(
 
 
 @router.post("/refresh", response_model=LoginResponse)
-async def refresh_token(body: RefreshRequest) -> LoginResponse:
-    """Exchange a refresh token for a new access + refresh token pair (rotation)."""
-    token_data = verify_refresh_token(body.refresh_token)
-    if token_data is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired refresh token.",
-        )
-
-    user = User.get_by_id(token_data.sub)
-    if user is None or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found or inactive.",
-        )
-
-    new_access = create_access_token(
-        user_id=user.id, username=user.username, role=user.role
-    )
-    new_refresh = create_refresh_token(
-        user_id=user.id, username=user.username, role=user.role
-    )
-    return LoginResponse(
-        access_token=new_access,
-        refresh_token=new_refresh,
-        token_type="bearer",
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        username=user.username,
-        role=user.role,
-    )
-
-
+# POST /auth/refresh
+# (Endpoint removed: refresh-flow is not fully supported/implemented)
+# ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # GET /auth/me
 # ---------------------------------------------------------------------------
