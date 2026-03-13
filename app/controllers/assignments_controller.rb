@@ -126,9 +126,20 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_peer_review_student_view?
-    @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+    @current_user.present? && @assignment.a2_enabled? &&
+      (!can_do(@context, @current_user, :read_as_admin) || user_assigned_as_student?) &&
       @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation_and_grading) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+  end
+
+  def user_assigned_as_student?
+    @context.student_enrollments.where(user: @current_user).exists? &&
+      AssignmentVisibility::AssignmentVisibilityService
+        .assignments_visible_to_students(
+          assignment_ids: [@assignment.id],
+          course_ids: [@context.id],
+          user_ids: [@current_user.id]
+        ).any?
   end
 
   def a2_active_student_and_enrollment
@@ -748,7 +759,18 @@ class AssignmentsController < ApplicationController
       return render_a2_peer_review_student_view
     end
 
-    if @context.feature_enabled?(:peer_review_allocation_and_grading) && authorized_action(@assignment, @current_user, :grade)
+    if @context.feature_enabled?(:peer_review_allocation_and_grading)
+      unless @assignment.grants_right?(@current_user, session, :grade) && !user_assigned_as_student?
+        @unauthorized_message = t("Please contact your Canvas Administrator, as one or more of the following feature options is not enabled to view this Peer Review Assignment:")
+        @unauthorized_details = [
+          t("Peer Review Allocation and Grading"),
+          t("Assignment Enhancements - Student"),
+          t("Enhanced Rubrics"),
+          t("Performance and Usability Upgrades for SpeedGrader"),
+        ]
+        render "shared/unauthorized", status: :unauthorized
+        return
+      end
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id, open_allocation_tray: true)
       return
     end
