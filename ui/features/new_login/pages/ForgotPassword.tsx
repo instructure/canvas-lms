@@ -28,8 +28,8 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
 import {forgotPassword} from '../services'
 import {createErrorMessage} from '../shared/helpers'
-import {assignLocation} from '@canvas/util/globalUtils'
-import {LOGIN_ENTRY_URL} from '../routes/routes'
+import {useSafeBackNavigation} from '../hooks'
+import {ROUTES} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -100,7 +100,7 @@ const ForgotPassword = () => {
     setUsername(value)
   }
 
-  const handleCancel = () => assignLocation(LOGIN_ENTRY_URL)
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const passwordRecoveryForm = (
     <>

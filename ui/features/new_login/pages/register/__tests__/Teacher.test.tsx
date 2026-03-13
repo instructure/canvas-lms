@@ -21,10 +21,20 @@ import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter} from 'react-router-dom'
+import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../context'
 import {createTeacherAccount} from '../../../services'
 import Teacher from '../Teacher'
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+    useNavigationType: vi.fn(),
+    useLocation: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),
@@ -44,6 +54,11 @@ vi.mock('../../../context', async () => {
   }
 })
 
+const mockNavigate = vi.fn()
+const mockedUseNavigate = useNavigate as ReturnType<typeof vi.fn>
+const mockNavigationType = useNavigationType as ReturnType<typeof vi.fn>
+const mockedUseLocation = useLocation as ReturnType<typeof vi.fn>
+
 describe('Teacher', () => {
   const setup = () => {
     render(
@@ -60,6 +75,9 @@ describe('Teacher', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
+    mockedUseNavigate.mockReturnValue(mockNavigate)
+    mockNavigationType.mockReturnValue('PUSH')
+    mockedUseLocation.mockReturnValue({key: 'default'})
     // reset the mock implementation to return the default values
     ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       loginHandleName: 'Email',
@@ -233,12 +251,36 @@ describe('Teacher', () => {
     })
   })
 
-  it('navigates back to login when the cancel button is clicked', async () => {
-    setup()
-    const backButton = screen.getByTestId('back-button')
-    await userEvent.click(backButton)
-    await waitFor(() => {
-      expect(assignLocation).toHaveBeenCalledWith('/login')
+  describe('navigation behavior', () => {
+    describe('when the cancel button is clicked', () => {
+      it('navigates back to login when there is no previous history', async () => {
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates back to the previous page when history exists', async () => {
+        mockNavigationType.mockReturnValue('PUSH')
+        mockedUseLocation.mockReturnValue({key: 'abc123'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith(-1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates to fallback when navigationType is POP or key is default', async () => {
+        mockNavigationType.mockReturnValue('POP')
+        mockedUseLocation.mockReturnValue({key: 'default'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+      })
     })
   })
 })

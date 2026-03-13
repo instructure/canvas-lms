@@ -31,7 +31,7 @@ import {createParentAccount} from '../../services'
 import {MessageAlert, SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
-import {Alert} from '@instructure/ui-alerts'
+import {ROUTES} from '../../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -309,7 +309,7 @@ const Parent = () => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = useSafeBackNavigation()
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
