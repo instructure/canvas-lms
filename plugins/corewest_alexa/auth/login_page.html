@@ -216,10 +216,10 @@
           return;
         }
 
-        // Persist token and redirect
+        // Persist token and redirect to the dashboard UI page
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('token_type',   data.token_type);
-        window.location.href = '/alexa/dashboard';
+        window.location.href = '/alexa/dashboard.html';
       } catch (err) {
         showError('Network error — please check your connection.');
       } finally {

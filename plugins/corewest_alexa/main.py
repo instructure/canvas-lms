@@ -57,12 +57,19 @@ app.include_router(auth_router)
 # ---------------------------------------------------------------------------
 
 _LOGIN_PAGE = Path(__file__).parent / "auth" / "login_page.html"
+_DASHBOARD_PAGE = Path(__file__).parent / "auth" / "dashboard_page.html"
 
 
 @app.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page() -> HTMLResponse:
     """Serve the standalone HTML login form."""
     return HTMLResponse(content=_LOGIN_PAGE.read_text(encoding="utf-8"))
+
+
+@app.get("/alexa/dashboard.html", response_class=HTMLResponse, include_in_schema=False)
+async def dashboard_page() -> HTMLResponse:
+    """Serve the HTML dashboard UI (reads JWT from localStorage via fetch)."""
+    return HTMLResponse(content=_DASHBOARD_PAGE.read_text(encoding="utf-8"))
 
 
 # ---------------------------------------------------------------------------

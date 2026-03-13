@@ -10,6 +10,7 @@ from .dependencies import require_authenticated
 from .jwt_handler import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
+    create_refresh_token,
     verify_access_token,
     verify_refresh_token,
 )
@@ -84,8 +85,12 @@ async def login(
     token = create_access_token(
         user_id=user.id, username=user.username, role=user.role
     )
+    refresh = create_refresh_token(
+        user_id=user.id, username=user.username, role=user.role
+    )
     return LoginResponse(
         access_token=token,
+        refresh_token=refresh,
         token_type="bearer",
         expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         username=user.username,
@@ -207,7 +212,7 @@ async def register(
 
 @router.post("/refresh", response_model=LoginResponse)
 async def refresh_token(body: RefreshRequest) -> LoginResponse:
-    """Exchange a refresh token for a new access token."""
+    """Exchange a refresh token for a new access + refresh token pair (rotation)."""
     token_data = verify_refresh_token(body.refresh_token)
     if token_data is None:
         raise HTTPException(
@@ -222,11 +227,15 @@ async def refresh_token(body: RefreshRequest) -> LoginResponse:
             detail="User not found or inactive.",
         )
 
-    new_token = create_access_token(
+    new_access = create_access_token(
+        user_id=user.id, username=user.username, role=user.role
+    )
+    new_refresh = create_refresh_token(
         user_id=user.id, username=user.username, role=user.role
     )
     return LoginResponse(
-        access_token=new_token,
+        access_token=new_access,
+        refresh_token=new_refresh,
         token_type="bearer",
         expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         username=user.username,

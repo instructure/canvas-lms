@@ -12,7 +12,13 @@ from .schemas import TokenData
 # Configuration (overridable via environment variables)
 # ---------------------------------------------------------------------------
 
-SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "change-me-in-production")
+SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "")
+if not SECRET_KEY:
+    raise RuntimeError(
+        "JWT_SECRET_KEY environment variable is required but not set. "
+        "Generate a strong secret (e.g. `openssl rand -hex 32`) and set it "
+        "before starting the application."
+    )
 ALGORITHM: str = os.environ.get("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
     os.environ.get("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30")

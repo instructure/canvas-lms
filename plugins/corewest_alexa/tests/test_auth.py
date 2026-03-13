@@ -263,12 +263,118 @@ class TestLogout:
     def test_logout_invalidates_token(self, client, admin_user):
         token = _login(client, "admin", "Admin1234!").json()["access_token"]
         client.post("/auth/logout", headers=_auth_header(token))
-        # Token should now be blacklisted — but the blacklist only works
-        # for the /auth/* routes that explicitly check it (register).
-        # Verify the token is blacklisted in the module.
         from auth.blacklist import is_blacklisted
 
         assert is_blacklisted(token)
+
+    def test_revoked_token_rejected_by_protected_endpoint(self, client, admin_user):
+        token = _login(client, "admin", "Admin1234!").json()["access_token"]
+        client.post("/auth/logout", headers=_auth_header(token))
+        # The blacklisted token must now be rejected on every protected endpoint
+        r = client.get("/auth/me", headers=_auth_header(token))
+        assert r.status_code == 401
+
+    def test_revoked_token_rejected_by_dashboard(self, client, admin_user):
+        token = _login(client, "admin", "Admin1234!").json()["access_token"]
+        client.post("/auth/logout", headers=_auth_header(token))
+        r = client.get("/alexa/dashboard", headers=_auth_header(token))
+        assert r.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# Refresh token
+# ---------------------------------------------------------------------------
+
+
+class TestRefreshToken:
+    def test_login_returns_refresh_token(self, client, admin_user):
+        data = _login(client, "admin", "Admin1234!").json()
+        assert "refresh_token" in data
+        assert data["refresh_token"]
+
+    def test_refresh_issues_new_access_token(self, client, admin_user):
+        login_data = _login(client, "admin", "Admin1234!").json()
+        r = client.post(
+            "/auth/refresh",
+            json={"refresh_token": login_data["refresh_token"]},
+        )
+        assert r.status_code == 200
+        data = r.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
+        assert data["token_type"] == "bearer"
+        assert data["username"] == "admin"
+
+    def test_refresh_new_access_token_is_usable(self, client, admin_user):
+        login_data = _login(client, "admin", "Admin1234!").json()
+        new_data = client.post(
+            "/auth/refresh",
+            json={"refresh_token": login_data["refresh_token"]},
+        ).json()
+        r = client.get("/auth/me", headers=_auth_header(new_data["access_token"]))
+        assert r.status_code == 200
+        assert r.json()["username"] == "admin"
+
+    def test_refresh_with_invalid_token(self, client, admin_user):
+        r = client.post(
+            "/auth/refresh",
+            json={"refresh_token": "not.a.valid.token"},
+        )
+        assert r.status_code == 401
+
+    def test_refresh_with_access_token_rejected(self, client, admin_user):
+        """An access token must not be accepted as a refresh token."""
+        access_token = _login(client, "admin", "Admin1234!").json()["access_token"]
+        r = client.post(
+            "/auth/refresh",
+            json={"refresh_token": access_token},
+        )
+        assert r.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# Change password
+# ---------------------------------------------------------------------------
+
+
+class TestChangePassword:
+    def test_change_password_success(self, client, admin_user):
+        token = _login(client, "admin", "Admin1234!").json()["access_token"]
+        r = client.put(
+            "/auth/change-password",
+            headers=_auth_header(token),
+            json={"current_password": "Admin1234!", "new_password": "NewPass99!"},
+        )
+        assert r.status_code == 204
+        # Can log in with new password
+        assert _login(client, "admin", "NewPass99!").status_code == 200
+        # Old password rejected
+        assert _login(client, "admin", "Admin1234!").status_code == 401
+
+    def test_change_password_wrong_current(self, client, admin_user):
+        token = _login(client, "admin", "Admin1234!").json()["access_token"]
+        r = client.put(
+            "/auth/change-password",
+            headers=_auth_header(token),
+            json={"current_password": "WrongPass1!", "new_password": "NewPass99!"},
+        )
+        assert r.status_code == 400
+
+    def test_change_password_weak_new(self, client, admin_user):
+        token = _login(client, "admin", "Admin1234!").json()["access_token"]
+        r = client.put(
+            "/auth/change-password",
+            headers=_auth_header(token),
+            json={"current_password": "Admin1234!", "new_password": "weak"},
+        )
+        assert r.status_code == 422
+
+    def test_change_password_requires_auth(self, client, admin_user):
+        r = client.put(
+            "/auth/change-password",
+            json={"current_password": "Admin1234!", "new_password": "NewPass99!"},
+        )
+        assert r.status_code == 401
 
 
 # ---------------------------------------------------------------------------
@@ -341,5 +447,10 @@ class TestPublicEndpoints:
 
     def test_login_page(self, client):
         r = client.get("/login")
+        assert r.status_code == 200
+        assert "Core West College" in r.text
+
+    def test_dashboard_html_page_served(self, client):
+        r = client.get("/alexa/dashboard.html")
         assert r.status_code == 200
         assert "Core West College" in r.text

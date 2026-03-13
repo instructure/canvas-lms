@@ -3,6 +3,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from .blacklist import is_blacklisted
 from .jwt_handler import verify_access_token
 from .models import User
 from .schemas import TokenData
@@ -27,6 +28,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     )
 
     if not token:
+        raise credentials_exception
+
+    # Reject tokens that have been explicitly revoked (logout)
+    if is_blacklisted(token):
         raise credentials_exception
 
     token_data: TokenData | None = verify_access_token(token)
