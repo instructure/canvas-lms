@@ -77,6 +77,7 @@ class GradeService
     rubric_data.map do |criterion|
       {
         name: criterion[:description],
+        useRange: criterion[:criterion_use_range],
         criteria: (criterion[:ratings] || []).map do |rating|
           {
             points: rating[:points],
@@ -106,7 +107,7 @@ class GradeService
         "rating" => {
           "id" => matched_rating[:id],
           "description" => result.criterion,
-          "rating" => matched_rating[:points],
+          "rating" => (criterion_data[:criterion_use_range] && result.points) ? result.points : matched_rating[:points],
           "reasoning" => result.reasoning
         },
         # NEW: inline guidance from gradeEssay
