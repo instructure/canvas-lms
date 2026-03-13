@@ -2060,6 +2060,21 @@ describe ExternalToolsController do
         end
       end
 
+      context "when submission URL contains session params" do
+        let(:submission_url) { "#{quiz_lti_tool.url}?participant_session_id=85&quiz_session_id=53" }
+
+        it "forwards participant_session_id and quiz_session_id in redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: submission_url,
+            assignment_id: assignment.id,
+            display: "borderless"
+          }
+          launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+          expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&content_only=true&display=borderless&participant_session_id=85&quiz_session_id=53&sessionless_launch=true&url=#{CGI.escape(submission_url)}")
+        end
+      end
+
       context "when native experience sessionless is disabled" do
         before do
           @course.disable_feature!(:new_quizzes_native_experience_sessionless)
