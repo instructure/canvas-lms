@@ -285,6 +285,8 @@ class Course < ActiveRecord::Base
 
   has_many :progresses, as: :context, inverse_of: :context
   has_many :gradebook_csvs, inverse_of: :course, class_name: "GradebookCSV"
+  has_many :institutional_tag_associations
+  has_many :institutional_tags, through: :institutional_tag_associations
 
   has_many :master_course_templates, class_name: "MasterCourses::MasterTemplate"
   # only valid if non-nil
