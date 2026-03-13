@@ -18,7 +18,7 @@
 
 require_relative "../../app/services/grade_service"
 
-GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance)
+GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, :points)
 
 RSpec.describe GradeService do
   # Test data setup
@@ -207,6 +207,31 @@ RSpec.describe GradeService do
       end
     end
 
+    [true, false, nil].each do |use_range|
+      it "passes useRange: #{use_range.inspect} to CedarClient when criterion_use_range is #{use_range.inspect}" do
+        single_criterion_rubric = [
+          {
+            id: "criteria_1",
+            description: "Content",
+            criterion_use_range: use_range,
+            ratings: [{ id: "rating_1", long_description: "Meets requirements", points: 3 }],
+            points: 4
+          }
+        ]
+        expect(CedarClient).to receive(:grade_essay).with(
+          hash_including(rubric: [hash_including(useRange: use_range)])
+        ).and_return([])
+
+        described_class.new(
+          assignment:,
+          essay:,
+          rubric: single_criterion_rubric,
+          root_account_uuid: "mock-root",
+          current_user:
+        ).call
+      end
+    end
+
     context "when rubric matches default template" do
       let(:default_rubric) do
         [
@@ -331,6 +356,35 @@ RSpec.describe GradeService do
 
       expect(result.length).to eq(1)
       expect(result.first["rating"]["description"]).to eq("Meets requirements")
+    end
+
+    # criterion_use_range + result.points combinations
+    [
+      [true, 2.5, 2.5],   # range enabled, points present → use result.points
+      [true, nil, 3],     # range enabled, points nil → fall back to rating points
+      [false, 2.5, 3],    # range disabled → always use rating points
+      [nil, 2.5, 3]       # range absent → always use rating points
+    ].each do |use_range, result_points, expected_rating|
+      it "returns rating=#{expected_rating} when criterion_use_range=#{use_range.inspect} and result.points=#{result_points.inspect}" do
+        rubric_with_range = [
+          {
+            id: "criteria_1",
+            description: "Content",
+            criterion_use_range: use_range,
+            ratings: [{ id: "rating_1", long_description: "Meets requirements", points: 3 }]
+          }
+        ]
+        result_obj = GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Good content",
+          criterion: "Meets requirements",
+          guidance: "Add more details.",
+          points: result_points
+        )
+
+        result = service.send(:map_grade_essay_results_to_canvas, [result_obj], rubric_with_range)
+        expect(result.first["rating"]["rating"]).to eq(expected_rating)
+      end
     end
 
     # Test handling of completely invalid responses
