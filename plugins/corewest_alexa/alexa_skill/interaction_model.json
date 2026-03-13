@@ -1,0 +1,93 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "core west",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "TodayBriefIntent",
+          "slots": [],
+          "samples": [
+            "today's brief",
+            "what's happening today",
+            "give me today's summary",
+            "today's report",
+            "daily brief",
+            "today update"
+          ]
+        },
+        {
+          "name": "InspectionIntent",
+          "slots": [],
+          "samples": [
+            "inspection summary",
+            "inspection readiness",
+            "how ready are we for inspection",
+            "inspection brief",
+            "inspection status",
+            "what is the inspection readiness"
+          ]
+        },
+        {
+          "name": "TeacherSummaryIntent",
+          "slots": [],
+          "samples": [
+            "teacher summary",
+            "teacher brief",
+            "how are the teachers doing",
+            "teacher report",
+            "tell me about the teachers",
+            "teacher status"
+          ]
+        },
+        {
+          "name": "StudentRiskIntent",
+          "slots": [],
+          "samples": [
+            "student risk summary",
+            "at risk students",
+            "how many students are at risk",
+            "student risk brief",
+            "tell me about at risk students",
+            "student safeguarding summary"
+          ]
+        },
+        {
+          "name": "TasksSummaryIntent",
+          "slots": [],
+          "samples": [
+            "tasks summary",
+            "open tasks",
+            "what tasks are open",
+            "task status",
+            "how many open tasks are there",
+            "tasks brief"
+          ]
+        },
+        {
+          "name": "IncidentsSummaryIntent",
+          "slots": [],
+          "samples": [
+            "incidents summary",
+            "unresolved incidents",
+            "how many incidents are there",
+            "incident brief",
+            "tell me about incidents",
+            "incident status"
+          ]
+        }
+      ]
+    }
+  }
+}

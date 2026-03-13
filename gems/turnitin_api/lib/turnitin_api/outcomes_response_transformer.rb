@@ -22,6 +22,7 @@ require "inst_statsd"
 require "active_support/core_ext/string/filters"
 require "faraday/follow_redirects"
 require "faraday/multipart"
+require "uri"
 
 module TurnitinApi
   class OutcomesResponseTransformer
@@ -32,6 +33,16 @@ module TurnitinApi
     attr_accessor :outcomes_response_json, :key, :lti_params
 
     class InvalidResponse < StandardError; end
+    class InvalidUrlError < StandardError; end
+
+    # Allowed hostnames for outbound Turnitin API requests.
+    # Restrict to only known Turnitin domains to prevent SSRF.
+    ALLOWED_HOSTS = %w[
+      turnitin.com
+      api.turnitin.com
+      www.turnitin.com
+      submittedwork.turnitin.com
+    ].freeze
 
     KNOWN_ERROR_MESSAGES = {
       api_login_failed: 'API Login failed: "oauth_signature" incorrect credentials and/or signature calculation',
@@ -89,17 +100,58 @@ module TurnitinApi
 
     private
 
+    # Validates that the URL is an absolute HTTPS URL pointing to an
+    # allowed Turnitin host, preventing Server-Side Request Forgery (SSRF).
+    def validate_url!(url)
+      uri = URI.parse(url.to_s)
+
+      unless uri.scheme == "https"
+        raise InvalidUrlError, "URL must use HTTPS: #{url.inspect}"
+      end
+
+      host = uri.host.to_s.downcase
+      unless ALLOWED_HOSTS.any? { |allowed| host == allowed || host.end_with?(".#{allowed}") }
+        raise InvalidUrlError, "URL host '#{host}' is not in the list of allowed Turnitin hosts"
+      end
+    rescue URI::InvalidURIError => e
+      raise InvalidUrlError, "Invalid URL: #{e.message}"
+    end
+
     def connection
       @connection ||= Faraday.new do |conn|
         conn.request :multipart
         conn.request :url_encoded
         conn.response :json, preserve_raw: true
-        conn.response :follow_redirects
+        conn.response :follow_redirects, callback: ->(_, new_env) { validate_url!(new_env[:url].to_s) }
         conn.adapter :net_http
       end
     end
 
+    def validate_turnitin_url!(raw_url)
+      uri = URI.parse(raw_url.to_s)
+
+      # Require an absolute HTTPS URL.
+      unless uri.is_a?(URI::HTTP) && uri.host && uri.scheme == "https"
+        raise InvalidResponse, "Invalid launch URL: #{raw_url.inspect}"
+      end
+
+      host = uri.host.downcase
+
+      # Only allow known Turnitin domains. Adjust this list if other
+      # official Turnitin domains are used in your deployment.
+      allowed_suffixes = [".turnitin.com", ".turnitinuk.com"]
+      unless allowed_suffixes.any? { |suffix| host == suffix.delete_prefix(".") || host.end_with?(suffix) }
+        raise InvalidResponse, "Launch URL host not allowed: #{host.inspect}"
+      end
+
+      uri.to_s
+    rescue URI::InvalidURIError
+      raise InvalidResponse, "Malformed launch URL: #{raw_url.inspect}"
+    end
+
     def make_call(url)
+      validate_url!(url)  # SSRF guard: reject non-allowlisted hosts
+
       default_params = {
         "roles" => "Learner",
         "lti_message_type" => "basic-lti-launch-request",
@@ -108,12 +160,12 @@ module TurnitinApi
       }
       params = default_params.merge(lti_params)
       header = SimpleOAuth::Header.new(:post,
-                                       url,
+                                       safe_url,
                                        params,
                                        consumer_key: @key,
                                        consumer_secret: @secret,
                                        callback: "about:blank")
-      connection.post url, params.merge(header.signed_attributes)
+      connection.post safe_url, params.merge(header.signed_attributes)
     end
   end
 end

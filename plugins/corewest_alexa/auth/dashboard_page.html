@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Core West College AI LMS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a1628;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #0d1f3c;
+      border-bottom: 3px solid #c8a84b;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #c8a84b;
+      letter-spacing: 0.5px;
+    }
+
+    .logo span { color: #e8e8e8; font-weight: 400; }
+
+    #user-info {
+      font-size: 0.9rem;
+      color: #a0aec0;
+    }
+
+    #user-info strong { color: #c8a84b; }
+
+    #logout-btn {
+      margin-left: 1.2rem;
+      background: transparent;
+      border: 1px solid #c8a84b;
+      color: #c8a84b;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #logout-btn:hover { background: #c8a84b; color: #0a1628; }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 1.6rem; color: #c8a84b; margin-bottom: 0.5rem; }
+    p.subtitle { color: #718096; margin-bottom: 2rem; font-size: 0.95rem; }
+
+    .card {
+      background: #0d1f3c;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 { font-size: 1rem; color: #c8a84b; margin-bottom: 1rem; }
+
+    #api-result {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #68d391;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    #error-msg {
+      color: #fc8181;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #4a5568;
+      font-size: 0.8rem;
+      border-top: 1px solid #1e3a5f;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Core West College <span>AI LMS</span></div>
+    <div id="user-info">
+      Signed in as <strong id="username-display">…</strong>
+      (<span id="role-display">…</span>)
+      <button id="logout-btn">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Alexa Dashboard</h1>
+    <p class="subtitle">Plugin status and live data for the Alexa integration.</p>
+
+    <div class="card">
+      <h2>Server status</h2>
+      <div id="api-result">Loading…</div>
+      <div id="error-msg"></div>
+    </div>
+  </main>
+
+  <footer>&copy; 2024 Core West College. All rights reserved.</footer>
+
+  <script>
+    (async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      // Decode username/role from the stored token (no verification — just
+      // display; the server enforces auth on every API call).
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        document.getElementById('username-display').textContent = payload.username || '?';
+        document.getElementById('role-display').textContent     = payload.role     || '?';
+      } catch (_) { /* ignore decode errors */ }
+
+      // Fetch the protected dashboard endpoint
+      try {
+        const res = await fetch('/alexa/dashboard', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          localStorage.removeItem('access_token');
+          window.location.href = '/login';
+          return;
+        }
+
+        const data = await res.json();
+        document.getElementById('api-result').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('error-msg').textContent =
+          'Network error — could not reach the server.';
+        document.getElementById('api-result').textContent = '';
+      }
+    })();
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          await fetch('/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+        } catch (_) { /* best-effort */ }
+      }
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('token_type');
+      window.location.href = '/login';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core West College — Sign In</title>
+  <style>
+    /* -----------------------------------------------------------------------
+       Core West College brand: dark blue (#003366) and gold (#C9A84C)
+    ----------------------------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      width: 100%;
+      max-width: 420px;
+      padding: 2.5rem 2rem;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #003366;
+      color: #C9A84C;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+
+    .logo h1 {
+      color: #003366;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .logo p {
+      color: #666;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px solid #C9A84C;
+      margin: 1.5rem 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #003366;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #003366;
+    }
+
+    .field { margin-bottom: 1.25rem; }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.75rem;
+      background: #003366;
+      color: #C9A84C;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, color 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-login:hover { background: #00264d; }
+    .btn-login:disabled { background: #aaa; color: #eee; cursor: not-allowed; }
+
+    #error-msg {
+      display: none;
+      background: #ffeaea;
+      border: 1px solid #f88;
+      color: #c00;
+      border-radius: 6px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    #error-msg.visible { display: block; }
+
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #888;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-badge">CW</div>
+      <h1>Core West College</h1>
+      <p>AI LMS — Alexa Plugin Dashboard</p>
+    </div>
+
+    <hr class="divider" />
+
+    <div id="error-msg" role="alert"></div>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          autocomplete="username"
+          placeholder="Enter your username"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
+
+      <button class="btn-login" type="submit" id="submit-btn">Sign In</button>
+    </form>
+
+    <div class="footer">&copy; 2024 Core West College. All rights reserved.</div>
+  </div>
+
+  <script>
+    const form       = document.getElementById('login-form');
+    const errorMsg   = document.getElementById('error-msg');
+    const submitBtn  = document.getElementById('submit-btn');
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('visible');
+    }
+
+    function clearError() {
+      errorMsg.textContent = '';
+      errorMsg.classList.remove('visible');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        showError('Please enter your username and password.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in…';
+
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.detail || 'Login failed. Please try again.');
+          return;
+        }
+
+        // Persist token and redirect to the dashboard UI page
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('token_type',   data.token_type);
+        window.location.href = '/alexa/dashboard.html';
+      } catch (err) {
+        showError('Network error — please check your connection.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>
