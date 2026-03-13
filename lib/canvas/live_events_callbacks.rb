@@ -115,6 +115,8 @@ module Canvas::LiveEventsCallbacks
         Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)
       end
       Canvas::LiveEvents.course_updated(obj)
+    when DiscussionEntry
+      Canvas::LiveEvents.discussion_entry_updated(obj)
     when DiscussionTopic
       Canvas::LiveEvents.discussion_topic_updated(obj)
     when Enrollment
