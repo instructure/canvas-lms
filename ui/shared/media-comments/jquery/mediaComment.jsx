@@ -26,7 +26,7 @@ import htmlEscape from '@instructure/html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 import {Suspense, lazy} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Spinner} from '@instructure/ui-spinner'
 
 const MediaPlayer = lazy(() =>
@@ -237,8 +237,7 @@ const mediaCommentActions = {
       return getSourcesAndTracks(mediaCommentId, attachmentId).done(sourcesAndTracks => {
         if (sourcesAndTracks.sources.length) {
           if (ENV.FEATURES?.consolidated_media_player) {
-            const root = createRoot(holder[0])
-            root.render(
+            const root = render(
               <Suspense fallback={<Spinner renderTitle={I18n.t('Loading')} size="small" />}>
                 <CanvasStudioPlayer
                   media_id={id}
@@ -248,6 +247,7 @@ const mediaCommentActions = {
                   type={mediaType === 'audio' ? 'audio' : 'video'}
                 />
               </Suspense>,
+              holder[0],
             )
             holder.data('reactRoot', root)
             return
@@ -444,8 +444,7 @@ const mediaCommentActions = {
                 </div>
               )
 
-              const root = createRoot($dialog[0])
-              root.render(mediaPlayer)
+              const root = render(mediaPlayer, $dialog[0])
               $dialog.data('reactRoot', root)
             } else {
               $mediaTag.appendTo($dialog.html(''))
