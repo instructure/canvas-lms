@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -102,7 +102,6 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
       const self = this
       const userName = user.get('name')
       const mountPoint = document.getElementById('generate_activity_for_user_mount_point')
-      const root = createRoot(mountPoint)
 
       const closeModal = () => {
         root.unmount()
@@ -110,7 +109,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
         self.$el.find(`.roster_user_name[data-user-id=${id}]`).focus()
       }
 
-      root.render(
+      const root = render(
         <UserDateRangeSearch
           isOpen
           userName={userName}
@@ -123,6 +122,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
           }}
           onClose={() => closeModal()}
         />,
+        mountPoint,
       )
     } else {
       return this.$userIdField.val('')

@@ -17,14 +17,15 @@
 
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import MutationAuditLog from '../../react/MutationAuditLog'
 
 export default class GraphQLMutationContentView extends Backbone.View {
   render() {
     if (!this._reactRoot) {
-      this._reactRoot = createRoot(this.el)
+      this._reactRoot = render(<MutationAuditLog />, this.el)
+    } else {
+      rerender(this._reactRoot, <MutationAuditLog />)
     }
-    this._reactRoot.render(<MutationAuditLog />)
   }
 }
