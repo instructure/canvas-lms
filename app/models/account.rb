@@ -2295,7 +2295,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_DEVELOPER_KEYS, label: t("#account.tab_developer_keys", "Developer Keys"), css_class: "developer_keys", href: :account_developer_keys_path, account_id: root_account.id }
     end
 
-    if user && grants_right?(user, :view_analytics_hub)
+    if !root_account.site_admin? && user && grants_right?(user, :view_analytics_hub)
       tabs << { id: TAB_ANALYTICS_HUB, label: t("#account.tab_analytics_hub", "Analytics Hub"), css_class: "analytics_hub", href: :account_analytics_hub_path }
     end
 
