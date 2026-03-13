@@ -958,7 +958,6 @@ module Lti
       context "when the new_quizzes_separators feature flag is enabled for decimal separators" do
         before do
           allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(true)
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
         end
 
         it "has substitution for $Canvas.account.decimal_separator when sub account has setting" do
@@ -983,7 +982,6 @@ module Lti
       context "when the new_quizzes_separators feature flag is disabled for decimal separators" do
         before do
           allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(false)
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
         end
 
         it "does not expand $Canvas.account.decimal_separator" do
@@ -999,7 +997,6 @@ module Lti
       context "when the new_quizzes_separators feature flag is enabled for thousand separators" do
         before do
           allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(true)
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
         end
 
         it "has substitution for $Canvas.account.thousand_separator when sub account has setting" do
@@ -1024,7 +1021,6 @@ module Lti
       context "when the new_quizzes_separators feature flag is disabled for thousand separators" do
         before do
           allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(false)
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
         end
 
         it "does not expand $Canvas.account.thousand_separator" do
@@ -1069,7 +1065,6 @@ module Lti
       context "custom_variables_booleans_as_strings feature flag" do
         context "when the ff is disabled and the output is a boolean it should be returned as a boolean" do
           before do
-            Account.site_admin.enable_feature! :disallow_null_custom_variables
             Account.site_admin.disable_feature! :custom_variables_booleans_as_strings
           end
 
@@ -1151,7 +1146,6 @@ module Lti
 
         context "when the ff is enabled and the output is a boolean it should be returned as a string" do
           before do
-            Account.site_admin.enable_feature! :disallow_null_custom_variables
             Account.site_admin.enable_feature! :custom_variables_booleans_as_strings
           end
 
