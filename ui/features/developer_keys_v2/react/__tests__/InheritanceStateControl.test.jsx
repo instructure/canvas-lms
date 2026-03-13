@@ -22,9 +22,28 @@ import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
 import {confirm as confirmDialog} from '@canvas/instui-bindings/react/Confirm'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import $ from 'jquery'
 
 vi.mock('@canvas/instui-bindings/react/Confirm')
+
+const server = setupServer(
+  http.post(
+    '/api/v1/accounts/:accountId/developer_keys/:keyId/developer_key_account_bindings',
+    async ({request}) => {
+      const body = await request.json()
+      return HttpResponse.json({
+        developer_key_id: 1,
+        workflow_state: body.developer_key_account_binding.workflow_state,
+      })
+    },
+  ),
+)
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 // Mock jQuery flash notification functions
 beforeEach(() => {
