@@ -3794,9 +3794,55 @@ describe AssignmentsController do
         user_session(@student)
       end
 
-      it "does not render A2 peer review student view" do
+      it "returns unauthorized status" do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "shows a custom error message about required feature flags" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:unauthorized_message]).to include("Canvas Administrator")
+        expect(assigns[:unauthorized_details]).to include("Assignment Enhancements - Student")
+        expect(assigns[:unauthorized_details].length).to eq(4)
+      end
+    end
+
+    context "when user has both student and teacher enrollments" do
+      before :once do
+        @dual_user = @student
+        teacher_in_course(course: @course, user: @dual_user, active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:assignments_2_student)
+      end
+
+      before do
+        user_session(@dual_user)
+      end
+
+      it "renders the A2 peer review student view when assigned to the assignment" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(layout: "layouts/application")
+      end
+
+      it "does not redirect to the allocation tray when assigned to the assignment" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).not_to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
+      end
+
+      it "shows unauthorized view instead of allocation tray when assignments_2_student is disabled" do
+        @course.disable_feature!(:assignments_2_student)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+        expect(assigns[:unauthorized_message]).to include("Canvas Administrator")
+      end
+
+      it "redirects to allocation tray when not assigned to the assignment" do
+        @assignment.update!(only_visible_to_overrides: true)
+        other_section = @course.course_sections.create!(name: "Other Section")
+        @assignment.assignment_overrides.create!(set: other_section)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
       end
     end
   end
