@@ -155,8 +155,7 @@ module Canvas::LiveEvents
       created_at: entry.created_at,
       discussion_entry_id: entry.id,
       discussion_topic_id: entry.discussion_topic_id,
-      text: LiveEvents.truncate(entry.message),
-      workflow_state: entry.workflow_state
+      text: LiveEvents.truncate(entry.message)
     }
 
     payload[:parent_discussion_entry_id] = entry.parent_id if entry.parent_id

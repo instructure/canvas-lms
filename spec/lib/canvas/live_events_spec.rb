@@ -1899,23 +1899,8 @@ describe Canvas::LiveEvents do
         created_at: entry.created_at,
         discussion_entry_id: entry.id.to_s,
         discussion_topic_id: entry.discussion_topic_id.to_s,
-        text: entry.message,
-        workflow_state: entry.workflow_state
+        text: entry.message
       }).once
-
-      Canvas::LiveEvents.discussion_entry_updated(entry)
-    end
-
-    it "includes workflow_state deleted when entry is soft deleted" do
-      course_with_student
-      topic = @course.discussion_topics.create!(title: "test title", message: "test body")
-      entry = topic.discussion_entries.create!(message: "<p>original</p>", user_id: @student.id)
-      entry.destroy
-
-      expect_event("discussion_entry_updated", hash_including(
-        discussion_entry_id: entry.id.to_s,
-        workflow_state: "deleted"
-      )).once
 
       Canvas::LiveEvents.discussion_entry_updated(entry)
     end
@@ -1953,8 +1938,7 @@ describe Canvas::LiveEvents do
                        created_at: entry.created_at,
                        discussion_entry_id: entry.id.to_s,
                        discussion_topic_id: entry.discussion_topic_id.to_s,
-                       text: entry.message,
-                       workflow_state: entry.workflow_state
+                       text: entry.message
                      }).once
 
         Canvas::LiveEvents.discussion_entry_submitted(entry, nil, nil)
@@ -1983,8 +1967,7 @@ describe Canvas::LiveEvents do
                        created_at: entry.created_at,
                        discussion_entry_id: entry.id.to_s,
                        discussion_topic_id: entry.discussion_topic_id.to_s,
-                       text: entry.message,
-                       workflow_state: entry.workflow_state
+                       text: entry.message
                      }).once
 
         Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.id, submission.id)
