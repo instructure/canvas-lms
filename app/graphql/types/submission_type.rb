@@ -169,22 +169,30 @@ module Types
       end
     end
 
-    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission"
+    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_submission_issues
       load_association(:course).then do |course|
         next nil unless course.feature_enabled?(:project_lhotse)
 
-        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).first
       end
     end
 
-    field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission"
+    field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_submission_errors
       load_association(:course).then do |course|
         next [] unless course.feature_enabled?(:project_lhotse)
 
-        issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
-        issues ? [issues[:message]] : []
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).pluck(:message)
+      end
+    end
+
+    field :auto_grade_eligibility, Types::AutoGradeEligibilityType, null: true, description: "Eligibility for auto-grading"
+    def auto_grade_eligibility
+      load_association(:course).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        { issues: GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:) }
       end
     end
 
