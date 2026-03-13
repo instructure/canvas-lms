@@ -127,6 +127,28 @@ module TurnitinApi
       end
     end
 
+    def validate_turnitin_url!(raw_url)
+      uri = URI.parse(raw_url.to_s)
+
+      # Require an absolute HTTPS URL.
+      unless uri.is_a?(URI::HTTP) && uri.host && uri.scheme == "https"
+        raise InvalidResponse, "Invalid launch URL: #{raw_url.inspect}"
+      end
+
+      host = uri.host.downcase
+
+      # Only allow known Turnitin domains. Adjust this list if other
+      # official Turnitin domains are used in your deployment.
+      allowed_suffixes = [".turnitin.com", ".turnitinuk.com"]
+      unless allowed_suffixes.any? { |suffix| host == suffix.delete_prefix(".") || host.end_with?(suffix) }
+        raise InvalidResponse, "Launch URL host not allowed: #{host.inspect}"
+      end
+
+      uri.to_s
+    rescue URI::InvalidURIError
+      raise InvalidResponse, "Malformed launch URL: #{raw_url.inspect}"
+    end
+
     def make_call(url)
       validate_url!(url)  # SSRF guard: reject non-allowlisted hosts
 
@@ -138,12 +160,12 @@ module TurnitinApi
       }
       params = default_params.merge(lti_params)
       header = SimpleOAuth::Header.new(:post,
-                                       url,
+                                       safe_url,
                                        params,
                                        consumer_key: @key,
                                        consumer_secret: @secret,
                                        callback: "about:blank")
-      connection.post url, params.merge(header.signed_attributes)
+      connection.post safe_url, params.merge(header.signed_attributes)
     end
   end
 end
