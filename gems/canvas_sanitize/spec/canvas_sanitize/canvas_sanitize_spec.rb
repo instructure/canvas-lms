@@ -160,6 +160,37 @@ describe CanvasSanitize do
     expect(res).not_to match(/foo/)
   end
 
+  describe "MathML Intent attributes for screen reader accessibility" do
+    it "preserves the intent attribute on mrow" do
+      str = %(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow intent="power($base, $exp)"><mi>x</mi><mn>2</mn></mrow></math>)
+      res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+      expect(res).to include('intent="power($base, $exp)"')
+    end
+
+    it "preserves the arg attribute on mi" do
+      str = %(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi arg="base">x</mi></mrow></math>)
+      res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+      expect(res).to include('arg="base"')
+    end
+
+    it "preserves intent and arg together for accessible math expressions" do
+      str = %(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow intent="power($base, $exp)"><mi arg="base">x</mi><mn arg="exp">2</mn></mrow></math>)
+      res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+      expect(res).to include('intent="power($base, $exp)"')
+      expect(res).to include('arg="base"')
+      expect(res).to include('arg="exp"')
+    end
+  end
+
+  describe "MathML layout attributes" do
+    it "preserves numalign on mfrac" do
+      str = %(<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac numalign="left" denomalign="right"><mn>1</mn><mn>2</mn></mfrac></math>)
+      res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+      expect(res).to include('numalign="left"')
+      expect(res).to include('denomalign="right"')
+    end
+  end
+
   it "removes and not escape contents of style tags" do
     str = %(<p><style>button { color: white !important; }</style>but not me</p>)
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
