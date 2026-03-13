@@ -138,6 +138,14 @@ module Canvas::LiveEvents
     post_event_stringified("discussion_entry_created", get_discussion_entry_data(entry))
   end
 
+  def self.discussion_entry_updated(entry)
+    post_event_stringified("discussion_entry_updated", get_discussion_entry_data(entry))
+  end
+
+  def self.discussion_entry_deleted(entry)
+    post_event_stringified("discussion_entry_deleted", get_discussion_entry_data(entry))
+  end
+
   def self.discussion_entry_submitted(entry, assignment_id, submission_id)
     payload = get_discussion_entry_data(entry)
     payload[:assignment_id] = assignment_id unless assignment_id.nil?

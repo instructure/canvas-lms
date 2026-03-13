@@ -248,6 +248,23 @@ describe LiveEventsObserver do
       discussion_topic_model(context: @course)
       @topic.discussion_entries.create!(message: "entry")
     end
+
+    it "posts update events" do
+      course_model
+      discussion_topic_model(context: @course)
+      entry = @topic.discussion_entries.create!(message: "entry")
+      expect(Canvas::LiveEvents).to receive(:discussion_entry_updated).once
+      entry.message = "edited"
+      entry.save
+    end
+
+    it "posts delete events when soft deleted" do
+      course_model
+      discussion_topic_model(context: @course)
+      entry = @topic.discussion_entries.create!(message: "entry")
+      expect(Canvas::LiveEvents).to receive(:discussion_entry_deleted).once
+      entry.destroy
+    end
   end
 
   describe "group" do
