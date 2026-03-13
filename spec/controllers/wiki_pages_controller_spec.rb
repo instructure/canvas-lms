@@ -197,6 +197,45 @@ describe WikiPagesController do
         it_behaves_like "pages enforcing differentiation"
       end
 
+      context "study_assist feature" do
+        before do
+          config = instance_double(CanvasCareer::Config)
+          allow(CanvasCareer::Config).to receive(:new).and_return(config)
+          allow(config).to receive(:public_app_config).and_return({ "hosts" => { "journey" => "http://journey.test" } })
+        end
+
+        context "when enabled" do
+          before { @course.enable_feature!(:study_assist) }
+
+          it "sets study_assist in FEATURES" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:FEATURES][:study_assist]).to be true
+          end
+
+          it "sets WIKI_PAGE_ID to the page url" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:WIKI_PAGE_ID]).to eq @page.url
+          end
+
+          it "sets JOURNEY_URL from CanvasCareer config" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+          end
+        end
+
+        context "when disabled" do
+          it "does not set WIKI_PAGE_ID" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :WIKI_PAGE_ID
+          end
+
+          it "does not set JOURNEY_URL" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :JOURNEY_URL
+          end
+        end
+      end
+
       context "permanent_page_links enabled" do
         before :once do
           Account.site_admin.enable_feature!(:permanent_page_links)

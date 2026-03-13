@@ -2949,6 +2949,13 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.1.1.tgz#10feedcc51bf0cf1597921efcc7041065b5ecc85"
   integrity sha512-9ICAUGylCpZtTvN2f8SZoZ+32L6+SxArYgGAuzW54F6fPPBiXZv4zUZna2N4ymAadOkaU312DUN9SBsr329oBA==
 
+"@instructure/platform-study-assist@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-study-assist/-/platform-study-assist-0.1.1.tgz#d8c63aa1b9b820bbd5456f38ddbfa622b721fb73"
+  integrity sha512-oIYwuo9w2+V0lAWQiiJgYCYtIMzRfc52W5NGmHfjmgkHDSTqlj4Qvb7zzF+4UtXqu9he5i6QZufMHAuVIXFrMQ==
+  dependencies:
+    uuid "^9.0.0"
+
 "@instructure/platform-widget-dashboard@0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@instructure/platform-widget-dashboard/-/platform-widget-dashboard-0.2.1.tgz#2daf3eb74f36e5915f0692b9bed41a5289ba14de"
@@ -24031,6 +24038,11 @@ uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+
+uuid@^9.0.0:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"
