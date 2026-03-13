@@ -2030,6 +2030,15 @@ describe Types::SubmissionType do
         expect(query_params[:resource_link_lookup_uuid]).to be_nil
         expect(preview_url).not_to include "resource_link_lookup_uuid"
       end
+
+      it "includes native experience sessionless override" do
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com"
+        )
+        expect(query_params[:new_quizzes_native_experience_sessionless]).to eq "false"
+      end
     end
 
     it "includes a 'version' query param that corresponds to the attempt number - 1 (and NOT the associated submission version number)" do

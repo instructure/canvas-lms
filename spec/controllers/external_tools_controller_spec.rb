@@ -2102,6 +2102,57 @@ describe ExternalToolsController do
           expect(response).not_to be_redirect
         end
       end
+
+      context "new_quizzes_native_experience_sessionless param" do
+        it "redirects when param is true" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: true
+          }
+          expect(response).to be_redirect
+        end
+
+        it "does not redirect when param is false" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: false
+          }
+          expect(response).not_to be_redirect
+        end
+
+        it "falls back to feature flag when param is an empty string" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: ""
+          }
+          expect(response).to be_redirect
+        end
+
+        it "falls back to feature flag when param is a random string" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: "foo"
+          }
+          expect(response).to be_redirect
+        end
+
+        it "falls back to feature flag when param is not provided" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id
+          }
+          expect(response).to be_redirect
+        end
+      end
     end
   end
 
