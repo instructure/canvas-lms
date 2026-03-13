@@ -202,8 +202,13 @@
   border-#{direction(left)}: 1px dashed $ic-border-dark;
 }
 
-.ag-header-controls .tooltip_link {
-  color: #3d454c;
+.ag-header-controls .pill {
+  display: flex;
+  align-items: center;
+
+  & button {
+    color: #3d454c;
+  }
 }
 
 .row-fluid span.grade-display {
