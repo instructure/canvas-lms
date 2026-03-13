@@ -53,8 +53,7 @@ describe "quizzes with draft state" do
 
       # verify tooltips
       driver.action.move_to(f(".ig-details .date-available a")).perform
-      wait_for_ajaximations
-      tooltip = fj(".ui-tooltip:visible")
+      tooltip = f("[role='tooltip']")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
 

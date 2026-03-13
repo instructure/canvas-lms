@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import DateAvailable from '@canvas/assignments/react/DateAvailable'
 import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
@@ -109,7 +109,6 @@ export default (AssignmentListItemView = (function () {
       this.child('publishIconView', '[data-view=publish-icon]')
       this.child('lockIconView', '[data-view=lock-icon]')
       this.child('dateDueColumnView', '[data-view=date-due]')
-      this.child('dateAvailableColumnView', '[data-view=date-available]')
       this.child('sisButtonView', '[data-view=sis-button]')
 
       this.prototype.els = {
@@ -196,7 +195,6 @@ export default (AssignmentListItemView = (function () {
       this.lockIconView = false
       this.sisButtonView = false
       this.editAssignmentView = false
-      this.dateAvailableColumnView = false
 
       if (this.canManage()) {
         this.publishIconView = new PublishIconView({
@@ -219,7 +217,6 @@ export default (AssignmentListItemView = (function () {
       this.initializeSisButton()
 
       this.dateDueColumnView = new DateDueColumnView({model: this.model})
-      return (this.dateAvailableColumnView = new DateAvailableColumnView({model: this.model}))
     }
 
     initializeSisButton() {
@@ -293,6 +290,36 @@ export default (AssignmentListItemView = (function () {
         .toggleClass('ig-published', this.view.model.get('published'))
     }
 
+    cleanupDateAvailableColumn() {
+      if (this._dateAvailableRoot) {
+        this._dateAvailableRoot.unmount()
+        this._dateAvailableRoot = null
+      }
+    }
+
+    renderDateAvailableColumn() {
+      const mountPoint = this.$el.find('[data-view=date-available]')[0]
+
+      if (!mountPoint) return
+
+      const group = this.model.defaultDates()
+      const data = this.model.toView()
+      const component = (
+        <DateAvailable
+          multipleDueDates={data.multipleDueDates}
+          allDates={this.model.allDates()}
+          defaultDates={group.toJSON()}
+          linkHref={this.model.htmlUrl()}
+        />
+      )
+
+      if (this._dateAvailableRoot) {
+        rerender(this._dateAvailableRoot, component)
+      } else {
+        this._dateAvailableRoot = render(component, mountPoint)
+      }
+    }
+
     cleanupPeerReviewInfo() {
       if (this.peerReviewInfoRoot) {
         this.peerReviewInfoRoot.unmount()
@@ -315,9 +342,7 @@ export default (AssignmentListItemView = (function () {
       if (this.dateDueColumnView) {
         this.dateDueColumnView.remove()
       }
-      if (this.dateAvailableColumnView) {
-        this.dateAvailableColumnView.remove()
-      }
+      this.cleanupDateAvailableColumn()
       this.cleanupPeerReviewInfo()
 
       super.render(...arguments)
@@ -330,12 +355,14 @@ export default (AssignmentListItemView = (function () {
     }
 
     remove() {
+      this.cleanupDateAvailableColumn()
       this.cleanupPeerReviewInfo()
       return super.remove()
     }
 
     afterRender() {
       this.createModuleToolTip()
+      this.renderDateAvailableColumn()
 
       const {attributes = {}} = this.model
       const {assessment_requests: assessmentRequests, checkpoints} = attributes

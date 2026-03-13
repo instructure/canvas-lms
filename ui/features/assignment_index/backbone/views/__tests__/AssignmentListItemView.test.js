@@ -240,7 +240,6 @@ describe('AssignmentListItemViewSpec', () => {
     const view = createView(assignment1(), {canManage: true})
     expect(view.publishIconView).toBeTruthy()
     expect(view.dateDueColumnView).toBeTruthy()
-    expect(view.dateAvailableColumnView).toBeTruthy()
   })
 
   test("initializes no child views if can't manage", () => {
@@ -754,32 +753,6 @@ describe('AssignmentListItemViewSpec', () => {
     vi.spyOn(model, 'pollUntilFinishedImporting').mockImplementation(() => {})
     const view = createView(model)
     expect(model.pollUntilFinishedImporting).toHaveBeenCalled()
-  })
-
-  test('shows availability for checkpoints', () => {
-    const model = buildAssignment({
-      id: 2,
-      title: 'test checkpoint',
-      workflow_state: 'published',
-      due_at: '2024-08-28T23:59:00-06:00',
-      lock_at: '2013-09-28T23:59:00-06:00',
-      unlock_at: '2013-07-28T23:59:00-06:00',
-      can_manage: true,
-      checkpoints: [
-        {
-          id: 2,
-          title: 'reply to topic',
-          tag: 'reply_to_topic',
-        },
-        {
-          id: 3,
-          title: 'reply to entry',
-          tag: 'reply_to_entry',
-        },
-      ],
-    })
-    const view = createView(model)
-    expect(view.dateAvailableColumnView).toBeTruthy()
   })
 })
 

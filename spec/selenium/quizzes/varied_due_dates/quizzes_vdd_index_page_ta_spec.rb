@@ -49,16 +49,16 @@ describe "viewing a quiz with variable due dates on the quizzes index page" do
     end
 
     it "shows the availability dates for Section A", priority: "2" do
-      validate_vdd_quiz_tooltip_dates(
+      validate_quiz_tooltip_dates(
         ".date-available",
-        "Everyone else\nAvailable until #{format_date_for_view(@lock_at_a, :short)}"
+        ["Everyone else", "Available until", format_date_for_view(@lock_at_a, :short).to_s]
       )
     end
 
     it "shows the availability dates for Section B", priority: "2" do
-      validate_vdd_quiz_tooltip_dates(
+      validate_quiz_tooltip_dates(
         ".date-available",
-        "#{@section_b.name}\nNot available until #{format_date_for_view(@unlock_at_b, :short)}"
+        [@section_b.name.to_s, "Not available until", format_date_for_view(@unlock_at_b, :short).to_s]
       )
     end
   end
