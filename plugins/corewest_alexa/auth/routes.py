@@ -1,5 +1,7 @@
 """Auth API endpoints."""
 
+from threading import Lock
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 
@@ -11,7 +13,7 @@ from .jwt_handler import (
     verify_access_token,
     verify_refresh_token,
 )
-from .models import User
+from .models import User, _store_lock, _load_users
 from .rate_limiter import check_rate_limit, reset_attempts
 from .schemas import (
     ChangePasswordRequest,
@@ -27,9 +29,13 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 _oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
+# Serialises all registration attempts so the "first-user" check and
+# creation happen atomically, eliminating the concurrent-registration race.
+_register_lock = Lock()
+
 
 # ---------------------------------------------------------------------------
-# Internal helpers (defined first so they can be used as Depends below)
+# Internal helpers
 # ---------------------------------------------------------------------------
 
 
@@ -43,53 +49,6 @@ def _to_response(user: User) -> UserResponse:
         created_at=user.created_at,
         last_login=user.last_login,
     )
-
-
-def _maybe_admin(
-    token: str = Depends(_oauth2_scheme),
-) -> "User | None":
-    """
-    Return the current admin user, **or** ``None`` if no users exist yet
-    (to allow the very first registration without authentication).
-    """
-    if not User.get_all():
-        return None  # first-user bootstrap — no auth required
-
-    # From here on we require a valid admin token
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required to register new users.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    token_data = verify_access_token(token)
-    if token_data is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token.",
-        )
-
-    if is_blacklisted(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has been revoked.",
-        )
-
-    user = User.get_by_id(token_data.sub)
-    if user is None or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found or inactive.",
-        )
-
-    if user.role != User.ROLE_ADMIN:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required to register new users.",
-        )
-
-    return user
 
 
 # ---------------------------------------------------------------------------
@@ -146,7 +105,7 @@ async def login(
 )
 async def register(
     body: RegisterRequest,
-    current_user: User = Depends(_maybe_admin),
+    token: str = Depends(_oauth2_scheme),
 ) -> UserResponse:
     """
     Register a new user.
@@ -154,8 +113,12 @@ async def register(
     * If no users exist yet, the first registration is allowed without
       authentication and the new user automatically becomes ``admin``.
     * Subsequent registrations require an authenticated admin.
+
+    The auth check and user creation are performed under a single lock to
+    prevent concurrent first-user registrations from both passing the
+    unauthenticated gate.
     """
-    # Validate password strength
+    # Validate password strength before acquiring the lock (no I/O needed)
     if not validate_password_strength(body.password):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -165,28 +128,75 @@ async def register(
             ),
         )
 
-    if User.get_by_username(body.username):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already taken.",
-        )
-    if User.get_by_email(body.email):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered.",
-        )
+    with _register_lock:
+        # Hold the store lock for the entire check-and-create sequence so
+        # that no concurrent request can slip in between the emptiness check
+        # and the actual write.
+        with _store_lock:
+            existing_users = _load_users()
+            is_first_user = len(existing_users) == 0
 
-    role = body.role
-    if not User.get_all():
-        # First user always becomes admin
-        role = User.ROLE_ADMIN
+            if not is_first_user:
+                # Require a valid admin token for all subsequent registrations
+                if not token:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Authentication required to register new users.",
+                        headers={"WWW-Authenticate": "Bearer"},
+                    )
+                token_data = verify_access_token(token)
+                if token_data is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid or expired token.",
+                    )
+                if is_blacklisted(token):
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Token has been revoked.",
+                    )
+                # Look up the admin directly from the already-loaded list
+                # to avoid re-acquiring _store_lock (deadlock prevention).
+                admin_dict = next(
+                    (d for d in existing_users if d["id"] == token_data.sub),
+                    None,
+                )
+                if admin_dict is None or not admin_dict.get("is_active", True):
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="User not found or inactive.",
+                    )
+                if admin_dict.get("role") != User.ROLE_ADMIN:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Admin access required to register new users.",
+                    )
 
-    user = User.create(
-        username=body.username,
-        email=body.email,
-        plain_password=body.password,
-        role=role,
-    )
+            # Uniqueness checks inside the lock so they are consistent
+            usernames = {d["username"].lower() for d in existing_users}
+            emails = {d["email"].lower() for d in existing_users}
+
+            if body.username.lower() in usernames:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Username already taken.",
+                )
+            if body.email.lower() in emails:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Email already registered.",
+                )
+
+            # First user is always admin regardless of requested role
+            role = User.ROLE_ADMIN if is_first_user else body.role
+
+            user = User.create_locked(
+                username=body.username,
+                email=body.email,
+                plain_password=body.password,
+                role=role,
+            )
+
     return _to_response(user)
 
 

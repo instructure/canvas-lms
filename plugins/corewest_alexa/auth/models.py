@@ -1,10 +1,11 @@
 """User model with JSON file-based storage."""
 
 import json
-import os
+import tempfile
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from threading import Lock
 from typing import Optional
 
 from .utils import hash_password, verify_password
@@ -12,19 +13,38 @@ from .utils import hash_password, verify_password
 # Path to the JSON user store (relative to this file)
 _USERS_FILE = Path(__file__).parent / "users.json"
 
+# Protects all read/write access to _USERS_FILE within this process
+_store_lock = Lock()
+
 
 def _load_users() -> list[dict]:
-    """Load users from the JSON store."""
+    """Load users from the JSON store (must be called under _store_lock)."""
     if not _USERS_FILE.exists():
         return []
-    with _USERS_FILE.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with _USERS_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(
+            f"User store '{_USERS_FILE}' is corrupted: {exc}"
+        ) from exc
 
 
 def _save_users(users: list[dict]) -> None:
-    """Persist users to the JSON store."""
-    with _USERS_FILE.open("w", encoding="utf-8") as f:
-        json.dump(users, f, indent=2, default=str)
+    """Atomically persist users to the JSON store (must be called under _store_lock)."""
+    parent = _USERS_FILE.parent
+    parent.mkdir(parents=True, exist_ok=True)
+    # Write to a temp file in the same directory then rename for atomicity
+    with tempfile.NamedTemporaryFile(
+        "w",
+        dir=parent,
+        delete=False,
+        encoding="utf-8",
+        suffix=".tmp",
+    ) as tmp:
+        json.dump(users, tmp, indent=2, default=str)
+        tmp_path = Path(tmp.name)
+    tmp_path.replace(_USERS_FILE)
 
 
 class User:
@@ -101,45 +121,51 @@ class User:
 
     @classmethod
     def get_all(cls) -> list["User"]:
-        return [cls.from_dict(d) for d in _load_users()]
+        with _store_lock:
+            return [cls.from_dict(d) for d in _load_users()]
 
     @classmethod
     def get_by_id(cls, user_id: str) -> Optional["User"]:
-        for d in _load_users():
-            if d["id"] == user_id:
-                return cls.from_dict(d)
+        with _store_lock:
+            for d in _load_users():
+                if d["id"] == user_id:
+                    return cls.from_dict(d)
         return None
 
     @classmethod
     def get_by_username(cls, username: str) -> Optional["User"]:
-        for d in _load_users():
-            if d["username"].lower() == username.lower():
-                return cls.from_dict(d)
+        with _store_lock:
+            for d in _load_users():
+                if d["username"].lower() == username.lower():
+                    return cls.from_dict(d)
         return None
 
     @classmethod
     def get_by_email(cls, email: str) -> Optional["User"]:
-        for d in _load_users():
-            if d["email"].lower() == email.lower():
-                return cls.from_dict(d)
+        with _store_lock:
+            for d in _load_users():
+                if d["email"].lower() == email.lower():
+                    return cls.from_dict(d)
         return None
 
     def save(self) -> None:
         """Insert or update this user in the JSON store."""
-        users = _load_users()
-        for i, d in enumerate(users):
-            if d["id"] == self.id:
-                users[i] = self.to_dict()
-                _save_users(users)
-                return
-        # New user
-        users.append(self.to_dict())
-        _save_users(users)
+        with _store_lock:
+            users = _load_users()
+            for i, d in enumerate(users):
+                if d["id"] == self.id:
+                    users[i] = self.to_dict()
+                    _save_users(users)
+                    return
+            # New user
+            users.append(self.to_dict())
+            _save_users(users)
 
     def delete(self) -> None:
         """Remove this user from the JSON store."""
-        users = [d for d in _load_users() if d["id"] != self.id]
-        _save_users(users)
+        with _store_lock:
+            users = [d for d in _load_users() if d["id"] != self.id]
+            _save_users(users)
 
     def touch_last_login(self) -> None:
         """Update last_login timestamp and persist."""
@@ -167,4 +193,29 @@ class User:
             role=role,
         )
         user.save()
+        return user
+
+    @classmethod
+    def create_locked(
+        cls,
+        username: str,
+        email: str,
+        plain_password: str,
+        role: str = ROLE_READONLY,
+    ) -> "User":
+        """
+        Create, persist and return a new User **while already holding
+        _store_lock**.  Use this inside ``with _store_lock`` blocks to
+        avoid a double-acquire deadlock.
+        """
+        user = cls(
+            id=str(uuid.uuid4()),
+            username=username,
+            email=email,
+            hashed_password=hash_password(plain_password),
+            role=role,
+        )
+        users = _load_users()
+        users.append(user.to_dict())
+        _save_users(users)
         return user
