@@ -34,7 +34,10 @@ module Oak
       return true if root_account.feature_enabled?(:oak_for_teachers) &&
                      user.all_courses
                          .where(root_account:)
-                         .first&.grants_right?(user, :access_oak_teacher)
+                         .active
+                         .distinct
+                         .order(id: :desc)
+                         .any? { |course| course.grants_right?(user, :access_oak_teacher) }
 
       false
     end
