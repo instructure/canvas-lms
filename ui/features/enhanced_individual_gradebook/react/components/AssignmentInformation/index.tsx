@@ -62,13 +62,14 @@ export default function AssignmentInformation({
   submissions = [],
   handleSetGrades,
 }: AssignmentInformationComponentProps) {
-  const {gradedSubmissions, scores} = useMemo(
-    () => ({
-      gradedSubmissions: submissions.filter(s => s.score !== null && s.score !== undefined),
-      scores: submissions.map(s => s.score ?? 0),
-    }),
-    [submissions],
-  )
+  const {gradedSubmissions, scores} = useMemo(() => {
+    // Exclude ungraded (null/undefined score) submissions from score calculations
+    const gradedSubmissions = submissions.filter(s => s.score != null)
+    return {
+      gradedSubmissions,
+      scores: gradedSubmissions.map(s => s.score as number),
+    }
+  }, [submissions])
 
   if (!assignment) {
     return (
