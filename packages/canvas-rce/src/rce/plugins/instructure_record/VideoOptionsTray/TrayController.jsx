@@ -47,10 +47,10 @@ export const videoDefaultSize = () => {
   return VIDEO_SIZE_DEFAULT
 }
 
-function onStudioEmbedOptionChanged(editor) {
+function onStudioEmbedOptionChanged(editor, videoContainer) {
   return embedOptions => {
     if (validateStudioEmbedOptions(embedOptions)) {
-      updateStudioEmbedOptions(editor, embedOptions)
+      updateStudioEmbedOptions(editor, embedOptions, videoContainer)
     }
   }
 }
@@ -333,13 +333,9 @@ export default class TrayController {
         }}
         open={this._shouldOpen}
         trayProps={bridge.trayProps.get(this._editor)}
-        studioOptions={
-          this.isStudioVideo
-            ? parseStudioOptions(this.$videoContainer)
-            : null
-        }
+        studioOptions={this.isStudioVideo ? parseStudioOptions(this.$videoContainer) : null}
         requestSubtitlesFromIframe={this.requestSubtitlesFromIframe}
-        onStudioEmbedOptionChanged={onStudioEmbedOptionChanged(this._editor)}
+        onStudioEmbedOptionChanged={onStudioEmbedOptionChanged(this._editor, this.$videoContainer)}
         isLoading={!this._isPlayerReady}
       />
     )
