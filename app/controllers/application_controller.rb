@@ -565,7 +565,6 @@ class ApplicationController < ActionController::Base
     mobile_offline_mode
     modules_requirements_allow_percentage
     non_scoring_rubrics
-    open_tools_in_new_tab
     pendo_extended
     product_tours
     rce_asr_captioning_improvements
