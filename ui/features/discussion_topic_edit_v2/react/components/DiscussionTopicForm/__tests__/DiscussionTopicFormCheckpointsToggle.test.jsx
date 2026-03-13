@@ -17,6 +17,8 @@
  */
 
 import {setup, setupDefaultEnv} from './DiscussionTopicFormTestHelpers'
+import userEvent from '@testing-library/user-event'
+import {waitFor} from '@testing-library/react'
 
 vi.mock('@canvas/rce/react/CanvasRce')
 
@@ -33,25 +35,25 @@ describe('DiscussionTopicForm Checkpoints Toggle', () => {
     window.ENV = {}
   })
 
-  it(
-    'unchecks the checkpoints checkbox when graded is unchecked',
-    async () => {
-      const {getByTestId, getByLabelText, findByTestId} = setup()
+  it('unchecks the checkpoints checkbox when graded is unchecked', async () => {
+    const {getByLabelText, queryByTestId, findByTestId} = setup()
 
-      getByLabelText('Graded').click()
-      // Wait for the checkpoints checkbox to appear after graded is checked
-      const checkpointsCheckbox = await findByTestId('checkpoints-checkbox')
-      checkpointsCheckbox.querySelector('input').click()
-      expect(checkpointsCheckbox.querySelector('input').checked).toBe(true)
+    await userEvent.click(getByLabelText('Graded'))
+    // Wait for the checkpoints checkbox to appear after graded is checked
+    const checkpointsCheckbox = await findByTestId('checkpoints-checkbox')
+    await userEvent.click(checkpointsCheckbox.querySelector('input'))
+    expect(checkpointsCheckbox.querySelector('input').checked).toBe(true)
 
-      // 1st graded click will uncheck checkpoints. but it also hides from document.
-      // 2nd graded click will render checkpoints, notice its unchecked.
-      getByLabelText('Graded').click()
-      getByLabelText('Graded').click()
-      // Wait for the checkpoints checkbox to reappear
-      const recheckCheckbox = await findByTestId('checkpoints-checkbox')
-      expect(recheckCheckbox.querySelector('input').checked).toBe(false)
-    },
-    30000,
-  )
+    // 1st graded click will uncheck checkpoints. but it also hides from document.
+    await userEvent.click(getByLabelText('Graded'))
+    // Wait for the checkpoints checkbox to be removed before re-enabling graded
+    await waitFor(() => {
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+    // 2nd graded click will render checkpoints, notice its unchecked.
+    await userEvent.click(getByLabelText('Graded'))
+    // Wait for the checkpoints checkbox to reappear
+    const recheckCheckbox = await findByTestId('checkpoints-checkbox')
+    expect(recheckCheckbox.querySelector('input').checked).toBe(false)
+  }, 30000)
 })
