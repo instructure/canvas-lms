@@ -1,192 +1,116 @@
 """
-Core West Alexa API — FastAPI application entry point.
-
-Endpoints:
-  GET  /              — root / liveness probe
-  GET  /alexa/health  — detailed health check
-  GET  /alexa/query   — voice query (query param: type)
-  GET  /alexa/dashboard — JSON dashboard data
-  POST /alexa/webhook — Alexa skill webhook
+Core West College AI LMS — Alexa Plugin
+FastAPI application entry-point.
 """
 
-import logging
-import sys
+import os
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse
 
-from config import settings
-from data_aggregator import DataAggregator
+from auth.dependencies import require_authenticated, verify_api_key
+from auth.routes import router as auth_router
 
-# ---------------------------------------------------------------------------
-# Logging
-# ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.DEBUG if settings.debug else logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s — %(message)s",
-    stream=sys.stdout,
-)
-logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# App
-# ---------------------------------------------------------------------------
 app = FastAPI(
-    title="Core West Alexa API",
-    description=(
-        "Voice briefing API that bridges the Core West Command Center "
-        "with Amazon Alexa.  Powered by Canvas LMS data."
-    ),
+    title="Core West College — Alexa Plugin",
     version="1.0.0",
+    description="Alexa integration API for the Core West College AI LMS.",
 )
+
+# ---------------------------------------------------------------------------
+# CORS
+# ---------------------------------------------------------------------------
+
+cors_origins_env = os.environ.get("CORS_ORIGINS", "").strip()
+
+if cors_origins_env and cors_origins_env != "*":
+    # Explicit list of allowed origins; strip whitespace and drop empties
+    allow_origins = [
+        origin.strip()
+        for origin in cors_origins_env.split(",")
+        if origin.strip()
+    ]
+    allow_credentials = True
+else:
+    # Fallback to wildcard origins but disable credentials for safety
+    allow_origins = ["*"]
+    allow_credentials = False
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
-    allow_credentials=False if settings.allowed_origins == ["*"] else True,
+    allow_origins=allow_origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-aggregator = DataAggregator()
+# ---------------------------------------------------------------------------
+# Auth router
+# ---------------------------------------------------------------------------
 
-SUPPORTED_TYPES = ["inspection", "teachers", "students", "today", "tasks", "incidents"]
+app.include_router(auth_router)
+
+# ---------------------------------------------------------------------------
+# Login page (public)
+# ---------------------------------------------------------------------------
+
+_LOGIN_PAGE = Path(__file__).parent / "auth" / "login_page.html"
+_DASHBOARD_PAGE = Path(__file__).parent / "auth" / "dashboard_page.html"
+
+
+@app.get("/login", response_class=HTMLResponse, include_in_schema=False)
+async def login_page() -> HTMLResponse:
+    """Serve the standalone HTML login form."""
+    return HTMLResponse(content=_LOGIN_PAGE.read_text(encoding="utf-8"))
+
+
+@app.get("/alexa/dashboard.html", response_class=HTMLResponse, include_in_schema=False)
+async def dashboard_page() -> HTMLResponse:
+    """Serve the HTML dashboard UI (reads JWT from localStorage via fetch)."""
+    return HTMLResponse(content=_DASHBOARD_PAGE.read_text(encoding="utf-8"))
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Public endpoints
 # ---------------------------------------------------------------------------
-
-def _alexa_response(text: str, card_title: str = "Core West") -> dict:
-    """Build a standard Alexa response payload."""
-    return {
-        "version": "1.0",
-        "response": {
-            "outputSpeech": {"type": "PlainText", "text": text},
-            "card": {"type": "Simple", "title": card_title, "content": text},
-            "shouldEndSession": True,
-        },
-    }
-
-
-# ---------------------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------------------
-
-@app.get("/")
-def root():
-    """Liveness probe — confirms the service is running."""
-    return {"message": "Core West Alexa API is running"}
 
 
 @app.get("/alexa/health")
-def health():
-    """Detailed health check."""
-    return {
-        "status": "ok",
-        "canvas_api_url": settings.canvas_api_url,
-        "use_mock_data": settings.use_mock_data,
-        "debug": settings.debug,
-    }
+async def health() -> JSONResponse:
+    """Health-check — no authentication required."""
+    return JSONResponse({"status": "ok"})
 
 
 @app.get("/alexa/query")
-def alexa_query(
-    query_type: str = Query(
-        ...,
-        alias="type",
-        description=(
-            "Report type. One of: "
-            + ", ".join(SUPPORTED_TYPES)
-        ),
-    ),
-):
-    """Return a voice-friendly summary for the requested *type*."""
-    query_type = query_type.strip().lower()
-    summary = aggregator.get_summary(query_type)
-    if summary is None:
-        return {
-            "speech_text": "I could not understand the requested report type.",
-            "card_title": "Core West Alexa Error",
-            "card_text": (
-                "Supported types are "
-                + ", ".join(SUPPORTED_TYPES[:-1])
-                + ", and "
-                + SUPPORTED_TYPES[-1]
-                + "."
-            ),
-            "status": "error",
-        }
-    return {
-        "speech_text": summary,
-        "card_title": "Core West Brief",
-        "card_text": summary,
-        "status": "success",
-    }
+async def alexa_query(q: str = "") -> JSONResponse:
+    """Public query endpoint — no authentication required."""
+    return JSONResponse({"query": q, "response": "Query received."})
+
+
+# ---------------------------------------------------------------------------
+# Protected endpoints
+# ---------------------------------------------------------------------------
 
 
 @app.get("/alexa/dashboard")
-def alexa_dashboard():
-    """Return structured JSON data for the Core West command center dashboard."""
-    try:
-        data = aggregator.get_dashboard_data()
-        return {"status": "success", "data": data}
-    except Exception as exc:  # noqa: BLE001
-        logger.error("Dashboard data fetch failed: %s", exc)
-        raise HTTPException(status_code=502, detail="Failed to fetch dashboard data") from exc
+async def alexa_dashboard(
+    _user=Depends(require_authenticated),
+) -> JSONResponse:
+    """Dashboard — requires a valid JWT (any role)."""
+    return JSONResponse(
+        {
+            "message": f"Welcome, {_user.username}!",
+            "role": _user.role,
+        }
+    )
 
 
 @app.post("/alexa/webhook")
-async def alexa_webhook(request: Request):
-    """Handle incoming Alexa skill requests."""
-    try:
-        body = await request.json()
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Invalid JSON in webhook body: %s", exc)
-        raise HTTPException(status_code=400, detail="Invalid JSON body") from exc
-
-    request_type = body.get("request", {}).get("type")
-    logger.debug("Alexa webhook request_type=%s", request_type)
-
-    if request_type == "LaunchRequest":
-        return _alexa_response(
-            "Welcome to Core West. You can ask for today's brief, "
-            "inspection summary, teacher summary, or student risk summary.",
-            "Core West Welcome",
-        )
-
-    if request_type == "IntentRequest":
-        intent_name = body.get("request", {}).get("intent", {}).get("name")
-        logger.debug("IntentRequest intent_name=%s", intent_name)
-
-        intent_map = {
-            "TodayBriefIntent": ("today", "Core West Daily Brief"),
-            "InspectionIntent": ("inspection", "Core West Inspection Brief"),
-            "TeacherSummaryIntent": ("teachers", "Core West Teacher Brief"),
-            "StudentRiskIntent": ("students", "Core West Student Risk Brief"),
-            "TasksSummaryIntent": ("tasks", "Core West Tasks Brief"),
-            "IncidentsSummaryIntent": ("incidents", "Core West Incidents Brief"),
-        }
-
-        if intent_name in intent_map:
-            query_type, card_title = intent_map[intent_name]
-            text = aggregator.get_summary(query_type)
-            return _alexa_response(text, card_title)
-
-    return _alexa_response(
-        "Sorry, I didn't understand that request.", "Core West Error"
-    )
-
-
-# ---------------------------------------------------------------------------
-# Dev entry point
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=settings.debug,
-    )
+async def alexa_webhook(
+    payload: dict,
+    _key: str = Depends(verify_api_key),
+) -> JSONResponse:
+    """Alexa webhook — requires a valid X-API-Key header."""
+    return JSONResponse({"received": True, "payload": payload})

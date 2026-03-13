@@ -1,41 +1,114 @@
-# Core West Alexa Plugin
+# Core West College AI LMS — Alexa Plugin
 
-A lightweight FastAPI service that bridges the **Core West Command Center**
-with **Amazon Alexa**.  It reads live data from the Canvas LMS REST API and
-exposes Alexa-friendly voice summaries, a dashboard endpoint, and a webhook
-handler for Alexa skill requests.
+A FastAPI-based Alexa integration plugin for the Core West College AI LMS, with a
+**self-contained security and authentication layer**.
 
 ---
 
-## Architecture
+## Quick Start
+
+```bash
+cd plugins/corewest_alexa
+
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Set environment variables (see below)
+export JWT_SECRET_KEY="your-very-secret-key"
+export ALEXA_API_KEY="your-alexa-api-key"
+
+# 3. Create the first admin user
+python -m auth.seed
+
+# 4. Start the server
+uvicorn main:app --reload
+```
+
+Open `http://localhost:8000/login` to access the login UI.
+
+---
+
+## Security & Authentication
+
+### Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `JWT_SECRET_KEY` | `change-me-in-production` | **Required.** HS256 signing key for JWT tokens |
+| `JWT_ALGORITHM` | `HS256` | JWT signing algorithm |
+| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime (minutes) |
+| `JWT_REFRESH_TOKEN_EXPIRE_DAYS` | `7` | Refresh token lifetime (days) |
+| `ALEXA_API_KEY` | *(unset)* | **Required.** API key for Alexa webhook requests |
+| `RATE_LIMIT_MAX_ATTEMPTS` | `5` | Max login attempts per window |
+| `RATE_LIMIT_WINDOW_SECONDS` | `60` | Rate-limit rolling window (seconds) |
+| `CORS_ORIGINS` | `*` | Comma-separated allowed CORS origins |
+
+> ⚠️ **Always set `JWT_SECRET_KEY` and `ALEXA_API_KEY` in production.**
+
+---
+
+### Creating the First Admin User
+
+```bash
+python -m auth.seed
+```
+
+Default credentials (change immediately after first login):
+
+| Field | Value |
+|---|---|
+| Username | `admin` |
+| Password | `CoreWest2024!` |
+| Role | `admin` |
+
+---
+
+### Authentication Flow
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    Amazon Alexa Device                        │
-└────────────────────────┬─────────────────────────────────────┘
-                         │  HTTPS (Alexa Skill webhook)
-                         ▼
-┌──────────────────────────────────────────────────────────────┐
-│              Core West Alexa API  (FastAPI / Python)          │
-│                                                               │
-│   GET  /                  — liveness probe                    │
-│   GET  /alexa/health      — health check                      │
-│   GET  /alexa/query       — voice query by type               │
-│   GET  /alexa/dashboard   — JSON dashboard data               │
-│   POST /alexa/webhook     — Alexa skill webhook               │
-│                                                               │
-│   ┌─────────────────┐   ┌──────────────────────────────┐     │
-│   │ data_aggregator │──▶│      canvas_client.py         │     │
-│   │  (summaries)    │   │  (Canvas LMS REST API calls)  │     │
-│   └─────────────────┘   └──────────────┬───────────────┘     │
-└──────────────────────────────────────────────────────────────┘
-                                         │  REST API
-                                         ▼
-                           ┌─────────────────────────┐
-                           │   Canvas LMS (Rails)     │
-                           │   /api/v1/…              │
-                           └─────────────────────────┘
+Client                          API
+  │                              │
+  ├─── POST /auth/login ────────>│
+  │    { username, password }    │
+  │                              │── verify credentials
+  │                              │── check rate limit
+  │<── { access_token, ... } ───│
+  │                              │
+  ├─── GET /alexa/dashboard ────>│
+  │    Authorization: Bearer ... │── verify JWT
+  │<── { message, role } ───────│
+  │                              │
+  ├─── POST /alexa/webhook ─────>│
+  │    X-API-Key: ...            │── verify API key
+  │<── { received: true } ──────│
 ```
+
+---
+
+### Protected vs Public Endpoints
+
+| Endpoint | Method | Auth required | Notes |
+|---|---|---|---|
+| `/alexa/health` | GET | ❌ None | Health check |
+| `/alexa/query` | GET | ❌ None | Public query |
+| `/login` | GET | ❌ None | HTML login page |
+| `/auth/login` | POST | ❌ None | Returns JWT |
+| `/auth/register` | POST | ✅ Admin JWT (except first user) | Register user |
+| `/auth/refresh` | POST | ✅ Refresh token | Refresh access token |
+| `/auth/me` | GET | ✅ Any JWT | Current user info |
+| `/auth/logout` | POST | ✅ Any JWT | Blacklist token |
+| `/auth/change-password` | PUT | ✅ Any JWT | Change password |
+| `/alexa/dashboard` | GET | ✅ Any JWT | Dashboard (any role) |
+| `/alexa/webhook` | POST | ✅ X-API-Key | Alexa webhook |
+
+---
+
+### User Roles
+
+| Role | Dashboard | Webhook | Register users |
+|---|---|---|---|
+| `admin` | ✅ | ✅ | ✅ |
+| `readonly` | ✅ | ❌ | ❌ |
 
 ---
 
@@ -43,151 +116,25 @@ handler for Alexa skill requests.
 
 ```
 plugins/corewest_alexa/
-├── README.md                   ← this file
-├── requirements.txt            ← Python dependencies
-├── main.py                     ← FastAPI application
-├── canvas_client.py            ← Canvas LMS API client
-├── config.py                   ← Environment-based configuration
-├── data_aggregator.py          ← Voice-friendly data summaries
-├── Dockerfile                  ← Container for the service
-├── docker-compose.yml          ← Run alongside Canvas LMS
-├── tests/
+├── main.py                  # FastAPI application entry-point
+├── requirements.txt         # Python dependencies
+├── README.md
+├── auth/
 │   ├── __init__.py
-│   ├── test_main.py            ← API endpoint tests
-│   └── test_data_aggregator.py ← Data aggregation tests
-└── alexa_skill/
-    └── interaction_model.json  ← Alexa skill interaction model
+│   ├── api_key.py           # X-API-Key validation for Alexa webhook
+│   ├── blacklist.py         # In-memory JWT blacklist (logout)
+│   ├── dependencies.py      # FastAPI route-protection dependencies
+│   ├── jwt_handler.py       # JWT creation & verification (python-jose)
+│   ├── login_page.html      # Standalone HTML/CSS/JS login form
+│   ├── models.py            # User model with JSON file storage
+│   ├── rate_limiter.py      # Brute-force protection (5 req/min/IP)
+│   ├── routes.py            # /auth/* endpoints
+│   ├── schemas.py           # Pydantic request/response models
+│   ├── seed.py              # Create default admin user
+│   └── utils.py             # bcrypt password hashing & validation
+└── tests/
+    └── test_auth.py         # pytest test suite
 ```
-
----
-
-## Quick Start
-
-### 1. Install Dependencies
-
-```bash
-cd plugins/corewest_alexa
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CANVAS_API_URL` | `http://localhost:3000` | Base URL of the Canvas LMS instance |
-| `CANVAS_API_TOKEN` | *(empty)* | Canvas API bearer token |
-| `CACHE_TTL_SECONDS` | `300` | How long to cache Canvas responses |
-| `DEBUG` | `false` | Enable debug logging and auto-reload |
-| `HOST` | `0.0.0.0` | Bind address |
-| `PORT` | `8000` | Bind port |
-| `ALLOWED_ORIGINS` | `*` | Comma-separated CORS allowed origins |
-| `USE_MOCK_DATA` | `true` | Use hardcoded mock data (no Canvas required) |
-
-Copy the example and edit as needed:
-
-```bash
-cp .env.example .env   # create your own .env file
-```
-
-### 3. Run the Service
-
-```bash
-uvicorn main:app --reload
-# or
-python main.py
-```
-
-### 4. Run with Docker
-
-```bash
-docker compose up --build
-```
-
----
-
-## API Endpoints
-
-### `GET /`
-Liveness probe.
-
-```json
-{"message": "Core West Alexa API is running"}
-```
-
-### `GET /alexa/health`
-Detailed health check.
-
-```json
-{"status": "ok", "canvas_api_url": "http://localhost:3000", "use_mock_data": true, "debug": false}
-```
-
-### `GET /alexa/query?type=<type>`
-Returns a voice-friendly summary for the given type.
-
-**Supported types:** `inspection`, `teachers`, `students`, `today`, `tasks`, `incidents`
-
-```bash
-curl "http://localhost:8000/alexa/query?type=today"
-```
-
-```json
-{
-  "speech_text": "Today, inspection readiness is 78 percent. There are 5 open tasks...",
-  "card_title": "Core West Brief",
-  "card_text": "...",
-  "status": "success"
-}
-```
-
-### `GET /alexa/dashboard`
-Returns structured JSON for a command center dashboard.
-
-```json
-{
-  "status": "success",
-  "data": {
-    "courses": {"total_active": 12},
-    "teachers": {"total": 24, "priority_followup": 3, "avg_quality_score": 3.1},
-    "students": {"total": 320, "high_risk": 11, "low_attendance": 18, "safeguarding_flags": 2},
-    "tasks": {"open": 5},
-    "incidents": {"unresolved": 2},
-    "inspection": {"readiness_percent": 78}
-  }
-}
-```
-
-### `POST /alexa/webhook`
-Handles Alexa skill requests.  Expects a standard Alexa request JSON body.
-
-**Supported intents:**
-- `TodayBriefIntent` — daily summary
-- `InspectionIntent` — inspection readiness
-- `TeacherSummaryIntent` — teacher metrics
-- `StudentRiskIntent` — at-risk student summary
-- `TasksSummaryIntent` — open tasks
-- `IncidentsSummaryIntent` — unresolved incidents
-
----
-
-## Example Alexa Queries
-
-> "Alexa, ask Core West for today's brief."
-
-> "Alexa, ask Core West for the inspection summary."
-
-> "Alexa, ask Core West how many students are at risk."
-
-> "Alexa, ask Core West about open tasks."
-
----
-
-## Alexa Skill Setup
-
-1. Log in to the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask).
-2. Create a new custom skill with invocation name **"core west"**.
-3. Import `alexa_skill/interaction_model.json` as the interaction model.
-4. Set the endpoint to your deployed service URL: `https://<your-domain>/alexa/webhook`.
-5. Build and test the skill.
 
 ---
 
@@ -197,33 +144,4 @@ Handles Alexa skill requests.  Expects a standard Alexa request JSON body.
 cd plugins/corewest_alexa
 pip install -r requirements.txt
 pytest tests/ -v
-```
-
----
-
-## Graceful Degradation
-
-When the Canvas API is unreachable (missing token, network error, etc.) the
-`canvas_client.py` falls back to static mock data so the Alexa skill
-continues to respond.  Set `USE_MOCK_DATA=true` to always use mock data
-during development.
-
----
-
-## Integration with Canvas LMS Docker Setup
-
-Add the following snippet to the root `docker-compose.yml` (or keep it as a
-standalone service using `plugins/corewest_alexa/docker-compose.yml`):
-
-```yaml
-alexa-api:
-  build:
-    context: ./plugins/corewest_alexa
-  ports:
-    - "8000:8000"
-  environment:
-    - CANVAS_API_URL=http://web:3000
-    - CANVAS_API_TOKEN=${CANVAS_API_TOKEN}
-  depends_on:
-    - web
 ```
