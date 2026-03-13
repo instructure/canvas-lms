@@ -712,6 +712,15 @@ class ExternalToolsController < ApplicationController
         @assignment = @context.assignments.find(params[:assignment_id])
         redirect_params = { context: @context, assignment: @assignment, sessionless_launch: true, **request.query_parameters }
         redirect_params[:content_only] = true if params[:borderless] || params[:display] == "borderless"
+
+        # Forward participant_session_id and quiz_session_id from the submission URL
+        # so quiz_lti can detect result/grading launches
+        if params[:url].present?
+          tool_url_params = Rack::Utils.parse_query(URI.parse(params[:url]).query)
+          redirect_params[:participant_session_id] = tool_url_params["participant_session_id"] if tool_url_params["participant_session_id"]
+          redirect_params[:quiz_session_id] = tool_url_params["quiz_session_id"] if tool_url_params["quiz_session_id"]
+        end
+
         return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(**redirect_params)
       end
       placement = placement_from_params
