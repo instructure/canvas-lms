@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/RestoreContentPane.handlebars'
@@ -99,12 +99,10 @@ export default class RestoreContentPaneView extends Backbone.View {
   renderSearchForm(props) {
     if (!this.root) {
       const mountPoint = document.getElementById('entity_search_mount_point')
-      const root = createRoot(mountPoint)
-
-      this.root = root
+      this.root = render(<EntitySearchForm {...props} />, mountPoint)
+    } else {
+      rerender(this.root, <EntitySearchForm {...props} />)
     }
-
-    this.root.render(<EntitySearchForm {...props} />)
   }
 
   unmountSearchForm() {
