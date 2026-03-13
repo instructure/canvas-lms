@@ -64,7 +64,7 @@ def seed() -> None:
     print("  Default admin user created")
     print("=" * 50)
     print(f"  Username : {user.username}")
-    print(f"  Password : {password}")
+    print("  Password : (hidden — not printed to logs)")
     print(f"  Role     : {user.role}")
     print("=" * 50)
     print("  ⚠️  Change the password after first login!")
