@@ -31,7 +31,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import InheritedCaptionTooltip from './InheritedCaptionTooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {languageCodes} from './mediaLanguageCodes'
@@ -573,8 +573,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
           .append('<span class="track-tip-container"></span>')
           .find('.track-tip-container')
 
-        const root = createRoot(tooltip_container[0])
-        root.render(<InheritedCaptionTooltip />)
+        render(<InheritedCaptionTooltip />, tooltip_container[0])
       }
 
       // remove this from the dropdownlist (if it exists)
