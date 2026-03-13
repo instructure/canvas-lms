@@ -290,6 +290,8 @@ class User < ActiveRecord::Base
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
   has_many :quiz_migration_alerts, dependent: :destroy
   has_many :custom_data, class_name: "CustomData"
+  has_many :institutional_tag_associations
+  has_many :institutional_tags, through: :institutional_tag_associations
 
   has_many :assessor_allocation_rules,
            class_name: "AllocationRule",
