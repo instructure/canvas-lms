@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {QuizTypeSelectorComponent} from '../../react/QuizTypeSelectorComponent'
 
 extend(QuizTypeSelector, Backbone.View)
@@ -50,17 +50,17 @@ QuizTypeSelector.prototype.updateComponent = function (quizType = null) {
   const currentQuizType = quizType || this.parentModel.newQuizzesType() || 'graded_quiz'
   const isExistingAssignment = !this.parentModel.isNew()
 
-  if (!this.root) {
-    this.root = createRoot(this.el)
-  }
+  const element = React.createElement(QuizTypeSelectorComponent, {
+    quizType: currentQuizType,
+    isExistingAssignment,
+    onChange: this.handleQuizTypeChange,
+  })
 
-  this.root.render(
-    React.createElement(QuizTypeSelectorComponent, {
-      quizType: currentQuizType,
-      isExistingAssignment,
-      onChange: this.handleQuizTypeChange,
-    }),
-  )
+  if (!this.root) {
+    this.root = render(element, this.el)
+  } else {
+    rerender(this.root, element)
+  }
 }
 
 QuizTypeSelector.prototype.render = function () {
