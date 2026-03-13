@@ -36,7 +36,7 @@
         new_tab = tool_details[:new_tab]
   %>
     <li id="<%= tool.asset_string %>_menu_item" data-tool-id="<%= tool_details[:tool_id] %>" class="globalNavExternalTool menu-item ic-app-header__menu-list-item<% if tool_details[:current_page]%> ic-app-header__menu-list-item--active<% end %>">
-      <a class='ic-app-header__menu-list-link' href="<%= tool_details[:tool_path] %>" target="<%= (new_tab && tool.root_account.feature_enabled?(:open_tools_in_new_tab)) ? '_blank' : '' %>">
+      <a class='ic-app-header__menu-list-link' href="<%= tool_details[:tool_path] %>" target="<%= new_tab ? '_blank' : '' %>">
         <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
         <% if svg_path %>
           <svg version="1.1" class="ic-icon-svg ic-icon-svg--lti menu-item__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64">

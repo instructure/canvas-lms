@@ -1500,10 +1500,8 @@ class UsersController < ApplicationController
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
 
-    @display_override = if @domain_root_account.feature_enabled?("open_tools_in_new_tab") && @tool.extension_setting("user_navigation", "windowTarget") == "_blank"
+    @display_override = if @tool.extension_setting("user_navigation", "windowTarget") == "_blank"
                           "borderless"
-                        else
-                          nil
                         end
 
     render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: @display_override)
