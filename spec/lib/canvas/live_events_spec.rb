@@ -1888,6 +1888,53 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".discussion_entry_updated" do
+    it "triggers a discussion entry updated live event" do
+      course_with_student
+      topic = @course.discussion_topics.create!(title: "test title", message: "test body")
+      entry = topic.discussion_entries.create!(message: "<p>original</p>", user_id: @student.id)
+
+      expect_event("discussion_entry_updated", {
+        user_id: entry.user_id.to_s,
+        created_at: entry.created_at,
+        discussion_entry_id: entry.id.to_s,
+        discussion_topic_id: entry.discussion_topic_id.to_s,
+        text: entry.message,
+        workflow_state: entry.workflow_state
+      }).once
+
+      Canvas::LiveEvents.discussion_entry_updated(entry)
+    end
+
+    it "includes workflow_state deleted when entry is soft deleted" do
+      course_with_student
+      topic = @course.discussion_topics.create!(title: "test title", message: "test body")
+      entry = topic.discussion_entries.create!(message: "<p>original</p>", user_id: @student.id)
+      entry.destroy
+
+      expect_event("discussion_entry_updated", hash_including(
+        discussion_entry_id: entry.id.to_s,
+        workflow_state: "deleted"
+      )).once
+
+      Canvas::LiveEvents.discussion_entry_updated(entry)
+    end
+
+    it "includes parent_discussion_entry_id for nested replies" do
+      course_with_student
+      topic = @course.discussion_topics.create!(title: "test title", message: "test body")
+      parent = topic.discussion_entries.create!(message: "parent", user_id: @student.id)
+      reply = topic.discussion_entries.create!(message: "reply", user_id: @student.id, parent_id: parent.id)
+
+      expect_event("discussion_entry_updated", hash_including(
+        discussion_entry_id: reply.id.to_s,
+        parent_discussion_entry_id: parent.id.to_s
+      )).once
+
+      Canvas::LiveEvents.discussion_entry_updated(reply)
+    end
+  end
+
   describe ".discussion_entry_submitted" do
     context "with non graded discussion" do
       it "creates a discussion entry created live event" do
@@ -1906,7 +1953,8 @@ describe Canvas::LiveEvents do
                        created_at: entry.created_at,
                        discussion_entry_id: entry.id.to_s,
                        discussion_topic_id: entry.discussion_topic_id.to_s,
-                       text: entry.message
+                       text: entry.message,
+                       workflow_state: entry.workflow_state
                      }).once
 
         Canvas::LiveEvents.discussion_entry_submitted(entry, nil, nil)
@@ -1935,7 +1983,8 @@ describe Canvas::LiveEvents do
                        created_at: entry.created_at,
                        discussion_entry_id: entry.id.to_s,
                        discussion_topic_id: entry.discussion_topic_id.to_s,
-                       text: entry.message
+                       text: entry.message,
+                       workflow_state: entry.workflow_state
                      }).once
 
         Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.id, submission.id)
