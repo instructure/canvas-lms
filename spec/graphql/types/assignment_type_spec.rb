@@ -3028,7 +3028,7 @@ describe Types::AssignmentType do
       allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
         .with(assignment:)
-        .and_return({ level: "error", message: "Test error" })
+        .and_return([{ level: "error", message: "Test error" }])
     end
 
     it "returns nil when project_lhotse feature flag is disabled" do
@@ -3039,9 +3039,10 @@ describe Types::AssignmentType do
 
     it "returns issues when project_lhotse feature flag is enabled" do
       course.enable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .at_least(:once).and_return([{ level: "error", message: "Test error" }])
       level = assignment_type.resolve("autoGradeAssignmentIssues { level }")
       message = assignment_type.resolve("autoGradeAssignmentIssues { message }")
-      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to have_received(:validate_assignment).at_least(:once)
       expect(level).to eq "error"
       expect(message).to eq "Test error"
     end
@@ -3052,7 +3053,7 @@ describe Types::AssignmentType do
       allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
         .with(assignment:)
-        .and_return({ level: "error", message: "Test error" })
+        .and_return([{ level: "error", message: "Test error" }])
     end
 
     it "returns empty array when project_lhotse feature flag is disabled" do
@@ -3066,6 +3067,39 @@ describe Types::AssignmentType do
       result = assignment_type.resolve("autoGradeAssignmentErrors")
       expect(GraphQLHelpers::AutoGradeEligibilityHelper).to have_received(:validate_assignment)
       expect(result).to eq(["Test error"])
+    end
+  end
+
+  describe "auto_grade_eligibility" do
+    before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .with(assignment:)
+        .and_return([{ level: "error", message: "No rubric is attached to this assignment." }, { level: "error", message: "Grading assistance is not available right now." }])
+    end
+
+    it "returns nil when project_lhotse feature flag is disabled" do
+      course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_assignment)
+      expect(assignment_type.resolve("autoGradeEligibility { issues { message } }")).to be_nil
+    end
+
+    it "returns all issues when project_lhotse feature flag is enabled" do
+      course.enable_feature!(:project_lhotse)
+      result = assignment_type.resolve("autoGradeEligibility { issues { message } }")
+      expect(result).to contain_exactly(
+        "No rubric is attached to this assignment.",
+        "Grading assistance is not available right now."
+      )
+    end
+
+    it "returns empty issues array when no issues exist" do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .with(assignment:)
+        .and_return([])
+      course.enable_feature!(:project_lhotse)
+      result = assignment_type.resolve("autoGradeEligibility { issues { message } }")
+      expect(result).to eq([])
     end
   end
 
