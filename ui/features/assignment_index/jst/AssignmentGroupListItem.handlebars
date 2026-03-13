@@ -58,17 +58,7 @@
           {{/if}}
           {{#if showRules}}
             <li>
-              <a
-                href='#'
-                title='{{#toSentence displayableRules}}{{this}}{{/toSentence}}'
-                class="tooltip_link"
-                data-tooltip-selector="#ag_{{id}}_rules_tooltip"
-              >{{rulesText}}<i class="icon-mini-arrow-down"></i></a>
-              <div id="ag_{{id}}_rules_tooltip" style="display:none;">
-                {{#each displayableRules}}
-                  <span>{{this}}</span><br/>
-                {{/each}}
-              </div>
+              <span id="ag_{{id}}_rules_tooltip_mount_point"></span>
             </li>
           {{/if}}
         </ul>
