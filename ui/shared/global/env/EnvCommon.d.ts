@@ -99,6 +99,8 @@ export interface BlueprintCoursesData {
 
 export interface EnvCommon {
   ASSET_HOST: string
+  JOURNEY_URL?: string
+  WIKI_PAGE_ID?: string
   DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
@@ -398,6 +400,7 @@ export type OtherFeatureId =
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
   | 'peer_review_allocation_and_grading'
+  | 'study_assist'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

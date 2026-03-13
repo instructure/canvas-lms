@@ -213,6 +213,7 @@ const featureBundles: {
     import('./features/submissions_show_preview_asset_report_status/index'),
   submissions: () => import('./features/submissions/index'),
   submit_assignment: () => import('./features/submit_assignment/index'),
+  study_assist: () => import('./features/study_assist/index'),
   syllabus: () => import('./features/syllabus/index'),
   syllabus_revisions: () => import('./features/syllabus_revisions/index'),
   take_quiz: () => import('./features/take_quiz/index'),
