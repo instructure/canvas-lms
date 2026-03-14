@@ -1,37 +1,21 @@
 """
-Core West College AI LMS — Alexa Plugin
-FastAPI application entry-point.
-
-Integrates:
-- Auth routes (JWT login, registration)
-- Alexa voice endpoints (query, webhook, dashboard)
-- Curriculum monitoring endpoints (/curriculum/*)
-- Inspection readiness endpoints (/inspection/*)
-- Inspection dashboard UI (/inspection-dashboard)
+Core West Unified API — Application Entry Point
+Mounts the LMS theme routes, static files, and the Alexa Voice API endpoints.
 """
 
 from __future__ import annotations
 
 import logging
-import os
+import sys
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-# ---------------------------------------------------------------------------
-# Auth
-# ---------------------------------------------------------------------------
-try:
-    from auth.dependencies import require_authenticated, verify_api_key  # type: ignore[import-not-found]
-    from auth.routes import router as auth_router  # type: ignore[import-not-found]
-    _AUTH_AVAILABLE = True
-except ImportError:  # pragma: no cover
-    _AUTH_AVAILABLE = False
-    require_authenticated = None  # type: ignore[assignment]
-    verify_api_key = None         # type: ignore[assignment]
-    auth_router = None            # type: ignore[assignment]
+from config import settings
+from data_aggregator import DataAggregator
+from theme_routes import router as theme_router
 
 # ---------------------------------------------------------------------------
 # Curriculum & Inspection routers
@@ -65,15 +49,14 @@ async def _fallback_verify_api_key(request: Request) -> None:
         raise HTTPException(status_code=401, detail="Invalid or missing API key.")
 
 # ---------------------------------------------------------------------------
-# App
+# App Initialization & Middleware
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="Core West College — Alexa Plugin",
-    version="2.0.0",
+    title="Core West College Unified API",
     description=(
-        "Alexa integration API for the Core West College AI LMS. "
-        "Includes curriculum monitoring and inspection readiness modules."
+        "AI-powered learning management system and Voice briefing API "
+        "that bridges the Core West Command Center with Amazon Alexa."
     ),
 )
 
@@ -98,19 +81,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------------------------------------------------------------
-# Routers
-# ---------------------------------------------------------------------------
-
-if _AUTH_AVAILABLE and auth_router is not None:
-    app.include_router(auth_router)
-
-app.include_router(curriculum_router)
-app.include_router(inspection_router)
+STATIC_DIR = Path(__file__).parent / "static"
 
 # ---------------------------------------------------------------------------
-# Login page (public)
+# LMS Theme & Static Mounts
 # ---------------------------------------------------------------------------
+# Mount static files
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+# Include theme routes
+app.include_router(theme_router)
+
+# ---------------------------------------------------------------------------
+# Alexa Setup & Helpers
+# ---------------------------------------------------------------------------
+aggregator = DataAggregator()
+
+SUPPORTED_TYPES = ["inspection", "teachers", "students", "today", "tasks", "incidents"]
 
 _LOGIN_PAGE = Path(__file__).parent / "auth" / "login_page.html"
 _DASHBOARD_PAGE = Path(__file__).parent / "curriculum" / "templates" / "inspection_dashboard.html"
@@ -136,22 +123,27 @@ async def inspection_dashboard() -> HTMLResponse:
         return HTMLResponse(content=_DASHBOARD_PAGE.read_text(encoding="utf-8"))
     return HTMLResponse(content="<h1>Dashboard not found</h1>", status_code=404)
 
-
 # ---------------------------------------------------------------------------
 # Public endpoints
 # ---------------------------------------------------------------------------
 
 
 @app.get("/")
-async def root() -> JSONResponse:
-    """Root liveness probe."""
-    return JSONResponse({"message": "Core West College Alexa API is running", "version": "2.0.0"})
+def root():
+    """Liveness probe — confirms the service is running."""
+    return {"message": "Core West Unified API is running"}
+
+
+@app.get("/health")
+async def health():
+    """Basic health check for the overall service."""
+    return {"status": "ok", "service": "Core West College Unified API"}
 
 
 @app.get("/alexa/health")
-async def health() -> JSONResponse:
-    """Health-check — no authentication required."""
-    return JSONResponse({
+def alexa_health():
+    """Detailed health check specifically for Alexa/Canvas integrations."""
+    return {
         "status": "ok",
         "auth_available": _AUTH_AVAILABLE,
         "modules": ["alexa", "curriculum", "inspection"],
@@ -255,24 +247,23 @@ async def alexa_webhook(
         }
 
         if intent_name in intent_map:
-            query_kind, handler = intent_map[intent_name]
-            try:
-                # Handlers that take no args (e.g. get_voice_summary on InspectionEngine)
-                try:
-                    speech = handler()  # type: ignore[call-arg]
-                except TypeError:
-                    speech = handler(query_kind)  # type: ignore[call-arg]
-            except (AttributeError, ValueError) as exc:
-                _logger.error("Voice handler error for %s: %s", intent_name, exc)
-                speech = f"I was unable to retrieve the {query_kind} summary."
-            return JSONResponse({"speech_text": speech, "intent": intent_name, "received": True})
+            query_type, card_title = intent_map[intent_name]
+            text = aggregator.get_summary(query_type)
+            return _alexa_response(text, card_title)
 
-    # Fallback for unrecognised requests — do not echo full payload to avoid leaking data.
-    request_id = payload.get("request", {}).get("requestId")
-    return JSONResponse({
-        "speech_text": "Sorry, I did not understand that request.",
-        "received": True,
-        "request_type": request_type or None,
-        "intent": intent_name or None,
-        "request_id": request_id,
-    })
+    return _alexa_response(
+        "Sorry, I didn't understand that request.", "Core West Error"
+    )
+
+# ---------------------------------------------------------------------------
+# Dev entry point
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host=settings.host,
+        port=settings.port,
+        reload=settings.debug,
+    )

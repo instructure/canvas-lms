@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curriculum Dashboard | Core West College</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body style="padding-top:0;background:var(--color-gray-light);">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header class="dash-header" role="banner">
+    <div class="dash-logo">
+      <span style="font-size:1.75rem;">🎓</span>
+      <div>
+        <span>Core West College</span>
+        <small>Curriculum Dashboard</small>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <a href="/dashboard" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">← Dashboard</a>
+      <a href="/inspection-dashboard" class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,.3);color:white;">✅ Inspection</a>
+      <a href="/login" class="btn btn-danger btn-sm" onclick="localStorage.removeItem('cwc_jwt');">Logout</a>
+    </div>
+  </header>
+
+  <main style="padding:2rem 1.5rem;max-width:1200px;margin:0 auto;" role="main">
+
+    <!-- ── Page Title ─────────────────────────────────── -->
+    <div style="margin-bottom:2rem;">
+      <h1 style="font-size:1.8rem;color:var(--color-navy-dark);">📚 Curriculum Coverage Report</h1>
+      <p style="color:var(--color-text-mid);">Subject coverage analysis, gap identification, and standards alignment across all divisions.</p>
+    </div>
+
+    <!-- ── Subject Coverage Bars ─────────────────────── -->
+    <div class="card" style="margin-bottom:2rem;">
+      <div class="card-header" style="font-size:1rem;">📊 Subject Coverage — All Divisions (Term 2, 2025–2026)</div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem 3rem;">
+          <div>
+            <div class="progress-label"><span>📐 Mathematics</span><span>91%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:91%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>📖 English Language Arts</span><span>88%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--color-navy-light),#42a5f5);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>🔬 Science</span><span>76%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:76%;"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>🌍 Social Studies / Humanities</span><span>82%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:82%;"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>🇦🇪 Arabic Language</span><span>93%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:93%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>💻 ICT / Computing</span><span>70%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:70%;background:linear-gradient(90deg,var(--color-warning),#ffb300);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>🎨 Arts &amp; Design</span><span>85%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:85%;background:linear-gradient(90deg,var(--color-navy-light),#42a5f5);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>⚽ Physical Education</span><span>95%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:95%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>🎵 Music</span><span>68%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:68%;background:linear-gradient(90deg,var(--color-warning),#ffb300);"></div></div>
+          </div>
+          <div>
+            <div class="progress-label"><span>🌱 PSHE / Personal Development</span><span>79%</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:79%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Standards Comparison Cards ────────────────── -->
+    <div class="grid grid-2" style="margin-bottom:2rem;">
+
+      <div class="card">
+        <div class="card-header" style="background:linear-gradient(90deg,#b71c1c,#c62828);color:white;">
+          🇺🇸 American Division — Common Core Alignment
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+              <div class="progress-label"><span>Math Standards (CCSS-M)</span><span>89%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:89%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>ELA Standards (CCSS-ELA)</span><span>84%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:84%;"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Next Gen Science (NGSS)</span><span>72%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--color-warning),#ffb300);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Social Studies Standards</span><span>80%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:80%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background:linear-gradient(90deg,#0d47a1,#1565c0);color:white;">
+          🇬🇧 British Division — National Curriculum Alignment
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+              <div class="progress-label"><span>Key Stage 2 Coverage</span><span>92%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:92%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Key Stage 3 Coverage</span><span>86%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:86%;background:linear-gradient(90deg,var(--color-success),#66bb6a);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>IGCSE Preparation (Yr 10–11)</span><span>74%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:74%;background:linear-gradient(90deg,var(--color-warning),#ffb300);"></div></div>
+            </div>
+            <div>
+              <div class="progress-label"><span>Cross-Curricular Literacy</span><span>81%</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:81%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Gap Analysis ───────────────────────────────── -->
+    <div class="card" style="margin-bottom:2rem;">
+      <div class="card-header" style="font-size:1rem;">🔍 Gap Analysis — Areas Requiring Attention</div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:.75rem;">
+          <div class="alert alert-warning" style="margin:0;">
+            <strong>⚠️ ICT/Computing — All Divisions (70%)</strong>
+            <p style="margin:.4rem 0 0;">Scheme of work for computing not yet fully documented for Grades 6–8. Action required by end of Term 3.</p>
+          </div>
+          <div class="alert alert-warning" style="margin:0;">
+            <strong>⚠️ Music — British &amp; American Divisions (68%)</strong>
+            <p style="margin:.4rem 0 0;">Music lessons running but formal coverage tracking not yet implemented. Assign responsible teacher to complete records.</p>
+          </div>
+          <div class="alert alert-warning" style="margin:0;">
+            <strong>⚠️ IGCSE Preparation — British Division Year 10–11 (74%)</strong>
+            <p style="margin:.4rem 0 0;">Past paper practice schedule incomplete for Science and Humanities. Recommend intensive revision programme Q4.</p>
+          </div>
+          <div class="alert alert-success" style="margin:0;">
+            <strong>✅ Mathematics — Strong Coverage Across All Divisions (89–91%)</strong>
+            <p style="margin:.4rem 0 0;">Maths curriculum is well-documented, consistently delivered, and supported by regular formative assessment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Performance Metrics ────────────────────────── -->
+    <div class="grid grid-4" style="margin-bottom:2rem;">
+      <div class="metric-card">
+        <span class="metric-icon">📋</span>
+        <span class="metric-value">10</span>
+        <span class="metric-label">Subjects Tracked</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">⚠️</span>
+        <span class="metric-value" style="color:var(--color-warning);">3</span>
+        <span class="metric-label">Coverage Gaps</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">✅</span>
+        <span class="metric-value" style="color:var(--color-success);">7</span>
+        <span class="metric-label">On Track</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">📈</span>
+        <span class="metric-value">85%</span>
+        <span class="metric-label">Avg Coverage</span>
+      </div>
+    </div>
+
+    <!-- ── Export Button ──────────────────────────────── -->
+    <div style="text-align:center;">
+      <button class="btn btn-primary btn-lg" onclick="alert('Exporting full curriculum report as PDF…')">
+        📥 Export Curriculum Report
+      </button>
+      <a href="/inspection-dashboard" class="btn btn-secondary btn-lg" style="margin-left:1rem;">
+        ✅ View Inspection Dashboard
+      </a>
+    </div>
+
+  </main>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
