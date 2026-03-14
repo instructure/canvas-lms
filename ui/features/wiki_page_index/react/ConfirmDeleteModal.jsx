@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {func, instanceOf, array} from 'prop-types'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -36,9 +36,15 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
-  const root = createRoot(parent)
-  root.render(
-    <ConfirmDeleteModal {...props} parent={parent} root={root} ref={showConfirmDeleteRef} />,
+  let root
+  root = render(
+    <ConfirmDeleteModal
+      {...props}
+      parent={parent}
+      root={{unmount: () => root.unmount()}}
+      ref={showConfirmDeleteRef}
+    />,
+    parent,
   )
 }
 
