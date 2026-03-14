@@ -4,26 +4,16 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-*.egg-info/
-dist/
-build/
-.eggs/
 
 # Virtual environments
-.venv/
 venv/
+.venv/
 env/
 
-# Test / coverage
+# Test artifacts
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Environment files (may contain secrets)
-.env
-.env.*
-!.env.example
-
-# Editor
-.vscode/
-.idea/
+# User data (generated at runtime)
+auth/users.json
