@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {subscribeFlashNotifications} from '@canvas/notifications/redux/actions'
 import {ConnectedAnnouncementsIndex} from './components/AnnouncementsIndex'
 import createStore from './store'
@@ -28,11 +28,11 @@ export default function createAnnouncementsIndex(root, data = {}) {
   const store = createStore(data)
 
   function unmount() {
-    ReactDOM.unmountComponentAtNode(root)
+    legacyUnmountComponentAtNode(root)
   }
 
   function render() {
-    ReactDOM.render(
+    legacyRender(
       <Provider store={store}>
         <ConnectedAnnouncementsIndex />
       </Provider>,
