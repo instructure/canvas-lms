@@ -17,8 +17,8 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {createRoot} from 'react-dom/client'
+import {legacyRender, legacyUnmountComponentAtNode, render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
@@ -142,7 +142,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const node = document.querySelector('.paginatedLoadingIndicator')
     if (node instanceof HTMLElement) {
-      ReactDOM.render(
+      legacyRender(
         <View padding="x-small" textAlign="center" as="div" display="block">
           <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
         </View>,
@@ -336,7 +336,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const {ContentTypeExternalToolTray: ExternalToolTray} = this
 
-    ReactDOM.render(
+    legacyRender(
       <ExternalToolTray
         tool={tool}
         placement="wiki_index_menu"
@@ -360,7 +360,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const pageId = newCopyToItem?.id
     const {DirectShareCourseTray: CourseTray} = this
 
-    ReactDOM.render(
+    legacyRender(
       <CourseTray
         open={newCopyToItem !== null}
         sourceCourseId={ENV.COURSE_ID}
@@ -382,7 +382,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const pageId = newSendToItem?.id
     const {DirectShareUserModal: UserModal} = this
 
-    ReactDOM.render(
+    legacyRender(
       <UserModal
         open={newSendToItem !== null}
         courseId={ENV.COURSE_ID}
@@ -403,9 +403,9 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       this.setAssignToItem(false, newAssignToItem, returnFocusTo)
       setTimeout(() => returnFocusTo?.focus(), 100)
     }
-    const handleTrayExited = () => ReactDOM.unmountComponentAtNode(this.$assignToMountPoint[0])
+    const handleTrayExited = () => legacyUnmountComponentAtNode(this.$assignToMountPoint[0])
 
-    ReactDOM.render(
+    legacyRender(
       <ItemAssignToManager
         open={open}
         onClose={handleTrayClose}
