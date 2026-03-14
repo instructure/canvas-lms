@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import page from 'page'
 import qs from 'qs'
 import DeveloperKeysApp from './App'
@@ -61,7 +62,7 @@ function renderShowDeveloperKeys(ctx) {
     const view = () => {
       const currentState = store.getState()
 
-      ReactDOM.render(
+      legacyRender(
         <DeveloperKeysApp
           applicationState={currentState}
           actions={actions}
@@ -79,7 +80,7 @@ function renderShowDeveloperKeys(ctx) {
 }
 
 const renderDeveloperKeySettings = ctx => {
-  ReactDOM.render(
+  legacyRender(
     <QueryClientProvider client={queryClient}>
       <RegistrationSettings ctx={ctx} />
     </QueryClientProvider>,
