@@ -30,7 +30,7 @@ import {
   autoFocusObserverPicker,
 } from '@canvas/observer-picker/util/pageReloadHelper'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import StudentViewQuery from './components/StudentViewQuery'
 import {View} from '@instructure/ui-view'
 
@@ -38,8 +38,7 @@ const client = createClient()
 const I18n = createI18nScope('assignments_2')
 
 export default function renderAssignmentsApp(env, elt) {
-  const root = createRoot(elt)
-  root.render(
+  render(
     <QueryClientProvider client={queryClient}>
       <ApolloProvider client={client}>
         <ErrorBoundary
@@ -63,12 +62,12 @@ export default function renderAssignmentsApp(env, elt) {
         </ErrorBoundary>
       </ApolloProvider>
     </QueryClientProvider>,
+    elt,
   )
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
-    const observerRoot = createRoot(observerPickerContainer)
-    observerRoot.render(
+    render(
       <View as="div" maxWidth="12em">
         <ObserverOptions
           autoFocus={autoFocusObserverPicker()}
@@ -80,6 +79,7 @@ export default function renderAssignmentsApp(env, elt) {
           renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
         />
       </View>,
+      observerPickerContainer,
     )
   }
 }
