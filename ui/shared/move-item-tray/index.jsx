@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import MoveItemTray from './react/index'
 
@@ -32,7 +32,7 @@ export function renderTray(props, rootContainer = document.body) {
     rootContainer.appendChild(root)
   }
 
-  ReactDOM.render(<MoveItemTray {...props} ref={tray => tray && tray.open()} />, root)
+  legacyRender(<MoveItemTray {...props} ref={tray => tray && tray.open()} />, root)
 }
 
 export const backbone = {
