@@ -27,8 +27,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, render as canvasRender} from '@canvas/react'
 import template from '../../jst/WikiPageEdit.handlebars'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
@@ -222,7 +221,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-      return createRoot(elt).render(
+      return legacyRender(
         <DueDateCalendarPicker
           dateType="todo_date"
           name="student_todo_at"
@@ -236,6 +235,7 @@ export default class WikiPageEditView extends ValidatedFormView {
           labelText="Student Planner Date"
           labelClasses="screenreader-only"
         />,
+        elt,
       )
     }
   }
@@ -282,7 +282,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         }
       }
 
-      ReactDOM.render(
+      legacyRender(
         React.createElement(MasteryPathToggle, {
           onSync,
           fetchOwnOverrides: true,
@@ -312,8 +312,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         const blockContentEditorToolbarReorder =
           ENV?.FEATURES?.block_content_editor_toolbar_reorder ?? false
 
-        const root = createRoot(document.getElementById('block_editor'))
-        root.render(
+        canvasRender(
           <BlockContentEditor
             data={data}
             onInit={handler => {
@@ -322,6 +321,7 @@ export default class WikiPageEditView extends ValidatedFormView {
             aiAltTextGenerationURL={aiAltTextGenerationURL}
             toolbarReorder={blockContentEditorToolbarReorder}
           />,
+          document.getElementById('block_editor'),
         )
       })
     } else if (
@@ -336,8 +336,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       container.style.width = '100%'
       container.style.transition = 'width 0.3s ease-in-out'
 
-      const root = createRoot(document.getElementById('block_editor'))
-      root.render(
+      canvasRender(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
             course_id={ENV.COURSE_ID}
@@ -346,6 +345,7 @@ export default class WikiPageEditView extends ValidatedFormView {
             onCancel={this.cancel.bind(this)}
           />
         </Suspense>,
+        document.getElementById('block_editor'),
       )
     } else {
       RichContentEditor.loadNewEditor(
