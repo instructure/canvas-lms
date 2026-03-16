@@ -636,6 +636,70 @@ describe Course do
       expect(migration.warnings[0]).to eq "Couldn't adjust dates on assignment lalala (ID #{assignment.id})"
     end
 
+    describe "delayed post scheduling for announcements" do
+      let(:course) { course_model }
+
+      def build_stuck_announcement(course, delayed_post_at)
+        ann = course.announcements.create!(
+          title: "test",
+          message: "body",
+          workflow_state: "post_delayed",
+          delayed_post_at:
+        )
+        ann.update_column(:posted_at, nil)
+        ann
+      end
+
+      context "with date_shift_options and identity day substitutions (trigger 1)" do
+        it "creates a delayed job for a post_delayed announcement when the date does not change" do
+          future_date = 1.week.from_now
+          ann = build_stuck_announcement(course, future_date)
+
+          migration = course.content_migrations.create!(
+            migration_settings: {
+              date_shift_options: {
+                old_start_date: future_date.to_date.to_s,
+                old_end_date: future_date.to_date.to_s,
+                new_start_date: future_date.to_date.to_s,
+                new_end_date: future_date.to_date.to_s,
+                day_substitutions: { future_date.wday.to_s => future_date.wday.to_s }
+              }
+            }
+          )
+          migration.add_imported_item(ann)
+
+          expect do
+            Importers::CourseContentImporter.adjust_dates(course, migration)
+          end.to change { Delayed::Job.where("handler LIKE ?", "%update_based_on_date%").count }.by(1)
+
+          ann.reload
+          expect(ann.workflow_state).to eq "post_delayed"
+        end
+      end
+
+      context "with date_shift_options and missing start/end dates (trigger 2)" do
+        it "creates a delayed job for a post_delayed announcement when shift_date returns original value" do
+          future_date = 1.week.from_now
+          ann = build_stuck_announcement(course, future_date)
+
+          migration = course.content_migrations.create!(
+            migration_settings: {
+              date_shift_options: {
+                day_substitutions: { future_date.wday.to_s => future_date.wday.to_s }
+              }
+            }
+          )
+          migration.add_imported_item(ann)
+
+          allow(course).to receive_messages(real_start_date: nil, real_end_date: nil)
+
+          expect do
+            Importers::CourseContentImporter.adjust_dates(course, migration)
+          end.to change { Delayed::Job.where("handler LIKE ?", "%update_based_on_date%").count }.by(1)
+        end
+      end
+    end
+
     describe "pre_date_shift_for_assignment_importing FF" do
       subject { Importers::CourseContentImporter.adjust_dates(course, migration) }
 
