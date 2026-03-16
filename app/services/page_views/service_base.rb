@@ -47,11 +47,31 @@ module PageViews
       )
     end
 
+    def get_with_clean_redirect(uri, headers, &)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == "https"
+      http.ssl_timeout = http.open_timeout = CanvasHttp::OPEN_TIMEOUT
+      http.read_timeout = CanvasHttp::READ_TIMEOUT
+      http.write_timeout = CanvasHttp::WRITE_TIMEOUT
+      http.max_retries = 0
+      response = http.request(Net::HTTP::Get.new(uri.request_uri, headers))
+
+      if response.is_a?(Net::HTTPRedirection)
+        redirect_url = response["Location"]
+        raise "Redirect response is missing a Location header" unless redirect_url
+
+        CanvasHttp.get(redirect_url, &)
+      else
+        yield response
+      end
+    end
+
     def handle_generic_errors(response)
       case response.code.to_i
       when 400
         error_messages = extract_error_messages_if_present(response)
-        raise Common::InvalidRequestError, "Invalid request: #{error_messages.join(", ")}"
+        detail = error_messages.any? ? error_messages.join(", ") : response.body
+        raise Common::InvalidRequestError, "Invalid request: #{detail}"
       when 403
         raise Common::AccessDeniedError, "Access denied to the requested resource"
       when 404
@@ -71,9 +91,9 @@ module PageViews
 
     def extract_error_messages_if_present(response)
       errors = JSON.parse(response.body)["errors"]
-      errors.is_a?(Array) ? errors : [errors]
+      Array(errors).compact
     rescue JSON::ParserError
-      nil
+      []
     end
   end
 end
