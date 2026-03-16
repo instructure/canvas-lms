@@ -29,6 +29,7 @@ class PlannerOverride < ActiveRecord::Base
     [:announcement,
      :assignment,
      :sub_assignment,
+     :peer_review_sub_assignment,
      :discussion_topic,
      :planner_note,
      :wiki_page,
