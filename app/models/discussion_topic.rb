@@ -324,7 +324,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def set_schedule_delayed_transitions
     @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
-    if delayed_post_at? && @delayed_post_at_changed
+    if delayed_post_at? && (@delayed_post_at_changed || (saved_by == :after_migration && workflow_state == "post_delayed"))
       @should_schedule_delayed_post = true
       self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.zone.now
     end
