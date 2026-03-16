@@ -26,7 +26,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
     <div style="position: relative;">
       <div class="form-control title" id="quiz-title-container">
         <% if content_is_locked %>
-          <h1 id="quiz_title" class="title"><%= @quiz.title.html_safe %></h1>
+          <h1 id="quiz_title" class="title"><%= @quiz.title %></h1>
           <input type="hidden" name="quiz[title]" value="<%=@quiz.title%>"/>
         <% else %>
           <label for="quiz_title" class="bold form-control__label"><%= t('Quiz Title') %><span aria-hidden="true" class="asterisk"> *</span></label>
