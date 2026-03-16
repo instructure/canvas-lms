@@ -58,7 +58,7 @@ template: |
   4. Rating language requirements
   <BLOOM_TAXONOMY_CONTEXT_PLACEHOLDER>
 
-  5. Output format: JSON only, no extra text. Example (illustrative only):
+  5. Output format: JSON only, no extra text. Example structure (with 2 ratings shown for brevity — use exactly <RATING_COUNT_PLACEHOLDER> ratings per criterion):
 
   {
     "criteria": [
@@ -69,14 +69,6 @@ template: |
           {
             "title": "Exceptional",
             "description": "Designs a compelling concept and justifies key features with specific examples."
-          },
-          {
-            "title": "Proficient",
-            "description": "Explains the concept clearly and analyzes its main features, though some details lack depth."
-          },
-          {
-            "title": "Developing",
-            "description": "Demonstrates a basic understanding of the concept but does not yet connect features to broader objectives."
           },
           {
             "title": "Insufficient",
