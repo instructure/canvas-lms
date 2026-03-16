@@ -271,6 +271,7 @@ describe('TagAsModal', () => {
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(() => {
+        expect(requestBody).toBeDefined()
         expect(requestBody.group_category.name).toBe('Reading Levels')
         expect(requestBody.group_category.id).toBeUndefined()
         expect(requestBody.operations.create).toEqual([{name: 'Level 1'}])
@@ -359,6 +360,7 @@ describe('TagAsModal', () => {
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(() => {
+        expect(requestBody).toBeDefined()
         expect(requestBody.group_category.id).toBe(3)
         expect(requestBody.group_category.name).toBeUndefined()
         expect(requestBody.operations.create).toEqual([{name: 'Variant D'}])
@@ -408,6 +410,7 @@ describe('TagAsModal', () => {
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(() => {
+        expect(requestBody).toBeDefined()
         expect(requestBody.group_category.name).toBe('Honors')
         expect(requestBody.operations.create).toEqual([{name: 'Honors'}])
         expect(defaultProps.onCreationSuccess).toHaveBeenCalledWith(999)
