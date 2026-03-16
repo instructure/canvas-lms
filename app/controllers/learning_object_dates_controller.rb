@@ -95,7 +95,7 @@
 #           "type": "string"
 #         },
 #         "peer_review_sub_assignment": {
-#           "description": "peer review sub assignment details, only present when include_peer_review=true is specified, assignment has peer reviews enabled, and peer_review_allocation_and_grading feature flag is enabled",
+#           "description": "peer review sub assignment details. If a peer review sub assignment exists, it is returned regardless of the Peer Review Allocation and Grading feature state. If no peer review sub assignment exists, the feature must be enabled to receive a null value; otherwise the key is omitted.",
 #           "type": "object",
 #           "properties": {
 #             "id": {"type": "integer"},
@@ -134,7 +134,9 @@ class LearningObjectDatesController < ApplicationController
   #   Array of strings indicating what additional data to include in the response.
   #   Valid values:
   #   - "peer_review": includes peer review sub assignment information and overrides in the response.
-  #     Requires the peer_review_allocation_and_grading feature flag to be enabled.
+  #     If a peer review sub assignment exists, it is returned regardless of the Peer Review
+  #     Allocation and Grading feature state. If no peer review sub assignment exists,
+  #     the feature must be enabled to receive a null value; otherwise the key is omitted.
   #   - "child_peer_review_override_dates": each assignment override will include a peer_review_dates
   #     field containing the matched peer review override data (id, due_at, unlock_at, lock_at)
   #     for that override. The field will be present as null if no matching peer review override exists.

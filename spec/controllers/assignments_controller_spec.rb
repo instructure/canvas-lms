@@ -2925,6 +2925,56 @@ describe AssignmentsController do
       end
     end
 
+    context "peer_review_sub_assignment in js_env" do
+      before do
+        user_session(@teacher)
+        @assignment.update!(peer_reviews: true)
+      end
+
+      it "includes peer_review_sub_assignment when it exists and feature flag is enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review_model(parent_assignment: @assignment, points_possible: 20)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).to have_key("peer_review_sub_assignment")
+        expect(assignment_data["peer_review_sub_assignment"]).to be_a(Hash)
+        expect(assignment_data["peer_review_sub_assignment"]["points_possible"]).to eq(20)
+      end
+
+      it "includes peer_review_sub_assignment as null when it does not exist and feature flag is enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).to have_key("peer_review_sub_assignment")
+        expect(assignment_data["peer_review_sub_assignment"]).to be_nil
+      end
+
+      it "includes peer_review_sub_assignment when it exists even if feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        peer_review_model(parent_assignment: @assignment, points_possible: 15)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).to have_key("peer_review_sub_assignment")
+        expect(assignment_data["peer_review_sub_assignment"]).to be_a(Hash)
+        expect(assignment_data["peer_review_sub_assignment"]["points_possible"]).to eq(15)
+      end
+
+      it "does not include peer_review_sub_assignment when it does not exist and feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).not_to have_key("peer_review_sub_assignment")
+      end
+    end
+
     it "bootstrap the assignment originality report visibility settings to js_env" do
       user_session(@teacher)
       get "edit", params: { course_id: @course.id, id: @assignment.id }

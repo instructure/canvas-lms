@@ -193,4 +193,23 @@ describe('ItemAssignToCard - Validation', () => {
       })
     })
   })
+
+  describe('Peer Review Date Validation - Feature Flag Disabled', () => {
+    beforeEach(() => {
+      fakeEnv.teardown()
+      fakeEnv.setup({
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: false,
+      })
+    })
+
+    it('handles peer review validation errors when feature flag is disabled', () => {
+      const {getByTestId} = renderComponent({
+        due_at: '2023-10-05T12:00:00Z',
+        // Peer review due date before assignment due date (invalid) - verifies component handles errors gracefully
+        peer_review_due_at: '2023-10-03T12:00:00Z',
+      })
+
+      expect(getByTestId('item-assign-to-card')).toBeInTheDocument()
+    })
+  })
 })
