@@ -32,7 +32,9 @@ export function legacyRender(
   container: Element | null,
   options: Options = {},
 ) {
-  if (!(container instanceof HTMLElement)) {
+  // Use nodeType check instead of instanceof to support cross-frame elements
+  // (e.g. window.parent.document.getElementById from inside an iframe)
+  if (!container || container.nodeType !== 1) {
     throw new Error('Container must be an HTMLElement')
   }
 
@@ -50,7 +52,7 @@ export function render(
   container: Element | null,
   options: Options = {},
 ) {
-  if (!(container instanceof HTMLElement)) {
+  if (!container || container.nodeType !== 1) {
     throw new Error('Container must be an HTMLElement')
   }
 
@@ -75,7 +77,7 @@ export function rerender(
 }
 
 export function legacyUnmountComponentAtNode(container: Element | null) {
-  if (!(container instanceof HTMLElement)) {
+  if (!container || container.nodeType !== 1) {
     return false
   }
   return ReactDOM.unmountComponentAtNode(container)
