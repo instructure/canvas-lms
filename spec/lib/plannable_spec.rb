@@ -80,6 +80,19 @@ describe Plannable do
       )
       expect(reply_to_entry.planner_override_for(@student)).to eq reply_to_entry_override
     end
+
+    it "returns overrides for peer_review_sub_assignments" do
+      @course.account.enable_feature!(:peer_review_allocation_and_grading)
+      parent_assignment = @course.assignments.create!(title: "Parent", peer_reviews: true)
+      prsa = PeerReviewSubAssignment.create!(parent_assignment:, context: @course, title: "Peer Review", points_possible: 10)
+      override = PlannerOverride.create!(
+        plannable_id: prsa.id,
+        plannable_type: "PeerReviewSubAssignment",
+        marked_complete: true,
+        user: @student
+      )
+      expect(prsa.planner_override_for(@student)).to eq override
+    end
   end
 
   context "complete_for_planner scope" do

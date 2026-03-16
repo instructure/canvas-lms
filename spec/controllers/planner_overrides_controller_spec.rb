@@ -115,6 +115,17 @@ describe PlannerOverridesController do
         expect(PlannerOverride.where(user_id: @student.id).count).to be 1
       end
 
+      it "saves peer_review_sub_assignment overrides with plannable type peer_review_sub_assignment" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        parent_assignment = @course.assignments.create!(title: "Parent Assignment", peer_reviews: true)
+        prsa = PeerReviewSubAssignment.create!(parent_assignment:, context: @course, title: "Peer Review", points_possible: 10)
+        post :create, params: { plannable_type: "peer_review_sub_assignment", plannable_id: prsa.id, user_id: @student.id, marked_complete: true }
+        expect(response).to have_http_status(:created)
+        json = json_parse(response.body)
+        expect(json["plannable_type"]).to eq "peer_review_sub_assignment"
+        expect(json["marked_complete"]).to be true
+      end
+
       it "saves sub_assignment overrides with plannable type sub_assignment" do
         @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
