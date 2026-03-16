@@ -27,7 +27,7 @@ class AiConversationsController < ApplicationController
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right
   before_action :load_experience
-  before_action :load_conversation, only: %i[post_message destroy show evaluation]
+  before_action :load_conversation, only: %i[post_message destroy show evaluation create_feedback delete_feedback]
 
   # Display the page for teachers to view all student AI conversations
   # Returns HTML for teachers, JSON for students (their active conversation)
@@ -82,6 +82,7 @@ class AiConversationsController < ApplicationController
     )
 
     messages_and_progress = client.messages_with_conversation_progress
+
     render json: {
       id: @conversation.id,
       user_id: @conversation.user_id.to_s,
@@ -252,6 +253,60 @@ class AiConversationsController < ApplicationController
       id: @conversation.id,
       evaluation: evaluation_data
     }
+  rescue LlmConversation::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
+  end
+
+  # @API Create feedback on a conversation message
+  #
+  # Submit a like or dislike vote on an AI-generated message.
+  #
+  # @argument vote [Required, String] "liked" or "disliked"
+  # @argument message_id [Required, String] llm-conversation message UUID
+  # @argument feedback_message [Optional, String] optional text for dislike
+  #
+  # @returns {Object} Hash with feedback record
+  def create_feedback
+    client = LLMConversationClient.new(
+      current_user: @current_user,
+      root_account_uuid: @context.root_account.uuid,
+      conversation_context_id: @experience.llm_conversation_context_id,
+      facts: @experience.facts,
+      learning_objectives: @experience.learning_objective,
+      scenario: @experience.pedagogical_guidance,
+      conversation_id: @conversation.llm_conversation_id
+    )
+    feedback = client.create_feedback(
+      message_id: params[:message_id],
+      user_id: @current_user.uuid,
+      vote: params[:vote],
+      feedback_message: params[:feedback_message]
+    )
+    render json: { feedback: }
+  rescue LlmConversation::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
+  end
+
+  # @API Delete feedback on a conversation message
+  #
+  # Remove a previously submitted vote (toggling off like/dislike).
+  #
+  # @returns {Object} Success response
+  def delete_feedback
+    client = LLMConversationClient.new(
+      current_user: @current_user,
+      root_account_uuid: @context.root_account.uuid,
+      conversation_context_id: @experience.llm_conversation_context_id,
+      facts: @experience.facts,
+      learning_objectives: @experience.learning_objective,
+      scenario: @experience.pedagogical_guidance,
+      conversation_id: @conversation.llm_conversation_id
+    )
+    client.delete_feedback(
+      message_id: params[:message_id],
+      feedback_id: params[:feedback_id]
+    )
+    render json: { success: true }
   rescue LlmConversation::Errors::ConversationError => e
     render json: { error: e.message }, status: :service_unavailable
   end
