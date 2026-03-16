@@ -172,6 +172,132 @@ describe('AccessibilityCoursesPage', () => {
     })
   })
 
+  describe('term filter', () => {
+    const PAST_DATE = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    const MOCK_TERMS = {
+      enrollment_terms: [
+        {
+          id: '10',
+          name: 'Spring 2026',
+          start_at: PAST_DATE,
+          end_at: null,
+          used_in_subaccount: true,
+        },
+      ],
+    }
+
+    const setupHandlers = (courseRequestSpy?: (params: URLSearchParams) => void) => {
+      server.use(
+        http.get('/api/v1/accounts/123/terms', () => HttpResponse.json(MOCK_TERMS)),
+        http.get('/api/v1/accounts/123/courses', ({request}) => {
+          courseRequestSpy?.(new URL(request.url).searchParams)
+          return HttpResponse.json(createMockCourses(2))
+        }),
+      )
+    }
+
+    it('renders the term filter dropdown', async () => {
+      setupHandlers()
+      renderPage()
+      expect(screen.getByPlaceholderText('Filter by term')).toBeInTheDocument()
+    })
+
+    it('loads enrollment_term_id from URL on mount and sends it in courses request', async () => {
+      let lastParams: URLSearchParams | undefined
+      setupHandlers(p => {
+        lastParams = p
+      })
+
+      renderPage(['/?enrollment_term_id=10'])
+
+      await waitFor(() => {
+        expect(lastParams?.get('enrollment_term_id')).toBe('10')
+      })
+    })
+
+    it('sends enrollment_term_id in courses request when a term is selected', async () => {
+      const user = userEvent.setup()
+      let lastParams: URLSearchParams | undefined
+      setupHandlers(p => {
+        lastParams = p
+      })
+
+      renderPage()
+
+      const input = screen.getByPlaceholderText('Filter by term')
+      await user.click(input)
+
+      const option = await screen.findByText('Spring 2026')
+      await user.click(option)
+
+      await waitFor(() => {
+        expect(lastParams?.get('enrollment_term_id')).toBe('10')
+      })
+    })
+
+    it('resets page to 1 when a term is selected', async () => {
+      const user = userEvent.setup()
+      let lastParams: URLSearchParams | undefined
+      setupHandlers(p => {
+        lastParams = p
+      })
+
+      renderPage(['/?page=3'])
+
+      const input = screen.getByPlaceholderText('Filter by term')
+      await user.click(input)
+
+      const option = await screen.findByText('Spring 2026')
+      await user.click(option)
+
+      await waitFor(() => {
+        expect(lastParams?.get('page')).toBe('1')
+        expect(lastParams?.get('enrollment_term_id')).toBe('10')
+      })
+    })
+
+    it('omits enrollment_term_id from request when "All terms" is selected', async () => {
+      const user = userEvent.setup()
+      let lastParams: URLSearchParams | undefined
+      setupHandlers(p => {
+        lastParams = p
+      })
+
+      renderPage(['/?enrollment_term_id=10'])
+
+      // Wait for the term filter to show the selected term label
+      await waitFor(() => {
+        const input = screen.getByRole('combobox') as HTMLInputElement
+        expect(input.value).toBe('Spring 2026')
+      })
+
+      const input = screen.getByRole('combobox')
+      await user.click(input)
+
+      const allTermsOption = await screen.findByText('All terms')
+      await user.click(allTermsOption)
+
+      await waitFor(() => {
+        expect(lastParams?.has('enrollment_term_id')).toBe(false)
+      })
+    })
+
+    it('shows empty state when 404 is returned for a selected term', async () => {
+      server.use(
+        http.get('/api/v1/accounts/123/terms', () => HttpResponse.json(MOCK_TERMS)),
+        http.get('/api/v1/accounts/123/courses', () =>
+          HttpResponse.json({errors: [{message: 'not found'}]}, {status: 404}),
+        ),
+      )
+
+      renderPage(['/?enrollment_term_id=nonexistent'])
+
+      await waitFor(() => {
+        expect(screen.getByText('No courses found')).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('pagination', () => {
     it('loads page from URL query parameter on mount', async () => {
       let lastRequestParams: URLSearchParams | undefined

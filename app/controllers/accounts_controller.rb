@@ -1082,6 +1082,11 @@ class AccountsController < ApplicationController
       GuardRail.activate(:secondary) do
         courses = @account.associated_courses.where.not(workflow_state: "deleted")
 
+        if params[:enrollment_term_id]
+          term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+          courses = courses.for_term(term)
+        end
+
         stats_table = AccessibilityCourseStatistic.arel_table
         active_issues, resolved_issues = courses
                                          .left_joins(:accessibility_course_statistic)

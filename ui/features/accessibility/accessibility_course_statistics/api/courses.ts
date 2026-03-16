@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {Course, CoursesResponse} from '../types/course'
 import type {SortOrder} from '../react/components/SortableTableHeader'
 
@@ -29,10 +29,11 @@ export interface FetchCoursesParams {
   order: SortOrder
   page: number
   search: string
+  enrollment_term_id?: string
 }
 
 export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesResponse> => {
-  const {accountId, sort, order, page, search} = params
+  const {accountId, sort, order, page, search, enrollment_term_id} = params
 
   const queryParams: Record<string, any> = {
     include: [
@@ -50,19 +51,29 @@ export const fetchCourses = async (params: FetchCoursesParams): Promise<CoursesR
   if (search.length > 0) {
     queryParams.search_term = search
   }
+  if (enrollment_term_id) {
+    queryParams.enrollment_term_id = enrollment_term_id
+  }
 
   queryParams.sort = sort
   queryParams.order = order
 
-  const response = await doFetchApi<Course[]>({
-    path: `/api/v1/accounts/${accountId}/courses`,
-    params: queryParams,
-  })
+  try {
+    const response = await doFetchApi<Course[]>({
+      path: `/api/v1/accounts/${accountId}/courses`,
+      params: queryParams,
+    })
 
-  const pageCount = Number.parseInt(response.link?.last?.page ?? '1', 10)
+    const pageCount = Number.parseInt(response.link?.last?.page ?? '1', 10)
 
-  return {
-    courses: response.json || [],
-    pageCount,
+    return {
+      courses: response.json || [],
+      pageCount,
+    }
+  } catch (err: unknown) {
+    if (err instanceof FetchApiError && err.response.status === 404) {
+      return {courses: [], pageCount: 1}
+    }
+    throw err
   }
 }
