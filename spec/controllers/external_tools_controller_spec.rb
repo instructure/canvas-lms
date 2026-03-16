@@ -2024,42 +2024,39 @@ describe ExternalToolsController do
         user_session(@teacher)
       end
 
-      it "redirects to the New Quizzes native launch" do
+      it "redirects to the New Quizzes native launch with exclude_module_launch_params" do
         get :retrieve, params: {
           course_id: @course.id,
           url: quiz_lti_tool.url,
           assignment_id: assignment.id
         }
-        expect(response).to redirect_to(
-          course_assignment_new_quizzes_launch_path(@course, assignment)
-        )
+        launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+        expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&exclude_module_launch_params=true&url=#{CGI.escape(quiz_lti_tool.url)}")
       end
 
       context "when borderless param is set" do
-        it "redirects with content_only" do
+        it "redirects with content_only and exclude_module_launch_params" do
           get :retrieve, params: {
             course_id: @course.id,
             url: quiz_lti_tool.url,
             assignment_id: assignment.id,
             borderless: true
           }
-          expect(response).to redirect_to(
-            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
-          )
+          launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+          expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&borderless=true&content_only=true&exclude_module_launch_params=true&url=#{CGI.escape(quiz_lti_tool.url)}")
         end
       end
 
       context "when display=borderless" do
-        it "redirects with content_only" do
+        it "redirects with content_only and exclude_module_launch_params" do
           get :retrieve, params: {
             course_id: @course.id,
             url: quiz_lti_tool.url,
             assignment_id: assignment.id,
             display: "borderless"
           }
-          expect(response).to redirect_to(
-            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
-          )
+          launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+          expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&content_only=true&display=borderless&exclude_module_launch_params=true&url=#{CGI.escape(quiz_lti_tool.url)}")
         end
       end
 
@@ -3881,10 +3878,10 @@ describe ExternalToolsController do
         @course.enable_feature!(:new_quizzes_native_experience_sessionless)
       end
 
-      it "redirects to the New Quizzes native launch with content_only" do
+      it "redirects to the New Quizzes native launch with content_only and exclude_module_launch_params" do
         get :sessionless_launch, params: { course_id: @course.id, verifier: }
         expect(response).to redirect_to(
-          course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+          course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true, exclude_module_launch_params: true)
         )
       end
 

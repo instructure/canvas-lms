@@ -710,7 +710,7 @@ class ExternalToolsController < ApplicationController
                            new_quizzes_native_experience_sessionless_enabled?
       if native_nq_redirect
         @assignment = @context.assignments.find(params[:assignment_id])
-        redirect_params = { context: @context, assignment: @assignment }
+        redirect_params = { context: @context, assignment: @assignment, exclude_module_launch_params: true, **request.query_parameters }
         redirect_params[:content_only] = true if params[:borderless] || params[:display] == "borderless"
         return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(**redirect_params)
       end
@@ -901,7 +901,8 @@ class ExternalToolsController < ApplicationController
           return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(
             context: @context,
             assignment: @assignment,
-            content_only: true
+            content_only: true,
+            exclude_module_launch_params: true
           )
         end
         # Use domain-specific URL for environment overrides
