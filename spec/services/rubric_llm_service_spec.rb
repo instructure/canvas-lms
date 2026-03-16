@@ -2835,6 +2835,66 @@ describe RubricLLMService do
     end
   end
 
+  describe "#resolve_generate_options" do
+    let(:test_service) { described_class.new(rubric) }
+
+    it "fills in all DEFAULT_GENERATE_OPTIONS keys when none are provided" do
+      result = test_service.send(:resolve_generate_options, {})
+      expect(result).to include(
+        criteria_count: 5,
+        rating_count: 4,
+        total_points: 100,
+        use_range: false,
+        grade_level: "higher-ed",
+        standard: "",
+        additional_prompt_info: ""
+      )
+    end
+
+    it "preserves caller-provided values over defaults" do
+      result = test_service.send(:resolve_generate_options, { criteria_count: 3, grade_level: "k-12" })
+      expect(result[:criteria_count]).to eq(3)
+      expect(result[:grade_level]).to eq("k-12")
+    end
+
+    it "keeps default values for keys not provided by the caller" do
+      result = test_service.send(:resolve_generate_options, { criteria_count: 3 })
+      expect(result[:rating_count]).to eq(4)
+      expect(result[:total_points]).to eq(100)
+    end
+  end
+
+  describe "#resolve_regenerate_options" do
+    let(:test_service) { described_class.new(rubric) }
+
+    it "includes all generate defaults" do
+      result = test_service.send(:resolve_regenerate_options, {}, {})
+      expect(result).to include(criteria_count: 5, rating_count: 4, total_points: 100)
+    end
+
+    it "uses additional_user_prompt from regenerate_options when present" do
+      result = test_service.send(:resolve_regenerate_options, {}, { additional_user_prompt: "be concise" })
+      expect(result[:additional_user_prompt]).to eq("be concise")
+    end
+
+    it "falls back to additional_prompt_info from generate_options when additional_user_prompt is absent" do
+      result = test_service.send(:resolve_regenerate_options, { additional_prompt_info: "focus on clarity" }, {})
+      expect(result[:additional_user_prompt]).to eq("focus on clarity")
+    end
+
+    it "falls back to hardcoded default when both prompt fields are blank" do
+      result = test_service.send(:resolve_regenerate_options, {}, {})
+      expect(result[:additional_user_prompt]).to eq("No specific expectations, just improve it.")
+    end
+
+    it "prefers additional_user_prompt over additional_prompt_info" do
+      result = test_service.send(:resolve_regenerate_options,
+                                 { additional_prompt_info: "from generate" },
+                                 { additional_user_prompt: "from regenerate" })
+      expect(result[:additional_user_prompt]).to eq("from regenerate")
+    end
+  end
+
   describe "#normalize_boolean_field!" do
     let(:test_rubric) { rubric }
     let(:test_service) { described_class.new(test_rubric) }
