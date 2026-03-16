@@ -533,6 +533,11 @@ export default function VideoOptionsTray({
                               value="enableTranscriptDownload"
                               variant="toggle"
                             />
+                            <Checkbox
+                              label={formatMessage('Show rolling transcript')}
+                              value="showRollingTranscript"
+                              variant="toggle"
+                            />
                           </CheckboxGroup>
                         </Flex.Item>
                       ) : null}

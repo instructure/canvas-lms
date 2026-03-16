@@ -16,24 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  displayStyleFrom,
-  isStudioEmbeddedMedia,
-  parseStudioOptions,
-  studioAttributesFrom,
-  StudioContentItemCustomJson,
-  StudioMediaOptionsAttributes,
-  handleBeforeObjectSelected,
-  findStudioLtiIframeFromSelection,
-  updateStudioIframeDimensions,
-  isValidEmbedType,
-  isValidDimension,
-  isValidResizable,
-} from '../StudioLtiSupportUtils'
 import {EditorEvent, Events} from 'tinymce'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
-
 import * as iframeUtils from '../iframeUtils'
+import {
+  displayStyleFrom,
+  findStudioLtiIframeFromSelection,
+  handleBeforeObjectSelected,
+  isStudioEmbeddedMedia,
+  isValidDimension,
+  isValidEmbedType,
+  isValidResizable,
+  parseStudioOptions,
+  StudioContentItemCustomJson,
+  StudioEmbedOptions,
+  StudioMediaOptionsAttributes,
+  studioAttributesFrom,
+  updateStudioEmbedOptions,
+  updateStudioIframeDimensions,
+} from '../StudioLtiSupportUtils'
 
 describe('studioAttributesFrom', () => {
   it('uses the default values for missing attributes', () => {
@@ -178,6 +179,30 @@ describe('parseStudioOptions', () => {
       convertibleToLink: true,
       embedOptions: {},
     })
+  })
+
+  it('parses showRollingTranscript as true from URL params', () => {
+    const element = document.createElement('span')
+    const studioUrl =
+      'https://studio.example.com/embed?custom_arc_show_rolling_transcript=true'
+    element.setAttribute(
+      'data-mce-p-src',
+      `https://canvas.example.com/external_tools/retrieve?url=${encodeURIComponent(studioUrl)}`,
+    )
+    const result = parseStudioOptions(element)
+    expect(result.embedOptions.showRollingTranscript).toBe(true)
+  })
+
+  it('parses showRollingTranscript as false from URL params', () => {
+    const element = document.createElement('span')
+    const studioUrl =
+      'https://studio.example.com/embed?custom_arc_show_rolling_transcript=false'
+    element.setAttribute(
+      'data-mce-p-src',
+      `https://canvas.example.com/external_tools/retrieve?url=${encodeURIComponent(studioUrl)}`,
+    )
+    const result = parseStudioOptions(element)
+    expect(result.embedOptions.showRollingTranscript).toBe(false)
   })
 })
 
@@ -824,5 +849,114 @@ describe('Studio Media Options Utils', () => {
       expect(isValidResizable([])).toBe(false)
       expect(isValidResizable(() => {})).toBe(false)
     })
+  })
+})
+
+describe('updateStudioEmbedOptions', () => {
+  let mockEditor: any
+  let mockIframe: HTMLIFrameElement
+  let mockParentElement: HTMLElement
+
+  const makeHref = (innerUrl: string) =>
+    `https://canvas.example.com/external_tools/retrieve?url=${encodeURIComponent(innerUrl)}`
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+
+    mockEditor = createDeepMockProxy({
+      dom: {
+        getAttrib: jest.fn(),
+        setAttrib: jest.fn(),
+      },
+    })
+
+    mockIframe = document.createElement('iframe')
+    mockParentElement = document.createElement('span')
+    mockParentElement.appendChild(mockIframe)
+    document.body.appendChild(mockParentElement)
+  })
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('clears existing url params when embedOptions is empty', () => {
+    const href = makeHref(
+      'https://studio.example.com/embed?custom_arc_show_rolling_transcript=true',
+    )
+    mockEditor.dom.getAttrib.mockReturnValue(href)
+
+    updateStudioEmbedOptions(mockEditor, {} as StudioEmbedOptions, mockIframe)
+
+    expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+      mockParentElement,
+      'data-mce-p-src',
+      makeHref('https://studio.example.com/embed'),
+    )
+  })
+
+  it('clears existing url params when embedOptions is undefined', () => {
+    const href = makeHref(
+      'https://studio.example.com/embed?custom_arc_show_rolling_transcript=true',
+    )
+    mockEditor.dom.getAttrib.mockReturnValue(href)
+
+    updateStudioEmbedOptions(mockEditor, undefined, mockIframe)
+
+    expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+      mockParentElement,
+      'data-mce-p-src',
+      makeHref('https://studio.example.com/embed'),
+    )
+  })
+
+  it('clears all params when all options are false', () => {
+    const href = makeHref(
+      'https://studio.example.com/embed?custom_arc_show_rolling_transcript=true&custom_arc_lock_speed=true',
+    )
+    mockEditor.dom.getAttrib.mockReturnValue(href)
+
+    updateStudioEmbedOptions(
+      mockEditor,
+      {
+        enableMediaDownload: false,
+        enableTranscriptDownload: false,
+        showRollingTranscript: false,
+        lockSpeed: false,
+        isExternal: false,
+      },
+      mockIframe,
+    )
+
+    expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+      mockParentElement,
+      'data-mce-p-src',
+      makeHref('https://studio.example.com/embed'),
+    )
+  })
+
+  it('sets params for true options and clears others', () => {
+    const href = makeHref(
+      'https://studio.example.com/embed?custom_arc_show_rolling_transcript=true',
+    )
+    mockEditor.dom.getAttrib.mockReturnValue(href)
+
+    updateStudioEmbedOptions(
+      mockEditor,
+      {
+        enableMediaDownload: true,
+        enableTranscriptDownload: false,
+        showRollingTranscript: false,
+        lockSpeed: false,
+        isExternal: false,
+      },
+      mockIframe,
+    )
+
+    expect(mockEditor.dom.setAttrib).toHaveBeenCalledWith(
+      mockParentElement,
+      'data-mce-p-src',
+      makeHref('https://studio.example.com/embed?custom_arc_display_download=true'),
+    )
   })
 })

@@ -124,6 +124,8 @@ export function parseStudioOptions(element: Element | null): ParsedStudioOptions
     embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
     embedOptions['enableTranscriptDownload'] =
       params.get('custom_arc_transcript_downloadable') === 'true'
+    embedOptions['showRollingTranscript'] =
+      params.get('custom_arc_show_rolling_transcript') === 'true'
     embedOptions['lockSpeed'] = params.get('custom_arc_lock_speed') === 'true'
     embedOptions['isExternal'] = params.get('custom_arc_is_external') === 'true'
   }
@@ -296,11 +298,13 @@ export type StudioEmbedOptions = {
   enableTranscriptDownload: boolean
   lockSpeed: boolean
   isExternal: boolean
+  showRollingTranscript: boolean
 }
 
 const embedOptionsKeyMap: {[key in keyof StudioEmbedOptions]: string} = {
   enableMediaDownload: 'custom_arc_display_download',
   enableTranscriptDownload: 'custom_arc_transcript_downloadable',
+  showRollingTranscript: 'custom_arc_show_rolling_transcript',
   lockSpeed: 'custom_arc_lock_speed',
   isExternal: 'custom_arc_is_external',
 }
@@ -309,8 +313,10 @@ export function validateStudioEmbedOptions(input: any): input is StudioEmbedOpti
   return (
     typeof input === 'object' &&
     (Object.keys(input).length === 0 ||
+      typeof input.isExternal === 'boolean' ||
       typeof input.enableMediaDownload === 'boolean' ||
       typeof input.enableTranscriptDownload === 'boolean' ||
+      typeof input.showRollingTranscript === 'boolean' ||
       typeof input.lockSpeed === 'boolean')
   )
 }
@@ -340,12 +346,15 @@ export function updateStudioEmbedOptions(
   const url = new URL(decodeURIComponent(urlMatch ? urlMatch[1] : ''))
   const params = url.searchParams
 
-  for (const [option, param] of Object.entries(embedOptionsKeyMap)) {
-    const optionValue = embedOptions[option as keyof StudioEmbedOptions]
-    if (optionValue) {
-      params.set(param, 'true')
-    } else if (params.has(param)) {
-      params.delete(param)
+  for (const param of Object.values(embedOptionsKeyMap)) {
+    params.delete(param)
+  }
+
+  if (embedOptions) {
+    for (const [option, param] of Object.entries(embedOptionsKeyMap)) {
+      if (embedOptions[option as keyof StudioEmbedOptions]) {
+        params.set(param, 'true')
+      }
     }
   }
 
