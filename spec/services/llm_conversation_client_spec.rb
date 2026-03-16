@@ -367,10 +367,26 @@ describe LLMConversationClient do
       }
     end
 
+    let(:refreshed_messages_response) do
+      {
+        "success" => true,
+        "data" => [
+          { "id" => "msg1", "text" => "Initial message", "is_llm_message" => false, "feedback" => [] },
+          { "id" => "msg2", "text" => "Initial response", "is_llm_message" => true, "feedback" => [] },
+          { "id" => "msg3", "text" => "Follow-up question", "is_llm_message" => false, "feedback" => [] },
+          { "id" => "msg4", "text" => "Follow-up response", "is_llm_message" => true, "feedback" => [] }
+        ]
+      }
+    end
+
     before do
       stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
         .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
+
+      stub_request(:get, %r{http://localhost:3001/conversations/#{conversation_id}/messages\?include_feedback_from=})
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: refreshed_messages_response.to_json, headers: { "Content-Type" => "application/json" })
     end
 
     it "adds user message and returns updated messages" do
@@ -492,7 +508,7 @@ describe LLMConversationClient do
         .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: conversation_response.to_json, headers: { "Content-Type" => "application/json" })
 
-      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+      stub_request(:get, %r{http://localhost:3001/conversations/#{conversation_id}/messages\?include_feedback_from=})
         .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: messages_response.to_json, headers: { "Content-Type" => "application/json" })
     end
@@ -508,6 +524,172 @@ describe LLMConversationClient do
       expect(result[:progress][:total]).to eq(2)
       expect(result[:progress][:objectives]).to be_an(Array)
       expect(result[:progress][:objectives].length).to eq(2)
+    end
+  end
+
+  describe "#messages with include_feedback_from" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
+    let(:messages_with_feedback_response) do
+      {
+        "success" => true,
+        "data" => [
+          {
+            "id" => "msg1",
+            "text" => "User message",
+            "is_llm_message" => false,
+            "feedback" => []
+          },
+          {
+            "id" => "msg2",
+            "text" => "Assistant message",
+            "is_llm_message" => true,
+            "feedback" => [
+              {
+                "id" => "fb-1",
+                "vote" => "liked",
+                "user_id" => "user-uuid",
+                "feedback_message" => nil
+              }
+            ]
+          }
+        ]
+      }
+    end
+
+    before do
+      stub_request(:get, %r{http://localhost:3001/conversations/#{conversation_id}/messages\?include_feedback_from=})
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: messages_with_feedback_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "sends include_feedback_from query param and includes feedback in response" do
+      result = client_with_conversation_id.messages(include_feedback_from: user.uuid)
+
+      expect(result[:messages][0][:feedback]).to eq([])
+      expect(result[:messages][1][:feedback].first["vote"]).to eq("liked")
+    end
+
+    it "does not include feedback key when include_feedback_from is not provided" do
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200,
+                   body: {
+                     "success" => true,
+                     "data" => [{ "id" => "msg1", "text" => "Hi", "is_llm_message" => false }]
+                   }.to_json,
+                   headers: { "Content-Type" => "application/json" })
+
+      result = client_with_conversation_id.messages
+
+      expect(result[:messages][0]).not_to have_key(:feedback)
+    end
+  end
+
+  describe "#create_feedback" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
+    let(:feedback_response) do
+      {
+        "success" => true,
+        "data" => {
+          "id" => "fb-1",
+          "vote" => "liked",
+          "user_id" => "user-uuid",
+          "feedback_message" => nil
+        }
+      }
+    end
+
+    before do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/msg-1/feedback")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: feedback_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "posts feedback and returns response data" do
+      result = client_with_conversation_id.create_feedback(
+        message_id: "msg-1",
+        user_id: "user-uuid",
+        vote: "liked"
+      )
+
+      expect(result["id"]).to eq("fb-1")
+      expect(result["vote"]).to eq("liked")
+    end
+
+    it "includes feedback_message when provided" do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/msg-1/feedback")
+        .with(
+          headers: { "Authorization" => "Bearer test-bearer-token" },
+          body: hash_including("feedback_message" => "Incorrect response")
+        )
+        .to_return(status: 200, body: feedback_response.to_json, headers: { "Content-Type" => "application/json" })
+
+      result = client_with_conversation_id.create_feedback(
+        message_id: "msg-1",
+        user_id: "user-uuid",
+        vote: "disliked",
+        feedback_message: "Incorrect response"
+      )
+
+      expect(result).to be_a(Hash)
+    end
+
+    it "raises ConversationError when conversation_id is not set" do
+      expect do
+        client.create_feedback(message_id: "msg-1", user_id: "user-uuid", vote: "liked")
+      end.to raise_error(LlmConversation::Errors::ConversationError, /Conversation ID not set/)
+    end
+
+    it "raises ConversationError on API failure" do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/msg-1/feedback")
+        .to_return(status: 500, body: "Internal Server Error")
+
+      expect do
+        client_with_conversation_id.create_feedback(
+          message_id: "msg-1",
+          user_id: "user-uuid",
+          vote: "liked"
+        )
+      end.to raise_error(LlmConversation::Errors::ConversationError)
+    end
+  end
+
+  describe "#delete_feedback" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
+    before do
+      stub_request(:delete, "http://localhost:3001/conversations/#{conversation_id}/messages/msg-1/feedback/fb-1")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: { "success" => true }.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "sends DELETE request for specified feedback" do
+      expect do
+        client_with_conversation_id.delete_feedback(message_id: "msg-1", feedback_id: "fb-1")
+      end.not_to raise_error
+    end
+
+    it "raises ConversationError when conversation_id is not set" do
+      expect do
+        client.delete_feedback(message_id: "msg-1", feedback_id: "fb-1")
+      end.to raise_error(LlmConversation::Errors::ConversationError, /Conversation ID not set/)
+    end
+
+    it "raises ConversationError on API failure" do
+      stub_request(:delete, "http://localhost:3001/conversations/#{conversation_id}/messages/msg-1/feedback/fb-1")
+        .to_return(status: 404, body: "Not Found")
+
+      expect do
+        client_with_conversation_id.delete_feedback(message_id: "msg-1", feedback_id: "fb-1")
+      end.to raise_error(LlmConversation::Errors::ConversationError)
     end
   end
 

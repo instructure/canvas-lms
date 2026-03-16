@@ -367,6 +367,7 @@ class AiExperiencesController < ApplicationController
     # The client handles communication with the external LLM service that stores the actual messages.
     client = LLMConversationClient.new(
       current_user: @conversation.user,
+      requesting_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
       conversation_context_id: @experience.llm_conversation_context_id,
       facts: @experience.facts,

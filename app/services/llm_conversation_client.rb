@@ -64,9 +64,10 @@ class LLMConversationClient
     Rails.application.credentials.llm_conversation_bearer_token
   end
 
-  def initialize(current_user: nil, root_account_uuid: nil, facts: "", learning_objectives: "", scenario: "", conversation_id: nil, conversation_context_id: nil)
+  def initialize(current_user: nil, requesting_user: nil, root_account_uuid: nil, facts: "", learning_objectives: "", scenario: "", conversation_id: nil, conversation_context_id: nil)
     @root_account_uuid = root_account_uuid
     @current_user = current_user
+    @requesting_user = requesting_user || current_user
     @facts = facts
     @learning_objectives = learning_objectives
     @scenario = scenario
@@ -114,22 +115,23 @@ class LLMConversationClient
     # Send the new user message and get LLM response
     llm_response = add_message_to_conversation(new_user_message, "User")
 
-    messages << { role: "User", text: new_user_message }
-    messages << { role: "Assistant", text: llm_response[:text] }
+    # Re-fetch full message list with IDs and feedback after the exchange
+    refreshed = self.messages(include_feedback_from: @requesting_user&.uuid)
 
     {
       conversation_id: @conversation_id,
-      messages:,
-      progress: llm_response[:progress]
+      messages: refreshed[:messages],
+      progress: llm_response[:progress] || refreshed[:progress]
     }
   end
 
-  def messages
+  def messages(include_feedback_from: nil)
     raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
 
+    query = include_feedback_from ? "?include_feedback_from=#{CGI.escape(include_feedback_from)}" : ""
     response = make_request(
       method: :get,
-      path: "/conversations/#{@conversation_id}/messages",
+      path: "/conversations/#{@conversation_id}/messages#{query}",
       error_message: "Failed to get messages"
     )
 
@@ -143,10 +145,13 @@ class LLMConversationClient
 
     # Convert llm-conversation message format to our format
     formatted_messages = messages_data.map do |msg|
-      {
+      base = {
+        id: msg["id"],
         role: msg["is_llm_message"] ? "Assistant" : "User",
         text: msg["text"]
       }
+      base[:feedback] = msg["feedback"] || [] if include_feedback_from
+      base
     end
 
     {
@@ -155,11 +160,37 @@ class LLMConversationClient
     }
   end
 
+  def create_feedback(message_id:, user_id:, vote:, feedback_message: nil)
+    raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
+
+    payload = { user_id:, vote: }
+    payload[:feedback_message] = feedback_message if feedback_message.present?
+
+    response = make_request(
+      method: :post,
+      path: "/conversations/#{@conversation_id}/messages/#{message_id}/feedback",
+      payload:,
+      error_message: "Failed to create feedback"
+    )
+
+    response["data"]
+  end
+
+  def delete_feedback(message_id:, feedback_id:)
+    raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
+
+    make_request(
+      method: :delete,
+      path: "/conversations/#{@conversation_id}/messages/#{message_id}/feedback/#{feedback_id}",
+      error_message: "Failed to delete feedback"
+    )
+  end
+
   def messages_with_conversation_progress
     raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
 
-    # Get messages first
-    messages_result = messages
+    # Get messages with feedback scoped to the requesting user
+    messages_result = messages(include_feedback_from: @requesting_user&.uuid)
 
     # If no progress on messages, fetch from conversation object
     progress = messages_result[:progress]
@@ -217,11 +248,13 @@ class LLMConversationClient
 
     request = case method
               when :get
-                Net::HTTP::Get.new(uri.path, headers)
+                Net::HTTP::Get.new(uri.request_uri, headers)
               when :post
                 req = Net::HTTP::Post.new(uri.path, headers)
                 req.body = payload.to_json if payload
                 req
+              when :delete
+                Net::HTTP::Delete.new(uri.path, headers)
               end
 
     response = http.request(request)
