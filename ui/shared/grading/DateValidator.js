@@ -286,136 +286,139 @@ export default class DateValidator {
       })
     }
 
-    // Peer review available from must be >= unlock_at (assignment available from)
-    if (peerReviewAvailableFrom && unlockAt) {
-      datetimesToValidate.push({
-        date: unlockAt,
-        validationDates: {
-          peer_review_available_from: peerReviewAvailableFrom,
-        },
-        range: 'start_range',
-        type: 'unlock',
-      })
-    }
+    // Only validate peer review dates when feature flag is enabled
+    if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+      // Peer review available from must be >= unlock_at (assignment available from)
+      if (peerReviewAvailableFrom && unlockAt) {
+        datetimesToValidate.push({
+          date: unlockAt,
+          validationDates: {
+            peer_review_available_from: peerReviewAvailableFrom,
+          },
+          range: 'start_range',
+          type: 'unlock',
+        })
+      }
 
-    // Peer review available from must be >= due_at (assignment due date)
-    if (peerReviewAvailableFrom && dueAt) {
-      datetimesToValidate.push({
-        date: dueAt,
-        validationDates: {
-          peer_review_available_from: peerReviewAvailableFrom,
-        },
-        range: 'start_range',
-        type: 'due',
-      })
-    }
+      // Peer review available from must be >= due_at (assignment due date)
+      if (peerReviewAvailableFrom && dueAt) {
+        datetimesToValidate.push({
+          date: dueAt,
+          validationDates: {
+            peer_review_available_from: peerReviewAvailableFrom,
+          },
+          range: 'start_range',
+          type: 'due',
+        })
+      }
 
-    // Peer review available from must be < lock_at (assignment available to)
-    if (peerReviewAvailableFrom && lockAt) {
-      datetimesToValidate.push({
-        date: lockAt,
-        validationDates: {
-          peer_review_available_from: peerReviewAvailableFrom,
-        },
-        range: 'end_range',
-        type: 'lock',
-      })
-    }
+      // Peer review available from must be < lock_at (assignment available to)
+      if (peerReviewAvailableFrom && lockAt) {
+        datetimesToValidate.push({
+          date: lockAt,
+          validationDates: {
+            peer_review_available_from: peerReviewAvailableFrom,
+          },
+          range: 'end_range',
+          type: 'lock',
+        })
+      }
 
-    // Peer review available from must be <= peer review due date
-    if (peerReviewDueAt && peerReviewAvailableFrom) {
-      datetimesToValidate.push({
-        date: peerReviewDueAt,
-        validationDates: {
-          peer_review_available_from: peerReviewAvailableFrom,
-        },
-        range: 'end_range',
-        type: 'peerReviewDueAt',
-      })
-    }
+      // Peer review available from must be <= peer review due date
+      if (peerReviewDueAt && peerReviewAvailableFrom) {
+        datetimesToValidate.push({
+          date: peerReviewDueAt,
+          validationDates: {
+            peer_review_available_from: peerReviewAvailableFrom,
+          },
+          range: 'end_range',
+          type: 'peerReviewDueAt',
+        })
+      }
 
-    // Peer review available to must be >= peer review due date
-    if (peerReviewAvailableTo && peerReviewDueAt) {
-      datetimesToValidate.push({
-        date: peerReviewDueAt,
-        validationDates: {
-          peer_review_available_to: peerReviewAvailableTo,
-        },
-        range: 'start_range',
-        type: 'peerReviewDueDate',
-      })
-    }
+      // Peer review available to must be >= peer review due date
+      if (peerReviewAvailableTo && peerReviewDueAt) {
+        datetimesToValidate.push({
+          date: peerReviewDueAt,
+          validationDates: {
+            peer_review_available_to: peerReviewAvailableTo,
+          },
+          range: 'start_range',
+          type: 'peerReviewDueDate',
+        })
+      }
 
-    // Peer review available to must be <= lock_at (assignment available to)
-    if (peerReviewAvailableTo && lockAt) {
-      datetimesToValidate.push({
-        date: lockAt,
-        validationDates: {
-          peer_review_available_to: peerReviewAvailableTo,
-        },
-        range: 'end_range',
-        type: 'lock',
-      })
-    }
+      // Peer review available to must be <= lock_at (assignment available to)
+      if (peerReviewAvailableTo && lockAt) {
+        datetimesToValidate.push({
+          date: lockAt,
+          validationDates: {
+            peer_review_available_to: peerReviewAvailableTo,
+          },
+          range: 'end_range',
+          type: 'lock',
+        })
+      }
 
-    // Peer review due date must be >= assignment available from (unlock_at)
-    if (peerReviewDueAt && unlockAt) {
-      datetimesToValidate.push({
-        date: unlockAt,
-        validationDates: {
-          peer_review_due_at: peerReviewDueAt,
-        },
-        range: 'start_range',
-        type: 'unlock',
-      })
-    }
+      // Peer review due date must be >= assignment available from (unlock_at)
+      if (peerReviewDueAt && unlockAt) {
+        datetimesToValidate.push({
+          date: unlockAt,
+          validationDates: {
+            peer_review_due_at: peerReviewDueAt,
+          },
+          range: 'start_range',
+          type: 'unlock',
+        })
+      }
 
-    // Peer review due date must be >= assignment due date
-    if (peerReviewDueAt && dueAt) {
-      datetimesToValidate.push({
-        date: dueAt,
-        validationDates: {
-          peer_review_due_at: peerReviewDueAt,
-        },
-        range: 'start_range',
-        type: 'due',
-      })
-    }
+      // Peer review due date must be >= assignment due date
+      if (peerReviewDueAt && dueAt) {
+        datetimesToValidate.push({
+          date: dueAt,
+          validationDates: {
+            peer_review_due_at: peerReviewDueAt,
+          },
+          range: 'start_range',
+          type: 'due',
+        })
+      }
 
-    // Peer review due date must be <= lock_at (assignment available to)
-    if (peerReviewDueAt && lockAt) {
-      datetimesToValidate.push({
-        date: lockAt,
-        validationDates: {
-          peer_review_due_at: peerReviewDueAt,
-        },
-        range: 'end_range',
-        type: 'lock',
-      })
-    }
+      // Peer review due date must be <= lock_at (assignment available to)
+      if (peerReviewDueAt && lockAt) {
+        datetimesToValidate.push({
+          date: lockAt,
+          validationDates: {
+            peer_review_due_at: peerReviewDueAt,
+          },
+          range: 'end_range',
+          type: 'lock',
+        })
+      }
 
-    // Peer review available to must be > assignment available from (unlock_at)
-    if (peerReviewAvailableTo && unlockAt) {
-      datetimesToValidate.push({
-        date: unlockAt,
-        validationDates: {
-          peer_review_available_to: peerReviewAvailableTo,
-        },
-        range: 'start_range',
-        type: 'unlock',
-      })
-    }
+      // Peer review available to must be > assignment available from (unlock_at)
+      if (peerReviewAvailableTo && unlockAt) {
+        datetimesToValidate.push({
+          date: unlockAt,
+          validationDates: {
+            peer_review_available_to: peerReviewAvailableTo,
+          },
+          range: 'start_range',
+          type: 'unlock',
+        })
+      }
 
-    // Peer review available to must be > peer review available from
-    if (peerReviewAvailableTo && peerReviewAvailableFrom) {
-      datetimesToValidate.push({
-        date: peerReviewAvailableFrom,
-        validationDates: {
-          peer_review_available_to: peerReviewAvailableTo,
-        },
-        range: 'start_range',
-        type: 'peerReviewAvailableFrom',
-      })
+      // Peer review available to must be > peer review available from
+      if (peerReviewAvailableTo && peerReviewAvailableFrom) {
+        datetimesToValidate.push({
+          date: peerReviewAvailableFrom,
+          validationDates: {
+            peer_review_available_to: peerReviewAvailableTo,
+          },
+          range: 'start_range',
+          type: 'peerReviewAvailableFrom',
+        })
+      }
     }
 
     const errs = {}

@@ -635,6 +635,10 @@ EditView.prototype.handleHideZeroPointQuizChange = function () {
 }
 
 EditView.prototype.togglePeerReviewsAndGroupCategoryEnabled = function () {
+  const isGradedPeerReviewInLegacyMode =
+    this.assignment.peerReviewSubAssignment() != null &&
+    !ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
+
   if (this.assignment.moderatedGrading()) {
     this.disableCheckbox(
       this.$peerReviewsBox,
@@ -646,8 +650,12 @@ EditView.prototype.togglePeerReviewsAndGroupCategoryEnabled = function () {
       I18n.t('Group assignments cannot be enabled for moderated assignments'),
     )
   } else {
-    this.enableCheckbox(this.$peerReviewsBox)
-    this.enablePeerReviewsCheckbox()
+    if (isGradedPeerReviewInLegacyMode) {
+      this.disablePeerReviewsCheckbox()
+    } else {
+      this.enableCheckbox(this.$peerReviewsBox)
+      this.enablePeerReviewsCheckbox()
+    }
     if (this.model.canGroup()) {
       this.enableCheckbox(this.$groupCategoryBox)
     }

@@ -533,15 +533,17 @@ module Api::V1::Assignment
       hash["estimated_duration"] = estimated_duration_json(assignment.estimated_duration, user, session)
     end
 
-    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+    if opts[:include_peer_review]
       peer_review_sub_assignment = assignment.peer_review_sub_assignment
       if peer_review_sub_assignment
         # Exclude recursive peer_review_sub_assignment
         sub_opts = opts.merge(include_peer_review: false)
         peer_review_json = assignment_json(peer_review_sub_assignment, user, session, sub_opts)
+        hash["peer_review_sub_assignment"] = peer_review_json
+      elsif assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+        # Only set to null when feature flag is enabled and no peer review sub-assignment exists
+        hash["peer_review_sub_assignment"] = nil
       end
-
-      hash["peer_review_sub_assignment"] = peer_review_json
     end
 
     hash
