@@ -138,7 +138,7 @@ describe NewQuizzesController do
       end
 
       context "with content_only param" do
-        it "renders without looking up module tag" do
+        it "still sets up content tag context" do
           get :launch, params: {
             course_id: course.id,
             assignment_id: assignment.id,
@@ -147,14 +147,36 @@ describe NewQuizzesController do
           expect(response).to render_template("assignments/native_new_quizzes")
           expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
         end
+      end
 
-        it "still sets resource_url from the external tool tag" do
+      context "with exclude_module_launch_params" do
+        it "skips content tag context setup" do
           get :launch, params: {
             course_id: course.id,
             assignment_id: assignment.id,
-            content_only: true
+            exclude_module_launch_params: true
           }
-          expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+          expect(response).to render_template("assignments/native_new_quizzes")
+          expect(assigns[:module_tag]).to be_nil
+          expect(assigns[:tag]).to be_nil
+          expect(assigns[:resource_url]).to be_nil
+        end
+      end
+
+      context "when assignment is in a module but no module_item_id is provided" do
+        let(:context_module) { course.context_modules.create!(name: "Test Module") }
+
+        before do
+          context_module.add_item(type: "assignment", id: assignment.id)
+        end
+
+        it "auto-resolves the first module tag for the assignment" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id
+          }
+          expect(assigns[:module_tag]).to be_present
+          expect(assigns[:module_tag].content).to eq(assignment)
         end
       end
     end
