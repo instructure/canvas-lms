@@ -725,6 +725,7 @@ module CanvasSanitize # :nodoc:
         text-decoration
         text-indent
         top
+        user-select
         vertical-align
         visibility
         white-space
