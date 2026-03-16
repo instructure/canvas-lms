@@ -36,9 +36,7 @@ export function NewQuizzesApp() {
 
   const courseId = quizzesData?.params?.custom_canvas_course_id?.toString()
 
-  // Only show module navigation when accessed from the modules tab.
-  const moduleItemId =
-    new URLSearchParams(window.location.search).get('module_item_id') ?? undefined
+  const moduleItemId = quizzesData?.params?.custom_canvas_module_item_id?.toString() ?? undefined
   const moduleNavigation = useModuleItemSequence(courseId, moduleItemId)
   useEffect(() => {
     let unmount = () => {}

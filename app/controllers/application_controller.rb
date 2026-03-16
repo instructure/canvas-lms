@@ -2387,7 +2387,7 @@ class ApplicationController < ActionController::Base
       if @tool
         # Redirect to dedicated New Quizzes controller for native experience
         if @tool.quiz_lti? && new_quizzes_native_experience_enabled?
-          redirect_params = { module_item_id: params[:module_item_id] }.compact_blank
+          redirect_params = request.query_parameters
           return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(
             context: @context,
             assignment: @assignment,
