@@ -282,4 +282,94 @@ RSpec.describe AutoGradeOrchestrationService do
       end
     end
   end
+
+  describe "#handle_grading_failure" do
+    let(:service) { AutoGradeOrchestrationService.new(course:, current_user: user) }
+    let(:error_message) { "Grading failed: something went wrong" }
+
+    context "on terminal failure" do
+      let(:progress) do
+        p = Progress.create!(context: course, tag: "auto_grade_submission", workflow_state: "running")
+        delayed_job_double = instance_double(Delayed::Job, attempts: AutoGradeOrchestrationService::MAX_ATTEMPTS - 1)
+        allow(p).to receive(:delayed_job).and_return(delayed_job_double)
+        p
+      end
+
+      it "sets progress.message to the specific error message" do
+        service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: false)
+        expect(progress.message).to eq(error_message)
+      end
+
+      it "calls progress.fail!" do
+        expect(progress).to receive(:fail!)
+        service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: false)
+      end
+
+      it "does not create an AutoGradeResult if one is not persisted" do
+        expect do
+          service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: false)
+        end.not_to change(AutoGradeResult, :count)
+      end
+
+      it "updates error_message and increments grading_attempts on an existing AutoGradeResult" do
+        rubric_association
+        auto_grade_result = AutoGradeResult.create!(
+          submission:,
+          attempt: submission.attempt,
+          grade_data: [{ "description" => "Content", "rating" => { "rating" => 3 } }],
+          root_account_id: root_account.id,
+          grading_attempts: 1
+        )
+
+        service.handle_grading_failure(error_message:, submission:, auto_grade_result:, progress:, retryable: false)
+
+        auto_grade_result.reload
+        expect(auto_grade_result.error_message).to eq(error_message)
+        expect(auto_grade_result.grading_attempts).to eq(2)
+      end
+    end
+
+    context "on retryable failure under AutoGradeOrchestrationService::MAX_ATTEMPTS" do
+      it "raises Delayed::RetriableError" do
+        expect do
+          service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: true)
+        end.to raise_error(Delayed::RetriableError, error_message)
+      end
+
+      it "does not call progress.fail!" do
+        expect(progress).not_to receive(:fail!)
+        begin
+          service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: true)
+        rescue Delayed::RetriableError
+          nil
+        end
+      end
+    end
+  end
+
+  describe "#run_auto_grader" do
+    let(:service) { AutoGradeOrchestrationService.new(course:, current_user: user) }
+
+    it "does not complete progress when get_grade_data returns nil" do
+      allow(service).to receive(:get_grade_data).and_return(nil)
+      expect(progress).not_to receive(:complete!)
+      service.run_auto_grader(progress, submission)
+    end
+
+    it "completes progress with grade_data when get_grade_data returns a result" do
+      rubric_association
+      auto_grade_result = AutoGradeResult.create!(
+        submission:,
+        attempt: submission.attempt,
+        grade_data: [{ "description" => "Content", "rating" => { "rating" => 3 } }],
+        root_account_id: root_account.id,
+        grading_attempts: 1
+      )
+      allow(service).to receive(:get_grade_data).and_return(auto_grade_result)
+
+      expect(progress).to receive(:complete!)
+      service.run_auto_grader(progress, submission)
+      expect(progress.results).to eq(auto_grade_result.grade_data)
+    end
+  end
 end
