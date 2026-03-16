@@ -465,11 +465,10 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
 
     it('a11y: retry upload re-announces and succeeds on retry', async () => {
-      let callCount = 0
+      let shouldFail = true
       server.use(
         http.put('**/api/media_objects/*/media_tracks', () => {
-          callCount++
-          if (callCount === 1) {
+          if (shouldFail) {
             return HttpResponse.json({error: 'Server error'}, {status: 500})
           }
           return HttpResponse.json({data: 'success'})
@@ -500,6 +499,8 @@ describe('<ClosedCaptionPanelV2 />', () => {
         },
         {timeout: 5000},
       )
+
+      shouldFail = false
 
       // Click retry
       fireEvent.click(screen.getByText('Retry German'))
@@ -772,6 +773,8 @@ describe('<ClosedCaptionPanelV2 />', () => {
           flow_type: 'upload_file',
         })
       })
+      // Drain the in-flight retry PUT so it doesn't leak into subsequent tests.
+      await screen.findByText('Upload Failed')
     })
 
     it('fires canvas_caption_item_action delete when delete button clicked', async () => {
