@@ -35,7 +35,7 @@ describe Mutations::AutoGradeSubmission do
     )
   end
 
-  def execute_mutation(submission_id: @submission.id)
+  def execute_mutation(submission_id: @submission.id, current_user: @teacher)
     mutation_command = <<~GQL
       mutation {
         autoGradeSubmission(input: {
@@ -50,14 +50,14 @@ describe Mutations::AutoGradeSubmission do
         }
       }
     GQL
-    CanvasSchema.execute(mutation_command, context: { current_user: @teacher, request: ActionDispatch::TestRequest.create })
+    CanvasSchema.execute(mutation_command, context: { current_user:, request: ActionDispatch::TestRequest.create })
   end
 
   before do
     allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
     allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive_messages(validate_assignment: [], validate_submission: [])
-    progress = @course.progresses.create!(tag: "auto_grade_submission", user: @student)
-    mock_service = instance_double(AutoGradeOrchestrationService, auto_grade_in_background: progress)
+    @progress = @course.progresses.create!(tag: "auto_grade_submission", user: @student)
+    mock_service = instance_double(AutoGradeOrchestrationService, auto_grade_in_background: @progress)
     allow(AutoGradeOrchestrationService).to receive(:new).and_return(mock_service)
   end
 
@@ -134,6 +134,93 @@ describe Mutations::AutoGradeSubmission do
         expect(error_message).to include("No rubric is attached to this assignment.")
         expect(error_message).not_to include("Some warning.")
       end
+    end
+  end
+
+  context "when the feature flag is disabled" do
+    before do
+      @course.disable_feature!(:project_lhotse)
+    end
+
+    it "returns a GraphQL execution error about the disabled feature" do
+      result = execute_mutation
+      errors = result["errors"]
+      expect(errors).not_to be_nil
+      expect(errors.first["message"]).to include("Project Lhotse is not enabled")
+    end
+  end
+
+  context "when the user lacks manage_grades permission" do
+    it "returns an authorization error for a student" do
+      result = execute_mutation(current_user: @student)
+      errors = result["errors"]
+      expect(errors).not_to be_nil
+      expect(errors.first["message"]).to include("not found")
+    end
+  end
+
+  context "when the submission is not found" do
+    it "returns an error for an invalid submission id" do
+      result = execute_mutation(submission_id: 0)
+      errors = result["errors"]
+      expect(errors).not_to be_nil
+      expect(errors.first["message"]).to include("unexpected")
+    end
+  end
+
+  context "background job enqueuing" do
+    it "calls auto_grade_in_background with the correct submission" do
+      mock_service = instance_double(AutoGradeOrchestrationService)
+      allow(AutoGradeOrchestrationService).to receive(:new).and_return(mock_service)
+      expect(mock_service)
+        .to receive(:auto_grade_in_background)
+        .with(submission: @submission)
+        .and_return(@progress)
+
+      execute_mutation
+    end
+  end
+
+  context "with a relay-encoded submission ID" do
+    it "resolves correctly and returns a progress object" do
+      relay_id = GraphQL::Schema::UniqueWithinType.encode("Submission", @submission.id)
+      result = execute_mutation(submission_id: relay_id)
+      expect(result.dig("data", "autoGradeSubmission", "errors")).to be_nil
+      expect(result.dig("data", "autoGradeSubmission", "progress")).to be_present
+    end
+  end
+
+  context "when the orchestration service raises an unexpected exception" do
+    before do
+      exploding_service = instance_double(AutoGradeOrchestrationService)
+      allow(exploding_service).to receive(:auto_grade_in_background).and_raise(RuntimeError, "unexpected error")
+      allow(AutoGradeOrchestrationService).to receive(:new).and_return(exploding_service)
+    end
+
+    it "wraps the exception in a GraphQL execution error" do
+      result = execute_mutation
+      errors = result["errors"]
+      expect(errors).not_to be_nil
+      expect(errors.first["message"]).to eq("An unexpected error occurred while grading.")
+    end
+  end
+
+  context "when the course is not found" do
+    before do
+      fake_assignment = instance_double(Assignment, course: nil)
+      fake_submission = instance_double(
+        Submission,
+        id: @submission.id,
+        assignment: fake_assignment
+      )
+      allow(Submission).to receive(:find).and_return(fake_submission)
+    end
+
+    it "returns a GraphQL execution error about the missing course" do
+      result = execute_mutation
+      errors = result["errors"]
+      expect(errors).not_to be_nil
+      expect(errors.first["message"]).to eq("An unexpected error occurred while grading.")
     end
   end
 end
