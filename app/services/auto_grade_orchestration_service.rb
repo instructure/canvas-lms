@@ -62,14 +62,14 @@ class AutoGradeOrchestrationService
 
     auto_grade_result = get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
 
-    progress&.results = auto_grade_result.grade_data
-    progress&.message = nil
-    progress&.complete!
+    if auto_grade_result
+      progress&.results = auto_grade_result.grade_data
+      progress&.message = nil
+      progress&.complete!
+    end
   end
 
   def get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
-    essay = self.class.extract_essay_text(submission)
-
     rubric = submission.assignment.rubric_association&.rubric
     raise StandardError, "Missing rubric" unless rubric&.data
 
@@ -79,31 +79,23 @@ class AutoGradeOrchestrationService
     )
     missing_criteria = get_criteria_missing_grades(auto_grade_result.grade_data, rubric)
 
-    unless missing_criteria.empty?
+    if missing_criteria.any?
       # filter rubric to only include missing criteria
       relevant_rubric = rubric.data.select { |item| missing_criteria.include?(item[:description]) }
 
       grade_data = GradeService.new(
         assignment: assignment_text,
-        essay:,
+        essay: self.class.extract_essay_text(submission),
         rubric: relevant_rubric,
         root_account_uuid:,
         current_user: @current_user
       ).call
 
-      # Merge new grade data with existing data
-      existing_data = auto_grade_result.grade_data || []
-      merged_data = (existing_data + grade_data)
-                    .group_by { |item| item["description"] }
-                    .map do |_, items|
-                      if items.size > 1
-                        lowest = items.min_by { |i| i.dig("rating", "rating").to_f }
-                        lowest["rating"]["reasoning"] = [lowest["rating"]["reasoning"], I18n.t("This work sits between two ratings for this criterion. The lower rating was applied for consistency.")].compact.join(" ")
-                        lowest
-                      else
-                        items.first
-                      end
-                    end
+      merged_data = merge_new_grade_data_with_existing(grade_data, auto_grade_result.grade_data)
+
+      unless get_criteria_missing_grades(merged_data, rubric).empty?
+        raise CedarAi::Errors::GraderError, "Number of graded criteria (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
+      end
 
       auto_grade_result.update!(
         root_account_id: submission.course.root_account_id,
@@ -111,15 +103,10 @@ class AutoGradeOrchestrationService
         error_message: nil,
         grading_attempts: auto_grade_result.grading_attempts + 1
       )
-
-      unless get_criteria_missing_grades(auto_grade_result.grade_data, rubric).empty?
-        raise CedarAi::Errors::GraderError, "Number of graded criteria (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
-      end
     end
 
-    auto_grade_result
+    auto_grade_result if auto_grade_result.persisted?
   rescue => e
-    Rails.logger.warn("[AutoGrade] Grading failed for submission #{submission.id}: #{e.message}")
     retryable = e.is_a?(CedarAi::Errors::GraderError)
     handle_grading_failure(
       error_message: "Grading failed: #{e.message}",
@@ -131,37 +118,34 @@ class AutoGradeOrchestrationService
   end
 
   def handle_grading_failure(error_message:, submission:, auto_grade_result:, progress:, retryable: true)
-    autograde_error_handling(submission, auto_grade_result, progress, error_message)
-    current_attempts = progress&.delayed_job&.attempts&.+ 1
+    Rails.logger.warn("[AutoGrade] Grading failed for submission #{submission.id}: #{error_message}")
 
-    if retryable && current_attempts && current_attempts < MAX_ATTEMPTS
-      raise Delayed::RetriableError, error_message
-    end
+    # this sets the error_message field on the AutoGradeResult if one already exists, since
+    # we have the error message in the Progress object and AutoGradeResult cannot be saved
+    # with a `nil` grade_data, we explicitly don't save rather than simply letting the save fail.
+    record_grading_error(auto_grade_result, error_message, submission.id) if auto_grade_result&.persisted?
 
-    progress&.results = []
-    progress&.message = I18n.t("Grading failed. Please try again later or grade manually.")
-    progress&.complete!
+    current_attempts = progress&.delayed_job&.attempts&.next
+    raise Delayed::RetriableError, error_message if retryable && current_attempts && current_attempts < MAX_ATTEMPTS
+
+    fail_progress(progress, error_message)
   end
 
-  def autograde_error_handling(submission, auto_grade_result, progress, error_message)
-    auto_grade_result ||= AutoGradeResult.find_or_initialize_by(
-      submission:,
-      attempt: submission.attempt
-    )
+  private
 
-    auto_grade_result&.update!(
-      root_account_id: submission.course.root_account_id,
-      grade_data: auto_grade_result.grade_data,
-      error_message:,
-      grading_attempts: auto_grade_result.grading_attempts + 1
-    )
-
-    if progress
-      progress.results = []
-      progress.message = error_message
+  def record_grading_error(auto_grade_result, error_message, submission_id)
+    next_attempt = auto_grade_result.grading_attempts + 1
+    unless auto_grade_result.update(error_message:, grading_attempts: next_attempt)
+      Rails.logger.error("[AutoGrade] Failed to record grading error for submission #{submission_id}")
     end
-  rescue => e
-    Rails.logger.error("[AutoGrade] Failed to record grading error: #{e.message}")
+  end
+
+  def fail_progress(progress, error_message)
+    return unless progress
+
+    progress.results = []
+    progress.message = error_message
+    progress.fail!
   end
 
   def handle_existing_progress(progress, singleton_key)
@@ -179,6 +163,20 @@ class AutoGradeOrchestrationService
     end
 
     progress
+  end
+
+  def merge_new_grade_data_with_existing(new_data, existing_data = [])
+    (existing_data + new_data)
+      .group_by { |item| item["description"] }
+      .map do |_, items|
+        if items.size > 1
+          lowest = items.min_by { |i| i.dig("rating", "rating").to_f }
+          lowest["rating"]["reasoning"] = [lowest["rating"]["reasoning"], I18n.t("This work sits between two ratings for this criterion. The lower rating was applied for consistency.")].compact.join(" ")
+          lowest
+        else
+          items.first
+        end
+      end
   end
 
   def get_criteria_missing_grades(grade_data, rubric)
