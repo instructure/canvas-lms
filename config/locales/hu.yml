@@ -9681,6 +9681,7 @@ hu:
   drag_and_drop_or_click_to_browse_your_local_filesy_e2f0e62f: "Húzza át, vagy kattintson a helyi fájlrendszer böngészéséhez"
   drag_and_drop_your_image_here_or_7fba7c14: "Húzza ide a képet, vagy"
   drag_to_rearrange_sections_637efee3: "Ragadja meg az elemeket a szekciók sorrendjének megváltoztatásához"
+  drag_to_reorder_e4257792: "Ragadja meg a sorrend módosításához"
   drop_coursename_813d3162: "%{courseName} eldobása"
   drop_files_here_to_add_to_module_236304f5: "Húzza ide a fájlokat a modulhoz való hozzáadáshoz"
   drop_files_here_to_upload_ce0f50f9: "Húzza ide a fájlokat a feltöltéshez"
