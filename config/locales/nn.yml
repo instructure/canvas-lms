@@ -10504,6 +10504,7 @@ nn:
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Dra og slipp, eller klikk for å hente fil frå disk"
   drag_and_drop_your_image_here_or_7fba7c14: "Dra og slipp bildet ditt her eller"
   drag_to_rearrange_sections_637efee3: "Dra for å ordne klassa på nytt"
+  drag_to_reorder_e4257792: "Dra for å omorganisere"
   drag_up_or_down_to_reorder_382126ff: "Dra opp eller ned for å omorganisere"
   drop_coursename_813d3162: "Fjern %{courseName}"
   drop_files_here_to_add_to_module_236304f5: "Dra filer hit for å legge til i modulen."
