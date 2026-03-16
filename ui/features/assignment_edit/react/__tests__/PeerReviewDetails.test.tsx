@@ -1375,4 +1375,36 @@ describe('PeerReviewDetails', () => {
       expect(screen.getByText(PEER_REVIEW_SUBMISSIONS_WARNING)).toBeInTheDocument()
     })
   })
+
+  describe('Accessibility', () => {
+    it('associates visible label text as accessible name for advanced toggle checkboxes', async () => {
+      assignment.peerReviews = vi.fn(() => true)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.getByLabelText('Allow peer reviews across sections')).toBeInTheDocument()
+      expect(
+        screen.getByLabelText('Use complete/incomplete instead of points for grading'),
+      ).toBeInTheDocument()
+      expect(screen.getByLabelText('Reviewers do not see who they review')).toBeInTheDocument()
+      expect(
+        screen.getByLabelText(
+          'Reviewers must submit their assignment before they can be allocated reviews',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('associates visible label text as accessible name for within groups toggle', async () => {
+      assignment.peerReviews = vi.fn(() => true)
+      assignment.groupCategoryId = vi.fn(() => '123')
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      expect(screen.getByLabelText('Allow peer reviews within groups')).toBeInTheDocument()
+    })
+  })
 })

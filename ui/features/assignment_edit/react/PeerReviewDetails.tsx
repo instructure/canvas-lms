@@ -150,7 +150,6 @@ const ToggleCheckbox = ({
   checked,
   onChange,
   label,
-  srLabel,
   id,
 }: {
   testId: string
@@ -158,27 +157,31 @@ const ToggleCheckbox = ({
   checked: boolean
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   label: string
-  srLabel: string
-  id?: string
+  id: string
 }) => (
-  <FlexRow>
-    <Flex.Item as="div" margin="0 0 0 medium" shouldGrow={true} shouldShrink={true}>
-      <Text size="contentSmall" weight="bold">
-        {label}
-      </Text>
-    </Flex.Item>
-    <Flex.Item as="div" margin="0" shouldShrink={false}>
+  <Flex as="div" margin="0 0 0 medium" padding="0 large 0 0" width="100%" justifyItems="end">
+    <Flex.Item>
       <Checkbox
         data-testid={testId}
         name={name}
         id={id}
+        inline={true}
         variant="toggle"
         checked={checked}
         onChange={onChange}
-        label={<ScreenReaderContent>{srLabel}</ScreenReaderContent>}
+        label={
+          <Flex as="div" width="100%" justifyItems="start">
+            <Flex.Item>
+              <Text size="contentSmall" weight="bold">
+                {label}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        }
+        labelPlacement="start"
       />
     </Flex.Item>
-  </FlexRow>
+  </Flex>
 )
 const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: string}) => (
   <Flex.Item as="div" padding={padding}>
@@ -490,7 +493,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     checked={allowPeerReviewAcrossMultipleSections}
                     onChange={handleCrossSectionsCheck}
                     label={I18n.t('Allow peer reviews across sections')}
-                    srLabel={I18n.t('Allow peer reviews to be assigned across course sections')}
                   />
                 </Flex.Item>
                 {isGroupAssignment && (
@@ -502,7 +504,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                       checked={allowPeerReviewWithinGroups}
                       onChange={handleInterGroupCheck}
                       label={I18n.t('Allow peer reviews within groups')}
-                      srLabel={I18n.t('Allow peer reviews within student groups')}
                     />
                   </Flex.Item>
                 )}
@@ -515,7 +516,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     checked={usePassFailGrading}
                     onChange={handleUsePassFailCheck}
                     label={I18n.t('Use complete/incomplete instead of points for grading')}
-                    srLabel={I18n.t('Use complete/incomplete instead of points for grading')}
                   />
                 </Flex.Item>
                 <SectionHeader title={I18n.t('Anonymity')} padding="medium 0 0 0" />
@@ -527,7 +527,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     checked={anonymousPeerReviews}
                     onChange={handleAnonymityCheck}
                     label={I18n.t('Reviewers do not see who they review')}
-                    srLabel={I18n.t('Reviewers do not see who they review')}
                   />
                 </Flex.Item>
                 <SectionHeader title={I18n.t('Submission required')} padding="medium 0 0 0" />
@@ -538,7 +537,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     id="peer_reviews_submission_required_checkbox"
                     checked={submissionRequiredBeforePeerReviews}
                     onChange={handleSubmissionRequiredCheck}
-                    srLabel={I18n.t('Students must submit to see peer reviews')}
                     label={I18n.t(
                       'Reviewers must submit their assignment before they can be allocated reviews',
                     )}
