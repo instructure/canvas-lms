@@ -184,6 +184,10 @@ describe RubricLLMService do
             current_criteria_count
           )
         end
+
+        def public_build_regenerate_dynamic_content(**)
+          build_regenerate_dynamic_content(**)
+        end
       end.new(rubric)
     end
   end
@@ -2474,12 +2478,23 @@ describe RubricLLMService do
     describe "#build_regenerate_dynamic_content" do
       let(:criteria_as_text) { "criterion:c1:description=Clarity" }
 
+      let(:default_kwargs) do
+        {
+          assignment:,
+          existing_criteria_text: criteria_as_text,
+          regeneration_target: "c1",
+          additional_user_prompt: "improve it",
+          grade_level: "higher-ed",
+          standard: "",
+          criteria_count: 1,
+          structure_directives: ""
+        }
+      end
+
       it "strips HTML tags from assignment description" do
         assignment.update!(description: "<p>Write an <em>analytical</em> essay.</p>")
 
-        result = service_with_access.public_build_regenerate_dynamic_content(
-          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
-        )
+        result = service_with_access.public_build_regenerate_dynamic_content(**default_kwargs)
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("Write an analytical essay.")
@@ -2489,9 +2504,7 @@ describe RubricLLMService do
       it "returns empty string for nil description" do
         assignment.update!(description: nil)
 
-        result = service_with_access.public_build_regenerate_dynamic_content(
-          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
-        )
+        result = service_with_access.public_build_regenerate_dynamic_content(**default_kwargs)
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("")
@@ -2500,9 +2513,7 @@ describe RubricLLMService do
       it "preserves plain text descriptions unchanged" do
         assignment.update!(description: "Research and write about climate change.")
 
-        result = service_with_access.public_build_regenerate_dynamic_content(
-          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
-        )
+        result = service_with_access.public_build_regenerate_dynamic_content(**default_kwargs)
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("Research and write about climate change.")
