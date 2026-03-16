@@ -56,6 +56,25 @@ describe EpubExports::CreateService do
         expect(service.offline_export).to be_new_record
       end
     end
+
+    context "with existing epub export in progress" do
+      it "returns existing epub_export instance if it has progressed recently" do
+        epub_export = @course.epub_exports.create(user: @student, workflow_state: "generating")
+        epub_export.job_progress.update(workflow_state: "running", updated_at: 1.minute.ago)
+
+        service = EpubExports::CreateService.new(@course, @student, :epub_export)
+        expect(service.offline_export).to eq epub_export
+      end
+
+      it "returns a new epub_export instance if previous one is stuck" do
+        epub_export = @course.epub_exports.create(user: @student, workflow_state: "generating")
+        epub_export.job_progress.update(workflow_state: "running", updated_at: 3.hours.ago)
+
+        service = EpubExports::CreateService.new(@course, @student, :epub_export)
+        expect(service.offline_export).to be_new_record
+        expect(epub_export.reload).to be_failed
+      end
+    end
   end
 
   describe "#already_running?" do

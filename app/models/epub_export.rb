@@ -163,7 +163,7 @@ class EpubExport < ApplicationRecord
 
   def self.fail_stuck_epub_exports(exports)
     cutoff = 2.hours.ago
-    exports.select { |e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
+    exports.select { |e| (e.generating? || e.exporting?) && e.job_progress&.updated_at&.<(cutoff) }.each(&:mark_as_failed)
   end
 
   def convert_to_epub
