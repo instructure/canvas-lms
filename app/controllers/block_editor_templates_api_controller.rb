@@ -166,7 +166,7 @@ class BlockEditorTemplatesApiController < ApplicationController
 
   def update
     if template_editor?
-      template = BlockEditorTemplate.find(params[:id])
+      template = @context.block_editor_templates.find(params[:id])
       template.update!(get_update_params(params))
       render json: block_editor_template_json(template, @current_user, session)
     else
@@ -176,7 +176,7 @@ class BlockEditorTemplatesApiController < ApplicationController
 
   def publish
     if template_editor?
-      template = BlockEditorTemplate.find(params[:id])
+      template = @context.block_editor_templates.find(params[:id])
       if template.present?
         template.publish!
         render json: block_editor_template_json(template, @current_user, session)
@@ -190,7 +190,7 @@ class BlockEditorTemplatesApiController < ApplicationController
 
   def destroy
     if template_editor?
-      template = BlockEditorTemplate.find(params[:id])
+      template = @context.block_editor_templates.find(params[:id])
 
       if template&.destroy
         render json: template.to_json
