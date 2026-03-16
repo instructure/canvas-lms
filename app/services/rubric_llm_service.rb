@@ -28,7 +28,9 @@ class RubricLLMService
     rating_count: 4,
     total_points: 100,
     use_range: false,
-    grade_level: "higher-ed"
+    grade_level: "higher-ed",
+    standard: "",
+    additional_prompt_info: ""
   }.freeze
   GENERATE_FEATURE_SLUG = "rubric-generate"
   REGENERATE_CRITERIA_FEATURE_SLUG = "rubric-regenerate-criteria"
@@ -65,6 +67,7 @@ class RubricLLMService
     validate_rubric_and_association_object(association_object)
 
     assignment = association_object
+    generate_options = resolve_generate_options(generate_options)
     llm_config = LLMConfigs.config_for("rubric_create")
     raise "No LLM config found for rubric creation" if llm_config.nil?
 
@@ -101,6 +104,7 @@ class RubricLLMService
     validate_rubric_and_association_object(association_object)
 
     assignment = association_object
+    generate_options = resolve_regenerate_options(generate_options, regenerate_options)
     incoming_criteria, existing_criteria_json, criteria_as_text, regenerable_criteria, learning_outcome_criteria_map, target_criterion =
       normalize_incoming_criteria(regenerate_options)
 
@@ -120,7 +124,7 @@ class RubricLLMService
     # Return the original criteria with recalculated points
     # Preserve all fields: learning_outcome_id, ignore_for_scoring, mastery_points, generated, etc.
     if regenerable_criteria.empty?
-      total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+      total_points = generate_options[:total_points].to_f
       points_per_criterion = calculate_points_per_criterion(total_points, incoming_criteria.size)
 
       return incoming_criteria.each_with_index.map do |criterion, index|
@@ -169,6 +173,19 @@ class RubricLLMService
   end
 
   private
+
+  def resolve_generate_options(generate_options)
+    DEFAULT_GENERATE_OPTIONS.merge(generate_options.symbolize_keys)
+  end
+
+  def resolve_regenerate_options(generate_options, regenerate_options)
+    resolved = resolve_generate_options(generate_options)
+    resolved.merge(
+      additional_user_prompt: regenerate_options.symbolize_keys[:additional_user_prompt].presence ||
+                              resolved[:additional_prompt_info].presence ||
+                              "No specific expectations, just improve it."
+    )
+  end
 
   def validate_rubric_and_association_object(association_object)
     unless association_object.is_a?(AbstractAssignment)
@@ -229,11 +246,11 @@ class RubricLLMService
         title: assignment.title,
         description: html_to_text(assignment.description),
       }.to_json,
-      CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
-      RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
+      CRITERIA_COUNT: generate_options[:criteria_count],
+      RATING_COUNT: generate_options[:rating_count],
       ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
-      GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
-      STANDARD: generate_options[:standard].presence || "",
+      GRADE_LEVEL: generate_options[:grade_level],
+      STANDARD: generate_options[:standard],
       BLOOM_TAXONOMY_CONTEXT:,
     }
   end
@@ -245,11 +262,11 @@ class RubricLLMService
     ai_rubric = JSON.parse(json_str, symbolize_names: true)
 
     criteria_count = ai_rubric[:criteria].length
-    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    total_points = generate_options[:total_points].to_f
     points_per_criterion = calculate_points_per_criterion(total_points, criteria_count)
 
     ai_rubric[:criteria].each_with_index.map do |criterion_data, index|
-      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range] || DEFAULT_GENERATE_OPTIONS[:use_range])
+      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range])
     end
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse LLM response as JSON during generation: #{e.message}")
@@ -358,7 +375,7 @@ class RubricLLMService
   # Returns [prompt_config_name, regeneration_target_prompt, structure_directives]
   def determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, generate_options)
     criterion_id = regenerate_options[:criterion_id]
-    orig_rating_count = generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
+    orig_rating_count = generate_options[:rating_count]
 
     if criterion_id.present?
       ["rubric_regenerate_criterion", criterion_id, ""]
@@ -445,8 +462,8 @@ class RubricLLMService
         ai_rubric_data,
         existing_criteria_json,
         criteria.size,
-        generate_options.fetch(:total_points, DEFAULT_GENERATE_OPTIONS[:total_points]),
-        !!generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+        generate_options[:total_points],
+        !!generate_options[:use_range]
       )
     end
 
@@ -459,7 +476,7 @@ class RubricLLMService
     # Distribute points across ALL criteria (including learning outcome criteria)
     # to maintain proper point distribution
     criteria_array = Array(ai_rubric[:criteria])
-    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    total_points = generate_options[:total_points].to_f
 
     # For single criterion regeneration, the criteria_array already includes learning outcomes
     # For full regeneration, we need to account for them
@@ -469,7 +486,7 @@ class RubricLLMService
       rebuild_regenerated_criterion(
         criterion_data,
         points_per_criterion[index],
-        generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+        generate_options[:use_range]
       )
     end
 
