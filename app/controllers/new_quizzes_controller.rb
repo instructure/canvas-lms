@@ -94,11 +94,12 @@ class NewQuizzesController < ApplicationController
   end
 
   def setup_content_tag_context
+    return if params[:exclude_module_launch_params]
+
     @tag = @assignment.external_tool_tag
     return unless @tag
 
     @resource_url = @tag.url
-    return if params[:content_only]
 
     @module_tag = if params[:module_item_id]
                     @context.context_module_tags.not_deleted.find(params[:module_item_id])
