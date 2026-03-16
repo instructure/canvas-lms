@@ -16,10 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface FeedbackItem {
+  id: string
+  user_id: string
+  vote: 'liked' | 'disliked'
+  feedback_message: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface LLMConversationMessage {
+  id?: string
   role: 'User' | 'Assistant'
   text: string
   timestamp?: Date
+  feedback?: FeedbackItem[]
 }
 
 export interface ConversationProgress {

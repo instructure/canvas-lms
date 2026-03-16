@@ -645,6 +645,160 @@ describe AiConversationsController do
     end
   end
 
+  describe "POST #create_feedback" do
+    before do
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "llm-conv-id",
+        user: @teacher,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "creates feedback and returns it" do
+        feedback_data = { "id" => "fb-1", "vote" => "liked", "user_id" => @teacher.uuid }
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:create_feedback).and_return(feedback_data)
+
+        post :create_feedback,
+             params: {
+               course_id: @course.id,
+               ai_experience_id: @ai_experience.id,
+               id: @conversation.id,
+               message_id: "msg-123",
+               vote: "liked"
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["feedback"]["id"]).to eq("fb-1")
+        expect(json_response["feedback"]["vote"]).to eq("liked")
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:create_feedback)
+          .and_raise(LlmConversation::Errors::ConversationError, "Feedback service error")
+
+        post :create_feedback,
+             params: {
+               course_id: @course.id,
+               ai_experience_id: @ai_experience.id,
+               id: @conversation.id,
+               message_id: "msg-123",
+               vote: "liked"
+             },
+             format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Feedback service error")
+      end
+    end
+
+    context "as student" do
+      before do
+        user_session(@student)
+        @student_conversation = @ai_experience.ai_conversations.create!(
+          llm_conversation_id: "student-llm-conv-id",
+          user: @student,
+          course: @course,
+          root_account: @course.root_account,
+          account: @course.account,
+          workflow_state: "active"
+        )
+      end
+
+      it "allows students to create feedback on their own conversations" do
+        feedback_data = { "id" => "fb-2", "vote" => "disliked", "user_id" => @student.uuid }
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:create_feedback).and_return(feedback_data)
+
+        post :create_feedback,
+             params: {
+               course_id: @course.id,
+               ai_experience_id: @ai_experience.id,
+               id: @student_conversation.id,
+               message_id: "msg-456",
+               vote: "disliked",
+               feedback_message: "Irrelevant"
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["feedback"]["vote"]).to eq("disliked")
+      end
+    end
+  end
+
+  describe "DELETE #delete_feedback" do
+    before do
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "llm-conv-id",
+        user: @teacher,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "deletes feedback and returns success" do
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:delete_feedback)
+
+        delete :delete_feedback,
+               params: {
+                 course_id: @course.id,
+                 ai_experience_id: @ai_experience.id,
+                 id: @conversation.id,
+                 message_id: "msg-123",
+                 feedback_id: "fb-1"
+               },
+               format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["success"]).to be true
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:delete_feedback)
+          .and_raise(LlmConversation::Errors::ConversationError, "Delete feedback error")
+
+        delete :delete_feedback,
+               params: {
+                 course_id: @course.id,
+                 ai_experience_id: @ai_experience.id,
+                 id: @conversation.id,
+                 message_id: "msg-123",
+                 feedback_id: "fb-1"
+               },
+               format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Delete feedback error")
+      end
+    end
+  end
+
   describe "ai_experiences feature flag" do
     context "when feature flag is disabled" do
       before do

@@ -32,10 +32,19 @@ export interface StudentConversation {
 }
 
 export interface ConversationMessage {
+  id?: string
   role: 'user' | 'assistant' | 'User' | 'Assistant'
   content?: string
   text?: string
   timestamp?: string
+  feedback?: Array<{
+    id: string
+    user_id: string
+    vote: 'liked' | 'disliked'
+    feedback_message: string | null
+    created_at: string
+    updated_at: string
+  }>
 }
 
 export interface ConversationDetail extends StudentConversation {
