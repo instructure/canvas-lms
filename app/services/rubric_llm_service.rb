@@ -146,15 +146,14 @@ class RubricLLMService
     raise "No LLM config found for rubric regeneration" if llm_config.nil?
 
     dynamic_content = build_regenerate_dynamic_content(
-      assignment,
-      criteria_as_text,
-      regeneration_target_prompt,
-      regenerate_options,
-      generate_options,
-      criterion_id,
-      structure_directives,
-      current_criteria_count,
-      target_criterion
+      assignment:,
+      existing_criteria_text: resolve_existing_criteria_text(criteria_as_text, criterion_id, target_criterion),
+      regeneration_target: regeneration_target_prompt,
+      additional_user_prompt: generate_options[:additional_user_prompt],
+      grade_level: generate_options[:grade_level],
+      standard: generate_options[:standard],
+      criteria_count: criterion_id.present? ? "original count" : current_criteria_count,
+      structure_directives:
     )
 
     prompt, = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
@@ -392,24 +391,15 @@ class RubricLLMService
   # Includes STRUCTURE_DIRECTIVES when regenerating the full rubric to enforce
   # exact counts/IDs/order.
   def build_regenerate_dynamic_content(
-    assignment,
-    criteria_as_text,
-    regeneration_target_prompt,
-    regenerate_options,
-    generate_options,
-    criterion_id,
-    structure_directives,
-    current_criteria_count = nil,
-    target_criterion = nil
+    assignment:,
+    existing_criteria_text:,
+    regeneration_target:,
+    additional_user_prompt:,
+    grade_level:,
+    standard:,
+    criteria_count:,
+    structure_directives:
   )
-    # When regenerating a single criterion, only pass that criterion to the LLM
-    # to avoid unwanted modifications to other criteria
-    existing_criteria_text = if criterion_id.present? && target_criterion.present?
-                               rubric_to_text({ criteria: [target_criterion] }.to_json)
-                             else
-                               criteria_as_text
-                             end
-
     {
       CONTENT: {
         id: assignment.id,
@@ -417,14 +407,24 @@ class RubricLLMService
         description: html_to_text(assignment.description),
       }.to_json,
       EXISTING_CRITERIA: existing_criteria_text,
-      REGENERATION_TARGET: regeneration_target_prompt,
-      ADDITIONAL_USER_PROMPT: regenerate_options.fetch(:additional_user_prompt, generate_options.fetch(:additional_prompt_info, "No specific expectations, just improve it.")),
-      GRADE_LEVEL: generate_options.fetch(:grade_level, DEFAULT_GENERATE_OPTIONS[:grade_level]),
-      STANDARD: generate_options.fetch(:standard, " "),
-      CRITERIA_COUNT: criterion_id.present? ? "original count" : (current_criteria_count || generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])),
+      REGENERATION_TARGET: regeneration_target,
+      ADDITIONAL_USER_PROMPT: additional_user_prompt,
+      GRADE_LEVEL: grade_level,
+      STANDARD: standard,
+      CRITERIA_COUNT: criteria_count,
       STRUCTURE_DIRECTIVES: structure_directives,
       BLOOM_TAXONOMY_CONTEXT:,
     }
+  end
+
+  # When regenerating a single criterion, only pass that criterion to the LLM
+  # to avoid unwanted modifications to other criteria.
+  def resolve_existing_criteria_text(criteria_as_text, criterion_id, target_criterion)
+    if criterion_id.present? && target_criterion.present?
+      rubric_to_text({ criteria: [target_criterion] }.to_json)
+    else
+      criteria_as_text
+    end
   end
 
   # Parse the <RUBRIC_DATA>...</RUBRIC_DATA> block, then:
