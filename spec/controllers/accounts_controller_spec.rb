@@ -3257,6 +3257,57 @@ describe AccountsController do
         expect(data["resolved"]).to eq(8)
       end
     end
+
+    context "enrollment term filtering" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns only counts for courses in the specified enrollment term" do
+        term = @account.root_account.enrollment_terms.create!(name: "Spring 2025")
+        other_term = @account.root_account.enrollment_terms.create!(name: "Fall 2025")
+
+        course_in_term = course_model(account: @account, enrollment_term: term)
+        course_in_other_term = course_model(account: @account, enrollment_term: other_term)
+
+        AccessibilityCourseStatistic.create!(course: course_in_term, workflow_state: "active", active_issue_count: 4, resolved_issue_count: 2)
+        AccessibilityCourseStatistic.create!(course: course_in_other_term, workflow_state: "active", active_issue_count: 10, resolved_issue_count: 6)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id, enrollment_term_id: term.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(4)
+        expect(data["resolved"]).to eq(2)
+      end
+
+      it "returns all courses when no enrollment_term_id param is given" do
+        term1 = @account.root_account.enrollment_terms.create!(name: "Term A")
+        term2 = @account.root_account.enrollment_terms.create!(name: "Term B")
+
+        course1 = course_model(account: @account, enrollment_term: term1)
+        course2 = course_model(account: @account, enrollment_term: term2)
+
+        AccessibilityCourseStatistic.create!(course: course1, workflow_state: "active", active_issue_count: 3, resolved_issue_count: 1)
+        AccessibilityCourseStatistic.create!(course: course2, workflow_state: "active", active_issue_count: 7, resolved_issue_count: 5)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(10)
+        expect(data["resolved"]).to eq(6)
+      end
+
+      it "returns 404 when the enrollment_term_id does not exist" do
+        get "accessibility_issue_summary", params: { account_id: @account.id, enrollment_term_id: 0 }, format: :json
+        expect(response).to be_not_found
+      end
+    end
   end
 
   describe "nav_menu_links in update action" do

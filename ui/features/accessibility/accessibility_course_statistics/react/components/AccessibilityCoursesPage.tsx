@@ -27,6 +27,7 @@ import {useCourses} from '../../hooks/useCourses'
 import {useCoursesParams} from '../../hooks/useCoursesParams'
 import {CoursesTable} from './CoursesTable'
 import {CoursesSearch} from './CoursesSearch'
+import {TermFilter} from './TermFilter'
 import {useAccessibilityIssueSummary} from '../../hooks/useAccessibilityIssueSummary'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
@@ -108,13 +109,32 @@ const CoursesPagination: React.FC<{
 
 export const AccessibilityCoursesPage: React.FC = () => {
   const accountId = getAccountId()
-  const {sort, order, page, search, handleChangeSort, handlePageChange, handleSearchChange} =
-    useCoursesParams({
-      defaultSort: 'course_name',
-      defaultOrder: 'asc',
-    })
-  const {data, isLoading, isError} = useCourses({accountId, sort, order, page, search})
-  const {data: issueSummary} = useAccessibilityIssueSummary({accountId})
+  const {
+    sort,
+    order,
+    page,
+    search,
+    enrollmentTermId,
+    handleChangeSort,
+    handlePageChange,
+    handleSearchChange,
+    handleTermChange,
+  } = useCoursesParams({
+    defaultSort: 'course_name',
+    defaultOrder: 'asc',
+  })
+  const {data, isLoading, isError} = useCourses({
+    accountId,
+    sort,
+    order,
+    page,
+    search,
+    enrollment_term_id: enrollmentTermId || undefined,
+  })
+  const {data: issueSummary} = useAccessibilityIssueSummary({
+    accountId,
+    enrollmentTermId: enrollmentTermId || undefined,
+  })
   const {trackA11yEvent} = useA11yTracking()
 
   useEffect(() => {
@@ -127,7 +147,14 @@ export const AccessibilityCoursesPage: React.FC = () => {
         {I18n.t('Accessibility report')}
       </Heading>
 
-      <CoursesSearch value={search} onChange={handleSearchChange} />
+      <Flex gap="small" margin="0 0 medium">
+        <Flex.Item size="30%">
+          <TermFilter accountId={accountId} value={enrollmentTermId} onChange={handleTermChange} />
+        </Flex.Item>
+        <Flex.Item shouldGrow>
+          <CoursesSearch value={search} onChange={handleSearchChange} />
+        </Flex.Item>
+      </Flex>
 
       <Flex>
         <IssueStatusBarChart
