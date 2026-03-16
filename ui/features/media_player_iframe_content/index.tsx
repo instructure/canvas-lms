@@ -207,6 +207,7 @@ ready(() => {
         onTranscriptEdit={handleTranscriptEdit}
         onConfirmEditChanges={handleConfirmEditChanges}
         onTrackEvent={handleTrackEvent}
+        hideUploadCaptions
         kebabMenuElements={
           isAsrCaptioningImprovements && showRollingTranscript
             ? [
