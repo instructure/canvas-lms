@@ -54,7 +54,6 @@ module Api::V1::User
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
-      json[:created_at] = json[:created_at]&.iso8601
       enrollment_json_opts = { preloaded_user: user }
       if grading_period.nil?
         enrollment_json_opts[:current_grading_period_scores] = includes.include?("current_grading_period_scores")
