@@ -915,7 +915,7 @@ class ExternalToolsController < ApplicationController
           )
         end
         # Use domain-specific URL for environment overrides
-        launch_url_with_overrides = tool.url_with_environment_overrides(launch_settings["launch_url"])
+        launch_url_with_overrides = tool.url_with_environment_overrides(launch_settings["launch_url"], include_launch_url: true)
         @lti_launch.resource_url = launch_url_with_overrides
 
         placement = launch_settings.dig("metadata", "placement")

@@ -3926,6 +3926,23 @@ describe ExternalToolsController do
           get :sessionless_launch, params: { course_id: @course.id, verifier: }
           expect(response).not_to be_redirect
         end
+
+        context "with environment overrides" do
+          let(:override_url) { "http://www.example-beta.com/quiz_lti_launch" }
+
+          before do
+            quiz_lti_tool.settings = quiz_lti_tool.settings.merge(
+              "environments" => { "beta_launch_url" => override_url }
+            )
+            quiz_lti_tool.save!
+            allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
+          end
+
+          it "uses the environment override URL for the launch" do
+            get :sessionless_launch, params: { course_id: @course.id, verifier: }
+            expect(assigns(:lti_launch).resource_url).to eq(override_url)
+          end
+        end
       end
 
       context "when native experience is disabled" do
