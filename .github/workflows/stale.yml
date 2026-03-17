@@ -1,0 +1,27 @@
+name: 'Close stale issues'
+on:
+  schedule:
+    - cron: '30 1 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          days-before-stale: 730
+          days-before-close: 30
+          stale-issue-label: 'No Activity'
+          exempt-issue-labels: 'Attached Pull Request,Confirmed,Pinned,Ready to Merge,Regression,Security,Waiting: Code Review,Waiting: Gerrit Import,Waiting: QA,Work in Progress'
+          stale-issue-message: >
+            Thanks for contributing to this issue. As it has been 2 years since the
+            last activity, we are automatically closing the issue in 30 days. This
+            is often because the request was already solved in some way and it just
+            wasn't updated or it's no longer applicable. If that's not the case,
+            please respond before the issue is closed, or post a message on the
+            [mailing list](http://groups.google.com/group/canvas-lms-users). We'll
+            gladly take a look again!
+          close-issue-message: false
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          operations-per-run: 5
