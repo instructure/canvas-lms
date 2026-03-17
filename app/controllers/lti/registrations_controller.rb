@@ -1468,6 +1468,105 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Get LTI Registration by Unified Tool ID
+  # Returns an LTI registration by looking up its unified_tool_id.
+  # Searches both manual configurations and IMS registrations.
+  # Only returns registrations that are active and accessible from the
+  # current account (owned by account, Site Admin, or has binding).
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/by_utid/<utid>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_by_utid
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return render json: { errors: "Not found" }, status: :not_found
+    end
+
+    GuardRail.activate(:secondary) do
+      utid = params[:utid]
+
+      manual_config = Lti::ToolConfiguration.find_by(unified_tool_id: utid)
+      ims_registration = manual_config.nil? ? Lti::IMS::Registration.find_by(unified_tool_id: utid) : nil
+
+      registration = manual_config&.lti_registration || ims_registration&.lti_registration
+
+      unless registration.present? && registration.active? && registration.account == @context
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Check LTI Registration Install Status
+  # Returns the local installation status for a Site Admin LTI registration.
+  # If the developer key's registration is in Site Admin, returns the local copy
+  # in the current account (if installed). If the registration is already in the
+  # current account, returns it directly.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/install_status/<client_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def install_status
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return render json: { errors: "Not found" }, status: :not_found
+    end
+
+    GuardRail.activate(:secondary) do
+      developer_key = DeveloperKey.find(params[:client_id])
+      unless developer_key&.lti_registration.present?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      template_registration = developer_key.lti_registration
+
+      # If the template registration is in Site Admin, look for a local copy in the current account
+      if template_registration.account == Account.site_admin
+        local_copy = template_registration.local_copies.active.find_by(account: @context)
+        unless local_copy.present?
+          return render json: { errors: "LTI registration not found" }, status: :not_found
+        end
+
+        registration = local_copy
+      elsif template_registration.account == @context
+        # If the registration is already in the current account, return it
+        registration = template_registration
+      else
+        # Registration is in a different account
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      # Ensure the registration is active
+      unless registration.active?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Update an LTI Registration
   # Update the specified LTI registration with the provided parameters. Note that updating the base tool configuration
   # of a registration that is associated with a Dynamic Registration will return a 422. All other fields can be updated
@@ -1674,7 +1773,7 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json"
   def install_from_template
     unless @context.feature_enabled?(:lti_registrations_templates)
-      return head :not_found
+      return render json: { errors: "Not found" }, status: :not_found
     end
 
     local_registration = Lti::InstallTemplateRegistrationService.call(

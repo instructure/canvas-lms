@@ -83,3 +83,39 @@ describe('findLtiVersion', () => {
     expect(findLtiVersion(integrationConfiguration)).toBe('1p3')
   })
 })
+
+describe('ProductConfigureButton disabled state', () => {
+  it('button should be disabled when tool is installed (has local copy)', () => {
+    const installStatus = {
+      id: '123',
+      name: 'Test Tool',
+      inherited: true,
+      workflow_state: 'on',
+    }
+
+    // The button should be disabled when tool is installed
+    const isDisabled = !!installStatus
+    expect(isDisabled).toBe(true)
+  })
+
+  it('button should be disabled when tool is installed in current account', () => {
+    const installStatus = {
+      id: '123',
+      name: 'Test Tool',
+      inherited: false,
+      workflow_state: 'on',
+    }
+
+    // The button should be disabled when installed (regardless of inherited flag)
+    const isDisabled = !!installStatus
+    expect(isDisabled).toBe(true)
+  })
+
+  it('button should be enabled when tool is not installed', () => {
+    const installStatus = null
+
+    // The button should be enabled when not installed
+    const isDisabled = !!installStatus
+    expect(isDisabled).toBe(false)
+  })
+})

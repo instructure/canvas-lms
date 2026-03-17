@@ -1012,27 +1012,6 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "when registration belongs to site admin" do
-      let_once(:site_admin_developer_key) { lti_developer_key_model(account: Account.site_admin) }
-      let_once(:site_admin_registration) { site_admin_developer_key.lti_registration }
-
-      subject { get "/api/v1/accounts/#{account.id}/lti_registration_by_client_id/#{site_admin_developer_key.id}" }
-
-      it "is successful" do
-        subject
-        expect(response).to be_successful
-      end
-
-      it "returns the registration" do
-        subject
-        expect(response_json).to include(
-          {
-            id: site_admin_registration.id,
-          }
-        )
-      end
-    end
-
     context "when registration belongs to a different root account" do
       let_once(:different_root_account) { account_model }
       let_once(:different_developer_key) { lti_developer_key_model(account: different_root_account) }
@@ -1042,6 +1021,275 @@ RSpec.describe Lti::RegistrationsController do
 
       it "returns 404" do
         subject
+        expect(response).to have_http_status(:not_found)
+        expect(response_json["errors"]).to eq("LTI registration not found")
+      end
+    end
+  end
+
+  describe "GET install_status", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/install_status/#{developer_key.id}" }
+
+    let(:developer_key) { lti_developer_key_model(account:) }
+    let(:registration) { developer_key.lti_registration }
+
+    before do
+      account.root_account.enable_feature!(:lti_registrations_templates)
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "for nonexistent developer key" do
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/install_status/#{developer_key.id + 1}"
+        expect(response).to be_not_found
+      end
+    end
+
+    context "when lti_registrations_templates feature flag is disabled" do
+      before do
+        account.root_account.disable_feature!(:lti_registrations_templates)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "when registration is in the current account" do
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the registration" do
+        subject
+        expect(response_json).to include({
+                                           id: registration.id,
+                                         })
+      end
+    end
+
+    context "when registration is in Site Admin and has a local copy" do
+      let_once(:site_admin_developer_key) { lti_developer_key_model(account: Account.site_admin) }
+      let_once(:site_admin_registration) { site_admin_developer_key.lti_registration }
+      let_once(:local_copy) do
+        Lti::Registration.create!(
+          account:,
+          name: "Local Copy",
+          admin_nickname: "local",
+          vendor: "test",
+          template_registration: site_admin_registration
+        )
+      end
+
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/install_status/#{site_admin_developer_key.id}" }
+
+      before do
+        # Ensure local copy exists
+        local_copy
+      end
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the local copy, not the Site Admin registration" do
+        subject
+        expect(response_json).to include(
+          {
+            id: local_copy.id,
+            name: "Local Copy",
+          }
+        )
+        expect(response_json[:id]).not_to eq(site_admin_registration.id)
+      end
+
+      it "includes inherited flag as true (local copy is inherited from template)" do
+        subject
+        expect(response_json[:inherited]).to be(true)
+      end
+    end
+
+    context "when registration is in Site Admin and has NO local copy" do
+      let_once(:site_admin_developer_key) { lti_developer_key_model(account: Account.site_admin) }
+      let_once(:site_admin_registration) { site_admin_developer_key.lti_registration }
+
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/install_status/#{site_admin_developer_key.id}" }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+        expect(response_json["errors"]).to eq("LTI registration not found")
+      end
+    end
+
+    context "when registration belongs to a different root account" do
+      let_once(:different_root_account) { account_model }
+      let_once(:different_developer_key) { lti_developer_key_model(account: different_root_account) }
+      let_once(:different_registration) { different_developer_key.lti_registration }
+
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/install_status/#{different_developer_key.id}" }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+        expect(response_json["errors"]).to eq("LTI registration not found")
+      end
+    end
+
+    context "when local copy is deleted" do
+      let_once(:site_admin_developer_key) { lti_developer_key_model(account: Account.site_admin) }
+      let_once(:site_admin_registration) { site_admin_developer_key.lti_registration }
+      let_once(:local_copy) do
+        Lti::Registration.create!(
+          account:,
+          name: "Local Copy",
+          admin_nickname: "local",
+          vendor: "test",
+          template_registration: site_admin_registration,
+          workflow_state: "deleted"
+        )
+      end
+
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/install_status/#{site_admin_developer_key.id}" }
+
+      before do
+        local_copy
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "GET show_by_utid", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/by_utid/#{utid}" }
+
+    let(:utid) { "test-utid-123" }
+    let(:registration) { lti_registration_with_tool(account:) }
+    let(:manual_config) { registration.manual_configuration }
+
+    before do
+      manual_config.update!(unified_tool_id: utid)
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "when UTID exists in manual configuration" do
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the registration" do
+        subject
+        expect(response_json).to include({
+                                           id: registration.id,
+                                         })
+      end
+
+      it "includes inherited flag" do
+        subject
+        expect(response_json).to have_key(:inherited)
+      end
+    end
+
+    context "when UTID exists in IMS registration" do
+      let(:ims_registration) { lti_ims_registration_model(account:) }
+      let(:lti_registration) { ims_registration.lti_registration }
+
+      before do
+        manual_config.update!(unified_tool_id: "different-utid")
+        ims_registration.update!(unified_tool_id: utid)
+      end
+
+      it "is successful" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/by_utid/#{utid}"
+        expect(response).to be_successful
+      end
+
+      it "returns the registration" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/by_utid/#{utid}"
+        expect(response_json).to include({
+                                           id: lti_registration.id,
+                                         })
+      end
+    end
+
+    context "when UTID does not exist" do
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/by_utid/nonexistent-utid"
+        expect(response).to have_http_status(:not_found)
+        expect(response_json["errors"]).to eq("LTI registration not found")
+      end
+    end
+
+    context "when registration is deleted" do
+      before do
+        # Ensure manual_config exists and has the utid set before deleting
+        manual_config # Force lazy evaluation
+        registration.update!(workflow_state: "deleted")
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+        expect(response_json["errors"]).to eq("LTI registration not found")
+      end
+    end
+
+    context "when registration belongs to a different root account" do
+      let_once(:different_root_account) { account_model }
+      let_once(:different_registration) { lti_registration_with_tool(account: different_root_account) }
+      let_once(:different_config) { different_registration.manual_configuration }
+
+      before do
+        different_config.update!(unified_tool_id: "other-utid")
+      end
+
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/by_utid/other-utid"
         expect(response).to have_http_status(:not_found)
         expect(response_json["errors"]).to eq("LTI registration not found")
       end

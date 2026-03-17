@@ -101,12 +101,19 @@ const router = createBrowserRouter(
           path: 'product_detail/:id',
           element: (
             <ProductDetail
-              renderConfigureButton={(buttonWidth, product) => {
+              renderConfigureButton={(
+                buttonWidth,
+                product,
+                installStatus,
+                installStatusLoading,
+              ) => {
                 return (
                   <ProductConfigureButton
                     accountId={accountId}
                     buttonWidth={buttonWidth}
                     product={product}
+                    installStatus={installStatus}
+                    installStatusLoading={installStatusLoading}
                   />
                 )
               }}
