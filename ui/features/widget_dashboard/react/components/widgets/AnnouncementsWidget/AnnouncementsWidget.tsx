@@ -38,7 +38,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
   isEditMode = false,
   dragHandleProps,
 }) => {
-  const {sharedCourseData} = useWidgetDashboard()
+  const {sharedCourseData, observedUserId} = useWidgetDashboard()
 
   const [filter, setFilter] = useWidgetConfig<FilterOption>(widget.id, 'filter', 'unread')
 
@@ -133,7 +133,11 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
               key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
               margin="0"
             >
-              <AnnouncementItem announcementItem={announcement} filter={filter} />
+              <AnnouncementItem
+                announcementItem={announcement}
+                filter={filter}
+                readOnly={!!observedUserId}
+              />
             </List.Item>
           ))}
         </List>

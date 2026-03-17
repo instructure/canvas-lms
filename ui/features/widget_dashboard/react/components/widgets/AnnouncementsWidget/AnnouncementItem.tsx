@@ -55,9 +55,14 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({children, maxLength = 80})
 interface AnnouncementItemProps {
   announcementItem: Announcement
   filter: FilterOption
+  readOnly?: boolean
 }
 
-const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, filter}) => {
+const AnnouncementItem: React.FC<AnnouncementItemProps> = ({
+  announcementItem,
+  filter,
+  readOnly = false,
+}) => {
   const toggleReadState = useToggleAnnouncementReadState()
   const [announcement, setAnnouncement] = useState(announcementItem)
   const [isLoading, setIsLoading] = useState(false)
@@ -153,8 +158,8 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
         size="small"
         withBackground={false}
         withBorder={false}
-        onClick={isLoading ? undefined : handleToggleReadState}
-        disabled={isLoading}
+        onClick={isLoading || readOnly ? undefined : handleToggleReadState}
+        disabled={isLoading || readOnly}
         screenReaderLabel={label}
         aria-pressed={isLoading ? undefined : isRead}
         data-testid={testId}

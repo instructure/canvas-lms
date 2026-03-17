@@ -191,6 +191,13 @@ describe "Student dashboard as observer", :ignore_js_errors do
       expect(element_exists?(announcement_item_selector(@announcement7.id))).to be_falsey
     end
 
+    it "disables the mark read/unread button" do
+      go_to_dashboard
+      select_observed_student(@student.name)
+
+      expect(announcement_item_mark_read(@announcement7.id)).to be_disabled
+    end
+
     it "navigates to observed courses announcements page" do
       go_to_dashboard
       select_observed_student(@student.name)
@@ -229,6 +236,33 @@ describe "Student dashboard as observer", :ignore_js_errors do
 
       message = ConversationMessage.last
       expect(message.author_id).to eq(@observer.id)
+    end
+  end
+
+  context "Todo list widget as observer" do
+    before :once do
+      add_widget_to_dashboard(@observer, :todo_list, 1)
+    end
+
+    it "shows observed student's todo items" do
+      go_to_dashboard
+      select_observed_student(@student.name)
+
+      expect(todo_item(@due_assignment.id)).to be_displayed
+    end
+
+    it "hides the New To-do button" do
+      go_to_dashboard
+      select_observed_student(@student.name)
+
+      expect(element_exists?(new_todo_button_selector)).to be_falsey
+    end
+
+    it "disables the complete checkbox" do
+      go_to_dashboard
+      select_observed_student(@student.name)
+
+      expect(todo_checkbox(@due_assignment.id)).to be_disabled
     end
   end
 

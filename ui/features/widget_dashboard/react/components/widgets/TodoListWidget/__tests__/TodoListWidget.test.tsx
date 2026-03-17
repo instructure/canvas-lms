@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import TodoListWidget from '../TodoListWidget'
@@ -80,7 +81,10 @@ afterEach(() => {
 })
 afterAll(() => server.close())
 
-const renderWithClient = (ui: React.ReactElement) => {
+const renderWithClient = (
+  ui: React.ReactElement,
+  {observedUserId = null}: {observedUserId?: string | null} = {},
+) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -91,7 +95,10 @@ const renderWithClient = (ui: React.ReactElement) => {
   return render(
     <PlatformTestWrapper>
       <QueryClientProvider client={queryClient}>
-        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+        <WidgetDashboardProvider
+          sharedCourseData={mockSharedCourseData}
+          observedUserId={observedUserId}
+        >
           <WidgetDashboardEditProvider>
             <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
           </WidgetDashboardEditProvider>
@@ -191,6 +198,54 @@ describe('TodoListWidget', () => {
       })
 
       expect(screen.getByText('Page')).toBeInTheDocument()
+    })
+  })
+
+  describe('observer mode', () => {
+    it('passes observed_user_id to planner API when observing a student', async () => {
+      const observedUserId = 'student-123'
+      let capturedUrl: string | null = null
+
+      server.use(
+        http.get('/api/v1/planner/items', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json([], {
+            headers: {Link: '</api/v1/planner/items?per_page=5>; rel="first"'},
+          })
+        }),
+      )
+
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />, {observedUserId})
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      expect(capturedUrl).not.toBeNull()
+      const url = new URL(capturedUrl!)
+      expect(url.searchParams.get('observed_user_id')).toBe(observedUserId)
+      expect(url.searchParams.getAll('include[]')).toContain('all_courses')
+    })
+
+    it('hides the New To-do button when observing a student', async () => {
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />, {observedUserId: 'student-123'})
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      expect(screen.queryByTestId('new-todo-button')).not.toBeInTheDocument()
+    })
+
+    it('disables the complete checkbox when observing a student', async () => {
+      renderWithClient(<TodoListWidget {...buildDefaultProps()} />, {observedUserId: 'student-123'})
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+      })
+
+      const checkbox = screen.getByTestId('todo-checkbox-1')
+      expect(checkbox).toBeDisabled()
     })
   })
 
