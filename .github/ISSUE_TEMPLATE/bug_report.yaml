@@ -1,0 +1,64 @@
+name: Bug report
+description: File a bug report.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the bug report below as best you can.
+
+        If you're experiencing issues setting up or running a self-hosted Canvas instance, please do _not_ file an issue here. Instead, please post to the [Canvas LMS Mailing List](https://groups.google.com/g/canvas-lms-users) where the community can help you troubleshoot. While some issues may be actual bugs, many issues are often due to configuration problems or lack of familiarity with running a Ruby on Rails application, and the community is a great resource for those types of questions.
+
+        For security vulnerabilities, please report them through our [Vulnerability Disclosure Program](https://www.instructure.com/trust-center/vulnerability-disclosure).
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: |
+        A clear and concise description of what the bug is. The more information you can provide, the easier it will be for us to investigate and fix the issue.
+      placeholder: "When I click the 'Submit' button, nothing happens."
+    validations:
+      required: true
+  - type: upload
+    id: screenshots
+    attributes:
+      label: Screenshots or screen recordings
+      description: |
+        If applicable, please upload any screenshots or screen recordings that show the bug. This can help us understand the issue better and speed up the investigation.
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: A clear and concise list of steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on (if applicable)?
+      description: You may select multiple browsers if the issue occurs on more than one.
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+  - type: textarea
+    id: backtrace
+    attributes:
+      label: Backtrace
+      description: |
+        If you have a backtrace from a server error, please copy and paste it here.
+        This will be automatically formatted into code, so no need for backticks.
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Please copy and paste any relevant log output.
+        Logs could include browser console logs, server logs, or any error messages you see.
+        This will be automatically formatted into code, so no need for backticks.
+      render: text
