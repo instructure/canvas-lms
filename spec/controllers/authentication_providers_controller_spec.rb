@@ -90,10 +90,10 @@ describe AuthenticationProvidersController do
         expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id])
       end
 
-      it "includes discovery_page_base_url in js_env" do
+      it "includes discovery_page_url in js_env" do
         get "index", params: { account_id: account.id }
         expect(response).to be_successful
-        expect(assigns(:js_env)).to include(:discovery_page_base_url)
+        expect(assigns(:js_env)).to include(:discovery_page_url)
       end
     end
 

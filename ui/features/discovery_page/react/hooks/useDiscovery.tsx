@@ -38,8 +38,7 @@ export function DiscoveryProvider({children}: DiscoveryProviderProps) {
         modalOpen,
         setModalOpen,
         authProviders: ENV.auth_providers,
-        previewUrl: 'http://localhost:9000/index.html',
-        //previewUrl: ENV.discovery_page_base_url
+        previewUrl: ENV.discovery_page_url,
       }}
     >
       {children}
