@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
-import {svgUrl} from '@canvas/outcomes/react/utils/icons'
+import {getTagIcon} from '@canvas/outcomes/react/utils/icons'
 import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {findRating} from '@canvas/outcomes/react/utils/ratings'
-import {ScoreWithLabel} from './ScoreWithLabel'
+import {ScoreWithLabel} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ScoreCellContent/ScoreWithLabel'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -38,19 +37,13 @@ const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
 }) => {
   const rating = score !== undefined ? findRating(outcome.ratings, score) : undefined
+  const masteryLevelResult = getTagIcon(rating?.points, outcome.mastery_points)
+  const masteryLevel = typeof masteryLevelResult === 'string' ? masteryLevelResult : 'unassessed'
 
   return (
     <ScoreWithLabel
-      icon={
-        <SVGWrapper
-          ariaLabel={rating?.description || I18n.t('Unassessed')}
-          ariaHidden={scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_LABEL}
-          fillColor={rating?.color}
-          url={svgUrl(rating?.points, outcome.mastery_points)}
-          style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}
-        />
-      }
-      score={score}
+      masteryLevel={masteryLevel}
+      score={score ?? 0}
       scoreDisplayFormat={scoreDisplayFormat}
       label={rating?.description || I18n.t('Unassessed')}
     />
