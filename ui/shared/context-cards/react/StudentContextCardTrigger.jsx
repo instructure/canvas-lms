@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import StudentContextTray from './GraphQLStudentContextTray'
 
 const handleClickEvent = event => {
@@ -44,7 +44,7 @@ const handleClickEvent = event => {
       return focusableItems
     }
 
-    ReactDOM.render(
+    legacyRender(
       <StudentContextTray
         key={`student_context_card_${courseId}_${studentId}`}
         courseId={courseId}
