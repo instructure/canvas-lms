@@ -2635,9 +2635,9 @@ describe Account do
     end
   end
 
-  describe "#discovery_page_base_url" do
+  describe "#discovery_page_url" do
     it "returns nil" do
-      expect(Account.new.discovery_page_base_url).to be_nil
+      expect(Account.new.discovery_page_url).to be_nil
     end
   end
 

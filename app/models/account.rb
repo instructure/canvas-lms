@@ -1871,7 +1871,7 @@ class Account < ActiveRecord::Base
     false
   end
 
-  def discovery_page_base_url
+  def discovery_page_url
     nil
   end
 

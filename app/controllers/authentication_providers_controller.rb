@@ -253,8 +253,8 @@ class AuthenticationProvidersController < ApplicationController
       if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
         auth_providers = @account.authentication_providers.valid_for_discovery_page
                                  .map { |ap| { id: ap.id, url: ap.login_authentication_provider_path, auth_type: ap.auth_type } }
-        discovery_page_base_url = @domain_root_account.discovery_page_base_url
-        js_env({ auth_providers:, discovery_page_base_url: })
+        discovery_page_url = @domain_root_account.discovery_page_url
+        js_env({ auth_providers:, discovery_page_url: })
       end
 
       add_crumb @page_title
