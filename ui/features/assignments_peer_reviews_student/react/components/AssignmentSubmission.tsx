@@ -281,7 +281,11 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     <View
       as="div"
       minHeight="calc(720px - 10.75rem)"
-      height={isAnonymous ? 'calc(100vh - 22rem)' : 'calc(100vh - 24rem)'}
+      height={
+        isAnonymous
+          ? `calc(100vh - 22rem - ${calculateMasqueradeHeight() + 65}px)`
+          : `calc(100vh - 24rem - ${calculateMasqueradeHeight() + 65}px)`
+      }
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">
@@ -327,7 +331,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
           right: 0,
           left: isMobile ? '0px' : '275px',
           bottom: `${calculateMasqueradeHeight()}px`,
-          padding: isMobile ? '0px' : '0px 24px 8px 0px',
+          padding: isMobile ? '0px' : '0px 24px 0px 0px',
           zIndex: '999',
         }}
         data-testid="peer-review-footer"

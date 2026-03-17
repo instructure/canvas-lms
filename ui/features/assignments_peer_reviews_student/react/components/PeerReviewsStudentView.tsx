@@ -309,24 +309,33 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
             padding="0"
             data-testid="submission-tab"
           >
-            {isUnavailableReviewSelected() || !selectedAssessment?.submission?.submittedAt ? (
-              <UnavailablePeerReview reason={getUnavailableReason()} />
-            ) : (
-              <AssignmentSubmission
-                submission={selectedAssessment.submission!}
-                isPeerReviewCompleted={selectedAssessment.workflowState === 'completed'}
-                rubricAssessment={selectedAssessment.rubricAssessment}
-                assignment={data.assignment}
-                reviewerSubmission={reviewerSubmission}
-                isMobile={isMobile}
-                handleNextPeerReview={handleNextPeerReview}
-                onPeerReviewSubmitted={handlePeerReviewSubmitted}
-                hasSeenPeerReviewModal={hasSeenPeerReviewModal}
-                isReadOnly={isPastLockDate}
-                isAnonymous={isAnonymous}
-                submissionUserId={submissionUserId}
-              />
-            )}
+            <div
+              onFocus={(e: React.FocusEvent<HTMLDivElement>) => {
+                const panel = e.currentTarget
+                const relatedTarget = e.relatedTarget as HTMLElement | null
+                if (relatedTarget && panel.contains(relatedTarget)) return
+                panel.scrollIntoView({block: 'start', behavior: 'smooth'})
+              }}
+            >
+              {isUnavailableReviewSelected() || !selectedAssessment?.submission?.submittedAt ? (
+                <UnavailablePeerReview reason={getUnavailableReason()} />
+              ) : (
+                <AssignmentSubmission
+                  submission={selectedAssessment.submission!}
+                  isPeerReviewCompleted={selectedAssessment.workflowState === 'completed'}
+                  rubricAssessment={selectedAssessment.rubricAssessment}
+                  assignment={data.assignment}
+                  reviewerSubmission={reviewerSubmission}
+                  isMobile={isMobile}
+                  handleNextPeerReview={handleNextPeerReview}
+                  onPeerReviewSubmitted={handlePeerReviewSubmitted}
+                  hasSeenPeerReviewModal={hasSeenPeerReviewModal}
+                  isReadOnly={isPastLockDate}
+                  isAnonymous={isAnonymous}
+                  submissionUserId={submissionUserId}
+                />
+              )}
+            </div>
           </Tabs.Panel>
         )}
       </Tabs>
