@@ -244,8 +244,12 @@ module Lti
             if uri.include? "?"
               # Verify the required query params are present
               required_params = CGI.parse(uri.split("?").last).to_a
-              requested_params = CGI.parse(requested_query_string).to_a
-              (required_params - requested_params).empty?
+              if requested_query_string.nil?
+                required_params.empty?
+              else
+                requested_params = CGI.parse(requested_query_string).to_a
+                (required_params - requested_params).empty?
+              end
             else
               uri == requested_redirect_base
             end
