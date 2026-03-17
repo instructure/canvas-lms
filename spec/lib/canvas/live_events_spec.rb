@@ -284,6 +284,62 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".lti_resource_link_created" do
+    before do
+      course_with_teacher
+      @tool = external_tool_model(context: @course)
+      @resource_link = Lti::ResourceLink.create!(
+        context: @course,
+        context_external_tool: @tool,
+        url: "http://example.com/launch",
+        title: "My Link"
+      )
+    end
+
+    it "posts the correct event and payload" do
+      expect_event("lti_resource_link_created", {
+                     resource_link_id: @resource_link.global_id.to_s,
+                     resource_link_uuid: @resource_link.resource_link_uuid,
+                     lookup_uuid: @resource_link.lookup_uuid,
+                     context_id: @resource_link.global_context_id.to_s,
+                     context_type: "Course",
+                     context_external_tool_id: @tool.global_id.to_s,
+                     url: "http://example.com/launch",
+                     title: "My Link",
+                     workflow_state: "active"
+                   })
+      Canvas::LiveEvents.lti_resource_link_created(@resource_link)
+    end
+  end
+
+  describe ".lti_resource_link_updated" do
+    before do
+      course_with_teacher
+      @tool = external_tool_model(context: @course)
+      @resource_link = Lti::ResourceLink.create!(
+        context: @course,
+        context_external_tool: @tool,
+        url: "http://example.com/launch",
+        title: "My Link"
+      )
+    end
+
+    it "posts the correct event and payload" do
+      expect_event("lti_resource_link_updated", {
+                     resource_link_id: @resource_link.global_id.to_s,
+                     resource_link_uuid: @resource_link.resource_link_uuid,
+                     lookup_uuid: @resource_link.lookup_uuid,
+                     context_id: @resource_link.global_context_id.to_s,
+                     context_type: "Course",
+                     context_external_tool_id: @tool.global_id.to_s,
+                     url: "http://example.com/launch",
+                     title: "My Link",
+                     workflow_state: "active"
+                   })
+      Canvas::LiveEvents.lti_resource_link_updated(@resource_link)
+    end
+  end
+
   describe ".wiki_page_updated" do
     before do
       course_with_teacher
