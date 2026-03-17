@@ -43,6 +43,10 @@ describe "as a teacher" do
         peer_reviews: true,
         peer_review_count: 2
       )
+      @assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
     end
 
     before do

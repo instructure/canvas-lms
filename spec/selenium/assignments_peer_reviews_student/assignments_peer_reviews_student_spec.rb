@@ -55,6 +55,10 @@ describe "peer review student landing page" do
     @assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
     @assignment.submit_homework(@student3, body: "student 3 attempt", submission_type: "online_text_entry")
     @assignment.submit_homework(@student4, body: "student 4 attempt", submission_type: "online_text_entry")
+    @assignment.create_peer_review_sub_assignment!(
+      peer_reviews: true,
+      peer_review_count: 2
+    )
   end
 
   before do
@@ -128,6 +132,10 @@ describe "peer review student landing page" do
                                                      submission_types: "online_text_entry",
                                                      peer_review_submission_required: false
                                                    })
+      no_peer_review_assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 1
+      )
 
       visit_peer_reviews_page(@course.id, no_peer_review_assignment.id)
       selector = f("input[data-testid='peer-review-selector']")
@@ -834,6 +842,10 @@ describe "peer review student landing page" do
 
       @must_review_assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
       @must_review_assignment.submit_homework(@student3, body: "student 3 attempt", submission_type: "online_text_entry")
+      @must_review_assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
 
       AllocationRule.create!(
         course: @course,

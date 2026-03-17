@@ -195,6 +195,10 @@ describe "as a teacher" do
             submission_types: "online_text_entry",
             peer_reviews: true
           )
+          @assignment.create_peer_review_sub_assignment!(
+            peer_reviews: true,
+            peer_review_count: 1
+          )
         end
 
         before do

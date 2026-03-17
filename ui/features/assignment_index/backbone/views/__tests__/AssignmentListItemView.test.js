@@ -1278,7 +1278,28 @@ describe('AssignmentListItemViewSpec - assessment requests display', () => {
     expect(studentViewItem.text()).toContain('Required Peer Review 1')
   })
 
-  test('does not render StudentViewPeerReviews when flag is enabled', () => {
+  test('does not render StudentViewPeerReviews when flag is enabled and assignment has sub-assignment', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      peer_review_sub_assignment: {id: 10, peer_review_count: 2},
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+
+    // When flag is enabled and assignment has a sub-assignment, peer reviews are handled as sub-assignments
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+
+  test('renders StudentViewPeerReviews for legacy peer reviews when flag is enabled', () => {
     const model = buildAssignment({
       id: 1,
       title: 'Peer Review Assignment',
@@ -1293,9 +1314,9 @@ describe('AssignmentListItemViewSpec - assessment requests display', () => {
     })
     const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
 
-    // When flag is enabled, peer reviews are handled as sub-assignments
+    // Legacy peer reviews (no sub-assignment) should still render even when flag is enabled
     const studentViewItem = view.$el.find('li.student-view')
-    expect(studentViewItem).toHaveLength(0)
+    expect(studentViewItem).toHaveLength(1)
   })
 
   test('does not render StudentViewPeerReviews when no assessment requests', () => {
