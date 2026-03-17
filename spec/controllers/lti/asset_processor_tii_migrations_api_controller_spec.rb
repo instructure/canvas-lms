@@ -254,7 +254,7 @@ describe Lti::AssetProcessorTiiMigrationsApiController do
       it "creates a progress and enqueues a job" do
         expect do
           post :create, params: { account_id: sub_account.id, email: "test@example.com" }
-        end.to change(Progress, :count).by(1).and change(Delayed::Job, :count).by(1)
+        end.to change(Progress, :count).by(1).and change(Delayed::Job, :count).by_at_least(1)
 
         expect(response).to have_http_status(:ok)
 

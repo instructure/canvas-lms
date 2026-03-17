@@ -1810,12 +1810,15 @@ describe Account do
 
       account.default_storage_quota = 10.decimal_megabytes
       account.save! # clear here
+      run_jobs
 
       account.reload
       account.save!
+      run_jobs
 
       account.default_storage_quota = 10.decimal_megabytes
       account.save!
+      run_jobs
     end
 
     it "inherits from a parent account's default_storage_quota" do
@@ -1830,6 +1833,7 @@ describe Account do
 
         account.default_storage_quota = 20.decimal_megabytes
         account.save!
+        run_jobs
 
         # should clear caches
         account = Account.find(account.id)
@@ -1971,6 +1975,7 @@ describe Account do
 
           @sub1.settings = @sub1.settings.merge(restrict_student_future_view: { locked: true, value: true }, lock_all_announcements: { locked: true, value: true })
           @sub1.save!
+          run_jobs
 
           # hard reload
           @account = Account.find(@account.id)

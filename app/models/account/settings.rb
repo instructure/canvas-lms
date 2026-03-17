@@ -68,7 +68,7 @@ module Account::Settings
   def cached_inherited_setting(setting)
     shard.activate do
       RequestCache.cache("inherited_settings", self, setting) do
-        Rails.cache.fetch([setting, global_id].cache_key) do
+        Rails.cache.fetch([setting, global_id].cache_key, expires_in: 1.day) do
           calculate_inherited_setting(setting)
         end
       end

@@ -289,6 +289,7 @@ describe EnrollmentState do
     def restrict_view(account, type)
       account.settings[type] = { value: true, locked: false }
       account.save!
+      run_jobs # ensure cache invalidations happen
     end
 
     it "invalidates access for future students when account future access settings are changed" do

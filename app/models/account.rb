@@ -999,7 +999,7 @@ class Account < ActiveRecord::Base
           # Prevent subsequent code using a stale Account object whose cached associations
           # or inherited settings were just invalidated.
           reload_if_cache_stale
-          Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}")
+          Account.delay(singleton: "Account.invalidate_inherited_caches_#{global_id}")
                  .invalidate_inherited_caches(self, @invalidations)
         end
       end
