@@ -26,6 +26,7 @@ import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 import {createGradebookHandler} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -36,6 +37,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({
   isEditMode = false,
   dragHandleProps,
 }) => {
+  const {isDark} = useWidgetTheme()
   const [globalGradeVisibility, setGlobalGradeVisibility] = useWidgetConfig<boolean>(
     widget.id,
     'showGrades',
@@ -94,6 +96,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({
           data-testid={
             globalGradeVisibility ? 'hide-all-grades-checkbox' : 'show-all-grades-checkbox'
           }
+          themeOverride={isDark ? {labelColor: '#FFFFFF'} : {}}
         />
       }
     >

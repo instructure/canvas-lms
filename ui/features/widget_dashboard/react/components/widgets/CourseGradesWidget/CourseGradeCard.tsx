@@ -211,7 +211,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
   return (
     <View
       as="div"
-      background="primary"
+      background="secondary"
       borderRadius="medium"
       width="100%"
       height="100%"

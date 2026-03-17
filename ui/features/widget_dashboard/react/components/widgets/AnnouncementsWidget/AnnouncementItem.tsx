@@ -32,6 +32,7 @@ import type {Announcement} from '../../../types'
 import {useToggleAnnouncementReadState} from '../../../hooks/useToggleAnnouncementReadState'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {FilterOption} from './utils'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 import {ANNOUNCEMENTS_PAGINATED_KEY} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -63,6 +64,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({
   filter,
   readOnly = false,
 }) => {
+  const {isDark} = useWidgetTheme()
   const toggleReadState = useToggleAnnouncementReadState()
   const [announcement, setAnnouncement] = useState(announcementItem)
   const [isLoading, setIsLoading] = useState(false)
@@ -158,6 +160,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({
         size="small"
         withBackground={false}
         withBorder={false}
+        color={isDark ? 'primary-inverse' : 'secondary'}
         onClick={isLoading || readOnly ? undefined : handleToggleReadState}
         disabled={isLoading || readOnly}
         screenReaderLabel={label}

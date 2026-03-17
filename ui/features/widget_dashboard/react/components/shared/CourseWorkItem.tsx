@@ -26,6 +26,7 @@ import {getSubmissionStatus} from '../widgets/CourseWorkWidget/utils'
 import {getTypeIcon} from '../../utils/assignmentUtils'
 import type {CourseWorkItem as CourseWorkItemType} from '../../hooks/useCourseWork'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
+import {useWidgetTheme} from '../../theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -34,7 +35,14 @@ interface CourseWorkItemProps {
 }
 
 export function CourseWorkItem({item}: CourseWorkItemProps) {
-  const submissionStatus = getSubmissionStatus(item.late, item.missing, item.state, item.dueAt)
+  const {isDark} = useWidgetTheme()
+  const submissionStatus = getSubmissionStatus(
+    item.late,
+    item.missing,
+    item.state,
+    item.dueAt,
+    isDark,
+  )
   const {isMobile} = useResponsiveContext()
 
   return (
@@ -61,9 +69,12 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                 margin="0 0 0 0"
                 themeOverride={{
                   backgroundSecondary: submissionStatus.color.background,
+                  color: submissionStatus.color.textColor,
                 }}
               >
-                {getTypeIcon(item.type, isMobile)}
+                <span style={{color: submissionStatus.color.textColor}}>
+                  {getTypeIcon(item.type, isMobile)}
+                </span>
               </View>
             </Flex.Item>
           )}

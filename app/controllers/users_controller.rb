@@ -430,8 +430,10 @@ class UsersController < ApplicationController
                                    .tabs_available(@current_user, root_account: @domain_root_account)
                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
                SHARED_COURSE_DATA: course_data_with_grades,
+               WIDGET_DASHBOARD_DARK_MODE: !!@current_user&.preferences&.dig(:widget_dashboard_dark_mode),
                DASHBOARD_FEATURES: {
                  widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
+                 widget_dashboard_dark_mode: Account.site_admin.feature_enabled?(:widget_dashboard_dark_mode),
                  platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard)
                }
              })
@@ -1717,6 +1719,7 @@ class UsersController < ApplicationController
     elementary_dashboard_disabled
     default_to_block_editor
     widget_dashboard_user_preference
+    widget_dashboard_dark_mode
   ].freeze
 
   # @API Update user settings.
@@ -1751,6 +1754,9 @@ class UsersController < ApplicationController
   #   If true, enables the widget dashboard for the user. Only applies
   #   when the widget_dashboard feature is enabled at the account level.
   #   Defaults to true when the feature becomes available.
+  #
+  # @argument widget_dashboard_dark_mode [Boolean]
+  #   If true, enables the dark color theme for the widget dashboard.
   #
   # @example_request
   #

@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import StatisticsCard from './StatisticsCard'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
+import {useWidgetTheme} from '../../theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -40,28 +41,33 @@ const StatisticsCardsGrid: React.FC<StatisticsCardsGridProps> = ({
   margin = 'small 0 0 xx-small',
 }) => {
   const {isMobile} = useResponsiveContext()
+  const {isDark, colors} = useWidgetTheme()
+  const cardBackground = isDark ? colors.cardSecondary : '#F5F5F5'
   const statisticsData = useMemo(
     () => [
       {
         key: 'due',
         count: summary.due,
         label: I18n.t('Due'),
-        backgroundColor: '#E0EBF5',
+        backgroundColor: cardBackground,
+        textColor: isDark ? '#5A9FD4' : '#1A5A8E',
       },
       {
         key: 'missing',
         count: summary.missing,
         label: I18n.t('Missing'),
-        backgroundColor: '#FCE4E5',
+        backgroundColor: cardBackground,
+        textColor: isDark ? '#F08A8D' : '#E62429',
       },
       {
         key: 'submitted',
         count: summary.submitted,
         label: I18n.t('Submitted'),
-        backgroundColor: '#DCEEE4',
+        backgroundColor: cardBackground,
+        textColor: isDark ? '#6FCF8A' : '#03893D',
       },
     ],
-    [summary],
+    [summary, isDark, cardBackground],
   )
 
   return (
@@ -72,6 +78,7 @@ const StatisticsCardsGrid: React.FC<StatisticsCardsGridProps> = ({
             count={stat.count}
             label={stat.label}
             backgroundColor={stat.backgroundColor}
+            textColor={stat.textColor}
           />
         </Flex.Item>
       ))}
