@@ -149,12 +149,12 @@ describe NewQuizzesController do
         end
       end
 
-      context "with exclude_module_launch_params" do
+      context "with sessionless_launch" do
         it "skips content tag context setup" do
           get :launch, params: {
             course_id: course.id,
             assignment_id: assignment.id,
-            exclude_module_launch_params: true
+            sessionless_launch: true
           }
           expect(response).to render_template("assignments/native_new_quizzes")
           expect(assigns[:module_tag]).to be_nil
@@ -178,6 +178,23 @@ describe NewQuizzesController do
           expect(assigns[:module_tag]).to be_present
           expect(assigns[:module_tag].content).to eq(assignment)
         end
+      end
+    end
+
+    context "when sessionless_launch param is present" do
+      before do
+        user_session(teacher)
+      end
+
+      it "renders the native new quizzes view" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, sessionless_launch: true }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      it "does not alter the basename" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, sessionless_launch: true }
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename])
+          .to eq("/courses/#{course.id}/assignments/#{assignment.id}")
       end
     end
 
