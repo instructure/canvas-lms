@@ -637,7 +637,7 @@ module Canvas::LiveEvents
       lookup_uuid: resource_link.lookup_uuid,
       context_id: resource_link.global_context_id,
       context_type: resource_link.context_type,
-      context_external_tool_id: resource_link.original_context_external_tool.global_id,
+      context_external_tool_id: resource_link.original_context_external_tool&.global_id,
       url: resource_link.url,
       title: resource_link.title,
       workflow_state: resource_link.workflow_state
