@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import StudyAssistTray from '../StudyAssistTray'
+
+const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-content" />)
 
 vi.mock('@instructure/platform-study-assist', () => ({
   AssistProvider: ({children, moduleItemId}: {children: React.ReactNode; moduleItemId: string}) => (
@@ -26,7 +29,7 @@ vi.mock('@instructure/platform-study-assist', () => ({
       {children}
     </div>
   ),
-  AssistContent: () => <div data-testid="assist-content" />,
+  AssistContent: (props: object) => mockAssistContent(props),
 }))
 
 describe('StudyAssistTray', () => {
@@ -40,6 +43,7 @@ describe('StudyAssistTray', () => {
       WIKI_PAGE_ID: 'test-page',
     } as any
     onDismiss.mockReset()
+    mockAssistContent.mockClear()
   })
 
   it('renders the heading when open', () => {
@@ -53,7 +57,8 @@ describe('StudyAssistTray', () => {
     expect(screen.getByText('Study tools')).toBeInTheDocument()
   })
 
-  it('calls onDismiss when close button is clicked', () => {
+  it('calls onDismiss when close button is clicked', async () => {
+    const user = userEvent.setup()
     render(
       <StudyAssistTray
         open={true}
@@ -63,7 +68,7 @@ describe('StudyAssistTray', () => {
     )
     const closeEl = screen.getByTestId('study-assist-close-button')
     const button = closeEl.tagName === 'BUTTON' ? closeEl : closeEl.querySelector('button')
-    fireEvent.click(button!)
+    await user.click(button!)
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
@@ -79,5 +84,38 @@ describe('StudyAssistTray', () => {
       'data-module-item-id',
       'test-page',
     )
+  })
+
+  it('configures AssistContent for prompts-only mode with white text', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(mockAssistContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chatEnabled: false,
+        showLargePrompts: true,
+        thumbsColor: 'primary-inverse',
+        renderMessage: expect.any(Function),
+        renderRichContent: expect.any(Function),
+      }),
+    )
+  })
+
+  it('renderMessage wraps text in a white span', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    const {renderMessage} = mockAssistContent.mock.calls[0][0] as any
+    const result = render(renderMessage('Hello world'))
+    expect(result.container.querySelector('span')).toHaveStyle({color: 'rgb(255, 255, 255)'})
+    expect(result.container).toHaveTextContent('Hello world')
   })
 })
