@@ -26,13 +26,18 @@ import {IconArrowOpenDownSolid, IconSettingsLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {View} from '@instructure/ui-view'
-import {ExportCSVButton} from './ExportCSVButton'
+import {ExportCSVButton} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/ExportCSVButton'
+import {exportCSV} from '../../apiClient'
 import {SettingsTray} from './SettingsTray'
 import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
 import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
 import {Heading} from '@instructure/ui-heading'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
+
+export const buildCsvExportHandler =
+  (courseId: string, gradebookFilters: string[]) => (): Promise<object[]> =>
+    exportCSV(courseId, gradebookFilters).then(r => r.data)
 
 const componentOverrides = {
   Link: {
@@ -94,8 +99,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {showDataDependentControls && (
           <Flex gap="small" alignItems="stretch" direction="row">
             <ExportCSVButton
-              courseId={courseId}
-              gradebookFilters={mapSettingsToFilters(gradebookSettings)}
+              csvFileName={`course-${courseId}-gradebook-export.csv`}
+              csvExportHandler={buildCsvExportHandler(
+                courseId,
+                mapSettingsToFilters(gradebookSettings),
+              )}
             />
             <View as="div" borderWidth="none small none none" width="0px" />
             <IconButton
