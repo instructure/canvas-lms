@@ -1327,8 +1327,8 @@ describe Canvas::LiveEvents do
       )
     end
 
-    it "triggers assignment_created event with quiz details" do
-      expect_event("assignment_created",
+    it "triggers quiz_created event with quiz details" do
+      expect_event("quiz_created",
                    hash_including({
                      quiz_id: @quiz.global_id.to_s,
                      quiz_type: "practice_quiz",
@@ -1354,8 +1354,8 @@ describe Canvas::LiveEvents do
       )
     end
 
-    it "triggers assignment_updated event with quiz details" do
-      expect_event("assignment_updated",
+    it "triggers quiz_updated event with quiz details" do
+      expect_event("quiz_updated",
                    hash_including({
                      quiz_id: @quiz.global_id.to_s,
                      quiz_type: "practice_quiz",
