@@ -19,6 +19,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {render} from '@canvas/react'
 import WidgetDashboardContainer from './react/WidgetDashboardContainer'
+import EducatorDashboardContainer from './react/EducatorDashboardContainer'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ErrorBoundary from '@canvas/error-boundary'
@@ -236,7 +237,11 @@ const WidgetDashboardApp = () => {
                     query={RESPONSIVE_QUERY}
                     render={(_props, matches) => (
                       <ResponsiveProvider matches={matches || ['desktop']}>
-                        <WidgetDashboardContainer />
+                        {ENV.DASHBOARD_FEATURES?.educator_dashboard ? (
+                          <EducatorDashboardContainer />
+                        ) : (
+                          <WidgetDashboardContainer />
+                        )}
                       </ResponsiveProvider>
                     )}
                   />
