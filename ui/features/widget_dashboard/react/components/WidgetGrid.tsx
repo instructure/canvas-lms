@@ -26,6 +26,8 @@ import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
 import {useResponsiveContext} from '../hooks/useResponsiveContext'
 import {useWidgetLayout} from '../hooks/useWidgetLayout'
+import {useWidgetDashboard} from '../hooks/useWidgetDashboardContext'
+import {WIDGET_TYPES} from '../constants'
 import {Flex} from '@instructure/ui-flex'
 import {DragDropContext, Droppable, Draggable, type DropResult} from 'react-beautiful-dnd'
 import AddWidgetModal from './AddWidgetModal/AddWidgetModal'
@@ -57,7 +59,13 @@ interface WidgetGridProps {
 const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => {
   const {matches} = useResponsiveContext()
   const {moveWidgetToPosition} = useWidgetLayout()
-  const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
+  const {currentUserRoles} = useWidgetDashboard()
+  const isObserver = currentUserRoles?.includes('observer') ?? false
+  const visibleWidgets = useMemo(
+    () => config.widgets.filter(w => !(isObserver && w.type === WIDGET_TYPES.INBOX)),
+    [config.widgets, isObserver],
+  )
+  const widgetsByColumn = useMemo(() => widgetsAsColumns(visibleWidgets), [visibleWidgets])
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [addPosition, setAddPosition] = useState<{col: number; row: number} | null>(null)
   const lastDraggedWidgetIdRef = useRef<string | null>(null)
@@ -70,7 +78,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
       const destCol = parseInt(result.destination.droppableId.replace('column-', ''), 10)
       const destIndex = result.destination.index
 
-      const destColWidgets = config.widgets
+      const destColWidgets = visibleWidgets
         .filter(w => w.position.col === destCol && w.id !== result.draggableId)
         .sort((a, b) => a.position.row - b.position.row)
 
@@ -95,7 +103,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
       }
       lastDraggedWidgetIdRef.current = null
     },
-    [moveWidgetToPosition, config.widgets],
+    [moveWidgetToPosition, visibleWidgets],
   )
 
   const renderWidget = (widget: Widget, dragHandleProps?: any) => {
