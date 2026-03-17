@@ -30,6 +30,7 @@ export interface FetchPlannerItemsParams {
     | 'all_ungraded_todo_items'
     | 'incomplete_items'
     | 'complete_items'
+  observed_user_id?: string | null
 }
 
 export interface FetchPlannerItemsResponse {
@@ -53,6 +54,10 @@ export async function fetchPlannerItems(
     if (params.per_page) queryParams.append('per_page', params.per_page.toString())
     if (params.order) queryParams.append('order', params.order)
     if (params.filter) queryParams.append('filter', params.filter)
+    if (params.observed_user_id) {
+      queryParams.append('observed_user_id', params.observed_user_id)
+      queryParams.append('include[]', 'all_courses')
+    }
 
     url = `/api/v1/planner/items?${queryParams.toString()}`
   }

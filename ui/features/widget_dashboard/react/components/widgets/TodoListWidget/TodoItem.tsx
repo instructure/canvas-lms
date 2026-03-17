@@ -34,9 +34,10 @@ const I18n = createI18nScope('widget_dashboard')
 interface TodoItemProps {
   item: PlannerItem
   onItemUpdate?: (plannableId: string, plannableType: string, override: PlannerOverride) => void
+  readOnly?: boolean
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
+const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate, readOnly = false}) => {
   const isAnnouncement = item.plannable_type === 'announcement'
   const dateText = isAnnouncement
     ? formatAnnouncementDate(item.plannable_date)
@@ -183,6 +184,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
               }
               onClick={handleCheckboxClick}
               data-testid={`todo-checkbox-${item.plannable_id}`}
+              interaction={readOnly ? 'disabled' : 'enabled'}
             >
               {isMarkedComplete ? <IconCheckLine color="success" /> : <IconCheckPlusLine />}
             </IconButton>

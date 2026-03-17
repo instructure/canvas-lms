@@ -248,6 +248,7 @@ const setup = (
   props: BaseWidgetProps = buildDefaultProps(),
   envOverrides = {},
   sharedCourseData: SharedCourseData[] = mockSharedCourseData,
+  observedUserId: string | null = null,
 ) => {
   // Set up Canvas ENV with current_user_id
   const originalEnv = window.ENV
@@ -270,7 +271,10 @@ const setup = (
     wrapper: ({children}: {children: React.ReactNode}) => (
       <PlatformTestWrapper>
         <QueryClientProvider client={queryClient}>
-          <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+          <WidgetDashboardProvider
+            sharedCourseData={sharedCourseData}
+            observedUserId={observedUserId}
+          >
             <WidgetDashboardEditProvider>
               <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
             </WidgetDashboardEditProvider>
@@ -928,5 +932,24 @@ describe('AnnouncementsWidget', () => {
     )
 
     cleanup()
+  })
+
+  describe('observer mode', () => {
+    it('disables the read/unread button when observing a student', async () => {
+      server.use(
+        graphql.query('GetUserAnnouncements', () => {
+          return HttpResponse.json(mockUnreadAnnouncementsResponse)
+        }),
+      )
+
+      const {cleanup} = setup(buildDefaultProps(), {}, mockSharedCourseData, 'student-123')
+
+      await waitForLoadingToComplete()
+
+      const markReadButton = screen.getByTestId('mark-read-2')
+      expect(markReadButton).toBeDisabled()
+
+      cleanup()
+    })
   })
 })
