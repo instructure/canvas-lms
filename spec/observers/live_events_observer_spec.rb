@@ -69,6 +69,40 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "lti_resource_link" do
+    let(:course) { Course.create!(name: "Course") }
+    let(:tool) { external_tool_model(context: course) }
+
+    it "posts lti_resource_link_created when a resource link is created" do
+      expect(Canvas::LiveEvents).to receive(:lti_resource_link_created).once
+      Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "http://example.com/launch"
+      )
+    end
+
+    it "posts lti_resource_link_updated when a resource link is updated" do
+      resource_link = Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "http://example.com/launch"
+      )
+      expect(Canvas::LiveEvents).to receive(:lti_resource_link_updated).once
+      resource_link.update!(title: "New Title")
+    end
+
+    it "posts lti_resource_link_updated (not deleted) when a resource link is soft deleted" do
+      resource_link = Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "http://example.com/launch"
+      )
+      expect(Canvas::LiveEvents).to receive(:lti_resource_link_updated).once
+      resource_link.destroy
+    end
+  end
+
   describe "wiki" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:wiki_page_created).once
