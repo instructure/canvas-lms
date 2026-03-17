@@ -95,7 +95,7 @@ class NewQuizzesController < ApplicationController
   end
 
   def setup_content_tag_context
-    return if params[:exclude_module_launch_params]
+    return if params[:sessionless_launch]
 
     @tag = @assignment.external_tool_tag
     return unless @tag
