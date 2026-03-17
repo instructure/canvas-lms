@@ -206,9 +206,9 @@ module Lti
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expected_json = group.users.map do |user|
-          user_json(user, user, nil, [], group.context, tool_includes: %w[email lti_id])
+          user_json(user, user, nil, [], group.context, tool_includes: %w[email lti_id]).as_json
         end
-        expect(parsed_body.sort_by { |u| u[:id] }).to eq(expected_json.sort_by { |u| u[:id] })
+        expect(parsed_body).to match_array(expected_json)
       end
 
       it "responds with 401 if group is not in tool context" do
@@ -240,9 +240,9 @@ module Lti
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expected_json = group.users.map do |user|
-          user_json(user, user, nil, [], group.context, tool_includes: %w[email lti_id])
+          user_json(user, user, nil, [], group.context, tool_includes: %w[email lti_id]).as_json
         end
-        expect(parsed_body.sort_by { |u| u[:id] }).to eq(expected_json.sort_by { |u| u[:id] })
+        expect(parsed_body).to match_array(expected_json)
       end
     end
   end
