@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
+import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-modules/utils/miscHelpers'
 import CommentsTrayContentWithApollo from './CommentsTrayContentWithApollo'
 import type {
   Submission,
@@ -72,8 +73,13 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
       padding="small"
       overflowY="auto"
       id="comments-panel"
+      elementRef={(el: Element | null) => {
+        if (el instanceof HTMLElement) {
+          el.style.scrollPaddingBottom = `${calculateMasqueradeHeight() + 65}px`
+        }
+      }}
     >
-      <Flex as="div" direction="column" justifyItems="space-between" height="100%">
+      <Flex as="div" direction="column">
         <Flex.Item>
           <Flex as="div" direction="row" justifyItems="space-between">
             <Flex.Item>
