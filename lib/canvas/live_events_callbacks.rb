@@ -46,6 +46,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.group_membership_created(obj)
     when WikiPage
       Canvas::LiveEvents.wiki_page_created(obj)
+    when Lti::ResourceLink
+      Canvas::LiveEvents.lti_resource_link_created(obj)
     when Assignment
       Canvas::LiveEvents.assignment_created(obj)
     when AssignmentGroup
@@ -135,6 +137,8 @@ module Canvas::LiveEventsCallbacks
                                              changes["title"]&.first,
                                              changes["body"]&.first)
       end
+    when Lti::ResourceLink
+      Canvas::LiveEvents.lti_resource_link_updated(obj)
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
     when AssignmentGroup

@@ -53,7 +53,9 @@ class DataServicesEventsLoader
     "doc/api/data_services/json/caliper/event-types/grade_change.json" => "grading",
     "doc/api/data_services/json/caliper/event-types/asset_accessed.json" => "navigation_events",
     "doc/api/data_services/json/caliper/event-types/logged_in.json" => "session",
-    "doc/api/data_services/json/caliper/event-types/logged_out.json" => "session"
+    "doc/api/data_services/json/caliper/event-types/logged_out.json" => "session",
+    "doc/api/data_services/json/canvas/event-types/lti_resource_link_created.json" => "external_tool",
+    "doc/api/data_services/json/canvas/event-types/lti_resource_link_updated.json" => "external_tool"
   }.freeze
 
   def initialize(json_base_path)
