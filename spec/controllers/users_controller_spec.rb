@@ -3602,51 +3602,104 @@ describe UsersController do
       account.enable_feature!(:educator_dashboard)
     end
 
-    it "returns false when feature flag is off" do
-      account.disable_feature!(:educator_dashboard)
-      course_with_teacher_logged_in(active_all: true)
-      get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
-    end
-
-    it "returns false for K5 teacher" do
-      course_with_teacher_logged_in(active_all: true)
-      allow(controller).to receive(:k5_user?).and_return(true)
-      get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
-    end
-
     it "returns true for teacher" do
       course_with_teacher_logged_in(active_all: true)
       get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be true
+      expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
     end
 
-    it "returns false for TA" do
+    it "does not load widget_dashboard bundle for TA" do
       course_with_ta(active_all: true)
       user_session(@ta)
       get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+      expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
     end
 
     it "returns true for multi-role user with teacher and student enrollments" do
       course_with_teacher_logged_in(active_all: true)
       @course.enroll_student(@user, enrollment_state: "active")
       get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be true
+      expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
     end
 
-    it "returns false for teacher with only completed enrollments" do
+    it "does not load widget_dashboard bundle for teacher with only completed enrollments" do
       course_with_teacher_logged_in(active_all: true)
       @enrollment.update!(workflow_state: "completed")
       get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+      expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
     end
 
-    it "returns false for student-only user" do
-      course_with_student_logged_in(active_all: true)
-      get "user_dashboard"
-      expect(assigns(:js_env)[:FEATURES][:educator_dashboard]).to be false
+    context "routing to widget_dashboard bundle" do
+      it "loads widget_dashboard bundle for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+      end
+
+      it "sets educator_dashboard in DASHBOARD_FEATURES for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+      end
+
+      it "loads educator_dashboard css bundle for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:css_bundles].flatten).to include :educator_dashboard
+      end
+
+      it "does not include student-only data for educator" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:js_env)).not_to have_key(:SHARED_COURSE_DATA)
+        expect(assigns(:js_env)).not_to have_key(:OBSERVED_USERS_LIST)
+      end
+
+      it "does not load widget_dashboard bundle when feature flag is off" do
+        account.disable_feature!(:educator_dashboard)
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "does not load widget_dashboard bundle for K5 teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        allow(controller).to receive(:k5_user?).and_return(true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "does not load widget_dashboard bundle for student-only user" do
+        course_with_student_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "adds educator-dashboard body class for educator" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:body_classes)).to include("educator-dashboard")
+      end
+
+      it "loads educator dashboard for designer" do
+        course = course_factory(active_all: true)
+        designer = user_factory(active_all: true)
+        course.enroll_user(designer, "DesignerEnrollment", enrollment_state: :active)
+        user_session(designer)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+      end
+
+      it "does not load educator dashboard for designer when flag is off" do
+        account.disable_feature!(:educator_dashboard)
+        course = course_factory(active_all: true)
+        designer = user_factory(active_all: true)
+        course.enroll_user(designer, "DesignerEnrollment", enrollment_state: :active)
+        user_session(designer)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
     end
   end
 
