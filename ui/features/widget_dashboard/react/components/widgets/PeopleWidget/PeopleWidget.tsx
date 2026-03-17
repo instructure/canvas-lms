@@ -30,6 +30,7 @@ import MessageStudents from '@canvas/message-students-modal/react'
 import {TemplateWidget} from '@instructure/platform-widget-dashboard'
 import PeopleFilters, {type RoleFilterOption, isValidRoleFilterOption} from './PeopleFilters'
 import type {BaseWidgetProps} from '../../../types'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 import {useCourseInstructorsPaginated} from '../../../hooks/useCourseInstructors'
 import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
 import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
@@ -44,6 +45,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   onRetry,
   dragHandleProps,
 }) => {
+  const {isDark} = useWidgetTheme()
   const [selectedCourse, setSelectedCourse] = useWidgetConfig<string>(
     widget.id,
     'selectedCourse',
@@ -269,6 +271,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                         <Flex.Item>
                           <View as="div" margin="0 small">
                             <IconButton
+                              color={isDark ? 'primary-inverse' : 'secondary'}
                               onClick={() => handleOpenMessageModal(instructor)}
                               screenReaderLabel={I18n.t('Send a message to %{instructor}', {
                                 instructor: instructor.name,

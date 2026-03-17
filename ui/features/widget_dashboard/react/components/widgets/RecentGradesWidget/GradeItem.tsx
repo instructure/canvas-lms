@@ -28,6 +28,7 @@ import {Expandable} from '@instructure/ui-expandable'
 import type {GradeItemProps} from '../../../types'
 import {determineItemType, getTypeIcon} from '../../../utils/assignmentUtils'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 import {ExpandedGradeView} from './ExpandedGradeView'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -61,6 +62,7 @@ const formatTimeAgo = (dateString: string | null): string => {
 
 export const GradeItem: React.FC<GradeItemProps> = ({submission, isRightColumn = false}) => {
   const {isMobile} = useResponsiveContext()
+  const {isDark} = useWidgetTheme()
   const [isExpanded, setIsExpanded] = useState(false)
   const isGraded = submission.gradedAt !== null
   const timeAgoText = formatTimeAgo(submission.gradedAt)
@@ -119,6 +121,7 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission, isRightColumn =
       size="small"
       withBackground={false}
       withBorder={false}
+      color={isDark ? 'primary-inverse' : 'secondary'}
       onClick={handleToggleExpand}
       data-testid={`expand-grade-${submission._id}`}
     >

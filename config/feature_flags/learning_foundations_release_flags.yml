@@ -294,6 +294,18 @@ widget_dashboard_customization:
     ci:
       state: allowed_on
 
+widget_dashboard_dark_mode:
+  state: hidden
+  display_name: Widget Dashboard Dark Mode
+  description: |-
+    When enabled, users can toggle a dark color theme for the widget dashboard.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 platform_ui_unified_widgets_dashboard:
   state: hidden
   display_name: Platform UI - Unified Widgets Dashboard
