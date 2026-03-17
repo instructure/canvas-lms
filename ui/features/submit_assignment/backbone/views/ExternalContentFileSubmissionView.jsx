@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {legacyRender} from '@canvas/react'
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {windowAlert, reloadWindow} from '@canvas/util/globalUtils'
@@ -37,7 +37,6 @@ class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissio
     this.disableLoader = this.disableLoader.bind(this)
     this.submissionFailure = this.submissionFailure.bind(this)
     this.shouldShowPledgeError = false
-    this.pledgeRoot = null
   }
 
   render() {
@@ -48,12 +47,11 @@ class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissio
     if (mountPoints.length > 0) {
       const pledgeMount = mountPoints[mountPoints.length - 1]
       if (pledgeMount) {
-        const pledgeRoot = this.pledgeRoot ?? createRoot(pledgeMount)
         const eulaUrl = pledgeMount.dataset.eulaurl
         const pledgeText = pledgeMount.dataset.pledge
         const setShouldShowPledgeError = shouldShow => (this.shouldShowPledgeError = shouldShow)
         const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
-        pledgeRoot.render(
+        legacyRender(
           <SimilarityPledge
             inputId="turnitin_pledge_external_content"
             setShouldShowPledgeError={setShouldShowPledgeError}
@@ -61,6 +59,7 @@ class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissio
             eulaUrl={eulaUrl}
             pledgeText={pledgeText}
           />,
+          pledgeMount,
         )
       }
     }
