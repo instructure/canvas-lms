@@ -281,7 +281,7 @@ class WikiPagesApiController < ApplicationController
   #   pages. If not present, do not filter on published status.
   #
   # @argument include[] [String, "body"]
-  #   - "enrollments": Optionally include the page body with each Page.
+  #   - "body": Optionally include the page body with each Page.
   #   If this is a block_editor page, returns the block_editor_attributes.
   #
   # @example_request
