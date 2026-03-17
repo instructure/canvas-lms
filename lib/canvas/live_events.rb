@@ -358,11 +358,11 @@ module Canvas::LiveEvents
   end
 
   def self.quiz_created(quiz)
-    post_event_stringified("assignment_created", get_quiz_data(quiz))
+    post_event_stringified("quiz_created", get_quiz_data(quiz))
   end
 
   def self.quiz_updated(quiz)
-    post_event_stringified("assignment_updated", get_quiz_data(quiz))
+    post_event_stringified("quiz_updated", get_quiz_data(quiz))
   end
 
   def self.assignment_group_created(assignment_group)
