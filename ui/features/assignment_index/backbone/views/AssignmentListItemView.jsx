@@ -447,7 +447,7 @@ export default (AssignmentListItemView = (function () {
       if (
         assessmentRequests &&
         assessmentRequests.length &&
-        !ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
+        !(ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && this.model.peerReviewSubAssignment())
       ) {
         const peerReviewElem =
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []

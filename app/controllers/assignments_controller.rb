@@ -129,6 +129,7 @@ class AssignmentsController < ApplicationController
     @current_user.present? && @assignment.a2_enabled? &&
       (!can_do(@context, @current_user, :read_as_admin) || user_assigned_as_student?) &&
       @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation_and_grading) &&
+      @assignment.peer_review_sub_assignment.present? &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
@@ -413,6 +414,7 @@ class AssignmentsController < ApplicationController
                        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
                        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
                        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
+                       HAS_PEER_REVIEW_SUB_ASSIGNMENT: @assignment.peer_review_sub_assignment.present?,
                        CAN_EDIT_ASSIGNMENTS: @context.grants_right?(@current_user, session, :manage_assignments_edit)
                      })
         set_section_list_js_env
@@ -759,7 +761,7 @@ class AssignmentsController < ApplicationController
       return render_a2_peer_review_student_view
     end
 
-    if @context.feature_enabled?(:peer_review_allocation_and_grading)
+    if @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.peer_review_sub_assignment.present?
       unless @assignment.grants_right?(@current_user, session, :grade) && !user_assigned_as_student?
         @unauthorized_message = t("Please contact your Canvas Administrator, as one or more of the following feature options is not enabled to view this Peer Review Assignment:")
         @unauthorized_details = [
@@ -771,6 +773,7 @@ class AssignmentsController < ApplicationController
         render "shared/unauthorized", status: :unauthorized
         return
       end
+
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id, open_allocation_tray: true)
       return
     end

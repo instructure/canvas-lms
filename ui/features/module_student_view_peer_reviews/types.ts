@@ -85,6 +85,7 @@ export type ExpandedAssignmentPeerReview = AssignmentPeerReviewSubset & {
   peer_review_count?: number | null
   peer_review_points_possible?: number | null
   peer_review_due_at?: string | null
+  peer_review_sub_assignment?: Record<string, unknown> | null
 }
 
 export type StudentViewPeerReviewsAssignment = {

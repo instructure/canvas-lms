@@ -64,7 +64,8 @@ export function formatAssignment(
   studentViewPeerReviewsAssignment: StudentViewPeerReviewsAssignment
 } | null {
   if (
-    (assessmentRequests.length === 0 && !ENV.FEATURES.peer_review_allocation_and_grading) ||
+    (assessmentRequests.length === 0 &&
+      !(ENV.FEATURES.peer_review_allocation_and_grading && peerReviewSubAssignment)) ||
     ENV.course_id == null
   )
     return null
@@ -88,6 +89,7 @@ export function formatAssignment(
           peer_review_count: count,
           peer_review_points_possible: pointsPossible,
           peer_review_due_at: peerReviewDueAt,
+          peer_review_sub_assignment: peerReviewSubAssignment ?? null,
         },
         container,
       },

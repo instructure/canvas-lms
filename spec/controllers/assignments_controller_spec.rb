@@ -3757,6 +3757,10 @@ describe AssignmentsController do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3803,9 +3807,32 @@ describe AssignmentsController do
       end
     end
 
+    context "when FF is enabled but assignment has legacy peer reviews (no sub-assignment)" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:assignments_2_student)
+      end
+
+      it "does not render A2 peer review student view for students" do
+        user_session(@student)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "renders the legacy peer review page for teachers" do
+        user_session(@teacher)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).not_to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
+      end
+    end
+
     context "when user is a teacher and peer_review_allocation_and_grading FF is enabled" do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3822,6 +3849,10 @@ describe AssignmentsController do
       before :once do
         @course.disable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3838,6 +3869,10 @@ describe AssignmentsController do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
         @course.disable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3863,6 +3898,10 @@ describe AssignmentsController do
         teacher_in_course(course: @course, user: @dual_user, active_all: true)
         @course.enable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
