@@ -1062,22 +1062,6 @@ describe OAuth2ProviderController do
       expect(response).to have_http_status(:bad_request)
     end
 
-    context "with custom_csrf_token FF off" do
-      before do
-        Account.site_admin.disable_feature! :csrf_oauth2_fix
-      end
-
-      it "does NOT skip standard CSRF protection if :csrf_oauth2_fix is off" do
-        allow(controller).to receive(:action_name).and_return("accept")
-        expect(controller.send(:skip_csrf?)).to be false
-      end
-
-      it "and custom_csrf_token is empty" do
-        post :accept, session: session_hash
-        expect(response).to have_http_status(:redirect)
-      end
-    end
-
     it "uses the global id of the user for generating the code" do
       expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(
         user.global_id,
