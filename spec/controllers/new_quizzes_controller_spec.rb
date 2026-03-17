@@ -191,6 +191,53 @@ describe NewQuizzesController do
         get :launch, params: { course_id: course.id, assignment_id: assignment.id }
         expect(response).to render_template("assignments/native_new_quizzes")
       end
+
+      context "when assignment is locked" do
+        it "returns unauthorized when before unlock_at" do
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          assert_unauthorized
+        end
+
+        it "returns unauthorized when after lock_at" do
+          assignment.update!(due_at: 36.hours.ago, unlock_at: 2.days.ago, lock_at: 1.day.ago)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          assert_unauthorized
+        end
+
+        it "renders when within the lock window" do
+          assignment.update!(due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+
+      context "when assignment has student-specific overrides" do
+        it "respects the override dates" do
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          override = assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: student)
+          override.override_unlock_at(1.day.ago)
+          override.override_lock_at(1.day.from_now)
+          override.save!
+
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+    end
+
+    context "when user is a teacher" do
+      before do
+        course.offer!
+        user_session(teacher)
+      end
+
+      it "renders even when assignment is locked" do
+        assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
     end
   end
 
