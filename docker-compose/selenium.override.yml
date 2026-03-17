@@ -7,7 +7,7 @@ services:
 
 ## Chrome
   selenium-hub:
-    image: selenium/standalone-chromium:137.0.7151.68
+    image: selenium/standalone-chromium:145.0
     shm_size: 2gb
     depends_on:
       - web
