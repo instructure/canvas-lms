@@ -1118,6 +1118,139 @@ describe Types::UserType do
         expect(enrollments_result["nodes"]).to be_empty
       end
     end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate do
+          @cross_shard_user = user_with_pseudonym(active_all: true)
+        end
+
+        @shard2.activate do
+          @cross_shard_account = Account.create!
+          @cross_shard_course = @cross_shard_account.courses.create!
+          @cross_shard_course.offer!
+          @cross_shard_enrollment = @cross_shard_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+        end
+      end
+
+      let(:cross_shard_user_type) { GraphQLTypeTester.new(@cross_shard_user, current_user: @cross_shard_user) }
+
+      def resolve_enrollment_ids(tester, query_args = nil)
+        tester.extract_result = false
+        args_str = query_args ? "(#{query_args})" : ""
+        result = tester.resolve("enrollmentsConnection#{args_str} { nodes { _id } }")
+        result["enrollmentsConnection"]["nodes"].pluck("_id")
+      end
+
+      it "returns enrollments from other shards" do
+        @shard1.activate do
+          node_ids = resolve_enrollment_ids(cross_shard_user_type)
+          expect(node_ids).to eq([@cross_shard_enrollment.id.to_s])
+        end
+      end
+
+      context "with enrollment on both shards" do
+        before :once do
+          @shard1.activate do
+            @shard1_account = Account.create!
+            @shard1_course = @shard1_account.courses.create!
+            @shard1_course.offer!
+            @shard1_enrollment = @shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+          end
+        end
+
+        it "returns enrollments from multiple shards" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type)
+            expect(node_ids.length).to eq(2)
+          end
+        end
+
+        it "filters by course_id across shards" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, %(courseId: "#{@cross_shard_course.id}"))
+            expect(node_ids).to eq([@cross_shard_enrollment.id.to_s])
+          end
+        end
+
+        it "excludes concluded enrollments across shards with currentOnly" do
+          @cross_shard_enrollment.complete!
+
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, "currentOnly: true")
+            expect(node_ids.length).to eq(1)
+          end
+        end
+
+        it "includes active enrollments from all shards with currentOnly" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, "currentOnly: true")
+            expect(node_ids.length).to eq(2)
+          end
+        end
+      end
+
+      context "permission handling" do
+        before :once do
+          @shard1.activate do
+            @cs_teacher = user_with_pseudonym(active_all: true)
+          end
+
+          @shard2.activate do
+            @cross_shard_course.enroll_teacher(@cs_teacher, enrollment_state: "active")
+          end
+        end
+
+        it "only shows enrollments in courses shared with the viewing teacher" do
+          @shard1.activate do
+            shard1_account = Account.create!
+            shard1_course = shard1_account.courses.create!
+            shard1_course.offer!
+            unshared_enrollment = shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+            teacher_viewing = GraphQLTypeTester.new(
+              @cross_shard_user,
+              current_user: @cs_teacher,
+              domain_root_account: shard1_account,
+              request: ActionDispatch::TestRequest.create
+            )
+
+            node_ids = resolve_enrollment_ids(teacher_viewing)
+            expect(node_ids).to include(@cross_shard_enrollment.id.to_s)
+            expect(node_ids).not_to include(unshared_enrollment.id.to_s)
+          end
+        end
+
+        it "scopes admin with manage_students to their own root account" do
+          shard1_account = nil
+          shard1_admin = nil
+          shard1_enrollment = nil
+
+          @shard1.activate do
+            shard1_account = Account.create!
+            shard1_course = shard1_account.courses.create!
+            shard1_course.offer!
+            shard1_enrollment = shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+            shard1_admin = account_admin_user(account: shard1_account)
+          end
+
+          admin_viewing = GraphQLTypeTester.new(
+            @cross_shard_user,
+            current_user: shard1_admin,
+            domain_root_account: shard1_account,
+            request: ActionDispatch::TestRequest.create
+          )
+
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(admin_viewing)
+            expect(node_ids).to include(shard1_enrollment.id.to_s)
+            expect(node_ids).not_to include(@cross_shard_enrollment.id.to_s)
+          end
+        end
+      end
+    end
   end
 
   context "email" do
