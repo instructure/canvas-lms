@@ -1239,8 +1239,17 @@ class Course < ActiveRecord::Base
       where(CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).arel.exists)
     end
   }
-  scope :published, -> { where(workflow_state: %w[available completed]) }
-  scope :unpublished, -> { where(workflow_state: %w[created claimed]) }
+  PUBLISHED_STATES = %w[available completed].freeze
+  UNPUBLISHED_STATES = %w[created claimed].freeze
+
+  # Maps virtual API state names to real workflow states
+  API_STATE_EXPANSIONS = {
+    "unpublished" => UNPUBLISHED_STATES,
+    "current_and_concluded" => PUBLISHED_STATES,
+  }.freeze
+
+  scope :published, -> { where(workflow_state: PUBLISHED_STATES) }
+  scope :unpublished, -> { where(workflow_state: UNPUBLISHED_STATES) }
 
   scope :deleted, -> { where(workflow_state: "deleted") }
   scope :archived, -> { deleted.where.not(archived_at: nil) }

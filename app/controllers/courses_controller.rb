@@ -4333,10 +4333,13 @@ class CoursesController < ApplicationController
     include_observed = params.fetch(:include, []).include?("observed_users")
 
     if params[:state]
-      states = Array(params[:state])
-      states += %w[created claimed] if states.include?("unpublished")
+      states = Array.wrap(params[:state])
+      states = states.flat_map { |s| Course::API_STATE_EXPANSIONS[s] || s }.uniq
       conditions = states.filter_map do |state|
-        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
+        # Disable strict checks for unpublished courses so student/observer
+        # invited enrollments are included, matching the web UI behavior.
+        strict = !Course::UNPUBLISHED_STATES.include?(state)
+        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true, strict_checks: strict).conditions
       end.join(" OR ")
       enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
 
@@ -4366,6 +4369,14 @@ class CoursesController < ApplicationController
       end
 
       enrollments = enrollments.to_a
+
+      # Honor restrict_student_future_listing account setting, matching the
+      # web UI's load_enrollments_for_index behavior.
+      if states.intersect?(Course::UNPUBLISHED_STATES)
+        ActiveRecord::Associations.preload(enrollments, :enrollment_state)
+        ActiveRecord::Associations.preload(enrollments.map(&:course).uniq, :account)
+        enrollments.reject!(&:restrict_future_listing?)
+      end
     elsif params[:enrollment_state] == "active"
       enrollments = user.participating_enrollments
       ActiveRecord::Associations.preload(enrollments, :course)
