@@ -22,13 +22,20 @@ import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
 import {AssistProvider, AssistContent} from '@instructure/platform-study-assist'
 import type {AssistRequest, AssistResponse} from '@instructure/platform-study-assist'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {IconAiSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('study_assist')
+
+const GRADIENT = 'linear-gradient(135deg, #7b5ea7 0%, #5b7fa6 60%, #4a919e 100%)'
+
+const renderMessage = (text: string) => <span style={{color: 'white'}}>{text}</span>
+
+const renderRichContent = (html: string) => (
+  <span style={{color: 'white'}} dangerouslySetInnerHTML={{__html: sanitizeHtml(html)}} />
+)
 
 type Props = {
   open: boolean
@@ -45,7 +52,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
       open={open}
       onDismiss={onDismiss}
     >
-      <View as="div" padding="small">
+      <div style={{background: GRADIENT, color: 'white', minHeight: '100vh', padding: '12px'}}>
         <Flex as="div" padding="small" alignItems="center">
           <Flex.Item shouldGrow={true}>
             <Flex gap="x-small" alignItems="center">
@@ -53,7 +60,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
                 <IconAiSolid />
               </Flex.Item>
               <Flex.Item>
-                <Heading>{I18n.t('Study tools')}</Heading>
+                <Heading themeOverride={{primaryColor: 'white'}}>{I18n.t('Study tools')}</Heading>
               </Flex.Item>
             </Flex>
           </Flex.Item>
@@ -61,6 +68,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
             <CloseButton
               onClick={onDismiss}
               size="small"
+              color="primary-inverse"
               screenReaderLabel={I18n.t('Close')}
               data-testid="study-assist-close-button"
             />
@@ -72,13 +80,15 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
           moduleItemId={window.ENV.WIKI_PAGE_ID}
         >
           <AssistContent
-            renderRichContent={(html: string) => (
-              <span dangerouslySetInnerHTML={{__html: sanitizeHtml(html)}} />
-            )}
+            chatEnabled={false}
+            showLargePrompts={true}
+            thumbsColor="primary-inverse"
+            renderMessage={renderMessage}
+            renderRichContent={renderRichContent}
             onAnalyticsEvent={() => null}
           />
         </AssistProvider>
-      </View>
+      </div>
     </Tray>
   )
 }
