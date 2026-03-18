@@ -28,6 +28,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :accessibility_resource_scans
     set_replica_identity :account_users
     set_replica_identity :accounts
+    set_replica_identity :ai_conversations
     set_replica_identity :ai_experiences
     set_replica_identity :allocation_rules
     set_replica_identity :asset_user_accesses
