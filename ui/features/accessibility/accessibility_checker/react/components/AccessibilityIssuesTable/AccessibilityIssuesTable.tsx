@@ -67,6 +67,7 @@ const getNewTableSortState = (
 
 const renderTableData = (
   isMobile: boolean,
+  selectedScanId?: number | null,
   scans?: AccessibilityResourceScan[] | null,
   error?: string | null,
   loading?: boolean,
@@ -87,6 +88,7 @@ const renderTableData = (
             key={`${item.resourceType}-${item.id}`}
             item={item}
             isMobile={isMobile}
+            isSelected={item.id === selectedScanId}
           />
         ))
       )}
@@ -116,7 +118,7 @@ export const AccessibilityIssuesTable = () => {
 
   useAccessibilityScansPolling()
 
-  const [error, loading, page, pageCount, accessibilityScans, tableSortState] =
+  const [error, loading, page, pageCount, accessibilityScans, tableSortState, selectedScan] =
     useAccessibilityScansStore(
       useShallow(state => [
         state.error,
@@ -125,6 +127,7 @@ export const AccessibilityIssuesTable = () => {
         state.pageCount,
         state.accessibilityScans,
         state.tableSortState,
+        state.selectedScan,
       ]),
     )
 
@@ -218,7 +221,13 @@ export const AccessibilityIssuesTable = () => {
                     </Table.Cell>
                   </Table.Row>
                 )}
-                {renderTableData(props?.isMobile ?? false, accessibilityScans, error, loading)}
+                {renderTableData(
+                  props?.isMobile ?? false,
+                  selectedScan?.id,
+                  accessibilityScans,
+                  error,
+                  loading,
+                )}
               </Table.Body>
             </Table>
           </View>
