@@ -28,7 +28,7 @@ import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
 import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {ColumnHeader} from './ColumnHeader'
+import {ColumnHeader} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ColumnHeader'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
@@ -41,7 +41,6 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcomeDistribution?: OutcomeDistribution
   distributionStudents?: Student[]
   courseId: string
-  titleId?: string
 }
 
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
@@ -51,7 +50,6 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   outcomeDistribution,
   distributionStudents,
   courseId,
-  titleId,
 }) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
@@ -128,7 +126,6 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
     <>
       <ColumnHeader
         title={outcome.title}
-        titleId={titleId}
         icon={<IconOutcomesLine />}
         optionsMenuTriggerLabel={I18n.t('%{outcome} options', {outcome: outcome.title})}
         optionsMenuItems={[sortMenuGroup, <Menu.Separator key="separator" />, displayMenuGroup]}
