@@ -53,16 +53,12 @@ function DiscoveryPageInner({initialEnabled, onChange}: DiscoveryPageProps) {
 
         <Flex.Item>
           <FormFieldGroup
-            description={
-              <ScreenReaderContent>
-                {I18n.t('Use Identity Service discovery page')}
-              </ScreenReaderContent>
-            }
+            description={<ScreenReaderContent>{I18n.t('Use discovery page')}</ScreenReaderContent>}
           >
             <Checkbox
               checked={isEnabled}
               data-testid="discovery-page-toggle"
-              label={I18n.t('Use Identity Service discovery page')}
+              label={I18n.t('Use discovery page')}
               labelPlacement="end"
               onChange={handleToggle}
               variant="toggle"

@@ -70,11 +70,11 @@ If no discovery URL is configured, the first configuration will be used to attem
         <% if @account.discovery_page_allowed? %>
           <%# BEGIN discovery page logic %>
           <div class="ic-Form-control">
-            <%= f.label :discovery_page_active, t("Identity Service Discovery Page"), class: 'ic-Label' %>
+            <%= f.label :discovery_page_active, t("Discovery Page"), class: 'ic-Label' %>
             <%= f.hidden_field :discovery_page_active, id: 'discovery_page_active_field', value: presenter.discovery_page_active? %>
             <div id="discovery-page-root"></div>
             <div class="ic-Form-help-text">
-              <%= t('Configure the Identity Service discovery page. When enabled, this page replaces the default discovery experience at /login/discovery.') %>
+              <%= t('Configure the discovery page. When enabled, this page replaces the default discovery experience at /login/discovery.') %>
             </div>
           </div>
           <%# END discovery page logic %>

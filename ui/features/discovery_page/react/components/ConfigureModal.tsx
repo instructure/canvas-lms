@@ -195,7 +195,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   return (
     <Modal
       data-testid="configure-modal"
-      label={I18n.t('Configure Identity Service Discovery Page')}
+      label={I18n.t('Configure Discovery Page')}
       onClose={handleCloseModal}
       onDismiss={handleCloseModal}
       open={open}
@@ -204,7 +204,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     >
       <Modal.Header spacing="compact">
         {renderCloseButton()}
-        <Heading>{I18n.t('Configure Identity Service Discovery Page')}</Heading>
+        <Heading>{I18n.t('Configure Discovery Page')}</Heading>
       </Modal.Header>
 
       <Modal.Body
