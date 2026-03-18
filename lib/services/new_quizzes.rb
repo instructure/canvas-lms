@@ -85,6 +85,10 @@ module Services
     class << self
       private
 
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
+
       def config
         @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["new_quizzes.yml", failsafe: nil] || "{}")
       end

@@ -65,6 +65,7 @@ RUN --mount=target=/tmp/src \
     lib/canvas_logger.rb \
     lib/logging_filter.rb \
     lib/canvas/cdn.rb \
+    lib/base/canvas.rb \
     lib/base/canvas/reloader.rb \
     .i18nignore \
     .i18nrc \
