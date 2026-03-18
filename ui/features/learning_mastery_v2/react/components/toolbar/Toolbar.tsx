@@ -21,14 +21,15 @@ import {Flex} from '@instructure/ui-flex'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {colors} from '@instructure/canvas-theme'
 import {IconButton} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
 import {IconArrowOpenDownSolid, IconSettingsLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {View} from '@instructure/ui-view'
 import {ExportCSVButton} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/ExportCSVButton'
+import {SettingsTray} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/SettingsTray'
+import {GradebookAppProvider} from '@instructure/outcomes-ui/es/components/Gradebook/context/GradebookAppContext/GradebookAppProvider'
 import {exportCSV} from '../../apiClient'
-import {SettingsTray} from './SettingsTray'
+import {SettingsTrayContent} from './SettingsTrayContent'
 import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
 import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
 import {Heading} from '@instructure/ui-heading'
@@ -51,7 +52,6 @@ export interface ToolbarProps {
   showDataDependentControls?: boolean
   gradebookSettings: GradebookSettings
   setGradebookSettings: (settings: GradebookSettings) => Promise<{success: boolean}>
-  isSavingSettings?: boolean
   hideHeading?: boolean
 }
 
@@ -61,7 +61,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   showDataDependentControls,
   gradebookSettings,
   setGradebookSettings,
-  isSavingSettings,
   hideHeading,
 }) => {
   const [isSettingsTrayOpen, setSettingsTrayOpen] = useState<boolean>(false)
@@ -115,13 +114,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             >
               <IconSettingsLine size="x-small" />
             </IconButton>
-            <SettingsTray
-              open={isSettingsTrayOpen}
-              onDismiss={() => setSettingsTrayOpen(false)}
-              gradebookSettings={gradebookSettings}
-              setGradebookSettings={setGradebookSettings}
-              isSavingSettings={isSavingSettings}
-            />
+            <GradebookAppProvider
+              settings={{settings: gradebookSettings, onSave: setGradebookSettings}}
+            >
+              <SettingsTray
+                open={isSettingsTrayOpen}
+                onDismiss={() => setSettingsTrayOpen(false)}
+                SettingsTrayContent={SettingsTrayContent}
+              />
+            </GradebookAppProvider>
           </Flex>
         )}
       </Flex>
