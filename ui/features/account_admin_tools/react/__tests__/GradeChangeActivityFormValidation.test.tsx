@@ -26,12 +26,13 @@ import userEvent from '@testing-library/user-event'
 describe('GradeChangeActivityForm Validation', () => {
   const props: GradeChangeActivityFormProps = {
     accountId: '1',
+    searchAsSubaccount: false,
     onSubmit: vi.fn(),
   }
 
   afterEach(() => vi.resetAllMocks())
 
-  it('should show an error if the form is empty', async () => {
+  it('should show an error if the form is empty as root account', async () => {
     render(<GradeChangeActivityForm {...props} />)
     const submit = screen.getByLabelText('Search Logs')
 
@@ -40,6 +41,21 @@ describe('GradeChangeActivityForm Validation', () => {
     const errorText = await screen.findAllByText('Please enter at least one field.')
     expect(errorText).toBeTruthy()
   })
+  it.each(['Grader', 'Student'])(
+    'should show an error when "$inputLabel" is the only field provided for subaccounts',
+    async inputLabel => {
+      render(<GradeChangeActivityForm {...props} searchAsSubaccount={true} />)
+      const inputValue = '1'
+      const input = screen.getByLabelText(inputLabel)
+      const submit = screen.getByLabelText('Search Logs')
+
+      fireEvent.change(input, {target: {value: inputValue}})
+      fireEvent.click(submit)
+
+      const errorText = await screen.findAllByText('Please enter either course or assignment ID.')
+      expect(errorText).toBeTruthy()
+    },
+  )
 
   it('should show an error if date fields are invalid', async () => {
     render(<GradeChangeActivityForm {...props} />)

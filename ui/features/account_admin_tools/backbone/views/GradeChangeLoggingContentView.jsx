@@ -56,6 +56,7 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
     render(
       <GradeChangeActivityForm
         accountId={ENV.ACCOUNT_ID}
+        searchAsSubaccount={this.options.searchAsSubaccount}
         onSubmit={data => {
           this.updateCollection(data)
         }}
