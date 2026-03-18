@@ -31,6 +31,7 @@ import {NoTranscript} from './components/NoTranscript'
 import {isAsrGenerating} from './utils/isAsrGenerating'
 
 import {createOnTranscriptEdit, onConfirmEditChanges} from './transcriptEditing'
+import {createPendoTrackEventHandler} from './pendoTrackEventHandler'
 
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
@@ -175,6 +176,8 @@ ready(() => {
   const handleConfirmEditChanges =
     isAsrCaptioningImprovements && isEditMode ? onConfirmEditChanges : undefined
 
+  const handleTrackEvent = isAsrCaptioningImprovements ? createPendoTrackEventHandler() : undefined
+
   const aria_label = !media_object.title ? undefined : media_object.title
   const canManageTranscripts = (ENV.current_user_roles ?? []).some(
     r => r === 'teacher' || r === 'admin',
@@ -204,6 +207,7 @@ ready(() => {
         openSidebar={isAsrCaptioningImprovements}
         onTranscriptEdit={handleTranscriptEdit}
         onConfirmEditChanges={handleConfirmEditChanges}
+        onTrackEvent={handleTrackEvent}
         kebabMenuElements={
           isAsrCaptioningImprovements && showRollingTranscript
             ? [
