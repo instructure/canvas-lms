@@ -698,6 +698,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index [:assessor_asset_id, :assessor_asset_type], name: "aa_id_and_aa_type"
       t.index [:asset_id, :asset_type]
+      t.index [:workflow_state, :asset_id],
+              name: "index_assessment_requests_on_workflow_state_and_asset_id"
     end
 
     create_table :asset_user_accesses do |t|
@@ -843,7 +845,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :has_sub_assignments, null: false, default: false
       t.boolean :rubric_self_assessment_enabled, null: false, default: false
       t.boolean :suppress_assignment, default: false, null: false
-      t.boolean :peer_review_submission_required, null: false, default: false
+      t.boolean :peer_review_submission_required, null: false, default: true
+      t.boolean :peer_review_across_sections, null: false, default: true
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -856,6 +859,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               unique: true,
               where: "type = 'PeerReviewSubAssignment' AND workflow_state != 'deleted'",
               name: "index_assignments_on_parent_assignment_peer_review_unique"
+      t.index :type,
+              where: "type = 'SubAssignment' AND parent_assignment_id IS NULL AND workflow_state != 'deleted'",
+              name: "index_assignments_on_null_parent_for_subassignments"
     end
 
     create_table :assignment_configuration_tool_lookups do |t|
@@ -2093,30 +2099,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:user_id, :discussion_topic_id],
               where: "workflow_state <> 'deleted'",
               name: "index_discussion_entries_active_on_user_id_and_topic"
-    end
-
-    create_table :discussion_entry_drafts do |t|
-      t.references :discussion_topic, null: false, foreign_key: true
-      t.references :discussion_entry, foreign_key: true, index: false
-      t.references :root_entry, foreign_key: { to_table: :discussion_entries }
-      t.references :parent, foreign_key: { to_table: :discussion_entries }
-      t.references :attachment, foreign_key: true
-      t.references :user, null: false, foreign_key: true
-      t.text :message
-      t.boolean :include_reply_preview, null: false, default: false
-      t.timestamps precision: 6
-
-      t.index %i[discussion_topic_id user_id],
-              name: "unique_index_on_topic_and_user",
-              where: "discussion_entry_id IS NULL AND root_entry_id IS NULL",
-              unique: true
-      t.index %i[root_entry_id user_id],
-              name: "unique_index_on_root_entry_and_user",
-              where: "discussion_entry_id IS NULL",
-              unique: true
-      t.index %i[discussion_entry_id user_id],
-              name: "unique_index_on_entry_and_user",
-              unique: true
     end
 
     create_table :discussion_entry_participants do |t|
@@ -3446,6 +3428,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :update_payload
       t.text :registration_url
       t.string :subscription_id
+      t.references :migrated_to_context_external_tool,
+                   foreign_key: { to_table: :context_external_tools, on_delete: :nullify },
+                   index: {
+                     where: "migrated_to_context_external_tool_id IS NOT NULL"
+                   }
     end
 
     create_table :lti_tool_proxy_bindings do |t|
@@ -4179,6 +4166,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :results
 
       t.index [:context_id, :context_type]
+      t.index :delayed_job_id,
+              where: "workflow_state='queued'",
+              name: "index_queued_progresses_on_delayed_job_id"
     end
 
     create_table :pseudonyms do |t|
@@ -4218,6 +4208,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index :account_id
       t.index "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
       t.index "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
+      t.index "lower(integration_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_integration_id", using: :gin
       t.index [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true
       t.index [:integration_id, :account_id],
               unique: true,
@@ -4820,6 +4811,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index %i[user_id hidden id stream_item_id], name: "index_stream_item_instances_global"
       t.index [:stream_item_id, :user_id], unique: true
+      t.index [:user_id, :context_id],
+              name: "index_stream_item_instances_on_user_and_context",
+              where: "NOT hidden"
     end
 
     create_table :submissions do |t|
