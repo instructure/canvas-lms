@@ -470,6 +470,21 @@ nav_menu_links:
       state: allowed_on
     ci:
       state: allowed_on
+oauth2_deny_post:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Use POST for OAuth2 deny endpoint
+  description: |-
+    If enabled, the OAuth2 deny endpoint will only accept POST requests instead of GET.
+    This prevents browser prefetch from triggering the deny action and destroying OAuth2 session state.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 refactor_custom_variables:
   state: hidden
   shadow: true

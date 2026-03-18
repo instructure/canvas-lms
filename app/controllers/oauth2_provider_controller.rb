@@ -157,6 +157,10 @@ class OAuth2ProviderController < ApplicationController
   end
 
   def deny
+    if @domain_root_account&.feature_enabled?(:oauth2_deny_post) && request.get?
+      return render plain: t("This endpoint requires a POST request"), status: :method_not_allowed
+    end
+
     return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
     params = { error: "access_denied" }
@@ -223,7 +227,10 @@ class OAuth2ProviderController < ApplicationController
   private
 
   def skip_csrf?
-    %w[token destroy accept].include?(action_name)
+    return true if %w[token destroy accept].include?(action_name)
+    return true if @domain_root_account&.feature_enabled?(:oauth2_deny_post) && action_name == "deny"
+
+    false
   end
 
   def oauth_error(exception)

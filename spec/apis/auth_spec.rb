@@ -247,7 +247,8 @@ describe "API Authentication", type: :request do
         expect(response).to be_successful
       end
 
-      it "redirects with access_denied if the user doesn't accept" do
+      it "redirects with access_denied if the user doesn't accept via GET" do
+        Account.site_admin.disable_feature!(:oauth2_deny_post)
         course_with_student_logged_in(active_all: true, user: user_with_pseudonym)
         get "/login/oauth2/auth", params: { response_type: "code", client_id: @client_id, redirect_uri: "urn:ietf:wg:oauth:2.0:oob" }
         expect(response).to be_redirect
@@ -262,6 +263,33 @@ describe "API Authentication", type: :request do
         expect(response["Location"]).not_to match(/code=/)
         get response["Location"]
         expect(response).to be_successful
+      end
+
+      it "redirects with access_denied if the user doesn't accept via POST" do
+        course_with_student_logged_in(active_all: true, user: user_with_pseudonym)
+        get "/login/oauth2/auth", params: { response_type: "code", client_id: @client_id, redirect_uri: "urn:ietf:wg:oauth:2.0:oob" }
+        expect(response).to be_redirect
+        expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
+        get response["Location"]
+        expect(response).to render_template("oauth2_provider/confirm")
+        post "/login/oauth2/deny"
+        expect(response).to be_redirect
+        expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
+        error = response["Location"].match(/error=([^?&]+)/)[1]
+        expect(error).to eq "access_denied"
+        expect(response["Location"]).not_to match(/code=/)
+        get response["Location"]
+        expect(response).to be_successful
+      end
+
+      it "rejects GET deny when oauth2_deny_post flag is enabled" do
+        Account.site_admin.enable_feature!(:oauth2_deny_post)
+        course_with_student_logged_in(active_all: true, user: user_with_pseudonym)
+        get "/login/oauth2/auth", params: { response_type: "code", client_id: @client_id, redirect_uri: "urn:ietf:wg:oauth:2.0:oob" }
+        expect(response).to be_redirect
+        get response["Location"]
+        get "/login/oauth2/deny"
+        expect(response).to have_http_status(:method_not_allowed)
       end
 
       it "requires the correct client secret" do

@@ -1155,6 +1155,8 @@ describe OAuth2ProviderController do
     let_once(:key) { DeveloperKey.create! }
     let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
 
+    before { Account.default.disable_feature!(:oauth2_deny_post) }
+
     it "forwards the oauth state if it was provided" do
       session_hash[:oauth2][:state] = "1234567890"
       get "deny", session: session_hash
@@ -1171,6 +1173,36 @@ describe OAuth2ProviderController do
     it "doesn't error on an empty session" do
       get "deny", session: {}
       expect(response).to be_bad_request
+    end
+  end
+
+  describe "POST deny" do
+    let_once(:key) { DeveloperKey.create! }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
+
+    before { Account.default.enable_feature!(:oauth2_deny_post) }
+
+    it "forwards the oauth state if it was provided" do
+      session_hash[:oauth2][:state] = "1234567890"
+      post "deny", session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).to match(/state=1234567890/)
+    end
+
+    it "does not provide state if there wasn't one provided" do
+      post "deny", session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).not_to match(/state=/)
+    end
+
+    it "doesn't error on an empty session" do
+      post "deny", session: {}
+      expect(response).to be_bad_request
+    end
+
+    it "rejects GET requests" do
+      get "deny", session: session_hash
+      expect(response).to have_http_status(:method_not_allowed)
     end
   end
 
