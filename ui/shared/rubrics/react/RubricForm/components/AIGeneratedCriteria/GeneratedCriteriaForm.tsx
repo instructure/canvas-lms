@@ -125,7 +125,7 @@ export const GeneratedCriteriaForm = ({
       background="secondary"
       data-testid="generate-criteria-form"
     >
-      <Heading level="h4">
+      <Heading level="h3">
         <Flex alignItems="center" gap="small">
           <IconAiColoredSolid />
           <Text>{I18n.t('Auto-Generate Criteria')}</Text>
