@@ -870,8 +870,13 @@ module Types
       load_association(:context).then do |course|
         if course.grants_right?(current_user, :read_as_admin)
           object.score_statistic if object.can_view_score_statistics?(current_user)
-        elsif object.can_view_score_statistics?(current_user) && object.submissions.first.eligible_for_showing_score_statistics?
-          object.score_statistic
+        else
+          submission = object.submissions.find_by(user_id: current_user.id)
+          if submission &&
+             object.can_view_score_statistics?(current_user) &&
+             submission.eligible_for_showing_score_statistics?
+            object.score_statistic
+          end
         end
       end
     end
