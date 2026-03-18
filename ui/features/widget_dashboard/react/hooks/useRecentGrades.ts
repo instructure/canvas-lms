@@ -78,7 +78,6 @@ const RECENT_GRADES_QUERY = gql`
     $after: String
     $courseFilter: String
     $observedUserId: ID
-    $orderBy: CourseWorkSubmissionsOrderField
   ) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
@@ -86,10 +85,9 @@ const RECENT_GRADES_QUERY = gql`
         courseWorkSubmissionsConnection(
           first: $first
           after: $after
-          onlySubmitted: true
+          onlyGradedOrWithFeedback: true
           courseFilter: $courseFilter
           observedUserId: $observedUserId
-          orderBy: $orderBy
         ) {
           nodes {
             _id
@@ -174,7 +172,6 @@ export async function fetchRecentGradesPage(
     after: cursor,
     courseFilter,
     observedUserId,
-    orderBy: 'graded_at',
   })
 
   if (!response?.legacyNode?.courseWorkSubmissionsConnection) {

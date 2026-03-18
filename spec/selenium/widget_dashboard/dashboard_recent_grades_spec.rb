@@ -40,7 +40,7 @@ describe "student dashboard Recent grades & feedback widget", :ignore_js_errors 
   end
 
   context "recent grades & feedback widget smoke tests" do
-    it "displays assignment, discussion, and quiz submissions" do
+    it "displays graded and feedback assignment, discussion, and quiz submissions" do
       go_to_dashboard
 
       expect(all_recent_grade_course_name.size).to eq(5)
@@ -76,25 +76,23 @@ describe "student dashboard Recent grades & feedback widget", :ignore_js_errors 
 
       expect(all_recent_grade_course_name.size).to eq(5)
       expect(widget_pagination_button("Recent grades", "1")).to be_displayed
-      expect(widget_pagination_button("Recent grades", "7")).to be_displayed
-      widget_pagination_button("Recent grades", "7").click
-      expect(all_recent_grade_course_name.size).to eq(2)
+      expect(widget_pagination_button("Recent grades", "3")).to be_displayed
+      widget_pagination_button("Recent grades", "3").click
+      expect(all_recent_grade_course_name.size).to eq(4)
       expect(widget_pagination_button("Recent grades", "1")).to be_displayed
     end
 
     it "maintains pagination when switching filters" do
       go_to_dashboard
 
-      expect(widget_pagination_button("Recent grades", "7")).to be_displayed
+      expect(widget_pagination_button("Recent grades", "3")).to be_displayed
       filter_recent_grades_by_course(@course1.name)
-      expect(widget_pagination_button("Recent grades", "5")).to be_displayed
-      widget_pagination_button("Recent grades", "5").click
-      expect(all_recent_grade_course_name.size).to eq(1)
-
-      filter_recent_grades_by_course(@course2.name)
       expect(widget_pagination_button("Recent grades", "3")).to be_displayed
       widget_pagination_button("Recent grades", "3").click
-      expect(all_recent_grade_course_name.size).to eq(1)
+      expect(all_recent_grade_course_name.size).to eq(2)
+
+      filter_recent_grades_by_course(@course2.name)
+      expect(all_recent_grade_course_name.size).to eq(2)
     end
   end
 
@@ -158,10 +156,31 @@ describe "student dashboard Recent grades & feedback widget", :ignore_js_errors 
     end
 
     it "shows expand button for ungraded submission with feedback" do
-      @submitted_assignment.submission_for_student(@student).add_comment(author: @teacher1, comment: "Please review your work.")
       go_to_dashboard
       submission = @submitted_assignment.submission_for_student(@student)
 
+      expect(recent_grade_expand_button(submission.id)).to be_displayed
+    end
+  end
+
+  context "pre-submission feedback" do
+    before :once do
+      @presubmission_assignment = @course1.assignments.create!(
+        name: "Course 1: Pre-submission Feedback Assignment",
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      @presubmission_assignment.submission_for_student(@student).add_comment(
+        author: @teacher1,
+        comment: "Get started early on this one!"
+      )
+    end
+
+    it "displays unsubmitted assignment with instructor feedback" do
+      go_to_dashboard
+      submission = @presubmission_assignment.submission_for_student(@student)
+
+      expect(recent_grades_widget.text).to include(@presubmission_assignment.name)
       expect(recent_grade_expand_button(submission.id)).to be_displayed
     end
   end

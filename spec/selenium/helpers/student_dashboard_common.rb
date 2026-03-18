@@ -142,6 +142,8 @@ module StudentDashboardCommon
     # Add comments to submissions
     @graded_assignment.submission_for_student(@student).add_comment(author: @teacher2, comment: "Place for improvement...")
     @graded_discussion.submission_for_student(@student).add_comment(author: @teacher1, comment: "Well done!")
+    @submitted_assignment.submission_for_student(@student).add_comment(author: @teacher1, comment: "Please review your work.")
+    @submitted_discussion.submission_for_student(@student).add_comment(author: @teacher2, comment: "See my feedback.")
   end
 
   def pagination_recent_grades_setup
@@ -185,6 +187,7 @@ module StudentDashboardCommon
     @course2.enroll_student(@student2, enrollment_state: :active)
 
     @submitted_discussion.submit_homework(@student2, submission_type: "discussion_topic")
+    @submitted_discussion.submission_for_student(@student2).add_comment(author: @teacher2, comment: "Good effort!")
     @graded_assignment.submit_homework(@student2, submission_type: "online_text_entry")
     @graded_assignment.grade_student(@student2, grade: "10", grader: @teacher2)
   end
