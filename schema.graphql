@@ -12529,6 +12529,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
     onlyCurrentGradingPeriod: Boolean = true
 
     """
+    Show only graded submissions or submissions with instructor feedback
+    """
+    onlyGradedOrWithFeedback: Boolean
+
+    """
     Show only submitted assignments
     """
     onlySubmitted: Boolean

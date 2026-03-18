@@ -3358,6 +3358,101 @@ describe Types::UserType do
       end
     end
 
+    context "onlyGradedOrWithFeedback filter" do
+      before(:once) do
+        Timecop.freeze(@frozen_time) do
+          @graded_assignment = @course.assignments.create!(
+            title: "Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @graded_submission = @graded_assignment.submissions.find_or_create_by(user: @student)
+          @graded_submission.update!(
+            workflow_state: "graded",
+            score: 85,
+            grade: "B",
+            submitted_at: @frozen_time - 1.week,
+            posted_at: @frozen_time - 1.week,
+            grader_id: @teacher.id
+          )
+
+          @feedback_only_assignment = @course.assignments.create!(
+            title: "Feedback Only Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @feedback_only_submission = @feedback_only_assignment.submissions.find_or_create_by(user: @student)
+          @feedback_only_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 2.weeks,
+            posted_at: @frozen_time - 2.weeks
+          )
+          @feedback_only_submission.update_column(:last_comment_at, @frozen_time - 2.weeks)
+
+          @no_feedback_assignment = @course.assignments.create!(
+            title: "Submitted No Feedback Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @no_feedback_submission = @no_feedback_assignment.submissions.find_or_create_by(user: @student)
+          @no_feedback_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 1.week
+          )
+        end
+      end
+
+      it "returns graded submissions" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Graded Assignment")
+        end
+      end
+
+      it "returns submissions with recent instructor feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Feedback Only Assignment")
+        end
+      end
+
+      it "does not return submitted submissions without a grade or feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Submitted No Feedback Assignment")
+        end
+      end
+
+      it "does not return unsubmitted assignments" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Test Assignment")
+        end
+      end
+
+      it "does not return graded submissions older than 4 weeks" do
+        Timecop.freeze(@frozen_time) do
+          old_assignment = @course.assignments.create!(
+            title: "Old Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          old_submission = old_assignment.submissions.find_or_create_by(user: @student)
+          old_submission.update!(
+            workflow_state: "graded",
+            score: 90,
+            submitted_at: @frozen_time - 5.weeks,
+            posted_at: @frozen_time - 5.weeks,
+            grader_id: @teacher.id
+          )
+          old_submission.update_column(:created_at, @frozen_time - 5.weeks)
+
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Old Graded Assignment")
+        end
+      end
+    end
+
     it "handles NULL excused values correctly" do
       Timecop.freeze(@frozen_time) do
         # Explicitly set excused to nil to test our NULL handling
