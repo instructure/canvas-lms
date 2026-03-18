@@ -1749,6 +1749,7 @@ class FilesController < ApplicationController
       attachment = thumbnail.attachment
       root_account = attachment&.root_account
       old_auth = params[:uuid].present? && params[:uuid] == thumbnail.uuid && root_account.present? && !root_account.feature_enabled?(:disable_file_verifier_access)
+
       return unless old_auth || access_allowed(attachment:, user: @current_user, access_type: :download)
 
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type

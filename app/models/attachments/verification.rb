@@ -102,21 +102,18 @@ class Attachments::Verification
   # @param permission (Symbol) - Either :read or :download
   #
   # Returns a boolean
-  def valid_verifier_for_permission?(verifier, permission, root_account, session = {})
+  def valid_verifier_for_permission?(verifier, permission, root_account, session = {}, request: nil, files_domain: false)
     return false unless verifier.is_a?(String)
 
     # Support for legacy verifiers.
-    unless root_account.feature_enabled?(:disable_file_verifier_access)
-      if ActiveSupport::SecurityUtils.secure_compare(verifier, attachment.uuid)
-        InstStatsd::Statsd.distributed_increment("attachments.legacy_verifier_success")
-        return true
-      elsif verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?
-        # if we have a uuid-sized verifier that doesn't match, see whether it matches a related attachment
-        # (meaning another copy of the same file, to deal with a question bank migration issue in which
-        # the source file's verifier remains in the URL)
-        InstStatsd::Statsd.distributed_increment("attachments.related_verifier_success")
-        return true
-      end
+    # if we have a uuid-sized verifier that doesn't match, see whether it matches a related attachment
+    # (meaning another copy of the same file, to deal with a question bank migration issue in which
+    # the source file's verifier remains in the URL)
+    if !root_account.feature_enabled?(:disable_file_verifier_access) && (ActiveSupport::SecurityUtils.secure_compare(verifier, attachment.uuid) ||
+             (verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?))
+      monitor_uuid_verifier_usage(request) if request
+      monitor_cross_domain_access(request, files_domain) if request
+      return true
     end
 
     body = decode_verifier(verifier)
@@ -136,6 +133,51 @@ class Attachments::Verification
     end
 
     attachment.grants_right?(user, session, permission)
+  end
+
+  # TODO: Remove this method once disable_file_verifier_access flag is enabled everywhere
+  def monitor_cross_domain_access(request, files_domain)
+    return unless request&.referer.present?
+    return if files_domain
+
+    begin
+      referrer_uri = URI.parse(request.referer)
+      referrer_host = referrer_uri.host
+      request_host = request.host
+
+      return if referrer_host == request_host
+
+      # Only monitor if the referrer is from another Canvas instance
+      return unless AccountDomain.where(host: referrer_host).exists?
+
+      InstStatsd::Statsd.event(
+        "File accessed from different Canvas domain",
+        "Referrer: #{request.referer}, Request URL: #{request.url}",
+        type: "cross_domain_file_access",
+        alert_type: :warning
+      )
+    rescue URI::InvalidURIError
+      Rails.logger.debug { "Invalid referrer URI: #{request.referer}" }
+    end
+  end
+
+  # TODO: Remove this method once disable_file_verifier_access flag is enabled everywhere
+  def monitor_uuid_verifier_usage(request)
+    referrer = request&.referer
+    request_url = request&.url
+
+    begin
+      URI.parse(referrer) if referrer.present?
+
+      InstStatsd::Statsd.event(
+        "File accessed with UUID verifier",
+        "Referrer: #{referrer}, Request URL: #{request_url}",
+        type: "uuid_verifier_usage",
+        alert_type: :info
+      )
+    rescue URI::InvalidURIError
+      Rails.logger.debug { "Invalid referrer URI: #{referrer}" }
+    end
   end
 
   private

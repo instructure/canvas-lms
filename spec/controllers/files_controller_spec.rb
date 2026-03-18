@@ -2904,4 +2904,86 @@ describe FilesController do
       end
     end
   end
+
+  describe "cross-domain file access monitoring" do
+    before :once do
+      course_with_student
+      @file = @course.attachments.create!(uploaded_data: io)
+      @root_account = @course.root_account
+      domain = @root_account.account_domains.build(host: "test.host")
+      domain.save!(validate: false)
+      other_account = Account.create!
+      other_domain = other_account.account_domains.build(host: "canvas.other.edu")
+      other_domain.save!(validate: false)
+    end
+
+    before do
+      user_session(@student)
+    end
+
+    it "detects cross-domain referrer correctly" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed with UUID verifier",
+        anything,
+        hash_including(
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      )
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed from different Canvas domain",
+        anything,
+        hash_including(
+          type: "cross_domain_file_access",
+          alert_type: :warning
+        )
+      )
+      request.env["HTTP_REFERER"] = "https://canvas.other.edu/path"
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+
+    it "ignores same-domain referrers" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed with UUID verifier",
+        anything,
+        hash_including(
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      )
+      expect(InstStatsd::Statsd).not_to receive(:event).with(
+        "File accessed from different Canvas domain",
+        anything,
+        anything
+      )
+
+      request.env["HTTP_REFERER"] = "http://test.host/courses/1"
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+
+    it "handles missing referrer" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed with UUID verifier",
+        anything,
+        hash_including(
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      )
+      expect(InstStatsd::Statsd).not_to receive(:event).with(
+        "File accessed from different Canvas domain",
+        anything,
+        anything
+      )
+
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+
+    it "handles malformed referrer URIs gracefully" do
+      expect(InstStatsd::Statsd).not_to receive(:event)
+
+      request.env["HTTP_REFERER"] = "not a valid uri"
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+  end
 end

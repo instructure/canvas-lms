@@ -86,7 +86,6 @@ describe Attachments::Verification do
     it "verifies a legacy verifier for read and download" do
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read, root_account)).to be(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download, root_account)).to be(true)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.legacy_verifier_success").twice
     end
 
     it "accepts the uuid of another copy of the file" do
@@ -95,7 +94,6 @@ describe Attachments::Verification do
       v2 = Attachments::Verification.new(clone)
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :read, root_account)).to be true
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :download, root_account)).to be true
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.related_verifier_success").twice
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
