@@ -3016,10 +3016,10 @@
   dependencies:
     prop-types "^15"
 
-"@instructure/studio-player@1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.7.0.tgz#c64158c6b80b477b53e5b13434d8b207666e08a2"
-  integrity sha512-JpopJNmChhJH4SEQ+h7TW9lfNRX6PZu6MClpcuWff1Sg65bK5WABXxw6v5piQjEfO+oINIL9LcN+Jjbq1pDk2g==
+"@instructure/studio-player@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.8.0.tgz#f0dcb1bc36842fa7eb5a1e7e02796eb5290d2d60"
+  integrity sha512-e5D8zIQAHpPvGuhVKVYfZAxUlD0G1gbBF/cdnudFHWfjxjlv3QkqhW/gNAnEIfIzVjZCIggx+TUrZcl5doGTvQ==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@nanostores/react" "^1.0.0"
