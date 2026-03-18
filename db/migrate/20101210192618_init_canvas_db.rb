@@ -405,7 +405,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :context,
                    polymorphic: %i[wiki_page assignment attachment],
                    foreign_key: true,
-                   check_constraint: { sort: false, name: "chk_require_context" }
+                   check_constraint: false
       t.string :rule_type, null: false, index: true
       t.text :node_path, limit: 1024
       t.jsonb :metadata, null: false, default: {}
@@ -413,9 +413,29 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
       t.timestamps
       t.references :accessibility_resource_scan, null: false, foreign_key: true
+      t.references :discussion_topic,
+                   foreign_key: true,
+                   index: { where: "discussion_topic_id IS NOT NULL" }
+      t.references :announcement,
+                   foreign_key: { to_table: :discussion_topics },
+                   index: { where: "announcement_id IS NOT NULL" }
+      t.boolean :is_syllabus, default: false, null: false
 
       t.check_constraint "rule_type IN (#{rule_types})", name: "chk_rule_type_enum"
       t.check_constraint "workflow_state IN ('active', 'resolved', 'dismissed')", name: "chk_workflow_state_enum"
+      t.polymorphic_check_constraint :context, %w[wiki_page assignment attachment discussion_topic announcement], sort: false
+
+      t.replica_identity_index
+    end
+
+    create_table :accessibility_course_statistics do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true, index: { unique: true }
+      t.integer :active_issue_count
+      t.string :workflow_state, default: "initialized", null: false
+      t.timestamps
+
+      t.check_constraint "workflow_state IN ('initialized', 'queued', 'in_progress', 'active', 'failed', 'deleted')", name: "chk_workflow_state_enum"
 
       t.replica_identity_index
     end
@@ -427,7 +447,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    polymorphic: %i[wiki_page assignment attachment],
                    foreign_key: true,
                    index: { unique: true },
-                   check_constraint: { sort: false, name: "chk_require_context" }
+                   check_constraint: false
       t.string :error_message, limit: 255
       t.string :workflow_state, default: "queued", null: false
       t.timestamps
@@ -435,11 +455,19 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :resource_workflow_state, default: "unpublished", null: false, index: true
       t.integer :issue_count, default: 0, null: false, index: true
       t.timestamp :resource_updated_at, index: { where: "resource_updated_at IS NOT NULL" }
+      t.references :discussion_topic,
+                   foreign_key: true,
+                   index: { where: "discussion_topic_id IS NOT NULL" }
+      t.references :announcement,
+                   foreign_key: { to_table: :discussion_topics },
+                   index: { where: "announcement_id IS NOT NULL" }
+      t.boolean :is_syllabus, default: false, null: false
 
       t.check_constraint "workflow_state IN ('queued', 'in_progress', 'completed', 'failed')",
                          name: "chk_workflow_state_enum"
       t.check_constraint "resource_workflow_state IN ('unpublished', 'published')",
                          name: "chk_resource_workflow_state_enum"
+      t.polymorphic_check_constraint :context, %w[wiki_page assignment attachment discussion_topic announcement], sort: false
 
       t.replica_identity_index
     end
@@ -556,6 +584,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :pedagogical_guidance, null: false, limit: 65_536
       t.string :workflow_state, null: false, default: "unpublished", limit: 255
       t.timestamps
+      t.string :llm_conversation_context_id, limit: 255, index: { where: "llm_conversation_context_id IS NOT NULL" }
 
       t.replica_identity_index
       t.index [:root_account_id, :workflow_state]
@@ -591,8 +620,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.check_constraint "workflow_state IN ('active', 'deleted')", name: "chk_workflow_state_enum"
 
       t.replica_identity_index
-      t.index %i[assignment_id assessor_id], name: "index_allocation_rules_on_assignment_assessor"
-      t.index %i[assignment_id assessee_id], name: "index_allocation_rules_on_assignment_assessee"
+      t.index %i[assignment_id assessor_id must_review review_permitted],
+              name: "index_allocation_rules_on_asgnt_assr_must_review_permitted"
     end
 
     create_table :anonymous_or_moderation_events do |t|
@@ -2490,14 +2519,14 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                      unique: true
                    }
 
-      t.replica_identity_index
-    end
-    # order is different than columns (and not sorted, either)
-    add_polymorphic_check_constraint :estimated_durations,
-                                     :context,
+      # check constraint columns are in a different order than the columns themselves
+      t.polymorphic_check_constraint :context,
                                      %i[assignment attachment content_tag discussion_topic wiki_page quiz external_tool],
                                      null: false,
                                      sort: false
+
+      t.replica_identity_index
+    end
 
     create_table :event_stream_failures do |t|
       t.string :operation, null: false, limit: 255
@@ -3077,7 +3106,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :path, null: false, limit: 4096, index: true
       t.references :deployment, foreign_key: { to_table: :context_external_tools }, null: false
       t.references :registration, null: false
-      t.references :context, polymorphic: %i[account course], foreign_key: true, index: false, null: false
+      t.references :context, polymorphic: %i[account course], foreign_key: true, null: false
       t.references :created_by, foreign_key: { to_table: :users }, index: { where: "created_by_id IS NOT NULL" }
       t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
       t.string :workflow_state, limit: 48, null: false, default: "active"
