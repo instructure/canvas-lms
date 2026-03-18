@@ -73,8 +73,6 @@
 class AiExperiencesController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create update destroy], with: :exception
-
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right, only: [:index, :show]
