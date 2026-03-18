@@ -20,12 +20,11 @@
 #
 
 module Assignments
-  describe NeedsGradingCountQuery do
-    before :once do
-      course_with_teacher(active_all: true)
-      student_in_course(active_all: true, user_name: "some user")
-    end
-
+  # Shared behavioural examples for NeedsGradingCountQuery.
+  # Run once for the legacy implementation (feature flag off) and once for the
+  # optimized implementation (feature flag on), so both paths are fully covered
+  # without duplicating test code.
+  shared_examples "NeedsGradingCountQuery behavior" do
     describe "#count" do
       it "only counts submissions in the user's visible section(s)" do
         @section = @course.course_sections.create!(name: "section 2")
@@ -350,6 +349,35 @@ module Assignments
           expect(default_section_count[:needs_grading_count]).to be(1)
           expect(section2_count[:needs_grading_count]).to be(1)
         end
+
+        it "returns correct counts when multiple parent assignments are batched together" do
+          # Regression test: sub-assignment IDs are fetched in a single bulk query
+          # (WHERE parent_assignment_id IN (...)) rather than one query per parent.
+          # If that regresses, counts would silently return 0.
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+          @course.enroll_student(@user2).update_attribute(:workflow_state, "active")
+
+          parent2 = @course.assignments.create!(
+            title: "parent assignment 2",
+            has_sub_assignments: true,
+            submission_types: "online_text_entry"
+          )
+          sub3 = parent2.sub_assignments.create!(
+            context: @course,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            points_possible: 5,
+            due_at: 2.days.from_now
+          )
+
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "reply")
+          sub3.submit_homework(@user2, submission_type: "online_text_entry", body: "reply")
+
+          result = NeedsGradingCountQuery.new([@parent_assignment, parent2], @teacher).count
+          expect(result[@parent_assignment.global_id]).to eq(1)
+          expect(result[parent2.global_id]).to eq(1)
+        end
       end
     end
 
@@ -628,48 +656,150 @@ module Assignments
       it "initializes only one CourseProxy per course for multiple assignments" do
         assignment1 = @course.assignments.create!(title: "a1", submission_types: ["online_text_entry"])
         assignment2 = @course.assignments.create!(title: "a2", submission_types: ["online_text_entry"])
-        expect(NeedsGradingCountQuery::CourseProxy).to receive(:new).once.and_call_original
+        expect(CourseProxyCache::CourseProxy).to receive(:new).once.and_call_original
         NeedsGradingCountQuery.new([assignment1, assignment2], @teacher).count
       end
+
+      it "returns results keyed by global_id" do
+        assignment = @course.assignments.create!(title: "a1", submission_types: ["online_text_entry"])
+        result = NeedsGradingCountQuery.new([assignment], @teacher).count
+        expect(result.keys).to eq([assignment.global_id])
+      end
+    end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      it "counts submissions for an assignment on a remote shard" do
+        assignment = nil
+        teacher = nil
+
+        @shard2.activate do
+          account = Account.create!
+          course = Course.create!(account:, workflow_state: "available")
+          teacher = User.create!
+          course.enroll_teacher(teacher).accept!
+          student = User.create!
+          course.enroll_student(student).update_attribute(:workflow_state, "active")
+          assignment = course.assignments.create!(
+            title: "shard2 assignment",
+            submission_types: ["online_text_entry"]
+          )
+          assignment.submit_homework(student, submission_type: "online_text_entry", body: "from shard2")
+        end
+
+        result = NeedsGradingCountQuery.new([assignment], teacher).count
+        expect(result[assignment.global_id]).to eq(1)
+      end
+
+      it "returns results for assignments on two shards in a single batch" do
+        student1 = student_in_course(course: @course, active_all: true).user
+        a1 = @course.assignments.create!(title: "default shard a", submission_types: ["online_text_entry"])
+        a1.submit_homework(student1, submission_type: "online_text_entry", body: "s1")
+
+        a2 = nil
+        @shard2.activate do
+          account = Account.create!
+          course2 = Course.create!(account:, workflow_state: "available")
+          student2 = User.create!
+          course2.enroll_student(student2).update_attribute(:workflow_state, "active")
+          a2 = course2.assignments.create!(title: "shard2 a", submission_types: ["online_text_entry"])
+          a2.submit_homework(student2, submission_type: "online_text_entry", body: "s2")
+        end
+
+        # Use manual_count (nil user) since teacher has no enrollment in the shard2 course
+        result = NeedsGradingCountQuery.new([a1, a2]).manual_count
+
+        expect(result[a1.global_id]).to eq(1)
+        expect(result[a2.global_id]).to eq(1)
+      end
+
+      it "does not share CourseProxy between courses on different shards" do
+        course_with_teacher(active_all: true)
+        shard2_course = @shard2.activate { Course.create!(account: Account.create!, workflow_state: "available") }
+        a1 = @course.assignments.create!(title: "a1", submission_types: ["online_text_entry"])
+        a2 = @shard2.activate { shard2_course.assignments.create!(title: "a2", submission_types: ["online_text_entry"]) }
+
+        expect(CourseProxyCache::CourseProxy).to receive(:new).twice.and_call_original
+        NeedsGradingCountQuery.new([a1, a2]).count
+      end
+
+      it "uses global_id in RequestCache key so shard2 assignments are correctly cached" do
+        assignment = nil
+        @shard2.activate do
+          account = Account.create!
+          course = Course.create!(account:, workflow_state: "available")
+          student = User.create!
+          course.enroll_student(student).update_attribute(:workflow_state, "active")
+          assignment = course.assignments.create!(title: "shard2 rc", submission_types: ["online_text_entry"])
+          assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
+        end
+
+        RequestCache.enable do
+          NeedsGradingCountQuery.new([assignment]).manual_count
+
+          expect(RequestCache.exist?("ngcq_manual_count", assignment.global_id, nil)).to be true
+
+          result = NeedsGradingCountQuery.new([assignment]).manual_count
+          expect(result[assignment.global_id]).to eq(1)
+        end
+      end
     end
   end
 
-  describe NeedsGradingCountQueryLegacy do
+  describe NeedsGradingCountQuery do
     before :once do
       course_with_teacher(active_all: true)
-      @cached_assignment = @course.assignments.create!(
-        title: "legacy cache test",
-        submission_types: ["online_text_entry"],
-        moderated_grading: true,
-        grader_count: 2
-      )
+      student_in_course(active_all: true, user_name: "some user")
     end
 
-    describe "#count" do
-      it "caches the result within an enable_cache block" do
-        querier = NeedsGradingCountQueryLegacy.new(@cached_assignment, @teacher)
-        expect(querier).to receive(:needs_moderated_grading_count).once.and_call_original
-        enable_cache do
-          querier.count
-          querier.count
-        end
+    context "with legacy implementation" do
+      before { Account.site_admin.disable_feature!(:optimized_needs_grading_count) }
+
+      it "delegates to NeedsGradingCountQueryLegacy, not optimized" do
+        assignment = @course.assignments.create!(title: "dispatch", submission_types: ["online_text_entry"])
+        expect(NeedsGradingCountQueryOptimized).not_to receive(:new)
+        NeedsGradingCountQuery.new([assignment], @teacher).count
       end
 
-      it "invalidates the cache when the cache key is explicitly cleared" do
-        querier = NeedsGradingCountQueryLegacy.new(@cached_assignment, @teacher)
-        expect(querier).to receive(:needs_moderated_grading_count).twice.and_call_original
-        enable_cache do
-          querier.count
-          Timecop.freeze(1.minute.from_now) do
-            @cached_assignment.clear_cache_key(:needs_grading)
-            querier.count
-          end
-        end
+      it_behaves_like "NeedsGradingCountQuery behavior"
+    end
+
+    context "with optimized implementation" do
+      before { Account.site_admin.enable_feature!(:optimized_needs_grading_count) }
+
+      it "delegates to NeedsGradingCountQueryOptimized, not legacy" do
+        assignment = @course.assignments.create!(title: "dispatch", submission_types: ["online_text_entry"])
+        expect(NeedsGradingCountQueryOptimized).to receive(:new).and_call_original
+        NeedsGradingCountQuery.new([assignment], @teacher).count
+      end
+
+      it_behaves_like "NeedsGradingCountQuery behavior"
+    end
+
+    describe "optimized? memoization" do
+      it "looks up the feature flag only once per instance across multiple calls" do
+        assignment = @course.assignments.create!(title: "flag test", submission_types: ["online_text_entry"])
+        query = NeedsGradingCountQuery.new([assignment], @teacher)
+        expect(Account.site_admin).to receive(:feature_enabled?)
+          .with(:optimized_needs_grading_count).once.and_return(false)
+        query.count
+        query.count
       end
     end
   end
 
+  # Tests the Legacy implementation's Rails.cache layer specifically.
+  # The optimized implementation does not use Rails.cache.fetch_with_batched_keys,
+  # so these tests are intentionally not inside the shared_examples.
   describe "Rails.cache caching" do
+    before { Account.site_admin.disable_feature!(:optimized_needs_grading_count) }
+
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true, user_name: "some user")
+    end
+
     it "serves count from cache until the cache key is cleared" do
       student = student_in_course(course: @course, active_all: true).user
       assignment = @course.assignments.create!(
@@ -732,6 +862,8 @@ module Assignments
 
   describe "RequestCache warming" do
     before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true, user_name: "some user")
       @rc_student = student_in_course(course: @course, active_all: true).user
       @rc_assignment1 = @course.assignments.create!(title: "rc1", submission_types: ["online_text_entry"])
       @rc_assignment2 = @course.assignments.create!(title: "rc2", submission_types: ["online_text_entry"])
@@ -806,6 +938,7 @@ module Assignments
 
   describe "batch queries" do
     it "returns correct counts for multiple assignments in one call" do
+      course_with_teacher(active_all: true)
       student = student_in_course(course: @course, active_all: true).user
       a1 = @course.assignments.create!(title: "batch a1", submission_types: ["online_text_entry"])
       a2 = @course.assignments.create!(title: "batch a2", submission_types: ["online_text_entry"])
@@ -815,85 +948,6 @@ module Assignments
 
       expect(result[a1.global_id]).to eq(1)
       expect(result[a2.global_id]).to eq(0)
-    end
-  end
-
-  context "cross-shard" do
-    specs_require_sharding
-
-    it "counts submissions for an assignment on a remote shard" do
-      assignment = nil
-      teacher = nil
-
-      @shard2.activate do
-        account = Account.create!
-        course = Course.create!(account:, workflow_state: "available")
-        teacher = User.create!
-        course.enroll_teacher(teacher).accept!
-        student = User.create!
-        course.enroll_student(student).update_attribute(:workflow_state, "active")
-        assignment = course.assignments.create!(
-          title: "shard2 assignment",
-          submission_types: ["online_text_entry"]
-        )
-        assignment.submit_homework(student, submission_type: "online_text_entry", body: "from shard2")
-      end
-
-      result = NeedsGradingCountQuery.new([assignment], teacher).count
-      expect(result[assignment.global_id]).to eq(1)
-    end
-
-    it "returns results for assignments on two shards in a single batch" do
-      student1 = student_in_course(course: @course, active_all: true).user
-      a1 = @course.assignments.create!(title: "default shard a", submission_types: ["online_text_entry"])
-      a1.submit_homework(student1, submission_type: "online_text_entry", body: "s1")
-
-      a2 = nil
-      @shard2.activate do
-        account = Account.create!
-        course2 = Course.create!(account:, workflow_state: "available")
-        student2 = User.create!
-        course2.enroll_student(student2).update_attribute(:workflow_state, "active")
-        a2 = course2.assignments.create!(title: "shard2 a", submission_types: ["online_text_entry"])
-        a2.submit_homework(student2, submission_type: "online_text_entry", body: "s2")
-      end
-
-      # Use manual_count (nil user) since teacher has no enrollment in the shard2 course
-      result = NeedsGradingCountQuery.new([a1, a2]).manual_count
-
-      expect(result[a1.global_id]).to eq(1)
-      expect(result[a2.global_id]).to eq(1)
-    end
-
-    it "does not share CourseProxy between courses on different shards" do
-      course_with_teacher(active_all: true)
-      shard2_course = @shard2.activate { Course.create!(account: Account.create!, workflow_state: "available") }
-      a1 = @course.assignments.create!(title: "a1", submission_types: ["online_text_entry"])
-      a2 = @shard2.activate { shard2_course.assignments.create!(title: "a2", submission_types: ["online_text_entry"]) }
-
-      expect(NeedsGradingCountQuery::CourseProxy).to receive(:new).twice.and_call_original
-      NeedsGradingCountQuery.new([a1, a2]).manual_count
-    end
-
-    it "uses global_id in RequestCache key so shard2 assignments are correctly cached" do
-      assignment = nil
-      @shard2.activate do
-        account = Account.create!
-        course = Course.create!(account:, workflow_state: "available")
-        student = User.create!
-        course.enroll_student(student).update_attribute(:workflow_state, "active")
-        assignment = course.assignments.create!(title: "shard2 rc", submission_types: ["online_text_entry"])
-        assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
-      end
-
-      RequestCache.enable do
-        NeedsGradingCountQuery.new([assignment]).manual_count
-
-        expect(RequestCache.exist?("ngcq_manual_count", assignment.global_id, nil)).to be true
-
-        result = NeedsGradingCountQuery.new([assignment]).manual_count
-        expect(result[assignment.global_id]).to eq(1)
-      end
     end
   end
 end
