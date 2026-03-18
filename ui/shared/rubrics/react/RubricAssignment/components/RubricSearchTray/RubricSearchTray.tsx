@@ -121,7 +121,7 @@ export const RubricSearchTray = ({
             padding="small 0"
             overflowY="auto"
           >
-            {selectedContext ? (
+            {selectedContext && (
               <RubricsForContext
                 courseId={courseId}
                 selectedAssociation={selectedAssociation}
@@ -133,8 +133,6 @@ export const RubricSearchTray = ({
                   setSelectedRubricId(rubricId)
                 }}
               />
-            ) : (
-              <LoadingIndicator />
             )}
           </View>
         </View>

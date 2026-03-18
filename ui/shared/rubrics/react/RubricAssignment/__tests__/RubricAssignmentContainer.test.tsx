@@ -470,6 +470,15 @@ describe('RubricAssignmentContainer Tests', () => {
   })
 
   describe('search tray', () => {
+    it('should display "No Rubrics Found" when no contexts are returned', async () => {
+      queryClient.setQueryData(['fetchGradingRubricContexts', '1'], [])
+      const {getByTestId, getByText} = renderComponent()
+      fireEvent.click(getByTestId('find-assignment-rubric-button'))
+
+      expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
+      expect(getByText('No Rubrics Found')).toBeInTheDocument()
+    })
+
     it('should open search tray when search button is clicked and load the correct rubric contexts', async () => {
       const {getByTestId, getByText} = renderComponent()
       fireEvent.click(getByTestId('find-assignment-rubric-button'))

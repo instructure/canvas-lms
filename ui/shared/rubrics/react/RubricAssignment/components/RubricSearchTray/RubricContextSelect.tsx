@@ -19,7 +19,9 @@
 import {useQuery} from '@tanstack/react-query'
 import {useEffect} from 'react'
 import {getGradingRubricContexts} from '../../queries'
+import {Heading} from '@instructure/ui-heading'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {View} from '@instructure/ui-view'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -39,7 +41,11 @@ export const RubricContextSelect = ({
   handleChangeContext,
   setSelectedContext,
 }: RubricContextSelectProps) => {
-  const {data: rubricContexts = [], isLoading} = useQuery({
+  const {
+    data: rubricContexts = [],
+    isLoading,
+    isSuccess,
+  } = useQuery({
     queryKey: ['fetchGradingRubricContexts', courseId],
     queryFn: getGradingRubricContexts,
   })
@@ -72,7 +78,15 @@ export const RubricContextSelect = ({
     return `${context.name} (${contextPrefix(context.context_code)})`
   }
 
-  if (isLoading && !rubricContexts) {
+  if (isSuccess && rubricContexts.length === 0) {
+    return (
+      <View as="div">
+        <Heading level="h3">{I18n.t('No Rubrics Found')}</Heading>
+      </View>
+    )
+  }
+
+  if (isLoading) {
     return <LoadingIndicator />
   }
 
