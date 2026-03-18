@@ -40,6 +40,32 @@ class Quizzes::QuizSubmissionHistory
     attempts.map { |attempt| attempt.versions.last }
   end
 
+  # Returns one entry per attempt ordered most-recent first, using a
+  # pre-loaded versions array to avoid additional queries. Intended for
+  # contexts where batched loading has already occurred (e.g. GraphQL).
+  def self.from_preloaded_versions(quiz_submission, versions)
+    by_attempt = versions.sort_by(&:number).each_with_object({}) do |ver, hash|
+      model = ver.model
+      next unless model&.attempt
+
+      hash[model.attempt] ||= []
+      hash[model.attempt] << model
+    end
+
+    by_attempt.sort_by { |num, _| -num }.map do |_, attempt_models|
+      model = attempt_models.last
+      if model&.attempt == quiz_submission.attempt
+        # Use the live record for the current attempt so score changes from
+        # regrades are reflected. Stamp version_number from the deserialized
+        # model to avoid an extra DB query.
+        quiz_submission.force_version_number(model.version_number)
+        quiz_submission
+      else
+        model
+      end
+    end
+  end
+
   def version_models
     last_versions.map do |version|
       model = version.model
