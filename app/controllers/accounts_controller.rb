@@ -1739,6 +1739,7 @@ class AccountsController < ApplicationController
 
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
+    search_as_subaccount = !@account.root_account.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
     mutation_logging = @account.feature_enabled?(:mutation_audit_log) &&
                        @account.grants_right?(@current_user, :manage_account_settings)
@@ -1746,6 +1747,7 @@ class AccountsController < ApplicationController
       logging = {
         authentication: authentication_logging,
         grade_change: grade_change_logging,
+        grade_change_search_as_subaccount: search_as_subaccount,
         course: course_logging,
         mutation: mutation_logging,
       }
