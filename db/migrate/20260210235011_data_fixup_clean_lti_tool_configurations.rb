@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,20 +16,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class AuditorApiController < ApplicationController
-  before_action :require_user
+class DataFixupCleanLtiToolConfigurations < ActiveRecord::Migration[8.0]
+  tag :postdeploy
 
-  private
-
-  def query_options
-    start_time = CanvasTime.try_parse(params[:start_time])
-    end_time = CanvasTime.try_parse(params[:end_time])
-
-    options = {}
-    options[:oldest] = start_time if start_time
-    options[:newest] = end_time if end_time
-    options
+  def up
+    DataFixup::CleanLtiToolConfigurations.new.run_later
   end
 end

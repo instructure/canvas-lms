@@ -286,7 +286,7 @@ class ContextExternalTool < ActiveRecord::Base
           canvas_icon_class:,
           width: tool.editor_button(:selection_width),
           height: tool.editor_button(:selection_height),
-          use_tray: tool.editor_button(:use_tray) == "true",
+          use_tray: Canvas::Plugin.value_to_boolean(tool.editor_button(:use_tray)),
           on_by_default: tool.on_by_default?(on_by_default_ids),
           description: if tool.description
                          Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)

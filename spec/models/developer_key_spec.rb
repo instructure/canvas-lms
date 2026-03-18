@@ -50,6 +50,26 @@ describe DeveloperKey do
     key_hash
   end
 
+  describe "before_validation" do
+    it "coerces an empty array for the public_jwk to null" do
+      developer_key_not_saved.public_jwk = []
+      developer_key_not_saved.is_lti_key = true
+      developer_key_not_saved.public_jwk_url = "https://example.com/jwks"
+
+      expect(developer_key_not_saved.valid?).to be(true)
+      expect(developer_key_not_saved.public_jwk).to be_nil
+    end
+
+    it "coerces an empty object for the public_jwk to null" do
+      developer_key_not_saved.public_jwk = {}
+      developer_key_not_saved.is_lti_key = true
+      developer_key_not_saved.public_jwk_url = "https://example.com/jwks"
+
+      expect(developer_key_not_saved.valid?).to be(true)
+      expect(developer_key_not_saved.public_jwk).to be_nil
+    end
+  end
+
   describe "#tokens_expire_in" do
     let(:developer_key) { DeveloperKey.new }
 

@@ -99,25 +99,35 @@ module Lti
           updated_by: created_by
         )
 
+        # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
+        # For manual registrations (which always have configuration_params),
+        # merge overlay into configuration instead of creating overlay.
+        final_config = configuration_params
         scopes = configuration_params[:scopes]
+
         if overlay_params.present?
-          overlay = Lti::Overlay.create!(
-            registration:,
-            account:,
-            updated_by: created_by,
-            data: overlay_params
-          )
-          scopes = overlay.apply_to(configuration_params)[:scopes]
+          # Validate overlay params before applying
+          validation_errors = Schemas::Lti::Overlay.validation_errors(overlay_params, allow_nil: true)
+          if validation_errors.present?
+            raise ArgumentError, "Invalid overlay parameters: #{validation_errors.to_json}"
+          end
+
+          # Manual registrations: merge overlay into config
+          # (We know this is a manual registration because we're creating a ToolConfiguration,
+          # not linking to an IMS registration)
+          merged_config = Lti::Overlay.apply_to(overlay_params, configuration_params, additive: true)
+          final_config = merged_config.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)
+          scopes = final_config[:scopes]
         end
 
         dk = DeveloperKey.create!(
           account: account.site_admin? ? nil : account,
-          icon_url: configuration_params.dig(:launch_settings, :icon_url),
-          name: registration_params[:name] || configuration_params[:title],
-          public_jwk: configuration_params[:public_jwk],
-          public_jwk_url: configuration_params[:public_jwk_url],
-          redirect_uris: configuration_params[:redirect_uris] || [configuration_params[:target_link_uri]],
-          oidc_initiation_url: configuration_params[:oidc_initiation_url],
+          icon_url: final_config.dig(:launch_settings, :icon_url),
+          name: registration_params[:name] || final_config[:title],
+          public_jwk: final_config[:public_jwk],
+          public_jwk_url: final_config[:public_jwk_url],
+          redirect_uris: final_config[:redirect_uris] || [final_config[:target_link_uri]],
+          oidc_initiation_url: final_config[:oidc_initiation_url],
           visible: !account.site_admin?,
           scopes:,
           lti_registration: registration,
@@ -131,7 +141,7 @@ module Lti
           developer_key: dk,
           lti_registration: registration,
           unified_tool_id:,
-          **configuration_params
+          **final_config
         )
 
         binding = Lti::AccountBindingService.call(account:,

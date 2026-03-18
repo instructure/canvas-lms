@@ -42,6 +42,7 @@ describe('AppsTableInner', () => {
       FEATURES: {
         lti_registrations_next: false,
       },
+      LTI_DR_REGISTRATIONS_UPDATE: false,
     })
     // Create flash_screenreader_holder element for Alert components
     const flashHolder = document.createElement('div')
@@ -249,13 +250,39 @@ describe('AppsTableInner', () => {
       })
 
       const columns = wrapper.getAllByRole('columnheader')
-      expect(columns).toHaveLength(6)
+      expect(columns).toHaveLength(5)
       expect(columns[0]).toHaveTextContent('Name')
       expect(columns[1]).toHaveTextContent('Nickname')
       expect(columns[2]).toHaveTextContent('Installed On')
       expect(columns[3]).toHaveTextContent('Version')
       expect(columns[4]).toHaveTextContent('On/Off')
+    })
+
+    it('includes the Status column when LTI_DR_REGISTRATIONS_UPDATE is on', () => {
+      window.ENV.LTI_DR_REGISTRATIONS_UPDATE = true
+
+      const wrapper = renderTable({
+        tableProps: {
+          apps: {data: [mockRegistration('App', 1)], total: 1},
+        },
+      })
+
+      const columns = wrapper.getAllByRole('columnheader')
+      expect(columns).toHaveLength(6)
       expect(columns[5]).toHaveTextContent('Status')
+    })
+
+    it('does not include the Status column when LTI_DR_REGISTRATIONS_UPDATE is off', () => {
+      window.ENV.LTI_DR_REGISTRATIONS_UPDATE = false
+
+      const wrapper = renderTable({
+        tableProps: {
+          apps: {data: [mockRegistration('App', 1)], total: 1},
+        },
+      })
+
+      const columns = wrapper.getAllByRole('columnheader')
+      expect(columns.map(c => c.textContent)).not.toContain(expect.stringContaining('Status'))
     })
 
     it('shows condensed version of table', async () => {

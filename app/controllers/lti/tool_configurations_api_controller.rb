@@ -90,20 +90,30 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
+    # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
+    # Instead of creating an overlay with disabled_placements, we directly modify the placements
+    # to set enabled: false for disabled placements.
     configuration_params = {
       redirect_uris: tool_configuration_redirect_uris.presence || [@settings[:target_link_uri]],
       privacy_level: tool_configuration_params[:privacy_level],
       **Schemas::InternalLtiConfiguration.from_lti_configuration(@settings)
     }.compact
 
+    # Handle disabled_placements by setting enabled: false on those placements
+    disabled_placements = tool_configuration_params[:disabled_placements]
+    if disabled_placements.present? && configuration_params[:placements].present?
+      configuration_params[:placements].each do |placement|
+        if disabled_placements.include?(placement[:placement])
+          placement[:enabled] = false
+        end
+      end
+    end
+
     create_params = {
       account: @context,
       created_by: @current_user,
       registration_params: {
         name: developer_key_params[:name] || "Unnamed tool",
-      },
-      overlay_params: {
-        disabled_placements: tool_configuration_params[:disabled_placements]
       },
       configuration_params:,
       developer_key_params:
@@ -146,13 +156,25 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def update
+    # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
+    # Instead of creating an overlay with disabled_placements, we directly modify the placements
+    # to set enabled: false for disabled placements.
     settings = tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields)
     configuration_params = {
-      disabled_placements: tool_configuration_params[:disabled_placements],
       redirect_uris: tool_configuration_redirect_uris,
       privacy_level: tool_configuration_params[:privacy_level],
       **Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
     }.compact
+
+    # Handle disabled_placements by setting enabled: false on those placements
+    disabled_placements = tool_configuration_params[:disabled_placements]
+    if disabled_placements.present? && configuration_params[:placements].present?
+      configuration_params[:placements].each do |placement|
+        if disabled_placements.include?(placement[:placement])
+          placement[:enabled] = false
+        end
+      end
+    end
 
     update_params = {
       id: developer_key.lti_registration_id,

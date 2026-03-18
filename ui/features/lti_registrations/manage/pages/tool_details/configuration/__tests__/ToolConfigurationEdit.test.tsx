@@ -27,6 +27,7 @@ import {Lti1p3RegistrationOverlayState} from 'features/lti_registrations/manage/
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {LtiPlacements} from '../../../../model/LtiPlacement'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {fireEvent} from '@testing-library/react'
 
 // Mock use-debounce to provide a flush method
 vi.mock('use-debounce', () => ({
@@ -37,19 +38,9 @@ vi.mock('use-debounce', () => ({
   },
 }))
 
-const userEvent = ue.userEvent.setup({advanceTimers: vi.advanceTimersByTime})
+const userEvent = ue.userEvent.setup()
 
-describe.skip('ToolConfigurationEdit', () => {
-  beforeEach(() => {
-    vi.resetAllMocks()
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.runAllTimers()
-    vi.useRealTimers()
-  })
-
+describe('ToolConfigurationEdit', () => {
   describe('Manual Registrations', () => {
     it('should render the Launch Settings', () => {
       const {getByText, container} = renderApp({
@@ -436,106 +427,87 @@ describe.skip('ToolConfigurationEdit', () => {
     expect(getByText('Data Sharing')).toBeInTheDocument()
     expect(getByDisplayValue(i18nLtiPrivacyLevel('email_only'))).toBeInTheDocument()
   })
-})
 
-describe('Tool Configuration Edit EULA Settings', () => {
-  const mockEulaMessageSettings = [
-    {
-      type: 'LtiEulaRequest' as const,
-      enabled: true,
-      target_link_uri: 'https://example.com/eula',
-      custom_fields: {
-        eula_field1: 'value1',
-        eula_field2: 'value2',
-      },
-    },
-  ]
-
-  beforeEach(() => {
-    // Ensure window.ENV exists
-    if (!window.ENV) {
-      ;(window as any).ENV = {}
-    }
-    if (!window.ENV.FEATURES) {
-      window.ENV.FEATURES = {}
-    }
-    vi.resetAllMocks()
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.runAllTimers()
-    vi.useRealTimers()
-  })
-
-  it.skip('should render EULA settings for manual registrations when feature flag is enabled', () => {
-    window.ENV.FEATURES.lti_asset_processor = true
-
-    const {getByText, getByLabelText} = renderApp({
-      n: 'Test App',
-      i: 1,
-      configuration: {
-        launch_settings: {
-          message_settings: mockEulaMessageSettings,
+  describe('EULA Settings', () => {
+    const mockEulaMessageSettings = [
+      {
+        type: 'LtiEulaRequest' as const,
+        enabled: true,
+        target_link_uri: 'https://example.com/eula',
+        custom_fields: {
+          eula_field1: 'value1',
+          eula_field2: 'value2',
         },
       },
-      registration: {
-        configuration: mockConfiguration({
+    ]
+
+    beforeEach(() => {
+      // Ensure window.ENV exists
+      if (!window.ENV) {
+        ;(window as any).ENV = {}
+      }
+      if (!window.ENV.FEATURES) {
+        window.ENV.FEATURES = {}
+      }
+    })
+
+    it('should render EULA settings for manual registrations when feature flag is enabled', () => {
+      window.ENV.FEATURES.lti_asset_processor = true
+
+      const {getByText, getByLabelText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
           launch_settings: {
             message_settings: mockEulaMessageSettings,
           },
-        }),
-        overlay: mockOverlay({}, {}),
-        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-      },
-    })(<ToolConfigurationEdit />)
-
-    expect(getByText('EULA Settings')).toBeInTheDocument()
-    expect(getByLabelText('Enable EULA Request')).toBeInTheDocument()
-    expect(getByLabelText('EULA Target Link URI')).toBeInTheDocument()
-    expect(getByLabelText('EULA Custom Fields')).toBeInTheDocument()
-  })
-
-  it('should render EULA settings when message settings contain LtiEulaRequest', () => {
-    const {getByText} = renderApp({
-      n: 'Test App',
-      i: 1,
-      configuration: {
-        launch_settings: {
-          message_settings: mockEulaMessageSettings,
         },
-      },
-      registration: {
-        configuration: mockConfiguration({
+        registration: {
+          configuration: mockConfiguration({
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('EULA Settings')).toBeInTheDocument()
+      expect(getByLabelText('Enable EULA Request')).toBeInTheDocument()
+      expect(getByLabelText('EULA Target Link URI')).toBeInTheDocument()
+      expect(getByLabelText('EULA Custom Fields')).toBeInTheDocument()
+    })
+
+    it('should render EULA settings when message settings contain LtiEulaRequest', () => {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
           launch_settings: {
             message_settings: mockEulaMessageSettings,
           },
-        }),
-        overlay: mockOverlay({}, {}),
-        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-      },
-    })(<ToolConfigurationEdit />)
+        },
+        registration: {
+          configuration: mockConfiguration({
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
 
-    expect(getByText('EULA Settings')).toBeInTheDocument()
-    expect(getByText('Enable EULA Request')).toBeInTheDocument()
-  })
+      expect(getByText('EULA Settings')).toBeInTheDocument()
+      expect(getByText('Enable EULA Request')).toBeInTheDocument()
+    })
 
-  it('should render EULA settings when tool has EulaUser scope and asset processor placements', () => {
-    const {getByText} = renderApp({
-      n: 'Test App',
-      i: 1,
-      configuration: {
-        scopes: [LtiScopes.EulaUser],
-        placements: [
-          {
-            placement: LtiPlacements.ActivityAssetProcessor,
-            enabled: true,
-            text: 'Activity Asset Processor',
-          },
-        ],
-      },
-      registration: {
-        configuration: mockConfiguration({
+    it('should render EULA settings when tool has EulaUser scope and asset processor placements', () => {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
           scopes: [LtiScopes.EulaUser],
           placements: [
             {
@@ -544,93 +516,172 @@ describe('Tool Configuration Edit EULA Settings', () => {
               text: 'Activity Asset Processor',
             },
           ],
-        }),
-        overlay: mockOverlay({}, {}),
-        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-      },
-    })(<ToolConfigurationEdit />)
-
-    expect(getByText('EULA Settings')).toBeInTheDocument()
-  })
-
-  it('should not render EULA settings for non-manual registrations', () => {
-    const {queryByText} = renderApp({
-      n: 'Test App',
-      i: 1,
-      configuration: {
-        launch_settings: {
-          message_settings: mockEulaMessageSettings,
         },
-      },
-      registration: {
-        ims_registration_id: ZLtiImsRegistrationId.parse('1'),
-        overlaid_configuration: mockConfiguration({
+        registration: {
+          configuration: mockConfiguration({
+            scopes: [LtiScopes.EulaUser],
+            placements: [
+              {
+                placement: LtiPlacements.ActivityAssetProcessor,
+                enabled: true,
+                text: 'Activity Asset Processor',
+              },
+            ],
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('EULA Settings')).toBeInTheDocument()
+    })
+
+    it('should not render EULA settings for non-manual registrations', () => {
+      const {queryByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
           launch_settings: {
             message_settings: mockEulaMessageSettings,
           },
-        }),
-      },
-    })(<ToolConfigurationEdit />)
-
-    expect(queryByText('EULA Settings')).not.toBeInTheDocument()
-  })
-
-  it('should not render EULA settings when no message settings and no EULA scope/placements', () => {
-    const {queryByText} = renderApp({
-      n: 'Test App',
-      i: 1,
-      configuration: {
-        // No launch_settings with EULA message settings
-        // No scopes that include EulaUser
-        // No placements that include ActivityAssetProcessor
-      },
-      registration: {
-        configuration: mockConfiguration({
-          // No launch_settings, no EULA-related scopes or placements
-        }),
-        overlay: mockOverlay({}, {}),
-        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-      },
-    })(<ToolConfigurationEdit />)
-
-    expect(queryByText('EULA Settings')).not.toBeInTheDocument()
-  })
-
-  it('should show EULA settings in the correct order after Placements', () => {
-    const {container} = renderApp({
-      n: 'Test App',
-      i: 1,
-      configuration: {
-        target_link_uri: 'https://example.com/target_link_uri',
-        redirect_uris: ['https://example.com/target_link_uri'],
-        launch_settings: {
-          message_settings: mockEulaMessageSettings,
         },
-      },
-      registration: {
-        configuration: mockConfiguration({
+        registration: {
+          ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+          overlaid_configuration: mockConfiguration({
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(queryByText('EULA Settings')).not.toBeInTheDocument()
+    })
+
+    it('should not render EULA settings when no message settings and no EULA scope/placements', () => {
+      const {queryByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          // No launch_settings with EULA message settings
+          // No scopes that include EulaUser
+          // No placements that include ActivityAssetProcessor
+        },
+        registration: {
+          configuration: mockConfiguration({
+            // No launch_settings, no EULA-related scopes or placements
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(queryByText('EULA Settings')).not.toBeInTheDocument()
+    })
+
+    it('should show EULA settings in the correct order after Placements', () => {
+      const {container} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
           target_link_uri: 'https://example.com/target_link_uri',
           redirect_uris: ['https://example.com/target_link_uri'],
           launch_settings: {
             message_settings: mockEulaMessageSettings,
           },
-        }),
-        overlay: mockOverlay({}, {}),
-        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-      },
-    })(<ToolConfigurationEdit />)
+        },
+        registration: {
+          configuration: mockConfiguration({
+            target_link_uri: 'https://example.com/target_link_uri',
+            redirect_uris: ['https://example.com/target_link_uri'],
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
 
-    const sections = container.querySelectorAll('h3')
-    const sectionTexts = Array.from(sections).map(section => section.textContent)
+      const sections = container.querySelectorAll('h3')
+      const sectionTexts = Array.from(sections).map(section => section.textContent)
 
-    const placementsIndex = sectionTexts.indexOf('Placements')
-    const eulaSettingsIndex = sectionTexts.indexOf('EULA Settings')
-    const overrideURIsIndex = sectionTexts.indexOf('Override URIs')
+      const placementsIndex = sectionTexts.indexOf('Placements')
+      const eulaSettingsIndex = sectionTexts.indexOf('EULA Settings')
+      const overrideURIsIndex = sectionTexts.indexOf('Override URIs')
 
-    expect(placementsIndex).not.toBe(-1)
-    expect(eulaSettingsIndex).not.toBe(-1)
-    expect(overrideURIsIndex).not.toBe(-1)
-    expect(eulaSettingsIndex).toBeGreaterThan(placementsIndex)
-    expect(overrideURIsIndex).toBeGreaterThan(eulaSettingsIndex)
+      expect(placementsIndex).not.toBe(-1)
+      expect(eulaSettingsIndex).not.toBe(-1)
+      expect(overrideURIsIndex).not.toBe(-1)
+      expect(eulaSettingsIndex).toBeGreaterThan(placementsIndex)
+      expect(overrideURIsIndex).toBeGreaterThan(eulaSettingsIndex)
+    })
+  })
+
+  describe('inherited registration', () => {
+    it('should disable the Update Configuration button when registration is inherited', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          inherited: true,
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      expect(updateButton).toHaveAttribute('disabled')
+    })
+
+    it('should show a tooltip on the Update Configuration button when registration is inherited', async () => {
+      const {getByRole, findByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          inherited: true,
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      fireEvent.focus(updateButton)
+
+      expect(
+        await findByText(
+          "This account does not own this app and therefore can't edit its configuration.",
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('should enable the Update Configuration button when registration is not inherited', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      expect(updateButton).not.toHaveAttribute('disabled')
+    })
+
+    it('should not show the tooltip on the Update Configuration button when registration is not inherited', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      fireEvent.focus(updateButton)
+
+      const tooltip = updateButton
+        .closest('[data-position-target]')
+        ?.parentElement?.querySelector('[role="tooltip"]')
+      expect(tooltip).toBeNull()
+    })
   })
 })
