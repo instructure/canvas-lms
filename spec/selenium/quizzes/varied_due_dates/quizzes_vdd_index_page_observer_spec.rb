@@ -35,7 +35,9 @@ describe "viewing a quiz with variable due dates on the quizzes index page" do
     end
 
     it "shows the due dates for Section B", priority: "2" do
-      expect(f(".date-due")).to include_text("Due #{format_time_for_view(@due_at_b)}")
+      date_due = f(".date-due")
+      expect(date_due).to include_text("Due")
+      expect(date_due).to include_text(format_time_for_view(@due_at_b))
     end
 
     it "shows the availability dates for Section B", priority: "2" do

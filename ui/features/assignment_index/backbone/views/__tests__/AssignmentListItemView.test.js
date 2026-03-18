@@ -31,6 +31,7 @@ import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import '@canvas/jquery/jquery.simulate'
 import {http, HttpResponse} from 'msw'
 import {isAccessible} from '@canvas/test-utils/assertions'
+import {act} from 'react'
 
 // Mock globalUtils
 vi.mock('@canvas/util/globalUtils', () => ({
@@ -239,7 +240,6 @@ describe('AssignmentListItemViewSpec', () => {
   test('initializes child views if can manage', () => {
     const view = createView(assignment1(), {canManage: true})
     expect(view.publishIconView).toBeTruthy()
-    expect(view.dateDueColumnView).toBeTruthy()
   })
 
   test("initializes no child views if can't manage", () => {
@@ -1411,7 +1411,7 @@ describe('AssignmentListItemViewSpec - peer review sub-assignment rendering', ()
     expect(view.$('.js-score').text()).toContain('5 pts')
   })
 
-  test('displays peer review due date', () => {
+  test('displays peer review due date', async () => {
     const model = buildAssignment({
       id: 103,
       is_peer_review_assignment: true,
@@ -1420,8 +1420,13 @@ describe('AssignmentListItemViewSpec - peer review sub-assignment rendering', ()
       due_at: '2025-01-15T23:59:00Z',
     })
     const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
-    const dueDateView = view.dateDueColumnView
-    expect(dueDateView).toBeTruthy()
+
+    await act(async () => {
+      view.render()
+    })
+
+    const $mountPoint = view.$('[data-view=date-due]')
+    expect($mountPoint.text()).toContain('Due Jan 15 at 11:59pm')
   })
 })
 

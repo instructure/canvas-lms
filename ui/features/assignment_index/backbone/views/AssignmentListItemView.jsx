@@ -17,7 +17,7 @@
 
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateAvailable from '@canvas/assignments/react/DateAvailable'
-import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
+import DateDue from '@canvas/assignments/react/DateDue'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
@@ -107,7 +107,6 @@ export default (AssignmentListItemView = (function () {
 
       this.child('publishIconView', '[data-view=publish-icon]')
       this.child('lockIconView', '[data-view=lock-icon]')
-      this.child('dateDueColumnView', '[data-view=date-due]')
       this.child('sisButtonView', '[data-view=sis-button]')
 
       this.prototype.els = {
@@ -213,8 +212,6 @@ export default (AssignmentListItemView = (function () {
       }
 
       this.initializeSisButton()
-
-      this.dateDueColumnView = new DateDueColumnView({model: this.model})
     }
 
     initializeSisButton() {
@@ -318,6 +315,36 @@ export default (AssignmentListItemView = (function () {
       }
     }
 
+    cleanupDateDueColumn() {
+      if (this._dateDueRoot) {
+        this._dateDueRoot.unmount()
+        this._dateDueRoot = null
+      }
+    }
+
+    renderDateDueColumn() {
+      const mountPoint = this.$el.find('[data-view=date-due]')[0]
+
+      if (!mountPoint) return
+
+      const data = this.model.toView()
+      const component = (
+        <DateDue
+          multipleDueDates={data.multipleDueDates}
+          allDates={this.model.allDates()}
+          singleSectionDueDate={data.singleSectionDueDate}
+          todoDate={data.todo_date}
+          linkHref={this.model.htmlUrl()}
+        />
+      )
+
+      if (this._dateDueRoot) {
+        rerender(this._dateDueRoot, component)
+      } else {
+        this._dateDueRoot = render(component, mountPoint)
+      }
+    }
+
     cleanupPeerReviewInfo() {
       if (this.peerReviewInfoRoot) {
         this.peerReviewInfoRoot.unmount()
@@ -337,9 +364,7 @@ export default (AssignmentListItemView = (function () {
       if (this.editAssignmentView) {
         this.editAssignmentView.remove()
       }
-      if (this.dateDueColumnView) {
-        this.dateDueColumnView.remove()
-      }
+      this.cleanupDateDueColumn()
       this.cleanupDateAvailableColumn()
       this.cleanupPeerReviewInfo()
       this.cleanupModuleToolTip()
@@ -354,6 +379,7 @@ export default (AssignmentListItemView = (function () {
     }
 
     remove() {
+      this.cleanupDateDueColumn()
       this.cleanupDateAvailableColumn()
       this.cleanupPeerReviewInfo()
       this.cleanupModuleToolTip()
@@ -369,6 +395,7 @@ export default (AssignmentListItemView = (function () {
 
     afterRender() {
       this.createModuleToolTip()
+      this.renderDateDueColumn()
       this.renderDateAvailableColumn()
 
       const {attributes = {}} = this.model

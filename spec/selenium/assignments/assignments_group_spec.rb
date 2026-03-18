@@ -334,7 +334,7 @@ describe "assignment groups" do
     it "reflects the new assignment in the Assignments Index page", priority: "1" do
       assignment = assignment_group.reload.assignments.last
       expect(ff("#assignment_group_#{assignment_group.id} .ig-title").last.text).to match assignment_name.to_s
-      expect(ff("#assignment_group_#{assignment_group.id} .assignment-date-due").last.text).to match current_time
+      expect(ff("#assignment_group_#{assignment_group.id} .assignment-date-due").last).to include_text(format_time_for_view(time, :short).to_s)
       expect(f("#assignment_#{assignment.id} .non-screenreader").text).to match "#{assignment_points} pts"
     end
 
