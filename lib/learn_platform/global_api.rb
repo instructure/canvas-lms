@@ -27,6 +27,13 @@ module LearnPlatform
     POST_UNIFIED_TOOL_ID_BULK_LOAD_CALLBACK_ENDPOINT = "/api/v2/lti/unified_tool_id_bulk_load"
     GET_API_LOOKUP_ENDPOINT = "/public-products/api/public/v1/products/api_registrations/lookup"
 
+    Canvas::Reloader.on_reload do
+      @config = nil
+      @credentials = nil
+      @endpoint = nil
+      @jwt = nil
+    end
+
     def self.credentials
       @credentials ||= Rails.application.credentials.learn_platform_creds&.with_indifferent_access || {}
     end

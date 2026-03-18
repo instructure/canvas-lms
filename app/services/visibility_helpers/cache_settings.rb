@@ -26,6 +26,10 @@ module VisibilityHelpers
     class << self
       private
 
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
+
       def config
         @config ||=
           YAML.safe_load(DynamicSettings.find(tree: :private)["canvas_visibility_helpers_tuning.yml", failsafe: nil] || "{}")
