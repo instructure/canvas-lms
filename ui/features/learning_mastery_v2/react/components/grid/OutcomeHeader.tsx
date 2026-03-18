@@ -92,7 +92,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   const sortMenuGroup = (
     <Menu.Group label={I18n.t('Sort')} key="sort">
       <Menu.Item
-        onClick={handleSortAscending}
+        onSelect={handleSortAscending}
         selected={isCurrentlySelected && sorting.sortOrder === SortOrder.ASC}
       >
         <Flex gap="x-small">
@@ -101,7 +101,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
         </Flex>
       </Menu.Item>
       <Menu.Item
-        onClick={handleSortDescending}
+        onSelect={handleSortDescending}
         selected={isCurrentlySelected && sorting.sortOrder === SortOrder.DESC}
       >
         <Flex gap="x-small">
