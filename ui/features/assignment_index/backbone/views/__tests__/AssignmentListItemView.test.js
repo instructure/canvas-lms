@@ -204,20 +204,8 @@ afterAll(() => {
 })
 
 describe('AssignmentListItemViewSpec', () => {
-  const server = setupServer()
-
-  beforeAll(() => {
-    server.listen()
-  })
-
   beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'},
-      current_user_is_admin: false,
-    })
-    const {model, submission, view} = genSetup()
-    // Variables can be accessed here if needed
+    genSetup()
   })
 
   afterEach(() => {
@@ -226,10 +214,6 @@ describe('AssignmentListItemViewSpec', () => {
     genTeardown()
     tzInTest.restore()
     I18nStubber.clear()
-  })
-
-  afterAll(() => {
-    server.close()
   })
 
   test('should be accessible', async () => {
@@ -335,7 +319,7 @@ describe('AssignmentListItemViewSpec', () => {
     })
     // Mock window.confirm in the JSDOM environment
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    vi.spyOn(view, 'delete')
+    vi.spyOn(view, 'delete').mockImplementation(() => {})
     view.$(`#assignment_${assignment1().id} .delete_assignment`).click()
     expect(confirmSpy).toHaveBeenCalled()
     expect(view.delete).toHaveBeenCalled()
@@ -359,17 +343,14 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('delete destroys model', () => {
-    const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     const view = createView(assignment1())
-    vi.spyOn(view.model, 'destroy')
+    vi.spyOn(view.model, 'destroy').mockImplementation(() => {})
     view.delete()
     expect(view.model.destroy).toHaveBeenCalled()
-    ENV.context_asset_string = old_asset_string
   })
 
   test('delete calls screenreader message', async () => {
-    const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     server.use(
       http.delete('/api/v1/courses/1/assignments/1', () => {
@@ -389,10 +370,11 @@ describe('AssignmentListItemViewSpec', () => {
     )
     const view = createView(assignment1())
     vi.spyOn($, 'screenReaderFlashMessage')
-    view.delete()
-    await new Promise(resolve => setTimeout(resolve, 10))
+    await act(async () => {
+      view.delete()
+      await new Promise(resolve => setTimeout(resolve, 50))
+    })
     expect($.screenReaderFlashMessage).toHaveBeenCalled()
-    ENV.context_asset_string = old_asset_string
   })
 
   test('show score if score is set', () => {
@@ -408,12 +390,10 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('do not show score if viewing as non-student', () => {
-    const old_user_roles = ENV.current_user_roles
     ENV.current_user_roles = ['user']
     const view = createView(assignment1(), {canManage: false})
     const str = view.$('.js-score:eq(0) .non-screenreader').html()
     expect(str.search('2 pts')).not.toBe(-1)
-    ENV.current_user_roles = old_user_roles
   })
 
   test('show no submission if none exists', () => {
@@ -571,7 +551,7 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_duplicate',
     })
     const view = createView(model)
-    vi.spyOn(model, 'duplicate_failed')
+    vi.spyOn(model, 'duplicate_failed').mockImplementation(() => ({always: vi.fn()}))
     view.$(`#assignment_${model.id} .duplicate-failed-retry`).click()
     expect(model.duplicate_failed).toHaveBeenCalled()
   })
@@ -584,7 +564,7 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_migrate',
     })
     const view = createView(model)
-    vi.spyOn(model, 'retry_migration')
+    vi.spyOn(model, 'retry_migration').mockImplementation(() => ({always: vi.fn()}))
     view.$(`#assignment_${model.id} .migrate-failed-retry`).click()
     expect(model.retry_migration).toHaveBeenCalled()
   })
@@ -799,11 +779,6 @@ describe.skip('AssignmentListItemViewSpec - opens and closes the direct share co
 
 describe('AssignmentListItemViewSpec - editing assignments', () => {
   beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'},
-      current_user_is_admin: false,
-    })
     genSetup()
   })
 
@@ -899,7 +874,6 @@ describe('AssignmentListItemViewSpec - skip to build screen button', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
     genTeardown()
   })
 
@@ -937,7 +911,7 @@ describe('AssignmentListItemViewSpec - mastery paths menu option', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1044,7 +1018,7 @@ describe('AssignmentListItemViewSpec - mastery paths link', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1105,7 +1079,7 @@ describe('AssignmentListItemViewSpec - mastery paths icon', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1152,7 +1126,7 @@ describe('AssignmentListItemViewSpec - assignment icons', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('renders discussion icon for discussion topic', () => {
@@ -1217,14 +1191,8 @@ describe('AssignmentListItemViewSpec - assignment icons', () => {
 })
 
 describe('Assignment#quizzesRespondusEnabled', () => {
-  beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: [],
-    })
-  })
-
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('returns false if the assignment is not RLDB enabled', () => {
