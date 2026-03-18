@@ -52,14 +52,17 @@ describe "quizzes with draft state" do
       expect(f(".ig-details .date-available")).to include_text "Multiple Dates"
 
       # verify tooltips
-      driver.action.move_to(f(".ig-details .date-available a")).perform
-      tooltip = f("[role='tooltip']")
+      date_available = f(".ig-details .date-available")
+      driver.action.move_to(date_available).perform
+      tooltip_id = date_available.find_element(:css, "a").dom_attribute("aria-describedby")
+      tooltip = f("[role='tooltip'][id=#{tooltip_id}]")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
 
-      driver.action.move_to(f(".ig-details .date-due a")).perform
-      wait_for_ajaximations
-      tooltip = fj(".ui-tooltip:visible")
+      date_due = f(".ig-details .date-due")
+      driver.action.move_to(date_due).perform
+      tooltip_id = date_due.find_element(:css, "a").dom_attribute("aria-describedby")
+      tooltip = f("[role='tooltip'][id=#{tooltip_id}]")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
     end

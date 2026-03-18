@@ -56,9 +56,11 @@ describe "quizzes" do
       add_due_date_override(@quiz)
 
       get "/courses/#{@course.id}/quizzes"
-      expect(f(".item-group-container .date-available")).to include_text "Multiple Dates"
-      driver.action.move_to(f(".item-group-container .date-available")).perform
-      tooltip = f("[role='tooltip']")
+      date_available = f(".item-group-container .date-available")
+      expect(date_available).to include_text "Multiple Dates"
+      driver.action.move_to(date_available).perform
+      tooltip_id = date_available.find_element(:css, "a").dom_attribute("aria-describedby")
+      tooltip = f("[role='tooltip'][id=#{tooltip_id}]")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
     end
