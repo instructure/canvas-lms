@@ -345,14 +345,14 @@ describe('ViewOptionsTabPanel', () => {
       const {getByLabelText} = renderPanel({
         viewStatusForColorblindness: {checked: true, onChange: () => {}},
       })
-      expect(getByLabelText('View status for colorblindness')).toBeChecked()
+      expect(getByLabelText('Enable Gradebook Status Icons')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
       const {getByLabelText} = renderPanel({
         viewStatusForColorblindness: {checked: false, onChange: () => {}},
       })
-      expect(getByLabelText('View status for colorblindness')).not.toBeChecked()
+      expect(getByLabelText('Enable Gradebook Status Icons')).not.toBeChecked()
     })
 
     it('calls .onChange when the user toggles the item', () => {
@@ -361,7 +361,7 @@ describe('ViewOptionsTabPanel', () => {
         viewStatusForColorblindness: {checked: false, onChange},
       })
 
-      fireEvent.click(getByLabelText('View status for colorblindness'))
+      fireEvent.click(getByLabelText('Enable Gradebook Status Icons'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })
