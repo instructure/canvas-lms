@@ -2699,11 +2699,102 @@ describe Types::SubmissionType do
         @quiz_submission_2.complete!
       end
 
-      it "returns versions from all attempts" do
+      it "returns one entry per attempt across all attempts" do
         @quiz_submission.reload
         result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
         attempts = result.flatten
         expect(attempts.length).to be > 1
+      end
+
+      it "returns exactly one entry per unique attempt" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts.uniq.length).to eq(attempts.length), "expected one entry per attempt but got duplicates: #{attempts.inspect}"
+      end
+
+      it "returns the same attempt count as old SpeedGrader submitted_attempts" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        graphql_attempt_count = result.flatten.length
+        classic_quiz_sub = @quiz_submission.quiz_submission
+        old_sg_attempt_count = classic_quiz_sub.submitted_attempts.length
+        expect(graphql_attempt_count).to eq(old_sg_attempt_count)
+      end
+
+      it "returns a non-nil versionNumber for each completed attempt" do
+        @quiz_submission.reload
+        version_numbers = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { versionNumber } }").flatten
+        expect(version_numbers).to all(be_present),
+                                   "expected all versionNumbers to be non-nil but got: #{version_numbers.inspect}"
+      end
+
+      it "returns results ordered most-recent attempt first" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts).to eq(attempts.sort.reverse), "expected descending attempt order but got: #{attempts.inspect}"
+      end
+
+      it "paginates without duplicating entries across pages" do
+        @quiz_submission.reload
+        quiz_submission_type.extract_result = false
+
+        # Fetch page 1 (1 item) and capture the cursor
+        page1 = quiz_submission_type.resolve(<<~GQL)
+          submissionQuizHistoriesConnection(first: 1) {
+            pageInfo { endCursor hasNextPage }
+            nodes { attempt }
+          }
+        GQL
+        connection1 = page1["submissionQuizHistoriesConnection"]
+        page1_attempts = connection1["nodes"].pluck("attempt")
+        end_cursor = connection1["pageInfo"]["endCursor"]
+        expect(connection1["pageInfo"]["hasNextPage"]).to be true
+
+        # Fetch page 2 using the cursor from page 1
+        page2 = quiz_submission_type.resolve(<<~GQL)
+          submissionQuizHistoriesConnection(first: 1, after: "#{end_cursor}") {
+            nodes { attempt }
+          }
+        GQL
+        page2_attempts = page2["submissionQuizHistoriesConnection"]["nodes"].pluck("attempt")
+
+        expect(page2_attempts).not_to be_empty
+        expect(page1_attempts & page2_attempts).to be_empty,
+                                                   "page 2 should not repeat attempts from page 1 but got page1=#{page1_attempts.inspect} page2=#{page2_attempts.inspect}"
+      end
+
+      it "deduplicates attempts when one has been regraded (multiple versions, same attempt number)" do
+        @quiz_submission.reload
+        classic_quiz_sub = @quiz_submission.quiz_submission
+        # Simulate a regrade by saving the quiz submission with versioning again,
+        # creating a second simply_versioned version for the current attempt
+        classic_quiz_sub.with_versioning { classic_quiz_sub.save! }
+
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts.uniq.length).to eq(attempts.length),
+                                        "expected one entry per attempt after regrade but got duplicates: #{attempts.inspect}"
+        expect(attempts.length).to eq(2)
+      end
+
+      it "returns a versionNumber that differs from attempt number after a regrade" do
+        @quiz_submission.reload
+        classic_quiz_sub = @quiz_submission.quiz_submission
+        # A regrade creates a new simply_versioned version for the same attempt,
+        # making version_number > attempt. SpeedGrader uses version_number (not
+        # attempt) for the ?version= preview URL param, so this must be correct.
+        classic_quiz_sub.with_versioning { classic_quiz_sub.save! }
+
+        # Results are ordered newest-first; index 0 is the current (regraded) attempt
+        version_numbers = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { versionNumber } }").flatten
+        attempts = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }").flatten
+        current_idx = attempts.index(classic_quiz_sub.attempt)
+        expect(current_idx).not_to be_nil
+        expect(version_numbers[current_idx]).not_to be_nil
+        expect(version_numbers[current_idx]).not_to eq(attempts[current_idx]),
+                                                    "expected versionNumber (#{version_numbers[current_idx]}) to differ from attempt (#{attempts[current_idx]}) after regrade"
       end
     end
   end
