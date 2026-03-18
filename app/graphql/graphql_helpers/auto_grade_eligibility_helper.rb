@@ -51,8 +51,11 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     rubric = assignment&.rubric
     return false unless rubric
 
-    rubric.data.any? do |data_entry|
-      data_entry[:ratings].any? { |rating| rating[:long_description].blank? }
+    rubric.data.any? do |criterion|
+      criterion[:ratings].any? do |rating|
+        effective_description = GradeService.rating_description_for(criterion, rating)
+        effective_description.blank?
+      end
     end
   end
 

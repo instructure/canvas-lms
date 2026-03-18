@@ -232,6 +232,86 @@ RSpec.describe GradeService do
       end
     end
 
+    context "when rubric contains learning outcome criteria" do
+      let(:outcome_rubric) do
+        [
+          {
+            id: "criteria_1",
+            description: "Commitment to Success",
+            learning_outcome_id: 12_190,
+            mastery_points: 2.0,
+            ratings: [
+              { id: "rating_1", description: "Thoroughly describes the need for change", long_description: "", points: 3 },
+              { id: "rating_2", description: "Vaguely describes the need for change", long_description: "", points: 2 },
+              { id: "rating_3", description: "Does not recognize need for change", long_description: "", points: 0 }
+            ],
+            points: 3
+          }
+        ]
+      end
+
+      let(:outcome_grading_results) do
+        [
+          GradeResult.new(
+            rubric_category: "Commitment to Success",
+            reasoning: "Student clearly articulated areas for improvement",
+            criterion: "Thoroughly describes the need for change",
+            guidance: "Well done."
+          )
+        ]
+      end
+
+      it "sends rating :description to Cedar instead of :long_description" do
+        expect(CedarClient).to receive(:grade_essay) do |args|
+          criteria = args[:rubric].first[:criteria]
+          expect(criteria.map { |c| c[:description] }).to eq(
+            [
+              "Thoroughly describes the need for change",
+              "Vaguely describes the need for change",
+              "Does not recognize need for change"
+            ]
+          )
+          outcome_grading_results
+        end
+
+        described_class.new(
+          assignment:,
+          essay:,
+          rubric: outcome_rubric,
+          root_account_uuid: "mock-root",
+          current_user:
+        ).call
+      end
+
+      it "maps the result back using rating :description for matching" do
+        allow(CedarClient).to receive(:grade_essay).and_return(outcome_grading_results)
+
+        result = described_class.new(
+          assignment:,
+          essay:,
+          rubric: outcome_rubric,
+          root_account_uuid: "mock-root",
+          current_user:
+        ).call
+
+        expect(result).to eq(
+          [
+            {
+              "id" => "criteria_1",
+              "description" => "Commitment to Success",
+              "rating" => {
+                "id" => "rating_1",
+                "description" => "Thoroughly describes the need for change",
+                "rating" => 3,
+                "reasoning" => "Student clearly articulated areas for improvement"
+              },
+              "comments" => "Well done."
+            }
+          ]
+        )
+      end
+    end
+
     context "when rubric matches default template" do
       let(:default_rubric) do
         [

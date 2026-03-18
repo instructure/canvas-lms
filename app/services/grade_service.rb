@@ -62,13 +62,17 @@ class GradeService
       acc[key] = {
         "Criteria" => (criterion[:ratings] || []).map do |rating|
           {
-            "Description" => rating[:long_description],
+            "Description" => rating_description_for(criterion, rating),
             "Points" => rating[:points]
           }
         end,
         "MaximumPoints" => criterion[:points]
       }
     end
+  end
+
+  def self.rating_description_for(criterion, rating)
+    criterion[:learning_outcome_id].present? ? rating[:description] : rating[:long_description]
   end
 
   private
@@ -81,7 +85,7 @@ class GradeService
         criteria: (criterion[:ratings] || []).map do |rating|
           {
             points: rating[:points],
-            description: rating[:long_description]
+            description: self.class.rating_description_for(criterion, rating)
           }
         end
       }
@@ -96,7 +100,8 @@ class GradeService
       next unless criterion_data
 
       matched_rating = (criterion_data[:ratings] || []).find do |r|
-        TextNormalizerHelper.normalize(r[:long_description]) ==
+        rating_description = self.class.rating_description_for(criterion_data, r)
+        TextNormalizerHelper.normalize(rating_description) ==
           TextNormalizerHelper.normalize(result.criterion)
       end
       next unless matched_rating
