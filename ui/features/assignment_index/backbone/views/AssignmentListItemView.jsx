@@ -35,10 +35,9 @@ import round from '@canvas/round'
 import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
 import {StudentViewPeerReviews} from '@canvas/student_view_peer_reviews/react/StudentViewPeerReviews'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
-import preventDefault from '@canvas/util/preventDefault'
 import {scoreToGrade} from '@instructure/grading-utils'
 import $ from 'jquery'
-import 'jqueryui/tooltip'
+import ModuleTooltip from '../../react/ModuleTooltip'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import template from '../../jst/AssignmentListItem.handlebars'
@@ -122,7 +121,6 @@ export default (AssignmentListItemView = (function () {
         'click .assign-to-link': 'onAssign',
         'click .send_assignment_to': 'onSendAssignmentTo',
         'click .copy_assignment_to': 'onCopyAssignmentTo',
-        'click .tooltip_link': preventDefault(function () {}),
         keydown: 'handleKeys',
         mousedown: 'stopMoveIfProtected',
         'click .icon-lock': 'onUnlockAssignment',
@@ -344,6 +342,7 @@ export default (AssignmentListItemView = (function () {
       }
       this.cleanupDateAvailableColumn()
       this.cleanupPeerReviewInfo()
+      this.cleanupModuleToolTip()
 
       super.render(...arguments)
       this.initializeSisButton()
@@ -357,7 +356,15 @@ export default (AssignmentListItemView = (function () {
     remove() {
       this.cleanupDateAvailableColumn()
       this.cleanupPeerReviewInfo()
+      this.cleanupModuleToolTip()
       return super.remove()
+    }
+
+    cleanupModuleToolTip() {
+      if (!this.moduleTooltipRoot) return
+
+      this.moduleTooltipRoot.unmount()
+      this.moduleTooltipRoot = null
     }
 
     afterRender() {
@@ -506,20 +513,15 @@ export default (AssignmentListItemView = (function () {
     }
 
     createModuleToolTip() {
-      const link = this.$el.find('.tooltip_link')
-      if (link.length > 0) {
-        return link.tooltip({
-          position: {
-            my: 'center bottom',
-            at: 'center top-10',
-            collision: 'fit fit',
-          },
-          tooltipClass: 'center bottom vertical',
-          content() {
-            return $(link.data('tooltipSelector')).html()
-          },
-        })
-      }
+      const modules = this.model.get('modules')
+      if (!modules || modules.length <= 1) return
+
+      const labelId = this.model.labelId()
+      const mountPoint = this.$el.find(`#module_tooltip_mount_${labelId}`)[0]
+      if (!mountPoint) return
+
+      this.moduleTooltipRoot = createRoot(mountPoint)
+      this.moduleTooltipRoot.render(<ModuleTooltip modules={modules} />)
     }
 
     toJSON() {

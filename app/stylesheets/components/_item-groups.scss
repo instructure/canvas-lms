@@ -236,6 +236,10 @@
   }
 }
 
+.ig-details [id^=module_tooltip_mount] button {
+  line-height: 0;
+}
+
 .ig-admin {
   box-sizing: border-box;
   white-space: nowrap;
