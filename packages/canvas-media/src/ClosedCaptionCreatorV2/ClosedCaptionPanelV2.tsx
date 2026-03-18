@@ -175,6 +175,8 @@ export function ClosedCaptionPanelV2({
             const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
             return (
               <CaptionRow
+                url={subtitle.url}
+                filename={subtitle.filename}
                 key={subtitle.locale}
                 workflow_state={subtitle.workflow_state ?? 'ready'}
                 captionName={getCaptionName(subtitle, language)}

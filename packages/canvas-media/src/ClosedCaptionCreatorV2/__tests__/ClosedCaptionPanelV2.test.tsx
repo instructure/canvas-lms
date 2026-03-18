@@ -816,6 +816,58 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
   })
 
+  describe('caption download', () => {
+    it('shows download button for each existing caption row', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', url: 'https://example.com/en.srt', file: {name: 'english.vtt'}},
+        {locale: 'es', url: 'https://example.com/es.srt', file: {name: 'spanish.vtt'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      expect(screen.getByText('Download English')).toBeInTheDocument()
+      expect(screen.getByText('Download Spanish')).toBeInTheDocument()
+    })
+
+    it('download button is a link with href when subtitle has url', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', url: 'https://example.com/en.srt', file: {name: 'english.vtt'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const downloadLink = screen.getByText('Download English').closest('a')
+      expect(downloadLink).toBeInTheDocument()
+      expect(downloadLink).toHaveAttribute('href', 'https://example.com/en.srt')
+    })
+
+    it('download button has no href when subtitle has no url', () => {
+      const initialSubtitles: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      expect(screen.getByText('Download English')).toBeInTheDocument()
+      expect(screen.getByText('Download English').closest('a')).toBeNull()
+    })
+
+    it('sets href and filename on the download link', () => {
+      const initialSubtitles: Subtitle[] = [
+        {
+          locale: 'fr',
+          url: 'https://example.com/fr.srt',
+          filename: 'french_fr.srt',
+          file: {name: 'french.vtt'},
+        },
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const downloadLink = screen.getByText('Download French').closest('a')
+      expect(downloadLink).toHaveAttribute('href', 'https://example.com/fr.srt')
+      expect(downloadLink).toHaveAttribute('download', 'french_fr.srt')
+    })
+  })
+
   // Skipped: ARC-11427
   it.skip('updates displayed subtitles when prop changes after mount', async () => {
     const onUpdateSubtitles = vi.fn()
