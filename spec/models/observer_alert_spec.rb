@@ -710,7 +710,7 @@ describe ObserverAlert do
           )
         end
 
-        enrollment_scope = double("enrollment_scope")
+        enrollment_scope = instance_double(ActiveRecord::Relation)
         allow(Enrollment).to receive(:active_or_pending_by_date).and_return(enrollment_scope)
         allow(enrollment_scope).to receive(:where).with(user_id: student.id, course_id: course.id).and_return(enrollment_scope)
         allow(enrollment_scope).to receive(:shard).with(observer).and_return(enrollment_scope)

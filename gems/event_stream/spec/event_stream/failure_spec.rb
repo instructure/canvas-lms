@@ -23,20 +23,20 @@ require "spec_helper"
 describe EventStream::Failure do
   describe "log!" do
     before do
-      @record = double("record",
-                       id: double("record_id", to_s: "record_id_string"),
-                       attributes: { "attribute" => "attribute_value" },
-                       changes: { "changed_attribute" => "changed_value" })
+      @record = instance_double(EventStream::Record,
+                                id: "record_id_string",
+                                attributes: { "attribute" => "attribute_value" },
+                                changes: { "changed_attribute" => "changed_value" })
 
-      @stream = double("stream",
-                       identifier: "stream_identifier",
-                       raise_on_error: false)
+      @stream = instance_double(EventStream::Stream,
+                                identifier: "stream_identifier",
+                                raise_on_error: false)
 
       allow(@stream).to receive(:operation_payload).with(:insert, @record).and_return(@record.attributes)
       allow(@stream).to receive(:operation_payload).with(:update, @record).and_return(@record.changes)
 
       @exception = StandardError.new
-      allow(@exception).to receive_messages(message: double("exception_message", to_s: "exception_message_string"), backtrace: [42])
+      allow(@exception).to receive_messages(message: "exception_message_string", backtrace: [42])
     end
 
     it "creates a new db record" do

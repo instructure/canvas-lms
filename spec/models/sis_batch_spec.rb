@@ -150,7 +150,7 @@ describe SisBatch do
     batch = process_csv_data([%(user_id,login_id,status
                         user_1,user_1,active)])
 
-    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(double("Delayed::Job", id: 789))
+    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(instance_double(Delayed::Job, id: 789))
     allow_any_instance_of(SisBatch).to receive(:roll_back_data).and_raise "no roll back data for you"
     batch.restore_states_later
     run_jobs
@@ -579,7 +579,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     it "enqueue a job to clean up the account associations" do
       job = created_jobs.find { |j| j.tag == "Account#update_account_associations" }
-      expect(job).to_not be_nil
+      expect(job).not_to be_nil
     end
 
     it "must fail itself" do
@@ -884,9 +884,7 @@ s2,test_1,section2,active),
       )
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_deleted
-      @section.enrollments.not_fake.each do |e|
-        expect(e).to be_deleted
-      end
+      expect(@section.enrollments.not_fake).to all(be_deleted)
       expect(@course.reload).to be_claimed
       expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
@@ -1232,7 +1230,7 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
-      expect(b4.generated_diff_id).to_not be_nil
+      expect(b4.generated_diff_id).not_to be_nil
     end
 
     it "does not diff outside of diff row count threshold" do
@@ -1288,7 +1286,7 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
-      expect(b4.generated_diff_id).to_not be_nil
+      expect(b4.generated_diff_id).not_to be_nil
     end
 
     it "requires a remaster after too many skipped over-threshold batches" do

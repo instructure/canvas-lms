@@ -43,8 +43,8 @@ describe WillPaginateHelper do
         link = @renderer.send(:page_number, 2)
         expect(link).to match('aria-label="Page 2"')
         expect(link).to match('class="current"')
-        expect(link).to_not match("href")
-        expect(link).to_not match("rel")
+        expect(link).not_to match("href")
+        expect(link).not_to match("rel")
       end
 
       it "when page is not current page" do
@@ -96,8 +96,8 @@ describe WillPaginateHelper do
         )
         expect(link).to match('aria-label="Previous Page"')
         expect(link).to match('class="previous_page disabled"')
-        expect(link).to_not match("rel")
-        expect(link).to_not match("href")
+        expect(link).not_to match("rel")
+        expect(link).not_to match("href")
       end
 
       it "when linking to next page without page number" do
@@ -109,8 +109,8 @@ describe WillPaginateHelper do
         )
         expect(link).to match('aria-label="Next Page"')
         expect(link).to match('class="next_page disabled"')
-        expect(link).to_not match("rel")
-        expect(link).to_not match("href")
+        expect(link).not_to match("rel")
+        expect(link).not_to match("href")
       end
     end
   end

@@ -29,6 +29,8 @@ module Lti::Messages
       raise ArgumentError, "asset_report is required" unless asset_report
 
       @asset_report = asset_report
+      raise ArgumentError, "Submission not found for asset report" unless submission
+
       @message = LtiAdvantage::Messages::ReportReviewRequest.new
     end
 

@@ -23,7 +23,7 @@ import {SubmissionCommentAuthor} from './User'
 
 export const SubmissionComment = {
   fragment: gql`
-    fragment SubmissionComment on SubmissionComment {
+    fragment StudentAssignmentSubmissionComment on SubmissionComment {
       _id
       attachments {
         ...SubmissionCommentFile

@@ -333,8 +333,8 @@ module RenderWithHelpers
 
       controller_class._helper_methods.each do |helper|
         class_eval <<~RUBY, __FILE__, __LINE__ + 1
-          def #{helper}(*args, **kwargs, &block)
-            real_controller.send(:#{helper}, *args, **kwargs, &block)
+          def #{helper}(...)
+            real_controller.send(:#{helper}, ...)
           end
         RUBY
       end
@@ -437,18 +437,6 @@ RSpec.configure do |config|
   config.order = :random
   config.filter_run_when_matching :focus
 
-  # The Pact specs have prerequisite setup steps so we exclude them by default
-  config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
-
-  if ENV["CRYSTALBALL_MAP"] == "1"
-    config.filter_run_excluding :pact_live_events
-    config.filter_run_excluding :pact
-  end
-
-  # The Pact build needs RspecJunitFormatter and does not run RSpecQ
-  file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
-  config.add_formatter "RspecJunitFormatter", file if (ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]) || ENV["CRYSTALBALL_MAP"] == "1"
-
   config.include Helpers
   config.include Factories
   config.include RequestHelper, type: :request
@@ -496,7 +484,7 @@ RSpec.configure do |config|
     ReadOnlySecondaryStub.reset
     Time.zone = "UTC"
     LoadAccount.force_special_account_reload = true
-    Account.clear_special_account_cache!(true)
+    Account.clear_special_account_cache!(force: true)
     PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
@@ -549,6 +537,17 @@ RSpec.configure do |config|
   # crazy/slow. but you probably don't. seriously. just use once-ler
   def using_transactions_properly?
     use_transactional_tests
+  end
+
+  config.after(:context) do
+    non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
+    next if non_empty_tables.empty?
+
+    # If you're seeing this error, your spec has left extra data around.
+    # The test database should be completely empty after migrations run
+    # with the exception of the core tables mentioned in the method above,
+    # and a single row in the accounts table for the dummy root account.
+    raise ActiveRecord::Base.connection.non_empty_tables_message(non_empty_tables)
   end
 
   config.before :suite do
@@ -675,12 +674,12 @@ RSpec.configure do |config|
     end
   end
 
-  def fixture_file_upload(path, mime_type = nil, binary = false)
+  def fixture_file_upload(path, mime_type = nil, binary: false)
     Rack::Test::UploadedFile.new(file_fixture(path), mime_type, binary)
   end
 
   def default_uploaded_data
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def create_temp_dir!
@@ -768,10 +767,10 @@ RSpec.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = true)
+  def enable_forgery_protection
     old_value = ActionController::Base.allow_forgery_protection
-    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
-    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
+    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
+    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
 
     yield if block_given?
   ensure
@@ -1000,7 +999,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def consider_all_requests_local(value)

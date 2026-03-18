@@ -34,16 +34,16 @@ describe SplitUsers do
       UserMerge.from(restored_user).into(source_user)
       SplitUsers.split_db_users(restored_user)
       expect(restored_user.reload.preferences[:accepted_terms]).to be_nil
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
     end
 
     it "restores terms_of use other way" do
       restored_user.accept_terms
       restored_user.save!
       UserMerge.from(restored_user).into(source_user)
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
       SplitUsers.split_db_users(source_user)
-      expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(restored_user.reload.preferences[:accepted_terms]).not_to be_nil
       expect(source_user.reload.preferences[:accepted_terms]).to be_nil
     end
 
@@ -63,8 +63,8 @@ describe SplitUsers do
       source_user.save!
       UserMerge.from(restored_user).into(source_user)
       SplitUsers.split_db_users(source_user)
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
-      expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
+      expect(restored_user.reload.preferences[:accepted_terms]).not_to be_nil
     end
 
     it "restores names" do
@@ -140,9 +140,9 @@ describe SplitUsers do
         UserMerge.from(user3).into(source_user)
         UserMergeData.find_by(user_id: source_user).update(workflow_state: "failed")
 
-        double = double(SplitUsers)
-        allow(SplitUsers).to receive(:new).and_return(double)
-        expect(double).to receive(:split_users).once
+        split_users_instance = instance_double(SplitUsers)
+        allow(SplitUsers).to receive(:new).and_return(split_users_instance)
+        expect(split_users_instance).to receive(:split_users).once
 
         SplitUsers.split_db_users(source_user)
       end
@@ -350,6 +350,33 @@ describe SplitUsers do
         expect(source_user.as_student_observation_links.first.workflow_state).to eq "active"
       end
 
+      it "updates existing enrollments' associated_user_id" do
+        observer = user_with_pseudonym(active_all: true, username: "observer@example.com")
+        add_linked_observer(restored_user, observer)
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        observer_enrollment = course1.enrollments.find_by(user_id: observer, associated_user_id: restored_user)
+        expect(observer_enrollment).to be_present
+        UserMerge.from(restored_user).into(source_user)
+        expect(observer_enrollment.reload.associated_user_id).to eq source_user.id
+        SplitUsers.split_db_users(source_user)
+        expect(observer_enrollment.reload.associated_user_id).to eq restored_user.id
+      end
+
+      it "deals with conflicts while updating existing enrollments' associated_user_id" do
+        observer = user_with_pseudonym(active_all: true, username: "observer@example.com")
+        add_linked_observer(restored_user, observer)
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        observer_enrollment = course1.enrollments.find_by(user_id: observer, associated_user_id: restored_user)
+        expect(observer_enrollment).to be_present
+        UserMerge.from(restored_user).into(source_user)
+        expect(observer_enrollment.reload.associated_user_id).to eq source_user.id
+        conflicting_enrollment = course1.observer_enrollments.create!(user_id: observer, associated_user_id: restored_user, course_section_id: observer_enrollment.course_section_id)
+        SplitUsers.split_db_users(source_user)
+        # no exception was raised, and the associated_user_ids were left alone
+        expect(observer_enrollment.reload.associated_user_id).to eq source_user.id
+        expect(conflicting_enrollment.reload.associated_user_id).to eq restored_user.id
+      end
+
       it "only splits users from merge_data when specified" do
         enrollment1 = course1.enroll_user(restored_user)
         enrollment2 = course1.enroll_student(source_user, enrollment_state: "active")
@@ -455,6 +482,38 @@ describe SplitUsers do
         expect(source_user.communication_channels.where.not(workflow_state: "retired")
           .map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
+
+      it "restores context module progressions" do
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        context_module = course1.context_modules.create!(name: "Module 1")
+        cmp = ContextModuleProgression.create!(user: restored_user, context_module:)
+
+        UserMerge.from(restored_user).into(source_user)
+        expect(cmp.reload.user_id).to eq source_user.id
+        SplitUsers.split_db_users(source_user)
+        expect(cmp.reload.user_id).to eq restored_user.id
+      end
+
+      it "handles conflicting context module progressions" do
+        course1.enroll_student(restored_user, enrollment_state: "active")
+        course1.enroll_student(source_user, enrollment_state: "active")
+        context_module = course1.context_modules.create!(name: "Module 1")
+        ContextModuleProgression.create!(user: restored_user, context_module:)
+        source_cmp = ContextModuleProgression.create!(user: source_user, context_module:)
+
+        UserMerge.from(restored_user).into(source_user)
+        # create the conflict scenario: restored_user gets a new progression post-merge
+        restored_user.context_module_progressions.where(context_module:).find_each(&:destroy)
+        conflicting_cmp = ContextModuleProgression.create!(user: restored_user, context_module:)
+
+        expect do
+          SplitUsers.split_db_users(source_user)
+        end.not_to raise_error
+
+        # source user's progression stays with source user since restored user already has one
+        expect(source_cmp.reload.user_id).to eq source_user.id
+        expect(conflicting_cmp.reload.user_id).to eq restored_user.id
+      end
     end
 
     it "restores submissions" do
@@ -556,8 +615,10 @@ describe SplitUsers do
       SplitUsers.split_db_users(source_user)
 
       expect(admin.reload.workflow_state).to eq "active"
-      expect(admin.reload.user).to eq restored_user
-      expect(admin2.reload.user).to eq restored_user
+      expect(admin.user).to eq restored_user
+      expect(admin2.reload.workflow_state).to eq "active"
+      expect(admin2.user).to eq restored_user
+      expect(admin3.reload.workflow_state).to eq "active"
       expect(admin3.reload.user).to eq source_user
     end
 
@@ -791,6 +852,22 @@ describe SplitUsers do
 
         SplitUsers.split_db_users(shard1_source_user)
         expect(shard1_source_user.communication_channels.count).to eq 1
+      end
+
+      it "completes split when cross-shard attachment content is missing" do
+        Attachment.create!(
+          user: restored_user,
+          context: restored_user,
+          filename: "test.txt",
+          uploaded_data: StringIO.new("first")
+        )
+        UserMerge.from(restored_user).into(shard1_source_user)
+
+        allow_any_instance_of(Attachment).to receive(:copy_attachment_content)
+          .and_raise(CanvasHttp::InvalidResponseCodeError.new(404, "File not found"))
+
+        expect { SplitUsers.split_db_users(shard1_source_user) }.not_to raise_error
+        expect(restored_user.reload).to be_registered
       end
     end
   end

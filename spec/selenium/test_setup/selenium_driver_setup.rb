@@ -433,15 +433,23 @@ module SeleniumDriverSetup
       app = spec_safe_rack_app
 
       lambda do |env|
-        # make legit asset 404s return more quickly
         asset_request = asset_request?(env["REQUEST_URI"])
-        return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
-
-        req = "#{env["REQUEST_METHOD"]} #{env["REQUEST_URI"]}"
-        Rails.logger.info "STARTING REQUEST #{req}" unless asset_request
-        result = app.call(env)
-        Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" unless asset_request
-        result
+        if asset_request
+          file_path = File.join("public", env["REQUEST_URI"])
+          if File.exist?(file_path)
+            content_type = Rack::Mime.mime_type(File.extname(file_path))
+            body = File.binread(file_path)
+            [200, { "content-type" => content_type, "content-length" => body.bytesize.to_s }, [body]]
+          else
+            [404, {}, [""]]
+          end
+        else
+          req = "#{env["REQUEST_METHOD"]} #{env["REQUEST_URI"]}"
+          Rails.logger.info "STARTING REQUEST #{req}"
+          result = app.call(env)
+          Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}"
+          result
+        end
       end
     end
 

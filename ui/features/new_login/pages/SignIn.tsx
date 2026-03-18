@@ -31,6 +31,7 @@ import {
   ActionPrompt,
   ForgotPasswordLink,
   LoginTroubleLink,
+  MessageAlert,
   RememberMeCheckbox,
   SSOButtons,
 } from '../shared'
@@ -43,8 +44,14 @@ const I18n = createI18nScope('new_login')
 const SignIn = () => {
   const {isUiActionPending, otpRequired, rememberMe, setIsUiActionPending, setOtpRequired} =
     useNewLogin()
-  const {authProviders, invalidLoginFaqUrl, isPreviewMode, loginHandleName, selfRegistrationType} =
-    useNewLoginData()
+  const {
+    authProviders,
+    invalidLoginFaqUrl,
+    isPreviewMode,
+    loginHandleName,
+    selfRegistrationType,
+    customMessageLogin,
+  } = useNewLoginData()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -150,11 +157,11 @@ const SignIn = () => {
   }
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setUsername(value.trim())
+    setUsername(value)
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setPassword(value.trim())
+    setPassword(value)
   }
 
   if (otpRequired && !isPreviewMode) {
@@ -180,6 +187,8 @@ const SignIn = () => {
           </Flex.Item>
         )}
       </Flex>
+
+      {customMessageLogin && <MessageAlert message={customMessageLogin} />}
 
       <form onSubmit={handleLogin} noValidate={true}>
         <Flex direction="column" gap="large">

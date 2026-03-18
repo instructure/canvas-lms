@@ -247,10 +247,10 @@ rce_a11y_resize:
 
 rce_asr_captioning_improvements:
   state: hidden
-  applies_to: SiteAdmin
-  display_name: RCE ASR Captioning Improvements
+  applies_to: RootAccount
+  display_name: Video Caption Generation
   description: |-
-    Enable RCE ASR Captioning improvements to embedded content from Media Tray.
+    Allows users to enable the rolling transcript for Canvas media and request captions for media added to RCE content.
 
 rce_studio_embed_improvements:
   state: hidden

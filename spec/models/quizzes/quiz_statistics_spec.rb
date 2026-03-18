@@ -47,7 +47,7 @@ describe Quizzes::QuizStatistics do
     # and one in progress
     @quiz.generate_submission(@student)
 
-    stats = @quiz.statistics(false)
+    stats = @quiz.statistics(include_all_versions: false)
     expect(stats[:multiple_attempts_exist]).to be_falsey
   end
 
@@ -155,11 +155,11 @@ describe Quizzes::QuizStatistics do
 
   describe "self#large_quiz?" do
     let :active_quiz_questions do
-      double(size: 50)
+      instance_double(ActiveRecord::Relation, size: 50)
     end
 
     let :quiz_submissions do
-      double(size: 15)
+      instance_double(ActiveRecord::Relation, size: 15)
     end
 
     let :quiz do

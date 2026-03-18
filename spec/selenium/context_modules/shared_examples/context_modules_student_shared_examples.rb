@@ -379,13 +379,13 @@ shared_examples "context modules for students" do
         validate_context_module_status_icon(@mark_done_module.id, @no_icon)
         navigate_to_wikipage "The page"
         el = f "#mark-as-done-checkbox"
-        expect(el).to_not be_nil
-        expect(el).to_not be_selected
+        expect(el).not_to be_nil
+        expect(el).not_to be_selected
         el.click
         go_to_modules
         validate_context_module_status_icon(@mark_done_module.id, @completed_icon)
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .fulfilled")).to be_displayed
-        expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed
+        expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).not_to be_displayed
       end
 
       it "still shows the mark done button when navigating directly" do
@@ -400,15 +400,15 @@ shared_examples "context modules for students" do
 
         get "/courses/#{@course.id}/pages/#{page.url}"
         el = f "#mark-as-done-checkbox"
-        expect(el).to_not be_nil
-        expect(el).to_not be_selected
+        expect(el).not_to be_nil
+        expect(el).not_to be_selected
         el.click
         wait_for_ajaximations
 
         get "/courses/#{@course.id}/assignments/#{assmt.id}"
         el = f "#mark-as-done-checkbox"
-        expect(el).to_not be_nil
-        expect(el).to_not be_selected
+        expect(el).not_to be_nil
+        expect(el).not_to be_selected
         el.click
         wait_for_ajaximations
 
@@ -431,7 +431,7 @@ shared_examples "context modules for students" do
         get "/courses/#{@course.id}/pages/#{page.url}"
         content = f("#content")
         expect(content).to contain_css(".lock_explanation")
-        expect(content).to_not contain_css("#mark-as-done-checkbox")
+        expect(content).not_to contain_css("#mark-as-done-checkbox")
       end
     end
 
@@ -619,7 +619,7 @@ shared_examples "context modules for students" do
 
       wait_for_ajaximations
       expect(f("#module_prerequisites_list")).to be_displayed
-      expect(f(".module_prerequisites_fallback")).to_not be_displayed
+      expect(f(".module_prerequisites_fallback")).not_to be_displayed
     end
 
     it "validates that a student can see published and not see unpublished context module", priority: "1" do
@@ -721,7 +721,7 @@ shared_examples "context modules for students" do
       sub_account = Account.create!(name: "sub account", parent_account: Account.default)
       @course.update!(account: sub_account)
       @course.account.enable_feature!(:discussion_checkpoints)
-      @modules = create_modules(1, true)
+      @modules = create_modules(1, published: true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
       @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(

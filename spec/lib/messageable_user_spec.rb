@@ -60,6 +60,21 @@ describe "MessageableUser" do
         .to eq ["course:StudentEnrollment", "course:TaEnrollment"]
     end
 
+    it "skips group_concat for common_courses when static_common_contexts is true" do
+      expect(MessageableUser.build_select(
+               common_course_column: "'course_column'",
+               common_role_column: "'role_column'",
+               static_common_contexts: true
+             )).to match(/'course_column'::text \|\| ':' \|\| 'role_column'::text AS common_courses/)
+    end
+
+    it "skips group_concat for common_groups when static_common_contexts is true" do
+      expect(MessageableUser.build_select(
+               common_group_column: "group_id",
+               static_common_contexts: true
+             )).to match(/group_id AS common_groups/)
+    end
+
     it "combines multiple common_group_column values in common_groups" do
       group1 = group_with_user(active_all: true).group
       group2 = group_with_user(user: @user, active_all: true).group
@@ -102,6 +117,10 @@ describe "MessageableUser" do
     it "does not include literal common_group_column value in group by" do
       expect(group_scope(MessageableUser.prepped(common_group_column: 5)))
         .not_to match("5")
+    end
+
+    it "skips group by when static_common_contexts is true" do
+      expect(MessageableUser.prepped(static_common_contexts: true).group_values).to be_empty
     end
 
     it "orders by sortable_name before id" do

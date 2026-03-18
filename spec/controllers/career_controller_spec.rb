@@ -25,7 +25,7 @@ describe CareerController do
     @course.update!(horizon_course: true)
   end
 
-  let(:config) { double("Config", learning_provider_app_launch_url: "https://example.com/lp", learner_app_launch_url: "https://example.com/learner", public_app_config: { some: "config" }) }
+  let(:config) { instance_double(CanvasCareer::Config, learning_provider_app_launch_url: "https://example.com/lp", learner_app_launch_url: "https://example.com/learner", public_app_config: { some: "config" }) }
   let(:resolver) { instance_double(CanvasCareer::ExperienceResolver) }
 
   before do
@@ -74,6 +74,7 @@ describe CareerController do
             horizon_learning_library: false,
             horizon_learning_library_ms2: false,
             horizon_learning_library_ms3: false,
+            horizon_study_tools: false,
             horizon_chart_view: false,
             horizon_native_permissions_page: false,
             horizon_block_content_editor: false,

@@ -71,6 +71,45 @@ describe AuthenticationProvidersController do
         expect(response).to be_successful
       end
     end
+
+    context "when new_login_ui_identity_discovery_page feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+      end
+
+      it "includes auth_providers in js_env with id, url, and name" do
+        saml = account.authentication_providers.create!(saml_hash)
+        cas = account.authentication_providers.create!(cas_hash)
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        js_env = assigns(:js_env)
+        expect(js_env).to include(auth_providers: be_an(Array))
+        auth_providers = js_env[:auth_providers]
+        expect(auth_providers).not_to be_empty
+        expect(auth_providers).to all(include(id: be_an(Integer), url: be_a(String), auth_type: be_a(String)))
+        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id])
+      end
+
+      it "includes discovery_page_base_url in js_env" do
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        expect(assigns(:js_env)).to include(:discovery_page_base_url)
+      end
+    end
+
+    context "when new_login_ui_identity_discovery_page feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      end
+
+      it "does not include auth_providers in js_env" do
+        account.authentication_providers.create!(saml_hash)
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        js_env = assigns(:js_env)
+        expect(js_env&.key?(:auth_providers)).to be_falsey
+      end
+    end
   end
 
   describe "refresh_saml_metadata" do
@@ -127,7 +166,7 @@ describe AuthenticationProvidersController do
         put "start_debugging", params: { account_id: account.id, authentication_provider_id: account.canvas_authentication_provider.id }, format: :json
         expect(response).to have_http_status :bad_request
         expect(response.body).to match("Unsupported authentication type")
-        expect(account.canvas_authentication_provider).to_not be_debugging
+        expect(account.canvas_authentication_provider).not_to be_debugging
       end
     end
 
@@ -436,58 +475,61 @@ describe AuthenticationProvidersController do
     end
   end
 
-  describe "native_discovery_enabled SSO setting" do
+  describe "discovery_page_active SSO setting" do
     before do
       Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
     end
 
-    it "includes native_discovery_enabled in the sso_settings response when feature flag is enabled" do
-      account.update!(native_discovery_enabled: true)
+    it "includes discovery_page_active in the sso_settings response when allowed" do
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
       expect(response).to be_successful
       json = response.parsed_body
-      expect(json["sso_settings"]["native_discovery_enabled"]).to be(true)
+      expect(json["sso_settings"]["discovery_page_active"]).to be(true)
     end
 
-    it "does not include native_discovery_enabled when feature flag is disabled" do
+    it "does not include discovery_page_active when not allowed" do
       Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
-      account.update!(native_discovery_enabled: true)
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
       get :show_sso_settings, params: { account_id: account.id }, format: :json
       expect(response).to be_successful
       json = response.parsed_body
-      expect(json["sso_settings"]).not_to have_key("native_discovery_enabled")
+      expect(json["sso_settings"]).not_to have_key("discovery_page_active")
     end
 
-    it "updates native_discovery_enabled via update_sso_settings when feature flag is enabled" do
+    it "updates discovery_page_active via update_sso_settings when feature flag is enabled" do
       put :update_sso_settings, params: {
         account_id: account.id,
-        sso_settings: { native_discovery_enabled: true }
+        sso_settings: { discovery_page_active: true }
       }
       expect(response).to be_redirect
       account.reload
-      expect(account.native_discovery_enabled?).to be(true)
+      expect(account.discovery_page_active?).to be(true)
     end
 
-    it "ignores native_discovery_enabled parameter when feature flag is disabled" do
+    it "ignores discovery_page_active parameter when not allowed" do
       Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
       put :update_sso_settings, params: {
         account_id: account.id,
-        sso_settings: { native_discovery_enabled: true }
+        sso_settings: { discovery_page_active: true }
       }
       expect(response).to be_redirect
       account.reload
-      expect(account.native_discovery_enabled?).to be(false)
+      expect(account.discovery_page_active?).to be(false)
     end
 
-    it "can disable native_discovery_enabled when feature flag is enabled" do
-      account.update!(native_discovery_enabled: true)
+    it "can disable discovery_page_active when feature flag is enabled" do
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
       put :update_sso_settings, params: {
         account_id: account.id,
-        sso_settings: { native_discovery_enabled: false }
+        sso_settings: { discovery_page_active: false }
       }
       expect(response).to be_redirect
       account.reload
-      expect(account.native_discovery_enabled?).to be(false)
+      expect(account.discovery_page_active?).to be(false)
     end
   end
 end

@@ -82,6 +82,33 @@ describe('useStudentAssignmentTray', () => {
       expect(result.current.state).toBeNull()
     })
 
+    it('restores focus to triggering element on close', () => {
+      const button = document.createElement('button')
+      document.body.appendChild(button)
+      button.focus()
+
+      const {result} = renderHook(() => useStudentAssignmentTray(MOCK_STUDENTS))
+
+      act(() => {
+        result.current.open(MOCK_OUTCOMES[0], MOCK_STUDENTS[0], 0, mockAlignments)
+      })
+
+      // Move focus elsewhere (simulating tray taking focus)
+      const trayElement = document.createElement('div')
+      document.body.appendChild(trayElement)
+      trayElement.tabIndex = 0
+      trayElement.focus()
+
+      act(() => {
+        result.current.close()
+      })
+
+      expect(document.activeElement).toBe(button)
+
+      document.body.removeChild(button)
+      document.body.removeChild(trayElement)
+    })
+
     it('does not open if alignmentIndex is undefined', () => {
       const {result} = renderHook(() => useStudentAssignmentTray(MOCK_STUDENTS))
 

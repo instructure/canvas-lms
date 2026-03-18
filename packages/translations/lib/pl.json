@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Dodaj zdjęcie"
     },
+    "add_new_a9226085": {
+        "message": "Dodaj nową"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Dodaj nowe napisy"
+    },
     "add_one_9e34a6f8": {
         "message": "Dodaj jedną!"
     },
@@ -176,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Istnieje automatycznie zapisana zawartość. Czy wolisz wczytać automatyczną zawartość?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatyczne napisy"
+    },
     "available_folders_694d0436": {
         "message": "Dostępne foldery"
     },
@@ -248,6 +257,15 @@
     "cap_product_3a5265a6": {
         "message": "G mnożenie"
     },
+    "caption_manager_aae0906f": {
+        "message": "Menedżer napisów"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Napisy zostały ukryte dla { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Napisy zostały usunięte dla { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Napisów odziedziczonych z kursu nadrzędnego nie można usunąć."
     },
@@ -307,6 +325,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Wybierz plik z napisami"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Wybierz plik"
     },
     "choose_usage_rights_33683854": {
         "message": "Wybierz prawa użytkowania..."
@@ -563,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(opisz { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(opisz wideo)"
-    },
     "description_436c48d7": {
         "message": "Opis"
     },
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Strzałka po przekątnej w dół i w prawo"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Pobierz { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Pobierz { filename }"
     },
@@ -715,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Osadź obraz"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Opcje osadzania"
     },
     "embed_video_a97a64af": {
         "message": "Osadź wideo"
@@ -844,6 +862,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Nie udało się pobrać zawartości z zewnętrznego narzędzia"
+    },
+    "file_d1b70050": {
+        "message": "Plik*"
     },
     "file_name_8fd421ff": {
         "message": "Nazwa pliku"
@@ -1277,8 +1298,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Język*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Ikona języków obcych"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Język używany w tych multimediach*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automatyczne)"
     },
     "languages_icon_9d20539": {
         "message": "Ikona języków"
@@ -1396,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Łącza do strony zewnętrznej."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Lista zwinięta."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Rozszerzono listę."
     },
     "lists_cd1336fc": {
         "message": "Listy"
@@ -1742,6 +1778,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Skróty do innych edytorów można znaleźć na"
     },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Nasza technologia pozwala generować napisy z ~85% dokładnością."
+    },
     "outline_color_3ef2cea7": {
         "message": "Kolor konturu"
     },
@@ -1862,6 +1901,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Wybierz plik obsługiwanego typu"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Wybierz język."
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Wybierz plik .vtt lub .srt"
+    },
     "plus_d43cd4ec": {
         "message": "Plus"
     },
@@ -1921,6 +1966,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Liczby pierwsze"
+    },
+    "processing_8c569014": {
+        "message": "Trwa przetwarzanie..."
     },
     "product_39cf144f": {
         "message": "Produkt"
@@ -2014,6 +2062,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Zamieniono wszystkie { alertFindText } na { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Żądanie"
     },
     "reset_95a81614": {
         "message": "Resetuj"
@@ -2161,6 +2212,9 @@
     },
     "selected_274ce24f": {
         "message": "Wybrano"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "Wybrany plik: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Wybrano { linkFileName }"
@@ -2591,6 +2645,12 @@
     "updated_link_a827e441": {
         "message": "Zaktualizowane łącze"
     },
+    "upload_8b403d05": {
+        "message": "Prześlij"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Aktualizuj ścieżkę napisów w formacie SRT lub WebVTT."
+    },
     "upload_document_253f0478": {
         "message": "Prześlij dokument"
     },
@@ -2695,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Używane przez czytniki ekranu do opisania zawartości obrazu"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Używane przez czytniki ekranu do opisania zawartości wideo"
     },
     "user_documents_c206e61f": {
         "message": "Dokumenty użytkownika"

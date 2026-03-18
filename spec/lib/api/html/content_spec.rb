@@ -75,7 +75,7 @@ module Api
           host = "somelink.com"
           port = 80
           expect(Html::Link).to receive(:new).with("http://somelink.com", host:, port:).and_return(
-            double(to_corrected_s: "http://otherlink.com")
+            instance_double(Html::Link, to_corrected_s: "http://otherlink.com")
           )
           html = Content.new(string, host:, port:).modified_html
           expect(html).to match(/otherlink.com/)
@@ -97,7 +97,7 @@ module Api
               <li><img class='nothing_special'></li>
             </ul></div>
           HTML
-          url_helper = double(rewrite_api_urls: nil)
+          url_helper = instance_double(UrlProxy, rewrite_api_urls: nil)
           html = Content.new(string).rewritten_html(url_helper)
           expected = <<~HTML
             <div><ul>
@@ -111,21 +111,21 @@ module Api
 
         it "inserts css/js if it is supposed to" do
           string = "<div>stuff</div>"
-          url_helper = double
+          url_helper = instance_double(UrlProxy)
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<div>stuff</div>")
         end
 
         it "re-writes root-relative urls to be absolute" do
           string = "<p><a href=\"/blah\"></a></p><source srcset=\"/img.src\">"
-          url_helper = UrlProxy.new(double, double(shard: nil), "example.com", "https")
+          url_helper = UrlProxy.new(instance_double(ApplicationController), instance_double(Course, shard: nil), "example.com", "https")
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p><source srcset=\"https://example.com/img.src\">")
         end
 
         it "does not re-write root-relative urls to be absolute if requested not to" do
           string = "<p><a href=\"/blah\"></a></p>"
-          url_helper = UrlProxy.new(double, double(shard: nil), "example.com", "https")
+          url_helper = UrlProxy.new(instance_double(ApplicationController), instance_double(Course, shard: nil), "example.com", "https")
           html = Content.new(string, rewrite_api_urls: false).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"/blah\"></a></p>")
         end
@@ -326,7 +326,7 @@ module Api
 
         context "integration with rewritten_html" do
           it "includes YouTube banner in the final output for native mobile app" do
-            url_helper = double(rewrite_api_urls: nil)
+            url_helper = instance_double(UrlProxy, rewrite_api_urls: nil)
             content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
             result = content.rewritten_html(url_helper)
 
@@ -336,7 +336,7 @@ module Api
           end
 
           it "does not include YouTube banner for non-native mobile app" do
-            url_helper = double(rewrite_api_urls: nil)
+            url_helper = instance_double(UrlProxy, rewrite_api_urls: nil)
             content = Content.new(html_with_youtube, account, is_native_mobile_app: false)
             result = content.rewritten_html(url_helper)
 

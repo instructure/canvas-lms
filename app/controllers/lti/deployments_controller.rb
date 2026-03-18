@@ -87,7 +87,6 @@ module Lti
 
     before_action :require_account_context
     before_action :require_root_account
-    before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
 
@@ -122,7 +121,7 @@ module Lti
     #        -H "Authorization: Bearer <token>"
     def create
       if params[:for_subaccount_id].present? && params[:for_course_id].present?
-        return render json: { error: "Cannot specify both for_subaccount_id and for_course_id" }, status: :unprocessable_entity
+        return render json: { error: "Cannot specify both for_subaccount_id and for_course_id" }, status: :unprocessable_content
       end
 
       context = if params[:for_subaccount_id].present?

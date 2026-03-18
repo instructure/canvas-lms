@@ -537,7 +537,7 @@ class AppointmentGroup < ActiveRecord::Base
       save!
       appointments.map do |a|
         a.updating_user = updating_user
-        a.destroy(false)
+        a.destroy(update_context_or_parent: false)
       end
     end
   end

@@ -44,7 +44,7 @@ describe ContentMigration do
       attrs = %w[title message discussion_type type pinned position require_initial_post]
       expect(new_topic.attributes.slice(*attrs)).to eq topic.attributes.slice(*attrs)
 
-      expect(new_topic.locked).to_not be true # don't lock copied discussions
+      expect(new_topic.locked).not_to be true # don't lock copied discussions
       expect(new_topic.last_reply_at).to be_nil
       expect(new_topic.allow_rating).to be false
       expect(new_topic.posted_at).to be_nil

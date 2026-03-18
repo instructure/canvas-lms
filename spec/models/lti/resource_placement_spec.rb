@@ -29,7 +29,7 @@ module Lti
       it "accepts types in PLACEMENT_LOOKUP" do
         subject.placement = ResourcePlacement::PLACEMENT_LOOKUP.values.first
         subject.save
-        expect(subject.errors).to_not include(:placement)
+        expect(subject.errors).not_to include(:placement)
       end
     end
 

@@ -29,9 +29,10 @@ export type GenerateCriteriaFormProps = {
   gradeLevel: string
   standard: string
 }
+export type AssociationType = 'Assignment' | 'Account' | 'Course'
 
 export type RubricFormProps = {
-  associationType: 'Assignment' | 'Account' | 'Course'
+  associationType: AssociationType
   associationTypeId?: string
   id?: string
   canUpdateRubric: boolean
@@ -69,7 +70,7 @@ export type RatingRowProps = {
   errorMessage: FormMessage[]
   hidePoints: boolean
   index: number
-  rangeStart: number
+  rangeStart?: number
   rating: RubricRating
   ratingInputRefs: MutableRefObject<HTMLInputElement[]>
   scale: number

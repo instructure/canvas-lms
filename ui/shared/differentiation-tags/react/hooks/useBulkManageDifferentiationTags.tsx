@@ -49,9 +49,9 @@ interface UseBulkManageDifferentiationTagsVariables {
  * The API will return the group category plus arrays of created, updated, and deleted groups.
  */
 interface BulkManageDiffTagResponse {
-  created: DifferentiationTagGroup[]
-  updated: DifferentiationTagGroup[]
-  deleted: DifferentiationTagGroup[]
+  created: Array<{group: DifferentiationTagGroup}>
+  updated: Array<{group: DifferentiationTagGroup}>
+  deleted: Array<{group: DifferentiationTagGroup}>
   group_category: DifferentiationTagCategory
 }
 

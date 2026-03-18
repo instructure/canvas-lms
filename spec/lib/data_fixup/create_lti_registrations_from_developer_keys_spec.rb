@@ -141,7 +141,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
     end
 
     context "when the registraton can't be saved" do
-      let(:scope) { double("scope") }
+      let(:scope) { instance_double(Sentry::Scope) }
 
       before do
         second_account_key.update_attribute!("account_id", Account.last.id + 1)
@@ -151,9 +151,9 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
         expect(Sentry).to receive(:with_scope).and_yield(scope)
         expect(Sentry).to receive(:capture_message)
           .with("DataFixup#create_lti_registrations_from_developer_keys", { level: :warning })
-        expect(scope).to receive(:set_tags).with(developer_key_id: second_account_key.global_id)
+        expect(scope).to receive(:set_tags).with(developer_key_id: second_account_key.global_id).and_return(nil)
         expect(scope).to receive(:set_context)
-          .with("exception", { name: "ActiveRecord::RecordInvalid", message: "Validation failed: Account must exist" })
+          .with("exception", { name: "ActiveRecord::RecordInvalid", message: "Validation failed: Account must exist" }).and_return(nil)
         described_class.run
       end
     end

@@ -423,6 +423,23 @@ describe Types::SubmissionCommentType do
     end
   end
 
+  describe "publishable" do
+    before(:once) do
+      @submission.add_comment(author: @teacher, comment: "draft comment", draft_comment: true, attempt: 2)
+    end
+
+    it "exposes publishable_for? on the comment" do
+      results = submission_type.resolve("commentsConnection(includeDraftComments: true) { nodes { publishable }}")
+      expect(results).to include(true)
+    end
+
+    it "returns no comments when current_user is nil" do
+      unauthenticated_type = GraphQLTypeTester.new(@submission, current_user: nil)
+      results = unauthenticated_type.resolve("commentsConnection(includeDraftComments: true) { nodes { publishable }}")
+      expect(results).to be_nil
+    end
+  end
+
   it "returns an empty list if there are no attachments" do
     expect(
       submission_type.resolve(

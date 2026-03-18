@@ -1,0 +1,198 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {chunk} from 'es-toolkit/compat'
+import React, {useEffect, useState, useRef} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Spinner} from '@instructure/ui-spinner'
+import {Tag} from '@instructure/ui-tag'
+import {TextArea} from '@instructure/ui-text-area'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {captureException} from '@sentry/react'
+
+const I18n = createI18nScope('groups')
+
+type GroupCategory = {
+  name: string
+}
+
+type Recipient = {
+  id: string
+  short_name: string
+}
+
+type Props = {
+  groupCategory: GroupCategory
+  recipients: Recipient[]
+  open: boolean
+  onDismiss: () => void
+}
+
+type MessageType = {
+  type: 'newError' | 'error' | 'hint' | 'success' | 'screenreader-only'
+  text: string
+}
+
+export default function GroupCategoryMessageAllUnassignedModal({
+  groupCategory,
+  recipients,
+  ...modalProps
+}: Props): JSX.Element {
+  const [message, setMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState<MessageType[]>([])
+  const [status, setStatus] = useState<'info' | 'error' | undefined>(undefined)
+  const messageTextAreaRef = useRef<TextArea | null>(null)
+
+  const contextAssetString = ENV.context_asset_string
+  // @ts-expect-error - MAX_GROUP_CONVERSATION_SIZE is a page-specific ENV property
+  const chunkSize = ENV.MAX_GROUP_CONVERSATION_SIZE || 100
+
+  const payload = {
+    body: message,
+    context_code: contextAssetString,
+    recipients: recipients.map(user => user.id),
+  }
+
+  useEffect(() => {
+    if (!modalProps.open) resetState()
+  }, [modalProps.open])
+
+  function resetState() {
+    setMessage('')
+    setStatus(undefined)
+  }
+
+  function handleSend() {
+    if (message.trim().length === 0) {
+      setErrorMessage([{type: 'newError', text: I18n.t('Message text is required')}])
+      if (messageTextAreaRef.current) messageTextAreaRef.current.focus()
+      return
+    }
+    setStatus('info')
+    const chunks = chunk(payload.recipients, chunkSize)
+    const promiseArray: Promise<unknown>[] = []
+
+    chunks.forEach(chunk => {
+      const chunkData = {...payload, recipients: chunk}
+      promiseArray.push(
+        doFetchApi({
+          method: 'POST',
+          path: `/api/v1/conversations`,
+          body: chunkData,
+        }),
+      )
+    })
+    Promise.all(promiseArray)
+      .then(notifyDidSave)
+      .catch(err => {
+        console.error(err)
+        captureException(err)
+        if (err.response) console.error(err.response)
+        setStatus('error')
+      })
+  }
+
+  function notifyDidSave() {
+    showFlashSuccess(I18n.t('Message Sent!'))()
+    modalProps.onDismiss()
+  }
+
+  function renderSelectedUserTags() {
+    return recipients.map(user => <Tag key={user.id} text={user.short_name} margin="xxx-small" />)
+  }
+
+  function Footer() {
+    return (
+      <>
+        <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
+        <Button
+          data-testid="message_submit"
+          type="submit"
+          color="primary"
+          margin="0 0 0 x-small"
+          onClick={handleSend}
+        >
+          {I18n.t('Send Message')}
+        </Button>
+      </>
+    )
+  }
+
+  let alertMessage = ''
+  if (status === 'info') alertMessage = I18n.t('Sending Message...')
+  else if (status === 'error') alertMessage = I18n.t('Sending Message Failed, please try again')
+
+  const alert = alertMessage ? (
+    <Alert variant={status}>
+      <div role="alert" aria-live="assertive" aria-atomic={true}>
+        {alertMessage}
+      </div>
+      {status === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
+    </Alert>
+  ) : null
+
+  return (
+    <CanvasModal
+      label={I18n.t('Message students for %{groupCategoryName}', {
+        groupCategoryName: groupCategory.name,
+      })}
+      size="medium"
+      shouldCloseOnDocumentClick={false}
+      footer={<Footer />}
+      {...modalProps}
+    >
+      <>
+        <FormFieldGroup
+          description={I18n.t('Recipients: Students who have not joined a group')}
+          layout="stacked"
+          rowSpacing="small"
+        >
+          <Flex>
+            <Flex.Item>{renderSelectedUserTags()}</Flex.Item>
+          </Flex>
+          <TextArea
+            id="message_all_unassigned"
+            data-testid="message_all_unassigned_textarea"
+            ref={ref => (messageTextAreaRef.current = ref)}
+            label={
+              <ScreenReaderContent>
+                {I18n.t('Required input. Message all unassigned students.')}
+              </ScreenReaderContent>
+            }
+            placeholder={I18n.t('Type message here...')}
+            height="200px"
+            value={message}
+            messages={errorMessage}
+            onChange={e => {
+              setErrorMessage([])
+              setMessage(e.target.value)
+            }}
+          />
+        </FormFieldGroup>
+        {alert}
+      </>
+    </CanvasModal>
+  )
+}

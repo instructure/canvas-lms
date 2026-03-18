@@ -480,11 +480,10 @@ describe LearnPlatform::GlobalApi do
       end
 
       context "with HTTP error response" do
-        let(:error_response) { double(Net::HTTPBadRequest, code: "400", body: "Bad Request", is_a?: false) }
+        let(:error_response) { instance_double(Net::HTTPBadRequest, code: "400", body: "Bad Request", is_a?: false) }
 
         before do
           allow(CanvasHttp).to receive(:get).and_return(error_response)
-          allow(error_response).to receive(:code).and_return("400")
         end
 
         it "returns empty array" do

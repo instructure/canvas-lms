@@ -122,6 +122,8 @@ module RSpec
 
     # Called when formatter is closing
     def close(_notification)
+      return if output.is_a?(::File) && output.closed?
+
       # Merge current run with existing data (read in initialize)
       merged_pending = @existing_data[:pending] + @pending_examples
       merged_total_count = @existing_data[:total] + @summary_data[:example_count]
@@ -136,7 +138,7 @@ module RSpec
       }
 
       output.puts JSON.pretty_generate(report)
-      output.close unless output == $stdout
+      output.close if output.is_a?(::File)
     end
 
     private

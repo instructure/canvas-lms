@@ -21,8 +21,6 @@
 class ObserverAlertThresholdsApiController < ApplicationController
   include Api::V1::ObserverAlertThreshold
 
-  before_action :require_user
-
   def index
     thresholds = if params[:student_id]
                    @current_user.as_observer_observer_alert_thresholds.active.where(student: params[:student_id])

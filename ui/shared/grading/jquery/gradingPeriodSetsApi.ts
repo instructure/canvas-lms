@@ -32,13 +32,21 @@ declare const ENV: GlobalEnv & EnvGradingStandardsCommon
 
 const I18n = createI18nScope('gradingPeriodSetsApi')
 
+export type GradingPeriodSetCreateParams = Pick<
+  CamelizedGradingPeriodSet,
+  'title' | 'weighted' | 'displayTotalsForAllGradingPeriods' | 'enrollmentTermIDs'
+>
+
+export type GradingPeriodSetUpdateParams = Pick<CamelizedGradingPeriodSet, 'id'> &
+  GradingPeriodSetCreateParams
+
 const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
 const createUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
 const updateUrl = (id: string) => replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL ?? '', 'id', id)
 
-const serializeSet = (set: CamelizedGradingPeriodSet) => {
+const serializeSet = (set: GradingPeriodSetCreateParams | GradingPeriodSetUpdateParams) => {
   const gradingPeriodSetAttrs = {
     title: set.title,
     weighted: set.weighted,
@@ -85,7 +93,7 @@ export default {
   deserializeSet,
 
   list() {
-    return new Promise((resolve, reject) => {
+    return new Promise<CamelizedGradingPeriodSet[]>((resolve, reject) => {
       const dispatch = new NaiveRequestDispatch()
 
       dispatch
@@ -101,13 +109,13 @@ export default {
     })
   },
 
-  create(set: CamelizedGradingPeriodSet) {
+  create(set: GradingPeriodSetCreateParams) {
     return axios
       .post(createUrl(), serializeSet(set))
       .then(response => deserializeSet(response.data.grading_period_set))
   },
 
-  update(set: CamelizedGradingPeriodSet) {
+  update(set: GradingPeriodSetUpdateParams) {
     return axios.patch(updateUrl(set.id), serializeSet(set)).then(_response => set)
   },
 }

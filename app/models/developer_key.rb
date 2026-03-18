@@ -199,7 +199,7 @@ class DeveloperKey < ActiveRecord::Base
     self.icon_url = nil if icon_url.blank?
   end
 
-  def generate_api_key(overwrite = false)
+  def generate_api_key(overwrite: false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !api_key
   end
 
@@ -636,11 +636,11 @@ class DeveloperKey < ActiveRecord::Base
 
   def tool_management_scope(base_scope, affected_account)
     if affected_account&.site_admin? || affected_account.blank?
-      return base_scope.where(developer_key: self)
+      return base_scope.where(developer_key: self, lti_registration:)
     end
 
     # Don't update tools in another root account on the same shard
-    base_scope.where(developer_key: self, root_account: affected_account)
+    base_scope.where(developer_key: self, lti_registration:, root_account: affected_account)
   end
 
   def update_tools_on_active_shard!(account)

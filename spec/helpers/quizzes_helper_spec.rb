@@ -558,7 +558,7 @@ describe QuizzesHelper do
 
   describe "#link_to_take_quiz" do
     before do
-      @quiz = instance_double("Quiz", cant_go_back?: false)
+      @quiz = instance_double(Quizzes::Quiz, cant_go_back?: false)
       allow(self).to receive_messages(preview_quiz_url: "/preview_quiz_url", take_quiz_url: "/take_quiz_url")
     end
 

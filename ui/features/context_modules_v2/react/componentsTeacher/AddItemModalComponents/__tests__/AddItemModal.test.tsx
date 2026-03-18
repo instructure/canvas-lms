@@ -271,9 +271,7 @@ describe('AddItemModal', () => {
 
       resolveQuery!(null)
 
-      await waitFor(() => {
-        expect(screen.getByText('Test Assignment')).toBeInTheDocument()
-      })
+      expect(await screen.findByText('Test Assignment', {}, {timeout: 10000})).toBeInTheDocument()
     })
   })
 })

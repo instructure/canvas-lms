@@ -143,7 +143,7 @@ describe AcademicBenchmark::Converter do
 
   before do
     allow(AcademicBenchmark).to receive(:config).and_return({ partner_id: "instructure", partner_key: "key" })
-    standards_mock = double("standards")
+    standards_mock = instance_double(AcademicBenchmarks::Api::Standards)
     allow(standards_mock).to receive(:authority_tree).and_return(
       AcademicBenchmarks::Standards::StandardsForest.new([standard_instance, standard_instance2]).consolidate_under_root(authority_instance)
     )

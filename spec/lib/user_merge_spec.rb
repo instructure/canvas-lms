@@ -524,6 +524,29 @@ describe UserMerge do
       expect(merge_data_record2.previous_workflow_state).to eq "active"
     end
 
+    context "destroy_remaining_from_user_enrollments" do
+      before :once do
+        @enrollment = course1.enroll_student(user2, enrollment_state: "active")
+        @merge_object = UserMerge.from(user2)
+        @merge_object.target_user = user1
+        @merge_object.merge_data = UserMergeData.create!(user: user1, from_user: user2)
+        @merge_object.send(:destroy_remaining_from_user_enrollments, :user_id)
+      end
+
+      it "soft-deletes any from_user enrollments remaining after the move" do
+        expect(@enrollment.reload.workflow_state).to eq "deleted"
+        expect(user2.reload.enrollments.active).to be_empty
+      end
+
+      it "records merge_data for remaining from_user enrollments" do
+        @merge_object.merge_data.bulk_insert_merge_data(@merge_object.data)
+
+        record = @merge_object.merge_data.records.find_by(context_type: "Enrollment", context_id: @enrollment)
+        expect(record).to be_present
+        expect(record.previous_workflow_state).to eq "active"
+      end
+    end
+
     it "removes conflicting module progressions" do
       course1.enroll_user(user1, "StudentEnrollment", enrollment_state: "active")
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
@@ -548,7 +571,7 @@ describe UserMerge do
       context_module.update_for(user2, :read, tag)
 
       # it should work
-      expect { UserMerge.from(user1).into(user2) }.to_not raise_error
+      expect { UserMerge.from(user1).into(user2) }.not_to raise_error
 
       # it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
       expect(ContextModuleProgression.where(user_id: user1, context_module_id: [context_module, context_module2]).count).to eq 0
@@ -903,6 +926,8 @@ describe UserMerge do
       end
 
       it "moves lti ids to the new user if possible" do
+        expect(@user1).to receive(:update_shadow_records_synchronously!).and_call_original
+        expect(@user2).to receive(:update_shadow_records_synchronously!).and_call_original
         UserMerge.from(@user1).into(@user2)
 
         expect(@user1.reload).to be_deleted
@@ -1052,7 +1077,7 @@ describe UserMerge do
         @user2 = user_model
         user_service_model(user: @user2)
       end
-      expect { UserMerge.from(@user2).into(user1) }.to_not raise_error
+      expect { UserMerge.from(@user2).into(user1) }.not_to raise_error
     end
 
     it "merges a user across shards" do

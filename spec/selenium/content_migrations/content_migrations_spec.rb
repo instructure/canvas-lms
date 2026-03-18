@@ -254,7 +254,7 @@ describe "content migrations", :non_parallel do
       #  you run it with the whole suite
       #  because of a cached default account
       #  that no longer exists in the db
-      Account.clear_special_account_cache!(true)
+      Account.clear_special_account_cache!(force: true)
       @copy_from = course_factory
       @copy_from.update_attribute(:name, "copy from me")
       data = File.read(File.dirname(__FILE__) + "/../../fixtures/migration/cc_full_test_smaller.zip")
@@ -297,7 +297,7 @@ describe "content migrations", :non_parallel do
       click_option("#courseSelect", @copy_from.id.to_s, :value)
       wait_for_ajaximations
 
-      expect(ContentMigrationPage.course_select_warning).to_not be_displayed
+      expect(ContentMigrationPage.course_select_warning).not_to be_displayed
     end
 
     it "selects by drop-down or by search box", priority: "2" do
@@ -447,7 +447,7 @@ describe "content migrations", :non_parallel do
 
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
-        root = @copy_from.root_outcome_group(true)
+        root = @copy_from.root_outcome_group(force: true)
         outcome_model(context: @copy_from, title: "root1")
 
         group = root.child_outcome_groups.create!(context: @copy_from, title: "group1")
@@ -725,7 +725,7 @@ describe "content migrations", :non_parallel do
     submod.find_element(:css, "a.checkbox-caret").click
     wait_for_ajaximations
 
-    expect(submod.find_element(:css, ".module_options")).to_not be_displayed
+    expect(submod.find_element(:css, ".module_options")).not_to be_displayed
 
     sub_submod = submod.find_element(:css, "li.normal-treeitem")
     expect(sub_submod).to include_text("Study Guide")

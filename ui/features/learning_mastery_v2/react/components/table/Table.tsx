@@ -28,6 +28,7 @@ import {Row} from './Row'
 import {ColHeader, ColHeaderProps} from './ColHeader'
 import {Column} from './utils'
 import {RowHeader} from './RowHeader'
+import {CustomDragLayer} from './CustomDragLayer'
 
 interface DragDropConfig {
   type: string
@@ -75,6 +76,15 @@ const TableComponent: React.FC<TableProps> = ({
     (rowIndex: number, colIndex: number) => {
       const cell = getCellElement(rowIndex, colIndex)
       if (cell) {
+        if (rowIndex === -1) {
+          const focusable = cell.querySelector<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          )
+          if (focusable) {
+            focusable.focus()
+            return
+          }
+        }
         cell.focus()
       }
     },
@@ -83,6 +93,17 @@ const TableComponent: React.FC<TableProps> = ({
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => {
+      // Allow arrow key navigation from the cell itself or from buttons within the cell
+      // (e.g., header options menu), but prevent navigation from other interactive elements
+      // (e.g., chart components that have their own keyboard navigation)
+      if (event.target !== event.currentTarget) {
+        const target = event.target as HTMLElement
+        const isButton = target.tagName === 'BUTTON' || target.getAttribute('role') === 'button'
+        if (!isButton) {
+          return
+        }
+      }
+
       const {key} = event
       let newRowIndex = rowIndex
       let newColIndex = colIndex
@@ -121,16 +142,17 @@ const TableComponent: React.FC<TableProps> = ({
   )
 
   const renderColHeader = useCallback(
-    (col: Column, colIndex: number, dragDropConfig?: DragDropConfig) => {
+    (col: Column, colIndex: number, draggableIndex: number, dragDropConfig?: DragDropConfig) => {
       const colHeaderProps: ColHeaderProps = {
         id: col.key,
         width: col.width,
         isSticky: col.isSticky,
         'data-cell-id': `header-${colIndex}`,
-        tabIndex: 0,
         onKeyDown: (e: React.KeyboardEvent) => handleKeyDown(e, -1, colIndex),
         ...col.colHeaderProps,
       }
+
+      const dragLabel = col.dragLabel || col.key
 
       return col.draggable && dragDropConfig ? (
         <DragDropWrapper
@@ -138,9 +160,10 @@ const TableComponent: React.FC<TableProps> = ({
           component={ColHeader}
           type={dragDropConfig.type}
           itemId={col.key}
-          index={colIndex}
+          index={draggableIndex}
           onMove={dragDropConfig.onMove}
           onDragEnd={dragDropConfig.onDragEnd}
+          dragLabel={dragLabel}
           {...colHeaderProps}
         >
           {typeof col.header === 'function' ? col.header() : col.header}
@@ -158,6 +181,16 @@ const TableComponent: React.FC<TableProps> = ({
     const isDragDropEnabled = dragDropConfig?.enabled
 
     if (isDragDropEnabled && dragDropConfig) {
+      // Pre-compute draggable indices for all columns
+      const draggableIndices = new Map<number, number>()
+      let draggableCounter = 0
+      columns.forEach((col, idx) => {
+        if (col.draggable) {
+          draggableIndices.set(idx, draggableCounter)
+          draggableCounter++
+        }
+      })
+
       return (
         <InstUITable.Head>
           <>
@@ -171,7 +204,10 @@ const TableComponent: React.FC<TableProps> = ({
                     }
                   }}
                 >
-                  {columns.map((col, colIndex) => renderColHeader(col, colIndex, dragDropConfig))}
+                  {columns.map((col, colIndex) => {
+                    const currentDraggableIndex = draggableIndices.get(colIndex) ?? 0
+                    return renderColHeader(col, colIndex, currentDraggableIndex, dragDropConfig)
+                  })}
                 </Row>
               )}
             </DragDropContainer>
@@ -184,7 +220,7 @@ const TableComponent: React.FC<TableProps> = ({
       <InstUITable.Head>
         <>
           {renderAboveHeader && renderAboveHeader(columns, handleKeyDown)}
-          <Row>{columns.map((col, colIndex) => renderColHeader(col, colIndex))}</Row>
+          <Row>{columns.map((col, colIndex) => renderColHeader(col, colIndex, 0))}</Row>
         </>
       </InstUITable.Head>
     )
@@ -234,20 +270,25 @@ const TableComponent: React.FC<TableProps> = ({
   }
 
   return (
-    <View
-      as="div"
-      overflowX="auto"
-      elementRef={(el: Element | null) => {
-        if (el instanceof HTMLDivElement) {
-          ;(tableRef as React.MutableRefObject<HTMLDivElement | null>).current = el
-        }
-      }}
-    >
-      <InstUITable id={id} caption={caption} {...tableProps}>
-        {renderHeader()}
-        {renderBody()}
-      </InstUITable>
-    </View>
+    <>
+      {dragDropConfig?.enabled && (
+        <CustomDragLayer renderItem={item => item?.label || 'Dragging...'} />
+      )}
+      <View
+        as="div"
+        overflowX="auto"
+        elementRef={(el: Element | null) => {
+          if (el instanceof HTMLDivElement) {
+            ;(tableRef as React.MutableRefObject<HTMLDivElement | null>).current = el
+          }
+        }}
+      >
+        <InstUITable id={id} caption={caption} {...tableProps}>
+          {renderHeader()}
+          {renderBody()}
+        </InstUITable>
+      </View>
+    </>
   )
 }
 

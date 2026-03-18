@@ -18,6 +18,15 @@
 
 import {AccountSelectOption} from '../../../features/users_admin_merge/react/common'
 
+interface User {
+  id: string
+  display_name: string
+  html_url: string
+}
+
 export interface EnvUserMerge {
   ADMIN_MERGE_ACCOUNT_OPTIONS: Array<AccountSelectOption>
+  ADMIN_SPLIT_USER: User
+  ADMIN_SPLIT_URL: string
+  ADMIN_SPLIT_USERS: User[]
 }

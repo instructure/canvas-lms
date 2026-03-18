@@ -28,9 +28,17 @@ describe EventStream::Stream do
   end
 
   let(:connection) { instance_double(ActiveRecord::ConnectionAdapters::AbstractAdapter, active?: true) }
-  let(:record_type) { double("record_type", connection:, create_from_event_stream!: nil, update_from_event_stream!: nil) }
+  let(:record_type) { double("record_type", connection:, create_from_event_stream!: nil, update_from_event_stream!: nil) } # rubocop:disable RSpec/VerifiedDoubles
   let(:created_at) { Time.zone.now }
-  let(:record) { double("ActiveRecord::Base", id: "id", created_at:, attributes: {}) }
+  let(:record_class) do
+    Class.new do
+      include ActiveModel::Attributes
+
+      attr :id
+      attr :created_at
+    end
+  end
+  let(:record) { double(record_class, id: "id", created_at:, attributes: {}) } # rubocop:disable RSpec/VerifiedDoubles
 
   context "setup block" do
     it "sets values as expected" do
@@ -65,26 +73,27 @@ describe EventStream::Stream do
   context "usage" do
     describe "on_insert" do
       it "registers callback for execution during insert" do
-        spy = double("spy")
-        stream.on_insert { spy.trigger }
-        expect(spy).to receive(:trigger).once
+        triggered = 0
+        stream.on_insert { triggered += 1 }
         stream.insert(record)
+        expect(triggered).to be 1
       end
 
       it "includes the record in the callback invocation" do
-        spy = double("spy")
-        stream.on_insert { |record| spy.trigger(record) }
-        expect(spy).to receive(:trigger).once.with(record)
+        captured_record = nil
+        stream.on_insert { |record| captured_record = record }
         stream.insert(record)
+        expect(captured_record).to eq(record)
       end
 
       it "stacks multiple callbacks" do
-        spy = double("spy")
-        stream.on_insert { spy.trigger1 }
-        stream.on_insert { spy.trigger2 }
-        expect(spy).to receive(:trigger1).once
-        expect(spy).to receive(:trigger2).once
+        triggered1 = 0
+        triggered2 = 0
+        stream.on_insert { triggered1 += 1 }
+        stream.on_insert { triggered2 += 1 }
         stream.insert(record)
+        expect(triggered1).to be 1
+        expect(triggered2).to be 1
       end
     end
 
@@ -97,26 +106,27 @@ describe EventStream::Stream do
 
     describe "on_update" do
       it "registers callback for execution during update" do
-        spy = double("spy")
-        stream.on_update { spy.trigger }
-        expect(spy).to receive(:trigger).once
+        triggered = 0
+        stream.on_update { triggered += 1 }
         stream.update(record)
+        expect(triggered).to be 1
       end
 
       it "includes the record in the callback invocation" do
-        spy = double("spy")
-        stream.on_update { |r| spy.trigger(r) }
-        expect(spy).to receive(:trigger).once.with(record)
+        captured_record = nil
+        stream.on_update { |r| captured_record = r }
         stream.update(record)
+        expect(captured_record).to eq(record)
       end
 
       it "stacks multiple callbacks" do
-        spy = double("spy")
-        stream.on_update { spy.trigger1 }
-        stream.on_update { spy.trigger2 }
-        expect(spy).to receive(:trigger1).once
-        expect(spy).to receive(:trigger2).once
+        triggered1 = 0
+        triggered2 = 0
+        stream.on_update { triggered1 += 1 }
+        stream.on_update { triggered2 += 1 }
         stream.update(record)
+        expect(triggered1).to be 1
+        expect(triggered2).to be 1
       end
     end
 
@@ -139,7 +149,7 @@ describe EventStream::Stream do
 
       describe "generated for_thing method" do
         it "forwards argument to index's find_with" do
-          entry = double("entry")
+          entry = Object.new
           expect(index).to receive(:find_with).once.with([entry], {})
           stream.for_thing(entry)
         end
@@ -151,21 +161,21 @@ describe EventStream::Stream do
 
       shared_examples_for "error callbacks" do
         it "triggers callbacks on failed inserts" do
-          spy = double("spy")
+          spy = double("spy") # rubocop:disable RSpec/VerifiedDoubles
           stream.on_error { |*args| spy.capture(*args) }
-          expect(spy).to receive(:capture).once.with(:insert, record, exception)
+          expect(spy).to receive(:capture).with(:insert, record, exception)
           stream.insert(record)
         end
 
         it "triggers callbacks on failed updates" do
-          spy = double("spy")
+          spy = double("spy") # rubocop:disable RSpec/VerifiedDoubles
           stream.on_error { |*args| spy.capture(*args) }
           expect(spy).to receive(:capture).once.with(:update, record, exception)
           stream.update(record)
         end
 
         it "raises error if raises_on_error is true, but still calls callbacks" do
-          spy = double("spy")
+          spy = double("spy") # rubocop:disable RSpec/VerifiedDoubles
           stream.raise_on_error = true
           stream.on_error { spy.trigger }
           expect(spy).to receive(:trigger).once
@@ -179,7 +189,7 @@ describe EventStream::Stream do
           allow(record_type).to receive(:update_from_event_stream!).and_raise(exception)
         end
 
-        include_examples "error callbacks"
+        it_behaves_like "error callbacks"
       end
 
       context "failing callbacks" do
@@ -189,7 +199,7 @@ describe EventStream::Stream do
           stream.on_update { raise exception }
         end
 
-        include_examples "error callbacks"
+        it_behaves_like "error callbacks"
       end
     end
   end

@@ -162,7 +162,7 @@ describe "quizzes" do
         add_question_to_group
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
 
         f("#questions .edit_group_link").click
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "2")
@@ -183,7 +183,7 @@ describe "quizzes" do
         add_question_to_group
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
       end
 
       it "shows a warning for groups picking too many questions from a bank", priority: "2" do
@@ -201,7 +201,7 @@ describe "quizzes" do
         submit_form(".quiz_group_form")
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
 
         f("#questions .edit_group_link").click
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "2")
@@ -223,7 +223,7 @@ describe "quizzes" do
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "1")
         submit_form(".quiz_group_form")
         wait_for_ajaximations
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
       end
     end
 
@@ -303,8 +303,8 @@ describe "quizzes" do
     def upload_attachment_answer
       f("input[type=file]").send_keys @fullpath
       wait_for_ajaximations
-      expect(f(".file-uploaded").text).to be
-      expect(f(".list_question, .answered").text).to be
+      expect(f(".file-uploaded").text).not_to be_nil
+      expect(f(".list_question, .answered").text).not_to be_nil
       f(".upload-label").click
       wait_for_ajaximations
     end

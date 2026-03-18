@@ -719,13 +719,13 @@ class SisImportsApiController < ApplicationController
 
       if batch.attachment
         batch.process
-
-        unless api_request?
-          @account.current_sis_batch_id = batch.id
-          @account.save
-        end
       else
         attachment_preflight = api_attachment_preflight(batch, request, params: params[:pre_attachment], check_quota: false, return_json: true)
+      end
+
+      unless api_request?
+        @account.current_sis_batch_id = batch.id
+        @account.save
       end
 
       render json: sis_import_json(batch, @current_user, session, attachment_preflight:)

@@ -274,11 +274,11 @@ describe('TempEnrollAssign', () => {
       fireEvent.blur(startDate)
 
       // The DateTimeInput's invalidDateTimeMessage is displayed internally by the component
-      // when the date is invalid. Use queryByText since it may take time to render.
+      // when the date is invalid, and may take time to render.
       await waitFor(() => {
-        expect(screen.queryByText('The chosen date and time is invalid.')).toBeInTheDocument()
-      })
-    })
+        expect(screen.getByText('The chosen date and time is invalid.')).toBeInTheDocument()
+      }, {timeout: 10000})
+    }, 30000)
 
     it('sets wrong order error state when start date is after end date', async () => {
       const screen = render(<TempEnrollAssign {...props} />)

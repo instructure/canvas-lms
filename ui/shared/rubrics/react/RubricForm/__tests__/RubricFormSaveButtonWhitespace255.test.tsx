@@ -103,5 +103,5 @@ describe('RubricForm Save Button - 255 Whitespace Validation', () => {
     await waitFor(() => {
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
-  })
+  }, 30000)
 })

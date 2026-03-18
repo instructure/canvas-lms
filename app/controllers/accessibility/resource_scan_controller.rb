@@ -22,7 +22,6 @@ module Accessibility
     include AccessibilityFilters
 
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
     before_action :check_close_issues_feature_flag, only: [:close_issues]
 
@@ -123,7 +122,7 @@ module Accessibility
         type_case = <<~SQL.squish
           CASE
             WHEN #{scans_table}.is_syllabus = true THEN 'syllabus'
-            WHEN #{scans_table}.wiki_page_id IS NOT NULL THEN 'wiki_page'
+            WHEN #{scans_table}.wiki_page_id IS NOT NULL THEN 'page'
             WHEN #{scans_table}.assignment_id IS NOT NULL THEN 'assignment'
             WHEN #{scans_table}.attachment_id IS NOT NULL THEN 'attachment'
             WHEN #{scans_table}.discussion_topic_id IS NOT NULL THEN 'discussion_topic'
@@ -150,7 +149,7 @@ module Accessibility
         end
       else
         relation.order({ sort => direction.downcase.to_sym })
-      end
+      end.order(id: :asc)
     end
 
     # Returns a hash representation of the scan, for JSON rendering.

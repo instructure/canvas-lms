@@ -81,7 +81,9 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     await userEvent.click(screen.getAllByRole('button', {name: /close/i})[0])
     expect(data.returnFocus).toHaveBeenCalled()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
   })
 
   test('deletes a tool', async () => {

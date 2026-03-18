@@ -321,7 +321,7 @@ class CalendarEventsApiController < ApplicationController
   include CalendarConferencesHelper
   include ::RruleHelper
 
-  before_action :require_user, except: %w[public_feed index]
+  skip_before_action :require_user, only: %w[public_feed index]
   before_action :get_calendar_context, only: :create
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]
@@ -648,7 +648,7 @@ class CalendarEventsApiController < ApplicationController
   # @returns CalendarEvent
 
   def show
-    get_event(true)
+    get_event(search_assignments: true)
     if authorized_action(@event, @current_user, :read)
       render json: event_json(@event, @current_user, session, include: includes + [:web_conference])
     end
@@ -777,7 +777,7 @@ class CalendarEventsApiController < ApplicationController
   #        -F 'calendar_event[title]=Epic Paintball Fight!' \
   #        -H "Authorization: Bearer <token>"
   def update
-    get_event(true)
+    get_event(search_assignments: true)
     if authorized_action(@event, @current_user, :update)
       params_for_update = nil
       if @event.is_a?(Assignment)
@@ -1586,7 +1586,7 @@ class CalendarEventsApiController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @context
   end
 
-  def get_event(search_assignments = false)
+  def get_event(search_assignments: false)
     @event = if params[:id] =~ /\Aassignment_(.*)/
                raise ActiveRecord::RecordNotFound unless search_assignments
 
@@ -1684,7 +1684,7 @@ class CalendarEventsApiController < ApplicationController
     @section_codes = []
     if user
       @is_admin = user.roles(@domain_root_account).include?("admin") # if we're an admin - don't try to figure out which sections we belong to; just include all of them
-      @section_codes = user.section_context_codes(@context_codes, @is_admin, include_concluded: false)
+      @section_codes = user.section_context_codes(@context_codes, skip_visibility_filter: @is_admin, include_concluded: false)
     end
 
     if @type == :event && @start_date && user
@@ -1817,7 +1817,7 @@ class CalendarEventsApiController < ApplicationController
         next if contexts.empty?
 
         context_codes = contexts.map(&:asset_string)
-        section_codes = user.section_context_codes(context_codes, @is_admin, include_concluded: false)
+        section_codes = user.section_context_codes(context_codes, skip_visibility_filter: @is_admin, include_concluded: false)
         relation = relation.for_user_and_context_codes(user, context_codes, section_codes)
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events

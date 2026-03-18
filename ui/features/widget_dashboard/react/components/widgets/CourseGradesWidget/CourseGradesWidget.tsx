@@ -16,25 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Checkbox} from '@instructure/ui-checkbox'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
 import type {BaseWidgetProps} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
+import {useWidgetConfig} from '../../../hooks/useWidgetConfig'
 import {createGradebookHandler} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
+
+const EMPTY_GRADE_VISIBILITIES: Record<string, boolean> = {}
 
 const CourseGradesWidget: React.FC<BaseWidgetProps> = ({
   widget,
   isEditMode = false,
   dragHandleProps,
 }) => {
-  const [gradeVisibilities, setGradeVisibilities] = useState<{[key: string]: boolean}>({})
-  const [globalGradeVisibility, setGlobalGradeVisibility] = useState(true)
+  const [globalGradeVisibility, setGlobalGradeVisibility] = useWidgetConfig<boolean>(
+    widget.id,
+    'showGrades',
+    true,
+  )
+  const [gradeVisibilities, setGradeVisibilities] = useWidgetConfig<Record<string, boolean>>(
+    widget.id,
+    'gradeVisibilities',
+    EMPTY_GRADE_VISIBILITIES,
+  )
 
   const {
     data: courseGrades,
@@ -49,31 +60,12 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({
 
   const displayedGrades = courseGrades
 
-  // Initialize visibilities for new courses using the global visibility state
-  useEffect(() => {
-    displayedGrades.forEach(grade => {
-      if (!(grade.courseId in gradeVisibilities)) {
-        setGradeVisibilities(prev => ({...prev, [grade.courseId]: globalGradeVisibility}))
-      }
-    })
-  }, [displayedGrades, gradeVisibilities, globalGradeVisibility])
-
-  // Calculate if any grades are visible based on current global state
-  const hasVisibleGrades = globalGradeVisibility
-
   const handleGradeVisibilityChange = (courseId: string, visible: boolean) => {
-    setGradeVisibilities(prev => ({...prev, [courseId]: visible}))
+    setGradeVisibilities({...gradeVisibilities, [courseId]: visible})
   }
 
   const handleToggleAllGrades = () => {
-    const newVisibility = !globalGradeVisibility
-    setGlobalGradeVisibility(newVisibility)
-    // Update visibilities for all currently displayed grades
-    const newVisibilities = {...gradeVisibilities}
-    displayedGrades.forEach(grade => {
-      newVisibilities[grade.courseId] = newVisibility
-    })
-    setGradeVisibilities(newVisibilities)
+    setGlobalGradeVisibility(!globalGradeVisibility)
   }
 
   const paginationProps = {
@@ -97,9 +89,11 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({
           label={I18n.t('Show all grades')}
           variant="toggle"
           value="showGrades"
-          checked={hasVisibleGrades}
+          checked={globalGradeVisibility}
           onChange={handleToggleAllGrades}
-          data-testid={hasVisibleGrades ? 'hide-all-grades-checkbox' : 'show-all-grades-checkbox'}
+          data-testid={
+            globalGradeVisibility ? 'hide-all-grades-checkbox' : 'show-all-grades-checkbox'
+          }
         />
       }
     >
@@ -127,7 +121,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({
             lastUpdated={grade.lastUpdated}
             onShowGradebook={createGradebookHandler(grade.courseId)}
             gridIndex={gradeIndex}
-            globalGradeVisibility={gradeVisibilities[grade.courseId] ?? true}
+            globalGradeVisibility={gradeVisibilities[grade.courseId] ?? globalGradeVisibility}
             onGradeVisibilityChange={visible =>
               handleGradeVisibilityChange(grade.courseId, visible)
             }

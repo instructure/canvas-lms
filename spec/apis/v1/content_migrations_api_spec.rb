@@ -388,7 +388,7 @@ describe ContentMigrationsController, type: :request do
       cm.attachment = file
       cm.save!
       cm.queue_migration
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       run_jobs
       expect(cm.reload.workflow_state).to eq "exported"
       expect(cm.migration_settings["job_ids"]).to eq([123])
@@ -399,7 +399,7 @@ describe ContentMigrationsController, type: :request do
                       @params.merge(action: "update", id: cm.to_param),
                       { copy: { "everything" => "1" } })
       expect(json["workflow_state"]).to eq "running"
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 456))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 456))
       run_jobs
       expect(cm.reload.workflow_state).to eq "imported"
       expect(cm.migration_settings["job_ids"]).to match_array([123, 456])

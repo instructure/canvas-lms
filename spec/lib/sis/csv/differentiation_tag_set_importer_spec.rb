@@ -137,14 +137,14 @@ describe SIS::CSV::DifferentiationTagSetImporter do
     tag_set = GroupCategory.non_collaborative.find_by(sis_source_id: "Ts001")
     expect(tag_set.deleted_at).to be_nil
     tag_set2 = GroupCategory.non_collaborative.find_by(sis_source_id: "Ts002")
-    expect(tag_set2.deleted_at).to_not be_nil
+    expect(tag_set2.deleted_at).not_to be_nil
 
     process_csv_data_cleanly(
       "tag_set_id,course_id,set_name,status",
       "Ts001,C001,Tag Set 1,deleted",
       "Ts002,C001,Tag Set 2,active"
     )
-    expect(tag_set.reload.deleted_at).to_not be_nil
+    expect(tag_set.reload.deleted_at).not_to be_nil
     expect(tag_set2.reload.deleted_at).to be_nil
   end
 

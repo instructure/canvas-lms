@@ -253,6 +253,7 @@ const AssignmentTable = ({
                 calculateOnlyGradedAssignments
                   ? courseGrades?.assignmentGroups[assignmentGroup._id]?.current
                   : courseGrades?.assignmentGroups[assignmentGroup._id]?.current,
+                hideTotalRow,
               )
             })
           : // @ts-expect-error
@@ -268,6 +269,7 @@ const AssignmentTable = ({
                         courseGrades?.gradingPeriods[gradingPeriod._id].current
                       : // @ts-expect-error
                         courseGrades?.gradingPeriods[gradingPeriod._id].current,
+                    hideTotalRow,
                   )
                 : null
             })}

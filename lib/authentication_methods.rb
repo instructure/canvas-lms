@@ -379,7 +379,7 @@ module AuthenticationMethods
     redirect_to url
   end
 
-  def store_location(uri = nil, overwrite = true)
+  def store_location(uri = nil, overwrite: true)
     if overwrite || !session[:return_to]
       uri ||= request.get? ? request.fullpath : request.referer
       session[:return_to] = clean_return_to(uri)
@@ -391,10 +391,6 @@ module AuthenticationMethods
     session.delete(:return_to) || default
   end
   protected :redirect_back_or_default
-
-  def redirect_to_referrer_or_default(default)
-    redirect_back(fallback_location: default)
-  end
 
   def redirect_to_login
     return unless fix_ms_office_redirects

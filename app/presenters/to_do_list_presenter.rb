@@ -34,8 +34,13 @@ class ToDoListPresenter
       sub_assignments_needing_grading = assignments_needing(:grading, is_sub_assignment: true)
       if discussion_checkpoints_enabled_somewhere(sub_assignments_needing_grading)
         @needs_grading += sub_assignments_needing_grading
-        @needs_grading.sort_by! { |a| a.due_at || a.updated_at }
       end
+      # add peer review sub assignments that need grading
+      peer_review_sub_assignments_needing_grading = assignments_needing(:grading, is_peer_review_sub_assignment: true)
+      if peer_review_allocation_enabled_somewhere(peer_review_sub_assignments_needing_grading)
+        @needs_grading += peer_review_sub_assignments_needing_grading
+      end
+      @needs_grading.sort_by! { |a| a.due_at || a.updated_at }
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
@@ -44,12 +49,21 @@ class ToDoListPresenter
       if discussion_checkpoints_enabled_somewhere(sub_assignments_needing_submitting)
         @needs_submitting += sub_assignments_needing_submitting
       end
-      @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       assessment_requests = user.submissions_needing_peer_review(contexts:, limit: ASSIGNMENT_LIMIT)
       @needs_reviewing = assessment_requests.filter_map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
       end
+
+      # Add PeerReviewSubAssignment items for dually-enrolled users (e.g., TAs
+      # with both teacher and student enrollments) so they see peer review
+      # submission items in the teacher-facing to-do list. The scope already
+      # filters to courses with peer_review_allocation_and_grading enabled.
+      peer_review_sub_assignment_presenters = user.peer_review_sub_assignments_needing_submitting(
+        contexts:, limit: ASSIGNMENT_LIMIT
+      ).map { |prsa| AssignmentPresenter.new(@view, prsa, @user, :submitting) }
+      @needs_submitting += peer_review_sub_assignment_presenters
+      @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       # we need a complete list of courses first because we only care about the courses
       # from the assignments involved. not just the contexts handed in.
@@ -74,6 +88,13 @@ class ToDoListPresenter
 
   def discussion_checkpoints_enabled_somewhere(assignment_presenter_array)
     assignment_presenter_array&.any? { |ap| ap.assignment.discussion_checkpoints_enabled? } || false
+  end
+
+  def peer_review_allocation_enabled_somewhere(assignment_presenter_array)
+    return false unless assignment_presenter_array&.any?
+
+    courses = assignment_presenter_array.map { |ap| ap.assignment.context }.uniq
+    courses.any? { |course| course.feature_enabled?(:peer_review_allocation_and_grading) }
   end
 
   def assignments_needing(type, opts = {})
@@ -185,6 +206,8 @@ class ToDoListPresenter
     def assignment_path
       if assignment.is_a?(Quizzes::Quiz)
         @view.course_quiz_path(assignment.context_id, assignment.id)
+      elsif assignment.is_a?(PeerReviewSubAssignment)
+        @view.course_assignment_peer_reviews_path(assignment.context_id, assignment.parent_assignment_id)
       elsif assignment.is_a?(SubAssignment)
         @view.course_assignment_path(assignment.context_id, assignment.parent_assignment_id)
       else
@@ -241,6 +264,10 @@ class ToDoListPresenter
 
     def sub_assignment?
       assignment.is_a?(SubAssignment)
+    end
+
+    def peer_review_sub_assignment?
+      assignment.is_a?(PeerReviewSubAssignment)
     end
 
     def required_replies

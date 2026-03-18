@@ -29,6 +29,7 @@ import type {SortDirection} from '../gradebook.d'
 import type {StatusColors} from '../constants/colors'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 const I18n = createI18nScope('gradebook')
 
@@ -136,6 +137,7 @@ interface ViewOptionsTabPanelProps {
   viewUngradedAsZero: CheckboxSetting & {allowed: boolean}
   viewHiddenGradesIndicator: CheckboxSetting
   viewStatusForColorblindness: CheckboxSetting
+  customGradeStatuses?: GradeStatusUnderscore[]
 }
 
 export default function ViewOptionsTabPanel({
@@ -150,6 +152,7 @@ export default function ViewOptionsTabPanel({
   viewUngradedAsZero,
   viewHiddenGradesIndicator,
   viewStatusForColorblindness,
+  customGradeStatuses,
 }: ViewOptionsTabPanelProps) {
   const sortOptions = buildAssignmentSortOptions(columnSort.modulesEnabled)
   const selectedSortKey =
@@ -237,6 +240,8 @@ export default function ViewOptionsTabPanel({
           <StatusColorPanel
             colors={statusColors.currentValues}
             onColorsUpdated={statusColors.onChange}
+            customGradeStatuses={customGradeStatuses}
+            viewStatusForColorblindness={viewStatusForColorblindness.checked}
           />
         </FormFieldGroup>
       </View>

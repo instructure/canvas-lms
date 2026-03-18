@@ -72,7 +72,7 @@ module ConditionalRelease
 
       it "sums up assignments" do
         set_trigger_submissions
-        rollup = Stats.students_per_range(@rule, false).with_indifferent_access
+        rollup = Stats.students_per_range(@rule, include_trend_data: false).with_indifferent_access
         expect(rollup[:enrolled]).to eq 4
         expect(rollup[:ranges][0][:size]).to eq 0
         expect(rollup[:ranges][1][:size]).to eq 1
@@ -82,7 +82,7 @@ module ConditionalRelease
 
       it "does not include trend data" do
         set_trigger_submissions
-        rollup = Stats.students_per_range(@rule, false).with_indifferent_access
+        rollup = Stats.students_per_range(@rule, include_trend_data: false).with_indifferent_access
         expect(rollup.dig(:ranges, 2, :students, 0)).not_to have_key "trend"
       end
 
@@ -90,7 +90,7 @@ module ConditionalRelease
         set_trigger_submissions
         @trigger.update_attribute(:points_possible, 0)
 
-        rollup = Stats.students_per_range(@rule, false).with_indifferent_access
+        rollup = Stats.students_per_range(@rule, include_trend_data: false).with_indifferent_access
         expect(rollup[:enrolled]).to eq 4
         expect(rollup[:ranges][0][:size]).to eq 0
         expect(rollup[:ranges][1][:size]).to eq 1
@@ -102,7 +102,7 @@ module ConditionalRelease
 
         it "has trend == nil if no follow on assignments have been completed" do
           set_user_submissions(1, "foo", [[@trigger, 32, 40]])
-          rollup = Stats.students_per_range(@rule, true).with_indifferent_access
+          rollup = Stats.students_per_range(@rule, include_trend_data: true).with_indifferent_access
           expect(rollup.dig(:ranges, 0, :students, 0)).to have_key "trend"
           expect(rollup.dig(:ranges, 0, :students, 0, :trend)).to be_nil
         end
@@ -114,7 +114,7 @@ module ConditionalRelease
 
           expected_assignment_set(get_student_ids([1, 2, 3]), @as1)
 
-          @rollup = Stats.students_per_range(@rule, true).with_indifferent_access
+          @rollup = Stats.students_per_range(@rule, include_trend_data: true).with_indifferent_access
           expect(trends).to eq [1, 0, -1]
         end
 
@@ -124,7 +124,7 @@ module ConditionalRelease
 
           expected_assignment_set(get_student_ids([1, 2]), @as1)
 
-          @rollup = Stats.students_per_range(@rule, true).with_indifferent_access
+          @rollup = Stats.students_per_range(@rule, include_trend_data: true).with_indifferent_access
           expect(trends).to eq [1, 0]
         end
 
@@ -132,7 +132,7 @@ module ConditionalRelease
           set_user_submissions(1, "foo", [[@trigger, 8, 10], [@a1, 3900, 5000], [@a2, 5, 5], [@a3, 9, 10], [@a4, 12, 1000], [@a5, 3.2, 3]])
           expected_assignment_set(get_student_ids([1]), @as1)
 
-          @rollup = Stats.students_per_range(@rule, true).with_indifferent_access
+          @rollup = Stats.students_per_range(@rule, include_trend_data: true).with_indifferent_access
           expect(trends).to eq [-1]
         end
 
@@ -140,7 +140,7 @@ module ConditionalRelease
           set_user_submissions(1, "foo", [[@trigger, 80, 100], [@a1, 75, 100], [@b1, 5, 5], [@b2, 10, 10], [@b3, 1000, 1000], [@b4, 3, 3]])
           expected_assignment_set(get_student_ids([1]), @as1)
 
-          @rollup = Stats.students_per_range(@rule, true).with_indifferent_access
+          @rollup = Stats.students_per_range(@rule, include_trend_data: true).with_indifferent_access
           expect(trends).to eq [-1]
         end
       end
@@ -197,10 +197,7 @@ module ConditionalRelease
         expected_assignment_set([@student_id], @as2)
 
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
-        details[:follow_on_assignments].each do |detail|
-          expect(detail).to have_key :score
-          expect(detail).to have_key :trend
-        end
+        expect(details[:follow_on_assignments]).to all(have_key(:score).and(have_key(:trend)))
       end
 
       it "includes course_id for trigger_assignment" do

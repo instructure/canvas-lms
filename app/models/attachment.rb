@@ -969,6 +969,16 @@ class Attachment < ActiveRecord::Base
     true
   end
 
+  def kaltura_manifest_file?
+    return false unless kaltura_media?
+
+    if stored_locally?
+      File.read(full_filename, 5) == "<?xml"
+    else # either instfs or s3
+      CanvasHttp.get(public_url(internal: true), { "Range" => "bytes=0-4" }).read_body == "<?xml"
+    end
+  end
+
   def downloadable?
     instfs_hosted? || !!authenticated_s3_url
   rescue
@@ -1759,7 +1769,7 @@ class Attachment < ActiveRecord::Base
   def self.create_data_attachment(context, data, display_name = nil)
     context.shard.activate do
       Attachment.new.tap do |att|
-        Attachment.skip_3rd_party_submits(true)
+        Attachment.skip_3rd_party_submits(skip: true)
         att.context = context
         att.display_name = display_name if display_name
         Attachments::Storage.store_for_attachment(att, data)
@@ -1767,7 +1777,7 @@ class Attachment < ActiveRecord::Base
       end
     end
   ensure
-    Attachment.skip_3rd_party_submits(false)
+    Attachment.skip_3rd_party_submits(skip: false)
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -2047,6 +2057,14 @@ class Attachment < ActiveRecord::Base
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
 
+    if !instfs_hosted? && %w[ContentMigration ContentExport].include?(context_type) && Attachment.s3_storage? && !s3object.exists?
+      child.workflow_state = child.file_state = "deleted"
+      child.root_attachment_id = nil
+      child.deleted_at ||= Time.now.utc
+      child.save!
+      return make_childless
+    end
+
     child.root_attachment_id = nil
     copy_attachment_content(child, split_root_attachment: true)
     child.save!
@@ -2121,7 +2139,7 @@ class Attachment < ActiveRecord::Base
     Attachment.where(id: ids).find_each(&:submit_to_canvadocs)
   end
 
-  def self.skip_3rd_party_submits(skip = true)
+  def self.skip_3rd_party_submits(skip: true)
     @skip_3rd_party_submits = skip
   end
 
@@ -2648,7 +2666,7 @@ class Attachment < ActiveRecord::Base
                               else
                                 begin
                                   attachment.copy_attachment_content(new_attachment)
-                                rescue Aws::S3::Errors::NoSuchKey => e
+                                rescue Aws::S3::Errors::NoSuchKey, CanvasHttp::InvalidResponseCodeError => e
                                   Canvas::Errors.capture_exception(:attachment, e, :warn)
                                   next
                                 end

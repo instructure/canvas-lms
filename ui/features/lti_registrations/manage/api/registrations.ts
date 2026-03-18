@@ -42,20 +42,14 @@ import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {compact} from '../../common/lib/compact'
 import {type LtiOverlayVersion, ZLtiOverlayVersion} from '../model/LtiOverlayVersion'
-import {
-  type LtiRegistrationHistoryEntry,
-  ZLtiRegistrationHistoryEntry,
-} from '../model/LtiRegistrationHistoryEntry'
+import {ZLtiRegistrationHistoryEntry} from '../model/LtiRegistrationHistoryEntry'
 import {useMutation, useQuery} from '@tanstack/react-query'
 import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {getAccountId} from '../../common/lib/getAccountId'
 import {ZPaginatedList} from './PaginatedList'
 import {queryClient} from '@canvas/query'
-import {
-  diffHistoryEntries,
-  diffHistoryEntry,
-  LtiHistoryEntryWithDiff,
-} from '../pages/tool_details/history/differ'
+import {diffHistoryEntries, LtiHistoryEntryWithDiff} from '../pages/tool_details/history/differ'
+import {ZLtiRegistrationAccountBinding} from '../model/LtiRegistrationAccountBinding'
 
 export type AppsSortProperty =
   | 'name'
@@ -417,7 +411,7 @@ export const updateRegistration: UpdateRegistration = ({
   )
 
 export const fetchRegistrationByClientId = (accountId: AccountId, clientId: DeveloperKeyId) =>
-  parseFetchResult(ZLtiRegistrationWithConfiguration)(
+  parseFetchResult(ZLtiRegistrationWithAllInformation)(
     fetch(`/api/v1/accounts/${accountId}/lti_registration_by_client_id/${clientId}`, {
       ...defaultFetchOptions(),
     }),
@@ -428,7 +422,7 @@ export const setGlobalLtiRegistrationWorkflowState = (
   ltiRegistrationId: LtiRegistrationId,
   workflowState: 'on' | 'off',
 ) =>
-  parseFetchResult(z.unknown())(
+  parseFetchResult(ZLtiRegistrationAccountBinding)(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
       ...defaultFetchOptions(),
       method: 'POST',

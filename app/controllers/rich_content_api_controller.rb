@@ -52,7 +52,7 @@ class RichContentApiController < ApplicationController
 
     if llm_generate_config.nil? || llm_modify_config.nil?
       logger.error("No LLM config found for rich content prompt")
-      return render(json: { error: t("Sorry, we are unable to handle this request at this time. Please try again later.") }, status: :unprocessable_entity)
+      return render(json: { error: t("Sorry, we are unable to handle this request at this time. Please try again later.") }, status: :unprocessable_content)
     end
 
     user_input = params[:prompt]
@@ -71,13 +71,13 @@ class RichContentApiController < ApplicationController
     when InstLLM::ThrottlingError
       render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
     when InstLLM::ValidationTooLongError
-      render(json: { error: t("Sorry, we are unable to handle your request as it is too long.") }, status: :unprocessable_entity)
+      render(json: { error: t("Sorry, we are unable to handle your request as it is too long.") }, status: :unprocessable_content)
     when InstLLM::ValidationError
-      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_content)
     when InstLLMHelper::RateLimitExceededError
       render(json: { error: t("Sorry, you have reached the maximum number of rich content generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
     else
-      render(json: { error: t("Sorry, we are unable to generate rich content at this time. Please try again later.") }, status: :unprocessable_entity)
+      render(json: { error: t("Sorry, we are unable to generate rich content at this time. Please try again later.") }, status: :unprocessable_content)
     end
   end
 

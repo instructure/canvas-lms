@@ -31,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -171,7 +171,7 @@ export default class IndexHeader extends Component {
       }
     }
 
-    ReactDOM.render(
+    legacyRender(
       // @ts-expect-error TS2741 (typescriptify)
       <ContentTypeExternalToolTray
         tool={tool}

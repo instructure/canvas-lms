@@ -52,7 +52,6 @@ export const StudentSection: React.FC<StudentSectionProps> = ({
   return (
     <Flex direction="column" gap="small">
       <Avatar
-        alt={currentStudent.name}
         as="div"
         size="medium"
         name={currentStudent.name}

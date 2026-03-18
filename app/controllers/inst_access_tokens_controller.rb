@@ -37,7 +37,7 @@
 #
 
 class InstAccessTokensController < ApplicationController
-  before_action :require_user, :require_non_jwt_auth
+  before_action :require_non_jwt_auth
 
   ADDITIONAL_CREATE_REQUEST_COST = 200
 

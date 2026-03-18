@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {difference, flatten, each, filter} from 'es-toolkit/compat'
@@ -185,7 +185,7 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   renderToggle() {
-    ReactDOM.render(
+    legacyRender(
       ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>
           <Menu.Group label="" selected={[this.showByDate() ? 'date' : 'type']}>

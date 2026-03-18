@@ -19,7 +19,6 @@
 #
 
 class GradebookSettingsController < ApplicationController
-  before_action :require_user
   before_action :require_context
   before_action :authorize
 
@@ -28,7 +27,7 @@ class GradebookSettingsController < ApplicationController
       if deep_merge_gradebook_settings
         format.json { render json: updated_settings, status: :ok }
       else
-        format.json { render json: @current_user.errors, status: :unprocessable_entity }
+        format.json { render json: @current_user.errors, status: :unprocessable_content }
       end
     end
   end

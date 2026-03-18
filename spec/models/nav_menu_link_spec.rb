@@ -21,7 +21,7 @@
 require_relative "../lib/validates_as_url"
 
 describe NavMenuLink do
-  before :once do
+  before do
     @account = Account.default
     @course = course_factory
   end
@@ -105,6 +105,175 @@ describe NavMenuLink do
         it "accepts NavMenuLinks with only course_nav enabled" do
           expect(make_nav_menu_link(@account, course_nav: true).valid?).to be true
         end
+      end
+    end
+  end
+
+  describe ".as_existing_link_objects" do
+    before do
+      @link1 = NavMenuLink.create!(context: @account, label: "Link One", url: "https://example.com/1", course_nav: true)
+      @link2 = NavMenuLink.create!(context: @account, label: "Link Two", url: "https://example.com/2", course_nav: true)
+      @link3 = NavMenuLink.create!(context: @account, label: "Link Three", url: "https://example.com/3", course_nav: true, workflow_state: :deleted)
+    end
+
+    it "returns an array of link objects with type, id, and label" do
+      result = NavMenuLink.active.where(context: @account).order(:id).as_existing_link_objects
+      expect(result).to eq([
+                             { type: "existing", id: @link1.id, label: "Link One" },
+                             { type: "existing", id: @link2.id, label: "Link Two" },
+                           ])
+    end
+  end
+
+  describe ".sync_with_link_objects_json" do
+    it "parses valid JSON, calls sync_with_link_objects when permission granted, and returns true on success" do
+      json_data = '[{"type":"new","url":"https://example.com","label":"New Link"}]'
+      expect(NavMenuLink).to receive(:sync_with_link_objects).with(context: @account, link_objects: JSON.parse(json_data))
+      result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: json_data, can_manage_links: true)
+      expect(result).to be true
+    end
+
+    it "logs error and returns false on invalid JSON" do
+      invalid_json = "not valid json"
+      expect(Rails.logger).to receive(:error).with(/Failed to parse link_objects_json/)
+      result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: invalid_json, can_manage_links: true)
+      expect(result).to be false
+    end
+  end
+
+  describe ".sync_with_link_objects" do
+    before do
+      @link1 = NavMenuLink.create!(context: @account, label: "Existing Link 1", url: "https://example.com/1", course_nav: true)
+      @link2 = NavMenuLink.create!(context: @account, label: "Existing Link 2", url: "https://example.com/2", course_nav: true)
+    end
+
+    it "handles both creating new links and removing old links" do
+      link_objects = [
+        { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+        { type: "new", url: "https://example.com/new1", label: "New Link 1" },
+        { type: "new", url: "https://example.com/new2", label: "New Link 2" }
+      ]
+
+      expect do
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+      end.to change { NavMenuLink.active.where(context: @account).count }.by(1)
+
+      expect(NavMenuLink.active.where(id: @link1.id).exists?).to be true
+      expect(NavMenuLink.active.where(id: @link2.id).exists?).to be false
+      expect(NavMenuLink.active.where(context: @account, label: "New Link 1").exists?).to be true
+      expect(NavMenuLink.active.where(context: @account, label: "New Link 2").exists?).to be true
+    end
+
+    it "handles string and symbol keys in link objects" do
+      link_objects = [
+        { "type" => "new", "url" => "https://example.com/new", "label" => "New Link" }
+      ]
+
+      expect do
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+      end.to change { NavMenuLink.active.where(context: @account).count }.by(-1)
+
+      new_link = NavMenuLink.active.where(context: @account).order(:id).last
+      expect(new_link.label).to eq("New Link")
+    end
+
+    it "only affects links for the specified context" do
+      other_account = Account.create!
+      other_link = NavMenuLink.create!(context: other_account, label: "Other Account Link", url: "https://example.com/other", course_nav: true)
+
+      link_objects = [
+        { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" }
+      ]
+
+      NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+
+      expect(NavMenuLink.active.where(id: other_link.id).exists?).to be true
+    end
+
+    describe "navigation cache invalidation" do
+      it "invalidates navigation cache when new links are added" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "existing", id: @link2.id.to_s, label: "Existing Link 2" },
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+      end
+
+      it "invalidates navigation cache when links are removed" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+      end
+
+      it "invalidates navigation cache when links are both added and removed" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(@account.root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+      end
+
+      it "does not invalidate navigation cache when no changes are made" do
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "existing", id: @link2.id.to_s, label: "Existing Link 2" }
+        ]
+
+        expect(Lti::NavigationCache).not_to receive(:new)
+
+        NavMenuLink.send(:sync_with_link_objects, context: @account, link_objects:)
+      end
+
+      it "uses the root account for cache invalidation in subaccounts" do
+        root_account = @account.root_account
+        subaccount = Account.create!(parent_account: root_account)
+        link_objects = [
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        nav_cache = instance_double(Lti::NavigationCache)
+        expect(Lti::NavigationCache).to receive(:new).with(root_account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+
+        NavMenuLink.send(:sync_with_link_objects, context: subaccount, link_objects:)
+      end
+    end
+
+    context "with can_manage_links: false" do
+      it "returns true without making changes, calling sync_with_link_objects, or invalidating cache" do
+        initial_count = NavMenuLink.active.where(context: @account).count
+
+        link_objects = [
+          { type: "existing", id: @link1.id.to_s, label: "Existing Link 1" },
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ]
+
+        expect(NavMenuLink).not_to receive(:sync_with_link_objects)
+        expect(Lti::NavigationCache).not_to receive(:new)
+
+        result = NavMenuLink.sync_with_link_objects_json(context: @account, link_objects_json: link_objects.to_json, can_manage_links: false)
+
+        expect(result).to be true
+        expect(NavMenuLink.active.where(context: @account).count).to eq(initial_count)
+        expect(NavMenuLink.active.where(context: @account, label: "New Link").exists?).to be false
+        expect(NavMenuLink.active.where(id: @link2.id).exists?).to be true
       end
     end
   end

@@ -165,7 +165,7 @@ describe('AssignmentGroupCollection', () => {
     })
 
     test('does nothing when feature flag is disabled', () => {
-      ENV.FLAGS.peer_review_allocation_and_grading = false
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
       ENV.current_user_roles = ['student']
 
       const assignment = new Assignment({
@@ -185,7 +185,7 @@ describe('AssignmentGroupCollection', () => {
     })
 
     test('does nothing when user is not a student', () => {
-      ENV.FLAGS.peer_review_allocation_and_grading = true
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
       ENV.current_user_roles = ['teacher']
       ENV.PERMISSIONS.manage = true
 
@@ -206,7 +206,7 @@ describe('AssignmentGroupCollection', () => {
     })
 
     test('expands peer review sub-assignments for students when feature flag is enabled', () => {
-      ENV.FLAGS.peer_review_allocation_and_grading = true
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
       ENV.current_user_roles = ['student']
       ENV.PERMISSIONS.manage = false
 
@@ -280,7 +280,7 @@ describe('AssignmentGroupCollection', () => {
     })
 
     test('does not add assignments when there are no peer_review_sub_assignments', () => {
-      ENV.FLAGS.peer_review_allocation_and_grading = true
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
       ENV.current_user_roles = ['student']
       ENV.PERMISSIONS.manage = false
 
@@ -298,7 +298,7 @@ describe('AssignmentGroupCollection', () => {
     })
 
     test('expands multiple peer review sub-assignments across multiple groups', () => {
-      ENV.FLAGS.peer_review_allocation_and_grading = true
+      ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
       ENV.current_user_roles = ['student']
       ENV.PERMISSIONS.manage = false
 

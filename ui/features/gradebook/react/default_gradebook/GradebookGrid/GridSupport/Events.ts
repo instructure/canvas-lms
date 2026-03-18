@@ -16,28 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import GridEvent from './GridEvent'
+import type {GridColumn, GridLocation} from '../../grid.d'
 
 export default class Events {
   // Column Changes
-  onColumnsResized = new GridEvent()
+  onColumnsResized = new GridEvent<Event, GridColumn[]>()
 
   // State Changes
-  onActiveLocationChanged = new GridEvent()
+  onActiveLocationChanged = new GridEvent<Event, GridLocation>()
 
   // Keyboard Interaction
-  onKeyDown = new GridEvent()
+  onKeyDown = new GridEvent<React.KeyboardEvent<Element>, GridLocation>()
 
   // Keyboard Navigation
-  onNavigatePrev = new GridEvent()
+  onNavigatePrev = new GridEvent<Event, GridLocation>()
 
-  onNavigateNext = new GridEvent()
+  onNavigateNext = new GridEvent<Event, GridLocation>()
 
-  onNavigateLeft = new GridEvent()
+  onNavigateLeft = new GridEvent<Event, GridLocation>()
 
-  onNavigateRight = new GridEvent()
+  onNavigateRight = new GridEvent<Event, GridLocation>()
 
-  onNavigateUp = new GridEvent()
+  onNavigateUp = new GridEvent<Event, GridLocation>()
 
-  onNavigateDown = new GridEvent()
+  onNavigateDown = new GridEvent<Event, GridLocation>()
 }

@@ -29,10 +29,10 @@ describe "collaborations" do
   include GoogleDriveCommon
 
   context "a Student's" do
-    title = "Google Docs"
-    type = "google_docs"
+    let(:title) { "Google Docs" }
+    let(:type) { "google_docs" }
 
-    context "#{title} collaboration" do
+    context "Google Docs collaboration" do
       before do
         course_with_student_logged_in
         setup_google_drive
@@ -59,7 +59,7 @@ describe "collaborations" do
     context "Google Docs collaborations with google docs not having access" do
       before do
         course_with_teacher_logged_in
-        setup_google_drive(false, false)
+        setup_google_drive(add_user_service: false, authorized: false)
       end
 
       it "is not editable if google drive does not have access to your account", priority: "1" do

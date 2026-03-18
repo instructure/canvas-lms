@@ -32,6 +32,8 @@ module Lti
       before_action :require_context_update_rights, except: [:deep_linking_cancel]
       before_action :require_tool, except: [:deep_linking_cancel]
       before_action :set_extra_csp_frame_ancestor!
+      skip_before_action :require_user, only: %i[deep_linking_cancel deep_linking_response]
+      skip_before_action :load_user, only: :deep_linking_cancel
 
       def deep_linking_cancel
         js_env({
@@ -48,7 +50,7 @@ module Lti
                  }.compact
                })
         if parent_frame_origin
-          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
         end
 
         render :deep_linking_response, layout: "bare"
@@ -194,7 +196,7 @@ module Lti
                  }.compact
                })
         if parent_frame_origin
-          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
         end
 
         render layout: "bare"

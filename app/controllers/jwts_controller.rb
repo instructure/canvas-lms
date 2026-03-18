@@ -36,7 +36,7 @@
 #
 
 class JwtsController < ApplicationController
-  before_action :require_user, :require_non_jwt_auth
+  before_action :require_non_jwt_auth
   before_action :require_access_token, only: :create, if: :audience_requested?
   before_action :validate_requested_audience, only: :create, if: :audience_requested?
   before_action :require_authorized_context, only: :create, if: :workflows_require_context?

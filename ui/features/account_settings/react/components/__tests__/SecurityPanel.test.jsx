@@ -17,52 +17,106 @@
  */
 
 import React from 'react'
-import {fireEvent} from '@testing-library/react'
-import {ConnectedSecurityPanel} from '../SecurityPanel'
-import {renderWithRedux} from './utils'
+import {render, fireEvent, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import {SecurityPanel} from '../SecurityPanel'
 
 const defaultProps = {
   context: 'account',
-  accountId: '1',
   contextId: '1',
   maxDomains: 50,
-  liveRegion: [],
 }
 
-describe('ConnectedSecurityPanel', () => {
+const cspSettingsResponse = {
+  enabled: false,
+  inherited: false,
+  effective_whitelist: [],
+  current_account_whitelist: [],
+  tools_whitelist: {},
+}
+
+const server = setupServer(
+  http.get('/api/v1/accounts/1/csp_settings', () => HttpResponse.json(cspSettingsResponse)),
+)
+
+describe('SecurityPanel', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    window.ENV = {
-      ACCOUNT: {id: '1234'},
-    }
+    window.ENV = {ACCOUNT: {id: '1234'}}
   })
 
-  it('updates CSP enabled status when the checkbox is clicked', () => {
-    const {getByLabelText} = renderWithRedux(<ConnectedSecurityPanel {...defaultProps} />)
+  afterEach(() => server.resetHandlers())
 
+  it('updates CSP enabled status when the checkbox is clicked', async () => {
+    server.use(
+      http.put('/api/v1/accounts/1/csp_settings', () => HttpResponse.json({enabled: true})),
+    )
+
+    const {getByLabelText} = render(<SecurityPanel {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(getByLabelText('Enable Content Security Policy')).toBeInTheDocument()
+    })
     const checkbox = getByLabelText('Enable Content Security Policy')
     fireEvent.click(checkbox)
-    expect(checkbox.checked).toBeTruthy()
+    await waitFor(() => {
+      expect(checkbox.checked).toBeTruthy()
+    })
   })
 
   describe('isSubAccount prop', () => {
-    it('updates CSP inherited status when the inherit checkbox is clicked', () => {
-      const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel {...defaultProps} isSubAccount={true} />,
+    it('updates CSP inherited status when the inherit checkbox is clicked', async () => {
+      server.use(
+        http.put('/api/v1/accounts/1/csp_settings', () =>
+          HttpResponse.json({
+            inherited: true,
+            enabled: false,
+            effective_whitelist: [],
+            current_account_whitelist: [],
+            tools_whitelist: {},
+          }),
+        ),
       )
 
+      const {getByLabelText} = render(<SecurityPanel {...defaultProps} isSubAccount={true} />)
+
+      await waitFor(() => {
+        expect(getByLabelText('Inherit Content Security Policy')).toBeInTheDocument()
+      })
       const checkbox = getByLabelText('Inherit Content Security Policy')
       fireEvent.click(checkbox)
-      expect(checkbox.checked).toBeTruthy()
+      await waitFor(() => {
+        expect(checkbox.checked).toBeTruthy()
+      })
     })
 
-    it('disables the enable checkbox when the inherit option is set to true', () => {
-      const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel {...defaultProps} isSubAccount={true} />,
+    it('disables the enable checkbox when the inherit option is set to true', async () => {
+      server.use(
+        http.put('/api/v1/accounts/1/csp_settings', () =>
+          HttpResponse.json({
+            inherited: true,
+            enabled: false,
+            effective_whitelist: [],
+            current_account_whitelist: [],
+            tools_whitelist: {},
+          }),
+        ),
       )
+
+      const {getByLabelText} = render(<SecurityPanel {...defaultProps} isSubAccount={true} />)
+
+      await waitFor(() => {
+        expect(getByLabelText('Inherit Content Security Policy')).toBeInTheDocument()
+      })
 
       const checkbox = getByLabelText('Inherit Content Security Policy')
       fireEvent.click(checkbox)
-      expect(checkbox.checked).toBeTruthy()
+      await waitFor(() => {
+        expect(checkbox.checked).toBeTruthy()
+      })
 
       const enableCheckbox = getByLabelText('Enable Content Security Policy')
       expect(enableCheckbox).toBeDisabled()

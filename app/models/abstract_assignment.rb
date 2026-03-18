@@ -68,7 +68,6 @@ class AbstractAssignment < ActiveRecord::Base
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
   QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
   QUIZZES_NEXT_TIMEOUT = 15.minutes
-  QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
   QUIZZES_NEXT_QUIZ_TYPES = %w[graded_quiz graded_survey ungraded_survey].freeze
   QUIZZES_NEXT_SURVEY_TYPES = %w[graded_survey ungraded_survey].freeze
   ROLLCALL_ASSIGNMENT_TITLE = "Roll Call Attendance"
@@ -204,7 +203,16 @@ class AbstractAssignment < ActiveRecord::Base
       SQL
   }
   scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :assignments_only, -> { where(type: "Assignment") }
   scope :assignment_or_peer_review, -> { where(type: ["Assignment", "PeerReviewSubAssignment"]) }
+
+  def self.assignment_scope_for_context(context)
+    if context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_or_peer_review.where(context:)
+    else
+      assignments_only.where(context:)
+    end
+  end
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
@@ -749,7 +757,7 @@ class AbstractAssignment < ActiveRecord::Base
   validates :hide_in_gradebook, inclusion: { in: [false] }, if: -> { points_possible.present? && points_possible > 0 }
 
   acts_as_list scope: :assignment_group
-  simply_versioned keep: 5
+  simply_versioned keep: 5, versioned_associations: [:attachment_associations]
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
 
@@ -1193,7 +1201,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.position = position_was if will_save_change_to_position? && position.nil? # don't allow setting to nil
 
     if !assignment_group || (assignment_group.deleted? && !deleted?)
-      ensure_assignment_group(false)
+      ensure_assignment_group(save: false)
     end
 
     self.title ||= assignment_group.default_assignment_name || "Assignment"
@@ -1237,14 +1245,14 @@ class AbstractAssignment < ActiveRecord::Base
   end
   protected :default_values
 
-  def ensure_assignment_group(do_save = true)
+  def ensure_assignment_group(save: true)
     return if assignment_group_id
 
     return if skip_assignment_group_for_wiki_page?
 
     context.require_assignment_group
     self.assignment_group = context.assignment_groups.active.first
-    if do_save
+    if save
       GuardRail.activate(:primary) { save! }
     end
   end
@@ -1562,7 +1570,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
-  def do_notifications!(prior_version = nil, notify = false)
+  def do_notifications!(prior_version = nil, notify: false)
     # TODO: this will blow up if the group_category string is set on the
     # previous version, because it gets confused between the db string field
     # and the association.  one more reason to drop the db column
@@ -1750,7 +1758,7 @@ class AbstractAssignment < ActiveRecord::Base
       GradingStandard.default_instance
   end
 
-  def score_to_grade(score = 0.0, given_grade = nil, force_letter_grade = false)
+  def score_to_grade(score = 0.0, given_grade = nil, force_letter_grade: false)
     result = score.to_f
     case force_letter_grade ? "letter_grade" : self.grading_type
     when "percent"
@@ -3485,7 +3493,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      QUIZZES_NEXT_IMPORTING_TIMEOUT.ago
+      Services::NewQuizzes.importing_timeout_in_minutes.ago
     )
   }
 

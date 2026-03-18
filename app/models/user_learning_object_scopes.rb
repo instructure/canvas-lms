@@ -37,7 +37,7 @@ module UserLearningObjectScopes
     param_values
   end
 
-  def ignore_item!(asset, purpose, permanent = false)
+  def ignore_item!(asset, purpose, permanent: false)
     asset.ignores.upsert(
       { user_id: id, purpose:, permanent: },
       unique_by: %i[asset_id asset_type user_id purpose],
@@ -185,7 +185,7 @@ module UserLearningObjectScopes
   )
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
-    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
+    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz", "PeerReviewSubAssignment"].include?(object_type)
 
     course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
     accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
@@ -194,7 +194,12 @@ module UserLearningObjectScopes
 
     scope = scope.for_course(course_ids_with_checkpoints_enabled) if object_type == "SubAssignment"
 
-    if ["Assignment", "SubAssignment"].include?(object_type)
+    if object_type == "PeerReviewSubAssignment"
+      courses_with_feature = Course.where(id: shard_course_ids).select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
+      scope = scope.for_course(courses_with_feature)
+    end
+
+    if %w[Assignment SubAssignment PeerReviewSubAssignment].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
 
@@ -216,10 +221,17 @@ module UserLearningObjectScopes
     cache_timeout: 120.minutes,
     include_locked: false,
     is_sub_assignment: false,
+    is_peer_review_sub_assignment: false,
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    object_type = if is_peer_review_sub_assignment
+                    "PeerReviewSubAssignment"
+                  elsif is_sub_assignment
+                    "SubAssignment"
+                  else
+                    "Assignment"
+                  end
     objects_needing(object_type,
                     purpose,
                     :student,
@@ -320,6 +332,13 @@ module UserLearningObjectScopes
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 
+      # Exclude courses using the new peer review allocation feature since
+      # those surface peer reviews via PeerReviewSubAssignment instead.
+      praa_course_ids = Course.where(id: shard_course_ids)
+                              .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                              .map(&:id)
+      ar_scope = ar_scope.where.not(assessor_asset: { course_id: praa_course_ids }) if praa_course_ids.any?
+
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
       # for the submissions, ensuring that the user has access and can read & comment on them.
       # The check for making sure that the user is a participant in the course is already made
@@ -340,6 +359,39 @@ module UserLearningObjectScopes
       else
         result = limit ? ar_scope.take(limit) : ar_scope.to_a
         result
+      end
+    end
+  end
+
+  def peer_review_sub_assignments_needing_submitting(
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: 2.weeks.ago,
+    due_before: 2.weeks.from_now,
+    scope_only: false,
+    include_ignored: false,
+    **opts
+  )
+    params = _params_hash(binding)
+    opts.merge!(params.slice(:limit, :scope_only, :include_ignored))
+    objects_needing("PeerReviewSubAssignment", "submitting", :student, params, 15.minutes, **opts) do |prsa_scope, shard_course_ids|
+      courses_with_peer_review_feature = Course.where(id: shard_course_ids)
+                                               .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                                               .map(&:id)
+
+      prsa_scope = prsa_scope
+                   .for_course(courses_with_peer_review_feature)
+                   .published
+                   .need_submitting_info(id, nil)
+
+      prsa_scope = prsa_scope.where("assignments.due_at IS NULL OR assignments.due_at > ?", due_after) if due_after
+      prsa_scope = prsa_scope.where("assignments.due_at IS NULL OR assignments.due_at <= ?", due_before) if due_before
+
+      if scope_only
+        prsa_scope
+      elsif limit
+        prsa_scope.take(limit)
+      else
+        prsa_scope.to_a
       end
     end
   end
@@ -368,16 +420,29 @@ module UserLearningObjectScopes
               ).count
   end
 
-  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, is_peer_review_sub_assignment: false, **opts)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
-      scope = is_sub_assignment ? SubAssignment.none : Assignment.none
+      scope = if is_peer_review_sub_assignment
+                PeerReviewSubAssignment.none
+              elsif is_sub_assignment
+                SubAssignment.none
+              else
+                Assignment.none
+              end
       return scope_only ? scope : []
     end
 
     params = _params_hash(binding)
     params.delete(:is_sub_assignment)
+    params.delete(:is_peer_review_sub_assignment)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    object_type = if is_peer_review_sub_assignment
+                    "PeerReviewSubAssignment"
+                  elsif is_sub_assignment
+                    "SubAssignment"
+                  else
+                    "Assignment"
+                  end
     objects_needing(object_type, "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
       if Setting.get("assignments_needing_grading_new_style", "true") == "true"
         submissions_needing_grading = Submission.select(:assignment_id, :user_id)

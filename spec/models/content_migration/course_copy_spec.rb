@@ -63,7 +63,7 @@ describe ContentMigration do
     end
 
     it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       run_course_copy
       expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
     end
@@ -800,7 +800,7 @@ describe ContentMigration do
       tag1_to.reload
       tag2_to.reload
 
-      expect(tag1_to).to_not be_deleted
+      expect(tag1_to).not_to be_deleted
       expect(tag2_to).to be_deleted
     end
 
@@ -847,26 +847,23 @@ describe ContentMigration do
 
     context "media objects" do
       before do
-        kaltura_double = double("kaltura")
+        kaltura_double = instance_double(CanvasKaltura::ClientV3)
+        flavor_asset = {
+          isOriginal: 1,
+          containerFormat: "mp4",
+          fileExt: "mp4",
+          id: "one",
+          size: 15,
+        }
         allow(kaltura_double).to receive(:startSession)
-        # rubocop:disable RSpec/ReceiveMessages
-        allow(kaltura_double).to receive(:flavorAssetGetByEntryId).and_return([
-                                                                                {
-                                                                                  isOriginal: 1,
-                                                                                  containerFormat: "mp4",
-                                                                                  fileExt: "mp4",
-                                                                                  id: "one",
-                                                                                  size: 15,
-                                                                                }
-                                                                              ])
-        allow(kaltura_double).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_double.flavorAssetGetByEntryId.first)
-        allow(kaltura_double).to receive(:media_sources).and_return([{
-                                                                      isOriginal: "0",
-                                                                      fileExt: "mp4",
-                                                                      url: "http://example.com/media_path",
-                                                                      content_type: "video/mp4"
-                                                                    }])
-        # rubocop:enable RSpec/ReceiveMessages
+        allow(kaltura_double).to receive_messages(flavorAssetGetByEntryId: [flavor_asset],
+                                                  flavorAssetGetOriginalAsset: flavor_asset,
+                                                  media_sources: [{
+                                                    isOriginal: "0",
+                                                    fileExt: "mp4",
+                                                    url: "http://example.com/media_path",
+                                                    content_type: "video/mp4"
+                                                  }])
         allow(CanvasKaltura::ClientV3).to receive_messages(config: true, new: kaltura_double)
       end
 
@@ -1333,9 +1330,9 @@ describe ContentMigration do
       run_course_copy
 
       new_mod.reload
-      expect(new_mod).to_not be_deleted
+      expect(new_mod).not_to be_deleted
       new_mod.content_tags.each do |new_tag|
-        expect(new_tag).to_not be_deleted
+        expect(new_tag).not_to be_deleted
       end
     end
 
@@ -1468,6 +1465,40 @@ describe ContentMigration do
         run_course_copy
 
         expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
+      end
+
+      it "does not copy late policy when LatePolicy is in importer_skips" do
+        @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
+
+        @cm.copy_options = { everything: true }
+        @cm.migration_settings = { importer_skips: ["LatePolicy"] }
+        @cm.save!
+
+        run_course_copy
+
+        expect(@copy_to.reload.late_policy).to be_nil
+      end
+
+      it "does not apply missing submission zeros when LatePolicy is in importer_skips" do
+        student = User.create!
+        @copy_to.enroll_student(student, enrollment_state: "active")
+        @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, missing_submission_deduction: 100)
+        assignment = @copy_from.assignments.create!(
+          title: "Past Due",
+          due_at: 1.day.ago,
+          submission_types: "online_text_entry",
+          points_possible: 10
+        )
+
+        @cm.copy_options = { everything: true }
+        @cm.migration_settings = { importer_skips: ["LatePolicy"] }
+        @cm.save!
+
+        run_course_copy
+
+        copied_assignment = @copy_to.assignments.find_by(title: assignment.title)
+        submission = copied_assignment.submissions.find_by(user: student)
+        expect(submission&.score).to be_nil
       end
     end
 

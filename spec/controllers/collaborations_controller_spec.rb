@@ -44,7 +44,7 @@ describe CollaborationsController do
 
     it "assigns variables" do
       user_session(@student)
-      allow(controller).to receive(:google_drive_connection).and_return(double(authorized?: true))
+      allow(controller).to receive(:google_drive_connection).and_return(instance_double(GoogleDrive::Connection, authorized?: true))
 
       get "index", params: { course_id: @course.id }
 
@@ -54,7 +54,7 @@ describe CollaborationsController do
 
     it "handles users without google authorized" do
       user_session(@student)
-      allow(controller).to receive(:google_drive_connection).and_return(double(authorized?: false))
+      allow(controller).to receive(:google_drive_connection).and_return(instance_double(GoogleDrive::Connection, authorized?: false))
 
       get "index", params: { course_id: @course.id }
 
@@ -89,8 +89,6 @@ describe CollaborationsController do
       gc = group_category
       group = gc.groups.create!(context: @course)
       group.add_user(@student, "accepted")
-
-      # allow(controller).to receive(:google_docs_connection).and_return(double(authorized?:false))
 
       get "index", params: { group_id: group.id }
       expect(response).to be_successful
@@ -499,7 +497,7 @@ describe CollaborationsController do
 
       it "callbacks on success" do
         user_session(@teacher)
-        content_item_util_stub = double("ContentItemUtil")
+        content_item_util_stub = instance_double(Lti::ContentItemUtil)
         expect(content_item_util_stub).to receive(:success_callback)
         allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
         post "create", params: { course_id: @course.id, contentItems: content_items.to_json }
@@ -508,7 +506,7 @@ describe CollaborationsController do
       it "callbacks on failure" do
         user_session(@teacher)
         expect_any_instance_of(Collaboration).to receive(:save).and_return(false)
-        content_item_util_stub = double("ContentItemUtil")
+        content_item_util_stub = instance_double(Lti::ContentItemUtil)
         expect(content_item_util_stub).to receive(:failure_callback)
         allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
         post "create", params: { course_id: @course.id, contentItems: content_items.to_json }
@@ -603,7 +601,7 @@ describe CollaborationsController do
 
       it "callbacks on success" do
         user_session(@teacher)
-        content_item_util_stub = double("ContentItemUtil")
+        content_item_util_stub = instance_double(Lti::ContentItemUtil)
         expect(content_item_util_stub).to receive(:success_callback)
         allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
         put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }
@@ -612,7 +610,7 @@ describe CollaborationsController do
       it "callbacks on failure" do
         user_session(@teacher)
         allow_any_instance_of(Collaboration).to receive(:save).and_return(false)
-        content_item_util_stub = double("ContentItemUtil")
+        content_item_util_stub = instance_double(Lti::ContentItemUtil)
         expect(content_item_util_stub).to receive(:failure_callback)
         allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
         put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }

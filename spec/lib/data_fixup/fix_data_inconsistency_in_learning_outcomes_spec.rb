@@ -21,7 +21,7 @@ require "spec_helper"
 
 describe DataFixup::FixDataInconsistencyInLearningOutcomes do
   before do
-    shard = double("Shard")
+    shard = instance_double(Shard)
     allow(Shard).to receive(:find).with(4).and_return(shard)
     allow(shard).to receive(:activate).and_yield
   end
@@ -64,7 +64,7 @@ describe DataFixup::FixDataInconsistencyInLearningOutcomes do
 
   describe ".run" do
     it "activates the correct shard and guard rail" do
-      shard = double("Shard")
+      shard = instance_double(Shard)
       allow(Shard).to receive(:find).with(4).and_return(shard)
       allow(shard).to receive(:activate).and_yield
 

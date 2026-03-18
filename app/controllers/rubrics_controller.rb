@@ -41,21 +41,25 @@ class RubricsController < ApplicationController
       return
     end
 
-    js_env ROOT_OUTCOME_GROUP: get_root_outcome,
-           PERMISSIONS: {
-             manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
-             manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
-           },
-           NON_SCORING_RUBRICS: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
-           OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+    js_env({
+             ROOT_OUTCOME_GROUP: get_root_outcome,
+             PERMISSIONS: {
+               manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
+               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+             },
+             NON_SCORING_RUBRICS: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+           })
 
     mastery_scales_js_env
     set_tutorial_js_env
 
     if @context.feature_enabled?(:enhanced_rubrics)
-      js_env breadcrumbs: rubric_breadcrumbs
-      js_env enhanced_rubrics_enabled: true
-      js_env enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
+      js_env({
+               breadcrumbs: rubric_breadcrumbs,
+               enhanced_rubrics_enabled: true,
+               enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
+             })
 
       return show_rubrics_redesign
     end
@@ -73,17 +77,21 @@ class RubricsController < ApplicationController
     is_enhanced_rubrics = @context.feature_enabled?(:enhanced_rubrics)
 
     if params[:id].match?(Api::ID_REGEX) || is_enhanced_rubrics
-      js_env ROOT_OUTCOME_GROUP: get_root_outcome,
-             PERMISSIONS: {
-               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
-             },
-             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+      js_env({
+               ROOT_OUTCOME_GROUP: get_root_outcome,
+               PERMISSIONS: {
+                 manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+               },
+               OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+             })
       mastery_scales_js_env
 
       if is_enhanced_rubrics
-        js_env breadcrumbs: rubric_breadcrumbs
-        js_env enhanced_rubrics_enabled: true
-        js_env enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
+        js_env({
+                 breadcrumbs: rubric_breadcrumbs,
+                 enhanced_rubrics_enabled: true,
+                 enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
+               })
 
         return show_rubrics_redesign
       end
@@ -307,6 +315,10 @@ class RubricsController < ApplicationController
         :long_description,
         :points,
         :criterion_use_range,
+        :learning_outcome_id,
+        :ignore_for_scoring,
+        :mastery_points,
+        :generated,
         ratings: %i[id criterion_id description long_description points]
       )
     end

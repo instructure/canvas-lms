@@ -24,8 +24,6 @@
 
 class RubricAssessmentsController < ApplicationController
   before_action :require_context
-  before_action :require_user
-
   include Api::V1::SubmissionComment
 
   # @API Create a single rubric assessment

@@ -182,16 +182,16 @@ module CanvasOutcomesHelper
 
     host_url = "#{protocol}://#{domain}" if domain.present?
 
-    js_env(
-      canvas_outcomes: {
-        artifact_type:,
-        artifact_id: artifact.id,
-        context_uuid: context.uuid,
-        host: host_url,
-        jwt:,
-        **props
-      }
-    )
+    js_env({
+             canvas_outcomes: {
+               artifact_type:,
+               artifact_id: artifact.id,
+               context_uuid: context.uuid,
+               host: host_url,
+               jwt:,
+               **props
+             }
+           })
   end
 
   def extract_domain_jwt(account, scope, **props)

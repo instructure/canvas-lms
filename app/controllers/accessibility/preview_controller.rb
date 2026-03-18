@@ -20,7 +20,6 @@
 module Accessibility
   class PreviewController < ApplicationController
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
 
     # GET /accessibility/preview
@@ -29,6 +28,11 @@ module Accessibility
       return head :bad_request unless params[:issue_id].present?
 
       content_loader = Accessibility::ContentLoader.new(issue_id: params[:issue_id])
+
+      if content_loader.resource_updated_since_issue?
+        return render json: { error: "Resource has been updated since this issue was detected" }, status: :conflict
+      end
+
       result = content_loader.content
       render json: { content: result[:content], **result[:metadata] }
     rescue Accessibility::ContentLoader::ElementNotFoundError, ActiveRecord::RecordNotFound => e

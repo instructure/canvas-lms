@@ -102,6 +102,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :valid_for_discovery_page, -> { active.where.not(auth_type: "canvas") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
 

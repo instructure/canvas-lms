@@ -46,7 +46,7 @@ export const Assignment = {
       }
       mySubAssignmentSubmissionsConnection {
         nodes {
-          ...Submission
+          ...DiscussionSubmission
         }
       }
       assessmentRequestsForCurrentUser {

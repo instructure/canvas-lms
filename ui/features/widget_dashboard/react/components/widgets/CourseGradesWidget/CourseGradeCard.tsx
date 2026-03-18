@@ -73,11 +73,11 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
     updateCourseColor(courseId, colorWithHash)
   }
 
-  const hasGrade = currentGrade !== null && currentGrade !== undefined
+  const hasNumericGrade = currentGrade !== null && currentGrade !== undefined
 
   const formatGradeDisplay = () => {
     if (!isGradeVisible) return '•••'
-    if (currentGrade === null) return 'N/A'
+    if (currentGrade === null) return I18n.t('N/A')
 
     if (gradingScheme === 'percentage') {
       return `${Math.floor(currentGrade)}%`
@@ -90,7 +90,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
     return `${Math.floor(currentGrade)}%`
   }
 
-  const gradeOverlay = hasGrade && (
+  const gradeOverlay = (
     <div
       style={{
         position: 'absolute',
@@ -305,7 +305,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                 </Text>
               </View>
             )}
-            {hasGrade && lastUpdated && (
+            {hasNumericGrade && lastUpdated && (
               <View>
                 <Text
                   size="small"

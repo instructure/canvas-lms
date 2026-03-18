@@ -148,9 +148,9 @@ describe "student groups" do
         group_test_setup(4, 1, 2)
         @group_category.first.configure_self_signup(true, false)
         3.times do |n|
-          add_user_to_group(@students[n], @testgroup.first, false)
+          add_user_to_group(@students[n], @testgroup.first, is_leader: false)
         end
-        add_user_to_group(@students[3], @testgroup.first, true)
+        add_user_to_group(@students[3], @testgroup.first, is_leader: true)
 
         user_session(@students[0])
         get "/courses/#{@course.id}/groups"
@@ -186,7 +186,7 @@ describe "student groups" do
         category.configure_self_signup(true, false)
         category.self_signup_end_at = 1.day.ago.utc
         category.save!
-        add_user_to_group(@students[0], @testgroup.first, false)
+        add_user_to_group(@students[0], @testgroup.first, is_leader: false)
 
         user_session(@students[0])
         get "/courses/#{@course.id}/groups"
@@ -204,7 +204,7 @@ describe "student groups" do
         category.configure_self_signup(true, false)
         category.self_signup_end_at = 1.day.ago.utc
         category.save!
-        add_user_to_group(@students[0], @testgroup.first, false)
+        add_user_to_group(@students[0], @testgroup.first, is_leader: false)
 
         user_session(@students[1])
         get "/courses/#{@course.id}/groups"

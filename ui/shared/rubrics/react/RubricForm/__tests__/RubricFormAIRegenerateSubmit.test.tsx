@@ -44,12 +44,39 @@ const mockCriteria = [
     description: 'Generated Criterion 1',
     points: 20,
     ratings: [],
-    longDescription: '',
+    long_description: '',
     outcome: undefined,
-    learningOutcomeId: undefined,
-    ignoreForScoring: false,
-    criterionUseRange: false,
-    masteryPoints: 0,
+    learning_outcome_id: undefined,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 0,
+    generated: true,
+  },
+  {
+    id: '2',
+    description: 'Manual Criterion 1',
+    points: 20,
+    ratings: [],
+    long_description: '',
+    outcome: undefined,
+    learning_outcome_id: 1,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 0,
+    generated: false,
+  },
+  {
+    id: '3',
+    description: 'Learning Outcome Criterion 1',
+    points: 20,
+    ratings: [],
+    long_description: '',
+    outcome: undefined,
+    learning_outcome_id: undefined,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 3,
+    generated: false,
   },
 ]
 
@@ -145,7 +172,7 @@ describe('RubricForm AI Regenerate Submit Test', () => {
   it('calls regenerate with additional prompt', async () => {
     const assignmentId = '1'
     const courseId = '1'
-    const {getByTestId, getByText} = renderComponent({
+    const {getByTestId, getByText, queryAllByTestId} = renderComponent({
       aiRubricsEnabled: true,
       assignmentId,
       courseId,
@@ -199,6 +226,8 @@ describe('RubricForm AI Regenerate Submit Test', () => {
         undefined,
         defaultGenerateCriteriaForm,
       )
+      expect(queryAllByTestId('rubric-criteria-row-ai-icon')).toHaveLength(1)
+      expect(queryAllByTestId('regenerate-criteria-button')).toHaveLength(3)
     })
   })
 })

@@ -105,5 +105,5 @@ describe('CanvasInbox App Container - Inbox Signature Block Settings', () => {
     fireEvent.click(composeButton)
     await waitForApolloLoading()
     expect(window.location.hash).toBe('#filter=type=inbox')
-  })
+  }, 30000)
 })

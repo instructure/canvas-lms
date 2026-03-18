@@ -298,7 +298,8 @@ describe Canvas::LiveEvents do
       expect_event("wiki_page_updated", {
                      wiki_page_id: @page.global_id.to_s,
                      title: "old title",
-                     body: "old body"
+                     body: "old body",
+                     workflow_state: @page.workflow_state
                    })
 
       wiki_page_updated
@@ -311,7 +312,8 @@ describe Canvas::LiveEvents do
                      wiki_page_id: @page.global_id.to_s,
                      title: "new title",
                      old_title: "old title",
-                     body: "old body"
+                     body: "old body",
+                     workflow_state: @page.workflow_state
                    })
 
       wiki_page_updated
@@ -324,7 +326,8 @@ describe Canvas::LiveEvents do
                      wiki_page_id: @page.global_id.to_s,
                      title: "old title",
                      body: "new body",
-                     old_body: "old body"
+                     old_body: "old body",
+                     workflow_state: @page.workflow_state
                    })
 
       wiki_page_updated

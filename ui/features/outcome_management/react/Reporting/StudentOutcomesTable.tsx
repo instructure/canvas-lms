@@ -98,6 +98,7 @@ const OutcomesTableRow = ({
     masteryScore,
     masteryLevel,
     masteryPoints,
+    ratings,
   } = outcome
   const [isTooltipShown, setIsTooltipShown] = useState(false)
 
@@ -177,6 +178,7 @@ const OutcomesTableRow = ({
               studentId={studentId}
               contributingScores={contributingScores}
               masteryPoints={masteryPoints}
+              proficiencyRatings={ratings}
             />
           </Table.Cell>
         </Table.Row>

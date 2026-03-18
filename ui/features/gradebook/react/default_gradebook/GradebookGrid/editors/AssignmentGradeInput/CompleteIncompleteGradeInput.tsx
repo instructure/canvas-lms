@@ -77,7 +77,7 @@ export default class CompleteIncompleteGradeInput extends Component {
     }).isRequired,
     disabled: bool,
     menuContentRef: func,
-    onMenuDismiss: Menu.propTypes.onDismiss,
+    onMenuDismiss: func,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,

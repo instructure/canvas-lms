@@ -499,8 +499,15 @@ module SIS
           return nil
         end
 
-        if enrollment_info.start_date >= enrollment_info.end_date
-          msg = "A temporary enrollment end date is before the start date "
+        if enrollment_info.start_date.present? && enrollment_info.end_date.present?
+          if enrollment_info.start_date >= enrollment_info.end_date
+            msg = "A temporary enrollment end date is before the start date "
+            msg += "(start_date: #{enrollment_info.start_date}, end_date: #{enrollment_info.end_date})"
+            @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
+            return nil
+          end
+        else
+          msg = "A temporary enrollment is missing a start or end date "
           msg += "(start_date: #{enrollment_info.start_date}, end_date: #{enrollment_info.end_date})"
           @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
           return nil

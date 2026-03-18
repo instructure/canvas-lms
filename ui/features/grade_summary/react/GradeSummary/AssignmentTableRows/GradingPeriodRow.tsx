@@ -20,6 +20,10 @@ import React from 'react'
 import {ASSIGNMENT_NOT_APPLICABLE} from '../constants'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
+import {IconOffLine} from '@instructure/ui-icons'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('grade_summary')
 
 import {
   formatNumber,
@@ -27,6 +31,7 @@ import {
   getGradingPeriodPercentage,
   filteredAssignments,
 } from '../utils'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 export const gradingPeriodRow = (
   // @ts-expect-error
@@ -37,6 +42,7 @@ export const gradingPeriodRow = (
   assignmentsData,
   calculateOnlyGradedAssignments = false,
   courseLevelGrades = {},
+  hideTotalRow = false,
 ) => {
   const filterByGradingPeriod = filteredAssignments(
     assignmentsData,
@@ -75,7 +81,7 @@ export const gradingPeriodRow = (
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{gradingPeriod.title}</Text>
       </Table.Cell>
-      {!ENV.restrict_quantitative_data && (
+      {!ENV.restrict_quantitative_data && !hideTotalRow && (
         <Table.Cell textAlign="center">
           <Text weight="bold">
             {Number.isNaN(Number.parseFloat(periodPercentage)) ||
@@ -86,7 +92,20 @@ export const gradingPeriodRow = (
         </Table.Cell>
       )}
       <Table.Cell textAlign="center">
-        <Text weight="bold">{ENV.restrict_quantitative_data ? letterGrade : formattedScore}</Text>
+        <Text weight="bold">
+          {hideTotalRow ? (
+            <Tooltip
+              data-testid="user-list-row-tooltip"
+              renderTip={I18n.t('Instructor has not posted this grade')}
+            >
+              <IconOffLine title={I18n.t('Instructor has not posted this grade')} />
+            </Tooltip>
+          ) : ENV.restrict_quantitative_data ? (
+            letterGrade
+          ) : (
+            formattedScore
+          )}
+        </Text>
       </Table.Cell>
       <Table.Cell>{/* Document processors */}</Table.Cell>
     </Table.Row>

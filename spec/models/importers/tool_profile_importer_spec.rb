@@ -25,7 +25,7 @@ describe Importers::ToolProfileImporter do
   describe "#process_migration" do
     context "no tool profiles" do
       let(:data) { {} }
-      let(:migration) { double }
+      let(:migration) { instance_double(ContentMigration) }
 
       it "does nothing" do
         expect { Importers::ToolProfileImporter.process_migration(data, migration) }.not_to raise_error
@@ -34,7 +34,7 @@ describe Importers::ToolProfileImporter do
 
     context "malformed tool profile" do
       let(:data) { { "tool_profiles" => [{ "resource_href" => "href" }] } }
-      let(:migration) { double }
+      let(:migration) { instance_double(ContentMigration) }
 
       it "adds an import warning" do
         expect(migration).to receive(:add_import_warning).with("tool_profile", "href", instance_of(Importers::MissingRequiredToolProfileValuesError))
@@ -63,7 +63,7 @@ describe Importers::ToolProfileImporter do
       include_context "lti2_course_spec_helper"
 
       let(:data) { get_import_data("", "nonmatching_tool_profiles") }
-      let(:migration) { double(context: course) }
+      let(:migration) { instance_double(ContentMigration, context: course) }
 
       it "adds a warning to the migration about finding a different version" do
         tool_proxy # necessary to instantiate tool_proxy
@@ -83,7 +83,7 @@ describe Importers::ToolProfileImporter do
       include_context "lti2_course_spec_helper"
 
       let(:data) { get_import_data("", "matching_tool_profiles") }
-      let(:migration) { double(context: course) }
+      let(:migration) { instance_double(ContentMigration, context: course) }
 
       it "does nothing" do
         tool_proxy # necessary to instantiate tool_proxy

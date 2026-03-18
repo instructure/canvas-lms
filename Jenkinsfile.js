@@ -35,10 +35,10 @@ node(nodeLabel()) {
         def tests = [:]
         try {
           for (int i = 0; i < jsTestsStage.VITEST_NODE_COUNT; i++) {
-            def index = i
-            def stageName = "Vitest ${index}"
+            def indexPadded = String.format('%02d', i)
+            def stageName = "Vitest ${indexPadded}"
             tests[stageName] = {
-              jsTestsStage.runVitestNode(index)
+              jsTestsStage.runVitestNode(indexPadded)
             }
           }
 
@@ -52,7 +52,7 @@ node(nodeLabel()) {
               }
 
               stage("${stageName} - Setup") {
-                jsTestsStage.checkoutCode()
+                distribution.unstashBuildScripts()
                 jsTestsStage.provisionDocker()
                 jsTestsStage.startServices()
               }
@@ -80,6 +80,11 @@ node(nodeLabel()) {
             } finally {
               pipelineHelpers.cleanupDocker()
             }
+          }
+
+          stage('Checkout') {
+            jsTestsStage.checkoutCode()
+            distribution.stashBuildScripts()
           }
 
           parallel(tests)

@@ -52,11 +52,11 @@ class AiConversationsController < ApplicationController
 
     can_manage = @context.grants_any_right?(@current_user, *permissions)
 
-    js_env(
-      AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage:),
-      COURSE_ID: @context.id,
-      ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
-    )
+    js_env({
+             AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage:),
+             COURSE_ID: @context.id,
+             ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
+           })
 
     render html: view_context.content_tag(:div, nil, id: "ai_experiences_ai_conversations"), layout: true
   end

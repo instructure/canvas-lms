@@ -18,24 +18,59 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe PageViews::Configuration do
-  let(:pv5_creds) { { test: { access_token: "mock_access_token" } } }
-
   before do
     allow(ConfigFile).to receive(:load).with("pv5").and_return("uri" => "http://pv5.instructure.com")
-    allow(Rails.env).to receive(:to_sym).and_return(:test)
-    allow(Rails.application.credentials).to receive(:pv5_creds).and_return(pv5_creds)
   end
 
   after do
-    RSpec::Mocks.space.proxy_for(Rails.env).reset
     RSpec::Mocks.space.proxy_for(ConfigFile).reset
-    RSpec::Mocks.space.proxy_for(Rails.application.credentials).reset
   end
 
-  it "loads configuration and secrets properly" do
+  it "loads configuration properly" do
     config = PageViews::Configuration.new
-    expect(config.access_token).to eq("mock_access_token")
     expect(config.uri).to be_a(URI::HTTP)
     expect(config.uri.to_s).to eq("http://pv5.instructure.com")
+  end
+
+  context "with regional configuration" do
+    let(:pv5_config) do
+      {
+        "uri" => "https://api.pv5-iad.inscloudgate.net",
+        "regions" => {
+          "eu-central-1" => {
+            "uri" => "https://api.pv5-fra.inscloudgate.net"
+          },
+          "us-west-2" => {
+            "uri" => "https://api.pv5-pdx.inscloudgate.net"
+          }
+        }
+      }
+    end
+
+    before do
+      allow(ConfigFile).to receive(:load).with("pv5").and_return(pv5_config)
+    end
+
+    it "should select regional URI for eu-central-1 when environment is beta" do
+      allow(ENV).to receive(:[]).with("CANVAS_ENVIRONMENT").and_return("beta")
+
+      config = PageViews::Configuration.new(region: "eu-central-1")
+
+      expect(config.uri.to_s).to eq("https://api.pv5-fra.inscloudgate.net")
+    end
+
+    it "should select regional URI for us-west-2 when environment is production" do
+      allow(ENV).to receive(:[]).with("CANVAS_ENVIRONMENT").and_return("production")
+
+      config = PageViews::Configuration.new(region: "us-west-2")
+
+      expect(config.uri.to_s).to eq("https://api.pv5-pdx.inscloudgate.net")
+    end
+
+    it "falls back to default URI when no regional match" do
+      config = PageViews::Configuration.new(region: "unknown-region")
+
+      expect(config.uri.to_s).to eq("https://api.pv5-iad.inscloudgate.net")
+    end
   end
 end

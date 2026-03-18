@@ -371,7 +371,7 @@ class Rubric < ActiveRecord::Base
     self
   end
 
-  def update_mastery_scales(save = true)
+  def update_mastery_scales(save: true)
     return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
 
     mastery_scale = context.resolved_outcome_proficiency
@@ -460,7 +460,7 @@ class Rubric < ActiveRecord::Base
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
-  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, :title, :migration_id, :percentage, :order, keyword_init: true)
+  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, :title, :migration_id, :percentage, :order, :generated, keyword_init: true)
   Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, :migration_id, :percentage, keyword_init: true)
   # association_object is only needed for generating via llm
   def generate_criteria(params, association_object = nil)
@@ -491,7 +491,13 @@ class Rubric < ActiveRecord::Base
             criterion[:learning_outcome_id] = outcome.id
             criterion[:mastery_points] = (criterion_data[:mastery_points] || outcome.data&.dig(:rubric_criterion, :mastery_points))&.to_f
             criterion[:ignore_for_scoring] = valid_bools.include?(criterion_data[:ignore_for_scoring])
+            # Learning outcome criteria are never AI-generated
+            criterion[:generated] = false
           end
+        else
+          # Preserve generated if provided (for AI-generated criteria being saved),
+          # otherwise set to false for manually created criteria
+          criterion[:generated] = valid_bools.include?(criterion_data[:generated])
         end
 
         ratings = (criterion_data[:ratings] || {}).values.map do |rating_data|
@@ -651,7 +657,7 @@ class Rubric < ActiveRecord::Base
 
   def update_association_count
     cnt = rubric_associations.for_grading.count
-    with_versioning(false) do
+    without_versioning do
       self.read_only = cnt > 1
       self.association_count = cnt
       begin

@@ -326,6 +326,7 @@ export type SiteAdminFeatureId =
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
+  | 'accessibility_automatic_scanning'
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
   | 'ams_advanced_content_organization'
@@ -349,14 +350,14 @@ export type RootAccountFeatureId =
   | 'lti_asset_processor'
   | 'lti_asset_processor_discussions'
   | 'lti_link_to_apps_from_developer_keys'
+  | 'lti_deactivate_registrations'
   | 'lti_registrations_next'
-  | 'lti_registrations_page'
+  | 'lti_registrations_templates'
   | 'lti_dr_registrations_update'
   | 'lti_registrations_usage_data'
   | 'lti_registrations_usage_data_dev'
   | 'lti_registrations_usage_data_low_usage'
   | 'lti_registrations_usage_tab'
-  | 'lti_deactivate_registrations'
   | 'mobile_offline_mode'
   | 'modules_requirements_allow_percentage'
   | 'nav_menu_links'
@@ -364,6 +365,7 @@ export type RootAccountFeatureId =
   | 'open_tools_in_new_tab'
   | 'pendo_extended'
   | 'product_tours'
+  | 'rce_asr_captioning_improvements'
   | 'rce_lite_enabled_speedgrader_comments'
   | 'rce_studio_embed_improvements'
   | 'rce_transform_loaded_content'

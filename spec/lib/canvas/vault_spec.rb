@@ -148,18 +148,14 @@ module Canvas
         end
 
         it "uses IAM token when IAM auth is enabled" do
-          mock_secret = double(
-            "Vault::Secret",
-            auth: double(
-              "auth",
-              client_token: iam_token,
-              lease_duration:
-            )
-          )
+          mock_auth_data = instance_double(::Vault::SecretAuth,
+                                           client_token: iam_token,
+                                           lease_duration:)
+          mock_secret = instance_double(::Vault::Secret, auth: mock_auth_data)
 
           # First call to Vault::Client.new is during authentication (no token)
           mock_auth_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_auth_client)
           allow(mock_auth_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam).with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws").and_return(mock_secret)
@@ -227,17 +223,13 @@ module Canvas
         end
 
         it "authenticates successfully and caches the token in memory" do
-          mock_secret = double(
-            "Vault::Secret",
-            auth: double(
-              "auth",
-              client_token: iam_token,
-              lease_duration:
-            )
-          )
+          mock_auth_data = instance_double(::Vault::SecretAuth,
+                                           client_token: iam_token,
+                                           lease_duration:)
+          mock_secret = instance_double(::Vault::Secret, auth: mock_auth_data)
 
           mock_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam).with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws").and_return(mock_secret)
@@ -253,17 +245,13 @@ module Canvas
         end
 
         it "uses custom auth path when VAULT_AWS_AUTH_PATH is set" do
-          mock_secret = double(
-            "Vault::Secret",
-            auth: double(
-              "auth",
-              client_token: iam_token,
-              lease_duration:
-            )
-          )
+          mock_auth_data = instance_double(::Vault::SecretAuth,
+                                           client_token: iam_token,
+                                           lease_duration:)
+          mock_secret = instance_double(::Vault::Secret, auth: mock_auth_data)
 
           mock_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam)
@@ -278,17 +266,13 @@ module Canvas
         end
 
         it "includes server ID header when VAULT_AWS_AUTH_HEADER_VALUE is set" do
-          mock_secret = double(
-            "Vault::Secret",
-            auth: double(
-              "auth",
-              client_token: iam_token,
-              lease_duration:
-            )
-          )
+          mock_auth_data = instance_double(::Vault::SecretAuth,
+                                           client_token: iam_token,
+                                           lease_duration:)
+          mock_secret = instance_double(::Vault::Secret, auth: mock_auth_data)
 
           mock_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam)
@@ -311,12 +295,13 @@ module Canvas
           described_class.instance_variable_set(:@iam_token_cache, cached_data)
 
           mock_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
+          mock_response = instance_double(Net::HTTPResponse, code: "403")
           allow(mock_auth).to receive(:aws_iam)
             .with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws")
-            .and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
+            .and_raise(::Vault::HTTPError.new(addr, mock_response))
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
@@ -328,12 +313,13 @@ module Canvas
           described_class.instance_variable_set(:@iam_token_cache, nil)
 
           mock_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
+          mock_response = instance_double(Net::HTTPResponse, code: "403")
           allow(mock_auth).to receive(:aws_iam)
             .with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws")
-            .and_raise(::Vault::HTTPError.new(addr, double(code: "403")))
+            .and_raise(::Vault::HTTPError.new(addr, mock_response))
 
           ENV["VAULT_IAM_AUTH_ENABLED"] = "true"
           ENV["VAULT_AWS_AUTH_ROLE"] = "canvas-role"
@@ -365,17 +351,13 @@ module Canvas
           }
           described_class.instance_variable_set(:@iam_token_cache, cached_data)
 
-          mock_secret = double(
-            "Vault::Secret",
-            auth: double(
-              "auth",
-              client_token: "new_iam_token",
-              lease_duration: 3600
-            )
-          )
+          mock_auth_data = instance_double(::Vault::SecretAuth,
+                                           client_token: "new_iam_token",
+                                           lease_duration: 3600)
+          mock_secret = instance_double(::Vault::Secret, auth: mock_auth_data)
 
           mock_client = instance_double(::Vault::Client)
-          mock_auth = double("auth")
+          mock_auth = instance_double(::Vault::Authenticate)
           allow(::Vault::Client).to receive(:new).with(address: addr).and_return(mock_client)
           allow(mock_client).to receive(:auth).and_return(mock_auth)
           allow(mock_auth).to receive(:aws_iam).with("canvas-role", mock_credentials, nil, "https://sts.amazonaws.com", "aws").and_return(mock_secret)

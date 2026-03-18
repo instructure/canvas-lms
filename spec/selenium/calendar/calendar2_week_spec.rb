@@ -156,7 +156,7 @@ describe "calendar2" do
 
       # Click non all-day event
       fj(".fc-agendaWeek-view .fc-time-grid .fc-slats .fc-widget-content:not(.fc-axis):first").click
-      event_from_modal(title, false, false)
+      event_from_modal(title)
       expect(f(".fc-title")).to include_text title
     end
 
@@ -166,7 +166,7 @@ describe "calendar2" do
 
       # click all day event
       f(".fc-agendaWeek-view .fc-week .fc-wed").click
-      event_from_modal(title, false, false)
+      event_from_modal(title)
       expect(f(".fc-title")).to include_text title
     end
 

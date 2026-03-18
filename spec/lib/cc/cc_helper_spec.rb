@@ -74,7 +74,7 @@ describe CC::CCHelper do
     end
 
     before do
-      @kaltura = double("CanvasKaltura::ClientV3")
+      @kaltura = instance_double(CanvasKaltura::ClientV3)
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("m-noattachment").and_return(flavor_asset)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return(flavor_asset)

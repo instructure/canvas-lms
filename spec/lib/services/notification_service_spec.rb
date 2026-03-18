@@ -36,7 +36,7 @@ module Services
       end
 
       before do
-        @queue = double("notification queue")
+        @queue = instance_double(Aws::SQS::Client)
         allow(NotificationService).to receive_messages(notification_sqs: @queue, choose_queue_url: "default")
       end
 
@@ -76,7 +76,7 @@ module Services
 
       it "processes push notification message type" do
         expect(@queue).to receive(:send_message).once
-        sns_client = double
+        sns_client = instance_double(Aws::SNS::Client)
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: "token")
@@ -87,7 +87,7 @@ module Services
 
       it "sends only one message to duplicate arn and token combo" do
         expect(@queue).to receive(:send_message).once
-        sns_client = double
+        sns_client = instance_double(Aws::SNS::Client)
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: "token")
@@ -99,7 +99,7 @@ module Services
 
       it "sends 2 only message to duplicate arns if token is different" do
         expect(@queue).to receive(:send_message).twice
-        sns_client = double
+        sns_client = instance_double(Aws::SNS::Client)
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: "token")
@@ -111,7 +111,7 @@ module Services
 
       it "prefers the most recently updated duplicate endpoint" do
         expect(@queue).to receive(:send_message).once
-        sns_client = double
+        sns_client = instance_double(Aws::SNS::Client)
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         first = @at.notification_endpoints.create!(token: "token")
@@ -127,7 +127,7 @@ module Services
 
       def test_push_notification(notification_name)
         expect(@queue).to receive(:send_message).once
-        sns_client = double
+        sns_client = instance_double(Aws::SNS::Client)
         allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: "token")
@@ -163,7 +163,7 @@ module Services
           req_id = SecureRandom.uuid
           allow(RequestContextGenerator).to receive(:request_id).and_return(req_id)
 
-          sqs = double
+          sqs = instance_double(Aws::SQS::Client)
           expect(sqs).to receive(:send_message) do |message_body:, **|
             expect(JSON.parse(message_body)).to eq({
               global_id: 1,

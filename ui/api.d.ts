@@ -745,6 +745,45 @@ export type CheckpointOverride = {
   lock_at: string | null
 }
 
+export type AttachmentPreflight = {
+  upload_url: string
+  upload_params: any
+  file_param: string
+}
+
+export type PreAttachmentRequest = {
+  name: string
+  size?: number
+  content_type?: string
+  no_redirect?: boolean
+  [key: string]: any // Other file upload properties per documentation
+}
+
+export type SisImportRequestBody = {
+  import_type?: 'instructure_csv'
+  // File upload options
+  attachment?: File | Blob
+  pre_attachment?: PreAttachmentRequest
+  extension?: 'zip' | 'xml' | 'csv' | string
+  // Batch mode options
+  batch_mode?: boolean
+  batch_mode_term_id?: string
+  multi_term_batch_mode?: boolean
+  // Processing options
+  skip_deletes?: boolean
+  override_sis_stickiness?: boolean
+  add_sis_stickiness?: boolean
+  clear_sis_stickiness?: boolean
+  update_sis_id_if_login_claimed?: boolean
+  // Diffing options
+  diffing_data_set_identifier?: string
+  diffing_remaster_data_set?: boolean
+  diffing_drop_status?: 'deleted' | 'completed' | 'inactive'
+  diffing_user_remove_status?: 'deleted' | 'suspended'
+  batch_mode_enrollment_drop_status?: 'deleted' | 'completed' | 'inactive'
+  change_threshold?: number
+}
+
 export type SisImport = {
   id: string
   created_at: string
@@ -772,6 +811,7 @@ export type SisImport = {
   change_threshold: number
   diff_row_count_threshold: number
   user: User
+  pre_attachment?: AttachmentPreflight
 }
 
 export type ExperienceSummary = {

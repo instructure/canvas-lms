@@ -21,9 +21,73 @@ import {ApolloProvider} from '@apollo/client'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mswClient} from '@canvas/msw/mswClient'
+import {graphql, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {AddressBookContainer} from '../AddressBookContainer'
 import {handlers} from '../../../../graphql/mswHandlers'
+
+// ADDRESS_BOOK_RECIPIENTS uses `sisId @include(if: ENV.inbox_sis_id_for_duplicates)`,
+// which is evaluated at module load time. Since ENV doesn't have the flag set in tests,
+// sisId is never requested. Override the query to always include sisId so SIS tests work.
+vi.mock('../../../../graphql/Queries', async () => {
+  const {gql} = await import('@apollo/client')
+  const actual = await vi.importActual('../../../../graphql/Queries')
+  return {
+    ...actual,
+    ADDRESS_BOOK_RECIPIENTS: gql`
+      query GetInboxAddressBookRecipients(
+        $userID: ID!
+        $context: String
+        $search: String
+        $afterUser: String
+        $afterContext: String
+        $courseContextCode: String!
+      ) {
+        legacyNode(_id: $userID, type: User) {
+          ... on User {
+            id
+            recipients(context: $context, search: $search) {
+              sendMessagesAll
+              contextsConnection(first: 20, after: $afterContext) {
+                nodes {
+                  id
+                  name
+                }
+                pageInfo {
+                  endCursor
+                  hasNextPage
+                }
+              }
+              usersConnection(first: 20, after: $afterUser) {
+                nodes {
+                  _id
+                  id
+                  name
+                  shortName
+                  pronouns
+                  sisId
+                  observerEnrollmentsConnection(contextCode: $courseContextCode) {
+                    nodes {
+                      associatedUser {
+                        _id
+                        name
+                      }
+                    }
+                  }
+                }
+                pageInfo {
+                  endCursor
+                  hasNextPage
+                }
+              }
+            }
+            __typename
+          }
+        }
+      }
+    `,
+  }
+})
 
 describe('AddressBookContainer', () => {
   const server = setupServer(...handlers)
@@ -240,6 +304,169 @@ describe('AddressBookContainer', () => {
       await waitFor(() => {
         expect(onInputValueChange).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('SIS ID duplicate detection', () => {
+    // Each test uses a unique courseContextCode to get a distinct Apollo cache key,
+    // preventing stale hits from the shared mswClient singleton across tests.
+    let SIS_COURSE_CONTEXT
+    beforeEach(() => {
+      SIS_COURSE_CONTEXT = `course_sis_${Date.now()}_${Math.random()}`
+    })
+
+    const makeRecipientsHandler = nodes =>
+      graphql.query('GetInboxAddressBookRecipients', () =>
+        HttpResponse.json({
+          data: {
+            legacyNode: {
+              id: 'VXNlci0x',
+              __typename: 'User',
+              recipients: {
+                sendMessagesAll: false,
+                contextsConnection: {
+                  nodes: [],
+                  pageInfo: {hasNextPage: false, endCursor: null, __typename: 'PageInfo'},
+                  __typename: 'MessageableContextConnection',
+                },
+                usersConnection: {
+                  nodes,
+                  pageInfo: {hasNextPage: false, endCursor: null, __typename: 'PageInfo'},
+                  __typename: 'MessageableUserConnection',
+                },
+                __typename: 'Recipients',
+              },
+            },
+          },
+        }),
+      )
+
+    const openUsersSubmenu = async rendered => {
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[1]) // Click on Users
+    }
+
+    it('shows sisId next to users with duplicate names', async () => {
+      server.use(
+        makeRecipientsHandler([
+          {
+            _id: '1',
+            id: 'U1',
+            name: 'John Smith',
+            shortName: 'John Smith',
+            pronouns: null,
+            sisId: 'SIS123',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+          {
+            _id: '2',
+            id: 'U2',
+            name: 'John Smith',
+            shortName: 'John Smith',
+            pronouns: null,
+            sisId: 'SIS456',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+          {
+            _id: '3',
+            id: 'U3',
+            name: 'Jane Doe',
+            shortName: 'Jane Doe',
+            pronouns: null,
+            sisId: 'SIS789',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+        ]),
+      )
+
+      const rendered = setup({courseContextCode: SIS_COURSE_CONTEXT})
+      await openUsersSubmenu(rendered)
+
+      expect(await rendered.findByText('SIS123')).toBeInTheDocument()
+      expect(await rendered.findByText('SIS456')).toBeInTheDocument()
+      expect(rendered.queryByText('SIS789')).not.toBeInTheDocument()
+    })
+
+    it('hides all sisIds when all names are unique', async () => {
+      server.use(
+        makeRecipientsHandler([
+          {
+            _id: '1',
+            id: 'U1',
+            name: 'Alice Brown',
+            shortName: 'Alice Brown',
+            pronouns: null,
+            sisId: 'SIS111',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+          {
+            _id: '2',
+            id: 'U2',
+            name: 'Bob Wilson',
+            shortName: 'Bob Wilson',
+            pronouns: null,
+            sisId: 'SIS222',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+          {
+            _id: '3',
+            id: 'U3',
+            name: 'Charlie Davis',
+            shortName: 'Charlie Davis',
+            pronouns: null,
+            sisId: 'SIS333',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+        ]),
+      )
+
+      const rendered = setup({courseContextCode: SIS_COURSE_CONTEXT})
+      await openUsersSubmenu(rendered)
+
+      await rendered.findAllByTestId('address-book-item') // wait for items to load
+      expect(rendered.queryByText('SIS111')).not.toBeInTheDocument()
+      expect(rendered.queryByText('SIS222')).not.toBeInTheDocument()
+      expect(rendered.queryByText('SIS333')).not.toBeInTheDocument()
+    })
+
+    it('treats names as duplicates case-insensitively', async () => {
+      server.use(
+        makeRecipientsHandler([
+          {
+            _id: '1',
+            id: 'U1',
+            name: 'John Smith',
+            shortName: 'John Smith',
+            pronouns: null,
+            sisId: 'SIS123',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+          {
+            _id: '2',
+            id: 'U2',
+            name: 'JOHN SMITH',
+            shortName: 'JOHN SMITH',
+            pronouns: null,
+            sisId: 'SIS456',
+            observerEnrollmentsConnection: null,
+            __typename: 'MessageableUser',
+          },
+        ]),
+      )
+
+      const rendered = setup({courseContextCode: SIS_COURSE_CONTEXT})
+      await openUsersSubmenu(rendered)
+
+      expect(await rendered.findByText('SIS123')).toBeInTheDocument()
+      expect(await rendered.findByText('SIS456')).toBeInTheDocument()
     })
   })
 })

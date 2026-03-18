@@ -327,6 +327,59 @@ module WidgetDashboardPage
     "[data-testid='recent-grades-list']"
   end
 
+  # Todo widget selectors
+  def todo_filter_select_selector
+    "[data-testid='todo-filter-select']"
+  end
+
+  def todo_item_selector(item_id)
+    "[data-testid='todo-item-#{item_id}']"
+  end
+
+  def todo_item_prefix_selector
+    "[data-testid^='todo-item-'][role='group']"
+  end
+
+  def todo_item_title_selector(item_id)
+    "[data-testid='todo-link-#{item_id}']"
+  end
+
+  def todo_checkbox_selector(item_id)
+    "[data-testid='todo-checkbox-#{item_id}']"
+  end
+
+  def todo_item_course_link_selector(item_id)
+    "[data-testid='todo-item-course-link-#{item_id}']"
+  end
+
+  def no_todo_items_message_selector
+    "[data-testid='no-todos-message']"
+  end
+
+  def new_todo_button_selector
+    "[data-testid='new-todo-button']"
+  end
+
+  def create_todo_modal_selector
+    "[role='dialog'][aria-label='Add To Do']"
+  end
+
+  def create_todo_title_input_selector
+    "[data-testid='create-todo-title-input']"
+  end
+
+  def create_todo_course_select_selector
+    "[data-testid='create-todo-course-select']"
+  end
+
+  def create_todo_cancel_button_selector
+    "[data-testid='create-todo-cancel-button']"
+  end
+
+  def create_todo_submit_button_selector
+    "[data-testid='create-todo-submit-button']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -639,6 +692,51 @@ module WidgetDashboardPage
     f(recent_grades_empty_message_selector)
   end
 
+  # Todo widget elements
+  def todo_filter_select
+    f(todo_filter_select_selector)
+  end
+
+  def all_todo_items
+    ff(todo_item_prefix_selector)
+  end
+
+  def todo_item(item_id)
+    f(todo_item_selector(item_id))
+  end
+
+  def todo_item_title(item_id)
+    f(todo_item_title_selector(item_id))
+  end
+
+  def todo_checkbox(item_id)
+    f(todo_checkbox_selector(item_id))
+  end
+
+  def todo_item_course_link(item_id)
+    f(todo_item_course_link_selector(item_id))
+  end
+
+  def no_todo_items_message
+    f(no_todo_items_message_selector)
+  end
+
+  def new_todo_button
+    f(new_todo_button_selector)
+  end
+
+  def create_todo_title_input
+    f(create_todo_title_input_selector)
+  end
+
+  def create_todo_cancel_button
+    f(create_todo_cancel_button_selector)
+  end
+
+  def create_todo_submit_button
+    f(create_todo_submit_button_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -761,5 +859,17 @@ module WidgetDashboardPage
   def expand_feedback_on_recent_grade(submission_id)
     expect(recent_grade_expand_button(submission_id)).to be_displayed
     recent_grade_expand_button(submission_id).click
+  end
+
+  def filter_todos_by(filter_value)
+    expect(todo_filter_select).to be_displayed
+    todo_filter_select.click
+    click_INSTUI_Select_option(todo_filter_select_selector, filter_value)
+    wait_for_ajaximations
+  end
+
+  def verify_todo_add_modal_closed
+    # Retry the block every polling interval for up to 1 second
+    keep_trying_until(1) { element_exists?(create_todo_modal_selector) == false }
   end
 end

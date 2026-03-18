@@ -238,7 +238,7 @@ describe Role do
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
       end
 
-      expect { Role.all_enrollment_roles_for_account(@sub_account) }.to_not raise_error
+      expect { Role.all_enrollment_roles_for_account(@sub_account) }.not_to raise_error
     end
 
     it "gets counts for all roles" do
@@ -274,7 +274,7 @@ describe Role do
 
     it "includes inactive roles" do
       @account.roles.each(&:deactivate!)
-      all = Role.all_enrollment_roles_for_account(@sub_account, true)
+      all = Role.all_enrollment_roles_for_account(@sub_account, include_inactive: true)
       @base_types.each do |bt|
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
       end
@@ -288,21 +288,24 @@ describe Role do
       end
 
       describe "does all the addable/deleteable by user stuff right" do
-        roles_to_test = %w[designer observer ta teacher student]
-        role_names = {
-          "designer" => "DesignerEnrollment",
-          "observer" => "ObserverEnrollment",
-          "ta" => "TaEnrollment",
-          "teacher" => "TeacherEnrollment",
-          "student" => "StudentEnrollment"
-        }
+        roles_to_test = %w[designer observer ta teacher student].freeze # rubocop:disable RSpec/LeakyLocalVariable
+        let(:role_names) do
+          {
+            "designer" => "DesignerEnrollment",
+            "observer" => "ObserverEnrollment",
+            "ta" => "TaEnrollment",
+            "teacher" => "TeacherEnrollment",
+            "student" => "StudentEnrollment"
+          }.freeze
+        end
+
         ["adding", "deleting"].each do |mode|
           roles_to_test.each do |perm_role|
-            role_key_to_test = (mode == "adding") ? :addable_by_user : :deleteable_by_user
-            opposite_role_key_to_test = (mode == "adding") ? :deleteable_by_user : :addable_by_user
-            permission_key = (mode == "adding") ? :"add_#{perm_role}_to_course" : "remove_#{perm_role}_from_course"
-
             it "when #{mode} a(n) #{perm_role}" do
+              role_key_to_test = (mode == "adding") ? :addable_by_user : :deleteable_by_user
+              opposite_role_key_to_test = (mode == "adding") ? :deleteable_by_user : :addable_by_user
+              permission_key = (mode == "adding") ? :"add_#{perm_role}_to_course" : "remove_#{perm_role}_from_course"
+
               @course.account.role_overrides.create!(role: @role, enabled: true, permission: permission_key)
 
               roles = Role.role_data(@course, @admin)

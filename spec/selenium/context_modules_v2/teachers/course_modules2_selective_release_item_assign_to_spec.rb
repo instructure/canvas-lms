@@ -418,8 +418,8 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
               update_due_date(card_index, date)
               update_due_time(card_index, time)
             elsif date_label == :unlock_at
-              update_available_date(card_index, date, true)
-              update_available_time(card_index, time, true)
+              update_available_date(card_index, date, exclude_due_date: true)
+              update_available_time(card_index, time, exclude_due_date: true)
             end
 
             click_save_button
@@ -1021,7 +1021,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       RoleOverride.create!(context: @course.account, permission:, role: teacher_role, enabled: false)
       go_to_modules
       manage_module_item_button(item.id).click
-      expect(element_exists?(module_item_action_menu_link_selector("Assign To..."), true)).not_to be_truthy
+      expect(element_exists?(module_item_action_menu_link_selector("Assign To..."), xpath: true)).not_to be_truthy
     end
 
     it "shows assign to option for assignment module items based off manage_assignments_edit permission" do

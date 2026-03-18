@@ -39,10 +39,12 @@ vi.mock('../../../context', async () => {
   return {
     ...actualContext,
     useNewLoginData: vi.fn(() => ({
+      customMessageParent: undefined,
       isDataLoading: false,
     })),
   }
 })
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 describe('Parent', () => {
   const setup = () => {
@@ -61,7 +63,7 @@ describe('Parent', () => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    vi.mocked(useNewLoginData).mockImplementation(() => ({
+    mockUseNewLoginData.mockImplementation(() => ({
       isDataLoading: false,
       loginHandleName: 'Email',
       privacyPolicyUrl: '',
@@ -87,7 +89,7 @@ describe('Parent', () => {
     })
 
     it('renders terms checkbox when required', async () => {
-      vi.mocked(useNewLoginData).mockImplementation(() => ({
+      mockUseNewLoginData.mockImplementation(() => ({
         isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
@@ -160,7 +162,7 @@ describe('Parent', () => {
     })
 
     it('validates the terms checkbox when required', async () => {
-      vi.mocked(useNewLoginData).mockImplementation(() => ({
+      mockUseNewLoginData.mockImplementation(() => ({
         isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
@@ -322,6 +324,37 @@ describe('Parent', () => {
     await userEvent.click(backButton)
     await waitFor(() => {
       expect(assignLocation).toHaveBeenCalledWith('/login')
+    })
+  })
+
+  describe('custom registration message', () => {
+    it('does not render custom message Alert when customMessageRegistrationParent is undefined', () => {
+      vi.mocked(useNewLoginData).mockImplementation(() => ({
+        isDataLoading: false,
+        loginHandleName: 'Email',
+        privacyPolicyUrl: '',
+        termsOfUseUrl: '',
+        termsRequired: false,
+        customMessageRegistrationParent: undefined,
+      }))
+      setup()
+      expect(screen.queryByTestId('custom-message-alert')).not.toBeInTheDocument()
+    })
+
+    it('renders custom message Alert when customMessageRegistrationParent is set', () => {
+      const customMsg = 'Parent registration info here!'
+      vi.mocked(useNewLoginData).mockImplementation(() => ({
+        isDataLoading: false,
+        loginHandleName: 'Email',
+        privacyPolicyUrl: '',
+        termsOfUseUrl: '',
+        termsRequired: false,
+        customMessageRegistrationParent: customMsg,
+      }))
+      setup()
+      const alert = screen.getByTestId('custom-message-alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(customMsg)
     })
   })
 })

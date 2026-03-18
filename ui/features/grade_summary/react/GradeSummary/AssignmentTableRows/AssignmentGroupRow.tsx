@@ -20,13 +20,17 @@ import React from 'react'
 import {ASSIGNMENT_NOT_APPLICABLE} from '../constants'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
-
+import {IconOffLine} from '@instructure/ui-icons'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   getAssignmentGroupPercentage,
   formatNumber,
   scorePercentageToLetterGrade,
   filteredAssignments,
 } from '../utils'
+import {Tooltip} from '@instructure/ui-tooltip'
+
+const I18n = createI18nScope('grade_summary')
 
 export const assignmentGroupRow = (
   // @ts-expect-error
@@ -37,6 +41,7 @@ export const assignmentGroupRow = (
   assignmentsData,
   calculateOnlyGradedAssignments = false,
   courseLevelGrades = {},
+  hideTotalRow = false,
 ) => {
   // @ts-expect-error
   const groupAssignments = assignmentsData?.assignments?.filter(assignment => {
@@ -82,18 +87,25 @@ export const assignmentGroupRow = (
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{assignmentGroup?.name}</Text>
       </Table.Cell>
-      {!ENV.restrict_quantitative_data && (
+      {!ENV.restrict_quantitative_data && !hideTotalRow && (
         <Table.Cell textAlign="center">
           <Text weight="bold">{formattedScore}</Text>
         </Table.Cell>
       )}
       <Table.Cell textAlign="center">
         <Text weight="bold">
-          {ENV.restrict_quantitative_data
-            ? letterGrade
-            : `${formatNumber(courseLevelScore) || '-'}/${
-                formatNumber(courseLevelPossible) || '-'
-              }`}
+          {hideTotalRow ? (
+            <Tooltip
+              data-testid="user-list-row-tooltip"
+              renderTip={I18n.t('Instructor has not posted this grade')}
+            >
+              <IconOffLine title={I18n.t('Instructor has not posted this grade')} />
+            </Tooltip>
+          ) : ENV.restrict_quantitative_data ? (
+            letterGrade
+          ) : (
+            `${formatNumber(courseLevelScore) || '-'}/${formatNumber(courseLevelPossible) || '-'}`
+          )}
         </Text>
       </Table.Cell>
       <Table.Cell>{/* Document processors */}</Table.Cell>

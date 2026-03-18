@@ -349,34 +349,14 @@ describe('ThreadActions', () => {
   })
 
   describe('Translate text button', () => {
-    beforeAll(() => {
-      window.ENV.discussion_translation_available = true
-      window.ENV.ai_translation_improvements = true
-    })
-
-    afterAll(() => {
-      delete window.ENV.ai_translation_improvements
-    })
-
     beforeEach(() => {
+      window.ENV.discussion_translation_available = true
       useTranslationStore.mockImplementation(selector =>
         selector({entries: {}, translateAll: false, clearEntry, setModalOpen}),
       )
     })
 
-    it('does not display if the feature flag is off', () => {
-      window.ENV.ai_translation_improvements = false
-      const props = createProps()
-      const {getByTestId, queryByText} = setup(props)
-      fireEvent.click(getByTestId('thread-actions-menu'))
-
-      expect(queryByText('Translate Text')).toBeFalsy()
-
-      window.ENV.ai_translation_improvements = true
-      window.ENV.discussion_translation_available = true
-    })
-
-    it('displays if the feature flag is on', () => {
+    it('displays normally', () => {
       const props = createProps()
       const {getByTestId, queryByText} = setup(props)
       fireEvent.click(getByTestId('thread-actions-menu'))

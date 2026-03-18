@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Thêm Hình Ảnh"
     },
+    "add_new_a9226085": {
+        "message": "Thêm Mới"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Thêm Chú Thích Mới"
+    },
     "add_one_9e34a6f8": {
         "message": "Thêm ngay!"
     },
@@ -176,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Nội dung tự động lưu tồn tại. Bạn có muốn tải nội dung tự động lưu để thay thế không?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Tạo phụ đề tự động"
+    },
     "available_folders_694d0436": {
         "message": "Thư Mục Khả Dụng"
     },
@@ -248,6 +257,15 @@
     "cap_product_3a5265a6": {
         "message": "Sản Phẩm Nắp"
     },
+    "caption_manager_aae0906f": {
+        "message": "Trình Quản Lý Chú Thích"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Chú thích đã được thêm cho { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Chú thích đã bị xóa cho { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Không thể gỡ phụ đề được kế thừa từ khóa học dành cho cha mẹ."
     },
@@ -307,6 +325,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Chọn tập tin phụ đề"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Chọn Tập Tin"
     },
     "choose_usage_rights_33683854": {
         "message": "Chọn quyền sử dụng..."
@@ -563,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Mô tả { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Mô tả video)"
-    },
     "description_436c48d7": {
         "message": "Mô Tả"
     },
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Mũi Tên Chéo Xuống Và Bên Phải"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Tải xuống { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Tải xuống { filename }"
     },
@@ -715,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Nhúng Hình Ảnh"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Tùy Chọn Nhúng"
     },
     "embed_video_a97a64af": {
         "message": "Nhúng Video"
@@ -844,6 +862,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Không thể truy xuất nội dung từ công cụ ngoài"
+    },
+    "file_d1b70050": {
+        "message": "Tập tin*"
     },
     "file_name_8fd421ff": {
         "message": "Tên tập tin"
@@ -1277,8 +1298,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Ngôn ngữ*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Biểu Tượng Nghệ Thuật Ngôn Ngữ"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Ngôn Ngữ Được Sử Dụng trong Phương Tiện Này*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Tự động)"
     },
     "languages_icon_9d20539": {
         "message": "Biểu Tượng Ngôn Ngữ"
@@ -1396,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Liên kết đến một trang bên ngoài."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Đã thu gọn danh sách."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Đã mở rộng danh sách."
     },
     "lists_cd1336fc": {
         "message": "Danh Sách"
@@ -1742,6 +1778,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Các phím tắt trình chỉnh sửa khác có trong"
     },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Công nghệ của chúng tôi tạo phụ đề chính xác ~85%."
+    },
     "outline_color_3ef2cea7": {
         "message": "Màu Viền"
     },
@@ -1862,6 +1901,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Vui lòng chọn tập tin có loại được hỗ trợ"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Vui lòng chọn một ngôn ngữ"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Vui lòng chọn một tập tin .vtt hoặc .srt"
+    },
     "plus_d43cd4ec": {
         "message": "Cộng"
     },
@@ -1921,6 +1966,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Số Nguyên Tố"
+    },
+    "processing_8c569014": {
+        "message": "Đang xử lý..."
     },
     "product_39cf144f": {
         "message": "Sản Phẩm"
@@ -2014,6 +2062,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Đã thay thế tất cả { alertFindText } bằng { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Yêu Cầu"
     },
     "reset_95a81614": {
         "message": "Cài lại"
@@ -2161,6 +2212,9 @@
     },
     "selected_274ce24f": {
         "message": "Đã chọn"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "Tập tin đã chọn: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Đã Chọn { linkFileName }"
@@ -2591,6 +2645,12 @@
     "updated_link_a827e441": {
         "message": "Đã cập nhật liên kết"
     },
+    "upload_8b403d05": {
+        "message": "Tải lên"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Tải lên một phần ghi âm phụ đề ở định dạng SRT hoặc WebVTT."
+    },
     "upload_document_253f0478": {
         "message": "Tải Lên Tài Liệu"
     },
@@ -2695,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Được trình đọc màn hình sử dụng để mô tả nội dung của hình ảnh"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Được trình đọc màn hình sử dụng để mô tả video"
     },
     "user_documents_c206e61f": {
         "message": "Tài Liệu Người Dùng"

@@ -59,14 +59,57 @@ class PeerReviewSubAssignment < AbstractAssignment
   after_initialize :set_default_context
   after_save :unlink_assessment_requests, if: :soft_deleted?
 
-  # TODO: update broadcast policy (EGG-1672)
   set_broadcast_policy do |p|
-    p.dispatch :peer_review_sub_assignment_created
+    p.dispatch :assignment_created
     p.to do |assignment|
       BroadcastPolicies::AssignmentParticipants.new(assignment).to
     end
-    p.whenever do
-      true
+    p.whenever do |assignment|
+      BroadcastPolicies::AssignmentPolicy.new(assignment)
+                                         .should_dispatch_assignment_created?
+    end
+    p.data { course_broadcast_data }
+    p.filter_asset_by_recipient do |assignment, user|
+      assignment.overridden_for(user, skip_clone: true)
+    end
+
+    p.dispatch :assignment_due_date_changed
+    p.to do |assignment|
+      # everyone who is _not_ covered by an assignment override affecting due_at
+      # (the AssignmentOverride records will take care of notifying those users)
+      excluded_ids = participants_with_overridden_due_at.to_set(&:id)
+      BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
+    end
+    p.whenever do |assignment|
+      BroadcastPolicies::AssignmentPolicy.new(assignment)
+                                         .should_dispatch_assignment_due_date_changed?
+    end
+    p.data { course_broadcast_data }
+
+    p.dispatch :assignment_changed
+    p.to do |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    end
+    p.whenever do |assignment|
+      BroadcastPolicies::AssignmentPolicy.new(assignment)
+                                         .should_dispatch_assignment_changed?
+    end
+    p.data { course_broadcast_data }
+
+    p.dispatch :submissions_posted
+    p.to do |assignment|
+      assignment.course.participating_instructors_by_date
+    end
+    p.whenever do |assignment|
+      BroadcastPolicies::AssignmentPolicy.new(assignment)
+                                         .should_dispatch_submissions_posted?
+    end
+    p.data do |record|
+      if record.posting_params_for_notifications.present?
+        record.posting_params_for_notifications.merge(course_broadcast_data)
+      else
+        course_broadcast_data
+      end
     end
   end
 
@@ -84,6 +127,24 @@ class PeerReviewSubAssignment < AbstractAssignment
 
   def governs_submittable?
     false
+  end
+
+  # visibility of peer_review_sub_assignments is determined by the visibility of their parent assignment
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids, assignment_ids = nil, include_concluded = true|
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                             .assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:, include_concluded:)
+                             .pluck(:assignment_id)
+    if visible_assignment_ids.any?
+      where(parent_assignment_id: visible_assignment_ids)
+    else
+      none
+    end
+  }
+
+  # Peer Review Sub Assignment is not accessible via URL directly, only via its parent
+  # Override to_model so notifications and URL generation point to parent assignment
+  def to_model
+    parent_assignment
   end
 
   private

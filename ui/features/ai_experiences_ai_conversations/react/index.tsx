@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import AIConversationsPage from './components/AIConversationsPage'
 import {AIExperience} from '../types'
 
@@ -27,8 +27,5 @@ if (container) {
   const aiExperience: AIExperience = (window.ENV.AI_EXPERIENCE as AIExperience) || {}
   const courseId = window.ENV.COURSE_ID || ''
 
-  ReactDOM.render(
-    <AIConversationsPage aiExperience={aiExperience} courseId={courseId} />,
-    container,
-  )
+  legacyRender(<AIConversationsPage aiExperience={aiExperience} courseId={courseId} />, container)
 }

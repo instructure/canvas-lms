@@ -143,7 +143,7 @@ describe "course settings" do
       fj(".grading_standard_select:visible a").click
       fj("button.select_grading_standard_link:visible").click
       f(".done_button").click
-      wait_for_new_page_load(submit_form("#course_form"))
+      wait_for_new_page_load { submit_form("#course_form") }
 
       @course.reload
       expect(@course.grading_standard).to eq(@standard)
@@ -308,7 +308,7 @@ describe "course settings" do
       @course.update(self_enrollment: true)
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       get "/courses/#{@course.id}/settings"
-      expect(f(".self_enrollment_message")).to_not be_displayed
+      expect(f(".self_enrollment_message")).not_to be_displayed
     end
 
     it "enables announcement limit if show announcements enabled" do
@@ -636,8 +636,8 @@ describe "course settings" do
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f("#course_restrict_student_past_view")).to_not be_displayed
-    expect(f("#course_restrict_student_future_view")).to_not be_displayed
+    expect(f("#course_restrict_student_past_view")).not_to be_displayed
+    expect(f("#course_restrict_student_future_view")).not_to be_displayed
   end
 
   it "disables editing settings if :manage rights are not granted" do

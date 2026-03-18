@@ -198,7 +198,11 @@ module Lti
         when :updated_by
           reg.updated_by&.name&.downcase || ""
         when :on
-          account_bindings[reg.global_id]&.workflow_state || ""
+          if check_registration_workflow_state?
+            reg.workflow_state
+          else
+            account_bindings[reg.global_id]&.workflow_state || ""
+          end
         end
       end
 
@@ -207,6 +211,12 @@ module Lti
       else
         sorted_registrations
       end
+    end
+
+    def check_registration_workflow_state?
+      return @check_registration_workflow_state if defined?(@check_registration_workflow_state)
+
+      @check_registration_workflow_state = account.root_account.feature_enabled?(:lti_deactivate_registrations)
     end
   end
 end

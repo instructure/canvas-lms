@@ -23,7 +23,7 @@ module Types
     graphql_name "PreferredLanguageType"
     description "The preferred language for the translation, currently supporting only Cedar languages."
 
-    Translation::CedarTranslator.languages.each do |lang|
+    Translation.languages.each do |lang|
       value lang[:id].sub("-", "_").upcase, value: lang[:id], description: lang[:name]
     end
   end

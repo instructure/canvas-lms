@@ -90,7 +90,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "kicks off a sis import via multipart attachment" do
-    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(double("Delayed::Job", id: 123))
+    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(instance_double(Delayed::Job, id: 123))
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: "sis_imports_api",
@@ -1123,7 +1123,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "works with import permissions" do
-    account_admin_user_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
+    account_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
              { controller: "sis_imports_api",

@@ -340,7 +340,7 @@ describe Login::CanvasController do
                                                                    .with("username", "password")
                                                                    .and_return([{ "uid" => ["12345"] }])
       unique_id = "username"
-      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).not_to be_exists
 
       post "create", params: { pseudonym_session: { unique_id: "username", password: "password" } }
       expect(response).to be_redirect
@@ -654,7 +654,7 @@ describe Login::CanvasController do
     end
 
     before do
-      redis = double("Redis")
+      redis = instance_double(Redis)
       allow(redis).to receive_messages(setex: nil, hget: nil, hmget: nil, del: nil, pipelined: nil)
       allow(Canvas::Security::LoginRegistry).to receive_messages(redis:)
     end

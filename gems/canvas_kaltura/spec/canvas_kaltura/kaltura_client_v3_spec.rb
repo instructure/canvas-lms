@@ -20,6 +20,8 @@
 
 require "spec_helper"
 
+require "active_support"
+
 describe CanvasKaltura::ClientV3 do
   def create_config(opts = {})
     allow(CanvasKaltura::ClientV3).to receive(:config) {
@@ -52,9 +54,8 @@ describe CanvasKaltura::ClientV3 do
   end
 
   before do
-    CanvasKaltura.cache = double(read: nil, write: nil)
-    CanvasKaltura.logger = double.as_null_object
-    CanvasKaltura.timeout_protector_proc = ->(_options, &block) { block.call }
+    CanvasKaltura.cache = instance_double(ActiveSupport::Cache::Store, read: nil, write: nil)
+    CanvasKaltura.logger = instance_double(Logger).as_null_object
     create_config
     WebMock.enable!
   end
@@ -131,7 +132,7 @@ describe CanvasKaltura::ClientV3 do
         { fileExt: "mp3", bitrate: "100", isOriginal: "0", hasWarnings: true },
         { fileExt: "mp4", bitrate: "100", isOriginal: "0", hasWarnings: true },
       ]
-      expect(@kaltura.sort_source_list(file_list).first[:isOriginal]).to_not eq "1"
+      expect(@kaltura.sort_source_list(file_list).first[:isOriginal]).not_to eq "1"
     end
 
     it "sorts by descending bitrate but deprioritize sources with suspiciously high bitrates" do
@@ -168,13 +169,13 @@ describe CanvasKaltura::ClientV3 do
 
       it "does not cache" do
         create_config_with_mock(0)
-        expect(CanvasKaltura.cache).to_not receive(:write)
+        expect(CanvasKaltura.cache).not_to receive(:write)
         @kaltura.media_sources("hi")
       end
 
       it "caches for set length" do
         create_config_with_mock(2)
-        m = double
+        m = instance_double(ActiveSupport::Cache::Store)
         expect(m).to receive(:write).with(["media_sources2", "hi", 2].join("/"), [@source], { expires_in: 2 })
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -183,7 +184,7 @@ describe CanvasKaltura::ClientV3 do
 
       it "caches indefinitely" do
         create_config_with_mock(nil)
-        m = double
+        m = instance_double(ActiveSupport::Cache::Store)
         expect(m).to receive(:write).with(["media_sources2", "hi", nil].join("/"), [@source])
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
@@ -281,7 +282,7 @@ describe CanvasKaltura::ClientV3 do
 
       expect(@kaltura).to receive(:getRequest).with(
         :media, :get, { ks: nil, entryId: entry_id }
-      ).and_return(double(children: []))
+      ).and_return(instance_double(Nokogiri::XML::Element, children: []))
 
       @kaltura.mediaGet(entry_id)
     end
@@ -304,7 +305,7 @@ describe CanvasKaltura::ClientV3 do
           :entryId => 12_345,
           "mediaEntry:key" => "value"
         }
-      ).and_return(double(children: []))
+      ).and_return(instance_double(Nokogiri::XML::Element, children: []))
 
       @kaltura.mediaUpdate(12_345, { "key" => "value" })
     end

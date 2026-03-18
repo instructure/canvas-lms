@@ -23,6 +23,7 @@ class OAuth2ProviderController < ApplicationController
   protect_from_forgery with: :exception, unless: :skip_csrf?
   before_action :run_login_hooks, only: %i[token]
   skip_before_action :require_reacceptance_of_terms, only: %i[token destroy]
+  skip_before_action :require_user, only: %i[accept auth confirm deny token]
 
   include Lti::Concerns::ParentFrame # allow_trusted_tools_to_embed_this_page!
   include Login::Shared

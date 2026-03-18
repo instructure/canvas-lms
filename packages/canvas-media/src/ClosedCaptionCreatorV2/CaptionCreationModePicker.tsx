@@ -24,12 +24,16 @@ import type {CaptionCreationMode} from './types'
 
 export interface CaptionCreationModePickerProps {
   onSelect: (mode: CaptionCreationMode) => void
+  showAutoOption?: boolean
 }
 
 /**
  * Component for choosing between manual upload or auto-captioning
  */
-export function CaptionCreationModePicker({onSelect}: CaptionCreationModePickerProps) {
+export function CaptionCreationModePicker({
+  onSelect,
+  showAutoOption = true,
+}: CaptionCreationModePickerProps) {
   return (
     <Flex gap="small">
       <Button
@@ -41,9 +45,11 @@ export function CaptionCreationModePicker({onSelect}: CaptionCreationModePickerP
         {formatMessage('Add New')}
       </Button>
 
-      <Button color="primary" onClick={() => onSelect('auto')} textAlign="center">
-        {formatMessage('Request')}
-      </Button>
+      {showAutoOption && (
+        <Button color="primary" onClick={() => onSelect('auto')} textAlign="center">
+          {formatMessage('Request')}
+        </Button>
+      )}
     </Flex>
   )
 }

@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Tambah Imej"
     },
+    "add_new_a9226085": {
+        "message": "Tambah Baharu"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Tambah Kapsyen Baharu"
+    },
     "add_one_9e34a6f8": {
         "message": "Tambah satu!"
     },
@@ -176,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Kandungan yang disimpan secara automatik wujud. Adakah anda ingin memuat naik kandungan yang disimpan secara automatik sebagai ganti?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Kapsyen automatik"
+    },
     "available_folders_694d0436": {
         "message": "Folder tersedia"
     },
@@ -248,6 +257,15 @@
     "cap_product_3a5265a6": {
         "message": "Hadkan Produk"
     },
+    "caption_manager_aae0906f": {
+        "message": "Pengurus Kapsyen"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Kapsyen telah ditambahkan untuk { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Kapsyen telah dipadamkan untuk { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Kapsyen yang diwarisi daripada kursus induk tidak boleh dialih keluar."
     },
@@ -307,6 +325,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Pilih fail kapsyen "
+    },
+    "choose_file_8d89ccab": {
+        "message": "Pilih Fail"
     },
     "choose_usage_rights_33683854": {
         "message": "Pilih hak penggunaan..."
@@ -563,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Terangkan { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Keterangan video)"
-    },
     "description_436c48d7": {
         "message": "Penerangan"
     },
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Panah Tenggara"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Muat turun { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Muat turun { filename }"
     },
@@ -715,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Imej Terbenam"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Pilihan benam"
     },
     "embed_video_a97a64af": {
         "message": "Video Terbenam"
@@ -844,6 +862,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Gagal mengambil kandungan daripada alat luar"
+    },
+    "file_d1b70050": {
+        "message": "Fail*"
     },
     "file_name_8fd421ff": {
         "message": "Nama fail"
@@ -1277,8 +1298,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Nama*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Ikon Seni Bahasa"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Bahasa Yang Dituturkan dalam Media Ini*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automatik)"
     },
     "languages_icon_9d20539": {
         "message": "Ikon Bahasa"
@@ -1396,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Pautan ke laman luar."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Senarai dikuncupkan."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Senarai dikembangkan."
     },
     "lists_cd1336fc": {
         "message": "Senarai"
@@ -1742,6 +1778,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Pintasan editor lain boleh ditemui di"
     },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Teknologi kami menjana ~85% kapsyen yang tepat."
+    },
     "outline_color_3ef2cea7": {
         "message": "Warna Garis Luar"
     },
@@ -1862,6 +1901,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Sila pilih fail daripada jenis yang disokong"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Sila pilih bahasa"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Sila pilih fail .vtt atau .srt"
+    },
     "plus_d43cd4ec": {
         "message": "Tambah"
     },
@@ -1921,6 +1966,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Nombor Perdana"
+    },
+    "processing_8c569014": {
+        "message": "Memproses..."
     },
     "product_39cf144f": {
         "message": "Produk"
@@ -2014,6 +2062,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Gantikan semua { alertFindText } dengan { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Permintaan"
     },
     "reset_95a81614": {
         "message": "Tetap Semula"
@@ -2161,6 +2212,9 @@
     },
     "selected_274ce24f": {
         "message": "Dipilih"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "Fail dipilih: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } dipilih"
@@ -2591,6 +2645,12 @@
     "updated_link_a827e441": {
         "message": "Pautan dikemas kini"
     },
+    "upload_8b403d05": {
+        "message": "Muat naik"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Muat naik trek sari kata sama ada dalam format SRT atau WebVTT."
+    },
     "upload_document_253f0478": {
         "message": "Muat Naik Dokumen"
     },
@@ -2695,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Digunakan oleh pembaca skrin untuk menerangkan kandungan imej"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Digunakan oleh pembaca skrin untuk menerangkan video"
     },
     "user_documents_c206e61f": {
         "message": "Dokumen Pengguna"

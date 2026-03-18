@@ -25,14 +25,14 @@ RSpec.shared_context "lti_advantage_shared_examples" do
   let(:lti_assignment) { Lti::LtiAssignmentCreator.new(assignment).convert }
   let(:deep_linking_return_url) { "http://www.test.cop/success" }
   let(:controller) do
-    controller = double("controller")
+    controller = instance_double(ApplicationController)
     allow(controller).to receive_messages(request:, polymorphic_url: deep_linking_return_url)
     allow(controller).to receive(:params)
     controller
   end
   # All this setup just so we can stub out controller.*_url methods
   let(:request) do
-    request = double("request")
+    request = instance_double(ActionDispatch::Request)
     allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
     request
   end

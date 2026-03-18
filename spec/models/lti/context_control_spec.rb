@@ -897,4 +897,23 @@ describe Lti::ContextControl do
         .to eq("a3.a2.a1.")
     end
   end
+
+  describe "#deleted?" do
+    let(:control) { create! }
+
+    it "returns false when workflow_state is active" do
+      expect(control.workflow_state).to eq("active")
+      expect(control.deleted?).to be false
+    end
+
+    it "returns true when workflow_state is deleted" do
+      control.update!(workflow_state: "deleted")
+      expect(control.deleted?).to be true
+    end
+
+    it "returns true when workflow_state is deleted_with_context" do
+      control.update!(workflow_state: "deleted_with_context")
+      expect(control.deleted?).to be true
+    end
+  end
 end

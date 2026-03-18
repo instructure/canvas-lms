@@ -82,7 +82,7 @@ class FeatureFlag < ActiveRecord::Base
           end
 
           if !::Rails.env.production? && context.is_a?(Account) && Account.all_special_accounts.include?(context)
-            Account.clear_special_account_cache!(true)
+            Account.clear_special_account_cache!(force: true)
           end
         end
       end

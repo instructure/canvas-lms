@@ -442,7 +442,6 @@ describe('PostToolbar', () => {
 
       it('displays Hide Translation when translation exists', () => {
         useTranslation.mockReturnValue({tryTranslate})
-        window.ENV.ai_translation_improvements = true
         window.ENV.discussion_translation_available = true
         useTranslationStore.mockImplementation(selector =>
           selector({

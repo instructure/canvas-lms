@@ -19,6 +19,8 @@
 #
 
 class LearnPlatformController < ApplicationController
+  skip_before_action :require_user
+
   def learnplatform_api
     @learnplatform_api ||= LearnPlatform::Api.new
   end

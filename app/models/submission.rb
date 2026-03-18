@@ -344,13 +344,27 @@ class Submission < ActiveRecord::Base
   scope :unposted, -> { where(posted_at: nil) }
 
   scope :in_current_grading_period_for_courses, lambda { |course_ids|
-    current_period_clause = ""
-    course_ids.uniq.each_with_index do |course_id, i|
-      grading_period_id = GradingPeriod.current_period_for(Course.find(course_id))&.id
-      current_period_clause += grading_period_id.nil? ? sanitize_sql(["course_id = ?", course_id]) : sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
-      current_period_clause += " OR " if i < course_ids.length - 1
+    unique_course_ids = course_ids.uniq
+    return none if unique_course_ids.empty?
+
+    courses = Course.where(id: unique_course_ids).preload(
+      :grading_period_groups,
+      :grading_periods,
+      enrollment_term: [:grading_period_group, :grading_periods]
+    ).index_by(&:id)
+
+    clauses = unique_course_ids.map do |course_id|
+      course = courses[course_id]
+      grading_period_id = course ? GradingPeriod.for(course).find(&:current?)&.id : nil
+
+      if grading_period_id.nil?
+        sanitize_sql(["course_id = ?", course_id])
+      else
+        sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
+      end
     end
-    where(current_period_clause)
+
+    where(clauses.join(" OR "))
   }
 
   workflow do
@@ -395,7 +409,7 @@ class Submission < ActiveRecord::Base
   end
 
   # see .needs_grading_conditions
-  def needs_grading?(was = false)
+  def needs_grading?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     !send(:"submission_type#{suffix}").nil? &&
@@ -427,7 +441,7 @@ class Submission < ActiveRecord::Base
   end
 
   def needs_grading_changed?
-    needs_grading? != needs_grading?(:was)
+    needs_grading? != needs_grading?(was: true)
   end
 
   def submitted_changed?
@@ -745,7 +759,9 @@ class Submission < ActiveRecord::Base
   end
 
   def can_read_submission_user_name?(user, session)
-    return false if user_id != user.id && assignment.anonymize_students?
+    if user_id != user.id && (assignment.anonymize_students? || assignment.new_quizzes_anonymous_participants?)
+      return false
+    end
 
     !assignment.anonymous_peer_reviews? ||
       user_id == user.id ||
@@ -1144,7 +1160,7 @@ class Submission < ActiveRecord::Base
 
   # this function will check if the score needs to be updated and update/save the new score if so,
   # otherwise, it just returns the vericite_data_hash
-  def vericite_data(lookup_data = false)
+  def vericite_data(lookup_data: false)
     self.vericite_data_hash ||= {}
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
@@ -1276,7 +1292,7 @@ class Submission < ActiveRecord::Base
     if data_changed
       vericite_data_changed!
       if recheck_score_all
-        with_versioning(false, &:save!)
+        without_versioning(&:save!)
       else
         save
       end
@@ -1778,7 +1794,7 @@ class Submission < ActiveRecord::Base
         model = version.model
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if vericiteable?
-          model.turnitin_data = vericite_data(true)
+          model.turnitin_data = vericite_data(lookup_data: true)
         # only use originality data if it's loaded, we want to avoid making N+1 queries
         elsif association(:originality_reports).loaded?
           model.turnitin_data = originality_data
@@ -2785,9 +2801,48 @@ class Submission < ActiveRecord::Base
     def time_of_submission
       time = submitted_at || Time.zone.now
       time -= 60.seconds if submission_type == "online_quiz" || cached_quiz_lti?
+
+      if discussion_checkpoint_submission_with_required_replies?
+        checkpoint_completion_time = calculate_checkpoint_completion_time
+        time = checkpoint_completion_time if checkpoint_completion_time.present?
+      end
+
       time
     end
     private :time_of_submission
+
+    def discussion_checkpoint_submission_with_required_replies?
+      return false unless submission_type == "discussion_topic"
+      return false unless assignment
+
+      assignment.is_a?(SubAssignment) && assignment.sub_assignment_tag == "reply_to_entry"
+    end
+
+    def calculate_checkpoint_completion_time
+      return @calculate_checkpoint_completion_time if defined?(@calculate_checkpoint_completion_time)
+
+      @calculate_checkpoint_completion_time = fetch_checkpoint_completion_time
+    end
+
+    def fetch_checkpoint_completion_time
+      return nil unless user_id && assignment
+
+      discussion_topic = assignment.parent_assignment&.discussion_topic
+      return nil unless discussion_topic
+
+      required_count = discussion_topic.reply_to_entry_required_count
+      return nil if required_count <= 0
+
+      discussion_topic.discussion_entries
+                      .non_top_level_for_user(user_id)
+                      .order(created_at: :asc)
+                      .offset(required_count - 1)
+                      .limit(1)
+                      .pick(:created_at)
+    end
+    private :discussion_checkpoint_submission_with_required_replies?,
+            :calculate_checkpoint_completion_time,
+            :fetch_checkpoint_completion_time
   end
   include Tardiness
 

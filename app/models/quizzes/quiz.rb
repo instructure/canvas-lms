@@ -86,7 +86,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :restore_learning_outcome_results, if: -> { saved_change_to_quiz_type?(to: "assignment") }
   serialize :quiz_data
 
-  simply_versioned
+  simply_versioned versioned_associations: [:attachment_associations]
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -173,7 +173,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     self.assignment_group_id ||= assignment.assignment_group_id if assignment
-    self.question_count = question_count(true)
+    self.question_count = question_count(force_check: true)
     @update_existing_submissions = true if for_assignment? && quiz_type_changed?
     @stored_questions = nil
 
@@ -291,7 +291,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def set_unpublished_question_count
-    entries = root_entries(true)
+    entries = root_entries(force_check: true)
     cnt = 0
     entries.each do |e|
       if e[:question_points]
@@ -521,7 +521,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
       a.notify_of_update = @notify_of_update
       a.mark_as_importing!(@importing_migration) if @importing_migration
-      a.with_versioning(false) do
+      a.without_versioning do
         @notify_of_update ? a.save : a.save_without_broadcasting!
       end
       self.assignment_id = a.id
@@ -607,7 +607,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # Returns the list of all "root" entries, either questions or question
   # groups for this quiz.  This is PRE-SAVED data.  Once the quiz has
   # been saved, all the data can be found in Quizzes::Quiz.quiz_data
-  def root_entries(force_check = false)
+  def root_entries(force_check: false)
     return @root_entries if @root_entries && !force_check
 
     result = []
@@ -637,7 +637,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # Returns the number of questions a student will see on the
   # SAVED version of the quiz
-  def question_count(force_check = false)
+  def question_count(force_check: false)
     return super() if !force_check && super()
 
     question_count = 0
@@ -692,7 +692,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result
   # in @stored_questions.
-  def stored_questions(preview = false)
+  def stored_questions(preview: false)
     return @stored_questions if @stored_questions && !preview
 
     @stored_questions = begin
@@ -718,7 +718,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     allowed_attempts == -1
   end
 
-  def build_submission_end_at(submission, with_time_limit = true)
+  def build_submission_end_at(submission, with_time_limit: true)
     course = context
     user   = submission.user
     end_at = nil
@@ -753,7 +753,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
-  def generate_submission(user, preview = false)
+  def generate_submission(user, preview: false)
     submission = nil
 
     transaction do
@@ -761,7 +761,7 @@ class Quizzes::Quiz < ActiveRecord::Base
                                                    shuffle_answers:
                                                  })
 
-      submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
+      submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, temporary: preview)
       submission.retake
       submission.attempt ||= 0
       submission.attempt += 1
@@ -770,7 +770,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       submission.quiz_data = begin
         @stored_questions = nil
-        builder.build_submission_questions(id, stored_questions(preview))
+        builder.build_submission_questions(id, stored_questions(preview:))
       end
 
       submission.quiz_version = version_number
@@ -786,7 +786,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       if preview || submission.untaken?
         submission.save!
       else
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
       end
     end
     submission.record_creation_event unless preview
@@ -800,7 +800,7 @@ class Quizzes::Quiz < ActiveRecord::Base
                  :user
                end
 
-    generate_submission quiz_participant.send(identity), false
+    generate_submission quiz_participant.send(identity), preview: false
   end
 
   # Takes the PRE-SAVED version of the quiz and uses it to generate a
@@ -808,7 +808,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # the database and uses them to populate a static version that will
   # be held in Quizzes::Quiz.quiz_data
   def generate_quiz_data(opts = {})
-    entries = root_entries(true)
+    entries = root_entries(force_check: true)
     t = Time.zone.now
     entries.each do |e|
       e[:published_at] = t
@@ -1031,7 +1031,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
-  def statistics(include_all_versions = true, includes_sis_ids = true)
+  def statistics(include_all_versions: true, includes_sis_ids: true)
     quiz_statistics.build(
       report_type: "student_analysis",
       includes_all_versions: include_all_versions,

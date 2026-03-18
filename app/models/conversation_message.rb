@@ -165,7 +165,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def attachment_associations_enabled?
     Account.where(id: root_account_ids&.split(",")).any? do |acc|
-      acc.feature_enabled?(:file_association_access)
+      acc.feature_enabled?(:file_association_access_conversation)
     end
   end
 
@@ -269,8 +269,8 @@ class ConversationMessage < ActiveRecord::Base
     if conversation.context
       context_names = [conversation.context.name]
     else
-      shared_tags = author.conversation_context_codes(false)
-      shared_tags &= recipient.conversation_context_codes(false)
+      shared_tags = author.conversation_context_codes(include_concluded_codes: false)
+      shared_tags &= recipient.conversation_context_codes(include_concluded_codes: false)
       shared_tags &= conversation.tags if conversation.tags.any?
 
       context_components = shared_tags.map { |t| ActiveRecord::Base.parse_asset_string(t) }
@@ -392,7 +392,7 @@ class ConversationMessage < ActiveRecord::Base
              },
              count: user_names.size,
              user: user_names.first,
-             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,
+             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence, # rubocop:disable Rails/OutputSafety
              current_user: author_name
     end
   end

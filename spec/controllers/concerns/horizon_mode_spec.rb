@@ -24,6 +24,8 @@ describe HorizonMode do
   controller(ApplicationController) do
     include HorizonMode
 
+    skip_before_action :require_user
+
     def show
       load_canvas_career
       head :ok unless performed?
@@ -262,7 +264,7 @@ describe HorizonMode do
     end
 
     context "when @context is neither Account nor Course" do
-      let(:other_context) { double("other_context", id: 123) }
+      let(:other_context) { instance_double(Group, id: 123) }
 
       before do
         controller.instance_variable_set(:@context, other_context)
@@ -322,7 +324,7 @@ describe HorizonMode do
     end
 
     context "when @context is neither Account nor Course" do
-      let(:other_context) { double("other_context") }
+      let(:other_context) { instance_double(Group) }
 
       before do
         controller.instance_variable_set(:@context, other_context)

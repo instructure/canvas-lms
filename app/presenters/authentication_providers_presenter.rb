@@ -94,7 +94,7 @@ class AuthenticationProvidersPresenter
 
   def position_options(config)
     position_options = (1..configs.length).map { |i| [i, i] }
-    config.new_record? ? [["Last", nil]] + position_options : position_options
+    config.new_record? ? [[I18n.t("Last"), nil]] + position_options : position_options
   end
 
   def saml_identifiers
@@ -110,7 +110,7 @@ class AuthenticationProvidersPresenter
   def saml_authn_contexts(base = SAML2::AuthnStatement::Classes.constants.map { |const| SAML2::AuthnStatement::Classes.const_get(const, false) })
     return [] unless saml_enabled?
 
-    [["No Value", nil]] + base.sort
+    [[I18n.t("No Value"), nil]] + base.sort
   end
 
   def saml_enabled?
@@ -157,5 +157,5 @@ class AuthenticationProvidersPresenter
     suf
   end
 
-  delegate :native_discovery_enabled?, to: :account
+  delegate :discovery_page_active?, to: :account
 end

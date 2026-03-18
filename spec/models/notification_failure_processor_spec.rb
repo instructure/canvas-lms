@@ -27,13 +27,13 @@ describe NotificationFailureProcessor do
   end
 
   def mock_failure_summary(obj)
-    failure_summary = double
+    failure_summary = instance_double(Aws::SQS::Types::Message)
     allow(failure_summary).to receive(:body).and_return(obj.to_json)
     failure_summary
   end
 
   def mock_queue(bare_failure_summaries)
-    queue = double
+    queue = instance_double(Aws::SQS::QueuePoller)
     expect(queue).to receive(:before_request)
     expectation = expect(queue).to receive(:poll)
     bare_failure_summaries.each do |s|
@@ -83,8 +83,8 @@ describe NotificationFailureProcessor do
 
       @at = AccessToken.create!(user: @user, developer_key: DeveloperKey.default, purpose: "test")
 
-      sns_client = double
-      expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(double(attributes: { "Enabled" => "true", "CustomUserData" => @at.global_id.to_s }))
+      sns_client = instance_double(Aws::SNS::Client)
+      expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(instance_double(Aws::SNS::Types::GetEndpointAttributesResponse, attributes: { "Enabled" => "true", "CustomUserData" => @at.global_id.to_s }))
       expect(sns_client).to receive(:create_platform_endpoint).twice.and_return({ endpoint_arn: bad_arn }, { endpoint_arn: good_arn })
       bad_ne = @at.notification_endpoints.new(token: "token1") # order matters
       good_ne = @at.notification_endpoints.new(token: "token2")
@@ -146,7 +146,7 @@ describe NotificationFailureProcessor do
                                                                            access_key: "key",
                                                                            secret_access_key: "secret"
                                                                          })
-      queue = double
+      queue = instance_double(Aws::SQS::QueuePoller)
       before_request = nil
       expect(queue).to receive(:before_request) do |&block|
         before_request = block

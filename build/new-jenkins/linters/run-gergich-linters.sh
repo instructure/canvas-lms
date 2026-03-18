@@ -49,17 +49,21 @@ if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
   ruby script/tatl_tael
 fi
 
-if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'packages/canvas-rce/**/*.jsx' 'packages/canvas-rce/**/*.ts' 'packages/canvas-rce/**/*.tsx'; then
+if git diff HEAD~1 -- 'packages/canvas-rce/**/*.js' 'packages/canvas-rce/**/*.jsx' 'packages/canvas-rce/**/*.ts' 'packages/canvas-rce/**/*.tsx' | grep -q '^+.*ENV'; then
   message="It looks like you added a reference to a Canvas ENV key inside the RCE. Instead, you should pass this value via a prop the RCEWrapper.\\n"
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
 if ! git diff-tree --no-commit-id --name-only --diff-filter=D -r --find-renames --exit-code HEAD -- 'db/migrate'; then
-  # We have deleted migrations, make sure we made a new migration integrity version
-  if git diff-tree --no-commit-id --name-only --diff-filter=A -r --no-renames --exit-code HEAD -- 'db/migrate/*_validate_migration_integrity.rb'; then
-    # No new migration integrity commit was added
-    message="Migrations were deleted (likely squashed) without the integrity migration being updated. Rename ValidateMigrationIntegrity to a new version and update last_squashed_migration_version to reflect the last removed migration."
-    gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+  # We have deleted migrations; only check for integrity migration update if
+  # other migrations were also modified (i.e. actual squashing occurred, not
+  # just deleting standalone migrations like DataFixups)
+  if ! git diff-tree --no-commit-id --name-only --diff-filter=M -r --exit-code HEAD -- 'db/migrate'; then
+    if git diff-tree --no-commit-id --name-only --diff-filter=A -r --no-renames --exit-code HEAD -- 'db/migrate/*_validate_migration_integrity.rb'; then
+      # No new migration integrity commit was added
+      message="Migrations were deleted (likely squashed) without the integrity migration being updated. Rename ValidateMigrationIntegrity to a new version and update last_squashed_migration_version to reflect the last removed migration."
+      gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+    fi
   fi
 fi
 

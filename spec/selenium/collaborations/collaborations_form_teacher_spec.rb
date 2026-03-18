@@ -29,10 +29,10 @@ describe "collaborations" do
   include GoogleDriveCommon
 
   context "a teacher's" do
-    title = "Google Docs"
-    type = "google_docs"
+    let(:title) { "Google Docs" }
+    let(:type) { "google_docs" }
 
-    context "#{title} collaboration" do
+    context "Google Docs collaboration" do
       before do
         course_with_teacher_logged_in
         setup_google_drive
@@ -75,7 +75,7 @@ describe "collaborations" do
         get "/courses/#{@course.id}/collaborations"
 
         expect(ff(".available-users li").length).to eq 2
-        expect(f(".available-users")).to_not include_text("inactive")
+        expect(f(".available-users")).not_to include_text("inactive")
       end
 
       it "selects from all course groups", priority: "1" do

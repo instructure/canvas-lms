@@ -296,6 +296,36 @@ describe UsersController, type: :request do
     expect(ignored_asset).to eq rtt
   end
 
+  it "supports ignore for peer review sub assignments" do
+    @teacher_course.account.enable_feature!(:peer_review_allocation_and_grading)
+    peer_assignment = @teacher_course.assignments.create!(
+      title: "Peer Review Assignment",
+      submission_types: "online_text_entry",
+      points_possible: 10,
+      peer_reviews: true
+    )
+    peer_review_sub_assignment = peer_assignment.create_peer_review_sub_assignment!(
+      title: "Peer Review Assignment Peer Review (2)",
+      points_possible: 5,
+      due_at: 1.day.from_now
+    )
+    student = @teacher_course.students.first
+    peer_assignment.submit_homework(student, submission_type: "online_text_entry", body: "student work")
+
+    api_call(:delete,
+             "/api/v1/users/self/todo/peer_review_sub_assignment_#{peer_review_sub_assignment.id}/grading",
+             controller: "users",
+             action: "ignore_item",
+             format: "json",
+             purpose: "grading",
+             asset_string: "peer_review_sub_assignment_#{peer_review_sub_assignment.id}",
+             permanent: "0")
+
+    expect(response).to be_successful
+    ignored_asset = Ignore.last.asset
+    expect(ignored_asset).to eq peer_review_sub_assignment
+  end
+
   it "ignores excused assignments for students" do
     @student_course.enroll_teacher(@teacher)
     @a1.grade_student(@me, excuse: true, grader: @teacher)
@@ -532,7 +562,7 @@ describe UsersController, type: :request do
       @teacher = course_with_teacher(active_all: true).user
       @teacher_course = @course
       @student_course = course_factory(active_course: true)
-      @student_course.enroll_student(@teacher).accept(true)
+      @student_course.enroll_student(@teacher).accept(force: true)
       # an assignment i need to submit (needs_submitting)
       batch = [120, 13, 147, 79, 161, 119, 81, 57, 134, 21].map do |i|
         {
@@ -668,7 +698,7 @@ describe UsersController, type: :request do
       assignment.submit_homework(@user, submission_type: "online_text_entry", body: "done")
       # one assignment ignored
       assignment = @student_course.assignments[1]
-      @user.ignore_item!(assignment, "submitting", true)
+      @user.ignore_item!(assignment, "submitting", permanent: true)
 
       # an assignment i created, and a student who submits the assignment (needs_grading)
       @me = @user
@@ -693,7 +723,7 @@ describe UsersController, type: :request do
       submission.save!
       # one assignment ignored
       assignment = @teacher_course.assignments[1]
-      @user.ignore_item!(assignment, "grading", true)
+      @user.ignore_item!(assignment, "grading", permanent: true)
     end
 
     it "checks for auth" do

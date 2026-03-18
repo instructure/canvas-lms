@@ -51,7 +51,7 @@ def collectCrystalballMap() {
   stage('Collect Crystalball Map') {
     copyArtifacts(
       filter: 'tmp/*/crystalball/**',
-      optional: false,
+      optional: true,
       projectName: env.JOB_NAME,
       selector: specific(env.BUILD_NUMBER),
     )
@@ -128,6 +128,7 @@ node(nodeLabel()) {
   timeout(time: 60, unit: 'MINUTES') {
     ansiColor('xterm') {
       timestamps {
+        def buildFailed = false
         try {
           stage('Clean Workspace') {
             pipelineHelpers.cleanupWorkspace()
@@ -165,96 +166,83 @@ node(nodeLabel()) {
           stage('Run Tests') {
             def rspecqStages = [:]
 
-            // Pull docker images before running Reporter
-            credentials.withStarlordCredentials {
-              sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+            stage('Setup Docker Images') {
+              rspecStage.setupNode()
+            }
+
+            rspecqStages['Reporter'] = {
+              try {
+                sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $env.PATCHSET_TAG bundle exec rspecq \
+                  --build=${env.JOB_NAME}_build${env.BUILD_NUMBER} \
+                  --queue-wait-timeout 120 \
+                  --redis-url $env.RSPECQ_REDIS_URL \
+                  --report", label: 'Reporter')
+              } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+                  sh '''#!/bin/bash
+                    ids=($(docker ps -aq --filter "name=canvas-"))
+                    for i in "${ids[@]}"
+                      do
+                        docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+                    done
+                  '''
+                }
+                throw e
+              }
             }
 
             // RSpecQ Set 00 runs on main coordinator node
-            rspecqStages['RSpecQ Set 00'] = {
+            rspecqStages['RSpecQ 00'] = {
               withEnv([
-                "CI_NODE_INDEX=0",
+                "CI_NODE_INDEX=00",
                 "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}",
                 "CRYSTALBALL_MAP=1"
               ]) {
-                def stageName = 'RSpecQ Set 00'
+                def stageName = 'RSpecQ 00'
                 def stageStartTime = System.currentTimeMillis()
                 try {
-                  stage('00 Cleanup') {
-                    pipelineHelpers.cleanupWorkspace()
-                  }
-
-                  stage('00 Setup') {
-                    sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
-                  }
-
-                  def initialStages = [:]
-
-                  initialStages['Reporter'] = {
-                    try {
-                      sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $env.PATCHSET_TAG bundle exec rspecq \
-                        --build=${env.JOB_NAME}_build${env.BUILD_NUMBER} \
-                        --queue-wait-timeout 120 \
-                        --redis-url $env.RSPECQ_REDIS_URL \
-                        --report", label: 'Reporter')
-                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-                      if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-                        sh '''#!/bin/bash
-                          ids=($(docker ps -aq --filter "name=canvas-"))
-                          for i in "${ids[@]}"
-                            do
-                              docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-                          done
-                        '''
-                      }
-                      throw e
-                    }
-                  }
-
-                  initialStages['00 Run Tests'] = {
-                    try {
+                  stage('00 Run Tests') {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                       rspecStage.runRspecqSuite()
-                    } finally {
-                      buildSummaryReport.trackStage(stageName, stageStartTime)
                     }
-                  }
-
-                  stage('Run Tests and Reporter') {
-                    parallel(initialStages)
                   }
 
                   stage('00 Collect Results') {
                     rspecStage.tearDownNode()
                   }
                 } finally {
-                  pipelineHelpers.cleanupDocker()
+                  buildSummaryReport.trackStage('RSpecQ Set 00', stageStartTime)
                 }
               }
             }
 
             // Remaining nodes (1 through rspecqNodeTotal-1)
             for (int i = 1; i < rspecqNodeTotal; i++) {
-              def index = i
-              def indexStr = (index).toString().padLeft(2, '0')
-              rspecqStages["RSpecQ Set ${indexStr}"] = {
+              def indexStr = String.format('%02d', i)
+              rspecqStages["RSpecQ ${indexStr}"] = {
                 rspecStage.runRspecQWorkerNode(indexStr, ["CRYSTALBALL_MAP=1"])
               }
             }
 
             parallel(rspecqStages)
           }
+        } catch (e) {
+          // currentBuild.currentResult is not updated until after the finally
+          // block completes, so it reads SUCCESS even on failure. Capture the
+          // failure here so the finally block can report the correct status.
+          buildFailed = true
+          throw e
         } finally {
+          def buildResult = buildFailed ? 'FAILURE' : currentBuild.currentResult
           pipelineHelpers.cleanupDocker()
 
           collectCrystalballMap()
-
+          
           buildSummaryReport.addFailureRun('Main Build', currentBuild)
-
-          if (currentBuild.currentResult != 'SUCCESS') {
-            sendCrystalballSlack(currentBuild.currentResult)
+          if (buildFailed || currentBuild.currentResult != 'SUCCESS') {
+            sendCrystalballSlack(buildFailed ? 'FAILURE' : currentBuild.currentResult)
           }
-
-          buildSummaryReport.publishReport('Build Summary Report', currentBuild.currentResult)
+          buildSummaryReport.publishReport('Build Summary Report', buildResult)
           buildSummaryReport.saveRunManifest()
         }
       }

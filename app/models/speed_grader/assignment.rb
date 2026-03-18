@@ -102,6 +102,7 @@ module SpeedGrader
 
       res["context"]["concluded"] = assignment.context.concluded?
       res["anonymize_students"] = anonymize_students?
+      res["anonymous_participants"] = assignment.anonymous_participants?
       res["anonymize_graders"] = !assignment.can_view_other_grader_identities?(current_user)
       res["post_manually"] = assignment.post_manually?
 

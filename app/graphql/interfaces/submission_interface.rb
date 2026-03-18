@@ -189,10 +189,12 @@ module Interfaces::SubmissionInterface
   end
   def comments_connection(filter:, sort_order:, include_draft_comments:, include_drafts_from_others:, include_provisional_comments:)
     filter = filter.to_h
-    filter => all_comments:, for_attempt:, peer_review:
+    filter => all_comments:, for_attempt:, peer_review:, status:
+    use_visible_comments = status&.include?("ALL") || (include_draft_comments && include_drafts_from_others)
 
-    # Preload provisional comments if needed
-    provisional_comments_promise = if include_provisional_comments
+    # Preload provisional comments only when needed (not using visible_submission_comments_for
+    # which already includes provisional comments via all_submission_comments)
+    provisional_comments_promise = if include_provisional_comments && !use_visible_comments
                                      Loaders::AssociationLoader
                                        .for(Submission, :provisional_grades)
                                        .load(submission)
@@ -215,7 +217,7 @@ module Interfaces::SubmissionInterface
     load_association(:assignment).then do
       load_association(:submission_comments).then do
         provisional_comments_promise.then do |provisional_comments|
-          comments = if include_draft_comments && include_drafts_from_others
+          comments = if use_visible_comments
                        submission.visible_submission_comments_for(current_user)
                      elsif include_draft_comments
                        submission.comments_including_drafts_for(current_user)
@@ -224,7 +226,7 @@ module Interfaces::SubmissionInterface
                      end
           comments = comments.to_a
 
-          if include_provisional_comments
+          if include_provisional_comments && !use_visible_comments
             comments.concat(submission.visible_provisional_comments(current_user, provisional_comments:))
           end
 
@@ -233,7 +235,12 @@ module Interfaces::SubmissionInterface
           comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
           comments.reverse! if sort_order.to_s.casecmp("desc").zero?
 
-          comments.select { |comment| comment.grants_right?(current_user, :read) }
+          if use_visible_comments
+            # Permissions checks are already applied in visible_submission_comments_for
+            comments
+          else
+            comments.select { |comment| comment.grants_right?(current_user, :read) }
+          end
         end
       end
     end
@@ -322,6 +329,17 @@ module Interfaces::SubmissionInterface
   field :auto_grade_result_present, Boolean, null: false, description: "Indicates whether an auto-grading result exists for the submission."
   def auto_grade_result_present
     Loaders::HasAutoGradeResultsLoader.load(submission)
+  end
+
+  field :ai_grade_result, Types::AiGradeResultType, null: true, description: "The AI grading result for the current submission attempt, if any."
+  def ai_grade_result
+    load_association(:course).then do |course|
+      next nil unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+
+      load_association(:auto_grade_results).then do |results|
+        results.find { |r| r.attempt == (object.attempt || 1) }
+      end
+    end
   end
 
   field :has_sub_assignment_submissions, Boolean, null: true
@@ -462,11 +480,11 @@ module Interfaces::SubmissionInterface
   field :vericite_data, [Types::VericiteDataType], null: true
   def vericite_data
     load_association(:assignment).then do
-      next nil unless object.vericite_data(false).present? &&
+      next nil unless object.vericite_data(lookup_data: false).present? &&
                       object.grants_right?(current_user, :view_vericite_report) &&
                       object.assignment.vericite_enabled
 
-      object.vericite_data(false)
+      object.vericite_data(lookup_data: false)
             .except(
               :provider,
               :last_processed_attempt,
@@ -679,24 +697,28 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    if submission.not_submitted? && !submission.partially_submitted?
-      nil
-    elsif submission.submission_type == "basic_lti_launch"
-      GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
-        submission.course_id,
-        assignment_id: submission.assignment_id,
-        url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
-        display: "borderless",
-        host: context[:request].host_with_port,
-        resource_link_lookup_uuid: submission.resource_link_lookup_uuid
-      )
-    else
-      Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+    return nil if submission.not_submitted? && !submission.partially_submitted?
+
+    Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+      # Legacy submission versions serialized before course_id was added to the
+      # submissions table will have course_id: nil. Fall back to the assignment's
+      # context_id, which is always the course for standard assignments.
+      course_id = submission.course_id || assignment.context_id
+      if submission.submission_type == "basic_lti_launch"
+        GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
+          course_id,
+          assignment_id: submission.assignment_id,
+          url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
+          display: "borderless",
+          host: context[:request].host_with_port,
+          resource_link_lookup_uuid: submission.resource_link_lookup_uuid
+        )
+      else
         is_discussion_topic = submission.submission_type == "discussion_topic" || submission.partially_submitted?
         show_full_discussion = is_discussion_topic ? { show_full_discussion_immediately: true } : {}
         if assignment.anonymize_students?
           GraphQLHelpers::UrlHelpers.course_assignment_anonymous_submission_url(
-            submission.course_id,
+            course_id,
             submission.assignment_id,
             submission.anonymous_id,
             host: context[:request].host_with_port,
@@ -706,7 +728,7 @@ module Interfaces::SubmissionInterface
           )
         else
           GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-            submission.course_id,
+            course_id,
             submission.assignment_id,
             submission.user_id,
             host: context[:request].host_with_port,

@@ -25,7 +25,6 @@ class Login::OtpController < ApplicationController
   include Login::Shared
   include Login::OtpHelper
 
-  before_action :require_user
   before_action :require_password_session
   before_action :forbid_on_files_domain
 
@@ -135,7 +134,7 @@ class Login::OtpController < ApplicationController
         }
       end
       if session.delete(:pending_otp)
-        successful_login(@current_user, @current_pseudonym, true)
+        successful_login(@current_user, @current_pseudonym, otp_passed: true)
       else
         respond_to do |format|
           format.html do
@@ -151,7 +150,7 @@ class Login::OtpController < ApplicationController
           flash[:error] = t "Invalid verification code, please try again"
           redirect_to otp_login_url
         end
-        format.json { render json: { error: t("Invalid verification code, please try again") }, status: :unprocessable_entity }
+        format.json { render json: { error: t("Invalid verification code, please try again") }, status: :unprocessable_content }
       end
     end
   end

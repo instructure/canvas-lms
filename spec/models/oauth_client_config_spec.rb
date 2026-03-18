@@ -275,16 +275,16 @@ describe OAuthClientConfig do
     end
 
     def cache_double
-      cache_double = double("cache", fetch: nil, delete: nil)
+      mock_cache = instance_double(ActiveSupport::Cache::Store, fetch: nil, delete: nil)
       cache_contents = {}
-      allow(cache_double).to receive(:fetch) do |key, value = nil, &block|
+      allow(mock_cache).to receive(:fetch) do |key, value = nil, &block|
         if cache_contents.key?(key)
           cache_contents[key]
         else
           cache_contents[key] = value || block&.call
         end
       end
-      allow(cache_double).to receive(:read_multi) do |*keys, &block|
+      allow(mock_cache).to receive(:read_multi) do |*keys, &block|
         result = {}
         keys.each do |key|
           if cache_contents.key?(key)
@@ -296,22 +296,18 @@ describe OAuthClientConfig do
         end
         result
       end
-      allow(cache_double).to receive(:write_multi) do |hash|
+      allow(mock_cache).to receive(:write_multi) do |hash|
         hash.each do |k, v|
           cache_contents[k] = v
         end
       end
-      allow(cache_double).to receive(:delete) do |key|
+      allow(mock_cache).to receive(:delete) do |key|
         cache_contents.delete(key)
       end
-      allow(cache_double).to receive(:clear) do
+      allow(mock_cache).to receive(:clear) do
         cache_contents = {}
       end
-      allow(cache_double).to receive(:get) do |key|
-        cache_contents[key]
-      end
-      allow(cache_double).to receive(:debug) { cache_contents }
-      cache_double
+      mock_cache
     end
 
     describe ".cache_double" do
@@ -466,8 +462,9 @@ describe OAuthClientConfig do
           OAuthClientConfig::Cache.fetch_all(client_identifiers, &block)
           expect(ha_cache).to have_received(:write_multi).with(a_hash_including(OAuthClientConfig::Cache.cache_key("client_id:1") => "value1", OAuthClientConfig::Cache.cache_key("product:3") => "value3"))
           expect(standard_cache).to have_received(:write_multi).with(a_hash_including(OAuthClientConfig::Cache.cache_key("token:2") => "value2"))
-          expect(ha_cache.debug).to include(OAuthClientConfig::Cache.cache_key("client_id:1") => "value1", OAuthClientConfig::Cache.cache_key("product:3") => "value3")
-          expect(standard_cache.debug).to include(OAuthClientConfig::Cache.cache_key("token:2") => "value2")
+          expect(ha_cache.fetch(OAuthClientConfig::Cache.cache_key("client_id:1"))).to eq("value1")
+          expect(ha_cache.fetch(OAuthClientConfig::Cache.cache_key("product:3"))).to eq("value3")
+          expect(standard_cache.fetch(OAuthClientConfig::Cache.cache_key("token:2"))).to eql "value2"
         end
       end
     end

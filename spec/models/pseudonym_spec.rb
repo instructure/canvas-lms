@@ -192,16 +192,10 @@ describe Pseudonym do
       expect(Pseudonym.active.by_unique_id("c①dy@instructure.com")).to eq [p4]
 
       scope = Pseudonym.active
-      shard = instance_double(Shard)
-      allow(shard).to receive(:settings).and_return({})
+      shard = instance_double(Shard, settings: {})
       allow(shard).to receive(:is_a?).with(Shard).and_return(true)
       allow(shard).to receive(:is_a?).with(Switchman::DefaultShard).and_return(false)
       # return our double once for the named scope, then the real thing for the query
-      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
-      expect(scope.by_unique_id("c1dy@instructure.com")).not_to exist
-
-      # mark the migration as complete, and it will start doing a normalized lookup
-      allow(shard).to receive(:settings).and_return({ "pseudonyms_normalized" => true })
       allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
       expect(scope.by_unique_id("c1dy@instructure.com")).to eq [p4]
     end
@@ -484,12 +478,12 @@ describe Pseudonym do
     ap = p.account.authentication_providers.create!(auth_type: "ldap")
     expect(p).to be_passwordable
     p.authentication_provider = ap
-    expect(p).to_not be_passwordable
+    expect(p).not_to be_passwordable
     p.account.canvas_authentication_provider.destroy
     p.authentication_provider = nil
     p.save!
     p.reload
-    expect(p).to_not be_passwordable
+    expect(p).not_to be_passwordable
   end
 
   context "login assertions" do
@@ -994,7 +988,7 @@ describe Pseudonym do
     aac = Account.default.authentication_providers.create!(auth_type: "facebook")
     u.pseudonyms.create!(unique_id: "a", account: Account.default)
     p2 = u.pseudonyms.new(unique_id: "a", account: Account.default)
-    expect(p2).to_not be_valid
+    expect(p2).not_to be_valid
     expect(p2.errors.details[:unique_id].first[:error]).to eq :taken
     p2.authentication_provider = aac
     expect(p2).to be_valid

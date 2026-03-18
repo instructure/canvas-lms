@@ -197,7 +197,9 @@ class SubmissionSearch
   end
 
   def order_by_username(search_scope:, direction:, sortable_name: false)
-    return order_by_anonymous_username(search_scope:, direction:) if @assignment.anonymize_students?
+    if @assignment.anonymize_students? || @assignment.new_quizzes_anonymous_participants?
+      return order_by_anonymous_username(search_scope:, direction:)
+    end
 
     order_clause = sortable_name ? User.sortable_name_order_by_clause("users") : User.name_order_by_clause("users")
     search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
@@ -229,9 +231,9 @@ class SubmissionSearch
 
   def allowed_users
     users = if @options[:apply_gradebook_enrollment_filters]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
             elsif @options[:include_concluded] || @options[:include_deactivated]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
             else
               @course.users_visible_to(@searcher)
             end
@@ -258,7 +260,7 @@ class SubmissionSearch
     return user_scope unless @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
 
     section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
-    return User.none if section_ids.empty?
+    return user_scope if section_ids.empty?
 
     enrollment_scope = user_ids_by_enrollment_section_filters(section_ids)
 
@@ -279,14 +281,14 @@ class SubmissionSearch
   def representatives
     includes = [:inactive]
     settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
-    includes << :completed if settings["show_concluded_enrollments"] == "true"
+    includes << :completed if settings["show_concluded_enrollments"] == "true" || @course.completed?
     @representatives ||= @assignment.representatives(user: @searcher, includes:, ignore_student_visibility: true, include_others: true)
   end
 
   def excluded_enrollment_states_from_gradebook_settings
     settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
     excluded_enrollment_states(
-      completed: settings["show_concluded_enrollments"] != "true",
+      completed: settings["show_concluded_enrollments"] != "true" && !@course.completed?,
       inactive: settings["show_inactive_enrollments"] != "true"
     )
   end

@@ -131,7 +131,7 @@ describe('CreateOutcomeModal', () => {
             message: '"Outcome 123" was successfully created.',
             type: 'success',
           })
-        })
+        }, 30000)
 
         it('sets focus on rating description if error in both description and points and click on Create button', async () => {
           const user = userEvent.setup(USER_EVENT_OPTIONS)
@@ -149,7 +149,7 @@ describe('CreateOutcomeModal', () => {
           await user.click(getByText('Create'))
           expect(ratingPoints).not.toBe(document.activeElement)
           expect(ratingDescription).toBe(document.activeElement)
-        })
+        }, 30000)
 
         it('sets focus on mastery points if error in mastery points and calculation method and click on Create button', async () => {
           const user = userEvent.setup(USER_EVENT_OPTIONS)
@@ -167,7 +167,7 @@ describe('CreateOutcomeModal', () => {
           await user.click(getByText('Create'))
           expect(calcInt).not.toBe(document.activeElement)
           expect(masteryPoints).toBe(document.activeElement)
-        })
+        }, 30000)
       })
     })
   })

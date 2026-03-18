@@ -89,7 +89,7 @@ describe UsersController do
     before do
       account.account_users.create!(user:)
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
       user_session(user)
     end
@@ -303,7 +303,7 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive_messages(settings: {}, enabled?: true)
 
       user_factory(active_all: true)
@@ -329,7 +329,7 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
@@ -363,7 +363,7 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
@@ -387,7 +387,7 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials)
       allow(authorization_mock).to receive_messages(:code= => nil,
@@ -824,7 +824,7 @@ describe UsersController do
         end
 
         it "redirects users to the oauth confirmation when registering through oauth" do
-          redis = double("Redis")
+          redis = instance_double(Redis)
           allow(redis).to receive(:setex)
           allow(redis).to receive(:hmget)
           allow(redis).to receive(:del)
@@ -1821,7 +1821,7 @@ describe UsersController do
         course.enroll_student(snooping_student, active_all: true)
         user_session(snooping_student)
         get_grades!(grading_period.id)
-        expect(response).to_not be_ok
+        expect(response).not_to be_ok
       end
     end
   end
@@ -3106,6 +3106,66 @@ describe UsersController do
   end
 
   describe "#user_dashboard" do
+    context "learning agent env" do
+      before(:once) do
+        course_with_student(active_all: true)
+        @course.root_account.allow_feature!(:athena_learning_agent_button)
+      end
+
+      before do
+        Rails.cache.clear
+        user_session(@student)
+      end
+
+      it "does not set ATHENA when no course has the flag enabled" do
+        @course.disable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "sets ATHENA when at least one course has the flag enabled" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).to have_key(:ATHENA)
+      end
+
+      it "caches the enrollment check with enrollment-aware batched keys" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        allow(Rails.cache).to receive(:fetch_with_batched_keys).and_call_original
+        expect(Rails.cache).to receive(:fetch_with_batched_keys)
+          .with("learning_agent_dashboard/v1",
+                batch_object: @student,
+                batched_keys: :enrollments)
+          .and_call_original
+        get :user_dashboard
+      end
+
+      it "does not set ATHENA for a teacher enrollment in a flagged course" do
+        course_with_teacher(active_all: true, user: @student)
+        @course.enable_feature!(:athena_learning_agent_button)
+        # student has no student enrollment in this new course
+        @student.enrollments.where(type: "StudentEnrollment").destroy_all
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "does not set ATHENA when the student enrollment is concluded" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        @course.update!(workflow_state: :completed)
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "sets ATHENA when only one of multiple courses has the flag enabled" do
+        course2 = course_with_student(active_all: true, user: @student).course
+        course2.root_account.allow_feature!(:athena_learning_agent_button)
+        @course.disable_feature!(:athena_learning_agent_button)
+        course2.enable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).to have_key(:ATHENA)
+      end
+    end
+
     context "with student planner feature enabled" do
       before(:once) do
         @account = Account.default
@@ -3163,7 +3223,7 @@ describe UsersController do
 
       it "loads nicknames" do
         @user.set_preference(:course_nicknames, @course1.id, "some nickname or whatever")
-        expect_any_instance_of(User).to_not receive(:course_nickname)
+        expect_any_instance_of(User).not_to receive(:course_nickname)
         get "user_dashboard"
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
         expect(course_data.detect { |h| h[:id] == @course1.id }[:shortName]).to eq "some nickname or whatever"
@@ -3209,7 +3269,7 @@ describe UsersController do
 
       context "disabled" do
         before(:once) do
-          toggle_k5_setting(@account, false)
+          toggle_k5_setting(@account, enable: false)
         end
 
         it_behaves_like "observer list"
@@ -3228,7 +3288,7 @@ describe UsersController do
 
       context "enabled" do
         before(:once) do
-          toggle_k5_setting(@account, true)
+          toggle_k5_setting(@account)
         end
 
         it_behaves_like "observer list"
@@ -3356,7 +3416,7 @@ describe UsersController do
           end
 
           it "does not include classic accounts in the list" do
-            toggle_k5_setting(@account2, false)
+            toggle_k5_setting(@account2, enable: false)
             get "user_dashboard"
             account_contexts = assigns[:js_env][:ACCOUNT_CALENDAR_CONTEXTS]
             expect(account_contexts.length).to be 1
@@ -3528,6 +3588,16 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).to include :dashboard
           expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
           expect(assigns[:css_bundles].flatten).to include :dashboard
+        end
+
+        it "shows legacy dashboard to account admins even when opted in" do
+          account_admin_user
+          @admin.preferences[:widget_dashboard_user_preference] = true
+          @admin.save!
+          user_session(@admin)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
         end
 
         it "respects user preference when feature is allowed (can override)" do
@@ -3908,7 +3978,7 @@ describe UsersController do
       user.access_tokens.create!(purpose: "active mobile token")
       user.access_tokens.create!(purpose: "expired mobile token", permanent_expires_at: 1.day.ago)
 
-      @sns_client = double
+      @sns_client = instance_double(Aws::SNS::Client)
       allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
       allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
       user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }

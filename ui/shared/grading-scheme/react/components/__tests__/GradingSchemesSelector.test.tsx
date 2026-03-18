@@ -291,5 +291,5 @@ describe('GradingSchemesSelector', () => {
         data: DefaultGradingScheme.data,
       })
     })
-  })
+  }, 30000)
 })

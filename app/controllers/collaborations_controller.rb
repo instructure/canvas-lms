@@ -154,17 +154,18 @@ class CollaborationsController < ApplicationController
     @etherpad_only = Collaboration.collaboration_types.length == 1 &&
                      Collaboration.collaboration_types[0]["type"] == "etherpad"
     @hide_create_ui = @sunsetting_etherpad && @etherpad_only
-    js_env TITLE_MAX_LEN: Collaboration::TITLE_MAX_LENGTH,
-           CAN_MANAGE_GROUPS:
+    js_env({
+             TITLE_MAX_LEN: Collaboration::TITLE_MAX_LENGTH,
+             CAN_MANAGE_GROUPS:
              @context.grants_any_right?(
                @current_user,
                session,
                *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
              ),
-           collaboration_types: Collaboration.collaboration_types,
-           POTENTIAL_COLLABORATORS_URL:
+             collaboration_types: Collaboration.collaboration_types,
+             POTENTIAL_COLLABORATORS_URL:
              polymorphic_url([:api_v1, @context, :potential_collaborators])
-
+           })
     set_tutorial_js_env
     page_has_instui_topnav
   end
@@ -269,12 +270,14 @@ class CollaborationsController < ApplicationController
 
     if @context.instance_of? Group
       parent_context = @context.context
-      js_env PARENT_CONTEXT: {
-        context_asset_string: parent_context.try(:asset_string)
-      }
+      js_env({
+               PARENT_CONTEXT: {
+                 context_asset_string: parent_context.try(:asset_string)
+               }
+             })
     end
 
-    js_env CREATE_PERMISSION: @context.grants_right?(@current_user, :create_collaborations)
+    js_env({ CREATE_PERMISSION: @context.grants_right?(@current_user, :create_collaborations) })
 
     set_tutorial_js_env
 

@@ -94,6 +94,6 @@
 
 <% js_bundle :authentication_providers %>
 <% js_bundle :ldap_cert_upload %>
-<% if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page) %>
-  <% js_bundle :native_discovery_page %>
+<% if @account.discovery_page_allowed? %>
+  <% js_bundle :discovery_page %>
 <% end %>

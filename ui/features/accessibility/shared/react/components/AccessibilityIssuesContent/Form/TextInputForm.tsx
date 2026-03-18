@@ -15,25 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {forwardRef, useImperativeHandle, useRef, useState, useEffect} from 'react'
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiSolid} from '@instructure/ui-icons'
-import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-
-import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentProps, FormComponentHandle} from './index'
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {useShallow} from 'zustand/react/shallow'
+import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
 
 const I18n = createI18nScope('accessibility_checker')
+
+export const CAPTION_EMPTY_MESSAGE = I18n.t('Caption cannot be empty.')
+
+export const GENERATE_CAPTION_INITIAL_LABEL = I18n.t('Generate caption')
+export const GENERATE_CAPTION_LOADING_LABEL = I18n.t('Generating caption...')
+export const GENERATE_CAPTION_LOADED_LABEL = I18n.t('Regenerate caption')
+
+export const TextInputFormButtonLabels: ButtonLabelByState = {
+  initial: GENERATE_CAPTION_INITIAL_LABEL,
+  loading: GENERATE_CAPTION_LOADING_LABEL,
+  loaded: GENERATE_CAPTION_LOADED_LABEL,
+}
 
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
@@ -42,21 +50,18 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
         issue,
         error,
         value,
+        onValidationChange,
         onChangeValue,
         isDisabled,
-        onValidationChange,
         onGenerateLoadingChange,
       }: FormComponentProps,
       ref,
     ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
-      const {selectedItem} = useAccessibilityCheckerContext()
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {isAiTableCaptionGenerationEnabled} = useAccessibilityScansStore(
-        useShallow(state => ({
-          isAiTableCaptionGenerationEnabled: state.isAiTableCaptionGenerationEnabled,
-        })),
+      const [isAiTableCaptionGenerationEnabled, selectedItem] = useAccessibilityScansStore(
+        useShallow(state => [state.isAiTableCaptionGenerationEnabled, state.selectedScan]),
       )
 
       useImperativeHandle(ref, () => ({
@@ -65,9 +70,15 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
         },
       }))
 
-      useEffect(() => {
-        onValidationChange?.(value?.trim()?.length > 0, I18n.t('Caption cannot be empty.'))
-      }, [value, onValidationChange])
+      const handleOnChange = (value: string) => {
+        onChangeValue(value)
+
+        if (value?.trim().length === 0) {
+          onValidationChange?.(false, CAPTION_EMPTY_MESSAGE)
+        } else {
+          onValidationChange?.(true)
+        }
+      }
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
@@ -90,7 +101,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             return result.json
           })
           .then(resultJson => {
-            onChangeValue(resultJson?.value)
+            handleOnChange(resultJson?.value || '')
           })
           .catch(error => {
             const statusCode = error?.response?.status || 0
@@ -117,45 +128,31 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
 
       return (
         <Flex direction="column" gap="medium">
-          <TextInput
-            data-testid="text-input-form"
-            renderLabel={issue.form.label}
-            value={value || ''}
-            onChange={(_, value) => onChangeValue(value)}
-            inputRef={el => (inputRef.current = el)}
-            messages={error ? [{text: error, type: 'newError'}] : []}
-            interaction={isDisabled ? 'disabled' : 'enabled'}
-          />
+          <Flex as="div" gap="mediumSmall" direction="column" alignItems="start">
+            <TextInput
+              data-testid="text-input-form"
+              renderLabel={issue.form.label}
+              value={value || ''}
+              onChange={(_, value) => handleOnChange(value)}
+              inputRef={el => (inputRef.current = el)}
+              isRequired
+              messages={error ? [{text: error, type: 'newError'}] : []}
+              interaction={isDisabled || generateLoading ? 'disabled' : 'enabled'}
+            />
 
-          {isAiTableCaptionGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
-            <Flex direction="column" gap="medium">
-              <Flex>
-                <Button
-                  color="ai-primary"
-                  renderIcon={() => <IconAiSolid />}
-                  onClick={handleGenerateClick}
-                  disabled={generateLoading}
-                >
-                  {generateLoading ? (
-                    <>
-                      {issue.form.generateButtonLabel}{' '}
-                      <Spinner size="x-small" renderTitle={I18n.t('Generating...')} />
-                    </>
-                  ) : (
-                    issue.form.generateButtonLabel
-                  )}
-                </Button>
-              </Flex>
-              {generationError !== null && (
-                <Flex>
-                  <Flex.Item>
-                    <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
-                      {generationError}
-                    </Alert>
-                  </Flex.Item>
-                </Flex>
-              )}
-            </Flex>
+            {isAiTableCaptionGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
+              <GenerateButton
+                handleGenerateClick={handleGenerateClick}
+                isLoading={generateLoading}
+                buttonLabels={TextInputFormButtonLabels}
+              />
+            )}
+          </Flex>
+
+          {generationError && (
+            <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+              {generationError}
+            </Alert>
           )}
         </Flex>
       )

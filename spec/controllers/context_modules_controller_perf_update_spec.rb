@@ -229,7 +229,7 @@ describe ContextModulesController do
           it "renders the template" do
             subject
             assert_status(200)
-            expect(response.body).to_not be_empty
+            expect(response.body).not_to be_empty
           end
 
           it "does not apply show_student_only_module_id to teachers" do
@@ -267,9 +267,9 @@ describe ContextModulesController do
             end
 
             it "has the @menu_tools variable" do
-              finder_double = double("Lti::ContextToolFinder")
-              tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
-              tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+              finder_double = instance_double(Lti::ContextToolFinder)
+              tool_double_1 = instance_double(ContextExternalTool, has_placement?: true, cache_key: "key")
+              tool_double_2 = instance_double(ContextExternalTool, has_placement?: false, cache_key: "key")
 
               allow_any_instance_of(ContextExternalToolsHelper)
                 .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
@@ -288,13 +288,13 @@ describe ContextModulesController do
           describe "rights load" do
             before { subject }
 
-            it { expect(assigns(:can_view)).to_not be_nil }
-            it { expect(assigns(:can_add)).to_not be_nil }
-            it { expect(assigns(:can_edit)).to_not be_nil }
-            it { expect(assigns(:can_delete)).to_not be_nil }
-            it { expect(assigns(:can_view_grades)).to_not be_nil }
-            it { expect(assigns(:is_student)).to_not be_nil }
-            it { expect(assigns(:can_view_unpublished)).to_not be_nil }
+            it { expect(assigns(:can_view)).not_to be_nil }
+            it { expect(assigns(:can_add)).not_to be_nil }
+            it { expect(assigns(:can_edit)).not_to be_nil }
+            it { expect(assigns(:can_delete)).not_to be_nil }
+            it { expect(assigns(:can_view_grades)).not_to be_nil }
+            it { expect(assigns(:is_student)).not_to be_nil }
+            it { expect(assigns(:can_view_unpublished)).not_to be_nil }
           end
         end
 
@@ -312,6 +312,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do
@@ -380,9 +381,9 @@ describe ContextModulesController do
           end
 
           it "has the @menu_tools variable" do
-            finder_double = double("Lti::ContextToolFinder")
-            tool_double_1 = double("Tool 1", has_placement?: true)
-            tool_double_2 = double("Tool 2", has_placement?: false)
+            finder_double = instance_double(Lti::ContextToolFinder)
+            tool_double_1 = instance_double(ContextExternalTool, has_placement?: true)
+            tool_double_2 = instance_double(ContextExternalTool, has_placement?: false)
 
             allow(Lti::ContextToolFinder)
               .to receive(:new)
@@ -398,13 +399,13 @@ describe ContextModulesController do
           describe "rights load" do
             before { subject }
 
-            it { expect(assigns(:can_view)).to_not be_nil }
-            it { expect(assigns(:can_add)).to_not be_nil }
-            it { expect(assigns(:can_edit)).to_not be_nil }
-            it { expect(assigns(:can_delete)).to_not be_nil }
-            it { expect(assigns(:can_view_grades)).to_not be_nil }
-            it { expect(assigns(:is_student)).to_not be_nil }
-            it { expect(assigns(:can_view_unpublished)).to_not be_nil }
+            it { expect(assigns(:can_view)).not_to be_nil }
+            it { expect(assigns(:can_add)).not_to be_nil }
+            it { expect(assigns(:can_edit)).not_to be_nil }
+            it { expect(assigns(:can_delete)).not_to be_nil }
+            it { expect(assigns(:can_view_grades)).not_to be_nil }
+            it { expect(assigns(:is_student)).not_to be_nil }
+            it { expect(assigns(:can_view_unpublished)).not_to be_nil }
           end
         end
 
@@ -515,6 +516,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do
@@ -636,6 +638,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do

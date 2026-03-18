@@ -557,15 +557,9 @@ describe CoursePace do
   end
 
   describe "default plan start_at" do
-    orig_zone = Time.zone
     before do
       @course.update start_at: nil
       @course_pace.user_id = nil
-      Time.zone = @course.time_zone
-    end
-
-    after do
-      Time.zone = orig_zone
     end
 
     it "returns student enrollment date, if working on behalf of a student" do
@@ -641,16 +635,11 @@ describe CoursePace do
   end
 
   describe "default plan effective_end_at" do
-    orig_zone = Time.zone
     before do
       @course.update start_at: nil
       @course_pace.user_id = nil
       @student = create_users(1, return_type: :record).first
       @course.enroll_student(@student, enrollment_state: "active")
-    end
-
-    after do
-      Time.zone = orig_zone
     end
 
     it "returns hard end date if set" do

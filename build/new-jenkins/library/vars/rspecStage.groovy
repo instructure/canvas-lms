@@ -49,11 +49,13 @@ def tearDownNode() {
     set -ex
 
     rm -rf ./tmp && mkdir -p $destDir ${destDir}_rspec_results
+    tar cfz $destDir/worker_logs.tgz worker_logs/${env.CI_NODE_INDEX}/ 2>/dev/null || true
+    rm -rf worker_logs/${env.CI_NODE_INDEX}
     docker cp ${srcDir}/log/results ${destDir}_rspec_results/ || true
     docker cp ${srcDir}/log/spec_failures ${destDir}/spec_failures/ || true
     docker cp ${srcDir}/log/skipped ${destDir}/skipped/ || true
 
-    tar cvfz ${destDir}/rspec_results.tgz ${destDir}_rspec_results/
+    tar cfz ${destDir}/rspec_results.tgz ${destDir}_rspec_results/
 
     if [[ "\$COVERAGE" == "1" ]]; then
       docker cp ${srcDir}/coverage ${destDir}/coverage/ || true
@@ -145,37 +147,45 @@ def tearDownNode() {
 
 def runRspecqSuite() {
   try {
-    sh(script: 'docker compose exec -T -e ENABLE_AXE_SELENIUM \
-                                       -e SENTRY_DSN \
-                                       -e RSPECQ_UPDATE_TIMINGS \
-                                       -e RSPECQ_WORKER_LIVENESS_SEC \
-                                       -e JOB_NAME \
-                                       -e COVERAGE \
-                                       -e BUILD_NAME \
-                                       -e BUILD_NUMBER \
-                                       -e CRYSTALBALL_MAP \
-                                       -e CI_NODE_INDEX \
-                                       -e CRYSTAL_BALL_SPECS canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
-  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      /* groovylint-disable-next-line GStringExpressionWithinString */
-      sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas-") )
-        for i in "${ids[@]}"
-        do
-          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-        done
-      '''
-    }
+    sh(script: """#!/bin/bash
+      set -o nounset -o errexit -o errtrace -o pipefail
 
-    throw e
+      PROCESSES=\$(( \${RSPEC_PROCESSES:-1} - 1 ))
+      mkdir -p worker_logs/${env.CI_NODE_INDEX}
+
+      worker_pids=()
+      for i in \$(seq 0 \$PROCESSES); do
+        (
+          set +e
+          docker compose exec -T \\
+            -e PARALLEL_INDEX=\$i \\
+            -e RAILS_DB_NAME_TEST=canvas_test_\$i \\
+            -e "RSPEC_SKIP_TRACKER_OUTPUT=log/skipped/skip_report_${env.CI_NODE_INDEX}_\$i.json" \\
+            -e ENABLE_AXE_SELENIUM -e SENTRY_DSN -e RSPECQ_UPDATE_TIMINGS \\
+            -e RSPECQ_WORKER_LIVENESS_SEC -e JOB_NAME -e COVERAGE \\
+            -e BUILD_NAME -e BUILD_NUMBER -e CRYSTALBALL_MAP \\
+            -e CI_NODE_INDEX -e CRYSTAL_BALL_SPECS \\
+            canvas bash -c 'build/new-jenkins/rspecq-tests.sh' 2>&1 | \\
+            tee worker_logs/${env.CI_NODE_INDEX}/worker_\$i.log | \\
+            awk -v prefix="[worker-\$i]" '{ print prefix " " \$0; fflush() }'
+          exit \${PIPESTATUS[0]}
+        ) &
+        worker_pids+=(\$!)
+      done
+
+      EXIT_CODE=0
+      for pid in "\${worker_pids[@]}"; do
+        wait \$pid || EXIT_CODE=\$?
+      done
+
+      exit \$EXIT_CODE
+    """, label: 'Run RspecQ Tests')
   } catch (err) {
     if (err instanceof FlowInterruptedException) {
       throw err
     }
     send_slack_alert(err)
     echo "RspecQ node ${env.CI_NODE_INDEX} failed: ${err}"
-    currentBuild.result = 'UNSTABLE'
     throw err
   }
 }
@@ -189,7 +199,7 @@ def send_slack_alert(error) {
 }
 
 def runRspecQWorkerNode(index, additionalEnvVars = []) {
-  def stageName = "RSpecQ Set ${index}"
+  def stageName = "RSpecQ ${index}"
   node(nodeLabel()) {
     def stageStartTime = System.currentTimeMillis()
     try {
@@ -209,10 +219,8 @@ def runRspecQWorkerNode(index, additionalEnvVars = []) {
 
       withEnv(envVars) {
         stage("${index} Run Tests") {
-          try {
+          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
             runRspecqSuite()
-          } finally {
-            buildSummaryReport.trackStage(stageName, stageStartTime)
           }
         }
 
@@ -221,6 +229,7 @@ def runRspecQWorkerNode(index, additionalEnvVars = []) {
         }
       }
     } finally {
+      buildSummaryReport.trackStage(stageName, stageStartTime)
       pipelineHelpers.cleanupDocker()
     }
   }

@@ -132,10 +132,10 @@ describe AccessToken do
       @at.regenerate_access_token
       new_token_string = @at.full_token
 
-      expect(new_token_string).to_not eq @token_string
+      expect(new_token_string).not_to eq @token_string
       expect(AccessToken.authenticate(new_token_string)).to eq @at
 
-      expect(AccessToken.authenticate(@token_string)).to_not eq @at
+      expect(AccessToken.authenticate(@token_string)).not_to eq @at
     end
 
     it "does not authenticate expired tokens" do

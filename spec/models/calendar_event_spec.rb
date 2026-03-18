@@ -253,7 +253,7 @@ describe CalendarEvent do
             html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
             calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html, saving_user: @teacher)
             ev = @event.to_ics(in_own_calendar: false)
-            expect(ev.description).to_not include("verifier")
+            expect(ev.description).not_to include("verifier")
 
             @attachment.file_state = "public"
             @attachment.save!

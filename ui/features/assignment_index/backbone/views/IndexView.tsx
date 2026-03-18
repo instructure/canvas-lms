@@ -24,7 +24,7 @@ import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDial
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import template from '../../jst/IndexView.handlebars'
 import NoAssignmentsSearch from '../../react/NoAssignmentsSearch'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
@@ -45,7 +45,6 @@ const I18n = createI18nScope('assignmentsIndexView')
 // @ts-expect-error
 extend(IndexView, Backbone.View)
 
-// @ts-expect-error
 function IndexView() {
   // @ts-expect-error
   this.filterKeyBindings = this.filterKeyBindings.bind(this)
@@ -144,8 +143,7 @@ IndexView.prototype.afterRender = function () {
     // @ts-expect-error
     const requestBulkEditFn = (!ENV.COURSE_HOME && this.requestBulkEdit) || void 0
     if (this.$settingsMountPoint.length) {
-      const settingsRoot = createRoot(this.$settingsMountPoint[0])
-      settingsRoot?.render(
+      render(
         React.createElement(IndexMenu, {
           store: this.indexMenuStore,
           contextType,
@@ -168,12 +166,12 @@ IndexView.prototype.afterRender = function () {
           hasAssignments: ENV.HAS_ASSIGNMENTS,
           assignmentGroupsCollection: this.collection,
         }),
+        this.$settingsMountPoint[0],
       )
     }
   }
   if (this.$indexCreateMountPoint.length) {
-    const indexRoot = createRoot(this.$indexCreateMountPoint[0])
-    indexRoot?.render(
+    render(
       React.createElement(IndexCreate, {
         // @ts-expect-error
         newAssignmentUrl: ENV.URLS.new_assignment_url,
@@ -182,17 +180,18 @@ IndexView.prototype.afterRender = function () {
         // @ts-expect-error
         manageAssignmentAddPermission: ENV.PERMISSIONS.manage_assignments_add,
       }),
+      this.$indexCreateMountPoint[0],
     )
   }
   if (this.bulkEditMode && this.$bulkEditRoot.length) {
-    const bulkEditRoot = createRoot(this.$bulkEditRoot[0])
-    bulkEditRoot?.render(
+    render(
       React.createElement(BulkEditIndex, {
         courseId: ENV.COURSE_ID,
         onCancel: this.cancelBulkEdit,
         onSave: this.handleBulkEditSaved,
         defaultDueTime: ENV.DEFAULT_DUE_TIME,
       }),
+      this.$bulkEditRoot[0],
     )
   }
   this.filterKeyBindings()
@@ -207,8 +206,7 @@ IndexView.prototype.afterRender = function () {
 
   this.$inputMountPoint = $('#search_input_container')
   if (this.$inputMountPoint?.length) {
-    const inputRoot = createRoot(this.$inputMountPoint[0])
-    inputRoot?.render(
+    render(
       <TextInput
         onChange={e => {
           // Sends events to hidden input to utilize backbone
@@ -231,6 +229,7 @@ IndexView.prototype.afterRender = function () {
         }
         renderBeforeInput={() => <IconSearchLine />}
       />,
+      this.$inputMountPoint[0],
     )
   }
   return this.selectGradingPeriod()
@@ -340,8 +339,7 @@ IndexView.prototype.filterResults = function () {
       if (!this.noAssignments) {
         const li = document.createElement('li')
         li.className = 'item-group-condensed'
-        this.noAssignmentsRoot = createRoot(li)
-        this.noAssignmentsRoot.render(<NoAssignmentsSearch />)
+        this.noAssignmentsRoot = render(<NoAssignmentsSearch />, li)
         this.noAssignments = li
         ul = this.assignmentGroupsView.$el.children('.collectionViewItems')
         return ul.append(this.noAssignments)

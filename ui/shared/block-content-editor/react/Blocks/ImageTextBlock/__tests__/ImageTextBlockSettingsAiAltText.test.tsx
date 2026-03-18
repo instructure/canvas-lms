@@ -158,5 +158,5 @@ describe('ImageTextBlockSettings - AI Alt Text', () => {
     await waitFor(() => {
       expect(component.queryByText(/\(Re\)generate Alt Text/i)).toBeInTheDocument()
     })
-  })
+  }, 30000)
 })

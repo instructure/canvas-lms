@@ -187,7 +187,8 @@ const DiscussionPostButtonsToolbar = props => {
       // @ts-expect-error TS18047 (typescriptify)
       !window.top.location.href.includes('speed_grader') &&
       childTopicSize >= 0 &&
-      props.isAdmin
+      props.canViewGroupPages &&
+      !ENV.current_user_is_student
     ) {
       options.push(
         <Drilldown.Option
@@ -221,7 +222,8 @@ const DiscussionPostButtonsToolbar = props => {
         </Drilldown.Option>,
       )
     }
-    if (translationLanguages.current.length > 0) {
+    // @ts-expect-error TS2339 (typescriptify)
+    if (ENV.discussion_translation_available && translationLanguages.current.length > 0) {
       options.push(
         <Drilldown.Option
           id="translation"
@@ -276,7 +278,7 @@ const DiscussionPostButtonsToolbar = props => {
 
     const buttonsMobile = () => {
       if (ENV.current_user_is_student) {
-        return [renderExpandsThreads(), renderGroup()]
+        return [renderExpandsThreads()]
       } else {
         return [
           renderAssignToButton(),

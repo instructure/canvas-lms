@@ -54,6 +54,27 @@ describe "student dashboard group specific tests", :ignore_js_errors do
       go_to_dashboard
       expect(element_exists?(course_work_item_selector(@group_assignment.id))).to be_falsey
     end
+
+    context "todo list widget with group assignments" do
+      before :once do
+        add_widget_to_dashboard(@student1_group1, :todo_list, 1)
+        add_widget_to_dashboard(@student_no_group, :todo_list, 1)
+      end
+
+      it "displays group assignment for student in the group" do
+        user_session(@student1_group1)
+        go_to_dashboard
+
+        expect(todo_item(@group_assignment.id).text).to include("Group Project")
+      end
+
+      it "does not display group assignment for student not in any group" do
+        user_session(@student_no_group)
+        go_to_dashboard
+
+        expect(no_todo_items_message).to be_displayed
+      end
+    end
   end
 
   context "group assignment submission status" do
@@ -104,6 +125,43 @@ describe "student dashboard group specific tests", :ignore_js_errors do
       expect(course_work_item(@missing_group_assignment.id)).to be_displayed
       expect(course_work_item(@missing_graded_individually.id)).to be_displayed
     end
+
+    context "todo list widget" do
+      before :once do
+        add_widget_to_dashboard(@student1_group1, :todo_list, 1)
+        add_widget_to_dashboard(@student2_group1, :todo_list, 1)
+      end
+
+      it "shows incomplete overdue group assignments for all group members" do
+        user_session(@student1_group1)
+        go_to_dashboard
+        expect(todo_item(@missing_group_assignment.id)).to be_displayed
+        expect(todo_item(@missing_graded_individually.id)).to be_displayed
+
+        destroy_session
+        user_session(@student2_group1)
+        go_to_dashboard
+        expect(todo_item(@missing_group_assignment.id)).to be_displayed
+        expect(todo_item(@missing_graded_individually.id)).to be_displayed
+      end
+
+      it "marks group assignments complete for all members when one submits" do
+        submit_group_assignment
+
+        user_session(@student1_group1)
+        go_to_dashboard
+        filter_todos_by("Complete")
+        expect(todo_item(@group_assignment.id)).to be_displayed
+        expect(todo_item(@group_assignment_graded_individually.id)).to be_displayed
+
+        destroy_session
+        user_session(@student2_group1)
+        go_to_dashboard
+        filter_todos_by("Complete")
+        expect(todo_item(@group_assignment.id)).to be_displayed
+        expect(todo_item(@group_assignment_graded_individually.id)).to be_displayed
+      end
+    end
   end
 
   context "multiple group assignments" do
@@ -142,6 +200,31 @@ describe "student dashboard group specific tests", :ignore_js_errors do
       expect(course_work_item(@group_assignment.id)).to be_displayed
       expect(element_exists?(course_work_item_selector(@lab_assignment.id))).to be_falsey
       expect(all_course_work_items.size).to eq(1)
+    end
+
+    context "todo list widget" do
+      before :once do
+        add_widget_to_dashboard(@student1_group1, :todo_list, 1)
+        add_widget_to_dashboard(@student2_group1, :todo_list, 1)
+      end
+
+      it "displays assignments from all groups student belongs to" do
+        user_session(@student1_group1)
+        go_to_dashboard
+
+        expect(todo_item(@group_assignment.id)).to be_displayed
+        expect(todo_item(@lab_assignment.id)).to be_displayed
+        expect(element_exists?(widget_pagination_container_selector("To-do list"))).to be_falsey
+      end
+
+      it "only shows assignments from student's own groups" do
+        # Student 2 is only in group1, not in lab group
+        user_session(@student2_group1)
+        go_to_dashboard
+
+        expect(todo_item(@group_assignment.id)).to be_displayed
+        expect(element_exists?(todo_item_selector(@lab_assignment.id))).to be_falsey
+      end
     end
   end
 

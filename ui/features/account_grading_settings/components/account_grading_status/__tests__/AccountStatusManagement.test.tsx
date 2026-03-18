@@ -199,6 +199,11 @@ describe('Account Grading Status Management', () => {
       const customStatusItemUpdated = getByTestId('custom-status-1')
       expect(customStatusItemUpdated.textContent).toContain('New Status 10')
 
+      // Verify icon is still present after update (from mutation response)
+      const icon = customStatusItemUpdated.querySelector('img')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('src')
+
       expect(getSRAlert()).toContain('Custom status New Status 10 updated')
     })
 
@@ -229,6 +234,11 @@ describe('Account Grading Status Management', () => {
 
       expect(newItem.textContent).toContain('New Status 11')
       expect(newItem.firstChild).toHaveStyle('background-color: #E5F3FC')
+
+      // Verify icon is present immediately after creation (from mutation response)
+      const icon = newItem.querySelector('img')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('src')
     })
   })
 
@@ -266,6 +276,74 @@ describe('Account Grading Status Management', () => {
 
       const customDeleteButton = customStatusItem?.querySelector('button') as Element
       expect(customDeleteButton).not.toBeInTheDocument()
+    })
+  })
+
+  describe('icon display', () => {
+    it('displays icons for all standard statuses', async () => {
+      const {queryAllByTestId} = renderGradingStatusManagement({
+        isRootAccount: true,
+      })
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
+
+      // Get all standard status items
+      const standardStatusItems = queryAllByTestId(/standard-status-/)
+      expect(standardStatusItems.length).toBeGreaterThanOrEqual(5)
+
+      // Each standard status should have an icon
+      standardStatusItems.forEach(item => {
+        const icon = item.querySelector('img')
+        expect(icon).toBeInTheDocument()
+        expect(icon).toHaveAttribute('src')
+        expect(icon).toHaveAttribute('alt', '')
+      })
+    })
+
+    it('displays icons for all custom statuses', async () => {
+      const {queryAllByTestId} = renderGradingStatusManagement({isRootAccount: true})
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
+
+      const customStatusItems = queryAllByTestId(/custom-status-[0-9]/)
+      expect(customStatusItems.length).toBeGreaterThanOrEqual(2)
+
+      // Each custom status should have an icon
+      customStatusItems.forEach(item => {
+        const icon = item.querySelector('img')
+        expect(icon).toBeInTheDocument()
+        expect(icon).toHaveAttribute('src')
+        expect(icon).toHaveAttribute('alt', '')
+      })
+    })
+
+    it('displays icons for both standard and custom statuses in sub accounts', async () => {
+      const {queryAllByTestId} = renderGradingStatusManagement({isRootAccount: false})
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
+
+      // Standard statuses should have icons
+      const standardStatusItems = queryAllByTestId(/standard-status-/)
+      standardStatusItems.forEach(item => {
+        const icon = item.querySelector('img')
+        expect(icon).not.toBeNull()
+        if (icon) {
+          expect(icon).toBeInTheDocument()
+        }
+      })
+
+      // Custom statuses should have icons
+      const customStatusItems = queryAllByTestId(/custom-status-[0-9]/)
+      customStatusItems.forEach(item => {
+        const icon = item.querySelector('img')
+        expect(icon).not.toBeNull()
+        if (icon) {
+          expect(icon).toBeInTheDocument()
+        }
+      })
     })
   })
 })

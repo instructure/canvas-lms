@@ -80,33 +80,17 @@ class MediaObjectsController < ApplicationController
   before_action :load_media_object_from_service, only: %i[show iframe_media_player]
   before_action :check_media_permissions, except: %i[create_media_object index media_object_thumbnail update_media_object]
   before_action(only: %i[update_media_object]) { check_media_permissions(access_type: :update) }
-  before_action :require_user, only: %i[index update_media_object]
+  skip_before_action :require_user, only: %i[create_media_object
+                                             iframe_media_player
+                                             immersive_view
+                                             media_object_inline
+                                             media_object_redirect
+                                             media_object_thumbnail
+                                             show]
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
   def token_auth_allowed?
     %w[media_object_redirect iframe_media_player].include?(params[:action])
-  end
-
-  # @{not an}API Show Media Object Details
-  # This isn't an API because it needs to work for non-logged in users (video in public course)
-  #
-  # Returns the Details of the given Media Object.
-  #
-  # @example_request
-  #     curl https://<canvas>/media_objects/<media_object_id>/info \
-  #          -H 'Authorization: Bearer <token>'
-  #
-  # @example_request
-  #     curl https://<canvas>/media_attachments/<attachment_id>/info \
-  #          -H 'Authorization: Bearer <token>'
-  #
-  # @returns MediaObject
-  def show
-    if @attachment
-      render json: media_attachment_api_json(@attachment, @media_object, @current_user, session)
-    else
-      render json: media_object_api_json(@media_object, @current_user, session)
-    end
   end
 
   # @API List Media Objects
@@ -181,9 +165,34 @@ class MediaObjectsController < ApplicationController
     render json: media_objects
   end
 
+  # @{not an}API Show Media Object Details
+  # This isn't an API because it needs to work for non-logged in users (video in public course)
+  #
+  # Returns the Details of the given Media Object.
+  #
+  # @example_request
+  #     curl https://<canvas>/media_objects/<media_object_id>/info \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/media_attachments/<attachment_id>/info \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns MediaObject
+  def show
+    if @attachment
+      render json: media_attachment_api_json(@attachment, @media_object, @current_user, session)
+    else
+      render json: media_object_api_json(@media_object, @current_user, session)
+    end
+  end
+
   # @API Update Media Object
   # Updates the title of a media object.
   # @argument user_entered_title [String] The new title.
+  # @argument viewer_restrictions [Optional, Hash]
+  #   A JSON object describing viewer access restrictions for this media.
+  #   - show_rolling_transcript [Optional, Boolean]: Whether to show the rolling transcripts of the media during playback, or not.
   #
   def update_media_object
     # media objects don't have any permissions associated with them,
@@ -202,7 +211,9 @@ class MediaObjectsController < ApplicationController
 
     @media_object.user_entered_title =
       CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
+    @media_object.viewer_restrictions.merge!(permitted_viewer_restrictions)
     @media_object.save!
+
     render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
   end
 
@@ -226,11 +237,17 @@ class MediaObjectsController < ApplicationController
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255) if params[:user_entered_title].present?
-        @media_object.save
+        @media_object.viewer_restrictions = {
+          show_rolling_transcript:
+            @domain_root_account.feature_enabled?(:rce_asr_captioning_improvements)
+        }.merge!(permitted_viewer_restrictions)
+
+        @media_object.save!
       end
       media_object_json = @media_object.as_json
       embedded_iframe_url = media_attachment_iframe_url(@media_object.attachment_id)
       media_object_json["media_object"]["uuid"] = @media_object.attachment.uuid
+
       render json: media_object_json.merge(embedded_iframe_url:)
     end
   end
@@ -239,8 +256,10 @@ class MediaObjectsController < ApplicationController
     @show_embedded_chat = false
     @show_left_side = false
     @show_right_side = false
-    js_env(MEDIA_OBJECT_ID: params[:id],
-           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video")
+    js_env({
+             MEDIA_OBJECT_ID: params[:id],
+             MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video"
+           })
     render
   end
 
@@ -317,9 +336,9 @@ class MediaObjectsController < ApplicationController
                        media_object_api_json(@media_object, @current_user, session)
                      end
 
-    js_env media_object: media_api_json if media_api_json
-    js_env attachment: !!@attachment
-    js_env attachment_id: @attachment.id if @attachment
+    js_env({ media_object: media_api_json }) if media_api_json
+    js_env({ attachment: !!@attachment })
+    js_env({ attachment_id: @attachment.id }) if @attachment
     consolidated_media_player_enabled = Account.site_admin.feature_enabled?(:consolidated_media_player)
     # this flag is also injected through the normal js_env for the RCE
     # but it needs to be added separately here for the iframe because of subaccount weirdness
@@ -335,6 +354,9 @@ class MediaObjectsController < ApplicationController
   end
 
   def immersive_view
+    return not_found unless @domain_root_account.feature_enabled?(:rce_asr_captioning_improvements) &&
+                            @media_object&.viewer_restrictions&.fetch("show_rolling_transcript", false)
+
     media_api_json = if @attachment && @media_object
                        media_attachment_api_json(
                          @attachment,
@@ -350,7 +372,7 @@ class MediaObjectsController < ApplicationController
                        media_object_api_json(@media_object, @current_user, session)
                      end
 
-    js_env media_object: media_api_json if media_api_json
+    js_env({ media_object: media_api_json }) if media_api_json
 
     # Add custom body class for responsive padding control
     @body_classes ||= []
@@ -364,9 +386,7 @@ class MediaObjectsController < ApplicationController
   private
 
   def load_media_object_from_service
-    return unless params[:media_object_id].present?
-
-    unless @media_object
+    if params[:media_object_id].present? && !@media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
       @media_object = MediaObject.create_if_id_exists(params[:media_object_id])
@@ -376,6 +396,12 @@ class MediaObjectsController < ApplicationController
       increment_request_cost(MISSED_MEDIA_ADDITIONAL_COST)
     end
 
-    @media_object.viewed!
+    @media_object&.viewed!
+  end
+
+  def permitted_viewer_restrictions
+    @permitted_viewer_restrictions ||=
+      params[:viewer_restrictions]&.permit(MediaObject::VIEWER_RESTRICTION_KEYS)
+    @permitted_viewer_restrictions ||= {}
   end
 end

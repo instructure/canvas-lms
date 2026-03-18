@@ -44,7 +44,7 @@ class QuestionBanksController < ApplicationController
   end
 
   def questions
-    find_bank(params[:question_bank_id], params[:inherited] == "1") do
+    find_bank(params[:question_bank_id], check_context_chain: params[:inherited] == "1") do
       @questions = @bank.assessment_questions.active
       url = polymorphic_url([@context, :question_bank_questions], question_bank_id: @bank)
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
@@ -62,11 +62,11 @@ class QuestionBanksController < ApplicationController
 
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
-    js_env(
-      CONTEXT_URL_ROOT: polymorphic_path([@context]),
-      ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
-      OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
-    )
+    js_env({
+             CONTEXT_URL_ROOT: polymorphic_path([@context]),
+             ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
+             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+           })
     mastery_scales_js_env
     rce_js_env
 
@@ -92,7 +92,7 @@ class QuestionBanksController < ApplicationController
     @new_bank = AssessmentQuestionBank.find(params[:assessment_question_bank_id])
     if authorized_action(@bank, @current_user, :update) && authorized_action(@new_bank, @current_user, :manage)
       unless params[:questions].present?
-        return render json: { error: "must specify questions to move" }, status: :unprocessable_entity
+        return render json: { error: "must specify questions to move" }, status: :unprocessable_content
       end
 
       ids = []
@@ -138,7 +138,7 @@ class QuestionBanksController < ApplicationController
     @bank = AssessmentQuestionBank.find(params[:question_bank_id])
 
     if params[:unbookmark] == "1"
-      render json: @bank.bookmark_for(@current_user, false)
+      render json: @bank.bookmark_for(@current_user, do_bookmark: false)
     elsif authorized_action(@bank, @current_user, :update)
       render json: @bank.bookmark_for(@current_user)
     end

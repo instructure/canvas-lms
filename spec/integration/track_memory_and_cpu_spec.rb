@@ -21,7 +21,7 @@ describe "memory and cpu tracking" do
   it "passes cpu info to statsd" do
     account = Account.default
 
-    allow(Process).to receive(:times).and_return(double(stime: 0, utime: 0))
+    allow(Process).to receive(:times).and_return(instance_double(Process::Tms, stime: 0, utime: 0))
 
     user_cpu = 0
     system_cpu = 0

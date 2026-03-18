@@ -119,13 +119,31 @@ describe('Table', () => {
 
     it('navigates up with ArrowUp key', async () => {
       const user = userEvent.setup()
-      render(<Table columns={mockColumns} data={mockData} caption="Test Table" />)
+      const columnsWithButton: Column[] = [
+        {
+          key: 'name',
+          header: () => (
+            <div>
+              Name
+              <button type="button" aria-label="Name options">
+                Options
+              </button>
+            </div>
+          ),
+          width: 200,
+          isSticky: true,
+          isRowHeader: true,
+        },
+        mockColumns[1],
+        mockColumns[2],
+      ]
+      render(<Table columns={columnsWithButton} data={mockData} caption="Test Table" />)
 
       const johnCell = screen.getByText('John Doe')
       johnCell.focus()
 
       await user.keyboard('{ArrowUp}')
-      expect(document.activeElement?.textContent).toContain('Name')
+      expect(document.activeElement).toBe(screen.getByRole('button', {name: 'Name options'}))
     })
 
     it('does not navigate beyond table boundaries', async () => {

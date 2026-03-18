@@ -188,7 +188,7 @@ describe "discussions" do
         expect(f("#availability_options")).to be_displayed
         fxpath("//span[text()='Graded']").click
         wait_for_ajaximations
-        expect(f("#availability_options")).to_not be_displayed
+        expect(f("#availability_options")).not_to be_displayed
         f("#discussion_topic_assignment_points_possible").send_keys("10")
         wait_for_ajaximations
         click_option("#assignment_group_id", assignment_group.name)

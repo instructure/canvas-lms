@@ -49,7 +49,8 @@ module TestDatabaseUtils
     end
 
     def reset_database!
-      return unless truncate_all_tables? || randomize_sequences?
+      non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
+      return unless !non_empty_tables.empty? || randomize_sequences?
 
       start = Time.zone.now
 
@@ -58,7 +59,11 @@ module TestDatabaseUtils
       require "switchman/test_helper"
       ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: ENV["CREATE_SHARDS"] != "1")
 
-      truncate_all_tables! if truncate_all_tables?
+      unless non_empty_tables.empty?
+        puts ActiveRecord::Base.connection.non_empty_tables_message(non_empty_tables) unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
+
+        truncate_all_tables!
+      end
       randomize_sequences! if randomize_sequences?
 
       # now delete any shard objects we created
@@ -113,14 +118,8 @@ module TestDatabaseUtils
       table_names
     end
 
-    def truncate_all_tables?
-      # Only account should be the dummy account with id=0
-      Account.where.not(id: 0).any? || Account.where(id: 0).none?
-    end
-
     def truncate_all_tables!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "truncating all tables..." unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
       each_connection do |connection|
         table_names = get_table_names(connection)
         next if table_names.empty?

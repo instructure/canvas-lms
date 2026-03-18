@@ -109,7 +109,17 @@ export function buildDescription(flag, allowsDefaults, appliesTo) {
   return descriptions[flag.state][contextType]
 }
 
-export function shouldDelete(flag, allowsDefaults, state) {
+export function shouldDelete({
+  flag,
+  allowsDefaults,
+  state,
+  rootOptIn = false,
+  isRootAccount = false,
+}) {
+  // Root opt-in flags on root account level should never be delete as they play a critical role in the inheritance model.
+  if (rootOptIn && isRootAccount) {
+    return false
+  }
   // Easy case
   if (flag.parent_state === state) {
     return true

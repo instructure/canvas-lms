@@ -39,7 +39,7 @@ describe Api::V1::AssignmentOverride do
                    unlock_at: nil,
                    lock_at: nil }
       allow(subject).to receive(:api_find_all).and_return []
-      assignment = double(context: double(all_students: []))
+      assignment = instance_double(Assignment, context: instance_double(Course, all_students: []))
       result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
       expect(result.first[:due_at]).to be_nil
       expect(result.first[:unlock_at]).to be_nil
@@ -59,7 +59,7 @@ describe Api::V1::AssignmentOverride do
         override = { student_ids: [@student.global_id] }
 
         allow(subject).to receive(:api_find_all).and_return [@student]
-        assignment = double(context: double(all_students: []))
+        assignment = instance_double(Assignment, context: instance_double(Course, all_students: []))
         result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
         expect(result[1]).to be_nil
         expect(result.first[:students]).to eq [@student]
@@ -348,7 +348,7 @@ describe Api::V1::AssignmentOverride do
           invisible_ids, _ = subject.invisible_users_and_overrides_for_user(
             @course, @teacher, @assignment.assignment_overrides.active
           )
-          expect(invisible_ids).to_not include(@student_invisible.id)
+          expect(invisible_ids).not_to include(@student_invisible.id)
         end
 
         it "returns no override ids in the second param" do

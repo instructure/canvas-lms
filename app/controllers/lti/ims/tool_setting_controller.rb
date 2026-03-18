@@ -38,7 +38,7 @@ module Lti
       TOOL_PROXY_BINDING_SERVICE = "ToolProxyBindingSettings"
       LTI_LINK_SETTINGS = "LtiLinkSettings"
 
-      skip_before_action :load_user
+      skip_before_action :load_user, :require_user
       before_action :authenticate_api_call
       skip_before_action :verify_authenticity_token
 

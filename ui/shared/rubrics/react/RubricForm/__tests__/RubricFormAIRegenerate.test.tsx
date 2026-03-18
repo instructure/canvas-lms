@@ -45,12 +45,13 @@ const mockCriteria = [
     description: 'Generated Criterion 1',
     points: 20,
     ratings: [],
-    longDescription: '',
+    long_description: '',
     outcome: undefined,
-    learningOutcomeId: undefined,
-    ignoreForScoring: false,
-    criterionUseRange: false,
-    masteryPoints: 0,
+    learning_outcome_id: undefined,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 0,
+    generated: true,
   },
 ]
 
@@ -70,6 +71,7 @@ const ROOT_OUTCOME_GROUP = {
 
 describe('RubricForm AI Regenerate Tests', () => {
   beforeEach(() => {
+    queryClient.clear()
     vi.useFakeTimers()
     fakeEnv.setup({
       context_asset_string: 'user_1',
@@ -77,6 +79,7 @@ describe('RubricForm AI Regenerate Tests', () => {
   })
 
   afterEach(() => {
+    queryClient.clear()
     vi.useRealTimers()
     vi.resetAllMocks()
     fakeEnv.teardown()
@@ -169,12 +172,11 @@ describe('RubricForm AI Regenerate Tests', () => {
     })
 
     it('does not show regenerate button if ai rubrics is enabled and an assignment rubric is being edited', async () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId} = renderComponent({
         aiRubricsEnabled: true,
         assignmentId: '1',
-        courseId: '1',
         rubricId: '1',
       })
 

@@ -137,7 +137,7 @@ describe "QTI Generator" do
       qti_generator
       allow(@qg).to receive_messages(aq_mig_id: "dummy_id", qq_mig_id: "dummy_id")
 
-      html_exporter = double("HtmlExporter")
+      html_exporter = instance_double(CC::CCHelper::HtmlContentExporter)
       allow(html_exporter).to receive(:html_content) { |s| s }
       @qg.instance_variable_set(:@html_exporter, html_exporter)
 

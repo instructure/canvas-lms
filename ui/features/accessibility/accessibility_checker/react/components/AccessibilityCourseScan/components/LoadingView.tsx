@@ -21,7 +21,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScanHandler} from './ScanHandler'
-
 const I18n = createI18nScope('accessibility_scan')
 
 export const LoadingView: React.FC = () => {

@@ -27,11 +27,13 @@ class BlockEditorsController < ApplicationController
       @embeddable = true
 
       block_editor = BlockEditor.find(params[:id])
-      js_env block_editor_attributes: {
-        id: block_editor.id,
-        version: block_editor.editor_version,
-        blocks: block_editor.blocks,
-      }.to_json
+      js_env({
+               block_editor_attributes: {
+                 id: block_editor.id,
+                 version: block_editor.editor_version,
+                 blocks: block_editor.blocks,
+               }
+             })
       js_bundle :block_editor_iframe_content
 
       render html: "<div id='block_editor_viewer_container'>#{I18n.t("Loading...")}</div>".html_safe,

@@ -78,8 +78,8 @@ describe "profile communication settings" do
 
     it "displays the users email address as channel" do
       get "/profile/communication"
-      expect(fj("th[scope='col'] span:contains('email')")).to be
-      expect(fj("th[scope='col'] span:contains('nobody@example.com')")).to be
+      expect(fj("th[scope='col'] span:contains('email')")).not_to be_nil
+      expect(fj("th[scope='col'] span:contains('nobody@example.com')")).not_to be_nil
     end
 
     it "does not display a SMS number as channel" do
@@ -150,7 +150,7 @@ describe "profile communication settings" do
   it "renders for a user with no enrollments" do
     user_logged_in(username: "somebody@example.com")
     get "/profile/communication"
-    expect(fj("th[scope='col'] span:contains('email')")).to be
-    expect(fj("th[scope='col'] span:contains('somebody@example.com')")).to be
+    expect(fj("th[scope='col'] span:contains('email')")).not_to be_nil
+    expect(fj("th[scope='col'] span:contains('somebody@example.com')")).not_to be_nil
   end
 end

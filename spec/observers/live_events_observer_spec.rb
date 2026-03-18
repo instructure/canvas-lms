@@ -106,6 +106,18 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:wiki_page_deleted).once
       @page.destroy_permanently!
     end
+
+    it "posts update event when page is published" do
+      wiki_page_model(workflow_state: "unpublished")
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
+      @page.publish!
+    end
+
+    it "posts update event when page is unpublished" do
+      wiki_page_model
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
+      @page.unpublish!
+    end
   end
 
   describe "attachment" do
@@ -268,7 +280,7 @@ describe LiveEventsObserver do
     end
 
     it "does not post a create event when a submission is first created in an unsubmitted state" do
-      expect(Canvas::LiveEvents).to_not receive(:submission_created)
+      expect(Canvas::LiveEvents).not_to receive(:submission_created)
       Submission.create!(assignment: assignment_model, user: user_model, workflow_state: "unsubmitted", submitted_at: Time.zone.now)
     end
 

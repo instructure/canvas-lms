@@ -154,7 +154,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         product_family
         tool_proxy.update_columns(subscription_id: "test-subscription-123")
         actl
-        success_response = double("response", is_a?: true, code: "200", body: "success")
+        success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
         allow(CanvasHttp).to receive(:post).and_return(success_response)
         expect(sub_account.context_external_tools.where(lti_registration: tii_registration).count).to eq(0)
         expect(Lti::AssetProcessor.where(assignment:).count).to eq(0)
@@ -226,8 +226,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         allow(worker).to receive(:migrate_tool_proxy).and_call_original
         allow(worker).to receive(:create_asset_processor_from_actl)
         worker.perform(test_progress)
-        expect(worker).to have_received(:migrate_tool_proxy).with(tool_proxy)
-        expect(worker).to have_received(:migrate_tool_proxy).with(course_tool_proxy)
+        expect(worker).to have_received(:migrate_tool_proxy).with(tool_proxy).at_least(:once)
+        expect(worker).to have_received(:migrate_tool_proxy).with(course_tool_proxy).at_least(:once)
       end
 
       it "does not migrate proxies of the subtree" do
@@ -394,7 +394,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
         expect(csv_content).to be_present
         csv_rows = CSV.parse(csv_content)
-        expect(csv_rows.length).to eq(3) # Header + 2 data rows
+        expect(csv_rows.length).to eq(4) # Header + 2 ACTL rows + 1 orphan proxy row
 
         first_item = csv_rows[1]
         expect(first_item[0]).to eq(sub_account.id.to_s)
@@ -412,6 +412,10 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         expect(second_item[8]).to eq("failed")
         expect(second_item[9]).to eq("0")
         expect(second_item[10]).to include("Unexpected error when migrating Tool Proxy")
+
+        orphan_row = csv_rows[3]
+        expect(orphan_row[2]).to eq("")
+        expect(orphan_row[10]).to include("Unexpected error when migrating Tool Proxy")
       end
     end
 
@@ -685,7 +689,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "adds error and returns early when deployment creation fails with Lti::ContextExternalToolErrors" do
-      errors = double("errors", full_messages: ["Duplicate deployment"])
+      errors = instance_double(ActiveModel::Errors, full_messages: ["Duplicate deployment"])
       allow_any_instance_of(Lti::Registration).to receive(:new_external_tool).and_raise(Lti::ContextExternalToolErrors.new(errors))
       allow(worker).to receive(:tii_tp_migration)
       worker.send(:initialize_proxy_results, tool_proxy)
@@ -737,7 +741,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "accepts valid turnitin.com endpoint" do
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, tool_proxy)
       worker.send(:tii_tp_migration, tool_proxy, deployment)
@@ -760,7 +764,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           }
         }
       )
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, subdomain_tool_proxy)
       worker.send(:tii_tp_migration, subdomain_tool_proxy, deployment)
@@ -784,7 +788,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
             }
           }
         )
-        success_response = double("response", is_a?: true, code: "200", body: "success")
+        success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
         allow(CanvasHttp).to receive(:post).and_return(success_response)
         worker.send(:initialize_proxy_results, domain_tool_proxy)
         worker.send(:tii_tp_migration, domain_tool_proxy, deployment)
@@ -809,7 +813,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           }
         }
       )
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, custom_tool_proxy)
       worker.send(:tii_tp_migration, custom_tool_proxy, deployment)
@@ -862,7 +866,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "makes HTTP POST request with correct authorization header and payload" do
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(success_response)
       worker.send(:initialize_proxy_results, tool_proxy)
       worker.send(:tii_tp_migration, tool_proxy, deployment)
@@ -887,8 +891,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "retries once after 2 seconds on HTTP failure" do
-      failure_response = double("response", is_a?: false, code: "500", body: "Internal Server Error")
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      failure_response = instance_double(Net::HTTPResponse, is_a?: false, code: "500", body: "Internal Server Error")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       allow(CanvasHttp).to receive(:post).and_return(failure_response, success_response)
       allow(worker).to receive(:sleep)
       worker.send(:initialize_proxy_results, tool_proxy)
@@ -901,7 +905,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "retries once after 2 seconds on exception" do
-      success_response = double("response", is_a?: true, code: "200", body: "success")
+      success_response = instance_double(Net::HTTPResponse, is_a?: true, code: "200", body: "success")
       call_count = 0
       allow(CanvasHttp).to receive(:post) do
         call_count += 1
@@ -920,7 +924,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "logs error and returns false after max retries" do
-      failure_response = double("response", is_a?: false, code: "500", body: "Internal Server Error")
+      failure_response = instance_double(Net::HTTPResponse, is_a?: false, code: "500", body: "Internal Server Error")
       allow(CanvasHttp).to receive(:post).and_return(failure_response)
       allow(worker).to receive(:sleep)
       allow(Canvas::Errors).to receive(:capture_exception)
@@ -1312,7 +1316,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       # Ensure no errors in results
       results[:proxies] = {}
 
-      mailer_instance = double("mailer")
+      mailer_instance = instance_double(Mail::Message)
       expect(Mailer).to receive(:create_message) do |message|
         expect(message.to).to eq(email)
         expect(message.subject).to eq("Turnitin Asset Processor Migration Report")
@@ -1334,7 +1338,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       # Ensure no errors in results
       results[:proxies] = {}
 
-      mailer_instance = double("mailer")
+      mailer_instance = instance_double(Mail::Message)
       expect(Mailer).to receive(:create_message) do |message|
         expect(message.body).to include("completed successfully")
         expect(message.body).to include("Turnitin migration from LTI 2.0 to LTI 1.3")
@@ -1354,7 +1358,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       # Add errors to results
       results[:proxies] = { 123 => { errors: ["Test error"] } }
 
-      mailer_instance = double("mailer")
+      mailer_instance = instance_double(Mail::Message)
       expect(Mailer).to receive(:create_message) do |message|
         expect(message.body).to include("completed with errors")
         expect(message.body).to include("Turnitin migration from LTI 2.0 to LTI 1.3")
@@ -1903,43 +1907,43 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#priority_from_cpf_report" do
     it "returns TIME_CRITICAL priority for error state" do
-      report = double("report", workflow_state: "error", originality_score: nil)
+      report = instance_double(OriginalityReport, workflow_state: "error", originality_score: nil)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
     end
 
     it "returns TIME_CRITICAL priority for score >= 75" do
-      report = double("report", workflow_state: "scored", originality_score: 80)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 80)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_TIME_CRITICAL)
     end
 
     it "returns SEMI_TIME_CRITICAL priority for score >= 50 and < 75" do
-      report = double("report", workflow_state: "scored", originality_score: 60)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 60)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_SEMI_TIME_CRITICAL)
     end
 
     it "returns NOT_TIME_CRITICAL priority for score >= 25 and < 50" do
-      report = double("report", workflow_state: "scored", originality_score: 35)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 35)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_NOT_TIME_CRITICAL)
     end
 
     it "returns GOOD priority for score < 25" do
-      report = double("report", workflow_state: "scored", originality_score: 10)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: 10)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
     end
 
     it "returns GOOD priority for scored state with no score" do
-      report = double("report", workflow_state: "scored", originality_score: nil)
+      report = instance_double(OriginalityReport, workflow_state: "scored", originality_score: nil)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
     end
 
     it "returns GOOD priority for pending state" do
-      report = double("report", workflow_state: "pending", originality_score: nil)
+      report = instance_double(OriginalityReport, workflow_state: "pending", originality_score: nil)
       priority = worker.send(:priority_from_cpf_report, report)
       expect(priority).to eq(Lti::AssetReport::PRIORITY_GOOD)
     end
@@ -1947,25 +1951,25 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#processing_progress_from_cpf_report" do
     it "returns PROCESSING for pending state" do
-      report = double("report", workflow_state: "pending")
+      report = instance_double(OriginalityReport, workflow_state: "pending")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_PROCESSING)
     end
 
     it "returns FAILED for error state" do
-      report = double("report", workflow_state: "error")
+      report = instance_double(OriginalityReport, workflow_state: "error")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_FAILED)
     end
 
     it "returns PROCESSED for scored state" do
-      report = double("report", workflow_state: "scored")
+      report = instance_double(OriginalityReport, workflow_state: "scored")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_PROCESSED)
     end
 
     it "returns NOT_READY for other states" do
-      report = double("report", workflow_state: "unknown")
+      report = instance_double(OriginalityReport, workflow_state: "unknown")
       progress = worker.send(:processing_progress_from_cpf_report, report)
       expect(progress).to eq(Lti::AssetReport::PROGRESS_NOT_READY)
     end
@@ -1973,8 +1977,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#extract_custom_sourcedid" do
     it "extracts custom_sourcedid from resource_url" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: "https://example.com/launch?custom_sourcedid=abc123&other=param")
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: "https://example.com/launch?custom_sourcedid=abc123&other=param")
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -1982,8 +1986,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil when resource_url is nil" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: nil)
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: nil)
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -1991,15 +1995,15 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil when lti_link is nil" do
-      report = double("report", lti_link: nil)
+      report = instance_double(OriginalityReport, lti_link: nil)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
       expect(sourcedid).to be_nil
     end
 
     it "returns nil when custom_sourcedid is not present" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: "https://example.com/launch?other=param")
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: "https://example.com/launch?other=param")
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -2007,8 +2011,8 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil for invalid URI" do
-      report = double("report")
-      lti_link = double("lti_link", resource_url: "not a valid uri")
+      report = instance_double(OriginalityReport)
+      lti_link = instance_double(Lti::Link, resource_url: "not a valid uri")
       allow(report).to receive(:lti_link).and_return(lti_link)
 
       sourcedid = worker.send(:extract_custom_sourcedid, report)
@@ -2018,7 +2022,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
   describe "#calc_indications_from_cpf_report" do
     it "returns red indication for very high similarity (failure)" do
-      report = double("report", originality_score: 95)
+      report = instance_double(OriginalityReport, originality_score: 95)
       allow(Turnitin).to receive(:state_from_similarity_score).with(95).and_return("failure")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2027,7 +2031,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns red indication for high similarity (problem)" do
-      report = double("report", originality_score: 80)
+      report = instance_double(OriginalityReport, originality_score: 80)
       allow(Turnitin).to receive(:state_from_similarity_score).with(80).and_return("problem")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2036,7 +2040,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns orange indication for medium similarity (warning)" do
-      report = double("report", originality_score: 60)
+      report = instance_double(OriginalityReport, originality_score: 60)
       allow(Turnitin).to receive(:state_from_similarity_score).with(60).and_return("warning")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2045,7 +2049,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns green indication for low similarity (acceptable)" do
-      report = double("report", originality_score: 15)
+      report = instance_double(OriginalityReport, originality_score: 15)
       allow(Turnitin).to receive(:state_from_similarity_score).with(15).and_return("acceptable")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2054,7 +2058,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns green indication for no similarity (none)" do
-      report = double("report", originality_score: 0)
+      report = instance_double(OriginalityReport, originality_score: 0)
       allow(Turnitin).to receive(:state_from_similarity_score).with(0).and_return("none")
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
@@ -2063,7 +2067,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns nil values when originality_score is not present" do
-      report = double("report", originality_score: nil)
+      report = instance_double(OriginalityReport, originality_score: nil)
 
       color, alt = worker.send(:calc_indications_from_cpf_report, report)
       expect(color).to be_nil
@@ -2382,9 +2386,16 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       )
     end
 
-    it "destroys asset processors and clears migrated_to_context_external_tool for all ACTLs" do
+    it "destroys asset processors and clears migrated_to_context_external_tool for all ACTLs and orphan proxies" do
       migrated_tool_proxy.update!(migrated_to_context_external_tool: ap_tool)
       allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      orphan_proxy = create_tool_proxy(
+        context: sub_account,
+        product_family:,
+        create_binding: false
+      )
+      orphan_proxy.update!(migrated_to_context_external_tool: ap_tool)
 
       actl1
       actl2
@@ -2404,12 +2415,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       )
 
       expect(migrated_tool_proxy.migrated_to_context_external_tool).to eq(ap_tool)
+      expect(orphan_proxy.migrated_to_context_external_tool).to eq(ap_tool)
       expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(2)
 
       worker.rollback
 
       expect(Lti::AssetProcessor.active.where(assignment: [test_assignment1, test_assignment2]).count).to eq(0)
       expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+      expect(orphan_proxy.reload.migrated_to_context_external_tool).to be_nil
     end
 
     it "skips tool proxies from other accounts and continues processing" do
@@ -2456,6 +2469,346 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       expect(ap2.reload.workflow_state).to eq("deleted")
       expect(other_tool_proxy.reload.migrated_to_context_external_tool).to eq(ap_tool)
       expect(migrated_tool_proxy.reload.migrated_to_context_external_tool).to be_nil
+    end
+
+    it "rollback_recursive rolls back orphan proxies in sub-accounts" do
+      child_account = account_model(parent_account: sub_account, root_account:)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      orphan_proxy_in_child = create_tool_proxy(
+        context: child_account,
+        product_family:,
+        create_binding: false
+      )
+      orphan_proxy_in_child.update!(migrated_to_context_external_tool: ap_tool)
+
+      expect(orphan_proxy_in_child.migrated_to_context_external_tool).to eq(ap_tool)
+
+      worker.rollback_recursive
+
+      expect(orphan_proxy_in_child.reload.migrated_to_context_external_tool).to be_nil
+    end
+
+    it "non-recursive rollback does not roll back orphan proxies in sub-accounts" do
+      child_account = account_model(parent_account: sub_account, root_account:)
+      allow_any_instance_of(Lti::ToolProxy).to receive(:manage_subscription)
+
+      orphan_proxy_in_child = create_tool_proxy(
+        context: child_account,
+        product_family:,
+        create_binding: false
+      )
+      orphan_proxy_in_child.update!(migrated_to_context_external_tool: ap_tool)
+
+      worker.rollback
+
+      expect(orphan_proxy_in_child.reload.migrated_to_context_external_tool).to eq(ap_tool)
+    end
+  end
+
+  describe "#tii_orphan_proxies" do
+    before do
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+    end
+
+    it "returns account-level TII proxies with no ACTLs" do
+      product_family
+      tool_proxy # account-level proxy in sub_account, no ACTLs
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).to include(tool_proxy)
+    end
+
+    it "returns course-level TII proxies with no ACTLs" do
+      product_family
+      course_tool_proxy # course-level proxy, no ACTLs
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).to include(course_tool_proxy)
+    end
+
+    it "excludes already-migrated proxies" do
+      product_family
+      tool_proxy.update!(migrated_to_context_external_tool: external_tool_1_3_model(context: sub_account))
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(tool_proxy)
+    end
+
+    it "excludes deleted proxies" do
+      product_family
+      tool_proxy.update!(workflow_state: "deleted")
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(tool_proxy)
+    end
+
+    it "excludes proxies from other accounts" do
+      product_family
+      other_account = account_model(parent_account: root_account, root_account:)
+      other_proxy = create_tool_proxy(
+        context: other_account,
+        product_family:,
+        create_binding: true,
+        raw_data: tii_raw_data
+      )
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(other_proxy)
+    end
+
+    it "excludes proxies from courses in deleted courses" do
+      product_family
+      course_tool_proxy
+      course.destroy
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(course_tool_proxy)
+    end
+
+    it "excludes non-TII proxies" do
+      other_family = Lti::ProductFamily.create!(
+        vendor_code: "other.com",
+        product_code: "other-tool",
+        vendor_name: "Other",
+        root_account:
+      )
+      other_proxy = create_tool_proxy(
+        context: sub_account,
+        product_family: other_family,
+        create_binding: true,
+        raw_data: tii_raw_data
+      )
+      result = worker.send(:tii_orphan_proxies)
+      expect(result).not_to include(other_proxy)
+    end
+  end
+
+  describe "#migrate_orphan_proxies" do
+    let(:assignment) { assignment_model(course:) }
+    let(:resource_handler) do
+      Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy:
+      )
+    end
+    let(:message_handler) do
+      Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy:,
+        capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
+      )
+    end
+    let(:actl) do
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: described_class::TII_TOOL_VENDOR_CODE,
+        tool_product_code: described_class::TII_TOOL_PRODUCT_CODE,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+    end
+
+    before do
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+    end
+
+    it "migrates an orphan account-level proxy and writes CSV row" do
+      product_family
+      tool_proxy
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).to have_received(:migrate_tool_proxy).with(tool_proxy)
+      expect(csv_rows.length).to eq(1)
+      row = csv_rows.first
+      expect(row[0]).to eq(sub_account.id)
+      expect(row[1]).to eq(sub_account.name)
+      expect(row[2]).to eq("")
+      expect(row[3]).to eq("")
+      expect(row[4]).to eq("")
+      expect(row[5]).to eq(tool_proxy.id)
+      expect(row[6]).to be_present
+      expect(row[9]).to eq(0)
+      expect(row[11]).to include("not associated with any assignment")
+    end
+
+    it "migrates an orphan course-level proxy with course ID in CSV" do
+      product_family
+      course_tool_proxy
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: course).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).to have_received(:migrate_tool_proxy).with(course_tool_proxy)
+      row = csv_rows.first
+      expect(row[0]).to eq(sub_account.id)
+      expect(row[4]).to eq(course.id)
+    end
+
+    it "skips proxies already in @migrated_tool_proxies" do
+      product_family
+      tool_proxy
+      worker.instance_variable_get(:@migrated_tool_proxies) << tool_proxy
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy)
+      expect(csv_rows).to be_empty
+    end
+
+    it "skips proxies that were already processed (e.g. failed in normal migration cycle)" do
+      product_family
+      tool_proxy
+      worker.send(:initialize_proxy_results, tool_proxy)
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy)
+    end
+
+    it "skips already-migrated proxies via DB query" do
+      product_family
+      tool_proxy.update!(migrated_to_context_external_tool: external_tool_1_3_model(context: sub_account))
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy)
+      expect(csv_rows).to be_empty
+    end
+
+    it "adds migrated proxy to @migrated_tool_proxies for subscription cleanup" do
+      product_family
+      tool_proxy.update_columns(subscription_id: "test-sub-orphan")
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker.instance_variable_get(:@migrated_tool_proxies)).to include(tool_proxy)
+    end
+
+    it "handles errors per-proxy and continues" do
+      product_family
+      tool_proxy
+      create_tool_proxy(
+        context: sub_account,
+        product_family:,
+        create_binding: true,
+        raw_data: tii_raw_data
+      )
+      call_count = 0
+      allow(worker).to receive(:migrate_tool_proxy) do |tp|
+        call_count += 1
+        raise StandardError, "boom" if call_count == 1
+
+        tp.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      end
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(csv_rows.length).to eq(2)
+      error_row = csv_rows.find { |r| r[10].include?("Unexpected error") }
+      expect(error_row).to be_present
+    end
+
+    it "does not migrate proxies that have ACTLs (already handled by migrate_actls)" do
+      product_family
+      actl
+      tool_proxy.update_column(:migrated_to_context_external_tool_id, external_tool_1_3_model(context: sub_account).id)
+      allow(worker).to receive(:migrate_tool_proxy)
+
+      csv_rows = []
+      worker.send(:migrate_orphan_proxies, csv_rows)
+
+      expect(worker).not_to have_received(:migrate_tool_proxy).with(tool_proxy)
+    end
+  end
+
+  describe "full flow with orphan proxies" do
+    let(:rsa_key) { OpenSSL::PKey::RSA.new(2048) }
+
+    before do
+      Setting.set("turnitin_asset_processor_client_id", developer_key.global_id.to_s)
+      allow(Lti::KeyStorage).to receive(:present_key).and_return(rsa_key)
+    end
+
+    it "migrates orphan proxy and deletes its subscription" do
+      product_family
+      tool_proxy.update_columns(subscription_id: "orphan-sub-123")
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+
+      worker.perform(test_progress)
+
+      expect(tool_proxy.reload.migrated_to_context_external_tool).to be_present
+      expect(tool_proxy.reload.subscription_id).to be_nil
+    end
+
+    it "includes orphan proxy rows in CSV report" do
+      product_family
+      tool_proxy
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+
+      worker.perform(test_progress)
+
+      csv_content = worker.instance_variable_get(:@csv_content)
+      csv_rows = CSV.parse(csv_content)
+      orphan_row = csv_rows.find { |r| r[5] == tool_proxy.id.to_s && r[2].blank? }
+      expect(orphan_row).to be_present
+      expect(orphan_row[0]).to eq(sub_account.id.to_s)
+    end
+
+    it "does not double-migrate a proxy found via both ACTL and orphan path" do
+      product_family
+      assignment = assignment_model(course:)
+      resource_handler = Lti::ResourceHandler.create!(
+        resource_type_code: "resource",
+        name: "Test Resource",
+        tool_proxy:
+      )
+      message_handler = Lti::MessageHandler.create!(
+        message_type: "basic-lti-launch-request",
+        launch_path: "http://example.com/launch",
+        resource_handler:,
+        tool_proxy:,
+        capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
+      )
+      AssignmentConfigurationToolLookup.create!(
+        assignment:,
+        tool: message_handler,
+        tool_type: "Lti::MessageHandler",
+        tool_id: message_handler.id,
+        tool_vendor_code: described_class::TII_TOOL_VENDOR_CODE,
+        tool_product_code: described_class::TII_TOOL_PRODUCT_CODE,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        context_type: "Course"
+      )
+      success_response = instance_double(Net::HTTPSuccess, is_a?: true, code: "200", body: "success")
+      allow(CanvasHttp).to receive(:post).and_return(success_response)
+
+      worker.perform(test_progress)
+
+      expect(CanvasHttp).to have_received(:post).once
+      deployments = sub_account.context_external_tools.where(lti_registration: tii_registration)
+      expect(deployments.count).to eq(1)
     end
   end
 end

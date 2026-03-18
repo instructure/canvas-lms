@@ -77,7 +77,7 @@ module CanvasSecurity
 
         it "is an empty hash if an unwrapped token" do
           original_token = ServicesJwt.generate({ sub: user_id })
-          jwt = ServicesJwt.new(original_token, false)
+          jwt = ServicesJwt.new(original_token, wrapped: false)
           expect(jwt.wrapper_token).to eq({})
         end
       end
@@ -104,13 +104,13 @@ module CanvasSecurity
 
         it "uses SecureRandom for generating the JWT" do
           allow(SecureRandom).to receive_messages(uuid: "some-secure-random-string")
-          jwt = ServicesJwt.new(jwt_string, false)
+          jwt = ServicesJwt.new(jwt_string, wrapped: false)
           expect(jwt.id).to eq("some-secure-random-string")
         end
 
         it "expires in an hour" do
           Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
-            jwt = ServicesJwt.new(jwt_string, false)
+            jwt = ServicesJwt.new(jwt_string, wrapped: false)
             expect(jwt.expires_at).to eq(1_363_169_520)
           end
         end
@@ -127,8 +127,8 @@ module CanvasSecurity
           end
 
           it "can return just the encrypted token without base64 encoding" do
-            jwt = ServicesJwt.generate({ sub: 1 }, false)
-            expect(jwt).to_not match(base64_regex)
+            jwt = ServicesJwt.generate({ sub: 1 }, base64: false)
+            expect(jwt).not_to match(base64_regex)
           end
 
           it "allows the introduction of arbitrary data" do
@@ -144,7 +144,7 @@ module CanvasSecurity
           end
 
           it "can generate a non-encrypted JWT" do
-            jwt = ServicesJwt.generate({ sub: 1, foo: "bar" }, false, encrypt: false)
+            jwt = ServicesJwt.generate({ sub: 1, foo: "bar" }, base64: false, encrypt: false)
             body = JSON::JWT.decode(jwt, ServicesJwt::KeyStorage.public_keyset)
             expect(body[:foo]).to eq "bar"
           end
@@ -152,7 +152,7 @@ module CanvasSecurity
 
         describe "via .for_user" do
           let(:user) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
-          let(:ctx) { double(id: 47) }
+          let(:ctx) { instance_double(ServicesJwtContext, id: 47) }
           let(:host) { "example.instructure.com" }
           let(:masq_user) { double(global_id: 24) }
 

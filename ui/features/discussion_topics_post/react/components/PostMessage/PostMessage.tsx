@@ -54,7 +54,7 @@ export function PostMessage({...props}) {
   let heading = 'h2'
 
   if (props.discussionEntry) {
-    const depth = Math.min((props.discussionEntry.depth || 0) + 2, 5)
+    const depth = Math.min((props.discussionEntry.depth || 0) + 1, 5)
     heading = 'h' + depth.toString()
   }
 
@@ -120,7 +120,7 @@ export function PostMessage({...props}) {
             // @ts-expect-error TS18049 (typescriptify)
             <View margin={responsiveProps.titleMargin} display={responsiveProps.titleDisplay}>
               {/* @ts-expect-error TS18049 (typescriptify) */}
-              <Heading level="h2" size={responsiveProps.titleTextSize} data-testid="message_title">
+              <Heading level="h1" size={responsiveProps.titleTextSize} data-testid="message_title">
                 <AccessibleContent alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}>
                   {props.title}
                 </AccessibleContent>

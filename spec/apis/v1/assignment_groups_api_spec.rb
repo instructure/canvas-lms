@@ -200,9 +200,7 @@ describe AssignmentGroupsController, type: :request do
     ]
 
     json.each do |group|
-      group["assignments"].each do |assignment|
-        expect(assignment).to have_key "description"
-      end
+      expect(group["assignments"]).to all(have_key("description"))
     end
 
     expect(json).to eq expected

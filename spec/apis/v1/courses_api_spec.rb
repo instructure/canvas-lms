@@ -67,11 +67,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, ["html_url"], [])).to include({
                                                                                       "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
                                                                                     })
-      expect(@test_api.course_json(@course1, @me, {}, [], [])).to_not include "html_url"
+      expect(@test_api.course_json(@course1, @me, {}, [], [])).not_to include "html_url"
     end
 
     it "only includes needs_grading_count if requested" do
-      expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).to_not include "needs_grading_count"
+      expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).not_to include "needs_grading_count"
     end
 
     it "only includes is_favorite if requested" do
@@ -94,7 +94,7 @@ describe Api::V1::Course do
     it "does not honor needs_grading_count for designers" do
       @designer_enrollment = @course1.enroll_designer(@me)
       @designer_enrollment.accept!
-      expect(@test_api.course_json(@course1, @me, {}, ["needs_grading_count"], [@designer_enrollment])).to_not include "needs_grading_count"
+      expect(@test_api.course_json(@course1, @me, {}, ["needs_grading_count"], [@designer_enrollment])).not_to include "needs_grading_count"
     end
 
     it "includes apply_assignment_group_weights" do
@@ -434,8 +434,8 @@ describe Api::V1::Course do
     subject { result }
 
     let(:hash) { {} }
-    let(:course) { double(feed_code: 573, id: 42, syllabus_body: "syllabus text").as_null_object }
-    let(:course_json) { double.as_null_object }
+    let(:course) { instance_double(Course, feed_code: 573, id: 42, syllabus_body: "syllabus text", method_missing: nil) }
+    let(:course_json) { instance_double(Api::V1::CourseJson).as_null_object }
     let(:api) { TestCourseApi.new }
 
     let(:result) do
@@ -461,7 +461,7 @@ describe Api::V1::Course do
     end
 
     describe "when the include options are all set off" do
-      let(:course_json) { double(include_syllabus: false, include_url: false) }
+      let(:course_json) { instance_double(Api::V1::CourseJson, include_syllabus: false, include_url: false) }
 
       describe "#syllabus_body" do
         subject { super().syllabus_body }
@@ -477,7 +477,7 @@ describe Api::V1::Course do
     end
 
     describe "when everything is included" do
-      let(:course_json) { double(include_syllabus: true, include_url: true) }
+      let(:course_json) { instance_double(Api::V1::CourseJson, include_syllabus: true, include_url: true) }
 
       describe "#syllabus_body" do
         subject { super().syllabus_body }
@@ -835,6 +835,25 @@ describe CoursesController, type: :request do
                                   format: "json" })
         entry = json.detect { |course| course["id"] == @course.id }
         expect(entry["sis_course_id"]).to eq "TEST-SIS-ONE.2011"
+      end
+
+      it "allows an admin with :read_roster to access the endpoint" do
+        role = custom_account_role("less_limited", account: Account.default)
+        role.role_overrides.create!(account: Account.default,
+                                    permission: :read_roster,
+                                    enabled: true)
+        less_limited_admin = account_admin_user(account: Account.default,
+                                                role:)
+        api_call_as_user(less_limited_admin,
+                         :get,
+                         "/api/v1/users/#{@student.id}/courses",
+                         { user_id: @student.to_param,
+                           controller: "courses",
+                           action: "user_index",
+                           format: "json" },
+                         {},
+                         {},
+                         { expected_status: 200 })
       end
 
       context "with temporary enrollments enabled" do
@@ -2123,7 +2142,7 @@ describe CoursesController, type: :request do
           expect do
             api_call(:put, @path, @params, course: { grading_standard_id: 123 })
             @course.reload
-          end.to_not change { @course.grading_standard_id }
+          end.not_to change { @course.grading_standard_id }
         end
 
         context "when an assignment is due in a closed grading period" do
@@ -3042,7 +3061,7 @@ describe CoursesController, type: :request do
            "not requested, even if 'current_grading_period_scores' are requested" do
           json_response = courses_api_index_call(includes: ["current_grading_period_scores"])
           enrollment_json = enrollment(json_response)
-          expect(enrollment_json).to_not include(*grading_period_score_keys)
+          expect(enrollment_json).not_to include(*grading_period_score_keys)
         end
 
         it "does not include current grading period scores if final grades are hidden, even if 'total_scores' and 'current_grading_period_scores' are requested" do
@@ -3134,13 +3153,13 @@ describe CoursesController, type: :request do
               json_response = courses_api_index_call(includes: ["total_scores", "current_grading_period_scores"])
               enrollment_json = enrollment(json_response)
               expect(enrollment_json["current_period_computed_current_score"])
-                .to_not eq(enrollment_json["computed_current_score"])
+                .not_to eq(enrollment_json["computed_current_score"])
               expect(enrollment_json["current_period_computed_final_score"])
-                .to_not eq(enrollment_json["computed_final_score"])
+                .not_to eq(enrollment_json["computed_final_score"])
               expect(enrollment_json["current_period_computed_current_grade"])
-                .to_not eq(enrollment_json["computed_current_grade"])
+                .not_to eq(enrollment_json["computed_current_grade"])
               expect(enrollment_json["current_period_computed_final_grade"])
-                .to_not eq(enrollment_json["computed_final_grade"])
+                .not_to eq(enrollment_json["computed_final_grade"])
             end
 
             it "current grading period scores are correct" do
@@ -3348,9 +3367,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "available"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "available")
       end
 
       it "returns only courses with state unpublished on ?state[]=unpublished" do
@@ -3359,9 +3376,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course3.id, @course4.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "unpublished"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
       it "returns only courses with state unpublished and available on ?state[]=unpublished, available" do
@@ -3370,9 +3385,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished", "available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id, @course3.id, @course4.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to be_in %w[available unpublished]
-        end
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available unpublished]))
       end
 
       it "returns courses by custom role and state unpublished" do
@@ -3387,9 +3400,7 @@ describe CoursesController, type: :request do
                                                 "user_id" => @me.id,
                                                 "enrollment_state" => "invited",
                                                 "limit_privileges_to_course_section" => false }]
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "unpublished"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
       it "does not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
@@ -3617,7 +3628,7 @@ describe CoursesController, type: :request do
       end
 
       it "is not paginated (for legacy reasons)" do
-        controller = double
+        controller = instance_double(CoursesController)
         allow(controller).to receive(:params).and_return({})
         course_with_teacher(active_all: true)
         num = Api.per_page_for(controller) + 1 # get the default api per page value
@@ -3998,6 +4009,71 @@ describe CoursesController, type: :request do
           check_json.call(@ta, @ta_enroll1, @ta_enroll2)
           check_json.call(@student1, @student1_enroll)
           check_json.call(@student2, @student2_enroll)
+        end
+
+        it "does not make N+1 role, user, or pseudonym queries when including enrollments" do
+          teacher = @user
+          admin = account_admin_user(account: @course1.account)
+          role_query = /FROM.*roles.*WHERE.*roles.*id.*=.*LIMIT/
+          user_query = /SELECT "users".\* FROM .* "users" WHERE "users"."id" = \d+ LIMIT/
+          pseudonym_query = /SELECT "pseudonyms".\* FROM .* "pseudonyms" WHERE .* "pseudonyms"."user_id" = \d+/
+          count_queries = lambda do |caller_user|
+            counts = { role: 0, user: 0, pseudonym: 0 }
+            counter = lambda do |_name, _start, _finish, _id, payload|
+              sql = payload[:sql]
+              counts[:role] += 1 if sql&.match?(role_query)
+              counts[:user] += 1 if sql&.match?(user_query)
+              counts[:pseudonym] += 1 if sql&.match?(pseudonym_query)
+            end
+            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+              api_call_as_user(caller_user, :get, api_url, api_route, include: ["enrollments"])
+            end
+            counts
+          end
+
+          # baseline with existing enrollments
+          teacher_baseline = count_queries.call(teacher)
+          admin_baseline = count_queries.call(admin)
+
+          section3 = @course1.course_sections.create!(name: "Section C")
+          student3 = user_with_pseudonym(name: "SSS3")
+          student4 = user_with_pseudonym(name: "SSS4")
+          @course1.enroll_user(student3, "StudentEnrollment", section: section3)
+          @course1.enroll_user(student4, "StudentEnrollment", section: section3)
+
+          # query counts must stay constant as enrollments grow
+          expect(count_queries.call(teacher)).to eq(teacher_baseline)
+          # admin exercises the SIS pseudonym lookup path (enrollment.user)
+          expect(count_queries.call(admin)).to eq(admin_baseline)
+        end
+
+        it "does not make N+1 user_profile queries when profiles are enabled" do
+          @course1.root_account.settings[:enable_profiles] = true
+          @course1.root_account.save!
+
+          profile_query = /SELECT "user_profiles".\* FROM .* "user_profiles" WHERE "user_profiles"."user_id" = \d+ LIMIT/
+          count_profile_queries = lambda do
+            count = 0
+            counter = lambda do |_name, _start, _finish, _id, payload|
+              count += 1 if payload[:sql]&.match?(profile_query)
+            end
+            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+              api_call(:get, api_url, api_route, include: ["bio"])
+            end
+            count
+          end
+
+          # baseline with existing users
+          baseline = count_profile_queries.call
+
+          section3 = @course1.course_sections.create!(name: "Section C")
+          student3 = user_with_pseudonym(name: "SSS3")
+          student4 = user_with_pseudonym(name: "SSS4")
+          @course1.enroll_user(student3, "StudentEnrollment", section: section3)
+          @course1.enroll_user(student4, "StudentEnrollment", section: section3)
+
+          # query count must stay constant as users grow
+          expect(count_profile_queries.call).to eq(baseline)
         end
 
         it "doesn't return enrollments from another course" do
@@ -4446,7 +4522,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus without verifiers" do
-      should_translate_user_content(@course1, false) do |content|
+      should_translate_user_content(@course1, include_verifiers: false) do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
         @course1.save!
@@ -4800,7 +4876,7 @@ describe CoursesController, type: :request do
       it "includes permissions" do
         # Make sure it only returns permissions when asked
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json", { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
-        expect(json).to_not include "permissions"
+        expect(json).not_to include "permissions"
 
         # When its asked to return permissions make sure they are there
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=permissions", { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["permissions"] })

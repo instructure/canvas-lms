@@ -22,6 +22,17 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
+import {vi} from 'vitest'
+import {completeUpload} from '@canvas/upload-file'
+
+// Mock the completeUpload function
+vi.mock('@canvas/upload-file', () => ({
+  completeUpload: vi.fn().mockResolvedValue({
+    id: 456,
+    filename: 'users.csv',
+    display_name: 'users.csv',
+  }),
+}))
 
 const ACCOUNT_ID = '100'
 const SIS_IMPORT_URI = `/sis_imports`
@@ -38,18 +49,35 @@ const mockPost = (expected: {batchMode: boolean; overrideSis: boolean; termId?: 
   fetchMock.post(SIS_IMPORT_URI, (_url, opts) => {
     const body = opts?.body
 
-    if (!(body instanceof FormData)) {
-      throw new Error('Expected FormData')
+    if (typeof body !== 'string') {
+      throw new Error('Expected JSON string')
     }
 
-    // validate body (FormData)
-    expect(body.get('attachment')).not.toBeNull() // file should be present
-    expect(body.get('batch_mode')).toEqual(batchMode.toString())
-    expect(body.get('override_sis_stickiness')).toEqual(overrideSis.toString())
+    const parsedBody = JSON.parse(body)
+
+    expect(parsedBody.pre_attachment).toBeDefined() // pre_attachment should be present
+    expect(parsedBody.batch_mode).toEqual(batchMode)
+    expect(parsedBody.override_sis_stickiness).toEqual(overrideSis)
     if (termId) {
-      expect(body.get('batch_mode_term_id')).toEqual(termId.toString())
+      expect(parsedBody.batch_mode_term_id).toEqual(termId)
     }
-    return 200
+
+    // Return response with pre_attachment data for the two-step flow
+    return {
+      id: 123,
+      workflow_state: 'created',
+      data: {},
+      progress: 0,
+      pre_attachment: {
+        upload_url: 'https://s3.example.com/upload',
+        upload_params: {
+          key: 'uploads/123/users.csv',
+          policy: 'base64policy',
+          signature: 'signature',
+        },
+        file_param: 'file',
+      },
+    }
   })
 }
 
@@ -81,6 +109,7 @@ describe('SisImportForm', () => {
     fetchMock.restore()
     queryClient.clear()
     fakeENV.teardown()
+    vi.clearAllMocks()
   })
 
   const renderWithClient = (ui: React.ReactElement) => {
@@ -161,18 +190,48 @@ describe('SisImportForm', () => {
     expect(clearCheck).not.toBeDisabled()
   })
 
-  it('calls onSuccess with data on submit', async () => {
+  it('calls onSuccess with data on submit and handles two-step upload', async () => {
     const onSuccess = vi.fn()
     const user = userEvent.setup()
     mockPost({batchMode: false, overrideSis: false})
+    vi.mocked(completeUpload).mockClear()
 
     const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={onSuccess} />)
 
-    await uploadFile(user, getByTestId('file_drop'))
+    const file = await uploadFile(user, getByTestId('file_drop'))
 
     getByText('Process Data').click()
     await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
-    expect(onSuccess).toHaveBeenCalled()
+
+    // Verify completeUpload was called with the correct parameters
+    expect(completeUpload).toHaveBeenCalledWith(
+      {
+        upload_url: 'https://s3.example.com/upload',
+        upload_params: {
+          key: 'uploads/123/users.csv',
+          policy: 'base64policy',
+          signature: 'signature',
+        },
+        file_param: 'file',
+      },
+      file,
+      expect.objectContaining({
+        onProgress: expect.any(Function),
+      }),
+    )
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+
+    // Verify onSuccess was called with the SIS import data
+    const sisImportData = onSuccess.mock.calls[0][0]
+    expect(sisImportData).toEqual(
+      expect.objectContaining({
+        id: 123,
+        workflow_state: 'created',
+        data: {},
+        progress: 0,
+      }),
+    )
   })
 
   describe('opens confirmation modal', () => {
@@ -195,6 +254,7 @@ describe('SisImportForm', () => {
       const onSuccess = vi.fn()
       const user = userEvent.setup()
       mockPost({batchMode: true, overrideSis: false, termId: '1'})
+      vi.mocked(completeUpload).mockClear()
       const {getByText, getByTestId, findByTestId} = renderWithClient(
         <SisImportForm onSuccess={onSuccess} />,
       )
@@ -207,7 +267,7 @@ describe('SisImportForm', () => {
       getByText('Process Data').click()
       getByText('Confirm').click()
       await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
-      expect(onSuccess).toHaveBeenCalled()
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
     it('does not call onSuccess if cancelled', async () => {

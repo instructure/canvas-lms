@@ -503,6 +503,10 @@ describe DiscussionEntry do
 
     it "does not update last_reply_at on the associated discussion_topic if less than a minute" do
       fresh_topic = @course.discussion_topics.create!(title: "title", message: "fresh")
+
+      first_entry = fresh_topic.discussion_entries.create!(message: "first", user: @user)
+      first_entry.update_topic
+      fresh_topic.reload
       initial_last_reply_at = fresh_topic.last_reply_at
 
       entry = fresh_topic.discussion_entries.create!(message: "entry", user: @user)
@@ -514,6 +518,10 @@ describe DiscussionEntry do
 
     it "leaves last_reply_at on the associated discussion_topic alone given an older entry" do
       fresh_topic = @course.discussion_topics.create!(title: "title", message: "fresh")
+
+      first_entry = fresh_topic.discussion_entries.create!(message: "first", user: @user)
+      first_entry.update_topic
+      fresh_topic.reload
       initial_last_reply_at = fresh_topic.last_reply_at
 
       entry = fresh_topic.discussion_entries.create!(message: "entry", user: @user)
@@ -565,7 +573,7 @@ describe DiscussionEntry do
       assignment = @course.assignments.create!(title: @topic.title, submission_types: "discussion_topic")
       topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment:)
       entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
-      expect { entry.destroy }.to_not raise_error
+      expect { entry.destroy }.not_to raise_error
     end
 
     it "decrements unread topic counts" do
@@ -625,7 +633,7 @@ describe DiscussionEntry do
         dt_assignment.has_sub_assignments = true
         dt_assignment.save(validate: false)
 
-        expect { entry.destroy }.to_not raise_error
+        expect { entry.destroy }.not_to raise_error
       end
     end
   end

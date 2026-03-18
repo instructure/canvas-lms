@@ -22,6 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import {convertToLetterGrade} from '../CourseGradesWidget/utils'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -32,6 +33,7 @@ interface GradeDisplayProps {
   excused: boolean
   gradingType: string
   courseGrade: number | null
+  gradingScheme: 'percentage' | Array<[string, number]>
   submissionId: string
 }
 
@@ -42,6 +44,7 @@ export const GradeDisplay: React.FC<GradeDisplayProps> = ({
   excused,
   gradingType,
   courseGrade,
+  gradingScheme,
   submissionId,
 }) => {
   // If the submission is excused, pass "EX" to the formatter which will handle it properly
@@ -59,8 +62,11 @@ export const GradeDisplay: React.FC<GradeDisplayProps> = ({
     formatType: 'points_out_of_fraction',
   })
 
-  const courseGradeText =
-    courseGrade !== null ? I18n.t('%{grade}%', {grade: courseGrade}) : I18n.t('N/A')
+  const courseGradeText = (() => {
+    if (courseGrade === null) return I18n.t('N/A')
+    if (Array.isArray(gradingScheme)) return convertToLetterGrade(courseGrade, gradingScheme)
+    return I18n.t('%{grade}%', {grade: Math.floor(courseGrade)})
+  })()
 
   return (
     <View

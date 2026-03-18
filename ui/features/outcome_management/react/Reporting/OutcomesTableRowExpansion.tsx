@@ -32,11 +32,14 @@ import OutcomeAlignmentsList from './OutcomeAlignmentsList'
 
 const I18n = createI18nScope('outcome_management')
 
+import type {LMGBRating} from './types'
+
 interface OutcomesTableRowExpansionProps {
   outcomeId: number | string
   studentId: string
   contributingScores: ContributingScoresManager
   masteryPoints: number
+  proficiencyRatings?: LMGBRating[]
 }
 
 const OutcomesTableRowExpansion = ({
@@ -44,6 +47,7 @@ const OutcomesTableRowExpansion = ({
   studentId,
   contributingScores,
   masteryPoints,
+  proficiencyRatings,
 }: OutcomesTableRowExpansionProps) => {
   const outcomeScores = contributingScores.forOutcome(outcomeId)
 
@@ -81,7 +85,7 @@ const OutcomesTableRowExpansion = ({
     return transformedScores
   }, [outcomeScores, studentId, outcomeId])
 
-  const {canvasRef, sortedScores} = useOutcomesChart(scores)
+  const {canvasRef, sortedScores} = useOutcomesChart(scores, proficiencyRatings)
 
   useEffect(() => {
     if (outcomeScores.error) {
@@ -160,6 +164,7 @@ const OutcomesTableRowExpansion = ({
           outcomeScores={outcomeScores}
           studentId={studentId}
           masteryPoints={masteryPoints}
+          proficiencyRatings={proficiencyRatings}
           hasChartView={scores.length > 0}
         />
       </Flex>

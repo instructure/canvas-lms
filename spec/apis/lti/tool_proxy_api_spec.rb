@@ -281,7 +281,7 @@ module Lti
                      {},
                      { domain_root_account: account })
 
-            expect(nav_cache.cache_key).to_not eq cache_key
+            expect(nav_cache.cache_key).not_to eq cache_key
           end
         end
 

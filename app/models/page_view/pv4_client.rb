@@ -27,9 +27,11 @@ class PageView
     class Pv4TooManyRequests < StandardError; end
     class Pv4Unauthorized < StandardError; end
 
-    def initialize(uri, access_token)
+    def initialize(uri, access_token = nil, requestor_user: nil, **)
       uri = URI.parse(uri) if uri.is_a?(String)
-      @uri, @access_token = uri, access_token
+      @uri = uri
+      @access_token = access_token
+      @requestor_user = requestor_user
     end
 
     PRECISION = 3
@@ -49,7 +51,7 @@ class PageView
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
         @uri.merge("users/#{user.global_id}/page_views?#{params}").to_s,
-        { "Authorization" => "Bearer #{@access_token}" }
+        request_headers
       )
 
       case response.code.to_i
@@ -117,6 +119,27 @@ class PageView
     end
 
     private
+
+    def request_headers
+      auth_token = generate_auth_token
+      {
+        "Authorization" => "Bearer #{auth_token}",
+        "X-Request-Context-Id" => RequestContext::Generator.request_id
+      }
+    end
+
+    def generate_auth_token
+      raise ArgumentError, "Either requestor_user or access_token must be provided" unless @requestor_user || @access_token
+      return @access_token unless @requestor_user
+
+      domain = @uri.host
+      CanvasSecurity::ServicesJwt.for_user(
+        domain,
+        @requestor_user,
+        encrypt: false,
+        base64: false
+      )
+    end
 
     def cached_root_account_uuids_for(user:)
       root_account_uuids = user.shard.activate do

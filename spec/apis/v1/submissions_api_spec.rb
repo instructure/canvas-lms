@@ -1351,7 +1351,7 @@ describe "Submissions API", type: :request do
     Quizzes::SubmissionGrader.new(qs).grade_submission
     qs.reload
     qs.attempt = 2
-    qs.with_versioning(true, &:save)
+    qs.with_versioning(&:save)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",
@@ -1529,7 +1529,7 @@ describe "Submissions API", type: :request do
     course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
-    should_translate_user_content(@course, false) do |content|
+    should_translate_user_content(@course, include_verifiers: false) do |content|
       submit_homework(a1, student1, body: content)
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
@@ -1576,7 +1576,7 @@ describe "Submissions API", type: :request do
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
     media_object(media_id: "54321", context: student1, user: student1)
-    mock_kaltura = double("CanvasKaltura::ClientV3")
+    mock_kaltura = instance_double(CanvasKaltura::ClientV3)
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
     expect(mock_kaltura).to receive(:media_sources).and_return([{ height: "240",
                                                                   bitrate: "382",
@@ -2498,7 +2498,7 @@ describe "Submissions API", type: :request do
                           include: ["provisional_grades"]
                         })
 
-        expect(json.first["provisional_grades"]).to_not be_empty
+        expect(json.first["provisional_grades"]).not_to be_empty
         speedgrader_url = URI.parse(json.first["provisional_grades"].first["speedgrader_url"])
         expect(speedgrader_url).to match_path("/courses/#{@course.id}/gradebook/speed_grader")
           .and_query({ assignment_id: @assignment.id, student_id: @student.id })
@@ -3814,6 +3814,98 @@ describe "Submissions API", type: :request do
       end.to change {
         submission.reload.sticker
       }.from(nil).to("trophy")
+    end
+
+    context "with peer review sub assignment" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @teacher = teacher_in_course(course: @course, active_all: true).user
+        @student = student_in_course(course: @course, active_all: true).user
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_reviews: true
+        )
+        @peer_review = peer_review_model(parent_assignment: @parent_assignment)
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @assessment_request = AssessmentRequest.create!(
+          user: @student,
+          asset: @parent_assignment.find_or_create_submission(@student),
+          assessor: @reviewer,
+          assessor_asset: @peer_review.find_or_create_submission(@reviewer),
+          peer_review_sub_assignment: @peer_review
+        )
+        @peer_review_submission = @peer_review.grade_student(@reviewer, grade: "3", grader: @teacher).first
+      end
+
+      it "allows posting a comment via peer review sub assignment" do
+        expect do
+          api_call_as_user(
+            @reviewer,
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+            {
+              controller: "submissions_api",
+              action: "update_anonymous",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: @peer_review.id.to_s,
+              anonymous_id: @peer_review_submission.anonymous_id.to_s
+            },
+            {
+              comment: { text_comment: "peer review comment via API" }
+            }
+          )
+        end.to change {
+          @peer_review_submission.reload.submission_comments.count
+        }.by(1)
+
+        expect(@peer_review_submission.submission_comments.last.comment).to eq("peer review comment via API")
+      end
+
+      it "does not allow updating deleted peer review assignments" do
+        @peer_review.destroy
+        api_call_as_user(
+          @reviewer,
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @peer_review.id.to_s,
+            anonymous_id: @peer_review_submission.anonymous_id.to_s
+          },
+          {
+            comment: { text_comment: "should not work" }
+          },
+          {},
+          { expected_status: 404 }
+        )
+      end
+
+      it "does not find peer review sub assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        api_call_as_user(
+          @reviewer,
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @peer_review.id.to_s,
+            anonymous_id: @peer_review_submission.anonymous_id.to_s
+          },
+          {
+            comment: { text_comment: "should not work" }
+          },
+          {},
+          { expected_status: 404 }
+        )
+      end
     end
   end
 
@@ -7355,7 +7447,7 @@ describe "Submissions API", type: :request do
                grade_data)
       run_jobs
 
-      expect(@a1.submission_for_student(@student1)).to_not be_excused
+      expect(@a1.submission_for_student(@student1)).not_to be_excused
     end
 
     it "posts do not set grader_id for unchanged scores" do

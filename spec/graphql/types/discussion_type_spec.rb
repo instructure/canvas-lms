@@ -828,9 +828,9 @@ describe Types::DiscussionType do
       type_with_student = GraphQLTypeTester.new(@topic, current_user: @student, request: ActionDispatch::TestRequest.create)
       resolved_message = type_with_student.resolve("message")
 
-      canvaslms_url = resolved_message.match(/x-canvaslms-trusted-url='([^']+)'/)
+      canvaslms_url = resolved_message.match(/x-canvaslms-trusted-url="([^"]+)"/)
       expect(canvaslms_url[1]).to include("/courses/#{@course.id}/modules/#{@context_module.id}/prerequisites/discussion_topic_#{@topic.id}")
-      expect(resolved_message).to include("id='module_prerequisites_lookup_link'")
+      expect(resolved_message).to include('id="module_prerequisites_lookup_link"')
     end
 
     it "does not return locked module information when you are the teacher" do
@@ -1189,9 +1189,7 @@ describe Types::DiscussionType do
       expect(discussion_type.resolve("author { htmlUrl }")).to end_with("/groups/#{@group.id}/users/#{@group_teacher.id}")
       entries_url = discussion_type.resolve("discussionEntriesConnection { nodes { author { htmlUrl }}}")
 
-      entries_url.each do |entry|
-        expect(entry).to end_with("/groups/#{@group.id}/users/#{@group_student.id}")
-      end
+      expect(entries_url).to all(end_with("/groups/#{@group.id}/users/#{@group_student.id}"))
     end
   end
 

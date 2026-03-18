@@ -54,7 +54,7 @@ describe Canvas::CacheRegister do
       set_revert!
       Timecop.freeze(time1) do
         key = @user.cache_key(:enrollments)
-        expect(key).to_not include(to_stamp(time1))
+        expect(key).not_to include(to_stamp(time1))
         expect(key).to include(to_stamp(@user.updated_at))
       end
     end
@@ -76,7 +76,7 @@ describe Canvas::CacheRegister do
 
     it "uses the same redis node for each object" do
       real_redis = Canvas.redis # may not actually be distributed so we'll make do
-      fake_redis = double
+      fake_redis = instance_double(Redis::Distributed)
       allow(Canvas).to receive(:redis).and_return(fake_redis)
       base_key = User.base_cache_register_key_for(@user.id)
       # should call node_for with the same base key each time
@@ -117,7 +117,7 @@ describe Canvas::CacheRegister do
 
       it "uses the same redis node for each object" do
         real_redis = Canvas.redis # may not actually be distributed so we'll make do
-        fake_redis = double
+        fake_redis = instance_double(Redis::Distributed)
         allow(Canvas).to receive(:redis).and_return(fake_redis)
         base_key = User.base_cache_register_key_for(@user.id)
         # should call node_for with the same base key each time
@@ -435,8 +435,8 @@ describe Canvas::CacheRegister do
   context "multi-cache preference" do
     it "retrieves multi-cache redis when preferred" do
       allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
-      mock_redis = double
-      cache = double(redis: mock_redis)
+      mock_redis = instance_double(Redis)
+      cache = instance_double(ActiveSupport::Cache::RedisCacheStore, redis: mock_redis)
       allow(MultiCache).to receive(:cache).and_return(cache)
       expect(Canvas::CacheRegister.redis("key", Shard.default, prefer_multi_cache: true)).to eq mock_redis
     end
@@ -450,7 +450,7 @@ describe Canvas::CacheRegister do
     it "uses multi-cache delete when clearing a configured key" do
       key = "{#{Account.base_cache_register_key_for(Account.default)}}/feature_flags"
       allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
-      expect(Canvas::CacheRegister).to_not receive(:redis)
+      expect(Canvas::CacheRegister).not_to receive(:redis)
       expect(MultiCache).to receive(:delete).with(key, { unprefixed_key: true })
       Account.default.clear_cache_key(:feature_flags)
     end

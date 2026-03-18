@@ -49,6 +49,7 @@ module Lti
       context "with feature disabled" do
         before do
           asset_processor.assignment.context.root_account.disable_feature!(:lti_asset_processor)
+          user_session(@teacher)
         end
 
         it "requires feature enabled" do
@@ -78,7 +79,7 @@ module Lti
           context "logging" do
             before do
               allow(Lti::LogService).to receive(:new) do
-                double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+                instance_double(Lti::LogService, call: nil)
               end
             end
 
@@ -121,6 +122,7 @@ module Lti
         subject { get :launch_settings, params: { asset_processor_id: 0 } }
 
         it "returns 404" do
+          user_session(@teacher)
           subject
           expect(response).to have_http_status :not_found
         end
@@ -131,6 +133,10 @@ module Lti
       let(:asset_report) { lti_asset_report_model(lti_asset_processor_id: asset_processor.id) }
 
       subject { get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report } }
+
+      before do
+        user_session(@teacher)
+      end
 
       context "with feature disabled" do
         before do
@@ -147,7 +153,6 @@ module Lti
         render_views
         before do
           asset_processor.assignment.context.root_account.enable_feature!(:lti_asset_processor)
-          user_session(@teacher)
         end
 
         it "redirects 200" do
@@ -256,7 +261,7 @@ module Lti
         context "logging" do
           before do
             allow(Lti::LogService).to receive(:new) do
-              double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+              instance_double(Lti::LogService, call: nil)
             end
           end
 

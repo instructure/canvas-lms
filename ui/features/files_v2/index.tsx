@@ -20,6 +20,8 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {RouterProvider} from 'react-router-dom'
 import {QueryClientProvider} from '@tanstack/react-query'
+import {getTheme} from '@canvas/instui-bindings'
+import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 import {router} from './routes/router'
 import {FilesErrorBoundary} from './react/components/FilesErrorBoundary'
 import {queryClient} from '@canvas/query'
@@ -27,10 +29,12 @@ import {queryClient} from '@canvas/query'
 const root = createRoot(document.getElementById('content')!)
 root.render(
   <React.StrictMode>
-    <FilesErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </FilesErrorBoundary>
+    <DynamicInstUISettingsProvider theme={getTheme()}>
+      <FilesErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </FilesErrorBoundary>
+    </DynamicInstUISettingsProvider>
   </React.StrictMode>,
 )

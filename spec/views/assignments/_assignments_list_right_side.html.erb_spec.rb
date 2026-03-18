@@ -39,6 +39,6 @@ describe "assignments list sidebar" do
     course_with_student(active_all: true)
     view_context(@course, @student)
     render "assignments/_assignments_list_right_side"
-    expect(response).to_not have_tag("div")
+    expect(response).not_to have_tag("div")
   end
 end

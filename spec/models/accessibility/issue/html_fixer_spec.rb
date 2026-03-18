@@ -443,7 +443,7 @@ describe Accessibility::Issue::HtmlFixer do
       end
 
       context "when rule returns array [element, preview_html]" do
-        let(:mock_rule) { double("MockRule") }
+        let(:mock_rule) { instance_double(Accessibility::Rule) }
         let(:mock_rule_registry) { { "test-array-rule" => mock_rule } }
         let(:html_fixer) do
           described_class.new(
@@ -483,7 +483,7 @@ describe Accessibility::Issue::HtmlFixer do
 
       context "when rule returns just the element (backwards compatible)" do
         let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: "<div><span id='old-element'>Old Text</span></div>") }
-        let(:mock_rule) { double("MockRule") }
+        let(:mock_rule) { instance_double(Accessibility::Rule) }
         let(:mock_rule_registry) { { "test-element-rule" => mock_rule } }
         let(:html_fixer) do
           described_class.new(

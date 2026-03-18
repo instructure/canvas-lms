@@ -213,7 +213,7 @@ module Lti
       end
 
       it "returns resource_selection tools" do
-        tool = new_valid_external_tool(account, true)
+        tool = new_valid_external_tool(account, resource_selection: true)
         placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
@@ -264,8 +264,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:definition_type] == "ContextExternalTool" }
         message_handler = definitions.find { |d| d[:definition_type] == "Lti::MessageHandler" }
-        expect(message_handler).to_not be_nil
-        expect(external_tool).to_not be_nil
+        expect(message_handler).not_to be_nil
+        expect(external_tool).not_to be_nil
       end
 
       context "pagination" do
@@ -286,7 +286,7 @@ module Lti
           page2 = collection.paginate(page: page1.next_page, per_page:)
           expect(page1.count).to eq 3
           expect(page2.count).to eq 3
-          expect(page1.first).to_not eq page2.first
+          expect(page1.first).not_to eq page2.first
         end
       end
     end

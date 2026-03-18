@@ -563,7 +563,7 @@ describe EnrollmentsApiController, type: :request do
         @section.end_at = 1.day.from_now
         @section.restrict_enrollments_to_section_dates = true
         @section.save!
-        expect(@section).to_not be_concluded
+        expect(@section).not_to be_concluded
         api_call :post, @path, @path_options, {
           enrollment: {
             user_id: @unenrolled_user.id,
@@ -741,7 +741,7 @@ describe EnrollmentsApiController, type: :request do
 
           expect(@course.account.roles.active.where(name: "newrole").first).to be_nil
           course_role = @course.account.get_course_role_by_name("newrole")
-          expect(course_role).to_not be_nil
+          expect(course_role).not_to be_nil
 
           @path = "/api/v1/courses/#{@course.id}/enrollments"
           @path_options = { controller: "enrollments_api", action: "create", format: "json", course_id: @course.id.to_s }
@@ -1553,7 +1553,7 @@ describe EnrollmentsApiController, type: :request do
         describe "grading period scores" do
           let(:observer) { User.create! }
 
-          student_grade = lambda do |json|
+          def student_grade(json)
             student_json = json.find do |e|
               e["type"] == "StudentEnrollment"
             end
@@ -1571,30 +1571,29 @@ describe EnrollmentsApiController, type: :request do
 
           it "returns grades for the requested grading period for courses" do
             json = api_call(:get, @path, @params)
-            expect(student_grade.call(json)).to eq 50
+            expect(student_grade(json)).to eq 50
 
             @params[:grading_period_id] = @first_grading_period.id
             json = api_call(:get, @path, @params)
-            expect(student_grade.call(json)).to eq 100
+            expect(student_grade(json)).to eq 100
 
             @params[:grading_period_id] = @last_grading_period.id
             json = api_call(:get, @path, @params)
-            expect(student_grade.call(json)).to eq 0
+            expect(student_grade(json)).to eq 0
           end
 
           it "includes observee grades when observed_users are requested" do
             @course.enroll_user(observer, "ObserverEnrollment", associated_user_id: @student.id)
             @params[:include] = ["observed_users"]
             json = api_call_as_user(observer, :get, @path, @params)
-            expect(student_grade.call(json)).to eq 50
+            expect(student_grade(json)).to eq 50
 
             @params[:grading_period_id] = @first_grading_period.id
             json = api_call_as_user(observer, :get, @path, @params)
-            expect(student_grade.call(json)).to eq 100
-
+            expect(student_grade(json)).to eq 100
             @params[:grading_period_id] = @last_grading_period.id
             json = api_call_as_user(observer, :get, @path, @params)
-            expect(student_grade.call(json)).to eq 0
+            expect(student_grade(json)).to eq 0
           end
         end
       end
@@ -3765,6 +3764,141 @@ describe EnrollmentsApiController, type: :request do
       expect(json["is_provider"]).to be_falsey
       expect(json["is_recipient"]).to be_falsey
       expect(json["can_provide"]).to be_truthy
+    end
+  end
+
+  describe "#bulk_temporary_enrollment_status" do
+    let_once(:start_at) { 1.day.ago }
+    let_once(:end_at) { 1.day.from_now }
+    let(:bulk_path) { "/api/v1/temporary_enrollment_status" }
+    let(:bulk_params) do
+      { controller: "enrollments_api",
+        action: "bulk_temporary_enrollment_status",
+        format: "json" }
+    end
+
+    before(:once) do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @provider = user_factory(active_all: true)
+      @recipient = user_factory(active_all: true)
+      @plain_user = user_factory(active_all: true)
+      course1 = course_with_teacher(active_all: true, user: @provider).course
+      temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+      course1.enroll_user(
+        @recipient,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: temporary_enrollment_pairing.id,
+          start_at:,
+          end_at:
+        }
+      )
+      enrollment = course1.enroll_user(
+        @plain_user,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          start_at:,
+          end_at:
+        }
+      )
+      enrollment.accept
+    end
+
+    it "returns statuses for multiple users" do
+      json = api_call_as_user(
+        account_admin_user,
+        :get,
+        bulk_path,
+        bulk_params,
+        { user_ids: [@provider.id, @recipient.id, @plain_user.id] }
+      )
+      expect(json[@provider.id.to_s]["is_provider"]).to be_truthy
+      expect(json[@provider.id.to_s]["is_recipient"]).to be_falsey
+      expect(json[@provider.id.to_s]["can_provide"]).to be_truthy
+
+      expect(json[@recipient.id.to_s]["is_provider"]).to be_falsey
+      expect(json[@recipient.id.to_s]["is_recipient"]).to be_truthy
+      expect(json[@recipient.id.to_s]["can_provide"]).to be_truthy
+
+      expect(json[@plain_user.id.to_s]["is_provider"]).to be_falsey
+      expect(json[@plain_user.id.to_s]["is_recipient"]).to be_falsey
+      expect(json[@plain_user.id.to_s]["can_provide"]).to be_truthy
+    end
+
+    it "returns bad_request when user_ids is missing" do
+      api_call_as_user(
+        account_admin_user,
+        :get,
+        bulk_path,
+        bulk_params
+      )
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it "returns empty response when temporary_enrollments feature is disabled" do
+      Account.default.disable_feature!(:temporary_enrollments)
+      json = api_call_as_user(
+        account_admin_user,
+        :get,
+        bulk_path,
+        bulk_params,
+        { user_ids: [@provider.id] }
+      )
+      expect(response).to have_http_status(:ok)
+      expect(json).to eq({})
+    end
+
+    it "excludes users the caller cannot view" do
+      unprivileged_user = user_factory(active_all: true)
+      json = api_call_as_user(
+        unprivileged_user,
+        :get,
+        bulk_path,
+        bulk_params,
+        { user_ids: [@provider.id, @recipient.id] }
+      )
+      expect(json).to eq({})
+    end
+
+    it "respects limit to cap how many user_ids are processed" do
+      json = api_call_as_user(
+        account_admin_user,
+        :get,
+        bulk_path,
+        bulk_params,
+        { user_ids: [@provider.id, @recipient.id, @plain_user.id], limit: 2 }
+      )
+      expect(json.keys.length).to eq(2)
+    end
+
+    it "caps limit at Api::MAX_PER_PAGE" do
+      extra_users = Array.new(Api::MAX_PER_PAGE + 5) { user_factory(active_all: true) }
+      all_ids = extra_users.map(&:id)
+
+      json = api_call_as_user(
+        account_admin_user,
+        :get,
+        bulk_path,
+        bulk_params,
+        { user_ids: all_ids, limit: all_ids.length }
+      )
+      expect(json.keys.length).to eq(Api::MAX_PER_PAGE)
+    end
+
+    it "scopes results to account_id when provided" do
+      sub_account = Account.default.sub_accounts.create!
+      json = api_call_as_user(
+        account_admin_user,
+        :get,
+        bulk_path,
+        bulk_params,
+        { user_ids: [@provider.id, @recipient.id], account_id: sub_account.id }
+      )
+      expect(json[@provider.id.to_s]["is_provider"]).to be_falsey
+      expect(json[@recipient.id.to_s]["is_recipient"]).to be_falsey
     end
   end
 

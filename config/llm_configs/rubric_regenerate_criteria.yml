@@ -45,28 +45,46 @@ template: |
   <ADDITIONAL_USER_PROMPT_PLACEHOLDER>
   </USER_PROMPT>
 
+  # Rating Language Requirements
+  <BLOOM_TAXONOMY_CONTEXT_PLACEHOLDER>
+
   # Language & Tone
   - Match the required grade level/complexity; be clear, concise, constructive.
   - Adapt both language and performance expectations to the specified grade level:
     - For younger students, use simpler words and ensure that lower rating levels are realistically achievable, showing clear steps for improvement.
     - For older students, use more advanced academic language and higher performance expectations that encourage critical thinking and depth.
   - If an Educational Standard is provided, incorporate only its key expectations into relevant criteria. Do not copy the standard text verbatim; adapt it to the assignment context.
-  - Criteria should include actionable performance indicators, with no copy-paste repetition of phrases across multiple criteria.
-  - Maintain a tone that is encouraging and constructive at all performance levels.
 
   # Output Specification
-  - Keep all existing criterion and rating IDs unchanged if they are provided.
-  - Only generate new IDs when a criterion or rating does not already have one.
-  - If the input criteria or ratings do not have IDs, you must generate them using the following format:
-      - Criteria: criterion:_new_c_X
-      - Ratings: rating:_new_r_X
-  - Never create hierarchical IDs such as rating:1:1 or criterion:1.
-  - IDs must always be either:
-      - The exact original ID (if provided), OR
-      - A new ID in the _new_c_X / _new_r_X format.
+  - **CRITICAL: Keep all existing criterion and rating IDs exactly as provided in the input.**
+  - IDs can be in any format: alphanumeric strings (like "abc123"), plain numbers (like "1770927058716"),
+    UUIDs, or any other format. ALL existing IDs must be preserved unchanged.
+  - Only generate new IDs when a criterion or rating does not have an ID at all.
+  - When generating new IDs, use this format:
+      - Criteria: criterion:_new_c_1, criterion:_new_c_2, etc.
+      - Ratings: rating:_new_r_1, rating:_new_r_2, etc.
+  - Never use hierarchical ID syntax like rating:1:1 or criterion:1:2 (with multiple colons in the ID itself).
+
+  # Examples of CORRECT ID handling:
+    - Input: criterion:1770927058716:description="Test"
+      Output: criterion:1770927058716:description="Improved test" ✓ (ID preserved)
+
+    - Input: criterion:abc123:description="Test"
+      Output: criterion:abc123:description="Improved test" ✓ (ID preserved)
+
+    - Input: rating:1:description="Excellent"
+      Output: rating:1:description="Outstanding" ✓ (numeric ID preserved)
+
+    - Input: criterion::description="New criterion" (no ID)
+      Output: criterion:_new_c_1:description="New criterion" ✓ (new ID generated)
+
   - Ratings must always be listed in descending order of points (highest → lowest).
   - Criteria must appear in the same order as provided in the input.
-  - Always make at least one textual improvement to every criterion and every rating, even if the original text seems perfect.
+  - Always make at least one textual improvement to every criterion and every rating.
+  - Completely rewrite any criterion that contains placeholder text like "Test", "Criterion 1", or "TODO".
+  - Replace vague criteria (e.g., "Good work") with specific, actionable descriptors.
+  - Ensure all criteria are relevant to the assignment topic and learning objectives.
+  - Do not use binary criteria (e.g., timeliness) unless the rating count is 2. If unavoidable with more ratings, make them progressive levels (e.g., always on time, usually on time, often late, missing).
 
   Example format for newly generated IDs (only when no ID exists):
   criterion:_new_c_1:description=
@@ -85,8 +103,8 @@ template: |
 
   [...]
 
-  Do not use binary criteria (like timeliness) unless the specified rating count is 2. If you don't follow the structure directives your work will be rejected. If you cannot avoid binary criteria and the rating count is more than 2, make the ratings progressive levels of performance (e.g., always on time, usually on time, often late, missing).
   The rubric must be in the same language as the assignment description.
+  Verify the criteria before returning and ensure there are exactly <CRITERIA_COUNT_PLACEHOLDER> unique criterion.
   Response must include the complete rubric data wrapped in <RUBRIC_DATA></RUBRIC_DATA>, with no extra text outside these tags.
 
 options:

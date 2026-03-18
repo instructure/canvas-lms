@@ -47,7 +47,7 @@ describe FilesController do
   end
 
   def io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def course_file
@@ -59,11 +59,11 @@ describe FilesController do
   end
 
   def user_html_file
-    @file = @user.attachments.create!(uploaded_data: fixture_file_upload("test.html", "text/html", false))
+    @file = @user.attachments.create!(uploaded_data: fixture_file_upload("test.html", "text/html"))
   end
 
   def account_js_file
-    @file = @account.attachments.create!(uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
+    @file = @account.attachments.create!(uploaded_data: fixture_file_upload("test.js", "text/javascript"))
   end
 
   def folder_file
@@ -311,7 +311,7 @@ describe FilesController do
         expect(response).to be_successful
 
         files_contexts = assigns[:js_env][:FILES_CONTEXTS]
-        files_contexts.each { |c| expect(c).to have_key(:root_folder_right) }
+        expect(files_contexts).to all(have_key(:root_folder_right))
       end
 
       it "includes user context with accessible courses" do
@@ -378,7 +378,7 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
         get "show", params: { course_id: @course.id, id: @file.id, verifier: @file.uuid }, format: "json"
         expect(response).to be_successful
-        expect(json_parse["attachment"]).to_not be_nil
+        expect(json_parse["attachment"]).not_to be_nil
         expect(json_parse["attachment"]["canvadoc_session_url"]).to eq "stubby"
         expect(json_parse["attachment"]["md5"]).to be_nil
       end
@@ -387,7 +387,7 @@ describe FilesController do
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
         get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
         expect(response).to be_successful
-        expect(json_parse["attachment"]).to_not be_nil
+        expect(json_parse["attachment"]).not_to be_nil
         expect(json_parse["attachment"]["md5"]).to be_nil
       end
 
@@ -804,7 +804,7 @@ describe FilesController do
     it "forces download when download_frd is set" do
       user_session(@teacher)
       # this call should happen inside of FilesController#send_attachment
-      expect_any_instance_of(FilesController).to receive(:send_stored_file).with(@file, false)
+      expect_any_instance_of(FilesController).to receive(:send_stored_file).with(@file, inline: false)
       get "show", params: { course_id: @course.id, id: @file.id, download: 1, verifier: @file.uuid, download_frd: 1 }
     end
 
@@ -1399,7 +1399,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return("files.test")
         request.host = "files.test"
         @file.update_attribute(:content_type, "text/html")
-        handle = double(read: "hello")
+        handle = instance_double(StringIO, read: "hello")
         allow_any_instantiation_of(@file).to receive(:open).and_return(handle)
         get "show_relative", params: { file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1 }
         expect(response).to be_successful
@@ -1589,6 +1589,15 @@ describe FilesController do
         end
       end
     end
+
+    it "uses the secondary database for read queries" do
+      user_session(@student)
+      expect(Folder).to receive(:find_attachment_in_context_with_path).and_wrap_original do |original, *args|
+        expect(GuardRail.environment).to eq(:secondary)
+        original.call(*args)
+      end
+      get "show_relative", params: { course_id: @course.id, file_path: @file.full_display_path }
+    end
   end
 
   describe "PUT 'update'" do
@@ -1684,9 +1693,9 @@ describe FilesController do
       end
 
       it "requires authorization" do
-        delete "destroy", params: { course_id: @course.id, id: @file.id }
-        expect(response.body).to eql("{\"message\":\"Unauthorized to delete this file\"}")
-        expect(assigns[:attachment].file_state).to eq "available"
+        delete "destroy", params: { course_id: @course.id, id: @file.id }, format: :json
+        expect(response).to have_http_status :unauthorized
+        expect(@file.reload.file_state).to eq "available"
       end
 
       it "deletes file" do
@@ -1699,6 +1708,7 @@ describe FilesController do
     end
 
     it "refuses to delete a file in a submissions folder" do
+      user_session(@teacher)
       file = @student.attachments.create! display_name: "blah", uploaded_data: default_uploaded_data, folder: @student.submissions_folder
       delete "destroy", params: { user_id: @student.id, id: file.id }
       expect(response).to have_http_status :unauthorized

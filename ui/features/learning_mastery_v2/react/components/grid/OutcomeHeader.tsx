@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowUpLine, IconArrowDownLine} from '@instructure/ui-icons'
+import {IconArrowUpLine, IconArrowDownLine, IconOutcomesLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -30,6 +30,7 @@ import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ColumnHeader} from './ColumnHeader'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -40,6 +41,7 @@ export interface OutcomeHeaderProps extends DragDropConnectorProps {
   outcomeDistribution?: OutcomeDistribution
   distributionStudents?: Student[]
   courseId: string
+  titleId?: string
 }
 
 export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
@@ -49,6 +51,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
   outcomeDistribution,
   distributionStudents,
   courseId,
+  titleId,
 }) => {
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal() as [boolean, () => void, () => void]
@@ -68,6 +71,22 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
     sorting.setSortBy(SortBy.Outcome)
     sorting.setSortOutcomeId(String(outcome.id))
     sorting.setSortOrder(SortOrder.DESC)
+  }
+
+  const handleToggleContributingScores = () => {
+    const wasVisible = contributingScoresForOutcome.isVisible()
+    contributingScoresForOutcome.toggleVisibility()
+
+    const message = wasVisible
+      ? I18n.t('Contributing Scores for %{outcome} Hidden', {outcome: outcome.title})
+      : I18n.t('Showing Contributing Scores for %{outcome}', {outcome: outcome.title})
+
+    showFlashAlert({
+      message,
+      type: 'info',
+      srOnly: true,
+      politeness: 'polite',
+    })
   }
 
   const sortMenuGroup = (
@@ -95,7 +114,7 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
 
   const displayMenuGroup = (
     <Menu.Group label={I18n.t('Display')} key="display">
-      <Menu.Item onClick={contributingScoresForOutcome.toggleVisibility}>
+      <Menu.Item onClick={handleToggleContributingScores}>
         {contributingScoresForOutcome.isVisible()
           ? I18n.t('Hide Contributing Scores')
           : I18n.t('Show Contributing Scores')}
@@ -109,6 +128,8 @@ export const OutcomeHeader: React.FC<OutcomeHeaderProps> = ({
     <>
       <ColumnHeader
         title={outcome.title}
+        titleId={titleId}
+        icon={<IconOutcomesLine />}
         optionsMenuTriggerLabel={I18n.t('%{outcome} options', {outcome: outcome.title})}
         optionsMenuItems={[sortMenuGroup, <Menu.Separator key="separator" />, displayMenuGroup]}
       />

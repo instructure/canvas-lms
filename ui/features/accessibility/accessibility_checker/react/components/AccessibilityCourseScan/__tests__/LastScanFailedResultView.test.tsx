@@ -23,13 +23,13 @@ import {LastScanFailedResultView} from '../components/LastScanFailedResultView'
 
 describe('LastScanFailedResultView', () => {
   it('renders error page', () => {
-    render(<LastScanFailedResultView />)
+    render(<LastScanFailedResultView buttonLabel="Scan Course" />)
 
     expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   it('renders scan button', () => {
-    render(<LastScanFailedResultView />)
+    render(<LastScanFailedResultView buttonLabel="Scan Course" />)
 
     expect(screen.getByRole('button', {name: /scan course/i})).toBeInTheDocument()
   })
@@ -38,7 +38,9 @@ describe('LastScanFailedResultView', () => {
     const user = userEvent.setup()
     const handleCourseScan = vi.fn()
 
-    render(<LastScanFailedResultView handleCourseScan={handleCourseScan} />)
+    render(
+      <LastScanFailedResultView buttonLabel="Scan Course" handleCourseScan={handleCourseScan} />,
+    )
 
     const button = screen.getByRole('button', {name: /scan course/i})
     await user.click(button)
@@ -47,14 +49,14 @@ describe('LastScanFailedResultView', () => {
   })
 
   it('disables button when request is loading', () => {
-    render(<LastScanFailedResultView isRequestLoading={true} />)
+    render(<LastScanFailedResultView buttonLabel="Scan Course" isRequestLoading={true} />)
 
     const button = screen.getByRole('button', {name: /scan course/i})
     expect(button).toBeDisabled()
   })
 
   it('enables button when request is not loading', () => {
-    render(<LastScanFailedResultView isRequestLoading={false} />)
+    render(<LastScanFailedResultView buttonLabel="Scan Course" isRequestLoading={false} />)
 
     const button = screen.getByRole('button', {name: /scan course/i})
     expect(button).not.toBeDisabled()

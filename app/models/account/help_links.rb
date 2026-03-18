@@ -26,7 +26,7 @@ class Account::HelpLinks
     @account = account
   end
 
-  def default_links(filter = true)
+  def default_links(filter: true)
     defaults = [
       {
         available_to: ["student"],

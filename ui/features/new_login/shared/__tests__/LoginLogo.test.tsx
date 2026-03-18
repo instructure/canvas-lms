@@ -18,29 +18,47 @@
 
 import React from 'react'
 import {cleanup, render, screen} from '@testing-library/react'
-import {LoginLogo} from '..'
-import {NewLoginProvider, NewLoginDataProvider, useNewLoginData} from '../../context'
+import MessageAlert from '../MessageAlert'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 
-vi.mock('../../context', async () => {
-  const originalModule = await vi.importActual('../../context')
-  return {
-    ...originalModule,
-    useNewLoginData: vi.fn(),
-  }
-})
+vi.mock('@canvas/i18n', () => ({
+  useScope: () => ({
+    t: (s: string) => s,
+  }),
+}))
 
-const mockUseNewLoginData = vi.mocked(useNewLoginData)
+vi.mock('@instructure/ui-alerts', () => ({
+  Alert: ({
+    children,
+    'data-testid': dataTestId,
+    variant,
+    variantScreenReaderLabel,
+    hasShadow,
+  }: {
+    children: React.ReactNode
+    'data-testid'?: string
+    variant?: string
+    variantScreenReaderLabel?: string
+    hasShadow?: boolean
+  }) => (
+    <div
+      data-testid={dataTestId}
+      data-variant={variant}
+      data-variant-sr-label={variantScreenReaderLabel}
+      data-has-shadow={String(hasShadow)}
+    >
+      {children}
+    </div>
+  ),
+}))
 
-const renderLoginLogo = () =>
-  render(
-    <NewLoginProvider>
-      <NewLoginDataProvider>
-        <LoginLogo />
-      </NewLoginDataProvider>
-    </NewLoginProvider>,
-  )
+vi.mock('@instructure/ui-text', () => ({
+  Text: ({children, wrap}: {children: React.ReactNode; wrap?: string}) => (
+    <span data-wrap={wrap}>{children}</span>
+  ),
+}))
 
-describe('LoginLogo', () => {
+describe('MessageAlert', () => {
   afterEach(() => {
     cleanup()
   })
@@ -49,40 +67,47 @@ describe('LoginLogo', () => {
     vi.clearAllMocks()
   })
 
-  it('renders nothing when loginLogoUrl is not provided', () => {
-    mockUseNewLoginData.mockReturnValue({
-      isDataLoading: false,
-      loginLogoUrl: '',
-      loginLogoText: 'Canvas LMS',
-    })
-    renderLoginLogo()
-    expect(screen.queryByTestId('login-logo-img')).not.toBeInTheDocument()
+  it('renders the message', () => {
+    render(<MessageAlert message="Hello world" />)
+    expect(screen.getByText('Hello world')).toBeInTheDocument()
   })
 
-  it('renders logo with correct src and alt text', () => {
-    const alt = 'Canvas LMS'
-    const src = 'https://example.com/logo.png'
-    mockUseNewLoginData.mockReturnValue({
-      isDataLoading: false,
-      loginLogoUrl: src,
-      loginLogoText: alt,
-    })
-    renderLoginLogo()
-    const image = screen.getByTestId('login-logo-img')
-    expect(image).toHaveAttribute('src', src)
-    expect(image).toHaveAttribute('alt', alt)
+  it('defaults variant to info', () => {
+    render(<MessageAlert message="Hello world" />)
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toHaveAttribute('data-variant', 'info')
   })
 
-  it('renders logo with empty alt when loginLogoText is missing', () => {
-    const src = 'https://example.com/logo.png'
-    mockUseNewLoginData.mockReturnValue({
-      isDataLoading: false,
-      loginLogoUrl: src,
-      loginLogoText: undefined,
-    })
-    renderLoginLogo()
-    const image = screen.getByTestId('login-logo-img')
-    expect(image).toHaveAttribute('src', src)
-    expect(image).toHaveAttribute('alt', '')
+  it('sets hasShadow to false', () => {
+    render(<MessageAlert message="Hello world" />)
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toHaveAttribute('data-has-shadow', 'false')
+  })
+
+  it('sets the screen reader label for info by default', () => {
+    render(<MessageAlert message="Hello world" />)
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toHaveAttribute('data-variant-sr-label', 'Information,')
+  })
+
+  it('sets the screen reader label for success', () => {
+    render(<MessageAlert message="Hello world" variant="success" />)
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toHaveAttribute('data-variant', 'success')
+    expect(alert).toHaveAttribute('data-variant-sr-label', 'Success,')
+  })
+
+  it('sets the screen reader label for warning', () => {
+    render(<MessageAlert message="Hello world" variant="warning" />)
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toHaveAttribute('data-variant', 'warning')
+    expect(alert).toHaveAttribute('data-variant-sr-label', 'Warning,')
+  })
+
+  it('sets the screen reader label for error', () => {
+    render(<MessageAlert message="Hello world" variant="error" />)
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toHaveAttribute('data-variant', 'error')
+    expect(alert).toHaveAttribute('data-variant-sr-label', 'Error,')
   })
 })

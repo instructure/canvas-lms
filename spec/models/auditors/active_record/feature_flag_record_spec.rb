@@ -48,7 +48,7 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::FeatureFlagRecord.create_from_event_stream!(es_record)
-      expect(ar_rec.id).to_not be_nil
+      expect(ar_rec.id).not_to be_nil
       expect(ar_rec.uuid).to eq(es_record.id)
       expect(ar_rec.request_id).to eq(request_id)
       expect(ar_rec.user_id).to eq(user.id)

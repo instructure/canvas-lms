@@ -44,7 +44,6 @@
 #    }
 #
 class GradingPeriodSetsController < ApplicationController
-  before_action :require_user
   before_action :get_context
   before_action :check_manage_rights, except: [:index]
   before_action :check_read_rights, except: %i[update create destroy]
@@ -108,7 +107,7 @@ class GradingPeriodSetsController < ApplicationController
 
         format.json { render json: serialized_set, status: :created }
       else
-        format.json { render json: grading_period_set.errors, status: :unprocessable_entity }
+        format.json { render json: grading_period_set.errors, status: :unprocessable_content }
       end
     end
   end
@@ -145,7 +144,7 @@ class GradingPeriodSetsController < ApplicationController
       if grading_period_set.update(set_params)
         format.json { head :no_content }
       else
-        format.json { render json: grading_period_set.errors, status: :unprocessable_entity }
+        format.json { render json: grading_period_set.errors, status: :unprocessable_content }
       end
     end
   end

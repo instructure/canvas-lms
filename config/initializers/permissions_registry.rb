@@ -343,7 +343,6 @@ BASE_PERMISSIONS = {
     account_only: true,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(a) { a.root_account.feature_enabled?(:lti_registrations_page) },
     account_details: [
       { title: -> { I18n.t("LTI Registrations - Manage") },
         description: -> { I18n.t("Allows users to view, add, modify, and delete LTI 1.3 tool registrations on the new Apps page.") } }
@@ -378,6 +377,34 @@ BASE_PERMISSIONS = {
       { description: -> { I18n.t("To edit lock settings on files, Courses - manage and Course Files - edit must also be enabled.") } },
       { description: -> { I18n.t("To edit lock settings on quizzes, Courses - manage and Assignments and Quizzes - manage / edit must also be enabled.") } },
       { description: -> { I18n.t("To manage lock settings for object types, Courses - manage must also be enabled.") } }
+    ]
+  },
+  manage_nav_menu_links: {
+    label: -> { I18n.t("Custom Links - manage") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:nav_menu_links) },
+    account_details: [
+      { title: -> { I18n.t("Custom Links (Account)") },
+        description: -> { I18n.t("Allows user to add and remove custom links in Account Navigation, User Navigation, and Course Navigation from the account settings page.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Custom Links (Account)") },
+        description: -> { I18n.t("Users can still rearrange custom links without this permission.") } },
+      { description: -> { I18n.t("To access account settings, Account-level settings - manage must also be enabled.") } },
+      { title: -> { I18n.t("Feature Flag") },
+        description: -> { I18n.t("This permission requires the Custom Links feature flag to be enabled.") } }
+    ],
+    course_details: [
+      { title: -> { I18n.t("Custom Links (Course)") },
+        description: -> { I18n.t("Allows user to add and remove custom links in Course Navigation.") } }
+    ],
+    course_considerations: [
+      { title: -> { I18n.t("Custom Links (Course)") },
+        description: -> { I18n.t("Users can still rearrange and hide custom links without this permission.") } },
+      { description: -> { I18n.t("To access course settings, Courses - manage must be enabled.") } },
+      { title: -> { I18n.t("Feature Flag") },
+        description: -> { I18n.t("This permission requires the Custom Links feature flag to be enabled.") } }
     ]
   },
   manage_role_overrides: {
@@ -1753,8 +1780,6 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("People (Course)") },
         description: -> { I18n.t("Allows user to view list of users in the course People page.") } },
       { description: -> { I18n.t("Allows user to view the Prior Enrollments button in the course People page.") } },
-      { title: -> { I18n.t("Subaccounts") },
-        description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
     account_considerations: [
       { title: -> { I18n.t("Account Groups") },
@@ -1961,8 +1986,6 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("To access the Student Interactions report, Reports - manage must also be enabled.") } },
       { title: -> { I18n.t("Student Context Card") },
         description: -> { I18n.t("Student Context Cards must be enabled for an account by an admin.") } },
-      { title: -> { I18n.t("Subaccounts") },
-        description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
     course_details: [
       { title: -> { I18n.t("Analytics") },
@@ -2080,8 +2103,8 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Allows user to open Analytics Hub, the central library of all things Data, Analytics and Insights.") } }
     ]
   },
-  view_ask_questions_analytics: {
-    label: -> { I18n.t("Ask Your Data") },
+  view_ask_questions_pinboards: {
+    label: -> { I18n.t("Pinboards - view") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
@@ -2089,13 +2112,27 @@ BASE_PERMISSIONS = {
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
     account_details: [
       { title: -> { I18n.t("Account Settings") },
-        description: -> { I18n.t("Allows users to access the Ask Your Data feature of Intelligent Insights.") } },
+        description: -> { I18n.t("Allows view access to Ask Your Data's Pinboards feature of Intelligent Insights. Does not include access to Ask Your Data's Chat feature or AI.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
+    ]
+  },
+  view_ask_questions_analytics: {
+    label: -> { I18n.t("Ask Your Data - use") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows users to access, interact with, and use the Ask Your Data feature of Intelligent Insights.") } },
       { title: -> { I18n.t("Subaccounts") },
         description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
     ]
   },
   manage_ask_questions_analytics_context: {
-    label: -> { I18n.t("Ask Your Data - Context Library") },
+    label: -> { I18n.t("Ask Your Data's Context Library - modify") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
@@ -2103,7 +2140,7 @@ BASE_PERMISSIONS = {
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
     account_details: [
       { title: -> { I18n.t("Account Settings") },
-        description: -> { I18n.t("Allows Ask Your Data users to access and manage the product's Context Library feature, to influence and tailor AI responses for all users.") } },
+        description: -> { I18n.t("Allows Ask Your Data users to access and modify the product's Context Library feature, to influence and tailor AI responses for all users.") } },
       { title: -> { I18n.t("Subaccounts") },
         description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
@@ -2226,7 +2263,7 @@ BASE_PERMISSIONS = {
   access_oak_teacher: {
     label: -> { I18n.t("IgniteAI Agent - Faculty & Support") },
     available_to: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership],
-    true_for: %w[AccountAdmin],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
     account_allows: ->(a) { a.feature_enabled?(:oak_for_teachers) },
     details: [
       { title: -> { I18n.t("IgniteAI Agent - Faculty & Support") },

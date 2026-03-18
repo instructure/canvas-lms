@@ -19,9 +19,9 @@
 
 describe AccessVerifier do
   describe "generate" do
-    let(:user) { double("user", uuid: "abcd", global_id: 1) }
-    let(:developer_key) { double("developer_key", global_id: 1) }
-    let(:authorization) { { attachment: double("attachment", global_id: 2), permission: "download" } }
+    let(:user) { instance_double(User, uuid: "abcd", global_id: 1) }
+    let(:developer_key) { instance_double(DeveloperKey, global_id: 1) }
+    let(:authorization) { { attachment: instance_double(Attachment, global_id: 2), permission: "download" } }
 
     it "includes an sf_verifier field in the response" do
       expect(AccessVerifier.generate(user:)).to have_key(:sf_verifier)

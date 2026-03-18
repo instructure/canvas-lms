@@ -780,6 +780,8 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::Quiz
   include Api::V1::Progress
   include Api::V1::AccessibilityResourceScan
+  include Api::V1::AssessmentRequest
+  include Api::V1::AllocationRule
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -836,7 +838,7 @@ class AssignmentsApiController < ApplicationController
   #   Optional information:
   #   When the root account has the feature `newquizzes_on_quiz_page` enabled
   #   and this argument is set to "Quiz" the response will be serialized into a
-  #   quiz format({file:doc/api/quizzes.html#Quiz});
+  #   {file:quizzes.html#Quiz quiz format};
   #   When this argument isn't specified the response will be serialized into an
   #   assignment format;
   #
@@ -1781,6 +1783,35 @@ class AssignmentsApiController < ApplicationController
     @assignment = api_find(@context.active_assignments, params[:assignment_id])
     scan = Accessibility::ResourceScannerService.new(resource: @assignment).call
     render json: accessibility_resource_scan_json(scan)
+  end
+
+  # @API Check allocation conversion
+  # Returns a list of objects that would be converted when toggling the
+  # peer_review_allocation_and_grading feature flag.
+  #
+  # @returns [AssessmentRequest] or [AllocationRule]
+  def check_allocation_conversion
+    @assignment = api_find(@context.active_assignments, params[:assignment_id])
+    return render_unauthorized_action unless @assignment.grants_right?(@current_user, session, :update)
+
+    if @context.feature_enabled?(:peer_review_allocation_and_grading)
+      # FF enabled: Check for legacy assessment requests to convert
+      assessment_requests = AssessmentRequest.for_assignment(@assignment.id).incomplete
+
+      # This timestamp comparison identifies assessment requests created with the legacy peer reviews flow
+      if @assignment.peer_review_sub_assignment
+        assessment_requests = assessment_requests.where(
+          assessment_requests: { created_at: ...@assignment.peer_review_sub_assignment.created_at }
+        )
+      end
+
+      render json: assessment_requests_json(assessment_requests, @current_user, session)
+    else
+      # FF disabled: Check for allocation rules
+      allocation_rules = @assignment.allocation_rules.active
+
+      render json: allocation_rules_json(allocation_rules, @current_user, session)
+    end
   end
 
   private

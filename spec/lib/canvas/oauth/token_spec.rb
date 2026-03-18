@@ -141,7 +141,7 @@ module Canvas::OAuth
 
       it "sets token to expire if the key is set to expire" do
         allow(key).to receive(:mobile_app?).and_return(true)
-        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 30 }))
+        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: { mobile_timeout: 30 }))
         expect(token.access_token.permanent_expires_at).not_to be_nil
       end
     end
@@ -149,7 +149,7 @@ module Canvas::OAuth
     describe "#create_access_token_if_needed" do
       it "deletes existing tokens for the same key when requested" do
         old_token = user.access_tokens.create! developer_key: key
-        token.create_access_token_if_needed(true)
+        token.create_access_token_if_needed(replace_tokens: true)
         expect(AccessToken.not_deleted.where(id: old_token.id).exists?).to be(false)
       end
 
@@ -206,7 +206,7 @@ module Canvas::OAuth
         access_token = AccessToken.authenticate(json["access_token"])
         # setup new token with existing access token
         new_token = Token.new(token.key, token.code, access_token)
-        expect(new_token.as_json.keys).to_not include "refresh_token"
+        expect(new_token.as_json.keys).not_to include "refresh_token"
       end
 
       it "grabs the user json as well" do
@@ -275,12 +275,12 @@ module Canvas::OAuth
 
     describe ".generate_code_for" do
       let(:code) { "brand_new_code" }
-      let(:redis) { double(setex: true) }
+      let(:redis) { instance_double(Redis, setex: true) }
 
       before { allow(SecureRandom).to receive_messages(hex: code) }
 
       it "returns the new code" do
-        allow(Canvas).to receive_messages(redis: double(setex: true))
+        allow(Canvas).to receive_messages(redis: instance_double(Redis, setex: true))
         expect(Token.generate_code_for(1, 2, 3)).to eq code
       end
 

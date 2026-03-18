@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {http, HttpResponse} from 'msw'
@@ -88,24 +89,28 @@ describe('ItemAssignToCard - Due Date ENV Null Defaults', () => {
   afterEach(() => {
     server.resetHandlers()
     fakeEnv.teardown()
+    vi.clearAllMocks()
+    cleanup()
   })
 
   it('defaults to the default due time for due dates from ENV if has null due time', async () => {
     const onCardDatesChangeMock = vi.fn()
-    const {getByLabelText, getAllByLabelText} = renderComponent({
+    const {getByLabelText, findAllByLabelText, findByRole} = renderComponent({
       onCardDatesChange: onCardDatesChangeMock,
     })
     const dateInput = getByLabelText('Due Date')
     onCardDatesChangeMock.mockClear()
-    fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
-    fireEvent.blur(dateInput, {target: {value: 'Nov 10, 2020'}})
+    await userEvent.type(dateInput, 'Nov 10, 2020')
+    const dateOption = await findByRole('option', {name: /10 november 2020/i})
+    await userEvent.click(dateOption)
     await waitFor(() => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
         'due_at',
         '2020-11-10T08:00:00.000Z',
       )
-      expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
-    })
+    }, {timeout: 30000})
+    const timeInputs = await findAllByLabelText('Time')
+    expect(timeInputs[0]).toHaveValue('8:00 AM')
   })
 })

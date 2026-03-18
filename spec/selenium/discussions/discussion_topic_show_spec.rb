@@ -524,10 +524,10 @@ describe "Discussion Topic Show" do
         update_reply_to_topic_time(1, format_date_for_view(new_dates[:student][:reply_to_topic], "%l:%M %p"))
         update_required_replies_date(1, format_date_for_view(new_dates[:student][:required_replies], "%b %-d, %Y"))
         update_required_replies_time(1, format_date_for_view(new_dates[:student][:required_replies], "%l:%M %p"))
-        update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), false, false)
-        update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), false, false)
-        update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), false, false)
-        update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), false, false)
+        update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), exclude_checkpoints: false)
+        update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), exclude_checkpoints: false)
+        update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), exclude_checkpoints: false)
+        update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), exclude_checkpoints: false)
 
         update_reply_to_topic_date(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%b %-d, %Y"))
         update_reply_to_topic_time(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%l:%M %p"))
@@ -992,31 +992,13 @@ describe "Discussion Topic Show" do
   context "nutrition facts functionality" do
     before do
       @course.enable_feature!(:translation)
+      allow(Translation).to receive(:available?).and_return(true)
     end
 
-    context "when cedar_translation feature flag is enabled" do
-      before do
-        @course.root_account.enable_feature!(:cedar_translation)
-        allow(CedarClient).to receive(:enabled?).and_return(true)
-      end
-
-      it "loads nutrition facts element with content in the DOM" do
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajaximations
-        expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
-      end
-    end
-
-    context "when cedar_translation feature flag is disabled" do
-      before do
-        @course.root_account.disable_feature!(:cedar_translation)
-      end
-
-      it "does not mount nutrition facts content" do
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajaximations
-        expect(element_exists?("#nutrition_facts_trigger")).to be_falsey
-      end
+    it "loads nutrition facts element with content in the DOM" do
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+      expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
     end
   end
 end

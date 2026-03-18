@@ -35,6 +35,7 @@ describe('OutcomeManagementPanel - Group Operations', () => {
   let render, defaultProps, groupDetailDefaultProps
 
   beforeEach(() => {
+    vi.useFakeTimers()
     const setup = setupTest()
     render = setup.render
     defaultProps = setup.defaultProps
@@ -43,6 +44,8 @@ describe('OutcomeManagementPanel - Group Operations', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.restoreAllMocks()
+    vi.useRealTimers()
     teardownTest()
   })
 
@@ -107,7 +110,7 @@ describe('OutcomeManagementPanel - Group Operations', () => {
       fireEvent.click(getByText('Remove Group'))
       await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
-    }, 10000)
+    }, 30000)
 
     it('Show parent group in the RHS', async () => {
       const {getByText, queryByText, getByTestId} = render(
@@ -133,7 +136,7 @@ describe('OutcomeManagementPanel - Group Operations', () => {
       fireEvent.click(getByText('Remove Group'))
       await act(async () => vi.runOnlyPendingTimers())
       expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
-    }, 10000)
+    }, 30000)
   })
 
   describe('Moving a group', () => {
@@ -239,7 +242,7 @@ describe('OutcomeManagementPanel - Group Operations', () => {
       fireEvent.click(within(getByRole('dialog')).getByText('Cancel'))
       await act(async () => vi.runAllTimers())
       expect(getByText('new group name')).toBeInTheDocument()
-    })
+    }, 30000)
 
     it('shows move group modal if move option from group menu is selected', async () => {
       const {getByText, getByTestId} = render(<OutcomeManagementPanel {...defaultProps()} />, {

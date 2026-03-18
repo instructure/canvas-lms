@@ -52,8 +52,8 @@ describe EventStream::Failure do
     end
 
     it "sets default values" do
-      expect(@event.id).to_not be_nil
-      expect(@event.created_at).to_not be_nil
+      expect(@event.id).not_to be_nil
+      expect(@event.created_at).not_to be_nil
       expect(@event.event_type).to eq "event_record"
       expect(@event.request_id).to eq @request_id
     end

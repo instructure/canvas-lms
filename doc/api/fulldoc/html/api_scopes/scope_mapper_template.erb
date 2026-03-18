@@ -28,14 +28,18 @@
 
 class ApiScopeMapper
   SCOPE_MAP = {
-  <% mapping.each_with_index do |(controller, children), i| -%>
-  <%="#{controller}: {" %>
-  <% children.each_with_index do |(action, resource), j| -%>
-    <%= "#{action}: :#{resource}" %><%= "," if j < (children.size - 1) %>
-  <% end -%>
-  <%= "}.freeze" %><%= "," if i < (mapping.size - 1) %>
-  <% end -%>
-}.freeze
+<% mapping.each_with_index do |(controller, children), i| -%>
+  <%- if children.empty? -%>
+    <%= controller %>: {}.freeze<%= "," if i < (mapping.size - 1) %>
+  <%- else -%>
+    <%= controller %>: {
+    <%- children.each_with_index do |(action, resource), j| -%>
+      <%= "#{action}: :#{resource}" %><%= "," if j < (children.size - 1) %>
+    <%- end -%>
+    }.freeze<%= "," if i < (mapping.size - 1) %>
+  <%- end -%>
+<%- end -%>
+  }.freeze
 
   RESOURCE_NAMES = {
     oauth2: -> { I18n.t("OAuth 2") },

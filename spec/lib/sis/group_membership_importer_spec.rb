@@ -41,7 +41,7 @@ module SIS
         GroupMembershipImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process do |importer|
           importer.add_group_membership(12_345, 54_321, "accepted")
         end
-      end.to_not raise_error
+      end.not_to raise_error
     end
 
     describe "validation" do

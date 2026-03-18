@@ -159,6 +159,9 @@ beforeEach(() => {
   fakeENV.setup({
     COURSE_SETTINGS_NAVIGATION_TABS: [...defaultEnabledTabs, ...defaultDisabledTabs],
     K5_SUBJECT_COURSE: false,
+    PERMISSIONS: {
+      manage_nav_menu_links: true,
+    },
   })
 
   // Reset the Zustand store state

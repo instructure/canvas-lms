@@ -61,14 +61,14 @@ describe "Account Reports" do
   end
 
   it "records the job id" do
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 1234))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 1234))
     report = run_report("unpublished_courses_csv")
     expect(report.job_ids).to eq [1234]
   end
 
   it "records account report runner job ids for parallelized reports" do
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
-                                                                double("Delayed::Job", id: 456))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123),
+                                                                instance_double(Delayed::Job, id: 456))
     report = run_report("grade_export_csv")
     expect(report.job_ids).to eq [123]
     expect(report.account_report_runners.first.job_ids).to eq [456]
@@ -88,8 +88,8 @@ describe "Account Reports" do
               end
       }
     }
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
-                                                                double("Delayed::Job", id: 456))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123),
+                                                                instance_double(Delayed::Job, id: 456))
 
     ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "fake_report")
     ar.run_report
@@ -113,8 +113,8 @@ describe "Account Reports" do
               end
       }
     }
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
-                                                                double("Delayed::Job", id: 456))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123),
+                                                                instance_double(Delayed::Job, id: 456))
 
     ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "fake_report")
     ar.run_report

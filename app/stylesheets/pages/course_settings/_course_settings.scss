@@ -320,6 +320,21 @@ ul.user_list div.enrollment_type.pending {
   }
 }
 
+#right-side .course-criteria {
+  margin-top: 20px;
+  h3 {
+    line-height: inherit;
+    margin: 0;
+    @include fontSize(13px);
+    padding: 6px;
+    font-weight: bold;
+    border-bottom: 1px solid #6A7883;
+  }
+  #criteria-mount {
+    padding: 6px;
+  }
+}
+
 .course-settings-sub-navigation-lti .new_badge {
   background-color: #bc3aa6;
   color: white;

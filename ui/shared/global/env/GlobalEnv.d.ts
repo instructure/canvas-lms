@@ -24,10 +24,12 @@ import {EnvAiExperiences} from './EnvAiExperiences'
 import {EnvAlerts} from './EnvAlerts'
 import {EnvAms} from './EnvAms'
 import {EnvAssignments} from './EnvAssignments'
+import {EnvAthena} from './EnvAthena'
 import {EnvChangePassword} from './EnvChangePassword'
 import {EnvCommon} from './EnvCommon'
 import {EnvContextModules} from './EnvContextModules'
 import {EnvCourse} from './EnvCourse'
+import {EnvCourseLinkValidator} from './EnvCourseLinkValidator'
 import {EnvCoursePaces} from './EnvCoursePaces'
 import {EnvDeepLinking} from './EnvDeepLinking'
 import {EnvDeveloperKeys} from './EnvDeveloperKeys'
@@ -71,7 +73,9 @@ export type GlobalEnv =
         EnvAms &
         EnvAccessibilityChecker &
         EnvAssignments &
+        EnvAthena &
         EnvCourse &
+        EnvCourseLinkValidator &
         EnvCoursePaces &
         EnvDeepLinking &
         EnvGradebook &

@@ -315,7 +315,7 @@ describe ContextController do
         @student.enrollments.first.deactivate
 
         get "roster_user", params: { course_id: @course.id, id: @student.id }
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
       end
 
       context "hide course sections from students feature enabled" do
@@ -739,6 +739,23 @@ describe ContextController do
       user_session(@teacher)
       post :undelete_item, params: { course_id: @course.id, asset_string: association.asset_string }
       expect(association.reload).not_to be_deleted
+    end
+
+    it "does not error undeleting a quiz assignment that somehow has no quiz" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:allow_attachment_association_creation)
+      assignment = @course.assignments.create!(
+        submission_types: "online_quiz",
+        description: "<p><a href='/courses/#{@course.id}/files/1/download'>quiz file link</a></p>",
+        workflow_state: "deleted",
+        updating_user: @teacher
+      )
+
+      expect do
+        post :undelete_item, params: { course_id: @course.id, asset_string: assignment.asset_string }
+      end.not_to raise_error
+
+      expect(assignment.reload).not_to be_deleted
     end
   end
 

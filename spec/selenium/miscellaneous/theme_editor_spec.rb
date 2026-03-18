@@ -166,7 +166,7 @@ describe "Theme Editor" do
 
     expect(f("body")).not_to contain_css("div.progress-bar__bar-container")
     preview_your_changes
-    expect(f("div.progress-bar__bar-container")).to be
+    expect(f("div.progress-bar__bar-container")).not_to be_nil
   end
 
   it "allows fields to be changed after colors are unlinked", priority: 3 do

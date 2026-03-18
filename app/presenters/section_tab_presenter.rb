@@ -35,6 +35,7 @@ class SectionTabPresenter
                              :visibility,
                              :external,
                              :position,
+                             :link_context_type,
                              keyword_init: true)
   def initialize(tab, context)
     @tab = TabDefinition.new(**tab)

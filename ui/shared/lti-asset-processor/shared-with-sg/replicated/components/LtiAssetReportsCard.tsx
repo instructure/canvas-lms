@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconInfoSolid, IconWarningSolid, IconExternalLinkLine} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconInfoSolid, IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {LtiAssetReport} from '../types/LtiAssetReports'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('lti_asset_processor')
 
@@ -220,7 +219,7 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}): JSX.Ele
               >
                 <Flex alignItems="center" gap="x-small">
                   <Text size="small">
-                    {I18n.t('View %{reportTitle} Report', {
+                    {I18n.t('View {{reportTitle}} Report', {
                       reportTitle: report.title || I18n.t('Document Processor'),
                     })}
                   </Text>

@@ -47,7 +47,7 @@ shared_examples_for "All answer parsers" do
 
   it "provides IDs for the answers" do
     ids = @answer_data.answers.pluck(:id)
-    ids.each { |id| expect(id).to be_a(Integer) }
+    expect(ids).to all(be_a(Integer))
   end
 
   it "sanitizes answer comments" do

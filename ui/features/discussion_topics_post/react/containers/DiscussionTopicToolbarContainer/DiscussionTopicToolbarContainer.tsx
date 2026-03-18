@@ -17,13 +17,8 @@
  */
 
 import {useMutation} from '@apollo/client'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {breakpointsShape} from '@canvas/with-breakpoints'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
@@ -36,21 +31,16 @@ import SortOrderDropDown from '../../components/DiscussionPostToolbar/SortOrderD
 import useSpeedGrader from '../../hooks/useSpeedGrader'
 import {hideStudentNames} from '../../utils'
 import {
-  DiscussionManagerUtilityContext,
   SEARCH_TERM_DEBOUNCE_DELAY,
   SearchContext,
   isSpeedGraderInTopUrl,
 } from '../../utils/constants'
 import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer/DiscussionTopicTitleContainer'
 
-const I18n = createI18nScope('discussion_topic')
-
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 // @ts-expect-error TS7006 (typescriptify)
 const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, setSearchTerm, setFilter} = useContext(SearchContext)
-  // @ts-expect-error TS2339 (typescriptify)
-  const {showTranslationControl} = useContext(DiscussionManagerUtilityContext)
   const [currentSearchValue, setCurrentSearchValue] = useState(searchTerm || '')
 
   useEffect(() => {
@@ -107,16 +97,27 @@ const DiscussionTopicToolbarContainer = props => {
   }
 
   const getGroupsMenuTopics = () => {
-    if (!props.discussionTopic.groupSet) {
+    if (!props.discussionTopic.groupSet && !props.discussionTopic.rootTopic?.groupSet) {
       return null
     }
     if (props.discussionTopic.childTopics?.length > 0) {
       return props.discussionTopic.childTopics
     } else if (props.discussionTopic.rootTopic?.childTopics?.length > 0) {
       return props.discussionTopic.rootTopic.childTopics
-    } else {
-      return []
     }
+    return null
+  }
+
+  const canViewGroups = (): boolean => {
+    if (props.discussionTopic.childTopics?.length > 0) {
+      return props.discussionTopic.permissions.viewGroupPages
+    }
+    // We are inside a group discussion (child topic) —
+    // the permission and sibling list live on rootTopic
+    if (props.discussionTopic.rootTopic?.childTopics?.length > 0) {
+      return props.discussionTopic.rootTopic.permissions?.viewGroupPages
+    }
+    return false
   }
 
   const background =
@@ -143,7 +144,7 @@ const DiscussionTopicToolbarContainer = props => {
             </Flex.Item>
             <Flex.Item id="Main">
               <DiscussionPostButtonsToolbar
-                canViewGroupPages={props.discussionTopic.permissions.viewGroupPages}
+                canViewGroupPages={canViewGroups()}
                 canEdit={props.discussionTopic.permissions.update}
                 childTopics={getGroupsMenuTopics()}
                 // @ts-expect-error TS2322 (typescriptify)
@@ -212,11 +213,8 @@ const DiscussionTopicToolbarContainer = props => {
         </>
       ) : (
         <>
-          <ScreenReaderContent>
-            <h1>{props.discussionTopic.title}</h1>
-          </ScreenReaderContent>
           <DiscussionPostToolbar
-            canViewGroupPages={props.discussionTopic.permissions.viewGroupPages}
+            canViewGroupPages={canViewGroups()}
             canEdit={props.discussionTopic.permissions.update}
             childTopics={getGroupsMenuTopics()}
             selectedView={filter}

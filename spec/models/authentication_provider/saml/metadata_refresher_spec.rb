@@ -83,7 +83,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
   end
 
   describe ".refresh_if_necessary" do
-    let(:redis) { double("redis") }
+    let(:redis) { instance_double(Redis) }
 
     before do
       allow(Canvas).to receive_messages(redis_enabled?: true, redis:)
@@ -105,7 +105,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
     it "returns false if not modified" do
       expect(redis).to receive(:get).and_return("MyETag")
-      response = double("response")
+      response = instance_double(Net::HTTPResponse)
       expect(response).to receive(:is_a?).with(Net::HTTPNotModified).and_return(true)
 
       expect(CanvasHttp).to receive(:get).with("url", { "If-None-Match" => "MyETag" }).and_yield(response)
@@ -115,7 +115,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
     it "sets the ETag if provided" do
       expect(redis).to receive(:get).and_return(nil)
-      response = double("response")
+      response = instance_double(Net::HTTPResponse)
       expect(response).to receive(:is_a?).with(Net::HTTPNotModified).and_return(false)
       expect(response).to receive(:value)
       allow(response).to receive(:[]).with("ETag").and_return("NewETag")

@@ -63,6 +63,8 @@ export default class TrayController {
     this._renderId = 0
     this._skipFocusOnExit = false
     this._announcer = this.createAnnouncer()
+    this._captionsModified = false
+    this.requestSubtitlesFromIframe = this.requestSubtitlesFromIframe.bind(this)
   }
 
   createAnnouncer() {
@@ -99,14 +101,28 @@ export default class TrayController {
     this._editor = editor
     this.$videoContainer = findMediaPlayerIframe(editor.selection.getNode())
     this._shouldOpen = true
+    this._captionsModified = false
 
     if (bridge.focusedEditor) {
       // Dismiss any content trays that may already be open
-      bridge.hideTrays()
+      bridge.hideTrays() // Do we need to implement .hideTray functionality in this controller as well?
     }
 
-    const trayProps = bridge.trayProps.get(editor)
-    this._renderTray(trayProps)
+    const isStudioVideo = isStudioEmbeddedMedia(this.$videoContainer)
+    // for studio embeds we don't need to show spinners
+    // so it is ready by default
+    this._isPlayerReady = isStudioVideo
+
+    // Clean broadcast listeners for any existing trays which are not shown (if not cleaned automatically)
+    this._iframeLoadingListener?.abort()
+
+    if (!isStudioVideo) {
+      const videoOptions = asVideoElement(this.$videoContainer)
+      this._listenForPlayerIframeToLoad(videoOptions.id)
+    }
+
+    this._renderId++
+    this._renderTray()
     this._announcer.textContent = ''
   }
 
@@ -174,6 +190,7 @@ export default class TrayController {
         attachment_id: videoOptions.attachment_id,
         subtitles: videoOptions.subtitles,
         skipCaptionUpdate: isCaptionImprovements,
+        viewerRestrictions: videoOptions.viewerRestrictions,
       }
 
       // If the video just edited came from a file uploaded to canvas
@@ -188,14 +205,18 @@ export default class TrayController {
           .updateMediaObject(data)
           .then(_r => {
             if (this.$videoContainer && videoOptions.displayAs === 'embed') {
-              this.$videoContainer.contentWindow.postMessage(
-                {
-                  subject: 'reload_media',
-                  media_object_id: videoOptions.media_object_id,
-                  attachment_id: data.attachment_id,
-                },
-                bridge.canvasOrigin,
-              )
+              if (isCaptionImprovements) {
+                this._reloadVideoPlayer()
+              } else {
+                this.$videoContainer.contentWindow.postMessage(
+                  {
+                    subject: 'reload_media',
+                    media_object_id: videoOptions.media_object_id,
+                    attachment_id: data.attachment_id,
+                  },
+                  bridge.canvasOrigin,
+                )
+              }
             }
           })
           .catch(ex => {
@@ -207,13 +228,57 @@ export default class TrayController {
     this._announcer.textContent = formatMessage('Media options saved.')
   }
 
+  _listenForPlayerIframeToLoad(currentMediaId) {
+    if (!bridge.canvasOrigin) return
+
+    this._iframeLoadingListener = new AbortController()
+
+    // Wait for player iframe to be loaded
+    window.addEventListener(
+      'message',
+      event => {
+        // If tray was opened before player iframe was ready it will catch ready event.
+        // If not it will request it later and catch it here anyway.
+        if (
+          event.data?.subject === 'media_player.iframe_ready' &&
+          event.data?.mediaId === currentMediaId
+        ) {
+          this._iframeLoadingListener.abort()
+          this._isPlayerReady = true
+          this._renderTray()
+        }
+      },
+      {signal: this._iframeLoadingListener.signal},
+    )
+
+    // If tray was opened after player was loaded we need to request iframe_ready state
+    this.$videoContainer?.contentWindow?.postMessage(
+      {subject: 'media_player.get_ready_state'},
+      bridge.canvasOrigin,
+    )
+  }
+
+  _reloadVideoPlayer() {
+    if (this.$videoContainer?.contentWindow?.location) {
+      this.$videoContainer.contentWindow.location.reload()
+    }
+  }
+
   _dismissTray() {
+    const isCaptionImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements || false
+
+    // Reload if captions were modified AND feature flag enabled
+    if (isCaptionImprovements && this._captionsModified && this.$videoContainer) {
+      this._reloadVideoPlayer()
+    }
+
     if (this.$videoContainer && !this._skipFocusOnExit) {
       this._editor?.selection?.select(this.$videoContainer)
     }
     this._shouldOpen = false
     this._renderTray()
     this._editor = null
+    this._iframeLoadingListener?.abort()
   }
 
   requestSubtitlesFromIframe(cb) {
@@ -236,18 +301,8 @@ export default class TrayController {
     )
   }
 
-  _renderTray(trayProps) {
-    let vo = {}
-
-    if (this._shouldOpen) {
-      /*
-       * When the tray is being opened again, it should be rendered fresh
-       * (clearing the internal state) so that the currently-selected video can
-       * be used for initial video options.
-       */
-      this._renderId++
-      vo = asVideoElement(this.$videoContainer) || {}
-    }
+  _renderTray() {
+    const vo = asVideoElement(this.$videoContainer) || {}
 
     const element = (
       <VideoOptionsTray
@@ -257,6 +312,7 @@ export default class TrayController {
         onEntered={() => {
           this._isOpen = true
         }}
+        // is not guaranteed to be called in case of showing another tray
         onExited={() => {
           if (!this._skipFocusOnExit) {
             bridge.focusActiveEditor(false)
@@ -264,20 +320,26 @@ export default class TrayController {
           this._skipFocusOnExit = false
           this._isOpen = false
           this._subtitleListener?.abort()
+          this._iframeLoadingListener?.abort()
+          this._isPlayerReady = false
         }}
         onSave={videoOptions => {
           this._applyVideoOptions(videoOptions)
         }}
         onRequestClose={() => this._dismissTray()}
+        onCaptionsModified={() => {
+          this._captionsModified = true
+        }}
         open={this._shouldOpen}
-        trayProps={trayProps}
+        trayProps={bridge.trayProps.get(this._editor)}
         studioOptions={
           isStudioEmbeddedMedia(this.$videoContainer)
             ? parseStudioOptions(this.$videoContainer)
             : null
         }
-        requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}
+        requestSubtitlesFromIframe={this.requestSubtitlesFromIframe}
         onStudioEmbedOptionChanged={onStudioEmbedOptionChanged(this._editor)}
+        isLoading={!this._isPlayerReady}
       />
     )
     ReactDOM.render(element, this.$container)

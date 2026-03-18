@@ -34,7 +34,7 @@ describe ContentExport do
     subject { @ce.export(synchronous: true) }
 
     it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
 
       subject
 

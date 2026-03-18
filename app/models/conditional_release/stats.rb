@@ -20,7 +20,7 @@
 module ConditionalRelease
   module Stats
     class << self
-      def students_per_range(rule, include_trend_data = false)
+      def students_per_range(rule, include_trend_data: false)
         assignment_ids = [rule.trigger_assignment_id]
         assignment_ids += rule.assignment_set_associations.pluck(:assignment_id) if include_trend_data
 

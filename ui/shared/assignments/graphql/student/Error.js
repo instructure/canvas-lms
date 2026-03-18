@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 export const Error = {
   fragment: gql`
-    fragment Error on ValidationError {
+    fragment StudentAssignmentError on ValidationError {
       attribute
       message
     }

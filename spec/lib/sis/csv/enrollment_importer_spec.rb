@@ -665,9 +665,9 @@ describe SIS::CSV::EnrollmentImporter do
   describe "#persist_errors" do
     it "gracefully handles string errors" do
       batch = Account.default.sis_batches.create!
-      csv = double(:root_account => Account.default, :batch => batch, :[] => nil)
-      importer = SIS::CSV::EnrollmentImporter.new(csv)
-      importer.persist_errors(csv, ["a string error message"])
+      sis_csv = instance_double(SIS::CSV::ImportRefactored, root_account: Account.default, batch:)
+      importer = SIS::CSV::EnrollmentImporter.new(sis_csv)
+      importer.persist_errors({ file: nil }, ["a string error message"])
       expect(batch.sis_batch_errors.count).to eq(1)
     end
   end
@@ -815,6 +815,23 @@ describe SIS::CSV::EnrollmentImporter do
         expect(importer.errors.map(&:last)).to eq ["Improper role \"Pixel Pusher\" for an enrollment"]
         expect(@user1.enrollments.size).to eq 0
         expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [["DesignerEnrollment", "Pixel Pusher"]]
+      end
+
+      it "finds the most specific role when multiple roles have the same name" do
+        sub1 = @account.sub_accounts.create!
+        sub2 = sub1.sub_accounts.create!
+        sub3 = sub2.sub_accounts.create!
+        @account.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        sub2.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        sub1.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        course2 = course_model(account: sub3, sis_source_id: "OtherCourse")
+        process_csv_data_cleanly(
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "OtherCourse,user2,Pixel Pusher,,active,"
+        )
+        role = course2.enrollments.where(user_id: @user2).first.role
+        expect(role.name).to eq "Pixel Pusher"
+        expect(role.account_id).to eq sub2.id
       end
     end
   end
@@ -1336,6 +1353,16 @@ describe SIS::CSV::EnrollmentImporter do
 
         enrollment_pairing_id = @recipient.enrollments.take.temporary_enrollment_pairing_id
         expect(Enrollment.where(temporary_enrollment_pairing_id: enrollment_pairing_id)).to exist
+      end
+
+      it "does not create enrollment if start or end date is missing" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,,,provider"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["A temporary enrollment is missing a start or end date (start_date: , end_date: )"]
       end
 
       it "does not create enrollment if end date is before start" do

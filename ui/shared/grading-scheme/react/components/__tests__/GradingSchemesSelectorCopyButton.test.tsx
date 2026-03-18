@@ -109,6 +109,7 @@ describe('GradingSchemesSelector copy button tests', () => {
   })
 
   it('should make an api call when the duplicate button is clicked and then open the edit modal', async () => {
+    // timeout: multi-modal interaction chain is slow in CI
     let createData: any = null
     server.use(
       http.post('/courses/:contextId/grading_schemes', async ({request}) => {
@@ -141,5 +142,5 @@ describe('GradingSchemesSelector copy button tests', () => {
       scaling_factor: 1,
       data: DefaultGradingScheme.data,
     })
-  })
+  }, 30000)
 })

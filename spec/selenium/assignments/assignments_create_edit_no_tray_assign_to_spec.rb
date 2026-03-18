@@ -258,7 +258,7 @@ describe "override assignees" do
   context "group assignments", :ignore_js_errors do
     before :once do
       course_with_teacher(active_all: true)
-      group_test_setup(3, 3, 1, true)
+      group_test_setup(3, 3, 1, differentiate_groups: true)
       @normal_assignment = Assignment.create!(context: @course, title: "Normal Assignment")
       @group_assignment = Assignment.create!(context: @course, title: "Group Assignment", group_category_id: @group_category[0].id)
       override = @group_assignment.assignment_overrides.build

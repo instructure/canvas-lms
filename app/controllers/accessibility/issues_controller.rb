@@ -24,7 +24,6 @@ module Accessibility
   # Keeping for now to maintain API compatibility if any external tools use it.
   class IssuesController < ApplicationController
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
 
     def index
@@ -55,7 +54,7 @@ module Accessibility
     private
 
     def check_authorized_action
-      return render status: :forbidden unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+      return render status: :forbidden unless tab_enabled?(Course::TAB_ACCESSIBILITY, no_render: true)
 
       authorized_action(@context, @current_user, [:read, :update])
     end

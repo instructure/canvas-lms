@@ -212,7 +212,7 @@ describe ContentMigration do
 
   it "excludes user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
-    expect(ContentMigration.migration_plugins(true)).not_to include(ab)
+    expect(ContentMigration.migration_plugins(exclude_hidden: true)).not_to include(ab)
   end
 
   context "zip file import" do
@@ -250,7 +250,7 @@ describe ContentMigration do
     end
 
     it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       cm = setup_zip_import(@course)
       test_zip_import(@course, cm)
       expect(cm.reload.migration_settings[:job_ids]).to eq([123])
@@ -282,7 +282,7 @@ describe ContentMigration do
     it "does not expand the mac system folder" do
       cm = setup_zip_import(@course, "macfile.zip")
       test_zip_import(@course, cm, 4)
-      expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
+      expect(@course.folders.pluck(:name)).not_to include("__MACOSX")
     end
 
     it "updates unzip progress often" do
@@ -1037,7 +1037,7 @@ describe ContentMigration do
           .and_return(false)
       end
 
-      let(:importer) { class_double("Importers::CourseContentImporter") }
+      let(:importer) { class_double(Importers::CourseContentImporter) }
 
       it "should not calls QuizzesNext::Importers" do
         expect(QuizzesNext::Importers::CourseContentImporter)
@@ -2779,7 +2779,7 @@ describe ContentMigration do
       expect(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_handler)
 
       # Mock API calls for Kaltura redirects during media downloads
-      kaltura_client_double = instance_double("CanvasKaltura::ClientV3")
+      kaltura_client_double = instance_double(CanvasKaltura::ClientV3)
 
       allow(kaltura_client_double).to receive(:media_download_url).with("m-media_id_1").and_return("http://kaltura.example/download/t-123")
       Net::HTTPSuccess.new(1.1, 200, "OK").tap do |response|

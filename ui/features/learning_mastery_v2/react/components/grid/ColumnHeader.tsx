@@ -28,16 +28,20 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 export interface ColumnHeaderProps {
   title: string
+  titleId?: string
   optionsMenuTriggerLabel?: string
   optionsMenuItems?: React.ReactNode[]
   columnWidth?: number
+  icon?: React.ReactNode
 }
 
 export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   title,
+  titleId,
   optionsMenuTriggerLabel,
   optionsMenuItems = [],
   columnWidth = COLUMN_WIDTH,
+  icon,
 }) => {
   return (
     <View background="secondary" as="div" width={columnWidth} data-testid="column-header">
@@ -48,10 +52,15 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         padding="none xx-small"
       >
         <Flex.Item size="80%">
-          <AccessibleContent alt={title}>
-            <Text weight="bold">
-              <TruncateWithTooltip>{title}</TruncateWithTooltip>
-            </Text>
+          <AccessibleContent alt={title} id={titleId}>
+            <Flex gap="xx-small" alignItems="center">
+              {icon && <Flex.Item>{icon}</Flex.Item>}
+              <Flex.Item shouldGrow={true} shouldShrink={true}>
+                <Text weight="bold">
+                  <TruncateWithTooltip>{title}</TruncateWithTooltip>
+                </Text>
+              </Flex.Item>
+            </Flex>
           </AccessibleContent>
         </Flex.Item>
         {optionsMenuItems.length > 0 && (

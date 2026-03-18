@@ -54,3 +54,4 @@ export {
   getTranslations,
   CONSTANTS,
 }
+export {trackPendoEvent} from './utils/trackPendoEvent'

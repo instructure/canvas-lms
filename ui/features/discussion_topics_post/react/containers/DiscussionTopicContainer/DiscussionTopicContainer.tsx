@@ -22,7 +22,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useCallback} from 'react'
+import {useContext, useState, useCallback, useMemo} from 'react'
 import {Discussion} from '../../../graphql/Discussion'
 import {Submission} from '../../../graphql/Submission'
 import {
@@ -50,6 +50,7 @@ import {SearchContext, isSpeedGraderInTopUrl} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 // @ts-expect-error TS7016 (typescriptify)
@@ -70,6 +71,11 @@ import {SummarizeButton} from './SummarizeButton'
 import {DiscussionInsightsButton} from './DiscussionInsightsButton'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentAssetProcessorEula from '@canvas/assignments/react/AssignmentAssetProcessorEula'
+import {DisplayRubricModal} from './DisplayRubricModal'
+import {
+  mapRubricUnderscoredKeysToCamelCase,
+  mapRubricAssociationUnderscoredKeysToCamelCase,
+} from '@canvas/rubrics/react/utils'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -87,6 +93,7 @@ export const DiscussionTopicContainer = ({
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
+  const [rubricModalOpen, setRubricModalOpen] = useState(false)
   const [lastMarkAllAction, setLastMarkAllAction] = useState('')
   const [summary, setSummary] = useState(null)
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false)
@@ -192,6 +199,25 @@ export const DiscussionTopicContainer = ({
     },
   })
 
+  const assignmentRubric = useMemo(
+    () =>
+      ENV.assigned_rubric
+        ? {
+            ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
+            association_count: ENV.assigned_rubric?.association_count,
+          }
+        : undefined,
+    [ENV.assigned_rubric],
+  )
+
+  const assignmentRubricAssociation = useMemo(
+    () =>
+      ENV.rubric_association
+        ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
+        : undefined,
+    [ENV.rubric_association],
+  )
+
   const onDelete = () => {
     const message = isAnnouncement
       ? I18n.t('Are you sure you want to delete this announcement?')
@@ -268,29 +294,6 @@ export const DiscussionTopicContainer = ({
 
   useEventHandler(KeyboardShortcuts.ON_OPEN_TOPIC_REPLY, onOpenTopicReply)
 
-  const handleSummarizeClick = async () => {
-    if (props.isSummaryEnabled) {
-      props.setIsSummaryEnabled(false)
-    } else {
-      if (summary) {
-        await postDiscussionSummaryFeedback('disable_summary')
-      }
-
-      try {
-        await doFetchApi({
-          method: 'PUT',
-          path: `${apiUrlPrefix}/summaries/disable`,
-        })
-      } catch (_error) {
-        setOnFailure(
-          I18n.t('There was an unexpected error while disabling the discussion summary.'),
-        )
-        return
-      }
-      props.setIsSummaryEnabled(true)
-    }
-  }
-
   const postDiscussionSummaryFeedback = useCallback(
     // @ts-expect-error TS7006 (typescriptify)
     async action => {
@@ -320,14 +323,6 @@ export const DiscussionTopicContainer = ({
     [apiUrlPrefix, summary, setOnFailure],
   )
 
-  const handleDisableSummaryClick = async () => {
-    if (summary) {
-      await postDiscussionSummaryFeedback('disable_summary')
-    }
-
-    await handleSummaryEnabled(false)
-  }
-
   const podcast_url =
     document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
     document.querySelector("link[type='application/rss+xml']")
@@ -345,6 +340,26 @@ export const DiscussionTopicContainer = ({
         {name: props.discussionTopic.title || '', url: ''},
       ]),
     )
+  }
+
+  const handleOnDisplayRubric = () => {
+    if (
+      !props.discussionTopic.permissions?.showRubric &&
+      !props.discussionTopic.permissions?.addRubric
+    ) {
+      return
+    }
+
+    if (ENV.enhanced_rubrics_enabled) {
+      setRubricModalOpen(true)
+      return
+    }
+
+    assignmentRubricDialog.initDialog()
+    assignmentRubricDialog.openDialog()
+
+    // @ts-expect-error TS7006 (typescriptify)
+    rubricEditing.init()
   }
 
   return (
@@ -430,6 +445,11 @@ export const DiscussionTopicContainer = ({
           />
           {/* @ts-expect-error TS2339 (typescriptify) */}
           <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />
+          {isSearch && (
+            <ScreenReaderContent>
+              <h1>{props.discussionTopic.title}</h1>
+            </ScreenReaderContent>
+          )}
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
@@ -543,17 +563,7 @@ export const DiscussionTopicContainer = ({
                                 }
                                 showRubric={props.discussionTopic.permissions?.showRubric}
                                 addRubric={props.discussionTopic.permissions?.addRubric}
-                                onDisplayRubric={
-                                  props.discussionTopic.permissions?.showRubric ||
-                                  props.discussionTopic.permissions?.addRubric
-                                    ? () => {
-                                        assignmentRubricDialog.initDialog()
-                                        assignmentRubricDialog.openDialog()
-                                        // @ts-expect-error TS2339 (typescriptify)
-                                        rubricEditing.init()
-                                      }
-                                    : null
-                                }
+                                onDisplayRubric={handleOnDisplayRubric}
                                 isPublished={props.discussionTopic.published}
                                 canUnpublish={props.discussionTopic.canUnpublish}
                                 isSubscribed={props.discussionTopic.subscribed}
@@ -770,7 +780,25 @@ export const DiscussionTopicContainer = ({
               setCopyToOpen(false)
             }}
           />
-          {props.discussionTopic.permissions?.addRubric && (
+          {ENV.enhanced_rubrics_enabled &&
+            ENV.ASSIGNMENT_ID &&
+            ENV.course_id &&
+            ENV.current_user_id && (
+              <DisplayRubricModal
+                aiRubricsEnabled={ENV.ai_rubrics_enabled ?? false}
+                assignmentId={ENV.ASSIGNMENT_ID.toString()}
+                assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
+                canManageRubrics={ENV.PERMISSIONS?.manage_rubrics ?? false}
+                courseId={ENV.course_id}
+                currentUserId={ENV.current_user_id}
+                isOpen={rubricModalOpen}
+                rubric={assignmentRubric}
+                rubricAssociation={assignmentRubricAssociation}
+                onClose={() => setRubricModalOpen(false)}
+              />
+            )}
+
+          {props.discussionTopic.permissions?.addRubric && !ENV.enhanced_rubrics_enabled && (
             /*
               HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it
             */

@@ -50,17 +50,21 @@ import {
   type MoveItemTrayResult,
   type NavigationTab,
 } from '../store/useTabListsStore'
-import {AddLinkModal} from './AddLinkModal'
+import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('course_navigation_settings')
 
 declare const ENV: EnvCommon & {
   COURSE_SETTINGS_NAVIGATION_TABS?: NavigationTab[]
+  PERMISSIONS?: {
+    manage_nav_menu_links?: boolean
+  }
 }
 
 /**
  * Navigation settings in Course Settings, where the teacher can reorder the
- * items ("tabs") which display in the Course Nav.
+ * items ("tabs") which display in the Course Nav, and add custom `NavMenuLink`s.
  */
 export default function CourseNavigationSettings({
   onSubmit,
@@ -178,7 +182,7 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
-        {ENV.FEATURES?.nav_menu_links && (
+        {ENV.FEATURES?.nav_menu_links && ENV.PERMISSIONS?.manage_nav_menu_links && (
           <View as="div" padding="medium 0 0 0">
             <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
               {I18n.t('Add a Link')}
@@ -259,14 +263,14 @@ const NavItem = React.memo(
             {tab.immovable ? <span>&nbsp;</span> : <IconDragHandleLine size="x-small" />}
           </View>
           <View as="div" display="inline-block" padding="small 0" margin="0 auto 0 0">
-            <Flex alignItems="center" gap="x-small">
+            <Flex alignItems="center" gap="x-small" wrap="wrap" width="100%">
               {isLinkTab(tab) && (
                 <Flex.Item>
                   <IconLinkLine size="x-small" />
                 </Flex.Item>
               )}
-              <Flex.Item>
-                <Text>{tab.label}</Text>
+              <Flex.Item shouldGrow shouldShrink size="0">
+                <Text wrap="break-word">{tab.label}</Text>
               </Flex.Item>
             </Flex>
             {!isEnabled && tab.disabled_message && (
@@ -287,16 +291,13 @@ const NavItem = React.memo(
                   withBorder={false}
                   onKeyDown={e => {
                     if (e.key === ' ') {
-                      // make space work to open menu
+                      // make space work to open menu (otherwise it initiates a move)
                       e.stopPropagation()
                     }
                   }}
-                >
-                  <IconMoreSolid />
-                </IconButton>
+                  renderIcon={IconMoreSolid}
+                />
               }
-              placement="bottom"
-              shouldHideOnSelect={true}
             >
               <Menu.Item
                 data-pendo="navigation-menu-disable-enable"
@@ -322,10 +323,11 @@ const NavItem = React.memo(
                   <Flex.Item>{I18n.t('Move')}</Flex.Item>
                 </Flex>
               </Menu.Item>
-              {isLinkTab(tab) && (
+              {isLinkTab(tab) && ENV.PERMISSIONS?.manage_nav_menu_links && (
                 <Menu.Item
                   data-pendo="navigation-menu-delete"
                   onClick={() => onDelete(tab.internalId)}
+                  disabled={tab.link_context_type === 'account'}
                   type="button"
                 >
                   <Flex>

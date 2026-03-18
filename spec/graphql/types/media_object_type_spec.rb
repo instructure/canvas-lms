@@ -79,6 +79,21 @@ describe Types::MediaObjectType do
       expect(resolve_media_object_field("mediaTracks { content }")).to eq([])
     end
 
+    it "returns workflow_state for media tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      expect(resolve_media_object_field("mediaTracks { workflowState }")).to eq(["ready"])
+    end
+
+    it "returns asr false for regular media tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      expect(resolve_media_object_field("mediaTracks { asr }")).to eq([false])
+    end
+
+    it "returns asr true for ASR media tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah", external_id: "ext123")
+      expect(resolve_media_object_field("mediaTracks { asr }")).to eq([true])
+    end
+
     it "returns nil when presented with an unrecognized media type" do
       @media_object.media_type = "fakemediatype"
       @media_object.save!
@@ -106,9 +121,9 @@ describe Types::MediaObjectType do
     end
 
     it "returns media download url" do
-      mock_request = double("request",
-                            host_with_port: "test.example.com",
-                            protocol: "https://")
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: "test.example.com",
+                                     protocol: "https://")
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to include("/download?download_frd=1")
@@ -119,9 +134,9 @@ describe Types::MediaObjectType do
       @media_object.attachment = nil
       @media_object.save!
 
-      mock_request = double("request",
-                            host_with_port: "test.example.com",
-                            protocol: "https://")
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: "test.example.com",
+                                     protocol: "https://")
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to be_nil
@@ -132,18 +147,18 @@ describe Types::MediaObjectType do
     end
 
     it "returns nil for media download url if request is defined but host_with_port is missing" do
-      mock_request = double("request",
-                            host_with_port: nil,
-                            protocol: "https://")
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: nil,
+                                     protocol: "https://")
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to be_nil
     end
 
     it "returns nil for media download url if request is defined but protocol is missing" do
-      mock_request = double("request",
-                            host_with_port: "test.example.com",
-                            protocol: nil)
+      mock_request = instance_double(ActionDispatch::Request,
+                                     host_with_port: "test.example.com",
+                                     protocol: nil)
       media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
 
       expect(media_download_url).to be_nil

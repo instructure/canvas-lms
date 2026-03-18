@@ -115,10 +115,10 @@ describe "gradebook - logged in as a student" do
       end
 
       context "with one past and one current period" do
-        past_period_name = "Past Grading Period"
-        current_period_name = "Current Grading Period"
-        past_assignment_name = "Past Assignment"
-        current_assignment_name = "Current Assignment"
+        let(:past_period_name) { "Past Grading Period" }
+        let(:current_period_name) { "Current Grading Period" }
+        let(:past_assignment_name) { "Past Assignment" }
+        let(:current_assignment_name) { "Current Assignment" }
 
         before do
           # create term

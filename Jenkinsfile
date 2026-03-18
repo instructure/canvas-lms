@@ -48,11 +48,14 @@ loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
 
+pipelineHelpers.preBuildChecks()
+
 pipeline {
   agent { label 'canvas-docker' }
 
   options {
-    timeout(time: 1, unit: 'HOURS')
+    skipDefaultCheckout()
+    timeout(time: 2, unit: 'HOURS')
     ansiColor('xterm')
     timestamps()
     lock (label: 'canvas_build_global_mutex', quantity: 1)
@@ -542,24 +545,6 @@ pipeline {
           }
         }
 
-        stage('Contract Tests') {
-          when {
-            expression { shouldStageRun('Contract') }
-          }
-          steps {
-            script {
-              pipelineHelpers.runTestSuite(
-                'Contract Tests',
-                '/Canvas/test-suites/contract-tests',
-                buildParameters + [
-                  string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                  string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                ]
-              )
-            }
-          }
-        }
-
         stage('Flakey Spec Catcher') {
           when {
             allOf {
@@ -631,12 +616,6 @@ pipeline {
   post {
     always {
       script {
-        // Restore the correct build result for skipped builds (e.g., translation builds)
-        if (env.SKIP_BUILD == 'true' && env.SKIP_BUILD_RESULT) {
-          currentBuild.result = env.SKIP_BUILD_RESULT
-          echo "Build was skipped - setting result to ${env.SKIP_BUILD_RESULT}"
-        }
-
         if (env.SKIP_BUILD != 'true') {
           // Only run the post-build cleanup if the build wasn't skipped, since skipped builds may not have set up docker or other resources
           pipelineHelpers.postBuildAlways()

@@ -1226,7 +1226,7 @@ describe "Api::V1::Assignment" do
       it "does not transition to another state" do
         expect do
           api.update_api_assignment(assignment, assignment_update_params, user)
-        end.to_not change { assignment.workflow_state }
+        end.not_to change { assignment.workflow_state }
       end
     end
 
@@ -1516,7 +1516,7 @@ describe "Api::V1::Assignment" do
 
           json = api.assignment_json(assignment, user, session, opts)
           expect(json).to be_a(Hash)
-          expect(json).to_not have_key "migrated_urls_content_migration_id"
+          expect(json).not_to have_key "migrated_urls_content_migration_id"
         end
       end
 
@@ -1531,7 +1531,7 @@ describe "Api::V1::Assignment" do
 
           json = api.assignment_json(assignment, user, session, opts)
           expect(json).to be_a(Hash)
-          expect(json).to_not have_key "migrated_urls_content_migration_id"
+          expect(json).not_to have_key "migrated_urls_content_migration_id"
         end
       end
     end
@@ -1942,12 +1942,14 @@ describe "Api::V1::Assignment" do
 
         result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
 
-        expect(result).to be_a(PeerReviewSubAssignment)
-        expect(result).to be_persisted
+        expect(result).to be_a(Hash)
+        peer_review_sub = result[:peer_review_sub_assignment]
+        expect(peer_review_sub).to be_a(PeerReviewSubAssignment)
+        expect(peer_review_sub).to be_persisted
         expect(parent_assignment.assignment_overrides.count).to eq(1)
-        expect(result.assignment_overrides.count).to eq(1)
+        expect(peer_review_sub.assignment_overrides.count).to eq(1)
 
-        peer_review_override = result.assignment_overrides.first
+        peer_review_override = peer_review_sub.assignment_overrides.first
         expect(peer_review_override.set_type).to eq("CourseSection")
         expect(peer_review_override.set_id).to eq(section.id)
         expect(peer_review_override.parent_override_id).to eq(parent_assignment.assignment_overrides.first.id)
@@ -1977,10 +1979,12 @@ describe "Api::V1::Assignment" do
 
         result = api.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
 
-        expect(result).to be_persisted
-        expect(result.assignment_overrides.count).to eq(1)
+        expect(result).to be_a(Hash)
+        peer_review_sub = result[:peer_review_sub_assignment]
+        expect(peer_review_sub).to be_persisted
+        expect(peer_review_sub.assignment_overrides.count).to eq(1)
 
-        peer_review_override = result.assignment_overrides.first
+        peer_review_override = peer_review_sub.assignment_overrides.first
         expect(peer_review_override.set_type).to eq("ADHOC")
         expect(peer_review_override.assignment_override_students.count).to eq(2)
         expect(peer_review_override.parent_override_id).to eq(parent_override.id)
@@ -2034,11 +2038,13 @@ describe "Api::V1::Assignment" do
 
         result = api.send(:update_api_peer_review_sub_assignment, parent_assignment, params)
 
-        expect(result).to be_a(PeerReviewSubAssignment)
-        expect(result).to be_persisted
-        expect(result.assignment_overrides.count).to eq(1)
+        expect(result).to be_a(Hash)
+        peer_review_sub = result[:peer_review_sub_assignment]
+        expect(peer_review_sub).to be_a(PeerReviewSubAssignment)
+        expect(peer_review_sub).to be_persisted
+        expect(peer_review_sub.assignment_overrides.count).to eq(1)
 
-        peer_review_override = result.assignment_overrides.first
+        peer_review_override = peer_review_sub.assignment_overrides.first
         expect(peer_review_override.set_type).to eq("CourseSection")
         expect(peer_review_override.set_id).to eq(section.id)
         expect(peer_review_override.parent_override_id).to eq(parent_assignment.assignment_overrides.first.id)

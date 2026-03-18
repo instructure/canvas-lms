@@ -38,12 +38,12 @@ describe Lti::DataServicesController do
   end
 
   def service_response(sub)
-    double(body: sub.merge(Id: "testid"), code: 200)
+    instance_double(HTTParty::Response, body: sub.merge(Id: "testid"), code: 200)
   end
 
   before do
     allow(CanvasSecurity::ServicesJwt).to receive_messages(encryption_secret: "setecastronomy92" * 2, signing_secret: "donttell" * 10)
-    allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
+    allow(HTTParty).to receive(:send).and_return(instance_double(HTTParty::Response, body: subscription, code: 200))
     allow(DynamicSettings).to receive(:find).and_call_original
     allow(DynamicSettings).to receive(:find)
       .with("live-events-subscription-service", default_ttl: 5.minutes)

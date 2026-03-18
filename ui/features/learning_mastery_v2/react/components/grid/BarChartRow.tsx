@@ -18,7 +18,8 @@
 
 import React, {useCallback} from 'react'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {colors} from '@instructure/canvas-theme'
+import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {
   BAR_CHART_HEIGHT,
   STUDENT_COLUMN_RIGHT_PADDING,
@@ -36,6 +37,8 @@ import {MasteryDistributionChartCell} from '../charts/MasteryDistributionChartCe
 export interface BarChartRowProps {
   columns: Column[]
   outcomeDistributions?: Record<string, OutcomeDistribution>
+  distributionStudents?: Student[]
+  courseId: string
   isLoading?: boolean
   handleKeyDown: (event: React.KeyboardEvent, rowIndex: number, colIndex: number) => void
   isMobile?: boolean
@@ -44,6 +47,8 @@ export interface BarChartRowProps {
 export const BarChartRow: React.FC<BarChartRowProps> = ({
   columns,
   outcomeDistributions,
+  distributionStudents,
+  courseId,
   isLoading = false,
   handleKeyDown,
   isMobile,
@@ -65,6 +70,20 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
     [outcomeDistributions],
   )
 
+  const getAlignmentDistributionAsOutcome = useCallback(
+    (outcomeId: string | number, alignmentId: string): OutcomeDistribution | undefined => {
+      const alignmentDist =
+        outcomeDistributions?.[outcomeId.toString()]?.alignment_distributions?.[alignmentId]
+      if (!alignmentDist) return undefined
+      return {
+        outcome_id: outcomeId.toString(),
+        ratings: alignmentDist.ratings,
+        total_students: alignmentDist.total_students,
+      }
+    },
+    [outcomeDistributions],
+  )
+
   return (
     <Row>
       {columns.map((column, columnIndex) => {
@@ -79,6 +98,8 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
+              boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
+              shadow="above"
             />
           )
         } else if (column.key.startsWith('outcome-')) {
@@ -90,11 +111,16 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
+              boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
+              shadow="above"
             >
               <MasteryDistributionChartCell
                 key={`outcomes-chart-${outcome.id}`}
                 outcome={outcome}
                 distributionData={getDistributionForOutcome(outcome.id)}
+                outcomeDistribution={outcomeDistributions?.[outcome.id.toString()]}
+                distributionStudents={distributionStudents}
+                courseId={courseId}
                 isLoading={isLoading}
                 loadingTitle="Loading mastery distribution"
               />
@@ -110,11 +136,19 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
+              boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
+              shadow="above"
             >
               <MasteryDistributionChartCell
                 key={`alignment-chart-${alignment.alignment_id}`}
                 outcome={outcome}
                 distributionData={getDistributionForAlignment(outcome.id, alignment.alignment_id)}
+                outcomeDistribution={getAlignmentDistributionAsOutcome(
+                  outcome.id,
+                  alignment.alignment_id,
+                )}
+                distributionStudents={distributionStudents}
+                courseId={courseId}
                 isLoading={isLoading}
                 loadingTitle="Loading alignment distribution"
               />

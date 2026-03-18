@@ -57,16 +57,17 @@
 #           "example": "Students",
 #           "type": "string"
 #         },
-#         "icon_url": {
-#           "description": "URL to an icon image for this provider button",
-#           "example": "https://example.com/icons/students.svg",
-#           "type": "string"
+#         "icon": {
+#           "description": "Icon key for this provider button",
+#           "example": "google",
+#           "type": "string",
+#           "enum": ["apple", "auth0", "classlink", "default", "facebook", "github", "google", "linkedin", "microsoft", "okta", "onelogin", "ping"]
 #         }
 #       }
 #     }
 
 class DiscoveryPagesApiController < ApplicationController
-  before_action :require_user, :load_context, :require_root_account_management
+  before_action :load_context, :require_root_account_management
 
   # @API Get Discovery Page
   # Get the discovery page configuration for the domain root account.
@@ -84,7 +85,7 @@ class DiscoveryPagesApiController < ApplicationController
   #         {
   #           "authentication_provider_id": 1,
   #           "label": "Students",
-  #           "icon_url": "https://example.com/icons/students.svg"
+  #           "icon": "google"
   #         }
   #       ],
   #       "secondary": [
@@ -111,8 +112,8 @@ class DiscoveryPagesApiController < ApplicationController
   # @argument discovery_page[primary][][label] [Required, String]
   #   The display label for this authentication provider button.
   #
-  # @argument discovery_page[primary][][icon_url] [String]
-  #   URL to an icon image for this authentication provider button.
+  # @argument discovery_page[primary][][icon] [String]
+  #   Icon key for this authentication provider button.
   #
   # @argument discovery_page[secondary][][authentication_provider_id] [Required, Integer]
   #   The ID of an active authentication provider for this account.
@@ -120,8 +121,8 @@ class DiscoveryPagesApiController < ApplicationController
   # @argument discovery_page[secondary][][label] [Required, String]
   #   The display label for this authentication provider button.
   #
-  # @argument discovery_page[secondary][][icon_url] [String]
-  #   URL to an icon image for this authentication provider button.
+  # @argument discovery_page[secondary][][icon] [String]
+  #   Icon key for this authentication provider button.
   #
   # @argument discovery_page[active] [Boolean]
   #   Whether the discovery page is enabled. Defaults to false if not provided.
@@ -138,12 +139,12 @@ class DiscoveryPagesApiController < ApplicationController
   #           {
   #             "authentication_provider_id": 1,
   #             "label": "Students",
-  #             "icon_url": "https://example.com/icons/students.svg"
+  #             "icon": "google"
   #           },
   #           {
   #             "authentication_provider_id": 2,
   #             "label": "Faculty",
-  #             "icon_url": "https://example.com/icons/faculty.svg"
+  #             "icon": "okta"
   #           }
   #         ],
   #         "secondary": [
@@ -163,12 +164,12 @@ class DiscoveryPagesApiController < ApplicationController
   #         {
   #           "authentication_provider_id": 1,
   #           "label": "Students",
-  #           "icon_url": "https://example.com/icons/students.svg"
+  #           "icon": "google"
   #         },
   #         {
   #           "authentication_provider_id": 2,
   #           "label": "Faculty",
-  #           "icon_url": "https://example.com/icons/faculty.svg"
+  #           "icon": "okta"
   #         }
   #       ],
   #       "secondary": [
@@ -181,10 +182,63 @@ class DiscoveryPagesApiController < ApplicationController
   #     }
   #   }
   def upsert
-    @domain_root_account.settings[:discovery_page] = upsert_params
+    @domain_root_account.settings[:discovery_page] = discovery_page_params
     @domain_root_account.save!
 
     render json: { discovery_page: }
+  end
+
+  # @API Generate Discovery Page Preview Token
+  # Returns a short-lived RS256-signed JWT containing the discovery page
+  # button link configuration, suitable for sending to the identity service
+  # preview iframe via postMessage.
+  #
+  # A discovery_page configuration must be provided in the request body.
+  # Omitting it returns a 400 Bad Request.
+  #
+  # @argument discovery_page[primary][][authentication_provider_id] [Required, Integer]
+  #   The ID of an active authentication provider for this account.
+  #
+  # @argument discovery_page[primary][][label] [String]
+  #   The display label for this authentication provider button.
+  #
+  # @argument discovery_page[primary][][icon] [String]
+  #   Icon key for this authentication provider button.
+  #
+  # @argument discovery_page[secondary][][authentication_provider_id] [Integer]
+  #   The ID of an active authentication provider for this account.
+  #
+  # @argument discovery_page[secondary][][label] [String]
+  #   The display label for this authentication provider button.
+  #
+  # @argument discovery_page[secondary][][icon] [String]
+  #   Icon key for this authentication provider button.
+  #
+  # @returns { "token": "eyJ..." }
+  #
+  # @example_request
+  #   curl -X POST 'https://<canvas>/api/v1/discovery_pages/token' \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -H 'Content-Type: application/json' \
+  #     -d '{
+  #       "discovery_page": {
+  #         "primary": [
+  #           {
+  #             "authentication_provider_id": 1,
+  #             "label": "Students",
+  #             "icon": "google"
+  #           }
+  #         ],
+  #         "secondary": []
+  #       }
+  #     }'
+  def token
+    config = discovery_page_params
+    now = Time.now.utc.to_i
+    claims = @domain_root_account.discovery_page_claims_for(@current_user, config)
+
+    payload = claims.merge(iat: now, exp: now + 30, scope: "discovery.preview")
+    render json: { token: CanvasSecurity::ServicesJwt.generate(payload, base64: false, encrypt: false) }
   end
 
   private
@@ -206,14 +260,16 @@ class DiscoveryPagesApiController < ApplicationController
     authorized_action(context, @current_user, :manage_account_settings)
   end
 
-  def upsert_params
-    permitted_keys = Validators::AccountSettingsValidator::DISCOVERY_PAGE_REQUIRED_KEYS +
-                     Validators::AccountSettingsValidator::DISCOVERY_PAGE_OPTIONAL_KEYS
+  def discovery_page_permitted_keys
+    Validators::AccountSettingsValidator::DISCOVERY_PAGE_REQUIRED_KEYS +
+      Validators::AccountSettingsValidator::DISCOVERY_PAGE_OPTIONAL_KEYS
+  end
 
+  def discovery_page_params
     params.expect(
       discovery_page: [
-        { primary: [permitted_keys] },
-        { secondary: [permitted_keys] },
+        { primary: [discovery_page_permitted_keys] },
+        { secondary: [discovery_page_permitted_keys] },
         :active
       ]
     ).to_h.deep_symbolize_keys.tap do |expected_params|

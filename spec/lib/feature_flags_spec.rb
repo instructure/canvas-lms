@@ -98,8 +98,8 @@ describe FeatureFlags do
     end
 
     it "returns nil if the visible_on returns false" do
-      feature = double(
-        "Feature double",
+      feature = instance_double(
+        Feature,
         feature: "some_feature",
         visible_on: ->(_) { false },
         state: "allowed",
@@ -337,7 +337,7 @@ describe FeatureFlags do
 
         @shard1.activate do
           flag = @other_course.lookup_feature_flag("course_feature")
-          expect(flag).to_not be_default
+          expect(flag).not_to be_default
           expect(@other_course.feature_enabled?("course_feature")).to be_truthy
         end
       end
@@ -349,7 +349,7 @@ describe FeatureFlags do
           account = Account.create!
           @other_course = account.courses.create!
           flag = @other_course.lookup_feature_flag("course_feature")
-          expect(flag).to_not be_default
+          expect(flag).not_to be_default
           expect(@other_course.feature_enabled?("course_feature")).to be_truthy
         end
       end

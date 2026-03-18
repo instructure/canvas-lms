@@ -23,7 +23,7 @@ require "oauth/client/action_controller_request"
 require "nokogiri"
 
 class LtiApiController < ApplicationController
-  skip_before_action :load_user
+  skip_before_action :load_user, :require_user
   skip_before_action :verify_authenticity_token
 
   # these exceptions will happen on bad external requests,

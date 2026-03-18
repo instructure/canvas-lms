@@ -79,6 +79,7 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
     error,
     refetch,
     resetPagination,
+    updateItemOverride,
   } = usePlannerItems({
     perPage: 5,
     startDate: dateRange.startDate,
@@ -167,7 +168,7 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
             <List isUnstyled margin="0">
               {currentPage.map(item => (
                 <List.Item key={`${item.plannable_type}-${item.plannable_id}`} margin="0">
-                  <TodoItem item={item} />
+                  <TodoItem item={item} onItemUpdate={updateItemOverride} />
                 </List.Item>
               ))}
             </List>

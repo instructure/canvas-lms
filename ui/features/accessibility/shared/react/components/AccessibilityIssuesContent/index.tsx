@@ -22,19 +22,16 @@ import {useShallow} from 'zustand/react/shallow'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {canvasThemeLocal} from '@instructure/ui-themes'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Heading} from '@instructure/ui-heading'
-import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import {Tray} from '@instructure/ui-tray'
 import {FormFieldMessage} from '@instructure/ui-form-field'
-import {IconExternalLinkLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {useNextResource} from '../../hooks/useNextResource'
-import {useAccessibilityCheckerContext} from '../../hooks/useAccessibilityCheckerContext'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 import {
   useAccessibilityScansStore,
@@ -57,15 +54,13 @@ import {PreviewHandle} from './Preview'
 import SuccessView from './SuccessView'
 import CloseRemediationView from './CloseRemediationView'
 import WhyMattersPopover from './WhyMattersPopover'
-import {ProblemArea} from './ProblemArea/ProblemArea'
 import {useA11yTracking} from '../../hooks/useA11yTracking'
+import UnsavedChangesModal from './UnsavedChangesModal'
+import {WizardHeader} from './WizardHeader/WizardHeader'
+import {WizardErrorBoundary} from './WizardErrorBoundary/WizardErrorBoundary'
+import {ProblemAreaAndIssueDescriptionSection} from './ProblemAreaAndIssueDescriptionSection'
 
 const I18n = createI18nScope('accessibility_checker')
-
-interface AccessibilityIssuesDrawerContentProps {
-  item: AccessibilityResourceScan
-  onClose: () => void
-}
 
 function renderSpinner() {
   return (
@@ -77,36 +72,73 @@ function renderSpinner() {
   )
 }
 
-const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps> = ({
-  item,
-  onClose,
-}: AccessibilityIssuesDrawerContentProps) => {
+export const AccessibilityWizard = () => {
+  const [
+    accessibilityScans,
+    nextResource,
+    filters,
+    isCloseIssuesEnabled,
+    issuesSummary,
+    isGA2FeaturesEnabled,
+    selectedScan,
+    setSelectedScan,
+    selectedIssue,
+    selectedIssueIndex,
+    setSelectedIssue,
+    isTrayOpen,
+    setIsTrayOpen,
+  ] = useAccessibilityScansStore(
+    useShallow(state => [
+      state.accessibilityScans,
+      state.nextResource,
+      state.filters,
+      state.isCloseIssuesEnabled,
+      state.issuesSummary,
+      state.isGA2FeaturesEnabled,
+      state.selectedScan,
+      state.setSelectedScan,
+      state.selectedIssue,
+      state.selectedIssueIndex,
+      state.setSelectedIssue,
+      state.isTrayOpen,
+      state.setIsTrayOpen,
+    ]),
+  )
+
+  // All other state hooks
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
-  const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
   const [isRemediated, setIsRemediated] = useState<boolean>(false)
+  const [isResourceStale, setIsResourceStale] = useState<boolean>(false)
+  const handleStaleConflict = useCallback(() => setIsResourceStale(true), [])
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
   const [isGenerateLoading, setIsGenerateLoading] = useState<boolean>(false)
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>()
   const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
-  const [issues, setIssues] = useState<AccessibilityIssue[]>(item.issues || [])
+  const issues = selectedScan?.issues || []
   const [allIssuesSkipped, setAllIssuesSkipped] = useState<boolean>(false)
+  const [pendingModalAction, setPendingModalAction] = useState<(() => void) | null>(null)
   const previousActiveRef = useRef<number | undefined>()
 
-  const {setSelectedItem} = useAccessibilityCheckerContext()
   const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
   const {trackA11yIssueEvent, trackA11yEvent} = useA11yTracking()
 
-  const [accessibilityScans, nextResource, filters, isCloseIssuesEnabled, issuesSummary] =
-    useAccessibilityScansStore(
-      useShallow(state => [
-        state.accessibilityScans,
-        state.nextResource,
-        state.filters,
-        state.isCloseIssuesEnabled,
-        state.issuesSummary,
-      ]),
-    )
+  // Helper to wrap actions with unsaved changes check
+  const useModalCheck = (action: () => void) =>
+    useCallback(() => {
+      if (isGA2FeaturesEnabled && isRemediated) {
+        setPendingModalAction(() => action)
+      } else {
+        action()
+      }
+    }, [action, isGA2FeaturesEnabled, isRemediated])
+
+  const onClose = useCallback(() => {
+    setSelectedScan(null)
+    setIsTrayOpen(false)
+  }, [setSelectedScan, setIsTrayOpen])
+
+  const onDismiss = useModalCheck(onClose)
 
   const [setAccessibilityScans, setNextResource] = useAccessibilityScansStore(
     useShallow(state => [state.setAccessibilityScans, state.setNextResource]),
@@ -118,13 +150,6 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
   const formRef: Ref<FormHandle> = useRef<FormHandle>(null)
   const regionRef = useRef<HTMLDivElement | null>(null)
-
-  const {currentIssue} = useMemo(
-    () => ({
-      currentIssue: issues.find((_, idx) => idx === currentIssueIndex),
-    }),
-    [currentIssueIndex, issues],
-  )
 
   // This debounces the preview update to prevent excessive API calls when the user is typing.
   const updatePreview = useDebouncedCallback((formValue: FormValue) => {
@@ -144,40 +169,49 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     )
   }, 1000)
 
-  const handleSkip = useCallback(() => {
-    if (currentIssue) {
-      trackA11yIssueEvent('IssueSkipped', item.resourceType, currentIssue.ruleId)
+  // Executor functions (without unsaved check)
+  const executeSkip = useCallback(() => {
+    if (selectedIssue && selectedScan) {
+      trackA11yIssueEvent('IssueSkipped', selectedScan.resourceType, selectedIssue.ruleId)
     }
 
-    if (isCloseIssuesEnabled && currentIssueIndex === issues.length - 1) {
+    if (isCloseIssuesEnabled && selectedIssueIndex === issues.length - 1) {
       setAllIssuesSkipped(true)
     } else {
-      setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
+      setSelectedIssue(issues[Math.min(selectedIssueIndex + 1, issues.length - 1)])
     }
+    setIsRemediated(false)
   }, [
     isCloseIssuesEnabled,
-    currentIssueIndex,
+    selectedIssueIndex,
     issues.length,
-    currentIssue,
-    item.resourceType,
+    selectedIssue,
+    selectedScan,
     trackA11yIssueEvent,
   ])
 
-  const handlePrevious = useCallback(() => {
-    setCurrentIssueIndex(prev => Math.max(prev - 1, 0))
-  }, [])
+  const executeBack = useCallback(() => {
+    setSelectedIssue(issues[Math.max(selectedIssueIndex - 1, 0)])
+    setIsRemediated(false)
+  }, [selectedIssueIndex, issues])
 
-  const handleBackToStart = useCallback(() => {
+  const executeBackToStart = useCallback(() => {
     setAllIssuesSkipped(false)
-    setCurrentIssueIndex(0)
-  }, [])
+    setSelectedIssue(issues[0])
+    setIsRemediated(false)
+  }, [issues])
+
+  const handleSkip = useModalCheck(executeSkip)
+  const handlePrevious = useModalCheck(executeBack)
+  const handleBackToStart = useModalCheck(executeBackToStart)
 
   const handleNextResource = useCallback(() => {
     if (!nextResource) return
     const nextItem = nextResource.item
     if (!nextItem) return
 
-    setSelectedItem(nextItem)
+    setSelectedScan(nextItem)
+    setAllIssuesSkipped(false)
 
     if (accessibilityScans) {
       const newNextResource = getNextResource(accessibilityScans, nextItem)
@@ -185,7 +219,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setNextResource(newNextResource)
       }
     }
-  }, [accessibilityScans, nextResource, setSelectedItem, setNextResource, getNextResource])
+  }, [accessibilityScans, nextResource, setSelectedScan, setNextResource, getNextResource])
 
   const handlePreviewApply = useCallback(() => {
     if (formError) {
@@ -253,8 +287,9 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const updateAccessibilityIssues = useCallback(
     (updatedIssues: AccessibilityIssue[]) => {
       if (!accessibilityScans) return
+      if (!selectedScan) return
 
-      const target = findById(accessibilityScans, item.id)
+      const target = findById(accessibilityScans, selectedScan.id)
 
       if (!target) return
 
@@ -266,49 +301,22 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
 
       setAccessibilityScans(updated)
     },
-    [accessibilityScans, item.id, setAccessibilityScans],
+    [accessibilityScans, selectedScan, setAccessibilityScans],
   )
 
-  const handleSaveAndNext = useCallback(async () => {
-    if (!currentIssue) return
-
-    trackA11yIssueEvent('IssueFixed', item.resourceType, currentIssue.ruleId)
+  const handleRescan = useCallback(async () => {
+    if (!selectedScan) return
 
     try {
-      const formValue = formRef.current?.getValue()
-
       setIsRequestInFlight(true)
 
-      await doFetchApi({
-        path: getCourseBasedPath(`/accessibility_issues/${currentIssue.id}`),
-        method: 'PATCH',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          workflow_state: IssueWorkflowState.Resolved,
-          value: formValue,
-        }),
-      })
-
-      setTimeout(() => {
-        setAssertiveAlertMessage(I18n.t('Issue fix applied successfully'))
-      }, 1500)
-
       const newScanResponse = await doFetchApi({
-        path: getResourceScanPath(item),
+        path: getResourceScanPath(selectedScan),
         method: 'POST',
       })
 
       const newScan = convertKeysToCamelCase(newScanResponse.json!) as AccessibilityResourceScan
       const newScanIssues = newScan.issues ?? []
-      const hadIssuesBefore = issues.length > 0
-
-      setIssues(newScanIssues)
-
-      if (hadIssuesBefore && newScanIssues.length === 0) {
-        const courseId = window.ENV.current_context?.id
-
-        trackA11yEvent('ResourceRemediated', {resourceId: item.resourceId, courseId})
-      }
 
       if (accessibilityScans) {
         const updatedOrderedTableData = updateCountPropertyForItem(accessibilityScans, newScan)
@@ -323,73 +331,144 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
           }
         }
       }
+
       updateAccessibilityIssues(newScanIssues)
-      setCurrentIssueIndex(prev => Math.min(prev, Math.max(0, newScanIssues.length - 1)))
+      setSelectedScan(newScan)
+      setSelectedIssue(
+        newScanIssues[Math.min(selectedIssueIndex, Math.max(0, newScanIssues.length - 1))],
+      )
       doFetchAccessibilityIssuesSummary({filters})
+      return newScan
     } catch (err: any) {
-      console.error('Error saving accessibility issue. Error is: ' + err.message)
+      console.error('Error rescanning resource. Error is: ' + err.message)
     } finally {
       setIsRequestInFlight(false)
     }
   }, [
-    item,
-    formRef,
-    currentIssue,
-    updateAccessibilityIssues,
+    selectedScan,
     accessibilityScans,
     nextResource,
+    selectedIssueIndex,
+    updateAccessibilityIssues,
+    updateCountPropertyForItem,
     getAccessibilityIssuesByItem,
     setAccessibilityScans,
     setNextResource,
-    updateCountPropertyForItem,
+    setSelectedScan,
+    setSelectedIssue,
     doFetchAccessibilityIssuesSummary,
     filters,
-    trackA11yIssueEvent,
-    trackA11yEvent,
   ])
 
-  const handleApplyAndSaveAndNext = useCallback(() => {
+  const handleSaveAndNext = useCallback(
+    async (formValue: any) => {
+      if (!selectedIssue) return
+      if (!selectedScan) return
+
+      trackA11yIssueEvent('IssueFixed', selectedScan.resourceType, selectedIssue.ruleId)
+
+      try {
+        setIsRequestInFlight(true)
+
+        await doFetchApi({
+          path: getCourseBasedPath(`/accessibility_issues/${selectedIssue.id}`),
+          method: 'PATCH',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            workflow_state: IssueWorkflowState.Resolved,
+            value: formValue,
+          }),
+        })
+
+        setTimeout(() => {
+          setAssertiveAlertMessage(I18n.t('Issue fix applied successfully'))
+        }, 1500)
+
+        const hadIssuesBefore = issues.length > 0
+        const newScan = await handleRescan()
+        const newScanIssues = newScan?.issues ?? []
+
+        if (hadIssuesBefore && newScanIssues.length === 0) {
+          trackA11yEvent('ResourceRemediated', {
+            resourceId: selectedScan.resourceId,
+            courseId: window.ENV.current_context?.id,
+          })
+        }
+      } catch (err: any) {
+        console.error('Error saving accessibility issue. Error is: ' + err.message)
+      } finally {
+        setIsRequestInFlight(false)
+      }
+    },
+    [selectedScan, selectedIssue, issues, handleRescan, trackA11yIssueEvent, trackA11yEvent],
+  )
+
+  const handleApplyAndSaveAndNext = useCallback(async () => {
     setIsFormLocked(true)
     const formValue = formRef.current?.getValue()
-    previewRef.current?.update(
-      formValue,
-      () => {
-        setFormError(null)
-        setIsRemediated(true)
-        setIsFormLocked(false)
-        handleSaveAndNext()
-      },
-      error => {
-        if (error) {
-          setFormError(error)
-          setAssertiveAlertMessage(error)
-        }
-        setIsRemediated(false)
-        setIsFormLocked(false)
 
-        // Focus after state updates to ensure form is enabled
-        if (error) {
-          setTimeout(() => {
-            formRef.current?.focus()
-          }, 150)
-        }
-      },
-    )
+    return new Promise<void>((resolve, reject) => {
+      previewRef.current?.update(
+        formValue,
+        async () => {
+          setFormError(null)
+          setIsRemediated(true)
+          setIsFormLocked(false)
+          await handleSaveAndNext(formValue)
+          resolve()
+        },
+        error => {
+          if (error) {
+            setFormError(error)
+            setAssertiveAlertMessage(error)
+          }
+          setIsRemediated(false)
+          setIsFormLocked(false)
+
+          // Focus after state updates to ensure form is enabled
+          if (error) {
+            setTimeout(() => {
+              formRef.current?.focus()
+            }, 150)
+          }
+          reject(error)
+        },
+      )
+    })
   }, [handleSaveAndNext, formRef, previewRef])
+
+  const handleModalConfirm = useCallback(async () => {
+    setPendingModalAction(null) // Close modal
+
+    if (pendingModalAction) {
+      await handleApplyAndSaveAndNext()
+
+      pendingModalAction()
+    }
+  }, [pendingModalAction, handleApplyAndSaveAndNext])
+
+  const handleModalCancel = useCallback(() => {
+    setPendingModalAction(null) // Close modal
+    pendingModalAction?.() // Execute without saving
+  }, [pendingModalAction])
+
+  const handleModalClose = useCallback(() => {
+    setPendingModalAction(null) // Just close, no execution
+  }, [])
 
   const applyButtonText = useMemo(() => {
     const defaultApplyText = I18n.t('Apply')
 
-    if (!currentIssue) {
+    if (!selectedIssue) {
       return null
     }
 
-    if (currentIssue.form.type === FormType.Button) {
-      return currentIssue.form.label || defaultApplyText
+    if (selectedIssue.form.type === FormType.Button) {
+      return selectedIssue.form.label || defaultApplyText
     }
 
-    return currentIssue.form.action || defaultApplyText
-  }, [currentIssue])
+    return selectedIssue.form.action || defaultApplyText
+  }, [selectedIssue])
 
   const handleClearError = useCallback(() => {
     setFormError(null)
@@ -405,14 +484,14 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
         setFormError(null)
       }
 
-      if (['small-text-contrast', 'large-text-contrast'].includes(currentIssue?.ruleId ?? '')) {
+      if (['small-text-contrast', 'large-text-contrast'].includes(selectedIssue?.ruleId ?? '')) {
         // Reset remediation state when color changes after being applied
         if (isRemediated) {
           setIsRemediated(false)
         }
       }
     },
-    [currentIssue, isRemediated],
+    [selectedIssue, isRemediated],
   )
 
   useEffect(() => {
@@ -426,18 +505,24 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   }, [assertiveAlertMessage, setAssertiveAlertMessage])
 
   useEffect(() => {
-    // issues are saved into local state, so the state does not update when "item" changes.
-    // this effect ensures that issues state is updated on external "item" prop change.
-    setIssues(item.issues || [])
-    setCurrentIssueIndex(0)
-  }, [item, setIssues, setCurrentIssueIndex])
-
-  useEffect(() => {
     setIsRemediated(false)
     setIsFormLocked(false)
     setFormError(null)
     setIsSaveButtonEnabled(true)
-  }, [currentIssue])
+    setIsResourceStale(false)
+  }, [selectedIssue])
+
+  useEffect(() => {
+    if (!isResourceStale) return
+    const timer = setTimeout(() => {
+      setAssertiveAlertMessage(
+        I18n.t(
+          'This issue may be outdated. The resource has been updated since this issue was detected. Rescan this resource',
+        ),
+      )
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [isResourceStale])
 
   useEffect(() => {
     const previousActive = previousActiveRef.current
@@ -451,213 +536,233 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     previousActiveRef.current = currentActive
   }, [issuesSummary?.active, trackA11yEvent])
 
-  if (allIssuesSkipped && isCloseIssuesEnabled) {
-    return (
-      <CloseRemediationView
-        scan={item}
-        onBack={handleBackToStart}
-        nextResource={nextResource || defaultNextResource}
-        onClose={onClose}
-        handleNextResource={handleNextResource}
-      />
-    )
-  }
+  const trayTitle = selectedScan?.resourceName ?? ''
+  const isUnsavedModalOpen = pendingModalAction !== null
 
-  if (!currentIssue) {
-    return (
-      <>
-        <SuccessView
-          title={item.resourceName}
+  const renderTrayContent = () => {
+    if (!selectedScan) {
+      return <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
+    }
+
+    if (allIssuesSkipped && isCloseIssuesEnabled) {
+      return (
+        <CloseRemediationView
+          scan={selectedScan}
+          onBack={handleBackToStart}
           nextResource={nextResource || defaultNextResource}
           onClose={onClose}
-          handleSkip={handleSkip}
-          handlePrevious={handlePrevious}
           handleNextResource={handleNextResource}
         />
-        {assertiveAlertMessage && (
-          <Alert
-            screenReaderOnly={true}
-            liveRegionPoliteness="assertive"
-            liveRegion={getLiveRegion}
-          >
-            {assertiveAlertMessage}
-          </Alert>
-        )}
-      </>
-    )
-  }
+      )
+    }
 
-  if (isRequestInFlight) {
-    return renderSpinner()
-  }
-
-  const previewActionButton = (
-    <ApplyButton
-      onApply={handlePreviewApply}
-      onUndo={handlePreviewUndo}
-      undoMessage={currentIssue.form.undoText}
-      isApplied={isRemediated}
-      isLoading={isFormLocked}
-      isDisabled={isGenerateLoading}
-    >
-      {applyButtonText}
-    </ApplyButton>
-  )
-
-  return (
-    <Flex as="div" direction="column" height="100%">
-      <Flex.Item shouldGrow overflowY="auto" padding="0 small">
-        <Flex direction="column" gap="large">
-          <Flex direction="column" gap="mediumSmall">
-            <Flex
-              as="header"
-              elementRef={(el: Element | null) => {
-                regionRef.current = el as HTMLDivElement | null
-              }}
+    if (!selectedIssue) {
+      return (
+        <>
+          <SuccessView
+            title={selectedScan.resourceName}
+            nextResource={nextResource || defaultNextResource}
+            onClose={onClose}
+            handleSkip={handleSkip}
+            handlePrevious={handlePrevious}
+            handleNextResource={handleNextResource}
+          />
+          {assertiveAlertMessage && (
+            <Alert
+              screenReaderOnly={true}
+              liveRegionPoliteness="assertive"
+              liveRegion={getLiveRegion}
             >
-              <Text
-                size="large"
-                variant="descriptionPage"
-                as="h3"
+              {assertiveAlertMessage}
+            </Alert>
+          )}
+        </>
+      )
+    }
+
+    if (isRequestInFlight) {
+      return renderSpinner()
+    }
+
+    const previewActionButton = (
+      <ApplyButton
+        onApply={handlePreviewApply}
+        onUndo={handlePreviewUndo}
+        undoMessage={selectedIssue.form.undoText}
+        isApplied={isRemediated}
+        isLoading={isFormLocked}
+        isDisabled={isGenerateLoading || isResourceStale}
+      >
+        {applyButtonText}
+      </ApplyButton>
+    )
+
+    return (
+      <Flex as="div" direction="column" height="100%">
+        <Flex.Item shouldGrow overflowY="auto" padding="0 small">
+          <Flex direction="column" gap="large">
+            <Flex direction="column" gap="mediumSmall">
+              <Flex
+                as="header"
                 elementRef={(el: Element | null) => {
-                  if (el instanceof HTMLElement) {
-                    el.style.margin = '0'
-                  }
+                  regionRef.current = el as HTMLDivElement | null
                 }}
               >
-                {I18n.t('Issue %{current}/%{total}: %{message}', {
-                  current: currentIssueIndex + 1,
-                  total: issues.length,
-                  message: currentIssue.displayName,
-                })}
-                <WhyMattersPopover issue={currentIssue} />
-              </Text>
-            </Flex>
-
-            <Flex gap="x-small" direction="column">
-              <Flex justifyItems="space-between">
-                <Heading level="h4" variant="titleCardMini">
-                  {I18n.t('Problem area')}
-                </Heading>
-                <Flex gap="small">
-                  <Link
-                    href={item.resourceUrl}
-                    variant="standalone"
-                    target="_blank"
-                    iconPlacement="end"
-                    renderIcon={<IconExternalLinkLine size="x-small" />}
-                    onClick={() =>
-                      trackA11yIssueEvent('PageViewOpened', item.resourceType, currentIssue.ruleId)
+                <Text
+                  size="large"
+                  variant="descriptionPage"
+                  as="h3"
+                  elementRef={(el: Element | null) => {
+                    if (el instanceof HTMLElement) {
+                      el.style.margin = '0'
                     }
-                  >
-                    {I18n.t('Open Page')}
-                    <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-                  </Link>
-                  <Link
-                    href={
-                      item.resourceType === 'Syllabus'
-                        ? item.resourceUrl // Syllabus is edited inline, no separate edit page
-                        : `${item.resourceUrl}/edit`
-                    }
-                    variant="standalone"
-                    target="_blank"
-                    iconPlacement="end"
-                    renderIcon={<IconExternalLinkLine size="x-small" />}
-                    onClick={() =>
-                      trackA11yIssueEvent(
-                        'PageEditorOpened',
-                        item.resourceType,
-                        currentIssue.ruleId,
-                      )
-                    }
-                  >
-                    {I18n.t('Edit Page')}
-                    <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
-                  </Link>
-                </Flex>
+                  }}
+                >
+                  {I18n.t('Issue %{current}/%{total}: %{message}', {
+                    current: selectedIssueIndex + 1,
+                    total: issues.length,
+                    message: selectedIssue.displayName,
+                  })}
+                  <WhyMattersPopover issue={selectedIssue} />
+                </Text>
               </Flex>
 
-              <ProblemArea previewRef={previewRef} item={item} issue={currentIssue} />
+              <ProblemAreaAndIssueDescriptionSection
+                previewRef={previewRef}
+                selectedScan={selectedScan}
+                selectedIssue={selectedIssue}
+                onOpenPage={() =>
+                  trackA11yIssueEvent(
+                    'PageViewOpened',
+                    selectedScan.resourceType,
+                    selectedIssue.ruleId,
+                  )
+                }
+                onEditPage={() =>
+                  trackA11yIssueEvent(
+                    'PageEditorOpened',
+                    selectedScan.resourceType,
+                    selectedIssue.ruleId,
+                  )
+                }
+                onStaleConflict={handleStaleConflict}
+                onRescan={handleRescan}
+              />
             </Flex>
 
-            <Flex gap="x-small" direction="column">
-              <Heading level="h4" variant="titleCardMini">
-                {I18n.t('Issue description')}
-              </Heading>
-              <Text weight="weightRegular">{currentIssue.message}</Text>
+            <Flex direction="column">
+              <Form
+                key={selectedIssue.id}
+                ref={formRef}
+                issue={selectedIssue}
+                error={formError}
+                onReload={updatePreview}
+                onClearError={handleClearError}
+                onValidationChange={handleValidationChange}
+                isDisabled={isRemediated || isFormLocked}
+                onGenerateLoadingChange={setIsGenerateLoading}
+              />
+              {selectedIssue.form.canGenerateFix &&
+                formError &&
+                selectedIssue.form.type === FormType.Button && (
+                  <View as="div" margin="x-small 0">
+                    <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
+                  </View>
+                )}
             </Flex>
-          </Flex>
 
-          <Flex direction="column">
-            <Form
-              key={currentIssue.id}
-              ref={formRef}
-              issue={currentIssue}
-              error={formError}
-              onReload={updatePreview}
-              onClearError={handleClearError}
-              onValidationChange={handleValidationChange}
-              isDisabled={isRemediated || isFormLocked}
-              previewRef={previewRef}
-              onGenerateLoadingChange={setIsGenerateLoading}
-            />
-            {currentIssue.form.canGenerateFix &&
-              formError &&
-              currentIssue.form.type === FormType.Button && (
+            <View>
+              {previewActionButton}
+              {formError && selectedIssue.form.type === FormType.Button && (
                 <View as="div" margin="x-small 0">
                   <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
                 </View>
               )}
+            </View>
+
+            {/* Spacer for sticky footer */}
+            <View></View>
           </Flex>
+        </Flex.Item>
 
-          <View>
-            {previewActionButton}
-            {formError && currentIssue.form.type === FormType.Button && (
-              <View as="div" margin="x-small 0">
-                <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
-              </View>
-            )}
+        <View as="div" position="sticky" insetBlockEnd="0" style={{zIndex: 10}}>
+          <AccessibilityIssuesDrawerFooter
+            nextButtonName={I18n.t('Save & Next')}
+            onSkip={handleSkip}
+            onBack={handlePrevious}
+            onSaveAndNext={handleApplyAndSaveAndNext}
+            onBackToStart={handleBackToStart}
+            showBackToStart={
+              !isCloseIssuesEnabled && selectedIssueIndex === issues.length - 1 && issues.length > 1
+            }
+            isBackToStartDisabled={isFormLocked}
+            isBackDisabled={selectedIssueIndex === 0 || isFormLocked}
+            isSkipDisabled={
+              isFormLocked ||
+              (issues.length === 1 && !isCloseIssuesEnabled && selectedIssueIndex === 0)
+            }
+            isSaveAndNextDisabled={
+              !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
+            }
+          />
+        </View>
+
+        {assertiveAlertMessage && (
+          <Alert
+            isLiveRegionAtomic
+            liveRegionPoliteness="assertive"
+            liveRegion={getLiveRegion}
+            screenReaderOnly={true}
+          >
+            {assertiveAlertMessage}
+          </Alert>
+        )}
+        {isGA2FeaturesEnabled && (
+          <UnsavedChangesModal
+            isOpen={isUnsavedModalOpen}
+            onConfirm={handleModalConfirm}
+            onCancel={handleModalCancel}
+            onClose={handleModalClose}
+          />
+        )}
+      </Flex>
+    )
+  }
+
+  return (
+    <Tray label={trayTitle} open={isTrayOpen} onDismiss={onDismiss} placement="end" size="regular">
+      <View
+        as="div"
+        padding="0"
+        position="absolute"
+        insetBlockStart="0"
+        insetBlockEnd="0"
+        insetInlineStart="0"
+        insetInlineEnd="0"
+      >
+        <Flex direction="column" width="100%" height="100%">
+          <View
+            as="div"
+            position="sticky"
+            insetBlockStart="0"
+            padding="medium small mediumSmall small"
+            elementRef={(el: Element | null) => {
+              if (el instanceof HTMLElement) {
+                el.style.zIndex = '10'
+                el.style.background = canvasThemeLocal.colors.contrasts.white1010
+                el.style.borderBottom = `1px solid ${canvasThemeLocal.colors.contrasts.grey1214}`
+              }
+            }}
+          >
+            <WizardHeader title={trayTitle} onDismiss={onDismiss} />
           </View>
-
-          {/* Spacer for sticky footer */}
-          <View></View>
+          <View as="div" width="100%" height="100%">
+            <WizardErrorBoundary>{renderTrayContent()}</WizardErrorBoundary>
+          </View>
         </Flex>
-      </Flex.Item>
-
-      <View as="div" position="sticky" insetBlockEnd="0" style={{zIndex: 10}}>
-        <AccessibilityIssuesDrawerFooter
-          nextButtonName={I18n.t('Save & Next')}
-          onSkip={handleSkip}
-          onBack={handlePrevious}
-          onSaveAndNext={handleApplyAndSaveAndNext}
-          onBackToStart={handleBackToStart}
-          showBackToStart={
-            !isCloseIssuesEnabled && currentIssueIndex === issues.length - 1 && issues.length > 1
-          }
-          isBackToStartDisabled={isFormLocked}
-          isBackDisabled={currentIssueIndex === 0 || isFormLocked}
-          isSkipDisabled={
-            isFormLocked ||
-            (issues.length === 1 && !isCloseIssuesEnabled && currentIssueIndex === 0)
-          }
-          isSaveAndNextDisabled={
-            !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
-          }
-        />
       </View>
-
-      {assertiveAlertMessage && (
-        <Alert
-          isLiveRegionAtomic
-          liveRegionPoliteness="assertive"
-          liveRegion={getLiveRegion}
-          screenReaderOnly={true}
-        >
-          {assertiveAlertMessage}
-        </Alert>
-      )}
-    </Flex>
+    </Tray>
   )
 }
 
-export default AccessibilityIssuesContent
+export default AccessibilityWizard

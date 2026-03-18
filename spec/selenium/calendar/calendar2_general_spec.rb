@@ -177,7 +177,7 @@ describe "calendar2" do
         wait_for_ajaximations
 
         expect(ag.reload.appointments.first.description).to eq description
-        expect(f(".fc-event")).to be
+        expect(f(".fc-event")).not_to be_nil
       end
 
       it "allows moving events between calendars" do

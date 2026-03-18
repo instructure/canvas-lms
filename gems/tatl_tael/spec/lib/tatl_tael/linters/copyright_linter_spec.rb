@@ -38,7 +38,7 @@ describe TatlTael::Linters::CopyrightLinter do
       }
     ]
   end
-  let(:changes) { raw_changes.map { |c| double(c) } }
+  let(:changes) { raw_changes.map { |c| double("DrDiff::Change", **c) } } # rubocop:disable RSpec/VerifiedDoubles
   let(:linter) { described_class.new(changes:, config:) }
   let(:linter_with_auto_correct) do
     described_class.new(changes:, config:, auto_correct: true)
@@ -77,7 +77,7 @@ describe TatlTael::Linters::CopyrightLinter do
         position: 0
       }
     end
-    include_examples "comments"
+    it_behaves_like "comments"
 
     it "auto corrects" do
       linter.run
@@ -108,7 +108,7 @@ describe TatlTael::Linters::CopyrightLinter do
     # doesn't need to exist cuz it'll be ignored before attempting to read
     let(:fixture_path) { Consts::PUBLIC_VENDOR_JS_PATH }
 
-    include_examples "does not comment"
+    it_behaves_like "does not comment"
   end
 
   context "included file" do
@@ -129,7 +129,7 @@ describe TatlTael::Linters::CopyrightLinter do
         Dir.chdir(fixture_base_type) do
           context fixture_base_type do # e.g. context "coffee" do
             Dir.glob("*").each do |fixture_variant| # e.g. "invalid--missing.coffee"
-              fixture_variant_name = fixture_variant.split(".").first # e.g. "invalid--missing"
+              fixture_variant_name = fixture_variant.split(".").first # e.g. "invalid--missing" # rubocop:disable RSpec/LeakyLocalVariable
               next if fixture_variant_name.split("--").last == "auto-corrected"
 
               context fixture_variant_name do # e.g. context "invalid--missing" do
@@ -154,15 +154,15 @@ describe TatlTael::Linters::CopyrightLinter do
                 auto_correct_version_exists = File.exist?("#{fixture_variant_name}--auto-corrected.#{fixture_base_type}")
                 expected_to_raise = fixture_variant_name.split("--").last == "raises"
                 if expected_to_be_valid
-                  include_examples "does not comment"
+                  it_behaves_like "does not comment"
                 elsif auto_correct_version_exists
                   if expected_to_raise
-                    include_examples "raises during auto correct"
+                    it_behaves_like "raises during auto correct"
                   else
-                    include_examples "comments and auto corrects"
+                    it_behaves_like "comments and auto corrects"
                   end
                 else
-                  include_examples "comments"
+                  it_behaves_like "comments"
                 end
               end
             end

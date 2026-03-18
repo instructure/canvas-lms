@@ -111,7 +111,7 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission, isRightColumn =
     </Pill>
   )
 
-  const expandButton = isGraded ? (
+  const expandButton = (
     <IconButton
       screenReaderLabel={
         isExpanded ? I18n.t('Collapse grade details') : I18n.t('Expand grade details')
@@ -124,7 +124,7 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission, isRightColumn =
     >
       {isExpanded ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
     </IconButton>
-  ) : null
+  )
 
   if (isMobile) {
     return (

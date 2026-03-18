@@ -1119,7 +1119,6 @@ describe Lti::IMS::NamesAndRolesController do
       # Group Assignments can't be associated to external tools, so this is basically the same set of tests as
       # for Course contexts, except that we're just checking to see if we can narrow results even further based
       # on group memberships
-      # rubocop:disable RSpec/LetSetup
       context "and an assignment rlid param is specified" do
         include_context "assignment context"
         let(:rlid_param) { rlid_param_1 }
@@ -1344,7 +1343,6 @@ describe Lti::IMS::NamesAndRolesController do
           end
         end
       end
-      # rubocop:enable RSpec/LetSetup
     end
   end
 

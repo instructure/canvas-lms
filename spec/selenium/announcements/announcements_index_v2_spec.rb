@@ -144,8 +144,8 @@ describe "announcements index v2" do
     end
 
     context "when instui_nav feature flag on" do
-      page_header_title_all = "Announcements"
-      page_header_title_unread = "Unread Announcements"
+      let(:page_header_title_all) { "Announcements" }
+      let(:page_header_title_unread) { "Unread Announcements" }
 
       before do
         @course.root_account.enable_feature!(:instui_nav)

@@ -14,7 +14,11 @@
 .mutagen
 .swc
 .idea/
-/.claude/
+.claude/settings.local.json
+.claude/worktrees/
+.claude/agents/*.local.md
+.claude/commands/*.local.md
+.claude/skills/*.local/
 CLAUDE.local.md
 /.yardoc/
 /.ruby-version
@@ -84,10 +88,6 @@ docker-compose/api-gateway.override.yml
 /packages/*/coverage/
 /packages/*/coverage-js/
 
-# pact artifacts
-/reports/
-/pacts/
-
 # generated scopes
 /lib/api_scope_mapper.rb
 
@@ -111,3 +111,4 @@ coverage-karma
 # Allows devs to create their own devcontainer files
 /.devcontainer/*
 /!.devcontainer/.keep
+.claude/scheduled_tasks.lock

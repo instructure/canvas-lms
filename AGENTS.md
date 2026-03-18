@@ -88,6 +88,35 @@ yarn build:watch                     # Frontend dev mode
   Do this by prefixing the commands with something like `BUNDLE_LOCKFILE=rails80`.
   You still need to run a bare `bundle install` afterwards to ensure the main lockfile and any child lockfiles stay in sync.
 
+## Squashing Migrations
+
+Squashing migrations is the process of going through individual migrations in db/migrate by date, and "squashing" them into the `InitCanvasDb` migration, then deleting the original.
+- `change_table` blocks that add new structures can be moved into the corresponding `create_table` block.
+- Individual DDL statements such as `add_index`, `add_reference`, etc. should also be moved to the corresponding `create_table` block, and modified as appropriate if their arguments differ.
+- `remove_`-style statements should result in the removal of the corresponding `add_`-style structure from `InitCanvasDb`.
+  Check the model file for any removed columns, and if the column has been ignored there, remove it from the list.
+  Remove the `ignored_columns` line completely if the list is empty.
+- `create_table` blocks should be moved into `InitCanvasDb` completely, putting it into its properly alphabetized position (using the non-plural form of the table name, so that for example `discussion_topics` is placed before `discussion_topic_replies`)
+- `set_replication_identity` calls are moved into the `SetReplicaIdenties` migration, in their same alphabetized position.
+- Any options (such as `algorithm: :concurrently`, `if_not_exists: true`, `validate: false`, `validate_constraint`) used to make the original migration idempotent are not necessary in `InitCanvasDb`, and should be removed.
+- Options that are already the default should not be specified:
+  - `default: nil`
+  - `null: true`
+  - `index: true` on `t.references` calls
+  - `index: false` on non-reference column addition calls
+- Keep the statements within `create_table` blocks organized, with a blank line between each section:
+  - Column additions (including `t.timestamps`) are the first section, preserving their original order they were added
+  - Additional constraints are the next section, preserving their original order they were added
+  - Additional indexes are the final section, preserving their original order they were added, with the exception that the `t.replica_identity_index` is first.
+- If the migration queues a `DataFixup`, find the file defining it, and any associated spec file. If the DataFixup is not reference by any other migration, just delete the spec file, the `DataFixup` file, and the migration file.
+- `create_initial_partitions` calls can be squashed into the `CreateInitialPartitions` migration.
+- Before making any modifications, reset the test database with `RAILS_ENV=test bin/rake db:test:reset`, and then store a copy of the structure to a temporary file for later validation: `pg_dump -s --restrict-key=MQTD3FxKJiJ5XiNN2cfyqy9ctUI0Tt9i3SWn8wZ7l2dYLJGctear9gqS1IRbdO5 canvas_test > original.sql`
+- After making modifications, reset the test database again, dump it to a separate temporary file, and confirm that the structure has not changed by running `diff -u original.sql modified.sql`.
+  The output should be empty.
+  Exceptions are allowed if the order of columns has changed, because a column that was squashed is now earlier in the table than a column that is added in migration in gems/plugins/*/db/migrate/*.
+- Finally, alter `ValidateMigrationIntegrity` by replacing the timestamp in `last_squashed_migration_version` with the value from the last deleted migration, and increment the version number in the filename.
+- Be sure to run `script/rlint -a` afterwards to fix any formatting issues.
+
 ## Final Notes
 
 Some users may run Canvas differently, so consider these useful default suggestions for

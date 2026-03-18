@@ -94,7 +94,7 @@ RSpec.describe AutoGradeOrchestrationService do
       tag: "auto_grade_submission",
       workflow_state: "running"
     )
-    delayed_job_double = instance_double("Delayed::Job", attempts: 1)
+    delayed_job_double = instance_double(Delayed::Job, attempts: 1)
     allow(progress).to receive(:delayed_job).and_return(delayed_job_double)
     progress
   end

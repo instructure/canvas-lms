@@ -39,7 +39,7 @@ describe "Discussion Topics API" do
           get api_v1_course_discussion_topics_path(course.id), params: { format: :json }
           expect(response).to have_http_status :ok
           json = response.parsed_body.detect { |d| d["id"] == discussion.id }
-          expect(json["author"]).to_not be_nil
+          expect(json["author"]).not_to be_nil
         end
       end
 

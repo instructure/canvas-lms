@@ -52,6 +52,56 @@ describe RubricAssociationsController do
       expect(response).to be_successful
     end
 
+    describe "association_count in JSON response" do
+      it "includes association_count when there is one association" do
+        course_with_teacher_logged_in(active_all: true)
+        rubric = @course.rubrics.create!(title: "Test Rubric")
+        assignment = @course.assignments.create!(title: "Test Assignment")
+
+        post "create", params: {
+          course_id: @course.id,
+          rubric_association: {
+            rubric_id: rubric.id,
+            association_type: "Assignment",
+            association_id: assignment.id
+          }
+        }
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["rubric_association"]["association_count"]).to eq 1
+      end
+
+      it "includes correct association_count when there are multiple associations" do
+        course_with_teacher_logged_in(active_all: true)
+        rubric = @course.rubrics.create!(title: "Test Rubric")
+        assignment1 = @course.assignments.create!(title: "Test Assignment 1")
+        assignment2 = @course.assignments.create!(title: "Test Assignment 2")
+
+        # Create first association
+        RubricAssociation.create!(
+          rubric:,
+          association_object: assignment1,
+          context: @course,
+          purpose: "grading"
+        )
+
+        # Create second association via API
+        post "create", params: {
+          course_id: @course.id,
+          rubric_association: {
+            rubric_id: rubric.id,
+            association_type: "Assignment",
+            association_id: assignment2.id
+          }
+        }
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["rubric_association"]["association_count"]).to eq 2
+      end
+    end
+
     describe "AnonymousOrModerationEvent creation for auditable assignments" do
       let(:course) { Course.create! }
       let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }

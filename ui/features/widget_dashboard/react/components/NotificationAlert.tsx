@@ -83,14 +83,14 @@ const NotificationAlert: React.FC<NotificationAlertProps> = ({notification, onDi
 
   const accountMessage = notification.siteAdmin ? (
     <Text size="small">
-      {I18n.t('This is a message from ')}
+      {I18n.t('This is an announcement from ')}
       <Text weight="bold" size="small">
         {I18n.t('Canvas Administration')}
       </Text>
     </Text>
   ) : (
     <Text size="small">
-      {I18n.t('This is a message from ')}
+      {I18n.t('This is an announcement from ')}
       <Text weight="bold" size="small">
         {notification.accountName}
       </Text>

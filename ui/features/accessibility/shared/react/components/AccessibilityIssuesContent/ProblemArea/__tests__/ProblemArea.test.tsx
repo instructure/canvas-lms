@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, render, screen} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {ProblemArea} from '../ProblemArea'
 import {
@@ -74,13 +74,15 @@ vi.mock('../../../A11yColorContrast', () => ({
 // Mock Preview component to control its behavior
 vi.mock('../../Preview', () => ({
   __esModule: true,
-  default: vi.fn(({onPreviewChange}: any) => {
-    // Simulate preview loading and calling onPreviewChange
+  default: vi.fn(({onPreviewChange, onStaleConflict, onRescan}: any) => {
+    // Simulate preview loading and calling onPreviewChange, onStaleConflict, and onRescan
     setTimeout(() => {
       onPreviewChange?.({
         content: '<div>Test content</div>',
         path: '//div',
       })
+      onStaleConflict?.()
+      onRescan?.()
     }, 0)
     return <div data-testid={TEST_IDS.MOCK_PREVIEW}>Mock Preview</div>
   }),
@@ -139,8 +141,18 @@ describe('ProblemArea', () => {
     item = mockItem,
     issue = mockIssue,
     previewRef?: React.RefObject<PreviewHandle>,
+    onStaleConflict: () => void = jest.fn(),
+    onRescan: () => void = jest.fn(),
   ) => {
-    return render(<ProblemArea item={item} issue={issue} previewRef={previewRef} />)
+    return render(
+      <ProblemArea
+        item={item}
+        issue={issue}
+        previewRef={previewRef}
+        onStaleConflict={onStaleConflict}
+        onRescan={onRescan}
+      />,
+    )
   }
 
   const expectColorContrastProps = (
@@ -235,6 +247,28 @@ describe('ProblemArea', () => {
       renderProblemArea(mockItem, mockIssue, ref)
 
       expect(screen.getByTestId(TEST_IDS.MOCK_PREVIEW)).toBeInTheDocument()
+    })
+  })
+
+  describe('callback props', () => {
+    it('calls onStaleConflict when Preview invokes it', async () => {
+      const onStaleConflict = vi.fn()
+
+      renderProblemArea(mockItem, mockIssue, undefined, onStaleConflict)
+
+      await waitFor(() => {
+        expect(onStaleConflict).toHaveBeenCalled()
+      })
+    })
+
+    it('calls onRescan when Preview invokes it', async () => {
+      const onRescan = vi.fn()
+
+      renderProblemArea(mockItem, mockIssue, undefined, undefined, onRescan)
+
+      await waitFor(() => {
+        expect(onRescan).toHaveBeenCalled()
+      })
     })
   })
 })

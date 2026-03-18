@@ -155,8 +155,8 @@ describe PlannerController do
         get :index
         response_json = json_parse(response.body)
         expect(response_json.length).to eq 2
-        expect(response_json.find { |i| i["plannable_id"] == course1_event.id }).to_not be_nil
-        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).to_not be_nil
+        expect(response_json.find { |i| i["plannable_id"] == course1_event.id }).not_to be_nil
+        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).not_to be_nil
 
         @student1_enrollment.deactivate
         @student1 = User.find(@student1.id)
@@ -166,7 +166,7 @@ describe PlannerController do
         response_json = json_parse(response.body)
         expect(response_json.length).to eq 1
         expect(response_json.find { |i| i["plannable_id"] == course1_event.id }).to be_nil
-        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).to_not be_nil
+        expect(response_json.find { |i| i["plannable_id"] == course2_event.id }).not_to be_nil
       end
 
       it "shows the appropriate section-specific event for the user" do
@@ -745,6 +745,20 @@ describe PlannerController do
             response_json = json_parse(response.body)
             assignment_ids = response_json.pluck("plannable_id")
             expect(assignment_ids).not_to include(submitted_assignment.id, unsubmitted_assignment.id)
+          end
+
+          it "excludes assignments from courses the student is not enrolled in" do
+            unenrolled_course = course_factory(active_all: true)
+            other_assignment = assignment_model(course: unenrolled_course, due_at: 1.week.from_now)
+
+            get :index, params: {
+              filter: "incomplete_items",
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            expect(response_json.pluck("plannable_id")).not_to include(other_assignment.id)
           end
         end
 
@@ -1863,6 +1877,110 @@ describe PlannerController do
             expect(items).to include ["assignment", @assignment_sub1.id]
             expect(items).to include ["assignment", @assignment_sub2.id]
           end
+        end
+      end
+
+      context "peer_review_allocation_and_grading FF" do
+        before :once do
+          course_with_student(active_all: true)
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @parent_assignment = @course.assignments.create!(
+            title: "Assignment with Peer Review",
+            peer_reviews: true,
+            due_at: 1.week.from_now
+          )
+          @peer_review_sub = PeerReviewSubAssignment.create!(
+            parent_assignment: @parent_assignment,
+            title: "Assignment with Peer Review Peer Review (2)",
+            due_at: 2.weeks.from_now
+          )
+        end
+
+        before do
+          user_session(@student)
+        end
+
+        it "includes peer review sub-assignments from courses with FF enabled" do
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).to include ["peer_review_sub_assignment", @peer_review_sub.id]
+        end
+
+        it "does not include peer review sub-assignments from courses with FF disabled" do
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).not_to include ["peer_review_sub_assignment", @peer_review_sub.id]
+        end
+
+        it "excludes AssessmentRequest when PeerReviewSubAssignment exists" do
+          reviewee = course_with_student(course: @course, active_all: true).user
+          submission = submission_model(assignment: @parent_assignment, user: reviewee)
+          assessor_submission = @parent_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "text")
+          assessment_request = AssessmentRequest.create!(
+            assessor: @student,
+            assessor_asset: assessor_submission,
+            asset: submission,
+            user: reviewee,
+            peer_review_sub_assignment: @peer_review_sub
+          )
+
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).to include ["peer_review_sub_assignment", @peer_review_sub.id]
+          expect(items).not_to include ["assessment_request", assessment_request.id]
+        end
+
+        it "includes AssessmentRequest when FF is disabled (no PeerReviewSubAssignment)" do
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+          @peer_review_sub.destroy
+
+          assessor_student = @student
+          reviewee = course_with_student(course: @course, active_all: true).user
+          submission = submission_model(assignment: @parent_assignment, user: reviewee)
+          assessor_submission = @parent_assignment.submit_homework(assessor_student, submission_type: "online_text_entry", body: "text")
+          assessment_request = AssessmentRequest.create!(
+            assessor: assessor_student,
+            assessor_asset: assessor_submission,
+            asset: submission,
+            user: reviewee
+          )
+
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).to include ["assessment_request", assessment_request.id]
+        end
+
+        it "excludes AssessmentRequest with peer_review_sub_assignment_id only when FF is enabled" do
+          assessor_student = @student
+          reviewee = course_with_student(course: @course, active_all: true).user
+          submission = submission_model(assignment: @parent_assignment, user: reviewee)
+          assessor_submission = @parent_assignment.submit_homework(assessor_student, submission_type: "online_text_entry", body: "text")
+          assessment_request = AssessmentRequest.create!(
+            assessor: assessor_student,
+            assessor_asset: assessor_submission,
+            asset: submission,
+            user: reviewee,
+            peer_review_sub_assignment: @peer_review_sub
+          )
+
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+
+          get :index
+          response_json = json_parse(response.body)
+          items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+          expect(items).to include ["assessment_request", assessment_request.id]
+        end
+
+        it "returns correct html_url pointing to peer reviews page" do
+          get :index
+          response_json = json_parse(response.body)
+          peer_review_item = response_json.detect { |i| i["plannable_type"] == "peer_review_sub_assignment" }
+          expect(peer_review_item["html_url"]).to match "/courses/#{@course.id}/assignments/#{@parent_assignment.id}/peer_reviews"
         end
       end
     end

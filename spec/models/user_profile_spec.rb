@@ -60,7 +60,7 @@ describe UserProfile do
       student_in_course(active_all: true)
       I18n.with_locale(:es) do
         tabs = @student.profile.tabs_available(@user, root_account: account)
-        expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
+        expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).not_to eq "Files"
       end
     end
 

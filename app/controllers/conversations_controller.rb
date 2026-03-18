@@ -158,7 +158,7 @@ class ConversationsController < ApplicationController
   include Api::V1::Progress
   include HorizonMode
 
-  before_action :require_user, except: [:public_feed]
+  skip_before_action :require_user, only: :public_feed
   before_action :reject_student_view_student
   before_action :get_conversation, only: %i[show update destroy add_recipients remove_messages]
   before_action :infer_scope, only: %i[index show create update add_recipients add_message remove_messages]
@@ -319,15 +319,16 @@ class ConversationsController < ApplicationController
         hash[:INBOX_AUTO_RESPONSE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) &&
                                              @domain_root_account.enable_inbox_auto_response? &&
                                              (!is_student || (is_student && !@domain_root_account.disable_inbox_auto_response_for_students?))
-        translation_flags = Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account)
         js_env({
                  CONVERSATIONS: hash,
                  apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                  conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q"),
                  react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels),
-                 inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages(translation_flags) : [],
+                 # TODO: clean :inbox_sis_id_for_duplicates flag after release, VICE-5840
+                 inbox_sis_id_for_duplicates: Account.site_admin.feature_enabled?(:inbox_sis_id_for_duplicates),
+                 inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages : [],
                  inbox_translation_enabled: @domain_root_account.feature_enabled?(:translate_inbox_messages),
-                 cedar_translation: @domain_root_account.feature_enabled?(:cedar_translation)
+                 cedar_translation: true, # KEPT TO AVOID P4 on release,  VICE-5844
                })
         @page_title = t("Inbox")
         InstStatsd::Statsd.distributed_increment("inbox.visit.react")
@@ -966,7 +967,7 @@ class ConversationsController < ApplicationController
   #
 
   def add_message
-    get_conversation(true)
+    get_conversation(allow_deleted: true)
 
     message = process_response(
       conversation: @conversation,
@@ -1192,7 +1193,7 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def get_conversation(allow_deleted = false)
+  def get_conversation(allow_deleted: false)
     scope = @current_user.all_conversations
     scope = scope.where("message_count>0") unless allow_deleted
     @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first

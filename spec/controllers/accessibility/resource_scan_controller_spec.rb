@@ -190,6 +190,34 @@ describe Accessibility::ResourceScanController do
       end
     end
 
+    it "sorts wiki pages before syllabus when sorting by resource_type ascending" do
+      # Create a wiki page scan and a syllabus scan to test sort order
+      accessibility_resource_scan_model(
+        course:,
+        is_syllabus: true,
+        workflow_state: "completed",
+        resource_name: "Syllabus Resource",
+        resource_workflow_state: :published,
+        issue_count: 1,
+        resource_updated_at: 1.day.ago
+      )
+
+      get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+      expect(response).to have_http_status(:ok)
+
+      json = response.parsed_body
+      resource_types = json.pluck("resource_type")
+
+      # Wiki pages sort as 'page', syllabus sorts as 'syllabus'
+      # 'page' comes before 'syllabus' alphabetically
+      wiki_page_index = resource_types.index("WikiPage")
+      syllabus_index = resource_types.index("Syllabus")
+
+      expect(wiki_page_index).not_to be_nil
+      expect(syllabus_index).not_to be_nil
+      expect(wiki_page_index).to be < syllabus_index
+    end
+
     %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].each do |sort_param|
       it "sorts by #{sort_param} ascending and descending" do
         # Ascending order
@@ -345,6 +373,177 @@ describe Accessibility::ResourceScanController do
         expect(scan1_json["closed_issue_count"]).to eq(10)
         expect(scan2_json["closed_issue_count"]).to eq(3)
         expect(scan3_json["closed_issue_count"]).to eq(20)
+      end
+    end
+
+    context "id tiebreaker when sort values are equal" do
+      context "resource_name tiebreaker" do
+        let!(:tied_scan_a) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Tied Name",
+            issue_count: 0
+          )
+        end
+
+        let!(:tied_scan_b) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Tied Name",
+            issue_count: 0
+          )
+        end
+
+        it "orders tied resource_name asc results by id asc" do
+          get :index, params: { course_id: course.id, sort: "resource_name", direction: "asc" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          tied = json.select { |s| [tied_scan_a.id, tied_scan_b.id].include?(s["id"]) }
+          expect(tied.pluck("id")).to eq([tied_scan_a.id, tied_scan_b.id])
+        end
+
+        it "orders tied resource_name desc results by id asc" do
+          get :index, params: { course_id: course.id, sort: "resource_name", direction: "desc" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          tied = json.select { |s| [tied_scan_a.id, tied_scan_b.id].include?(s["id"]) }
+          expect(tied.pluck("id")).to eq([tied_scan_a.id, tied_scan_b.id])
+        end
+      end
+
+      context "resource_type tiebreaker (all wiki pages)" do
+        let!(:tied_scan_a) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Page Alpha",
+            issue_count: 0
+          )
+        end
+
+        let!(:tied_scan_b) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Page Beta",
+            issue_count: 0
+          )
+        end
+
+        it "orders tied resource_type asc results by id asc" do
+          get :index, params: { course_id: course.id, sort: "resource_type", direction: "asc" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          tied = json.select { |s| [tied_scan_a.id, tied_scan_b.id].include?(s["id"]) }
+          expect(tied.pluck("id")).to eq([tied_scan_a.id, tied_scan_b.id])
+        end
+      end
+
+      context "issue_count tiebreaker (close_issues feature OFF)" do
+        let!(:tied_scan_a) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Issue Count Tied A",
+            issue_count: 4
+          )
+        end
+
+        let!(:tied_scan_b) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Issue Count Tied B",
+            issue_count: 4
+          )
+        end
+
+        before do
+          Account.site_admin.disable_feature!(:a11y_checker_close_issues)
+        end
+
+        it "orders tied issue_count asc results by id asc" do
+          get :index, params: { course_id: course.id, sort: "issue_count", direction: "asc" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          tied = json.select { |s| [tied_scan_a.id, tied_scan_b.id].include?(s["id"]) }
+          expect(tied.pluck("id")).to eq([tied_scan_a.id, tied_scan_b.id])
+        end
+
+        it "orders tied issue_count desc results by id asc" do
+          get :index, params: { course_id: course.id, sort: "issue_count", direction: "desc" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          tied = json.select { |s| [tied_scan_a.id, tied_scan_b.id].include?(s["id"]) }
+          expect(tied.pluck("id")).to eq([tied_scan_a.id, tied_scan_b.id])
+        end
+      end
+
+      context "issue_count tiebreaker (close_issues feature ON, same issue_count and same closed count)" do
+        let!(:tied_scan_a) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Close Issues Tied A",
+            issue_count: 3
+          )
+        end
+
+        let!(:tied_scan_b) do
+          accessibility_resource_scan_model(
+            course:,
+            context: wiki_page_model(course:),
+            workflow_state: "completed",
+            resource_name: "Close Issues Tied B",
+            issue_count: 3
+          )
+        end
+
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_close_issues)
+          Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+
+          2.times do
+            accessibility_issue_model(
+              course:,
+              accessibility_resource_scan: tied_scan_a,
+              rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+              workflow_state: "closed"
+            )
+          end
+
+          2.times do
+            accessibility_issue_model(
+              course:,
+              accessibility_resource_scan: tied_scan_b,
+              rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+              workflow_state: "closed"
+            )
+          end
+        end
+
+        it "orders tied issue_count asc results by id asc when closed counts are also tied" do
+          get :index, params: { course_id: course.id, sort: "issue_count", direction: "asc" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          tied = json.select { |s| [tied_scan_a.id, tied_scan_b.id].include?(s["id"]) }
+          expect(tied.pluck("id")).to eq([tied_scan_a.id, tied_scan_b.id])
+        end
       end
     end
 

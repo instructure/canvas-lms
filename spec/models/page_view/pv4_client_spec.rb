@@ -45,187 +45,216 @@ describe PageView::Pv4Client do
       "user_id" => "31410000000000028",
       "vhost" => "canvas.instructure.com" }.freeze
   end
-  let(:client) { PageView::Pv4Client.new("http://pv4/", "token") }
   let(:account) { instance_double(Account, id: 1, uuid: "abc") }
   let(:user) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
+  let(:jwt_token) { "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.test.signature" }
 
   before do
     allow(Account).to receive(:find_cached).with(1).and_return(account)
   end
 
   def stub_http_request(response)
-    double = double(body: response.to_json, code: 200)
-    allow(CanvasHttp).to receive(:get).and_return(double)
+    http_response = instance_double(Net::HTTPResponse, body: response.to_json, code: 200)
+    allow(CanvasHttp).to receive(:get).and_return(http_response)
   end
 
-  describe "#fetch" do
-    it "returns page view objects" do
+  describe "auth argument validation" do
+    it "raises ArgumentError when neither requestor_user nor access_token is given" do
+      bad_client = PageView::Pv4Client.new("http://pv4/")
       stub_http_request("page_views" => [pv4_object])
-
-      response = client.fetch(user)
-      expect(response.length).to eq 1
-      expect(response.first).to be_a PageView
-      pv = response.first
-      expect(pv.url).to eq "http://canvas.instructure.com/accounts/2/users/1"
-      expect(pv.created_at).to eq Time.zone.parse("2015-11-05T17:01:20.306Z")
-      expect(pv.session_id).to eq "c73d248f3e4cec530261c95232ba63fg"
-      expect(pv.context_id).to eq 120_000_000_000_002
-      expect(pv.context_type).to eq "Account"
-      expect(pv.user_agent).to include("Safari")
-      expect(pv.account_id).to eq 120_000_000_000_002
-      expect(pv.user_id).to eq 31_410_000_000_000_028
-      expect(pv.remote_ip).to eq "192.168.0.1"
-      expect(pv.render_time).to eq 6.367549
+      expect { bad_client.fetch(user) }.to raise_error(ArgumentError, /requestor_user or access_token/)
     end
+  end
 
-    it "handles nil vhost gracefully by constructing URL from http_request only" do
-      pv_without_vhost = pv4_object.merge("vhost" => nil)
-      stub_http_request("page_views" => [pv_without_vhost])
+  shared_examples "pv4 client" do
+    describe "#fetch" do
+      it "returns page view objects" do
+        stub_http_request("page_views" => [pv4_object])
 
-      response = client.fetch(user)
-      pv = response.first
-      expect(pv.url).to eq "http:/accounts/2/users/1"
-    end
+        response = client.fetch(user)
+        expect(response.length).to eq 1
+        expect(response.first).to be_a PageView
+        pv = response.first
+        expect(pv.url).to eq "http://canvas.instructure.com/accounts/2/users/1"
+        expect(pv.created_at).to eq Time.zone.parse("2015-11-05T17:01:20.306Z")
+        expect(pv.session_id).to eq "c73d248f3e4cec530261c95232ba63fg"
+        expect(pv.context_id).to eq 120_000_000_000_002
+        expect(pv.context_type).to eq "Account"
+        expect(pv.user_agent).to include("Safari")
+        expect(pv.account_id).to eq 120_000_000_000_002
+        expect(pv.user_id).to eq 31_410_000_000_000_028
+        expect(pv.remote_ip).to eq "192.168.0.1"
+        expect(pv.render_time).to eq 6.367549
+      end
 
-    it "handles nil http_request gracefully by constructing URL from vhost only" do
-      pv_without_http_request = pv4_object.merge("http_request" => nil)
-      stub_http_request("page_views" => [pv_without_http_request])
+      it "handles nil vhost gracefully by constructing URL from http_request only" do
+        pv_without_vhost = pv4_object.merge("vhost" => nil)
+        stub_http_request("page_views" => [pv_without_vhost])
 
-      response = client.fetch(user)
-      pv = response.first
-      expect(pv.url).to eq "http://canvas.instructure.com"
-    end
+        response = client.fetch(user)
+        pv = response.first
+        expect(pv.url).to eq "http:/accounts/2/users/1"
+      end
 
-    it "handles nil vhost and http_request by setting url to nil" do
-      pv_without_url_data = pv4_object.merge("vhost" => nil, "http_request" => nil)
-      stub_http_request("page_views" => [pv_without_url_data])
+      it "handles nil http_request gracefully by constructing URL from vhost only" do
+        pv_without_http_request = pv4_object.merge("http_request" => nil)
+        stub_http_request("page_views" => [pv_without_http_request])
 
-      response = client.fetch(user)
-      pv = response.first
-      expect(pv.url).to be_nil
-    end
+        response = client.fetch(user)
+        pv = response.first
+        expect(pv.url).to eq "http://canvas.instructure.com"
+      end
 
-    it "handles nil agent gracefully by setting user_agent to nil" do
-      pv_without_agent = pv4_object.merge("agent" => nil)
-      stub_http_request("page_views" => [pv_without_agent])
+      it "handles nil vhost and http_request by setting url to nil" do
+        pv_without_url_data = pv4_object.merge("vhost" => nil, "http_request" => nil)
+        stub_http_request("page_views" => [pv_without_url_data])
 
-      response = client.fetch(user)
-      pv = response.first
-      expect(pv.user_agent).to be_nil
-    end
+        response = client.fetch(user)
+        pv = response.first
+        expect(pv.url).to be_nil
+      end
 
-    it "formats url params correctly" do
-      t = Time.zone.parse("2016-04-27")
-      Timecop.freeze(t) do
-        zone = ActiveSupport::TimeZone.new("America/Denver")
-        start_time = Time.now.in_time_zone(zone)
-        end_time = 5.minutes.from_now.in_time_zone(zone)
+      it "handles nil agent gracefully by setting user_agent to nil" do
+        pv_without_agent = pv4_object.merge("agent" => nil)
+        stub_http_request("page_views" => [pv_without_agent])
 
-        expect_params = "?start_time=2016-04-27T00:00:00.000Z&end_time=2016-04-27T00:05:00.000Z&root_account_uuids=abc"
-        expect_url = "http://pv4/users/1/page_views#{expect_params}"
-        expect_header = { "Authorization" => "Bearer token" }
+        response = client.fetch(user)
+        pv = response.first
+        expect(pv.user_agent).to be_nil
+      end
 
-        res = double(body: { "page_views" => [pv4_object] }.to_json, code: 200)
-        expect(CanvasHttp).to receive(:get).with(expect_url, expect_header).and_return(res)
-        client.fetch(user, start_time:, end_time:)
+      it "formats url params correctly" do
+        t = Time.zone.parse("2016-04-27")
+        Timecop.freeze(t) do
+          zone = ActiveSupport::TimeZone.new("America/Denver")
+          start_time = Time.now.in_time_zone(zone)
+          end_time = 5.minutes.from_now.in_time_zone(zone)
+
+          expect_params = "?start_time=2016-04-27T00:00:00.000Z&end_time=2016-04-27T00:05:00.000Z&root_account_uuids=abc"
+          expect_url = "http://pv4/users/1/page_views#{expect_params}"
+          expect_header = hash_including("Authorization" => "Bearer #{expected_token}")
+
+          res = instance_double(Net::HTTPResponse, body: { "page_views" => [pv4_object] }.to_json, code: 200)
+          expect(CanvasHttp).to receive(:get).with(expect_url, expect_header).and_return(res)
+          client.fetch(user, start_time:, end_time:)
+        end
+      end
+
+      it "raises Pv4BadRequest when response code is 400" do
+        response = instance_double(Net::HTTPResponse, body: "", code: 400)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4BadRequest, "invalid request"
+        )
+      end
+
+      it "raises Pv4Unauthorized when response code is 401" do
+        response = instance_double(Net::HTTPResponse, body: "", code: 401)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4Unauthorized, "unauthorized request"
+        )
+      end
+
+      it "raises Pv4NotFound when response code is 404" do
+        response = instance_double(Net::HTTPResponse, body: "", code: 404)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4NotFound, "resource not found"
+        )
+      end
+
+      it "raises Pv4TooManyRequests when response code is 429" do
+        response = instance_double(Net::HTTPResponse, body: "", code: 429)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4TooManyRequests, "rate limit exceeded"
+        )
+      end
+
+      it "parses the JSON response when the body is valid JSON with page_views" do
+        response = instance_double(Net::HTTPResponse, body: { "page_views" => [pv4_object] }.to_json, code: 200)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        result = client.fetch(user)
+        expect(result.length).to eq 1
+        expect(result.first).to be_a PageView
+      end
+
+      it "raises Pv4EmptyResponse when response body is empty" do
+        response = instance_double(Net::HTTPResponse, body: "", code: 200)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
+        )
+      end
+
+      it "raises Pv4EmptyResponse when response body is invalid JSON" do
+        response = instance_double(Net::HTTPResponse, body: "invalid json", code: 200)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
+        )
+      end
+
+      it "raises Pv4EmptyResponse when response body does not contain page_views" do
+        response = instance_double(Net::HTTPResponse, body: { "other_key" => [pv4_object] }.to_json, code: 200)
+        allow(CanvasHttp).to receive(:get).and_return(response)
+
+        expect { client.fetch(user) }.to raise_error(
+          PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
+        )
       end
     end
 
-    it "raises Pv4BadRequest when response code is 400" do
-      response = double(body: "", code: 400)
-      allow(CanvasHttp).to receive(:get).and_return(response)
+    describe "#for_user" do
+      it "returns a paginatable object" do
+        stub_http_request("page_views" => [pv4_object])
 
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4BadRequest, "invalid request"
-      )
-    end
+        result = client.for_user(user).paginate(per_page: 10)
+        expect(result).to be_a(Array)
+        expect(result.length).to eq 1
+      end
 
-    it "raises Pv4Unauthorized when response code is 401" do
-      response = double(body: "", code: 401)
-      allow(CanvasHttp).to receive(:get).and_return(response)
+      it "sends last_page_view_id when paginating" do
+        stub_http_request("page_views" => [pv4_object])
 
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4Unauthorized, "unauthorized request"
-      )
-    end
+        now = Time.now.utc
+        result = client.for_user(user).paginate(per_page: 10)
 
-    it "raises Pv4NotFound when response code is 404" do
-      response = double(body: "", code: 404)
-      allow(CanvasHttp).to receive(:get).and_return(response)
-
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4NotFound, "resource not found"
-      )
-    end
-
-    it "raises Pv4TooManyRequests when response code is 429" do
-      response = double(body: "", code: 429)
-      allow(CanvasHttp).to receive(:get).and_return(response)
-
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4TooManyRequests, "rate limit exceeded"
-      )
-    end
-
-    it "parses the JSON response when the body is valid JSON with page_views" do
-      response = double(body: { "page_views" => [pv4_object] }.to_json, code: 200)
-      allow(CanvasHttp).to receive(:get).and_return(response)
-
-      result = client.fetch(user)
-      expect(result.length).to eq 1
-      expect(result.first).to be_a PageView
-    end
-
-    it "raises Pv4EmptyResponse when response body is empty" do
-      response = double(body: "", code: 200)
-      allow(CanvasHttp).to receive(:get).and_return(response)
-
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
-      )
-    end
-
-    it "raises Pv4EmptyResponse when response body is invalid JSON" do
-      response = double(body: "invalid json", code: 200)
-      allow(CanvasHttp).to receive(:get).and_return(response)
-
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
-      )
-    end
-
-    it "raises Pv4EmptyResponse when response body does not contain page_views" do
-      response = double(body: { "other_key" => [pv4_object] }.to_json, code: 200)
-      allow(CanvasHttp).to receive(:get).and_return(response)
-
-      expect { client.fetch(user) }.to raise_error(
-        PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
-      )
+        http_response = instance_double(Net::HTTPResponse, body: '{ "page_views": [] }', code: 200)
+        expect(CanvasHttp).to receive(:get).with(
+          "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object["timestamp"]}&root_account_uuids=abc&last_page_view_id=#{pv4_object["request_id"]}&limit=10",
+          hash_including("Authorization" => "Bearer #{expected_token}")
+        ).and_return(http_response)
+        client.for_user(user, oldest: now, newest: now)
+              .paginate(page: result.next_page, per_page: 10)
+      end
     end
   end
 
-  describe "#for_user" do
-    it "returns a paginatable object" do
-      stub_http_request("page_views" => [pv4_object])
+  context "with JWT auth" do
+    let(:client) { PageView::Pv4Client.new("http://pv4/", requestor_user: user) }
+    let(:expected_token) { jwt_token }
 
-      result = client.for_user(user).paginate(per_page: 10)
-      expect(result).to be_a(Array)
-      expect(result.length).to eq 1
+    before do
+      allow(CanvasSecurity::ServicesJwt).to receive(:for_user).and_return(jwt_token)
     end
 
-    it "sends last_page_view_id when paginating" do
-      stub_http_request("page_views" => [pv4_object])
+    it_behaves_like "pv4 client"
+  end
 
-      now = Time.now.utc
-      result = client.for_user(user).paginate(per_page: 10)
+  context "with access_token auth" do
+    let(:access_token) { "test_access_token_abc123" }
+    let(:client) { PageView::Pv4Client.new("http://pv4/", access_token) }
+    let(:expected_token) { access_token }
 
-      double = double(body: '{ "page_views": [] }', code: 200)
-      expect(CanvasHttp).to receive(:get).with(
-        "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object["timestamp"]}&root_account_uuids=abc&last_page_view_id=#{pv4_object["request_id"]}&limit=10",
-        { "Authorization" => "Bearer token" }
-      ).and_return(double)
-      client.for_user(user, oldest: now, newest: now)
-            .paginate(page: result.next_page, per_page: 10)
-    end
+    it_behaves_like "pv4 client"
   end
 end

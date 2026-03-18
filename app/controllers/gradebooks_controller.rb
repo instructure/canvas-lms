@@ -23,6 +23,7 @@ class GradebooksController < ApplicationController
   include GradebooksHelper
   include SubmissionCommentsHelper
   include KalturaHelper
+  include NewQuizzesHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Group
   include Api::V1::GroupCategory
@@ -33,7 +34,6 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: %i[speed_grader speed_grader_settings grade_summary grading_rubrics update_final_grade_overrides]
 
   include HorizonMode
 
@@ -287,7 +287,8 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def grading_rubrics
+  # LEGACY: Original implementation
+  def grading_rubrics_legacy
     return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
 
     @rubric_contexts = @context.rubric_contexts(@current_user)
@@ -308,6 +309,46 @@ class GradebooksController < ApplicationController
       render json: StringifyIds.recursively_stringify_ids(data)
     else
       render json: @rubric_contexts
+    end
+  end
+
+  def grading_rubrics
+    if Account.site_admin.feature_enabled?(:optimized_grading_rubrics)
+      grading_rubrics_optimized
+    else
+      grading_rubrics_legacy
+    end
+  end
+
+  # OPTIMIZED: Uses context filtering to avoid loading all contexts when requesting specific one
+  def grading_rubrics_optimized
+    return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
+
+    # Only load requested context instead of all contexts when filtering
+    rubric_contexts = if params[:context_code]
+                        @context.rubric_contexts(@current_user, context_code: params[:context_code])
+                      else
+                        @context.rubric_contexts(@current_user)
+                      end
+
+    if params[:context_code]
+      # rubric_contexts already filtered by context_code, check if context exists
+      rubric_context = if rubric_contexts.any?
+                         Context.find_by_asset_string(params[:context_code])
+                       else
+                         @context
+                       end
+      rubric_associations = rubric_context.shard.activate { Context.sorted_rubrics(rubric_context) }
+      data = rubric_associations.map do |ra|
+        json = ra.as_json(methods: [:context_name], include: { rubric: { include_root: false } })
+        # return shard-aware context codes
+        json["rubric_association"]["context_code"] = ra.context.asset_string
+        json["rubric_association"]["rubric"]["context_code"] = ra.rubric.context.asset_string
+        json
+      end
+      render json: StringifyIds.recursively_stringify_ids(data)
+    else
+      render json: rubric_contexts
     end
   end
 
@@ -793,6 +834,10 @@ class GradebooksController < ApplicationController
                ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
                OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
                outcome_proficiency:,
+               message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
+               permissions: {
+                 allow_assign_to_differentiation_tags: @context.account.allow_assign_to_differentiation_tags? && @context.grants_right?(@current_user, session, :manage_tags_add)
+               },
                sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
@@ -826,12 +871,12 @@ class GradebooksController < ApplicationController
       @page_title = t("Gradebook History")
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
-      js_env(
-        COURSE_URL: named_context_url(@context, :context_url),
-        COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
-        OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
-        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?)
-      )
+      js_env({
+               COURSE_URL: named_context_url(@context, :context_url),
+               COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
+               OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
+               OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?)
+             })
 
       render html: "", layout: true
     end
@@ -858,7 +903,7 @@ class GradebooksController < ApplicationController
       user_ids = submissions.pluck(:user_id)
       assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
-      assignments = assignment_scope.active.find(assignment_ids).index_by(&:id)
+      assignments = AbstractAssignment.assignment_scope_for_context(@context).active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,
       # so we pull the records here in order to check hide_grade_from_student?
       # on each submission below.
@@ -1072,7 +1117,7 @@ class GradebooksController < ApplicationController
     @assignment = if params[:assignment_id].blank?
                     nil
                   else
-                    assignment_scope.active.find(params[:assignment_id])
+                    AbstractAssignment.assignment_scope_for_context(@context).active.find(params[:assignment_id])
                   end
 
     platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
@@ -1111,6 +1156,7 @@ class GradebooksController < ApplicationController
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
         VIEW_ALL_GRADES: @context.grants_right?(@current_user, session, :view_all_grades),
+        can_delete_attachments: @context.root_account.grants_right?(@current_user, session, :become_user),
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
@@ -1229,7 +1275,6 @@ class GradebooksController < ApplicationController
           enhanced_rubrics_enabled:,
           rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : [],
           multiselect_filters_enabled: multiselect_filters_enabled?,
-          use_comment_library_v2: Account.site_admin.feature_enabled?(:use_comment_library_v2),
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1256,6 +1301,33 @@ class GradebooksController < ApplicationController
 
         env[:assignment_comment_library_feature_enabled] =
           @context.root_account.feature_enabled?(:assignment_comment_library)
+
+        # Native New Quizzes support in SpeedGrader
+        native_quiz_enabled = @assignment.quiz_lti? &&
+                              @context.feature_enabled?(:new_quizzes_native_experience)
+
+        if native_quiz_enabled
+          tool = Lti::ToolFinder.from_assignment(@assignment)
+
+          if tool&.quiz_lti?
+            signed_launch_data = Services::NewQuizzes::Routes::LaunchHelper.build_speedgrader_launch_data(
+              tool:,
+              assignment: @assignment,
+              context: @context,
+              user: @current_user,
+              controller: self,
+              request:,
+              basename: "/courses/#{@context.id}/gradebook/speed_grader",
+              current_pseudonym: @current_pseudonym,
+              domain_root_account: @domain_root_account
+            )
+
+            launch_url = Services::NewQuizzes.launch_url(tool_url: tool&.url)
+            setup_new_quizzes_env(signed_launch_data, launch_url:)
+          else
+            Rails.logger.error "Failed to find quiz_lti tool for New Quizzes SpeedGrader launch for assignment #{@assignment.id} in context #{@context.id}"
+          end
+        end
 
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true
@@ -1592,14 +1664,6 @@ class GradebooksController < ApplicationController
   end
 
   private
-
-  def assignment_scope
-    @assignment_scope ||= if @context.feature_enabled?(:peer_review_allocation_and_grading)
-                            AbstractAssignment.assignment_or_peer_review.where(context: @context)
-                          else
-                            @context.assignments
-                          end
-  end
 
   def multiselect_filters_enabled?
     return @multiselect_filters_enabled if defined?(@multiselect_filters_enabled)

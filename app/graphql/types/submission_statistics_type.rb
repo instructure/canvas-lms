@@ -20,7 +20,13 @@
 
 module Types
   class SubmissionStatisticsType < ApplicationObjectType
-    alias_method :submissions, :object
+    def submissions
+      object[:submissions]
+    end
+
+    def course
+      object[:course]
+    end
 
     field :submissions_due_this_week_count, Integer, null: false
     def submissions_due_this_week_count
@@ -38,11 +44,19 @@ module Types
       end
     end
 
-    field :missing_submissions_count, Integer, null: false
-    def missing_submissions_count
+    field :missing_submissions_count, Integer, null: false do
+      argument :only_current_grading_period, Boolean, required: false, default_value: true, description: "Only count missing submissions from current grading period (default: true)"
+    end
+    def missing_submissions_count(only_current_grading_period: true)
       return 0 unless current_user
 
-      submissions.count(&:missing?)
+      missing_submissions = submissions.select(&:missing?)
+      return missing_submissions.count unless only_current_grading_period
+
+      current_period = GradingPeriod.current_period_for(course)
+      return missing_submissions.count unless current_period
+
+      missing_submissions.count { |s| s.grading_period_id == current_period.id }
     end
 
     field :submitted_submissions_count, Integer, null: false

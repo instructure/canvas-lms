@@ -17,13 +17,20 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 import UsersList from '../UsersList'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
 const server = setupServer()
+
+function renderWithQueryClient(ui) {
+  queryClient.clear()
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+}
 
 describe('Account Course User Search UsersList View', function () {
   beforeAll(() => server.listen())
@@ -77,11 +84,51 @@ describe('Account Course User Search UsersList View', function () {
   }
 
   it('displays users that are passed in as props', () => {
-    const {getByText} = render(<UsersList {...usersProps} />)
+    const {getByText} = renderWithQueryClient(<UsersList {...usersProps} />)
 
     expect(getByText('UserA')).toBeInTheDocument()
     expect(getByText('UserB')).toBeInTheDocument()
     expect(getByText('UserC')).toBeInTheDocument()
+  })
+
+  describe('bulk temporary enrollment status', () => {
+    const tempEnrollPermissions = {
+      can_view_temporary_enrollments: true,
+    }
+
+    it('fetches batch statuses when can_view_temporary_enrollments is true', async () => {
+      let batchRequestMade = false
+      server.use(
+        http.get('/api/v1/temporary_enrollment_status', () => {
+          batchRequestMade = true
+          return HttpResponse.json({})
+        }),
+      )
+
+      renderWithQueryClient(
+        <UsersList
+          {...usersProps}
+          permissions={{...usersProps.permissions, ...tempEnrollPermissions}}
+          roles={[{id: '1', label: 'Student'}]}
+        />,
+      )
+
+      await waitFor(() => expect(batchRequestMade).toBe(true))
+    })
+
+    it('does not fetch batch statuses when can_view_temporary_enrollments is falsy', () => {
+      let batchRequestMade = false
+      server.use(
+        http.get('/api/v1/temporary_enrollment_status', () => {
+          batchRequestMade = true
+          return HttpResponse.json({})
+        }),
+      )
+
+      renderWithQueryClient(<UsersList {...usersProps} />)
+
+      expect(batchRequestMade).toBe(false)
+    })
   })
 
   Object.entries({
@@ -112,7 +159,7 @@ describe('Account Course User Search UsersList View', function () {
       }
 
       it(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
-        const wrapper = render(<UsersList {...props} />)
+        const wrapper = renderWithQueryClient(<UsersList {...props} />)
         expect(
           wrapper.container.querySelectorAll(`[name="IconMiniArrow${unexpectedArrow}"]`),
         ).toHaveLength(0)
@@ -126,7 +173,7 @@ describe('Account Course User Search UsersList View', function () {
 
       it(`clicking the ${label} column header calls onChangeSort with ${columnID}`, async () => {
         const sortSpy = vi.fn()
-        const wrapper = render(
+        const wrapper = renderWithQueryClient(
           <UsersList
             {...{
               ...props,

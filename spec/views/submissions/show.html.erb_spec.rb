@@ -42,7 +42,7 @@ describe "submissions/show" do
     before :once do
       @group_category = @course.group_categories.create!(name: "Test Group Set")
       @group = @course.groups.create!(name: "a group", group_category: @group_category)
-      add_user_to_group(@user, @group, true)
+      add_user_to_group(@user, @group, is_leader: true)
       @assignment =
         @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -73,7 +73,7 @@ describe "submissions/show" do
       @html = Nokogiri::HTML5.fragment(response.body)
       expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
       checkbox = @html.css("#submission_group_comment")
-      expect(checkbox.attr("checked")).to_not be_nil
+      expect(checkbox.attr("checked")).not_to be_nil
       expect(checkbox.attr("style").value).to include("display:none")
     end
 
@@ -92,7 +92,7 @@ describe "submissions/show" do
       assign(:submission, @submission)
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)
-      expect(html.css("#submission_group_comment").attr("checked")).to_not be_nil
+      expect(html.css("#submission_group_comment").attr("checked")).not_to be_nil
     end
 
     it "students that are not peer reviewers are not allowed to make group comments" do
@@ -466,8 +466,8 @@ describe "submissions/show" do
       before do
         assign(:context, course)
 
-        course.enroll_teacher(teacher).accept(true)
-        course.enroll_student(student).accept(true)
+        course.enroll_teacher(teacher).accept(force: true)
+        course.enroll_student(student).accept(force: true)
 
         muted_submission.add_comment(author: student, comment: "I did a great job!")
         muted_submission.add_comment(author: teacher, comment: "No, you did not", hidden: true)

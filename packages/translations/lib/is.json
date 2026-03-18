@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Bæta við mynd"
     },
+    "add_new_a9226085": {
+        "message": "Bæta við nýjum"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Bæta við nýjum skjátexta"
+    },
     "add_one_9e34a6f8": {
         "message": "Bæta einum við!"
     },
@@ -176,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Sjálfvirkur myndatexti"
+    },
     "available_folders_694d0436": {
         "message": "Tiltækar möppur"
     },
@@ -248,6 +257,15 @@
     "cap_product_3a5265a6": {
         "message": "Stafafeldi"
     },
+    "caption_manager_aae0906f": {
+        "message": "Skjátextastjórnun"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Skjátextum hefur verið bætt við fyrir { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Skjátextum hefur verið eytt fyrir { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Ekki er hægt að fjarlægja skjátexta sem erfðir eru frá foreldrisnámskeiði."
     },
@@ -307,6 +325,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Veldu skjátextaskrá"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Velja skrá"
     },
     "choose_usage_rights_33683854": {
         "message": "Velja notkunarréttindi..."
@@ -563,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Lýsa { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Lýsa myndbandinu)"
-    },
     "description_436c48d7": {
         "message": "Lýsing"
     },
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Skáör niður og til hægri"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Hlaða niður { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Hlaða niður { filename }"
     },
@@ -715,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Fella inn mynd"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Fella inn valkosti"
     },
     "embed_video_a97a64af": {
         "message": "Fella inn myndband"
@@ -844,6 +862,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Mistókst að sækja efni frá ytra verkfæri"
+    },
+    "file_d1b70050": {
+        "message": "Skrá*"
     },
     "file_name_8fd421ff": {
         "message": "Skráarheiti"
@@ -1277,8 +1298,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Tungumál*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Tungumálalistar tákn"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Tungumál sem talað er í þessu margmiðlunarefni*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (sjálfvirkur)"
     },
     "languages_icon_9d20539": {
         "message": "Tungumála tákn"
@@ -1396,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Tenglar á ytra svæði."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Listi dreginn saman."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Listi víkkaður út."
     },
     "lists_cd1336fc": {
         "message": "Listar"
@@ -1742,6 +1778,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Aðra flýtivísa ritils má finna á"
     },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Tæknin okkar býr til ~85% nákvæma skjátexta."
+    },
     "outline_color_3ef2cea7": {
         "message": "Útlínulitur"
     },
@@ -1862,6 +1901,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Veldu skrá af studdri tegund"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Veldu tungumál"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Veldu .vtt eða .srt skrá"
+    },
     "plus_d43cd4ec": {
         "message": "Plús"
     },
@@ -1921,6 +1966,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Frumtölur"
+    },
+    "processing_8c569014": {
+        "message": "Vinnur úr..."
     },
     "product_39cf144f": {
         "message": "Feldi"
@@ -2014,6 +2062,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Skipt út öllu { alertFindText } fyrir { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Beiðni"
     },
     "reset_95a81614": {
         "message": "Endurstilla"
@@ -2161,6 +2212,9 @@
     },
     "selected_274ce24f": {
         "message": "Valið"
+    },
+    "selected_file_name_93fa1a14": {
+        "message": "Valin skrá: { name }"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Valið { linkFileName }"
@@ -2591,6 +2645,12 @@
     "updated_link_a827e441": {
         "message": "Uppfærður tengill"
     },
+    "upload_8b403d05": {
+        "message": "Hlaða upp"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Hlaða upp skjátextarás í SRT eða WEBVTT sniði."
+    },
     "upload_document_253f0478": {
         "message": "Hlaða upp skjali"
     },
@@ -2695,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Notað af skjálesurum til að lýsa efni myndar"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Notað af skjálesurum til að lýsa myndbandinu"
     },
     "user_documents_c206e61f": {
         "message": "Notandaskjöl"

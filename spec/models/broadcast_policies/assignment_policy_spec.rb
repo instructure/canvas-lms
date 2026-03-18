@@ -20,7 +20,7 @@
 module BroadcastPolicies
   describe AssignmentPolicy do
     let(:context) do
-      ctx = double
+      ctx = instance_double(Course)
       allow(ctx).to receive_messages(
         available?: true,
         concluded?: false,
@@ -29,22 +29,23 @@ module BroadcastPolicies
       ctx
     end
     let(:assignment) do
-      double(context:,
-             published?: true,
-             muted?: false,
-             created_at: 4.hours.ago,
-             changed_in_state: true,
-             due_at: Time.zone.now,
-             points_possible: 100,
-             assignment_changed: false,
-             previously_new_record?: false,
-             workflow_state: "published",
-             due_at_before_last_save: 7.days.ago,
-             saved_change_to_points_possible?: true,
-             saved_change_to_workflow_state?: false,
-             workflow_state_before_last_save: "published",
-             checkpoints_parent?: false,
-             checkpoint?: false)
+      instance_double(Assignment,
+                      context:,
+                      published?: true,
+                      muted?: false,
+                      created_at: 4.hours.ago,
+                      changed_in_state: true,
+                      due_at: Time.zone.now,
+                      points_possible: 100,
+                      assignment_changed: false,
+                      previously_new_record?: false,
+                      workflow_state: "published",
+                      due_at_before_last_save: 7.days.ago,
+                      saved_change_to_points_possible?: true,
+                      saved_change_to_workflow_state?: false,
+                      workflow_state_before_last_save: "published",
+                      checkpoints_parent?: false,
+                      checkpoint?: false)
     end
 
     let(:policy) { AssignmentPolicy.new(assignment) }

@@ -536,6 +536,10 @@ export type SpeedGrader = {
     lti_retrieve_url: string,
     submission: HistoricalSubmission,
   ) => void
+  renderNativeQuiz: (submission: HistoricalSubmission) => void
+  unmountNativeQuiz: () => void
+  renderAmsGrading: (submission: HistoricalSubmission) => void
+  unmountAmsGrading: () => void
   setCurrentStudentAvatar: () => void
   setActiveProvisionalGradeFields: (options?: {
     grade?: null | Partial<ProvisionalGrade>
@@ -731,6 +735,7 @@ export const ZSpeedGraderResponse = z
     anonymize_graders: z.boolean(),
     anonymize_students: z.boolean(),
     anonymous_grading: z.boolean(),
+    anonymous_participants: z.boolean(),
     anonymous_instructor_annotations: z.boolean(),
     anonymous_peer_reviews: z.boolean(),
     assignment_group_id: z.string(),

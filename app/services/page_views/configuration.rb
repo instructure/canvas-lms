@@ -19,16 +19,25 @@
 
 module PageViews
   class Configuration
-    attr_reader :access_token, :uri
+    attr_reader :uri
 
-    def initialize
+    def initialize(region: nil)
       config = ConfigFile.load("pv5")
-      env_creds = Rails.application.credentials.pv5_creds[Rails.env.to_sym] if Rails.application.credentials.pv5_creds
-      raise Common::ConfigurationError, "Missing credentials for environment: #{Rails.env}" unless env_creds && env_creds[:access_token]
-      raise Common::ConfigurationError, "Missing or invalid 'uri' in pv5 config file" unless config["uri"].is_a?(String) && !config["uri"].strip.empty?
+      regional_config = get_regional_config(config, region) || {}
+      @uri = URI.parse(regional_config["uri"] || config["uri"])
+    rescue URI::InvalidURIError => e
+      raise Common::ConfigurationError, "Invalid URI in pv5 config: #{e.message}"
+    end
 
-      @access_token = env_creds[:access_token]
-      @uri = URI.parse(config["uri"])
+    private
+
+    def get_regional_config(config, region)
+      return unless config["regions"].is_a?(Hash)
+
+      regional_config = config["regions"][region]
+      return unless regional_config.is_a?(Hash)
+
+      regional_config
     end
   end
 end

@@ -17,7 +17,7 @@
  */
 
 import React, {useRef} from 'react'
-import {getAccessToken, refreshToken, getUser} from './auth'
+import {getAccessToken, refreshToken, getUser, getRcsToken, refreshRcsToken} from './auth'
 import {createRubricController} from '@canvas/rubrics/react/RubricAssignment'
 import type {RubricController} from '@canvas/rubrics/react/RubricAssignment'
 
@@ -64,9 +64,10 @@ export function AmsLoader({
     let stillMounting = true
 
     // Set window variables for AMS to consume
-    if (REMOTES?.ams?.api_url) {
+    if (REMOTES?.ams?.api_url || ENV.RICH_CONTENT_APP_HOST) {
       window.AMS_CONFIG = {
-        API_URL: REMOTES?.ams?.api_url,
+        API_URL: REMOTES?.ams?.api_url || '',
+        ...(ENV.RICH_CONTENT_APP_HOST && {RCS_HOST: ENV.RICH_CONTENT_APP_HOST}),
       }
     }
 
@@ -86,6 +87,8 @@ export function AmsLoader({
               getAccessToken,
               refreshToken,
               getUser,
+              getRcsToken,
+              refreshRcsToken,
             },
             rubrics: {
               createController: createRubricController,

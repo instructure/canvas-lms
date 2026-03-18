@@ -26,13 +26,13 @@ describe ErrorReport do
                 "llo"
       data = { extra: { message: } }
       expect { described_class.log_exception_from_canvas_errors("my error", data) }
-        .to_not raise_error
+        .not_to raise_error
     end
 
     it "uses an empty hash as a default for errors with no extra data" do
       data = { tags: { a: "b" } }
       expect { described_class.log_exception_from_canvas_errors("my error", data) }
-        .to_not raise_error
+        .not_to raise_error
     end
 
     it "uses class name for category" do
@@ -108,7 +108,7 @@ describe ErrorReport do
       request_parameters: { "client_secret" => "xoxo" }
     }
     mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
-    req = double(mock_attrs)
+    req = instance_double(ActionDispatch::Request, **mock_attrs)
     report = described_class.new
     report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
     expect(report.data["QUERY_STRING"]).to eq "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
@@ -132,7 +132,7 @@ describe ErrorReport do
       request_parameters: { "pseudonym" =>
         { "old_password" => "elitepotato", "password" => "ghosthunter", "password_confirmation" => "ghosthunter" } }
     }
-    req = double(mock_attrs)
+    req = instance_double(ActionDispatch::Request, **mock_attrs)
     report = described_class.new
     report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
 

@@ -243,8 +243,8 @@ class Course < ActiveRecord::Base
   has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: "Quizzes::Quiz", as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
-  def inherited_assessment_question_banks(include_self = false)
-    account.inherited_assessment_question_banks(true, *(include_self ? [self] : []))
+  def inherited_assessment_question_banks(include_self: false)
+    account.inherited_assessment_question_banks(*(include_self ? [self] : []), include_self: true)
   end
 
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
@@ -371,6 +371,7 @@ class Course < ActiveRecord::Base
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
   after_update :log_rqd_setting_enable_or_disable
   after_update :queue_remap_enrollment_roles
+
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -423,17 +424,18 @@ class Course < ActiveRecord::Base
                      end
                    },
                    on_create: lambda { |course, version|
-                     if course.saving_user
+                     if course.updating_user
                        begin
                          yaml_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
-                         yaml_data["user_id"] = course.saving_user.id
+                         yaml_data["user_id"] = course.updating_user.id
                          version.yaml = yaml_data.to_yaml
                          version.save
                        rescue => e
                          Rails.logger.error("Failed to add user_id to course version: #{e.message}")
                        end
                      end
-                   }
+                   },
+                   versioned_associations: [:attachment_associations]
 
   include StickySisFields
 
@@ -580,6 +582,17 @@ class Course < ActiveRecord::Base
     if saved_change_to_account_id? && !saved_change_to_id?
       Lti::ContextControl.update_paths_for_reparent(self, account_id_before_last_save, account_id)
     end
+  end
+
+  def delete_lti_context_controls
+    updates = { workflow_state: "deleted_with_context", updated_at: Time.current }
+    Lti::ContextControl.where(course_id: id).active.in_batches.update_all(updates)
+  end
+
+  def undelete_lti_context_controls
+    updates = { workflow_state: "active", updated_at: Time.current }
+    # Only restore context controls that were deleted with the context (course)
+    Lti::ContextControl.where(course_id: id, workflow_state: "deleted_with_context").in_batches.update_all(updates)
   end
 
   def update_enrollment_states_if_necessary
@@ -854,14 +867,13 @@ class Course < ActiveRecord::Base
     role_map = {}
     used_roles = Role.where(id: enrollments.distinct.select(:role_id)).to_a
     if used_roles.any?
-      available_roles = account.available_course_roles(true)
+      available_roles = account.available_course_roles(include_inactive: true)
       (used_roles - available_roles).each do |missing_role|
-        replacement_roles = available_roles.select do |role|
+        replacement_role = available_roles.find do |role|
           role.built_in? == missing_role.built_in? &&
             role.name == missing_role.name &&
             role.base_role_type == missing_role.base_role_type
         end
-        replacement_role = replacement_roles.find(&:active?) || replacement_roles.first
         if replacement_role
           role_map[missing_role.id] = replacement_role.id
         else
@@ -1888,6 +1900,9 @@ class Course < ActiveRecord::Base
       event :offer, transitions_to: :available
       event :complete, transitions_to: :completed
       event :delete, transitions_to: :deleted
+      on_entry do |prior_state, _event|
+        undelete_lti_context_controls if prior_state == :deleted
+      end
     end
 
     state :available do
@@ -1905,6 +1920,7 @@ class Course < ActiveRecord::Base
 
     state :deleted do
       event :undelete, transitions_to: :claimed
+      on_entry { delete_lti_context_controls }
     end
   end
 
@@ -1924,8 +1940,8 @@ class Course < ActiveRecord::Base
     return false if template?
 
     gradebook_filters.in_batches.destroy_all
-    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
+    process_event(:delete)
     save!
   end
 
@@ -2088,7 +2104,7 @@ class Course < ActiveRecord::Base
 
     RoleOverride.permissions.each do |permission, details|
       given do |user|
-        active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) ||
+        active_enrollment_allows(user, permission, allow_future: !details[:restrict_future_enrollments]) ||
           account_membership_allows(user, permission)
       end
       can permission
@@ -2266,7 +2282,7 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def active_enrollment_allows(user, permission, allow_future = true)
+  def active_enrollment_allows(user, permission, allow_future: true)
     return false unless user && permission && !deleted?
 
     is_unpublished = created? || claimed?
@@ -2917,7 +2933,7 @@ class Course < ActiveRecord::Base
 
   def self_enroll_student(user, opts = {})
     enrollment = enroll_student(user, opts.merge(self_enrolled: true))
-    enrollment.accept(:force)
+    enrollment.accept(force: true)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
       new_pseudonym.save if new_pseudonym&.changed?
@@ -3295,13 +3311,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def users_visible_to(user, include_priors = false, opts = {})
+  def users_visible_to(user, include_priors: false, include_inactive: false, enrollment_state: nil, exclude_enrollment_state: nil, section_ids: nil)
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
 
     scope = if include_priors
               users
-            elsif opts[:include_inactive] && [:full, :sections].include?(visibility)
+            elsif include_inactive && [:full, :sections].include?(visibility)
               all_current_users
             else
               current_users
@@ -3311,9 +3327,9 @@ class Course < ActiveRecord::Base
                                            user,
                                            visibilities,
                                            visibility,
-                                           enrollment_state: opts[:enrollment_state],
-                                           exclude_enrollment_state: opts[:exclude_enrollment_state],
-                                           section_ids: opts[:section_ids])
+                                           enrollment_state:,
+                                           exclude_enrollment_state:,
+                                           section_ids:)
   end
 
   def enrollments_visible_to(user, opts = {})
@@ -3733,6 +3749,7 @@ class Course < ActiveRecord::Base
         tab[:external] = default_tab[:external]
         tab[:icon] = default_tab[:icon]
         tab[:target] = default_tab[:target] if default_tab[:target]
+        tab[:link_context_type] = default_tab[:link_context_type] if default_tab[:link_context_type]
         default_tabs.delete_if { |t| t[:id] == tab[:id] }
         external_tabs.delete_if { |t| t[:id] == tab[:id] }
         tab
@@ -3761,19 +3778,24 @@ class Course < ActiveRecord::Base
       tabs += default_tabs
       tabs += external_tabs
 
-      if root_account.feature_enabled?(:ams_root_account_integration) &&
-         feature_enabled?(:ams_course_integration) &&
-         tabs.any? { |t| t[:label] == "Item Banks" }
-        ams_item_banks_tab = {
-          id: TAB_ITEM_BANKS,
-          label: t("#tabs.item_banks", "Item Banks"),
-          css_class: "item_banks",
-          href: :course_item_banks_path,
-        }
+      is_ams = root_account.feature_enabled?(:ams_root_account_integration) &&
+               feature_enabled?(:ams_course_integration)
 
-        item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
-        tabs.delete_at(item_banks_index)
-        tabs.insert(item_banks_index, ams_item_banks_tab)
+      item_bank_href_override = if is_ams
+                                  :course_item_banks_path
+                                elsif feature_enabled?(:new_quizzes_native_experience)
+                                  :course_new_quizzes_banks_path
+                                else
+                                  nil
+                                end
+
+      if item_bank_href_override
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: item_bank_href_override,
+          context: self,
+          css_class: is_ams ? "item_banks" : nil
+        )
       end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
@@ -4090,7 +4112,7 @@ class Course < ActiveRecord::Base
     false
   end
 
-  def restrict_quantitative_data?(user = nil, check_extra_permissions = false)
+  def restrict_quantitative_data?(user = nil, check_extra_permissions: false)
     return false unless user.is_a?(User)
 
     # When check_extra_permissions is true, return false for a teacher,ta, admin, or designer

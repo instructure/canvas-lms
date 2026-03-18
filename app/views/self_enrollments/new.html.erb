@@ -20,7 +20,7 @@
   provide :page_title, t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name)
   js_bundle :self_enrollment
   css_bundle :self_enrollment
-  js_env :SELF_ENROLLMENT_OPTIONS => {:confirmEnrollmentUrl => @confirm_enrollment_url}
+  js_env({ SELF_ENROLLMENT_OPTIONS: { confirmEnrollmentUrl: @confirm_enrollment_url } })
 
   if !@current_user && !@embedded_view
     css_bundle :login

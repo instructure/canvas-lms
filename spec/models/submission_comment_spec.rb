@@ -261,15 +261,15 @@ RSpec.describe SubmissionComment do
     it "does not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@course).to_not be_available
-      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
+      expect(@course).not_to be_available
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create for provisional comments" do
@@ -1013,7 +1013,7 @@ RSpec.describe SubmissionComment do
       @assignment.post_policy.update_attribute(:post_manually, true)
       @assignment.hide_submissions(submission_ids: [@submission.id])
 
-      expect(ContentParticipation).to_not receive(:create_or_update)
+      expect(ContentParticipation).not_to receive(:create_or_update)
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
 
@@ -1024,7 +1024,7 @@ RSpec.describe SubmissionComment do
     end
 
     it "does not update participation for a draft comment" do
-      expect(ContentParticipation).to_not receive(:create_or_update)
+      expect(ContentParticipation).not_to receive(:create_or_update)
         .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment", draft_comment: true)
     end
@@ -1145,6 +1145,43 @@ RSpec.describe SubmissionComment do
         comment = @submission.submission_comments.create!(valid_attributes.merge(author: peer_reviewer))
         expect(comment.author_visible_name(peer_reviewer)).to eq(peer_reviewer.short_name)
       end
+    end
+  end
+
+  describe "#publishable_for?" do
+    before(:once) do
+      @comment_author = User.create!(name: "Comment Author")
+      @other_user = User.create!(name: "Other User")
+      @draft_comment = @submission.submission_comments.create!(
+        comment: "draft",
+        author: @comment_author,
+        draft: true
+      )
+      @published_comment = @submission.submission_comments.create!(
+        comment: "published",
+        author: @comment_author,
+        draft: false
+      )
+    end
+
+    it "returns true when the comment is a draft and the user is the author" do
+      expect(@draft_comment.publishable_for?(@comment_author)).to be true
+    end
+
+    it "returns false when the comment is published and the user is the author" do
+      expect(@published_comment.publishable_for?(@comment_author)).to be false
+    end
+
+    it "returns false when the comment is a draft and the user is not the author" do
+      expect(@draft_comment.publishable_for?(@other_user)).to be false
+    end
+
+    it "returns false when the comment is published and the user is not the author" do
+      expect(@published_comment.publishable_for?(@other_user)).to be false
+    end
+
+    it "returns false when user is nil" do
+      expect(@draft_comment.publishable_for?(nil)).to be false
     end
   end
 

@@ -70,7 +70,7 @@ describe "context modules" do
 
     context "expanding/collapsing modules" do
       before do
-        @mod = create_modules(2, true)
+        @mod = create_modules(2, published: true)
         @mod[0].add_item({ id: @assignment.id, type: "assignment" })
         @mod[1].add_item({ id: @assignment2.id, type: "assignment" })
         get "/courses/#{@course.id}/modules"

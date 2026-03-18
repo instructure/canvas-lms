@@ -22,16 +22,18 @@ require "action_controller"
 require_relative "data/owned_class"
 
 describe CanvasErrors do
-  error_testing_class = Class.new do
-    attr_accessor :exception, :details, :level
+  subject(:error_testing_class) do
+    Class.new do
+      attr_accessor :exception, :details, :level
 
-    def register!
-      target = self
-      CanvasErrors.register!(:test_thing) do |e, d, l|
-        target.exception = e
-        target.details = d
-        target.level = l
-        "ERROR_BLOCK_RESPONSE"
+      def register!
+        target = self
+        CanvasErrors.register!(:test_thing) do |e, d, l|
+          target.exception = e
+          target.details = d
+          target.level = l
+          "ERROR_BLOCK_RESPONSE"
+        end
       end
     end
   end
@@ -47,7 +49,7 @@ describe CanvasErrors do
     described_class.instance_variable_set(:@registry, @old_registry)
   end
 
-  let(:error) { double("Some Error", backtrace: []) }
+  let(:error) { instance_double(RuntimeError, backtrace: []) }
 
   describe ".capture_exception" do
     it "tags with the exception type and default level" do

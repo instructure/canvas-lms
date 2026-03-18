@@ -98,7 +98,7 @@ describe DiscussionTopicsApiController do
                      attachment: default_uploaded_data },
            format: "json"
 
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
       expect(response.body).to include("User storage quota exceeded")
     end
 
@@ -307,7 +307,7 @@ describe DiscussionTopicsApiController do
       @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
       user_session(@teacher)
 
-      @inst_llm = double("InstLLM::Client")
+      @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
     end
 
@@ -504,11 +504,7 @@ describe DiscussionTopicsApiController do
       before do
         @course.account.root_account.enable_feature!(:discussion_summary_with_cedar)
 
-        mock_response = Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
-          response: "cedar summary",
-          input_tokens: 100,
-          output_tokens: 200
-        )
+        mock_response = double(response: "cedar summary")
         stub_const("CedarClient", Class.new do
           define_singleton_method(:prompt) do |*|
             mock_response
@@ -535,6 +531,7 @@ describe DiscussionTopicsApiController do
 
       it "passes correct parameters to Cedar" do
         calls = []
+        mock_response = double(response: "cedar summary")
         stub_const("CedarClient", Class.new do
           define_singleton_method(:prompt) do |args|
             calls << args
@@ -542,11 +539,7 @@ describe DiscussionTopicsApiController do
             raise "Expected feature_slug to eq 'discussion-summary'" unless args[:feature_slug] == "discussion-summary"
             raise "Expected prompt to be present" unless args[:prompt].present?
 
-            Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
-              response: "cedar summary",
-              input_tokens: 100,
-              output_tokens: 200
-            )
+            mock_response
           end
         end)
 
@@ -787,7 +780,7 @@ describe DiscussionTopicsApiController do
 
     it "creates an insight and submits a job" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
-      expect_any_instance_of(DiscussionTopicInsight).to receive(:delay).and_return(double("DelayedJob", generate: nil))
+      expect_any_instance_of(DiscussionTopicInsight).to receive(:delay).and_return(instance_double(DiscussionTopicInsight, generate: nil))
 
       post "insight_generation", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
@@ -1229,7 +1222,7 @@ describe DiscussionTopicsApiController do
                                       workflow_state: "completed",
                                       error_message: nil,
                                       issue_count: 1,
-                                      accessibility_issues: double(select: []))
+                                      accessibility_issues: instance_double(ActiveRecord::Relation, select: []))
 
         expect(Accessibility::ResourceScannerService).to receive(:new)
           .with(resource: @topic)

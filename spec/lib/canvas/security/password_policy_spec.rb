@@ -25,17 +25,17 @@ describe Canvas::Security::PasswordPolicy do
   let(:account) { Account.default }
   let(:policy) { { common_passwords_attachment_id: 1 } }
   let(:attachment) do
-    double("Attachment",
-           size: 500.kilobytes,
-           open: StringIO.new("password1\npassword2\npassword3"),
-           root_account: account)
+    instance_double(Attachment,
+                    size: 500.kilobytes,
+                    open: StringIO.new("password1\npassword2\npassword3"),
+                    root_account: account)
   end
   let(:redis) { Canvas.redis }
   let(:cache_key) { "common_passwords:{#{account.global_id}}/#{policy[:common_passwords_attachment_id]}" }
 
   before do
     account.enable_feature!(:password_complexity)
-    allow(Attachment).to receive(:not_deleted).and_return(double(find_by: attachment))
+    allow(Attachment).to receive(:not_deleted).and_return(class_double(Attachment, find_by: attachment))
   end
 
   describe "validations" do
@@ -209,7 +209,7 @@ describe Canvas::Security::PasswordPolicy do
       end
 
       it "falls back to default common password dictionary when attachment is not found" do
-        allow(Attachment).to receive(:not_deleted).and_return(double(find_by: nil))
+        allow(Attachment).to receive(:not_deleted).and_return(class_double(Attachment, find_by: nil))
         pseudonym_with_policy(disallow_common_passwords: true)
         @pseudonym.password = @pseudonym.password_confirmation = "Password!"
         expect(@pseudonym).to be_valid
@@ -247,7 +247,7 @@ describe Canvas::Security::PasswordPolicy do
 
     context "when attachment is not found" do
       before do
-        allow(Attachment).to receive(:not_deleted).and_return(double(find_by: nil))
+        allow(Attachment).to receive(:not_deleted).and_return(class_double(Attachment, find_by: nil))
       end
 
       it "returns false" do
@@ -345,7 +345,7 @@ describe Canvas::Security::PasswordPolicy do
     context "when file loading fails for other reasons" do
       before do
         allow(redis).to receive(:srandmember).with(cache_key).and_return(nil)
-        allow(Attachment).to receive(:not_deleted).and_return(double(find_by: nil))
+        allow(Attachment).to receive(:not_deleted).and_return(class_double(Attachment, find_by: nil))
       end
 
       it "returns false when attachment is not found" do

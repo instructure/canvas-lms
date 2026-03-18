@@ -22,11 +22,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {IconCheckMarkLine} from '@instructure/ui-icons'
-import {getTagIcon} from '@canvas/outcomes/react/utils/icons'
+import {getTagIcon, type ProficiencyRating} from '@canvas/outcomes/react/utils/icons'
+import {getDescriptionForLevel} from '@canvas/outcomes/react/utils/masteryScaleLogic'
 import type {MasteryLevel} from './types'
 import MasteryDetail from './MasteryDetail'
-import {useMemo, useEffect, useState, useRef} from 'react'
+import {useMemo, useEffect, useState} from 'react'
 import type {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
+import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 
 const I18n = createI18nScope('outcome_management')
 
@@ -44,6 +46,7 @@ interface OutcomeAlignmentsListProps {
   outcomeScores: ContributingScoresForOutcome
   studentId: string
   masteryPoints: number
+  proficiencyRatings?: ProficiencyRating[]
   hasChartView?: boolean
 }
 
@@ -51,8 +54,14 @@ const OutcomeAlignmentsList = ({
   outcomeScores,
   studentId,
   masteryPoints,
+  proficiencyRatings: outcomeRatings,
   hasChartView = false,
 }: OutcomeAlignmentsListProps) => {
+  // Get proficiency ratings from props (outcome-specific), or fall back to context (global default)
+  const {outcomeProficiency} = useLMGBContext()
+  const proficiencyRatings: ProficiencyRating[] | undefined =
+    outcomeRatings || outcomeProficiency?.ratings
+
   // Combine alignments with their scores for the list view
   const alignmentsWithScores: AlignmentWithScore[] = useMemo(() => {
     if (!outcomeScores.data) return []
@@ -63,7 +72,7 @@ const OutcomeAlignmentsList = ({
     const combined: AlignmentWithScore[] = alignments.map((alignment, index) => {
       const score = userScores[index]
       const scoreValue = score?.score ?? null
-      const masteryLevel = getTagIcon(scoreValue, masteryPoints) as MasteryLevel
+      const masteryLevel = getTagIcon(scoreValue, masteryPoints, proficiencyRatings) as MasteryLevel
 
       return {
         alignmentId: alignment.alignment_id,
@@ -83,42 +92,44 @@ const OutcomeAlignmentsList = ({
       if (!b.submittedAt) return -1
       return new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
     })
-  }, [outcomeScores, studentId, masteryPoints])
+  }, [outcomeScores, studentId, masteryPoints, proficiencyRatings])
 
   // Load assignment type icons
-  const iconCache = useRef<Map<string, string>>(new Map())
-  const [iconsLoaded, setIconsLoaded] = useState(false)
+  const [iconCache, setIconCache] = useState<Map<string, string>>(new Map())
 
   useEffect(() => {
     const loadIcons = async () => {
       const types = new Set(alignmentsWithScores.map(a => a.type))
-      const loadPromises = Array.from(types).map(type => {
-        return new Promise<void>(resolve => {
-          if (iconCache.current.has(type)) {
-            resolve()
-            return
-          }
-          const img = new Image()
-          img.src = `/images/outcomes/${type}.svg`
-          img.onload = () => {
-            iconCache.current.set(type, img.src)
-            resolve()
-          }
-          img.onerror = () => {
-            // Fallback to assignment icon if type-specific icon fails
-            iconCache.current.set(type, '/images/outcomes/assignment.svg')
-            resolve()
-          }
-        })
+
+      // Check which types need loading
+      const typesToLoad = Array.from(types).filter(type => !iconCache.has(type))
+      if (typesToLoad.length === 0) return
+
+      // Load icons and collect results
+      const loadPromises = typesToLoad.map(
+        type =>
+          new Promise<[string, string]>(resolve => {
+            const img = new Image()
+            img.src = `/images/outcomes/${type}.svg`
+            img.onload = () => resolve([type, img.src])
+            img.onerror = () => resolve([type, '/images/outcomes/assignment.svg'])
+          }),
+      )
+
+      const results = await Promise.all(loadPromises)
+
+      // Update cache with new icons
+      setIconCache(prevCache => {
+        const newCache = new Map(prevCache)
+        results.forEach(([type, src]) => newCache.set(type, src))
+        return newCache
       })
-      await Promise.all(loadPromises)
-      setIconsLoaded(true)
     }
 
     if (alignmentsWithScores.length > 0) {
       loadIcons()
     }
-  }, [alignmentsWithScores])
+  }, [alignmentsWithScores, iconCache])
 
   if (alignmentsWithScores.length === 0) {
     return null
@@ -183,9 +194,9 @@ const OutcomeAlignmentsList = ({
 
                 {/* Assignment Type Icon */}
                 <Flex.Item width="1rem">
-                  {iconsLoaded && iconCache.current.has(alignment.type) && (
+                  {iconCache.has(alignment.type) && (
                     <img
-                      src={iconCache.current.get(alignment.type)}
+                      src={iconCache.get(alignment.type)}
                       alt={alignment.type}
                       style={{width: '1rem', height: '1rem'}}
                     />
@@ -214,7 +225,14 @@ const OutcomeAlignmentsList = ({
 
                 {/* Mastery Detail */}
                 <Flex.Item>
-                  <MasteryDetail masteryLevel={alignment.masteryLevel} />
+                  <MasteryDetail
+                    masteryLevel={alignment.masteryLevel}
+                    description={
+                      typeof alignment.masteryLevel === 'number' && proficiencyRatings
+                        ? getDescriptionForLevel(alignment.masteryLevel, proficiencyRatings)
+                        : undefined
+                    }
+                  />
                 </Flex.Item>
               </Flex>
             </View>

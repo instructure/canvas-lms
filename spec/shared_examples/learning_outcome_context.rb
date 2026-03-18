@@ -36,7 +36,7 @@ shared_examples_for "a learning outcome context" do
     end
 
     it "does not create a root outcome group if force is false" do
-      root = outcome_context.root_outcome_group(false)
+      root = outcome_context.root_outcome_group(force: false)
       expect(root).to be_nil
     end
   end

@@ -20,7 +20,6 @@ import type {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcesso
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
-import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import type {IframeDimensions} from '@canvas/lti/model/common'
 import type {Spacing} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
@@ -229,27 +228,15 @@ export const AssetProcessorsCard = ({
               iconUrl={icon.url}
             />
           </div>
-          <div style={{overflow: 'hidden', flex: 1}}>
+          <div style={{flex: 1}}>
             <div style={{marginRight: '1.4em'}}>
-              <TruncateWithTooltip
-                linesAllowed={2}
-                horizontalOffset={0}
-                backgroundColor="primary-inverse"
-              >
-                <Text weight="bold" size="medium">
-                  {title}
-                </Text>
-              </TruncateWithTooltip>
+              <Text weight="bold" size="medium" wrap="break-word">
+                {title}
+              </Text>
             </div>
             {description ? (
               <div style={{marginRight: '1.4em'}}>
-                <TruncateWithTooltip
-                  linesAllowed={4}
-                  horizontalOffset={0}
-                  backgroundColor="primary-inverse"
-                >
-                  {description}
-                </TruncateWithTooltip>
+                <Text wrap="break-word">{description}</Text>
               </div>
             ) : null}
             {children}

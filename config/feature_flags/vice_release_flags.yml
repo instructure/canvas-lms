@@ -91,14 +91,6 @@ apollo_caching:
     Allow for Apollo to cache graphQL queries on a users browser to speed up their experience
   applies_to: SiteAdmin
 
-react_people_page:
-  state: hidden
-  display_name: People Page Upgrade
-  description: |-
-    This feature flag enables the React/InstUI and GraphQL People page upgrade.
-  applies_to: RootAccount
-  shadow: true
-
 discussion_checkpoints:
   state: allowed
   display_name: Discussion Checkpoints
@@ -139,7 +131,6 @@ discussion_insights:
   applies_to: Course
   display_name: IgniteAI Insights for Discussions
   root_opt_in: true
-  beta: true
   description: |-
     Allow access to discussion insights
 
@@ -189,3 +180,18 @@ restore_discussion_entry:
   display_name: Restore Discussion Entry
   description: |-
     This feature flag enables the ability to restore deleted discussion entries in the discussion topic with moderate permission or the entry creator.
+
+inbox_sis_id_for_duplicates:
+  state: hidden
+  beta: true
+  applies_to: SiteAdmin
+  display_name: Inbox - SIS ID for Duplicate Names
+  description: |-
+    When enabled, displays SIS IDs in the Inbox recipient selector
+    to help differentiate users with identical names. Only visible
+    to users with read_sis permission (teachers by default).
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

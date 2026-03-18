@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback, useEffect} from 'react'
+import React, {useState, useCallback, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -118,10 +118,15 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     settings: gradebookSettings,
   })
 
+  const sortedOutcomeIds = useMemo(
+    () => outcomes.map(outcome => outcome.id.toString()).sort(),
+    [outcomes],
+  )
+
   const {data: distributionData, isLoading: isLoadingDistribution} = useMasteryDistribution({
     courseId,
     filters: mapSettingsToFilters(gradebookSettings),
-    outcomeIds: outcomes.map(outcome => outcome.id.toString()),
+    outcomeIds: sortedOutcomeIds,
     includeAlignments: true,
     onlyAssignmentAlignments: true,
     showUnpublishedAssignments: false,

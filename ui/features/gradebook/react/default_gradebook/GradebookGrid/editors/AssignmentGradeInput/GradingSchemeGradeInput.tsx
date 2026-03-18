@@ -79,7 +79,7 @@ export default class GradingSchemeInput extends Component {
     gradingScheme: instanceOf(Array).isRequired,
     pointsBasedGradingScheme: bool,
     label: element.isRequired,
-    menuContentRef: Menu.propTypes.menuRef,
+    menuContentRef: func,
     messages: arrayOf(
       shape({
         text: string.isRequired,

@@ -182,18 +182,32 @@ describe AuthenticationProvidersPresenter do
     end
   end
 
-  describe "#native_discovery_enabled?" do
-    it "returns true when account.native_discovery_enabled? is true" do
+  describe "#discovery_page_active?" do
+    it "returns true when account.discovery_page_active is true" do
       account = Account.create!(name: "Test")
-      account.native_discovery_enabled = true
+      account.discovery_page_active = true
       presenter = described_class.new(account)
-      expect(presenter.native_discovery_enabled?).to be(true)
+      expect(presenter.discovery_page_active?).to be(true)
     end
 
-    it "returns false when account.native_discovery_enabled? is false" do
+    it "returns false when account.discovery_page_active is false" do
       account = Account.create!(name: "Test")
       presenter = described_class.new(account)
-      expect(presenter.native_discovery_enabled?).to be(false)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when active is nil" do
+      account = Account.create!(name: "Test")
+      account.settings[:discovery_page] = { active: nil }
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when discovery_page is not set" do
+      account = Account.create!(name: "Test")
+      account.settings.delete(:discovery_page)
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
     end
   end
 

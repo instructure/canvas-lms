@@ -369,13 +369,13 @@ describe Enrollment do
     let(:student) { User.create! }
     let(:teacher) do
       user = User.create!
-      @course.enroll_teacher(user).accept(true)
+      @course.enroll_teacher(user).accept(force: true)
       user
     end
 
     before do
       original_enrollment = @course.enroll_student(student)
-      original_enrollment.accept(true)
+      original_enrollment.accept(force: true)
       assignment.grade_student(student, grade: "10", grader: teacher)
       original_enrollment.destroy!
     end
@@ -1282,7 +1282,7 @@ describe Enrollment do
     @enrollment.type = "ObserverEnrollment"
     @enrollment.user_id = observed.id
     @enrollment.associated_user_id = observed.id
-    expect(@enrollment).to_not be_valid
+    expect(@enrollment).not_to be_valid
   end
 
   it "does not allow an enrollment to be created in a template course" do
@@ -1486,7 +1486,7 @@ describe Enrollment do
       user_with_pseudonym
       e = @course.enroll_student(@user)
       expect(e).to be_inactive
-      expect(e.messages_sent).to_not include("Enrollment Registration")
+      expect(e.messages_sent).not_to include("Enrollment Registration")
 
       Timecop.freeze(2.days.from_now) do
         expect(e).to be_invited
@@ -1511,7 +1511,7 @@ describe Enrollment do
       @course.enroll_student(student)
       student.reload
       observer.reload
-      expect(student.messages).to_not be_empty
+      expect(student.messages).not_to be_empty
       expect(observer.messages).to be_empty
     end
 
@@ -1712,7 +1712,7 @@ describe Enrollment do
         end
       end
 
-      def course_section_availability_test(should_be_invited = false)
+      def course_section_availability_test(should_be_invited: false)
         @section = @course.course_sections.first
         expect(@section).not_to be_nil
         @enrollment.course_section = @section
@@ -1947,7 +1947,7 @@ describe Enrollment do
         end
 
         it "accepts into the right state based on availability dates on course_section" do
-          course_section_availability_test(true)
+          course_section_availability_test(should_be_invited: true)
         end
 
         it "accepts into the right state based on availability dates on course" do
@@ -3331,8 +3331,8 @@ describe Enrollment do
 
   describe "#can_be_deleted_by" do
     describe "on a student enrollment" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
+      let(:user) { instance_double(User, id: 42) }
+      let(:session) { instance_double(ActionDispatch::Request::Session) }
 
       before do
         course_with_student
@@ -3367,8 +3367,8 @@ describe Enrollment do
     end
 
     describe "on an observer enrollment" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
+      let(:user) { instance_double(User, id: 42) }
+      let(:session) { instance_double(ActionDispatch::Request::Session) }
 
       before do
         course_with_observer
@@ -3394,8 +3394,8 @@ describe Enrollment do
     end
 
     describe "on a teacher enrollment" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
+      let(:user) { instance_double(User, id: 42) }
+      let(:session) { instance_double(ActionDispatch::Request::Session) }
 
       before do
         course_with_teacher

@@ -17,7 +17,6 @@
  */
 
 import {Text} from '@instructure/ui-text'
-import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -33,10 +32,8 @@ export function ToolContextName({tool}: ToolContextNameProps) {
   }
 
   return (
-    <TruncateWithTooltip linesAllowed={2} horizontalOffset={0} backgroundColor="primary-inverse">
-      <Text size="medium">
-        {I18n.t('Installed in: %{contextName}', {contextName: tool.context_name})}
-      </Text>
-    </TruncateWithTooltip>
+    <Text size="medium" wrap="break-word">
+      {I18n.t('Installed in: %{contextName}', {contextName: tool.context_name})}
+    </Text>
   )
 }

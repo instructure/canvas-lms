@@ -82,7 +82,7 @@ describe Mutations::CreateGroupInSet do
       validation_errors = result.dig(*%w[data createGroupInSet errors])
       expect(validation_errors.size).to eq 1
       expect(validation_errors[0]["attribute"]).to eq "name"
-      expect(validation_errors[0]["message"]).to_not be_nil
+      expect(validation_errors[0]["message"]).not_to be_nil
 
       expect(result.dig("data", "createGroupInSet", "group")).to be_nil
     end

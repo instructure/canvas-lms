@@ -133,7 +133,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         }
       }
       mySubAssignmentSubmissions {
-        ...Submission
+        ...DiscussionSubmission
       }
       errors {
         ...Error
@@ -222,7 +222,7 @@ export const UPDATE_DISCUSSION_READ_STATE = gql`
 
 export const UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT = gql`
   mutation UpdateSplitScreenViewDeeplyNestedAlert($splitScreenViewDeeplyNestedAlert: Boolean!) {
-    UpdateSplitScreenViewDeeplyNestedAlert(
+    updateSplitScreenViewDeeplyNestedAlert(
       input: {splitScreenViewDeeplyNestedAlert: $splitScreenViewDeeplyNestedAlert}
     ) {
       user {

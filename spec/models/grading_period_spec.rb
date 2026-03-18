@@ -710,7 +710,7 @@ describe GradingPeriod do
         start_date: 2.months.ago(now),
         end_date: 1.month.ago(now)
       )
-      expect(grading_period).to_not be_current
+      expect(grading_period).not_to be_current
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)",
@@ -727,7 +727,7 @@ describe GradingPeriod do
         start_date: 1.month.from_now(now),
         end_date: 2.months.from_now(now)
       )
-      expect(grading_period).to_not be_current
+      expect(grading_period).not_to be_current
     end
   end
 

@@ -22,6 +22,7 @@ import {executeQuery} from '@canvas/graphql'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {UPDATE_WIDGET_DASHBOARD_LAYOUT} from '../constants'
 import type {WidgetConfig} from '../types'
+import {announceToScreenReader} from '../utils/screenReaderAnnounce'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -55,6 +56,7 @@ export const WidgetDashboardEditProvider: React.FC<{children: React.ReactNode}> 
     setIsEditMode(true)
     setIsDirty(false)
     setSaveError(null)
+    announceToScreenReader(I18n.t('Widget customize mode enabled'))
   }, [])
 
   const exitEditMode = useCallback(() => {
@@ -85,6 +87,7 @@ export const WidgetDashboardEditProvider: React.FC<{children: React.ReactNode}> 
       setSaveError(null)
       try {
         await saveMutation.mutateAsync(config)
+        announceToScreenReader(I18n.t('Dashboard updates saved'))
         setIsEditMode(false)
         setIsDirty(false)
       } catch {

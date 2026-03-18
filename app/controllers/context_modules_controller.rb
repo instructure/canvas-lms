@@ -25,6 +25,7 @@ class ContextModulesController < ApplicationController
   include ObserverModuleInfo
 
   before_action :require_context
+  skip_before_action :require_user, only: %i[content_tag_assignment_data index progressions]
 
   include HorizonMode
 
@@ -299,8 +300,10 @@ class ContextModulesController < ApplicationController
       end
       add_body_class("padless-content")
 
-      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
-      js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
+      js_env({
+               CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+               CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url)
+             })
 
       if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
@@ -340,7 +343,7 @@ class ContextModulesController < ApplicationController
             visible: !@last_web_export.nil?
           },
         }
-        js_env(CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props)
+        js_env({ CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props })
 
         modules_permissions = {
           canAdd: @can_add,
@@ -357,20 +360,23 @@ class ContextModulesController < ApplicationController
         if @current_user
           observed_users_list = observed_users(@current_user, session, @context.id)
           if observed_users_list.present?
-            js_env({ OBSERVER_OPTIONS: {
-                     OBSERVED_USERS_LIST: observed_users_list,
-                     CAN_ADD_OBSERVEE: @current_user
-                                        .profile
-                                        .tabs_available(@current_user, root_account: @domain_root_account)
-                                        .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
-                   } })
+            js_env({
+                     OBSERVER_OPTIONS: {
+                       OBSERVED_USERS_LIST: observed_users_list,
+                       CAN_ADD_OBSERVEE: @current_user
+                                               .profile
+                                               .tabs_available(@current_user, root_account: @domain_root_account)
+                                               .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                     }
+                   })
           end
         end
 
-        js_env(MODULES_PERMISSIONS: modules_permissions)
-        js_env(MODULES_OBSERVER_INFO: observer_module_info)
-
-        js_env(PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}")
+        js_env({
+                 MODULES_PERMISSIONS: modules_permissions,
+                 MODULES_OBSERVER_INFO: observer_module_info,
+                 PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}"
+               })
 
         js_bundle :context_modules_v2
         css_bundle :content_next, :context_modules2, :context_modules_v2

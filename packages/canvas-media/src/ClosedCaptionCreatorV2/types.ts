@@ -17,9 +17,9 @@
  */
 
 /**
- * Upload/Processing states for caption files
+ * Caption track workflow states — mirrors backend workflow_state values
  */
-export type CaptionUploadStatus = 'processing' | 'failed' | 'uploaded'
+export type WorkflowState = 'processing' | 'failed' | 'ready'
 
 /**
  * Creation mode for new captions
@@ -40,10 +40,13 @@ export interface SubtitleFile {
 export interface Subtitle {
   locale: string // Language code (e.g., 'en', 'fr', 'es')
   inherited?: boolean // Whether caption is inherited from parent course
-  file: SubtitleFile
+  asr?: boolean // Whether caption is auto-generated
+  file?: SubtitleFile // Absent for ASR-generated captions (no local file)
   isNew?: boolean // Whether this is a newly added caption
-  status?: CaptionUploadStatus // Upload state (processing, failed, or uploaded)
+  workflow_state?: WorkflowState // Mirrors backend workflow_state: processing, failed, or ready
   errorMessage?: string // Error message if upload failed
+  failedOperation?: 'upload' | 'delete' | 'asr' // Which operation failed, used for retry
+  rawFile?: File // In-memory file kept for upload retry; never persisted to server
 }
 
 /**

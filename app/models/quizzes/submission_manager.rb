@@ -23,7 +23,7 @@ module Quizzes
       @quiz = quiz
     end
 
-    def find_or_create_submission(user, temporary = false, state = nil)
+    def find_or_create_submission(user, temporary: false, state: nil)
       s = nil
       state ||= "untaken"
       @quiz.shard.activate do

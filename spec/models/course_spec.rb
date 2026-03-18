@@ -496,6 +496,24 @@ describe Course do
       expect(@course.public_syllabus).to be false
     end
 
+    it "versions attachment associations with the course syllabus" do
+      course_model
+      attachment_model(context: @course)
+      @course.update(syllabus_body: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+      @course.reload.update(syllabus_body: "meh", updating_user: @teacher)
+
+      expect(YAML.load(@course.reload.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                                    attachment_id: @attachment.id,
+                                                                                                                    context_id: @course.id,
+                                                                                                                    context_type: "Course",
+                                                                                                                    root_account_id: @course.root_account_id,
+                                                                                                                    user_id: @teacher.id,
+                                                                                                                    context_concern: "syllabus_body"
+                                                                                                                  })
+
+      expect(YAML.load(@course.reload.versions.find_by(number: 2).yaml)["attachment_associations"]).to eq([])
+    end
+
     it "returns offline web export flag" do
       expect(@course.enable_offline_web_export?).to be false
       account = Account.default
@@ -812,7 +830,7 @@ describe Course do
       it "does not allow updating account to site_admin" do
         course = course_model
         course.root_account = Account.site_admin
-        expect(course).to_not be_valid
+        expect(course).not_to be_valid
       end
 
       it "does not allow updating account to a subaccount where roles for existing enrollments don't exist" do
@@ -836,6 +854,8 @@ describe Course do
         enrollment = course.enroll_user(user, "StudentEnrollment", role:)
 
         account2 = Account.default.sub_accounts.create!
+        # ensure the most specific role is chosen (it should prefer the one in the subaccount)
+        Account.default.roles.create! name: "Something", base_role_type: "StudentEnrollment"
         # ensure the active role is chosen if there are dups (a unique constraint ensures only one active one can exist)
         account2.roles.create! name: "Something", workflow_state: "inactive", base_role_type: "StudentEnrollment"
         role2 = account2.roles.create! name: "Something", workflow_state: "active", base_role_type: "StudentEnrollment"
@@ -851,7 +871,7 @@ describe Course do
 
         new_course = course_factory
         new_course.sis_source_id = other_course.sis_source_id
-        expect(new_course).to_not be_valid
+        expect(new_course).not_to be_valid
         new_course.sis_source_id = nil
         expect(new_course).to be_valid
       end
@@ -863,7 +883,7 @@ describe Course do
 
         new_course = course_factory
         new_course.integration_id = other_course.integration_id
-        expect(new_course).to_not be_valid
+        expect(new_course).not_to be_valid
         new_course.integration_id = nil
         expect(new_course).to be_valid
       end
@@ -915,7 +935,7 @@ describe Course do
       expect(code).to eql(@course.course_code)
       @course.course_code = nil
       @course.save
-      expect(code).to_not eql(@course.course_code)
+      expect(code).not_to eql(@course.course_code)
     end
 
     it "removes carriage returns from the name" do
@@ -1774,7 +1794,7 @@ describe Course do
     end
 
     it "filters users by section_ids" do
-      visible_users = @course.users_visible_to(@teacher, false, section_ids: [@section1.id, @section2.id])
+      visible_users = @course.users_visible_to(@teacher, section_ids: [@section1.id, @section2.id])
       expect(visible_users.pluck(:id)).to include(@student1.id, @student2.id)
       expect(visible_users.pluck(:id)).not_to include(@student3.id)
     end
@@ -1785,7 +1805,7 @@ describe Course do
     end
 
     it "returns empty when filtering by non-existent section" do
-      visible_users = @course.users_visible_to(@teacher, false, section_ids: [99_999])
+      visible_users = @course.users_visible_to(@teacher, section_ids: [99_999])
       expect(visible_users.count).to eq(0)
     end
 
@@ -1793,7 +1813,6 @@ describe Course do
       @course.enrollments.where(user_id: @student2.id).first.conclude
       visible_users = @course.users_visible_to(
         @teacher,
-        false,
         section_ids: [@section1.id, @section2.id],
         exclude_enrollment_state: "completed"
       )
@@ -1980,17 +1999,17 @@ describe Course do
         participants = @course.participants
         expect(participants).to include(@student)
 
-        expect(@course.participating_students_by_date).to_not include(@student)
+        expect(@course.participating_students_by_date).not_to include(@student)
         expect(@course.participating_admins_by_date).to include(@ta)
 
         by_date = @course.participants(by_date: true)
-        expect(by_date).to_not include(@student)
+        expect(by_date).not_to include(@student)
         expect(by_date).to include(@ta)
 
         @course.enrollment_term.set_overrides(@course.root_account, "TaEnrollment" => { start_at: 3.days.ago, end_at: 2.days.ago })
         @course.reload
-        expect(@course.participants(by_date: true)).to_not include(@ta)
-        expect(@course.participating_admins_by_date).to_not include(@ta)
+        expect(@course.participants(by_date: true)).not_to include(@ta)
+        expect(@course.participating_admins_by_date).not_to include(@ta)
       end
     end
 
@@ -2015,7 +2034,7 @@ describe Course do
       context "excluding specific students" do
         it "rejects observers only following one of the excluded students" do
           partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
-          [@student, @student_following_observer].each { |usr| expect(partic).to_not include(usr) }
+          [@student, @student_following_observer].each { |usr| expect(partic).not_to include(usr) }
         end
 
         it "includes admins and course level observers" do
@@ -2028,7 +2047,7 @@ describe Course do
     it "excludes some student when passed their id" do
       partic = @course.participants(include_observers: false, excluded_user_ids: [@student.id])
       [@ta, @teach].each { |usr| expect(partic).to include(usr) }
-      expect(partic).to_not include(@student)
+      expect(partic).not_to include(@student)
     end
   end
 
@@ -3240,6 +3259,24 @@ describe Course do
           tabs = @course.tabs_available(@student)
           expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
         end
+
+        it "includes link_context_type in tab_configuration" do
+          l2 = NavMenuLink.create!(context: @course.account, course_nav: true, url: "https://example.com", label: "l2")
+          @course.tab_configuration = [
+            { "id" => Course::TAB_HOME },
+            { "id" => "nav_menu_link_#{link.id}" },
+            { "id" => "nav_menu_link_#{l2.id}" },
+          ]
+          @course.save!
+
+          tabs = @course.tabs_available(@teacher)
+          expect(tabs[1][:id]).to eq("nav_menu_link_#{link.id}")
+          expect(tabs[1][:link_context_type]).to eq("course")
+
+          expect(tabs[2][:id]).to eq("nav_menu_link_#{l2.id}")
+          expect(tabs[2][:link_context_type]).to eq("account")
+          expect(tabs[2][:label]).to eq("l2")
+        end
       end
 
       it "handles hidden_unused correctly for discussions" do
@@ -3275,7 +3312,7 @@ describe Course do
       it "does not include Announcements without read_announcements rights" do
         @course.account.role_overrides.create!(role: teacher_role, permission: "read_announcements", enabled: false)
         tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).pluck(:id)
-        expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
+        expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
       end
 
       it "shows people tab with granular permissions if hidden" do
@@ -3894,7 +3931,7 @@ describe Course do
 
         course_observers = @course.active_course_level_observers
         expect(course_observers).to include(@course_level_observer)
-        expect(course_observers).to_not include(@oe.user)
+        expect(course_observers).not_to include(@oe.user)
       end
     end
 
@@ -5006,7 +5043,7 @@ describe Course do
     end
 
     context "integration suite" do
-      def quick_sanity_check(user, expect_success = true)
+      def quick_sanity_check(user, expect_success: true)
         Course.valid_grade_export_types["test_export"] = {
           name: "test export",
           callback: lambda do |course, _enrollments, publishing_user, publishing_pseudonym|
@@ -5047,7 +5084,7 @@ describe Course do
 
       it "does not allow grade publishing for a user that is disallowed" do
         @user = User.new
-        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, expect_success: false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not allow grade publishing for a user with a pseudonym in the wrong account" do
@@ -5055,7 +5092,7 @@ describe Course do
         @pseudonym.account = account_model
         @pseudonym.sis_user_id = "U1"
         @pseudonym.save!
-        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, expect_success: false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not allow grade publishing for a user with a pseudonym without a sis id" do
@@ -5063,7 +5100,7 @@ describe Course do
         @pseudonym.account_id = @course.root_account_id
         @pseudonym.sis_user_id = nil
         @pseudonym.save!
-        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, expect_success: false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not publish empty csv" do
@@ -5082,7 +5119,7 @@ describe Course do
         @ps.save!
 
         @course.grading_standard_id = 0
-        expect(SSLCommon).to_not receive(:post_data) # like c'mon dude why send an empty csv file
+        expect(SSLCommon).not_to receive(:post_data) # like c'mon dude why send an empty csv file
         @course.publish_final_grades(@user)
       end
 
@@ -5547,7 +5584,7 @@ describe Course do
       expect(Course.manageable_by_user(user.id).map(&:id)).to include(course.id)
 
       user.account_users.first.destroy!
-      expect(Course.manageable_by_user(user.id)).to_not be_exists
+      expect(Course.manageable_by_user(user.id)).not_to be_exists
     end
 
     it "includes courses the user is actively enrolled in as a teacher" do
@@ -5687,10 +5724,10 @@ describe Course do
     it "includes the course's banks if include_self is true" do
       @account = Account.create
       @course = Course.create(account: @account)
-      expect(@course.inherited_assessment_question_banks(true)).to be_empty
+      expect(@course.inherited_assessment_question_banks(include_self: true)).to be_empty
 
       bank = @course.assessment_question_banks.create
-      expect(@course.inherited_assessment_question_banks(true)).to eq [bank]
+      expect(@course.inherited_assessment_question_banks(include_self: true)).to eq [bank]
     end
 
     it "includes all banks in the account hierarchy" do
@@ -5718,7 +5755,7 @@ describe Course do
       @course = Course.create(account: @account)
       bank = @course.assessment_question_banks.create
 
-      banks = @course.inherited_assessment_question_banks(true)
+      banks = @course.inherited_assessment_question_banks(include_self: true)
       expect(banks.order(:id)).to eq [root_bank, account_bank, bank]
       expect(banks.where(id: bank).first).to eql bank
       expect(banks.where(id: account_bank).first).to eql account_bank
@@ -5804,7 +5841,7 @@ describe Course do
         enrollment = @course.enrollments.where(user: @student2).first
         enrollment.deactivate
 
-        expect(@course.users_visible_to(@teacher, include: [:inactive])).to include(@student2)
+        expect(@course.users_visible_to(@teacher, include_priors: true)).to include(@student2)
       end
 
       it "does not return inactive users when not included from all sections" do
@@ -5818,7 +5855,7 @@ describe Course do
         enrollment = @course.enrollments.where(user: @student2).first
         enrollment.conclude
 
-        expect(@course.users_visible_to(@teacher, include: [:completed])).to include(@student2)
+        expect(@course.users_visible_to(@teacher, include_priors: true)).to include(@student2)
       end
 
       it "does not return concluded users when not included from all sections" do
@@ -6084,7 +6121,7 @@ describe Course do
   describe "#sync_homeroom_enrollments" do
     before :once do
       @homeroom_course = course_factory(active_course: true)
-      toggle_k5_setting(@homeroom_course.account, true)
+      toggle_k5_setting(@homeroom_course.account)
       @homeroom_course.homeroom_course = true
       @homeroom_course.save!
 
@@ -6194,7 +6231,7 @@ describe Course do
       before :once do
         @shard1.activate do
           account = Account.create!
-          toggle_k5_setting(account, true)
+          toggle_k5_setting(account, enable: true)
           @cross_shard_course = course_factory(account:, active_course: true)
           @cross_shard_course.sync_enrollments_from_homeroom = true
           @cross_shard_course.homeroom_course_id = @homeroom_course.id
@@ -6219,7 +6256,7 @@ describe Course do
   describe "#sync_homeroom_participation" do
     before :once do
       @homeroom_course = course_factory(active_course: true)
-      toggle_k5_setting(@homeroom_course.account, true)
+      toggle_k5_setting(@homeroom_course.account)
       @homeroom_course.homeroom_course = true
       @homeroom_course.save!
 
@@ -6286,7 +6323,7 @@ describe Course do
   describe "#sync_with_homeroom" do
     before :once do
       @account = Account.default
-      toggle_k5_setting(@account, true)
+      toggle_k5_setting(@account)
 
       @homeroom_course1 = course_factory(active_course: true, account: @account)
       @homeroom_course1.homeroom_course = true
@@ -6338,7 +6375,7 @@ describe Course do
   describe ".syncing_subjects" do
     before :once do
       @account = Account.default
-      toggle_k5_setting(@account, true)
+      toggle_k5_setting(@account)
 
       @homeroom_course1 = course_factory(active_course: true, account: @account)
       @homeroom_course1.homeroom_course = true
@@ -6662,7 +6699,7 @@ describe Course do
 
       it "does not allow students to read files" do
         user.student_enrollments.create!(workflow_state: "active", course: @course)
-        expect(@course.check_policy(user)).to_not include :read_files
+        expect(@course.check_policy(user)).not_to include :read_files
       end
 
       it "allows teachers to read files" do
@@ -7202,14 +7239,14 @@ describe Course do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment", role: @lazy_role)
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
         expect(@user.enrollments.count).to be 2
-        expect(enrollment1).to_not eql enrollment2
+        expect(enrollment1).not_to eql enrollment2
       end
 
       it "does not re-use an enrollment with no role when enrolling with a role" do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment")
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
         expect(@user.enrollments.count).to be 2
-        expect(enrollment1).to_not eql enrollment2
+        expect(enrollment1).not_to eql enrollment2
       end
 
       it "does not re-use an enrollment with a role when enrolling with no role" do
@@ -7677,12 +7714,12 @@ describe Course do
       end
 
       it "does not show to student not in section" do
-        expect(@course.module_items_visible_to(@student)).to_not include(@topic_tag)
+        expect(@course.module_items_visible_to(@student)).not_to include(@topic_tag)
       end
 
       it "does not show to student if visibiilty is deleted" do
         @topic.discussion_topic_section_visibilities.destroy_all
-        expect(@course.module_items_visible_to(@other_section_student)).to_not include(@topic_tag)
+        expect(@course.module_items_visible_to(@other_section_student)).not_to include(@topic_tag)
       end
 
       it "shows to teacher" do
@@ -7727,7 +7764,7 @@ describe Course do
       end
 
       context "when module not exist on the course" do
-        subject { @course.visible_module_items_by_module(@teacher, double("mock", id: "noop")) }
+        subject { @course.visible_module_items_by_module(@teacher, instance_double(ContextModule, id: "noop")) }
 
         it "should return empty list" do
           expect(subject.length).to be(0)
@@ -7751,7 +7788,7 @@ describe Course do
       end
 
       context "when module not exist on the course" do
-        subject { @course.visible_module_items_by_module(@student, double("mock", id: "noop")) }
+        subject { @course.visible_module_items_by_module(@student, instance_double(ContextModule, id: "noop")) }
 
         it "should return empty list" do
           expect(subject.length).to be(0)
@@ -9149,6 +9186,48 @@ describe Course do
       course_model
       expect { @course.destroy }.to change { @course.reload.deleted_at }.from(nil).to be_truthy
     end
+
+    it "soft-deletes associated LTI context controls" do
+      course = course_model
+      registration = lti_registration_with_tool(account: course.account)
+      deployment = registration.deployments.first
+
+      # Create a context control for the course
+      control = Lti::ContextControl.create!(
+        context: course,
+        registration:,
+        deployment:
+      )
+
+      expect(control.workflow_state).not_to eq("deleted_with_context")
+
+      course.destroy
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+      expect(control.updated_at).to be > control.created_at
+    end
+
+    it "restores LTI context controls when course is undeleted" do
+      course = course_model
+      registration = lti_registration_with_tool(account: course.account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: course,
+        registration:,
+        deployment:
+      )
+
+      # Delete the course
+      course.destroy
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the course
+      course.process_event(:undelete)
+      course.save!
+
+      expect(control.reload.workflow_state).to eq("active")
+    end
   end
 
   describe "#all_dates" do
@@ -9532,7 +9611,7 @@ describe Course do
     end
 
     let(:regular_account) { Account.create! }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, ingest_url: true, ingest_html: true)
@@ -9673,11 +9752,12 @@ describe Course do
 
     describe "#exceeds_accessibility_scan_limit?" do
       before do
-        allow(course.wiki_pages).to receive(:not_deleted).and_return(double(count: wiki_count))
-        active_assignments = double(not_excluded_from_accessibility_scan: double(count: assignment_count))
+        allow(course.wiki_pages).to receive(:not_deleted).and_return(instance_double(ActiveRecord::Relation, count: wiki_count))
+        not_excluded = instance_double(ActiveRecord::Relation, count: assignment_count)
+        active_assignments = class_double(Assignment, not_excluded_from_accessibility_scan: not_excluded)
         allow(course.assignments).to receive(:active).and_return(active_assignments)
-        allow(course.discussion_topics).to receive(:scannable).and_return(double(count: discussion_topic_count))
-        allow(course.announcements).to receive(:active).and_return(double(count: announcement_count))
+        allow(course.discussion_topics).to receive(:scannable).and_return(instance_double(ActiveRecord::Relation, count: discussion_topic_count))
+        allow(course.announcements).to receive(:active).and_return(instance_double(ActiveRecord::Relation, count: announcement_count))
       end
 
       context "when total resources exceed limit" do
@@ -9836,7 +9916,7 @@ describe Course do
         course.restrict_enrollments_to_course_dates = true
       else
         course.restrict_enrollments_to_course_dates = false
-        enrollment_term = double("EnrollmentTerm", start_at:, end_at:)
+        enrollment_term = instance_double(EnrollmentTerm, start_at:, end_at:)
         allow(course).to receive(:enrollment_term).and_return(enrollment_term)
       end
       expect(course.active_now?).to eq(expected)

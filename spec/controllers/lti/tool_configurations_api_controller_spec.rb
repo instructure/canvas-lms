@@ -99,7 +99,8 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
   shared_examples_for "an endpoint that accepts a settings_url" do
     let(:ok_response) do
-      double(
+      instance_double(
+        Net::HTTPSuccess,
         :body => canvas_lti_configuration.to_json,
         :is_a? => true,
         "[]" => "application/json"
@@ -198,7 +199,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     context "when the response is not a success" do
       subject { json_parse["errors"].first["message"] }
 
-      let(:stubbed_response) { double }
+      let(:stubbed_response) { instance_double(Net::HTTPResponse) }
 
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
@@ -666,15 +667,20 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           },
           scopes: [],
           developer_key:,
-          lti_registration: developer_key.lti_registration,
-          registration_overlay: {
-            "privacy_level" => "anonymous"
-          }
+          lti_registration: developer_key.lti_registration
         )
+      end
+
+      let(:overlay) do
+        Lti::Overlay.create!(updated_by: account_admin_user,
+                             registration: developer_key.lti_registration,
+                             account:,
+                             data: { privacy_level: "anonymous" })
       end
 
       before do
         ims_registration
+        overlay
       end
 
       it "returns the registration with its overlay applied" do
@@ -682,27 +688,6 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         expect(json_parse.with_indifferent_access
           .dig(:tool_configuration, :settings, :extensions)[0][:privacy_level])
           .to eq "anonymous"
-      end
-
-      context "when the overlay is stored on an Lti::Overlay" do
-        let(:overlay) do
-          Lti::Overlay.create!(updated_by: account_admin_user,
-                               registration: developer_key.lti_registration,
-                               account:,
-                               data: { privacy_level: "anonymous" })
-        end
-
-        before do
-          overlay
-          ims_registration.update!(registration_overlay: nil)
-        end
-
-        it "still returns the registration with its overlay applied" do
-          subject
-          expect(json_parse.with_indifferent_access
-            .dig(:tool_configuration, :settings, :extensions)[0][:privacy_level])
-            .to eq "anonymous"
-        end
       end
     end
   end

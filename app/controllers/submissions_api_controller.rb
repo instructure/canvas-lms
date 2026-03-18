@@ -1213,7 +1213,7 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update_anonymous
-    assignment_scope = AbstractAssignment.assignment_or_peer_review.where(context: @context).active
+    assignment_scope = AbstractAssignment.assignment_scope_for_context(@context).active
     @assignment = api_find(assignment_scope, params[:assignment_id])
     @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
     @user = get_user_considering_section(@submission.user_id)

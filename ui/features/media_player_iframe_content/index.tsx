@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@canvas/react'
 // TODO: use URL() in browser to parse URL
 // eslint-disable-next-line import/no-nodejs-modules
@@ -28,11 +27,16 @@ import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {MediaInfo} from '@canvas/canvas-studio-player/react/types'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import {NoTranscript} from './components/NoTranscript'
+import {isAsrGenerating} from './utils/isAsrGenerating'
+
+import {createOnTranscriptEdit, onConfirmEditChanges} from './transcriptEditing'
 
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
   attachment_id?: string
   attachment?: boolean
+  current_user_roles?: string[]
   FEATURES: {
     consolidated_media_player_iframe?: boolean
   }
@@ -42,6 +46,10 @@ const I18n = createI18nScope('CanvasMediaPlayer')
 
 const isStandalone = () => {
   return !window.frameElement && window.location === window?.top?.location
+}
+
+const isRceEditMode = () => {
+  return window.parent.document.body.id === 'tinymce'
 }
 
 const addVerifier = (url: string, verifier: string | string[] | undefined): string => {
@@ -102,20 +110,45 @@ ready(() => {
         (media_id === event?.data?.media_object_id || attachment_id === event?.data?.attachment_id)
       ) {
         document.getElementsByTagName('video')[0].load()
-      } else if (event?.data?.subject === 'media_tracks_request') {
+        return
+      }
+
+      if (event?.data?.subject === 'media_tracks_request') {
         const tracks = mediaTracks?.map(t => ({
           locale: t.language,
           language: t.label,
           inherited: t.inherited,
+          asr: t.asr,
+          workflow_state: t.workflow_state,
         }))
-        if (tracks)
+        if (tracks) {
           event?.source?.postMessage(
             {subject: 'media_tracks_response', payload: tracks},
             {targetOrigin: event.origin},
           )
+        }
+        return
+      }
+
+      if (event.data?.subject === 'media_player.get_ready_state') {
+        event.source?.postMessage(
+          {
+            subject: 'media_player.iframe_ready',
+            mediaId: media_id,
+          },
+          {targetOrigin: event.origin},
+        )
       }
     },
     false,
+  )
+
+  window?.top?.postMessage(
+    {
+      subject: 'media_player.iframe_ready',
+      mediaId: media_id,
+    },
+    {targetOrigin: window?.top?.location.origin},
   )
 
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
@@ -123,27 +156,56 @@ ready(() => {
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
   const div = document.body.firstElementChild
-  let explicitSize;
+  let explicitSize
   if (isStandalone()) {
     // we're standalone mode
     div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
-    explicitSize = { width: 640, height: 408 };
+    explicitSize = {width: 640, height: 408}
   }
 
+  const isAsrCaptioningImprovements = ENV.FEATURES?.rce_asr_captioning_improvements
+  const isEditMode = isRceEditMode()
+  const RCE_ENV = window.parent.parent.ENV
+
+  const handleTranscriptEdit =
+    isAsrCaptioningImprovements && isEditMode && attachment_id && RCE_ENV.JWT
+      ? createOnTranscriptEdit(attachment_id, RCE_ENV.JWT)
+      : undefined
+
+  const handleConfirmEditChanges =
+    isAsrCaptioningImprovements && isEditMode ? onConfirmEditChanges : undefined
+
   const aria_label = !media_object.title ? undefined : media_object.title
+  const canManageTranscripts = (ENV.current_user_roles ?? []).some(
+    r => r === 'teacher' || r === 'admin',
+  )
+  const isGenerating = isAsrGenerating(media_object?.media_tracks)
+  // Get rid of processing state ASR tracks, since their content will be empty anyway.
+  // append ASR track's label with "(Automatic)" to differentiate from human-created captions
+  const playerTracks = mediaTracks
+    ?.filter(t => !(t.asr && t.workflow_state === 'processing'))
+    .map(t => (t.asr ? {...t, label: I18n.t('%{language} (Automatic)', {language: t.label})} : t))
+
+  const viewerRestrictions = media_object?.viewer_restrictions || {}
+  const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
+
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
     render(
       <CanvasStudioPlayer
         media_id={media_id || ''}
         media_sources={href_source || media_object.media_sources}
-        media_tracks={mediaTracks}
+        media_tracks={playerTracks}
         type={is_video ? 'video' : 'audio'}
         aria_label={aria_label}
         is_attachment={is_attachment}
         attachment_id={attachment_id}
         explicitSize={explicitSize}
+        enableSidebar={isAsrCaptioningImprovements && showRollingTranscript}
+        openSidebar={isAsrCaptioningImprovements}
+        onTranscriptEdit={handleTranscriptEdit}
+        onConfirmEditChanges={handleConfirmEditChanges}
         kebabMenuElements={
-          ENV.FEATURES?.rce_studio_embed_improvements
+          isAsrCaptioningImprovements && showRollingTranscript
             ? [
                 {
                   id: 'expand-view',
@@ -162,6 +224,11 @@ ready(() => {
               ]
             : []
         }
+        emptyTranscriptsComponent={
+          isAsrCaptioningImprovements && is_video ? (
+            <NoTranscript isGenerating={isGenerating} canManageTranscripts={canManageTranscripts} />
+          ) : undefined
+        }
       />,
       container,
     )
@@ -169,7 +236,7 @@ ready(() => {
     render(
       <CanvasMediaPlayer
         media_id={media_id || ''}
-        media_sources={href_source || media_object.media_sources}
+        media_sources={(href_source || media_object.media_sources) as any}
         media_tracks={mediaTracks}
         type={is_video ? 'video' : 'audio'}
         aria_label={aria_label}

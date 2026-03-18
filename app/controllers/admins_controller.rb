@@ -47,7 +47,6 @@
 #       }
 #    }
 class AdminsController < ApplicationController
-  before_action :require_user
   before_action :get_context
 
   include Api::V1::Admin

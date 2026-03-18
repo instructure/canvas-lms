@@ -24,7 +24,7 @@ module Lti
     include Lti::IMS::AccessTokenHelper
     include Api::V1::User
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     before_action :authorized_lti2_tool
     before_action :user_in_context, only: :show
     before_action :tool_in_context, only: :group_index

@@ -864,7 +864,7 @@ describe SIS::CSV::CourseImporter do
       other_mm.update_attribute(:workflow_state, "completed")
       run_jobs
       mm = @template.reload.master_migrations.last
-      expect(mm).to_not eq other_mm
+      expect(mm).not_to eq other_mm
       expect(mm).to be_completed
     end
 

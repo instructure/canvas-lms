@@ -422,7 +422,7 @@ describe ConversationsController do
       @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
       post "create", params: { recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string }
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
     end
 
     it "allows sending to instructors even if permissions are disabled" do

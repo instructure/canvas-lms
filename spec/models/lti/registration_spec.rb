@@ -73,6 +73,43 @@ RSpec.describe Lti::Registration do
     end
   end
 
+  describe "workflow states" do
+    let(:registration) { lti_registration_model }
+
+    it "defaults to active" do
+      expect(registration).to be_active
+    end
+
+    it "transitions from active to inactive via deactivate!" do
+      registration.deactivate!
+      expect(registration).to be_inactive
+    end
+
+    it "transitions from inactive to active via activate!" do
+      registration.deactivate!
+      registration.activate!
+      expect(registration).to be_active
+    end
+
+    describe ".active scope" do
+      let!(:active_reg) { lti_registration_model(account:) }
+      let!(:inactive_reg) { lti_registration_model(account:).tap(&:deactivate!) }
+      let!(:deleted_reg) { lti_registration_model(account:).tap(&:destroy) }
+
+      it "includes active registrations" do
+        expect(Lti::Registration.active).to include(active_reg)
+      end
+
+      it "includes inactive registrations" do
+        expect(Lti::Registration.active).to include(inactive_reg)
+      end
+
+      it "excludes deleted registrations" do
+        expect(Lti::Registration.active).not_to include(deleted_reg)
+      end
+    end
+  end
+
   describe "#dynamic_registration?" do
     subject { registration.dynamic_registration? }
 
@@ -137,27 +174,29 @@ RSpec.describe Lti::Registration do
         expect(subject).to eq(ims_registration.internal_lti_configuration)
       end
 
-      context "when the ims_registration has an overlay on itself" do
+      context "when the registration has an overlay" do
         let(:icon_url) { "https://example.com/icon.png" }
 
         before do
           ims_registration.lti_tool_configuration["messages"][0]["placements"] << "course_navigation"
-          ims_registration.registration_overlay = {
-            "privacy_level" => "email_only",
-            "disabledScopes" => [TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE],
-            "disabledPlacements" => ["course_navigation"],
-            "placements" => [
-              {
-                "type" => "course_navigation",
-                "default" => "disabled",
-              },
-              {
-                "type" => "global_navigation",
-                "iconUrl" => icon_url,
-              }
-            ]
-          }
           ims_registration.save!
+          Lti::Overlay.create!(
+            registration:,
+            account:,
+            data: {
+              "privacy_level" => "email_only",
+              "disabled_scopes" => [TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE],
+              "disabled_placements" => ["course_navigation"],
+              "placements" => {
+                "course_navigation" => {
+                  "default" => "disabled",
+                },
+                "global_navigation" => {
+                  "icon_url" => icon_url,
+                }
+              }
+            }
+          )
         end
 
         it "returns the configuration with the overlay applied" do
@@ -167,14 +206,14 @@ RSpec.describe Lti::Registration do
           expect(config["placements"].find { |p| p["placement"] == "course_navigation" }).to include("default" => "disabled", "enabled" => false)
         end
 
-        it "only overlays allowed properties for Dyn Reg" do
-          overlay = ims_registration.registration_overlay
-          overlay["custom_fields"] = { "foo" => "bar" }
-          # Avoid validation callbacks to simulate invalid data, like might
-          # be in production.
-          ims_registration.update_column(:registration_overlay, overlay)
+        it "does not allow adding new placements for IMS registrations" do
+          overlay = registration.overlay_for(account)
+          overlay.data["placements"] = { "new_placement" => { "text" => "New Placement" } }
+          overlay.update_column(:data, overlay.data)
 
-          expect(subject["custom_fields"]).not_to eq({ "foo" => "bar" })
+          # The new placement should not be added since IMS registrations use additive: false
+          placement_names = subject["placements"].pluck("placement")
+          expect(placement_names).not_to include("new_placement")
         end
       end
 
@@ -340,14 +379,6 @@ RSpec.describe Lti::Registration do
 
       before(:once) do
         ims_registration.update!(lti_registration: registration)
-      end
-
-      context "the Dynamic Registration has it's own list of disabledPlacements" do
-        before do
-          ims_registration.update!(registration_overlay: { "disabledPlacements" => ["global_navigation"] })
-        end
-
-        it_behaves_like "doesn't remove disabled placements"
       end
 
       context "an Lti::Overlay exists" do

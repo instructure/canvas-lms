@@ -46,6 +46,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 import {toggleDashboardView} from '@canvas/dashboard-toggle/utils/dashboardToggle'
+import {LearningAgentButton} from '@canvas/learning-agent'
 
 const I18n = createI18nScope('dashboard')
 
@@ -380,6 +381,7 @@ class DashboardHeader extends React.Component {
                   canEnableElementaryDashboard={canEnableElementaryDashboard}
                 />
               </div>
+              {ENV.ATHENA && <LearningAgentButton />}
               {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
               {ENV.add_oak_mount_point && <div id="oak-mount-point"></div>}
             </div>
@@ -459,6 +461,11 @@ class DashboardHeader extends React.Component {
                   />
                 </div>
               </Flex.Item>
+              {ENV.ATHENA && (
+                <Flex.Item overflowY="visible">
+                  <LearningAgentButton />
+                </Flex.Item>
+              )}
               <span
                 style={{
                   display:

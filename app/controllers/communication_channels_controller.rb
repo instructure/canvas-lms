@@ -87,7 +87,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, only: %i[create destroy re_send_confirmation delete_push_token]
+  skip_before_action :require_user, only: :confirm
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
@@ -333,7 +333,7 @@ class CommunicationChannelsController < ApplicationController
         @merge_opportunities = []
       end
 
-      js_env PASSWORD_POLICY: @domain_root_account.password_policy
+      js_env({ PASSWORD_POLICY: @domain_root_account.password_policy })
 
       if @current_user && params[:confirm].present? && @merge_opportunities.find { |opp| opp.first == @current_user }
         @user.transaction do

@@ -215,7 +215,7 @@
         <%= render(partial: 'external_tools/global_nav_menu_items') %>
       <% end %>
       <li class="ic-app-header__menu-list-item">
-        <%= link_to help_link_url,
+        <%= link_to "#",  # gets overridden by JS to this anyway, and also there is a click action to slide out the help tray
                     :id => 'global_nav_help_link',
                     :role => 'button',
                     :class => "ic-app-header__menu-list-link",

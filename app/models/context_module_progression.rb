@@ -121,7 +121,7 @@ class ContextModuleProgression < ActiveRecord::Base
       self.met_requirement_count += 1
     end
 
-    def requirement_met?(req, include_type = true)
+    def requirement_met?(req, include_type: true)
       actions_done.any? { |r| r[:id] == req[:id] && (include_type ? r[:type] == req[:type] : true) }
     end
 
@@ -145,7 +145,7 @@ class ContextModuleProgression < ActiveRecord::Base
     def check_view_requirements
       view_requirements.each do |req|
         # should mark a must_view as true if a completed must_submit/min_score/min_percentage action already exists
-        check_action!(req, requirement_met?(req, false))
+        check_action!(req, requirement_met?(req, include_type: false))
       end
     end
   end

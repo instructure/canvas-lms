@@ -29,6 +29,7 @@ import {
   DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
   NameDisplayFormat,
+  CELL_HEIGHT,
 } from '@canvas/outcomes/react/utils/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
@@ -154,6 +155,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         sorting={sorting}
         nameDisplayFormat={gradebookSettings.nameDisplayFormat}
         onChangeNameDisplayFormat={onChangeNameDisplayFormat}
+        titleId="ilmgb-student-header"
       />
     ),
     [sorting, gradebookSettings.nameDisplayFormat, onChangeNameDisplayFormat],
@@ -177,7 +179,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   )
 
   const renderOutcomeHeader = useCallback(
-    (outcome: Outcome, contributingScoreForOutcome: any) => () => {
+    (outcome: Outcome, contributingScoreForOutcome: any, titleId?: string) => () => {
       return (
         <OutcomeHeader
           outcome={outcome}
@@ -186,6 +188,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
           courseId={courseId}
           sorting={sorting}
           contributingScoresForOutcome={contributingScoreForOutcome}
+          titleId={titleId}
         />
       )
     },
@@ -208,8 +211,13 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   )
 
   const renderContributingScoreHeader = useCallback(
-    (alignment: ContributingScoreAlignment) => () => (
-      <ContributingScoreHeader alignment={alignment} courseId={courseId} sorting={sorting} />
+    (alignment: ContributingScoreAlignment, titleId?: string) => () => (
+      <ContributingScoreHeader
+        alignment={alignment}
+        courseId={courseId}
+        sorting={sorting}
+        titleId={titleId}
+      />
     ),
     [courseId, sorting],
   )
@@ -256,57 +264,73 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
     const commonColHeaderProps = {
       borderWidth: 'large 0 medium 0',
       background: 'secondary',
+      height: CELL_HEIGHT,
     }
 
     columns.push({
       key: 'student',
       header: renderStudentHeader,
       render: renderStudentCell,
-      width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
       isSticky: !isMobile,
       isRowHeader: true,
       colHeaderProps: {
         'data-testid': 'student-header',
+        width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
+        ariaLabelId: 'ilmgb-student-header',
         ...commonColHeaderProps,
+      },
+      cellProps: {
+        height: CELL_HEIGHT,
       },
     } as Column)
 
     {
       outcomes.map(outcome => {
         const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
+        const titleId = `ilmgb-outcome-header-${outcome.id}`
         columns.push({
           key: `outcome-${outcome.id}`,
-          header: renderOutcomeHeader(outcome, contributingScoreForOutcome),
+          header: renderOutcomeHeader(outcome, contributingScoreForOutcome, titleId),
           render: renderOutcomeCell(outcome),
-          width: COLUMN_WIDTH + COLUMN_PADDING,
           draggable: true,
+          dragLabel: outcome.title,
           data: {outcome},
           colHeaderProps: {
             'data-testid': `outcome-header-${outcome.id}`,
+            'aria-label': I18n.t('Outcome, %{title}', {title: outcome.title}),
+            width: COLUMN_WIDTH + COLUMN_PADDING,
             ...commonColHeaderProps,
+          },
+          cellProps: {
+            height: CELL_HEIGHT,
           },
         } as Column)
 
         if (contributingScoreForOutcome.isVisible()) {
           ;(contributingScoreForOutcome.alignments || []).forEach(
             (alignment: ContributingScoreAlignment) => {
+              const titleId = `ilmgb-contributing-score-header-${outcome.id}-${alignment.alignment_id}`
               columns.push({
                 key: `contributing-score-${outcome.id}-${alignment.alignment_id}`,
-                header: renderContributingScoreHeader(alignment),
+                header: renderContributingScoreHeader(alignment, titleId),
                 render: renderContributingScoreCell(
                   outcome,
                   alignment,
                   contributingScoreForOutcome,
                 ),
-                width: COLUMN_WIDTH + COLUMN_PADDING,
                 data: {outcome, alignment, contributingScoreForOutcome},
                 cellProps: {
                   padding: '0',
                   overflowX: 'hidden',
                   overflowY: 'hidden',
+                  height: CELL_HEIGHT,
                 },
                 colHeaderProps: {
                   'data-testid': `contributing-score-header-${outcome.id}-${alignment.alignment_id}`,
+                  'aria-label': I18n.t('Assignment, %{name}', {
+                    name: alignment.associated_asset_name,
+                  }),
+                  width: COLUMN_WIDTH + COLUMN_PADDING,
                   ...commonColHeaderProps,
                 },
               } as Column)
@@ -338,13 +362,15 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         <BarChartRow
           columns={_columns}
           outcomeDistributions={outcomeDistributions}
+          distributionStudents={distributionStudents}
+          courseId={courseId}
           isLoading={isLoadingDistribution}
           handleKeyDown={handleKeyDown}
           isMobile={isMobile}
         />
       )
     },
-    [outcomeDistributions, isLoadingDistribution, isMobile],
+    [outcomeDistributions, distributionStudents, courseId, isLoadingDistribution, isMobile],
   )
 
   const handleColumnMove = useCallback(

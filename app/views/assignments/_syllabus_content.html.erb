@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
-<% js_env :SYLLABUS_BODY => (@syllabus_body || '') %>
+<% js_env({ CAN_READ: can_do(@context, @current_user, :read),
+            SYLLABUS_BODY: (@syllabus_body || '') }) %>
 <%
   show_summary = @context.syllabus_course_summary? && !@context.elementary_enabled? && !@context.horizon_course?
   if @context.elementary_enabled?

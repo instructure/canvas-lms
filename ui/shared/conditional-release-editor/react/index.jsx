@@ -19,7 +19,8 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
+import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms'
 
@@ -153,8 +154,9 @@ class Editor extends React.Component {
 
 const attach = function (element, type, env, readOnly = false) {
   const editor = <Editor env={env} type={type} readOnly={readOnly} />
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(editor, element)
+  const editorRef = React.createRef()
+  flushSync(() => createRoot(element).render(React.cloneElement(editor, {ref: editorRef})))
+  return editorRef.current
 }
 
 const ConditionalRelease = {

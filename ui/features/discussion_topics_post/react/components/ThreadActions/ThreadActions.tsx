@@ -255,8 +255,6 @@ const getMenuConfigs = props => {
   if (
     // @ts-expect-error TS2339 (typescriptify)
     window.ENV.discussion_translation_available &&
-    // @ts-expect-error TS2339 (typescriptify)
-    window.ENV.ai_translation_improvements &&
     !props.translateAll
   ) {
     options.push({

@@ -21,7 +21,6 @@
 class ObserverAlertsApiController < ApplicationController
   include Api::V1::ObserverAlert
 
-  before_action :require_user
   before_action :require_observer
 
   def alerts_by_student

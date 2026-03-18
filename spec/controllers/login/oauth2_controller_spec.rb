@@ -33,7 +33,7 @@ describe Login::OAuth2Controller do
       get :new, params: { auth_type: "facebook" }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://www.facebook.com/dialog/oauth\?})
-      expect(session[:oauth2_nonce]).to_not be_blank
+      expect(session[:oauth2_nonce]).not_to be_blank
     end
   end
 
@@ -63,8 +63,8 @@ describe Login::OAuth2Controller do
       allow(controller.logger).to receive(:error).and_call_original
       get :create, params: { code: "abc", state: jwt }
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
-      expect(response).to_not be_successful
-      expect(response).to_not be_redirect
+      expect(response).not_to be_successful
+      expect(response).not_to be_redirect
       expect(controller.logger).to have_received(:error).with("Nonce mismatch - JWT nonce: 'different', Session nonce(s): [\"bob\"]")
     end
 
@@ -72,7 +72,7 @@ describe Login::OAuth2Controller do
       get :new, params: { auth_type: "facebook" }
       expect(response).to be_redirect
       state = CGI.parse(URI.parse(response.location).query)["state"].first
-      expect(state).to_not be_nil
+      expect(state).not_to be_nil
 
       expect_any_instantiation_of(aac).not_to receive(:get_token)
       Timecop.travel(15.minutes) do
@@ -240,7 +240,7 @@ describe Login::OAuth2Controller do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
-      expect(Account.default.pseudonyms.active.by_unique_id("user")).to_not be_exists
+      expect(Account.default.pseudonyms.active.by_unique_id("user")).not_to be_exists
       get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       p = Account.default.pseudonyms.active.by_unique_id("user").first!

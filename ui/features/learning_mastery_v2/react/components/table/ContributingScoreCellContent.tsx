@@ -25,6 +25,9 @@ import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContri
 import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('learning_mastery_gradebook')
 
 export type ContributingScoreCellContentProps = Omit<ViewProps, 'children'> & {
   alignment: ContributingScoreAlignment
@@ -45,6 +48,11 @@ export const ContributingScoreCellContent: React.FC<ContributingScoreCellContent
   onAction,
   focus,
 }: ContributingScoreCellContentProps) => {
+  const buttonLabel = I18n.t('View Contributing Score Details for %{student} %{assignment}', {
+    student: student.name,
+    assignment: alignment.associated_asset_name,
+  })
+
   return (
     <View
       as="div"
@@ -58,18 +66,24 @@ export const ContributingScoreCellContent: React.FC<ContributingScoreCellContent
           outcome={outcome}
           scoreDisplayFormat={scoreDisplayFormat}
         />
-        {focus && (
+        <div
+          style={{
+            opacity: focus ? 1 : 0,
+            pointerEvents: focus ? 'auto' : 'none',
+          }}
+        >
           <IconButton
+            aria-haspopup="dialog"
             withBackground={false}
             withBorder={false}
             size="small"
             margin="xx-small small"
             renderIcon={<IconExpandStartLine />}
-            screenReaderLabel="View Contributing Score Details"
+            screenReaderLabel={buttonLabel}
             onClick={onAction}
             disabled={!onAction}
           />
-        )}
+        </div>
       </Flex>
     </View>
   )

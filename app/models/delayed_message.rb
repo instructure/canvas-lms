@@ -28,6 +28,7 @@ class DelayedMessage < ActiveRecord::Base
       :discussion_entry,
       :assignment,
       :sub_assignment,
+      :peer_review_sub_assignment,
       :submission_comment,
       :submission,
       :conversation_message,

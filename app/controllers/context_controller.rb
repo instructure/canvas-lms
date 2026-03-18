@@ -29,7 +29,7 @@ class ContextController < ApplicationController
 
   before_action :load_canvas_career, only: [:roster]
 
-  before_action :require_user, only: [:inbox, :report_avatar_image]
+  skip_before_action :require_user, only: :object_snippet
   before_action :reject_student_view_student, only: [:inbox]
   protect_from_forgery except: [:object_snippet], with: :exception
 
@@ -162,13 +162,6 @@ class ContextController < ApplicationController
       end
     end
 
-    # Render upgraded People page if feature flag is enabled
-    if @domain_root_account.feature_enabled?(:react_people_page)
-      add_crumb t("People")
-      js_bundle :course_people
-      render html: "", layout: true
-    end
-
     @secondary_users ||= {}
     @groups = @context.try(:groups)&.active || []
 
@@ -238,8 +231,10 @@ class ContextController < ApplicationController
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
             @last_activity_at = @context.enrollments.where(user_id: @user).maximum(:last_activity_at)
             @aua_expiration_date = AssetUserAccess.expiration_date
-            js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
-                   accesses_total_pages: @accesses.total_pages)
+            js_env({
+                     context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
+                     accesses_total_pages: @accesses.total_pages
+                   })
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
@@ -314,7 +309,7 @@ class ContextController < ApplicationController
       end
       # rubocop:enable Rails/ActionControllerFlashBeforeRender
 
-      js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
+      js_env({ CONTEXT_USER_DISPLAY_NAME: @user.short_name })
 
       js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
@@ -442,6 +437,7 @@ class ContextController < ApplicationController
         )
       end
 
+      @item.updating_user = @current_user if @item.respond_to?(:updating_user=)
       @item.restore
       if @item.errors.any?
         return render json: @item.errors.full_messages, status: :forbidden

@@ -21,25 +21,31 @@
   js_bundle(:navigation_header) unless @headers == false
 
   if @domain_root_account&.feature_enabled?(:top_navigation_placement)
-    js_env INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout"
+    js_env({ INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout" })
     js_bundle(:top_navigation_tools)
   end
 
   @add_oak_bundle = add_oak_bundle?
   if @add_oak_bundle
     js_bundle(:ignite_agent)
-    js_env(add_oak_mount_point: true)
+    js_env({ add_oak_mount_point: true })
     remote_env(ignite_agent: {
       launch_url: Services::IgniteAgent.launch_url,
       backend_url: Services::IgniteAgent.backend_url
     })
   end
 
+  @show_learning_agent = show_learning_agent_button?
+  if @show_learning_agent
+    load_learning_agent_env
+    js_bundle(:learning_agent)
+  end
+
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
   set_badge_counts_for(@context, @current_user) if @set_badge_counts
-  js_env notices: flash_notices()
+  js_env({ notices: flash_notices() })
   student_view_text = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
   enable_content_view_if_requested
   enable_hide_global_nav_if_requested
@@ -166,6 +172,9 @@
           <div class="right-of-crumbs right-of-crumbs-no-reverse">
             <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
               <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+            <% end %>
+            <% if @show_learning_agent %>
+              <div id="learning_agent_mount_point"></div>
             <% end %>
             <% if show_student_view_button? %>
               <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>

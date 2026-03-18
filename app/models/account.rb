@@ -155,7 +155,7 @@ class Account < ActiveRecord::Base
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
-  def inherited_assessment_question_banks(include_self = false, *additional_contexts)
+  def inherited_assessment_question_banks(*additional_contexts, include_self: false)
     sql, conds = [], []
     contexts = additional_contexts + account_chain
     contexts.delete(self) unless include_self
@@ -322,8 +322,6 @@ class Account < ActiveRecord::Base
   add_setting :change_password_url, root_only: true
   add_setting :unknown_user_url, root_only: true
   add_setting :fft_registration_url, root_only: true
-
-  add_setting :native_discovery_enabled, boolean: true, root_only: true, default: false
 
   add_setting :restrict_student_future_view, boolean: true, default: false, inheritable: true
   add_setting :restrict_student_future_listing, boolean: true, default: false, inheritable: true
@@ -750,6 +748,17 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def delete_lti_context_controls
+    updates = { workflow_state: "deleted_with_context", updated_at: Time.current }
+    Lti::ContextControl.where(account_id: id).active.in_batches.update_all(updates)
+  end
+
+  def undelete_lti_context_controls
+    updates = { workflow_state: "active", updated_at: Time.current }
+    # Only restore context controls that were deleted with the context (account)
+    Lti::ContextControl.where(account_id: id, workflow_state: "deleted_with_context").in_batches.update_all(updates)
+  end
+
   def check_downstream_caches
     # dummy account has no downstream
     return if dummy?
@@ -816,7 +825,13 @@ class Account < ActiveRecord::Base
   end
 
   def root_account?
-    root_account_id.nil? || local_root_account_id.zero?
+    if root_account_id
+      local_root_account_id.zero?
+    elsif new_record?
+      parent_account_id.nil?
+    else
+      false
+    end
   end
 
   def primary_settings_root_account?
@@ -847,7 +862,7 @@ class Account < ActiveRecord::Base
         (preloaded_accounts[account.parent_account_id] ||= []) << account
       end
     end
-    res = [[("&nbsp;&nbsp;" * indent).html_safe + name, id]]
+    res = [[("&nbsp;&nbsp;".html_safe * indent) + name, id]]
     preloaded_accounts[id]&.each do |account|
       res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
     end
@@ -1309,9 +1324,7 @@ class Account < ActiveRecord::Base
     Account.limit(limit).offset(offset).sub_accounts_recursive(id)
   end
 
-  def self.sub_accounts_recursive(parent_account_id, pluck = false)
-    raise ArgumentError unless [false, :pluck].include?(pluck)
-
+  def self.sub_accounts_recursive(parent_account_id, pluck: false)
     original_shard = Shard.current
     result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
@@ -1369,7 +1382,7 @@ class Account < ActiveRecord::Base
 
   # a common helper
   def self.sub_account_ids_recursive(parent_account_id)
-    active.select(:id).sub_accounts_recursive(parent_account_id, :pluck)
+    active.select(:id).sub_accounts_recursive(parent_account_id, pluck: true)
   end
 
   # compat for reports
@@ -1454,12 +1467,12 @@ class Account < ActiveRecord::Base
     account_users.active.where(user_id: user).first if user
   end
 
-  def available_custom_account_roles(include_inactive = false)
-    available_custom_roles(include_inactive).for_accounts.to_a
+  def available_custom_account_roles(include_inactive: false)
+    available_custom_roles(include_inactive:).for_accounts.to_a
   end
 
-  def available_account_roles(include_inactive = false, user = nil)
-    account_roles = available_custom_account_roles(include_inactive)
+  def available_account_roles(include_inactive: false, user: nil)
+    account_roles = available_custom_account_roles(include_inactive:)
     account_roles << Role.get_built_in_role("AccountAdmin", root_account_id: resolved_root_account_id)
     if user
       account_roles.select! do |role|
@@ -1471,17 +1484,28 @@ class Account < ActiveRecord::Base
     account_roles
   end
 
-  def available_custom_course_roles(include_inactive = false)
-    available_custom_roles(include_inactive).for_courses.to_a
+  # returns active roles first, then ordered by their place in the account chain.
+  # this provides determinism when multiple roles with the same name exist
+  # in the account chain - just pick the first matching one you find
+  def available_custom_course_roles(include_inactive: false)
+    roles = available_custom_roles(include_inactive:).for_courses.to_a
+
+    shard.activate do
+      account_positions = account_chain_ids(include_federated_parent_id: true).each_with_index.to_h
+      roles.sort_by do |role|
+        [role.active? ? CanvasSort::First : CanvasSort::Last,
+         account_positions[role.account_id] || CanvasSort::Last]
+      end
+    end
   end
 
-  def available_course_roles(include_inactive = false)
-    course_roles = available_custom_course_roles(include_inactive)
+  def available_course_roles(include_inactive: false)
+    course_roles = available_custom_course_roles(include_inactive:)
     course_roles += Role.built_in_course_roles(root_account_id: resolved_root_account_id)
     course_roles
   end
 
-  def available_custom_roles(include_inactive = false)
+  def available_custom_roles(include_inactive: false)
     scope = if root_account.primary_settings_root_account?
               Role.where(account_id: account_chain_ids)
             else
@@ -1490,8 +1514,8 @@ class Account < ActiveRecord::Base
     include_inactive ? scope.not_deleted : scope.active
   end
 
-  def available_roles(include_inactive = false)
-    available_account_roles(include_inactive) + available_course_roles(include_inactive)
+  def available_roles(include_inactive: false)
+    available_account_roles(include_inactive:) + available_course_roles(include_inactive:)
   end
 
   def get_account_role_by_name(role_name)
@@ -1510,24 +1534,13 @@ class Account < ActiveRecord::Base
     end
 
     shard.activate do
-      role_scope = Role.not_deleted.where(name: role_name)
-      role_scope = if self.class.connection.adapter_name == "PostgreSQL"
-                     role_scope.where("account_id = ? OR
-          account_id IN (
-            WITH RECURSIVE t AS (
-              SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
-              UNION
-              SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
-            )
-            SELECT id FROM t
-          )",
-                                      id,
-                                      id)
-                   else
-                     role_scope.where(account_id: account_chain.map(&:id))
-                   end
-      # not_deleted scope could return both active and inactive roles, prefer the active one
-      role_scope.min_by { |r| (r.workflow_state == "active") ? 0 : 1 }
+      role_scope = Role.not_deleted.where(name: role_name, account_id: account_chain_ids)
+      # not_deleted scope could return both active and inactive roles, prefer the active one.
+      # also prefer roles defined lower in the account chain, to eliminate ambiguity when a role with
+      # the same name exists at multiple levels
+      account_positions = account_chain_ids.each_with_index.to_h
+      n = account_positions.size
+      role_scope.min_by { |r| ((r.workflow_state == "active") ? 0 : n) + (account_positions[r.account_id] || n) }
     end
   end
 
@@ -1562,7 +1575,11 @@ class Account < ActiveRecord::Base
   end
 
   workflow do
-    state :active
+    state :active do
+      on_entry do |prior_state, _event|
+        undelete_lti_context_controls if prior_state == :deleted
+      end
+    end
     state :deleted
   end
 
@@ -1740,9 +1757,10 @@ class Account < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
-  def destroy
+  def destroy(user: nil)
     transaction do
       account_users.update_all(workflow_state: "deleted")
+      delete_lti_context_controls
       self.workflow_state = "deleted"
       self.deleted_at = Time.now.utc
       save!
@@ -1810,18 +1828,6 @@ class Account < ActiveRecord::Base
     settings[:auth_discovery_url]
   end
 
-  def native_discovery_enabled=(enabled)
-    settings[:native_discovery_enabled] = Canvas::Plugin.value_to_boolean(enabled)
-  end
-
-  def native_discovery_enabled?
-    settings[:native_discovery_enabled] == true
-  end
-
-  def native_discovery_route_active?
-    native_discovery_enabled?
-  end
-
   def auth_discovery_url_options(_request)
     {}
   end
@@ -1850,8 +1856,44 @@ class Account < ActiveRecord::Base
     settings[:unknown_user_url]
   end
 
+  def discovery_page_active=(active)
+    settings[:discovery_page] ||= {}
+    settings[:discovery_page][:active] = Canvas::Plugin.value_to_boolean(active)
+  end
+
   def discovery_page_active?
     settings.dig(:discovery_page, :active) == true
+  end
+
+  def discovery_page_allowed?
+    false
+  end
+
+  def discovery_page_base_url
+    nil
+  end
+
+  def discovery_page_claims_for(user, config)
+    providers = authentication_providers.active.load
+    build_links = lambda do |entries|
+      (entries || []).filter_map do |entry|
+        provider = providers.find { |p| p.id == entry[:authentication_provider_id].to_i }
+        next if provider.nil?
+
+        discovery_page_link_for(provider, entry)
+      end
+    end
+
+    {
+      sub: user.global_id.to_s,
+      org: uuid,
+      primary: build_links.call(config[:primary]),
+      secondary: build_links.call(config[:secondary])
+    }
+  end
+
+  def discovery_page_link_for(provider, entry)
+    { label: entry[:label], icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
   end
 
   def validate_auth_discovery_url
@@ -1945,16 +1987,16 @@ class Account < ActiveRecord::Base
       @special_account_list ||= []
     end
 
-    def clear_special_account_cache!(force = false)
-      special_account_timed_cache.clear(force)
+    def clear_special_account_cache!(force: false)
+      special_account_timed_cache.clear(force:)
     end
 
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
       special_account_list << key
       instance_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def self.#{key}(force_create = false)
-          get_special_account(:#{key}, #{name.inspect}, force_create)
+        def self.#{key}(force_create: false)
+          get_special_account(:#{key}, #{name.inspect}, force_create:)
         end
       RUBY
     end
@@ -1968,7 +2010,7 @@ class Account < ActiveRecord::Base
 
   def clear_special_account_cache_if_special
     if shard == Shard.birth && Account.special_account_ids.values.map(&:to_i).include?(id)
-      Account.clear_special_account_cache!(true)
+      Account.clear_special_account_cache!(force: true)
     end
   end
 
@@ -1996,7 +2038,7 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def self.get_special_account(special_account_type, default_account_name, force_create = false)
+  def self.get_special_account(special_account_type, default_account_name, force_create: false)
     Shard.birth.activate do
       account = special_accounts[special_account_type]
       unless account
@@ -2256,7 +2298,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_ANALYTICS_HUB, label: t("#account.tab_analytics_hub", "Analytics Hub"), css_class: "analytics_hub", href: :account_analytics_hub_path }
     end
 
-    if root_account? && grants_right?(user, :manage_developer_keys) && root_account.feature_enabled?(:lti_registrations_page)
+    if root_account? && grants_right?(user, :manage_developer_keys)
       registrations_path = root_account.feature_enabled?(:lti_registrations_discover_page) ? :account_lti_registrations_path : :account_lti_manage_registrations_path
       tabs << { id: TAB_APPS, label: t("#account.tab_apps", "Apps"), css_class: "apps", href: registrations_path, account_id: root_account.id }
     elsif root_account.feature_enabled?(:canvas_apps_sub_account_access) && root_account.feature_enabled?(:lti_registrations_usage_data) && !root_account? && grants_right?(user, :manage_lti_registrations)
@@ -2267,6 +2309,15 @@ class Account < ActiveRecord::Base
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(tabs)
+
+    if feature_enabled?(:new_quizzes_native_experience)
+      NewQuizzesHelper.override_item_banks_tab(
+        tabs:,
+        href: :account_new_quizzes_banks_path,
+        context: self
+      )
+    end
+
     tabs << { id: TAB_ADMIN_TOOLS, label: t("#account.tab_admin_tools", "Admin Tools"), css_class: "admin_tools", href: :account_admin_tools_path } if can_see_admin_tools_tab?(user)
     if user && grants_right?(user, :moderate_user_content)
       tabs << {
@@ -2482,8 +2533,8 @@ class Account < ActiveRecord::Base
     :closed
   end
 
-  scope :root_accounts, -> { where("(accounts.root_account_id = 0 OR accounts.root_account_id IS NULL) AND accounts.id != 0") }
-  scope :non_root_accounts, -> { where("(accounts.root_account_id != 0 AND accounts.root_account_id IS NOT NULL)") }
+  scope :root_accounts, -> { where("accounts.root_account_id = 0 AND accounts.id != 0") }
+  scope :non_root_accounts, -> { where("accounts.root_account_id != 0") }
   scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
   scope :name_like, ->(name) { where(wildcard("accounts.name", name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
@@ -2552,7 +2603,7 @@ class Account < ActiveRecord::Base
     work = lambda do
       default_enrollment_term
       enable_canvas_authentication
-      TermsOfService.ensure_terms_for_account(self, true) if root_account? && !TermsOfService.skip_automatic_terms_creation
+      TermsOfService.ensure_terms_for_account(self, is_new_account: true) if root_account? && !TermsOfService.skip_automatic_terms_creation
       create_built_in_roles if root_account?
     end
     return work.call if Rails.env.test?
@@ -2723,7 +2774,7 @@ class Account < ActiveRecord::Base
   def roles_with_enabled_permission(permission)
     roles = available_roles
     roles.select do |role|
-      RoleOverride.permission_for(self, permission, role, self, true)[:enabled]
+      RoleOverride.permission_for(self, permission, role, self, caching: false)[:enabled]
     end
   end
 

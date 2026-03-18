@@ -1277,9 +1277,7 @@ describe DiscussionTopic do
                                                                   .group(:context_id)
                                                                   .pluck("array_agg(attachment_id) as attachment_ids")
 
-          child_association_attachment_ids.each do |attachment_ids|
-            expect(attachment_ids).to match_array([@attachment1.id, @attachment2.id])
-          end
+          expect(child_association_attachment_ids).to all(match_array([@attachment1.id, @attachment2.id]))
         end
 
         it "preserves user_id from parent associations when copying to child topics" do
@@ -1316,9 +1314,7 @@ describe DiscussionTopic do
                                                                   .group(:context_id)
                                                                   .pluck("array_agg(attachment_id) as attachment_ids")
 
-          child_association_attachment_ids.each do |attachment_ids|
-            expect(attachment_ids).to match_array([@attachment3.id])
-          end
+          expect(child_association_attachment_ids).to all(match_array([@attachment3.id]))
         end
       end
     end
@@ -1680,19 +1676,19 @@ describe DiscussionTopic do
       end
 
       it "does not allow observers to see replies to a discussion linked students haven't posted in" do
-        expect(@topic.initial_post_required?(@observer)).to be
+        expect(@topic.initial_post_required?(@observer)).to be true
       end
 
       # previously this worked for exactly one observer enrollment, whichever became @context_enrollment
       # so test both ways
       it "allows observers to see replies in a discussion a linked student has posted in (1/2)" do
         @topic.reply_from(user: @student, text: "wat")
-        expect(@topic.initial_post_required?(@observer)).not_to be
+        expect(@topic.initial_post_required?(@observer)).to be false
       end
 
       it "allows observers to see replies in a discussion a linked student has posted in (2/2)" do
         @topic.reply_from(user: @other_student, text: "wat")
-        expect(@topic.initial_post_required?(@observer)).not_to be
+        expect(@topic.initial_post_required?(@observer)).to be false
       end
     end
   end
@@ -3032,7 +3028,7 @@ describe DiscussionTopic do
     end
 
     it "returns active entries by default" do
-      expect(@topic.entries_for_feed(@student)).to_not be_empty
+      expect(@topic.entries_for_feed(@student)).not_to be_empty
     end
 
     it "returns empty if user cannot see posts" do
@@ -3046,12 +3042,12 @@ describe DiscussionTopic do
 
     it "returns student entries if specified" do
       @topic.update(podcast_has_student_posts: true)
-      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1, @entry2])
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).to match_array([@entry1, @entry2])
     end
 
     it "only returns admin entries if specified" do
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1])
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).to match_array([@entry1])
     end
 
     it "returns student entries for group discussions even if not specified" do
@@ -3060,7 +3056,7 @@ describe DiscussionTopic do
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to_not be_empty
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).not_to be_empty
     end
   end
 

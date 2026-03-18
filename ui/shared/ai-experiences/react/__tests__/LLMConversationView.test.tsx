@@ -560,18 +560,14 @@ describe('LLMConversationView', () => {
         {role: 'Assistant', text: 'Hello', timestamp: new Date()},
       ]
 
-      let callCount = 0
-
       server.resetHandlers()
       server.use(
+        // Return an existing conversation so no init POST is needed
         http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          return HttpResponse.json({})
+          return HttpResponse.json({id: '1', messages: initialMessages})
         }),
+        // Restart POST always fails
         http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-          callCount++
-          if (callCount === 1) {
-            return HttpResponse.json({id: '1', messages: initialMessages})
-          }
           return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
         }),
       )
@@ -582,7 +578,7 @@ describe('LLMConversationView', () => {
         expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
       })
 
-      const restartButton = screen.getByText('Restart')
+      const restartButton = screen.getByTestId('llm-conversation-restart-button')
       fireEvent.click(restartButton)
 
       await waitFor(() => {

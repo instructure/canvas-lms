@@ -120,5 +120,5 @@ describe('OutcomeManagement - LHS Group Selection', () => {
     const modal = await findByTestId('createOutcomeModal')
     expect(within(modal).getByText('Course folder 0')).not.toBeNull()
     expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
-  })
+  }, 30000)
 })

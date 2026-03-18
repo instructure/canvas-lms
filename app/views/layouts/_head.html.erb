@@ -46,7 +46,7 @@
   <%= render_datadog_rum_js %>
   <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
   <% js_bundle :navigation_header unless @headers == false %>
-  <% js_env(active_context_tab: get_active_tab) %>
+  <% js_env({ active_context_tab: get_active_tab }) %>
   <script>
     INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
     ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;

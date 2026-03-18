@@ -48,11 +48,11 @@ describe OutcomesService::MigrationExtractor do
           "$canvas_learning_outcome_id": course_outcome.id,
           rubric_criterion: be_an_instance_of(Hash)
         )
-        expect(outcome).to_not have_key(:migration_id_2)
-        expect(outcome).to_not have_key(:vendor_guid_2)
-        expect(outcome).to_not have_key(:root_account_id)
-        expect(outcome).to_not have_key(:context_type)
-        expect(outcome).to_not have_key(:context_id)
+        expect(outcome).not_to have_key(:migration_id_2)
+        expect(outcome).not_to have_key(:vendor_guid_2)
+        expect(outcome).not_to have_key(:root_account_id)
+        expect(outcome).not_to have_key(:context_type)
+        expect(outcome).not_to have_key(:context_id)
       end
 
       context "with global outcome" do
@@ -82,12 +82,12 @@ describe OutcomesService::MigrationExtractor do
         "$canvas_learning_outcome_group_id": @course.root_outcome_group.id,
         parent_outcome_group_id: nil
       )
-      expect(group).to_not have_key(:id)
-      expect(group).to_not have_key(:learning_outcome_group_id)
-      expect(group).to_not have_key(:root_learning_outcome_group_id)
-      expect(group).to_not have_key(:root_account_id)
-      expect(group).to_not have_key(:migration_id_2)
-      expect(group).to_not have_key(:vendor_guid_2)
+      expect(group).not_to have_key(:id)
+      expect(group).not_to have_key(:learning_outcome_group_id)
+      expect(group).not_to have_key(:root_learning_outcome_group_id)
+      expect(group).not_to have_key(:root_account_id)
+      expect(group).not_to have_key(:migration_id_2)
+      expect(group).not_to have_key(:vendor_guid_2)
     end
   end
 

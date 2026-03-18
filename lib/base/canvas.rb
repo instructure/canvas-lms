@@ -108,6 +108,30 @@ module Canvas
     load_config_from_consul(config_name, **, fallback_to_filesystem: false)
   end
 
+  # Load configuration with filesystem (ConfigFile) priority, Consul fallback
+  #
+  # This is the preferred method for configs that need to be overridable
+  # via filesystem (e.g., in Kubernetes/trigger deployments) while still
+  # defaulting to Consul in standard deployments.
+  #
+  # Priority order:
+  #   1. ConfigFile.load (filesystem YAML)
+  #   2. Consul (DynamicSettings, no filesystem fallback to avoid double read)
+  #
+  # @param config_name [String] The config file name (without .yml extension)
+  # @param kwargs [Hash] Same keyword arguments as load_config_from_consul_only
+  # @return [Hash, nil] Configuration hash or nil if not found anywhere
+  #
+  # @example Basic usage
+  #   config = Canvas.load_config_file_or_consul("domain")
+  #
+  # @example With failsafe cache for critical configs
+  #   config = Canvas.load_config_file_or_consul("redis", failsafe_cache: true)
+  #
+  def self.load_config_file_or_consul(config_name, **)
+    ConfigFile.load(config_name) || load_config_from_consul_only(config_name, **)
+  end
+
   def self.lookup_cache_store(config, cluster)
     config = config.to_h.deep_symbolize_keys
     cache_store = config.delete(:cache_store)&.to_sym || :null_store
@@ -175,7 +199,7 @@ module Canvas
     revision&.delete("-")
   end
 
-  DEFAULT_RETRY_CALLBACK = lambda do |ex, tries|
+  DEFAULT_RETRY_CALLBACK = lambda do |ex, tries, *|
     Rails.logger.debug do
       {
         error_class: ex.class,
@@ -194,9 +218,9 @@ module Canvas
   def self.retriable(opts = {}, &)
     if opts[:on_retry]
       original_callback = opts[:on_retry]
-      opts[:on_retry] = lambda do |ex, tries|
-        original_callback.call(ex, tries)
-        DEFAULT_RETRY_CALLBACK.call(ex, tries)
+      opts[:on_retry] = lambda do |*args|
+        original_callback.call(*args)
+        DEFAULT_RETRY_CALLBACK.call(*args)
       end
     end
     options = DEFAULT_RETRIABLE_OPTIONS.merge(opts)

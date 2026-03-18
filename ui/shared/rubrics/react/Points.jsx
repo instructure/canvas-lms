@@ -43,7 +43,7 @@ export const possibleString = possible =>
   })
 
 export const possibleStringRange = (min, possible) =>
-  I18n.t('%{min} to %{possible} pts', {
+  I18n.t('%{possible} to >%{min} pts', {
     possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true}),
     min: I18n.toNumber(min, {precision: 2, strip_insignificant_zeros: true}),
   })

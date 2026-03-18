@@ -24,8 +24,8 @@ module Types
 
     implements Interfaces::LegacyIDInterface
 
-    field :association_type, String, null: false
     field :association_id, String, null: false
+    field :association_type, String, null: false
 
     field :hide_outcome_results, Boolean, null: false
     def hide_outcome_results

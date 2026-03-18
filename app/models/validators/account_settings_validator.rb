@@ -21,7 +21,21 @@
 module Validators
   class AccountSettingsValidator < ActiveModel::Validator
     DISCOVERY_PAGE_REQUIRED_KEYS = %i[authentication_provider_id label].freeze
-    DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon_url].freeze
+    DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon].freeze
+    DISCOVERY_PAGE_ICON_VALUES = %w[
+      apple
+      auth0
+      classlink
+      default
+      facebook
+      github
+      google
+      linkedin
+      microsoft
+      okta
+      onelogin
+      ping
+    ].freeze
 
     def validate(record)
       # Discovery Page
@@ -38,12 +52,15 @@ module Validators
       record.authentication_providers.load unless record.authentication_providers.loaded?
 
       %i[primary secondary].each do |section|
-        unless data[section].is_a?(Array)
+        section_data = data[section]
+        next if section_data.nil?
+
+        unless section_data.is_a?(Array)
           record.errors.add(:settings, "discovery_page.#{section} must be an array")
           next
         end
 
-        data[section].each_with_index do |entry, index|
+        section_data.each_with_index do |entry, index|
           validate_discovery_page_entry(record, section, entry, index)
         end
       end
@@ -62,15 +79,10 @@ module Validators
         end
       end
 
-      return unless entry[:icon_url].present?
+      return unless entry[:icon].present?
 
-      begin
-        uri = URI.parse(entry[:icon_url])
-        unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-          record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon_url must be a valid URL")
-        end
-      rescue URI::InvalidURIError
-        record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon_url must be a valid URL")
+      unless DISCOVERY_PAGE_ICON_VALUES.include?(entry[:icon])
+        record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon must be one of: #{DISCOVERY_PAGE_ICON_VALUES.join(", ")}")
       end
     end
   end

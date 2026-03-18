@@ -24,7 +24,7 @@ import {
 
 export const Submission = {
   fragment: gql`
-    fragment Submission on Submission {
+    fragment StudentAssignmentSubmission on Submission {
       ...SubmissionInterface
       _id
       id

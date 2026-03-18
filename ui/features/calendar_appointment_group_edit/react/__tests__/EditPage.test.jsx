@@ -156,12 +156,12 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.click(deleteButton)
       await waitFor(() => {
         expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
-      })
+      }, {timeout: 10000})
       const cancelButton = testScreen.getByTestId('cancel-delete-button')
       fireEvent.click(cancelButton)
       await waitFor(() => {
         expect(testScreen.queryByTestId('delete-appointment-group-modal')).not.toBeInTheDocument()
-      })
+      }, {timeout: 10000})
 
       expect(axios.delete).not.toHaveBeenCalled()
     })

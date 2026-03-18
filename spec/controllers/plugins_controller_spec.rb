@@ -74,8 +74,9 @@ describe PluginsController do
     end
 
     it "still enables plugins even with no settings posted" do
+      user = account_admin_user(account: Account.site_admin, active_all: true)
+      user_session(user)
       expect(PluginSetting.find_by(name: "account_reports")).to be_nil
-      allow(controller).to receive(:require_setting_site_admin).and_return(true)
 
       put "update", params: { id: "account_reports", account_id: Account.default.id, plugin_setting: { disabled: false } }
       expect(response).to be_redirect
@@ -84,12 +85,13 @@ describe PluginsController do
     end
 
     it "trims posted params" do
+      user = account_admin_user(account: Account.site_admin, active_all: true)
+      user_session(user)
       ps = PluginSetting.new(name: "big_blue_button")
       ps.settings = {}.with_indifferent_access
       ps.disabled = false
       ps.save!
 
-      allow(controller).to receive(:require_setting_site_admin).and_return(true)
       # The 'all' parameter is necessary for this test to pass when the
       # multiple root accounts plugin is installed
       put "update", params: { id: "big_blue_button", settings: { domain: " abc ", secret: "secret", recording_enabled: "0", free_trial: true, send_avatar: true, replace_with_alternatives: false, use_fallback: false }, all: 1 }
@@ -100,11 +102,12 @@ describe PluginsController do
 
     context "account_reports" do
       it "can disable reports" do
+        user = account_admin_user(account: Account.site_admin, active_all: true)
+        user_session(user)
         ps = PluginSetting.new(name: "account_reports")
         ps.settings = { course_storage_csv: true }.with_indifferent_access
         ps.save!
 
-        allow(controller).to receive(:require_setting_site_admin).and_return(true)
         # The 'all' parameter is necessary for this test to pass when the
         # multiple root acoounts plugin is installed
         put "update", params: { id: "account_reports", settings: { "course_storage_csv" => "0" }, all: 1 }

@@ -24,10 +24,12 @@ import {Text} from '@instructure/ui-text'
 import {IconUploadSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {SisImport} from 'api'
+import {SisImport, SisImportRequestBody} from 'api'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
+import {ProgressCircle} from '@instructure/ui-progress'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {completeUpload} from '@canvas/upload-file'
 import {ConfirmationModal} from './ConfirmationModal'
 import FullBatchDropdown from './FullBatchDropdown'
 
@@ -41,6 +43,7 @@ export default function SisImportForm(props: Props) {
   const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [confirmed, setConfirmed] = useState(true)
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
   // form fields
   const [file, setFile] = useState<File | null>(null)
   const [fullChecked, setFullChecked] = useState(false)
@@ -67,32 +70,63 @@ export default function SisImportForm(props: Props) {
     }
   }, [submitting, confirmed])
 
-  const createFormData = () => {
-    const formData = new FormData()
-    formData.append('attachment', file as Blob)
-    formData.append('batch_mode', fullChecked.toString())
-    formData.append('override_sis_stickiness', overrideChecked.toString())
+  const createRequestBody = (): SisImportRequestBody => {
+    const requestBody: SisImportRequestBody = {
+      batch_mode: fullChecked,
+      override_sis_stickiness: overrideChecked,
+    }
+
+    if (file) {
+      requestBody.pre_attachment = {
+        name: file.name,
+        size: file.size,
+        no_redirect: true,
+      }
+    }
+
     if (overrideChecked) {
-      formData.append('add_sis_stickiness', processChecked.toString())
-      formData.append('clear_sis_stickiness', clearChecked.toString())
+      requestBody.add_sis_stickiness = processChecked
+      requestBody.clear_sis_stickiness = clearChecked
     }
+
     if (fullChecked) {
-      formData.append('batch_mode_term_id', termId)
+      requestBody.batch_mode_term_id = termId
     }
-    return formData
+
+    return requestBody
   }
 
   const startSisImport = async () => {
-    const formData = createFormData()
+    const requestBody = createRequestBody()
     try {
+      // Request 1: create the SIS import
       const {json} = await doFetchApi<SisImport>({
         path: `sis_imports`,
         method: 'POST',
-        body: formData,
+        body: requestBody,
       })
+
+      if (!json) {
+        throw new Error('No response received')
+      }
+
+      if (!json.pre_attachment) {
+        throw new Error('Missing pre_attachment in response')
+      }
+
+      // Request 2: upload the file
+      setUploadProgress(0)
+      await completeUpload(json.pre_attachment, file!, {
+        onProgress: (response: any) => {
+          setUploadProgress(Math.round((response.loaded / response.total) * 100))
+        },
+      })
+      setUploadProgress(null)
+
       props.onSuccess(json as SisImport)
     } catch (e) {
       setSubmitting(false)
+      setUploadProgress(null)
       showFlashError(I18n.t('Error starting SIS import'))(e as Error)
     }
   }
@@ -115,6 +149,25 @@ export default function SisImportForm(props: Props) {
   }
 
   if (submitting && confirmed) {
+    if (uploadProgress !== null) {
+      return (
+        <Flex direction="row" gap="small" alignItems="center">
+          <ProgressCircle
+            size="small"
+            meterColor="info"
+            screenReaderLabel={I18n.t('Upload progress: %{progress}%', {progress: uploadProgress})}
+            valueNow={uploadProgress}
+            valueMax={100}
+            renderValue={function ({valueNow}) {
+              return (
+                <Text variant="contentImportant">{I18n.t('%{percent}%', {percent: valueNow})}</Text>
+              )
+            }}
+          />
+          <Text>{I18n.t('Uploading SIS package...')}</Text>
+        </Flex>
+      )
+    }
     return <Spinner renderTitle={I18n.t('Starting SIS import')} />
   }
 

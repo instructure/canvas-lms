@@ -43,11 +43,11 @@ module Canvas::Plugins::TicketingSystem
     end
 
     describe "#sub_account_tag" do
-      let(:asset_manager) { double }
+      let(:asset_manager) { class_double(Context) }
 
       it "prefixes the account_id with subaccount" do
         report.data["context_asset_string"] = "42"
-        context = double(account_id: "123")
+        context = instance_double(Course, account_id: "123")
         allow(asset_manager).to receive(:find_by_asset_string).with("42").and_return(context)
         expect(delegate.sub_account_tag(asset_manager, context.class))
           .to eq("subaccount_123")
@@ -57,7 +57,7 @@ module Canvas::Plugins::TicketingSystem
       # a type override
       it "returns nil if the context isnt the expected type" do
         report.data["context_asset_string"] = "42"
-        context = double(account_id: "123")
+        context = instance_double(Group, account_id: "123")
         allow(asset_manager).to receive(:find_by_asset_string).with("42").and_return(context)
         expect(delegate.sub_account_tag(asset_manager)).to be_nil
       end
@@ -110,7 +110,7 @@ module Canvas::Plugins::TicketingSystem
 
     describe "#account_domain_value" do
       it "uses the domain off the account attribute" do
-        allow(report).to receive_messages(account: double(domain: "www.example.com"))
+        allow(report).to receive_messages(account: instance_double(Account, domain: "www.example.com"))
         expect(delegate.account_domain_value).to eq("www.example.com")
       end
 
@@ -122,7 +122,7 @@ module Canvas::Plugins::TicketingSystem
 
     describe "#user_name" do
       it "uses the name off the user attribute" do
-        allow(report).to receive_messages(user: double(name: "Stanley Stanleyson"))
+        allow(report).to receive_messages(user: instance_double(User, name: "Stanley Stanleyson"))
         expect(delegate.user_name).to eq("Stanley Stanleyson")
       end
 

@@ -727,7 +727,7 @@ class GroupCategoriesController < ApplicationController
                           .order("users.sortable_name").group(:id)
           gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id))
                                           .joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
-          csv << export_headers(include_sis_id, gms_by_user_id.any?)
+          csv << export_headers(include_sis_id, groups_exist: gms_by_user_id.any?)
           users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
         end
         # keep inside authorized_action block to avoid
@@ -807,7 +807,7 @@ class GroupCategoriesController < ApplicationController
     row
   end
 
-  def export_headers(include_sis_id, groups_exist = true)
+  def export_headers(include_sis_id, groups_exist: true)
     headers = []
     headers << I18n.t("name")
     headers << "canvas_user_id"
@@ -926,7 +926,7 @@ class GroupCategoriesController < ApplicationController
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ["uuid", "lti_id"].any? { |id| includes.include? id }
-    user_json_preloads(users, false, { profile: true })
+    user_json_preloads(users, profile: true)
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?("group_submissions") && @group_category.context_type == "Course"
@@ -1046,7 +1046,7 @@ class GroupCategoriesController < ApplicationController
 
     if value_to_boolean(params[:sync])
       # do the distribution and note the changes
-      memberships = @group_category.assign_unassigned_members(by_section, updating_user: @current_user)
+      memberships = @group_category.assign_unassigned_members(by_section:, updating_user: @current_user)
 
       # render the changes
       json = memberships.group_by(&:group_id).map do |group_id, new_members|
@@ -1054,7 +1054,7 @@ class GroupCategoriesController < ApplicationController
       end
       render json:
     else
-      @group_category.assign_unassigned_members_in_background(by_section, updating_user: @current_user)
+      @group_category.assign_unassigned_members_in_background(by_section:, updating_user: @current_user)
       render json: progress_json(@group_category.current_progress, @current_user, session)
     end
   end

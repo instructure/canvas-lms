@@ -70,7 +70,7 @@ module CC
       def add_cc_question(node, question)
         return false unless CC_SUPPORTED_TYPES.member?(question["question_type"])
 
-        add_question(node, question, true)
+        add_question(node, question, for_cc: true)
         true
       end
 
@@ -96,7 +96,7 @@ module CC
         create_key("assessment_question_#{aq_id}")
       end
 
-      def add_question(node, question, for_cc = false)
+      def add_question(node, question, for_cc: false)
         question["migration_id"] = question[:is_quiz_question] ? qq_mig_id(question) : aq_mig_id(question)
         question["answers"] ||= []
 

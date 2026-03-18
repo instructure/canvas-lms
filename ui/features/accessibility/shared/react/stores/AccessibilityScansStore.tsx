@@ -19,7 +19,12 @@
 import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
-import {AccessibilityIssuesSummaryData, AccessibilityResourceScan, Filters} from '../types'
+import {
+  AccessibilityIssue,
+  AccessibilityIssuesSummaryData,
+  AccessibilityResourceScan,
+  Filters,
+} from '../types'
 import {IssuesTableColumns} from '../../../accessibility_checker/react/constants'
 
 export const USE_ACCESSIBILITY_SCANS_STORE = false
@@ -62,6 +67,11 @@ export type AccessibilityScansState = {
   additionalResourcesEnabled?: boolean
   isCloseIssuesEnabled?: boolean
   isGA2FeaturesEnabled?: boolean
+  isAutomaticScanEnabled?: boolean
+  selectedScan: AccessibilityResourceScan | null
+  selectedIssue: AccessibilityIssue | null
+  selectedIssueIndex: number
+  isTrayOpen: boolean
 }
 
 export type AccessibilityScansActions = {
@@ -79,6 +89,9 @@ export type AccessibilityScansActions = {
   setAccessibilityScans: (accessibilityScans: AccessibilityResourceScan[] | null) => void
   setIssuesSummary: (issuesSummary: AccessibilityIssuesSummaryData | null) => void
   setNextResource: (nextResource: NextResource) => void
+  setSelectedScan: (item: AccessibilityResourceScan | null) => void
+  setIsTrayOpen: (open: boolean) => void
+  setSelectedIssue: (item: AccessibilityIssue | null) => void
 }
 
 export const defaultNextResource: NextResource = {index: -1, item: null}
@@ -109,6 +122,11 @@ export const initialState: AccessibilityScansState = {
     window.ENV.FEATURES?.a11y_checker_ai_table_caption_generation || false,
   isCloseIssuesEnabled: window.ENV.FEATURES?.a11y_checker_close_issues || false,
   isGA2FeaturesEnabled: window.ENV.FEATURES?.a11y_checker_ga2_features || false,
+  isAutomaticScanEnabled: window.ENV.FEATURES?.accessibility_automatic_scanning || false,
+  selectedScan: null,
+  isTrayOpen: false,
+  selectedIssueIndex: 0,
+  selectedIssue: null,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {
@@ -123,7 +141,7 @@ export const useAccessibilityScansStore = create<
   AccessibilityScansState & AccessibilityScansActions
 >()(
   devtools(
-    set => ({
+    (set, get) => ({
       ...initialState,
 
       setPage: page => set({page}),
@@ -140,6 +158,15 @@ export const useAccessibilityScansStore = create<
       setAccessibilityScans: accessibilityScans => set({accessibilityScans}),
       setIssuesSummary: issuesSummary => set({issuesSummary}),
       setNextResource: nextResource => set({nextResource}),
+      setSelectedScan: item =>
+        set({selectedScan: item, selectedIssueIndex: 0, selectedIssue: item?.issues?.[0] || null}),
+      setSelectedIssue: item =>
+        set({
+          selectedIssue: item,
+          selectedIssueIndex:
+            get().selectedScan?.issues?.findIndex(issue => issue.id === item?.id) || 0,
+        }),
+      setIsTrayOpen: open => set({isTrayOpen: open}),
     }),
     {
       name: 'AccessibilityScansStore',

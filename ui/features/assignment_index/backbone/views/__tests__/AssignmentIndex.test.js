@@ -36,6 +36,7 @@ $.fn.tooltip = vi.fn(function () {
 
 let assignmentGroups = null
 let container = null
+let app = null
 
 const createAssignmentIndex = (opts = {withAssignmentSettings: false}) => {
   container = document.createElement('div')
@@ -89,7 +90,7 @@ const createAssignmentIndex = (opts = {withAssignmentSettings: false}) => {
     })
   }
 
-  const app = new IndexView({
+  app = new IndexView({
     assignmentGroupsView,
     collection: assignmentGroups,
     createGroupView: false,
@@ -104,6 +105,7 @@ const createAssignmentIndex = (opts = {withAssignmentSettings: false}) => {
 
 describe('AssignmentIndex', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     fakeENV.setup({
       URLS: {
         assignment_sort_base_url: 'test',
@@ -120,10 +122,14 @@ describe('AssignmentIndex', () => {
   })
 
   afterEach(() => {
+    vi.runOnlyPendingTimers()
+    app?.remove()
+    app = null
     fakeENV.teardown()
     assignmentGroups = null
     container?.remove()
     container = null
+    vi.useRealTimers()
   })
 
   it('should filter by search term', () => {

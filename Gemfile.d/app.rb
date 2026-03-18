@@ -27,7 +27,6 @@ gem "sqlite3", "~> 2.6"
 gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
-gem "irb", "~> 1.7"
 
 gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model_serializers", "~> 0.9.9"
@@ -39,7 +38,6 @@ gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
-gem "aws-sdk-translate", "~> 1.77", require: false
 gem "rqrcode", "~> 3.0", require: false
 gem "bcrypt", "~> 3.1"
 gem "benchmark", "~> 0.4", require: false
@@ -59,7 +57,7 @@ gem "graphql-batch", "~> 0.5"
 gem "hashdiff", "~> 1.1", require: false
 gem "highline", "~> 3.0", require: false
 gem "httparty", "~> 0.24"
-gem "i18nliner", "~> 0.2.4"
+gem "i18nliner", "~> 0.3"
 gem "icalendar", "~> 2.9", require: false
 gem "diplomat", "~> 2.6", require: false
 gem "ims-lti", "~> 2.3", require: "ims"
@@ -79,7 +77,7 @@ gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
 gem "mimemagic", "~> 0.4.3"
 gem "mini_magick", "~> 5.0"
-gem "multi_json", "1.15.0"
+gem "multi_json", "~> 1.19"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
 gem "oauth", "~> 1.1", require: false
@@ -109,15 +107,15 @@ gem "rubyzip", "~> 3.0", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false
 gem "stackprof", github: "instructure/stackprof", branch: "switch-d3-data-to-iterative"
-gem "sentry-rails", "~> 5.10"
-gem "sentry-inst_jobs", "~> 5.10"
+gem "sentry-rails", "~> 6.0"
+gem "sentry-inst_jobs", "~> 6.0"
 gem "soap4r-ng", github: "instructure/soap4r", require: false # dependency of respondus_soap_endpoint, but we need to use an unreleased fork
 gem "syslog", "~> 0.1"
 gem "twilio-ruby", "~> 7.0", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
-gem "css_parser", "~> 1.17"
+gem "css_parser", "~> 2.0"
 
 path "../gems" do
   gem "activesupport-suspend_callbacks"

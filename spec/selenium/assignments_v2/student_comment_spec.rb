@@ -77,7 +77,7 @@ describe "assignments" do
 
     it "paginates the comments starting with most recent into batches of 20 with a button to load more comments" do
       expect(StudentAssignmentPageV2.comment_container).to include_text("20")
-      expect(StudentAssignmentPageV2.comment_container).to_not include_text("First")
+      expect(StudentAssignmentPageV2.comment_container).not_to include_text("First")
       StudentAssignmentPageV2.load_more_comments_button.click
 
       expect(StudentAssignmentPageV2.comment_container).to include_text("First")

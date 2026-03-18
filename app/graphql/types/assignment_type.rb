@@ -343,7 +343,7 @@ module Types
       argument :check_extra_permissions, Boolean, "Check extra permissions in RQD method", required: false
     end
     def restrict_quantitative_data(check_extra_permissions: false)
-      assignment.restrict_quantitative_data?(current_user, check_extra_permissions)
+      assignment.restrict_quantitative_data?(current_user, check_extra_permissions:)
     end
 
     field :provisional_grading_locked, Boolean, "Indicates if the user is locked out of provisional grading for this assignment.", null: false
@@ -611,9 +611,14 @@ module Types
 
     field :html_url, UrlType, null: true
     def html_url
+      object_for_url = if object.is_a?(SubAssignment) && object.parent_assignment&.discussion_topic
+                         object.parent_assignment
+                       else
+                         assignment
+                       end
       GraphQLHelpers::UrlHelpers.course_assignment_url(
-        course_id: assignment.context_id,
-        id: assignment.id,
+        course_id: object_for_url.context_id,
+        id: object_for_url.id,
         host: context[:request].host_with_port
       )
     end

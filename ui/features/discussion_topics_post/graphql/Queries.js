@@ -87,7 +87,7 @@ export const DISCUSSION_QUERY = gql`
   ${Group.fragment}
 `
 export const STUDENT_DISCUSSION_QUERY = gql`
-  query GetDiscussionQuery(
+  query GetStudentDiscussionQuery(
     $discussionID: ID!
     $perPage: Int!
     $userSearchId: String

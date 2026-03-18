@@ -25,7 +25,7 @@ describe CanvasPandaPub::AsyncWorker do
     CanvasPandaPub.process_interval = -> { 0.1 }
     CanvasPandaPub.max_queue_size = -> { 100 }
     CanvasPandaPub.logger = double.as_null_object
-    @worker = CanvasPandaPub::AsyncWorker.new(false)
+    @worker = CanvasPandaPub::AsyncWorker.new(start_thread: false)
   end
 
   describe "push" do

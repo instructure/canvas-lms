@@ -223,5 +223,17 @@ RSpec.describe Lti::AssetReport do
         expect(report.visible_to_user?(teacher)).to be true
       end
     end
+
+    context "when submission has been hard-deleted" do
+      let(:report) { lti_asset_report_model(asset:, asset_processor:, visible_to_owner: true) }
+
+      it "returns false for all users" do
+        report # materialize before destroying submission
+        submission.destroy
+        asset.reload
+        expect(report.visible_to_user?(student)).to be false
+        expect(report.visible_to_user?(teacher)).to be false
+      end
+    end
   end
 end

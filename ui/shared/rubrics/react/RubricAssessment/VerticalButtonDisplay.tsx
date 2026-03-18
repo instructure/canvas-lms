@@ -79,15 +79,19 @@ export const VerticalButtonDisplay = ({
         const isSelfAssessmentSelected =
           rating.id != null && rating.id === selectedSelfAssessmentRatingId
 
-        const min = criterionUseRange ? rangingFrom(ratings, index, undefined, true) : undefined
+        const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
         const getPossibleText = (points?: number) => {
           return min != null ? possibleStringRange(min, points) : possibleString(points)
         }
 
-        const buttonAriaLabel = `${rating.description} ${rating.longDescription} ${getPossibleText(
-          rating.points,
-        )}`
+        const buttonAriaLabel = [
+          rating.description,
+          rating.longDescription,
+          getPossibleText(rating.points),
+        ]
+          .filter(Boolean)
+          .join(' ')
 
         return (
           <Flex.Item key={`${rating.id}-${buttonLabel}`} padding="xx-small 0 0 0">
@@ -95,7 +99,6 @@ export const VerticalButtonDisplay = ({
               <Flex.Item
                 align={isSelected ? 'start' : 'center'}
                 data-testid={`rating-button-${rating.id}-${index}`}
-                aria-label={buttonAriaLabel}
                 elementRef={ref => {
                   if (index === 0) {
                     firstRatingRef.current = ref
@@ -104,6 +107,7 @@ export const VerticalButtonDisplay = ({
               >
                 {isSelfAssessment ? (
                   <SelfAssessmentRatingButton
+                    ariaLabel={buttonAriaLabel}
                     buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
@@ -111,6 +115,7 @@ export const VerticalButtonDisplay = ({
                   />
                 ) : (
                   <RatingButton
+                    ariaLabel={buttonAriaLabel}
                     buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}

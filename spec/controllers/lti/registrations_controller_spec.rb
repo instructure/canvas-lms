@@ -35,10 +35,6 @@ RSpec.describe Lti::RegistrationsController do
   let_once(:account) { account_model }
   let_once(:admin) { account_admin_user(name: "A User", account:) }
 
-  before(:once) do
-    account.enable_feature!(:lti_registrations_page)
-  end
-
   before do
     user_session(admin)
   end
@@ -78,17 +74,6 @@ RSpec.describe Lti::RegistrationsController do
       it "redirects to the homepage" do
         get :index, params: { account_id: account.id }
         expect(response).to be_redirect
-      end
-    end
-
-    context "with flag disabled" do
-      before do
-        account.disable_feature!(:lti_registrations_page)
-      end
-
-      it "returns 404" do
-        get :index, params: { account_id: account.id }
-        expect(response).to be_not_found
       end
     end
 
@@ -329,6 +314,23 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
+      context "when registration is inactive" do
+        let(:inactive_registration) do
+          reg = lti_registration_model(account:, name: "Inactive registration")
+          lti_registration_account_binding_model(registration: reg, account:, workflow_state: "on", created_by: admin)
+          reg.deactivate!
+          reg
+        end
+
+        it "includes the inactive registration with workflow_state 'inactive'" do
+          inactive_registration
+          subject
+          reg_json = response_data.find { |r| r["id"] == inactive_registration.id }
+          expect(reg_json).to be_present
+          expect(reg_json["workflow_state"]).to eq("inactive")
+        end
+      end
+
       context "when sorting by installed_by" do
         subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
 
@@ -453,16 +455,29 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
-      context "when sorting by a workflow_state" do
-        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on" }
+      context "when sorting by workflow_state" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on&dir=asc" }
 
-        it "does not error if the account binding is nil" do
-          reg = lti_registration_model(account:, name: "no account bindings")
-          # expect it to have no account bindings, just in case we start automatically
-          # creating a default one in the future.
-          expect(reg.lti_registration_account_bindings).to eq([])
+        context "with lti_deactivate_registrations disabled" do
+          before do
+            account.disable_feature!(:lti_deactivate_registrations)
+          end
+
+          it "does not error if the account binding is nil" do
+            reg = lti_registration_model(account:, name: "no account bindings")
+            expect(reg.lti_registration_account_bindings).to eq([])
+            subject
+            expect(response_data.first["name"]).to eq("no account bindings")
+          end
+        end
+
+        it "sorts by registration workflow_state" do
+          inactive_reg = lti_registration_model(account:, name: "Inactive reg")
+          inactive_reg.deactivate!
+
           subject
-          expect(response_data.last["name"]).to eq("no account bindings")
+          workflow_states = response_data.pluck("workflow_state")
+          expect(workflow_states).to eq(workflow_states.sort)
         end
       end
 
@@ -608,7 +623,6 @@ RSpec.describe Lti::RegistrationsController do
 
         before do
           user_session(admin)
-          account.enable_feature!(:lti_registrations_page)
           inherited_binding
         end
 
@@ -633,15 +647,6 @@ RSpec.describe Lti::RegistrationsController do
         it "returns 403" do
           subject
           expect(response).to be_forbidden
-        end
-      end
-
-      context "with flag disabled" do
-        before { account.disable_feature!(:lti_registrations_page) }
-
-        it "returns 404" do
-          subject
-          expect(response).to be_not_found
         end
       end
     end
@@ -765,15 +770,6 @@ RSpec.describe Lti::RegistrationsController do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -953,15 +949,6 @@ RSpec.describe Lti::RegistrationsController do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -1500,14 +1487,6 @@ RSpec.describe Lti::RegistrationsController do
         expect(subject).to be_forbidden
       end
     end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        expect(subject).to be_not_found
-      end
-    end
   end
 
   describe "PUT reset", type: :request do
@@ -1542,15 +1521,6 @@ RSpec.describe Lti::RegistrationsController do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -1659,15 +1629,6 @@ RSpec.describe Lti::RegistrationsController do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -1857,15 +1818,6 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
     context "without any params" do
       it "returns 422" do
         subject
@@ -1996,7 +1948,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when url responds with non-200" do
-        let(:result) { double(class: Net::HTTPBadRequest, code: 400) }
+        let(:result) { instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 400) }
 
         it "returns 422" do
           subject
@@ -2005,7 +1957,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when url responds with non-JSON" do
-        let(:result) { double(class: Net::HTTPSuccess, is_a?: true, body: "invalid json") }
+        let(:result) { instance_double(Net::HTTPSuccess, class: Net::HTTPSuccess, is_a?: true, body: "invalid json") }
 
         it "returns 422" do
           subject
@@ -2014,7 +1966,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when url responds with JSON" do
-        let(:result) { double(class: Net::HTTPSuccess, is_a?: true, body: config.to_json) }
+        let(:result) { instance_double(Net::HTTPSuccess, class: Net::HTTPSuccess, is_a?: true, body: config.to_json) }
 
         context "when configuration is invalid" do
           let(:config) { { title: "Title" } }
@@ -2065,7 +2017,6 @@ RSpec.describe Lti::RegistrationsController do
 
     before do
       user_session(admin)
-      account.enable_feature!(:lti_registrations_page)
     end
 
     context "without user session" do
@@ -2085,15 +2036,6 @@ RSpec.describe Lti::RegistrationsController do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -2345,7 +2287,6 @@ RSpec.describe Lti::RegistrationsController do
 
     before do
       user_session(admin)
-      account.enable_feature!(:lti_registrations_page)
       account.enable_feature!(:lti_registrations_next)
     end
 
@@ -2369,15 +2310,6 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
     context "with new flag disabled" do
       before do
         deployment # create before disabling flag that would otherwise prevent this
@@ -2395,7 +2327,6 @@ RSpec.describe Lti::RegistrationsController do
       let(:registration) { lti_registration_with_tool(account: other_root_account) }
 
       before do
-        other_root_account.enable_feature!(:lti_registrations_page)
         other_root_account.enable_feature!(:lti_registrations_next)
       end
 
@@ -2411,7 +2342,6 @@ RSpec.describe Lti::RegistrationsController do
       let(:deployment) { other_registration.deployments.first }
 
       before do
-        other_account.enable_feature!(:lti_registrations_page)
         other_account.enable_feature!(:lti_registrations_next)
       end
 
@@ -2764,15 +2694,6 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
     context "with lti_registrations_next flag disabled" do
       before { account.disable_feature!(:lti_registrations_next) }
 
@@ -2882,7 +2803,6 @@ RSpec.describe Lti::RegistrationsController do
     end
 
     before(:once) do
-      account.enable_feature!(:lti_registrations_page)
       account.enable_feature!(:lti_registrations_history)
     end
 
@@ -3116,15 +3036,6 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
     context "when registration update request does not exist" do
       it "returns 404" do
         get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{Lti::RegistrationUpdateRequest.last.id + 1}", as: :json
@@ -3224,15 +3135,6 @@ RSpec.describe Lti::RegistrationsController do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_registrations_page) }
-
-      it "returns 404" do
-        subject
-        expect(response).to have_http_status(:not_found)
       end
     end
 

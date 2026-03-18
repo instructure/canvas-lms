@@ -289,6 +289,7 @@ const FeatureFlagRow = React.memo(
             featureFlag={feature.feature_flag}
             disableDefaults={disableDefaults}
             appliesTo={feature.applies_to}
+            rootOptIn={feature.root_opt_in}
             onStateChange={newState => onStateChange(feature.feature, newState)}
             checkEarlyAccessProgram={checkEarlyAccessProgram}
           />

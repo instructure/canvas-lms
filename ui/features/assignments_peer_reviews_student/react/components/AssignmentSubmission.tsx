@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
@@ -84,6 +84,9 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   const [initialIsPeerReviewCompleted, setInitialIsPeerReviewCompleted] =
     useState(isPeerReviewCompleted)
   const previousSubmissionIdRef = useRef(submission._id)
+  const commentsButtonRef = useRef<HTMLButtonElement | null>(null)
+  const rubricButtonRef = useRef<HTMLButtonElement | null>(null)
+  const pendingFocusPanel = useRef<'comments' | 'rubric' | null>(null)
 
   useEffect(() => {
     if (submission._id !== previousSubmissionIdRef.current) {
@@ -114,19 +117,31 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     setPeerReviewCommentCompleted(isPeerReviewCompleted)
   }, [isPeerReviewCompleted])
 
-  const handleToggleComments = () => {
+  const handleToggleComments = useCallback(() => {
     if (!showComments) {
+      pendingFocusPanel.current = 'comments'
       setShowRubric(false)
     }
     setShowComments(!showComments)
-  }
+  }, [showComments])
 
-  const handleToggleRubric = () => {
+  const handleToggleRubric = useCallback(() => {
     if (!showRubric) {
+      pendingFocusPanel.current = 'rubric'
       setShowComments(false)
     }
     setShowRubric(!showRubric)
-  }
+  }, [showRubric])
+
+  const handleCloseComments = useCallback(() => {
+    setShowComments(false)
+    commentsButtonRef.current?.focus()
+  }, [])
+
+  const handleCloseRubric = useCallback(() => {
+    setShowRubric(false)
+    rubricButtonRef.current?.focus()
+  }, [])
 
   const handlePeerReviewCompletion = () => {
     if (assignment.rubric && !rubricAssessmentCompleted) {
@@ -280,10 +295,11 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             rubricViewMode={rubricViewMode}
             isPeerReviewCompleted={isPeerReviewCompleted}
             rubricAssessmentCompleted={rubricAssessmentCompleted}
-            onClose={() => setShowRubric(false)}
+            onClose={handleCloseRubric}
             onSubmit={handleRubricSubmit}
             onViewModeChange={setRubricViewMode}
             isReadOnly={isReadOnly}
+            autoFocusCloseButton={pendingFocusPanel.current === 'rubric'}
           />
         )}
         {showComments && (
@@ -293,14 +309,14 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             reviewerSubmission={reviewerSubmission}
             isMobile={isMobile}
             isOpen={showComments}
-            onClose={() => setShowComments(false)}
+            onClose={handleCloseComments}
             onSuccessfulPeerReview={() => {
               setPeerReviewCommentCompleted(true)
               onPeerReviewSubmitted()
             }}
             isReadOnly={isReadOnly}
-            // Suppress the success alert since the modal and peer review container already provide completion feedback
             suppressSuccessAlert={true}
+            autoFocusCloseButton={pendingFocusPanel.current === 'comments'}
           />
         )}
       </Flex>
@@ -331,10 +347,16 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
                 {assignment.rubric && (
                   <Flex.Item>
                     <Button
+                      elementRef={(el: Element | null) => {
+                        rubricButtonRef.current = el as HTMLButtonElement
+                      }}
                       renderIcon={<IconRubricLine />}
                       onClick={handleToggleRubric}
                       data-testid="toggle-rubric-button"
                       size={isMobile ? 'small' : 'medium'}
+                      aria-expanded={showRubric}
+                      aria-controls="rubric-panel"
+                      aria-haspopup="dialog"
                     >
                       {showRubric ? I18n.t('Hide Rubric') : I18n.t('Show Rubric')}
                     </Button>
@@ -342,10 +364,16 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
                 )}
                 <Flex.Item>
                   <Button
+                    elementRef={(el: Element | null) => {
+                      commentsButtonRef.current = el as HTMLButtonElement
+                    }}
                     renderIcon={<IconDiscussionLine />}
                     onClick={handleToggleComments}
                     data-testid="toggle-comments-button"
                     size={isMobile ? 'small' : 'medium'}
+                    aria-expanded={showComments}
+                    aria-controls="comments-panel"
+                    aria-haspopup="dialog"
                   >
                     {showComments ? I18n.t('Hide Comments') : I18n.t('Show Comments')}
                   </Button>

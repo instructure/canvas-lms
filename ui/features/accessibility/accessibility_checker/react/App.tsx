@@ -16,21 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState} from 'react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {View} from '@instructure/ui-view'
 
 import {queryClient} from '@canvas/query'
 import {AccessibilityCheckerApp} from './components/AccessibilityCheckerApp/AccessibilityCheckerApp'
 import {AccessibilityCourseScan} from './components/AccessibilityCourseScan'
-import {AccessibilityCheckerContext} from '../../shared/react/contexts/AccessibilityCheckerContext'
-import {AccessibilityResourceScan} from '../../shared/react/types'
-import {AccessibilityWizard} from './components/AccessibilityWizard'
+import AccessibilityWizard from '../../shared/react/components/AccessibilityIssuesContent'
 
 export const App = () => {
-  const [selectedItem, setSelectedItem] = useState<AccessibilityResourceScan | null>(null)
-  const [isTrayOpen, setIsTrayOpen] = useState<boolean>(false)
-
   const scanDisabled = !!window.ENV.SCAN_DISABLED
   const courseId = window.ENV.current_context?.id
 
@@ -40,16 +34,12 @@ export const App = () => {
 
   return (
     <View display="block">
-      <AccessibilityCheckerContext.Provider
-        value={{selectedItem, setSelectedItem, isTrayOpen, setIsTrayOpen}}
-      >
-        <QueryClientProvider client={queryClient}>
-          <AccessibilityWizard />
-          <AccessibilityCourseScan courseId={courseId} scanDisabled={scanDisabled}>
-            <AccessibilityCheckerApp />
-          </AccessibilityCourseScan>
-        </QueryClientProvider>
-      </AccessibilityCheckerContext.Provider>
+      <QueryClientProvider client={queryClient}>
+        <AccessibilityWizard />
+        <AccessibilityCourseScan courseId={courseId} scanDisabled={scanDisabled}>
+          <AccessibilityCheckerApp />
+        </AccessibilityCourseScan>
+      </QueryClientProvider>
     </View>
   )
 }

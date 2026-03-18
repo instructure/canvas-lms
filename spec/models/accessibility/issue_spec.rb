@@ -21,39 +21,20 @@ require "spec_helper"
 
 describe Accessibility::Issue do
   describe "#generate" do
-    let(:context_double) { double("Context") }
+    let(:context_double) { instance_double(Course) }
 
     it "returns issues for pages" do
-      page = double("WikiPage", id: 1, body: "<div>content</div>", title: "Page 1", published?: true, updated_at: Time.zone.now)
-
-      wiki_pages = double("WikiPages")
-      not_deleted_wiki_pages = double("NotDeletedWikiPagesRelation")
-
-      assignments = double("Assignments")
-      active_assignments = double("ActiveAssignments")
-      not_excluded_assignments = double("NotExcludedAssignments")
-
-      discussion_topics = double("DiscussionTopics")
-      announcements = double("Announcements")
+      page = instance_double(WikiPage, id: 1, body: "<div>content</div>", title: "Page 1", published?: true, updated_at: Time.zone.now)
 
       allow(context_double).to receive_messages(
-        wiki_pages:,
-        assignments:,
-        discussion_topics:,
-        announcements:,
-        attachments: double("Attachments", not_deleted: double(order: [])),
+        wiki_pages: class_double(WikiPage, order: [page]).as_null_object,
+        assignments: class_double(Assignment, order: []).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: []),
+        announcements: class_double(Announcement, active: []),
+        attachments: class_double(Attachment, order: []).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
-      allow(wiki_pages).to receive(:not_deleted).and_return(not_deleted_wiki_pages)
-      allow(not_deleted_wiki_pages).to receive(:order).and_return([page])
-
-      allow(assignments).to receive(:active).and_return(active_assignments)
-      allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
-      allow(not_excluded_assignments).to receive(:order).and_return([])
-
-      allow(discussion_topics).to receive(:scannable).and_return([])
-      allow(announcements).to receive(:active).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -64,30 +45,17 @@ describe Accessibility::Issue do
     end
 
     it "returns issues for assignments" do
-      assignment = double("Assignment", id: 2, description: "<div>desc</div>", title: "Assignment 1", published?: false, updated_at: Time.zone.now)
-
-      assignments = double("Assignments")
-      active_assignments = double("ActiveAssignments")
-      not_excluded_assignments = double("NotExcludedAssignments")
-
-      discussion_topics = double("DiscussionTopics")
-      announcements = double("Announcements")
+      assignment = instance_double(Assignment, id: 2, description: "<div>desc</div>", title: "Assignment 1", published?: false, updated_at: Time.zone.now)
 
       allow(context_double).to receive_messages(
-        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments:,
-        discussion_topics:,
-        announcements:,
-        attachments: double("Attachments", not_deleted: double(order: [])),
+        wiki_pages: class_double(WikiPage, order: []).as_null_object,
+        assignments: class_double(Assignment, order: [assignment]).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: []),
+        announcements: class_double(Announcement, active: []),
+        attachments: class_double(Attachment, order: []).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
-      allow(assignments).to receive(:active).and_return(active_assignments)
-      allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
-      allow(not_excluded_assignments).to receive(:order).and_return([assignment])
-
-      allow(discussion_topics).to receive(:scannable).and_return([])
-      allow(announcements).to receive(:active).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -98,23 +66,17 @@ describe Accessibility::Issue do
     end
 
     it "returns issues for discussion topics" do
-      discussion_topic = double("DiscussionTopic", id: 3, message: "<div>message</div>", title: "Discussion 1", published?: true, updated_at: Time.zone.now)
-
-      discussion_topics = double("DiscussionTopics")
-      announcements = double("Announcements")
+      discussion_topic = instance_double(DiscussionTopic, id: 3, message: "<div>message</div>", title: "Discussion 1", published?: true, updated_at: Time.zone.now)
 
       allow(context_double).to receive_messages(
-        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
-        discussion_topics:,
-        announcements:,
-        attachments: double("Attachments", not_deleted: double(order: [])),
+        wiki_pages: class_double(WikiPage, order: []).as_null_object,
+        assignments: class_double(Assignment, order: []).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: [discussion_topic]),
+        announcements: class_double(Announcement, active: []).as_null_object,
+        attachments: class_double(Attachment, order: []).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
-
-      allow(discussion_topics).to receive(:scannable).and_return([discussion_topic])
-      allow(announcements).to receive(:active).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -125,21 +87,17 @@ describe Accessibility::Issue do
     end
 
     it "returns issues for announcements" do
-      announcement = double("Announcement", id: 4, message: "<div>announcement message</div>", title: "Announcement 1", published?: true, updated_at: Time.zone.now)
-
-      announcements = double("Announcements")
+      announcement = instance_double(Announcement, id: 4, message: "<div>announcement message</div>", title: "Announcement 1", published?: true, updated_at: Time.zone.now)
 
       allow(context_double).to receive_messages(
-        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
-        discussion_topics: double("DiscussionTopics", scannable: []),
-        announcements:,
-        attachments: double("Attachments", not_deleted: double(order: [])),
+        wiki_pages: class_double(WikiPage, order: []).as_null_object,
+        assignments: class_double(Assignment, order: []).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: []),
+        announcements: class_double(Announcement, active: [announcement]),
+        attachments: class_double(Attachment, order: []).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
-
-      allow(announcements).to receive(:active).and_return([announcement])
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
@@ -151,39 +109,28 @@ describe Accessibility::Issue do
 
     # TODO: Disable PDF Accessibility Checks Until Post-InstCon
     it "returns issues for attachments", skip: "LMA-181 2025-06-11" do
-      attachment_pdf = double("AttachmentPDF",
-                              id: 3,
-                              title: "Document.pdf",
-                              content_type: "application/pdf",
-                              published?: true,
-                              updated_at: Time.zone.now)
-      attachment_other = double("AttachmentOther",
-                                id: 4,
-                                title: "Image.png",
-                                content_type: "image/png",
-                                published?: false,
-                                updated_at: Time.zone.now)
-
-      attachments_collection = double("AttachmentsCollection")
-      not_deleted_attachments_relation = double("NotDeletedAttachmentsRelation")
-
-      discussion_topics = double("DiscussionTopics")
-      announcements = double("Announcements")
+      attachment_pdf = instance_double(Attachment,
+                                       id: 3,
+                                       title: "Document.pdf",
+                                       content_type: "application/pdf",
+                                       published?: true,
+                                       updated_at: Time.zone.now)
+      attachment_other = instance_double(Attachment,
+                                         id: 4,
+                                         title: "Image.png",
+                                         content_type: "image/png",
+                                         published?: false,
+                                         updated_at: Time.zone.now)
 
       allow(context_double).to receive_messages(
-        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
-        discussion_topics:,
-        announcements:,
-        attachments: attachments_collection,
+        wiki_pages: class_double(WikiPage, order: []).as_null_object,
+        assignments: class_double(Assignment, order: []).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: []),
+        announcements: class_double(Announcement, active: []),
+        attachments: class_double(Attachment, order: [attachment_pdf, attachment_other]).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
-      allow(attachments_collection).to receive(:not_deleted).and_return(not_deleted_attachments_relation)
-      allow(not_deleted_attachments_relation).to receive(:order).and_return([attachment_pdf, attachment_other])
-
-      allow(discussion_topics).to receive(:scannable).and_return([])
-      allow(announcements).to receive(:active).and_return([])
 
       allow(Rails.application.routes.url_helpers).to receive(:course_files_url) do |_, options|
         case options[:preview]
@@ -221,29 +168,15 @@ describe Accessibility::Issue do
     end
 
     it "returns nils if size limits exceeded" do
-      assignments = double("Assignments")
-      active_assignments = double("ActiveAssignments")
-      not_excluded_assignments = double("NotExcludedAssignments")
-
-      discussion_topics = double("DiscussionTopics")
-      announcements = double("Announcements")
-
       allow(context_double).to receive_messages(
-        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments:,
-        discussion_topics:,
-        announcements:,
-        attachments: double("Attachments", not_deleted: double(order: [])),
+        wiki_pages: class_double(WikiPage, order: []).as_null_object,
+        assignments: class_double(Assignment, order: []).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: []).as_null_object,
+        announcements: class_double(Announcement, active: []),
+        attachments: class_double(Attachment, order: []).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: true
       )
-
-      allow(assignments).to receive(:active).and_return(active_assignments)
-      allow(active_assignments).to receive(:not_excluded_from_accessibility_scan).and_return(not_excluded_assignments)
-      allow(not_excluded_assignments).to receive(:order).and_return([])
-
-      allow(discussion_topics).to receive(:scannable).and_return([])
-      allow(announcements).to receive(:active).and_return([])
 
       result = described_class.new(context: context_double).generate
       expect(result[:accessibility_scan_disabled]).to be true
@@ -499,33 +432,33 @@ describe Accessibility::Issue do
 
   describe "#search" do
     let(:course) { course_model }
-    let(:context_double) { double("Context") }
+    let(:context_double) { instance_double(Course) }
 
     before do
       allow(context_double).to receive_messages(
-        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
-        assignments: double("Assignments", active: double(not_excluded_from_accessibility_scan: double(order: []))),
-        discussion_topics: double("DiscussionTopics", scannable: []),
-        announcements: double("Announcements"),
-        attachments: double("Attachments", not_deleted: double(order: [])),
+        wiki_pages: class_double(WikiPage, order: []).as_null_object,
+        assignments: class_double(Assignment, order: []).as_null_object,
+        discussion_topics: class_double(DiscussionTopic, scannable: []),
+        announcements: class_double(Announcement, active: []),
+        attachments: class_double(Attachment, order: []).as_null_object,
         syllabus_body: nil,
         exceeds_accessibility_scan_limit?: false
       )
     end
 
     it "filters announcements by query" do
-      announcement1 = double("Announcement",
-                             id: 1,
-                             message: "<p>Apple announcement content</p>",
-                             title: "Apple Announcement",
-                             published?: true,
-                             updated_at: Time.zone.now)
-      announcement2 = double("Announcement",
-                             id: 2,
-                             message: "<p>Banana announcement content</p>",
-                             title: "Banana Announcement",
-                             published?: true,
-                             updated_at: Time.zone.now)
+      announcement1 = instance_double(Announcement,
+                                      id: 1,
+                                      message: "<p>Apple announcement content</p>",
+                                      title: "Apple Announcement",
+                                      published?: true,
+                                      updated_at: Time.zone.now)
+      announcement2 = instance_double(Announcement,
+                                      id: 2,
+                                      message: "<p>Banana announcement content</p>",
+                                      title: "Banana Announcement",
+                                      published?: true,
+                                      updated_at: Time.zone.now)
 
       allow(context_double.announcements).to receive(:active).and_return([announcement1, announcement2])
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
@@ -538,18 +471,18 @@ describe Accessibility::Issue do
     end
 
     it "returns all announcements when query is blank" do
-      announcement1 = double("Announcement",
-                             id: 1,
-                             message: "<p>First announcement</p>",
-                             title: "First Announcement",
-                             published?: true,
-                             updated_at: Time.zone.now)
-      announcement2 = double("Announcement",
-                             id: 2,
-                             message: "<p>Second announcement</p>",
-                             title: "Second Announcement",
-                             published?: true,
-                             updated_at: Time.zone.now)
+      announcement1 = instance_double(Announcement,
+                                      id: 1,
+                                      message: "<p>First announcement</p>",
+                                      title: "First Announcement",
+                                      published?: true,
+                                      updated_at: Time.zone.now)
+      announcement2 = instance_double(Announcement,
+                                      id: 2,
+                                      message: "<p>Second announcement</p>",
+                                      title: "Second Announcement",
+                                      published?: true,
+                                      updated_at: Time.zone.now)
 
       allow(context_double.announcements).to receive(:active).and_return([announcement1, announcement2])
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
@@ -561,18 +494,18 @@ describe Accessibility::Issue do
     end
 
     it "filters pages, assignments, and discussion topics along with announcements" do
-      page = double("WikiPage",
-                    id: 1,
-                    body: "<div>Apple page content</div>",
-                    title: "Apple Page",
-                    published?: true,
-                    updated_at: Time.zone.now)
-      announcement = double("Announcement",
-                            id: 2,
-                            message: "<p>Banana announcement</p>",
-                            title: "Banana Announcement",
-                            published?: true,
-                            updated_at: Time.zone.now)
+      page = instance_double(WikiPage,
+                             id: 1,
+                             body: "<div>Apple page content</div>",
+                             title: "Apple Page",
+                             published?: true,
+                             updated_at: Time.zone.now)
+      announcement = instance_double(Announcement,
+                                     id: 2,
+                                     message: "<p>Banana announcement</p>",
+                                     title: "Banana Announcement",
+                                     published?: true,
+                                     updated_at: Time.zone.now)
 
       allow(context_double.wiki_pages.not_deleted).to receive(:order).and_return([page])
       allow(context_double.announcements).to receive(:active).and_return([announcement])

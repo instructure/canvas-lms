@@ -103,7 +103,7 @@ describe "Groups API", type: :request do
     }
   end
 
-  def membership_json(membership, is_admin = false)
+  def membership_json(membership, is_admin: false)
     json = {
       "id" => membership.id,
       "group_id" => membership.group_id,
@@ -991,7 +991,7 @@ describe "Groups API", type: :request do
 
       @membership = GroupMembership.where(user_id: @to_add, group_id: @group).first
       expect(@membership.workflow_state).to eq "accepted"
-      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
+      expect(json).to eq membership_json(@membership, is_admin: true).merge("just_created" => true)
     end
 
     it "shows sis_import_id for group" do
@@ -1006,7 +1006,7 @@ describe "Groups API", type: :request do
                         filter_states: ["invited"]
                       })
       expect(json.first["sis_import_id"]).to eq sis_batch.id
-      expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: "invited").first, true)
+      expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: "invited").first, is_admin: true)
     end
 
     it "allows a user to join a group whose self sign-up is still open" do
@@ -1025,7 +1025,7 @@ describe "Groups API", type: :request do
 
       @membership = GroupMembership.where(user_id: @student, group_id: @group).first
       expect(@membership.workflow_state).to eq "accepted"
-      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
+      expect(json).to eq membership_json(@membership, is_admin: true).merge("just_created" => true)
     end
 
     it "does not allow a user to join a group whose self sign-up is closed" do

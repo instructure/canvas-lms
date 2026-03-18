@@ -133,7 +133,7 @@ module Api::V1::OutcomeResults
   def outcome_results_linked_users_json(users, context)
     includes = %w[sis_user_id avatar_url]
     excludes = %w[personal_info]
-    user_json_preloads(users, false, { accounts: true })
+    user_json_preloads(users, accounts: true)
     users = users_json(users, @current_user, session, includes, context, nil, excludes)
 
     allowed_fields = %w[id name display_name sortable_name sis_id integration_id login_id avatar_url]

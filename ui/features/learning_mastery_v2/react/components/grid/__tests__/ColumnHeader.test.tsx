@@ -81,4 +81,16 @@ describe('ColumnHeader', () => {
     const headerElement = container.querySelector('[data-testid="column-header"]')
     expect(headerElement).toHaveStyle({width: '300px'})
   })
+
+  it('renders the icon when provided', () => {
+    const icon = <span data-testid="test-icon">📝</span>
+    render(<ColumnHeader {...defaultProps} icon={icon} />)
+    expect(screen.getByTestId('test-icon')).toBeInTheDocument()
+  })
+
+  it('does not render an icon when not provided', () => {
+    const {container} = render(<ColumnHeader {...defaultProps} />)
+    const iconContainer = container.querySelector('[data-testid="test-icon"]')
+    expect(iconContainer).not.toBeInTheDocument()
+  })
 })

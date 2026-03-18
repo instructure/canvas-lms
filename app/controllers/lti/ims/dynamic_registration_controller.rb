@@ -26,7 +26,7 @@ module Lti
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
-      before_action :require_user, except: %i[create update show_configuration]
+      skip_before_action :require_user, only: %i[create update show_configuration]
       before_action :require_account, except: %i[create update show_configuration]
       before_action :require_site_admin_modify_permission, only: %w[registration_token update_registration_overlay]
 
@@ -185,6 +185,12 @@ module Lti
         end
 
         ims_registration = Lti::IMS::Registration.find(params[:registration_id])
+
+        # Verify that the developer key from the access token matches the registration's developer key
+        unless validation_result[:developer_key].global_id == ims_registration.developer_key.global_id
+          return render status: :forbidden, json: { errorMessage: "You are not authorized to access this registration" }
+        end
+
         root_deployment = ContextExternalTool.find_by(account: ims_registration.root_account, lti_registration: ims_registration.lti_registration_id)
         render_registration(ims_registration, ims_registration.developer_key, root_deployment)
       end
@@ -206,17 +212,13 @@ module Lti
 
       def update_registration_overlay
         registration = Lti::IMS::Registration.find(params[:registration_id])
-        # Historically, the overlay for an IMS Registration lived on its
-        # registration_overlay column. However, we're transitioning over to using
-        # the Lti::Overlay and Lti::Registration models, so that more than just Dynamic
-        # Registrations can be overlaid, hence the reason for keeping two data
-        # sources in sync.
         Lti::IMS::Registration.transaction do
           registration_overlay = JSON.parse(request.body.read)
           overlay = registration.lti_registration.overlay_for(@context)
 
-          # Let the registration validate the data they passed
-          registration.update!(registration_overlay:)
+          # Validate the data before proceeding
+          errors = Schemas::Lti::IMS::RegistrationOverlay.simple_validation_errors(registration_overlay)
+          raise ActiveRecord::RecordInvalid, registration if errors.present?
 
           # also update the DK scopes
           if registration_overlay["disabledScopes"].present?
@@ -261,7 +263,7 @@ module Lti
 
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
           { errors:, registration_attrs: }
-        return render status: :unprocessable_entity, json: { errors: } if errors.present?
+        return render status: :unprocessable_content, json: { errors: } if errors.present?
 
         if jwt["existing_registration"].present?
           registration = Lti::Registration.find(jwt["existing_registration"])
@@ -357,11 +359,16 @@ module Lti
           return render status: validation_result[:status], json: { errorMessage: validation_result[:error] }
         end
 
+        # Verify that the developer key from the access token matches the registration's developer key
+        unless validation_result[:developer_key].global_id == ims_registration.developer_key.global_id
+          return render status: :forbidden, json: { errorMessage: "You are not authorized to update this registration" }
+        end
+
         # create a registration update request based on the body
         # of the request and the registration id
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
           { errors:, registration_attrs: }
-        return render status: :unprocessable_entity, json: { errors: } if errors.present?
+        return render status: :unprocessable_content, json: { errors: } if errors.present?
 
         if registration.present?
           # Create an LTI RegistrationUpdateRequest
@@ -384,7 +391,7 @@ module Lti
 
       def registration_view
         registration = Lti::IMS::Registration.find(params[:registration_id])
-        redirect_to account_developer_key_view_url(registration.root_account_id, registration.developer_key_id)
+        redirect_to "/accounts/#{registration.root_account_id}/apps/manage/#{registration.lti_registration.id}/configuration"
       end
 
       def dr_iframe
@@ -427,7 +434,7 @@ module Lti
           scope: (registration.scopes + ["openid"]).join(" "),
           "https://purl.imsglobal.org/spec/lti-tool-configuration": registration.lti_tool_configuration.merge(
             {
-              "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/registration_config_url": lti_registration_config_url(registration.global_id),
+              "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/registration_config_url": lti_registration_config_url(registration.lti_registration.account.global_id, registration.global_id),
             }
           ),
           registration_client_uri: get_lti_registration_url(registration_id: registration.global_id),

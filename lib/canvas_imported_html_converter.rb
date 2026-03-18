@@ -132,7 +132,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     end
   end
 
-  def replace_item_placeholders!(item_key, field_links, skip_associations = false)
+  def replace_item_placeholders!(item_key, field_links, skip_associations: false)
     item_type = item_key[:type]
     item_type = field_links.keys.first if [:block_editor, :block_editor_text].include? field_links.keys.first
 
@@ -221,14 +221,14 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     case item
     when Assignment
       if item.discussion_topic
-        replace_item_placeholders!({ item: item.discussion_topic }, { message: links }, true)
+        replace_item_placeholders!({ item: item.discussion_topic }, { message: links }, skip_associations: true)
       end
       if item.quiz
-        replace_item_placeholders!({ item: item.quiz }, { description: links }, true)
+        replace_item_placeholders!({ item: item.quiz }, { description: links }, skip_associations: true)
       end
     when DiscussionTopic, Quizzes::Quiz
       if item.assignment
-        replace_item_placeholders!({ item: item.assignment }, { description: links }, true)
+        replace_item_placeholders!({ item: item.assignment }, { description: links }, skip_associations: true)
       end
     end
   end

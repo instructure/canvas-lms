@@ -1222,7 +1222,7 @@ describe CommunicationChannelsController do
             expect(response).to have_http_status(:ok)
             # can't expect to eq because we get stray channels for the users we created
             expect(included_channels).to include(@c1, @c2, @c5)
-            expect(included_channels).to_not include(@c3, @c4)
+            expect(included_channels).not_to include(@c3, @c4)
           end
 
           it "filters by path type" do
@@ -1230,7 +1230,7 @@ describe CommunicationChannelsController do
 
             expect(response).to have_http_status(:ok)
             expect(included_channels).to include(@c5)
-            expect(included_channels).to_not include(@c1, @c2, @c3, @c4)
+            expect(included_channels).not_to include(@c1, @c2, @c3, @c4)
           end
         end
 
@@ -1410,8 +1410,9 @@ describe CommunicationChannelsController do
   end
 
   context "push token deletion" do
-    let(:sns_response) { double(:[] => { endpoint_arn: "endpointarn" }, :attributes => { endpoint_arn: "endpointarn" }) }
-    let(:sns_client) { double(create_platform_endpoint: sns_response, get_endpoint_attributes: sns_response) }
+    let(:sns_create_response) { instance_double(Aws::SNS::Types::CreateEndpointResponse, :[] => { endpoint_arn: "endpointarn" }, :endpoint_arn => "endpointarn") }
+    let(:sns_get_attrs_response) { instance_double(Aws::SNS::Types::GetEndpointAttributesResponse, attributes: { "Enabled" => "true" }) }
+    let(:sns_client) { instance_double(Aws::SNS::Client, create_platform_endpoint: sns_create_response, get_endpoint_attributes: sns_get_attrs_response) }
     let(:sns_developer_key_sns_field) { sns_client }
 
     let(:sns_developer_key) do

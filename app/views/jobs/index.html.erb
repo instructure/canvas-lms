@@ -194,10 +194,12 @@ tags_opts = {
   :refresh_rate => @job_tags_refresh_seconds * 1000,
 }
 
-js_env :JOBS => {
-  :opts => jobs_opts.as_json(:include_root => false),
-  :running_opts => running_opts.as_json(:include_root => false),
-  :tags_opts => tags_opts
-}
+js_env({
+  JOBS: {
+    :opts => jobs_opts.as_json(:include_root => false),
+    :running_opts => running_opts.as_json(:include_root => false),
+    :tags_opts => tags_opts
+  }
+})
 %>
 

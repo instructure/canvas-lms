@@ -32,6 +32,7 @@ const I18n = createI18nScope('rubrics-criteria-container')
 
 type RubricCriteriaRowsProps = {
   rubricForm: RubricFormProps
+  isAIRubricsAvailable: boolean
   isGenerating?: boolean
   showCriteriaRegeneration?: boolean
   handleDragEnd: (result: DropResult) => void
@@ -43,6 +44,7 @@ type RubricCriteriaRowsProps = {
 }
 export const RubricCriteriaContainer = ({
   rubricForm,
+  isAIRubricsAvailable,
   isGenerating = false,
   showCriteriaRegeneration = false,
   handleDragEnd,
@@ -116,6 +118,7 @@ export const RubricCriteriaContainer = ({
                         freeFormCriterionComments={rubricForm.freeFormCriterionComments}
                         hidePoints={rubricForm.hidePoints}
                         rowIndex={index + 1}
+                        isAIRubricsAvailable={isAIRubricsAvailable}
                         isGenerated={criterion.isGenerated}
                         nextIsGenerated={rubricForm.criteria[index + 1]?.isGenerated}
                         onDeleteCriterion={() => deleteCriterion(criterion)}

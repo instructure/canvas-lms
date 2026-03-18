@@ -92,7 +92,7 @@ module Lti
   #   }
   class LtiAppsController < ApplicationController
     before_action :require_context
-    before_action :require_user, except: [:launch_definitions]
+    skip_before_action :require_user, only: [:launch_definitions]
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)

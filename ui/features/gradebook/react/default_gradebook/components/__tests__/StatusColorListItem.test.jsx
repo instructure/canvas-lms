@@ -46,20 +46,20 @@ describe('StatusColorListItem', () => {
   it('renders color picker with correct initial color', () => {
     const props = defaultProps()
     render(<StatusColorListItem {...props} />)
-    const colorPickerButton = screen.getByRole('button', {name: /late color picker/i})
+    const colorPickerButton = screen.getByText(/late color picker/i).closest('button')
     expect(colorPickerButton).toBeInTheDocument()
   })
 
   it('renders edit icon as popover trigger', () => {
     render(<StatusColorListItem {...defaultProps()} />)
-    const editButton = screen.getByRole('button', {name: /late color picker/i})
+    const editButton = screen.getByText(/late color picker/i).closest('button')
     expect(editButton).toBeInTheDocument()
   })
 
   it('applies background color to list item', () => {
     const color = '#FFFFFF'
-    render(<StatusColorListItem {...defaultProps({color})} />)
-    const listItem = screen.getByRole('listitem')
+    const {container} = render(<StatusColorListItem {...defaultProps({color})} />)
+    const listItem = container.querySelector('li')
     expect(listItem).toHaveStyle({backgroundColor: color})
   })
 
@@ -69,10 +69,68 @@ describe('StatusColorListItem', () => {
 
     render(<StatusColorListItem {...defaultProps({afterSetColor})} />)
 
-    const editButton = screen.getByRole('button', {name: /late color picker/i})
+    const editButton = screen.getByText(/late color picker/i).closest('button')
     await user.click(editButton)
 
     // Note: Further color picker interaction tests would depend on the actual ColorPicker implementation
     // and would need to be added based on how the color selection is implemented
+  })
+
+  describe('icon display', () => {
+    it('displays icon when showIcon is true', () => {
+      const {container} = render(<StatusColorListItem {...defaultProps({showIcon: true})} />)
+      const icon = container.querySelector('img')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('src')
+      expect(icon).toHaveAttribute('title', 'Late')
+    })
+
+    it('does not display icon when showIcon is false', () => {
+      const {container} = render(<StatusColorListItem {...defaultProps({showIcon: false})} />)
+      expect(container.querySelector('img')).not.toBeInTheDocument()
+    })
+
+    it('does not display icon when showIcon is undefined', () => {
+      const {container} = render(<StatusColorListItem {...defaultProps()} />)
+      expect(container.querySelector('img')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('custom name', () => {
+    it('displays custom name when name prop is provided', () => {
+      const customName = 'Custom Status Name'
+      render(<StatusColorListItem {...defaultProps({name: customName})} />)
+      expect(screen.getByText(customName)).toBeInTheDocument()
+    })
+
+    it('displays default status name when name prop is not provided', () => {
+      render(<StatusColorListItem {...defaultProps()} />)
+      expect(screen.getByText('Late')).toBeInTheDocument()
+    })
+  })
+
+  describe('color picker visibility', () => {
+    it('hides color picker button when disableColorPicker is true', () => {
+      render(<StatusColorListItem {...defaultProps({disableColorPicker: true})} />)
+      expect(screen.queryByText(/color picker/i)).not.toBeInTheDocument()
+    })
+
+    it('shows color picker button when disableColorPicker is false', () => {
+      render(<StatusColorListItem {...defaultProps({disableColorPicker: false})} />)
+      expect(screen.getByText(/late color picker/i).closest('button')).toBeInTheDocument()
+    })
+
+    it('shows color picker button when disableColorPicker is undefined', () => {
+      render(<StatusColorListItem {...defaultProps()} />)
+      expect(screen.getByText(/late color picker/i).closest('button')).toBeInTheDocument()
+    })
+
+    it('applies custom padding when disableColorPicker is true', () => {
+      const {container} = render(
+        <StatusColorListItem {...defaultProps({disableColorPicker: true})} />,
+      )
+      const listItem = container.querySelector('li')
+      expect(listItem).toHaveStyle({padding: '11px 8px'})
+    })
   })
 })

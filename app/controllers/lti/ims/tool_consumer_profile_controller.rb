@@ -26,7 +26,7 @@ module Lti
       TOOL_CONSUMER_PROFILE_SERVICE = "ToolConsumerProfile"
 
       before_action :require_context
-      skip_before_action :load_user
+      skip_before_action :load_user, :require_user
 
       def show
         dev_key = oauth2_request? ? developer_key : nil

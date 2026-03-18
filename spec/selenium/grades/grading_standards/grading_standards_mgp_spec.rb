@@ -101,12 +101,12 @@ describe "grading periods account page" do
     end
 
     context "with populated data" do
-      group_name_1 = "Group 1"
-      group_name_2 = "Group 2"
-      term_name_1 = "First Term"
-      term_name_2 = "Second Term"
-      period_name_1 = "A Grading Period"
-      period_name_2 = "Another Grading Period"
+      let(:group_name_1) { "Group 1" }
+      let(:group_name_2) { "Group 2" }
+      let(:term_name_1) { "First Term" }
+      let(:term_name_2) { "Second Term" }
+      let(:period_name_1) { "A Grading Period" }
+      let(:period_name_2) { "Another Grading Period" }
 
       before do
         group1 = backend_group_helper.create_for_account_with_term(Account.default, term_name_1, group_name_1)

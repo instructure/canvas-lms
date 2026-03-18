@@ -91,7 +91,7 @@ describe BrandableCSS do
   describe "all_brand_variable_values_as_css" do
     it "defines the right default css values in the root scope" do
       expected_css = ":root {
-        #{BrandableCSS.all_brand_variable_values(nil, true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
+        #{BrandableCSS.all_brand_variable_values(nil, css_urls: true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
       }"
       expect(BrandableCSS.default("css")).to eq expected_css
     end
@@ -104,7 +104,7 @@ describe BrandableCSS do
     end
 
     it "has high contrast overrides for link and brand-primary" do
-      brand_variables = JSON.parse(BrandableCSS.default("json", true))
+      brand_variables = JSON.parse(BrandableCSS.default("json", high_contrast: true))
       expect(brand_variables["ic-brand-primary"]).to eq "#0A5A9E"
       expect(brand_variables["ic-link-color"]).to eq "#09508C"
     end
@@ -116,9 +116,9 @@ describe BrandableCSS do
         it "writes the default json representation to the default json file" do
           allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
           file = StringIO.new
-          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
-          BrandableCSS.save_default!(type, high_contrast)
-          expect(file.string).to eq BrandableCSS.default(type, high_contrast)
+          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast:).and_return(file)
+          BrandableCSS.save_default!(type, high_contrast:)
+          expect(file.string).to eq BrandableCSS.default(type, high_contrast:)
         end
 
         it "uploads json file to s3 if cdn is enabled" do
@@ -131,10 +131,10 @@ describe BrandableCSS do
           )
 
           file = StringIO.new
-          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
+          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast:).and_return(file)
           allow(File).to receive(:delete)
-          expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_path(type, high_contrast))
-          BrandableCSS.save_default!(type, high_contrast)
+          expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_path(type, high_contrast:))
+          BrandableCSS.save_default!(type, high_contrast:)
         end
 
         it "deletes the local json file if cdn is enabled" do
@@ -146,10 +146,10 @@ describe BrandableCSS do
                                                             bucket: "cdn")
           )
           file = StringIO.new
-          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
-          expect(File).to receive(:delete).with(BrandableCSS.default_brand_file(type, high_contrast))
+          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast:).and_return(file)
+          expect(File).to receive(:delete).with(BrandableCSS.default_brand_file(type, high_contrast:))
           expect(BrandableCSS.s3_uploader).to receive(:upload_file)
-          BrandableCSS.save_default!(type, high_contrast)
+          BrandableCSS.save_default!(type, high_contrast:)
         end
       end
     end

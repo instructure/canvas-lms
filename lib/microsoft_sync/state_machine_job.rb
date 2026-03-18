@@ -180,7 +180,7 @@ module MicrosoftSync
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state = nil)
       run_with_delay(initial_mem_state:, synchronous: true)
-    rescue IRB::Abort => e
+    rescue AbortExceptionMatcher => e
       update_state_record_to_errored_and_cleanup(error: e, step: nil)
       raise
     end
@@ -191,7 +191,7 @@ module MicrosoftSync
 
     private
 
-    def run(step, initial_mem_state, synchronous = false)
+    def run(step, initial_mem_state, synchronous: false)
       job_state = job_state_record.job_state
 
       # Record has been deleted since we were enqueued:
@@ -328,7 +328,7 @@ module MicrosoftSync
 
       if synchronous
         sleep delay_amount if delay_amount
-        run(step, initial_mem_state, true)
+        run(step, initial_mem_state, synchronous: true)
         return
       end
 

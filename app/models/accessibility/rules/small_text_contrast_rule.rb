@@ -110,7 +110,11 @@ module Accessibility
       end
 
       def why
-        I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
+        [I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision."),
+         I18n.t(
+           "Note that we can only accurately detect color contrast issues in content created in Canvas using the Rich Content Editor (using in-line CSS and Hex code values for colors.) " \
+           "If colors in this content are defined by internal or external CSS, or color values other than Hex code, results may be inaccurate."
+         )]
       end
 
       def issue_metadata(elem)

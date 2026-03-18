@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {queryClient} from '@canvas/query'
-import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
@@ -33,7 +32,6 @@ vi.mock('../queries/RubricFormQueries', async importOriginal => {
   return {
     ...actual,
     saveRubric: vi.fn(),
-    generateCriteria: vi.fn(),
   }
 })
 
@@ -55,22 +53,34 @@ const ROOT_OUTCOME_GROUP = {
   url: 'https://example.com/root',
 }
 
+let queryClient: QueryClient
+
 describe('RubricForm Tests', () => {
   beforeEach(() => {
     window.ENV = {
       ...window.ENV,
       context_asset_string: 'user_1',
     }
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          staleTime: Infinity,
+          refetchOnMount: false,
+        },
+      },
+    })
   })
 
   afterEach(() => {
+    queryClient.clear()
     vi.resetAllMocks()
     destroyFlashAlertContainer()
   })
 
   const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
     return render(
-      <MockedQueryProvider>
+      <MockedQueryClientProvider client={queryClient}>
         <RubricForm
           rootOutcomeGroup={ROOT_OUTCOME_GROUP}
           criterionUseRangeEnabled={false}
@@ -82,20 +92,15 @@ describe('RubricForm Tests', () => {
           aiRubricsEnabled={false}
           {...props}
         />
-      </MockedQueryProvider>,
+      </MockedQueryClientProvider>,
     )
   }
 
-  const getSRAlert = () => document.querySelector('#flash_screenreader_holder')?.textContent
-
   describe('without rubricId', () => {
     it('loads rubric data and populates appropriate fields', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
-
       const {getByTestId, getByText} = renderComponent()
       expect(getByText('Create New Rubric')).toBeInTheDocument()
       expect(getByTestId('rubric-form-title')).toHaveValue('')
-      // expect(getByTestId('rubric-hide-points-select')).toBeInTheDocument()
       expect(getByTestId('rubric-rating-order-select')).toBeInTheDocument()
       expect(getByTestId('save-as-draft-button')).toBeInTheDocument()
     })
@@ -107,7 +112,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('loads rubric data and populates appropriate fields', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
@@ -116,7 +121,7 @@ describe('RubricForm Tests', () => {
 
   describe('rubric criteria', () => {
     it('renders all criteria rows for a rubric', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -128,11 +133,11 @@ describe('RubricForm Tests', () => {
       const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
       const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
       expect(criteriaRows).toHaveLength(2)
-      expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0].description)
-      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].longDescription ?? '')
-      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription ?? '')
-      expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0].points.toString())
-      expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())
+      expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0]?.description ?? '')
+      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1]?.longDescription ?? '')
+      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0]?.longDescription ?? '')
+      expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0]?.points?.toString() ?? '')
+      expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1]?.points?.toString() ?? '')
       expect(criteriaRowIndexes[0]).toHaveTextContent('1.')
       expect(criteriaRowIndexes[1]).toHaveTextContent('2')
       expect(criteriaRowThresholds).toHaveLength(1)
@@ -140,7 +145,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders the criteria rows without pill if is ignore for scoring', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
@@ -151,7 +156,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders the criterion ratings accordion button', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -159,15 +164,15 @@ describe('RubricForm Tests', () => {
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       expect(ratingScaleAccordion).toHaveLength(2)
       expect(ratingScaleAccordion[0]).toHaveTextContent(
-        `Rating Scale: ${criteria[0].ratings.length}`,
+        `Rating Scale: ${criteria[0]?.ratings?.length ?? 0}`,
       )
       expect(ratingScaleAccordion[1]).toHaveTextContent(
-        `Rating Scale: ${criteria[0].ratings.length}`,
+        `Rating Scale: ${criteria[1]?.ratings?.length ?? 0}`,
       )
     })
 
     it('renders the criterion ratings accordion items when button is clicked', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -175,11 +180,11 @@ describe('RubricForm Tests', () => {
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       fireEvent.click(ratingScaleAccordion[0])
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
-      expect(ratingScaleAccordionItems).toHaveLength(criteria[0].ratings.length)
+      expect(ratingScaleAccordionItems).toHaveLength(criteria[0]?.ratings?.length ?? 0)
     })
 
     it('does not render the criterion ratings accordion items when accordion is closed', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
@@ -274,19 +279,24 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders a lock icon with a tooltip next to the outcome name', async () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
-      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+      const {queryAllByTestId, getByTestId, getByText} = renderComponent({rubricId: '1'})
 
       const outcomeLockIcons = queryAllByTestId(/^outcome-lock-icon/)
       expect(outcomeLockIcons).toHaveLength(1)
 
-      expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
+      const lockIcon = getByTestId('outcome-lock-icon-2')
+      expect(lockIcon).toBeInTheDocument()
+
+      // Find the tooltip by its text content
+      const outcomeTooltip = getByText("An outcome can't be edited")
+      expect(outcomeTooltip).toBeInTheDocument()
     })
 
     describe('freeFormCriterionComments', () => {
       it('does not render accordion when rubric is free form comments', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], {
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], {
           ...RUBRICS_QUERY_RESPONSE,
           freeFormCriterionComments: true,
         })
@@ -328,7 +338,7 @@ describe('RubricForm Tests', () => {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, queryAllByTestId} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -367,7 +377,7 @@ describe('RubricForm Tests', () => {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, queryAllByTestId} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -396,7 +406,7 @@ describe('RubricForm Tests', () => {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, getAllByText} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -409,7 +419,7 @@ describe('RubricForm Tests', () => {
 
     describe('criterion modal', () => {
       it('opens the criterion modal when the add criterion button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
         expect(queryByTestId('rubric-criterion-modal')).toBeNull()
@@ -420,7 +430,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not save new criterion when the cancel button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         fireEvent.click(getByTestId('add-criterion-button'))
@@ -434,7 +444,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('saves new criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
@@ -453,7 +463,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('updates existing criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
@@ -472,7 +482,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not update existing criterion when the cancel button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
@@ -499,7 +509,7 @@ describe('RubricForm Tests', () => {
 
     it('renders appropriate info alert when rubric is assessed', () => {
       const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
-      queryClient.setQueryData(['fetch-rubric', '1'], rubricQueryResponse)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], rubricQueryResponse)
 
       const {queryByTestId} = renderComponent({rubricId: '1'})
       expect(queryByTestId('rubric-limited-edit-mode-alert')).toBeInTheDocument()
@@ -509,7 +519,7 @@ describe('RubricForm Tests', () => {
   describe('cannot update rubric', () => {
     it('renders appropriate info alert when rubric is assessed', () => {
       const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, canUpdateRubric: false}
-      queryClient.setQueryData(['fetch-rubric', '1'], rubricQueryResponse)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], rubricQueryResponse)
 
       const {queryByTestId} = renderComponent({rubricId: '1'})
       expect(queryByTestId('rubric-cannot-update-alert')).toBeInTheDocument()
@@ -518,7 +528,7 @@ describe('RubricForm Tests', () => {
 
   describe('rubric assessment options', () => {
     it('renders the rubric assessment options', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-rating-scoring-type-select')).toBeInTheDocument()
@@ -526,7 +536,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('does not display options when showAdditionalOptions is set to false', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
 
@@ -563,7 +573,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1', assignmentId: '1'})
 
@@ -574,7 +584,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
 
@@ -588,7 +598,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('hides points when scoring type is set to unscored', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
 
@@ -604,7 +614,7 @@ describe('RubricForm Tests', () => {
   describe('Accessibility: Criteria Reordering', () => {
     it('should display a move up menu option for criteria rows', async () => {
       const user = userEvent.setup()
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
       const {queryAllByTestId, queryByTestId} = renderComponent({rubricId: '1'})
 
       const criterionPopovers = queryAllByTestId('criterion-options-popover')
@@ -619,7 +629,7 @@ describe('RubricForm Tests', () => {
 
     it('should display a move down menu option for criteria rows', async () => {
       const user = userEvent.setup()
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
       const {queryAllByTestId, queryByTestId} = renderComponent({rubricId: '1'})
 
       const criterionPopovers = queryAllByTestId('criterion-options-popover')
@@ -634,7 +644,7 @@ describe('RubricForm Tests', () => {
 
     it('should move a criterion up when move up is clicked', async () => {
       const user = userEvent.setup()
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
       const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
       const criterionDescriptionsBefore = queryAllByTestId('rubric-criteria-row-description')
@@ -655,7 +665,7 @@ describe('RubricForm Tests', () => {
 
     it('should move a criterion down when move down is clicked', async () => {
       const user = userEvent.setup()
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
       const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
       const criterionDescriptionsBefore = queryAllByTestId('rubric-criteria-row-description')
@@ -676,7 +686,7 @@ describe('RubricForm Tests', () => {
 
     it('should disable move up for the first criterion', async () => {
       const user = userEvent.setup()
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
       const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
       const criterionPopovers = queryAllByTestId('criterion-options-popover')
@@ -691,7 +701,7 @@ describe('RubricForm Tests', () => {
 
     it('should disable move down for the last criterion', async () => {
       const user = userEvent.setup()
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
       const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
       const criterionPopovers = queryAllByTestId('criterion-options-popover')

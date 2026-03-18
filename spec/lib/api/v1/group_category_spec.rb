@@ -44,7 +44,8 @@ describe "Api::V1::GroupCategory" do
       end
 
       it "is present with the includes" do
-        allow(category).to receive_messages(groups: double(active: double(size: 3)), is_member?: false)
+        allow(category).to receive_message_chain(:groups, :active, :size).and_return(3)
+        allow(category).to receive(:is_member?).and_return(false)
         json = CategoryHarness.new.group_category_json(category, nil, nil, { include: ["groups_count"] })
         expect(json["groups_count"]).to eq(3)
       end
@@ -57,7 +58,7 @@ describe "Api::V1::GroupCategory" do
       end
 
       it "is present with the includes" do
-        allow(category).to receive_messages(current_progress: double(pending?: true))
+        allow(category).to receive_messages(current_progress: instance_double(Progress, pending?: true))
         json = CategoryHarness.new.group_category_json(category, nil, nil, { include: ["progress_url"] })
         expect(json["progress"]["url"]).to match(%r{example.com/api/api_v1})
       end

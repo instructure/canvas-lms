@@ -72,6 +72,7 @@ beforeEach(() => {
   window.ENV = {
     course_id: '1',
     SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
+    discussion_translation_available: true,
     DISCUSSION: {
       preferences: {
         discussions_splitscreen_view: false,
@@ -218,6 +219,16 @@ describe('DiscussionPostToolbar', () => {
       })
     })
 
+    describe('when discussion_translation_available is false', () => {
+      it('does not render the translate button even with languages', () => {
+        window.ENV.discussion_translation_available = false
+        const {queryByTestId} = setup(null, null, {
+          translationLanguages: {current: ['en', 'es']},
+        })
+        expect(queryByTestId('translate-button')).toBeNull()
+      })
+    })
+
     describe('when the discussion topic is an announcement', () => {
       it('does render the translate button', () => {
         const {queryByTestId} = setup({isAnnouncement: true}, null, {
@@ -227,7 +238,6 @@ describe('DiscussionPostToolbar', () => {
       })
 
       it('does render the new button label if the flag is on', () => {
-        ENV.ai_translation_improvements = true
         const {getByText} = setup({isAnnouncement: true}, null, {
           translationLanguages: {current: ['en', 'es']},
         })
@@ -235,15 +245,7 @@ describe('DiscussionPostToolbar', () => {
       })
     })
 
-    describe('when the improvement flag is turned on', () => {
-      beforeEach(() => {
-        ENV.ai_translation_improvements = true
-      })
-
-      afterEach(() => {
-        ENV.ai_translation_improvements = false
-      })
-
+    describe('translation controls', () => {
       it('does render the translate button with improved text', () => {
         const {getByText} = setup(null, null, {
           translationLanguages: {current: ['en', 'es']},

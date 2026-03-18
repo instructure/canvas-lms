@@ -161,7 +161,7 @@ module Lti::IMS
     #  Contains metadata about the submission attempt. Supported fields listed below.
     #
     # @argument submission[submittedAt] [Optional, String]
-    #  Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision.
+    #  Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. If the submittedAt time has not changed from its current value, the submission attempt number will not be incremented.
     #
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data. Fields listed below.
@@ -383,6 +383,7 @@ module Lti::IMS
       # if attempts_left is 0, trying to submit will fail
       # attempts_left will be nil for non-limited assignments
       return if submission.attempts_left.nil? || submission.attempts_left > 0
+      return if submission.submitted_at && submission.submitted_at == submitted_at
 
       render_error("The maximum number of allowed attempts has been reached for this submission", :unprocessable_entity)
     end

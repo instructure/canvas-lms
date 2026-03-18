@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('student_entries')
 
 export const STUDENT_DISCUSSION_QUERY = gql`
-  query GetDiscussionQuery(
+  query GetStudentEntriesDiscussionQuery(
     $discussionID: ID!
     $perPage: Int!
     $discussionPageAmount: Int!

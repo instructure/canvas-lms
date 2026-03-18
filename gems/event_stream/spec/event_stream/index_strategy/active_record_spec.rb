@@ -66,8 +66,8 @@ describe EventStream::IndexStrategy::ActiveRecord do
 
   describe "scope assembly" do
     before do
-      stream = double("stream",
-                      record_type: fake_record_type)
+      stream = instance_double(EventStream::Stream,
+                               record_type: fake_record_type)
       ar_cls = fake_record_type
       base_index = EventStream::Index.new(stream) do
         ar_scope_proc ->(a1, a2) { ar_cls.where({ one: a1.id, two: a2.id }) }
@@ -76,8 +76,8 @@ describe EventStream::IndexStrategy::ActiveRecord do
     end
 
     it "applies scope conditions with dual sorting" do
-      arg1 = double("arg1", id: "abc")
-      arg2 = double("arg2", id: "def")
+      arg1 = instance_double(ActiveRecord::Base, "arg1", id: "abc")
+      arg2 = instance_double(ActiveRecord::Base, "arg2", id: "def")
       outcome = @index.for_ar_scope([arg1, arg2], {})
       outcome.paginate(per_page: 10)
       conditions = fake_record_type.applied_conditions

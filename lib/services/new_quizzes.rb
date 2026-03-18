@@ -20,26 +20,66 @@
 
 module Services
   class NewQuizzes
-    def self.launch_url
-      config["launch_url"]
-    end
+    NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY = "new_quizzes_cloudfront_host_production"
+    NEW_QUIZZES_CLOUDFRONT_HOST_BETA_KEY = "new_quizzes_cloudfront_host_beta"
+    NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY = "new_quizzes_cloudfront_host_edge"
+    NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY = "new_quizzes_importing_timeout_in_minutes"
 
-    def self.ui_version
-      url = launch_url
-      return nil unless url
-
-      uri = URI.parse(url)
-      path_segments = uri.path.split("/").reject(&:empty?)
-
-      # Expected format: /<version>/remoteEntry.js
-      unless path_segments.length >= 2 && path_segments.last == "remoteEntry.js"
-        raise URI::InvalidURIError, "Launch URL does not match expected format: /<version>/remoteEntry.js"
+    def self.importing_timeout_in_minutes
+      value = config[NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY]
+      Integer(value).minutes
+    rescue => e
+      message = "Services::NewQuizzes#importing_timeout_in_minutes can't convert value (#{value}): #{e.message}"
+      Rails.logger.error(message)
+      Rails.logger.error(e.backtrace.join("\n"))
+      Sentry.capture_exception(e) do |scope|
+        scope.set_extra(message:)
       end
 
-      path_segments[-2]
-    rescue URI::InvalidURIError => e
-      Rails.logger.error("Failed to parse New Quizzes launch URL: #{e.message}")
-      nil
+      30.minutes
+    end
+
+    def self.launch_url(tool_url: nil)
+      return "#{config[NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY]}/none/remoteEntry.js" if Rails.env.development?
+
+      "#{cloudfront_host}/#{region(tool_url:)}/remoteEntry.js"
+    end
+
+    def self.ui_version(tool_url: nil)
+      return "none" if Rails.env.development?
+
+      region(tool_url:)
+    end
+
+    def self.cloudfront_host
+      case environment
+      when "prod"
+        config[NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY]
+      when "beta"
+        config[NEW_QUIZZES_CLOUDFRONT_HOST_BETA_KEY] || config[NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY]
+      when "edge"
+        config[NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY] || config[NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY]
+      else
+        raise ArgumentError, "Unknown environment: #{environment}"
+      end
+    end
+
+    def self.region(tool_url: nil)
+      return "edge" if tool_url.present? && tool_url.include?("quiz-lti-pdx-edge")
+
+      ApplicationController.region || begin
+        Rails.logger.warn("ApplicationController.region is not set, defaulting to 'us-east-1'")
+        "us-east-1"
+      end
+    end
+
+    def self.environment
+      env = ENV.fetch("CANVAS_ENVIRONMENT") do
+        Rails.logger.warn("CANVAS_ENVIRONMENT is not set, defaulting to 'edge'")
+        "edge"
+      end
+      env = "edge" if env == "cd"
+      env
     end
 
     class << self

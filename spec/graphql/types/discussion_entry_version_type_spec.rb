@@ -130,9 +130,7 @@ describe Types::DiscussionEntryVersionType do
       created_ats = discussion_entry_type.resolve("discussionEntryVersions { createdAt }")
       expect(created_ats).to be_an(Array)
       expect(created_ats.size).to eq 2
-      created_ats.each do |created_at|
-        expect(created_at).to match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
-      end
+      expect(created_ats).to all(match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/))
     end
 
     it "returns updatedAt for each version" do
@@ -142,9 +140,7 @@ describe Types::DiscussionEntryVersionType do
       updated_ats = discussion_entry_type.resolve("discussionEntryVersions { updatedAt }")
       expect(updated_ats).to be_an(Array)
       expect(updated_ats.size).to eq 2
-      updated_ats.each do |updated_at|
-        expect(updated_at).to match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
-      end
+      expect(updated_ats).to all(match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/))
     end
   end
 
@@ -156,9 +152,7 @@ describe Types::DiscussionEntryVersionType do
       ids = discussion_entry_type.resolve("discussionEntryVersions { _id }")
       expect(ids).to be_an(Array)
       expect(ids.size).to eq 2
-      ids.each do |id|
-        expect(id).to match(/^\d+$/)
-      end
+      expect(ids).to all(match(/^\d+$/))
     end
   end
 end

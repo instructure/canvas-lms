@@ -33,7 +33,7 @@ describe EventStream do
 
   describe ".current_shard" do
     it "returns the current shard" do
-      shard = double("shard")
+      shard = Object.new
       EventStream.current_shard_lookup = -> { shard }
 
       expect(EventStream.current_shard).to eq shard
@@ -46,9 +46,7 @@ describe EventStream do
 
   describe ".get_index_ids" do
     let(:index) do
-      index = double("index")
-      allow(index).to receive(:id_column).and_return(:id)
-      index
+      double("index", id_column: :id) # rubocop:disable RSpec/VerifiedDoubles
     end
     let(:index_ids) { (1..10).to_a }
     let(:index_rows) do

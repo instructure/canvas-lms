@@ -61,13 +61,13 @@ RSpec.shared_context "shared_tii_lti", shared_context: :metadata do
   end
 
   let(:tii_client) do
-    tii_mock = double("tii_client")
+    tii_mock = instance_double(Turnitin::TiiClient)
     allow(tii_mock).to receive(:original_submission).and_yield(response_mock)
     tii_mock
   end
   let(:filename) { "my/new/filename.txt" }
   let(:response_mock) do
-    r_mock = double("response")
+    r_mock = instance_double(Faraday::Response)
     allow(r_mock).to receive_messages(
       headers: {
         "content-disposition" => "attachment; filename=#{filename}",

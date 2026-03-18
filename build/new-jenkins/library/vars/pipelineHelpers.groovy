@@ -17,10 +17,22 @@
  */
 
 import groovy.transform.Field
+import hudson.model.Result
+import jenkins.model.CauseOfInterruption
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 // Helper functions extracted from Jenkinsfile to reduce bytecode size
 
 @Field final static GERRIT_CHANGE_ID_REGEX = /Change\-Id: (.*)/
+
+def haltBuildWithResult(Result result, String reason) {
+  // Mark the current build with the specified result
+  currentBuild.rawBuild.@result = result
+  // Create a custom interruption cause
+  def cause = new CauseOfInterruption.UserInterruption(reason)
+  // Throw a FlowInterruptedException to halt the build with the specified result
+  throw new FlowInterruptedException(result, false, cause)
+}
 
 def getDockerWorkDir() {
   if (env.GERRIT_PROJECT == 'qti_migration_tool') {
@@ -175,33 +187,36 @@ def copyFromContainer(containerName, containerPath, workspacePath) {
   sh "docker compose -f ${env.COMPOSE_FILE} cp ${containerName}:${containerPath} ${workspacePath}"
 }
 
-// Configure Build stage helper - extracted to reduce Jenkinsfile bytecode
-def configureBuildStage(buildParameters) {
-  def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
-
-  if (canvasRailsOverrideValue) {
-    env.CANVAS_RAILS = canvasRailsOverrideValue
-  }
-
-  // Require valid GERRIT_CHANGE_NUMBER for all builds - many stages will fail without it
+// Pre-pipeline checks - call before pipeline {} in Jenkinsfile to skip
+// builds early without spinning up an agent or running any stages.
+def preBuildChecks() {
+  // Require valid GERRIT_CHANGE_NUMBER - many stages will fail without it
   if (!env.GERRIT_CHANGE_NUMBER || env.GERRIT_CHANGE_NUMBER == '000000') {
     env.SKIP_BUILD = 'true'
     error "GERRIT_CHANGE_NUMBER is not set or invalid (${env.GERRIT_CHANGE_NUMBER}). Cannot proceed with build."
   }
 
   if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' &&
-    env.GERRIT_CHANGE_SUBJECT =~ /translation$/) {
+    env.GERRIT_CHANGE_SUBJECT.replaceAll(/\p{Punct}+$/, '') =~ /translations?$/) {
     env.SKIP_BUILD = 'true'
     if (configuration.isChangeMerged()) {
-      // Post-merge translation: will be set to SUCCESS in post block
-      env.SKIP_BUILD_RESULT = 'SUCCESS'
+      // Post-merge translation: halt with SUCCESS status
       echo "Translation build from svc.cloudjenkins@instructure.com - post-merge build will be skipped"
+      haltBuildWithResult(Result.SUCCESS, "svc.cloudjenkins@instructure.com")
     } else {
-      // Pre-merge translation: will be set to NOT_BUILT in post block
-      env.SKIP_BUILD_RESULT = 'NOT_BUILT'
+      // Pre-merge translation: halt with NOT_BUILT status
       echo "Translation build from svc.cloudjenkins@instructure.com - pre-merge build will be skipped"
+      haltBuildWithResult(Result.NOT_BUILT, "svc.cloudjenkins@instructure.com")
     }
-    error "Skipping translation build from svc.cloudjenkins@instructure.com"
+  }
+}
+
+// Configure Build stage helper - extracted to reduce Jenkinsfile bytecode
+def configureBuildStage(buildParameters) {
+  def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
+
+  if (canvasRailsOverrideValue) {
+    env.CANVAS_RAILS = canvasRailsOverrideValue
   }
 
   if (commitMessageFlag('skip-ci') as Boolean) {
@@ -280,12 +295,6 @@ def postBuildAlways() {
     if (isStartedByUser()) {
       submitGerritReview((status == 'SUCCESS' ? '--verified +1' : '--verified -1'), "${env.BUILD_URL}/build-summary-report/")
     }
-
-    build(job: '/Canvas/helpers/junit-uploader', parameters: [
-      string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-      string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
-      string(name: 'SOURCE', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
-    ], propagate: false, wait: false)
   } catch (Exception e) {
     echo "Post-build operations failed: ${e.message}"
   }

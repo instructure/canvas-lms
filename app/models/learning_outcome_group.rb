@@ -324,7 +324,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
   end
 
-  def self.global_root_outcome_group(force = true)
+  def self.global_root_outcome_group(force: true)
     find_or_create_root(nil, force)
   end
 

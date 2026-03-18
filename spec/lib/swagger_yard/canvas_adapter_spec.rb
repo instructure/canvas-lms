@@ -539,25 +539,25 @@ describe SwaggerYard::CanvasAdapter do
     end
 
     it "returns nil when yard_object has no @API tag" do
-      docstring = double("docstring")
+      docstring = instance_double(YARD::Docstring)
       allow(docstring).to receive(:tags).with(:API).and_return([])
 
-      yard_object = double("yard_object",
-                           name: "index",
-                           docstring:)
+      yard_object = instance_double(YARD::CodeObjects::MethodObject,
+                                    name: "index",
+                                    docstring:)
 
       result = test_context.paths_from_yard_object_canvas(yard_object)
       expect(result).to be_nil
     end
 
     it "returns nil when no routes are found in canvas_routes" do
-      api_tag = double("api_tag")
-      docstring = double("docstring")
+      api_tag = instance_double(YARD::Tags::Tag)
+      docstring = instance_double(YARD::Docstring)
       allow(docstring).to receive(:tags).with(:API).and_return([api_tag])
 
-      yard_object = double("yard_object",
-                           name: "nonexistent_method",
-                           docstring:)
+      yard_object = instance_double(YARD::CodeObjects::MethodObject,
+                                    name: "nonexistent_method",
+                                    docstring:)
 
       result = test_context.paths_from_yard_object_canvas(yard_object)
       expect(result).to be_nil
@@ -571,13 +571,13 @@ describe SwaggerYard::CanvasAdapter do
                                                                      ]
                                                                    })
 
-      api_tag = double("api_tag")
-      docstring = double("docstring")
+      api_tag = instance_double(YARD::Tags::Tag)
+      docstring = instance_double(YARD::Docstring)
       allow(docstring).to receive(:tags).with(:API).and_return([api_tag])
 
-      yard_object = double("yard_object",
-                           name: "index",
-                           docstring:)
+      yard_object = instance_double(YARD::CodeObjects::MethodObject,
+                                    name: "index",
+                                    docstring:)
 
       result = test_context.paths_from_yard_object_canvas(yard_object)
 
@@ -595,13 +595,13 @@ describe SwaggerYard::CanvasAdapter do
                                                                      ]
                                                                    })
 
-      api_tag = double("api_tag")
-      docstring = double("docstring")
+      api_tag = instance_double(YARD::Tags::Tag)
+      docstring = instance_double(YARD::Docstring)
       allow(docstring).to receive(:tags).with(:API).and_return([api_tag])
 
-      yard_object = double("yard_object",
-                           name: "show",
-                           docstring:)
+      yard_object = instance_double(YARD::CodeObjects::MethodObject,
+                                    name: "show",
+                                    docstring:)
 
       result = test_context.paths_from_yard_object_canvas(yard_object)
 
@@ -620,13 +620,13 @@ describe SwaggerYard::CanvasAdapter do
                                                                      ]
                                                                    })
 
-      api_tag = double("api_tag")
-      docstring = double("docstring")
+      api_tag = instance_double(YARD::Tags::Tag)
+      docstring = instance_double(YARD::Docstring)
       allow(docstring).to receive(:tags).with(:API).and_return([api_tag])
 
-      yard_object = double("yard_object",
-                           name: "index",
-                           docstring:)
+      yard_object = instance_double(YARD::CodeObjects::MethodObject,
+                                    name: "index",
+                                    docstring:)
 
       result = nested_context.paths_from_yard_object_canvas(yard_object)
 

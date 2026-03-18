@@ -400,17 +400,17 @@ describe "Outcomes Import API", type: :request do
         end
 
         it "check valid migration id" do
-          cm_mock = double("content_migration", {
-                             id: 2,
-                             context_id: 1,
-                             created_at: Time.zone.now,
-                             attachment: nil,
-                             for_course_copy?: false,
-                             job_progress: nil,
-                             migration_type: nil,
-                             source_course: nil,
-                             migration_settings: {}
-                           })
+          cm_mock = instance_double(ContentMigration, {
+                                      id: 2,
+                                      context_id: 1,
+                                      created_at: Time.zone.now,
+                                      attachment: nil,
+                                      for_course_copy?: false,
+                                      job_progress: nil,
+                                      migration_type: nil,
+                                      source_course: nil,
+                                      migration_settings: {}
+                                    })
           allow(cm_mock).to receive(:migration_issues).and_return([])
           allow(ContentMigration).to receive(:find).with("2").and_return(cm_mock)
           expect(status_json(migration_id: 2)["migration_issues_count"]).to eq 0
@@ -420,14 +420,14 @@ describe "Outcomes Import API", type: :request do
   end
 
   def stub_ab_import
-    cm_mock = double("content_migration")
+    cm_mock = instance_double(ContentMigration)
     allow(cm_mock).to receive(:id).and_return(3)
     allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
   end
   it_behaves_like "outcomes import" do
     let(:json_file) { "available_return_val.json" }
     def stub_ab_api
-      standards_mock = double("standards")
+      standards_mock = instance_double(AcademicBenchmarks::Api::Standards)
       allow(standards_mock).to receive(:authorities)
         .and_return(filename_to_hash("available_authorities.json")
                 .map { |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })

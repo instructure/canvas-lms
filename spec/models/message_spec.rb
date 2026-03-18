@@ -413,7 +413,7 @@ describe Message do
                                 path_type: "email"
                               })
       message.workflow_state = "staged"
-      allow(Mailer).to receive(:create_message).and_return(double(deliver_now: "Response!"))
+      allow(Mailer).to receive(:create_message).and_return(instance_double(ActionMailer::MessageDelivery, deliver_now: "Response!"))
       expect(message.workflow_state).to eq("staged")
       expect { message.deliver }.not_to raise_error
     end
@@ -465,7 +465,7 @@ describe Message do
       end
 
       it "deletes unreachable push endpoints" do
-        ne = double
+        ne = instance_double(NotificationEndpoint)
         expect(ne).to receive(:push_json).and_return(false)
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
@@ -481,7 +481,7 @@ describe Message do
       end
 
       it "delivers to each of a user's push endpoints" do
-        ne = double
+        ne = instance_double(NotificationEndpoint)
         expect(ne).to receive(:push_json).twice.and_return(true)
         expect(ne).not_to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
@@ -570,7 +570,7 @@ describe Message do
           notification_name: "Assignment Graded",
           user: @user
         )
-        expect(@message).to_not receive(:deliver_via_sms)
+        expect(@message).not_to receive(:deliver_via_sms)
         @message.deliver
       end
     end
@@ -840,7 +840,7 @@ describe Message do
     url = "a" * 256
     msg = Message.new
     msg.url = url
-    expect { msg.save! }.to_not raise_error
+    expect { msg.save! }.not_to raise_error
   end
 
   describe "#context_context" do

@@ -110,6 +110,8 @@ interface BaseCanvasStudioPlayerProps {
   tabs?: StudioPlayerProps['tabs']
   emptyTranscriptsComponent?: StudioPlayerProps['emptyTranscriptsComponent']
   rollingTranscriptElement?: StudioPlayerProps['rollingTranscriptElement']
+  onTranscriptEdit?: StudioPlayerProps['onTranscriptEdit']
+  onConfirmEditChanges?: StudioPlayerProps['onConfirmEditChanges']
 }
 
 type CanvasStudioPropsWithMediaIdOrAttachmentId =
@@ -140,6 +142,8 @@ export default function CanvasStudioPlayer({
   tabs,
   emptyTranscriptsComponent,
   rollingTranscriptElement,
+  onTranscriptEdit,
+  onConfirmEditChanges,
 }: CanvasStudioPropsWithMediaIdOrAttachmentId) {
   const [mediaId, setMediaId] = useState(media_id)
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
@@ -149,6 +153,7 @@ export default function CanvasStudioPlayer({
   const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
+  const [mediaObjFailed, setMediaObjFailed] = useState(false)
   const [containerWidth, setContainerWidth] = useState(explicitSize?.width || 0)
   const [containerHeight, setContainerHeight] = useState(explicitSize?.height || 0)
   const [isLoading, setIsLoading] = useState(true)
@@ -231,6 +236,7 @@ export default function CanvasStudioPlayer({
       try {
         setIsLoading(true)
         setMediaObjNetworkErr(null)
+        setMediaObjFailed(false)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e: any) {
         console.warn(`Error getting ${url}`, e.message)
@@ -243,6 +249,11 @@ export default function CanvasStudioPlayer({
       }
       if (typeof resp?.can_add_captions === 'boolean') {
         setCanAddCaptions(resp.can_add_captions)
+      }
+      if (resp?.status === 'ERROR_IMPORTING' || resp?.status === 'ERROR_CONVERTING') {
+        setMediaObjFailed(true)
+        setIsLoading(false)
+        return
       }
       if (resp?.media_sources?.length) {
         setMediaSources(convertAndSortMediaSources(resp.media_sources))
@@ -306,6 +317,15 @@ export default function CanvasStudioPlayer({
     (document.fullscreenEnabled || document.webkitFullscreenEnabled) && type === 'video'
 
   function renderNoPlayer() {
+    if (mediaObjFailed) {
+      return (
+        <Alert key="failedalert" variant="error" margin="small" liveRegion={liveRegion}>
+          {I18n.t(
+            "This file couldn't be processed. It may be corrupted or in an unsupported format. Please upload a different file.",
+          )}
+        </Alert>
+      )
+    }
     if (mediaObjNetworkErr) {
       if (is_attachment) {
         return (
@@ -479,6 +499,8 @@ export default function CanvasStudioPlayer({
               enableSidebar={enableSidebar}
               openSidebar={openSidebar}
               tabs={tabs}
+              onTranscriptEdit={onTranscriptEdit}
+              onConfirmEditChanges={onConfirmEditChanges}
               emptyTranscriptsComponent={emptyTranscriptsComponent}
               rollingTranscriptElement={rollingTranscriptElement}
               kebabMenuElements={

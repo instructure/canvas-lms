@@ -434,8 +434,8 @@ describe Lti::Messages::JwtMessage do
       end
 
       let(:controller) do
-        controller = double("controller")
-        allow(controller).to receive(:request).and_return(double("request"))
+        controller = instance_double(ApplicationController)
+        allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request))
         controller
       end
 
@@ -562,13 +562,13 @@ describe Lti::Messages::JwtMessage do
       )
     end
     let(:controller) do
-      controller = double("controller")
+      controller = instance_double(ApplicationController)
       allow(controller).to receive_messages(polymorphic_url: "polymorphic_url", request:)
       controller
     end
     # All this setup just so we can stub out controller.polymorphic_url
     let(:request) do
-      request = double("request")
+      request = instance_double(ActionDispatch::Request)
       allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
       request
     end

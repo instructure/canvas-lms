@@ -18,11 +18,16 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
+import '@canvas/rails-flash-notifications'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {each, reject, extend as lodashExtend, flatten} from 'es-toolkit/compat'
 import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import UserCollection from '@canvas/users/backbone/collections/UserCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import collaboratorTemplate from '../../jst/collaborator.handlebars'
+import {updateCollaboratorFocus} from '../utils'
+
+const I18n = createI18nScope('collaborations')
 
 extend(ListView, PaginatedView)
 
@@ -35,7 +40,7 @@ function ListView() {
 ListView.prototype.filteredMembers = []
 
 ListView.prototype.events = {
-  'click a': 'selectCollaborator',
+  'click button': 'selectCollaborator',
 }
 
 ListView.prototype.initialize = function (options) {
@@ -119,25 +124,23 @@ ListView.prototype.renderCollaborator = function (collaborator) {
 //
 // Returns nothing.
 ListView.prototype.updateFocus = function () {
-  let $target = $(this.$el.find('li').get(this.currentIndex)).find('a')
-  if ($target.length === 0) {
-    $target = $(this.$el.find('li').get(this.currentIndex - 1)).find('a')
-  }
-  if ($target.length === 0) {
-    $target = this.$el.parents('.collaborator-picker').find('.members-list')
-  }
-  return $target.focus()
+  updateCollaboratorFocus(this.$el, this.currentIndex)
 }
 
 // Internal: Select a collaborator and remove them from the collection.
 //
 // Returns nothing.
 ListView.prototype.selectCollaborator = function (e) {
-  e.preventDefault()
-  const id = $(e.currentTarget).attr('data-id')
-  this.currentIndex = $(e.currentTarget).parent().index()
+  const $button = $(e.currentTarget)
+  const id = $button.attr('data-id')
+  const name = $button.attr('data-name')
+  this.currentIndex = $button.parent().index()
   this.hasFocus = true
-  return this.collection.remove(id)
+  this.collection.remove(id)
+  // Announce after focus change with polite mode - lets VoiceOver finish reading the button first
+  setTimeout(() => {
+    $.screenReaderFlashMessageExclusive(I18n.t('%{name} added', {name}), true)
+  }, 1500)
 }
 
 // Public: Filter out the given members. We wrap this in a setTimeout to

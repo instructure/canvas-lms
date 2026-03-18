@@ -270,8 +270,6 @@
 #
 
 class PageViewsController < ApplicationController
-  before_action :require_user, only: [:index]
-
   include Api::V1::PageView
 
   # Maximum records per page for page views API (PV5 supports up to 200)
@@ -466,6 +464,11 @@ class PageViewsController < ApplicationController
   # @API BETA - Poll query status
   # Checks the status of a previously initiated page views query. Returns the current
   # processing status and provides a result URL when the query is complete.
+  #
+  # The query may fail with status "failed" and error_code
+  # "RESULT_SIZE_LIMIT_EXCEEDED" if the result exceeds 500 MB.
+  # If this happens, narrow the date range or query smaller
+  # time intervals.
   #
   # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
   #
@@ -847,28 +850,33 @@ class PageViewsController < ApplicationController
 
   private
 
+  def pv5_config
+    current_region = Shard.current&.database_server&.config&.dig(:region) || ApplicationController.region
+    PageViews::Configuration.new(region: current_region)
+  end
+
   def pv5_enqueue_service
-    PageViews::EnqueueQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::EnqueueQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_poll_service
-    PageViews::PollQueryService.new(PageViews::Configuration.new)
+    PageViews::PollQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_fetch_result_service
-    PageViews::FetchResultService.new(PageViews::Configuration.new)
+    PageViews::FetchResultService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_enqueue_batch_service
-    PageViews::EnqueueBatchQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::EnqueueBatchQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_poll_batch_service
-    PageViews::PollBatchQueryService.new(PageViews::Configuration.new)
+    PageViews::PollBatchQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_fetch_batch_result_service
-    PageViews::FetchBatchResultService.new(PageViews::Configuration.new)
+    PageViews::FetchBatchResultService.new(pv5_config, requestor_user: @current_user)
   end
 
   def validate_query_id!
