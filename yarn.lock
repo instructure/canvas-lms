@@ -2971,10 +2971,10 @@
   dependencies:
     uuid "^9.0.0"
 
-"@instructure/platform-widget-dashboard@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-widget-dashboard/-/platform-widget-dashboard-0.2.1.tgz#2daf3eb74f36e5915f0692b9bed41a5289ba14de"
-  integrity sha512-Xp8XFXcj8trqTxw9ZEl//zCrkZovXY58zGnzl5EJJk1KPJxMCVBf9nAWEWlzxIBmfKXlwuA+WCjq3O0zOxm3lA==
+"@instructure/platform-widget-dashboard@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-widget-dashboard/-/platform-widget-dashboard-1.0.0.tgz#61129bfaa94c5bd85b9c4eced8ecba9c6597a8f4"
+  integrity sha512-73Ybgmi7SiciqAZ/HjtcvlrHIgzrNzrfsg9DahfwXoYXN60HWWXi7mC6tMJLt80ke8EaT77lbR8v74DqGRNJ4Q==
   dependencies:
     "@instructure/platform-graphql-types" "0.1.1"
     "@tanstack/query-persist-client-core" "^5.0.0"

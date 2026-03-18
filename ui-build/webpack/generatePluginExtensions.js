@@ -32,7 +32,6 @@ async function generateImports() {
       const packagePath = path.join(pluginsDir, dir, 'package.json')
 
       try {
-        // eslint-disable-next-line no-await-in-loop
         const packageJson = await fs.readFile(packagePath, 'utf8').catch(() => null)
 
         if (!packageJson) {
@@ -42,9 +41,11 @@ async function generateImports() {
 
         if (packageObj.canvas && packageObj.canvas['source-file-extensions']) {
           for (const [key, value] of Object.entries(packageObj.canvas['source-file-extensions'])) {
-            imports[key] = `() =>\n    import(\n      '../../../gems/plugins/${path
+            const importPath = path
               .join(dir, value)
-              .replace(/\\/g, '/')}'\n    )`
+              .replace(/\\/g, '/')
+              .replace(/\.tsx?$/, '')
+            imports[key] = `() =>\n    import(\n      '../../../gems/plugins/${importPath}'\n    )`
           }
         }
       } catch (error) {

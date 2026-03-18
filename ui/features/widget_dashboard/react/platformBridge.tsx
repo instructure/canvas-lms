@@ -134,6 +134,10 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
   failedToLoadProgressOverview: () => I18n.t('Failed to load progress overview. Please try again.'),
   loadingProgressOverview: () => I18n.t('Loading progress overview...'),
   progressOverviewPagination: () => I18n.t('Progress overview pagination'),
+  gradedCourseWork: () => I18n.t('Graded course work'),
+  ungradedCourseWork: () => I18n.t('Ungraded course work'),
+  missingCourseWork: () => I18n.t('Missing course work'),
+  upcomingAvailableWork: () => I18n.t('Upcoming available work'),
 
   people: () => I18n.t('People'),
   noPeople: () => I18n.t('No people'),
