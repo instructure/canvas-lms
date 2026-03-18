@@ -462,7 +462,7 @@ class AssignmentsController < ApplicationController
           return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
         elsif @assignment.submission_types == "external_tool" && @assignment.external_tool_tag && @unlocked
           permissions = {
-            manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+            manage_rubrics: @assignment.can_manage_rubrics?(@current_user, session)
           }
           hash = {
             PERMISSIONS: permissions,
@@ -525,7 +525,7 @@ class AssignmentsController < ApplicationController
           context: context_rights,
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
           can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create),
-          manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+          manage_rubrics: @assignment.can_manage_rubrics?(@current_user, session)
         }
 
         @similarity_pledge = pledge_text
@@ -996,7 +996,7 @@ class AssignmentsController < ApplicationController
           can_edit_grades: can_do(@context, @current_user, :manage_grades),
           manage_grading_schemes: can_do(@context, @current_user, :manage_grading_schemes),
           set_grading_scheme: can_do(@context, @current_user, :set_grading_scheme),
-          manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
+          manage_rubrics: @assignment.can_manage_rubrics?(@current_user, session)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,

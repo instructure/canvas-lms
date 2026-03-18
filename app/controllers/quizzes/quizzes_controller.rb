@@ -302,7 +302,7 @@ class Quizzes::QuizzesController < ApplicationController
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         HAS_GRADING_PERIODS: @context.grading_periods?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
-        PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) },
+        PERMISSIONS: { manage_rubrics: @quiz.assignment&.can_manage_rubrics?(@current_user, session) || false },
       }
       set_section_list_js_env
       append_sis_data(hash)
@@ -1162,7 +1162,7 @@ class Quizzes::QuizzesController < ApplicationController
   def render_ams_service
     js_env({
              context_url: named_context_url(@context, :context_quizzes_url),
-             PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) }
+             PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_assignments_edit) }
            })
     enhanced_rubrics_context_js_env
     remote_env(ams:
