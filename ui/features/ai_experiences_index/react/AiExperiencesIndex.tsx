@@ -26,6 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine, IconAiColoredSolid} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import AIExperienceList from './components/AIExperienceList'
 import AIExperiencesEmptyState from './components/AIExperiencesEmptyState'
 import type {AiExperience} from './types'
@@ -46,19 +47,12 @@ const AiExperiencesIndex: React.FC = () => {
           throw new Error('Could not find course ID in environment')
         }
 
-        const response = await fetch(`/courses/${courseId}/ai_experiences`, {
-          headers: {
-            Accept: 'application/json',
-          },
+        const {json: data} = await doFetchApi<{experiences: AiExperience[]; can_manage: boolean}>({
+          path: `/api/v1/courses/${courseId}/ai_experiences`,
         })
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch AI experiences')
-        }
-
-        const data = await response.json()
-        setExperiences(data.experiences)
-        setCanManage(data.can_manage)
+        setExperiences(data!.experiences)
+        setCanManage(data!.can_manage)
       } catch (err) {
         // TODO: Show flash alert to user for fetch error
         setError(err instanceof Error ? err.message : 'An error occurred')
@@ -92,23 +86,15 @@ const AiExperiencesIndex: React.FC = () => {
     try {
       const courseId = ENV.COURSE_ID
 
-      const response = await fetch(`/courses/${courseId}/ai_experiences/${id}`, {
+      await doFetchApi({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${id}`,
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete AI experience')
-      }
 
       // Remove from local state
       setExperiences(prevExperiences => prevExperiences.filter(exp => exp.id !== id))
     } catch (err) {
-      // TODO: Replace alert() with flash alert
-      alert(I18n.t('Failed to delete AI Experience. Please try again.'))
+      showFlashError(I18n.t('Failed to delete AI Experience. Please try again.'))()
     }
   }
 
@@ -116,28 +102,11 @@ const AiExperiencesIndex: React.FC = () => {
     try {
       const courseId = ENV.COURSE_ID
 
-      const response = await fetch(`/courses/${courseId}/ai_experiences/${id}`, {
+      const {json: updatedExperience} = await doFetchApi({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${id}`,
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          ai_experience: {
-            workflow_state: newState,
-          },
-        }),
+        body: {ai_experience: {workflow_state: newState}},
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        const errorMessage =
-          errorData?.errors?.workflow_state?.[0] || I18n.t('Failed to update AI experience')
-        showFlashError(errorMessage)()
-        return
-      }
-
-      const updatedExperience = await response.json()
 
       // Update the local state
       setExperiences(prevExperiences =>
@@ -146,7 +115,7 @@ const AiExperiencesIndex: React.FC = () => {
             ? {
                 ...exp,
                 workflow_state: newState,
-                can_unpublish: updatedExperience.can_unpublish,
+                can_unpublish: (updatedExperience as any)?.can_unpublish,
               }
             : exp,
         ),

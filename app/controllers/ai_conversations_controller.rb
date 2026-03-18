@@ -23,8 +23,6 @@
 class AiConversationsController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create post_message], with: :exception
-
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right
