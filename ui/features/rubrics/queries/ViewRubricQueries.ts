@@ -352,6 +352,7 @@ export const duplicateRubric = async ({
       points: criterion.points,
       learning_outcome_id: criterion.learningOutcomeId,
       criterion_use_range: criterion.criterionUseRange,
+      ignore_for_scoring: criterion.ignoreForScoring,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,
         long_description: rating.longDescription,
@@ -383,6 +384,7 @@ export const duplicateRubric = async ({
         association_id: accountId ?? courseId,
         association_type: accountId ? 'Account' : 'Course',
         hide_points: hidePoints ? 1 : 0,
+        purpose: 'bookmark',
       },
     }),
   })
