@@ -14560,4 +14560,28 @@ describe Assignment do
       expect(result).not_to include(assignment1)
     end
   end
+
+  describe "#can_manage_rubrics?" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!
+    end
+
+    it "returns true for a teacher with manage_assignments_edit" do
+      expect(@assignment.can_manage_rubrics?(@teacher, nil)).to be true
+    end
+
+    it "returns true when user has manage_assignments_edit but not manage_rubrics" do
+      custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+      custom_teacher = course_with_user("TeacherEnrollment", active_all: true, course: @course, role: custom_role).user
+      expect(@assignment.can_manage_rubrics?(custom_teacher, nil)).to be true
+    end
+
+    it "returns false for a student" do
+      student = course_with_student(active_all: true, course: @course).user
+      expect(@assignment.can_manage_rubrics?(student, nil)).to be false
+    end
+  end
 end

@@ -1978,6 +1978,22 @@ describe AssignmentsController do
         expect(assigns[:js_env][:PERMISSIONS]).not_to include :can_edit_grades
       end
 
+      it "sets manage_rubrics to true for user with only manage_assignments_edit" do
+        custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+        @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+        @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+        custom_teacher = course_with_user("TeacherEnrollment", {
+                                            active_all: true,
+                                            course: @course,
+                                            role: custom_role
+                                          }).user
+        user_session(custom_teacher)
+
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:PERMISSIONS]).to include manage_rubrics: true
+      end
+
       context "default_due_time" do
         before do
           Account.default.update(settings: { default_due_time: { value: "22:00:00" } })
@@ -2802,6 +2818,22 @@ describe AssignmentsController do
       user_session(@teacher)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:PERMISSIONS]).to include can_edit_grades: true
+    end
+
+    it "sets manage_rubrics to true for user with only manage_assignments_edit" do
+      custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+      custom_teacher = course_with_user("TeacherEnrollment", {
+                                          active_all: true,
+                                          course: @course,
+                                          role: custom_role
+                                        }).user
+      user_session(custom_teacher)
+
+      get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+      expect(assigns[:js_env][:PERMISSIONS]).to include manage_rubrics: true
     end
 
     it "requires authorization" do

@@ -933,7 +933,7 @@ class DiscussionTopicsController < ApplicationController
              restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
              enhanced_rubrics_enabled: @context.is_a?(Course) && @context.feature_enabled?(:enhanced_rubrics),
              PERMISSIONS: {
-               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
+               manage_rubrics: @topic.assignment&.can_manage_rubrics?(@current_user, session) || false,
              },
            })
     unless @locked

@@ -2191,6 +2191,10 @@ class AbstractAssignment < ApplicationRecord
     final_grader_id.blank? || context.grants_right?(user, :select_final_grade)
   end
 
+  def can_manage_rubrics?(user, session = nil)
+    grants_right?(user, session, :update)
+  end
+
   def user_can_read_grades?(user, session = nil)
     RequestCache.cache("user_can_read_grades", self, user, session) do
       context.grants_right?(user, session, :view_all_grades) ||
