@@ -137,6 +137,7 @@ module Extensions
                          index: true,
                          foreign_key: false,
                          check_constraint: true,
+                         sort: true,
                          **)
             return super(*args, polymorphic:, null:, index:, foreign_key:, **) unless polymorphic.is_a?(Array)
 
@@ -163,10 +164,14 @@ module Extensions
 
               next unless check_constraint
 
-              kwargs = check_constraint.is_a?(Hash) ? check_constraint : {}
-              sql, name = @conn.polymorphic_check_constraint_sql(ref_name, polymorphic, null:, sort: true, **kwargs)
-              check_constraint(sql, name:)
+              polymorphic_check_constraint(ref_name, polymorphic, null:, sort:, **)
             end
+          end
+
+          def polymorphic_check_constraint(ref_name, references, null: true, sort: true, check_constraint: nil, **)
+            kwargs = check_constraint.is_a?(Hash) ? check_constraint : {}
+            sql, name = @conn.polymorphic_check_constraint_sql(ref_name, references, null:, sort:, **kwargs)
+            check_constraint(sql, name:)
           end
         end
       end
