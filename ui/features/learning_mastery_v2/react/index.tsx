@@ -76,7 +76,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     updateSettings,
   } = useGradebookSettings(courseId)
 
-  const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
 
   const {
@@ -134,7 +133,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
 
   const handleGradebookSettingsChange = useCallback(
     async (settings: GradebookSettings) => {
-      setIsSavingSettings(true)
       let error = null
 
       try {
@@ -147,8 +145,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         updateSettings(settings)
       } catch (_) {
         error = I18n.t('Failed to save settings')
-      } finally {
-        setIsSavingSettings(false)
       }
 
       return {success: error === null}
@@ -235,7 +231,6 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         showDataDependentControls={error === null && !isLoadingSettings}
         gradebookSettings={gradebookSettings}
         setGradebookSettings={handleGradebookSettingsChange}
-        isSavingSettings={isSavingSettings}
         hideHeading={instuiNavFF}
       />
       {pagination && (
