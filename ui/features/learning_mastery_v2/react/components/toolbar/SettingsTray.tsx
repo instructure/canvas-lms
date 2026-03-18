@@ -25,10 +25,16 @@ import {Tray} from '@instructure/ui-tray'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
-import {SecondaryInfoSelector} from './SecondaryInfoSelector'
-import {DisplayFilterSelector} from './DisplayFilterSelector'
-import {ScoreDisplayFormatSelector} from './ScoreDisplayFormatSelector'
-import {OutcomeArrangementSelector} from './OutcomeArrangementSelector'
+import type {
+  SecondaryInfoDisplay,
+  DisplayFilter,
+  ScoreDisplayFormat,
+  OutcomeArrangement,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+import {SecondaryInfoSelector} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/SettingsTray/SecondaryInfoSelector'
+import {DisplayFilterSelector} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/SettingsTray/DisplayFilterSelector'
+import {ScoreDisplayFormatSelector} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/SettingsTray/ScoreDisplayFormatSelector'
+import {OutcomeArrangementSelector} from '@instructure/outcomes-ui/es/components/Gradebook/toolbar/SettingsTray/OutcomeArrangementSelector'
 import {colors} from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
@@ -122,19 +128,19 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
           <Flex direction="column" padding="small medium" alignItems="stretch" gap="medium">
             <SecondaryInfoSelector
               value={secondaryInfoDisplay}
-              onChange={info => setSecondaryInfoDisplay(info)}
+              onChange={(info: SecondaryInfoDisplay) => setSecondaryInfoDisplay(info)}
             />
             <DisplayFilterSelector
               values={displayFilters}
-              onChange={filters => setDisplayFilters(filters)}
+              onChange={(filters: DisplayFilter[]) => setDisplayFilters(filters)}
             />
             <ScoreDisplayFormatSelector
               value={scoreDisplayFormat}
-              onChange={format => setScoreDisplayFormat(format)}
+              onChange={(format: ScoreDisplayFormat) => setScoreDisplayFormat(format)}
             />
             <OutcomeArrangementSelector
               value={outcomeArrangement}
-              onChange={arrangement => setOutcomeArrangement(arrangement)}
+              onChange={(arrangement: OutcomeArrangement) => setOutcomeArrangement(arrangement)}
             />
           </Flex>
         </Flex.Item>
