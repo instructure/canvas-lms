@@ -93,6 +93,30 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         end
       end
 
+      context "when a criterion is linked to a learning outcome" do
+        it "does not return an error when long_description is blank but description is present" do
+          rubric.data[0][:learning_outcome_id] = 123
+          rubric.data[0][:ratings][0][:long_description] = ""
+          rubric.data[0][:ratings][0][:description] = "Meets expectations"
+          rubric.save!
+          assignment.reload
+
+          issues = described_class.validate_assignment(assignment:)
+          expect(issues).to eq([])
+        end
+
+        it "returns a rating description error when description is also blank" do
+          rubric.data[0][:learning_outcome_id] = 123
+          rubric.data[0][:ratings][0][:long_description] = ""
+          rubric.data[0][:ratings][0][:description] = ""
+          rubric.save!
+          assignment.reload
+
+          issues = described_class.validate_assignment(assignment:)
+          expect(issues).to eq([{ level: "error", message: "Rubric is missing rating description." }])
+        end
+      end
+
       context "when assignment description is too long" do
         it "returns an array with assignment description too long error" do
           assignment.description = "a" * 13_501
