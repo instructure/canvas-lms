@@ -21,6 +21,12 @@
 body.native-new-quizzes {
   .ic-Layout-wrapper {
     max-width: 100%;
+    // Cap at viewport height so flex children stay within visible area.
+    // Only on desktop — mobile webviews need unconstrained height for scrolling.
+    @include desktop-only {
+      height: 100vh;
+      overflow: hidden;
+    }
   }
 
   .ic-Layout-columns {
@@ -61,6 +67,11 @@ body.native-new-quizzes {
     flex: 1;
     flex-direction: column;
     overflow: auto;
+    // this is a hack to Constraint InstUI modals/trays to this element
+    // instead of the full viewport, so they don't cover Canvas nav.
+    @include desktop-only {
+      transform: translateZ(0);
+    }
   }
 
   #new-quizzes-root > #root {
