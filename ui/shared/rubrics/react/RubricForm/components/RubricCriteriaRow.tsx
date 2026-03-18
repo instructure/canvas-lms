@@ -248,7 +248,7 @@ export const RubricCriteriaRow = ({
                           <Flex alignItems="center" gap="x-small">
                             {isGenerated && (
                               <span data-testid="rubric-criteria-row-ai-icon">
-                                <IconAiColoredSolid />
+                                <IconAiColoredSolid title={I18n.t('Ignite AI Generated')} />
                               </span>
                             )}
                             <Text weight="bold">{description}</Text>
