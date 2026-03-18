@@ -20,7 +20,7 @@
 require_relative "../../spec_helper"
 require_relative "../../lti_spec_helper"
 
-RSpec.describe Lti::LtiAppsController, type: :controller do
+RSpec.describe Lti::LtiAppsController do
   include LtiSpecHelper
 
   describe "GET #launch_definitions" do
@@ -164,5 +164,88 @@ RSpec.describe Lti::LtiAppsController, type: :controller do
         expect(tool_ids).to include(other_tool.id)
       end
     end
+  end
+
+  describe "GET #launch_definitions with Account context" do
+    let(:account) { account_model }
+    let(:admin_user) { user_model }
+    let!(:quiz_tool) do
+      account.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch",
+        account_navigation: {
+          enabled: true,
+          text: "Quizzes"
+        }
+      )
+    end
+    let!(:regular_tool) do
+      account.context_external_tools.create!(
+        name: "Regular Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        tool_id: "regular_tool",
+        url: "http://regular.example.com/launch",
+        account_navigation: {
+          enabled: true,
+          text: "Regular Tool"
+        }
+      )
+    end
+
+    before do
+      account.account_users.create!(user: admin_user, role: admin_role)
+      user_session(admin_user)
+    end
+
+    context "when new quizzes feature is disabled" do
+      before do
+        account.disable_feature!(:quizzes_next) if account.feature_enabled?(:quizzes_next)
+      end
+
+      it "does not filter out Quizzes 2 tool from launch definitions when context is Account" do
+        get :launch_definitions, params: {
+          account_id: account.id,
+          placements: ["account_navigation"],
+          format: :json
+        }
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tool_ids = json.pluck("definition_id")
+
+        # When context is Account, Quizzes 2 filtering is skipped and tool is included
+        expect(tool_ids).to include(quiz_tool.id)
+        expect(tool_ids).to include(regular_tool.id)
+      end
+    end
+
+    context "when new quizzes feature is enabled" do
+      before do
+        account.enable_feature!(:quizzes_next)
+      end
+
+      it "includes Quizzes 2 tool when context is Account and feature is enabled" do
+        get :launch_definitions, params: {
+          account_id: account.id,
+          placements: ["account_navigation"],
+          format: :json
+        }
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tool_ids = json.pluck("definition_id")
+
+        expect(tool_ids).to include(quiz_tool.id)
+        expect(tool_ids).to include(regular_tool.id)
+      end
+    end
+  end
+
+  def admin_role
+    @admin_role ||= account_model.roles.first
   end
 end

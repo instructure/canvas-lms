@@ -19,9 +19,13 @@
 import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import LoadingIndicator from '@canvas/loading-indicator'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AIExperience, AIExperienceFormData} from '../types'
 import AIExperienceForm from './components/AIExperienceForm/AIExperienceForm'
+
+const I18n = createI18nScope('ai_experiences_edit')
 
 interface AIExperienceManagerProps {
   aiExperience?: AIExperience
@@ -61,7 +65,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
     fetchAIExperience()
   }, [])
 
-  const handleSubmit = async (formData: AIExperienceFormData, shouldPreview = false) => {
+  const handleSubmit = async (formData: AIExperienceFormData) => {
     setIsLoading(true)
     try {
       const courseId = ENV.COURSE_ID
@@ -90,13 +94,23 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
       const updatedExperience = json as AIExperience
       setAIExperience(updatedExperience)
 
-      // Redirect to the show page, optionally with preview parameter
       if (updatedExperience.id) {
-        const previewParam = shouldPreview ? '?preview=true' : ''
-        window.location.href = `/courses/${courseId}/ai_experiences/${updatedExperience.id}${previewParam}`
+        window.location.href = `/courses/${courseId}/ai_experiences/${updatedExperience.id}`
       }
     } catch (error) {
-      // TODO: Show flash alert to user for save error
+      let message = I18n.t('An unexpected error occurred. Please try again.')
+      if (error instanceof FetchApiError) {
+        try {
+          const body = await error.response.json()
+          const baseErrors = body?.base
+          if (Array.isArray(baseErrors) && baseErrors.length > 0) {
+            message = baseErrors[0]
+          }
+        } catch {
+          // Use default message if response body cannot be parsed
+        }
+      }
+      showFlashError(I18n.t('Failed to save AI Experience: %{error}', {error: message}))()
     } finally {
       setIsLoading(false)
     }

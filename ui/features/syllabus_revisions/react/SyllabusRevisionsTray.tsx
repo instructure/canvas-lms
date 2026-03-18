@@ -86,6 +86,7 @@ export default function SyllabusRevisionsTray({
         if (currentContent === selectedContent && currentContent !== currentSyllabusBody.trim()) {
           syllabusElement.innerHTML = currentSyllabusBody
         }
+        $(syllabusElement).removeData('revision_preview')
       }
     }
   }
@@ -165,6 +166,7 @@ export default function SyllabusRevisionsTray({
 
         if (shouldUpdateDOM) {
           syllabusElement.innerHTML = version.syllabus_body || ''
+          $(syllabusElement).data('revision_preview', version.syllabus_body || '')
           setIsPreviewingVersion(true)
         }
       }
@@ -208,6 +210,7 @@ export default function SyllabusRevisionsTray({
 
   const handleTrayDismiss = () => {
     restoreOriginalSyllabusIfNeeded()
+    $('#course_syllabus').removeData('revision_preview')
     onDismiss()
   }
 

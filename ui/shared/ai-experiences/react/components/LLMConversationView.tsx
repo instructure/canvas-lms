@@ -316,7 +316,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
       <View as="div" padding="small" background="primary" borderWidth="small" borderRadius="medium">
         <div style={{marginBottom: '0.75rem'}}>
           <Text weight="bold" size="small">
-            {I18n.t('Message box')}
+            {I18n.t('Message')}
           </Text>
         </div>
         <Flex gap="small" alignItems="center">
@@ -621,7 +621,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                   >
                     <div style={{marginBottom: '0.75rem'}}>
                       <Text weight="bold" size="small">
-                        {I18n.t('Message box')}
+                        {I18n.t('Message')}
                       </Text>
                     </div>
                     <Flex gap="small" alignItems="center">

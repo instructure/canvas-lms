@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ContextFile} from '@canvas/canvas-file-upload/react/types'
+
 export interface AIExperience {
   id?: string
   course_id?: string | number
@@ -27,6 +29,8 @@ export interface AIExperience {
   workflow_state: 'published' | 'unpublished'
   can_manage: boolean
   can_unpublish?: boolean
+  context_files?: ContextFile[]
+  context_ready?: boolean
 }
 
 export interface AIExperienceShowProps {

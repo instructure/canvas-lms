@@ -33,6 +33,7 @@ describe "ai experiences form" do
 
     @existing_experience = @course.ai_experiences.create!(
       title: "Existing Experience",
+      facts: "Existing facts",
       learning_objective: "Existing objective",
       pedagogical_guidance: "Existing guidance"
     )
@@ -91,6 +92,7 @@ describe "ai experiences form" do
         it "can save with only required fields" do
           AiExperiencesFormPage.fill_form(
             title: "Minimal Experience",
+            facts: "Minimal facts",
             learning_objective: "Minimal objective",
             pedagogical_guidance: "Minimal guidance"
           )
@@ -168,7 +170,7 @@ describe "ai experiences form" do
 
       describe "page structure" do
         it "displays the Edit AI Experience heading" do
-          expect(AiExperiencesFormPage.page_heading_text).to eq("Edit AI Experience")
+          expect(AiExperiencesFormPage.page_heading_text).to eq("Edit Existing Experience")
         end
 
         it "pre-populates form fields with existing data" do
@@ -205,7 +207,7 @@ describe "ai experiences form" do
           AiExperiencesFormPage.cancel_delete
 
           # Should still be on edit page
-          expect(AiExperiencesFormPage.page_heading_text).to eq("Edit AI Experience")
+          expect(AiExperiencesFormPage.page_heading_text).to eq("Edit Existing Experience")
           expect(@existing_experience.reload.workflow_state).not_to eq("deleted")
         end
       end

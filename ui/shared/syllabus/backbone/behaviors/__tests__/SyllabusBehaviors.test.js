@@ -105,6 +105,70 @@ describe('SyllabusBehaviors', () => {
       expect(fresh.val).toHaveBeenCalledWith(text)
     })
 
+    it.skip('loads revision_preview data when set instead of syllabus_body', () => {
+      const fresh = {val: vi.fn()}
+      vi.spyOn(RichContentEditor, 'freshNode').mockReturnValue(fresh)
+      vi.spyOn(RichContentEditor, 'loadNewEditor').mockImplementation()
+
+      const syllabus = document.createElement('div')
+      syllabus.id = 'course_syllabus'
+      container.appendChild(syllabus)
+
+      const editLink = document.createElement('a')
+      editLink.href = '#'
+      editLink.className = 'edit_syllabus_link'
+      editLink.textContent = 'Edit Link'
+      container.appendChild(editLink)
+
+      const form = document.createElement('form')
+      form.id = 'edit_course_syllabus_form'
+      container.appendChild(form)
+
+      const textarea = document.createElement('textarea')
+      textarea.id = 'course_syllabus_body'
+      container.appendChild(textarea)
+
+      $(syllabus).data('syllabus_body', '<p>Current content</p>')
+      $(syllabus).data('revision_preview', '<p>Old revision content</p>')
+
+      const $form = SyllabusBehaviors.bindToEditSyllabus()
+      $form.trigger('edit')
+
+      expect(fresh.val).toHaveBeenCalledWith('<p>Old revision content</p>')
+    })
+
+    it.skip('clears revision_preview data after loading it into editor', () => {
+      const fresh = {val: vi.fn()}
+      vi.spyOn(RichContentEditor, 'freshNode').mockReturnValue(fresh)
+      vi.spyOn(RichContentEditor, 'loadNewEditor').mockImplementation()
+
+      const syllabus = document.createElement('div')
+      syllabus.id = 'course_syllabus'
+      container.appendChild(syllabus)
+
+      const editLink = document.createElement('a')
+      editLink.href = '#'
+      editLink.className = 'edit_syllabus_link'
+      editLink.textContent = 'Edit Link'
+      container.appendChild(editLink)
+
+      const form = document.createElement('form')
+      form.id = 'edit_course_syllabus_form'
+      container.appendChild(form)
+
+      const textarea = document.createElement('textarea')
+      textarea.id = 'course_syllabus_body'
+      container.appendChild(textarea)
+
+      $(syllabus).data('syllabus_body', '<p>Current content</p>')
+      $(syllabus).data('revision_preview', '<p>Old revision content</p>')
+
+      const $form = SyllabusBehaviors.bindToEditSyllabus()
+      $form.trigger('edit')
+
+      expect($(syllabus).data('revision_preview')).toBeUndefined()
+    })
+
     it.skip('shows student view button after done editing', () => {
       const editLink = document.createElement('a')
       editLink.href = '#'

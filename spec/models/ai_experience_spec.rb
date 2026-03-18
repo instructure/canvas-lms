@@ -171,9 +171,35 @@ describe AiExperience do
         stub_request(:post, "http://localhost:3001/conversation-context")
           .to_return(status: 500, body: "Internal Server Error")
 
-        expect(Rails.logger).to receive(:error).with(/Failed to create conversation context/)
-
+        allow(Rails.logger).to receive(:error)
         AiExperience.create!(valid_attributes)
+        expect(Rails.logger).to have_received(:error).with(/Failed to create conversation context/)
+      end
+
+      context "with ai_experiences_context_file_upload feature flag enabled" do
+        let(:attachment) { attachment_model(context: course) }
+
+        before { course.enable_feature!(:ai_experiences_context_file_upload) }
+
+        before do
+          stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
+            .to_return(status: 200, body: { "success" => true }.to_json, headers: { "Content-Type" => "application/json" })
+
+          stub_request(:post, "http://localhost:3001/contexts/context-uuid/documents")
+            .to_return(status: 201, body: { "id" => "doc-1", "status" => "pending" }.to_json, headers: { "Content-Type" => "application/json" })
+        end
+
+        it "updates conversation_context with context_files when created with files" do
+          AiExperience.create!(valid_attributes.merge(context_file_ids: [attachment.id.to_s]))
+
+          expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "does not update conversation_context when created without files" do
+          AiExperience.create!(valid_attributes)
+
+          expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
       end
     end
 
@@ -227,6 +253,134 @@ describe AiExperience do
         expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
       end
 
+      context "with ai_experiences_context_file_upload feature flag enabled" do
+        let(:attachment) { attachment_model(context: course) }
+
+        before { course.enable_feature!(:ai_experiences_context_file_upload) }
+
+        before do
+          stub_request(:post, "http://localhost:3001/contexts/context-uuid/documents")
+            .to_return(status: 201, body: { "id" => "doc-1", "status" => "pending" }.to_json, headers: { "Content-Type" => "application/json" })
+        end
+
+        it "updates conversation_context when context_file_ids change" do
+          experience.update!(context_file_ids: [attachment.id.to_s])
+
+          expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "persists context file join records when context_file_ids are set" do
+          experience.update!(context_file_ids: [attachment.id.to_s])
+
+          expect(experience.ai_experience_context_files.pluck(:attachment_id)).to eq([attachment.id])
+        end
+
+        it "removes context files when context_file_ids is empty" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          experience.update!(context_file_ids: [])
+
+          expect(experience.ai_experience_context_files).to be_empty
+          expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "does not update conversation_context when context_file_ids unchanged" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          experience.update!(context_file_ids: [attachment.id.to_s])
+
+          expect(WebMock).not_to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+        end
+
+        it "calls remove_documents when a file is removed" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          expect(LLMConversationContextManager).to receive(:remove_documents)
+            .with(ai_experience: experience, context_files: array_including(have_attributes(attachment_id: attachment.id)))
+
+          experience.update!(context_file_ids: [])
+        end
+
+        it "does not call remove_documents when only adding files" do
+          attachment2 = attachment_model(context: course)
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          expect(LLMConversationContextManager).not_to receive(:remove_documents)
+
+          experience.update!(context_file_ids: [attachment.id.to_s, attachment2.id.to_s])
+        end
+
+        it "only indexes newly added files when updating context_file_ids" do
+          attachment2 = attachment_model(context: course)
+          existing_context_file = AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+          expect(LLMConversationContextManager).to receive(:trigger_indexing) do |ai_experience:, context_file_ids:|
+            new_context_file = AiExperienceContextFile.find_by(ai_experience:, attachment: attachment2)
+            expect(context_file_ids).to eq([new_context_file.id])
+            expect(context_file_ids).not_to include(existing_context_file.id)
+          end
+
+          experience.update!(context_file_ids: [attachment.id.to_s, attachment2.id.to_s])
+        end
+
+        it "does not trigger indexing when only removing files" do
+          AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+          attachment2 = attachment_model(context: course)
+          AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment2)
+
+          expect(LLMConversationContextManager).not_to receive(:trigger_indexing)
+
+          experience.update!(context_file_ids: [attachment.id.to_s])
+        end
+
+        context "when file indexing fails" do
+          before do
+            stub_request(:post, "http://localhost:3001/contexts/context-uuid/documents")
+              .to_return(status: 503, body: "Service Unavailable")
+          end
+
+          it "returns false and does not persist added files" do
+            result = experience.update(context_file_ids: [attachment.id.to_s])
+
+            expect(result).to be false
+            expect(experience.reload.ai_experience_context_files).to be_empty
+          end
+
+          it "adds an error to the experience" do
+            experience.update(context_file_ids: [attachment.id.to_s])
+
+            expect(experience.errors[:base]).not_to be_empty
+          end
+        end
+
+        context "when file removal from LLM service fails" do
+          let(:context_file) do
+            AiExperienceContextFile.create!(ai_experience: experience, attachment:).tap do |cf|
+              cf.update_column(:llm_conversation_service_document_id, "doc-uuid-1")
+            end
+          end
+
+          before do
+            context_file
+            stub_request(:delete, "http://localhost:3001/contexts/context-uuid/documents/doc-uuid-1")
+              .to_return(status: 500, body: "Internal Server Error")
+          end
+
+          it "returns false and does not remove files" do
+            result = experience.update(context_file_ids: [])
+
+            expect(result).to be false
+            expect(experience.reload.ai_experience_context_files).not_to be_empty
+          end
+
+          it "adds an error to the experience" do
+            experience.update(context_file_ids: [])
+
+            expect(experience.errors[:base]).not_to be_empty
+          end
+        end
+      end
+
       it "does not update conversation_context if context_id is not set" do
         experience.update_column(:llm_conversation_context_id, nil)
         experience.update!(pedagogical_guidance: "Updated scenario")
@@ -248,9 +402,9 @@ describe AiExperience do
         stub_request(:patch, "http://localhost:3001/conversation-context/context-uuid")
           .to_return(status: 500, body: "Internal Server Error")
 
-        expect(Rails.logger).to receive(:error).with(/Failed to update conversation context/)
-
+        allow(Rails.logger).to receive(:error)
         experience.update!(pedagogical_guidance: "Updated scenario")
+        expect(Rails.logger).to have_received(:error).with(/Failed to update conversation context/)
       end
     end
 
@@ -295,10 +449,101 @@ describe AiExperience do
         stub_request(:delete, "http://localhost:3001/conversation-context/context-uuid")
           .to_return(status: 500, body: "Internal Server Error")
 
-        expect(Rails.logger).to receive(:error).with(/Failed to delete conversation context/)
-
+        allow(Rails.logger).to receive(:error)
         experience.destroy
+        expect(Rails.logger).to have_received(:error).with(/Failed to delete conversation context/)
       end
+    end
+  end
+
+  describe "context_files association" do
+    let(:experience) { AiExperience.create!(valid_attributes) }
+
+    it "returns active attachments" do
+      attachment = attachment_model(context: course)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment:)
+
+      expect(experience.context_files).to include(attachment)
+    end
+
+    it "excludes soft-deleted attachments" do
+      active = attachment_model(context: course, filename: "active.pdf")
+      deleted = attachment_model(context: course, filename: "deleted.pdf")
+      deleted.update_column(:file_state, "deleted")
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: active)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: deleted)
+
+      expect(experience.context_files).to contain_exactly(active)
+    end
+  end
+
+  describe "#sync_context_files" do
+    let(:experience) { AiExperience.create!(valid_attributes) }
+    let(:attachment_a) { attachment_model(context: course, filename: "a.pdf") }
+    let(:attachment_b) { attachment_model(context: course, filename: "b.pdf") }
+    let(:attachment_c) { attachment_model(context: course, filename: "c.pdf") }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      allow(LLMConversationContextManager).to receive(:remove_documents)
+    end
+
+    it "adds files when given new context_file_ids" do
+      experience.update!(context_file_ids: [attachment_a.id.to_s, attachment_b.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a, attachment_b)
+    end
+
+    it "does not create duplicate records when the same id is saved again" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+
+      experience.update!(context_file_ids: [attachment_a.id.to_s])
+
+      expect(experience.ai_experience_context_files.where(attachment: attachment_a).count).to eq(1)
+    end
+
+    it "removes files that are no longer in the list" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_b)
+
+      experience.update!(context_file_ids: [attachment_a.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a)
+    end
+
+    it "preserves existing files when adding new ones" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+
+      experience.update!(context_file_ids: [attachment_a.id.to_s, attachment_b.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a, attachment_b)
+    end
+
+    it "removes all files when context_file_ids is empty" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_b)
+
+      experience.update!(context_file_ids: [])
+
+      expect(experience.reload.context_files).to be_empty
+    end
+
+    it "does not touch files when context_file_ids is not provided" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+
+      experience.update!(title: "New title")
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_a)
+    end
+
+    it "can replace all files in one save" do
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_a)
+      AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment_b)
+
+      experience.update!(context_file_ids: [attachment_c.id.to_s])
+
+      expect(experience.reload.context_files).to contain_exactly(attachment_c)
     end
   end
 
@@ -425,13 +670,178 @@ describe AiExperience do
       it "prevents unpublishing" do
         experience.workflow_state = "unpublished"
         expect(experience).not_to be_valid
-        expect(experience.errors[:workflow_state]).to include("Can't unpublish if students have started conversations")
+        expect(experience.errors[:workflow_state]).to include("Cannot unpublish if students have started conversations")
       end
 
       it "allows publishing" do
         experience.unpublish!
         experience.workflow_state = "published"
         expect(experience).to be_valid
+      end
+    end
+  end
+
+  describe "#can_publish?" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "unpublished")) }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:create_context)
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+    end
+
+    context "when feature flag is disabled" do
+      it "returns true" do
+        course.disable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_publish?).to be true
+      end
+    end
+
+    context "when no context files uploaded" do
+      it "returns true" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_publish?).to be true
+      end
+    end
+
+    context "when indexing is completed" do
+      it "returns true" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "completed")
+        expect(experience.can_publish?).to be true
+      end
+    end
+
+    context "when indexing is in_progress" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_publish?).to be false
+      end
+    end
+
+    context "when indexing has failed" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "failed")
+        expect(experience.can_publish?).to be false
+      end
+    end
+
+    context "when indexing is not_started" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "not_started")
+        expect(experience.can_publish?).to be false
+      end
+    end
+  end
+
+  describe "#can_unpublish? with indexing status" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "published")) }
+    let(:student) { user_factory(active_all: true) }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:create_context)
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      course.enroll_student(student, enrollment_state: "active")
+    end
+
+    context "when students have conversations" do
+      before do
+        AiConversation.create!(
+          ai_experience: experience,
+          course:,
+          user: student,
+          llm_conversation_id: "student-conv-1",
+          workflow_state: "active",
+          root_account: course.root_account,
+          account: course.account
+        )
+      end
+
+      it "returns false regardless of indexing status" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "completed")
+        expect(experience.can_unpublish?).to be false
+      end
+    end
+
+    context "when indexing is in_progress and no student conversations" do
+      it "returns false" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "in_progress")
+        expect(experience.can_unpublish?).to be false
+      end
+    end
+
+    context "when indexing is completed and no student conversations" do
+      it "returns true" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "completed")
+        expect(experience.can_unpublish?).to be true
+      end
+    end
+  end
+
+  describe "publish validation" do
+    let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "unpublished")) }
+
+    before do
+      allow(LLMConversationContextManager).to receive(:create_context)
+      allow(LLMConversationContextManager).to receive(:update_context)
+      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+    end
+
+    context "when publishing while indexing is in_progress" do
+      it "prevents publishing" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "in_progress")
+
+        experience.workflow_state = "published"
+        expect(experience.valid?).to be false
+        expect(experience.errors[:workflow_state]).to include("Cannot publish while source files are still processing")
+      end
+
+      it "allows publishing when no context files are attached" do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        experience.update_column(:context_index_status, "in_progress")
+
+        experience.workflow_state = "published"
+        expect(experience.valid?).to be true
+      end
+    end
+
+    context "when unpublishing while indexing is in_progress" do
+      it "prevents unpublishing" do
+        experience.update_column(:workflow_state, "published")
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: course)
+        experience.ai_experience_context_files.create!(attachment:)
+        experience.update_column(:context_index_status, "in_progress")
+
+        experience.workflow_state = "unpublished"
+        expect(experience.valid?).to be false
+        expect(experience.errors[:workflow_state]).to include("Cannot unpublish while source files are still processing")
       end
     end
   end

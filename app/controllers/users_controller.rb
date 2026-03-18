@@ -3233,7 +3233,7 @@ class UsersController < ApplicationController
       includes << "terms_of_use" unless accepted_terms.nil?
     end
     @user.name ||= params[:pseudonym][:unique_id]
-    skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))
+    skip_registration = manage_user_logins && value_to_boolean(params[:user].try(:[], :skip_registration))
     unless @user.registered?
       @user.workflow_state = if require_password || skip_registration
                                # no email confirmation required (self_enrollment_code and password

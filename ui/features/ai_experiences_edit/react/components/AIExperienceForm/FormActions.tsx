@@ -20,55 +20,21 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import {IconArrowOpenDownLine} from '@instructure/ui-icons'
-import {Menu} from '@instructure/ui-menu'
-import {Pill} from '@instructure/ui-pill'
 
 const I18n = createI18nScope('ai_experiences_edit')
 
 interface FormActionsProps {
   isLoading: boolean
   onCancel: () => void
-  onPreview: () => void
 }
 
-const FormActions: React.FC<FormActionsProps> = ({isLoading, onCancel, onPreview}) => {
+const FormActions: React.FC<FormActionsProps> = ({isLoading, onCancel}) => {
   return (
     <Flex justifyItems="end" margin="large 0 0 0">
       <Flex.Item padding="0 x-small 0 0">
         <Button data-testid="ai-experience-edit-cancel-button" onClick={onCancel}>
           {I18n.t('Cancel')}
         </Button>
-      </Flex.Item>
-      <Flex.Item padding="0 x-small 0 0">
-        <Menu
-          placement="top"
-          trigger={
-            <Button>
-              <Flex alignItems="center">
-                <Flex.Item shouldGrow>{I18n.t('Preview')}</Flex.Item>
-                <Flex.Item padding="0 0 0 x-small">
-                  <IconArrowOpenDownLine />
-                </Flex.Item>
-              </Flex>
-            </Button>
-          }
-        >
-          <Menu.Item data-testid="ai-experience-edit-preview-item" onClick={onPreview}>
-            {I18n.t('Preview experience')}
-          </Menu.Item>
-          <Menu.Item disabled>
-            <Flex justifyItems="space-between" alignItems="center" width="100%">
-              <Flex.Item shouldGrow shouldShrink>
-                <Text>{I18n.t('Run chat simulation')}</Text>
-              </Flex.Item>
-              <Flex.Item>
-                <Pill color="info">{I18n.t('Coming soon')}</Pill>
-              </Flex.Item>
-            </Flex>
-          </Menu.Item>
-        </Menu>
       </Flex.Item>
       <Flex.Item>
         <Button
@@ -77,7 +43,7 @@ const FormActions: React.FC<FormActionsProps> = ({isLoading, onCancel, onPreview
           color="primary"
           interaction={isLoading ? 'disabled' : 'enabled'}
         >
-          {isLoading ? I18n.t('Saving...') : I18n.t('Save as draft')}
+          {isLoading ? I18n.t('Saving...') : I18n.t('Save to preview')}
         </Button>
       </Flex.Item>
     </Flex>

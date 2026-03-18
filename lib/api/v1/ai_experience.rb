@@ -33,21 +33,33 @@ module Api::V1::AiExperience
     json = api_json(ai_experience, user, session, opts.merge(API_JSON_OPTS))
     json[:can_manage] = opts[:can_manage] if opts.key?(:can_manage)
     json[:submission_status] = opts[:submission_status] if opts.key?(:submission_status)
-    # Include can_unpublish if user can manage
-    json[:can_unpublish] = ai_experience.can_unpublish? if opts[:can_manage]
+    # Include can_unpublish and context_ready if user can manage.
+    # context_ready is false when context files exist but are not yet indexed
+    # (in_progress, not_started, or failed) — gates publish, preview, and AI Conversations.
+    if opts[:can_manage]
+      json[:can_unpublish] = ai_experience.can_unpublish?
+      json[:context_ready] = ai_experience.can_publish?
+    end
 
-    # Include context files if feature flag is enabled
+    # Hide teacher-facing fields from non-managers
+    unless opts[:can_manage]
+      json.delete(:facts)
+      json.delete(:pedagogical_guidance)
+    end
+
+    # Include context files if feature flag is enabled.
+    # Uses the scoped context_files association which excludes deleted attachments.
     if ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
-      json[:context_files] = ai_experience.ai_experience_context_files.order(:position).map do |context_file|
-        attachment = context_file.attachment
-        {
-          id: attachment.id,
-          filename: attachment.filename,
-          size: attachment.size,
-          content_type: attachment.content_type,
-          url: attachment.public_url,
-          position: context_file.position
-        }
+      json[:context_files] = ai_experience.context_files
+                                          .order("ai_experience_context_files.position")
+                                          .map do |attachment|
+                                            {
+                                              id: attachment.id.to_s,
+                                              display_name: attachment.display_name,
+                                              size: attachment.size,
+                                              content_type: attachment.content_type,
+                                              url: attachment.public_url
+                                            }
       end
     end
 

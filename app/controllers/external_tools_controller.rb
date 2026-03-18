@@ -613,7 +613,7 @@ class ExternalToolsController < ApplicationController
   before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
   before_action :require_access_to_context, except: %i[index sessionless_launch all_visible_nav_tools]
-  before_action :require_user, only: [:generate_sessionless_launch]
+  before_action :require_user, only: [:generate_sessionless_launch, :migration_info]
   before_action :get_context, only: %i[retrieve show resource_selection]
   before_action :parse_context_codes, only: [:all_visible_nav_tools]
   before_action :set_extra_csp_frame_ancestor!, only: %i[retrieve resource_selection]
@@ -953,6 +953,8 @@ class ExternalToolsController < ApplicationController
   end
 
   def migration_info
+    return unless authorized_action(@context, @current_user, :read_as_admin)
+
     # Define tool to be the external tool associated with the external tool id from the route
     tool = ContextExternalTool.find(params[:external_tool_id])
 
@@ -1150,7 +1152,7 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def assignment_from_assignment_id(lti_assignment_id: nil, tool: nil)
+  def assignment_from_assignment_id(lti_assignment_id: nil)
     if params[:assignment_id].present?
       assignment = api_find(@context.assignments.active, params[:assignment_id])
     elsif lti_assignment_id.present?
@@ -1159,14 +1161,6 @@ class ExternalToolsController < ApplicationController
     return nil unless assignment
 
     raise Lti::Errors::UnauthorizedError unless assignment.grants_right?(@current_user, :read)
-
-    if tool&.quiz_lti?
-      assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
-      locked = assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
-      unlocked = !locked || assignment.grants_right?(@current_user, session, :update)
-
-      raise Lti::Errors::UnauthorizedError unless unlocked
-    end
 
     assignment
   end
@@ -1186,9 +1180,9 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
     opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
-    assignment = assignment_from_assignment_id(lti_assignment_id: opts.dig(:link_params, :ext, :lti_assignment_id), tool:)
+    assignment = assignment_from_assignment_id(lti_assignment_id: opts.dig(:link_params, :ext, :lti_assignment_id))
 
-    if assignment.present? && @current_user.present? && !tool.quiz_lti?
+    if assignment.present? && @current_user.present?
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
     end
 
@@ -1350,7 +1344,7 @@ class ExternalToolsController < ApplicationController
                                                              tool:,
                                                              secure_params: params[:secure_params])
 
-    assignment = assignment_from_assignment_id(tool:)
+    assignment = assignment_from_assignment_id
 
     opts = {
       post_only: @tool.settings["post_only"].present?,

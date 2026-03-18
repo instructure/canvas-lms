@@ -98,6 +98,12 @@ class AiExperiencesController < ApplicationController
     # Students (non-managers) should only see published experiences
     @experiences = @experiences.where(workflow_state: "published") unless can_manage
     @experiences = @experiences.where(workflow_state: params[:workflow_state]) if params[:workflow_state].present?
+
+    # Sync index status for actively indexing experiences
+    if @context.feature_enabled?(:ai_experiences_context_file_upload)
+      sync_in_progress_index_statuses(@experiences)
+    end
+
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences")
     respond_to do |format|
@@ -107,7 +113,7 @@ class AiExperiencesController < ApplicationController
         render
       end
       format.json do
-        experiences_json = can_manage ? experiences_json_for_teacher : experiences_json_for_student
+        experiences_json = can_manage ? experiences_json_for_teacher(can_manage) : experiences_json_for_student(can_manage)
         render json: {
           experiences: experiences_json,
           can_manage:
@@ -132,11 +138,19 @@ class AiExperiencesController < ApplicationController
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
     add_crumb @ai_experience.title
+    if @context.feature_enabled?(:ai_experiences_context_file_upload) &&
+       @ai_experience.llm_conversation_context_id.present?
+      LLMConversationContextManager.sync_index_status(ai_experience: @ai_experience)
+    end
+
     respond_to do |format|
       format.html do
         @page_title = @ai_experience.title
         js_bundle :ai_experiences_show
         js_env(AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:))
+        js_env[:FEATURES] ||= {}
+        js_env[:FEATURES][:ai_experiences_context_file_upload] =
+          @context.feature_enabled?(:ai_experiences_context_file_upload)
         render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
                layout: true
       end
@@ -428,11 +442,11 @@ class AiExperiencesController < ApplicationController
     end
   end
 
-  def experiences_json_for_teacher
-    ai_experiences_json(@experiences, @current_user, session)
+  def experiences_json_for_teacher(can_manage)
+    ai_experiences_json(@experiences, @current_user, session, can_manage:)
   end
 
-  def experiences_json_for_student
+  def experiences_json_for_student(can_manage)
     @experiences.map do |experience|
       # Query for the student's latest conversation for this experience
       latest_conversation = experience.ai_conversations
@@ -450,7 +464,19 @@ class AiExperiencesController < ApplicationController
                             "in_progress"
                           end
 
-      ai_experience_json(experience, @current_user, session, { submission_status: })
+      ai_experience_json(experience, @current_user, session, { submission_status:, can_manage: })
+    end
+  end
+
+  def sync_in_progress_index_statuses(experiences)
+    # Only sync experiences that are actively indexing to minimize API calls
+    experiences_to_sync = experiences.select do |exp|
+      exp.llm_conversation_context_id.present? &&
+        exp.context_index_status == "in_progress"
+    end
+
+    experiences_to_sync.each do |experience|
+      LLMConversationContextManager.sync_index_status(ai_experience: experience)
     end
   end
 end

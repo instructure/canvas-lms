@@ -21,6 +21,7 @@ import React from 'react'
 import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import AIExperienceShow from '../components/AIExperienceShow'
 import type {AIExperience} from '../../types'
 
@@ -54,18 +55,22 @@ describe('AIExperienceShow', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
+    fakeENV.setup()
     server.resetHandlers()
     // Mock scrollIntoView which is not available in JSDOM
     Element.prototype.scrollIntoView = vi.fn()
-    // Reset window.location
+    // Reset window.location (include href so fetch can resolve relative URLs)
     delete (window as any).location
     window.location = {
       search: '',
       pathname: '/courses/123/ai_experiences/1',
+      href: 'http://localhost/courses/123/ai_experiences/1',
+      origin: 'http://localhost',
     } as any
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     cleanup()
     vi.clearAllMocks()
   })
@@ -85,17 +90,17 @@ describe('AIExperienceShow', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     expect(screen.getByText('Configurations')).toBeInTheDocument()
-    expect(screen.getByText('Facts students should know')).toBeInTheDocument()
+    expect(screen.getByText('Facts Students Should Know')).toBeInTheDocument()
     expect(
       screen.getByText(
         'You are a customer service representative helping customers with billing issues.',
       ),
     ).toBeInTheDocument()
-    expect(screen.getByText('Learning objectives')).toBeInTheDocument()
+    expect(screen.getByText('Learning Objectives')).toBeInTheDocument()
     expect(
       screen.getByText('Students will learn to handle customer complaints professionally'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Pedagogical guidance')).toBeInTheDocument()
+    expect(screen.getByText('Pedagogical Guidance')).toBeInTheDocument()
     expect(screen.getByText('A customer calls about incorrect billing')).toBeInTheDocument()
   })
 
@@ -254,18 +259,11 @@ describe('AIExperienceShow', () => {
       expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
     })
 
-    // Click Delete button in modal (not the menu item)
-    const buttons = screen.getAllByText('Delete')
-    const confirmDeleteButton = buttons.find(
-      el => el.closest('button') && el.closest('button')!.getAttribute('type') === 'button',
-    )
-    fireEvent.click(confirmDeleteButton!.closest('button')!)
+    fireEvent.click(screen.getByTestId('ai-experience-show-delete-confirm-button'))
 
-    // Wait for delete to be processed - the modal should close after delete
     await waitFor(
       () => {
-        // Either the delete was called or the modal closes (indicating success)
-        expect(deleteCalled || screen.queryByText('Delete AI Experience') === null).toBe(true)
+        expect(deleteCalled).toBe(true)
       },
       {timeout: 5000},
     )
@@ -289,5 +287,130 @@ describe('AIExperienceShow', () => {
     render(<AIExperienceShow aiExperience={{...mockAiExperience, can_manage: false}} />)
     const menuButton = screen.queryByText('AI Experience settings')
     expect(menuButton).not.toBeInTheDocument()
+  })
+
+  describe('indexing notice', () => {
+    it('shows indexing notice instead of preview when context_ready is false and can_manage', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+        />,
+      )
+      expect(screen.getByTestId('ai-experience-show-indexing-notice')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Preview and AI Conversations will be available once processing is complete. Check back later.',
+        ),
+      ).toBeInTheDocument()
+      // Preview chat is hidden — replaced by the notice
+      expect(screen.queryByText('Preview')).not.toBeInTheDocument()
+    })
+
+    it('disables AI Conversations button when context_ready is false', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+        />,
+      )
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).toHaveAttribute('disabled')
+    })
+
+    it('does not show indexing notice when context_ready is true', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: true, can_manage: true}}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+    })
+
+    it('shows preview and enables AI Conversations button when context_ready is true', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: true, can_manage: true}}
+        />,
+      )
+      // LLMConversationView is shown
+      expect(screen.getByText('Preview')).toBeInTheDocument()
+      // AI Conversations button is enabled (has href, not disabled)
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).not.toHaveAttribute('disabled')
+      expect(aiConversationsButton).toHaveAttribute(
+        'href',
+        `/courses/${mockAiExperience.course_id}/ai_experiences/${mockAiExperience.id}/ai_conversations`,
+      )
+    })
+
+    it('students always see the preview even when context_ready is false', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{...mockAiExperience, context_ready: false, can_manage: false}}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+      // Students see the conversation view (not the teacher's "Preview" panel)
+      expect(screen.getByText('Conversation')).toBeInTheDocument()
+    })
+  })
+
+  describe('context files table', () => {
+    const mockFiles = [
+      {
+        id: 'f1',
+        display_name: 'lecture-notes.pdf',
+        url: '/files/f1/download',
+        size: 204800,
+        content_type: 'application/pdf',
+      },
+      {
+        id: 'f2',
+        display_name: 'rubric.docx',
+        url: '/files/f2/download',
+        size: 51200,
+        content_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      },
+    ]
+
+    beforeEach(() => {
+      fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: true}})
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('renders Source Files section when flag is on and files are present', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.getByText('Source Files')).toBeInTheDocument()
+    })
+
+    it('renders each file as a list item with its name', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.getByText('lecture-notes.pdf')).toBeInTheDocument()
+      expect(screen.getByText('rubric.docx')).toBeInTheDocument()
+    })
+
+    it('renders file names as plain text without links', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      const item = screen.getByText('lecture-notes.pdf')
+      expect(item.closest('a')).toBeNull()
+    })
+
+    it('does not render Source Files section when files array is empty', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: []}} />)
+      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+    })
+
+    it('does not render Source Files section when context_files is absent', () => {
+      render(<AIExperienceShow aiExperience={mockAiExperience} />)
+      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+    })
+
+    it('does not render Source Files section when feature flag is off', () => {
+      fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: false}})
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+    })
   })
 })

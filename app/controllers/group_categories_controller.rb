@@ -1147,14 +1147,19 @@ class GroupCategoriesController < ApplicationController
       file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
                                    Attachment.mimetype("course_group_import.#{params[:extension]}"))
     else
-      charset = request.media_type_params["charset"]
+      env = request.env.dup
+      env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
+      # copy of request with original content type restored
+      request2 = Rack::Request.new(env)
+      charset = request2.media_type_params["charset"]
       if charset.present? && charset.casecmp("utf-8") != 0
         raise InvalidContentType
       end
 
-      params[:extension] ||= "csv"
+      params[:extension] ||= { "text/plain" => "csv",
+                               "text/csv" => "csv" }[request2.media_type] || "csv"
       file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
-                                   request.media_type)
+                                   request2.media_type)
       file_obj
     end
   end

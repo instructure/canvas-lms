@@ -143,12 +143,12 @@ module Lti
             expires_in 10.minutes
 
             # Filter out Quizzes 2 if new quizzes feature is disabled
-            filtered_launch_defs = if NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
-                                     launch_defs
-                                   else
+            filtered_launch_defs = if @context.is_a?(Course) && !NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
                                      launch_defs.reject do |tool|
                                        tool.respond_to?(:tool_id) && tool.tool_id == "Quizzes 2"
                                      end
+                                   else
+                                     launch_defs
                                    end
 
             render json: AppLaunchCollator.launch_definitions(filtered_launch_defs, placements, include_context_name: value_to_boolean(params[:include_context_name]))
