@@ -40,22 +40,31 @@ describe('<CaptionRow />', () => {
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
-  it('uploaded caption: if onDownload is provided, it shows download button', () => {
-    const onDownload = vi.fn()
+  it('uploaded caption: shows download link with href and filename attributes', () => {
     const onDelete = vi.fn()
 
     renderComponent({
       workflow_state: 'ready',
       captionName: 'Spanish Caption',
-      onDownload,
+      url: 'https://example.com/es.srt',
+      filename: 'spanish_es.srt',
       onDelete,
     })
 
-    const downloadButton = screen.getByText('Download Spanish Caption').closest('button')
-    expect(downloadButton).toBeInTheDocument()
+    const downloadLink = screen.getByText('Download Spanish Caption').closest('a')
+    expect(downloadLink).toBeInTheDocument()
+    expect(downloadLink).toHaveAttribute('href', 'https://example.com/es.srt')
+    expect(downloadLink).toHaveAttribute('download', 'spanish_es.srt')
+  })
 
-    fireEvent.click(downloadButton!)
-    expect(onDownload).toHaveBeenCalledTimes(1)
+  it('uploaded caption: download button always shown in ready state', () => {
+    renderComponent({
+      workflow_state: 'ready',
+      captionName: 'Spanish Caption',
+      onDelete: vi.fn(),
+    })
+
+    expect(screen.getByText('Download Spanish Caption')).toBeInTheDocument()
   })
 
   it('renders processing state properly displaying text', () => {

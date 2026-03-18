@@ -38,10 +38,12 @@ export interface SubtitleFile {
  * Subtitle/Caption track
  */
 export interface Subtitle {
+  url?: string // Download URL for existing captions
   locale: string // Language code (e.g., 'en', 'fr', 'es')
   inherited?: boolean // Whether caption is inherited from parent course
   asr?: boolean // Whether caption is auto-generated
   file?: SubtitleFile // Absent for ASR-generated captions (no local file)
+  filename?: string // Filename for download
   isNew?: boolean // Whether this is a newly added caption
   workflow_state?: WorkflowState // Mirrors backend workflow_state: processing, failed, or ready
   errorMessage?: string // Error message if upload failed

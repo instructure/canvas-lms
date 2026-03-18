@@ -121,6 +121,8 @@ ready(() => {
           inherited: t.inherited,
           asr: t.asr,
           workflow_state: t.workflow_state,
+          url: t.url,
+          filename: `${media_object?.title}_${t.locale}.srt`,
         }))
         if (tracks) {
           event?.source?.postMessage(
