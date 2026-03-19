@@ -538,5 +538,60 @@ module NewQuizzes
         end
       end
     end
+
+    describe "result launch behavior (submission views)" do
+      let(:controller) do
+        ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
+        instance_double(ApplicationController,
+                        request:,
+                        params: ActionController::Parameters.new({ participant_session_id: "85", quiz_session_id: "53" }),
+                        lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                        blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                        lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                        set_return_url: "https://canvas.instructure.com/courses/#{course.id}/assignments",
+                        polymorphic_url: "https://canvas.instructure.com/courses/#{course.id}")
+      end
+
+      it "includes participant_session_id and quiz_session_id in build output" do
+        result = builder.build
+        expect(result[:participant_session_id]).to eq("85")
+        expect(result[:quiz_session_id]).to eq("53")
+      end
+
+      it "excludes outcome service params for result launches" do
+        course.enroll_student(user, enrollment_state: "active")
+        result = builder.build
+        expect(result).not_to have_key(:lis_result_sourcedid)
+        expect(result).not_to have_key(:lis_outcome_service_url)
+        expect(result).not_to have_key(:ext_ims_lis_basic_outcome_url)
+        expect(result).not_to have_key(:ext_outcome_data_values_accepted)
+        expect(result).not_to have_key(:ext_outcome_result_total_score_accepted)
+        expect(result).not_to have_key(:ext_outcome_submission_submitted_at_accepted)
+        expect(result).not_to have_key(:ext_outcome_submission_needs_additional_review_accepted)
+        expect(result).not_to have_key(:ext_outcome_submission_prioritize_non_tool_grade_accepted)
+        expect(result).not_to have_key(:ext_outcomes_tool_placement_url)
+      end
+
+      it "uses course URL for launch_presentation_return_url" do
+        result = builder.build
+        expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}")
+      end
+    end
+
+    describe "non-result launch includes outcome service params" do
+      it "includes outcome service params when participant_session_id is absent" do
+        course.enroll_student(user, enrollment_state: "active")
+        result = builder.build
+        expect(result[:lis_outcome_service_url]).to be_present
+        expect(result[:ext_ims_lis_basic_outcome_url]).to be_present
+        expect(result).to have_key(:ext_outcome_data_values_accepted)
+      end
+
+      it "does not include participant_session_id or quiz_session_id" do
+        result = builder.build
+        expect(result[:participant_session_id]).to be_nil
+        expect(result[:quiz_session_id]).to be_nil
+      end
+    end
   end
 end

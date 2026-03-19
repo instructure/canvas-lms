@@ -23,7 +23,6 @@ class GradebooksController < ApplicationController
   include GradebooksHelper
   include SubmissionCommentsHelper
   include KalturaHelper
-  include NewQuizzesHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Group
   include Api::V1::GroupCategory
@@ -1253,7 +1252,7 @@ class GradebooksController < ApplicationController
           grading_role: grading_role_for_user,
           grading_type: @assignment.grading_type,
           lti_retrieve_url: retrieve_course_external_tools_url(
-            @context.id, assignment_id: @assignment.id, display: "borderless"
+            @context.id, assignment_id: @assignment.id, display: "borderless", new_quizzes_native_experience_sessionless: false
           ),
           course_id: @context.id,
           assignment_id: @assignment.id,
@@ -1301,33 +1300,6 @@ class GradebooksController < ApplicationController
 
         env[:assignment_comment_library_feature_enabled] =
           @context.root_account.feature_enabled?(:assignment_comment_library)
-
-        # Native New Quizzes support in SpeedGrader
-        native_quiz_enabled = @assignment.quiz_lti? &&
-                              @context.feature_enabled?(:new_quizzes_native_experience)
-
-        if native_quiz_enabled
-          tool = Lti::ToolFinder.from_assignment(@assignment)
-
-          if tool&.quiz_lti?
-            signed_launch_data = Services::NewQuizzes::Routes::LaunchHelper.build_speedgrader_launch_data(
-              tool:,
-              assignment: @assignment,
-              context: @context,
-              user: @current_user,
-              controller: self,
-              request:,
-              basename: "/courses/#{@context.id}/gradebook/speed_grader",
-              current_pseudonym: @current_pseudonym,
-              domain_root_account: @domain_root_account
-            )
-
-            launch_url = Services::NewQuizzes.launch_url(tool_url: tool&.url)
-            setup_new_quizzes_env(signed_launch_data, launch_url:)
-          else
-            Rails.logger.error "Failed to find quiz_lti tool for New Quizzes SpeedGrader launch for assignment #{@assignment.id} in context #{@context.id}"
-          end
-        end
 
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true

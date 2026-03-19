@@ -111,7 +111,6 @@ export interface NewQuizzesContext {
   basename: string
   signature: string
   launchType: 'regular' | 'respondus'
-  grade_by_question_enabled?: boolean
 }
 
 export interface EnvNewQuizzes {

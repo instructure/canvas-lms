@@ -67,49 +67,6 @@ module Services
           )
         end
 
-        # Build launch data for New Quizzes in SpeedGrader
-        # Includes grade_by_question preference for grader UI
-        # @param tool [ContextExternalTool] The external tool
-        # @param assignment [Assignment] The assignment
-        # @param context [Course] The course context
-        # @param user [User] The current user (grader)
-        # @param controller [ApplicationController] The controller instance
-        # @param request [ActionDispatch::Request] The request object
-        # @param basename [String] The base path for routing (e.g., "/courses/1/gradebook/speed_grader")
-        # @param current_pseudonym [Pseudonym] Optional current pseudonym
-        # @param domain_root_account [Account] Optional domain root account
-        # @return [Hash] Signed launch data with grade_by_question preference
-        def self.build_speedgrader_launch_data(
-          tool:,
-          assignment:,
-          context:,
-          user:,
-          controller:,
-          request:,
-          basename:,
-          current_pseudonym: nil,
-          domain_root_account: nil
-        )
-          launch_data = build_signed_launch_data(
-            tool:,
-            context:,
-            user:,
-            controller:,
-            request:,
-            assignment:,
-            tag: assignment.external_tool_tag,
-            placement: nil,
-            current_pseudonym:,
-            domain_root_account:,
-            basename:
-          )
-
-          # Add grade_by_question preference for SpeedGrader
-          # Frontend will combine this with submission-specific session IDs
-          launch_data[:grade_by_question_enabled] = user.preferences.fetch(:enable_speedgrader_grade_by_question, false)
-          launch_data
-        end
-
         # Build launch data for New Quizzes item banks
         # @param tool [ContextExternalTool] The external tool
         # @param context [Course, Account] The context (course or account)
