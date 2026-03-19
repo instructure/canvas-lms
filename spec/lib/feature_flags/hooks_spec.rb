@@ -574,31 +574,6 @@ describe FeatureFlags::Hooks do
     end
   end
 
-  describe "oak_visible_on_hook" do
-    let(:context) { instance_double(Account) }
-    let(:database_server) { instance_double(DatabaseServer, config: { region: "us-east-1" }) }
-    let(:current_shard) { instance_double(Shard, database_server:) }
-    let(:oak_predicate) { instance_double(FeatureFlags::OakPredicate) }
-
-    before do
-      allow(Shard).to receive(:current).and_return(current_shard)
-      allow(FeatureFlags::OakPredicate).to receive(:new).and_return(oak_predicate)
-      allow(oak_predicate).to receive(:call)
-    end
-
-    it "creates a new OakPredicate with context and region" do
-      expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
-
-      FeatureFlags::Hooks.oak_visible_on_hook(context)
-    end
-
-    it "calls .call on the OakPredicate instance" do
-      expect(oak_predicate).to receive(:call)
-
-      FeatureFlags::Hooks.oak_visible_on_hook(context)
-    end
-  end
-
   describe "oak_for_users_visible_on_hook" do
     let(:domain_root_account) { account_model }
 
@@ -629,28 +604,8 @@ describe FeatureFlags::Hooks do
       end
     end
 
-    context "when oak_visible_on_hook returns false" do
+    context "when context is a User" do
       let(:context) { user_model }
-
-      before do
-        allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(false)
-      end
-
-      it "returns false without checking permission" do
-        expect(Oak::PermissionChecker).not_to receive(:user_permitted?)
-
-        result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
-
-        expect(result).to be false
-      end
-    end
-
-    context "when oak_visible_on_hook returns true" do
-      let(:context) { user_model }
-
-      before do
-        allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
-      end
 
       it "checks user_permitted? with proper parameters" do
         expect(Oak::PermissionChecker).to receive(:user_permitted?).with(context, domain_root_account)
