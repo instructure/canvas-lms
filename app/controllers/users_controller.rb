@@ -3025,7 +3025,8 @@ class UsersController < ApplicationController
     has_flagged_course = Rails.cache.fetch_with_batched_keys(
       "learning_agent_dashboard/v1",
       batch_object: @current_user,
-      batched_keys: :enrollments
+      batched_keys: :enrollments,
+      expires_in: 5.minutes
     ) do
       @current_user.enrollments
                    .active_by_date

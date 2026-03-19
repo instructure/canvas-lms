@@ -3135,7 +3135,8 @@ describe UsersController do
         expect(Rails.cache).to receive(:fetch_with_batched_keys)
           .with("learning_agent_dashboard/v1",
                 batch_object: @student,
-                batched_keys: :enrollments)
+                batched_keys: :enrollments,
+                expires_in: 5.minutes)
           .and_call_original
         get :user_dashboard
       end
