@@ -108,7 +108,7 @@ export default function RubricsQuery({
     getNextPageParam: lastPage => {
       const pageInfo =
         // @ts-expect-error
-        lastPage?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+        lastPage?.course?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
       return pageInfo?.hasNextPage ? pageInfo.endCursor : null
     },
     initialPageParam: null,
@@ -138,7 +138,7 @@ export default function RubricsQuery({
       key={submission.attempt}
       // @ts-expect-error
       proficiencyRatings={ratingsData.pages.reduce((acc, page) => {
-        const nodes = page?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+        const nodes = page?.course?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
         if (nodes) {
           return acc.concat(nodes)
         }
