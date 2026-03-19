@@ -237,7 +237,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       expect(f("body")).to include_text("This is a peer review comment")
@@ -292,7 +292,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       @assessment_request.reload
@@ -312,7 +312,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       # Reload the page
@@ -364,7 +364,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -401,7 +401,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -426,7 +426,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -441,7 +441,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -464,7 +464,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -502,7 +502,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -517,7 +517,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -532,7 +532,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -584,7 +584,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -599,7 +599,7 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       send_button = fj("button:contains('Send Comment')")
-      send_button.click
+      scroll_to_click_element(send_button)
       wait_for_ajaximations
 
       submit_button = f("button[data-testid='submit-peer-review-button']")
@@ -760,10 +760,10 @@ describe "peer review student landing page" do
 
       expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
 
-      fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-3']:first").click
+      scroll_to_click_element(fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-3']:first"))
       wait_for_ajaximations
 
-      fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-2']:eq(1)").click
+      scroll_to_click_element(fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-2']:eq(1)"))
       wait_for_ajaximations
 
       save_button = f("[data-testid='save-rubric-assessment-button']")
@@ -809,10 +809,10 @@ describe "peer review student landing page" do
 
       expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
 
-      fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-3']:first").click
+      scroll_to_click_element(fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-3']:first"))
       wait_for_ajaximations
 
-      fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-2']:eq(1)").click
+      scroll_to_click_element(fj("[data-testid='rubric-assessment-vertical-display'] button[data-testid='rubric-rating-button-2']:eq(1)"))
       wait_for_ajaximations
 
       save_button = f("[data-testid='save-rubric-assessment-button']")
