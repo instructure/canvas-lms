@@ -48,8 +48,16 @@ module Accessibility
         domain_root_account: @domain_root_account
       ).generate_alt_text
       render json: { value: alt_text }, status: :ok
+    rescue Accessibility::AiGenerationService::AttachmentNotFoundError
+      render json: { error: "Attachment not found" }, status: :not_found
+    rescue Accessibility::AiGenerationService::AttachmentPermissionError
+      render json: { error: "You do not have permission to access this attachment" }, status: :forbidden
+    rescue Accessibility::AiGenerationService::AttachmentTooLargeError
+      render json: { error: "Attachment exceeds the maximum allowed size" }, status: :content_too_large
+    rescue Accessibility::AiGenerationService::UnsupportedImageTypeError
+      render json: { error: "Attachment type is not supported" }, status: :unsupported_media_type
     rescue Accessibility::AiGenerationService::InvalidParameterError
-      render json: { error: "Attachment not found" }, status: :bad_request
+      render json: { error: "Invalid or missing parameters" }, status: :bad_request
     end
 
     private
