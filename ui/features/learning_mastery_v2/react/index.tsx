@@ -32,7 +32,11 @@ import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {SearchWrapper} from './components/filters/SearchWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
-import {GradebookSettings, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {
+  DisplayFilter,
+  GradebookSettings,
+  NameDisplayFormat,
+} from '@canvas/outcomes/react/utils/constants'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
@@ -143,13 +147,22 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         }
 
         updateSettings(settings)
+
+        // If the "Show students with no results" filter has changed,
+        // reset to the first page to avoid landing on an empty page
+        const showStudentsWithNoResultsChanged =
+          settings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS) !==
+          gradebookSettings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
+        if (showStudentsWithNoResultsChanged) {
+          setCurrentPage(1)
+        }
       } catch (_) {
         error = I18n.t('Failed to save settings')
       }
 
       return {success: error === null}
     },
-    [courseId, updateSettings],
+    [courseId, updateSettings, gradebookSettings.displayFilters, setCurrentPage],
   )
 
   const handleNameDisplayFormatChange = useCallback(
@@ -164,9 +177,12 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     async (studentsPerPage: number) => {
       const newSettings = {...gradebookSettings, studentsPerPage}
 
-      handleGradebookSettingsChange(newSettings)
+      const result = await handleGradebookSettingsChange(newSettings)
+      if (result.success) {
+        setCurrentPage(1)
+      }
     },
-    [gradebookSettings, handleGradebookSettingsChange],
+    [gradebookSettings, handleGradebookSettingsChange, setCurrentPage],
   )
 
   const handleOutcomesReorder = useCallback(
