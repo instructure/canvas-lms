@@ -186,13 +186,8 @@ module FeatureFlags
       only_admins_can_enable_during_eap(user, context, :a11y_checker, from_state, transitions, allow_subaccount_admins: true)
     end
 
-    def self.oak_visible_on_hook(context)
-      OakPredicate.new(context, Shard.current.database_server.config[:region]).call
-    end
-
     def self.oak_for_users_visible_on_hook(context)
       return false unless context.is_a?(User)
-      return false unless oak_visible_on_hook(context)
 
       Oak::PermissionChecker.user_permitted?(context, Account.current_domain_root_account)
     end
