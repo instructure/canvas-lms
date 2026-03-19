@@ -25,7 +25,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {getDiscoveryPageIcons} from '../constants'
+import {DISCOVERY_PAGE_ICONS} from '../constants'
 import {useDiscovery} from '../hooks/useDiscovery'
 import {SelectedBadge} from './SelectedBadge'
 
@@ -100,7 +100,7 @@ export const AuthProviderForm = React.forwardRef<HTMLDivElement, AuthProviderFor
             <Text weight="bold">{I18n.t('Icon')}</Text>
 
             <Flex as="div" gap="xx-small" wrap="wrap" role="radiogroup" aria-label={I18n.t('Icon')}>
-              {getDiscoveryPageIcons().map(icon => {
+              {DISCOVERY_PAGE_ICONS.map(icon => {
                 const isSelected = selectedIconId === icon.id
 
                 return (

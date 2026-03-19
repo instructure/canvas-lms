@@ -19,7 +19,7 @@
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AuthProviderCard, CardConfig} from '../types'
-import {getDiscoveryPageIcons} from '../constants'
+import {DISCOVERY_PAGE_ICONS} from '../constants'
 
 const I18n = createI18nScope('discovery_page')
 
@@ -71,7 +71,7 @@ export function useDiscoveryConfig({
 
   const handleAddCard = (section: 'primary' | 'secondary') => {
     const id = crypto.randomUUID()
-    const defaultIcon = getDiscoveryPageIcons().find(icon => icon.id === 'default')
+    const defaultIcon = DISCOVERY_PAGE_ICONS.find(icon => icon.id === 'default')
     const defaultProviderId = authProviders?.[0] ? Number(authProviders[0].id) : 0
     const newCard: AuthProviderCard = {
       id,
