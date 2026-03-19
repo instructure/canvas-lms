@@ -232,5 +232,58 @@ describe('ScanStateCell', () => {
       const rescanButton = container.querySelector('[data-pendo="resource-rescan-button"]')
       expect(rescanButton).toHaveAttribute('data-pendo', 'resource-rescan-button')
     })
+
+    it('renders limit reached text when errorMessage is issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'issue_limit_reached',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Limit reached/i)).toBeInTheDocument()
+    })
+
+    it('renders limit reached tooltip when errorMessage is issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'issue_limit_reached',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      expect(explanation).toBeInTheDocument()
+      explanation.focus()
+      expect(explanation).toHaveTextContent(
+        'Max issue count reached on course. Remediate found issues and update report to find additional issues.',
+      )
+    })
+
+    it('renders the normal failed scan state when errorMessage is not issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'other error',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.queryByText(/Limit reached/i)).not.toBeInTheDocument()
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      explanation.focus()
+      expect(explanation).toHaveTextContent('Failed scan')
+    })
   })
 })

@@ -219,6 +219,8 @@ const UnknownIssuesText = ({isMobile}: {isMobile: boolean}) => (
   />
 )
 
+const ISSUE_LIMIT_REACHED_ERROR = 'issue_limit_reached'
+
 const ScanWithError = ({
   item,
   isMobile,
@@ -227,14 +229,28 @@ const ScanWithError = ({
   item: AccessibilityResourceScan
   isMobile: boolean
   onRescan?: (item: AccessibilityResourceScan) => void
-}) => (
-  <ScanStateWithExplanation
-    icon={<IconWarningLine color="error" size="x-small" aria-hidden="true" />}
-    content={<RescanAction item={item} isMobile={isMobile} onRescan={onRescan} />}
-    tooltipText={I18n.t('Failed scan')}
-    isMobile={isMobile}
-  />
-)
+}) => {
+  if (item.errorMessage === ISSUE_LIMIT_REACHED_ERROR) {
+    return (
+      <ScanStateWithExplanation
+        icon={<IconQuestionLine color="secondary" size="x-small" aria-hidden="true" />}
+        content={<Text>{I18n.t('Limit reached')}</Text>}
+        tooltipText={I18n.t(
+          'Max issue count reached on course. Remediate found issues and update report to find additional issues.',
+        )}
+        isMobile={isMobile}
+      />
+    )
+  }
+  return (
+    <ScanStateWithExplanation
+      icon={<IconWarningLine color="error" size="x-small" aria-hidden="true" />}
+      content={<RescanAction item={item} isMobile={isMobile} onRescan={onRescan} />}
+      tooltipText={I18n.t('Failed scan')}
+      isMobile={isMobile}
+    />
+  )
+}
 
 export const ScanStateCell: React.FC<ScanStateCellProps> = ({
   item,
