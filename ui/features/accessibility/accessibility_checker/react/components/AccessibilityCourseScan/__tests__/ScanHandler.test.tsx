@@ -89,6 +89,67 @@ describe('ScanHandler', () => {
     })
   })
 
+  describe('what we look for popover', () => {
+    beforeEach(() => {
+      window.ENV.LOCALE = 'en-US'
+      ;(window.ENV as any).TIMEZONE = 'UTC'
+    })
+
+    afterEach(() => {
+      delete (window.ENV as any).LOCALE
+      delete (window.ENV as any).TIMEZONE
+    })
+
+    it('renders the popover trigger button when lastChecked is provided', () => {
+      render(
+        <ScanHandler lastChecked="2026-04-03T13:30:00Z">
+          <div />
+        </ScanHandler>,
+      )
+
+      expect(screen.getByRole('button', {name: 'What we look for'})).toBeInTheDocument()
+    })
+
+    it('does not render the popover trigger when lastChecked is omitted', () => {
+      render(
+        <ScanHandler>
+          <div />
+        </ScanHandler>,
+      )
+
+      expect(screen.queryByRole('button', {name: 'What we look for'})).not.toBeInTheDocument()
+    })
+
+    it('opens the popover when the trigger button is clicked', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <ScanHandler lastChecked="2026-04-03T13:30:00Z">
+          <div />
+        </ScanHandler>,
+      )
+
+      await user.click(screen.getByRole('button', {name: 'What we look for'}))
+
+      expect(screen.getByRole('heading', {name: 'What we look for'})).toBeInTheDocument()
+    })
+
+    it('closes the popover when the close button is clicked', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <ScanHandler lastChecked="2026-04-03T13:30:00Z">
+          <div />
+        </ScanHandler>,
+      )
+
+      await user.click(screen.getByRole('button', {name: 'What we look for'}))
+      await user.click(screen.getByRole('button', {name: 'Close'}))
+
+      expect(screen.queryByRole('heading', {name: 'What we look for'})).not.toBeInTheDocument()
+    })
+  })
+
   describe('last checked date', () => {
     beforeEach(() => {
       window.ENV.LOCALE = 'en-US'
@@ -107,7 +168,7 @@ describe('ScanHandler', () => {
         </ScanHandler>,
       )
 
-      expect(screen.getByText('Last checked Apr 3, 2026, 1:30 PM')).toBeInTheDocument()
+      expect(screen.getByText(/Last checked Apr 3, 2026, 1:30 PM/)).toBeInTheDocument()
     })
 
     it('does not render "Last checked" text when lastChecked is omitted', () => {
