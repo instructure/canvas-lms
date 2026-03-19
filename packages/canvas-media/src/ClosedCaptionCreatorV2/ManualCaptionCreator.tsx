@@ -111,7 +111,7 @@ export function ManualCaptionCreator({
     <Flex as="div" direction="column" gap="medium">
       <Flex.Item overflowY="hidden" overflowX="hidden">
         <Heading variant="titleCardMini">{formatMessage('Add New Caption')}</Heading>
-        <Text variant="contentSmall">
+        <Text id="cc-file-hint" variant="contentSmall">
           {formatMessage('Upload a subtitle track in either the SRT or WebVTT format.')}
         </Text>
       </Flex.Item>
@@ -192,18 +192,18 @@ export function ManualCaptionCreator({
           <Flex.Item shouldShrink={false}>
             <Button
               onClick={() => fileInputRef.current?.click()}
-              aria-label={
-                selectedFile
-                  ? formatMessage('Selected file: {name}', {name: selectedFile.name})
-                  : formatMessage('Choose File')
-              }
+              aria-describedby="cc-file-hint cc-file-status"
             >
               {formatMessage('Choose File')}
             </Button>
           </Flex.Item>
-          {!selectedFile && <Text variant="contentSmall">{formatMessage('No file chosen')}</Text>}
+          {!selectedFile && (
+            <Text id="cc-file-status" variant="contentSmall">
+              {formatMessage('No file chosen')}
+            </Text>
+          )}
           {selectedFile && (
-            <View minWidth={0}>
+            <View id="cc-file-status" minWidth={0}>
               <Text variant="contentSmall">
                 <TruncateText>{selectedFile.name}</TruncateText>
               </Text>
