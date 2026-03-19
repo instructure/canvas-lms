@@ -26,7 +26,6 @@ import {Text} from '@instructure/ui-text'
 import {SimpleSelect, SimpleSelectOption} from '@instructure/ui-simple-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
-import {useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import type {GenerateCriteriaFormProps} from '../../types/RubricForm'
@@ -95,29 +94,19 @@ const gradeLevelLabel = (k: GradeLevel) => {
 }
 
 type GeneratedCriteriaFormProps = {
-  totalPoints?: number
+  formOptions: GenerateCriteriaFormProps
   criterionUseRangeEnabled: boolean
   criteriaBeingGenerated: boolean
   generateCriteriaMutation: () => void
-  onFormOptionsChange?: (options: GenerateCriteriaFormProps) => void
+  onFormOptionsChange: (options: GenerateCriteriaFormProps) => void
 }
 export const GeneratedCriteriaForm = ({
-  totalPoints,
+  formOptions: generateCriteriaForm,
   criterionUseRangeEnabled,
   criteriaBeingGenerated,
   generateCriteriaMutation,
   onFormOptionsChange,
 }: GeneratedCriteriaFormProps) => {
-  const [generateCriteriaForm, setGenerateCriteriaForm] = useState<GenerateCriteriaFormProps>({
-    ...defaultGenerateCriteriaForm,
-    totalPoints: totalPoints ? totalPoints.toString() : defaultGenerateCriteriaForm.totalPoints,
-  })
-
-  const updateGenerateCriteriaForm = (newForm: GenerateCriteriaFormProps) => {
-    setGenerateCriteriaForm(newForm)
-    onFormOptionsChange?.(newForm)
-  }
-
   const handleGenerateButton = () => {
     const points = parseFloat(generateCriteriaForm.totalPoints)
     if (isNaN(points) || points < 0) {
@@ -150,7 +139,7 @@ export const GeneratedCriteriaForm = ({
             value={generateCriteriaForm.gradeLevel}
             onChange={(_event, {value}) => {
               if (value) {
-                updateGenerateCriteriaForm({
+                onFormOptionsChange({
                   ...generateCriteriaForm,
                   gradeLevel: value.toString(),
                 })
@@ -170,7 +159,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Number of Criteria')}
             value={generateCriteriaForm.criteriaCount.toString()}
             onChange={(_event, {value}) =>
-              updateGenerateCriteriaForm({
+              onFormOptionsChange({
                 ...generateCriteriaForm,
                 criteriaCount: value ? parseInt(value.toString(), 10) : 0,
               })
@@ -192,7 +181,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Number of Ratings')}
             value={generateCriteriaForm.ratingCount.toString()}
             onChange={(_event, {value}) =>
-              updateGenerateCriteriaForm({
+              onFormOptionsChange({
                 ...generateCriteriaForm,
                 ratingCount: value ? parseInt(value.toString(), 10) : 0,
               })
@@ -214,7 +203,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Total points')}
             value={generateCriteriaForm.totalPoints}
             onChange={(_event, value) =>
-              updateGenerateCriteriaForm({
+              onFormOptionsChange({
                 ...generateCriteriaForm,
                 totalPoints: value,
               })
@@ -229,7 +218,7 @@ export const GeneratedCriteriaForm = ({
               label={I18n.t('Enable Range')}
               checked={generateCriteriaForm.useRange}
               onChange={_event =>
-                updateGenerateCriteriaForm({
+                onFormOptionsChange({
                   ...generateCriteriaForm,
                   useRange: !generateCriteriaForm.useRange,
                 })
@@ -251,7 +240,7 @@ export const GeneratedCriteriaForm = ({
                 )}
                 value={generateCriteriaForm.standard}
                 onChange={event =>
-                  updateGenerateCriteriaForm({
+                  onFormOptionsChange({
                     ...generateCriteriaForm,
                     standard: event.target.value,
                   })
@@ -280,7 +269,7 @@ export const GeneratedCriteriaForm = ({
                 )}
                 value={generateCriteriaForm.additionalPromptInfo}
                 onChange={event =>
-                  updateGenerateCriteriaForm({
+                  onFormOptionsChange({
                     ...generateCriteriaForm,
                     additionalPromptInfo: event.target.value,
                   })
