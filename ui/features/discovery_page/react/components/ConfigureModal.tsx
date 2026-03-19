@@ -33,7 +33,7 @@ import {PreviewAndSidebar} from './PreviewAndSidebar'
 import {SignInOptionsHeader} from './SignInOptionsHeader'
 import {backfillLabels, useDiscoveryConfig} from '../hooks/useDiscoveryConfig'
 import {AuthProvider} from './AuthProvider'
-import {getDiscoveryPageIcons} from '../constants'
+import {DISCOVERY_PAGE_ICONS} from '../constants'
 
 const I18n = createI18nScope('discovery_page')
 
@@ -150,7 +150,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
           <AuthProvider
             key={card.id}
             label={card.label}
-            iconUrl={getDiscoveryPageIcons().find(i => i.id === card.icon)?.url}
+            iconUrl={DISCOVERY_PAGE_ICONS.find(i => i.id === card.icon)?.url}
             loginLabel={card.label}
             selectedProviderId={String(card.authentication_provider_id)}
             onLoginChange={value =>
