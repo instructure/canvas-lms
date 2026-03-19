@@ -28,8 +28,15 @@ module NavMenuLinkTabs
   def account_tabs(account)
     tabs_for_context_and_nav_type(
       scope:
-        NavMenuLink.where(context: account.account_chain, account_nav: true)
-        .order(:account_id, :id),
+        NavMenuLink.where(context: account.account_chain, account_nav: true).order(:account_id, :id),
+      link_context_type: "account"
+    )
+  end
+
+  def user_tabs(account)
+    tabs_for_context_and_nav_type(
+      scope:
+        NavMenuLink.where(context: account.account_chain, user_nav: true).order(:account_id, :id),
       link_context_type: "account"
     )
   end
@@ -41,8 +48,7 @@ module NavMenuLinkTabs
     )
     account_context_tabs = tabs_for_context_and_nav_type(
       scope:
-        NavMenuLink.where(context: course.account_chain, course_nav: true)
-        .order(:account_id, :id),
+        NavMenuLink.where(context: course.account_chain, course_nav: true).order(:account_id, :id),
       link_context_type: "account"
     )
 

@@ -181,8 +181,10 @@ describe('AddLinkModal', () => {
       fireEvent.change(textIn, {target: {value: 'My Link'}})
       fireEvent.change(linkIn, {target: {value: 'https://example.com'}})
 
-      // course_nav is pre-checked; also check account_nav
+      // No placements are pre-checked; select course_nav and account_nav
+      const courseCheckbox = screen.getByRole('checkbox', {name: 'Course Navigation'})
       const accountCheckbox = screen.getByRole('checkbox', {name: 'Account Navigation'})
+      await user.click(courseCheckbox)
       await user.click(accountCheckbox)
 
       await user.click(screen.getAllByRole('button', {name: 'Add'}).at(-1)!)
