@@ -96,6 +96,32 @@ describe SIS::CSV::SectionImporter do
     expect(CourseSection.find_by(sis_source_id: "section").workflow_state).to eq "deleted"
   end
 
+  it "soft-deletes DiscussionTopicSectionVisibility records when section is deleted" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status",
+      "S001,C001,Section 1,active"
+    )
+    section = CourseSection.find_by(sis_source_id: "S001")
+    topic = section.course.discussion_topics.create!(
+      title: "Test",
+      message: "body",
+      is_section_specific: true,
+      course_sections: [section]
+    )
+    visibility = topic.discussion_topic_section_visibilities.first
+    expect(visibility.workflow_state).to eq "active"
+
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status",
+      "S001,C001,,deleted"
+    )
+    expect(visibility.reload.workflow_state).to eq "deleted"
+  end
+
   it "still requires a name for new deleted sections" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",

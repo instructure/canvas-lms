@@ -24,6 +24,7 @@ require "net/http"
 require "uri"
 require "nokogiri"
 require "legacy_multipart"
+require "canvas_kaltura/client_v3/caption_asset_methods"
 
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
@@ -34,6 +35,8 @@ module CanvasKaltura
   end
 
   class ClientV3
+    include CanvasKaltura::ClientV3::CaptionAssetMethods
+
     attr_accessor :endpoint, :ks
 
     def initialize
@@ -49,6 +52,7 @@ module CanvasKaltura
       @endpoint ||= "/api_v3"
       @cache_play_list_seconds = config["cache_play_list_seconds"]&.to_i
       @kaltura_sis = config["kaltura_sis"]
+      @ks = nil
     end
 
     def self.config
@@ -196,11 +200,7 @@ module CanvasKaltura
                           entryId:)
       return nil unless result
 
-      item = {}
-      result.children.each do |child|
-        item[child.name.to_sym] = child.content
-      end
-      item
+      node_to_hash(result)
     end
 
     def mediaUpdate(entryId, attributes)
@@ -214,11 +214,7 @@ module CanvasKaltura
       result = getRequest(:media, :update, hash)
       return nil unless result
 
-      item = {}
-      result.children.each do |child|
-        item[child.name.to_sym] = child.content
-      end
-      item
+      node_to_hash(result)
     end
 
     def mediaDelete(entryId)
@@ -227,6 +223,31 @@ module CanvasKaltura
         entryId:
       }
       getRequest(:media, :delete, hash)
+    end
+
+    def media_download_url(entry_id)
+      cache_key = ["media_download_url", entry_id].join("/")
+      if (download_url = CanvasKaltura.cache.read(cache_key))
+        return download_url
+      end
+
+      startSession(CanvasKaltura::SessionType::ADMIN)
+      assets = flavorAssetGetByEntryId(entry_id)
+      return nil unless assets.present?
+
+      highest_quality_asset =
+        assets
+        .select { |asset| ASSET_STATUSES[asset[:status]] == :READY }
+        .max_by { |asset| asset[:bitrate].to_i }
+      return nil unless highest_quality_asset
+
+      download_url = flavorAssetGetDownloadUrl(
+        highest_quality_asset[:id],
+        use: "download"
+      )&.strip&.presence
+
+      CanvasKaltura.cache.write(cache_key, download_url, expires_in: 43_200) if download_url
+      download_url
     end
 
     # See the method of the same name in saveMediaRecording.js
@@ -311,15 +332,7 @@ module CanvasKaltura
                           entryId:)
       return nil unless result
 
-      items = []
-      result.css("item").each do |node|
-        item = {}
-        node.children.each do |child|
-          item[child.name.to_sym] = child.content
-        end
-        items << item
-      end
-      items
+      result.css("item").map { node_to_hash(it) }
     end
 
     # returns the original flavor of the asset, or the first flavor if for some
@@ -329,11 +342,12 @@ module CanvasKaltura
       flavors.find { |f| f[:isOriginal] == 1 } || flavors.first
     end
 
-    def flavorAssetGetDownloadUrl(assetId)
+    def flavorAssetGetDownloadUrl(asset_id, use: nil)
+      params = { ks: @ks, id: asset_id }
+      params[:use] = use if use.present?
       result = getRequest(:flavorAsset,
                           :getDownloadUrl,
-                          ks: @ks,
-                          id: assetId)
+                          params)
       result&.content
     end
 
@@ -406,6 +420,16 @@ module CanvasKaltura
       end
 
       response
+    end
+
+    def node_to_hash(node)
+      item = {}
+
+      node.children.each do |child|
+        item[child.name.to_sym] = child.content
+      end
+
+      item
     end
   end
 end

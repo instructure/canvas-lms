@@ -311,9 +311,7 @@ module Canvas::LiveEvents
       workflow_state: assignment.workflow_state
     }
 
-    if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
-      event[:anonymous_participants] = assignment.anonymous_participants?
-    end
+    event[:anonymous_participants] = assignment.anonymous_participants?
 
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.environment_specific_domain

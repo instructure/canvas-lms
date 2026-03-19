@@ -829,6 +829,35 @@ describe "Rubrics API", type: :request do
         expected_assignments = [{ "id" => assignment.id, "title" => assignment.title }]
         expect(locations.first["assignments"]).to eq expected_assignments
       end
+
+      it "does not include assignments from deleted courses in used locations" do
+        @user = account_admin_user
+        user_session(@user)
+
+        # Create a second course
+        course2 = Course.create!(account: @account, name: "Course 2")
+        course2.offer!
+
+        # Create assignments in both courses
+        active_assignment = @course.assignments.create(title: "Active Assignment")
+        deleted_course_assignment = course2.assignments.create(title: "Deleted Course Assignment")
+
+        # Associate rubric with both assignments
+        create_rubric(@account, {}, active_assignment)
+        @rubric.associate_with(deleted_course_assignment, course2, purpose: "grading")
+
+        # Delete the second course
+        course2.destroy
+
+        get "/api/v1/accounts/#{@account.id}/rubrics/#{@rubric.id}/used_locations", as: :json
+        locations = response.parsed_body
+
+        expect(locations.size).to eq(1)
+        expect(locations.first["id"]).to eq(@course.id)
+        expect(locations.first["assignments"].size).to eq(1)
+        expect(locations.first["assignments"].first["id"]).to eq(active_assignment.id)
+        expect(locations.first["assignments"].first["title"]).to eq("Active Assignment")
+      end
     end
 
     describe "upload status in an account" do

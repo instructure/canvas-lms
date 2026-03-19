@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {bool, func, number, shape, string, object} from 'prop-types'
+import {bool, func, number, object, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {IconLockLine, IconWarningSolid} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {Text} from '@instructure/ui-text'
 
 import formatMessage from '../../../../format-message'
 import DimensionInput from './DimensionInput'
@@ -41,8 +41,12 @@ const errorMessage = message => {
   )
 }
 
-const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
-  let result = {text: formatMessage('Aspect ratio will be preserved'), type: 'hint'}
+const getMessage = (dimensionsState, minWidth, minHeight, minPercentage, additionalHintText) => {
+  const baseHint = formatMessage('Aspect ratio will be preserved')
+  let result = {
+    text: additionalHintText ? `${baseHint}. ${additionalHintText}` : baseHint,
+    type: 'hint',
+  }
   if (dimensionsState.usePercentageUnits) {
     if (!dimensionsState.isNumeric) {
       result = {text: formatMessage('Percentage must be a number'), type: 'error'}
@@ -69,13 +73,27 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
 }
 
 export default function DimensionsInput(props) {
-  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage, dimensionsRef} = props
+  const {
+    dimensionsState,
+    minHeight,
+    minWidth,
+    minPercentage,
+    hidePercentage,
+    dimensionsRef,
+    additionalHintText,
+  } = props
 
   const handleDimensionTypeChange = e => {
     dimensionsState.setUsePercentageUnits(e.target.value === 'percentage')
   }
 
-  const message = getMessage(dimensionsState, minWidth, minHeight, minPercentage)
+  const message = getMessage(
+    dimensionsState,
+    minWidth,
+    minHeight,
+    minPercentage,
+    additionalHintText,
+  )
   const secondaryMessage = {...message, text: ''}
 
   const displayMessage = message => {
@@ -190,6 +208,7 @@ DimensionsInput.propTypes = {
   minPercentage: number.isRequired,
   hidePercentage: bool,
   dimensionsRef: object,
+  additionalHintText: string,
 }
 
 DimensionsInput.defaultProps = {

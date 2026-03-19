@@ -22,8 +22,8 @@ require_relative "../../spec_helper"
 require "rotp"
 
 describe Login::CasController do
-  def stubby(stub_response, use_mock = true)
-    cas_client = use_mock ? double(:cas_client).as_null_object : controller.client
+  def stubby(stub_response)
+    cas_client = instance_double(CASClient::Client).as_null_object
     cas_client.instance_variable_set(:@stub_response, stub_response)
     def cas_client.validate_service_ticket(st)
       response = CASClient::ValidationResponse.new(@stub_response)
@@ -31,7 +31,7 @@ describe Login::CasController do
       st.success = response.is_success?
       st
     end
-    allow_any_instance_of(AuthenticationProvider::CAS).to receive(:client).and_return(cas_client) if use_mock
+    allow_any_instance_of(AuthenticationProvider::CAS).to receive(:client).and_return(cas_client)
   end
 
   it "logouts with specific cas ticket" do
@@ -231,7 +231,7 @@ describe Login::CasController do
     account_with_cas(account: Account.default)
     ap = Account.default.authentication_providers.detect { |a| a.auth_type == "cas" }
     Setting.set("service_cas:#{ap.global_id}_timeout", "0.01")
-    cas_client = double
+    cas_client = instance_double(CASClient::Client)
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
     allow(Canvas::Errors).to receive(:capture_exception).and_return(true)

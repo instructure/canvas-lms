@@ -55,6 +55,7 @@ export function formatAssignment(
     assessmentRequestsForCurrentUser: assessmentRequests = [],
     name,
     peerReviews,
+    peerReviewSubAssignment,
   }: GraphQLAssignment,
   moduleId: string,
 ): {
@@ -62,13 +63,18 @@ export function formatAssignment(
   assignmentId: string
   studentViewPeerReviewsAssignment: StudentViewPeerReviewsAssignment
 } | null {
-  if (assessmentRequests.length === 0 || ENV.course_id == null) return null
+  if (
+    (assessmentRequests.length === 0 && !ENV.FEATURES.peer_review_allocation_and_grading) ||
+    ENV.course_id == null
+  )
+    return null
 
   const container: Element | undefined = $(
     `#module_student_view_peer_reviews_${assignmentId}_${moduleId}`,
   )[0]
 
-  const {anonymousReviews} = peerReviews
+  const {anonymousReviews, count, pointsPossible} = peerReviews
+  const peerReviewDueAt = peerReviewSubAssignment?.dueAt ?? null
 
   return {
     studentViewPeerReviewsAssignment: {
@@ -79,6 +85,9 @@ export function formatAssignment(
           course_id: ENV.course_id,
           id: assignmentId,
           name,
+          peer_review_count: count,
+          peer_review_points_possible: pointsPossible,
+          peer_review_due_at: peerReviewDueAt,
         },
         container,
       },
@@ -113,7 +122,7 @@ export function formatGraphqlModuleNodes(
       const {studentViewPeerReviewsAssignment, assessmentRequests, assignmentId} =
         formattedAssignment
 
-      if (!assessmentRequests.length) return
+      if (!assessmentRequests.length && !ENV.FEATURES.peer_review_allocation_and_grading) return
 
       const formattedAssessmentRequests = assessmentRequests.map(formatAssessmentRequest)
       studentViewPeerReviewsAssignment[assignmentId].assignment.assessment_requests =

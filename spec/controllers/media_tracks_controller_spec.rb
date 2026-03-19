@@ -58,17 +58,17 @@ describe MediaTracksController do
 
       it "disallows TTML" do
         post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: "en", content: example_ttml_susceptible_to_xss }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "validates :kind" do
         post "create", params: { media_object_id: @mo.media_id, kind: "unkind", locale: "en", content: "1" }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "validates :locale" do
         post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: '<img src="lolcats.gif">', content: "1" }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "respects the exclude[] option" do
@@ -108,7 +108,7 @@ describe MediaTracksController do
         track = @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
         track.update_attribute(:content, example_ttml_susceptible_to_xss)
         get "show", params: { media_object_id: @mo.media_id, id: track.id }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -170,6 +170,15 @@ describe MediaTracksController do
           expect(t["media_object_id"]).to eql tracks[t["locale"]]["media_object_id"]
           expect(t["user_id"]).to eql tracks[t["locale"]]["user_id"]
         end
+      end
+
+      it "includes workflow_state and asr in listed tracks" do
+        @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id)
+        get "index", params: { media_object_id: @mo.media_id }
+        expect(response).to be_successful
+        track = response.parsed_body.first
+        expect(track["workflow_state"]).to eq("ready")
+        expect(track["asr"]).to be false
       end
 
       it "does not list tracks that belong to an attachment other than the one media object belongs to" do
@@ -451,6 +460,15 @@ describe MediaTracksController do
           expect(t["media_object_id"]).to eql tracks[t["locale"]]["media_object_id"]
           expect(t["user_id"]).to eql tracks[t["locale"]]["user_id"]
         end
+      end
+
+      it "includes workflow_state and asr in listed tracks" do
+        @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id, media_object: @mo)
+        get "index", params: { attachment_id: @attachment.id }
+        expect(response).to be_successful
+        track = response.parsed_body.first
+        expect(track["workflow_state"]).to eq("ready")
+        expect(track["asr"]).to be false
       end
 
       it "lists tracks considering other MediaObject's attachments" do

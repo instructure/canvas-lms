@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Legg til bilde"
     },
+    "add_new_a9226085": {
+        "message": "Legg til ny"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Legg til ny bildetekst"
+    },
     "add_one_9e34a6f8": {
         "message": "Legg til en!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "Capsprodukt"
     },
+    "caption_manager_aae0906f": {
+        "message": "Bildetekstadministrator"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Bildetekster ble lagt til for { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Bildetekster ble slettet for { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Bildetekster som er arvet fra et overordnet fag, kan ikke fjernes."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Velg undertekst-fil"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Velg fil"
     },
     "choose_usage_rights_33683854": {
         "message": "Velg bruksrettigheter…"
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Diagonal pil ned til høyre"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Last ned { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Last ned { filename }"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kunne ikke hente innhold fra eksternt verktøy"
+    },
+    "file_d1b70050": {
+        "message": "Fil*"
     },
     "file_name_8fd421ff": {
         "message": "Filnavn"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "Lambda"
+    },
+    "language_91effaa0": {
+        "message": "Språk*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "Språkkunst-ikon"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Velg en fil av støttet filtype"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Velg et språk"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Velg en .vtt- eller .srt-file"
+    },
     "plus_d43cd4ec": {
         "message": "Pluss"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Primtall"
+    },
+    "processing_8c569014": {
+        "message": "Behandler…"
     },
     "product_39cf144f": {
         "message": "Produkt"
@@ -1994,9 +2030,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Fjerne lenke"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Fjern Studio-media"
-    },
     "replace_all_d3d68b3": {
         "message": "Erstatt alle"
     },
@@ -2017,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Erstattet alle { alertFindText } med { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Forespørsel"
     },
     "reset_95a81614": {
         "message": "Tilbakestill"
@@ -2165,6 +2201,9 @@
     "selected_274ce24f": {
         "message": "Valgt"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Valgt fil: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Valgt { linkFileName }"
     },
@@ -2198,20 +2237,11 @@
     "show_all_967a90f0": {
         "message": "Vis alle"
     },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydalternativer"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Vis bildemuligheter"
     },
     "show_link_options_545338fd": {
         "message": "Vis lenkevalg"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Vis Studio-mediealternativer"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videovalg"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Seende brukere surfer nettsider kjapt, og ser etter store eller uthevede titler. Brukere av skjermlesere er avhengige av titler for å forstå konteksten. Titler bør bruke korrekt struktur."
@@ -2602,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "Oppdatert lenke"
+    },
+    "upload_8b403d05": {
+        "message": "Last opp"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Last opp et undertekstspor i SRT- eller WebVTT-format."
     },
     "upload_document_253f0478": {
         "message": "Last opp dokument"

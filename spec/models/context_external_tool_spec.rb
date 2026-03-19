@@ -112,7 +112,7 @@ describe ContextExternalTool do
         control.suspend_callbacks { control.destroy_permanently! }
       end
 
-      sentry_scope = double(Sentry::Scope)
+      sentry_scope = instance_double(Sentry::Scope)
       expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
       expect(sentry_scope).to receive(:set_tags).with(context_id: account.global_id)
       expect(sentry_scope).to receive(:set_tags).with(lti_registration_id: tool.lti_registration.global_id)
@@ -3000,7 +3000,7 @@ describe ContextExternalTool do
           a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
           a
         end
-        let(:scope) { double("scope") }
+        let(:scope) { instance_double(Sentry::Scope) }
 
         before do
           valid_assignment

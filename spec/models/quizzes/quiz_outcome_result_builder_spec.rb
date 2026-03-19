@@ -111,7 +111,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         @outcome.align(@bank, @bank.context, mastery_score: 0.7)
         @outcome2.align(@bank2, @bank2.context, mastery_score: 0.5)
 
-        @a1 = @bank.assessment_questions.create!(question_data: question_data(true))
+        @a1 = @bank.assessment_questions.create!(question_data: question_data(reset: true))
         @a3 = @bank.assessment_questions.create!(question_data:)
         @a2 = @bank2.assessment_questions.create!(question_data:)
         @a4 = @bank2.assessment_questions.create!(question_data:)

@@ -21,36 +21,8 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {getCourseCodeColor} from '../widgets/CourseGradesWidget/utils'
+import {getCourseCodeColor, getAccessibleTextColor} from '../widgets/CourseGradesWidget/utils'
 import {useWidgetDashboard} from '../../hooks/useWidgetDashboardContext'
-
-// Helper function to determine appropriate text color for accessibility
-// Uses white (#FFFFFF) by default, but switches to black (#000000) for light backgrounds
-const getAccessibleTextColor = (backgroundColor: string): string => {
-  // Remove # if present and convert to lowercase
-  const color = backgroundColor.replace('#', '').toLowerCase()
-
-  // Convert to RGB
-  const r = parseInt(color.substring(0, 2), 16)
-  const g = parseInt(color.substring(2, 4), 16)
-  const b = parseInt(color.substring(4, 6), 16)
-
-  // Calculate relative luminance using WCAG formula
-  const getLuminance = (r: number, g: number, b: number) => {
-    const [rs, gs, bs] = [r, g, b].map(c => {
-      c = c / 255
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-    })
-    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs
-  }
-
-  const backgroundLuminance = getLuminance(r, g, b)
-
-  // Calculate contrast ratio with white (luminance = 1)
-  // WCAG AA requires 4.5:1 for normal text
-  const contrastWithWhite = 1.05 / (backgroundLuminance + 0.05)
-  return contrastWithWhite >= 4.5 ? '#FFFFFF' : '#000000'
-}
 
 export interface CourseCodeProps {
   courseId: string

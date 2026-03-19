@@ -322,7 +322,7 @@ describe('StudentCellPopover', () => {
 
       await waitFor(() => {
         // Average of rollups: (8 + 5) / 2 = 6.5
-        expect(screen.getByText('6.5')).toBeInTheDocument()
+        expect(screen.getByText(/6\.5/)).toBeInTheDocument()
       })
     })
 

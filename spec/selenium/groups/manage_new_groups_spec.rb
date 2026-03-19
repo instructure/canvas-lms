@@ -223,8 +223,8 @@ describe "manage groups" do
       # category menu should show unassigned-member options
       fj(actions_button).click
       wait_for_ajaximations
-      expect(fj([actions_button, message_users].join(" + "))).to be
-      expect(fj([actions_button, randomly_assign_users].join(" + "))).to be
+      expect(fj([actions_button, message_users].join(" + "))).not_to be_nil
+      expect(fj([actions_button, randomly_assign_users].join(" + "))).not_to be_nil
       fj(actions_button).click # close the menu, or it can prevent the next step
 
       # assign the last unassigned member

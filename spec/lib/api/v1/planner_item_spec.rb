@@ -758,4 +758,43 @@ describe Api::V1::PlannerItem do
       expect(json.first[:submissions][:feedback][:comment]).to eq("html comment")
     end
   end
+
+  describe "peer review sub assignments" do
+    before :once do
+      @course.account.enable_feature!(:peer_review_allocation_and_grading)
+      @peer_assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10
+      )
+      @peer_review_sub_assignment = @peer_assignment.create_peer_review_sub_assignment!(
+        title: "Peer Review Assignment Peer Review (2)",
+        points_possible: 5,
+        due_at: 1.day.from_now
+      )
+    end
+
+    it "formats title with parent assignment name and peer review count" do
+      json = api.planner_item_json(@peer_review_sub_assignment, @teacher, session)
+      expect(json[:plannable][:title]).to eq("Grade Peer Review Assignment Peer Review (2)")
+    end
+
+    it "includes points_possible and due_at in plannable" do
+      json = api.planner_item_json(@peer_review_sub_assignment, @teacher, session)
+      expect(json[:plannable][:points_possible]).to eq(5)
+      expect(json[:plannable][:due_at]).to eq(@peer_review_sub_assignment.due_at)
+    end
+
+    it "links to speed grader with peer_review_sub_assignment_id" do
+      json = api.planner_item_json(@peer_review_sub_assignment, @teacher, session)
+      expect(json[:html_url]).to eq("named_context_url")
+    end
+
+    it "sets plannable_date to due_at" do
+      json = api.planner_item_json(@peer_review_sub_assignment, @teacher, session)
+      expect(json[:plannable_date]).to eq(@peer_review_sub_assignment.due_at)
+    end
+  end
 end

@@ -16,18 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, act, waitFor, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {Assignment} from '../../../../graphql/Assignment'
 import DiscussionTopicForm from '../DiscussionTopicForm'
 import {useAssetProcessorsState} from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 import {useAssetProcessorsToolsList} from '@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList'
-import {
-  mockToolsForDiscussions,
-  mockContributionDeepLinkResponse,
-  mockAssetProcessorsToolsListQuery,
-} from '../../../../../../shared/lti-asset-processor/react/__tests__/assetProcessorsTestHelpers'
+import {mockAssetProcessorsToolsListQuery} from '../../../../../../shared/lti-asset-processor/react/__tests__/assetProcessorsTestHelpers'
 
 vi.mock('@canvas/rce/react/CanvasRce')
 // Without mocking useAssetProcessorsToolsList, the request will fail / never

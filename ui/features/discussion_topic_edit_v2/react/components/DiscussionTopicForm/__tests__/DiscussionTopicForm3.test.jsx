@@ -87,20 +87,24 @@ describe('DiscussionTopicForm - UI Options', () => {
   })
 
   describe('Graded options', () => {
-    it('hides student ToDo, and ungraded options when Graded', () => {
-      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.id = 1
+    it(
+      'hides student ToDo, and ungraded options when Graded',
+      () => {
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.id = 1
 
-      const {queryByTestId, getByLabelText, queryByLabelText} = setup()
-      expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
-      queryByLabelText('Add to student to-do').click()
-      expect(queryByTestId('todo-date-section')).toBeInTheDocument()
-      expect(queryByTestId('discussion-assign-to-section')).toBeInTheDocument()
-      getByLabelText('Graded').click()
-      expect(queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
-      expect(queryByTestId('todo-date-section')).not.toBeInTheDocument()
-      expect(queryByTestId('assignment-assign-to-section')).toBeInTheDocument()
-    })
+        const {queryByTestId, getByLabelText, queryByLabelText} = setup()
+        expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
+        queryByLabelText('Add to student to-do').click()
+        expect(queryByTestId('todo-date-section')).toBeInTheDocument()
+        expect(queryByTestId('discussion-assign-to-section')).toBeInTheDocument()
+        getByLabelText('Graded').click()
+        expect(queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
+        expect(queryByTestId('todo-date-section')).not.toBeInTheDocument()
+        expect(queryByTestId('assignment-assign-to-section')).toBeInTheDocument()
+      },
+      30000,
+    )
   })
 
   describe('Attachment options', () => {

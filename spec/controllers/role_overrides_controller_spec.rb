@@ -346,7 +346,7 @@ describe RoleOverridesController do
       it "returns 400 with an error message" do
         get "check_account_permission", params: { account_id: @account.id, permission: "manage_course_content_add" }
         expect(response.code.to_i).to eq(400)
-        expect(json["message"]).to be
+        expect(json["message"]).not_to be_nil
       end
     end
 

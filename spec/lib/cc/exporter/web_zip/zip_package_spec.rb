@@ -927,7 +927,7 @@ describe "ZipPackage" do
           context: @course,
           content_type: "video/mp4"
         )
-        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
+        allow_any_instance_of(Attachment).to receive(:media_object).and_return(instance_double(MediaObject, media_id:))
         allow_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:create_tree_data).and_return(file_data)
 
         path = CGI.escape(att.full_path)
@@ -955,7 +955,7 @@ describe "ZipPackage" do
           context: @course,
           content_type: "video/mp4"
         )
-        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
+        allow_any_instance_of(Attachment).to receive(:media_object).and_return(instance_double(MediaObject, media_id:))
         allow_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:create_tree_data).and_return(file_data)
 
         path = CGI.escape(att.full_path)

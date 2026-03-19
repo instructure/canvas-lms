@@ -147,7 +147,7 @@ class AccountNotificationsController < ApplicationController
   def render_past_global_announcements
     add_crumb(@current_user.short_name, profile_path)
     add_crumb(t("Global Announcements"))
-    js_env(global_notifications: html_to_string)
+    js_env({ global_notifications: html_to_string })
     @show_left_side = true
     @context = @current_user.profile
     set_active_tab("past_global_announcements")

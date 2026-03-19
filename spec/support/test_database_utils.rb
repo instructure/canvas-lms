@@ -66,7 +66,7 @@ module TestDatabaseUtils
       Shard.default(reload: true)
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "finished resetting test db in #{Time.zone.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1"
+      puts "finished resetting test db in #{Time.zone.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
     end
 
     # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the
@@ -114,13 +114,12 @@ module TestDatabaseUtils
     end
 
     def truncate_all_tables?
-      # Only account should be the dummy account with id=0
-      Account.where.not(id: 0).any? || Account.where(id: 0).none?
+      !ActiveRecord::Base.connection.non_empty_tables.empty? || !Account.where(id: 0).exists?
     end
 
     def truncate_all_tables!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "truncating all tables..." unless ENV["SUPPRESS_OUTPUT"] == "1"
+      puts "truncating all tables..." unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
       each_connection do |connection|
         table_names = get_table_names(connection)
         next if table_names.empty?
@@ -147,7 +146,7 @@ module TestDatabaseUtils
 
     def randomize_sequences!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "randomizing db sequences..." unless ENV["SUPPRESS_OUTPUT"] == "1"
+      puts "randomizing db sequences..." unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
       seed = ::RSpec.configuration.seed
       i = 0
       each_connection do |connection|

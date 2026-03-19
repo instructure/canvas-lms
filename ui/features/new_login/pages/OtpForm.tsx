@@ -157,7 +157,7 @@ const OtpForm = () => {
     _event: React.ChangeEvent<HTMLInputElement>,
     value: string,
   ) => {
-    setVerificationCode(value.trim())
+    setVerificationCode(value)
     if (verificationCodeError) setVerificationCodeError('')
   }
 

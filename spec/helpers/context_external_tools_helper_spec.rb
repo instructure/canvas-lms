@@ -112,7 +112,7 @@ describe ContextExternalToolsHelper do
   end
 
   context "With tools" do
-    def tool_settings(setting, include_class = false)
+    def tool_settings(setting, include_class: false)
       settings_hash = {
         url: "http://example.dev/launch",
         icon_url: "http://example.dev/icon.png",
@@ -146,7 +146,7 @@ describe ContextExternalToolsHelper do
         shared_secret: "secret"
       )
 
-      tool_1_settings = tool_settings(:course_home_sub_navigation, true)
+      tool_1_settings = tool_settings(:course_home_sub_navigation, include_class: true)
       tool_1_settings.delete(:icon_url)
       tool_1.course_home_sub_navigation = tool_1_settings
       tool_1.save!
@@ -170,7 +170,7 @@ describe ContextExternalToolsHelper do
         shared_secret: "secret"
       )
 
-      tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, true)
+      tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, include_class: true)
       tool_3.save!
     end
 

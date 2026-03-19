@@ -47,21 +47,21 @@ describe CanvasSecurity do
         end
 
         it "encodes with configured encryption key" do
-          jwt = double
+          jwt = instance_double(JSON::JWT)
           expect(jwt).to receive(:sign).with(CanvasSecurity.jwt_encryption_key, :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 })
         end
 
         it "encodes with the supplied key" do
-          jwt = double
+          jwt = instance_double(JSON::JWT)
           expect(jwt).to receive(:sign).with("mykey", :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey")
         end
 
         it "encodes with supplied algorithm" do
-          jwt = double
+          jwt = instance_double(JSON::JWT)
           expect(jwt).to receive(:sign).with("mykey", :HS512).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey", :HS512)
@@ -235,7 +235,7 @@ describe CanvasSecurity do
           another_key: true
       YAML
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
-      credentials = double(security_encryption_key: "secret", security_jwt_encryption_keys: ["secret2"])
+      credentials = ActiveSupport::InheritableOptions.new(security_encryption_key: "secret", security_jwt_encryption_keys: ["secret2"])
       expect(Rails).to receive(:application).twice.and_return(instance_double(Rails::Application, credentials:))
       expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "jwt_encryption_keys" => ["secret2"], "another_key" => true)
     end

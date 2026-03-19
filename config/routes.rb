@@ -25,6 +25,14 @@ Rails.root.glob("{gems,vendor}/plugins/*/config/pre_routes.rb") do |pre_routes|
 end
 
 CanvasRails::Application.routes.draw do
+  # Test-only routes for Selenium tests with mock LTI tool
+  if Rails.env.test?
+    post "/test/mock_lti/ui", to: "test/mock_lti#ui"
+    post "/test/mock_lti/login", to: "test/mock_lti#login"
+    get "/test/mock_lti/jwks", to: "test/mock_lti#jwks"
+    post "/test/mock_lti/subscription_handler", to: "test/mock_lti#subscription_handler"
+  end
+
   post "/api/graphql", to: "graphql#execute"
   get "graphiql", to: "graphql#graphiql"
 
@@ -347,6 +355,28 @@ CanvasRails::Application.routes.draw do
           as: :resource_link_id
 
       get :tool_launch
+
+      # New Quizzes native experience routes
+      # All routes render the app shell and let React Router handle navigation
+      scope(controller: :new_quizzes) do
+        get "launch", action: :launch, as: :new_quizzes_launch
+        get "build(/*path)", action: :launch, as: :new_quizzes_build
+        get "reporting(/*path)", action: :launch, as: :new_quizzes_reporting
+        get "moderation(/*path)", action: :launch, as: :new_quizzes_moderation
+        get "exports(/*path)", action: :launch, as: :new_quizzes_exports
+        get "taking(/*path)", action: :launch, as: :new_quizzes_taking
+        get "observing(/*path)", action: :launch, as: :new_quizzes_observing
+        get "errors(/*path)", action: :launch, as: :new_quizzes_errors
+        get "version", action: :launch, as: :new_quizzes_version
+        get "course_concluded", action: :launch, as: :new_quizzes_course_concluded
+        get "banks(/*path)", action: :launch, as: :new_quizzes_assignment_banks
+      end
+    end
+
+    # New Quizzes native experience routes
+    # All routes render the app shell and let React Router handle navigation
+    scope(controller: :new_quizzes) do
+      get "banks(/*path)", action: :banks, as: :new_quizzes_banks
     end
 
     resources :grading_standards, only: %i[index create update destroy]
@@ -549,6 +579,8 @@ CanvasRails::Application.routes.draw do
 
     resources :accessibility, only: [:index] do
       collection do
+        # TODO: RCX-4765 - The :issues resource is deprecated. UI was removed in 70d63e25976
+        # New accessibility checker uses resource_scan endpoints. Keep for external API compatibility.
         resource :issues, only: [:create, :update], module: "accessibility"
         post "preview" => "accessibility/preview#create"
         get "preview" => "accessibility/preview#show"
@@ -793,6 +825,12 @@ CanvasRails::Application.routes.draw do
       collection do
         get :retrieve
       end
+    end
+
+    # New Quizzes native experience routes
+    # All routes render the app shell and let React Router handle navigation
+    scope(controller: :new_quizzes) do
+      get "banks(/*path)", action: :banks, as: :new_quizzes_banks
     end
 
     get "lti/resource/:resource_link_id",
@@ -1282,6 +1320,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :create
       post "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages", action: :post_message, as: "course_ai_experience_conversation_messages"
       delete "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id", action: :destroy
+      get "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/evaluation", action: :evaluation, as: "course_ai_experience_conversation_evaluation"
     end
 
     scope(controller: :microfrontends_release_tag_override) do
@@ -1296,6 +1335,11 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/account_calendars", action: :bulk_update, as: :bulk_update_account_calendars
       get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
       get "accounts/:account_id/visible_calendars_count", action: :visible_calendars_count, as: :visible_calendars_count
+    end
+
+    scope(controller: :discovery_pages_api) do
+      get "discovery_pages", action: :show
+      put "discovery_pages", action: :upsert, as: :discovery_pages
     end
 
     scope(controller: :account_notifications) do
@@ -1465,6 +1509,7 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
       post "courses/:course_id/assignments/:assignment_id/accessibility/scan", action: :accessibility_scan, as: "assignment_accessibility_scan"
       post "courses/:course_id/assignments/:assignment_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "assignment_accessibility_queue_scan"
+      get "courses/:course_id/assignments/:assignment_id/check_allocation_conversion", action: :check_allocation_conversion
     end
 
     scope(controller: "assignment_extensions") do
@@ -1612,6 +1657,7 @@ CanvasRails::Application.routes.draw do
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries", action: :insight_entries, as: "#{context}_discussion_topic_insight_entries"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries/:entry_id", action: :insight_entry_update, as: "#{context}_discussion_topic_insight_entry_update"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/duplicate", action: :duplicate
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "#{context}_discussion_topic_accessibility_queue_scan"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/accessibility/scan", action: :accessibility_scan, as: "#{context}_discussion_topic_accessibility_scan"
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", action: :entry_list, as: "#{context}_discussion_topic_entry_list"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :add_entry, as: "#{context}_discussion_add_entry"
@@ -1840,6 +1886,11 @@ CanvasRails::Application.routes.draw do
         get "courses/:course_id/convert_tag_overrides/status", action: :conversion_job_status
       end
 
+      scope(controller: :assignment_peer_review_allocation_conversion) do
+        put "courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations", action: :convert_peer_review_allocations
+        get "courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations/status", action: :conversion_job_status
+      end
+
       scope(controller: :login) do
         get "login/session_token", action: :session_token, as: :login_session_token
       end
@@ -1883,6 +1934,7 @@ CanvasRails::Application.routes.draw do
       get "accounts", action: :index, as: :accounts
       get "course_accounts", action: :course_accounts, as: :course_accounts
       get "manageable_accounts", action: :manageable_accounts, as: :manageable_accounts
+      get "horizon_accounts", action: :horizon_accounts, as: :horizon_accounts
       get "course_creation_accounts", action: :course_creation_accounts, as: :course_creation_accounts
       get "accounts/:id", action: :show, as: :account
       put "accounts/:id", action: :update
@@ -1900,6 +1952,7 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/users/:user_id/restore", action: :restore_user
       get "accounts/:account_id/quiz_ip_filters", action: :quiz_ip_filters, as: "quiz_ip_filters"
       get "acceptable_use_policy", action: :acceptable_use_policy
+      get "accounts/:account_id/accessibility_issue_summary", action: :accessibility_issue_summary, as: "account_accessibility_issue_summary"
     end
 
     scope(controller: :sub_accounts) do
@@ -1962,6 +2015,11 @@ CanvasRails::Application.routes.draw do
       post "users/:user_id/page_views/query", action: :query, as: "user_page_views_enqueue_query"
       get "users/:user_id/page_views/query/:query_id", action: :poll_query, as: "page_views_poll_query_status"
       get "users/:user_id/page_views/query/:query_id/results", action: :query_results, as: "page_views_get_query_results"
+
+      # routes for batch page views queries
+      post "users/page_views/query", action: :batch_query, as: "page_views_enqueue_batch_query"
+      get "users/page_views/query/:query_id", action: :poll_batch_query, as: "page_views_poll_batch_query_status"
+      get "users/page_views/query/:query_id/results", action: :batch_query_results, as: "page_views_get_batch_query_results"
     end
 
     get "users/:user_id/profile", controller: :profile, action: :settings
@@ -2121,6 +2179,7 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
+      post "accounts/:account_id/lti_registrations/:id/install_from_template", action: :install_from_template
     end
 
     scope(controller: "lti/deployments") do
@@ -2502,6 +2561,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_results) do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
+      get "courses/:course_id/outcome_mastery_distribution", action: :mastery_distribution
       get "courses/:course_id/outcomes/:outcome_id/contributing_scores", action: :contributing_scores, as: "course_outcome_contributing_scores"
       post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
       post "enqueue_outcome_rollup_calculation", action: :enqueue_outcome_rollup_calculation
@@ -2729,6 +2789,13 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :announcements_api) do
       get "announcements", action: :index, as: :announcements
+      post "courses/:course_id/announcements/:announcement_id/accessibility/scan", action: :accessibility_scan, as: "course_announcement_accessibility_scan"
+      post "courses/:course_id/announcements/:announcement_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "course_announcement_accessibility_queue_scan"
+    end
+
+    scope(controller: :syllabus_api) do
+      post "courses/:course_id/syllabus/accessibility/scan", action: :accessibility_scan, as: "course_syllabus_accessibility_scan"
+      post "courses/:course_id/syllabus/accessibility/queue_scan", action: :accessibility_queue_scan, as: "course_syllabus_accessibility_queue_scan"
     end
 
     scope(controller: :release_notes) do
@@ -3174,7 +3241,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/registrations/:registration_id", action: :show
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "accounts/:account_id/dr_iframe", action: :dr_iframe
-      get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
+      get "accounts/:account_id/registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
       put "registrations/:registration_id", action: :update, as: :update_lti_registration
       get "registrations/:registration_id", action: :show_configuration, as: :get_lti_registration

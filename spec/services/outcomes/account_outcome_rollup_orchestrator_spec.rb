@@ -38,7 +38,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
         context: account,
         tag: "account_outcome_rollup_orchestrator",
         message: "Processing outcome rollup calculations"
-      ).and_return(double("progress", process_job: nil))
+      ).and_return(instance_double(Progress, process_job: nil))
 
       progress = described_class.process_account_outcome_change(
         account_id: account.id,
@@ -49,7 +49,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
     end
 
     it "passes correct parameters to process_job" do
-      progress = double("progress")
+      progress = instance_double(Progress)
       allow(Progress).to receive(:create!).and_return(progress)
 
       expect(progress).to receive(:process_job).with(
@@ -91,10 +91,10 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
   end
 
   describe ".perform_rollup_calculation" do
-    let(:progress) { double("progress") }
+    let(:progress) { instance_double(Progress) }
 
     it "creates orchestrator instance and calls it" do
-      orchestrator = double("orchestrator")
+      orchestrator = instance_double(Outcomes::AccountOutcomeRollupOrchestrator)
       expect(described_class).to receive(:new).with(
         account_id: account.id,
         outcome_id: outcome.id,
@@ -140,7 +140,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
   end
 
   describe "#call" do
-    let(:progress) { double("progress", update!: nil, complete!: nil) }
+    let(:progress) { instance_double(Progress, update!: nil, complete!: nil) }
     let(:orchestrator) { described_class.new(account_id: account.id, outcome_id: outcome.id, progress:) }
 
     context "when there are no affected courses" do
@@ -256,7 +256,7 @@ describe Outcomes::AccountOutcomeRollupOrchestrator do
   end
 
   describe "#update_progress" do
-    let(:progress) { double("progress") }
+    let(:progress) { instance_double(Progress) }
     let(:orchestrator) { described_class.new(account_id: account.id, outcome_id: outcome.id, progress:) }
 
     it "updates progress with correct completion percentage" do

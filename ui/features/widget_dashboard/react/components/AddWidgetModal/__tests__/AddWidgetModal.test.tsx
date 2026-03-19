@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {type MockedFunction} from 'vitest'
 import AddWidgetModal from '../AddWidgetModal'
 import {useWidgetLayout} from '../../../hooks/useWidgetLayout'
+import {ResponsiveProvider} from '../../../hooks/useResponsiveContext'
 
 vi.mock('../../../hooks/useWidgetLayout')
 
@@ -103,7 +104,7 @@ describe('AddWidgetModal', () => {
   it('renders Add buttons for all widgets', () => {
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    const addButtons = screen.getAllByTestId('add-widget-button')
     expect(addButtons).toHaveLength(8)
   })
 
@@ -111,7 +112,7 @@ describe('AddWidgetModal', () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    const addButtons = screen.getAllByTestId('add-widget-button')
     await user.click(addButtons[0])
 
     expect(mockAddWidget).toHaveBeenCalledWith(
@@ -126,7 +127,7 @@ describe('AddWidgetModal', () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
+    const addButtons = screen.getAllByTestId('add-widget-button')
     await user.click(addButtons[0])
 
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
@@ -170,7 +171,8 @@ describe('AddWidgetModal', () => {
 
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addedButton = screen.getByRole('button', {name: 'Added'})
+    const courseWorkCard = screen.getByTestId('widget-card-course_work_combined')
+    const addedButton = courseWorkCard.querySelector('[data-testid="add-widget-button"]')
     expect(addedButton).toBeDisabled()
   })
 
@@ -195,10 +197,9 @@ describe('AddWidgetModal', () => {
 
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addButtons = screen.getAllByRole('button', {name: 'Add'})
-    addButtons.forEach(button => {
-      expect(button).not.toBeDisabled()
-    })
+    const courseGradesCard = screen.getByTestId('widget-card-course_grades')
+    const addButton = courseGradesCard.querySelector('[data-testid="add-widget-button"]')
+    expect(addButton).not.toBeDisabled()
   })
 
   it('does not call addWidget when clicking disabled button', async () => {
@@ -223,10 +224,60 @@ describe('AddWidgetModal', () => {
     const user = userEvent.setup()
     render(<AddWidgetModal {...defaultProps} />)
 
-    const addedButton = screen.getByRole('button', {name: 'Added'})
+    const courseWorkCard = screen.getByTestId('widget-card-course_work_combined')
+    const addedButton = courseWorkCard.querySelector('[data-testid="add-widget-button"]')
+    if (!addedButton) throw new Error('Added button not found')
     await user.click(addedButton)
 
     expect(mockAddWidget).not.toHaveBeenCalled()
     expect(defaultProps.onClose).not.toHaveBeenCalled()
+  })
+
+  it('renders each widget card with role=group for screen readers', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const widgetGroups = screen.getAllByRole('group')
+    expect(widgetGroups.length).toBeGreaterThan(0)
+  })
+
+  it('provides accessible labels for each widget card group', () => {
+    render(<AddWidgetModal {...defaultProps} />)
+
+    const courseGradesGroup = screen.getByRole('group', {name: 'Course grades'})
+    expect(courseGradesGroup).toBeInTheDocument()
+
+    const announcementsGroup = screen.getByRole('group', {name: 'Announcements'})
+    expect(announcementsGroup).toBeInTheDocument()
+
+    const todoListGroup = screen.getByRole('group', {name: 'To-do list'})
+    expect(todoListGroup).toBeInTheDocument()
+  })
+
+  describe('responsive layout', () => {
+    it('uses single-column layout on mobile viewports', () => {
+      render(
+        <ResponsiveProvider matches={['mobile']}>
+          <AddWidgetModal {...defaultProps} />
+        </ResponsiveProvider>,
+      )
+
+      const widgetCards = screen.getAllByRole('group')
+      const firstCardContainer = widgetCards[0].closest('[class*="flexItem"]') as HTMLElement
+
+      expect(firstCardContainer).toHaveStyle({width: '100%'})
+    })
+
+    it('uses two-column layout on desktop viewports', () => {
+      render(
+        <ResponsiveProvider matches={['desktop']}>
+          <AddWidgetModal {...defaultProps} />
+        </ResponsiveProvider>,
+      )
+
+      const widgetCards = screen.getAllByRole('group')
+      const firstCardContainer = widgetCards[0].closest('[class*="flexItem"]') as HTMLElement
+
+      expect(firstCardContainer).toHaveStyle({width: 'calc(50% - 0.5rem)'})
+    })
   })
 })

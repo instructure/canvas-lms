@@ -178,7 +178,7 @@ RSpec.describe CanvasOperations::DataFixup do
         end
 
         fixup = fixup_class.new
-        record = double("record")
+        record = instance_double(User)
         expect { fixup.send(:process_record, record) }.to raise_error(NoMethodError, "Subclasses must implement #process_record when mode is :individual_record")
       end
     end

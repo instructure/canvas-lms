@@ -23,21 +23,36 @@ class PeerReview::DateOverriderService < ApplicationService
 
   def initialize(
     peer_review_sub_assignment: nil,
-    overrides: nil
+    overrides: nil,
+    reload_associations: false
   )
     super()
 
     @peer_review_sub_assignment = peer_review_sub_assignment
     @assignment = @peer_review_sub_assignment&.parent_assignment
     @overrides = format_overrides(overrides || [])
+    @reload_associations = reload_associations
   end
 
   def call
+    refresh_parent_associations if @reload_associations
     run_validations
-    create_or_update_peer_review_overrides
+    overrides_affected = create_or_update_peer_review_overrides
+    update_only_visible_to_overrides
+    overrides_affected
   end
 
   private
+
+  # Reloads parent assignment and its overrides to ensure changes made upstream are visible,
+  # preventing stale cache when linking peer review overrides to parent overrides.
+  # Set reload_associations: true when parent overrides are modified in same request.
+  def refresh_parent_associations
+    return unless @assignment && @peer_review_sub_assignment
+
+    @peer_review_sub_assignment.association(:parent_assignment).reload
+    @peer_review_sub_assignment.parent_assignment.association(:assignment_overrides).reload
+  end
 
   def run_validations
     validate_parent_assignment(@assignment)
@@ -118,9 +133,35 @@ class PeerReview::DateOverriderService < ApplicationService
         overrides: create_overrides
       )
     end
+
+    override_ids_to_delete.size + update_overrides.size + create_overrides.size
   end
 
   def destroy_overrides(override_ids)
     @peer_review_sub_assignment.assignment_overrides.where(id: override_ids).destroy_all
+  end
+
+  def update_only_visible_to_overrides
+    updated_only_visible_to_overrides = only_visible_to_overrides?
+
+    if @peer_review_sub_assignment.only_visible_to_overrides != updated_only_visible_to_overrides
+      @peer_review_sub_assignment.update!(only_visible_to_overrides: updated_only_visible_to_overrides)
+    end
+  end
+
+  def only_visible_to_overrides?
+    return false unless no_base_dates?
+
+    override_types = @peer_review_sub_assignment.active_assignment_overrides.distinct.pluck(:set_type).to_set
+    no_course_override = !override_types.include?("Course")
+    has_other_overrides = (override_types - Set["Course"]).any?
+
+    no_course_override && has_other_overrides
+  end
+
+  def no_base_dates?
+    @peer_review_sub_assignment.due_at.nil? &&
+      @peer_review_sub_assignment.unlock_at.nil? &&
+      @peer_review_sub_assignment.lock_at.nil?
   end
 end

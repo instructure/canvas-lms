@@ -108,7 +108,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def show
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.for_user(@current_user).find(params[:id])
     render json: planner_override_json(planner_override, @current_user, session)
   end
 
@@ -124,7 +124,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def update
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.for_user(@current_user).find(params[:id])
     planner_override.marked_complete = value_to_boolean(params[:marked_complete])
     planner_override.dismissed = value_to_boolean(params[:dismissed])
     sync_module_requirement_done(planner_override.plannable, @current_user, value_to_boolean(params[:marked_complete]))
@@ -189,7 +189,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def destroy
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.for_user(@current_user).find(params[:id])
 
     if planner_override.destroy
       Rails.cache.delete(planner_meta_cache_key)

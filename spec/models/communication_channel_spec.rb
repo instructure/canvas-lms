@@ -24,7 +24,7 @@ describe CommunicationChannel do
   end
 
   before do
-    @pseudonym = double("Pseudonym")
+    @pseudonym = instance_double(Pseudonym)
     allow(@pseudonym).to receive(:destroyed?).and_return(false)
     allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
   end
@@ -43,7 +43,7 @@ describe CommunicationChannel do
       CommunicationChannel.instance_variable_set(:@redirect_trust_policies, @cc_redirect_trust_policies)
     end
 
-    let(:account) { double("Account") }
+    let(:account) { instance_double(Account) }
     let(:url) { "http://some.place" }
 
     it "is falsey by default" do

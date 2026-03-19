@@ -406,15 +406,16 @@ describe Types::AssignmentType do
       end
     end
 
-    context "when current user lacks grade permission" do
+    context "when current user is a student" do
       before do
         course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment.update!(peer_reviews: true)
       end
 
-      it "returns nil for students" do
-        peer_review_model(parent_assignment: assignment)
+      it "returns the peer review sub assignment for students with read permission" do
+        peer_review_sub_assignment = peer_review_model(parent_assignment: assignment)
         result = assignment_type.resolve("peerReviewSubAssignment { _id }")
-        expect(result).to be_nil
+        expect(result).to eq peer_review_sub_assignment.id.to_s
       end
     end
   end

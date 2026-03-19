@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.shared_examples "course_pages_granular_permissions" do
-  def update_role_override(permission, role, is_enabled = true)
+  def update_role_override(permission, role, enabled:)
     RoleOverride.create!(
       permission: permission.to_s,
-      enabled: is_enabled,
+      enabled:,
       role:,
       account: @course.root_account
     )
@@ -36,9 +36,9 @@ RSpec.shared_examples "course_pages_granular_permissions" do
 
   context "user only having manage_wiki_create permission" do
     before do
-      update_role_override("manage_wiki_create", @role, true)
-      update_role_override("manage_wiki_update", @role, false)
-      update_role_override("manage_wiki_delete", @role, false)
+      update_role_override("manage_wiki_create", @role, enabled: true)
+      update_role_override("manage_wiki_update", @role, enabled: false)
+      update_role_override("manage_wiki_delete", @role, enabled: false)
     end
 
     context "show page" do
@@ -63,9 +63,9 @@ RSpec.shared_examples "course_pages_granular_permissions" do
 
   context "user only having manage_wiki_update permission" do
     before do
-      update_role_override("manage_wiki_create", @role, false)
-      update_role_override("manage_wiki_update", @role, true)
-      update_role_override("manage_wiki_delete", @role, false)
+      update_role_override("manage_wiki_create", @role, enabled: false)
+      update_role_override("manage_wiki_update", @role, enabled: true)
+      update_role_override("manage_wiki_delete", @role, enabled: false)
     end
 
     context "show page" do
@@ -92,9 +92,9 @@ RSpec.shared_examples "course_pages_granular_permissions" do
 
   context "user only having manage_wiki_delete permission" do
     before do
-      update_role_override("manage_wiki_create", @role, false)
-      update_role_override("manage_wiki_update", @role, false)
-      update_role_override("manage_wiki_delete", @role, true)
+      update_role_override("manage_wiki_create", @role, enabled: false)
+      update_role_override("manage_wiki_update", @role, enabled: false)
+      update_role_override("manage_wiki_delete", @role, enabled: true)
     end
 
     context "show page" do

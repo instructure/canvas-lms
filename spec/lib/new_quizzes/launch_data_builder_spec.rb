@@ -26,15 +26,19 @@ module NewQuizzes
     let_once(:assignment) { assignment_model(course:) }
     let_once(:user) { user_model }
     let(:tool) { external_tool_1_3_model(context: account, opts: { url: "https://account.quiz-lti-dub-prod.instructure.com/lti/launch" }) }
-    let(:request) { double("request", host: "canvas.instructure.com", host_with_port: "canvas.instructure.com", params: {}) }
+    let(:request) { instance_double(ActionDispatch::Request, host: "canvas.instructure.com", host_with_port: "canvas.instructure.com", params: {}) }
     let(:controller) do
-      double("controller",
-             request:,
-             lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
-             blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
-             lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
-             named_context_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect",
-             set_return_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect")
+      # Trigger lazy definition of route helper methods on ApplicationController
+      # so that instance_double can verify against them
+      ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
+      instance_double(ApplicationController,
+                      request:,
+                      params: ActionController::Parameters.new({}),
+                      lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                      blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                      lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                      named_context_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect",
+                      set_return_url: "https://canvas.instructure.com/courses/#{course.id}/external_content/success/external_tool_redirect")
     end
     let(:variable_expander) { Lti::VariableExpander.new(account, course, controller, current_user: user, tool:) }
     let(:tag) do
@@ -458,12 +462,16 @@ module NewQuizzes
 
       context "when controller responds to set_return_url" do
         let(:controller) do
-          double("controller",
-                 request:,
-                 lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
-                 blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
-                 lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
-                 set_return_url: "https://canvas.instructure.com/courses/#{course.id}/quizzes")
+          # Trigger lazy definition of route helper methods on ApplicationController
+          # so that instance_double can verify against them
+          ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
+          instance_double(ApplicationController,
+                          request:,
+                          params: ActionController::Parameters.new({}),
+                          lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                          blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                          lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                          set_return_url: "https://canvas.instructure.com/courses/#{course.id}/quizzes")
         end
 
         it "uses set_return_url from controller to match LTI launch behavior" do
@@ -471,6 +479,42 @@ module NewQuizzes
           expect(controller).to receive(:set_return_url).and_return("https://canvas.instructure.com/courses/#{course.id}/quizzes")
           result = builder.build
           expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/quizzes")
+        end
+      end
+
+      context "when module_item_id is present in params" do
+        let(:request) { instance_double(ActionDispatch::Request, host: "canvas.instructure.com", host_with_port: "canvas.instructure.com", params: { module_item_id: "464" }) }
+        let(:controller) do
+          ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
+          instance_double(ApplicationController,
+                          request:,
+                          params: ActionController::Parameters.new({ module_item_id: "464" }),
+                          lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                          blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                          lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                          course_assignment_url: "https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464",
+                          set_return_url: "https://canvas.instructure.com/courses/#{course.id}/modules")
+        end
+
+        it "includes platform_redirect_url with the assignment URL and module_item_id" do
+          expect(controller).to receive(:course_assignment_url).with(course, assignment, module_item_id: "464")
+                                                               .and_return("https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464")
+          result = builder.build
+          expect(result[:platform_redirect_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464")
+        end
+
+        it "uses set_return_url for launch_presentation_return_url" do
+          allow(controller).to receive(:course_assignment_url)
+            .and_return("https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464")
+          result = builder.build
+          expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/modules")
+        end
+      end
+
+      context "when module_item_id is not present in params" do
+        it "does not include platform_redirect_url" do
+          result = builder.build
+          expect(result[:platform_redirect_url]).to be_nil
         end
       end
 

@@ -543,4 +543,91 @@ describe LLMConversationClient do
       expect(result[:percentage]).to eq(0)
     end
   end
+
+  describe "#evaluation" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
+    let(:evaluation_response) do
+      {
+        "success" => true,
+        "data" => {
+          "overall_assessment" => "Student demonstrated strong analytical skills and good understanding of the material.",
+          "key_moments" => [
+            {
+              "learning_objective" => "Critical thinking",
+              "evidence" => "Student analyzed the problem systematically",
+              "message_number" => 3
+            }
+          ],
+          "learning_objectives_evaluation" => [
+            {
+              "objective" => "Critical thinking",
+              "met" => true,
+              "score" => 85,
+              "explanation" => "Student showed excellent analytical skills"
+            },
+            {
+              "objective" => "Historical context",
+              "met" => false,
+              "score" => 45,
+              "explanation" => "Student needs more practice with historical analysis"
+            }
+          ],
+          "strengths" => [
+            "Clear communication",
+            "Systematic approach",
+            "Good problem-solving skills"
+          ],
+          "areas_for_improvement" => [
+            "Historical context analysis",
+            "Evidence citation"
+          ],
+          "overall_score" => 75
+        }
+      }
+    end
+
+    before do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/evaluate")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
+        .to_return(status: 200, body: evaluation_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "requests evaluation and returns data" do
+      result = client_with_conversation_id.evaluation
+
+      expect(result).to be_a(Hash)
+      expect(result["overall_assessment"]).to be_present
+      expect(result["overall_score"]).to eq(75)
+      expect(result["learning_objectives_evaluation"]).to be_an(Array)
+      expect(result["learning_objectives_evaluation"].length).to eq(2)
+      expect(result["strengths"]).to be_an(Array)
+      expect(result["areas_for_improvement"]).to be_an(Array)
+      expect(result["key_moments"]).to be_an(Array)
+    end
+
+    it "raises ConversationError when conversation_id is not set" do
+      expect { client.evaluation }.to raise_error(
+        LlmConversation::Errors::ConversationError,
+        /Conversation ID not set/
+      )
+    end
+
+    it "raises ConversationError on API failure" do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/evaluate")
+        .to_return(status: 500, body: "Internal Server Error")
+
+      expect { client_with_conversation_id.evaluation }.to raise_error(LlmConversation::Errors::ConversationError)
+    end
+
+    it "raises ConversationError when bearer token is not configured" do
+      allow(described_class).to receive(:bearer_token).and_return(nil)
+      expect { client_with_conversation_id.evaluation }.to raise_error(
+        LlmConversation::Errors::ConversationError,
+        "llm_conversation_bearer_token not found in vault secrets"
+      )
+    end
+  end
 end

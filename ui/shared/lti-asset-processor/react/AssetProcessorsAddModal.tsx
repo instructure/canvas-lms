@@ -31,6 +31,7 @@ import type {
   LtiLaunchDefinition,
   LtiLaunchPlacement,
 } from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {
   AssetProcessorsAddModalState,
@@ -40,6 +41,7 @@ import {AssetProcessorsCard} from './AssetProcessorsCards'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
+import {ToolContextName} from './ToolContextName'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -61,6 +63,15 @@ export type AssetProcessorsAddModalProps = {
 export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
   const stateTag = useAssetProcessorsAddModalState(s => s.state.tag)
   const {close, showToolList} = useAssetProcessorsAddModalState(s => s.actions)
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (stateTag === 'toolLaunch' && closeButtonRef.current) {
+      setTimeout(() => {
+        closeButtonRef.current?.focus()
+      }, 0)
+    }
+  }, [stateTag])
 
   if (stateTag === 'closed') {
     return null
@@ -76,7 +87,8 @@ export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
       <Modal.Header>
         <CloseButton
           elementRef={el => {
-            if (el) {
+            if (el instanceof HTMLButtonElement) {
+              closeButtonRef.current = el
               el.setAttribute('data-pendo', 'asset-processors-add-modal-close-button')
             }
           }}
@@ -176,7 +188,9 @@ function AssetProcessorsAddModalBodyToolList({
                 description={tool.description}
                 margin="small"
                 onClick={() => launchTool(tool)}
-              />
+              >
+                <ToolContextName tool={tool} />
+              </AssetProcessorsCard>
             </Flex.Item>
           )
         })}
@@ -208,19 +222,26 @@ function AssetProcessorsAddModalBodyToolLaunch(
       handleExternalContentMessages({
         onDeepLinkingResponse: data => {
           try {
-            tool && onProcessorResponse({tool, data})
+            if (tool) {
+              onProcessorResponse({tool, data})
+            }
           } catch (e) {
             // Provide debugging output for tool developers to help figure out the problem:
             console.error(e)
             showInvlidDeepLinkingResponse(tool)
             return
           }
+          showFlashAlert({
+            message: I18n.t('%{toolName} successfully added', {toolName: tool.name}),
+            type: 'success',
+            srOnly: true,
+          })
           close()
         },
         ready: close,
         cancel: close,
       }),
-    [onProcessorResponse, close, tool],
+    [onProcessorResponse, close, tool, showInvlidDeepLinkingResponse],
   )
 
   useEffect(() => {

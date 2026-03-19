@@ -37,6 +37,7 @@ export const defaultAssignment: AssignmentConnection = {
   name: 'Missing Assignment 1',
   omitFromFinalGrade: false,
   pointsPossible: 10,
+  position: 1,
   postManually: false,
   submissionTypes: ['online_text_entry', 'online_upload'],
   published: true,

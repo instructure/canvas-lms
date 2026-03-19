@@ -31,7 +31,16 @@ describe('ColumnHeader', () => {
 
   it('renders the title', () => {
     render(<ColumnHeader {...defaultProps} />)
-    expect(screen.getByText('Test Column')).toBeInTheDocument()
+    expect(screen.getAllByText('Test Column')[0]).toBeInTheDocument()
+  })
+
+  it('provides accessible content for screen readers', () => {
+    const {container} = render(<ColumnHeader {...defaultProps} />)
+    const screenReaderContent = container.querySelector('[class*="screenReaderContent"]')
+    expect(screenReaderContent).toHaveTextContent('Test Column')
+    const visualContent = container.querySelector('[aria-hidden="true"]')
+    expect(visualContent).toBeInTheDocument()
+    expect(visualContent).toHaveTextContent('Test Column')
   })
 
   it('does not render the options menu when no items are provided', () => {
@@ -71,5 +80,17 @@ describe('ColumnHeader', () => {
     const {container} = render(<ColumnHeader {...defaultProps} columnWidth={300} />)
     const headerElement = container.querySelector('[data-testid="column-header"]')
     expect(headerElement).toHaveStyle({width: '300px'})
+  })
+
+  it('renders the icon when provided', () => {
+    const icon = <span data-testid="test-icon">📝</span>
+    render(<ColumnHeader {...defaultProps} icon={icon} />)
+    expect(screen.getByTestId('test-icon')).toBeInTheDocument()
+  })
+
+  it('does not render an icon when not provided', () => {
+    const {container} = render(<ColumnHeader {...defaultProps} />)
+    const iconContainer = container.querySelector('[data-testid="test-icon"]')
+    expect(iconContainer).not.toBeInTheDocument()
   })
 })

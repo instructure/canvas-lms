@@ -24,42 +24,17 @@ import {extractDataTurnitin} from '@canvas/grading/Turnitin'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
-import {statusesTitleMap} from '../../constants/statuses'
 import type Gradebook from '../../Gradebook'
 import type {PendingGradeInfo} from '../../gradebook.d'
 import type {SubmissionData, SubmissionWithOriginalityReport} from '@canvas/grading/grading.d'
 import type {GradingStandard} from '@instructure/grading-utils'
 import type {Assignment, Student, Submission} from '../../../../../../api.d'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
-import statusLateUrl from '../icons/late.svg'
-import statusMissingUrl from '../icons/missing.svg'
-import statusResubmittedUrl from '../icons/resubmitted.svg'
-import statusDroppedUrl from '../icons/dropped.svg'
-import statusExcusedUrl from '../icons/excused.svg'
-import statusExtendedUrl from '../icons/extended.svg'
-import statusCustom1Url from '../icons/custom-1.svg'
-import statusCustom2Url from '../icons/custom-2.svg'
-import statusCustom3Url from '../icons/custom-3.svg'
+import {getStatusIcon, StatusIconInfo} from '@canvas/grading/gradingStatus'
 
 const I18n = createI18nScope('gradebook')
 
 // Status to icon mapping for colorblindness accessibility
-const STATUS_ICONS: Record<string, string> = {
-  late: statusLateUrl,
-  missing: statusMissingUrl,
-  resubmitted: statusResubmittedUrl,
-  dropped: statusDroppedUrl,
-  excused: statusExcusedUrl,
-  extended: statusExtendedUrl,
-  'custom-1': statusCustom1Url,
-  'custom-2': statusCustom2Url,
-  'custom-3': statusCustom3Url,
-}
-
-type StatusIconInfo = {
-  iconUrl: string
-  title: string
-}
 
 type Options = {
   classNames?: string[]
@@ -133,46 +108,6 @@ function formatGrade(
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
-}
-
-function getStatusIcon(
-  submissionData: SubmissionData,
-  customGradeStatuses: GradeStatusUnderscore[] = [],
-): StatusIconInfo | undefined {
-  if (submissionData.dropped) {
-    return {iconUrl: STATUS_ICONS.dropped, title: statusesTitleMap.dropped}
-  }
-  if (submissionData.excused) {
-    return {iconUrl: STATUS_ICONS.excused, title: statusesTitleMap.excused}
-  }
-  if (submissionData.extended) {
-    return {iconUrl: STATUS_ICONS.extended, title: statusesTitleMap.extended}
-  }
-  if (submissionData.late) {
-    return {iconUrl: STATUS_ICONS.late, title: statusesTitleMap.late}
-  }
-  if (submissionData.resubmitted) {
-    return {iconUrl: STATUS_ICONS.resubmitted, title: statusesTitleMap.resubmitted}
-  }
-  if (submissionData.missing) {
-    return {iconUrl: STATUS_ICONS.missing, title: statusesTitleMap.missing}
-  }
-  if (submissionData.customGradeStatusId) {
-    const customStatusesForSubmissions = customGradeStatuses.filter(
-      status => status.applies_to_submissions,
-    )
-    const customStatus = customStatusesForSubmissions.find(
-      status => status.id === submissionData.customGradeStatusId,
-    )
-
-    if (customStatus?.icon) {
-      return {
-        iconUrl: STATUS_ICONS[customStatus.icon],
-        title: customStatus.name,
-      }
-    }
-  }
-  return undefined
 }
 
 function renderStartContainer(options: {

@@ -203,6 +203,9 @@
     "external_tools_6e77821": {
         "message": "Зовнішні інструменти"
     },
+    "failed_276786d": {
+        "message": "Не вдалося"
+    },
     "files_c300e900": {
         "message": "Файли"
     },
@@ -392,6 +395,9 @@
     "previous_bd2ac015": {
         "message": "Попередній"
     },
+    "processing_8c569014": {
+        "message": "Обробка..."
+    },
     "published_c944a23d": {
         "message": "опубліковано"
     },
@@ -490,6 +496,9 @@
     },
     "up_c553575d": {
         "message": "вверх"
+    },
+    "upload_8b403d05": {
+        "message": "Завантажити"
     },
     "upload_media_ce31135a": {
         "message": "Завантажити медіа контент"

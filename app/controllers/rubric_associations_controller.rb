@@ -123,8 +123,8 @@ class RubricAssociationsController < ApplicationController
                                                                                       session: }),
       rubric_association: @association.as_json(include_root: false,
                                                include: %i[rubric_assessments assessment_requests],
-                                               association_count: @rubric.rubric_associations.where(association_type: "Assignment").count,
                                                permissions: { user: @current_user, session: })
+                                      .merge(association_count: @rubric.rubric_associations.count)
     }
     render json: json_res
   end

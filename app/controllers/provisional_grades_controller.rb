@@ -268,7 +268,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
 
       unless selected_provisional_grade
         return render json: { message: "All submissions must have a selected grade" },
-                      status: :unprocessable_entity
+                      status: :unprocessable_content
       end
 
       selected_provisional_grade

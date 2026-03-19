@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback, useEffect} from 'react'
+import React, {useState, useCallback, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -40,6 +40,8 @@ import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
 import {useStudentAssignmentTray} from './hooks/useStudentAssignmentTray'
+import {useMasteryDistribution} from './hooks/useMasteryDistribution'
+import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
 
 const queryClient = new QueryClient()
 
@@ -59,12 +61,14 @@ interface LearningMasteryContentProps {
   courseId: string
   contextURL: string
   accountLevelMasteryScalesFF: boolean
+  instuiNavFF?: boolean
 }
 
 const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
   courseId,
   contextURL,
   accountLevelMasteryScalesFF,
+  instuiNavFF,
 }) => {
   const {
     settings: gradebookSettings,
@@ -112,6 +116,20 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     studentIds: students.map(student => student.id),
     outcomeIds: outcomes.map(outcome => outcome.id),
     settings: gradebookSettings,
+  })
+
+  const sortedOutcomeIds = useMemo(
+    () => outcomes.map(outcome => outcome.id.toString()).sort(),
+    [outcomes],
+  )
+
+  const {data: distributionData, isLoading: isLoadingDistribution} = useMasteryDistribution({
+    courseId,
+    filters: mapSettingsToFilters(gradebookSettings),
+    outcomeIds: sortedOutcomeIds,
+    includeAlignments: true,
+    onlyAssignmentAlignments: true,
+    showUnpublishedAssignments: false,
   })
 
   const handleGradebookSettingsChange = useCallback(
@@ -193,6 +211,9 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         outcomes={outcomes}
         students={students}
         rollups={rollups}
+        outcomeDistributions={distributionData?.outcome_distributions}
+        distributionStudents={distributionData?.students}
+        isLoadingDistribution={isLoadingDistribution}
         pagination={pagination}
         setCurrentPage={setCurrentPage}
         sorting={sorting}
@@ -215,6 +236,7 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         gradebookSettings={gradebookSettings}
         setGradebookSettings={handleGradebookSettingsChange}
         isSavingSettings={isSavingSettings}
+        hideHeading={instuiNavFF}
       />
       {pagination && (
         <SearchWrapper
@@ -266,6 +288,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           courseId={courseId}
           contextURL={contextURL ?? ''}
           accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+          instuiNavFF={ENV.FEATURES?.instui_nav}
         />
       </LMGBContext.Provider>
     </QueryClientProvider>

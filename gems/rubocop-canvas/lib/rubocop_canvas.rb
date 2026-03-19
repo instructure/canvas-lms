@@ -74,16 +74,26 @@ require "rubocop_canvas/cops/specs/scope_includes"
 ## style
 require "rubocop_canvas/cops/style/concat_array_literals"
 
+## plugin cops
+canvas_root = File.expand_path("../../..", __dir__)
+Dir[File.join(canvas_root, "gems/plugins/*/lib/cops/**/*.rb")].each { |f| require f }
+
 module RuboCop
   module Canvas
     module Inject
       DEFAULT_FILE = File.expand_path("../config/default.yml", __dir__)
+      PLUGIN_CONFIG_FILES = Dir[File.join(File.expand_path("../../..", __dir__), "gems/plugins/*/config/rubocop_default.yml")]
 
       def self.defaults!
         path = File.absolute_path(DEFAULT_FILE)
         hash = ConfigLoader.send(:load_yaml_configuration, path)
         config = Config.new(hash, path)
         config = ConfigLoader.merge_with_default(config, path)
+
+        PLUGIN_CONFIG_FILES.each do |plugin_path|
+          plugin_hash = ConfigLoader.send(:load_yaml_configuration, plugin_path)
+          config = Config.new(config.to_h.merge(plugin_hash), path)
+        end
 
         ConfigLoader.instance_variable_set(:@default_configuration, config)
 

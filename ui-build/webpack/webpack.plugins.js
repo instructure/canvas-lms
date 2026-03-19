@@ -36,6 +36,7 @@ const {
   fetchCanvasCareerLearnerApp,
   fetchIgniteAgentLibrary,
   fetchNewQuizzesApp,
+  fetchCanvasCourseCriteria,
 } = require('./remotes')
 
 // determines which folder public assets are compiled to
@@ -157,6 +158,7 @@ exports.moduleFederation = new ModuleFederationPlugin({
     ltiusage: `promise new Promise(${fetchLtiUsage.toString()})`,
     igniteagent: `promise new Promise(${fetchIgniteAgentLibrary.toString()})`,
     newquizzes: `promise new Promise(${fetchNewQuizzesApp.toString()})`,
+    canvascoursecriteria: `promise new Promise(${fetchCanvasCourseCriteria.toString()})`,
   },
   exposes: {},
   shared: {},

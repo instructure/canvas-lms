@@ -21,7 +21,8 @@ class CreateInitialPartitions < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def up
-    [Auditors::ActiveRecord::AuthenticationRecord,
+    [Auditors::ActiveRecord::AccountUserRecord,
+     Auditors::ActiveRecord::AuthenticationRecord,
      Auditors::ActiveRecord::CourseRecord,
      Auditors::ActiveRecord::FeatureFlagRecord,
      Auditors::ActiveRecord::GradeChangeRecord,

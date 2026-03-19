@@ -116,7 +116,7 @@ describe DiscussionEntry do
           entry.save!
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
 
       describe "on update" do
@@ -160,7 +160,7 @@ describe DiscussionEntry do
           entry.update!(attachment:)
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
 
       describe "on destroy" do
@@ -182,7 +182,7 @@ describe DiscussionEntry do
           entry.destroy
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
 
       describe "on restore" do
@@ -207,7 +207,7 @@ describe DiscussionEntry do
           entry.restore
         end
 
-        include_examples "does not send notifications"
+        it_behaves_like "does not send notifications"
       end
     end
   end
@@ -503,6 +503,10 @@ describe DiscussionEntry do
 
     it "does not update last_reply_at on the associated discussion_topic if less than a minute" do
       fresh_topic = @course.discussion_topics.create!(title: "title", message: "fresh")
+
+      first_entry = fresh_topic.discussion_entries.create!(message: "first", user: @user)
+      first_entry.update_topic
+      fresh_topic.reload
       initial_last_reply_at = fresh_topic.last_reply_at
 
       entry = fresh_topic.discussion_entries.create!(message: "entry", user: @user)
@@ -514,6 +518,10 @@ describe DiscussionEntry do
 
     it "leaves last_reply_at on the associated discussion_topic alone given an older entry" do
       fresh_topic = @course.discussion_topics.create!(title: "title", message: "fresh")
+
+      first_entry = fresh_topic.discussion_entries.create!(message: "first", user: @user)
+      first_entry.update_topic
+      fresh_topic.reload
       initial_last_reply_at = fresh_topic.last_reply_at
 
       entry = fresh_topic.discussion_entries.create!(message: "entry", user: @user)

@@ -53,7 +53,7 @@ describe Anonymity do
         Anonymity.generate_id(existing_ids: existing_anonymous_ids_fake)
       end
 
-      let(:existing_anonymous_ids_fake) { double("Array") }
+      let(:existing_anonymous_ids_fake) { instance_double(Array) }
 
       it "queries the passed in existing_anonymous_ids" do
         allow(Anonymity).to receive(:generate_short_id).and_return(short_id)

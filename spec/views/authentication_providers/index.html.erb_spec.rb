@@ -66,4 +66,22 @@ describe "authentication_providers/index" do
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css("#delete-aac-#{aac.id}")).to be_blank
   end
+
+  describe "Identity Service Discovery Page section" do
+    it "renders when discovery page is allowed" do
+      allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.css("#discovery-page-root")).to be_present
+      expect(doc.css("input#discovery_page_active_field")).to be_present
+      expect(response.body).to include("Identity Service Discovery Page")
+    end
+
+    it "does not render when discovery page is not allowed" do
+      allow(account).to receive(:discovery_page_allowed?).and_return(false)
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.css("#discovery-page-root")).to be_blank
+    end
+  end
 end

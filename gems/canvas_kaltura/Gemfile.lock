@@ -106,6 +106,9 @@ GEM
     crass (1.0.6)
     csv (3.3.5)
     date (3.5.1)
+    debug (1.11.1)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
     diff-lcs (1.6.2)
     digest-murmurhash (1.1.1)
     drb (2.2.3)
@@ -123,7 +126,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     logger (1.7.0)
-    loofah (2.25.0)
+    loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     mime-types (3.7.0)
@@ -149,7 +152,7 @@ GEM
       stringio
     public_suffix (7.0.2)
     racc (1.8.1)
-    rack (3.2.4)
+    rack (3.2.5)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -235,6 +238,7 @@ DEPENDENCIES
   canvas_slug!
   canvas_sort!
   config_file!
+  debug
   legacy_multipart!
   rake
   rspec (~> 3.12)

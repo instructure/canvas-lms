@@ -27,8 +27,10 @@
 %>
 <%
   assignments_2_student_enabled = @context.feature_enabled?(:assignments_2_student)
-  js_env assignments_2_student_enabled: assignments_2_student_enabled
-  js_env restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user)
+  js_env({
+    assignments_2_student_enabled: assignments_2_student_enabled,
+    restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user)
+  })
 %>
 <div id="grade-summary-content" style="display: none;">
   <% provide :right_side do %>
@@ -131,6 +133,7 @@
       </a>
     </div>
     <div id="outcomes"></div>
+    <div id="outcome-detail-view-mount-point"></div>
   <% end %>
 
   <div id="assignments">

@@ -181,7 +181,8 @@ ul.user_list div.enrollment_type.pending {
 
 #sections {
   @include reset-list;
-  max-width: 500px;
+  max-width: fit-content;
+  min-width: 500px;
   list-style-type: none;
 }
 
@@ -316,6 +317,21 @@ ul.user_list div.enrollment_type.pending {
     margin: 0;
     @include fontSize(13px);
     font-weight: bold;
+  }
+}
+
+#right-side .course-criteria {
+  margin-top: 20px;
+  h3 {
+    line-height: inherit;
+    margin: 0;
+    @include fontSize(13px);
+    padding: 6px;
+    font-weight: bold;
+    border-bottom: 1px solid #6A7883;
+  }
+  #criteria-mount {
+    padding: 6px;
   }
 }
 

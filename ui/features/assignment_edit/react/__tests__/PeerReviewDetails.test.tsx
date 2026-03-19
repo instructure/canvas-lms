@@ -24,6 +24,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PeerReviewDetails, {type AssignmentModel} from '../PeerReviewDetails'
 import {MAX_NUM_PEER_REVIEWS} from '../hooks/usePeerReviewSettings'
+import {SETTING_MESSAGES} from '@canvas/assignments/react/hooks/useSettingDependency'
 
 vi.mock('@canvas/graphql', () => ({
   executeQuery: vi.fn(),
@@ -525,7 +526,7 @@ describe('PeerReviewDetails', () => {
         window,
         new MessageEvent('message', {
           data: {
-            subject: 'ASGMT.togglePeerReviews',
+            subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS,
             enabled: false,
           },
         }),
@@ -543,7 +544,7 @@ describe('PeerReviewDetails', () => {
         window,
         new MessageEvent('message', {
           data: {
-            subject: 'ASGMT.togglePeerReviews',
+            subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS,
             enabled: false,
           },
         }),
@@ -558,7 +559,7 @@ describe('PeerReviewDetails', () => {
         window,
         new MessageEvent('message', {
           data: {
-            subject: 'ASGMT.togglePeerReviews',
+            subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS,
             enabled: true,
           },
         }),
@@ -569,17 +570,20 @@ describe('PeerReviewDetails', () => {
       })
     })
 
-    it('unchecks checkbox when disabled', async () => {
+    it('unchecks checkbox and updates hidden input when disabled via postMessage', async () => {
       assignment.peerReviews = vi.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
-      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
-      await user.click(advancedSettingsToggle)
+
+      const hiddenInput = document.getElementById(
+        'assignment_peer_reviews_hidden',
+      ) as HTMLInputElement
+      expect(hiddenInput.value).toBe('true')
 
       fireEvent(
         window,
         new MessageEvent('message', {
           data: {
-            subject: 'ASGMT.togglePeerReviews',
+            subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS,
             enabled: false,
           },
         }),
@@ -587,6 +591,7 @@ describe('PeerReviewDetails', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('peer-review-checkbox')).not.toBeChecked()
+        expect(hiddenInput.value).toBe('false')
       })
     })
 

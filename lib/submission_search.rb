@@ -258,7 +258,7 @@ class SubmissionSearch
     return user_scope unless @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
 
     section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
-    return User.none if section_ids.empty?
+    return user_scope if section_ids.empty?
 
     enrollment_scope = user_ids_by_enrollment_section_filters(section_ids)
 
@@ -279,14 +279,14 @@ class SubmissionSearch
   def representatives
     includes = [:inactive]
     settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
-    includes << :completed if settings["show_concluded_enrollments"] == "true"
+    includes << :completed if settings["show_concluded_enrollments"] == "true" || @course.completed?
     @representatives ||= @assignment.representatives(user: @searcher, includes:, ignore_student_visibility: true, include_others: true)
   end
 
   def excluded_enrollment_states_from_gradebook_settings
     settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
     excluded_enrollment_states(
-      completed: settings["show_concluded_enrollments"] != "true",
+      completed: settings["show_concluded_enrollments"] != "true" && !@course.completed?,
       inactive: settings["show_inactive_enrollments"] != "true"
     )
   end

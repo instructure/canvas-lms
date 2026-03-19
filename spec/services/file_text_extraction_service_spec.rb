@@ -21,16 +21,13 @@ require_relative "../../app/services/file_text_extraction_service"
 
 RSpec.describe FileTextExtractionService do
   let(:attachment) do
-    double(
-      "Attachment",
+    instance_double(
+      Attachment,
       id: 42,
       mimetype:,
-      mime_type: mime_type_for_log,
       open: StringIO.new("dummy-io")
     )
   end
-
-  let(:mime_type_for_log) { mimetype }
 
   before do
     allow(Setting).to receive(:get)
@@ -49,17 +46,17 @@ RSpec.describe FileTextExtractionService do
       let(:mimetype) { "application/pdf" }
 
       it "extracts text and detects images" do
-        page1 = double(
-          "PDF::Reader::Page",
+        page1 = instance_double(
+          PDF::Reader::Page,
           text: "Hello\x07World",
-          xobjects: { "Im1" => double("Stream", hash: { Subtype: :Image }) }
+          xobjects: { "Im1" => instance_double(PDF::Reader::Stream, hash: { Subtype: :Image }) }
         )
-        page2 = double(
-          "PDF::Reader::Page",
+        page2 = instance_double(
+          PDF::Reader::Page,
           text: "Second page",
           xobjects: nil
         )
-        reader = double("PDF::Reader", pages: [page1, page2])
+        reader = instance_double(PDF::Reader, pages: [page1, page2])
 
         expect(PDF::Reader).to receive(:new).with(instance_of(StringIO)).and_return(reader)
 
@@ -71,8 +68,8 @@ RSpec.describe FileTextExtractionService do
       end
 
       it "extracts text and reports no images when none present" do
-        page = double("PDF::Reader::Page", text: "Only text", xobjects: {})
-        reader = double("PDF::Reader", pages: [page])
+        page = instance_double(PDF::Reader::Page, text: "Only text", xobjects: {})
+        reader = instance_double(PDF::Reader, pages: [page])
 
         expect(PDF::Reader).to receive(:new).and_return(reader)
 
@@ -98,10 +95,10 @@ RSpec.describe FileTextExtractionService do
       let(:mimetype) { "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }
 
       it "extracts text and detects images via zip glob" do
-        doc = double("Docx::Document", text: "Docx\x0CText")
+        doc = instance_double(Docx::Document, text: "Docx\x0CText")
         expect(Docx::Document).to receive(:open).with(instance_of(StringIO)).and_return(doc)
 
-        zip_double = double("Zip::File")
+        zip_double = instance_double(Zip::File)
         expect(Zip::File).to receive(:open).with(instance_of(StringIO)).and_yield(zip_double)
         expect(zip_double).to receive(:glob).with("word/media/*").and_return(%w[word/media/image1.png])
 
@@ -112,10 +109,10 @@ RSpec.describe FileTextExtractionService do
       end
 
       it "extracts text and reports no images when media folder is empty" do
-        doc = double("Docx::Document", text: "Plain text")
+        doc = instance_double(Docx::Document, text: "Plain text")
         expect(Docx::Document).to receive(:open).and_return(doc)
 
-        zip_double = double("Zip::File")
+        zip_double = instance_double(Zip::File)
         expect(Zip::File).to receive(:open).and_yield(zip_double)
         expect(zip_double).to receive(:glob).with("word/media/*").and_return([])
 
@@ -145,8 +142,8 @@ RSpec.describe FileTextExtractionService do
       let(:mimetype) { "application/pdf" }
 
       it "returns blank string as-is when text is empty" do
-        page = double("PDF::Reader::Page", text: "", xobjects: nil)
-        reader = double("PDF::Reader", pages: [page])
+        page = instance_double(PDF::Reader::Page, text: "", xobjects: nil)
+        reader = instance_double(PDF::Reader, pages: [page])
 
         expect(PDF::Reader).to receive(:new).and_return(reader)
 

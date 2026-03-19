@@ -21,16 +21,18 @@ describe Quizzes::QuizRegrader::Answer do
   let(:points) { 15 }
 
   let(:question) do
-    double(id: 1,
-           question_data: { id: 1,
-                            regrade_option: "full_credit",
-                            points_possible: points },
-           quiz_group: nil)
+    instance_double(Quizzes::QuizQuestion,
+                    id: 1,
+                    question_data: { id: 1,
+                                     regrade_option: "full_credit",
+                                     points_possible: points },
+                    quiz_group: nil)
   end
 
   let(:question_regrade) do
-    double(quiz_question: question,
-           regrade_option: "full_credit")
+    instance_double(Quizzes::QuizQuestionRegrade,
+                    quiz_question: question,
+                    regrade_option: "full_credit")
   end
 
   let(:answer) do
@@ -100,16 +102,18 @@ describe Quizzes::QuizRegrader::Answer do
     end
 
     it "raises an error if the question has an unrecognized regrade_option" do
-      question_regrade = double(quiz_question: question,
-                                regrade_option: "be_a_jerk")
+      question_regrade = instance_double(Quizzes::QuizQuestionRegrade,
+                                         quiz_question: question,
+                                         regrade_option: "be_a_jerk")
 
       expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to raise_error("Regrade option not valid!")
     end
 
     it "does not raise an error if question has recognized regrade_option" do
       Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS.each do |regrade_option|
-        question_regrade = double(quiz_question: question,
-                                  regrade_option:)
+        question_regrade = instance_double(Quizzes::QuizQuestionRegrade,
+                                           quiz_question: question,
+                                           regrade_option:)
         expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to_not raise_error
       end
     end

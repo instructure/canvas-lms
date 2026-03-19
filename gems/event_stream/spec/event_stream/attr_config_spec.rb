@@ -37,7 +37,7 @@ describe EventStream::AttrConfig do
   describe "attr_config" do
     it "creates dual accessor method" do
       @class.attr_config :field, default: nil
-      value = double("value")
+      value = instance_double(Object, "value")
       obj = @class.new
       obj.field(value)
       obj.field == value
@@ -52,7 +52,7 @@ describe EventStream::AttrConfig do
     end
 
     it "allows defaults" do
-      value = double("value")
+      value = instance_double(Object, "value")
       @class.attr_config :field, default: value
       obj = @class.new
       obj.field == value
@@ -60,8 +60,8 @@ describe EventStream::AttrConfig do
 
     it "casts values with type String" do
       @class.attr_config :field, type: String, default: nil
-      string = double("value")
-      value = double(to_s: string)
+      string = "converted_string"
+      value = instance_double(Object, "value", to_s: string)
       obj = @class.new
       obj.field(value)
       obj.field == string
@@ -69,8 +69,8 @@ describe EventStream::AttrConfig do
 
     it "casts values with type Integer" do
       @class.attr_config :field, type: Integer, default: nil
-      integer = double("value")
-      value = double(to_i: integer)
+      integer = 42
+      value = instance_double(String, "value", to_i: integer)
       obj = @class.new
       obj.field(value)
       obj.field == integer
@@ -109,30 +109,30 @@ describe EventStream::AttrConfig do
     end
 
     it "skips cast with unknown type" do
-      @class.attr_config :field, type: double("unknown"), default: nil
-      value = double("value")
+      @class.attr_config :field, type: instance_double(Class, "unknown"), default: nil
+      value = instance_double(Object, "value")
       obj = @class.new
       obj.field(value)
       obj.field == value
     end
 
     it "casts defaults with type" do
-      string = double("value")
-      value = double(to_s: string)
+      string = "converted_string"
+      value = instance_double(Object, "value", to_s: string)
       @class.attr_config :field, type: String, default: value
       obj = @class.new
       obj.field == string
     end
 
     it "does not cast defaults with unknown type" do
-      value = double("value")
-      @class.attr_config :field, type: double("unknown"), default: value
+      value = instance_double(Object, "value")
+      @class.attr_config :field, type: instance_double(Class, "unknown"), default: value
       obj = @class.new
       obj.field == value
     end
 
     it "requires setting non-defaulted fields before validation" do
-      value = double("value")
+      value = instance_double(Object, "value")
       @class.attr_config :field
       @class.new(field: value)
       expect do

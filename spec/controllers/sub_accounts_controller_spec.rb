@@ -228,6 +228,23 @@ describe SubAccountsController do
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
       expect(@sub_account.reload.course_template_id).to be_nil
     end
+
+    it "deletes associated LTI context controls when deleting a sub-account" do
+      user_session(@user)
+
+      registration = lti_registration_with_tool(account: @root_account)
+      deployment = registration.deployments.first
+      control = Lti::ContextControl.create!(
+        context: @sub_account,
+        registration:,
+        deployment:
+      )
+      expect(control.workflow_state).to eq("active")
+
+      delete "destroy", params: { account_id: @root_account, id: @sub_account }
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+    end
   end
 
   describe "GET 'show'" do

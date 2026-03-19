@@ -101,4 +101,79 @@ describe('DiscussionTopicForm Rendering', () => {
     const document = setup()
     expect(document.queryByTestId('discussion-topic-message-locked')).toBeTruthy()
   })
+
+  it('initializes form with query parameters from ENV for new graded discussion', () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+      title: 'Test Discussion from Assignment Index',
+      assignment: {
+        points_possible: '50',
+        due_at: '2026-02-25T06:59:00.000Z',
+        assignment_group_id: '26',
+      },
+    }
+
+    const currentDiscussionTopic = {
+      title: 'Test Discussion from Assignment Index',
+      assignment: {
+        pointsPossible: 50,
+        dueAt: '2026-02-25T06:59:00.000Z',
+        assignmentGroup: {_id: '26'},
+        assignmentOverrides: {
+          nodes: [
+            {
+              id: 'everyone',
+              dueAt: '2026-02-25T06:59:00.000Z',
+              unlockAt: null,
+              lockAt: null,
+              set: {
+                __typename: 'Course',
+                _id: '1',
+              },
+            },
+          ],
+        },
+      },
+    }
+
+    const document = setup({currentDiscussionTopic})
+    expect(document.getByDisplayValue('Test Discussion from Assignment Index')).toBeInTheDocument()
+    expect(document.getByDisplayValue('50')).toBeInTheDocument()
+  })
+
+  it('converts points_possible string to float', () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+      title: 'Test',
+      assignment: {
+        points_possible: '43',
+        due_at: '2026-02-25T06:59:00.000Z',
+        assignment_group_id: '26',
+      },
+    }
+
+    const currentDiscussionTopic = {
+      title: 'Test',
+      assignment: {
+        pointsPossible: 43,
+        dueAt: '2026-02-25T06:59:00.000Z',
+        assignmentGroup: {_id: '26'},
+        assignmentOverrides: {
+          nodes: [
+            {
+              id: 'everyone',
+              dueAt: '2026-02-25T06:59:00.000Z',
+              unlockAt: null,
+              lockAt: null,
+              set: {
+                __typename: 'Course',
+                _id: '1',
+              },
+            },
+          ],
+        },
+      },
+    }
+
+    const document = setup({currentDiscussionTopic})
+    expect(document.getByDisplayValue('43')).toBeInTheDocument()
+  })
 })

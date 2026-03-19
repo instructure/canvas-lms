@@ -20,7 +20,6 @@ import React, {Component, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {px} from '@instructure/ui-utils'
 import indicatorRegion from '../../../indicatorRegion'
-import {isAudioOrVideo, isImage} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
 import {StoreProvider} from '../StoreContext'
@@ -68,13 +67,7 @@ export const handleSubmit = (
         usageRights:
           uploadData?.usageRights?.usageRight === 'choose' ? undefined : uploadData?.usageRights,
       }
-      let tabContext = 'documents'
-      if (isImage(theFile.type)) {
-        tabContext = 'images'
-      } else if (isAudioOrVideo(theFile.type)) {
-        tabContext = 'media'
-      }
-      storeProps.startMediaUpload(tabContext, fileMetaData)
+      storeProps.startMediaUpload(fileMetaData)
       break
     }
     case 'URL': {

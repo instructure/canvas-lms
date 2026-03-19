@@ -126,6 +126,7 @@ const editView = (assignmentOpts = {}) => {
         <div id="peer_reviews_selector"></div>
         <div class="js-assignment-overrides"></div>
         <input type="checkbox" id="assignment_peer_reviews_checkbox" />
+        <input type="hidden" id="assignment_peer_reviews_hidden" value="" />
         <div id="peer_reviews_allocation_and_grading_details"></div>
       </form>
     </div>
@@ -207,8 +208,8 @@ describe('EditView - Peer Review Integration - validateBeforeSave', () => {
   })
 
   it('calls validatePeerReviewDetails when peer reviews are enabled', () => {
-    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-    peerReviewCheckbox.checked = true
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    peerReviewHidden.value = 'true'
 
     const peerReviewDetailsEl = document.getElementById(
       'peer_reviews_allocation_and_grading_details',
@@ -223,8 +224,8 @@ describe('EditView - Peer Review Integration - validateBeforeSave', () => {
   })
 
   it('adds error when validatePeerReviewDetails returns false', () => {
-    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
-    peerReviewCheckbox.checked = true
+    const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
+    peerReviewHidden.value = 'true'
 
     const peerReviewDetailsEl = document.getElementById(
       'peer_reviews_allocation_and_grading_details',

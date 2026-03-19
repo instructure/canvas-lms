@@ -145,9 +145,6 @@ describe('EditView - Quiz Type Handling', () => {
     vi.useFakeTimers()
 
     fakeENV.setup({
-      FEATURES: {
-        new_quizzes_surveys: true,
-      },
       PERMISSIONS: {
         can_edit_grades: true,
       },
@@ -254,21 +251,15 @@ describe('EditView - Quiz Type Handling', () => {
   })
 
   describe('toJSON', () => {
-    test('includes newQuizzesSurveysFFEnabled when feature flag is enabled and assignment is quiz LTI', () => {
+    test('includes isQuizLTIAssignment when assignment is quiz LTI', () => {
       const data = view.toJSON()
-      expect(data.newQuizzesSurveysFFEnabled).toBe(true)
+      expect(data.isQuizLTIAssignment).toBe(true)
     })
 
-    test('does not include newQuizzesSurveysFFEnabled when feature flag is disabled', () => {
-      ENV.FEATURES.new_quizzes_surveys = false
-      const data = view.toJSON()
-      expect(data.newQuizzesSurveysFFEnabled).toBe(false)
-    })
-
-    test('does not include newQuizzesSurveysFFEnabled when assignment is not quiz LTI', () => {
+    test('does not include isQuizLTIAssignment when assignment is not quiz LTI', () => {
       view.assignment.set('is_quiz_lti_assignment', false)
       const data = view.toJSON()
-      expect(data.newQuizzesSurveysFFEnabled).toBe(false)
+      expect(data.isQuizLTIAssignment).toBe(false)
     })
   })
 

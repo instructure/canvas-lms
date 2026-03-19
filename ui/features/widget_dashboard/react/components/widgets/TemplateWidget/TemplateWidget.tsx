@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
+import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -25,10 +26,16 @@ import {Text} from '@instructure/ui-text'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Pagination} from '@instructure/ui-pagination'
+import {Overlay, Mask} from '@instructure/ui-overlays'
 import {IconDragHandleLine, IconTrashLine} from '@instructure/ui-icons'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
-import {useWidgetLayout, type MoveAction} from '../../../hooks/useWidgetLayout'
+import {
+  useWidgetLayout,
+  getMoveActionDescription,
+  type MoveAction,
+} from '../../../hooks/useWidgetLayout'
+import {announceToScreenReader} from '../../../utils/screenReaderAnnounce'
 import WidgetContextMenu from '../../shared/WidgetContextMenu'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -38,7 +45,11 @@ export interface PaginationProps {
   totalPages: number
   onPageChange: (page: number) => void
   ariaLabel: string
-  isLoading?: boolean
+}
+
+export interface LoadingOverlayProps {
+  isLoading: boolean
+  ariaLabel?: string
 }
 
 export interface TemplateWidgetProps extends BaseWidgetProps {
@@ -49,6 +60,7 @@ export interface TemplateWidgetProps extends BaseWidgetProps {
   headerActions?: React.ReactNode
   loadingText?: string
   pagination?: PaginationProps
+  loadingOverlay?: LoadingOverlayProps
   footerActions?: React.ReactNode
   isEditMode?: boolean
   dragHandleProps?: any
@@ -66,6 +78,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   onRetry,
   loadingText,
   pagination,
+  loadingOverlay,
   footerActions,
   isEditMode = false,
   dragHandleProps,
@@ -74,13 +87,39 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   const {config, moveWidget, removeWidget} = useWidgetLayout()
   const widgetTitle = title || widget.title
   const headingId = `${widget.id}-heading`
+  const contentRef = React.useRef<HTMLElement | null>(null)
+  const [mountNode, setMountNode] = React.useState<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setMountNode(contentRef.current)
+    }
+  }, [])
 
   const handleMenuSelect = (action: string) => {
-    moveWidget(widget.id, action as MoveAction)
+    const moveAction = action as MoveAction
+
+    flushSync(() => {
+      moveWidget(widget.id, moveAction)
+    })
+
+    const dragHandle = document.querySelector(
+      `[data-testid="${widget.id}-drag-handle"]`,
+    ) as HTMLElement
+    if (dragHandle) {
+      dragHandle.focus()
+
+      const moveAnnouncement = I18n.t('%{widgetName}, moved %{direction}', {
+        widgetName: widgetTitle,
+        direction: getMoveActionDescription(moveAction),
+      })
+
+      announceToScreenReader(moveAnnouncement)
+    }
   }
 
   const handleRemove = () => {
-    removeWidget(widget.id)
+    removeWidget(widget.id, widgetTitle)
   }
 
   const editModeActions = (
@@ -102,17 +141,18 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
               lineHeight: 1,
             }}
             type="button"
-            aria-label={I18n.t('Drag to reorder or click for options')}
+            aria-label={I18n.t('Reorder %{widgetName}', {widgetName: widgetTitle})}
           >
             <IconDragHandleLine />
           </button>
         }
         widget={widget}
         config={config}
+        isStacked={!isDesktop}
         onSelect={handleMenuSelect}
       />
       <IconButton
-        screenReaderLabel={I18n.t('Remove widget')}
+        screenReaderLabel={I18n.t('Remove %{widgetName}', {widgetName: widgetTitle})}
         size="small"
         withBackground={false}
         withBorder={false}
@@ -127,9 +167,9 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   const renderContent = () => {
     if (isLoading) {
       return (
-        <View as="div" textAlign="center" width="100%" minHeight="400px">
+        <Flex justifyItems="center" alignItems="center" height="400px">
           <Spinner renderTitle={loadingText || I18n.t('Loading widget data...')} size="medium" />
-        </View>
+        </Flex>
       )
     }
 
@@ -189,7 +229,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                 {headerActions && (
                   <Flex.Item padding="x-small 0 x-small x-small">{headerActions}</Flex.Item>
                 )}
-                {isEditMode && isDesktop && (
+                {isEditMode && (
                   <Flex.Item padding="x-small 0 x-small x-small">{editModeActions}</Flex.Item>
                 )}
               </Flex>
@@ -201,7 +241,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
                   </Heading>
                 </Flex.Item>
                 {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
-                {isEditMode && isDesktop && (
+                {isEditMode && (
                   <Flex.Item margin="0 0 0 small" shouldGrow={false}>
                     {editModeActions}
                   </Flex.Item>
@@ -211,7 +251,32 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
           </>
         )}
 
-        <View as="div">{renderContent()}</View>
+        <View
+          as="div"
+          position="relative"
+          elementRef={el => {
+            contentRef.current = el as HTMLElement
+          }}
+        >
+          {renderContent()}
+          {loadingOverlay?.isLoading && !isLoading && !error && mountNode && (
+            <Overlay
+              open={true}
+              transition="fade"
+              label={loadingOverlay.ariaLabel || I18n.t('Loading')}
+              data-testid="loading-overlay"
+              mountNode={mountNode}
+            >
+              <Mask>
+                <Spinner
+                  renderTitle={loadingText || I18n.t('Loading...')}
+                  size="medium"
+                  margin="0 0 0 medium"
+                />
+              </Mask>
+            </Overlay>
+          )}
+        </View>
 
         {actions && !isLoading && !error && (
           <View as="div" margin="small 0 0">
@@ -222,9 +287,6 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
         {pagination && !isLoading && !error && pagination.totalPages > 1 && (
           <View as="div" textAlign="center" padding="x-small 0" data-testid="pagination-container">
             <Flex direction="row" justifyItems="center" alignItems="center" gap="small">
-              {pagination.isLoading && (
-                <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
-              )}
               <Pagination
                 as="nav"
                 margin="x-small"

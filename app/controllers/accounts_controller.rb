@@ -361,6 +361,38 @@ class AccountsController < ApplicationController
     end
   end
 
+  # @API List horizon accounts
+  # A paginated list of horizon accounts that the current user can view or manage.
+  # Returns all accounts with the horizon_account setting enabled. If there are any
+  # horizon accounts and the user has access to Site Admin, Site Admin will also be
+  # included in the results.
+  #
+  # Typically, students and even teachers will get an empty list in response,
+  # only account admins can view the accounts that they are in.
+  #
+  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"|"course_count"|"sub_account_count"|"site_admin"]
+  #   Array of additional information to include.
+  #
+  #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
+  #   "registration_settings":: returns info about the privacy policy and terms of use
+  #   "services":: returns services and whether they are enabled (requires account management permissions)
+  #   "course_count":: returns the number of courses directly under each account
+  #   "sub_account_count":: returns the number of sub-accounts directly under each account
+  #   "site_admin":: returns true if the account is the Site Admin account (only included if true)
+  #
+  # @returns [Account]
+  def horizon_accounts
+    @accounts = if @current_user
+                  Api.paginate(@current_user.all_paginatable_horizon_accounts, self, api_v1_horizon_accounts_url)
+                else
+                  []
+                end
+    ActiveRecord::Associations.preload(@accounts, :root_account)
+
+    includes = params[:include] || params[:includes]
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+  end
+
   # @API Get accounts that admins can manage
   # A paginated list of accounts where the current user has permission to create
   # or manage courses. List will be empty for students and teachers as only admins
@@ -912,6 +944,14 @@ class AccountsController < ApplicationController
       @courses = @courses.homeroom
     end
 
+    if @account.root_account.feature_enabled?(:horizon_learning_library_ms2) && params.key?(:career_learning_library_only)
+      @courses = if value_to_boolean(params[:career_learning_library_only])
+                   @courses.career_learning_library
+                 else
+                   @courses.not_career_learning_library
+                 end
+    end
+
     if starts_before || ends_after
       @courses = @courses.joins(:enrollment_term)
       if starts_before
@@ -1027,6 +1067,35 @@ class AccountsController < ApplicationController
       paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
       render json: renderable
+    end
+  end
+
+  # Get account accessibility issue summary
+  def accessibility_issue_summary
+    if authorized_action(@account, @current_user, :read)
+      unless @account.can_see_accessibility_tab?(@current_user)
+        return render json: { error: "Not authorized to view accessibility data" }, status: :unauthorized
+      end
+
+      GuardRail.activate(:secondary) do
+        courses = @account.associated_courses.where.not(workflow_state: "deleted")
+
+        stats_table = AccessibilityCourseStatistic.arel_table
+        active_issues, resolved_issues = courses
+                                         .left_joins(:accessibility_course_statistic)
+                                         .where(stats_table[:workflow_state].eq("active").or(stats_table[:id].eq(nil)))
+                                         .pick(
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.active_issue_count), 0)"),
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.resolved_issue_count), 0)")
+                                         )
+
+        summary_data = {
+          active: active_issues || 0,
+          resolved: resolved_issues || 0
+        }
+
+        render json: summary_data
+      end
     end
   end
 
@@ -1490,7 +1559,13 @@ class AccountsController < ApplicationController
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
         set_course_template
 
-        if @account.update(strong_account_params)
+        nav_menu_links_success = NavMenuLink.sync_with_link_objects_json(
+          context: @account,
+          link_objects_json: params[:account].delete(:nav_menu_links),
+          can_manage_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
+        )
+
+        if nav_menu_links_success && @account.update(strong_account_params)
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render json: @account }
@@ -1591,7 +1666,8 @@ class AccountsController < ApplicationController
         manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags),
         add_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_add),
         edit_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_edit),
-        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete)
+        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete),
+        manage_nav_menu_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
       }
 
       can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }
@@ -1622,10 +1698,18 @@ class AccountsController < ApplicationController
                  account_roles: @account_roles,
                }
              })
-      js_env(edit_help_links_env, true)
+
+      if @account.root_account.feature_enabled?(:nav_menu_links)
+        js_env({
+                 NAV_MENU_LINKS:
+                   NavMenuLink.active.where(context: @account).order(:id).as_existing_link_objects
+               })
+      end
+
+      js_env(edit_help_links_env, overwrite: true)
       if @account.root_account?
-        js_env(EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
-                                     @account.grants_right?(@current_user, :manage_site_settings))
+        js_env({ EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
+                                     @account.grants_right?(@current_user, :manage_site_settings) })
       end
     end
   end
@@ -1657,17 +1741,19 @@ class AccountsController < ApplicationController
     end
     logging ||= false
 
-    js_env PERMISSIONS: {
-      restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
-      restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
-      # Permission caching issue makes explicitly checking the account setting
-      # an easier option.
-      view_messages: (@account.settings[:admins_can_view_notifications] &&
-                       @account.grants_right?(@current_user, session, :view_notifications)) ||
-                     Account.site_admin.grants_right?(@current_user, :read_messages),
-      logging:
-    }
-    js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
+    js_env({
+             PERMISSIONS: {
+               restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+               restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
+               # Permission caching issue makes explicitly checking the account setting
+               # an easier option.
+               view_messages: (@account.settings[:admins_can_view_notifications] &&
+                             @account.grants_right?(@current_user, session, :view_notifications)) ||
+                           Account.site_admin.grants_right?(@current_user, :read_messages),
+               logging:
+             },
+             BOUNCED_EMAILS_ADMIN_TOOL: @account.grants_right?(@current_user, session, :view_bounced_emails)
+           })
   end
 
   def confirm_delete_user

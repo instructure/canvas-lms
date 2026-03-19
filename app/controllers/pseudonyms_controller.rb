@@ -188,16 +188,18 @@ class PseudonymsController < ApplicationController
       password_policies = @password_pseudonyms.to_h do |p|
         [p.id, { pseudonym: { unique_id: p.unique_id, account_display_name: p.account.display_name }, policy: p.account.password_policy }]
       end
-      js_env PASSWORD_POLICY: @domain_root_account.password_policy,
-             PASSWORD_POLICIES: password_policies,
-             CC: {
-               confirmation_code: @cc.confirmation_code,
-               path: @cc.path,
-             },
-             PSEUDONYM: {
-               id: @pseudonym.id,
-               user_name: @pseudonym.user.name,
-             }
+      js_env({
+               PASSWORD_POLICY: @domain_root_account.password_policy,
+               PASSWORD_POLICIES: password_policies,
+               CC: {
+                 confirmation_code: @cc.confirmation_code,
+                 path: @cc.path,
+               },
+               PSEUDONYM: {
+                 id: @pseudonym.id,
+                 user_name: @pseudonym.user.name,
+               }
+             })
     end
   end
 
@@ -624,6 +626,7 @@ class PseudonymsController < ApplicationController
 
     authorized_if_requested_change?(:workflow_state, :delete) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :workflow_state)
+        @pseudonym.current_user = @current_user # performing user for audit logging
         @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
       end
     end or return false

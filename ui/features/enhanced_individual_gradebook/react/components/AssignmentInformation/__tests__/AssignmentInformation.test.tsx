@@ -63,6 +63,18 @@ describe('Assignment Information Tests', () => {
     expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online upload')
   })
 
+  it('displays peer review submission type correctly', () => {
+    const props = {
+      ...assignmentInfoDefaultProps,
+      assignment: {
+        ...defaultAssignment,
+        submissionTypes: ['peer_review'],
+      },
+    }
+    const {getByTestId} = renderAssignmentInformation(props)
+    expect(getByTestId('assignment-submission-info')).toHaveTextContent('Peer review')
+  })
+
   it('does not display the message students who button when the selected assignment is anonymous', () => {
     const {queryByTestId} = renderAssignmentInformation({
       ...assignmentInfoDefaultProps,

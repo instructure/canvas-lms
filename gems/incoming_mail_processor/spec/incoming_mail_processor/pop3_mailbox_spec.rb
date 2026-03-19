@@ -21,7 +21,7 @@
 require "spec_helper"
 
 describe IncomingMailProcessor::Pop3Mailbox do
-  include_examples "Mailbox"
+  it_behaves_like "Mailbox"
 
   def default_config
     {
@@ -34,7 +34,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
   end
 
   def mock_net_pop
-    @pop_mock = double
+    @pop_mock = instance_double(Net::POP3)
     IncomingMailProcessor::Pop3Mailbox::UsedPopMethods.each do |method_name|
       allow(@pop_mock).to receive(method_name)
     end
@@ -111,9 +111,9 @@ describe IncomingMailProcessor::Pop3Mailbox do
     end
 
     it "retrieves and yield messages" do
-      foo = double(pop: "foo body")
-      bar = double(pop: "bar body")
-      baz = double(pop: "baz body")
+      foo = instance_double(Net::POPMail, pop: "foo body")
+      bar = instance_double(Net::POPMail, pop: "bar body")
+      baz = instance_double(Net::POPMail, pop: "baz body")
       expect(@pop_mock).to receive(:mails).and_return([foo, bar, baz])
 
       yielded_values = []
@@ -126,7 +126,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
     it "retrieves messages using a stride and offset" do
       foo, bar, baz = %w[foo bar baz].map do |msg|
-        m = double(pop: "#{msg} body")
+        m = instance_double(Net::POPMail, pop: "#{msg} body")
         expect(m).to receive(:uidl).twice.and_return(msg)
         m
       end
@@ -147,7 +147,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
     context "with simple foo message" do
       before do
-        @foo = double(pop: "foo body")
+        @foo = instance_double(Net::POPMail, pop: "foo body")
         expect(@pop_mock).to receive(:mails).and_return([@foo])
       end
 

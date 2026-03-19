@@ -26,12 +26,12 @@
 %>
 
 <div id="gradebook_wrapper">
-  <h1 class="screenreader-only"><%= t('Learning Mastery') %></h1>
-    <% if @context.feature_enabled?(:improved_lmgb) %>
-      <% js_bundle :learning_mastery_v2 %>
-      <div id="learning_mastery_gradebook"></div>
+  <% if @context.feature_enabled?(:improved_lmgb) %>
+    <% js_bundle :learning_mastery_v2 %>
+    <div id="learning_mastery_gradebook"></div>
   <% else %>
     <% js_bundle :learning_mastery %>
+    <h1 class="screenreader-only"><%= t('Learning Mastery') %></h1>
     <div class="outcome-gradebook-container">
       <%# EVAL-3711 Remove ICE Feature Flag %>
       <nav style="display: flex; justify-content: space-between; padding: <%= @domain_root_account.feature_enabled?(:instui_nav) ? '2.25em 0' : '0.4em 0' %>;">

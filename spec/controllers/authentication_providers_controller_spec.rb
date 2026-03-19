@@ -229,7 +229,7 @@ describe AuthenticationProvidersController do
       account.authentication_providers.create!(linkedin)
 
       post "create", format: :json, params: { account_id: account.id }.merge(linkedin)
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
     end
 
     context "when the auth provider type is restorable" do
@@ -263,7 +263,7 @@ describe AuthenticationProvidersController do
       context "and an active existing provider of the same type exists" do
         before { account.authentication_providers.create!(params.merge(workflow_state: "active")) }
 
-        it { is_expected.to have_http_status :unprocessable_entity }
+        it { is_expected.to have_http_status :unprocessable_content }
 
         it "indicates an active auth provider of the type already exists" do
           create_provider
@@ -433,6 +433,64 @@ describe AuthenticationProvidersController do
 
         it { is_expected.to be_unauthorized }
       end
+    end
+  end
+
+  describe "discovery_page_active SSO setting" do
+    before do
+      Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+    end
+
+    it "includes discovery_page_active in the sso_settings response when allowed" do
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
+      get :show_sso_settings, params: { account_id: account.id }, format: :json
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json["sso_settings"]["discovery_page_active"]).to be(true)
+    end
+
+    it "does not include discovery_page_active when not allowed" do
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
+      get :show_sso_settings, params: { account_id: account.id }, format: :json
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json["sso_settings"]).not_to have_key("discovery_page_active")
+    end
+
+    it "updates discovery_page_active via update_sso_settings when feature flag is enabled" do
+      put :update_sso_settings, params: {
+        account_id: account.id,
+        sso_settings: { discovery_page_active: true }
+      }
+      expect(response).to be_redirect
+      account.reload
+      expect(account.discovery_page_active?).to be(true)
+    end
+
+    it "ignores discovery_page_active parameter when not allowed" do
+      Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      put :update_sso_settings, params: {
+        account_id: account.id,
+        sso_settings: { discovery_page_active: true }
+      }
+      expect(response).to be_redirect
+      account.reload
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "can disable discovery_page_active when feature flag is enabled" do
+      account.settings[:discovery_page] = { active: true, primary: [], secondary: [] }
+      account.save!
+      put :update_sso_settings, params: {
+        account_id: account.id,
+        sso_settings: { discovery_page_active: false }
+      }
+      expect(response).to be_redirect
+      account.reload
+      expect(account.discovery_page_active?).to be(false)
     end
   end
 end

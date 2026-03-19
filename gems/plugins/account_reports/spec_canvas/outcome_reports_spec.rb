@@ -438,7 +438,7 @@ describe "Outcome Reports" do
       Account.site_admin.disable_feature!(:improved_outcome_report_generation)
     end
 
-    include_examples "common outcomes report behavior"
+    it_behaves_like "common outcomes report behavior"
   end
 
   describe "outcome results report" do
@@ -447,7 +447,7 @@ describe "Outcome Reports" do
     let(:all_values) { [user1_values] }
     let(:order) { [0, 2, 3, 13, 18] }
 
-    include_examples "common outcomes report behavior"
+    it_behaves_like "common outcomes report behavior"
 
     context "with quiz question results" do
       before(:once) do
@@ -649,21 +649,27 @@ describe "Outcome Reports" do
 
       context ":outcome_service_results_to_canvas" do
         # Column indexes
-        student_name = 0
-        assessment_title = 3
-        assessment_type = 5
-        outcome = 8
-        question = 12
-        question_id = 13
-        course = 14
+        let(:student_name) { 0 }
+        let(:assessment_title) { 3 }
+        let(:assessment_type) { 5 }
+        let(:outcome) { 8 }
+        let(:question) { 12 }
+        let(:question_id) { 13 }
+        let(:course) { 14 }
 
         # These columns are added/modified to the report when writing the csv file
-        outcome_score = 11
-        learning_outcome_points_possible = 22
-        learning_outcome_mastery_score = 23
-        learning_outcome_mastered = 24
-        learning_outcome_rating = 25
-        learning_outcome_rating_points = 26
+        let(:outcome_score) { 11 }
+        let(:learning_outcome_points_possible) { 22 }
+        let(:learning_outcome_mastery_score) { 23 }
+        let(:learning_outcome_mastered) { 24 }
+        let(:learning_outcome_rating) { 25 }
+        let(:learning_outcome_rating_points) { 26 }
+
+        let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+        let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+        let(:assignment_ids) { @new_quiz.id.to_s }
+        let(:outcome_ids) { @outcome.id.to_s }
+        let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
         def mock_os_result(user, outcome, quiz, submission_date, attempts = nil)
           if attempts.nil?
@@ -693,12 +699,6 @@ describe "Outcome Reports" do
              submitted_at: submission_date,
              mastery: nil },]
         end
-
-        let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
-        let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
-        let(:assignment_ids) { @new_quiz.id.to_s }
-        let(:outcome_ids) { @outcome.id.to_s }
-        let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
         it "filters out users that do not have results" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
@@ -1462,15 +1462,15 @@ describe "Outcome Reports" do
     let(:config_options) { {} }
     let(:csv) { [] }
     let(:canvas_scope) do
-      double("canvas_scope").tap do |scope|
+      instance_double(ActiveRecord::Relation).tap do |scope|
         allow(scope).to receive(:find_each) do |&block|
           (1..3).each do |i|
-            record = double(attributes: {
-                              "student id" => i,
-                              "course id" => i,
-                              "learning outcome id" => i,
-                              "submission date" => Time.now.utc + i.days
-                            })
+            record = instance_double(ActiveRecord::Base, attributes: {
+                                       "student id" => i,
+                                       "course id" => i,
+                                       "learning outcome id" => i,
+                                       "submission date" => Time.now.utc + i.days
+                                     })
             allow(record).to receive(:[]).with("student id").and_return(i)
             allow(record).to receive(:[]).with("course id").and_return(i)
             allow(record).to receive(:[]).with("learning outcome id").and_return(i)
@@ -1478,7 +1478,7 @@ describe "Outcome Reports" do
             block.call(record)
           end
         end
-        except_scope = double("except_scope")
+        except_scope = instance_double(ActiveRecord::Relation)
         allow(scope).to receive(:except).with(:select).and_return(except_scope)
         allow(except_scope).to receive(:count).and_return(1)
       end

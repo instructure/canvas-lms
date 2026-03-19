@@ -235,4 +235,46 @@ describe "ToDoListPresenter" do
       end
     end
   end
+
+  context "peer review sub assignments for grading" do
+    let(:course) { Course.create! }
+    let(:teacher) { course_with_teacher(course:, active_all: true).user }
+    let(:student1) { course_with_student(course:, active_all: true).user }
+    let(:student2) { course_with_student(course:, active_all: true).user }
+
+    before do
+      course.account.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment = Assignment.create!(
+        context: course,
+        title: "Assignment with Peer Review",
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10
+      )
+      @peer_review_sub_assignment = @assignment.create_peer_review_sub_assignment!(
+        points_possible: 5,
+        due_at: 1.day.from_now
+      )
+      @peer_review_sub_assignment.submit_homework(student1, body: "peer review 1")
+      @peer_review_sub_assignment.submit_homework(student2, body: "peer review 2")
+    end
+
+    it "includes peer review sub assignments in needs_grading when feature flag is enabled" do
+      presenter = ToDoListPresenter.new(nil, teacher, [course])
+      expect(presenter.needs_grading.map(&:assignment)).to include(@peer_review_sub_assignment)
+    end
+
+    it "does not include peer review sub assignments when feature flag is disabled" do
+      course.account.disable_feature!(:peer_review_allocation_and_grading)
+      presenter = ToDoListPresenter.new(nil, teacher, [course])
+      expect(presenter.needs_grading.map(&:assignment)).not_to include(@peer_review_sub_assignment)
+    end
+
+    it "does not include peer review sub assignments without submissions" do
+      @peer_review_sub_assignment.submissions.destroy_all
+      presenter = ToDoListPresenter.new(nil, teacher, [course])
+      expect(presenter.needs_grading.map(&:assignment)).not_to include(@peer_review_sub_assignment)
+    end
+  end
 end

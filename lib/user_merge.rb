@@ -135,7 +135,13 @@ class UserMerge
 
       account_users = AccountUser.where(user_id: from_user)
       merge_data.add_more_data(account_users)
-      account_users.update_all(user_id: target_user.id, updated_at: Time.now.utc)
+      # soft-delete account_users that would violate the unique index, then move the rest
+      target_combos = AccountUser.where(user_id: target_user).pluck(:role_id, :account_id).to_set
+      conflicting_ids = account_users.filter_map { |au| au.id if target_combos.include?([au.role_id, au.account_id]) }
+      if conflicting_ids.any?
+        AccountUser.where(id: conflicting_ids).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+      end
+      AccountUser.where(user_id: from_user).where.not(id: conflicting_ids).update_all(user_id: target_user.id, updated_at: Time.now.utc)
 
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
@@ -303,6 +309,7 @@ class UserMerge
       from_user.update_shadow_records_synchronously!
       from_user.save!
 
+      target_user.update_shadow_records_synchronously!
       target_user.save!
     end
 
@@ -654,6 +661,16 @@ class UserMerge
     end
   end
 
+  def destroy_remaining_from_user_enrollments(column)
+    # Safety net: soft-delete any from_user enrollments that are still active
+    # after the move (e.g. if handle_conflicts missed a conflict ;) ).
+    remaining = Enrollment.active.where(column => from_user)
+    return unless remaining.exists?
+
+    merge_data.build_more_data(remaining, data:)
+    remaining.find_each(&:destroy)
+  end
+
   def remove_self_observers
     # prevent observing self by marking them as deleted
     to_delete = Enrollment.active.where("type = 'ObserverEnrollment' AND
@@ -676,6 +693,7 @@ class UserMerge
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
           merge_data.build_more_data(to_move, data:)
           to_move.update_all(column => target_user.id, :updated_at => Time.now.utc)
+          destroy_remaining_from_user_enrollments(column)
         end
       end
     end

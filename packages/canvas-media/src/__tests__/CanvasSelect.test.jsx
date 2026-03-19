@@ -21,11 +21,11 @@
  ** Copied from canvas-lms/ui/shared/react/components/__test__/CanvasSelect.test.js
  */
 
-import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
+import React from 'react'
 import '@instructure/canvas-theme'
-import CanvasSelect from '../shared/CanvasSelect'
 import {vi} from 'vitest'
+import CanvasSelect from '../shared/CanvasSelect'
 
 function selectProps(override = {}) {
   return {

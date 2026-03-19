@@ -184,8 +184,8 @@ describe MicrosoftSync::Group do
   end
 
   describe "#enqueue_future_sync" do
-    let(:delay_double) { double(:delay) }
-    let(:syncer_job) { double(:syncer_job) }
+    let(:delay_double) { instance_double(MicrosoftSync::StateMachineJob, run_later: nil) }
+    let(:syncer_job) { instance_double(MicrosoftSync::SyncerSteps) }
 
     it "enqueues a debounced (singleton and on_conflict=overwrite) job" do
       Timecop.freeze do
@@ -213,12 +213,12 @@ describe MicrosoftSync::Group do
   end
 
   describe "#enqueue_future_partial_sync" do
-    let(:delay_double) { double(:delay) }
-    let(:syncer_job) { double(:syncer_job) }
+    let(:delay_double) { instance_double(MicrosoftSync::StateMachineJob, run_later: nil) }
+    let(:syncer_job) { instance_double(MicrosoftSync::SyncerSteps) }
 
     it "upserts the sync change & enqueues a debounced (singleton and on_conflict=overwrite) job" do
       Timecop.freeze do
-        enrollment = double(:enrollment)
+        enrollment = instance_double(Enrollment)
         expect(MicrosoftSync::PartialSyncChange).to receive(:upsert_for_enrollment).with(enrollment)
 
         expect(subject).to receive(:syncer_job).and_return(syncer_job)
@@ -239,7 +239,7 @@ describe MicrosoftSync::Group do
         subject.destroy
         expect(MicrosoftSync::PartialSyncChange).to_not receive(:upsert_for_enrollment)
         expect(subject).to_not receive(:syncer_job)
-        subject.enqueue_future_partial_sync(double(:enrollment))
+        subject.enqueue_future_partial_sync(instance_double(Enrollment))
       end
     end
   end

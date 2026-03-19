@@ -51,10 +51,14 @@ module Accessibility
       end
 
       def self.fix_alt_text!(elem, value)
-        if value.blank?
+        if value.nil?
           elem["role"] = "presentation"
           elem["alt"] = ""
           return { changed: elem, content_preview: adjust_img_style(elem) }
+        end
+
+        if value.to_s.strip.empty?
+          raise StandardError, validation_error_missing
         end
 
         if filename_like?(value)

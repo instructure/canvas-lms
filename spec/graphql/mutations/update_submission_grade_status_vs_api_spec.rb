@@ -466,7 +466,7 @@ RSpec.describe "UpdateSubmissionGradeStatus vs SubmissionsApiController#update",
           )
         end
 
-        include_examples "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: false
+        it_behaves_like "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: false
       end
 
       context "with missing deductions but without late deductions" do
@@ -478,7 +478,7 @@ RSpec.describe "UpdateSubmissionGradeStatus vs SubmissionsApiController#update",
           )
         end
 
-        include_examples "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: expected_posted_at_set
+        it_behaves_like "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: expected_posted_at_set
       end
 
       context "without missing deductions but with late deductions" do
@@ -491,7 +491,7 @@ RSpec.describe "UpdateSubmissionGradeStatus vs SubmissionsApiController#update",
           )
         end
 
-        include_examples "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: false
+        it_behaves_like "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: false
       end
 
       context "with missing and late deductions" do
@@ -504,7 +504,7 @@ RSpec.describe "UpdateSubmissionGradeStatus vs SubmissionsApiController#update",
           )
         end
 
-        include_examples "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: expected_posted_at_set
+        it_behaves_like "submission status updates", expected_posted_at_set:, expected_missing_posted_at_set: expected_posted_at_set
       end
     end
 
@@ -520,7 +520,7 @@ RSpec.describe "UpdateSubmissionGradeStatus vs SubmissionsApiController#update",
         expect(@assignment.post_manually?).to be false
       end
 
-      include_examples "missing and late deductions variations", expected_posted_at_set: true
+      it_behaves_like "missing and late deductions variations", expected_posted_at_set: true
     end
 
     context "with automatic grade posting disabled" do
@@ -535,7 +535,7 @@ RSpec.describe "UpdateSubmissionGradeStatus vs SubmissionsApiController#update",
         expect(@assignment.post_manually?).to be true
       end
 
-      include_examples "missing and late deductions variations", expected_posted_at_set: false
+      it_behaves_like "missing and late deductions variations", expected_posted_at_set: false
     end
   end
 end

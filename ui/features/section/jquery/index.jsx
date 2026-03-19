@@ -17,26 +17,21 @@
  */
 
 import React from 'react'
+import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
-import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
-import 'jqueryui/menu'
-import 'jqueryui/autocomplete'
 import PaginatedList from './PaginatedList'
 import UncrosslistForm from '../react/UncrosslistForm'
+import CrosslistForm from '../react/CrosslistForm'
 import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
-import replaceTags from '@canvas/util/replaceTags'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
-import {createRoot} from 'react-dom/client'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import StartDateTimeInput from '../react/StartDateTimeInput'
 import EndDateTimeInput from '../react/EndDateTimeInput'
@@ -72,12 +67,12 @@ ready(() => {
       const onChange = isoDate => {
         startDateTimeValue.value = isoDate ?? ''
       }
-      const root = createRoot(startDateTimeInput)
-      root.render(
+      render(
         <StartDateTimeInput
           initialValue={value}
           handleDateTimeChange={onChange}
         ></StartDateTimeInput>,
+        startDateTimeInput,
       )
     }
   }
@@ -93,9 +88,9 @@ ready(() => {
       const onChange = isoDate => {
         endDateTimeValue.value = isoDate ?? ''
       }
-      const root = createRoot(endDateTimeInput)
-      root.render(
+      render(
         <EndDateTimeInput initialValue={value} handleDateTimeChange={onChange}></EndDateTimeInput>,
+        endDateTimeInput,
       )
     }
   }
@@ -121,15 +116,16 @@ ready(() => {
       }
       // For inst-ui components error message is handled by messages prop
       if (!formError.instUIControlled) {
-        const root = errorRoots[formError.containerId] ?? createRoot(errorsContainer)
-        errorRoots[formError.containerId] = root
-        root.render(
+        const id = formError.containerId
+        const element = (
           <FormattedErrorMessage
-            message={I18n.t('%{errorText}', {errorText: formError.errorText})}
+            message={formError.errorText}
             margin="0 0 xx-small 0"
             iconMargin="0 xx-small xxx-small 0"
-          />,
+          />
         )
+        if (!errorRoots[id]) errorRoots[id] = render(element, errorsContainer)
+        else rerender(errorRoots[id], element)
       }
     })
   }
@@ -181,59 +177,6 @@ ready(() => {
     const endDateTime = document.getElementById('end_datetime_value').value
     errors = validateStartDateAfterEnd(startDateTime, endDateTime)
     return errors
-  }
-
-  function validateCrossListForm(courseName) {
-    const courseLookupValue = $('#course_autocomplete_id').val()
-    const autocompleteValue = $('#course_autocomplete_id_lookup').val()
-    const courseIdValue = $('#course_id').val()
-    const error = {}
-    clearCrossListFormErrors()
-    if (courseIdValue && !courseLookupValue && !autocompleteValue) {
-      error.containerId = '#course_id'
-      error.errorsContainerId = '#course_id_errors'
-      error.errorText = I18n.t(
-        'errors.course_not_authorized_for_crosslist',
-        '%{course_name} not authorized for cross-listing',
-        {
-          course_name:
-            courseName ||
-            I18n.t('default_course_name', 'Course ID "%{course_id}"', {
-              course_id: $('#course_id').val(),
-            }),
-        },
-      )
-      renderFormErrors([error], true)
-    } else if (courseName && !courseLookupValue) {
-      error.containerId = '#course_autocomplete_id_lookup'
-      error.errorsContainerId = '#course_autocomplete_id_lookup_errors'
-      error.errorText = I18n.t(
-        'errors.course_not_authorized_for_crosslist',
-        '%{course_name} not authorized for cross-listing',
-        {course_name: courseName},
-      )
-      renderFormErrors([error], true)
-      $('#sis_id_holder,#account_name_holder').hide()
-      $('#course_autocomplete_name').text('')
-    } else if (!courseLookupValue && !courseName && !courseIdValue) {
-      error.containerId = '#course_autocomplete_id_lookup'
-      error.errorsContainerId = '#course_autocomplete_id_lookup_errors'
-      error.errorText = I18n.t(
-        'errors.missing_target_course_for_crosslist',
-        'Not a valid course name',
-      )
-      renderFormErrors([error], true)
-    } else if (courseLookupValue) return true
-
-    return false
-  }
-
-  function clearCrossListFormErrors() {
-    errorRoots['#course_autocomplete_id_lookup']?.unmount()
-    errorRoots['#course_autocomplete_id_lookup'] = null
-    errorRoots['#course_id']?.unmount()
-    errorRoots['#course_id'] = null
-    $('#course_autocomplete_id_lookup, #course_id').removeClass('error-outline')
   }
 
   // remove course_section_name errors if you begin to type.
@@ -333,168 +276,31 @@ ready(() => {
   if (uncrosslistLinkContainer) {
     /** @type {{courseName: string, enrollmentsCount: number, courseId: string, sectionId: string, nonxlistCourseId: string}} */
     const props = JSON.parse(uncrosslistLinkContainer.dataset.props)
-    const {courseName, enrollmentsCount, courseId, sectionId, nonxlistCourseId} = props
-    createRoot(uncrosslistLinkContainer).render(
+    render(
       <UncrosslistForm
-        courseId={courseId}
-        sectionId={sectionId}
-        nonxlistCourseId={nonxlistCourseId}
-        courseName={courseName}
-        studentEnrollmentsCount={enrollmentsCount}
+        courseId={props.courseId}
+        sectionId={props.sectionId}
+        nonxlistCourseId={props.nonxlistCourseId}
+        courseName={props.courseName}
+        studentEnrollmentsCount={props.enrollmentsCount}
       />,
+      uncrosslistLinkContainer,
     )
   }
 
-  $('.crosslist_link').on('click', event => {
-    event.preventDefault()
-    $('#crosslist_course_form').dialog({
-      width: 450,
-      modal: true,
-      zIndex: 1000,
-    })
-    $('#course_autocomplete_id_lookup').val('')
-    $('#course_id').val('').trigger('change')
-    clearCrossListFormErrors()
-  })
-
-  $('#course_autocomplete_id_lookup')
-    .autocomplete({
-      source: $('#course_autocomplete_url').attr('href'),
-      select(_e, ui) {
-        $('#course_id').val('').trigger('input')
-        $('#crosslist_course_form').triggerHandler('id_entered', ui.item)
-      },
-    })
-    .data('ui-autocomplete')._renderItem = function (ul, item) {
-    return $('<li>')
-      .data('ui-autocomplete-item', item)
-      .append(
-        $('<a>')
-          .append($('<div>').text(item.label))
-          .append(
-            $('<div>')
-              .addClass('secondary')
-              .append(
-                $('<small>').text(
-                  item.sis_id
-                    ? I18n.t(
-                        'course.sisid_term',
-                        'SIS ID: %{course_sisid} | Term: %{course_term}',
-                        {
-                          course_sisid: item.sis_id,
-                          course_term: item.term,
-                        },
-                      )
-                    : I18n.t('course.term', 'Term: %{course_term}', {
-                        course_term: item.term,
-                      }),
-                ),
-              ),
-          ),
-      )
-      .appendTo(ul)
-  }
-
-  $('#course_id').keycodes('return', function (event) {
-    event.preventDefault()
-    $(this).trigger('change')
-  })
-
-  $('#course_autocomplete_id_lookup')
-    .on('input', function () {
-      const container = $(this)
-      if (container) {
-        container.removeClass('error-outline')
-      }
-      $('#course_autocomplete_id').val('')
-      $('#course_id').val('')
-      clearCrossListFormErrors()
-    })
-    .on('blur', function () {
-      const CourseLookupValue = $('#course_autocomplete_id_lookup').val()
-      if (CourseLookupValue) validateCrossListForm()
-    })
-
-  $('#course_id').on('input', function () {
-    const container = $(this)
-    if (container) {
-      container.removeClass('error-outline')
-    }
-    clearCrossListFormErrors()
-  })
-
-  $('#course_id').on('change', function () {
-    $('#course_autocomplete_id_lookup').val('')
-    $('#crosslist_course_form').triggerHandler('id_entered', {id: $(this).val()})
-  })
-  $('#crosslist_course_form .cancel_button').on('click', () => {
-    $('#crosslist_course_form').dialog('close')
-  })
-  let latest_course_id = null
-  $('#crosslist_course_form').on('id_entered', (_e, course) => {
-    if (course.id == latest_course_id) return
-
-    $('#course_autocomplete_id').val('')
-    if (!course.id) {
-      $('#sis_id_holder,#account_name_holder').hide()
-      $('#course_autocomplete_name').text('')
-      return
-    }
-    course.name =
-      course.name ||
-      I18n.t('default_course_name', 'Course ID "%{course_id}"', {course_id: course.id})
-    $('#course_autocomplete_name_holder').show()
-    const confirmingText = I18n.t('status.confirming_course', 'Confirming %{course_name}...', {
-      course_name: course.name,
-    })
-    $('#course_autocomplete_name').text(confirmingText)
-    $.screenReaderFlashMessage(confirmingText)
-    $('#sis_id_holder,#account_name_holder').hide()
-    $('#course_autocomplete_account_name').hide()
-    const url = replaceTags($('#course_confirm_crosslist_url').attr('href'), 'id', course.id)
-    latest_course_id = course.id
-    const course_id_before_get = latest_course_id
-    $.ajaxJSON(
-      url,
-      'GET',
-      {},
-      data => {
-        if (course_id_before_get != latest_course_id) {
-          return
-        }
-        if (data && data.allowed) {
-          const template_data = {
-            sis_id: data.course && data.course.sis_source_id,
-            account_name: data.account && data.account.name,
-          }
-          $('#course_autocomplete_name_holder').fillTemplateData({data: template_data})
-          $('#course_autocomplete_name').text(data.course.name)
-          $.screenReaderFlashMessage(data.course.name)
-          $('#sis_id_holder').showIf(template_data.sis_id)
-          $('#account_name_holder').showIf(template_data.account_name)
-
-          $('#course_autocomplete_id').val(data.course.id)
-        } else {
-          const errorText = I18n.t(
-            'errors.course_not_authorized_for_crosslist',
-            '%{course_name} not authorized for cross-listing',
-            {course_name: course.name},
-          )
-          validateCrossListForm(course.name)
-          $('#course_autocomplete_name').text('')
-          $.screenReaderFlashError(errorText)
-          $('#sis_id_holder,#account_name_holder').hide()
-        }
-      },
-      _data => {
-        $('#course_autocomplete_name').text(
-          I18n.t('errors.confirmation_failed', 'Confirmation Failed'),
-        )
-      },
+  const crosslistLinkContainer = document.getElementById('crosslist_link_button_container')
+  if (crosslistLinkContainer) {
+    /** @type {{sectionId: string, isAlreadyCrosslisted: boolean, manageableCoursesUrl: string, confirmCrosslistUrl: string, crosslistUrl: string}} */
+    const props = JSON.parse(crosslistLinkContainer.dataset.props)
+    render(
+      <CrosslistForm
+        sectionId={props.sectionId}
+        isAlreadyCrosslisted={props.isAlreadyCrosslisted}
+        manageableCoursesUrl={props.manageableCoursesUrl}
+        confirmCrosslistUrl={props.confirmCrosslistUrl}
+        crosslistUrl={props.crosslistUrl}
+      />,
+      crosslistLinkContainer,
     )
-  })
-  $("#crosslist_course_form button[type='submit']").on('click', function (e) {
-    e.preventDefault()
-    if (validateCrossListForm()) $('#crosslist_course_form').trigger('submit')
-  })
+  }
 })

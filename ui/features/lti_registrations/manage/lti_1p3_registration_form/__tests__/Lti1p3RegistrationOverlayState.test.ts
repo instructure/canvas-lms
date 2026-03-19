@@ -425,5 +425,20 @@ describe('Lti1p3RegistrationOverlayState', () => {
       )
       expect(initialState.placements.topNavigationAllowFullscreen).toBe(false)
     })
+
+    it('includes placements from existing overlay in the placements list', () => {
+      const config = mockInternalConfiguration({
+        placements: [{placement: 'course_navigation'}],
+      })
+
+      const existingOverlay: LtiConfigurationOverlay = {
+        placements: {
+          global_navigation: {},
+        },
+      }
+
+      const initialState = initialOverlayStateFromInternalConfig(config, undefined, existingOverlay)
+      expect(initialState.placements.placements).toContain('global_navigation')
+    })
   })
 })

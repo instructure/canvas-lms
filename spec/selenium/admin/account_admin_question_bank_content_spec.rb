@@ -172,7 +172,7 @@ describe "account admin question bank" do
   end
 
   it "deletes a question bank" do
-    expect_new_page_load(true) { f("#right-side .delete_bank_link").click }
+    expect_new_page_load(accept_alert: true) { f("#right-side .delete_bank_link").click }
     @question_bank.reload
     expect(@question_bank.workflow_state).to eq "deleted"
   end

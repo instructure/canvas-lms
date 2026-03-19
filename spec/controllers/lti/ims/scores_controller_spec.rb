@@ -705,7 +705,7 @@ module Lti::IMS
                 allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
                 @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
                 allow(CanvasHttp).to receive(:post).and_return(
-                  double(class: Net::HTTPCreated, code: 201, body: {})
+                  instance_double(Net::HTTPCreated, class: Net::HTTPCreated, code: 201, body: {})
                 )
               end
 
@@ -771,7 +771,7 @@ module Lti::IMS
               context "when InstFS responds with a 500" do
                 before do
                   allow(CanvasHttp).to receive(:post).and_return(
-                    double(class: Net::HTTPServerError, code: 500, body: {})
+                    instance_double(Net::HTTPServerError, class: Net::HTTPServerError, code: 500, body: {})
                   )
                 end
 
@@ -781,7 +781,7 @@ module Lti::IMS
               context "when InstFS responds with a 400" do
                 before do
                   allow(CanvasHttp).to receive(:post).and_return(
-                    double(class: Net::HTTPBadRequest, code: 400, body: {})
+                    instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 400, body: {})
                   )
                 end
 
@@ -792,7 +792,7 @@ module Lti::IMS
                 context "and InstFS responds with a 502" do
                   before do
                     allow(CanvasHttp).to receive(:post).and_return(
-                      double(class: Net::HTTPBadRequest, code: 502, body: {})
+                      instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 502, body: {})
                     )
                   end
 
@@ -806,7 +806,7 @@ module Lti::IMS
                 context "and InstFS responds with a 400" do
                   before do
                     allow(CanvasHttp).to receive(:post).and_return(
-                      double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                      instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
                     )
                   end
 
@@ -1248,7 +1248,7 @@ module Lti::IMS
           it "returns an unprocessable_entity error" do
             result
             send_request
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
           end
         end
 
@@ -1433,7 +1433,7 @@ module Lti::IMS
             result
             send_request
             expect(assignment.find_or_create_submission(user).workflow_state).to eq "unsubmitted"
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
             expect(response.body).to include "This assignment is still unpublished"
           end
         end

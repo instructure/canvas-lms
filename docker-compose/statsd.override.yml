@@ -5,7 +5,7 @@ services:
     environment:
       INST_STATSD_HOST: statsd
       INST_STATSD_PORT: 8125
-
+      INST_DOG_TAGS: '{ "project": "canvas" }'
   statsd:
     image: alpine
     command:

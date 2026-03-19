@@ -189,10 +189,12 @@ module Interfaces::SubmissionInterface
   end
   def comments_connection(filter:, sort_order:, include_draft_comments:, include_drafts_from_others:, include_provisional_comments:)
     filter = filter.to_h
-    filter => all_comments:, for_attempt:, peer_review:
+    filter => all_comments:, for_attempt:, peer_review:, status:
+    use_visible_comments = status&.include?("ALL") || (include_draft_comments && include_drafts_from_others)
 
-    # Preload provisional comments if needed
-    provisional_comments_promise = if include_provisional_comments
+    # Preload provisional comments only when needed (not using visible_submission_comments_for
+    # which already includes provisional comments via all_submission_comments)
+    provisional_comments_promise = if include_provisional_comments && !use_visible_comments
                                      Loaders::AssociationLoader
                                        .for(Submission, :provisional_grades)
                                        .load(submission)
@@ -215,7 +217,7 @@ module Interfaces::SubmissionInterface
     load_association(:assignment).then do
       load_association(:submission_comments).then do
         provisional_comments_promise.then do |provisional_comments|
-          comments = if include_draft_comments && include_drafts_from_others
+          comments = if use_visible_comments
                        submission.visible_submission_comments_for(current_user)
                      elsif include_draft_comments
                        submission.comments_including_drafts_for(current_user)
@@ -224,7 +226,7 @@ module Interfaces::SubmissionInterface
                      end
           comments = comments.to_a
 
-          if include_provisional_comments
+          if include_provisional_comments && !use_visible_comments
             comments.concat(submission.visible_provisional_comments(current_user, provisional_comments:))
           end
 
@@ -233,7 +235,12 @@ module Interfaces::SubmissionInterface
           comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
           comments.reverse! if sort_order.to_s.casecmp("desc").zero?
 
-          comments.select { |comment| comment.grants_right?(current_user, :read) }
+          if use_visible_comments
+            # Permissions checks are already applied in visible_submission_comments_for
+            comments
+          else
+            comments.select { |comment| comment.grants_right?(current_user, :read) }
+          end
         end
       end
     end
@@ -466,34 +473,38 @@ module Interfaces::SubmissionInterface
                       object.grants_right?(current_user, :view_vericite_report) &&
                       object.assignment.vericite_enabled
 
-      promises =
-        object.vericite_data
-              .except(
-                :provider,
-                :last_processed_attempt,
-                :webhook_info,
-                :eula_agreement_timestamp,
-                :assignment_error,
-                :student_error,
-                :status
-              )
-              .map do |asset_string, data|
-                Loaders::AssetStringLoader
-                  .load(asset_string.to_s)
-                  .then do |target|
-                    next if target.nil?
+      object.vericite_data(false)
+            .except(
+              :provider,
+              :last_processed_attempt,
+              :webhook_info,
+              :eula_agreement_timestamp,
+              :assignment_error,
+              :student_error,
+              :status
+            )
+            .map do |asset_string, data|
+              # For submission asset strings, use current submission object instead of loading
+              # OriginalityReport#asset_key appends ISO8601 timestamp to submission asset strings
+              target_promise = if asset_string.to_s.start_with?("submission_")
+                                 Promise.resolve(object)
+                               else
+                                 Loaders::AssetStringLoader.load(asset_string.to_s)
+                               end
 
-                    {
-                      target:,
-                      asset_string:,
-                      report_url: data[:report_url],
-                      score: data[:similarity_score],
-                      status: data[:status],
-                      state: data[:state],
-                    }
-                  end
-        end
-      Promise.all(promises).then(&:compact)
+              target_promise.then do |target|
+                next if target.nil?
+
+                {
+                  target:,
+                  asset_string:,
+                  report_url: data[:report_url],
+                  score: data[:similarity_score],
+                  status: data[:status],
+                  state: data[:state],
+                }
+              end
+      end
     end
   end
 
@@ -501,37 +512,40 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     load_association(:assignment).then do
       next nil unless object.grants_right?(current_user, :view_turnitin_report)
-      next nil if object.turnitin_data.empty?
 
-      promises =
-        object
-        .turnitin_data
-        .except(
-          :last_processed_attempt,
-          :webhook_info,
-          :eula_agreement_timestamp,
-          :assignment_error,
-          :provider,
-          :student_error,
-          :status
-        )
-        .map do |asset_string, data|
-          Loaders::AssetStringLoader
-            .load(asset_string.to_s)
-            .then do |target|
-              next if target.nil?
+      Promise.all(
+        [
+          load_association(:originality_reports),
+          Loaders::AssociationLoader.for(Assignment, :assignment_configuration_tool_lookups).load(object.assignment)
+        ]
+      ).then do
+        next nil unless object.originality_data.present?
 
-              {
-                target:,
-                asset_string:,
-                report_url: data[:report_url],
-                score: data[:similarity_score],
-                status: data[:status],
-                state: data[:state]
-              }
-            end
+        # matching Api:V1:Submission#submission_attempt_json
+        promises = object.originality_data.map do |asset_string, data|
+          # For submission asset strings, use current submission object instead of loading
+          # OriginalityReport#asset_key appends ISO8601 timestamp to submission asset strings
+          target_promise = if asset_string.to_s.start_with?("submission_")
+                             Promise.resolve(object)
+                           else
+                             Loaders::AssetStringLoader.load(asset_string.to_s)
+                           end
+
+          target_promise.then do |target|
+            next if target.nil?
+
+            {
+              target:,
+              asset_string:,
+              report_url: data[:report_url],
+              score: data[:similarity_score],
+              status: data[:status],
+              state: data[:state]
+            }
+          end
         end
-      Promise.all(promises).then(&:compact)
+        Promise.all(promises).then(&:compact)
+      end
     end
   end
 
@@ -672,24 +686,28 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    if submission.not_submitted? && !submission.partially_submitted?
-      nil
-    elsif submission.submission_type == "basic_lti_launch"
-      GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
-        submission.course_id,
-        assignment_id: submission.assignment_id,
-        url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
-        display: "borderless",
-        host: context[:request].host_with_port,
-        resource_link_lookup_uuid: submission.resource_link_lookup_uuid
-      )
-    else
-      Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+    return nil if submission.not_submitted? && !submission.partially_submitted?
+
+    Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+      # Legacy submission versions serialized before course_id was added to the
+      # submissions table will have course_id: nil. Fall back to the assignment's
+      # context_id, which is always the course for standard assignments.
+      course_id = submission.course_id || assignment.context_id
+      if submission.submission_type == "basic_lti_launch"
+        GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
+          course_id,
+          assignment_id: submission.assignment_id,
+          url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
+          display: "borderless",
+          host: context[:request].host_with_port,
+          resource_link_lookup_uuid: submission.resource_link_lookup_uuid
+        )
+      else
         is_discussion_topic = submission.submission_type == "discussion_topic" || submission.partially_submitted?
         show_full_discussion = is_discussion_topic ? { show_full_discussion_immediately: true } : {}
         if assignment.anonymize_students?
           GraphQLHelpers::UrlHelpers.course_assignment_anonymous_submission_url(
-            submission.course_id,
+            course_id,
             submission.assignment_id,
             submission.anonymous_id,
             host: context[:request].host_with_port,
@@ -699,7 +717,7 @@ module Interfaces::SubmissionInterface
           )
         else
           GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-            submission.course_id,
+            course_id,
             submission.assignment_id,
             submission.user_id,
             host: context[:request].host_with_port,

@@ -41,17 +41,16 @@ end
 describe Api::V1::GradebookHistory do
   subject(:gradebook_history) { GradebookHistoryHarness.new }
 
-  let(:course) { double }
+  let(:course) { instance_double(Course) }
   let(:controller) do
-    double(
-      params: {},
-      request: double(query_parameters: {}),
-      response: double(headers: {})
-    )
+    instance_double(CoursesController,
+                    params: {},
+                    request: instance_double(ActionDispatch::Request, query_parameters: {}),
+                    response: instance_double(ActionDispatch::Response, headers: {}))
   end
   let(:path) { "" }
   let(:user) { User.new }
-  let(:session) { double }
+  let(:session) { {} }
   let(:api_context) { Api::V1::ApiContext.new(controller, path, user, session) }
   let(:now) { Time.now.in_time_zone }
   let(:yesterday) { (now - 24.hours).in_time_zone }
@@ -246,12 +245,12 @@ describe Api::V1::GradebookHistory do
 
   describe "#day_string_for" do
     it "builds a formatted date" do
-      submission = double(graded_at: now)
+      submission = instance_double(Submission, graded_at: now)
       expect(gradebook_history.day_string_for(submission)).to match(/\d{4}-\d{2}-\d{2}/)
     end
 
     it "gives a empty string if there is no time" do
-      submission = double(graded_at: nil)
+      submission = instance_double(Submission, graded_at: nil)
       expect(gradebook_history.day_string_for(submission)).to eq ""
     end
   end

@@ -145,9 +145,6 @@ describe('EditView - Points Tooltip', () => {
 
   beforeEach(() => {
     fakeENV.setup({
-      FEATURES: {
-        new_quizzes_surveys: true,
-      },
       PERMISSIONS: {
         can_edit_grades: true,
       },

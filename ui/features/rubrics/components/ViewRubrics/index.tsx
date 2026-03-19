@@ -62,7 +62,6 @@ export const TABS = {
 
 export type ViewRubricsProps = {
   canManageRubrics?: boolean
-  canImportExportRubrics?: boolean
   showHeader?: boolean
 }
 
@@ -70,11 +69,7 @@ const rubricsFromPage = (page: RubricQueryResponse) => (page ? page.rubricsConne
 const rubricsFromPages = (resp: InfiniteData<RubricQueryResponse>) =>
   resp?.pages.flatMap(rubricsFromPage)
 
-export const ViewRubrics = ({
-  canManageRubrics = false,
-  canImportExportRubrics = false,
-  showHeader = true,
-}: ViewRubricsProps) => {
+export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewRubricsProps) => {
   const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const isAccount = !!accountId
@@ -330,7 +325,7 @@ export const ViewRubrics = ({
                 />
               </FlexItem>
               <FlexItem>
-                {canManageRubrics && canImportExportRubrics && (
+                {canManageRubrics && (
                   <Button
                     renderIcon={<IconImportLine />}
                     color="secondary"
@@ -369,7 +364,6 @@ export const ViewRubrics = ({
               >
                 <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
                   <RubricTable
-                    canImportExportRubrics={canImportExportRubrics}
                     handleCheckboxChange={handleCheckboxChange}
                     selectedRubricIds={selectedRubricIds}
                     canManageRubrics={canManageRubrics}
@@ -390,7 +384,6 @@ export const ViewRubrics = ({
               >
                 <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
                   <RubricTable
-                    canImportExportRubrics={canImportExportRubrics}
                     selectedRubricIds={selectedRubricIds}
                     handleCheckboxChange={handleCheckboxChange}
                     canManageRubrics={canManageRubrics}
@@ -404,41 +397,39 @@ export const ViewRubrics = ({
               </Tabs.Panel>
             </Tabs>
 
-            {canImportExportRubrics && (
-              <div
-                id="enhanced-rubric-builder-footer"
-                style={{backgroundColor: colors.contrasts.white1010}}
+            <div
+              id="enhanced-rubric-builder-footer"
+              style={{backgroundColor: colors.contrasts.white1010}}
+            >
+              <View
+                as="div"
+                margin="small large"
+                themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
               >
-                <View
-                  as="div"
-                  margin="small large"
-                  themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
-                >
-                  <Flex justifyItems="end">
-                    <Flex.Item margin="0 medium 0 0">
-                      <Button
-                        onClick={() => setSelectedRubricIds([])}
-                        data-testid="cancel-select-mode-button"
-                      >
-                        {I18n.t('Cancel')}
-                      </Button>
-                    </Flex.Item>
+                <Flex justifyItems="end">
+                  <Flex.Item margin="0 medium 0 0">
+                    <Button
+                      onClick={() => setSelectedRubricIds([])}
+                      data-testid="cancel-select-mode-button"
+                    >
+                      {I18n.t('Cancel')}
+                    </Button>
+                  </Flex.Item>
 
-                    <Flex.Item margin="0 medium 0 0">
-                      <Button
-                        color="primary"
-                        renderIcon={<IconDownloadLine />}
-                        data-testid="download-rubrics"
-                        disabled={selectedRubricIds.length === 0}
-                        onClick={handleDownloadRubrics}
-                      >
-                        {I18n.t('Download Selected Rubrics')}
-                      </Button>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </div>
-            )}
+                  <Flex.Item margin="0 medium 0 0">
+                    <Button
+                      color="primary"
+                      renderIcon={<IconDownloadLine />}
+                      data-testid="download-rubrics"
+                      disabled={selectedRubricIds.length === 0}
+                      onClick={handleDownloadRubrics}
+                    >
+                      {I18n.t('Download Selected Rubrics')}
+                    </Button>
+                  </Flex.Item>
+                </Flex>
+              </View>
+            </div>
 
             <RubricAssessmentTray
               currentUserId={ENV.current_user_id ?? ''}
@@ -462,15 +453,13 @@ export const ViewRubrics = ({
               onClose={handleLocationsUsedModalClose}
             />
 
-            {canImportExportRubrics && (
-              <ImportRubric
-                accountId={accountId}
-                courseId={courseId}
-                isTrayOpen={importTrayIsOpen}
-                handleImportSuccess={handleImportSuccess}
-                handleTrayClose={() => setImportTrayIsOpen(false)}
-              />
-            )}
+            <ImportRubric
+              accountId={accountId}
+              courseId={courseId}
+              isTrayOpen={importTrayIsOpen}
+              handleImportSuccess={handleImportSuccess}
+              handleTrayClose={() => setImportTrayIsOpen(false)}
+            />
           </View>
         )
       }}

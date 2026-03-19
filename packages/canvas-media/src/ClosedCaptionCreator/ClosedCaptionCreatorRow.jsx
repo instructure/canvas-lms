@@ -15,17 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {Component} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
-import {StyleSheet, css} from 'aphrodite'
+
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {IconTrashLine, IconQuestionLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconQuestionLine, IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
+import {css, StyleSheet} from 'aphrodite'
+import {arrayOf, bool, element, func, objectOf, oneOfType, shape, string} from 'prop-types'
+import React, {Component} from 'react'
 import formatMessage from '../format-message'
 import CanvasSelect from '../shared/CanvasSelect'
 import {CC_FILE_MAX_BYTES} from '../shared/constants'
@@ -36,7 +37,7 @@ export default class ClosedCaptionCreatorRow extends Component {
       shape({
         id: string,
         label: string,
-      })
+      }),
     ),
     liveRegion: func,
     uploadMediaTranslations: shape({
@@ -96,7 +97,7 @@ export default class ClosedCaptionCreatorRow extends Component {
         'The selected file exceeds the {maxSize} Byte limit',
         {
           maxSize: maxCCFileSize,
-        }
+        },
       )
       this.setState({
         isValidCC: false,

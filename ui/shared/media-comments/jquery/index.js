@@ -44,16 +44,11 @@ $.mediaComment = function (_command, _arg1, _arg2) {
 $.mediaComment.partnerData = function (_params) {
   const hash = {
     context_code: $.mediaComment.contextCode(),
-    root_account_id: ENV.DOMAIN_ROOT_ACCOUNT_ID,
+    root_account_uuid: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
+    user_uuid: ENV.current_user_uuid,
     context_source: ENV.CONTEXT_ACTION_SOURCE,
   }
-  if (ENV.SIS_SOURCE_ID) {
-    hash.sis_source_id = ENV.SIS_SOURCE_ID
-  }
-  if (ENV.SIS_USER_ID) {
-    hash.sis_user_id = ENV.SIS_USER_ID
-  }
-  return JSON.stringify(hash)
+  return new URLSearchParams(hash).toString()
 }
 
 $.mediaComment.contextCode = function () {

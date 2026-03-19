@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
-import {object, func, bool} from 'prop-types'
 import {render} from '@testing-library/react'
-import useComputerPanelFocus from '../useComputerPanelFocus'
+import {bool, func, object} from 'prop-types'
+import {useRef} from 'react'
 import {vi} from 'vitest'
+import useComputerPanelFocus from '../useComputerPanelFocus'
 
 function TestComponent(props) {
   const panelRef = useRef(null)

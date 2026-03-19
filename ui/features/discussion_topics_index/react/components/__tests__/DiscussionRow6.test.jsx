@@ -133,4 +133,66 @@ describe('DiscussionRow', () => {
     // Expected format: "Available until 5/15/2027"
     expect(availabilityElement.textContent).toContain('5/15/2027')
   })
+
+  describe('subscribe button visibility', () => {
+    it('hides subscribe button for not_in_group_set hold (teachers on group discussions)', () => {
+      const discussion = {
+        subscription_hold: 'not_in_group_set',
+        subscribed: false,
+      }
+      render(<DiscussionRow {...makeProps({discussion})} />)
+
+      expect(screen.queryByTestId('discussion-subscribe')).not.toBeInTheDocument()
+    })
+
+    it('hides subscribe button for not_in_group hold (students not in the group)', () => {
+      const discussion = {
+        subscription_hold: 'not_in_group',
+        subscribed: false,
+      }
+      render(<DiscussionRow {...makeProps({discussion})} />)
+
+      expect(screen.queryByTestId('discussion-subscribe')).not.toBeInTheDocument()
+    })
+
+    it('shows subscribe button if user is already subscribed', () => {
+      const discussion = {
+        subscription_hold: 'not_in_group_set',
+        subscribed: true,
+      }
+      render(<DiscussionRow {...makeProps({discussion})} />)
+
+      expect(screen.getByTestId('discussion-subscribe')).toBeInTheDocument()
+    })
+
+    it('shows subscribe button for initial_post_required hold (temporary - can subscribe after posting)', () => {
+      const discussion = {
+        subscription_hold: 'initial_post_required',
+        subscribed: false,
+      }
+      render(<DiscussionRow {...makeProps({discussion})} />)
+
+      expect(screen.getByTestId('discussion-subscribe')).toBeInTheDocument()
+    })
+
+    it('shows subscribe button when subscription_hold is not set', () => {
+      const discussion = {
+        subscription_hold: undefined,
+        subscribed: false,
+      }
+      render(<DiscussionRow {...makeProps({discussion})} />)
+
+      expect(screen.getByTestId('discussion-subscribe')).toBeInTheDocument()
+    })
+
+    it('works correctly for custom roles', () => {
+      const discussion = {
+        subscription_hold: 'not_in_group_set',
+        subscribed: false,
+      }
+      render(<DiscussionRow {...makeProps({discussion})} />)
+
+      expect(screen.queryByTestId('discussion-subscribe')).not.toBeInTheDocument()
+    })
+  })
 })

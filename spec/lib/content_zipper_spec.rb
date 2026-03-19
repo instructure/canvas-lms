@@ -362,7 +362,7 @@ describe ContentZipper do
         (visible_files + ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible/sub-locked.png", "locked.png"]).sort
       end
 
-      def zipped_files_for_user(user = nil, check_user = true)
+      def zipped_files_for_user(user = nil, check_user: true)
         @attachment.user_id = user.id if user
         @attachment.save!
         ContentZipper.process_attachment(@attachment, user, check_user:)
@@ -412,7 +412,7 @@ describe ContentZipper do
         end
 
         it "gives all files if check_user=false" do
-          expect(zipped_files_for_user(nil, false)).to eq all_files
+          expect(zipped_files_for_user(nil, check_user: false)).to eq all_files
         end
       end
 
@@ -435,7 +435,7 @@ describe ContentZipper do
         end
 
         it "gives all files if check_user=false" do
-          expect(zipped_files_for_user(nil, false)).to eq all_files
+          expect(zipped_files_for_user(nil, check_user: false)).to eq all_files
         end
       end
     end

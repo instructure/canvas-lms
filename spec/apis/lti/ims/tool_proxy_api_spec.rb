@@ -56,7 +56,7 @@ module Lti
 
       describe "Get #show" do
         before do
-          allow(OAuth::Signature).to receive(:build).and_return(double(verify: true))
+          allow(OAuth::Signature).to receive(:build).and_return(instance_double(OAuth::Signature::Base, verify: true))
           allow(OAuth::Helper).to receive(:parse_header).and_return({ "oauth_consumer_key" => "key" })
         end
 
@@ -73,7 +73,7 @@ module Lti
 
       describe "POST #create" do
         before do
-          mock_oauth_sig = double("oauth_signature")
+          mock_oauth_sig = instance_double(OAuth::Signature::Base)
           allow(mock_oauth_sig).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_oauth_sig)
           allow(OAuth::Helper).to receive(:parse_header).and_return({ "oauth_consumer_key" => "key" })
@@ -200,7 +200,7 @@ module Lti
 
       describe "POST #reregistration" do
         before do
-          mock_siq = double("signature")
+          mock_siq = instance_double(OAuth::Signature::Base)
           allow(mock_siq).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
         end
@@ -213,7 +213,7 @@ module Lti
         end
 
         it "checks for valid oauth signatures" do
-          mock_siq = double("signature")
+          mock_siq = instance_double(OAuth::Signature::Base)
           allow(mock_siq).to receive(:verify).and_return(false)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(active_all: true)
@@ -223,7 +223,7 @@ module Lti
         end
 
         it "updates the tool proxy update payload" do
-          mock_siq = double("signature")
+          mock_siq = instance_double(OAuth::Signature::Base)
           allow(mock_siq).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(active_all: true)
@@ -247,7 +247,7 @@ module Lti
         end
 
         it "Errors on invalid payload" do
-          mock_siq = double("signature")
+          mock_siq = instance_double(OAuth::Signature::Base)
           allow(mock_siq).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(active_all: true)

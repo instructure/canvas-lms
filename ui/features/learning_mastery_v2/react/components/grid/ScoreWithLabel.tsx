@@ -42,8 +42,6 @@ const Label: React.FC<LabelProps> = ({scoreDisplayFormat, score, text}) => {
   if (scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_POINTS) {
     return <Text size="legend">{score}</Text>
   }
-
-  return <ScreenReaderContent>{text}</ScreenReaderContent>
 }
 
 export const ScoreWithLabel: React.FC<ScoreWithLabelProps> = ({

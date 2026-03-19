@@ -440,8 +440,8 @@ describe "selective_release module item assign to tray" do
               update_due_date(card_index, date)
               update_due_time(card_index, time)
             elsif date_label == :unlock_at
-              update_available_date(card_index, date, true)
-              update_available_time(card_index, time, true)
+              update_available_date(card_index, date, exclude_due_date: true)
+              update_available_time(card_index, time, exclude_due_date: true)
             end
 
             click_save_button

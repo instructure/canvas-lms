@@ -2684,6 +2684,7 @@ he:
       graded_quiz: "בוחן מוערך"
       graded_survey: "סקר מוערך"
       ungraded_survey: "סקר שלא להערכה"
+  assignment_rubric_details_1b6723b2: "פרטי טור המשימה"
   assignment_selection_6bff05c4: "בחירת משימה"
   assignment_title_82b4422e: "כותרת המטלה:"
   assignment_title_8a707dd2: "כותרת משימה"
@@ -5851,6 +5852,7 @@ he:
   course_groups_e8239a1e: "קבוצות קורס"
   course_home_4c4c0107: "דף הבית של הקורס"
   course_home_sub_navigation_b1ee6b03: "ניווט משנה של דף הקורס"
+  course_id_33633604: "מזהה קורס:"
   course_id_8bd2a21c: "מזהה קורס"
   course_id_a7c924d5: "מזהה קורס"
   course_id_b0bc82d4: "מזהה קורס"
@@ -10726,6 +10728,7 @@ he:
     lock_module_until: "נעילה עד"
   language_6b3e2c7c: שפה
   last_activity_a983e541: "הפעילות האחרונה"
+  last_e159dbd: אחרון
   last_enrollment_activity_10fe15ba: "פעילות הרשמה אחרונה"
   last_error_a3832668: "השגיאה האחרונה "
   last_export_899a04c5: "ייצוא אחרון:"

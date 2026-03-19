@@ -67,8 +67,6 @@ describe('TranslationControls Component', () => {
     node.setAttribute('role', 'alert')
     node.setAttribute('id', 'flash_screenreader_holder')
     document.body.appendChild(node)
-
-    ENV.ai_translation_improvements = true
   })
 
   beforeEach(() => {

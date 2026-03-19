@@ -36,6 +36,8 @@ export const ProblemArea = (props: {
   previewRef?: React.RefObject<PreviewHandle>
   item: AccessibilityResourceScan
   issue: AccessibilityIssue
+  onStaleConflict: () => void
+  onRescan: () => void
 }) => {
   const [previewResponse, setPreviewResponse] = useState<PreviewResponse | null>(null)
   return (
@@ -46,6 +48,8 @@ export const ProblemArea = (props: {
         resourceId={props.item.resourceId}
         itemType={props.item.resourceType}
         onPreviewChange={setPreviewResponse}
+        onStaleConflict={props.onStaleConflict}
+        onRescan={props.onRescan}
       />
       {props.issue.form.type === FormType.ColorPicker && (
         <View>

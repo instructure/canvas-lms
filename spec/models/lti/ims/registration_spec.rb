@@ -62,6 +62,13 @@ module Lti::IMS
       expect(registration.reload.workflow_state).to eq("deleted")
     end
 
+    it "can be soft-deleted even with an invalid target_link_uri" do
+      registration.lti_tool_configuration["target_link_uri"] = "localhost"
+      registration.save!(validate: false)
+      expect { registration.destroy }.not_to raise_error
+      expect(registration.reload.workflow_state).to eq("deleted")
+    end
+
     describe "validations" do
       subject { registration.validate }
 
@@ -734,7 +741,13 @@ module Lti::IMS
       let(:context) { account_model }
 
       context 'when "disabled_placements" is set' do
-        before { registration.registration_overlay["disabledPlacements"] = ["course_navigation"] }
+        before do
+          Lti::Overlay.create!(
+            registration: registration.developer_key.lti_registration,
+            account: context,
+            data: { "disabled_placements" => ["course_navigation"] }
+          )
+        end
 
         it "does not set the disabled placements" do
           expect(subject.settings.keys).not_to include "course_navigation"
@@ -1071,7 +1084,6 @@ module Lti::IMS
             id
             lti_registration_id
             developer_key_id
-            overlay
             lti_tool_configuration
             application_type
             grant_types

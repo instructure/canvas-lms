@@ -117,6 +117,7 @@ describe('RubricForm utils', () => {
         workflowState: 'active',
         freeFormCriterionComments: false,
         canUpdateRubric: true,
+        public: false,
       }
 
       const rubricAssociation: RubricAssociation = {
@@ -148,6 +149,7 @@ describe('RubricForm utils', () => {
         workflowState: 'active',
         freeFormCriterionComments: true,
         canUpdateRubric: true,
+        public: false,
       }
 
       const rubricAssociation: RubricAssociation = {
@@ -181,6 +183,7 @@ describe('RubricForm utils', () => {
         workflowState: 'active',
         freeFormCriterionComments: false,
         canUpdateRubric: false,
+        public: false,
       }
 
       const rubricAssociation: RubricAssociation = {
@@ -224,6 +227,7 @@ describe('RubricForm utils', () => {
         canUpdateRubric: true,
         hasRubricAssociations: true,
         unassessed: false,
+        public: false,
       }
 
       const rubricAssociation: RubricAssociation = {

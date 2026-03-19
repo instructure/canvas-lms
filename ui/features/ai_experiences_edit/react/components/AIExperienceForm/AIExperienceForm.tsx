@@ -25,17 +25,17 @@ import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience, AIExperienceFormData} from '../../../types'
-import PreviewConfirmationModal from './PreviewConfirmationModal'
 import DeleteConfirmationModal from './DeleteConfirmationModal'
 import FormHeader from './FormHeader'
 import ConfigurationSection from './ConfigurationSection'
 import FormActions from './FormActions'
+import type {ContextFile} from '@canvas/canvas-file-upload/react/types'
 
 const I18n = createI18nScope('ai_experiences_edit')
 
 interface AIExperienceFormProps {
   aiExperience?: AIExperience | null
-  onSubmit: (data: AIExperienceFormData, shouldPreview?: boolean) => void
+  onSubmit: (data: AIExperienceFormData) => void
   isLoading: boolean
   onCancel?: () => void
 }
@@ -53,7 +53,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     learning_objective: '',
     pedagogical_guidance: '',
   })
-  const [showPreviewModal, setShowPreviewModal] = useState(false)
+  const [contextFiles, setContextFiles] = useState<ContextFile[]>([])
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -69,6 +69,9 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         learning_objective: aiExperience.learning_objective || '',
         pedagogical_guidance: aiExperience.pedagogical_guidance || '',
       })
+      if (aiExperience.context_files) {
+        setContextFiles(aiExperience.context_files as ContextFile[])
+      }
     }
   }, [aiExperience])
 
@@ -93,11 +96,19 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       }
     }
 
+  const handleContextFilesChange = (files: ContextFile[]) => {
+    setContextFiles(files)
+  }
+
   const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.title.trim()) {
       newErrors.title = I18n.t('Title required')
+    }
+
+    if (!formData.facts.trim()) {
+      newErrors.facts = I18n.t('Please provide facts students should know')
     }
 
     if (!formData.learning_objective.trim()) {
@@ -123,7 +134,11 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       return
     }
 
-    onSubmit(formData)
+    const dataToSubmit: AIExperienceFormData = {
+      ...formData,
+      context_file_ids: contextFiles.map(f => f.id),
+    }
+    onSubmit(dataToSubmit)
   }
 
   const handleCancel = () => {
@@ -132,16 +147,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     } else {
       window.history.back()
     }
-  }
-
-  const handlePreviewExperience = () => {
-    setShowPreviewModal(true)
-  }
-
-  const handleConfirmPreview = () => {
-    setShowPreviewModal(false)
-    // Save as draft first, then redirect to preview
-    onSubmit(formData, true)
   }
 
   const handleDeleteClick = () => {
@@ -188,7 +193,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         </Alert>
       )}
 
-      <FormHeader isEdit={isEdit} onDeleteClick={handleDeleteClick} />
+      <FormHeader isEdit={isEdit} title={aiExperience?.title} onDeleteClick={handleDeleteClick} />
 
       <form onSubmit={handleSubmit} noValidate={true}>
         <View as="div" margin="0 0 large 0">
@@ -208,7 +213,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
             label={I18n.t('Description')}
             value={formData.description}
             onChange={handleInputChange('description')}
-            required
             resize="vertical"
             height="120px"
           />
@@ -219,20 +223,13 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           onChange={handleInputChange}
           showErrors={showErrors}
           errors={errors}
+          contextFiles={contextFiles}
+          onContextFilesChange={handleContextFilesChange}
+          courseId={((window as any).ENV?.COURSE_ID || '').toString()}
         />
 
-        <FormActions
-          isLoading={isLoading}
-          onCancel={handleCancel}
-          onPreview={handlePreviewExperience}
-        />
+        <FormActions isLoading={isLoading} onCancel={handleCancel} />
       </form>
-
-      <PreviewConfirmationModal
-        open={showPreviewModal}
-        onDismiss={() => setShowPreviewModal(false)}
-        onConfirm={handleConfirmPreview}
-      />
 
       <DeleteConfirmationModal
         open={showDeleteModal}

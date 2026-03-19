@@ -61,23 +61,25 @@ describe PlannerOverride do
 
   describe "::plannable_workflow_state" do
     context "respond_to?(:published?)" do
-      mock_asset = Class.new do
-        def initialize(opts = {})
-          opts = { published: true, deleted: false }.merge(opts)
-          @published = opts[:published]
-          @deleted = opts[:deleted]
-        end
+      let(:mock_asset) do
+        Class.new do
+          def initialize(opts = {})
+            opts = { published: true, deleted: false }.merge(opts)
+            @published = opts[:published]
+            @deleted = opts[:deleted]
+          end
 
-        def published?
-          !!@published
-        end
+          def published?
+            !!@published
+          end
 
-        def unpublished?
-          !@published
-        end
+          def unpublished?
+            !@published
+          end
 
-        def deleted?
-          @deleted
+          def deleted?
+            @deleted
+          end
         end
       end
 
@@ -98,11 +100,13 @@ describe PlannerOverride do
     end
 
     context "respond_to?(:workflow_state)" do
-      mock_asset = Class.new do
-        attr_reader :workflow_state
+      let(:mock_asset) do
+        Class.new do
+          attr_reader :workflow_state
 
-        def initialize(workflow_state)
-          @workflow_state = workflow_state
+          def initialize(workflow_state)
+            @workflow_state = workflow_state
+          end
         end
       end
 

@@ -23,7 +23,7 @@ import type {AccountId} from '../manage/model/AccountId'
 import {fetchImpact} from './api/impact'
 import {fetchLtiUsageToken} from './api/jwt'
 import {ltiUsageConfig, ltiUsageOptions} from './utils'
-import {useBreadcrumbStore} from '@canvas/breadcrumbs/useBreadcrumbStore'
+import {useBreadcrumbStore, type Breadcrumb} from '@canvas/breadcrumbs/useBreadcrumbStore'
 
 const I18n = createI18nScope('lti_registrations.monitor')
 
@@ -40,8 +40,7 @@ type Module = {
       fetchImpact: typeof fetchImpact
     }
     breadcrumbStore: {
-      appendBreadcrumb: (breadcrumb: {name: string; url: string}) => void
-      popBreadcrumb: () => void
+      setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void
     }
     options: Record<string, any>
   }) => () => void
@@ -51,15 +50,22 @@ export const Monitor = ({accountId}: MonitorProps) => {
   const root = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    const store = useBreadcrumbStore.getState()
     let unmount = () => {}
+    let initialBreadcrumbs: Breadcrumb[] = []
 
-    let addedBreadcrumbCount = 0
+    const store = useBreadcrumbStore.getState()
+    const basename = getBasename('apps') + '/monitor'
+
+    const unsubscribe = useBreadcrumbStore.subscribe(next => {
+      if (next.state.at(-1)?.url === basename) {
+        initialBreadcrumbs = next.state
+      }
+    })
 
     import('ltiusage/AppModule').then((module: Module) => {
       if (root.current !== null) {
         unmount = module.render({
-          basename: getBasename('apps') + '/monitor',
+          basename,
           mountPoint: root.current,
           config: {
             ...ltiUsageConfig(),
@@ -67,16 +73,13 @@ export const Monitor = ({accountId}: MonitorProps) => {
             fetchImpact,
           },
           breadcrumbStore: {
-            appendBreadcrumb: breadcrumb => {
-              // We only want to append the breadcrumb once
-              store.appendBreadcrumb(breadcrumb)
-              addedBreadcrumbCount += 1
-            },
-            popBreadcrumb: () => {
-              if (addedBreadcrumbCount > 0) {
-                addedBreadcrumbCount -= 1
-                store.popBreadcrumb()
-              }
+            setBreadcrumbs: (values: Breadcrumb[]) => {
+              const prefixedValues = values.map(breadcrumb => ({
+                ...breadcrumb,
+                url: `${basename}${breadcrumb.url}`,
+              }))
+
+              store.setBreadcrumbs([...initialBreadcrumbs, ...prefixedValues])
             },
           },
           options: ltiUsageOptions(),
@@ -86,7 +89,11 @@ export const Monitor = ({accountId}: MonitorProps) => {
       }
     })
 
-    return () => unmount()
+    return () => {
+      store.setBreadcrumbs(initialBreadcrumbs)
+      unsubscribe()
+      unmount()
+    }
   }, [])
 
   return <div ref={root}></div>

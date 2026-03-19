@@ -233,7 +233,7 @@ describe BrandConfig do
     describe "with cdn enabled" do
       before do
         expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(true)
-        s3 = double(bucket: nil)
+        s3 = instance_double(Aws::S3::Resource, bucket: nil)
         allow(Aws::S3::Resource).to receive(:new).and_return(s3)
         @upload_expectation = expect(@subaccount_bc.s3_uploader).to receive(:upload_file).exactly(3).times
         expect(File).to receive(:delete).exactly(3).times
@@ -283,13 +283,143 @@ describe BrandConfig do
   end
 
   it "expects md5 to be correct" do
-    what_it_should_be_if_you_have_not_ran_gulp_rev = 249_250_173_663_295_064_325
-    what_it_should_be_if_you_have = 66_137_131_007_895_491
+    what_it_should_be_if_you_have_not_ran_gulp_rev = 937_157_303_960_263_479
+    what_it_should_be_if_you_have = 937_157_303_960_263_479
     expect(BrandableCSS.migration_version).to eq(what_it_should_be_if_you_have_not_ran_gulp_rev).or eq(what_it_should_be_if_you_have)
     # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
     # you will need to update the migration that runs brand_configs and update these md5s that are
     # with and without running `rake canvas:compile_assets`
     # See the following migration file for more info: "#{BrandableCSS::MIGRATION_NAME.underscore}_predeploy.rb"
+  end
+
+  describe "cascade cache invalidation" do
+    specs_require_cache(:redis_cache_store)
+
+    before :once do
+      @parent_account = Account.default
+      @parent_config = BrandConfig.create(
+        variables: { "ic-brand-primary" => "#321" },
+        js_overrides: "parent.js",
+        css_overrides: "parent.css"
+      )
+
+      @child_config = BrandConfig.create(
+        variables: { "ic-brand-global-nav-bgd" => "#123" },
+        parent_md5: @parent_config.md5,
+        js_overrides: "child.js"
+      )
+
+      @grandchild_config = BrandConfig.create(
+        variables: { "ic-brand-global-nav-avatar-border" => "blue" },
+        parent_md5: @child_config.md5
+      )
+    end
+
+    it "clears descendant caches when clear_dependent_caches is called" do
+      Rails.cache.write([@child_config, "css_and_js_overrides"].cache_key, { test: "data" })
+      Rails.cache.write([@grandchild_config, "css_and_js_overrides"].cache_key, { test: "data" })
+
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be true
+      expect(Rails.cache.exist?([@grandchild_config, "css_and_js_overrides"].cache_key)).to be true
+
+      @parent_config.clear_dependent_caches
+
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be false
+      expect(Rails.cache.exist?([@grandchild_config, "css_and_js_overrides"].cache_key)).to be false
+    end
+
+    it "does not clear unrelated config caches" do
+      unrelated_config = BrandConfig.create(
+        variables: { "ic-brand-primary" => "#999" }
+      )
+
+      Rails.cache.write([@child_config, "css_and_js_overrides"].cache_key, { test: "data" })
+      Rails.cache.write([unrelated_config, "css_and_js_overrides"].cache_key, { test: "data" })
+
+      @parent_config.clear_dependent_caches
+
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be false
+      expect(Rails.cache.exist?([unrelated_config, "css_and_js_overrides"].cache_key)).to be true
+    end
+
+    it "handles configs with no children without errors" do
+      orphan_config = BrandConfig.new(
+        variables: { "ic-brand-primary" => "#456" }
+      )
+
+      expect { orphan_config.clear_dependent_caches }.not_to raise_error
+      expect { orphan_config.save! }.not_to raise_error
+    end
+
+    it "clears dependent caches after save via after_save callback" do
+      Rails.cache.write([@child_config, "css_and_js_overrides"].cache_key, { test: "data" })
+
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be true
+
+      BrandConfig.create(
+        variables: { "ic-brand-primary" => "#999" }
+      )
+      # Child cache should still exist (new config has no relationship to child)
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be true
+
+      new_child = BrandConfig.create(
+        variables: { "ic-brand-global-nav-bgd" => "#456" },
+        parent_md5: @parent_config.md5
+      )
+
+      Rails.cache.write([new_child, "css_and_js_overrides"].cache_key, { test: "data" })
+      expect(Rails.cache.exist?([new_child, "css_and_js_overrides"].cache_key)).to be true
+
+      @parent_config.clear_dependent_caches
+
+      # New child's cache should be cleared
+      expect(Rails.cache.exist?([new_child, "css_and_js_overrides"].cache_key)).to be false
+    end
+
+    it "recursively clears through multiple generations" do
+      Rails.cache.write([@child_config, "css_and_js_overrides"].cache_key, { test: "data" })
+      Rails.cache.write([@grandchild_config, "css_and_js_overrides"].cache_key, { test: "data" })
+
+      great_grandchild_config = BrandConfig.create(
+        variables: { "ic-brand-button--primary-bgd" => "purple" },
+        parent_md5: @grandchild_config.md5
+      )
+      Rails.cache.write([great_grandchild_config, "css_and_js_overrides"].cache_key, { test: "data" })
+
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be true
+      expect(Rails.cache.exist?([@grandchild_config, "css_and_js_overrides"].cache_key)).to be true
+      expect(Rails.cache.exist?([great_grandchild_config, "css_and_js_overrides"].cache_key)).to be true
+
+      @parent_config.clear_dependent_caches
+
+      expect(Rails.cache.exist?([@child_config, "css_and_js_overrides"].cache_key)).to be false
+      expect(Rails.cache.exist?([@grandchild_config, "css_and_js_overrides"].cache_key)).to be false
+      expect(Rails.cache.exist?([great_grandchild_config, "css_and_js_overrides"].cache_key)).to be false
+    end
+
+    it "clears Account brand_config caches for accounts using this config" do
+      account1 = Account.create!(brand_config_md5: @parent_config.md5)
+      account2 = Account.create!
+      account2.shared_brand_configs.create!(
+        name: "shared",
+        brand_config_md5: @parent_config.md5
+      )
+
+      expected_ids = [account1.id, account2.id]
+      expect(Account).to receive(:clear_cache_keys).with(match_array(expected_ids), :brand_config)
+
+      @parent_config.clear_dependent_caches
+    end
+
+    it "clears Account brand_config caches for accounts using descendant configs" do
+      account_using_child = Account.create!(brand_config_md5: @child_config.md5)
+      account_using_grandchild = Account.create!(brand_config_md5: @grandchild_config.md5)
+
+      expect(Account).to receive(:clear_cache_keys).with([account_using_child.id], :brand_config).once
+      expect(Account).to receive(:clear_cache_keys).with([account_using_grandchild.id], :brand_config).once
+
+      @parent_config.clear_dependent_caches
+    end
   end
 
   context "with sharding" do

@@ -17,267 +17,184 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "aws-sdk-translate"
-
 TranslationResponse = Struct.new(:translation, :source_language, keyword_init: true)
 
 describe Translation do
-  let(:translation_flags) { { translation: true, ai_translation_improvements: true, cedar_translation: true } }
-  let(:current_user) { double("User") }
+  let(:user) { User.create!(name: "Test User") }
 
-  before do
-    # We're gonna focus on CedarClient, since other clients are deprecated
-    allow(CedarClient).to receive(:enabled?).and_return(true)
-  end
+  describe "#available?" do
+    context "when CedarClient is defined and enabled" do
+      before { stub_const("CedarClient", class_double(CedarClient, enabled?: true)) }
 
-  # rubocop:disable Layout/MultilineArrayLineBreaks
-  describe "#languages" do
-    context "when improvements feature is enabled" do
-      subject { described_class.languages({ translation: true, ai_translation_improvements: true, cedar_translation: false }) }
-
-      let(:language_abbrs) do
-        %w[
-          af sq am ar hy az bn bs bg ca zh-TW zh hr cs da fa-AF nl en et
-          fa tl fi fr-CA fr ka de el gu ht ha he hi hu is id
-          ga it ja kn kk ko lv lt mk ms ml mt mr mn no ps pl pt pt-PT pa
-          ro ru sr si sk sl so es es-MX sw sv ta te th tr uk ur uz vi cy
-        ]
-      end
-
-      it "returns the proper list" do
-        expect(subject.pluck(:id)).to match_array(language_abbrs)
-      end
-
-      it "returns the list of languages in name asc" do
-        expect(subject.pluck(:name).sort).to eq(subject.pluck(:name))
+      it "returns true" do
+        expect(Translation.available?).to be true
       end
     end
 
-    context "when improvements feature is disabled" do
-      subject { described_class.languages({ translation: true, ai_translation_improvements: false, cedar_translation: false }) }
+    context "when CedarClient is defined but not enabled" do
+      before { stub_const("CedarClient", class_double(CedarClient, enabled?: false)) }
 
-      let(:language_abbrs) do
-        %w[ca de en es fr nl pt-BR ru sv zh-Hans]
-      end
-
-      it "returns the proper list" do
-        expect(subject.pluck(:id)).to match_array(language_abbrs)
-      end
-
-      it "returns the list of languages in name asc" do
-        expect(subject.pluck(:name).sort).to eq(subject.pluck(:name))
-      end
-    end
-
-    context "when language characters using unicode chars" do
-      subject { described_class.languages({ translation: true, ai_translation_improvements: true, cedar_translation: false }) }
-
-      let(:improvements_feature_enabled) { true }
-
-      it "returns the proper list sorted by unicode characters" do
-        I18n.with_locale(:hu) do
-          result_names = subject.pluck(:name)
-          expect(result_names.find_index("Örmény") < result_names.find_index("Román")).to be true
-        end
+      it "returns false" do
+        expect(Translation.available?).to be false
       end
     end
   end
-  # rubocop:enable Layout/MultilineArrayLineBreaks
 
-  describe "available?" do
-    it "returns true if feature flag is enabled and translation client is present" do
-      expect(described_class.available?(translation_flags)).to be true
-    end
-
-    it "returns false if feature flag is disabled" do
-      expect(described_class.available?({ translation: false })).to be false
-    end
-
-    it "returns false if translation client is not present" do
-      allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.available?(translation_flags)).to be false
-    end
-  end
-
-  describe "current_translation_provider_type" do
-    it "returns nil if translation flags are not enabled" do
-      flags = { translation: false, ai_translation_improvements: false, cedar_translation: false }
-      expect(described_class.current_translation_provider_type(flags)).to be_nil
-    end
-
-    it "returns cedar as default translation provider" do
-      flags = { translation: true, ai_translation_improvements: false, cedar_translation: false }
-      expect(described_class.current_translation_provider_type(flags)).to eq(Translation::TranslationType::CEDAR)
-    end
-
-    it "returns aws translate as improved translation provider" do
-      flags = { translation: true, ai_translation_improvements: true, cedar_translation: false }
-      expect(described_class.current_translation_provider_type(flags)).to eq(Translation::TranslationType::AWS_TRANSLATE)
-    end
-
-    it "returns cedar if cedar is on" do
-      flags = { translation: true, ai_translation_improvements: false, cedar_translation: true }
-      expect(described_class.current_translation_provider_type(flags)).to eq(Translation::TranslationType::CEDAR)
-    end
-  end
-
-  describe "translate_text" do
+  describe "#translate_text" do
     let(:text) { "Hello, world!" }
-    let(:result) { "Hola, mundo!" }
+    let(:tgt_lang) { "es" }
+    let(:options) { { root_account_uuid: "1234567890", feature_slug: "discussion", current_user: user } }
 
-    before do
-      stub_const("CedarClient", Class.new do
-        def self.enabled?
-          true
-        end
-
-        def self.translate_text(*)
+    context "when available" do
+      before do
+        stub_const("CedarClient", class_double(CedarClient, enabled?: true))
+        allow(CedarClient).to receive(:translate_text).and_return(
           TranslationResponse.new(
             translation: "Hola, mundo!",
             source_language: "en"
           )
-        end
-      end)
-    end
-
-    it "returns nil if translation client is not present" do
-      allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags)).to be_nil
-    end
-
-    it "returns nil if tgt_lang is nil" do
-      expect(described_class.translate_text(text:, tgt_lang: nil, flags: translation_flags)).to be_nil
-    end
-
-    it "translates text when tgt_lang is provided" do
-      expect(described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "inbox", current_user: })).to eq(result)
-    end
-
-    it "provides default feature_slug if not received from parameters" do
-      client = instance_double("TranslationClient")
-      allow(described_class).to receive(:translation_client).and_return(client)
-      allow(client).to receive(:available?).and_return(true)
-
-      expect(client).to receive(:translate_text).with(
-        text:,
-        tgt_lang: "es",
-        options: hash_including(
-          current_user:,
-          feature_slug: "content-translation"
         )
-      )
+      end
 
-      described_class.translate_text(
-        text:,
-        tgt_lang: "es",
-        flags: translation_flags,
-        options: { current_user: }
-      )
-    end
-
-    it "provides default feature_slug if the given one is unknown" do
-      client = instance_double("TranslationClient")
-      allow(described_class).to receive(:translation_client).and_return(client)
-      allow(client).to receive(:available?).and_return(true)
-
-      expect(client).to receive(:translate_text).with(
-        text:,
-        tgt_lang: "es",
-        options: hash_including(
-          current_user:,
-          feature_slug: "content-translation"
+      it "calls CedarClient.translate_text with correct parameters" do
+        expect(CedarClient).to receive(:translate_text).with(
+          content: text,
+          target_language: tgt_lang,
+          feature_slug: "discussion",
+          root_account_uuid: "1234567890",
+          current_user: user
         )
-      )
+        Translation.translate_text(text:, tgt_lang:, options:)
+      end
 
-      described_class.translate_text(
-        text:,
-        tgt_lang: "es",
-        flags: translation_flags,
-        options: { current_user:, feature_slug: "unknown-feature" }
-      )
+      it "returns the translated text" do
+        expect(Translation.translate_text(text:, tgt_lang:, options:)).to eq("Hola, mundo!")
+      end
+
+      it "collects translation stats" do
+        allow(Translation).to receive(:collect_translation_stats)
+        Translation.translate_text(text:, tgt_lang:, options:)
+        expect(Translation).to have_received(:collect_translation_stats).with(
+          src_lang: "en",
+          tgt_lang:,
+          type: "discussion"
+        )
+      end
+
+      it "raises TextTooLongError if text is too long" do
+        long_text = "a" * 5001
+        allow(CedarClient).to receive(:translate_text).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError)
+        expect { Translation.translate_text(text: long_text, tgt_lang:, options:) }.to raise_error(Translation::TextTooLongError)
+      end
+
+      it "raises UnsupportedLanguageError if language is not supported" do
+        allow(CedarClient).to receive(:translate_text).and_raise(InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError)
+        expect { Translation.translate_text(text: "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn", tgt_lang: "??", options:) }.to raise_error(Translation::UnsupportedLanguageError)
+      end
+
+      it "raises ValidationError if required parameter is missing or empty" do
+        allow(CedarClient).to receive(:translate_text).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ValidationError)
+        expect { Translation.translate_text(text: "", tgt_lang:, options:) }.to raise_error(Translation::ValidationError)
+      end
     end
 
-    context "when target language is identical to detected source language" do
-      it "raises SameLanguageTranslationError" do
-        expect { described_class.translate_text(text: "Hello world", tgt_lang: "en", flags: translation_flags, options: { feature_slug: "inbox", current_user: }) }.to raise_error(Translation::SameLanguageTranslationError)
+    context "when not available" do
+      before { allow(Translation).to receive(:available?).and_return(false) }
+
+      it "returns nil" do
+        expect(Translation.translate_text(text:, tgt_lang:, options:)).to be_nil
+      end
+    end
+
+    context "when tgt_lang is nil" do
+      before { allow(Translation).to receive(:available?).and_return(true) }
+
+      it "returns nil" do
+        expect(Translation.translate_text(text:, tgt_lang: nil, options:)).to be_nil
       end
     end
   end
 
-  describe "translate_html" do
-    let(:html) { "<p>Hello, world!</p>" }
-    let(:result) { "<p>Hola, mundo!</p>" }
+  describe "#translate_html" do
+    let(:html_string) { "<p>Hello, world!</p>" }
+    let(:tgt_lang) { "es" }
+    let(:options) { { root_account_uuid: "939393", feature_slug: "discussion", current_user: user } }
 
-    before do
-      stub_const("CedarClient", Class.new do
-        def self.enabled?
-          true
-        end
-
-        def self.translate_html(*)
+    context "when available" do
+      before do
+        stub_const("CedarClient", class_double(CedarClient, enabled?: true))
+        allow(CedarClient).to receive(:translate_html).and_return(
           TranslationResponse.new(
             translation: "<p>Hola, mundo!</p>",
             source_language: "en"
           )
-        end
-      end)
-    end
-
-    it "returns nil if translation client is not present" do
-      allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.translate_html(html_string: html, tgt_lang: "es", flags: translation_flags)).to be_nil
-    end
-
-    it "returns nil if tgt_lang is nil" do
-      expect(described_class.translate_html(html_string: html, tgt_lang: nil, flags: translation_flags)).to be_nil
-    end
-
-    it "translates text when tgt_lang is provided" do
-      expect(described_class.translate_html(html_string: html, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "discussion", current_user: })).to eq("<p>Hola, mundo!</p>")
-    end
-
-    it "provides default feature_slug if not received from parameters" do
-      client = instance_double("TranslationClient")
-      allow(described_class).to receive(:translation_client).and_return(client)
-      allow(client).to receive(:available?).and_return(true)
-
-      expect(client).to receive(:translate_html).with(
-        html_string: html,
-        tgt_lang: "es",
-        options: hash_including(
-          current_user:,
-          feature_slug: "content-translation"
         )
-      )
+      end
 
-      described_class.translate_html(
-        html_string: html,
-        tgt_lang: "es",
-        flags: translation_flags,
-        options: { current_user: }
-      )
+      it "calls CedarClient.translate_html with correct parameters" do
+        expect(CedarClient).to receive(:translate_html).with(
+          content: html_string,
+          target_language: tgt_lang,
+          feature_slug: "discussion",
+          root_account_uuid: "939393",
+          current_user: user
+        )
+        Translation.translate_html(html_string:, tgt_lang:, options:)
+      end
+
+      it "returns the translated html" do
+        expect(Translation.translate_html(html_string:, tgt_lang:, options:)).to eq("<p>Hola, mundo!</p>")
+      end
+
+      it "collects translation stats" do
+        allow(Translation).to receive(:collect_translation_stats)
+        Translation.translate_html(html_string:, tgt_lang:, options:)
+        expect(Translation).to have_received(:collect_translation_stats).with(
+          src_lang: "en",
+          tgt_lang:,
+          type: "discussion"
+        )
+      end
+
+      it "raises TextTooLongError if html_string is too long" do
+        long_html = "<p>" + ("a" * 5000) + "</p>"
+        allow(CedarClient).to receive(:translate_html).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError, "Content too long")
+        expect { Translation.translate_html(html_string: long_html, tgt_lang:, options:) }.to raise_error(Translation::TextTooLongError)
+      end
+
+      it "raises UnsupportedLanguageError if language is not supported" do
+        allow(CedarClient).to receive(:translate_html).and_raise(InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError)
+        expect { Translation.translate_html(html_string: "<p>Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn</p>", tgt_lang: "??", options:) }.to raise_error(Translation::UnsupportedLanguageError)
+      end
+
+      it "raises ValidationError if required parameter is missing or empty" do
+        allow(CedarClient).to receive(:translate_html).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ValidationError)
+        expect { Translation.translate_html(html_string: "", tgt_lang:, options:) }.to raise_error(Translation::ValidationError)
+      end
     end
 
-    it "provides default feature_slug if the given one is unknown" do
-      client = instance_double("TranslationClient")
-      allow(described_class).to receive(:translation_client).and_return(client)
-      allow(client).to receive(:available?).and_return(true)
+    context "when not available" do
+      before { allow(Translation).to receive(:available?).and_return(false) }
 
-      expect(client).to receive(:translate_html).with(
-        html_string: html,
-        tgt_lang: "es",
-        options: hash_including(
-          current_user:,
-          feature_slug: "content-translation"
-        )
-      )
+      it "returns nil" do
+        expect(Translation.translate_html(html_string:, tgt_lang:, options:)).to be_nil
+      end
+    end
+  end
 
-      described_class.translate_html(
-        html_string: html,
-        tgt_lang: "es",
-        flags: translation_flags,
-        options: { current_user:, feature_slug: "unknown-feature" }
-      )
+  describe ".languages" do
+    subject { described_class.languages }
+
+    let(:language_abbrs) do
+      %w[ca de en es fr nl pt-BR ru sv zh-Hans]
+    end
+
+    it "returns the proper list" do
+      expect(subject.pluck(:id)).to match_array(language_abbrs)
+    end
+
+    it "returns the list of languages in name asc" do
+      expect(subject.pluck(:name).sort).to eq(subject.pluck(:name))
     end
   end
 end

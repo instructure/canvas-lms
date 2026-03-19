@@ -443,7 +443,7 @@ describe ExternalToolsController do
         context "logging" do
           before do
             allow(Lti::LogService).to receive(:new) do
-              double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+              instance_double(Lti::LogService, call: nil)
             end
             user_session(@teacher)
           end
@@ -1204,7 +1204,7 @@ describe ExternalToolsController do
       context "ENV.LTI_TOOL_FORM_ID" do
         it "sets a random id" do
           expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
-          expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
+          expect(controller).to receive(:js_env).with({ LTI_TOOL_FORM_ID: "1" })
           get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/launch" }
         end
       end
@@ -1471,7 +1471,7 @@ describe ExternalToolsController do
     context "logging" do
       before do
         allow(Lti::LogService).to receive(:new) do
-          double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+          instance_double(Lti::LogService, call: nil)
         end
         user_session(@teacher)
       end
@@ -2012,6 +2012,119 @@ describe ExternalToolsController do
         end
       end
     end
+
+    context "when tool is quiz_lti and native experience sessionless is enabled" do
+      let(:quiz_lti_tool) do
+        account.context_external_tools.create!(
+          name: "New Quizzes",
+          url: "http://www.example.com/basic_lti",
+          consumer_key: "key",
+          shared_secret: "secret",
+          tool_id: "Quizzes 2",
+          privacy_level: "public"
+        )
+      end
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          name: "NQ Assignment",
+          submission_types: "external_tool"
+        )
+        a.external_tool_tag = ContentTag.create!(
+          context: a,
+          content: quiz_lti_tool,
+          url: quiz_lti_tool.url,
+          content_type: "ContextExternalTool"
+        )
+        a.save!
+        a
+      end
+
+      before do
+        @course.enable_feature!(:new_quizzes_native_experience)
+        @course.enable_feature!(:new_quizzes_native_experience_sessionless)
+        user_session(@teacher)
+      end
+
+      it "redirects to the New Quizzes native launch" do
+        get :retrieve, params: {
+          course_id: @course.id,
+          url: quiz_lti_tool.url,
+          assignment_id: assignment.id
+        }
+        expect(response).to redirect_to(
+          course_assignment_new_quizzes_launch_path(@course, assignment)
+        )
+      end
+
+      context "when borderless param is set" do
+        it "redirects with content_only" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            borderless: true
+          }
+          expect(response).to redirect_to(
+            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+          )
+        end
+      end
+
+      context "when display=borderless" do
+        it "redirects with content_only" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            display: "borderless"
+          }
+          expect(response).to redirect_to(
+            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+          )
+        end
+      end
+
+      context "when native experience sessionless is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience_sessionless)
+        end
+
+        it "does not redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id
+          }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when native experience is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience)
+        end
+
+        it "does not redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id
+          }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when assignment_id is not provided" do
+        it "does not redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url
+          }
+          expect(response).not_to be_redirect
+        end
+      end
+    end
   end
 
   describe "GET 'resource_selection'" do
@@ -2024,7 +2137,7 @@ describe ExternalToolsController do
 
     it "logs the launch" do
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
 
       user_session(@teacher)
@@ -2353,7 +2466,7 @@ describe ExternalToolsController do
 
         it "return 422" do
           subject
-          expect(response).to have_http_status :unprocessable_entity
+          expect(response).to have_http_status :unprocessable_content
         end
       end
 
@@ -2365,7 +2478,7 @@ describe ExternalToolsController do
 
         it "return 422" do
           subject
-          expect(response).to have_http_status :unprocessable_entity
+          expect(response).to have_http_status :unprocessable_content
         end
       end
     end
@@ -3537,7 +3650,7 @@ describe ExternalToolsController do
         end
 
         context "when the cross-account request fails" do
-          before { allow(HTTParty).to receive(:get).and_return(double("success?" => false)) }
+          before { allow(HTTParty).to receive(:get).and_return(instance_double(HTTParty::Response, "success?" => false)) }
 
           it "uses the request host" do
             @shard2.activate { get :generate_sessionless_launch, params: }
@@ -3661,7 +3774,7 @@ describe ExternalToolsController do
 
     it "logs the launch" do
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
 
       get :sessionless_launch, params: { course_id: @course.id, verifier: }
@@ -3694,6 +3807,78 @@ describe ExternalToolsController do
       it "uses the environment override URL for the launch" do
         get :sessionless_launch, params: { course_id: @course.id, verifier: }
         expect(assigns(:lti_launch).resource_url).to eq(override_url)
+      end
+    end
+
+    context "when tool is quiz_lti and native experience sessionless is enabled" do
+      let(:quiz_lti_tool) do
+        @course.context_external_tools.create!(
+          name: "New Quizzes",
+          url: "http://www.example.com/quiz_lti_launch",
+          consumer_key: "key",
+          shared_secret: "secret",
+          tool_id: "Quizzes 2",
+          privacy_level: "public",
+          course_navigation: { enabled: true }
+        )
+      end
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          name: "NQ Assignment",
+          submission_types: "external_tool"
+        )
+        a.external_tool_tag = ContentTag.create!(
+          context: a,
+          content: quiz_lti_tool,
+          url: quiz_lti_tool.url,
+          content_type: "ContextExternalTool"
+        )
+        a.save!
+        a
+      end
+      let(:verifier) do
+        get :generate_sessionless_launch, params: {
+          course_id: @course.id,
+          launch_type: "assessment",
+          assignment_id: assignment.id
+        }
+        json = response.parsed_body
+        CGI.parse(URI.parse(json["url"]).query)["verifier"].first
+      end
+
+      before do
+        @course.enable_feature!(:new_quizzes_native_experience)
+        @course.enable_feature!(:new_quizzes_native_experience_sessionless)
+      end
+
+      it "redirects to the New Quizzes native launch with content_only" do
+        get :sessionless_launch, params: { course_id: @course.id, verifier: }
+        expect(response).to redirect_to(
+          course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+        )
+      end
+
+      context "when native experience sessionless is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience_sessionless)
+        end
+
+        it "does not redirect and renders the LTI launch" do
+          get :sessionless_launch, params: { course_id: @course.id, verifier: }
+          expect(response).not_to be_redirect
+        end
+      end
+
+      context "when native experience is disabled" do
+        before do
+          @course.disable_feature!(:new_quizzes_native_experience)
+        end
+
+        it "does not redirect and renders the LTI launch" do
+          get :sessionless_launch, params: { course_id: @course.id, verifier: }
+          expect(response).not_to be_redirect
+        end
       end
     end
   end
@@ -3796,7 +3981,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.pluck("name")).to match_array ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "shows course nav tools for the single-context endpoint" do
@@ -3814,7 +3999,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.pluck("name")).to match_array ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "only returns tools with a course navigation placement" do
@@ -3870,81 +4055,6 @@ describe ExternalToolsController do
 
       tools = json_parse(response.body)
       expect(tools.count).to eq 0
-    end
-  end
-
-  describe "#render_native_item_banks" do
-    let(:course) { course_model }
-    let(:teacher) { teacher_in_course(course:, active_all: true).user }
-    let(:tool) do
-      course.context_external_tools.create!(
-        name: "New Quizzes",
-        url: "http://example.com/launch",
-        consumer_key: "key",
-        shared_secret: "secret",
-        tool_id: "Quizzes 2"
-      )
-    end
-    let(:request_mock) do
-      double(path: "/courses/3/external_tools/7/banks")
-    end
-
-    before do
-      user_session(teacher)
-      allow(controller).to receive(:add_new_quizzes_bundle)
-      allow(controller).to receive(:add_body_class)
-      allow(controller).to receive(:render)
-      allow(controller).to receive(:js_env).and_call_original
-      controller.instance_variable_set(:@context, course)
-      controller.instance_variable_set(:@tool, tool)
-      controller.instance_variable_set(:@current_user, teacher)
-      controller.instance_variable_set(:@domain_root_account, Account.default)
-      allow(controller).to receive_messages(build_item_banks_launch_data: { test: "data" }, request: request_mock)
-    end
-
-    it "sets basename in js_env when full_path param is present" do
-      allow(controller).to receive(:params).and_return({ full_path: "/banks" })
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7")
-        expect(data[:NEW_QUIZZES][:test]).to eq("data")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
-    end
-
-    it "uses request path as basename when full_path param is not present" do
-      allow(controller).to receive(:params).and_return({})
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7/banks")
-        expect(data[:NEW_QUIZZES][:test]).to eq("data")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
-    end
-
-    it "preserves other NEW_QUIZZES data in js_env" do
-      allow(controller).to receive_messages(params: { full_path: "/banks" }, build_item_banks_launch_data: { test: "data", other: "value" })
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:test]).to eq("data")
-        expect(data[:NEW_QUIZZES][:other]).to eq("value")
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
-    end
-
-    it "correctly handles complex subroutes" do
-      complex_request_mock = double(path: "/courses/3/external_tools/7/banks/item/123")
-      allow(controller).to receive_messages(request: complex_request_mock, params: { full_path: "/banks/item/123" })
-
-      expect(controller).to receive(:js_env) do |data|
-        expect(data[:NEW_QUIZZES][:basename]).to eq("/courses/3/external_tools/7")
-      end
-
-      controller.send(:render_native_item_banks, "course_navigation")
     end
   end
 end

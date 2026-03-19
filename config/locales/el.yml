@@ -2136,6 +2136,7 @@ el:
       graded_quiz: "Βαθμολογημένο κουίζ"
       graded_survey: "Βαθμολογημένη Δημοσκόπηση"
       ungraded_survey: "Μη Βαθμολογημένη Δημοσκόπηση"
+  assignment_rubric_details_1b6723b2: "Λεπτομέρειες Ρουμπρίκας Εργασίας"
   assignment_selection_6bff05c4: "Επιλογή Εργασίας"
   assignment_title_8a707dd2: "τίτλος εργασίας"
   assignment_url_37c849c6: "url εργασίας"
@@ -4595,6 +4596,7 @@ el:
   course_groups_e8239a1e: "Ομάδες Μαθήματος"
   course_home_4c4c0107: "Αρχική Σελίδα Μαθήματος"
   course_home_sub_navigation_b1ee6b03: "Υπο-πλοήγηση στην Αρχική Σελίδα του Μαθήματος"
+  course_id_33633604: "ID Μαθήματος:"
   course_id_8bd2a21c: "ID Μαθήματος"
   course_id_course_id_2841413a: "ID Μαθήματος «%{course_id}»"
   course_id_f8640bb8: course_id
@@ -7921,6 +7923,7 @@ el:
     lock_module_until: "Κλειδωμένο έως"
   language_6b3e2c7c: Γλώσσα
   last_activity_a983e541: "Τελευταία Δραστηριότητα"
+  last_e159dbd: Τελευταίο
   last_enrollment_activity_10fe15ba: "Δραστηριότητα Τελευταίας Εγγραφής"
   last_error_a3832668: "Τελευταίο Σφάλμα"
   last_export_899a04c5: "Τελευταία Εξαγωγή"
@@ -10249,6 +10252,7 @@ el:
   no_email_8585ad7e: "Κανένα Email"
   no_grade_3fa326c: "δεν υπάρχει βαθμός"
   no_grading_schemes_to_display_8b0e92e7: "Δεν υπάρχουν κανονισμοί βαθμολόγησης"
+  no_items_20cde5bf: "Δεν υπάρχουν στοιχεία."
   no_items_found_870b2d0d: "Δεν βρέθηκαν στοιχεία"
   no_items_in_module_21f111a2: "Δεν υπάρχουν στοιχεία στην ενότητα"
   no_marks_5e7d2b59: "Χωρίς Επισημάνσεις"

@@ -318,9 +318,12 @@ describe('ActionsMenuCell', () => {
   describe('loading states', () => {
     it('disables menu items while loading and shows screen reader announcement', async () => {
       const user = userEvent.setup()
+      let resolveRequest!: (value: {json: object; response: {ok: boolean}}) => void
       mockDoFetchApi.mockImplementation(
         () =>
-          new Promise(resolve => setTimeout(() => resolve({json: {}, response: {ok: true}}), 100)),
+          new Promise(resolve => {
+            resolveRequest = resolve
+          }),
       )
 
       render(<ActionsMenuCell scan={activeScan} />, {wrapper})
@@ -330,6 +333,9 @@ describe('ActionsMenuCell', () => {
 
       const closeOption = screen.getByText(/close remediation/i)
       await user.click(closeOption)
+
+      // Wait for the API call to be initiated
+      await waitFor(() => expect(mockDoFetchApi).toHaveBeenCalled())
 
       // Menu button should NOT be disabled (users can still open the menu)
       expect(menuButton).not.toBeDisabled()
@@ -341,6 +347,9 @@ describe('ActionsMenuCell', () => {
       await user.click(menuButton)
       const menuItem = screen.getByText(/close remediation/i).closest('[role="menuitem"]')
       expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+
+      // Now resolve the request
+      resolveRequest({json: {}, response: {ok: true}})
 
       await waitFor(() => {
         expect(screen.queryByText(/closing remediation, please wait/i)).not.toBeInTheDocument()

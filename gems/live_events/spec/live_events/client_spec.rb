@@ -51,7 +51,7 @@ describe LiveEvents::Client do
 
   def prep_client_and_worker
     stub_config
-    allow(LiveEvents).to receive_messages(logger: double(info: nil, error: nil, warn: nil), stream_client: fclient)
+    allow(LiveEvents).to receive_messages(logger: instance_double(Logger, info: nil, error: nil, warn: nil), stream_client: fclient)
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.retry_throttled_events = -> { true }
     LiveEvents.clear_context!

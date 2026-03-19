@@ -346,7 +346,7 @@ describe "Provisional Grades API", type: :request do
 
           api_call_as_user(@teacher, :post, @path, @params)
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(@assignment.reload.grades_published?).to be false
         end
       end
@@ -450,7 +450,7 @@ describe "Provisional Grades API", type: :request do
 
           it "returns status unprocessable entity" do
             api_call_as_user(@teacher, :post, @path, @params)
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
           end
 
           it "does not publish the assignment" do
@@ -476,7 +476,7 @@ describe "Provisional Grades API", type: :request do
 
           it "returns status unprocessable entity" do
             api_call_as_user(@teacher, :post, @path, @params)
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
           end
 
           it "does not grade the submission" do

@@ -51,11 +51,26 @@ module Types
       account.resolved_outcome_calculation_method
     end
 
-    field :courses_connection, CourseType.connection_type, null: true
-    def courses_connection
+    field :courses_connection, CourseType.connection_type, null: true do
+      argument :career_learning_library_only,
+               Boolean,
+               "Whether or not to include or exclude Canvas Career learning library only courses",
+               required: false
+    end
+    def courses_connection(career_learning_library_only: nil)
       return unless account.grants_right?(current_user, :read_course_list)
 
-      account.associated_courses
+      courses = account.associated_courses
+
+      if account.root_account.feature_enabled?(:horizon_learning_library_ms2) && !career_learning_library_only.nil?
+        courses = if career_learning_library_only
+                    courses.career_learning_library
+                  else
+                    courses.not_career_learning_library
+                  end
+      end
+
+      courses
     end
 
     field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
@@ -95,14 +110,23 @@ module Types
       account.account_chain - [account]
     end
 
-    field :rubrics_connection, RubricType.connection_type, null: true
-    def rubrics_connection
+    field :rubrics_connection, RubricType.connection_type, null: true do
+      argument :id,
+               ID,
+               "Filter by rubric ID",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Rubric")
+    end
+    def rubrics_connection(id: nil)
       rubric_associations = account.rubric_associations
                                    .bookmarked
                                    .include_rubric
                                    .joins(:rubric)
                                    .where.not(rubrics: { workflow_state: "deleted" })
-                                   .to_a
+
+      rubric_associations = rubric_associations.where(rubric_id: id) if id
+
+      rubric_associations = rubric_associations.to_a
       rubric_associations = Canvas::ICU.collate_by(rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
       rubric_associations.map(&:rubric)
     end

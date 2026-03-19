@@ -39,7 +39,6 @@ gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
-gem "aws-sdk-translate", "~> 1.77", require: false
 gem "rqrcode", "~> 3.0", require: false
 gem "bcrypt", "~> 3.1"
 gem "benchmark", "~> 0.4", require: false
@@ -49,7 +48,7 @@ gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 1.0"
 gem "canvas_webex", "0.18.2"
-gem "code_ownership", "~> 1.33"
+gem "code_ownership", "~> 2.1"
 gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"

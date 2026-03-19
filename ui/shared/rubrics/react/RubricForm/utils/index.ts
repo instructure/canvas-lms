@@ -23,18 +23,19 @@ import type {
   RubricRating,
 } from '@canvas/rubrics/react/types/rubric'
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
-import type {RubricFormProps} from '../types/RubricForm'
+import type {RubricFormProps, AssociationType} from '../types/RubricForm'
 import {isEqual} from 'es-toolkit/compat'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
-    associationType: fields.rubricAssociationForContext?.associationType ?? 'Assignment',
+    associationType: (fields.rubricAssociationForContext?.associationType ??
+      'Assignment') as AssociationType,
     associationTypeId: fields.rubricAssociationForContext?.associationId,
     id: fields.id,
     title: fields.title ?? '',
     hasRubricAssociations: fields.hasRubricAssociations ?? false,
     hidePoints: fields.rubricAssociationForContext?.hidePoints ?? false,
-    criteria: fields.criteria ?? [],
+    criteria: (fields.criteria ?? []) as RubricCriterion[],
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
     ratingOrder: fields.ratingOrder ?? 'descending',

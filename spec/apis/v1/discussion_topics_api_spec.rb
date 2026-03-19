@@ -42,6 +42,10 @@ class DiscussionTopicsTestCourseApi
   def course_assignment_url(*args)
     "course_assignment_url(#{args.inspect[1..-2]})"
   end
+
+  def speed_grader_course_gradebook_url(*args)
+    "speed_grader_course_gradebook_url(#{args.inspect[1..-2]})"
+  end
 end
 
 describe Api::V1::DiscussionTopics do
@@ -211,10 +215,8 @@ describe DiscussionTopicsController, type: :request do
   include Api::V1::User
   include AvatarHelper
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "discussion_topic" }
-
-    include_examples "a locked api item"
 
     let_once(:locked_item) do
       @course.discussion_topics.create!(user: @user, message: "Locked Discussion")
@@ -929,9 +931,7 @@ describe DiscussionTopicsController, type: :request do
                           scope: "unlocked" })
         expect(json.size).to eq 1
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("scope=unlocked")
-        end
+        expect(links).to all(match("scope=unlocked"))
 
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
@@ -943,9 +943,7 @@ describe DiscussionTopicsController, type: :request do
                           scope: "locked" })
         expect(json.size).to eq 2
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("scope=locked")
-        end
+        expect(links).to all(match("scope=locked"))
 
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=pinned",
@@ -998,11 +996,9 @@ describe DiscussionTopicsController, type: :request do
                           scope: "unlocked" })
         expect(json.size).to eq 2
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("only_announcements=true")
-          expect(link).to match("order_by=recent_activity")
-          expect(link).to match("scope=unlocked")
-        end
+        expect(links).to all(match("only_announcements=true")
+          .and(match("order_by=recent_activity"))
+          .and(match("scope=unlocked")))
       end
 
       it "returns group_topic_children for group discussions" do
@@ -2322,7 +2318,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   it "translates user content in topics without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @topic ||= create_topic(@course, title: "Topic 1", message: user_content)
       json = api_call(
         :get,
@@ -2774,7 +2770,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "allows including attachments on top-level entries" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -2792,7 +2788,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "includes attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, message: "top-level message")
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
@@ -3104,7 +3100,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "translates user content in replies without verifiers" do
-      should_translate_user_content(@course, false) do |user_content|
+      should_translate_user_content(@course, include_verifiers: false) do |user_content|
         @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(

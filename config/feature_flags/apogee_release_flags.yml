@@ -289,22 +289,10 @@ archived_grading_schemes:
       state: allowed_on
 enhanced_rubrics:
   state: hidden
-  beta: true
   applies_to: Course
   root_opt_in: true
   display_name: Enhanced Rubrics
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
-  environments:
-    ci:
-      state: allowed
-    development:
-      state: allowed
-enhanced_rubrics_copy_to:
-  state: hidden
-  applies_to: SiteAdmin
-  root_opt_in: true
-  display_name: Enhanced Rubrics Copy To
-  description: This functionality allows copying rubrics between courses from the enhanced rubrics UI and also assigning them directly to an assignment.
   environments:
     ci:
       state: allowed
@@ -371,17 +359,6 @@ speedgrader_studio_media_capture:
       state: allowed
     development:
       state: allowed
-rubric_imports_exports:
-  state: hidden
-  applies_to: SiteAdmin
-  root_opt_in: true
-  display_name: Rubric Imports and Exports
-  description: This feature allows users to import and export rubrics from CSV and XML files from Enhanced Rubrics.
-  environments:
-    ci:
-      state: allowed
-    development:
-      state: allowed
 rce_lite_enabled_speedgrader_comments:
   state: hidden
   applies_to: RootAccount
@@ -433,7 +410,6 @@ ai_rubrics:
   state: hidden
   applies_to: Course
   root_opt_in: true
-  beta: true
   display_name: IgniteAI Generator for Rubrics
   description: Give rubric creators the option to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
 use_body_word_count:
@@ -470,8 +446,9 @@ post_grades_enhanced_modal:
 project_lhotse:
   state: hidden
   applies_to: Course
-  display_name: Grading Assistance
-  description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
+  display_name: IgniteAI Grading Assistance for SpeedGrader
+  root_opt_in: true
+  description: Enables the new IgniteAI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
 performance_improvements_for_gradebook:
   state: hidden
@@ -509,12 +486,6 @@ scheduled_feedback_releases:
       state: allowed_on
     development:
       state: allowed_on
-use_comment_library_v2:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Use Enhanced Comment Library in SpeedGrader
-  description: |
-    Enables the new Comment Library experience in SpeedGrader.
 use_queue_for_rate_limiting_gradebook_requests:
   state: hidden
   applies_to: SiteAdmin
@@ -522,3 +493,17 @@ use_queue_for_rate_limiting_gradebook_requests:
   description: |
     This feature enables the use of a queue to limit the number of concurrent GraphQL requests made
     when loading data in the Gradebook.
+gradebook_use_sis_pseudonym_order_for_sorting:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Use SisPseudonym.order Logic for Gradebook Pseudonym Sorting
+  description: |
+    Fixes a bug where sorting by Login ID, SIS ID, or Integration ID in the Gradebook would use
+    the wrong pseudonym when users have multiple login IDs. With this flag enabled, the backend
+    sorting will correctly match the frontend's SisPseudonym.for logic to select the primary pseudonym.
+  shadow: true
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development

@@ -727,7 +727,7 @@ class GroupCategoriesController < ApplicationController
                           .order("users.sortable_name").group(:id)
           gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id))
                                           .joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
-          csv << export_headers(include_sis_id, gms_by_user_id.any?)
+          csv << export_headers(include_sis_id, groups_exist: gms_by_user_id.any?)
           users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
         end
         # keep inside authorized_action block to avoid
@@ -807,7 +807,7 @@ class GroupCategoriesController < ApplicationController
     row
   end
 
-  def export_headers(include_sis_id, groups_exist = true)
+  def export_headers(include_sis_id, groups_exist: true)
     headers = []
     headers << I18n.t("name")
     headers << "canvas_user_id"

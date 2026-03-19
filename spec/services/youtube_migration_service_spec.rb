@@ -131,19 +131,9 @@ RSpec.describe YoutubeMigrationService do
 
       describe "if there are no new quizzes" do
         before do
-          assignment_relation = double("assignment_relation")
-          active_relation = double("active_relation")
-          quiz_relation = double("quiz_relation")
-          except_relation = double("except_relation")
-
-          allow(course).to receive(:assignments).and_return(assignment_relation)
-          allow(assignment_relation).to receive(:active).and_return(active_relation)
-          allow(active_relation).to receive_messages(
-            type_quiz_lti: quiz_relation,
-            except: except_relation
-          )
-          allow(quiz_relation).to receive(:any?).and_return(false)
-          allow(except_relation).to receive(:find_each).and_return([])
+          empty_relation = course.assignments.none
+          allow(course).to receive(:assignments).and_return(empty_relation)
+          allow(empty_relation).to receive_messages(active: empty_relation, type_quiz_lti: empty_relation, except: empty_relation)
         end
 
         it "does not emit a live event" do
@@ -155,27 +145,10 @@ RSpec.describe YoutubeMigrationService do
       end
 
       it "emits a live event with the right parameters" do
-        assignment_relation = double("assignment_relation")
-        active_relation = double("active_relation")
-        quiz_relation = double("quiz_relation")
-        except_relation = double("except_relation")
-        last_assignment = double("last_assignment")
-        external_tool_tag = double("external_tool_tag")
-
-        allow(course).to receive(:assignments).and_return(assignment_relation)
-        allow(assignment_relation).to receive(:active).and_return(active_relation)
-        allow(active_relation).to receive_messages(
-          type_quiz_lti: quiz_relation,
-          except: except_relation
-        )
-        allow(quiz_relation).to receive_messages(
-          any?: true,
-          last: last_assignment
-        )
-        allow(last_assignment).to receive(:external_tool_tag).and_return(external_tool_tag)
-        allow(external_tool_tag).to receive(:content_id).and_return("external_tool_123")
-        allow(except_relation).to receive(:find_each).and_return([])
-        allow(course).to receive_messages(global_id: "course_global_id_123", id: 1)
+        external_tool_tag = instance_double(ContentTag, content_id: "external_tool_123")
+        last_assignment = instance_double(Assignment, external_tool_tag:)
+        relation = class_double(Assignment, any?: true, last: last_assignment).as_null_object
+        allow(course).to receive_messages(global_id: "course_global_id_123", id: 1, assignments: relation)
 
         expect(Canvas::LiveEvents).to receive(:scan_youtube_links) do |payload|
           expect(payload.scan_id).to eq(Progress.last.id)
@@ -514,7 +487,7 @@ RSpec.describe YoutubeMigrationService do
 
       context "when resource_type is a New Quizzes resource" do
         YoutubeMigrationService::NEW_QUIZZES_RESOURCES.each do |type|
-          include_examples "passes for New Quizzes resource", type
+          it_behaves_like "passes for New Quizzes resource", type
         end
       end
     end
@@ -2621,11 +2594,9 @@ RSpec.describe YoutubeMigrationService do
       Account.site_admin.enable_feature!(:new_quizzes_scanning_youtube_links)
 
       # Stub the assignment chain for new_quizzes? and call_external_tool
-      external_tool_tag = double(content_id: 1)
-      quiz_assignment = double(external_tool_tag:)
-      quiz_lti_scope = double(any?: true, last: quiz_assignment)
-      active_scope = double(type_quiz_lti: quiz_lti_scope)
-      assignments = double(active: active_scope)
+      external_tool_tag = instance_double(ContentTag, content_id: 1)
+      quiz_assignment = instance_double(Assignment, external_tool_tag:)
+      assignments = class_double(Assignment, any?: true, last: quiz_assignment).as_null_object
 
       allow_any_instance_of(Course).to receive(:assignments).and_return(assignments)
     end
@@ -2763,7 +2734,7 @@ RSpec.describe YoutubeMigrationService do
         wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true).wiki_page
       end
 
-      include_examples "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
+      it_behaves_like "skips attachment association creation", "WikiPage", :wiki_page_with_embed, :body
     end
 
     context "with Assignment" do
@@ -2771,7 +2742,7 @@ RSpec.describe YoutubeMigrationService do
         assignment_model(course:, description: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Assignment", :assignment_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :assignment_with_embed, :description
     end
 
     context "Assignment with discussion_topic" do
@@ -2779,7 +2750,7 @@ RSpec.describe YoutubeMigrationService do
         graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true).assignment
       end
 
-      include_examples "skips attachment association creation", "Assignment", :discussion_assign_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :discussion_assign_with_embed, :description
     end
 
     context "Assignment with quiz" do
@@ -2787,7 +2758,7 @@ RSpec.describe YoutubeMigrationService do
         assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true).assignment
       end
 
-      include_examples "skips attachment association creation", "Assignment", :assignment_quiz_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :assignment_quiz_with_embed, :description
     end
 
     context "Assignment with wiki page" do
@@ -2795,7 +2766,7 @@ RSpec.describe YoutubeMigrationService do
         wiki_page_assignment_model(course:, body: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Assignment", :assignment_wiki_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Assignment", :assignment_wiki_with_embed, :description
     end
 
     context "with DiscussionTopic" do
@@ -2803,7 +2774,7 @@ RSpec.describe YoutubeMigrationService do
         graded_discussion_topic(context: course, message: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
+      it_behaves_like "skips attachment association creation", "DiscussionTopic", :discussion_topic_with_embed, :message
     end
 
     context "with Announcement" do
@@ -2811,7 +2782,7 @@ RSpec.describe YoutubeMigrationService do
         course.announcements.create!(title: "Test", message: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Announcement", :announcement_with_embed, :message
+      it_behaves_like "skips attachment association creation", "Announcement", :announcement_with_embed, :message
     end
 
     context "with DiscussionEntry" do
@@ -2820,7 +2791,7 @@ RSpec.describe YoutubeMigrationService do
         topic.discussion_entries.create!(message: original_html, user: @teacher, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
+      it_behaves_like "skips attachment association creation", "DiscussionEntry", :discussion_entry_with_embed, :message
     end
 
     context "with CalendarEvent" do
@@ -2828,7 +2799,7 @@ RSpec.describe YoutubeMigrationService do
         calendar_event_model(context: course, description: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
+      it_behaves_like "skips attachment association creation", "CalendarEvent", :calendar_event_with_embed, :description
     end
 
     context "with Quizzes::Quiz" do
@@ -2836,7 +2807,7 @@ RSpec.describe YoutubeMigrationService do
         assignment_quiz([], course:, description: original_html, skip_attachment_association_update: true)
       end
 
-      include_examples "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
+      it_behaves_like "skips attachment association creation", "Quizzes::Quiz", :quiz_with_embed, :description
     end
 
     context "with Course syllabus" do
@@ -2845,7 +2816,7 @@ RSpec.describe YoutubeMigrationService do
         course
       end
 
-      include_examples "skips attachment association creation", "Course", :course_with_syllabus, :syllabus_body
+      it_behaves_like "skips attachment association creation", "Course", :course_with_syllabus, :syllabus_body
     end
   end
 end

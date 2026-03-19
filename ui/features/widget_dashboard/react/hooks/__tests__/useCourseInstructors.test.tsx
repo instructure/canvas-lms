@@ -65,17 +65,21 @@ const mockInstructorsResponse = {
             avatarUrl: 'https://example.com/avatar1.jpg',
             email: 'prof.smith@example.com',
           },
-          course: {
-            _id: '1',
-            name: 'Advanced Mathematics',
-            courseCode: 'MATH301',
-          },
-          type: 'TeacherEnrollment',
-          role: {
-            _id: '1',
-            name: 'Teacher',
-          },
-          enrollmentState: 'active',
+          enrollments: [
+            {
+              course: {
+                _id: '1',
+                name: 'Advanced Mathematics',
+                courseCode: 'MATH301',
+              },
+              type: 'TeacherEnrollment',
+              role: {
+                _id: '1',
+                name: 'Teacher',
+              },
+              enrollmentState: 'active',
+            },
+          ],
         },
         {
           user: {
@@ -86,17 +90,21 @@ const mockInstructorsResponse = {
             avatarUrl: 'https://example.com/avatar2.jpg',
             email: 'ta.johnson@example.com',
           },
-          course: {
-            _id: '1',
-            name: 'Advanced Mathematics',
-            courseCode: 'MATH301',
-          },
-          type: 'TaEnrollment',
-          role: {
-            _id: '2',
-            name: 'Teaching Assistant',
-          },
-          enrollmentState: 'active',
+          enrollments: [
+            {
+              course: {
+                _id: '1',
+                name: 'Advanced Mathematics',
+                courseCode: 'MATH301',
+              },
+              type: 'TaEnrollment',
+              role: {
+                _id: '2',
+                name: 'Teaching Assistant',
+              },
+              enrollmentState: 'active',
+            },
+          ],
         },
       ],
       pageInfo: {

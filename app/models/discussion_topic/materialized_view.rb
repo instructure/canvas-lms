@@ -140,12 +140,12 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
 
   def update_materialized_view(xlog_location: nil, use_master: false)
     unless use_master
-      timeout = Setting.get("discussion_materialized_view_replication_timeout", "60").to_i.seconds
+      timeout = Setting.get("discussion_materialized_view_replication_timeout", "90").to_i.seconds
       unless self.class.wait_for_replication(start: xlog_location, timeout:)
         # failed to replicate - requeue later
         run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
         delay(singleton: "materialized_discussion:#{Shard.birth.activate { discussion_topic_id }}", run_at:)
-          .update_materialized_view(synchronous: true, xlog_location:, use_master:)
+          .update_materialized_view(xlog_location:, use_master:)
         raise ReplicationTimeoutError, "timed out waiting for replication"
       end
     end

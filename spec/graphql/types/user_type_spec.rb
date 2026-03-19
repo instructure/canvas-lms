@@ -157,12 +157,12 @@ describe Types::UserType do
     end
 
     it "returns an avatar url when avatars are enabled" do
-      @student.account.enable_service(:avatars)
+      @course.account.root_account.tap { |a| a.enable_service(:avatars) }.save!
       expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
 
     it "returns nil when a user has no avatar" do
-      @student.account.enable_service(:avatars)
+      @course.account.root_account.tap { |a| a.enable_service(:avatars) }.save!
       @student.update! avatar_image_url: nil
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
@@ -744,6 +744,33 @@ describe Types::UserType do
       it "returns only non-horizon courses if false" do
         @course3.enroll_student(@student, enrollment_state: "active")
         expect(user_type.resolve("enrollments(horizonCourses: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
+      end
+    end
+
+    context "Career Learning Library courses" do
+      before :once do
+        @horizon_account = Account.create!
+        @horizon_account.enable_feature!(:horizon_course_setting)
+        @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+        @horizon_account.horizon_account = true
+        @horizon_account.save!
+
+        @cll_course = @horizon_account.courses.create!(name: "CLL Course", career_learning_library_only: true)
+        @regular_course = @horizon_account.courses.create!(name: "Regular Course", career_learning_library_only: false)
+      end
+
+      it "returns only career learning library courses if true" do
+        @cll_course.enroll_student(@student, enrollment_state: "active")
+        @regular_course.enroll_student(@student, enrollment_state: "active")
+        expect(user_type.resolve("enrollments(careerLearningLibraryOnly: true) { _id }", current_user: @student).length).to eq 1
+      end
+
+      it "returns only non-career learning library courses if false" do
+        @cll_course.enroll_student(@student, enrollment_state: "active")
+        @regular_course.enroll_student(@student, enrollment_state: "active")
+        # Student has enrollments in @course, @course2, @cll_course, and @regular_course = 4 total
+        # With careerLearningLibraryOnly: false, should exclude @cll_course = 3 enrollments
+        expect(user_type.resolve("enrollments(careerLearningLibraryOnly: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
       end
     end
 
@@ -3568,6 +3595,111 @@ describe Types::UserType do
 
         missing_result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
         expect(missing_result).to include("Calculated Missing Assignment")
+      end
+    end
+
+    context "with grading periods" do
+      before(:once) do
+        @frozen_time = Time.zone.parse("2024-06-15 12:00:00")
+
+        Timecop.freeze(@frozen_time) do
+          term = Account.default.enrollment_terms.create!(start_at: 10.years.ago)
+          @gp_course = course_factory(active_all: true, enrollment_term_id: term.id)
+          @gp_course.enroll_student(@student, enrollment_state: :active)
+
+          period_group = Account.default.grading_period_groups.create!
+          period_group.enrollment_terms << @gp_course.enrollment_term
+          @closed_period = period_group.grading_periods.create!(
+            title: "Closed Period",
+            start_date: 5.months.ago(@frozen_time),
+            end_date: 2.months.ago(@frozen_time),
+            close_date: 2.months.ago(@frozen_time)
+          )
+          @current_period = period_group.grading_periods.create!(
+            title: "Current Period",
+            start_date: 2.months.ago(@frozen_time),
+            end_date: 2.months.from_now(@frozen_time),
+            close_date: 2.months.from_now(@frozen_time)
+          )
+
+          @closed_period_assignment = @gp_course.assignments.create!(
+            title: "Assignment in Closed Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 4.months.ago(@frozen_time)
+          )
+          @current_period_assignment = @gp_course.assignments.create!(
+            title: "Assignment in Current Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 1.month.ago(@frozen_time)
+          )
+
+          @closed_period_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+          @current_period_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+        end
+      end
+
+      let(:gp_student_user_type) do
+        GraphQLTypeTester.new(
+          @student,
+          current_user: @student,
+          domain_root_account: @gp_course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      it "filters missing submissions by current grading period by default" do
+        Timecop.freeze(@frozen_time) do
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment in Current Period")
+          expect(result).not_to include("Assignment in Closed Period")
+        end
+      end
+
+      it "returns all missing submissions when onlyCurrentGradingPeriod is false" do
+        Timecop.freeze(@frozen_time) do
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true, onlyCurrentGradingPeriod: false) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment in Current Period")
+          expect(result).to include("Assignment in Closed Period")
+        end
+      end
+
+      it "includes missing assignments from courses without grading periods" do
+        Timecop.freeze(@frozen_time) do
+          no_gp_course = course_factory(active_all: true)
+          no_gp_course.enroll_student(@student, enrollment_state: :active)
+          no_gp_assignment = no_gp_course.assignments.create!(
+            title: "Assignment Without Grading Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 1.month.ago(@frozen_time)
+          )
+          no_gp_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment Without Grading Period")
+          expect(result).to include("Assignment in Current Period")
+          expect(result).not_to include("Assignment in Closed Period")
+        end
       end
     end
   end

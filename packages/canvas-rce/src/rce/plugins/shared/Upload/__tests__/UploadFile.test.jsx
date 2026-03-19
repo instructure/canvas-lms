@@ -237,7 +237,7 @@ describe('UploadFile', () => {
           {theFile: fakeFile},
           {startMediaUpload: fakeMediaUpload},
         )
-        expect(fakeMediaUpload).toHaveBeenCalledWith('images', {
+        expect(fakeMediaUpload).toHaveBeenCalledWith({
           parentFolderId: 'media',
           name: 'foo.png',
           size: 3000,
@@ -260,7 +260,7 @@ describe('UploadFile', () => {
           {theFile: fakeFile},
           {startMediaUpload: fakeMediaUpload},
         )
-        expect(fakeMediaUpload).toHaveBeenCalledWith('media', {
+        expect(fakeMediaUpload).toHaveBeenCalledWith({
           parentFolderId: 'media',
           name: 'foo.mov',
           size: 3000,
@@ -285,7 +285,7 @@ describe('UploadFile', () => {
           },
           {startMediaUpload: fakeMediaUpload},
         )
-        expect(fakeMediaUpload).toHaveBeenCalledWith('images', {
+        expect(fakeMediaUpload).toHaveBeenCalledWith({
           altText: '(╯°□°）╯︵ ┻━┻',
           displayAs: 'embed',
           isDecorativeImage: true,
@@ -312,7 +312,7 @@ describe('UploadFile', () => {
           {theFile: fakeFile},
           {startMediaUpload: fakeMediaUpload},
         )
-        expect(fakeMediaUpload).toHaveBeenCalledWith('media', {
+        expect(fakeMediaUpload).toHaveBeenCalledWith({
           parentFolderId: 'media',
           name: 'foo.mp3',
           size: 3000,
@@ -335,7 +335,7 @@ describe('UploadFile', () => {
           {theFile: fakeFile},
           {startMediaUpload: fakeMediaUpload},
         )
-        expect(fakeMediaUpload).toHaveBeenCalledWith('documents', {
+        expect(fakeMediaUpload).toHaveBeenCalledWith({
           parentFolderId: 'media',
           name: 'foo.txt',
           size: 3000,

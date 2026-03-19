@@ -654,7 +654,7 @@ describe Login::CanvasController do
     end
 
     before do
-      redis = double("Redis")
+      redis = instance_double(Redis)
       allow(redis).to receive_messages(setex: nil, hget: nil, hmget: nil, del: nil, pipelined: nil)
       allow(Canvas::Security::LoginRegistry).to receive_messages(redis:)
     end

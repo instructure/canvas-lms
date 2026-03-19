@@ -26,6 +26,7 @@ class Test::MockLtiController < ApplicationController
 
   # Defines a login endpoint for a mini LTI tool for testing purposes
   def login
+    Rails.logger.info "[MockLTI] Login endpoint called - params: #{params.keys.join(", ")}"
     @client_id = DeveloperKey.last.global_id
     @redirect_uri = "http://#{HostUrl.default_host}/test/mock_lti/ui"
     @authorization_redirect = "http://#{HostUrl.default_host}/api/lti/authorize_redirect"
@@ -40,6 +41,7 @@ class Test::MockLtiController < ApplicationController
   # Endpoint for a minimal UI for an LTI tool. Shows a button that, when clicked,
   # will subscribe to the platform notification service.
   def ui
+    Rails.logger.info "[MockLTI] UI endpoint called - JWT present: #{params[:id_token].present?}"
     id_token = params[:id_token]
     jwt = JWT.decode(id_token, nil, false) # false means don't bother verifying signature
     deep_link_settings = jwt.first["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]

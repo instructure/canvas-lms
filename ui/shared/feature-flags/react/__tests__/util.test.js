@@ -142,4 +142,84 @@ describe('feature_flags:util', () => {
       expect(util.doesAllowDefaults(sampleData.allowedOnCourseFeature.feature_flag)).toBe(false)
     })
   })
+
+  describe('shouldDelete', () => {
+    it('returns true when new state matches parent state', () => {
+      const flag = {parent_state: 'allowed_on', state: 'on'}
+      expect(util.shouldDelete({flag, allowsDefaults: false, state: 'allowed_on'})).toBe(true)
+    })
+
+    it('returns true for hidden parent when setting to off', () => {
+      const flag = {parent_state: 'hidden', state: 'on'}
+      expect(util.shouldDelete({flag, allowsDefaults: false, state: 'off'})).toBe(true)
+    })
+
+    it('returns true when reverting allowed_on to on for contexts that allow defaults', () => {
+      const flag = {parent_state: 'allowed_on', state: 'off', feature: 'some_feature'}
+      expect(util.shouldDelete({flag, allowsDefaults: false, state: 'on'})).toBe(true)
+    })
+
+    it('returns false for new_user_tutorial_on_off when setting to on with allowed_on parent', () => {
+      // This exception allows legacy users to create explicit 'on' flags
+      const flag = {parent_state: 'allowed_on', state: 'off', feature: 'new_user_tutorial_on_off'}
+      expect(util.shouldDelete({flag, allowsDefaults: false, state: 'on'})).toBe(false)
+    })
+
+    it('returns true for other flags when setting to on with allowed_on parent', () => {
+      const flag = {parent_state: 'allowed_on', state: 'off', feature: 'some_other_feature'}
+      expect(util.shouldDelete({flag, allowsDefaults: false, state: 'on'})).toBe(true)
+    })
+
+    it('returns false for root_opt_in features on root account even when state matches parent_state', () => {
+      const flag = {parent_state: 'off', state: 'allowed', feature: 'root_opt_in_feature'}
+      expect(
+        util.shouldDelete({
+          flag,
+          allowsDefaults: true,
+          state: 'off',
+          rootOptIn: true,
+          isRootAccount: true,
+        }),
+      ).toBe(false)
+    })
+
+    it('returns false for root_opt_in features on root account regardless of target state', () => {
+      const flag = {parent_state: 'allowed_on', state: 'on', feature: 'root_opt_in_feature'}
+      expect(
+        util.shouldDelete({
+          flag,
+          allowsDefaults: false,
+          state: 'allowed',
+          rootOptIn: true,
+          isRootAccount: true,
+        }),
+      ).toBe(false)
+    })
+
+    it('allows deletion for root_opt_in features on sub-accounts when state matches parent', () => {
+      const flag = {parent_state: 'off', state: 'allowed', feature: 'root_opt_in_feature'}
+      expect(
+        util.shouldDelete({
+          flag,
+          allowsDefaults: true,
+          state: 'off',
+          rootOptIn: true,
+          isRootAccount: false,
+        }),
+      ).toBe(true)
+    })
+
+    it('allows deletion for non-root_opt_in features on root account when state matches parent', () => {
+      const flag = {parent_state: 'allowed_on', state: 'on'}
+      expect(
+        util.shouldDelete({
+          flag,
+          allowsDefaults: false,
+          state: 'allowed_on',
+          rootOptIn: false,
+          isRootAccount: true,
+        }),
+      ).toBe(true)
+    })
+  })
 })

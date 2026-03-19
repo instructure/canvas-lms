@@ -1175,7 +1175,7 @@ class EnrollmentsApiController < ApplicationController
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
       enrollments = if params[:state].present?
-                      user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
+                      user.enrollments.where(enrollment_index_conditions(use_course_state: true)).joins(:enrollment_state)
                           .where(enrollment_states: { state: enrollment_states_for_state_param })
                     else
                       user.enrollments.current_and_invited.where(enrollment_index_conditions)
@@ -1233,7 +1233,7 @@ class EnrollmentsApiController < ApplicationController
   # index is :course or :user
   #
   # Returns [ sql fragment string, replacement hash ]
-  def enrollment_index_conditions(use_course_state = false)
+  def enrollment_index_conditions(use_course_state: false)
     type, state, role_names, role_ids = params.values_at(:type, :state, :role, :role_id)
     clauses = []
     replacements = {}

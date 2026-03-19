@@ -63,7 +63,7 @@ describe('QuizEngineModal', () => {
   it('submits to new quizzes without saving', () => {
     const handleDismiss = vi.fn()
     const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
-    fireEvent.click(getByText('New Quizzes'))
+    fireEvent.click(getByText('New Quizzes/Surveys'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(assignLocation).toHaveBeenCalledWith('http://localhost/assignments?quiz_lti')
   })
@@ -82,7 +82,7 @@ describe('QuizEngineModal', () => {
   it('redirects to new quizzes after saving engine choice', () => {
     const handleDismiss = vi.fn()
     const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
-    fireEvent.click(getByText('New Quizzes'))
+    fireEvent.click(getByText('New Quizzes/Surveys'))
     fireEvent.change(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(assignLocation).toHaveBeenCalledWith('http://localhost/assignments?quiz_lti')

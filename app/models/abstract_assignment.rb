@@ -204,7 +204,16 @@ class AbstractAssignment < ActiveRecord::Base
       SQL
   }
   scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :assignments_only, -> { where(type: "Assignment") }
   scope :assignment_or_peer_review, -> { where(type: ["Assignment", "PeerReviewSubAssignment"]) }
+
+  def self.assignment_scope_for_context(context)
+    if context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_or_peer_review.where(context:)
+    else
+      assignments_only.where(context:)
+    end
+  end
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
@@ -241,7 +250,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   with_options if: :quiz_lti? do
-    validate :new_quizzes_type_ok?, if: -> { Account.site_admin.feature_enabled?(:new_quizzes_surveys) }
+    validate :new_quizzes_type_ok?
   end
 
   accepts_nested_attributes_for :estimated_duration, allow_destroy: true
@@ -749,7 +758,7 @@ class AbstractAssignment < ActiveRecord::Base
   validates :hide_in_gradebook, inclusion: { in: [false] }, if: -> { points_possible.present? && points_possible > 0 }
 
   acts_as_list scope: :assignment_group
-  simply_versioned keep: 5
+  simply_versioned keep: 5, versioned_associations: [:attachment_associations]
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
 
@@ -4024,6 +4033,15 @@ class AbstractAssignment < ActiveRecord::Base
 
     self.submission_types = "external_tool"
     self.external_tool_tag_attributes = { content: tool, url: tool.url }
+  end
+
+  # Determines if the external tool URL indicates this is a quiz LTI assignment
+  # @param external_tool_url [String, nil] the external tool URL
+  # @return [Boolean] true if the URL belongs to a quiz LTI tool
+  def quiz_lti_assignment?(external_tool_url: nil)
+    return false unless external_tool_url.present?
+
+    Lti::ToolFinder.from_url(external_tool_url, context)&.quiz_lti?
   end
 
   def rollcall_assignment?

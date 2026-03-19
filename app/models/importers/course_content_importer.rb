@@ -500,7 +500,8 @@ module Importers
               tab["id"] = "context_external_tool_#{tool.id}"
               tab_config << tab
             end
-          else
+          elsif !NavMenuLinkTabs.nav_menu_link_tab_id?(tab["id"])
+            # Nav Menu Links not yet supported, see INTEROP-9293
             tab_config << tab
           end
         end

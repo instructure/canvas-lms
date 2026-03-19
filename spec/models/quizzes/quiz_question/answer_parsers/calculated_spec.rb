@@ -54,9 +54,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
     end
 
     it "formats formulas for the question" do
-      @question[:formulas].each do |formula|
-        expect(formula).to be_a(Hash)
-      end
+      expect(@question[:formulas]).to all(be_a(Hash))
     end
 
     it "formats variables for the question" do

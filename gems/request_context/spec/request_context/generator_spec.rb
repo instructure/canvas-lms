@@ -22,8 +22,8 @@ require "timecop"
 
 describe "RequestContext::Generator" do
   let(:env) { {} }
-  let(:request) { double("Rack::Request", path_parameters: { controller: "users", action: "index" }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
-  let(:context) { double("Course", class: "Course", id: 15) }
+  let(:request) { instance_double(ActionDispatch::Request, path_parameters: { controller: "users", action: "index" }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
+  let(:context) { instance_double(ActiveRecord::Base, class: "Course", id: 15) }
 
   it "generates the X-Canvas-Meta response header" do
     _, headers, = RequestContext::Generator.new(lambda do |_env|

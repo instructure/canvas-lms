@@ -31,6 +31,16 @@ class Lti::Registration < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
+  workflow do
+    state :active do
+      event :deactivate, transitions_to: :inactive
+    end
+    state :inactive do
+      event :activate, transitions_to: :active
+    end
+    state :deleted
+  end
+
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: true
@@ -58,7 +68,7 @@ class Lti::Registration < ActiveRecord::Base
   validate :account_is_root_account
   validate :template_registration_must_be_in_site_admin, if: :template_registration_id?
 
-  scope :active, -> { where(workflow_state: "active") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :site_admin, -> { where(account: Account.site_admin) }
 
   resolves_root_account through: :account
@@ -192,10 +202,22 @@ class Lti::Registration < ActiveRecord::Base
   # for a _sub_ account underneath the registration's root account.
   def inherited_for?(account)
     if self.account.feature_enabled?(:lti_registrations_templates)
-      template_registration_id.present?
+      inherited_from_template?
     else
       account != self.account
     end
+  end
+
+  def inherited_from_template?
+    template_registration_id.present?
+  end
+
+  def developer_key
+    super || template_registration&.developer_key
+  end
+
+  def developer_key_id
+    super || template_registration&.developer_key_id
   end
 
   delegate :site_admin?, to: :account
@@ -229,12 +251,6 @@ class Lti::Registration < ActiveRecord::Base
     return internal_config unless include_overlay
 
     overlay = overlay_for(context)&.data
-    # TODO: Remove this clause once we have backfilled all Lti::IMS::Registration overlays into the
-    # actual Lti::Overlay table.
-    if ims_registration.present? && overlay.blank?
-      overlay = Schemas::Lti::IMS::RegistrationOverlay
-                .to_lti_overlay(ims_registration.registration_overlay)
-    end
 
     # IMS registrations should not allow adding new placements via overlay
     # Only manual/legacy registrations can have additional placements added
@@ -279,7 +295,7 @@ class Lti::Registration < ActiveRecord::Base
 
   def undestroy(active_state: "active")
     ims_registration&.undestroy
-    developer_key&.update!(workflow_state: active_state)
+    developer_key&.update!(workflow_state: active_state) unless inherited_from_template?
     lti_registration_account_bindings.each(&:undestroy)
     manual_configuration&.undestroy
     super
@@ -291,17 +307,16 @@ class Lti::Registration < ActiveRecord::Base
 
   private
 
-  # Returns which placements are disabled at the Lti::IMS::Registration or Lti::ToolConfiguration level.
-  # Note that this is legacy behavior, as moving forward, the overlay will be the source of truth. This method
-  # is only used for backwards compatibility.
+  # Returns which placements are disabled at the Lti::ToolConfiguration level.
+  # Note: For IMS registrations, disabled placements are now handled via Lti::Overlay
+  # and applied in internal_lti_configuration, so this method returns an empty array.
+  # This method is only used for backwards compatibility with manual configurations.
   #
   # @return [Array<String>] An array of placement names that are disabled.
   def registration_level_disabled_placements
     @registration_level_disabled_placements ||=
       if ims_registration.present?
-        ims_registration&.registration_overlay
-                        &.with_indifferent_access
-                        &.dig(:disabledPlacements) || []
+        []
       else
         manual_configuration&.disabled_placements || []
       end
@@ -314,9 +329,11 @@ class Lti::Registration < ActiveRecord::Base
   # Finally, dependent: :destroy on the tool_configuration will also hard delete it, which we also don't want.
   def destroy_associations
     ims_registration&.destroy
-    developer_key&.destroy
+    unless inherited_from_template?
+      developer_key&.destroy
+    end
     lti_registration_account_bindings.each(&:destroy)
-    manual_configuration&.destroy
+    deployments.each(&:destroy)
   end
 
   # Overridden in MRA, where federated consortia are supported

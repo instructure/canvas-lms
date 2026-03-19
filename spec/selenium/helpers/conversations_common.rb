@@ -128,15 +128,11 @@ module ConversationsCommon
     wait_for_ajaximations
   end
 
-  def select_message_course(new_course, is_group = false)
+  def select_message_course(new_course)
     new_course = new_course.name if new_course.respond_to? :name
     f(".dropdown-toggle", message_course).click
     wait_for_ajaximations
-    if is_group
-      fj("a:contains('Groups')", message_course).click
-    else
-      fj("a:contains('Favorite Courses')", message_course).click
-    end
+    fj("a:contains('Favorite Courses')", message_course).click
     fj("a:contains('#{new_course}')", message_course).click
   end
 

@@ -457,7 +457,7 @@ class AssignmentGroupsController < ApplicationController
       groups,
       includes: assignment_includes,
       assignment_ids:
-    )
+    ).where("COALESCE(settings->'new_quizzes'->>'type', '') != 'ungraded_survey'")
 
     if value_to_boolean(params[:hide_zero_point_quizzes])
       assignments = assignments.not_hidden_in_gradebook
@@ -468,11 +468,6 @@ class AssignmentGroupsController < ApplicationController
       exclude_types = Array.wrap(exclude_types) &
                       %w[online_quiz discussion_topic wiki_page external_tool]
       assignments = assignments.where.not(submission_types: exclude_types)
-    end
-
-    if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
-      assignments = assignments.where("settings IS NULL OR settings->'new_quizzes' IS NULL OR
-        jsonb_typeof(settings->'new_quizzes') = 'null' OR settings->'new_quizzes'->>'type' != 'ungraded_survey'")
     end
 
     assignments = assignments.with_student_submission_count.all

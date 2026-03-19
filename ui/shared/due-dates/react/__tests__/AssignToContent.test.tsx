@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act, within, screen} from '@testing-library/react'
+import {render, within, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
@@ -198,6 +198,72 @@ describe('AssignToContent', () => {
     expect(
       within(within(cards[1]).getByTestId('lock_at_input')).getByDisplayValue('Feb 20, 2025'),
     ).toBeInTheDocument()
+  })
+
+  it('preserves peer review dates on the everyone override when cards change', async () => {
+    const overridesWithPeerReview = [
+      {
+        id: '200',
+        title: 'Course 1',
+        due_at: '2025-01-10T23:59:59.000Z',
+        unlock_at: '2025-01-05T06:00:00.000Z',
+        lock_at: '2025-01-20T23:59:59.000Z',
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        course_section_id: '1',
+        unassign_item: false,
+        peer_review_due_at: '2025-01-15T12:00:00.000Z',
+        peer_review_available_from: '2025-01-11T06:00:00.000Z',
+        peer_review_available_to: '2025-01-20T23:59:59.000Z',
+      },
+      {
+        id: '201',
+        title: 'Section A',
+        due_at: '2025-02-10T23:59:59.000Z',
+        unlock_at: '2025-02-05T06:00:00.000Z',
+        lock_at: '2025-02-20T23:59:59.000Z',
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        course_section_id: '2',
+        unassign_item: false,
+      },
+    ]
+
+    const onSyncMock = vi.fn()
+    render(
+      <MockedQueryProvider>
+        <AssignToContent
+          {...props}
+          defaultSectionId={'1'}
+          overrides={overridesWithPeerReview}
+          onSync={onSyncMock}
+        />
+      </MockedQueryProvider>,
+    )
+
+    const cards = await screen.findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(2)
+    onSyncMock.mockClear()
+
+    const assigneeSelector = within(cards[0]).getByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+
+    const sectionOption = await screen.findByText('Section A')
+    await userEvent.click(sectionOption)
+
+    await waitFor(() => {
+      expect(onSyncMock).toHaveBeenCalled()
+    })
+
+    const lastCallOverrides = onSyncMock.mock.calls[onSyncMock.mock.calls.length - 1][0]
+    const everyoneOverride = lastCallOverrides.find(
+      (o: any) => o.peer_review_default_dates === true,
+    )
+
+    expect(everyoneOverride).toBeDefined()
+    expect(everyoneOverride.peer_review_due_at).toBe('2025-01-15T12:00:00.000Z')
+    expect(everyoneOverride.peer_review_available_from).toBe('2025-01-11T06:00:00.000Z')
+    expect(everyoneOverride.peer_review_available_to).toBe('2025-01-20T23:59:59.000Z')
   })
 
   describe('in a paced course', () => {

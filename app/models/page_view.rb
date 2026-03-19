@@ -64,13 +64,13 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find_for_update(request_id)
+  def self.find_for_update(request_id, created_at = nil)
     if PageView.updates_enabled? && db?
       find_by(id: request_id)
     else
       new do |p|
         p.request_id = request_id
-        p.created_at = Time.zone.now
+        p.created_at = created_at || Time.now.utc
       end
     end
   end
@@ -204,7 +204,7 @@ class PageView < ActiveRecord::Base
     ConfigFile.cache_object("pv4") do |config|
       creds = Rails.application.credentials.pv4_creds
 
-      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token))
+      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token), **)
     end
   end
 
@@ -212,10 +212,10 @@ class PageView < ActiveRecord::Base
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user, options = {})
-    client = options.delete(:client) || pv4_client
     viewer = options.delete(:viewer)
     viewer = nil if viewer == user
     viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
+    client = options.delete(:client) || pv4_client(requestor_user: viewer || user)
     user.shard.activate do
       if PageView.pv4?
         result = client.for_user(user, **options)

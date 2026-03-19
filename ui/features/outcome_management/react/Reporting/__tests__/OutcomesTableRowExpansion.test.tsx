@@ -74,6 +74,7 @@ describe('OutcomesTableRowExpansion', () => {
           outcomeId={1}
           studentId="1"
           contributingScores={mockContributingScores}
+          masteryPoints={1}
         />,
       ),
     ).not.toThrow()
@@ -85,6 +86,7 @@ describe('OutcomesTableRowExpansion', () => {
         outcomeId={1}
         studentId="1"
         contributingScores={mockContributingScores}
+        masteryPoints={1}
       />,
     )
     const canvas = screen.getByTestId('outcome-scores-chart')

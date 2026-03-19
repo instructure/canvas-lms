@@ -17,27 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "twilio-ruby"
+
 describe "Canvas::Twilio" do
   def make_phone_number_stub(number, country_code)
-    phone_number_stub = double("Canvas::Twilio.lookups_client.phone_numbers(#{number})")
-    fetch_stub = double("Canvas::Twilio.lookups_client.phone_numbers(#{number}).fetch")
-    allow(fetch_stub).to receive(:country_code).and_return(country_code)
+    phone_number_stub = instance_double(Twilio::REST::Lookups::V2::PhoneNumberContext, number)
+    fetch_stub = instance_double(Twilio::REST::Lookups::V2::PhoneNumberInstance, number, country_code:)
     allow(phone_number_stub).to receive(:fetch).and_return(fetch_stub)
     phone_number_stub
   end
 
   def stub_twilio(available_phone_numbers, phone_number_countries = {})
     phone_number_objects = available_phone_numbers.map do |number|
-      double("Canvas::Twilio.client.incoming_phone_numbers.list/#{number}",
-             phone_number: number)
+      instance_double(Twilio::REST::Api::V2010::AccountContext::IncomingPhoneNumberInstance,
+                      phone_number: number)
     end
 
-    v2 = double("Canvas::Twilio.client.lookups.v2")
+    v2 = instance_double(Twilio::REST::Lookups::V2)
     # Expectations are matched last to first, so add our catch-all expectation before the number specific ones
     allow(v2).to receive(:phone_numbers).with(anything).and_return(
       make_phone_number_stub("anything", Canvas::Twilio::DEFAULT_COUNTRY)
     )
-    lookups = double("Canvas::Twilio.client.lookups", v2:)
+    lookups = instance_double(Twilio::REST::Lookups, v2:)
 
     # Now add one expectation for each number+country mapping
     phone_number_countries.each do |number, country_code|
@@ -46,13 +47,15 @@ describe "Canvas::Twilio" do
       )
     end
 
-    account = double("Canvas::Twilio.client.account")
-    allow(account).to receive_messages(incoming_phone_numbers: double("Canvas::Twilio.client.api.account.client.incoming_phone_numbers",
-                                                                      stream: phone_number_objects),
-                                       messages: double)
+    incoming_phone_numbers = instance_double(Twilio::REST::Api::V2010::AccountContext::IncomingPhoneNumberList,
+                                             stream: phone_number_objects)
+    messages = instance_double(Twilio::REST::Api::V2010::AccountContext::MessageList)
+    account = instance_double(Twilio::REST::Api::V2010::AccountContext,
+                              incoming_phone_numbers:,
+                              messages:)
 
-    client = double("Canvas::Twilio.client")
-    allow(client).to receive_messages(lookups:, api: double("Canvas::Twilio.client.api", account:))
+    api = instance_double(Twilio::REST::Api, account:)
+    client = instance_double(Twilio::REST::Client, lookups:, api:)
     allow(Canvas::Twilio).to receive(:client).and_return(client)
   end
 

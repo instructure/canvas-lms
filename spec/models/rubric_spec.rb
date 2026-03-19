@@ -961,7 +961,6 @@ describe Rubric do
       end
 
       it "handles feature flag inheritance from root account" do
-        # Enable at root account level but not course level
         course.root_account.enable_feature!(:enhanced_rubrics)
         course.root_account.enable_feature!(:ai_rubrics)
         course.disable_feature!(:enhanced_rubrics)
@@ -992,17 +991,14 @@ describe Rubric do
 
     context "feature flag edge cases" do
       it "raises NoMethodError when course doesn't have feature_enabled method" do
-        # Create a mock object that responds to is_a?(Course) but doesn't have feature_enabled?
-        mock_course = double("MockCourse")
+        mock_course = instance_double(Course)
         allow(mock_course).to receive(:is_a?).with(Course).and_return(true)
         allow(mock_course).to receive(:feature_enabled?).and_raise(NoMethodError)
 
-        # The method should raise the NoMethodError since there's no error handling
         expect { Rubric.ai_rubrics_enabled?(mock_course) }.to raise_error(NoMethodError)
       end
 
       it "handles course subclasses" do
-        # Test with a class that inherits from Course
         course_subclass = Class.new(Course) do
           def self.name
             "CourseSubclass"
@@ -1025,8 +1021,7 @@ describe Rubric do
         rubric_params = { title: "Test LLM Rubric", criteria_via_llm: "true" }
         association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
-        # Mock the service and feature flag check
-        service = double("RubricLLMService")
+        service = instance_double(RubricLLMService)
         expect(RubricLLMService).to receive(:new).with(llm_rubric).and_return(service)
         expect(service).to receive(:generate_criteria_via_llm).with(assignment).and_return([
                                                                                              { id: "c1", description: "Generated Criterion", points: 20, ratings: [] }
@@ -1064,7 +1059,6 @@ describe Rubric do
         }
         association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
-        # Should not call RubricLLMService
         expect(RubricLLMService).not_to receive(:new)
 
         association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
@@ -1129,7 +1123,6 @@ describe Rubric do
           other_user = User.create!(name: "Other User")
           course.enroll_teacher(other_user, active_all: true)
 
-          # Don't give the other user rubric permissions
           allow_any_instance_of(Rubric).to receive(:grants_right?).with(other_user, :update).and_return(false)
 
           if method_name == :process_generate_criteria_via_llm
@@ -1172,11 +1165,11 @@ describe Rubric do
             expect(progress.results[:criteria].first[:description]).to eq "Generated Criterion"
           end
 
-          include_examples "checks user permissions", :process_generate_criteria_via_llm
+          it_behaves_like "checks user permissions", :process_generate_criteria_via_llm
         end
 
         context "error handling" do
-          include_examples "handles LLM service errors", :process_generate_criteria_via_llm
+          it_behaves_like "handles LLM service errors", :process_generate_criteria_via_llm
         end
       end
 
@@ -1208,11 +1201,11 @@ describe Rubric do
             expect(progress.results[:criteria].first[:description]).to eq "Regenerated Criterion"
           end
 
-          include_examples "checks user permissions", :process_regenerate_criteria_via_llm
+          it_behaves_like "checks user permissions", :process_regenerate_criteria_via_llm
         end
 
         context "error handling" do
-          include_examples "handles LLM service errors", :process_regenerate_criteria_via_llm
+          it_behaves_like "handles LLM service errors", :process_regenerate_criteria_via_llm
         end
       end
     end

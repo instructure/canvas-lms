@@ -43,26 +43,14 @@ class KalturaMediaFileHandler
   private
 
   def build_partner_data(attachment)
-    partner_data = {}
+    partner_data = {
+      attachment_id: attachment.id.to_s,
+      context_code: [attachment.context_type, attachment.context_id].join("_").underscore,
+      context_source: "file_upload",
+      root_account_uuid: attachment.root_account.uuid.to_s,
+      user_uuid: attachment.user&.uuid&.to_s,
+    }.compact
 
-    if send_sis_data_to_kaltura?
-      if attachment.user && attachment.context.respond_to?(:root_account)
-        pseudonym = SisPseudonym.for(attachment.user, attachment.context)
-        if pseudonym
-          partner_data[:sis_user_id] = pseudonym.sis_user_id
-        end
-      end
-      if attachment.context.respond_to?(:sis_source_id) && attachment.context.sis_source_id
-        partner_data[:sis_source_id] = attachment.context.sis_source_id
-      end
-      partner_data[:context_code] = [attachment.context_type, attachment.context_id].join("_").underscore
-    end
-
-    partner_data.merge!({
-                          attachment_id: attachment.id.to_s,
-                          context_source: "file_upload",
-                          root_account_id: Shard.global_id_for(attachment.root_account_id).to_s,
-                        })
     Rack::Utils.build_nested_query(partner_data)
   end
 
@@ -96,9 +84,5 @@ class KalturaMediaFileHandler
   def refresh_later(bulk_upload_id, attachments, root_account_id)
     MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY)
                .refresh_media_files(bulk_upload_id, attachments.map(&:id), root_account_id)
-  end
-
-  def send_sis_data_to_kaltura?
-    CanvasKaltura::ClientV3.config["kaltura_sis"] == "1"
   end
 end

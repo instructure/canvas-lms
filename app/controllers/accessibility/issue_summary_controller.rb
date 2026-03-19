@@ -50,15 +50,16 @@ module Accessibility
       scans = apply_accessibility_filters(scans, params[:filters], params[:search]) if params[:filters].present? || params[:search].present?
 
       all_issues = AccessibilityIssue
-                   .active
                    .joins(:accessibility_resource_scan)
                    .where(accessibility_resource_scans: { id: scans.select(:id) })
 
-      total_count = all_issues.count
-      issue_count_by_rule_type = all_issues.group(:rule_type).count
+      active_count = all_issues.active.count
+      resolved_count = all_issues.resolved.count
+      issue_count_by_rule_type = all_issues.active.group(:rule_type).count
 
       {
-        total: total_count,
+        active: active_count,
+        resolved: resolved_count,
         by_rule_type: issue_count_by_rule_type
       }
     end

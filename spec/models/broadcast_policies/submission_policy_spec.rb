@@ -20,12 +20,12 @@
 module BroadcastPolicies
   describe SubmissionPolicy do
     let(:course) do
-      double("Course").tap do |c|
+      instance_double(Course).tap do |c|
         allow(c).to receive_messages(available?: true, concluded?: false, id: 1)
       end
     end
     let(:assignment) do
-      double("Assignment").tap do |a|
+      instance_double(Assignment).tap do |a|
         allow(a).to receive_messages(context: course,
                                      published?: true,
                                      deleted?: false,
@@ -34,12 +34,12 @@ module BroadcastPolicies
       end
     end
     let(:enrollment) do
-      double("Enrollment").tap do |e|
+      instance_double(Enrollment).tap do |e|
         allow(e).to receive(:course_id).and_return(course.id)
       end
     end
     let(:user) do
-      double("User").tap do |u|
+      instance_double(User).tap do |u|
         allow(u).to receive(:student_enrollments).and_return([enrollment])
       end
     end
@@ -47,7 +47,7 @@ module BroadcastPolicies
       Time.zone.now
     end
     let(:submission) do
-      double("Submission").tap do |s|
+      instance_double(Submission).tap do |s|
         allow(s).to receive_messages(group_broadcast_submission: false,
                                      assignment:,
                                      submitted?: true,
@@ -61,7 +61,7 @@ module BroadcastPolicies
                                      user:,
                                      context: course,
                                      submitted_at_before_last_save: nil,
-                                     saved_change_to_submitted?: false)
+                                     saved_change_to_submitted_at?: false)
         allow(s).to receive(:changed_state_to).with(:submitted).and_return true
       end
     end
@@ -217,7 +217,7 @@ module BroadcastPolicies
               before do
                 allow(submission).to receive(:submission_history).and_return(
                   [
-                    double("Submission", url: submission.url)
+                    instance_double(Submission, url: submission.url)
                   ]
                 )
               end
@@ -229,7 +229,7 @@ module BroadcastPolicies
               before do
                 allow(submission).to receive(:submission_history).and_return(
                   [
-                    double("Submission", url: "http://quiz-lti.docker/lti/launch?participant_session_id=83&quiz_session_id=51")
+                    instance_double(Submission, url: "http://quiz-lti.docker/lti/launch?participant_session_id=83&quiz_session_id=51")
                   ]
                 )
               end
@@ -277,7 +277,7 @@ module BroadcastPolicies
 
       specify { wont_send_when { allow(submission).to receive(:posted?).and_return false } }
       specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:quiz_submission_id).and_return double } }
+      specify { wont_send_when { allow(submission).to receive(:quiz_submission_id).and_return instance_double(Quizzes::QuizSubmission) } }
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(policy).to receive(:user_active_or_invited?).and_return(false) } }
       specify { wont_send_when { allow(course).to receive(:concluded?).and_return true } }
@@ -287,8 +287,7 @@ module BroadcastPolicies
     describe "#should_dispatch_submission_grade_changed?" do
       before do
         allow(submission).to receive_messages(graded_at: Time.zone.now,
-                                              assignment_graded_in_the_last_hour?: false,
-                                              assignment_just_published: true)
+                                              assignment_graded_in_the_last_hour?: false)
         allow(submission).to receive(:changed_in_state).with(:graded, fields: [:score, :grade]).and_return true
       end
 
@@ -303,7 +302,7 @@ module BroadcastPolicies
 
       specify { wont_send_when { allow(submission).to receive(:posted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:graded_at).and_return nil } }
-      specify { wont_send_when { allow(submission).to receive(:quiz_submission_id).and_return double } }
+      specify { wont_send_when { allow(submission).to receive(:quiz_submission_id).and_return instance_double(Quizzes::QuizSubmission) } }
       specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(course).to receive(:concluded?).and_return true } }

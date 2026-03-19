@@ -25,8 +25,6 @@
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
   show_checkpoints = @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints?
   item_restrictions ||= nil
-  new_mastery_connect_icon = Account.site_admin.feature_enabled?(:updated_mastery_connect_icon)
-
   @module_item_image_tags ||= {
     'indent' => "<i class='icon-arrow-right'></i>".html_safe,
     'outdent' => "<i class='icon-arrow-left'></i>".html_safe,
@@ -95,13 +93,8 @@
         <i class="icon-quiz"></i>
         <i class="icon-quiz icon-Solid"></i>
         <i class="icon-link"></i>
-        <% if new_mastery_connect_icon %>
-          <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc-assignment-pub-v2.svg' : 'mc-assignment-unpub-v2.svg' %>"
+        <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc-assignment-pub-v2.svg' : 'mc-assignment-unpub-v2.svg' %>"
             alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
-        <% else %>
-          <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc-assignment-pub.svg' : 'mc-assignment-unpub.svg' %>"
-            alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
-        <% end %>
       </span>
     </span>
 
@@ -172,10 +165,17 @@
             <div class="ig-details__item reply_to_topic_display"></div>
             <div class="ig-details__item reply_to_entry_display"></div>
         <%end%>
-        <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-due-date" class="due_date_display ig-details__item"></div>
-        <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
-          <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-points" class="points_possible_display ig-details__item"></div>
-        <%end%>
+        <% show_peer_review_info = !@is_student && module_item && module_item.content_type == 'Assignment' && module_item.content&.peer_reviews? && module_item.content&.peer_review_sub_assignment && @context.feature_enabled?(:peer_review_allocation_and_grading) %>
+        <% render_peer_review_container = !@is_student && @context.feature_enabled?(:peer_review_allocation_and_grading) && (!module_item || (module_item.content_type == 'Assignment' && module_item.content&.peer_review_sub_assignment)) %>
+        <% if !show_peer_review_info %>
+          <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-due-date" class="due_date_display ig-details__item"></div>
+          <% if (!module_item && !@is_student) || (module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true)))%>
+            <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-points" class="points_possible_display ig-details__item"></div>
+          <%end%>
+        <% end %>
+        <% if render_peer_review_container %>
+          <div class="peer-review-info-container" id="module_teacher_peer_review_info_<%= module_item ? module_item.content_id : "{{ content_id }}" %>_<%= module_item ? module_item.context_module_id : "{{ context_module_id }}" %>" style="<%= 'display: none;' unless show_peer_review_info %>"></div>
+        <% end %>
         <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-requirement" class="requirement-description ig-details__item">
           <span class="completion_requirement">
             <span class="requirement_type min_score_requirement">

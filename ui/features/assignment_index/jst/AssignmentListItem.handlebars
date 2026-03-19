@@ -78,11 +78,7 @@
     {{/if}}
     <div class="ig-type-icon">
       {{#if isMasteryConnectTool}}
-        {{#if newMasteryConnectIconEnabled}}
           <img src="/images/icons/{{#if published}}mc-assignment-pub-v2.svg{{else}}mc-assignment-unpub-v2.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
-        {{else}}
-          <img src="/images/icons/{{#if published}}mc-assignment-pub.svg{{else}}mc-assignment-unpub.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
-        {{/if}}
       {{else}}
         <i aria-hidden="true" class='icon-{{iconType}}'></i>
       {{/if}}
@@ -116,6 +112,9 @@
         {{#if isCheckpoint}}
           <div id="assignment_teacher_checkpoint_info_{{id}}"></div>
         {{/if}}
+        {{#if hasPeerReviewInfo}}
+          <div id="assignment_peer_review_info_{{id}}" class="peer-review-info-container"></div>
+        {{else}}
         {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
@@ -142,6 +141,7 @@
               {{#t}}No Points Possible{{/t}}
             </span>
           {{/if}}
+        {{/if}}
         {{/if}}
         {{#if isMasteryConnectTool}}
           <div class="ig-details__item mc-objectives">{{externalToolData.objectives}}</div>

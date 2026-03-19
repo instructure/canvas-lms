@@ -143,6 +143,7 @@ Rails/Output:
     - gems/i18n_tasks/**/*.rb
     - gems/tatl_tael/**/*.rb
     - spec/spec_helper.rb
+    - spec/support/test_database_utils.rb
   AutoCorrect: false # Force the developer to think about what to do; don't just silently convert it to a debug log
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
@@ -171,6 +172,9 @@ RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
+RSpec/Output:
+  Exclude:
+    - "**/fixtures/**/*.rb"
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
@@ -329,8 +333,6 @@ Rake/MethodDefinitionInTask:
 
 RSpec/AroundBlock:
   Severity: convention
-RSpec/Be:
-  Severity: convention
 RSpec/BeforeAfterAll:
   Severity: convention
 RSpec/ContextWording:
@@ -354,8 +356,6 @@ RSpec/ImplicitBlockExpectation:
 RSpec/ImplicitExpect:
   Severity: convention
   AutoCorrect: false
-RSpec/IteratedExpectation:
-  Severity: convention
 RSpec/LeakyConstantDeclaration:
   Severity: convention
 RSpec/LetSetup:
@@ -396,10 +396,6 @@ RSpec/SubjectDeclaration:
   Severity: convention
 RSpec/VariableName:
   Severity: convention
-RSpec/VerifiedDoubleReference:
-  Enabled: false
-RSpec/VerifiedDoubles:
-  Enabled: false
 
 Style/AccessorGrouping:
   Severity: convention

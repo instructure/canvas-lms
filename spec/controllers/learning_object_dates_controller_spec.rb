@@ -1248,6 +1248,124 @@ describe LearningObjectDatesController do
         end
       end
 
+      context "with peer reviews" do
+        before :once do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @assignment_with_peer_reviews = @course.assignments.create!(
+            title: "Assignment with Peer Reviews",
+            due_at: "2025-09-10T18:00:00Z",
+            peer_reviews: true,
+            peer_review_count: 2
+          )
+          @peer_review_sub_assignment = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: @assignment_with_peer_reviews,
+            due_at: "2025-09-15T18:00:00Z",
+            unlock_at: "2025-09-11T08:00:00Z",
+            lock_at: "2025-09-30T18:00:00Z"
+          )
+        end
+
+        it "updates peer review dates using nested format" do
+          peer_review_due_at = "2025-09-20T18:00:00Z"
+          peer_review_unlock_at = "2025-09-15T08:00:00Z"
+          peer_review_lock_at = "2025-10-05T18:00:00Z"
+
+          put :update, params: {
+            course_id: @course.id,
+            assignment_id: @assignment_with_peer_reviews.id,
+            due_at: "2025-09-12T18:00:00Z",
+            peer_review: {
+              due_at: peer_review_due_at,
+              unlock_at: peer_review_unlock_at,
+              lock_at: peer_review_lock_at
+            }
+          }
+
+          expect(response).to be_no_content
+          @peer_review_sub_assignment.reload
+          expect(@peer_review_sub_assignment.due_at.iso8601).to eq peer_review_due_at
+          expect(@peer_review_sub_assignment.unlock_at.iso8601).to eq peer_review_unlock_at
+          expect(@peer_review_sub_assignment.lock_at.iso8601).to eq peer_review_lock_at
+        end
+
+        it "updates peer review overrides using nested format" do
+          section = @course.course_sections.create!(name: "Test Section")
+          peer_review_due_at = "2025-09-18T18:00:00Z"
+          peer_review_unlock_at = "2025-09-13T08:00:00Z"
+          peer_review_lock_at = "2025-09-25T18:00:00Z"
+
+          put :update, params: {
+            course_id: @course.id,
+            assignment_id: @assignment_with_peer_reviews.id,
+            assignment_overrides: [
+              {
+                course_section_id: section.id,
+                due_at: "2025-09-12T18:00:00Z"
+              }
+            ],
+            peer_review: {
+              peer_review_overrides: [
+                {
+                  course_section_id: section.id,
+                  due_at: peer_review_due_at,
+                  unlock_at: peer_review_unlock_at,
+                  lock_at: peer_review_lock_at
+                }
+              ]
+            }
+          }
+
+          expect(response).to be_no_content
+
+          peer_review_override = @peer_review_sub_assignment.assignment_overrides.active.first
+          expect(peer_review_override).not_to be_nil
+          expect(peer_review_override.set_id).to eq section.id
+          expect(peer_review_override.due_at.iso8601).to eq peer_review_due_at
+          expect(peer_review_override.unlock_at.iso8601).to eq peer_review_unlock_at
+          expect(peer_review_override.lock_at.iso8601).to eq peer_review_lock_at
+        end
+
+        it "updates both default and override peer review dates" do
+          section = @course.course_sections.create!(name: "Test Section")
+          peer_review_due_at = "2025-09-20T18:00:00Z"
+          peer_review_unlock_at = "2025-09-15T08:00:00Z"
+          peer_review_lock_at = "2025-10-05T18:00:00Z"
+
+          put :update, params: {
+            course_id: @course.id,
+            assignment_id: @assignment_with_peer_reviews.id,
+            assignment_overrides: [
+              {
+                course_section_id: section.id,
+                due_at: "2025-09-12T18:00:00Z"
+              }
+            ],
+            peer_review: {
+              due_at: peer_review_due_at,
+              unlock_at: peer_review_unlock_at,
+              lock_at: peer_review_lock_at,
+              peer_review_overrides: [
+                {
+                  course_section_id: section.id,
+                  due_at: "2025-09-22T18:00:00Z"
+                }
+              ]
+            }
+          }
+
+          expect(response).to be_no_content
+
+          @peer_review_sub_assignment.reload
+          expect(@peer_review_sub_assignment.due_at.iso8601).to eq peer_review_due_at
+          expect(@peer_review_sub_assignment.unlock_at.iso8601).to eq peer_review_unlock_at
+          expect(@peer_review_sub_assignment.lock_at.iso8601).to eq peer_review_lock_at
+
+          peer_review_override = @peer_review_sub_assignment.assignment_overrides.active.first
+          expect(peer_review_override).not_to be_nil
+          expect(peer_review_override.due_at.iso8601).to eq "2025-09-22T18:00:00Z"
+        end
+      end
+
       context "on blueprint child courses" do
         before :once do
           @child_course = @course
@@ -2813,6 +2931,69 @@ describe LearningObjectDatesController do
         expect(override).to be_present
         sub_dates = override["sub_assignment_due_dates"]
         expect(sub_dates.nil? || sub_dates == []).to be true
+      end
+    end
+  end
+
+  describe "#allow_peer_reviews?" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context "when asset is an Assignment with peer_reviews enabled and feature flag is enabled" do
+      it "returns true" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(title: "Test", peer_reviews: true)
+
+        get :show, params: { course_id: @course.id, assignment_id: assignment.id }
+
+        expect(controller.send(:allow_peer_reviews?)).to be true
+      end
+    end
+
+    context "when feature flag is disabled" do
+      it "returns false" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(title: "Test", peer_reviews: true)
+
+        get :show, params: { course_id: @course.id, assignment_id: assignment.id }
+
+        expect(controller.send(:allow_peer_reviews?)).to be false
+      end
+    end
+
+    context "when assignment does not have peer_reviews enabled" do
+      it "returns false" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(title: "Test", peer_reviews: false)
+
+        get :show, params: { course_id: @course.id, assignment_id: assignment.id }
+
+        expect(controller.send(:allow_peer_reviews?)).to be false
+      end
+    end
+
+    context "when asset is not an Assignment" do
+      it "returns false for a Quiz" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        quiz = @course.quizzes.create!(title: "Test Quiz")
+
+        get :show, params: { course_id: @course.id, quiz_id: quiz.id }
+
+        expect(controller.send(:allow_peer_reviews?)).to be false
+      end
+
+      it "returns false for a DiscussionTopic" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        topic = @course.discussion_topics.create!(title: "Test Topic")
+
+        get :show, params: { course_id: @course.id, discussion_topic_id: topic.id }
+
+        expect(controller.send(:allow_peer_reviews?)).to be false
       end
     end
   end

@@ -79,7 +79,7 @@ describe "student dashboard", :ignore_js_errors do
       expect(no_announcements_message).to be_displayed
 
       expect(all_message_buttons.size).to eq(4)
-      expect(element_exists?(message_instructor_button_selector(@teacher1.id, @course3.id))).to be_falsey
+      expect(element_exists?(message_instructor_button_selector(@teacher1.id))).to be_truthy
     end
   end
 
@@ -127,8 +127,73 @@ describe "student dashboard", :ignore_js_errors do
       go_to_dashboard
 
       select_observed_student(@student_w_inactive.name)
-      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
+      expect(message_instructor_button(@teacher1.id)).to be_displayed
       expect(all_message_buttons.size).to eq(2)
+    end
+
+    context "todo widget" do
+      before :once do
+        add_widget_to_dashboard(@student_w_inactive, :todo_list, 1)
+        @concluded_assignment = @concluded_course.assignments.create!(
+          name: "Concluded Course Assignment",
+          points_possible: 10,
+          due_at: 3.days.from_now.end_of_day,
+          submission_types: "online_text_entry"
+        )
+        @past_assignment = @past_course.assignments.create!(
+          name: "Past Course Assignment",
+          points_possible: 10,
+          due_at: 3.days.from_now.end_of_day,
+          submission_types: "online_text_entry"
+        )
+      end
+
+      it "does not show items from concluded or inactive courses" do
+        user_session(@student_w_inactive)
+        go_to_dashboard
+
+        expect(no_todo_items_message).to be_displayed
+      end
+    end
+  end
+
+  context "new widgets on zero states" do
+    it "shows empty state when no graded submissions exist" do
+      add_widget_to_dashboard(@student, :recent_grades, 1)
+      go_to_dashboard
+
+      expect(recent_grades_empty_message).to be_displayed
+      expect(recent_grades_empty_message.text).to include("No recent grades available")
+    end
+
+    it "shows empty state message when no messages exist" do
+      add_widget_to_dashboard(@student, :inbox, 1)
+      go_to_dashboard
+
+      expect(inbox_no_messages_message).to be_displayed
+      expect(inbox_show_all_messages_link).to be_displayed
+    end
+
+    it "shows empty state for unread filter when only read messages exist" do
+      # Create student with only read messages
+      create_multiple_conversations(@student, @teacher2, 3, "read")
+      add_widget_to_dashboard(@student, :inbox, 1)
+      go_to_dashboard
+
+      expect(inbox_no_messages_message).to be_displayed
+      filter_inbox_messages_by("All")
+      expect(all_inbox_message_items.size).to eq(3)
+    end
+
+    it "shows empty state for all todo filter options when no items exist" do
+      add_widget_to_dashboard(@student, :todo_list, 1)
+      go_to_dashboard
+
+      expect(no_todo_items_message.text).to eq("No upcoming items")
+      filter_todos_by("Complete")
+      expect(no_todo_items_message.text).to eq("No upcoming items")
+      filter_todos_by("All")
+      expect(no_todo_items_message.text).to eq("No upcoming items")
     end
   end
 end

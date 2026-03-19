@@ -182,14 +182,23 @@ module InstFS
       data = {}
       data[file_name] = file_object
 
+      intervals = []
+      if file_object.respond_to?(:rewind)
+        intervals << (Rails.env.test? ? 0 : 0.5)
+        intervals << (Rails.env.test? ? 0 : 4.5) if Delayed::Worker.current_job
+      end
+      on_retry = ->(*) { file_object.rewind }
+      response = nil
+
       begin
-        retries ||= 0
-        response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
-      rescue Timeout::Error
-        if file_object.respond_to?(:rewind) && (retries += 1) < 2
-          file_object.rewind
-          retry
+        Canvas.retriable(on: [Timeout::Error, InstFS::RetriableError], intervals:, on_retry:) do |try|
+          response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+          # retry 5xx errors such as gateway timeouts
+          if try <= intervals.size && response.code.to_i >= 500
+            raise InstFS::RetriableError, "retrying response with code \"#{response.code}\", message \"#{response.body}\""
+          end
         end
+      rescue Timeout::Error
         raise InstFS::ServiceError, "timed out communicating with instfs"
       rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
@@ -540,6 +549,8 @@ module InstFS
       400
     end
   end
+
+  class RetriableError < StandardError; end
 
   class ExportReferenceError < StandardError; end
 

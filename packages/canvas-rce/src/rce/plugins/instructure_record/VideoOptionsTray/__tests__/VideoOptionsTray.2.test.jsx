@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-
+import React from 'react'
+import RCEGlobals from '../../../../../rce/RCEGlobals'
+import RceApiSource from '../../../../../rcs/api'
+import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
-import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
-import RceApiSource from '../../../../../rcs/api'
-import RCEGlobals from '../../../../../rce/RCEGlobals'
 
 jest.useFakeTimers()
 
@@ -230,6 +229,164 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       })
       expect(tray.$closedCaptionPanel).toBeInTheDocument()
       expect(tray.$titleTextField).toBeInTheDocument()
+    })
+  })
+
+  describe('when rce_asr_captioning_improvements is enabled', () => {
+    beforeEach(() => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        consolidated_media_player: true,
+        rce_asr_captioning_improvements: true,
+      })
+    })
+
+    it('renders "Player layout" as the dropdown label', () => {
+      render(<VideoOptionsTray {...props} />)
+      expect(screen.getByText('Player layout')).toBeInTheDocument()
+      expect(screen.queryByText('Size')).not.toBeInTheDocument()
+    })
+
+    it('renders all player layout size options', async () => {
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.click(screen.getByLabelText('Player layout'))
+      expect(
+        await screen.findByText('Small (400 x 273px)', {selector: '[role="option"]'}),
+      ).toBeInTheDocument()
+      expect(
+        await screen.findByText('Medium (480 x 318px)', {selector: '[role="option"]'}),
+      ).toBeInTheDocument()
+      expect(
+        await screen.findByText('Large (700 x 442px)', {selector: '[role="option"]'}),
+      ).toBeInTheDocument()
+      expect(
+        await screen.findByText('With Transcript (850 x 357px)', {selector: '[role="option"]'}),
+      ).toBeInTheDocument()
+      expect(await screen.findByText('Custom', {selector: '[role="option"]'})).toBeInTheDocument()
+    })
+
+    it('does not show dimension hint below dropdown for fixed sizes', async () => {
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.click(screen.getByLabelText('Player layout'))
+      fireEvent.click(await screen.findByText('Large (700 x 442px)', {selector: '[role="option"]'}))
+      expect(screen.queryByText('700 x 442px')).not.toBeInTheDocument()
+    })
+
+    it.each([
+      ['Small (400 x 273px)', 400, 273],
+      ['Medium (480 x 318px)', 480, 318],
+      ['Large (700 x 442px)', 700, 442],
+      ['With Transcript (850 x 357px)', 850, 357],
+    ])('selecting %s saves correct dimensions', async (label, expectedWidth, expectedHeight) => {
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.change(screen.getByPlaceholderText('(Describe the video)'), {
+        target: {value: 'A title'},
+      })
+      fireEvent.click(screen.getByLabelText('Player layout'))
+      fireEvent.click(await screen.findByText(label, {selector: '[role="option"]'}))
+      fireEvent.click(screen.getByText('Done'))
+      await waitFor(() => {
+        const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
+        expect(appliedWidth).toEqual(expectedWidth)
+        expect(appliedHeight).toEqual(expectedHeight)
+      })
+    })
+
+    it.each([
+      [400, 'Small (400 x 273px)'],
+      [480, 'Medium (480 x 318px)'],
+      [850, 'With Transcript (850 x 357px)'],
+    ])('appliedWidth %i pre-selects %s on re-open', async (appliedWidth, expectedLabel) => {
+      props.videoOptions.appliedWidth = appliedWidth
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.click(screen.getByLabelText('Player layout'))
+      expect(
+        await screen.findByText(expectedLabel, {selector: '[role="option"][aria-selected="true"]'}),
+      ).toBeInTheDocument()
+    })
+
+    it('does not show "With Transcript" for Studio media', async () => {
+      props.studioOptions = {resizable: true, convertibleToLink: true}
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.click(screen.getByLabelText('Player layout'))
+      await screen.findByText('Small (400 x 273px)', {selector: '[role="option"]'})
+      expect(screen.queryByText(/With Transcript/)).not.toBeInTheDocument()
+    })
+
+    it('shows DimensionsInput with transcript hint when Custom is selected', async () => {
+      props.videoOptions.appliedWidth = 640
+      props.videoOptions.appliedHeight = 480
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.click(screen.getByLabelText('Player layout'))
+      fireEvent.click(await screen.findByText('Custom', {selector: '[role="option"]'}))
+      const message = await screen.findByTestId('message')
+      expect(message.textContent).toContain('Transcript panel is available at widths above 720px.')
+    })
+
+    it('shows minimum error message as 400 x 273px for below-minimum custom size', async () => {
+      props.videoOptions.appliedWidth = 300
+      props.videoOptions.appliedHeight = 200
+      props.videoOptions.videoSize = 'custom'
+      render(<VideoOptionsTray {...props} />)
+      const message = await screen.findByTestId('message')
+      expect(message.textContent).toContain('400 x 273px')
+    })
+
+    describe('Custom layout formula', () => {
+      it('derives height from width (no sidebar, <= 720)', async () => {
+        props.videoOptions.appliedWidth = 400
+        props.videoOptions.appliedHeight = 273
+        render(<VideoOptionsTray {...props} />)
+        fireEvent.click(screen.getByLabelText('Player layout'))
+        fireEvent.click(await screen.findByText('Custom', {selector: '[role="option"]'}))
+        fireEvent.change(screen.getByPlaceholderText('(Describe the video)'), {
+          target: {value: 'A title'},
+        })
+        fireEvent.click(screen.getByText('Done'))
+        await waitFor(() => {
+          const [{appliedWidth, appliedHeight}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(400)
+          expect(appliedHeight).toEqual(273)
+        })
+      })
+
+      it('derives height from width (sidebar, > 720)', async () => {
+        props.videoOptions.appliedWidth = 1032
+        props.videoOptions.appliedHeight = 460
+        render(<VideoOptionsTray {...props} />)
+        fireEvent.click(screen.getByLabelText('Player layout'))
+        fireEvent.click(await screen.findByText('Custom', {selector: '[role="option"]'}))
+        fireEvent.change(screen.getByPlaceholderText('(Describe the video)'), {
+          target: {value: 'A title'},
+        })
+        fireEvent.click(screen.getByText('Done'))
+        await waitFor(() => {
+          const [{appliedWidth, appliedHeight}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(1032)
+          expect(appliedHeight).toEqual(460)
+        })
+      })
+    })
+  })
+
+  describe('when rce_asr_captioning_improvements is disabled', () => {
+    beforeEach(() => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        consolidated_media_player: true,
+        rce_asr_captioning_improvements: false,
+      })
+    })
+
+    it('renders "Size" as the dropdown label', () => {
+      render(<VideoOptionsTray {...props} />)
+      expect(screen.getByText('Size')).toBeInTheDocument()
+      expect(screen.queryByText('Player layout')).not.toBeInTheDocument()
+    })
+
+    it('does not include "With Transcript" in the size options', async () => {
+      render(<VideoOptionsTray {...props} />)
+      fireEvent.click(screen.getByRole('combobox'))
+      await screen.findByText('Small', {selector: '[role="option"]'})
+      expect(screen.queryByText(/With Transcript/)).not.toBeInTheDocument()
     })
   })
 

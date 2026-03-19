@@ -137,7 +137,6 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
    * Register the Video "Options" button that will open the Video Options
    * tray.
    */
-  const buttonAriaLabel = formatMessage('Show video options')
   ed.ui.registry.addButton('instructure-video-options', {
     onAction() {
       // show the tray
@@ -145,7 +144,6 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
     },
 
     text: formatMessage('Video Options'),
-    tooltip: buttonAriaLabel,
   })
 
   ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
@@ -160,7 +158,6 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
       audioTrayController.showTrayForEditor(ed)
     },
     text: formatMessage('Audio Options'),
-    tooltip: formatMessage('Show audio options'),
   })
 
   ed.ui.registry.addContextToolbar('instructure-audio-toolbar', {

@@ -25,17 +25,18 @@ class AccessibilityController < ApplicationController
   def index
     @page_title = t("titles.accessibility_checker", "Accessibility Checker")
     add_crumb(t("titles.accessibility_checker", "Accessibility Checker"))
+    set_active_tab "accessibility"
     @show_left_side = true
     @collapse_course_menu = false
     js_bundle :accessibility_checker
-    js_env(SCAN_DISABLED: @context.exceeds_accessibility_scan_limit?)
+    js_env({ SCAN_DISABLED: @context.exceeds_accessibility_scan_limit? })
     render html: "".html_safe, layout: true
   end
 
   private
 
   def check_authorized_action
-    return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+    return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY, no_render: true)
 
     authorized_action(@context, @current_user, [:read, :update])
   end

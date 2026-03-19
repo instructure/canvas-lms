@@ -747,20 +747,20 @@ describe Course do
 
   describe "import_media_objects" do
     before do
-      @kmh = double(KalturaMediaFileHandler)
+      @kmh = instance_double(KalturaMediaFileHandler)
       allow(KalturaMediaFileHandler).to receive(:new).and_return(@kmh)
       MediaObject.create!(media_id: "maybe")
       attachment_model(uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"), media_entry_id: "maybe")
     end
 
     it "waits for media objects on canvas cartridge import" do
-      migration = double(canvas_import?: true)
+      migration = instance_double(ContentMigration, canvas_import?: true)
       expect(@kmh).to receive(:add_media_files).with([@attachment], true)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
 
     it "does not wait for media objects on other import" do
-      migration = double(canvas_import?: false)
+      migration = instance_double(ContentMigration, canvas_import?: false)
       expect(@kmh).to receive(:add_media_files).with([@attachment], false)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
@@ -1029,7 +1029,7 @@ describe Course do
   end
 
   describe "#error_on_dates?" do
-    let(:item) { double("item") }
+    let(:item) { instance_double(Assignment) }
     let(:attributes) { [:due_at] }
 
     context "when there are errors on the given attributes" do
@@ -1209,6 +1209,46 @@ describe Course do
       expect do
         Importers::CourseContentImporter.import_content(course, data, params, migration)
       end.not_to change { Lti::ContextControl.count }
+    end
+  end
+
+  describe "tab configuration import" do
+    before :once do
+      @copy_from = course_factory
+      @copy_to = course_factory
+    end
+
+    it "filters out nav menu link tabs during import" do
+      # Course copy not handled yet for Nav Menu Link tabs. See INTEROP-9293
+      link = NavMenuLink.create!(
+        context: @copy_from,
+        course_nav: true,
+        label: "External Link",
+        url: "https://example.com"
+      )
+
+      # Set up tab configuration with nav menu link
+      @copy_from.tab_configuration = [
+        { "id" => "assignments" },
+        { "id" => "nav_menu_link_#{link.id}", "hidden" => true },
+        { "id" => "discussions" }
+      ]
+      @copy_from.save!
+
+      # Perform the import
+      migration = @copy_to.content_migrations.create!
+      data = {
+        "all_course_settings" => true,
+        :course => {
+          tab_configuration: @copy_from.tab_configuration
+        }
+      }
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+
+      # Nav menu link should not be included in copied tab configuration
+      copied_tab_ids = @copy_to.tab_configuration.pluck("id")
+      expect(copied_tab_ids.select { it.start_with?("nav_menu_link_") }).to be_empty
+      expect(copied_tab_ids).to include("assignments", "discussions")
     end
   end
 end

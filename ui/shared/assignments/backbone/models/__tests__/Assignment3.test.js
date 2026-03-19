@@ -53,6 +53,138 @@ describe('Assignment', () => {
     })
   })
 
+  describe('#peerReviewAllDates', () => {
+    it('returns empty array when peer review sub assignment has no all_dates', () => {
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue({})
+      const result = assignment.peerReviewAllDates()
+      expect(result).toEqual([])
+    })
+
+    it('returns empty array when peer review sub assignment is null', () => {
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue(null)
+      const result = assignment.peerReviewAllDates()
+      expect(result).toEqual([])
+    })
+
+    it('passes through availabilityStatus from backend', () => {
+      const availabilityStatus = {status: 'pending', date: '2026-02-05T00:00:00Z'}
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue({
+        all_dates: [
+          {
+            title: 'Section 1',
+            due_at: null,
+            unlock_at: '2026-02-05T00:00:00Z',
+            lock_at: null,
+            availability_status: availabilityStatus,
+          },
+        ],
+      })
+
+      const result = assignment.peerReviewAllDates()
+      expect(result).toHaveLength(1)
+      expect(result[0].availabilityStatus).toEqual(availabilityStatus)
+      expect(result[0].dueFor).toBe('Section 1')
+    })
+
+    it('passes through open status from backend', () => {
+      const availabilityStatus = {status: 'open', date: '2026-02-10T00:00:00Z'}
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue({
+        all_dates: [
+          {
+            title: 'Section 2',
+            due_at: null,
+            unlock_at: null,
+            lock_at: '2026-02-10T00:00:00Z',
+            availability_status: availabilityStatus,
+          },
+        ],
+      })
+
+      const result = assignment.peerReviewAllDates()
+      expect(result).toHaveLength(1)
+      expect(result[0].availabilityStatus).toEqual(availabilityStatus)
+      expect(result[0].dueFor).toBe('Section 2')
+    })
+
+    it('passes through closed status from backend', () => {
+      const availabilityStatus = {status: 'closed', date: null}
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue({
+        all_dates: [
+          {
+            title: 'Section 3',
+            due_at: null,
+            unlock_at: null,
+            lock_at: '2026-01-10T00:00:00Z',
+            availability_status: availabilityStatus,
+          },
+        ],
+      })
+
+      const result = assignment.peerReviewAllDates()
+      expect(result).toHaveLength(1)
+      expect(result[0].availabilityStatus).toEqual(availabilityStatus)
+      expect(result[0].dueFor).toBe('Section 3')
+    })
+
+    it('handles multiple date overrides with availability status', () => {
+      const pendingStatus = {status: 'pending', date: '2026-02-02T00:00:00Z'}
+      const closedStatus = {status: 'closed', date: null}
+
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue({
+        all_dates: [
+          {
+            title: 'Section A',
+            due_at: '2026-01-30T07:00:00Z',
+            unlock_at: '2026-02-02T00:00:00Z',
+            lock_at: null,
+            availability_status: pendingStatus,
+          },
+          {
+            title: 'Section B',
+            due_at: '2026-02-15T07:00:00Z',
+            unlock_at: null,
+            lock_at: '2026-01-20T00:00:00Z',
+            availability_status: closedStatus,
+          },
+        ],
+      })
+
+      const result = assignment.peerReviewAllDates()
+      expect(result).toHaveLength(2)
+      expect(result[0].availabilityStatus).toEqual(pendingStatus)
+      expect(result[0].dueFor).toBe('Section A')
+      expect(result[0].dueAt).toBe('2026-01-30T07:00:00Z')
+      expect(result[1].availabilityStatus).toEqual(closedStatus)
+      expect(result[1].dueFor).toBe('Section B')
+      expect(result[1].dueAt).toBe('2026-02-15T07:00:00Z')
+    })
+
+    it('handles dates without availability status', () => {
+      const assignment = new Assignment({name: 'foo'})
+      vi.spyOn(assignment, 'peerReviewSubAssignment').mockReturnValue({
+        all_dates: [
+          {
+            title: 'Section 4',
+            due_at: '2026-01-25T07:00:00Z',
+            unlock_at: null,
+            lock_at: null,
+          },
+        ],
+      })
+
+      const result = assignment.peerReviewAllDates()
+      expect(result).toHaveLength(1)
+      expect(result[0].availabilityStatus).toBeUndefined()
+      expect(result[0].dueFor).toBe('Section 4')
+    })
+  })
+
   describe('#notifyOfUpdate', () => {
     it("returns record's notifyOfUpdate if no args passed", () => {
       const assignment = new Assignment({name: 'foo'})

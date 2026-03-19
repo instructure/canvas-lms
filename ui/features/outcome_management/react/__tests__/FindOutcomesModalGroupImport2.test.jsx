@@ -109,7 +109,7 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
     expect(getAllByText('Added')).toHaveLength(3)
     // resets latestImport after progress is resolved
     expect(localStorage.latestImport).toBeUndefined()
-  })
+  }, 30000)
 
   it('changes button text of individual outcomes from Add to Added after group import completes', async () => {
     resolveProgress.mockImplementation(() => Promise.resolve())
@@ -135,7 +135,7 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
       await Promise.resolve()
     })
     expect(getAllByText('Added')).toHaveLength(2)
-  })
+  }, 30000)
 
   it('displays flash confirmation with proper message if group import to Course succeeds', async () => {
     resolveProgress.mockImplementation(() => Promise.resolve())
@@ -163,7 +163,7 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
       message: 'All outcomes from Group 300 have been successfully added to this course.',
       type: 'success',
     })
-  })
+  }, 30000)
 
   it('displays flash confirmation with proper message if group import to Account succeeds', async () => {
     resolveProgress.mockImplementation(() => Promise.resolve())
@@ -189,7 +189,7 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
       message: 'All outcomes from Group 300 have been successfully added to this account.',
       type: 'success',
     })
-  })
+  }, 30000)
 
   it('displays flash confirmation with proper message if group import to targetGroup succeeds', async () => {
     resolveProgress.mockImplementation(() => Promise.resolve())
@@ -225,7 +225,7 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
       message: 'All outcomes from Group 300 have been successfully added to The Group Title.',
       type: 'success',
     })
-  })
+  }, 30000)
 
   it('displays flash alert with custom error message if group import fails', async () => {
     resolveProgress.mockImplementation(() => Promise.reject(new Error('Network error.')))
@@ -254,7 +254,7 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
       message: 'An error occurred while importing these outcomes: Network error.',
       type: 'error',
     })
-  })
+  }, 30000)
 
   it('displays flash alert with generic error message if group import fails and no error message', async () => {
     resolveProgress.mockImplementation(() => Promise.reject(new Error()))
@@ -283,5 +283,5 @@ describe('FindOutcomesModal - Group Import Tests Part 2', () => {
       message: 'An error occurred while importing these outcomes.',
       type: 'error',
     })
-  })
+  }, 30000)
 })

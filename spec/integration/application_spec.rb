@@ -218,7 +218,7 @@ describe "site-wide" do
         user_session(@admin, @admin.pseudonyms.first)
         post "/users/#{@student.id}/masquerade"
 
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
       end
     end
   end

@@ -25,34 +25,32 @@ describe ObserverAlertsApiController, type: :request do
   include Api::V1::ObserverAlert
 
   describe "#alerts_by_student" do
-    alerts = []
     before :once do
       @course = course_model
       @course.offer!
       @assignment = assignment_model(context: @course)
 
-      alerts << observer_alert_model(course: @course,
+      alerts = [observer_alert_model(course: @course,
                                      alert_type: "assignment_grade_high",
                                      threshold: 80,
-                                     context: @assignment)
+                                     context: @assignment)]
       observer_alert_threshold = @observer_alert_threshold
-
-      alerts << observer_alert_model(course: @course,
-                                     observer: @observer,
-                                     student: @student,
-                                     link: @observation_link,
-                                     alert_type: "assignment_grade_low",
-                                     threshold: 70,
-                                     context: @assignment)
-      alerts << observer_alert_model(course: @course,
-                                     observer: @observer,
-                                     student: @student,
-                                     link: @observation_link,
-                                     alert_type: "course_grade_high",
-                                     threshold: 80,
-                                     context: @course)
-
+      alerts.push(observer_alert_model(course: @course,
+                                       observer: @observer,
+                                       student: @student,
+                                       link: @observation_link,
+                                       alert_type: "assignment_grade_low",
+                                       threshold: 70,
+                                       context: @assignment),
+                  observer_alert_model(course: @course,
+                                       observer: @observer,
+                                       student: @student,
+                                       link: @observation_link,
+                                       alert_type: "course_grade_high",
+                                       threshold: 80,
+                                       context: @course))
       @observer_alert_threshold = observer_alert_threshold
+      @alerts = alerts.freeze
 
       @path = "/api/v1/users/#{@observer.id}/observer_alerts/#{@student.id}"
       @params = { user_id: @observer.to_param,
@@ -84,7 +82,7 @@ describe ObserverAlertsApiController, type: :request do
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json.length).to eq 3
 
-      expect(json.pluck("id")).to eq alerts.map(&:id).reverse
+      expect(json.pluck("id")).to eq @alerts.map(&:id).reverse
     end
 
     it "excludes alerts where enrollment is inactive" do

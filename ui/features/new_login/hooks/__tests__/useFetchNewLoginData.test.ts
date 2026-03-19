@@ -40,6 +40,9 @@ const createMockContainer = (
   invalidLoginFaqUrl: string | null,
   helpLink: string | null,
   requireAup: string | null,
+  customMessageLogin?: string | null,
+  customMessageRegistration?: string | null,
+  customMessageRegistrationParent?: string | null,
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -100,6 +103,18 @@ const createMockContainer = (
   if (requireAup !== null) {
     container.setAttribute('data-require-aup', requireAup)
   }
+  if (customMessageLogin !== undefined && customMessageLogin !== null) {
+    container.setAttribute('data-custom-message-login', customMessageLogin)
+  }
+  if (customMessageRegistration !== undefined && customMessageRegistration !== null) {
+    container.setAttribute('data-custom-message-registration', customMessageRegistration)
+  }
+  if (customMessageRegistrationParent !== undefined && customMessageRegistrationParent !== null) {
+    container.setAttribute(
+      'data-custom-message-registration-parent',
+      customMessageRegistrationParent,
+    )
+  }
   document.body.appendChild(container)
 }
 
@@ -137,6 +152,9 @@ describe('useFetchNewLoginData', () => {
       '', // invalidLoginFaqUrl
       '', // helpLink
       '', // requireAup
+      '', // customMessageLogin
+      '', // customMessageRegistration
+      '', // customMessageRegistrationParent
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     await waitFor(() => {
@@ -161,6 +179,9 @@ describe('useFetchNewLoginData', () => {
         'invalidLoginFaqUrl',
         'helpLink',
         'requireAup',
+        'customMessageLogin',
+        'customMessageRegistration',
+        'customMessageRegistrationParent',
       ]
       expect(hookAttributes.sort()).toEqual(expectedAttributes.sort())
     })
@@ -188,38 +209,44 @@ describe('useFetchNewLoginData', () => {
       invalidLoginFaqUrl: undefined,
       helpLink: undefined,
       requireAup: undefined,
+      customMessageLogin: undefined,
+      customMessageRegistration: undefined,
+      customMessageRegistrationParent: undefined,
     })
   })
 
   it('returns parsed values from the container when attributes are present', () => {
     createMockContainer(
-      'true',
-      JSON.stringify([{id: '1', name: 'Google', auth_type: 'google'}]),
-      'Username',
-      'https://example.com/logo.png',
-      'Custom Alt Text',
-      '#ffffff',
-      'https://example.com/bg.png',
-      'true',
-      'all',
-      'recaptcha_key_value',
-      'true',
-      'https://example.com/terms-of-use',
-      'https://example.com/privacy',
-      'true',
+      'true', // enableCourseCatalog
+      JSON.stringify([{id: '1', name: 'Google', auth_type: 'google'}]), // authProviders
+      'Username', // loginHandleName
+      'https://example.com/logo.png', // loginLogoUrl
+      'Custom Alt Text', // loginLogoText
+      '#ffffff', // bodyBgColor
+      'https://example.com/bg.png', // bodyBgImage
+      'true', // isPreviewMode
+      'all', // selfRegistrationType
+      'recaptcha_key_value', // recaptchaKey
+      'true', // termsRequired
+      '/acceptable_use_policy', // termsOfUseUrl
+      'https://example.com/privacy', // privacyPolicyUrl
+      'true', // requireEmail
       JSON.stringify({
         minimum_character_length: 8,
         require_number_characters: 'false',
         require_symbol_characters: 'false',
-      }),
-      'https://example.com/password-reset',
-      'https://example.com/faq',
+      }), // passwordPolicy
+      'https://example.com/password-reset', // forgotPasswordUrl
+      'https://example.com/faq', // invalidLoginFaqUrl
       JSON.stringify({
         text: 'Help Center',
         trackCategory: 'login',
         trackLabel: 'help',
-      }),
-      'true',
+      }), // helpLink
+      'true', // requireAup
+      'Welcome to our platform!', // customMessageLogin
+      'Register to get started!', // customMessageRegistration
+      'Please fill out the registration form below.', // customMessageRegistrationParent
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
@@ -234,7 +261,7 @@ describe('useFetchNewLoginData', () => {
       selfRegistrationType: 'all',
       recaptchaKey: 'recaptcha_key_value',
       termsRequired: true,
-      termsOfUseUrl: 'https://example.com/terms-of-use',
+      termsOfUseUrl: '/acceptable_use_policy',
       privacyPolicyUrl: 'https://example.com/privacy',
       requireEmail: true,
       passwordPolicy: {
@@ -250,31 +277,37 @@ describe('useFetchNewLoginData', () => {
         trackLabel: 'help',
       },
       requireAup: true,
+      customMessageLogin: 'Welcome to our platform!',
+      customMessageRegistration: 'Register to get started!',
+      customMessageRegistrationParent: 'Please fill out the registration form below.',
     })
   })
 
   it('handles invalid JSON in data-auth-providers gracefully', () => {
     const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {})
     createMockContainer(
-      null,
-      'invalid JSON',
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
+      null, // enableCourseCatalog
+      'invalid JSON', // authProviders
+      null, // loginHandleName
+      null, // loginLogoUrl
+      null, // loginLogoText
+      null, // bodyBgColor
+      null, // bodyBgImage
+      null, // isPreviewMode
+      null, // selfRegistrationType
+      null, // recaptchaKey
+      null, // termsRequired
+      null, // termsOfUseUrl
+      null, // privacyPolicyUrl
+      null, // requireEmail
+      null, // passwordPolicy
+      null, // forgotPasswordUrl
+      null, // invalidLoginFaqUrl
+      null, // helpLink
+      null, // requireAup
+      null, // customMessageLogin
+      null, // customMessageRegistration
+      null, // customMessageRegistrationParent
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data.authProviders).toBeUndefined()
@@ -287,25 +320,28 @@ describe('useFetchNewLoginData', () => {
 
   it('returns false for boolean attributes when set to "false"', () => {
     createMockContainer(
-      'false',
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      'false',
-      null,
-      null,
-      null,
-      null,
-      null,
-      'false',
-      null,
-      null,
-      null,
-      null,
-      'false',
+      'false', // enableCourseCatalog
+      null, // authProviders
+      null, // loginHandleName
+      null, // loginLogoUrl
+      null, // loginLogoText
+      null, // bodyBgColor
+      null, // bodyBgImage
+      'false', // isPreviewMode
+      null, // selfRegistrationType
+      null, // recaptchaKey
+      null, // termsRequired
+      null, // termsOfUseUrl
+      null, // privacyPolicyUrl
+      'false', // requireEmail
+      null, // passwordPolicy
+      null, // forgotPasswordUrl
+      null, // invalidLoginFaqUrl
+      null, // helpLink
+      'false', // requireAup
+      null, // customMessageLogin
+      null, // customMessageRegistration
+      null, // customMessageRegistrationParent
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data.enableCourseCatalog).toBe(false)
@@ -315,7 +351,30 @@ describe('useFetchNewLoginData', () => {
   })
 
   it('returns undefined for empty string attributes', () => {
-    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
+    createMockContainer(
+      '', // enableCourseCatalog
+      '', // authProviders
+      '', // loginHandleName
+      '', // loginLogoUrl
+      '', // loginLogoText
+      '', // bodyBgColor
+      '', // bodyBgImage
+      '', // isPreviewMode
+      '', // selfRegistrationType
+      '', // recaptchaKey
+      '', // termsRequired
+      '', // termsOfUseUrl
+      '', // privacyPolicyUrl
+      '', // requireEmail
+      '', // passwordPolicy
+      '', // forgotPasswordUrl
+      '', // invalidLoginFaqUrl
+      '', // helpLink
+      '', // requireAup
+      '', // customMessageLogin
+      '', // customMessageRegistration
+      '', // customMessageRegistrationParent
+    )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
@@ -337,59 +396,72 @@ describe('useFetchNewLoginData', () => {
       invalidLoginFaqUrl: undefined,
       helpLink: undefined,
       requireAup: undefined,
+      customMessageLogin: undefined,
+      customMessageRegistration: undefined,
+      customMessageRegistrationParent: undefined,
     })
   })
 
   it('returns empty structures for present but empty object-like attributes', () => {
     createMockContainer(
-      null,
+      null, // enableCourseCatalog
       JSON.stringify({}), // authProviders
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
+      null, // loginHandleName
+      null, // loginLogoUrl
+      null, // loginLogoText
+      null, // bodyBgColor
+      null, // bodyBgImage
+      null, // isPreviewMode
+      null, // selfRegistrationType
+      null, // recaptchaKey
+      null, // termsRequired
+      null, // termsOfUseUrl
+      null, // privacyPolicyUrl
+      null, // requireEmail
       JSON.stringify({}), // passwordPolicy
-      null,
-      null,
-      null,
+      null, // forgotPasswordUrl
+      null, // invalidLoginFaqUrl
       JSON.stringify({}), // helpLink
-      null,
+      null, // requireAup
+      null, // customMessageLogin
+      null, // customMessageRegistration
+      null, // customMessageRegistrationParent
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     const data = result.current.data
-    expect(data.passwordPolicy).toBeUndefined()
+    expect(data.passwordPolicy).toEqual({
+      minimumCharacterLength: undefined,
+      requireNumberCharacters: false,
+      requireSymbolCharacters: false,
+    })
     expect(data.authProviders).toEqual({})
     expect(data.helpLink).toEqual({text: '', trackCategory: '', trackLabel: ''})
   })
 
   it('returns undefined for object-like attributes that are missing from the DOM', () => {
     createMockContainer(
-      null,
+      null, // enableCourseCatalog
       null, // authProviders
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
+      null, // loginHandleName
+      null, // loginLogoUrl
+      null, // loginLogoText
+      null, // bodyBgColor
+      null, // bodyBgImage
+      null, // isPreviewMode
+      null, // selfRegistrationType
+      null, // recaptchaKey
+      null, // termsRequired
+      null, // termsOfUseUrl
+      null, // privacyPolicyUrl
+      null, // requireEmail
       null, // passwordPolicy
-      null,
-      null,
-      null,
+      null, // forgotPasswordUrl
+      null, // invalidLoginFaqUrl
       null, // helpLink
-      null,
+      null, // requireAup
+      null, // customMessageLogin
+      null, // customMessageRegistration
+      null, // customMessageRegistrationParent
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     const data = result.current.data
@@ -398,25 +470,69 @@ describe('useFetchNewLoginData', () => {
     expect(data.helpLink).toBeUndefined()
   })
 
-  // returns raw values; escaping/sanitizing is the responsibility of the rendering layer
-  it('returns potentially unsafe-looking strings without decoding or sanitizing', () => {
-    const xssString = '" onmouseover="alert(\'xss\')'
-    const xssScript = '<script>alert("xss")</script>'
-    const weirdUnicode = 'string with 𝒲𝒺𝒾𝓇𝒹 chars 💣'
-    const helpLink = {
-      text: xssScript,
-      trackCategory: 'category',
-      trackLabel: 'label',
-    }
-    const container = document.createElement('div')
-    container.id = 'new_login_data'
-    container.setAttribute('data-login-handle-name', xssString)
-    container.setAttribute('data-login-logo-text', `${xssScript} ${weirdUnicode}`)
-    container.setAttribute('data-help-link', JSON.stringify(helpLink))
-    document.body.appendChild(container)
-    const {result} = renderHook(() => useFetchNewLoginData())
-    expect(result.current.data.loginHandleName).toBe(xssString)
-    expect(result.current.data.loginLogoText).toBe(`${xssScript} ${weirdUnicode}`)
-    expect(result.current.data.helpLink).toEqual(helpLink)
+  describe('escaping and sanitizing responsibility', () => {
+    // returns raw values; escaping/sanitizing is the responsibility of the rendering layer
+    it('returns potentially unsafe-looking strings without decoding or sanitizing', () => {
+      const xssString = '" onmouseover="alert(\'xss\')'
+      const xssScript = '<script>alert("xss")</script>'
+      const weirdUnicode = 'string with 𝒲𝒺𝒾𝓇𝒹 chars 💣'
+      const helpLink = {
+        text: xssScript,
+        trackCategory: 'category',
+        trackLabel: 'label',
+      }
+      const container = document.createElement('div')
+      container.id = 'new_login_data'
+      container.setAttribute('data-login-handle-name', xssString)
+      container.setAttribute('data-login-logo-text', `${xssScript} ${weirdUnicode}`)
+      container.setAttribute('data-help-link', JSON.stringify(helpLink))
+      document.body.appendChild(container)
+      const {result} = renderHook(() => useFetchNewLoginData())
+      expect(result.current.data.loginHandleName).toBe(xssString)
+      expect(result.current.data.loginLogoText).toBe(`${xssScript} ${weirdUnicode}`)
+      expect(result.current.data.helpLink).toEqual(helpLink)
+    })
+
+    it('returns potentially unsafe-looking custom message strings without decoding or sanitizing', () => {
+      const xssStrings = [
+        `" onclick="alert('xss')`,
+        `" onmouseover="alert(1)`,
+        `&quot;onclick&quot;=&quot;alert(1)&quot;`,
+        `<script>alert('xss')</script>`,
+        `<img src=x onerror=alert(1)>`,
+        '`alert(1)`',
+        'javascript:alert(1)',
+        'test',
+        '<img src=x onerror=alert(1)>',
+      ]
+      createMockContainer(
+        null, // enableCourseCatalog
+        null, // authProviders
+        null, // loginHandleName
+        null, // loginLogoUrl
+        null, // loginLogoText
+        null, // bodyBgColor
+        null, // bodyBgImage
+        null, // isPreviewMode
+        null, // selfRegistrationType
+        null, // recaptchaKey
+        null, // termsRequired
+        null, // termsOfUseUrl
+        null, // privacyPolicyUrl
+        null, // requireEmail
+        null, // passwordPolicy
+        null, // forgotPasswordUrl
+        null, // invalidLoginFaqUrl
+        null, // helpLink
+        null, // requireAup
+        xssStrings[0], // customMessageLogin
+        xssStrings[2], // customMessageRegistration
+        xssStrings[3], // customMessageRegistrationParent
+      )
+      const {result} = renderHook(() => useFetchNewLoginData())
+      expect(result.current.data.customMessageLogin).toBe(xssStrings[0])
+      expect(result.current.data.customMessageRegistration).toBe(xssStrings[2])
+      expect(result.current.data.customMessageRegistrationParent).toBe(xssStrings[3])
+    })
   })
 })

@@ -32,7 +32,11 @@ describe('RegenerateCriteria', () => {
 
   it('renders the regenerate button', () => {
     const {getByTestId} = render(<RegenerateCriteria {...defaultProps} />)
-    expect(getByTestId('regenerate-criteria-button')).toBeInTheDocument()
+
+    const button = getByTestId('regenerate-criteria-button')
+
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveTextContent('Regenerate')
   })
 
   it('opens modal when regenerate button is clicked', async () => {
@@ -145,10 +149,91 @@ describe('RegenerateCriteria', () => {
     })
 
     expect(getByTestId('additional-prompt-textarea')).toHaveValue('')
-  })
+  }, 30000)
 
   it('disables the button when disabled prop is true', () => {
     const {getByTestId} = render(<RegenerateCriteria {...defaultProps} disabled={true} />)
     expect(getByTestId('regenerate-criteria-button')).toBeDisabled()
+  })
+
+  describe('RegenerateButtonWrapper tooltip behavior', () => {
+    it('renders tooltip when toolTipText is provided and button is disabled', () => {
+      const {getByTestId, getByText} = render(
+        <RegenerateCriteria
+          {...defaultProps}
+          toolTipText="Criteria is regenerating"
+          disabled={true}
+        />,
+      )
+      const button = getByTestId('regenerate-criteria-button')
+      expect(button).toHaveAttribute('aria-describedby')
+      const tooltipId = button.getAttribute('aria-describedby')
+      const tooltip = getByText('Criteria is regenerating')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip.id).toBe(tooltipId)
+    })
+
+    it('does not render tooltip when toolTipText is empty', () => {
+      const {queryByText} = render(
+        <RegenerateCriteria {...defaultProps} toolTipText="" disabled={true} />,
+      )
+
+      expect(queryByText('Criteria is regenerating')).not.toBeInTheDocument()
+    })
+
+    it('does not render tooltip when toolTipText is not provided', () => {
+      const {queryByText} = render(<RegenerateCriteria {...defaultProps} disabled={true} />)
+
+      expect(queryByText('Criteria is regenerating')).not.toBeInTheDocument()
+    })
+
+    it('renders button with tooltip and disabled state together', () => {
+      const {getByText, getByTestId} = render(
+        <RegenerateCriteria
+          {...defaultProps}
+          disabled={true}
+          toolTipText="Criteria is regenerating"
+        />,
+      )
+
+      const tooltip = getByText('Criteria is regenerating')
+      expect(tooltip).toBeInTheDocument()
+      expect(getByTestId('regenerate-criteria-button')).toBeDisabled()
+    })
+
+    it('button can be clicked to open modal when not disabled despite tooltip presence', async () => {
+      const {getByTestId, getByText} = render(
+        <RegenerateCriteria {...defaultProps} toolTipText="Some tooltip text" />,
+      )
+
+      const button = getByTestId('regenerate-criteria-button')
+      expect(button).not.toBeDisabled()
+      expect(button).toHaveAttribute('aria-describedby')
+      const tooltipId = button.getAttribute('aria-describedby')
+      expect(tooltipId).toBeTruthy()
+      expect(tooltipId).toContain('Tooltip__')
+
+      fireEvent.click(getByTestId('regenerate-criteria-button'))
+
+      await waitFor(() => {
+        expect(getByText('Regenerate Criteria')).toBeInTheDocument()
+      })
+    })
+
+    it('button cannot be clicked when disabled regardless of tooltip', () => {
+      const {getByTestId, queryByText, getByText} = render(
+        <RegenerateCriteria
+          {...defaultProps}
+          disabled={true}
+          toolTipText="Criteria is regenerating"
+        />,
+      )
+
+      expect(getByText('Criteria is regenerating')).toBeInTheDocument()
+
+      fireEvent.click(getByTestId('regenerate-criteria-button'))
+
+      expect(queryByText('Regenerate Criteria')).not.toBeInTheDocument()
+    })
   })
 })

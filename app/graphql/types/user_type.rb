@@ -113,12 +113,9 @@ module Types
     field :avatar_url, UrlType, null: true
     def avatar_url
       load_association(:pseudonym).then do
-        if object.account.service_enabled?(:avatars)
-          load_association(:associated_root_accounts).then do
-            AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
-          end
-        else
-          nil
+        load_association(:associated_root_accounts).then do
+          root_account = context[:domain_root_account]
+          AvatarHelper.avatar_url_for_user(object, context[:request], root_account:, use_fallback: false)
         end
       end
     end
@@ -228,6 +225,10 @@ module Types
     ALLOWED_ORDER_BY_VALUES = %w[id user_id course_id created_at start_at end_at completed_at courses.id courses.name courses.course_code courses.start_at courses.conclude_at].to_set
 
     field :enrollments, [EnrollmentType], null: false do
+      argument :career_learning_library_only,
+               Boolean,
+               "Whether or not to only filter for or exclude Canvas Career learning library only courses",
+               required: false
       argument :course_id,
                ID,
                "only return enrollments for this course",
@@ -275,7 +276,7 @@ module Types
       end
     end
 
-    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, career_learning_library_only: nil, sort: {})
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids:,
@@ -283,6 +284,7 @@ module Types
         current_only:,
         exclude_concluded:,
         horizon_courses:,
+        career_learning_library_only:,
         sort:
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
@@ -692,11 +694,12 @@ module Types
       argument :include_no_due_date, Boolean, required: false, description: "Include assignments with no due date"
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
       argument :observed_user_id, ID, required: false, description: "ID of the observed user"
+      argument :only_current_grading_period, Boolean, required: false, default_value: true, description: "Only include missing submissions from current grading period (default: true)"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
       argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
       return [] unless object == current_user
 
       # Get active course enrollments using the same filtering as dashboard
@@ -778,6 +781,9 @@ module Types
         # Add overdue filter if requested
         if include_overdue
           submissions_query = submissions_query.merge(Submission.missing)
+          if only_current_grading_period
+            submissions_query = submissions_query.merge(Submission.in_current_grading_period_for_courses(active_course_ids))
+          end
         end
 
         # Add no due date filter if requested
@@ -1027,13 +1033,14 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, sort: {})
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, career_learning_library_only: nil, sort: {})
       @course_ids = course_ids
       @order_by = order_by
       @current_only = current_only
       @exclude_concluded = exclude_concluded
       @exclude_pending_enrollments = exclude_pending_enrollments
       @horizon_courses = horizon_courses
+      @career_learning_library_only = career_learning_library_only
       @sort = sort
 
       scope = build_scope
@@ -1080,6 +1087,14 @@ module Loaders
                 Enrollment.not_horizon
               else
                 Enrollment.joins(:course)
+              end
+
+      scope = if @career_learning_library_only
+                scope.career_learning_library
+              elsif @career_learning_library_only == false
+                scope.not_career_learning_library
+              else
+                scope
               end
 
       scope = if @current_only

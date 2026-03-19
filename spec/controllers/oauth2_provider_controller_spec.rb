@@ -133,7 +133,7 @@ describe OAuth2ProviderController do
       before do
         user_session(@user)
 
-        redis = double("Redis")
+        redis = instance_double(Redis)
         allow(redis).to receive(:setex)
         allow(Canvas).to receive_messages(redis:)
       end
@@ -510,7 +510,7 @@ describe OAuth2ProviderController do
       let(:valid_code) { "thecode" }
       let(:valid_code_redis_key) { "#{Canvas::OAuth::Token::REDIS_PREFIX}#{valid_code}" }
       let(:redis) do
-        redis = double("Redis")
+        redis = instance_double(Redis)
         allow(redis).to receive(:get)
         allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
         allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
@@ -582,7 +582,7 @@ describe OAuth2ProviderController do
       let(:code_challenge_key) { "#{Canvas::OAuth::PKCE::KEY_PREFIX}#{valid_code}" }
 
       let(:redis) do
-        redis = double("Redis")
+        redis = instance_double(Redis)
 
         allow(redis).to receive(:get)
 
@@ -981,7 +981,7 @@ describe OAuth2ProviderController do
 
         context "with public key url setting and invalid kid in the header" do
           before do
-            allow(CanvasHttp).to receive(:get).and_return(double(body: '{"keys": []}'))
+            allow(CanvasHttp).to receive(:get).and_return(instance_double(Net::HTTPSuccess, body: '{"keys": []}'))
             key.public_jwk_url = "http://localhost"
             key.save!
           end

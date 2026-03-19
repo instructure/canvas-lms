@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, screen} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {BLACKOUT_DATES, COURSE, PRIMARY_PACE} from '../../../../__tests__/fixtures'
@@ -58,7 +58,7 @@ afterEach(() => {
 })
 
 describe('Settings Blackout Dates Modal', () => {
-  it('shows and hides the blackout dates modal correctly', () => {
+  it('shows and hides the blackout dates modal correctly', async () => {
     const {getByRole} = renderConnected(<Settings {...defaultProps} />)
     const settingsButton = getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
@@ -69,11 +69,16 @@ describe('Settings Blackout Dates Modal', () => {
     expect(cancelButton).toBeInTheDocument()
 
     act(() => cancelButton.click())
-    expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
+      },
+      {timeout: 5000},
+    )
     expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
   })
 
-  it('saves blackout dates from modal correctly', () => {
+  it('saves blackout dates from modal correctly', async () => {
     const {getByRole} = renderConnected(<Settings {...defaultProps} />)
     const settingsButton = getByRole('button', {name: 'Settings'})
     act(() => settingsButton.click())
@@ -84,7 +89,12 @@ describe('Settings Blackout Dates Modal', () => {
     expect(saveButton).toBeInTheDocument()
 
     act(() => saveButton.click())
-    expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
+      },
+      {timeout: 5000},
+    )
     expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
     expect(updateBlackoutDates).toHaveBeenCalledWith(defaultProps.blackoutDates)
   })

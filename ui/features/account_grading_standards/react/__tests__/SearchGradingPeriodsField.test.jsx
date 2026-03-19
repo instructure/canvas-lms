@@ -22,7 +22,7 @@ import SearchGradingPeriodsField from '../SearchGradingPeriodsField'
 import userEvent from '@testing-library/user-event'
 
 vi.mock('es-toolkit/compat', async () => ({
-  ...await vi.importActual('es-toolkit/compat'),
+  ...(await vi.importActual('es-toolkit/compat')),
   debounce: vi.fn(fn => fn),
 }))
 

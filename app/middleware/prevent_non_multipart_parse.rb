@@ -26,12 +26,12 @@ class PreventNonMultipartParse
     @app = app
     @considered_paths = [%r{\A/api/.*/sis_imports[^/]*(/|)\z},
                          %r{\A/api/.*/outcome_imports[^/]*(/|)\z}]
-    @ignored_content_types = [%r{\Amultipart/form-data}i]
+    @ignored_content_types = [%r{\Amultipart/form-data}i, %r{\Aapplication/json}i]
   end
 
   def call(env)
     env["ORIGINAL_CONTENT_TYPE"] = env["CONTENT_TYPE"]
-    env["CONTENT_TYPE"] = "application/octet-stream" if !@considered_paths.detect { |r| env["PATH_INFO"] =~ r }.nil? && @ignored_content_types.detect { |r| env["CONTENT_TYPE"] =~ r }.nil?
+    env["CONTENT_TYPE"] = "application/octet-stream" if @considered_paths.any? { |r| env["PATH_INFO"] =~ r } && @ignored_content_types.none? { |r| env["CONTENT_TYPE"] =~ r }
     @app.call(env)
   end
 end

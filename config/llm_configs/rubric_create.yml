@@ -45,19 +45,20 @@ template: |
   - Base primarily on assignment objectives; integrate standard expectations only where they fit
   - Select exactly <CRITERIA_COUNT_PLACEHOLDER> clear, specific, mutually exclusive criteria
   - Use grade-appropriate language
-  - Adapt both language and performance expectations to the specified grade level:
-    - For younger students, use simpler words and ensure that lower rating levels are realistically achievable, showing clear steps for improvement.
-    - For older students, use more advanced academic language and higher performance expectations that encourage critical thinking and depth.
 
   3. Develop rating scales:
   - Provide <RATING_COUNT_PLACEHOLDER> levels per criterion
-  - Use grade-level adjusted language (simple for younger, advanced for older)
-  - Make each level measurable and actionable (e.g., “Uses 1–2 sources” vs. “Lacks support”)
-  - Ensure that rating levels show a clear progression of performance, with meaningful distinctions between each level.
-  - Avoid vague/repetitive wording; specify improvements
-  - Keep tone encouraging at all levels
+  - Adapt language and expectations to grade level:
+    - Younger students: simpler words, lower levels realistically achievable, clear steps for improvement.
+    - Older students: advanced academic language, higher expectations that encourage critical thinking.
+  - Make each level measurable and actionable (e.g., “Uses 1–2 sources” not “Lacks support”)
+  - Ensure clear progression between levels with meaningful distinctions
+  - Avoid vague or repetitive wording
 
-  4. Output format: JSON only, no extra text. Example (illustrative only):
+  4. Rating language requirements
+  <BLOOM_TAXONOMY_CONTEXT_PLACEHOLDER>
+
+  5. Output format: JSON only, no extra text. Example (illustrative only):
 
   {
     "criteria": [
@@ -67,19 +68,19 @@ template: |
         "ratings": [
           {
             "title": "Exceptional",
-            "description": "Presents a unique, well-defined concept with clear features and examples."
+            "description": "Designs a compelling concept and justifies key features with specific examples."
           },
           {
-            "title": "Satisfactory",
-            "description": "Explains the concept with some clear features but lacks detail or originality."
+            "title": "Proficient",
+            "description": "Explains the concept clearly and analyzes its main features, though some details lack depth."
           },
           {
-            "title": "Inadequate",
-            "description": "Idea is vague or missing important features."
+            "title": "Developing",
+            "description": "Demonstrates a basic understanding of the concept but does not yet connect features to broader objectives."
           },
           {
-            "title": "No Marks",
-            "description": "Does not provide a recognizable concept."
+            "title": "Insufficient",
+            "description": "Lists concept elements without explaining how they relate to the game idea."
           }
         ]
       }
@@ -89,6 +90,7 @@ template: |
   Ensure the rubric is comprehensive, grade-appropriate, and integrates only relevant standard expectations.
   Identify the language of the assignment (english, spanish, etc.) and use the same language throughout.
   Now, create the rubric in JSON with exactly <CRITERIA_COUNT_PLACEHOLDER> criteria, each containing exactly <RATING_COUNT_PLACEHOLDER> ratings. Do not include any additional criteria or ratings beyond this number.
+  **IMPORTANT**: Validate the created JSON object and verify there are no unexpected characters and every comma is in place before returning.
 
 options:
   max_tokens: 5000

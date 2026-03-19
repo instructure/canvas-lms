@@ -101,7 +101,6 @@ const featureBundles: {
   discussion_topic_edit_v2: () => import('./features/discussion_topic_edit_v2/index'),
   discussion_topic_edit: () => import('./features/discussion_topic_edit/index'),
   discussion_topic_insights: () => import('./features/discussion_topic_insights/index'),
-  discussion_topic: () => import('./features/discussion_topic/index'),
   discussion_topics_index: () => import('./features/discussion_topics_index/index'),
   discussion_topics_post: () => import('./features/discussion_topics_post/index'),
   edit_calendar_event: () => import('./features/edit_calendar_event/index'),
@@ -157,6 +156,7 @@ const featureBundles: {
   module_sequence_footer: () => import('./features/module_sequence_footer/index'),
   module_student_view_peer_reviews: () =>
     import('./features/module_student_view_peer_reviews/index'),
+  discovery_page: () => import('./features/discovery_page/index'),
   nav_tourpoints: () => import('./features/nav_tourpoints/index'),
   navigation_header: () => import('./features/navigation_header/index'),
   new_quizzes: () => import('./features/new_quizzes/index'),

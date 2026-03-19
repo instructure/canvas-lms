@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {forwardRef, useImperativeHandle, useRef, useState, useEffect} from 'react'
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -24,8 +24,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-
-import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -35,20 +33,27 @@ import {useShallow} from 'zustand/react/shallow'
 
 const I18n = createI18nScope('accessibility_checker')
 
+export const CAPTION_EMPTY_MESSAGE = I18n.t('Caption cannot be empty.')
+
 const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
     (
-      {issue, error, value, onChangeValue, isDisabled, onValidationChange}: FormComponentProps,
+      {
+        issue,
+        error,
+        value,
+        onValidationChange,
+        onChangeValue,
+        isDisabled,
+        onGenerateLoadingChange,
+      }: FormComponentProps,
       ref,
     ) => {
       const [generateLoading, setGenerateLoading] = useState(false)
-      const {selectedItem} = useAccessibilityCheckerContext()
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {isAiTableCaptionGenerationEnabled} = useAccessibilityScansStore(
-        useShallow(state => ({
-          isAiTableCaptionGenerationEnabled: state.isAiTableCaptionGenerationEnabled,
-        })),
+      const [isAiTableCaptionGenerationEnabled, selectedItem] = useAccessibilityScansStore(
+        useShallow(state => [state.isAiTableCaptionGenerationEnabled, state.selectedScan]),
       )
 
       useImperativeHandle(ref, () => ({
@@ -57,13 +62,21 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
         },
       }))
 
-      useEffect(() => {
-        onValidationChange?.(value?.trim()?.length > 0, I18n.t('Caption cannot be empty.'))
-      }, [value, onValidationChange])
+      const handleOnChange = (value: string) => {
+        onChangeValue(value)
+
+        if (value?.trim().length === 0) {
+          onValidationChange?.(false, CAPTION_EMPTY_MESSAGE)
+        } else {
+          onValidationChange?.(true)
+        }
+      }
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
         setGenerationError(null)
+        onGenerateLoadingChange?.(true)
+
         doFetchApi<GenerateResponse>({
           path: `${stripQueryString(window.location.href)}/generate/table_caption`,
           method: 'POST',
@@ -80,7 +93,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             return result.json
           })
           .then(resultJson => {
-            onChangeValue(resultJson?.value)
+            handleOnChange(resultJson?.value || '')
           })
           .catch(error => {
             const statusCode = error?.response?.status || 0
@@ -99,7 +112,10 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
               )
             }
           })
-          .finally(() => setGenerateLoading(false))
+          .finally(() => {
+            setGenerateLoading(false)
+            onGenerateLoadingChange?.(false)
+          })
       }
 
       return (
@@ -108,8 +124,9 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             data-testid="text-input-form"
             renderLabel={issue.form.label}
             value={value || ''}
-            onChange={(_, value) => onChangeValue(value)}
+            onChange={(_, value) => handleOnChange(value)}
             inputRef={el => (inputRef.current = el)}
+            isRequired
             messages={error ? [{text: error, type: 'newError'}] : []}
             interaction={isDisabled ? 'disabled' : 'enabled'}
           />
@@ -123,18 +140,16 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
                   onClick={handleGenerateClick}
                   disabled={generateLoading}
                 >
-                  {issue.form.generateButtonLabel}
+                  {generateLoading ? (
+                    <>
+                      {issue.form.generateButtonLabel}{' '}
+                      <Spinner size="x-small" renderTitle={I18n.t('Generating...')} />
+                    </>
+                  ) : (
+                    issue.form.generateButtonLabel
+                  )}
                 </Button>
               </Flex>
-              {generateLoading && (
-                <Flex.Item>
-                  <Spinner
-                    size="x-small"
-                    renderTitle={I18n.t('Generating...')}
-                    margin="0 small 0 0"
-                  />
-                </Flex.Item>
-              )}
               {generationError !== null && (
                 <Flex>
                   <Flex.Item>

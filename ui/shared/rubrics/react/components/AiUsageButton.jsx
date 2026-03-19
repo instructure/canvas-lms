@@ -79,7 +79,7 @@ const AiUsageButton = () => {
         <Flex.Item padding="0 0 x-small 0">
           <Text>
             {I18n.t(
-              'To support more fair and consistent grading, AI was used to assist in the grading process. All final grades are determined by your teacher.',
+              'To support more fair and consistent grading, AI was used to assist in the grading process. All final grades are determined by your instructor.',
             )}
           </Text>
         </Flex.Item>

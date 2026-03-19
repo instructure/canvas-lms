@@ -101,7 +101,7 @@ const renderWithClient = (ui: React.ReactElement) => {
 }
 
 describe('TodoListWidget - Create Todo Modal', () => {
-  it('opens modal when "+ New" button is clicked', async () => {
+  it('opens modal when "+ New To-do" button is clicked', async () => {
     const user = userEvent.setup()
     renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
 

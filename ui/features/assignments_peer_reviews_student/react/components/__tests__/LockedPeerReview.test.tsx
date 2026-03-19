@@ -31,9 +31,14 @@ describe('LockedPeerReview', () => {
     nonDigitalSubmission: false,
     pointsPossible: 10,
     courseId: '1',
-    peerReviews: {count: 2, submissionRequired: true, pointsPossible: null, anonymousReviews: false},
+    peerReviews: {
+      count: 2,
+      submissionRequired: true,
+      pointsPossible: null,
+      anonymousReviews: false,
+    },
     submissionsConnection: null,
-    assignedToDates: null,
+    peerReviewSubAssignment: null,
     assessmentRequestsForCurrentUser: null,
     ...overrides,
   })
@@ -47,12 +52,8 @@ describe('LockedPeerReview', () => {
 
   it('renders locked message with unlock date', () => {
     const assignment = mockAssignment({
-      assignedToDates: [
-        {
-          dueAt: '2020-10-20T16:00:00Z',
-          peerReviewDates: null,
-        },
-      ],
+      dueAt: '2020-10-20T16:00:00Z',
+      peerReviewSubAssignment: null,
     })
     render(<LockedPeerReview assignment={assignment} />)
     expect(screen.getByTestId('locked-peer-review')).toBeInTheDocument()
@@ -61,16 +62,12 @@ describe('LockedPeerReview', () => {
 
   it('renders locked message with peer review unlock date', () => {
     const assignment = mockAssignment({
-      assignedToDates: [
-        {
-          dueAt: '2020-10-10T16:00:00Z',
-          peerReviewDates: {
-            unlockAt: '2020-10-31T06:00:00Z',
-            dueAt: null,
-            lockAt: null,
-          },
-        },
-      ],
+      dueAt: '2020-10-10T16:00:00Z',
+      peerReviewSubAssignment: {
+        dueAt: null,
+        unlockAt: '2020-10-31T06:00:00Z',
+        lockAt: null,
+      },
     })
     render(<LockedPeerReview assignment={assignment} />)
     expect(screen.getByTestId('locked-peer-review')).toBeInTheDocument()
@@ -80,16 +77,12 @@ describe('LockedPeerReview', () => {
   describe('Past lock date', () => {
     it('renders "no longer available" message when isPastLockDate is true', () => {
       const assignment = mockAssignment({
-        assignedToDates: [
-          {
-            dueAt: '2020-10-10T16:00:00Z',
-            peerReviewDates: {
-              unlockAt: '2020-09-20T06:00:00Z',
-              dueAt: null,
-              lockAt: '2020-09-30T18:00:00Z',
-            },
-          },
-        ],
+        dueAt: '2020-10-10T16:00:00Z',
+        peerReviewSubAssignment: {
+          dueAt: null,
+          unlockAt: '2020-09-20T06:00:00Z',
+          lockAt: '2020-09-30T18:00:00Z',
+        },
       })
       render(<LockedPeerReview assignment={assignment} isPastLockDate={true} />)
       expect(screen.getByTestId('locked-peer-review')).toBeInTheDocument()
@@ -98,16 +91,12 @@ describe('LockedPeerReview', () => {
 
     it('renders "locked until" message when isPastLockDate is false', () => {
       const assignment = mockAssignment({
-        assignedToDates: [
-          {
-            dueAt: '2020-10-10T16:00:00Z',
-            peerReviewDates: {
-              unlockAt: '2020-10-31T06:00:00Z',
-              dueAt: null,
-              lockAt: '2020-11-30T18:00:00Z',
-            },
-          },
-        ],
+        dueAt: '2020-10-10T16:00:00Z',
+        peerReviewSubAssignment: {
+          dueAt: null,
+          unlockAt: '2020-10-31T06:00:00Z',
+          lockAt: '2020-11-30T18:00:00Z',
+        },
       })
       render(<LockedPeerReview assignment={assignment} isPastLockDate={false} />)
       expect(screen.getByTestId('locked-peer-review')).toBeInTheDocument()
@@ -116,16 +105,12 @@ describe('LockedPeerReview', () => {
 
     it('defaults to "locked until" message when isPastLockDate is not provided', () => {
       const assignment = mockAssignment({
-        assignedToDates: [
-          {
-            dueAt: '2020-10-10T16:00:00Z',
-            peerReviewDates: {
-              unlockAt: '2020-10-31T06:00:00Z',
-              dueAt: null,
-              lockAt: null,
-            },
-          },
-        ],
+        dueAt: '2020-10-10T16:00:00Z',
+        peerReviewSubAssignment: {
+          dueAt: null,
+          unlockAt: '2020-10-31T06:00:00Z',
+          lockAt: null,
+        },
       })
       render(<LockedPeerReview assignment={assignment} />)
       expect(screen.getByTestId('locked-peer-review')).toBeInTheDocument()

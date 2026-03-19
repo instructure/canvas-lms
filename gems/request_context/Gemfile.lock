@@ -85,10 +85,26 @@ GEM
     bigdecimal (3.3.1)
     bindata (2.5.1)
     builder (3.3.0)
-    code_ownership (1.39.0)
+    code_ownership (2.1.1)
       code_teams (~> 1.0)
       packs-specification
-      sorbet-runtime (>= 0.5.11249)
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-aarch64-linux)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-arm64-darwin)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-x86_64-darwin)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
+    code_ownership (2.1.1-x86_64-linux)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.6.12763)
     code_teams (1.2.0)
       sorbet-runtime
     concurrent-ruby (1.3.6)
@@ -139,7 +155,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.18.0)
+    json (2.19.2)
     json-jwt (1.17.0)
       activesupport (>= 4.2)
       aes_key_wrap
@@ -148,13 +164,17 @@ GEM
       faraday (~> 2.0)
       faraday-follow_redirects
     logger (1.7.0)
-    loofah (2.25.0)
+    loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    mini_portile2 (2.8.9)
     minitest (6.0.1)
       prism (~> 1.5)
     net-http (0.9.1)
       uri (>= 0.11.1)
+    nokogiri (1.19.1)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.19.1-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.1-arm64-darwin)
@@ -174,7 +194,7 @@ GEM
       stringio
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.4)
+    rack (3.2.5)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)

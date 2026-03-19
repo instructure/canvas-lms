@@ -124,10 +124,10 @@ describe "Block Content Editor", :ignore_js_errors do
       end
     end
 
-    include_examples "block movement", :last_block, :up, [:last_block, :first_block]
-    include_examples "block movement", :first_block, :down, [:last_block, :first_block]
-    include_examples "block movement", :last_block, :to_top, [:last_block, :first_block]
-    include_examples "block movement", :first_block, :to_bottom, [:last_block, :first_block]
+    it_behaves_like "block movement", :last_block, :up, [:last_block, :first_block]
+    it_behaves_like "block movement", :first_block, :down, [:last_block, :first_block]
+    it_behaves_like "block movement", :last_block, :to_top, [:last_block, :first_block]
+    it_behaves_like "block movement", :first_block, :to_bottom, [:last_block, :first_block]
   end
 
   context "Undo/Redo" do
@@ -246,9 +246,9 @@ describe "Block Content Editor", :ignore_js_errors do
       end
     end
 
-    include_examples "preview mode switching", :tablet, [:desktop, :mobile]
-    include_examples "preview mode switching", :mobile, [:desktop, :tablet]
-    include_examples "preview mode switching", :desktop, [:tablet, :mobile]
+    it_behaves_like "preview mode switching", :tablet, [:desktop, :mobile]
+    it_behaves_like "preview mode switching", :mobile, [:desktop, :tablet]
+    it_behaves_like "preview mode switching", :desktop, [:tablet, :mobile]
 
     it "exits preview mode when preview button is clicked" do
       expect(preview_component.preview_layout).to be_displayed
@@ -397,7 +397,7 @@ describe "Block Content Editor", :ignore_js_errors do
       wait_for_ajaximations
 
       block_title_toggle = BlockTitleToggle.new
-      expect(element_exists?(block_title_toggle.toggle_selector, true)).to be false
+      expect(element_exists?(block_title_toggle.toggle_selector, xpath: true)).to be false
     end
 
     it "does not have title color settings in settings tray" do
@@ -405,7 +405,7 @@ describe "Block Content Editor", :ignore_js_errors do
       wait_for_ajaximations
 
       color_settings = ColorSettings.new
-      expect(element_exists?(color_settings.title_color_setting_selector, true)).to be false
+      expect(element_exists?(color_settings.title_color_setting_selector, xpath: true)).to be false
     end
   end
 
@@ -801,8 +801,8 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Divider", "Separator line")
       end
 
-      include_examples "editing background color"
-      include_examples "no block title"
+      it_behaves_like "editing background color"
+      it_behaves_like "no block title"
 
       it "changes separator color" do
         blocks.first.settings_button.click
@@ -870,8 +870,8 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Text", "Highlight")
       end
 
-      include_examples "editing background color"
-      include_examples "no block title"
+      it_behaves_like "editing background color"
+      it_behaves_like "no block title"
 
       it "toggles highlight icon display" do
         blocks.first.settings_button.click
@@ -929,8 +929,8 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Multimedia", "Media")
       end
 
-      include_examples "editing block title"
-      include_examples "editing background color"
+      it_behaves_like "editing block title"
+      it_behaves_like "editing background color"
 
       it "displays placeholder in edit preview mode when no media is added" do
         expect(blocks.first.media_placeholder).to be_displayed
@@ -955,7 +955,7 @@ describe "Block Content Editor", :ignore_js_errors do
 
         expect(settings.choose_media_button).to be_displayed
         expect(settings.choose_media_button.text).to eq("Add media")
-        expect(element_exists?(settings.replace_media_button_selector, true)).to be false
+        expect(element_exists?(settings.replace_media_button_selector, xpath: true)).to be false
       end
 
       it "adds media" do
@@ -1008,7 +1008,7 @@ describe "Block Content Editor", :ignore_js_errors do
         settings = blocks.first.settings
         expect(settings.replace_media_button).to be_displayed
         expect(settings.replace_media_button.text).to eq("Replace media")
-        expect(element_exists?(settings.choose_media_button_selector, true)).to be false
+        expect(element_exists?(settings.choose_media_button_selector, xpath: true)).to be false
       end
 
       it "preserves media after closing settings tray" do
@@ -1058,9 +1058,9 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Image", "Full width image")
       end
 
-      include_examples "editing block title"
-      include_examples "editing background color"
-      include_examples "editing image"
+      it_behaves_like "editing block title"
+      it_behaves_like "editing background color"
+      it_behaves_like "editing image"
     end
 
     context "Text block" do
@@ -1068,9 +1068,9 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Text", "Text column")
       end
 
-      include_examples "editing block title"
-      include_examples "editing background color"
-      include_examples "editing text"
+      it_behaves_like "editing block title"
+      it_behaves_like "editing background color"
+      it_behaves_like "editing text"
     end
 
     context "Image + Text block" do
@@ -1078,10 +1078,10 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Image", "Image + text")
       end
 
-      include_examples "editing block title"
-      include_examples "editing background color"
-      include_examples "editing text"
-      include_examples "editing image"
+      it_behaves_like "editing block title"
+      it_behaves_like "editing background color"
+      it_behaves_like "editing text"
+      it_behaves_like "editing image"
 
       def expect_image_position(image_element, text_element, expected_image_position)
         image_x = image_element.location.x
@@ -1162,8 +1162,8 @@ describe "Block Content Editor", :ignore_js_errors do
         add_a_block("Interactive element", "Button")
       end
 
-      include_examples "editing block title"
-      include_examples "editing background color"
+      it_behaves_like "editing block title"
+      it_behaves_like "editing background color"
 
       it "displays a single button with 'Button' text by default" do
         expect(blocks.first.buttons.size).to eq(1)

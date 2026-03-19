@@ -175,7 +175,7 @@ class MicrosoftSync::GroupsController < ApplicationController
       )
     end
 
-    render json: { message: error_msg }, status: :unprocessable_entity if error_msg
+    render json: { message: error_msg }, status: :unprocessable_content if error_msg
   end
 
   # Don't allow scheduling a new job

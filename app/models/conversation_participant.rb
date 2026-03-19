@@ -503,9 +503,21 @@ class ConversationParticipant < ActiveRecord::Base
           ConversationMessageParticipant.joins(:conversation_message)
                                         .where(conversation_messages: { conversation_id: }, user_id:)
                                         .update_all(user_id: new_user.id)
-          update_attribute :user, new_user
-          clear_participants_cache
-          existing = self
+          begin
+            update_attribute :user, new_user
+            clear_participants_cache
+            existing = self
+          rescue ActiveRecord::RecordNotUnique
+            # the target user already has a CP for this conversation on self's shard,
+            # but the check above queried the conversation's shard and didn't find it
+            existing = conversation.conversation_participants.where(user_id: new_user).first
+            existing ||= shard.activate { self.class.where(conversation_id: self[:conversation_id], user_id: new_user.id).first }
+            if existing && existing != self
+              existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+              existing.clear_participants_cache
+            end
+            destroy
+          end
         end
         # replicate ConversationParticipant record to the new user's shard
         if old_shard != new_user.shard && new_user.shard != conversation.shard && !new_user.all_conversations.where(conversation_id: conversation).exists?

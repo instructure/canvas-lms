@@ -19,7 +19,6 @@
 import React, {useRef} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 

@@ -631,7 +631,7 @@ class ContextModule < ActiveRecord::Base
                                             .active
                                             .joins(assignment_sets: :assignment_set_associations)
                                             .group("conditional_release_rules.trigger_assignment_id")
-                                            .having("count(conditional_release_assignment_set_associations.id) >= 3")
+                                            .having("count(conditional_release_assignment_set_associations.id) >= 1")
                                             .pluck(:trigger_assignment_id)
                                             .uniq
 

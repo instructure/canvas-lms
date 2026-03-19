@@ -184,26 +184,17 @@ describe WikiPagesApiController, type: :request do
       expect(att_occurences.values).to all eq 1
     end
 
-    it "updates with removed attachments should keep the associations" do
-      wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
-      @wiki_page = WikiPage.find(wiki_response["page_id"])
-      update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.removed_html })
-      id_occurences, att_occurences = @aa_test_data.count_aa_records("WikiPage", wiki_response["page_id"])
-
-      expect(id_occurences.keys).to match_array [wiki_response["page_id"]]
-      expect(id_occurences.values).to all eq 1
-      expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id]
-      expect(att_occurences.values).to all eq 1
-    end
-
     it "reverts as expected" do
       wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
       @wiki_page = WikiPage.find(wiki_response["page_id"])
       update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.added_html })
-      revisions = revisions_of_wiki_page(@teacher, @wiki_page)
+      expect(@wiki_page.reload.attachment_associations.pluck(:attachment_id)).to match_array([@aa_test_data.attachment1.id, @aa_test_data.attachment2.id])
       expect do
-        revert_wiki_page(@teacher, @wiki_page, revisions.last["revision_id"])
+        revert_wiki_page(@teacher, @wiki_page, "1")
       end.not_to raise_error
+      expect(@wiki_page.reload.attachment_associations.pluck(:attachment_id)).to match_array([@aa_test_data.attachment1.id])
+      revert_wiki_page(@teacher, @wiki_page, "2")
+      expect(@wiki_page.reload.attachment_associations.pluck(:attachment_id)).to match_array([@aa_test_data.attachment1.id, @aa_test_data.attachment2.id])
     end
   end
 
@@ -536,10 +527,11 @@ describe WikiPagesApiController, type: :request do
                                       resource_workflow_state: "active",
                                       resource_updated_at: Time.zone.now,
                                       context_url: "/courses/#{@course.id}/pages/#{@wiki_page.id}",
+                                      resource_scan_path: nil,
                                       workflow_state: "completed",
                                       error_message: nil,
                                       issue_count: 0,
-                                      accessibility_issues: double(select: []))
+                                      accessibility_issues: instance_double(ActiveRecord::Relation, select: []))
 
         expect(Accessibility::ResourceScannerService).to receive(:new)
           .with(resource: @wiki_page)

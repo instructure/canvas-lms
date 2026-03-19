@@ -38,8 +38,8 @@ class BrandConfig < ActiveRecord::Base
 
   after_save :clear_cache
 
-  has_many :accounts, foreign_key: "brand_config_md5", inverse_of: :brand_config
-  has_many :shared_brand_configs, foreign_key: "brand_config_md5", inverse_of: :brand_config
+  has_many :accounts, foreign_key: "brand_config_md5", primary_key: "md5", inverse_of: :brand_config
+  has_many :shared_brand_configs, foreign_key: "brand_config_md5", primary_key: "md5", inverse_of: :brand_config
 
   # belongs_to :parent, class_name: "BrandConfig", foreign_key: "parent_md5"
   def parent
@@ -90,6 +90,8 @@ class BrandConfig < ActiveRecord::Base
     shard.activate do
       self.class.connection.after_transaction_commit do
         MultiCache.delete(self.class.cache_key_for_md5(shard.id, md5))
+        delay_if_production(singleton: "brand_config_clear_caches_#{shard.id}_#{md5}")
+          .clear_dependent_caches
       end
     end
   end
@@ -195,7 +197,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def s3_uploader
-    @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
+    @s3_uploader ||= Canvas::Cdn::S3Uploader.new
   end
 
   def save_all_files!
@@ -268,5 +270,46 @@ class BrandConfig < ActiveRecord::Base
       .where.not(Account.where("brand_config_md5=brand_configs.md5").arel.exists)
       .where.not(SharedBrandConfig.where("brand_config_md5=brand_configs.md5").arel.exists)
       .delete_all
+  end
+
+  # Clear all dependent caches when this BrandConfig changes
+  # This includes:
+  # 1. BrandConfig-level caches: css_and_js_overrides for all child configs
+  # 2. Account-level caches: effective_brand_config for all accounts using this config or its children
+  #
+  # This is necessary because:
+  # - Child BrandConfigs cache css_and_js_overrides which includes parent overrides
+  # - Accounts cache effective_brand_config which determines inheritance chain
+  # - Both must be invalidated when parent BrandConfig changes
+  #
+  # This base implementation only handles same-shard children (the common case)
+  def clear_dependent_caches
+    self.class.clear_child_override_caches_recursively(md5)
+    self.class.clear_account_chain_caches(md5)
+    self.class.clear_account_caches_for_children(md5)
+  end
+
+  class << self
+    def clear_child_override_caches_recursively(parent_md5)
+      BrandConfig.where(parent_md5:).find_each do |child_config|
+        Rails.cache.delete([child_config, "css_and_js_overrides"].cache_key)
+        clear_child_override_caches_recursively(child_config.md5)
+      end
+    end
+
+    def clear_account_chain_caches(target_md5)
+      account_ids = Account.where(brand_config_md5: target_md5).ids
+      shared_config_account_ids = SharedBrandConfig.where(brand_config_md5: target_md5).pluck(:account_id)
+
+      all_account_ids = (account_ids + shared_config_account_ids).uniq
+      Account.clear_cache_keys(all_account_ids, :brand_config) if all_account_ids.any?
+    end
+
+    def clear_account_caches_for_children(parent_md5)
+      BrandConfig.where(parent_md5:).find_each do |child_config|
+        clear_account_chain_caches(child_config.md5)
+        clear_account_caches_for_children(child_config.md5)
+      end
+    end
   end
 end

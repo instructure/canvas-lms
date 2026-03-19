@@ -21,7 +21,7 @@
 module CanvasCareer
   describe Config do
     let(:root_account) { Account.default }
-    let(:request) { double("request", base_url: "https://canvascareer.instructure.com") }
+    let(:request) { instance_double(ActionDispatch::Request, base_url: "https://canvascareer.instructure.com") }
     let(:dynamic_settings_yaml) do
       {
         "public_app_config" => {
@@ -31,7 +31,7 @@ module CanvasCareer
     end
 
     before do
-      dynamic_settings = double("DynamicSettings")
+      dynamic_settings = instance_double(DynamicSettings::PrefixProxy)
       allow(DynamicSettings).to receive(:find).and_call_original
       allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(dynamic_settings)
       allow(dynamic_settings).to receive(:[]).and_return(nil)
@@ -40,23 +40,17 @@ module CanvasCareer
 
     describe "public_app_config" do
       context "when horizon_academic_mode is not set" do
-        it "returns experience preferences with skillspace and learner_assist enabled" do
+        it "returns career experience_mode" do
           config = Config.new(root_account)
           result = config.public_app_config(request)
 
           expect(result["hosts"]["canvas"]).to eq("https://canvascareer.instructure.com")
-          expect(result["experience_preferences"]).to eq({
-                                                           features: {
-                                                             notebook: true,
-                                                             skillspace: true,
-                                                             learner_assist: true,
-                                                           }
-                                                         })
+          expect(result["experience_mode"]).to eq("career")
         end
       end
 
       context "when horizon_academic_mode is true" do
-        it "returns experience preferences with rubrics enabled" do
+        it "returns academic experience_mode" do
           root_account.settings[:horizon_academic_mode] = true
           root_account.save!
 
@@ -64,13 +58,7 @@ module CanvasCareer
           result = config.public_app_config(request)
 
           expect(result["hosts"]["canvas"]).to eq("https://canvascareer.instructure.com")
-          expect(result["experience_preferences"]).to eq({
-                                                           features: {
-                                                             notebook: true,
-                                                             skillspace: false,
-                                                             learner_assist: false,
-                                                           }
-                                                         })
+          expect(result["experience_mode"]).to eq("academic")
         end
       end
     end

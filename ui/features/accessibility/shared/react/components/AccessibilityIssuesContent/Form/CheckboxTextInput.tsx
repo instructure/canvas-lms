@@ -37,7 +37,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {FormMessage} from '@instructure/ui-form-field'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import {useAccessibilityCheckerContext} from '../../../hooks/useAccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
@@ -68,11 +67,8 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const {selectedItem} = useAccessibilityCheckerContext()
-      const {isAiAltTextGenerationEnabled} = useAccessibilityScansStore(
-        useShallow(state => ({
-          isAiAltTextGenerationEnabled: state.isAiAltTextGenerationEnabled,
-        })),
+      const [isAiAltTextGenerationEnabled, selectedItem] = useAccessibilityScansStore(
+        useShallow(state => [state.isAiAltTextGenerationEnabled, state.selectedScan]),
       )
       const charCountId = useId()
 
@@ -237,6 +233,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         <Flex direction="column" gap="mediumSmall">
           <View as="div">
             <Checkbox
+              data-testid="decorative-img-checkbox"
               inputRef={el => (checkboxRef.current = el)}
               label={issue.form.checkboxLabel}
               checked={isChecked}
@@ -265,12 +262,13 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               disabled={isChecked || isDisabled}
               value={isChecked ? '' : value || ''}
               onChange={handleTextAreaChange}
+              required
               messages={formMessages}
               aria-describedby={charCountId}
             />
           </View>
 
-          {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && (
+          {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
             <Flex as="div" gap="small" direction="column">
               <Flex as="div" gap="x-small" direction="column">
                 <Flex.Item overflowX="visible" overflowY="visible">
@@ -279,7 +277,9 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                     color="ai-primary"
                     renderIcon={() => <IconAiSolid />}
                     onClick={handleGenerateClick}
-                    disabled={generateLoading || isDisabled || !issue.form.isCanvasImage}
+                    disabled={
+                      generateLoading || isChecked || isDisabled || !issue.form.isCanvasImage
+                    }
                   >
                     {generateLoading ? (
                       <>
@@ -291,13 +291,15 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                     )}
                   </Button>
                 </Flex.Item>
-                <Flex.Item>
-                  <Text size="small">
-                    {I18n.t(
-                      'AI alt text generation is only available for images uploaded to Canvas.',
-                    )}
-                  </Text>
-                </Flex.Item>
+                {!issue.form.isCanvasImage && (
+                  <Flex.Item>
+                    <Text data-testid="alt-text-generation-not-available-message" size="small">
+                      {I18n.t(
+                        'AI alt text generation is only available for images uploaded to Canvas.',
+                      )}
+                    </Text>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex>
           )}

@@ -1224,7 +1224,7 @@ describe MasterCourses::MasterMigration do
       expect(ag1_to.group_weight).to eq 33
       expect(ag1_to.rules).to eq "drop_highest:1\n"
       a1_to = ag1_to.assignments.first
-      expect(a1_to).to be
+      expect(a1_to).not_to be_nil
     end
 
     it "syncs unpublished quiz points possible" do
@@ -3162,9 +3162,7 @@ describe MasterCourses::MasterMigration do
       copied_tag = @copy_to.context_module_tags.where(migration_id: mig_id(tag)).first
       copied_things = [copied_assmt, copied_topic, copied_page, copied_quiz, copied_file, copied_mod, copied_tag]
 
-      copied_things.each do |copied_obj|
-        expect(copied_obj).to be_published
-      end
+      expect(copied_things).to all(be_published)
 
       # unpublish everything
       Timecop.freeze(1.minute.from_now) do

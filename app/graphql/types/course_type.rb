@@ -142,8 +142,17 @@ module Types
 
     global_id_field :id
 
+    field :career_learning_library_only, Boolean, null: true
+
+    def career_learning_library_only
+      return nil unless object.root_account.feature_enabled?(:horizon_learning_library_ms2)
+
+      object.career_learning_library_only
+    end
+
     field :course_code, String, "course short name", null: true
     field :horizon_course, Boolean, null: true
+
     field :name, String, null: false
     field :state, CourseWorkflowState, method: :workflow_state, null: false
     field :syllabus_body, String, null: true
@@ -236,13 +245,7 @@ module Types
       scope = course.active_course_sections
 
       if filter[:assignment_id]
-        assignment_scope = if course.feature_enabled?(:peer_review_allocation_and_grading)
-                             AbstractAssignment.assignment_or_peer_review.where(context: course)
-                           else
-                             course.assignments
-                           end
-
-        assignment = assignment_scope.active.find(filter[:assignment_id])
+        assignment = AbstractAssignment.assignment_scope_for_context(course).active.find(filter[:assignment_id])
         scope = scope.where(id: assignment.sections_for_assigned_students) if assignment.only_visible_to_overrides?
       end
 
@@ -267,14 +270,23 @@ module Types
       scope.order(:name)
     end
 
-    field :rubrics_connection, RubricType.connection_type, null: true
-    def rubrics_connection
+    field :rubrics_connection, RubricType.connection_type, null: true do
+      argument :id,
+               ID,
+               "Filter by rubric ID",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Rubric")
+    end
+    def rubrics_connection(id: nil)
       rubric_associations = course.rubric_associations
                                   .bookmarked
                                   .include_rubric
                                   .joins(:rubric)
                                   .where.not(rubrics: { workflow_state: "deleted" })
-                                  .to_a
+
+      rubric_associations = rubric_associations.where(rubric_id: id) if id
+
+      rubric_associations = rubric_associations.to_a
       rubric_associations = Canvas::ICU.collate_by(rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
       rubric_associations.map(&:rubric)
     end
@@ -422,9 +434,15 @@ module Types
 
         filter ||= {}
 
+        all_assignment_ids = if filter[:include_peer_review_submissions] && course.feature_enabled?(:peer_review_allocation_and_grading)
+                               AbstractAssignment.assignment_or_peer_review.published.where(context: course).pluck(:id)
+                             else
+                               course.assignments.published.reorder(nil).pluck(:id)
+                             end
+
         submissions = Submission.active.joins(:assignment).where(
           user_id: allowed_user_ids,
-          assignment_id: course.assignments.published.reorder(nil).select(:id),
+          assignment_id: all_assignment_ids,
           workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
         )
 
@@ -601,13 +619,13 @@ module Types
 
         is_observer = !observed_students.empty?
 
-        if is_observer
-          Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
-        elsif observed_user_id.nil?
-          Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
-        else
-          nil
-        end
+        loader_promise = if is_observer
+                           Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
+                         elsif observed_user_id.nil?
+                           Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+                         end
+
+        loader_promise&.then { |submissions| { course:, submissions: } }
       end
     end
 

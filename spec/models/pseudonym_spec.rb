@@ -192,16 +192,10 @@ describe Pseudonym do
       expect(Pseudonym.active.by_unique_id("c①dy@instructure.com")).to eq [p4]
 
       scope = Pseudonym.active
-      shard = instance_double(Shard)
-      allow(shard).to receive(:settings).and_return({})
+      shard = instance_double(Shard, settings: {})
       allow(shard).to receive(:is_a?).with(Shard).and_return(true)
       allow(shard).to receive(:is_a?).with(Switchman::DefaultShard).and_return(false)
       # return our double once for the named scope, then the real thing for the query
-      allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
-      expect(scope.by_unique_id("c1dy@instructure.com")).not_to exist
-
-      # mark the migration as complete, and it will start doing a normalized lookup
-      allow(shard).to receive(:settings).and_return({ "pseudonyms_normalized" => true })
       allow(scope).to receive(:primary_shard).and_return(shard, Shard.default)
       expect(scope.by_unique_id("c1dy@instructure.com")).to eq [p4]
     end
@@ -322,6 +316,27 @@ describe Pseudonym do
 
         pseudonym.destroy(custom_deleted_at: Time.now.utc, validate: false)
       end
+    end
+  end
+
+  describe "suspend auditing" do
+    it "audits suspension" do
+      pseudonym_model
+      @pseudonym.suspend!
+      expect(@pseudonym.auditor_records.where(action: "suspended")).to exist
+    end
+
+    it "audits unsuspension" do
+      pseudonym_model(workflow_state: "suspended")
+      @pseudonym.unsuspend!
+      expect(@pseudonym.auditor_records.where(action: "unsuspended")).to exist
+    end
+
+    it "logs deletion in preference to unsuspension" do
+      pseudonym_model(workflow_state: "suspended")
+      @pseudonym.destroy
+      expect(@pseudonym.auditor_records.where(action: "deleted")).to exist
+      expect(@pseudonym.auditor_records.where(action: "unsuspended")).not_to exist
     end
   end
 
@@ -979,20 +994,20 @@ describe Pseudonym do
     expect(p2).to be_valid
   end
 
-  describe ".find_all_by_arbtrary_credentials" do
-    let_once(:p) do
+  describe ".find_all_by_arbitrary_credentials" do
+    let_once(:pseudonym) do
       u = User.create!
       u.pseudonyms.create!(unique_id: "a", account: Account.default, password: "abcdefgh", password_confirmation: "abcdefgh")
     end
 
     it "finds a valid pseudonym" do
-      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [pseudonym]
     end
 
     it "doesn't choke on if global lookups is down" do
       expect(GlobalLookups).to receive(:enabled?).and_return(true)
       expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
-      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [pseudonym]
     end
 
     it "throws an error if your credentials are absurd" do
@@ -1003,12 +1018,12 @@ describe Pseudonym do
     end
 
     it "doesn't find deleted pseudonyms" do
-      p.update!(workflow_state: "deleted")
+      pseudonym.update!(workflow_state: "deleted")
       expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq []
     end
 
     it "doesn't find suspended pseudonyms" do
-      p.update!(workflow_state: "suspended")
+      pseudonym.update!(workflow_state: "suspended")
       expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq []
     end
   end

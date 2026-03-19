@@ -54,6 +54,9 @@ import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import ExternalAppsMenuTray from '@canvas/external-apps/react/components/ExternalAppsMenuTray'
+import {PeerReviewInfo} from '@canvas/assignments/react/PeerReviewInfo'
+import {render} from '@canvas/react'
+import {captureException} from '@sentry/browser'
 import {
   initPublishButton,
   onContainerOverlapped,
@@ -101,6 +104,8 @@ import {fetchItemTitles} from '../utils/fetchItemTitles'
 if (!('INST' in window)) window.INST = {}
 
 const I18n = createI18nScope('context_modulespublic')
+
+const peerReviewRoots = new Map()
 
 // TODO: AMD don't export global, use as module
 /* global modules */
@@ -476,6 +481,20 @@ window.modules = (function () {
               }
 
               $context_module_item.addClass('rendered')
+
+              if (!ENV.IS_STUDENT) {
+                const moduleType = $context_module_item.find('.lock-icon').attr('data-module-type')
+                if (moduleType === 'assignment') {
+                  const contextModuleId = $context_module_item
+                    .closest('.context_module')
+                    .attr('id')
+                    ?.replace('context_module_', '')
+                  const contentId = $context_module_item.find('.lock-icon').attr('data-content-id')
+                  if (contextModuleId && contentId) {
+                    renderPeerReviewInfo(contentId, contextModuleId, info)
+                  }
+                }
+              }
             })
 
             vddTooltip()
@@ -606,6 +625,13 @@ window.modules = (function () {
         id: 'context_module_item_' + data.id,
         hrefValues: ['id', 'context_module_id', 'content_id', 'content_type', 'assignment_id'],
       })
+
+      const $peerReviewContainer = $item.find('.peer-review-info-container')
+      if ($peerReviewContainer.length && data.content_id && data.context_module_id) {
+        const newId = `module_teacher_peer_review_info_${data.content_id}_${data.context_module_id}`
+        $peerReviewContainer.attr('id', newId)
+      }
+
       for (let idx = 0; idx < 10; idx++) {
         $item.removeClass('indent_' + idx)
       }
@@ -1292,6 +1318,7 @@ modules.initModuleManagement = async function (duplicate) {
             : $addModuleButton
           removeEmptyModuleUI($(this)[0])
           $(this).slideUp(function () {
+            cleanupPeerReviewComponentsForModule(this)
             $(this).remove()
             modules.updateTaggedItems()
             $toFocus.focus()
@@ -1469,6 +1496,7 @@ modules.initModuleManagement = async function (duplicate) {
         success(data) {
           delete ENV.MODULE_FILE_DETAILS[data.content_tag.id]
           $(this).slideUp(function () {
+            cleanupPeerReviewComponentsForItem(this)
             $(this).remove()
             modules.updateTaggedItems()
             modules.updateEstimatedDurations()
@@ -1734,6 +1762,7 @@ modules.initModuleManagement = async function (duplicate) {
             maybeExpandAndLoadAll(id, true)
             modules.addContentTagToEnv(data.content_tag)
           } else {
+            if ($item?.[0]) cleanupPeerReviewComponentsForItem($item[0])
             $item?.remove()
             data.content_tag.type = item_data['item[type]']
             $item = modules.addItemToModule($module, data.content_tag)
@@ -1745,11 +1774,11 @@ modules.initModuleManagement = async function (duplicate) {
             modules.updateAssignmentData()
             modules.updateEstimatedDurations()
 
-            $item.find('.lock-icon').data({
-              moduleType: data.content_tag.type,
-              contentId: data.content_tag.content_id,
-              moduleItemId: data.content_tag.id,
-            })
+            $item
+              .find('.lock-icon')
+              .attr('data-module-type', data.content_tag.type)
+              .attr('data-content-id', data.content_tag.content_id)
+              .attr('data-module-item-id', data.content_tag.id)
             modules.loadMasterCourseData(data.content_tag.id)
           }
         }),
@@ -1788,11 +1817,11 @@ modules.initModuleManagement = async function (duplicate) {
           modules.updateAssignmentData()
           modules.updateEstimatedDurations()
 
-          $item.find('.lock-icon').data({
-            moduleType: data.content_tag.type,
-            contentId: data.content_tag.content_id,
-            moduleItemId: data.content_tag.id,
-          })
+          $item
+            .find('.lock-icon')
+            .attr('data-module-type', data.content_tag.type)
+            .attr('data-content-id', data.content_tag.content_id)
+            .attr('data-module-item-id', data.content_tag.id)
           modules.loadMasterCourseData(data.content_tag.id)
 
           $module.find('.context_module_items.ui-sortable').sortable('disable')
@@ -2049,6 +2078,108 @@ function moduleContentIsHidden(contentEl) {
   )
 }
 
+function convertVddToAllDates(vddTooltip) {
+  if (!vddTooltip || !vddTooltip.due_dates) return []
+  return vddTooltip.due_dates.map(date => ({
+    dueFor: date.due_for,
+    dueAt: date.due_at,
+    unlockAt: date.unlock_at,
+    lockAt: date.lock_at,
+  }))
+}
+
+function unmountPeerReviewInfo(mountPointId) {
+  const root = peerReviewRoots.get(mountPointId)
+  if (root) {
+    root.unmount()
+    peerReviewRoots.delete(mountPointId)
+  }
+}
+
+function cleanupPeerReviewComponentsForItem(itemElement) {
+  const peerReviewContainer = itemElement.querySelector('.peer-review-info-container')
+  if (peerReviewContainer) {
+    const mountPointId = peerReviewContainer.id
+    if (mountPointId) {
+      unmountPeerReviewInfo(mountPointId)
+    }
+  }
+}
+
+function cleanupPeerReviewComponentsForModule(moduleElement) {
+  const items = moduleElement.querySelectorAll('.context_module_item')
+  items.forEach(item => cleanupPeerReviewComponentsForItem(item))
+}
+
+function renderPeerReviewInfo(contentId, contextModuleId, assignmentInfo) {
+  const mountPointId = `module_teacher_peer_review_info_${contentId}_${contextModuleId}`
+  const mountPoint = document.getElementById(mountPointId)
+
+  if (!mountPoint) {
+    return
+  }
+
+  if (!assignmentInfo.peer_review) {
+    mountPoint.remove()
+    return
+  }
+
+  const moduleItem = mountPoint.closest('.context_module_item')
+  if (moduleItem) {
+    const dueDateDisplay = moduleItem.querySelector('.due_date_display')
+    const pointsDisplay = moduleItem.querySelector('.points_possible_display')
+    if (dueDateDisplay) dueDateDisplay.style.display = 'none'
+    if (pointsDisplay) pointsDisplay.style.display = 'none'
+  }
+
+  mountPoint.style.display = ''
+  unmountPeerReviewInfo(mountPointId)
+
+  const peerReviewSubAssignment = assignmentInfo.peer_review
+  const assignmentAllDates =
+    assignmentInfo.all_dates || convertVddToAllDates(assignmentInfo.vdd_tooltip)
+  const peerReviewAllDates =
+    peerReviewSubAssignment.all_dates || convertVddToAllDates(peerReviewSubAssignment.vdd_tooltip)
+
+  const assignmentData = {
+    id: contentId,
+    name: assignmentInfo.name || '',
+    due_at: assignmentInfo.due_date,
+    unlock_at: null,
+    lock_at: null,
+    points_possible: assignmentInfo.points_possible,
+    all_dates: assignmentAllDates,
+    peer_reviews: true,
+    peer_review_count: peerReviewSubAssignment.peer_review_count || 0,
+    peer_review_sub_assignment: {
+      id: peerReviewSubAssignment.id,
+      points_possible: peerReviewSubAssignment.points_possible,
+      due_at: peerReviewSubAssignment.due_date,
+      unlock_at: null,
+      lock_at: null,
+      all_dates: peerReviewAllDates,
+    },
+    html_url: peerReviewSubAssignment.parent_assignment_html_url || assignmentInfo.html_url || '#',
+    availability_status: null,
+  }
+
+  try {
+    const root = render(
+      React.createElement(PeerReviewInfo, {
+        assignment: assignmentData,
+        showDueDateLabel: false,
+        useDateOnly: true,
+        showAvailability: false,
+      }),
+      mountPoint,
+    )
+    peerReviewRoots.set(mountPointId, root)
+  } catch (error) {
+    const errorMessage = I18n.t('Peer review info mount point element not found')
+    captureException(new Error(errorMessage), error)
+  }
+}
+
 function updateSubAssignmentData(contextModuleItem, subAssignments) {
   subAssignments.forEach(subAssignment => {
     const replyToTopicElement = contextModuleItem.find('.reply_to_topic_display')
@@ -2142,6 +2273,7 @@ function initNewItemMoveHandler($item) {
           reorderElements(order, $container[0], id => `#context_module_item_${id}`)
           $container.sortable('enable').sortable('refresh')
         } else {
+          cleanupPeerReviewComponentsForItem(item)
           item.remove()
         }
         if (ENV.FEATURE_MODULES_PERF) {

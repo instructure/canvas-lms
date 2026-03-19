@@ -32,7 +32,8 @@ describe "files index page", :ignore_js_errors do
 
   context("for a course") do
     context("as a teacher") do
-      base_file_name = "example.pdf"
+      let(:base_file_name) { "example.pdf" }
+
       before(:once) do
         course_with_teacher(active_all: true)
       end
@@ -149,8 +150,9 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "from cog icon" do
-        a_txt_file_name = "a_file.txt"
-        b_txt_file_name = "b_file.txt"
+        let(:a_txt_file_name) { "a_file.txt" }
+        let(:b_txt_file_name) { "b_file.txt" }
+
         before do
           add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                    @course,
@@ -218,8 +220,9 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "from toolbar menu" do
-        a_txt_file_name = "a_file.txt"
-        b_txt_file_name = "b_file.txt"
+        let(:a_txt_file_name) { "a_file.txt" }
+        let(:b_txt_file_name) { "b_file.txt" }
+
         before do
           add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                    @course,
@@ -302,9 +305,10 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "File Preview" do
-        a_txt_file_name = "a_file.txt"
-        b_txt_file_name = "b_file.txt"
-        mp3_file_name = "292.mp3"
+        let(:a_txt_file_name) { "a_file.txt" }
+        let(:b_txt_file_name) { "b_file.txt" }
+        let(:mp3_file_name) { "292.mp3" }
+
         before do
           @file_a = add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                              @course,
@@ -515,7 +519,8 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "When Require Usage Rights is turned-off" do
-        a_txt_file_name = "a_file.txt"
+        let(:a_txt_file_name) { "a_file.txt" }
+
         before do
           course_with_teacher_logged_in
           @course.usage_rights_required = false
@@ -542,9 +547,10 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "Move dialog" do
-        folder_name = "base folder"
-        file_to_move = "a_file.txt"
-        txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
+        let(:folder_name) { "base folder" }
+        let(:file_to_move) { "a_file.txt" }
+        let(:txt_files) { %w[a_file.txt b_file.txt c_file.txt].freeze }
+
         before do
           @base_folder = Folder.create!(name: folder_name, context: @course)
           txt_files.map do |text_file|

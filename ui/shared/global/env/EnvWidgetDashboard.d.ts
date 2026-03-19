@@ -28,6 +28,7 @@ export interface EnvWidgetDashboard {
     courseId: string
     courseCode: string
     courseName: string
+    originalName?: string
     currentGrade: number | null
     gradingScheme: 'percentage' | Array<[string, number]>
     lastUpdated: string

@@ -633,7 +633,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
     end
   end
 end

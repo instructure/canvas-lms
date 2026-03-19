@@ -61,7 +61,7 @@ describe('useRubricAssessment', () => {
     courseId: '1',
     peerReviews: null,
     submissionsConnection: null,
-    assignedToDates: null,
+    peerReviewSubAssignment: null,
     assessmentRequestsForCurrentUser: null,
     rubric: {
       _id: '3',

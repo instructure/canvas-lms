@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "이미지 추가"
     },
+    "add_new_a9226085": {
+        "message": "새로 추가"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "새 캡션 추가"
+    },
     "add_one_9e34a6f8": {
         "message": "추가하기!"
     },
@@ -67,6 +73,12 @@
     },
     "all_apps_a50dea49": {
         "message": "모든 앱"
+    },
+    "allow_media_download_16dcf2bd": {
+        "message": "미디어 다운로드 허용"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "대화 기록 다운로드 허용"
     },
     "alpha_15d59033": {
         "message": "알파"
@@ -242,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "교집합"
     },
+    "caption_manager_aae0906f": {
+        "message": "캡션 매니저"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "{ lang }의 캡션을 추가했습니다"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "{ lang }의 캡션을 삭제했습니다"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "상위 과목에서 상속한 캡션을 제거할 수 없습니다."
     },
@@ -268,6 +289,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "텍스트 색 변경"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "이 페이지를 저장한 후에 변경 사항이 적용됩니다."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "변경한 사항은 저장되지 않을 수 있습니다."
@@ -298,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "캡션 파일 선택"
+    },
+    "choose_file_8d89ccab": {
+        "message": "파일 선택"
     },
     "choose_usage_rights_33683854": {
         "message": "사용 권리를 선택..."
@@ -346,6 +373,9 @@
     },
     "clubs_suit_c1ffedff": {
         "message": "클럽(슈트)"
+    },
+    "collab_575ac7bc": {
+        "message": "공동 작업"
     },
     "collaborations_5c56c15f": {
         "message": "공동 작업"
@@ -638,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "아래 및 오른쪽 대각선 화살표"
     },
+    "download_captionname_2e5eea35": {
+        "message": "{ captionName } 다운로드"
+    },
     "download_filename_2baae924": {
         "message": "{ filename } 다운로드"
     },
@@ -703,6 +736,9 @@
     },
     "embed_image_1080badc": {
         "message": "이미지 포함"
+    },
+    "embed_options_44c4cba8": {
+        "message": "포함 옵션"
     },
     "embed_video_a97a64af": {
         "message": "동영상 포함"
@@ -830,8 +866,17 @@
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "외부 도구에서 콘텐츠를 가져오지 못함"
     },
+    "file_d1b70050": {
+        "message": "파일*"
+    },
     "file_name_8fd421ff": {
         "message": "파일 이름"
+    },
+    "file_preview_21667a6e": {
+        "message": "파일 미리 보기"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "{ fileName }의 파일 미리 보기"
     },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "파일 스토리지 할당량 초과"
@@ -1256,6 +1301,9 @@
     "lambda_4f602498": {
         "message": "람다"
     },
+    "language_91effaa0": {
+        "message": "언어*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "어학 아이콘"
     },
@@ -1270,6 +1318,9 @@
     },
     "latvian_2bbb6aab": {
         "message": "라트비아어"
+    },
+    "learn_ad3b3505": {
+        "message": "학습"
     },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "인접한 링크에 대해 자세히 알아보기"
@@ -1415,6 +1466,9 @@
     "loading_preview_9f077aa1": {
         "message": "미리 보기 로드"
     },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "속도를 1x로 잠금"
+    },
     "locked_762f138b": {
         "message": "잠김"
     },
@@ -1459,6 +1513,9 @@
     },
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "미디어 파일을 처리 중입니다. 나중에 다시 시도하세요."
+    },
+    "media_options_saved_560c4ec8": {
+        "message": "미디어 옵션을 저장했습니다."
     },
     "media_title_2112243b": {
         "message": "미디어 제목"
@@ -1697,6 +1754,9 @@
     "operators_a2ef9a93": {
         "message": "연산자"
     },
+    "options_3ab0ea65": {
+        "message": "옵션"
+    },
     "or_9b70ccaa": {
         "message": "또는"
     },
@@ -1823,8 +1883,17 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "파일 이름을 입력하세요"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "지원되는 플랫폼에서 유효한 동영상 URL을 입력하세요."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "지원하는 유형의 파일을 선택하세요"
+    },
+    "please_select_a_language_d90256fb": {
+        "message": "언어를 선택하세요"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": ".vtt 또는 .srt 파일을 선택하세요"
     },
     "plus_d43cd4ec": {
         "message": "더하기"
@@ -1886,6 +1955,9 @@
     "prime_numbers_13464f61": {
         "message": "기수"
     },
+    "processing_8c569014": {
+        "message": "처리 중..."
+    },
     "product_39cf144f": {
         "message": "제품/곱"
     },
@@ -1946,6 +2018,12 @@
     "religion_icon_246e0be1": {
         "message": "종교 아이콘"
     },
+    "remove_f47dc62a": {
+        "message": "제거"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "{ filename } 제거"
+    },
     "remove_heading_style_5fdc8855": {
         "message": "머리글 스타일 제거"
     },
@@ -1972,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "모든 { alertFindText }을(를) { alertReplaceText }(으)로 바꿈"
+    },
+    "request_d1129f7d": {
+        "message": "요청"
     },
     "reset_95a81614": {
         "message": "초기화"
@@ -2120,6 +2201,9 @@
     "selected_274ce24f": {
         "message": "선택됨"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "선택된 파일: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } 선택됨"
     },
@@ -2153,20 +2237,11 @@
     "show_all_967a90f0": {
         "message": "모두 표시"
     },
-    "show_audio_options_b489926b": {
-        "message": "오디오 옵션 표시"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "이미지 옵션 표시"
     },
     "show_link_options_545338fd": {
         "message": "링크 옵션 표시"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Studio 미디어 옵션 표시"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "동영상 옵션 표시"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "시력에 문제가 없는 사용자는 큰 머리글 또는 굵은 글자체의 머리글을 찾아서 웹 페이지를 빠르게 탐색합니다. 화면 읽기 프로그램 사용자는 컨텍스트에 기반한 이해를 위해 헤더에 의존합니다. 헤더는 적절한 구조를 사용해야 합니다."
@@ -2474,6 +2549,9 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "동여상은 브라우저에서 정확한 제목을 표시할 것이지만 데이터베이스에서 업데이트하지 못했습니다."
     },
+    "thumbnail_e0de666f": {
+        "message": "썸네일"
+    },
     "timebar_a4d18443": {
         "message": "시간 표시줄"
     },
@@ -2554,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "업데이트된 링크"
+    },
+    "upload_8b403d05": {
+        "message": "업로드"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "SRT 또는 WebVTT 형식으로 자막 트랙을 업로드합니다."
     },
     "upload_document_253f0478": {
         "message": "문서 업로드"
@@ -2699,6 +2783,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title }의 동영상 플레이어"
     },
+    "video_url_889d3263": {
+        "message": "동영상 URL"
+    },
     "vietnamese_e7a76583": {
         "message": "베트남어"
     },
@@ -2824,6 +2911,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "웹캠이 이미 사용 중일 수 있습니다."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "YouTube 포함 URL"
     },
     "zeta_5ef24f0e": {
         "message": "제타"

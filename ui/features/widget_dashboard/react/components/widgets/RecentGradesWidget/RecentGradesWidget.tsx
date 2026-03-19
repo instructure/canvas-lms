@@ -20,6 +20,7 @@ import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import {GradeItem} from './GradeItem'
 import CourseFilterSelect from '../../shared/CourseFilterSelect'
@@ -39,6 +40,7 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
   dragHandleProps,
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
+  const isRightColumn = widget.position.col === 2
 
   const {
     currentPage,
@@ -46,6 +48,7 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
     totalPages,
     goToPage,
     isLoading: isLoadingData,
+    isPaginationLoading,
     error: errorData,
     refetch,
   } = useRecentGrades({
@@ -95,6 +98,10 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
       onRetry={handleRetry}
       loadingText={I18n.t('Loading recent grades...')}
       pagination={paginationProps}
+      loadingOverlay={{
+        isLoading: isPaginationLoading,
+        ariaLabel: I18n.t('Loading grades'),
+      }}
       footerActions={
         <View as="div" textAlign="center">
           <Link href="/grades" isWithinText={false} data-testid="view-all-grades-link">
@@ -112,9 +119,13 @@ const RecentGradesWidget: React.FC<BaseWidgetProps> = ({
       </View>
       <View as="div" data-testid="recent-grades-list">
         {currentSubmissions.length > 0 ? (
-          currentSubmissions.map(submission => (
-            <GradeItem key={submission._id} submission={submission} />
-          ))
+          <List isUnstyled margin="0">
+            {currentSubmissions.map(submission => (
+              <List.Item key={submission._id} margin="0">
+                <GradeItem submission={submission} isRightColumn={isRightColumn} />
+              </List.Item>
+            ))}
+          </List>
         ) : (
           <View as="div" textAlign="center" padding="large">
             {I18n.t('No recent grades available')}

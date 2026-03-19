@@ -34,7 +34,7 @@ describe "OutcomeResultsReport" do
   let(:all_values) { [user1_values] }
   let(:order) { [0, 2, 3, 13, 18] }
 
-  include_examples "common outcomes report behavior"
+  it_behaves_like "common outcomes report behavior"
 
   context "with quiz question results" do
     before(:once) do
@@ -236,21 +236,27 @@ describe "OutcomeResultsReport" do
 
     context ":outcome_service_results_to_canvas" do
       # Column indexes
-      student_name = 0
-      assessment_title = 3
-      assessment_type = 5
-      outcome = 8
-      question = 12
-      question_id = 13
-      course = 14
+      let(:student_name) { 0 }
+      let(:assessment_title) { 3 }
+      let(:assessment_type) { 5 }
+      let(:outcome) { 8 }
+      let(:question) { 12 }
+      let(:question_id) { 13 }
+      let(:course) { 14 }
 
       # These columns are added/modified to the report when writing the csv file
-      outcome_score = 11
-      learning_outcome_points_possible = 22
-      learning_outcome_mastery_score = 23
-      learning_outcome_mastered = 24
-      learning_outcome_rating = 25
-      learning_outcome_rating_points = 26
+      let(:outcome_score) { 11 }
+      let(:learning_outcome_points_possible) { 22 }
+      let(:learning_outcome_mastery_score) { 23 }
+      let(:learning_outcome_mastered) { 24 }
+      let(:learning_outcome_rating) { 25 }
+      let(:learning_outcome_rating_points) { 26 }
+
+      let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+      let(:outcome_reports) { AccountReports::ImprovedOutcomeReports::OutcomeResultsReport.new(account_report) }
+      let(:assignment_ids) { @new_quiz.id.to_s }
+      let(:outcome_ids) { @outcome.id.to_s }
+      let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
       def mock_os_result(user, outcome, quiz, submission_date, attempts = nil)
         if attempts.nil?
@@ -280,12 +286,6 @@ describe "OutcomeResultsReport" do
            submitted_at: submission_date,
            mastery: nil },]
       end
-
-      let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
-      let(:outcome_reports) { AccountReports::ImprovedOutcomeReports::OutcomeResultsReport.new(account_report) }
-      let(:assignment_ids) { @new_quiz.id.to_s }
-      let(:outcome_ids) { @outcome.id.to_s }
-      let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
       it "filters out users that do not have results" do
         @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
@@ -1013,20 +1013,26 @@ describe "OutcomeResultsReport" do
       @root_account.enable_feature!(:outcome_service_results_to_canvas)
     end
 
-    it "queries outcomes_new_quiz_scope on secondary/report replica" do
-      guardrail_environment_during_outcomes_call = nil
+    it "queries scopes on secondary/report replica" do
+      guardrail_environments_during_outcomes_call = []
 
       report_class = AccountReports::ImprovedOutcomeReports::OutcomeResultsReport
-      original_method = report_class.instance_method(:outcomes_new_quiz_scope)
+      outcomes_new_quiz_scope_method = report_class.instance_method(:outcomes_new_quiz_scope)
+      outcome_results_scope_method = report_class.instance_method(:outcome_results_scope)
 
       allow_any_instance_of(report_class).to receive(:outcomes_new_quiz_scope) do |instance|
-        guardrail_environment_during_outcomes_call = GuardRail.environment
-        original_method.bind_call(instance)
+        guardrail_environments_during_outcomes_call << GuardRail.environment
+        outcomes_new_quiz_scope_method.bind_call(instance)
+      end
+
+      allow_any_instance_of(report_class).to receive(:outcome_results_scope) do |instance|
+        guardrail_environments_during_outcomes_call << GuardRail.environment
+        outcome_results_scope_method.bind_call(instance)
       end
 
       read_report(report_type, { order:, parse_header: true, account: @root_account })
 
-      expect(guardrail_environment_during_outcomes_call).to be_in([:secondary, :report])
+      expect(guardrail_environments_during_outcomes_call).to all(be_in([:secondary, :report]))
     end
   end
 end

@@ -138,6 +138,7 @@ interface NicknameInfo {
   nickname?: string
   originalName?: string
   courseId?: string | number
+  onNicknameChange?: (nickname: string) => void
 }
 
 interface ColorPickerProps {

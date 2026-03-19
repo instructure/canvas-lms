@@ -53,10 +53,12 @@ class WikiPagesController < ApplicationController
   def set_pandapub_read_token
     if @page&.grants_right?(@current_user, session, :read) && CanvasPandaPub.enabled?
       channel = "/private/wiki_page/#{@page.global_id}/update"
-      js_env WIKI_PAGE_PANDAPUB: {
-        CHANNEL: channel,
-        TOKEN: CanvasPandaPub.generate_token(channel, true)
-      }
+      js_env({
+               WIKI_PAGE_PANDAPUB: {
+                 CHANNEL: channel,
+                 TOKEN: CanvasPandaPub.generate_token(channel, true)
+               }
+             })
     end
   end
 
@@ -245,7 +247,7 @@ class WikiPagesController < ApplicationController
 
     ai_alt_text_generation_url = ai_enabled ? ai_alt_text_generation_url_for_context(@context) : nil
 
-    js_env(ai_alt_text_generation_url:)
+    js_env({ ai_alt_text_generation_url: })
   end
 
   def ai_alt_text_generation_url_for_context(context)

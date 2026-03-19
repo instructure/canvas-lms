@@ -194,7 +194,7 @@ class ProfileController < ApplicationController
     )
 
     if @user_data[:known_user] # if you can message them, you can see the profile
-      js_env enable_gravatar: @domain_root_account&.enable_gravatar?
+      js_env({ enable_gravatar: @domain_root_account&.enable_gravatar? })
       if @domain_root_account.try(:feature_enabled?, :instui_nav)
         add_crumb(@user.short_name, user_profile_path(@user))
         add_crumb(t("Profile"))
@@ -213,6 +213,14 @@ class ProfileController < ApplicationController
   #
   # When requesting the profile for the user accessing the API, the user's
   # calendar feed URL and LTI user id will be returned as well.
+  #
+  # @argument include[] [String, "links"|"user_services"|"uuid"]
+  #   Array of additional information to include.
+  #
+  #   "links":: include the user's profile links in the response
+  #             as an array of objects with +url+ and +title+ fields
+  #   "user_services":: include names and links for the user's connected services
+  #   "uuid":: include the user's uuid in the response
   #
   # @returns Profile
   def settings
@@ -255,10 +263,10 @@ class ProfileController < ApplicationController
                                    @user.participating_instructor_course_ids.any?
         add_crumb(@user.short_name, profile_path)
         add_crumb(t("Settings"))
-        js_env(
-          NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
-          CONTEXT_BASE_URL: "/users/#{@user.id}"
-        )
+        js_env({
+                 NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
+                 CONTEXT_BASE_URL: "/users/#{@user.id}"
+               })
         page_has_instui_topnav
         render :profile
       end
@@ -277,18 +285,20 @@ class ProfileController < ApplicationController
 
     add_crumb(@current_user.short_name, profile_path)
     add_crumb(t("Notification Settings"))
-    js_env NOTIFICATION_PREFERENCES_OPTIONS: {
-      allowed_push_categories: Notification.categories_to_send_in_push,
-      send_scores_in_emails_text: Notification.where(category: "Grading").first&.related_user_setting(@user, @domain_root_account),
-      daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone),
-      weekly_notification_range: {
-        weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, format: :weekday),
-        start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone),
-        end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone)
-      },
-      read_privacy_info: @user.preferences[:read_notification_privacy_info],
-      account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
-    }
+    js_env({
+             NOTIFICATION_PREFERENCES_OPTIONS: {
+               allowed_push_categories: Notification.categories_to_send_in_push,
+               send_scores_in_emails_text: Notification.where(category: "Grading").first&.related_user_setting(@user, @domain_root_account),
+               daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone),
+               weekly_notification_range: {
+                 weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, format: :weekday),
+                 start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone),
+                 end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone)
+               },
+               read_privacy_info: @user.preferences[:read_notification_privacy_info],
+               account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
+             }
+           })
 
     js_bundle :account_notification_settings
     respond_to do |format|

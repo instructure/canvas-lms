@@ -1,0 +1,21 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+    "strictBindCallApply": false,
+    "noImplicitReturns": false,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./**/*"
+  ],
+  "exclude": [
+    "./**/__tests__/**/*",
+    "./**/*.test.ts",
+    "./**/*.test.tsx"
+  ]
+}

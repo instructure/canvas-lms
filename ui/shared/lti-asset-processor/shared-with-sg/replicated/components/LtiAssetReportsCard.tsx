@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconInfoSolid, IconWarningSolid} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconInfoSolid, IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {LtiAssetReport} from '../types/LtiAssetReports'
 
@@ -204,15 +204,28 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}): JSX.Ele
           // without overflowY, there's a scrollbar in Chrome, no idea why...
           report.launchUrlPath && (
             <Flex.Item overflowY="visible">
+              <style>
+                {`
+                  #asset-processor-view-report-button:hover {
+                    text-decoration: none;
+                  }
+                `}
+              </style>
               <Button
                 id="asset-processor-view-report-button"
                 size="small"
-                onClick={() =>
-                  // TS/biome complain without the || ""
-                  window.open(report.launchUrlPath || '', '_blank')
-                }
+                href={report.launchUrlPath}
+                target="_blank"
               >
-                {I18n.t('View Report')}
+                <Flex alignItems="center" gap="x-small">
+                  <Text size="small">
+                    {I18n.t('View {{reportTitle}} Report', {
+                      reportTitle: report.title || I18n.t('Document Processor'),
+                    })}
+                  </Text>
+                  <IconExternalLinkLine size="x-small" />
+                </Flex>
+                <ScreenReaderContent>{I18n.t(' - Opens in a new tab.')}</ScreenReaderContent>
               </Button>
             </Flex.Item>
           )

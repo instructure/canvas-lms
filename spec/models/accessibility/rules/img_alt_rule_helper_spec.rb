@@ -60,7 +60,7 @@ describe Accessibility::Rules::ImgAltRuleHelper do
   end
 
   describe ".fix_alt_text!" do
-    it "sets role=presentation and alt='' for blank values" do
+    it "sets role=presentation and alt='' for nil value" do
       html = '<img src="test.jpg">'
       doc = Nokogiri::HTML.fragment(html)
       elem = doc.at_css("img")
@@ -116,6 +116,26 @@ describe Accessibility::Rules::ImgAltRuleHelper do
       expect do
         described_class.fix_alt_text!(elem, long_text)
       end.to raise_error(StandardError, /Keep alt text under/)
+    end
+
+    it "raises error for empty string" do
+      html = '<img src="test.jpg">'
+      doc = Nokogiri::HTML.fragment(html)
+      elem = doc.at_css("img")
+
+      expect do
+        described_class.fix_alt_text!(elem, "")
+      end.to raise_error(StandardError, /Alt text is required/)
+    end
+
+    it "raises error for whitespace-only string" do
+      html = '<img src="test.jpg">'
+      doc = Nokogiri::HTML.fragment(html)
+      elem = doc.at_css("img")
+
+      expect do
+        described_class.fix_alt_text!(elem, "   ")
+      end.to raise_error(StandardError, /Alt text is required/)
     end
   end
 end

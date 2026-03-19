@@ -20,6 +20,7 @@
 
 class Course < ActiveRecord::Base
   include Context
+  include Accessibility::Scannable
   include Workflow
   include TextHelper
   include HtmlTextHelper
@@ -69,6 +70,7 @@ class Course < ActiveRecord::Base
     storage_quota
     created_at
     updated_at
+    career_learning_library_only
   ].freeze
 
   time_zone_attribute :time_zone
@@ -343,6 +345,7 @@ class Course < ActiveRecord::Base
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   before_save :set_self_enrollment_code
   before_save :validate_license
+  before_save :set_career_learning_library_only, if: -> { account_id_changed? || new_record? || career_learning_library_only_changed? }
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
   before_save :update_syllabus_timestamp
   before_save :handle_syllabus_master_template_tracking
@@ -354,6 +357,7 @@ class Course < ActiveRecord::Base
   after_save :update_enrollment_states_if_necessary
   after_save :clear_caches_if_necessary
   after_save :log_published_assignment_count
+  after_save :remove_course_pacing_overrides_if_disabled
   after_commit :update_cached_due_dates
 
   after_create :set_default_post_policy
@@ -366,6 +370,8 @@ class Course < ActiveRecord::Base
   after_update :log_course_format_publish_update, if: :saved_change_to_workflow_state?
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
   after_update :log_rqd_setting_enable_or_disable
+  after_update :queue_remap_enrollment_roles
+
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -373,6 +379,7 @@ class Course < ActiveRecord::Base
   validate :validate_default_view
   validate :validate_template
   validate :validate_not_on_siteadmin
+  validate :validate_enrollment_roles
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
   validates :account_id, :root_account_id, :enrollment_term_id, :workflow_state, presence: true
   validates :syllabus_body, length: { maximum: maximum_long_text_length, allow_blank: true }
@@ -417,17 +424,18 @@ class Course < ActiveRecord::Base
                      end
                    },
                    on_create: lambda { |course, version|
-                     if course.saving_user
+                     if course.updating_user
                        begin
                          yaml_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
-                         yaml_data["user_id"] = course.saving_user.id
+                         yaml_data["user_id"] = course.updating_user.id
                          version.yaml = yaml_data.to_yaml
                          version.save
                        rescue => e
                          Rails.logger.error("Failed to add user_id to course version: #{e.message}")
                        end
                      end
-                   }
+                   },
+                   versioned_associations: [:attachment_associations]
 
   include StickySisFields
 
@@ -576,6 +584,17 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def delete_lti_context_controls
+    updates = { workflow_state: "deleted_with_context", updated_at: Time.current }
+    Lti::ContextControl.where(course_id: id).active.in_batches.update_all(updates)
+  end
+
+  def undelete_lti_context_controls
+    updates = { workflow_state: "active", updated_at: Time.current }
+    # Only restore context controls that were deleted with the context (course)
+    Lti::ContextControl.where(course_id: id, workflow_state: "deleted_with_context").in_batches.update_all(updates)
+  end
+
   def update_enrollment_states_if_necessary
     return if previously_new_record? # new object, nothing to possibly invalidate
 
@@ -614,6 +633,21 @@ class Course < ActiveRecord::Base
     return if just_published # Don't decrement on publish
 
     InstStatsd::Statsd.decrement(settings_before_last_save[:enable_course_paces] ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if had_end_date
+  end
+
+  def remove_course_pacing_overrides_if_disabled
+    return unless root_account&.feature_enabled?(:course_pace_remove_overrides_on_disable)
+    return unless saved_changes[:settings]
+
+    old_settings = saved_changes[:settings][0] || {}
+    new_settings = saved_changes[:settings][1] || {}
+
+    return unless old_settings[:enable_course_paces] == true && new_settings[:enable_course_paces] == false
+
+    CoursePacing::RemoveOverridesService.delay_if_production(
+      priority: Delayed::LOW_PRIORITY,
+      n_strand: ["course_pacing_remove_overrides", global_root_account_id]
+    ).call(id)
   end
 
   def module_based?
@@ -797,6 +831,58 @@ class Course < ActiveRecord::Base
     if root_account_id_changed? && root_account_id == Account.site_admin&.id
       errors.add(:root_account_id, t("Courses cannot be created on the site_admin account."))
     end
+  end
+
+  def validate_enrollment_roles
+    return unless account_id_changed?
+
+    @role_map = build_role_map
+    if @role_map[:missing].present?
+      errors.add(:account_id,
+                 t("course roles unavailable in %{account}: %{roles}",
+                   account: account.name,
+                   roles: @role_map[:missing].join(", ")))
+    end
+  end
+
+  def queue_remap_enrollment_roles
+    return unless @role_map.present?
+
+    self.class.connection.after_transaction_commit do
+      delay_if_production.remap_enrollment_roles(@role_map.except(:missing))
+    end
+  end
+
+  def remap_enrollment_roles(role_map)
+    Course.transaction do
+      role_map.each do |old_role_id, new_role_id|
+        enrollments.where(role_id: old_role_id).in_batches.update_all(role_id: new_role_id, updated_at: Time.now.utc)
+      end
+    end
+  end
+
+  # returns a mapping from (existing role id => role id in the new account), matching by role name and built_in status
+  # names of roles unavailable in the new account are returned under the :missing key
+  def build_role_map
+    role_map = {}
+    used_roles = Role.where(id: enrollments.distinct.select(:role_id)).to_a
+    if used_roles.any?
+      available_roles = account.available_course_roles(true)
+      (used_roles - available_roles).each do |missing_role|
+        replacement_role = available_roles.find do |role|
+          role.built_in? == missing_role.built_in? &&
+            role.name == missing_role.name &&
+            role.base_role_type == missing_role.base_role_type
+        end
+        if replacement_role
+          role_map[missing_role.id] = replacement_role.id
+        else
+          role_map[:missing] ||= []
+          role_map[:missing] << missing_role.name
+        end
+      end
+    end
+    role_map
   end
 
   def image
@@ -1175,6 +1261,9 @@ class Course < ActiveRecord::Base
 
   scope :horizon, -> { where(horizon_course: true) }
   scope :not_horizon, -> { where(horizon_course: false) }
+
+  scope :career_learning_library, -> { where(career_learning_library_only: true) }
+  scope :not_career_learning_library, -> { where(career_learning_library_only: false) }
 
   def potential_collaborators
     current_users
@@ -1584,6 +1673,17 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def set_career_learning_library_only
+    return if dummy?
+
+    new_account = Account.find(account_id)
+    return unless new_account
+
+    unless root_account.feature_enabled?(:horizon_learning_library_ms2) && new_account.horizon_account?
+      self.career_learning_library_only = false
+    end
+  end
+
   def set_horizon_course
     return if dummy?
 
@@ -1800,6 +1900,9 @@ class Course < ActiveRecord::Base
       event :offer, transitions_to: :available
       event :complete, transitions_to: :completed
       event :delete, transitions_to: :deleted
+      on_entry do |prior_state, _event|
+        undelete_lti_context_controls if prior_state == :deleted
+      end
     end
 
     state :available do
@@ -1817,6 +1920,7 @@ class Course < ActiveRecord::Base
 
     state :deleted do
       event :undelete, transitions_to: :claimed
+      on_entry { delete_lti_context_controls }
     end
   end
 
@@ -1836,8 +1940,8 @@ class Course < ActiveRecord::Base
     return false if template?
 
     gradebook_filters.in_batches.destroy_all
-    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
+    process_event(:delete)
     save!
   end
 
@@ -3044,6 +3148,7 @@ class Course < ActiveRecord::Base
        alt_name
        restrict_quantitative_data
        horizon_course
+       career_learning_library_only
        conditional_release
        default_due_time
        content_library]
@@ -3619,15 +3724,21 @@ class Course < ActiveRecord::Base
       tabs = (elementary_subject_course? && !course_subject_tabs) ? [] : tab_configuration.compact
       home_tab = default_tabs.find { |t| t[:id] == TAB_HOME }
       settings_tab = default_tabs.find { |t| t[:id] == TAB_SETTINGS }
-      external_tabs = if opts[:include_external]
-                        external_tool_tabs(opts, user) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
-                      else
-                        []
-                      end
-      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tabs)
+      external_tool_tabs = if opts[:include_external]
+                             external_tool_tabs(opts, user) +
+                               Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                           else
+                             []
+                           end
+      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tool_tabs)
+      external_tabs = external_tool_tabs
+      if opts[:include_external] && root_account.feature_enabled?(:nav_menu_links)
+        external_tabs += NavMenuLinkTabs.course_tabs(self)
+      end
 
       tabs = tabs.map do |tab|
-        default_tab = default_tabs.find { |t| t[:id] == tab[:id] } || external_tabs.find { |t| t[:id] == tab[:id] }
+        default_tab = default_tabs.find { |t| t[:id] == tab[:id] } ||
+                      external_tabs.find { |t| t[:id] == tab[:id] }
         next unless default_tab
 
         tab[:label] = default_tab[:label]
@@ -3638,6 +3749,7 @@ class Course < ActiveRecord::Base
         tab[:external] = default_tab[:external]
         tab[:icon] = default_tab[:icon]
         tab[:target] = default_tab[:target] if default_tab[:target]
+        tab[:link_context_type] = default_tab[:link_context_type] if default_tab[:link_context_type]
         default_tabs.delete_if { |t| t[:id] == tab[:id] }
         external_tabs.delete_if { |t| t[:id] == tab[:id] }
         tab
@@ -3666,30 +3778,34 @@ class Course < ActiveRecord::Base
       tabs += default_tabs
       tabs += external_tabs
 
-      if root_account.feature_enabled?(:ams_root_account_integration) &&
-         feature_enabled?(:ams_course_integration) &&
-         tabs.any? { |t| t[:label] == "Item Banks" }
-        ams_item_banks_tab = {
-          id: TAB_ITEM_BANKS,
-          label: t("#tabs.item_banks", "Item Banks"),
-          css_class: "item_banks",
-          href: :course_item_banks_path,
-        }
+      item_bank_href_override = if root_account.feature_enabled?(:ams_root_account_integration) &&
+                                   feature_enabled?(:ams_course_integration)
+                                  :course_item_banks_path
+                                elsif feature_enabled?(:new_quizzes_native_experience)
+                                  :course_new_quizzes_banks_path
+                                else
+                                  nil
+                                end
 
-        item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
-        tabs.delete_at(item_banks_index)
-        tabs.insert(item_banks_index, ams_item_banks_tab)
+      if item_bank_href_override
+        NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: item_bank_href_override,
+          context: self
+        )
       end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings or AI Experiences, ensure that all external tools are at the bottom (with the exception of Groups, which
-        # should stick to the end unless it has been re-ordered)
+        # Don't show Settings or AI Experiences, ensure that all
+        # external tool and nav menu links tools are at the bottom
+        # (with the exception of Groups, which should stick to the
+        # end unless it has been re-ordered)
         tabs.delete_if { |t| t[:id] == TAB_AI_EXPERIENCES }
-        lti_tabs = tabs.filter { |t| t[:external] }
-        tabs -= lti_tabs
+        ext_tabs = tabs.filter { |t| t[:external] }
+        tabs -= ext_tabs
         groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
-        tabs += lti_tabs
+        tabs += ext_tabs
         tabs << groups_tab if groups_tab
       else
         # Ensure that Settings is always at the bottom
@@ -3769,6 +3885,9 @@ class Course < ActiveRecord::Base
 
         hidden_external_tabs = tabs.select do |t|
           next false unless t[:external]
+          # Hidden tools do not show for admins. Hidden Nav Menu Links are
+          # shown with "crossed-out eye" icon like other tabs.
+          next false if NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id])
 
           elementary_enabled = elementary_subject_course? && !course_subject_tabs
           (t[:hidden] && !elementary_enabled) || (elementary_enabled && tab_hidden?(t[:id]))
@@ -3953,8 +4072,10 @@ class Course < ActiveRecord::Base
     account.feature_enabled?(:block_content_editor) && feature_enabled?(:block_content_editor_eap)
   end
 
+  # the feature_flag(:a11y_checker_eap) check is for testing purposes. Unfortunately multiple_root_accounts plugin mocking out Feature.definitions
+  # so we have a redundant call for that
   def a11y_checker_enabled?
-    (account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
+    (account.feature_enabled?(:a11y_checker) && feature_flag(:a11y_checker_eap) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
   end
 
   def elementary_enabled?
@@ -4571,7 +4692,7 @@ class Course < ActiveRecord::Base
                .preload(:post_policy)
                .each do |assignment|
                  assignment.ensure_post_policy(post_manually:)
-    end
+               end
   end
 
   CUSTOMIZABLE_PERMISSIONS.each do |key, cfg|
@@ -4726,9 +4847,10 @@ class Course < ActiveRecord::Base
   def exceeds_accessibility_scan_limit?
     wiki_page_count = wiki_pages.not_deleted.count
     assignment_count = assignments.active.not_excluded_from_accessibility_scan.count
-    discussion_topic_count = discussion_topics.count
+    discussion_topic_count = discussion_topics.scannable.count
+    announcement_count = announcements.active.count
 
-    total = wiki_page_count + assignment_count + discussion_topic_count
+    total = wiki_page_count + assignment_count + discussion_topic_count + announcement_count
     total > MAX_ACCESSIBILITY_SCAN_RESOURCES
   end
 
@@ -4739,6 +4861,13 @@ class Course < ActiveRecord::Base
   def has_studio_integration?
     !!Course.find_studio_tool(self)
   end
+
+  delegate :a11y_checker_ai_table_caption_generation?,
+           :a11y_checker_ai_alt_text_generation?,
+           :a11y_checker_close_issues?,
+           :a11y_checker_account_statistics?,
+           :a11y_checker_additional_resources?,
+           to: :account
 
   private
 
@@ -4904,5 +5033,17 @@ class Course < ActiveRecord::Base
     elsif old_rqd_setting == true && new_rqd_setting == false
       InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.disabled")
     end
+  end
+
+  def a11y_scannable_attributes
+    [:syllabus_body, :workflow_state]
+  end
+
+  def any_completed_accessibility_scan?
+    Accessibility::CourseScanService.last_accessibility_course_scan(self)&.completed? || false
+  end
+
+  def excluded_from_accessibility_scan?
+    !a11y_checker_additional_resources?
   end
 end

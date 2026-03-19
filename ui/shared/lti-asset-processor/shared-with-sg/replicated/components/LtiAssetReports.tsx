@@ -19,8 +19,8 @@
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useFormatDateTime, useResubmitLtiAssetReports} from '../../dependenciesShims'
 import {
@@ -36,7 +36,6 @@ import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
 import type {AssetReportCompatibleSubmissionType, LtiAssetReport} from '../types/LtiAssetReports'
 import {LtiAssetReportsCard, LtiAssetReportsMissingReportsCard} from './LtiAssetReportsCard'
 import {ToolIconOrDefault} from './ToolIconOrDefault'
-import TruncateWithTooltip from './TruncateWithTooltip'
 
 const I18n = createI18nScope('lti_asset_processor')
 
@@ -70,17 +69,18 @@ function ltiAssetProcessorHeader(assetProcessor: LtiAssetProcessor) {
           toolId={assetProcessor.externalTool._id}
           toolName={assetProcessor.externalTool.name}
           iconUrl={assetProcessor.iconOrToolIconUrl}
+          decorative={true}
         />
       </Flex.Item>
       <Flex.Item padding="0 large 0 0">
-        <Heading level="h4">
-          <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
+        <Heading level="h3">
+          <Text size="medium" wrap="break-word">
             {buildAPDisplayTitle({
               toolName: assetProcessor.externalTool.name,
               toolPlacementLabel: assetProcessor.externalTool.labelFor,
               title: assetProcessor.title,
             })}
-          </TruncateWithTooltip>
+          </Text>
         </Heading>
       </Flex.Item>
     </Flex>
@@ -102,11 +102,9 @@ function LtiAssetReportsCardGroup({
     <Flex direction="column" gap="x-small" margin="xx-small 0 0 0">
       {showDisplayName && displayName && (
         <View as="div" maxWidth="80%">
-          <Heading level="h4">
-            <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
-              {displayName}
-            </TruncateWithTooltip>
-          </Heading>
+          <Text weight="bold" size="small" wrap="break-word">
+            {displayName}
+          </Text>
         </View>
       )}
       {reports.length ? (

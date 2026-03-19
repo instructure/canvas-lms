@@ -11,3 +11,5 @@ owned_globs:
   - ui/features/files_v2/**/*
   - ui/shared/block-content-editor/**/*
   - ui/shared/immersive-reader/**/*
+github:
+  team: ''

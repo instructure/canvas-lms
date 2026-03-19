@@ -17,7 +17,7 @@
  */
 
 import {useState, useCallback, useEffect} from 'react'
-import {useInfiniteQuery, useQuery, useQueryClient} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery, useQueryClient, keepPreviousData} from '@tanstack/react-query'
 import {createUserQueryConfig} from '../utils/graphql'
 import {COURSE_INSTRUCTORS_PAGINATED_KEY, QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
@@ -39,6 +39,8 @@ export interface CourseInstructorForComponent {
     id: string
     user_id: string
     course_id: string
+    course_name: string
+    course_code?: string
     type: 'TeacherEnrollment' | 'TaEnrollment'
     role: string
     role_id: string
@@ -168,6 +170,7 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
   const {
     data: currentPage,
     isLoading,
+    isFetching,
     error,
     refetch: refetchCurrentPage,
   } = useQuery({
@@ -183,6 +186,7 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
     staleTime: QUERY_CONFIG.STALE_TIME.USERS * 60 * 1000, // Convert minutes to ms
     persister: widgetDashboardPersister,
     refetchOnMount: false,
+    placeholderData: keepPreviousData,
   })
 
   // Broadcast instructor updates across tabs
@@ -221,6 +225,8 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
     return refetchCurrentPage()
   }, [queryClient, refetchCurrentPage])
 
+  const isPaginationLoading = isFetching && !!currentPage
+
   return {
     currentPage,
     currentPageIndex,
@@ -230,6 +236,7 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
     resetPagination,
     refetch,
     isLoading,
+    isPaginationLoading,
     error: error as Error | null,
     pageSize,
   }

@@ -48,12 +48,14 @@ const ROOT_OUTCOME_GROUP = {
 
 describe('RubricForm Tests', () => {
   beforeEach(() => {
+    queryClient.clear()
     fakeEnv.setup({
       context_asset_string: 'user_1',
     })
   })
 
   afterEach(() => {
+    queryClient.clear()
     vi.resetAllMocks()
     fakeEnv.teardown()
     destroyFlashAlertContainer()
@@ -101,6 +103,7 @@ describe('RubricForm Tests', () => {
                 ratings: [],
               },
             ],
+            public: false,
           },
           rubricAssociation: {
             hidePoints: false,
@@ -115,7 +118,7 @@ describe('RubricForm Tests', () => {
       )
 
       // Pre-populate the query cache with a rubric that has criteria
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId} = renderComponent({rubricId: '1'})
       const titleInput = getByTestId('rubric-form-title')
@@ -158,6 +161,7 @@ describe('RubricForm Tests', () => {
             criteriaCount: 1,
             pointsPossible: 10,
             title: 'Rubric with Outcome',
+            public: false,
             criteria: [
               {
                 id: '2',
@@ -183,7 +187,7 @@ describe('RubricForm Tests', () => {
       )
 
       // Load a rubric with an outcome criterion that has masteryPoints
-      queryClient.setQueryData(['fetch-rubric', '1'], {
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], {
         ...RUBRICS_QUERY_RESPONSE,
         criteria: [
           {
@@ -228,7 +232,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('does not display save as draft button if rubric has associations', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], {
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], {
         ...RUBRICS_QUERY_RESPONSE,
         hasRubricAssociations: true,
       })
@@ -243,7 +247,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not render when not on assignment level', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({
           rubricId: '1',
@@ -295,7 +299,7 @@ describe('RubricForm Tests', () => {
         const {getByTestId, queryByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -320,11 +324,26 @@ describe('RubricForm Tests', () => {
         expect(queryByTestId('edit-confirm-modal')).toBeInTheDocument()
       })
 
+      it('does not render when rubric is unassessed', () => {
+        const {getByTestId, queryByTestId} = renderComponent({
+          rubricId: '1',
+          assignmentId: '1',
+          rubric: {...RUBRIC, unassessed: true},
+          rubricAssociation: RUBRIC_ASSOCIATION,
+        })
+
+        const titleInput = getByTestId('rubric-form-title')
+        fireEvent.change(titleInput, {target: {value: 'Rubric 1 (edited)'}})
+
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(queryByTestId('edit-confirm-modal')).toBeNull()
+      })
+
       it('calls save on confirmation', async () => {
         const {getByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -344,7 +363,7 @@ describe('RubricForm Tests', () => {
         const {getByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 

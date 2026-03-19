@@ -28,7 +28,6 @@ import {AiInfo} from '@instructure.ai/aiinfo'
 
 declare const ENV: Global & {
   inbox_translation_enabled?: boolean
-  cedar_translation?: boolean
 }
 
 const I18n = createI18nScope('conversations_2')
@@ -53,8 +52,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
   })
 
   const inboxTranslationInfo = AiInfo.canvasinboxtranslation
-  const showNutritionFacts =
-    ENV?.inbox_translation_enabled && ENV?.cedar_translation && inboxTranslationInfo
+  const showNutritionFacts = ENV?.inbox_translation_enabled && inboxTranslationInfo
 
   return (
     <>

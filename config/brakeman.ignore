@@ -840,6 +840,29 @@
       "note": ""
     },
     {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "845beab98b685fc8d9465eb19cc9c4bed0f53483cbdff93114497ba35ed54e92",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/lti/ims/dynamic_registration_controller.rb",
+      "line": 387,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(\"/accounts/#{Lti::IMS::Registration.find(params[:registration_id]).root_account_id}/apps/manage/#{Lti::IMS::Registration.find(params[:registration_id]).lti_registration.id}/configuration\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Lti::IMS::DynamicRegistrationController",
+        "method": "registration_view"
+      },
+      "user_input": "Lti::IMS::Registration.find(params[:registration_id]).root_account_id",
+      "confidence": "High",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "871762919d635836a40277367e84b1427e48755b97056fc79f826168f35ffcbc",

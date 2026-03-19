@@ -32,7 +32,7 @@ describe Polling::PollsController, type: :request do
       end
     end
 
-    def get_index(raw = false, data = {}, headers = {})
+    def get_index(data = {}, headers = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls",
@@ -52,7 +52,7 @@ describe Polling::PollsController, type: :request do
     end
 
     it "paginates to the jsonapi standard if requested" do
-      json = get_index(false, {}, "Accept" => "application/vnd.api+json")
+      json = get_index({}, { "Accept" => "application/vnd.api+json" })
       poll_json = json["polls"]
       expect(poll_json.size).to eq 5
 
@@ -85,7 +85,7 @@ describe Polling::PollsController, type: :request do
       @poll = @teacher.polls.create!(question: "An Example Poll")
     end
 
-    def get_show(raw = false, data = {})
+    def get_show(data = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}",
@@ -141,7 +141,7 @@ describe Polling::PollsController, type: :request do
         student_in_course(active_all: true, course: @course)
         @poll.poll_sessions.create!(course: @course)
 
-        get_show(true)
+        get_show(raw: true)
         expect(response).to have_http_status :ok
       end
 
@@ -149,14 +149,14 @@ describe Polling::PollsController, type: :request do
         student_in_course(active_all: true, course: @course)
         unenrolled = Course.create!(name: "Unenrolled Course")
         @poll.poll_sessions.create!(course: unenrolled)
-        get_show(true)
+        get_show(raw: true)
         expect(response).to have_http_status :forbidden
       end
     end
   end
 
   describe "POST create" do
-    def post_create(params, raw = false)
+    def post_create(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls",
@@ -168,7 +168,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a teacher" do
       it "creates a poll successfully" do
-        post_create(question: "A Test Poll", description: "A test description.")
+        post_create({ question: "A Test Poll", description: "A test description." })
         expect(@teacher.polls.first.question).to eq "A Test Poll"
         expect(@teacher.polls.first.description).to eq "A test description."
       end
@@ -177,7 +177,7 @@ describe Polling::PollsController, type: :request do
     context "as a student" do
       it "is forbidden" do
         student_in_course(active_all: true, course: @course)
-        post_create({ question: "New Title" }, true)
+        post_create({ question: "New Title" }, raw: true)
         expect(response).to have_http_status :forbidden
       end
     end
@@ -188,7 +188,7 @@ describe Polling::PollsController, type: :request do
       @poll = @teacher.polls.create!(question: "An Old Title")
     end
 
-    def put_update(params, raw = false)
+    def put_update(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
@@ -204,7 +204,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a teacher" do
       it "updates a poll successfully" do
-        put_update(question: "A New Title")
+        put_update({ question: "A New Title" })
         expect(@poll.reload.question).to eq "A New Title"
       end
     end
@@ -212,7 +212,7 @@ describe Polling::PollsController, type: :request do
     context "as a student" do
       it "is forbidden" do
         student_in_course(active_all: true, course: @course)
-        put_update({ question: "New Title" }, true)
+        put_update({ question: "New Title" }, raw: true)
         expect(response).to have_http_status :forbidden
       end
     end

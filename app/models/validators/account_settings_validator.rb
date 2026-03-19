@@ -1,0 +1,89 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2026 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+module Validators
+  class AccountSettingsValidator < ActiveModel::Validator
+    DISCOVERY_PAGE_REQUIRED_KEYS = %i[authentication_provider_id label].freeze
+    DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon].freeze
+    DISCOVERY_PAGE_ICON_VALUES = %w[
+      apple
+      auth0
+      classlink
+      default
+      facebook
+      github
+      google
+      linkedin
+      microsoft
+      okta
+      onelogin
+      ping
+    ].freeze
+
+    def validate(record)
+      # Discovery Page
+      validate_discovery_page(record) if record.settings[:discovery_page].present? && record.discovery_page_changed?
+    end
+
+    private
+
+    def validate_discovery_page(record)
+      data = record.settings[:discovery_page]
+
+      # Load authentication providers into memory and validate there
+      # to avoid N+1 queries during #validate_discovery_page_entry
+      record.authentication_providers.load unless record.authentication_providers.loaded?
+
+      %i[primary secondary].each do |section|
+        section_data = data[section]
+        next if section_data.nil?
+
+        unless section_data.is_a?(Array)
+          record.errors.add(:settings, "discovery_page.#{section} must be an array")
+          next
+        end
+
+        section_data.each_with_index do |entry, index|
+          validate_discovery_page_entry(record, section, entry, index)
+        end
+      end
+    end
+
+    def validate_discovery_page_entry(record, section, entry, index)
+      provider_id = entry[:authentication_provider_id].to_i
+      unless record.authentication_providers.find { it.id == provider_id }&.active?
+        record.errors.add(:settings, "discovery_page.#{section}[#{index}].authentication_provider_id is invalid or inactive")
+        return
+      end
+
+      DISCOVERY_PAGE_REQUIRED_KEYS.each do |key|
+        if entry[key].blank?
+          record.errors.add(:settings, "discovery_page.#{section}[#{index}].#{key} is required")
+        end
+      end
+
+      return unless entry[:icon].present?
+
+      unless DISCOVERY_PAGE_ICON_VALUES.include?(entry[:icon])
+        record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon must be one of: #{DISCOVERY_PAGE_ICON_VALUES.join(", ")}")
+      end
+    end
+  end
+end

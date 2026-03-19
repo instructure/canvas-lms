@@ -2334,7 +2334,7 @@ describe CoursesController do
         end
 
         it "syncs enrollments if setting is set" do
-          progress = double("Progress").as_null_object
+          progress = instance_double(Progress).as_null_object
           allow(Progress).to receive(:new).and_return(progress)
           expect(progress).to receive(:process_job)
 
@@ -2350,7 +2350,7 @@ describe CoursesController do
         end
 
         it "does not sync if course is a sis import" do
-          progress = double("Progress").as_null_object
+          progress = instance_double(Progress).as_null_object
           allow(Progress).to receive(:new).and_return(progress)
           expect(progress).not_to receive(:process_job)
 
@@ -2516,6 +2516,48 @@ describe CoursesController do
         get "show", params: { id: @course.id }
 
         expect(assigns[:js_env][:ACTIVE_TAG_CONVERSION_JOB]).to be_truthy
+      end
+    end
+
+    context "intelligent_insights_modernisation feature flag" do
+      let(:launch_url) { "https://example.com/canvas_course_criteria" }
+
+      before do
+        allow(Services::CanvasCourseCriteria).to receive(:launch_url).and_return(launch_url)
+        user_session(@teacher)
+      end
+
+      context "when feature is enabled" do
+        before do
+          @course.account.enable_feature!(:intelligent_insights_modernisation)
+        end
+
+        it "sets canvas_course_criteria launch_url in remote_env" do
+          get "show", params: { id: @course.id }
+          expect(controller.remote_env[:canvas_course_criteria]).to eq({ launch_url: })
+        end
+
+        it "sets CANVAS_COURSE_CRITERIA.COURSE_ID in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA][:COURSE_ID]).to eq(@course.id)
+        end
+
+        it "sets CANVAS_COURSE_CRITERIA.ACCOUNT_ID in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA][:ACCOUNT_ID]).to eq(@course.account.id.to_s)
+        end
+      end
+
+      context "when feature is disabled" do
+        it "does not set canvas_course_criteria in remote_env" do
+          get "show", params: { id: @course.id }
+          expect(controller.remote_env[:canvas_course_criteria]).to be_nil
+        end
+
+        it "does not set CANVAS_COURSE_CRITERIA in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA]).to be_nil
+        end
       end
     end
   end
@@ -3123,6 +3165,30 @@ describe CoursesController do
       expect(@course.workflow_state).to eq "deleted"
     end
 
+    it "soft-deletes associated LTI context controls when course is deleted" do
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: "manage_courses_delete",
+        enabled: true
+      )
+      user_session(@teacher)
+
+      registration = lti_registration_with_tool(account: @course.account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: @course,
+        registration:,
+        deployment:
+      )
+
+      expect(control.workflow_state).to eq("active")
+
+      put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+    end
+
     it "doesn't delete course if :manage_courses_delete is not enabled" do
       @course.root_account.role_overrides.create!(
         role: teacher_role,
@@ -3152,6 +3218,79 @@ describe CoursesController do
       expect(json["course"]["workflow_state"]).to eq "claimed"
       @course.reload
       expect(@course.workflow_state).to eq "claimed"
+    end
+
+    it "restores LTI context controls when course is undeleted" do
+      @course.root_account.role_overrides.create!(
+        role: admin_role,
+        permission: "manage_courses_delete",
+        enabled: true
+      )
+      admin = account_admin_user
+      user_session(admin)
+
+      registration = lti_registration_with_tool(account: @course.account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: @course,
+        registration:,
+        deployment:
+      )
+
+      # Delete the course
+      put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the course
+      put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
+
+      expect(control.reload.workflow_state).to eq("active")
+    end
+
+    it "does not restore context controls that were independently deleted before course deletion" do
+      @course.root_account.role_overrides.create!(
+        role: admin_role,
+        permission: "manage_courses_delete",
+        enabled: true
+      )
+      admin = account_admin_user
+      user_session(admin)
+
+      registration1 = lti_registration_with_tool(account: @course.account)
+      deployment1 = registration1.deployments.first
+      registration2 = lti_registration_with_tool(account: @course.account)
+      deployment2 = registration2.deployments.first
+
+      control1 = Lti::ContextControl.create!(
+        context: @course,
+        registration: registration1,
+        deployment: deployment1
+      )
+      control2 = Lti::ContextControl.create!(
+        context: @course,
+        registration: registration2,
+        deployment: deployment2
+      )
+
+      # Delete control1 as though it was deleted in the Apps UI,
+      # not via course deletion.
+      control1.update!(workflow_state: "deleted")
+
+      # Delete the course (which will delete control2)
+      put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
+      # control1 is in normal "deleted" state
+      expect(control1.reload.workflow_state).to eq("deleted")
+      # control1 is "deleted_with_context" because it was deleted along with a course
+      expect(control2.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the course
+      put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
+
+      # control1 should remain deleted
+      expect(control1.reload.workflow_state).to eq("deleted")
+      # control2 should be restored
+      expect(control2.reload.workflow_state).to eq("active")
     end
 
     it "returns an error if a bad event is given" do
@@ -3459,7 +3598,7 @@ describe CoursesController do
 
         expected_associations = [["syllabus_body", @image.id],
                                  ["syllabus_body", media.id]]
-        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
+        expect(@course.reload.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
       end
 
       it "removes attachment_associations when files are removed from the syllabus" do
@@ -3469,7 +3608,7 @@ describe CoursesController do
         HTML
         put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
 
-        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
+        expect(@course.reload.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
       end
 
       it "does not call update_associations when the syllabus body doesn't change" do
@@ -3743,7 +3882,7 @@ describe CoursesController do
     it "does not attempt to sync k5 homeroom to course if sync_enrollments_from_homeroom is falsey" do
       teacher = @teacher
       subject = @course
-      toggle_k5_setting(subject.account, true)
+      toggle_k5_setting(subject.account)
       homeroom = course_factory(active_all: true, account: subject.account)
       homeroom.enroll_teacher(teacher, enrollment_state: :active)
       homeroom.homeroom_course = true
@@ -3801,7 +3940,7 @@ describe CoursesController do
     end
 
     it "does not allow homeroom course to enable course pacing" do
-      toggle_k5_setting(@course.account, true)
+      toggle_k5_setting(@course.account)
       homeroom = course_factory(active_all: true, account: @course.account)
       homeroom.homeroom_course = true
       homeroom.save!
@@ -5467,19 +5606,19 @@ describe CoursesController do
 
         context "with existing progress" do
           let(:progress) do
-            double("Progress",
-                   id: 123,
-                   workflow_state: "completed",
-                   results: {
-                     resources: {
-                       "WikiPage|1" => { name: "Page 1", type: "WikiPage", embeds: [], count: 1 },
-                       "WikiPage|2" => { name: "Page 2", type: "WikiPage", embeds: [], count: 2 },
-                       "WikiPage|3" => { name: "Page 3", type: "WikiPage", embeds: [], count: 1 },
-                       "WikiPage|4" => { name: "Page 4", type: "WikiPage", embeds: [], count: 3 },
-                       "WikiPage|5" => { name: "Page 5", type: "WikiPage", embeds: [], count: 1 }
-                     },
-                     total_count: 8
-                   })
+            instance_double(Progress,
+                            id: 123,
+                            workflow_state: "completed",
+                            results: {
+                              resources: {
+                                "WikiPage|1" => { name: "Page 1", type: "WikiPage", embeds: [], count: 1 },
+                                "WikiPage|2" => { name: "Page 2", type: "WikiPage", embeds: [], count: 2 },
+                                "WikiPage|3" => { name: "Page 3", type: "WikiPage", embeds: [], count: 1 },
+                                "WikiPage|4" => { name: "Page 4", type: "WikiPage", embeds: [], count: 3 },
+                                "WikiPage|5" => { name: "Page 5", type: "WikiPage", embeds: [], count: 1 }
+                              },
+                              total_count: 8
+                            })
           end
 
           before do
@@ -5571,7 +5710,7 @@ describe CoursesController do
           resource_group_key: "key"
         }
       end
-      let(:progress) { double("Progress", id: 1) }
+      let(:progress) { instance_double(Progress, id: 1) }
 
       before do
         allow(YoutubeMigrationService).to receive(:new).with(@course).and_return(service)
@@ -6458,6 +6597,94 @@ describe CoursesController do
           post :create, params: { account_id: mcc_account.id, course: { name: "Test Course" }, format: :json }
           expect(response).to be_forbidden
         end
+      end
+    end
+  end
+
+  describe "PUT update_nav" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
+      user_session(@teacher)
+      tabs_json = [
+        { id: "assignments", label: "Assignments" },
+        { id: "announcements", label: "Announcements", hidden: true }
+      ].to_json
+
+      processed_tabs = [
+        { "id" => "assignments", "label" => "Assignments" },
+        { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+      ]
+
+      expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+        .with(
+          course: @course,
+          tabs: [
+            { "id" => "assignments", "label" => "Assignments" },
+            { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+          ],
+          can_manage_links: false
+        )
+        .and_return(processed_tabs)
+
+      put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+      expect(response).to be_redirect
+      @course.reload
+      expect(@course.tab_configuration).to eq(processed_tabs)
+    end
+
+    it "requires update permission" do
+      student_in_course(active_all: true)
+      user_session(@student)
+
+      tabs_json = [{ id: "assignments", label: "Assignments" }].to_json
+
+      put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+      expect(response).to be_unauthorized
+    end
+
+    context "with manage_nav_menu_links permission" do
+      it "passes can_manage_links: true when user has permission" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:nav_menu_links)
+
+        # Grant the permission
+        role = @teacher.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :manage_nav_menu_links, role:, enabled: true)
+
+        tabs_json = [
+          { id: "assignments" },
+          { href: "nav_menu_link_url", args: ["https://example.com"], label: "New Link" }
+        ].to_json
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(hash_including(can_manage_links: true))
+          .and_call_original
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+      end
+
+      it "passes can_manage_links: false when user lacks permission" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:nav_menu_links)
+
+        # Permission is not granted (default is false)
+
+        tabs_json = [{ id: "assignments" }].to_json
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(hash_including(can_manage_links: false))
+          .and_call_original
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
       end
     end
   end

@@ -176,9 +176,9 @@ describe User do
 
   it "gets the first email from communication_channel" do
     @user = User.create
-    @cc1 = double("CommunicationChannel")
+    @cc1 = instance_double(CommunicationChannel)
     allow(@cc1).to receive(:path).and_return("cc1")
-    @cc2 = double("CommunicationChannel")
+    @cc2 = instance_double(CommunicationChannel)
     allow(@cc2).to receive(:path).and_return("cc2")
     allow(@user).to receive_messages(communication_channels: [@cc1, @cc2],
                                      communication_channel: @cc1)
@@ -802,7 +802,7 @@ describe User do
           expect(@user.user_account_associations.shard(@user).map(&:account)).to eq [Account.site_admin]
           expect(@account.reload.user_account_associations.map(&:user)).to eq []
 
-          @account.account_users.create!(user: @user)
+          au.reactivate!
 
           expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
             [Account.site_admin, @account].sort_by(&:id)
@@ -1032,7 +1032,7 @@ describe User do
     it "caches the account properly" do
       enable_cache(:redis_cache_store) do
         @user = sub_sub_admin
-        expect(@user).to receive(:account_users).and_return(double(active: [])).once
+        expect(@user).to receive(:account_users).and_return(class_double(AccountUser, active: [])).once
         2.times { @user.alternate_account_for_course_creation }
       end
     end
@@ -1444,12 +1444,12 @@ describe User do
         end
 
         it "returns false if the account is not a root account" do
-          account = double(root_account?: false)
+          account = instance_double(Account, root_account?: false)
           expect(masqueradee.includes_subset_of_course_admin_permissions?(masquerader, account)).to be_falsey
         end
 
         it "is true when all permissions for current user are subsets of target user" do
-          account = double(root_account?: true)
+          account = instance_double(Account, root_account?: true)
           masquerader_permissions = { become_user: [true], view_all_grades: [true] }
           masqueradee_permissions = { view_all_grades: [true] }
           allow(AccountUser).to receive(:all_permissions_for).and_return(masquerader_permissions)
@@ -1459,7 +1459,7 @@ describe User do
         end
 
         it "is false when any permission for current user is not a subset of target user" do
-          account = double(root_account?: true)
+          account = instance_double(Account, root_account?: true)
           masquerader_permissions = { become_user: [true], view_all_grades: [] }
           masqueradee_permissions = { view_all_grades: [true] }
           allow(AccountUser).to receive(:all_permissions_for).and_return(masquerader_permissions)
@@ -1553,21 +1553,21 @@ describe User do
     end
 
     it "is false if the account is not a root account" do
-      expect(user.has_subset_of_account_permissions?(other_user, double(root_account?: false))).to be_falsey
+      expect(user.has_subset_of_account_permissions?(other_user, instance_double(Account, root_account?: false))).to be_falsey
     end
 
     it "is true if there are no account users for this root account" do
-      account = double(root_account?: true, cached_all_account_users_for: [])
+      account = instance_double(Account, root_account?: true, cached_all_account_users_for: [])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it "is true when all account_users for current user are subsets of target user" do
-      account = double(root_account?: true, cached_all_account_users_for: [double(is_subset_of?: true)])
+      account = instance_double(Account, root_account?: true, cached_all_account_users_for: [instance_double(AccountUser, is_subset_of?: true)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it "is false when any account_user for current user is not a subset of target user" do
-      account = double(root_account?: true, cached_all_account_users_for: [double(is_subset_of?: false)])
+      account = instance_double(Account, root_account?: true, cached_all_account_users_for: [instance_double(AccountUser, is_subset_of?: false)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
   end
@@ -2195,7 +2195,7 @@ describe User do
       end
 
       context "when user has associated root accounts with file_association_access feature" do
-        let(:root_account) { double("Account", feature_enabled?: true) }
+        let(:root_account) { instance_double(Account, feature_enabled?: true) }
 
         before do
           allow(user).to receive(:associated_root_accounts).and_return([root_account])
@@ -2283,7 +2283,7 @@ describe User do
       context "edge cases" do
         before do
           user.avatar_image_source = "attachment"
-          root_account = double("Account", feature_enabled?: true)
+          root_account = instance_double(Account, feature_enabled?: true)
           allow(user).to receive(:associated_root_accounts).and_return([root_account])
         end
 
@@ -3115,6 +3115,46 @@ describe User do
         expect(events_a).to include(reply_to_entry_a)
       end
 
+      it "includes peer review sub assignments when peer review feature is enabled" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = peer_review_model(course: @course, due_at: 2.days.from_now)
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).to include(peer_review)
+      end
+
+      it "does not include peer review sub assignments when peer review feature is disabled" do
+        @course.account.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = assignment_model(
+          course: @course,
+          title: "Parent Assignment",
+          points_possible: 20,
+          peer_reviews: true,
+          submission_types: "online_text_entry",
+          due_at: 1.day.from_now
+        )
+        # Create directly since the feature is disabled (service won't work)
+        peer_review = PeerReviewSubAssignment.create!(
+          parent_assignment: assignment,
+          context: @course,
+          title: "Parent Assignment Peer Review",
+          due_at: 2.days.from_now,
+          workflow_state: "published"
+        )
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(peer_review)
+      end
+
+      it "does not include unpublished peer review sub assignments" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = peer_review_model(course: @course, due_at: 2.days.from_now)
+        peer_review.unpublish!
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(peer_review)
+      end
+
       it "doesn't include events for enrollments that are inactive due to date" do
         @enrollment.start_at = 1.day.ago
         @enrollment.end_at = 2.days.from_now
@@ -3728,6 +3768,150 @@ describe User do
       end
 
       expect(@user.adminable_accounts.map(&:id).sort).to eq [Account.site_admin].map(&:id).sort
+    end
+  end
+
+  describe "#adminable_horizon_accounts_scope" do
+    it "returns horizon accounts the user can administer" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account2 = Account.create!(name: "Account 2")
+      account3 = Account.create!(name: "Account 3")
+
+      account1.account_users.create!(user:)
+      account2.account_users.create!(user:)
+      # User does not have access to account3
+
+      # Mark account1 and account2 as horizon accounts
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+      account2.settings[:horizon_account_ids] = [account2.id]
+      account2.save!
+      # Mark account3 as horizon account, but user doesn't have access
+      account3.settings[:horizon_account_ids] = [account3.id]
+      account3.save!
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to match_array [account1, account2]
+    end
+
+    it "returns empty when no horizon_account_ids are configured" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to be_empty
+    end
+
+    it "includes site admin when user has access and there are horizon accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      Account.site_admin.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to include(Account.site_admin)
+      expect(result).to include(account1)
+    end
+
+    it "does not include site admin when user has access but no horizon accounts" do
+      user = user_model
+      Account.site_admin.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to be_empty
+    end
+
+    it "does not include site admin when user does not have access" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).not_to include(Account.site_admin)
+      expect(result).to include(account1)
+    end
+
+    it "includes sub-accounts when user is admin on a sub-account of horizon-enabled parent" do
+      user = user_model
+      root = Account.create!(name: "Root")
+      sub_account = Account.create!(name: "Sub Account", parent_account: root, root_account: root)
+
+      # Enable horizon on root
+      root.settings[:horizon_account_ids] = [root.id]
+      root.save!
+
+      # User is admin on sub-account (not on root)
+      sub_account.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+
+      # User should see the sub-account because it inherits horizon from root
+      expect(result).to include(sub_account)
+      expect(result).not_to include(root) # User is NOT admin on root
+    end
+
+    it "includes multiple levels of sub-accounts in horizon hierarchy" do
+      user = user_model
+      root = Account.create!(name: "Root")
+      sub1 = Account.create!(name: "Sub 1", parent_account: root, root_account: root)
+      sub2 = Account.create!(name: "Sub 2", parent_account: sub1, root_account: root)
+
+      # Enable horizon on root
+      root.settings[:horizon_account_ids] = [root.id]
+      root.save!
+
+      # User is admin on multiple levels
+      sub1.account_users.create!(user:)
+      sub2.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+
+      # User should see both sub-accounts
+      expect(result).to include(sub1, sub2)
+      expect(result.size).to eq(2)
+    end
+  end
+
+  describe "adminable_horizon_accounts" do
+    it "returns cached horizon accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      expect(user.adminable_horizon_accounts.map(&:id)).to eq [account1.id]
+    end
+
+    it "excludes deleted accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+      account1.destroy
+
+      expect(user.adminable_horizon_accounts).to be_empty
+    end
+
+    it "only includes accounts in horizon_account_ids that user has admin access to" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account2 = Account.create!(name: "Account 2")
+      account1.account_users.create!(user:)
+      # User does not have access to account2
+      account1.settings[:horizon_account_ids] = [account1.id, account2.id]
+      account1.save!
+
+      # User only has access to account1, not account2, so only account1 should be returned
+      expect(user.adminable_horizon_accounts.map(&:id)).to eq [account1.id]
     end
   end
 

@@ -20,7 +20,7 @@
 
 require_relative "api_spec_helper"
 
-shared_examples_for "file uploads api" do
+shared_examples "file uploads api" do
   include ApplicationHelper
 
   # send a multipart post request in an integration spec post_params is
@@ -346,7 +346,7 @@ shared_examples_for "file uploads api" do
 end
 
 shared_examples_for "file uploads api with folders" do
-  include_examples "file uploads api"
+  include_context "file uploads api"
 
   it "allows specifying a folder with deprecated argument name" do
     preflight({ name: "with_path.txt", folder: "files/a/b/c/mypath" })

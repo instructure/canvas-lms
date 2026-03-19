@@ -234,6 +234,84 @@ describe('TemplateWidget', () => {
     expect(screen.queryByLabelText('Test Pagination')).not.toBeInTheDocument()
   })
 
+  it('does not show overlay during initial load', () => {
+    const loadingOverlay = {
+      isLoading: true,
+      ariaLabel: 'Loading data',
+    }
+    const props = buildDefaultProps({loadingOverlay, isLoading: true})
+    setup(props)
+
+    expect(screen.queryByText('Test content')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument()
+    expect(screen.getByText('Loading widget data...')).toBeInTheDocument()
+  })
+
+  it('shows overlay when data refresh changes from not loading to loading', () => {
+    const loadingOverlay = {
+      isLoading: false,
+      ariaLabel: 'Loading data',
+    }
+    const props = buildDefaultProps({loadingOverlay})
+    const {rerender} = setup(props)
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument()
+
+    const updatedLoadingOverlay = {isLoading: true, ariaLabel: 'Loading data'}
+    const updatedProps = buildDefaultProps({loadingOverlay: updatedLoadingOverlay})
+
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {retry: false},
+        mutations: {retry: false},
+      },
+    })
+
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <ResponsiveProvider matches={['desktop']}>
+                <TemplateWidget {...updatedProps}>
+                  <div>Test content</div>
+                </TemplateWidget>
+              </ResponsiveProvider>
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.getByTestId('loading-overlay')).toBeInTheDocument()
+  })
+
+  it('shows overlay with loadingOverlay prop', () => {
+    const loadingOverlay = {
+      isLoading: true,
+      ariaLabel: 'Loading filter results',
+    }
+    const props = buildDefaultProps({loadingOverlay})
+    setup(props)
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.getByTestId('loading-overlay')).toBeInTheDocument()
+  })
+
+  it('does not show overlay when loadingOverlay.isLoading is false', () => {
+    const loadingOverlay = {
+      isLoading: false,
+      ariaLabel: 'Loading filter results',
+    }
+    const props = buildDefaultProps({loadingOverlay})
+    setup(props)
+
+    expect(screen.getByText('Test content')).toBeInTheDocument()
+    expect(screen.queryByTestId('loading-overlay')).not.toBeInTheDocument()
+  })
+
   it('handles widget with no title properly', () => {
     const widgetWithNoTitle = {...mockWidget, title: ''}
     const props = buildDefaultProps({widget: widgetWithNoTitle})
@@ -265,12 +343,12 @@ describe('TemplateWidget', () => {
       expect(screen.getByTestId('test-widget-remove-button')).toBeInTheDocument()
     })
 
-    it('does not show edit mode icons in mobile mode even when isEditMode is true', () => {
+    it('shows edit mode icons in mobile mode when isEditMode is true', () => {
       const props = buildDefaultProps({isEditMode: true})
       setup(props, <div>Test content</div>, ['mobile'])
 
-      expect(screen.queryByTestId('test-widget-drag-handle')).not.toBeInTheDocument()
-      expect(screen.queryByTestId('test-widget-remove-button')).not.toBeInTheDocument()
+      expect(screen.getByTestId('test-widget-drag-handle')).toBeInTheDocument()
+      expect(screen.getByTestId('test-widget-remove-button')).toBeInTheDocument()
     })
 
     it('shows context menu when drag handle is clicked', async () => {
@@ -327,6 +405,40 @@ describe('TemplateWidget', () => {
           </WidgetDashboardProvider>
         </QueryClientProvider>,
       )
+    })
+
+    describe('accessibility', () => {
+      it('includes widget name in reorder button aria-label', () => {
+        const props = buildDefaultProps({isEditMode: true})
+        setup(props, <div>Test content</div>, ['desktop'])
+
+        const dragHandle = screen.getByTestId('test-widget-drag-handle')
+        expect(dragHandle).toHaveAccessibleName('Reorder Test Widget')
+      })
+
+      it('includes widget name in remove button aria-label', () => {
+        const props = buildDefaultProps({isEditMode: true})
+        setup(props, <div>Test content</div>, ['desktop'])
+
+        const removeButton = screen.getByTestId('test-widget-remove-button')
+        expect(removeButton).toHaveAccessibleName('Remove Test Widget')
+      })
+
+      it('maintains focus on drag handle after moving widget via keyboard navigation', async () => {
+        const user = userEvent.setup()
+        const props = buildDefaultProps({isEditMode: true})
+        setup(props, <div>Test content</div>, ['desktop'])
+
+        const dragHandle = screen.getByTestId('test-widget-drag-handle')
+        await user.click(dragHandle)
+
+        const moveDownOption = screen.getByText('Move down')
+        await user.click(moveDownOption)
+
+        await vi.waitFor(() => {
+          expect(document.activeElement).toBe(dragHandle)
+        })
+      })
     })
   })
 })

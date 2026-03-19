@@ -37,12 +37,12 @@ module Lti
         url: "http://www.example.com"
       )
     end
-    let(:substitution_helper) { double.as_null_object }
+    let(:substitution_helper) { instance_double(Lti::SubstitutionsHelper).as_null_object }
     let(:right_now) { Time.current }
     let(:tool) do
-      shard_mock = double("shard")
+      shard_mock = instance_double(Shard)
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
-      m = double("tool")
+      m = instance_double(ContextExternalTool)
       allow(m).to receive_messages(id: 1,
                                    context: root_account,
                                    include_email?: true,
@@ -64,7 +64,7 @@ module Lti
     end
 
     let(:controller) do
-      request_mock = double("request")
+      request_mock = instance_double(ActionDispatch::Request)
       allow(request_mock).to receive_messages(url: "https://localhost", host_with_port: "https://localhost", host: "/my/url", scheme: "https", parameters: {
         com_instructure_course_accept_canvas_resource_types: ["page", "module"],
         com_instructure_course_canvas_resource_type: "page",
@@ -72,15 +72,18 @@ module Lti
         com_instructure_course_allow_canvas_resource_selection: "true",
         com_instructure_course_available_canvas_resources: available_canvas_resources
       }.with_indifferent_access)
-      view_context_mock = double("view_context")
-      m = double("controller")
+      view_context_mock = instance_double(ActionView::Base)
+      # Trigger lazy definition of route helper methods on ApplicationController
+      # so that instance_double can verify against them
+      ApplicationController.new.respond_to?(:api_v1_collaboration_members_url)
+      m = instance_double(ApplicationController)
       allow(m).to receive(:css_url_for).with(:common).and_return("/path/to/common.scss")
       allow(view_context_mock).to receive(:stylesheet_path)
         .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
       allow(m).to receive_messages(request: request_mock,
                                    logged_in_user: user,
                                    named_context_url: "url",
-                                   active_brand_config: double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'),
+                                   active_brand_config: instance_double(BrandConfig, to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'),
                                    polymorphic_url: "url",
                                    view_context: view_context_mock)
       allow(m).to receive(:active_brand_config_url).with("json").and_return("http://example.com/brand_config.json")
@@ -398,7 +401,7 @@ module Lti
       end
 
       it "includes Person.sourcedId when in enabled capability" do
-        allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(double(sis_user_id: 12))
+        allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(instance_double(Pseudonym, sis_user_id: 12))
         expanded = variable_expander.enabled_capability_params(["Person.sourcedId"])
         expect(expanded.keys).to include "lis_person_sourcedid"
       end
@@ -2121,7 +2124,7 @@ module Lti
           end
 
           let(:content_tag) do
-            double("content_tag")
+            instance_double(ContentTag)
           end
 
           let(:variable_expander) do
@@ -2813,14 +2816,14 @@ module Lti
         end
 
         it "has substitution for Canvas.module.id" do
-          content_tag = double("content_tag")
+          content_tag = instance_double(ContentTag)
           allow(content_tag).to receive(:context_module_id).and_return("foo")
           variable_expander.instance_variable_set(:@content_tag, content_tag)
           expect(expand!("$Canvas.module.id")).to eq "foo"
         end
 
         it "has substitution for Canvas.moduleItem.id" do
-          content_tag = double("content_tag")
+          content_tag = instance_double(ContentTag)
           allow(content_tag).to receive(:id).and_return(7878)
           variable_expander.instance_variable_set(:@content_tag, content_tag)
           expect(expand!("$Canvas.moduleItem.id")).to eq 7878

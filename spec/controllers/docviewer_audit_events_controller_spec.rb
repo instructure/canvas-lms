@@ -104,7 +104,7 @@ describe DocviewerAuditEventsController do
 
       default_params[:docviewer_audit_event][:event_type] = "miscellaneous_annotation_created"
       post :create, format: :json, params: default_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "renders status not_found if passed a document_id that does not match submission" do

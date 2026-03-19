@@ -19,8 +19,8 @@
   css_bundle :account_settings, :reports, :tinymce
   provide :page_title, t(:page_title, "Account Settings")
 
-  js_env(
-    :ACCOUNT => {
+  js_env({
+    ACCOUNT: {
       'id' => @context.id,
       'site_admin' => @account.site_admin?,
       'root_account' => @account.root_account?
@@ -33,7 +33,7 @@
         )
       end
     end
-  )
+  })
 %>
 
 <% provide :right_side do %>
@@ -562,7 +562,7 @@
                     <%= settings.check_box :can_change_pronouns, :checked => @account.can_change_pronouns? %>
                     <%= settings.label :can_change_pronouns, en: "Allow users to change their pronouns in Canvas" %>
                   </div>
-                    <% js_env(PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)))
+                    <% js_env({ PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)) })
                     js_bundle :available_pronouns_list %>
                 </div>
               <% end %>
@@ -902,6 +902,10 @@
 
         <% if @account.primary_settings_root_account? && !@account.site_admin? %>
           <div id="custom_help_link_settings"></div>
+        <% end %>
+
+        <% if @account.root_account&.feature_enabled?(:nav_menu_links) %>
+          <div id="nav_menu_links_settings"></div>
         <% end %>
 
         <% unless @account.site_admin? %>

@@ -270,7 +270,6 @@ module Calendar2Common
   end
 
   def test_timed_calendar_event_in_tz(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
-    puts ">>> TZ #{time_zone}, #{Time.zone}"
     @user.time_zone = time_zone
     @user.save!
     @date = @user.time_zone.now.beginning_of_day
@@ -322,16 +321,12 @@ module Calendar2Common
   end
 
   # Creates event from the 'edit event' modal
-  def event_from_modal(event_title, should_add_date = false, should_add_location = false)
+  def event_from_modal(event_title)
     edit_event_dialog = f("#edit_event_tabs")
     expect(edit_event_dialog).to be_displayed
     title = edit_calendar_event_form_title
     keep_trying_until { title.displayed? }
     replace_content(title, event_title)
-    add_date(middle_number) if should_add_date
-    if should_add_location
-      replace_content(f("input[placeHolder='Input Event Location...'"), "location title")
-    end
     edit_calendar_event_form_submit_button.click
     wait_for_ajax_requests
   end
@@ -397,7 +392,6 @@ module Calendar2Common
     num_attempts = 1
 
     until element_exists?(".event-details-timestring") || num_attempts == max_attempts
-      puts "Attempt #{num_attempts} looking for event element"
       scroll_to(f(".fc-event"))
       f(".fc-event").click
       num_attempts += 1

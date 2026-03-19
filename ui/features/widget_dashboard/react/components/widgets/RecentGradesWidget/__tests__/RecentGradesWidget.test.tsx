@@ -628,4 +628,35 @@ describe('RecentGradesWidget', () => {
 
     expect(screen.queryByTestId('expand-grade-sub-ungraded')).not.toBeInTheDocument()
   })
+
+  it('renders grade items in a semantic list structure', async () => {
+    setup()
+
+    await waitFor(() => {
+      const gradesList = screen.getByTestId('recent-grades-list')
+      const list = gradesList.querySelector('ul')
+      expect(list).toBeInTheDocument()
+    })
+  })
+
+  it('renders each grade item with role=group for screen readers', async () => {
+    setup()
+
+    await waitFor(() => {
+      const gradeGroups = screen.getAllByRole('group')
+      expect(gradeGroups.length).toBeGreaterThan(0)
+    })
+  })
+
+  it('provides accessible labels for each grade item group', async () => {
+    setup()
+
+    await waitFor(() => {
+      const reactHooksGroup = screen.getByRole('group', {name: 'Introduction to React Hooks'})
+      expect(reactHooksGroup).toBeInTheDocument()
+
+      const quizGroup = screen.getByRole('group', {name: 'Data Structures Quiz'})
+      expect(quizGroup).toBeInTheDocument()
+    })
+  })
 })

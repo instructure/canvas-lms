@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cleanup, render, waitFor} from '@testing-library/react'
+import {cleanup, render, waitFor, screen} from '@testing-library/react'
 import {type MockedFunction} from 'vitest'
 import LearningMastery from '../index'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
@@ -28,6 +28,7 @@ import {Rating, Student, Outcome, StudentRollupData} from '@canvas/outcomes/reac
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
+import {useMasteryDistribution} from '../hooks/useMasteryDistribution'
 
 vi.mock('../apiClient')
 
@@ -35,6 +36,13 @@ vi.mock('@canvas/outcomes/react/hooks/useRollups')
 vi.mock('../hooks/useGradebookSettings')
 vi.mock('../hooks/useStudents')
 vi.mock('@canvas/outcomes/react/hooks/useContributingScores')
+vi.mock('../hooks/useMasteryDistribution')
+
+vi.mock('@canvas/svg-wrapper', () => ({
+  default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
+    <svg aria-label={ariaLabel} aria-hidden={ariaHidden} data-testid="mock-svg" />
+  ),
+}))
 
 describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS
@@ -155,6 +163,28 @@ describe('LearningMastery', () => {
         })),
       },
     })
+
+    const mockUseMasteryDistribution = useMasteryDistribution as MockedFunction<
+      typeof useMasteryDistribution
+    >
+    mockUseMasteryDistribution.mockReturnValue({
+      data: {
+        outcome_distributions: {
+          '1': {
+            outcome_id: '1',
+            ratings: [
+              {description: 'Exceeds', points: 3, color: '#127A1B', count: 5, student_ids: []},
+              {description: 'Meets', points: 2, color: '#0B874B', count: 10, student_ids: []},
+            ],
+            total_students: 15,
+          },
+        },
+        students: [],
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    } as any)
   })
 
   afterEach(() => {
@@ -168,54 +198,84 @@ describe('LearningMastery', () => {
     fakeENV.teardown()
   })
 
-  it('renders a loading spinner when useRollups.isLoading is true', async () => {
+  it('renders a loading spinner when useRollups.isLoading is true', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({isLoading: true}))
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByText('Loading')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByText('Loading')).toBeInTheDocument()
   })
 
-  it('renders the gradebook menu on the page', async () => {
-    const {getByTestId} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+  it('renders the gradebook menu on the page', () => {
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+  })
+
+  it('renders a single h1 for the page when instuiNavFF is disabled', () => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        outcome_proficiency: {ratings},
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        context_url: '/courses/1',
+      },
+      FEATURES: {instui_nav: false},
+    })
+
+    render(<LearningMastery {...defaultProps()} />)
+    const headings = screen.queryAllByRole('heading', {level: 1})
+    expect(headings).toHaveLength(1)
+  })
+
+  it('renders a single h1 for the page when instuiNavFF is enabled', () => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        outcome_proficiency: {ratings},
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        context_url: '/courses/1',
+      },
+      FEATURES: {instui_nav: true},
+    })
+
+    render(<LearningMastery {...defaultProps()} />)
+    const headings = screen.queryAllByRole('heading', {level: 1})
+    expect(headings).toHaveLength(1)
   })
 
   it('renders the export button on the page', async () => {
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByText('Export')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByText('Export')).toBeInTheDocument()
   })
 
-  it('does not render the export button on load error', async () => {
+  it('does not render the export button on load error', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
-    const {queryByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(queryByText('Export')).not.toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.queryByText('Export')).not.toBeInTheDocument()
   })
 
-  it('does not render the gradebook body on the page if loading failed', async () => {
+  it('does not render the gradebook body on the page if loading failed', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: ''}))
-    const {queryByTestId} = render(<LearningMastery {...defaultProps()} />)
-    expect(queryByTestId('gradebook-body')).not.toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.queryByTestId('gradebook-body')).not.toBeInTheDocument()
   })
 
-  it('renders generic error page if loading failed, while still rendering the gradebook menu', async () => {
+  it('renders generic error page if loading failed, while still rendering the gradebook menu', () => {
     const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue(createMockUseRollupsReturnValue({error: 'Banana Error'}))
-    const {getByTestId, getByText} = render(<LearningMastery {...defaultProps()} />)
-    expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
-    expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    render(<LearningMastery {...defaultProps()} />)
+    expect(screen.getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+    expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   it('renders each student, outcome, rollup from the response', async () => {
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
+    render(<LearningMastery {...defaultProps()} />)
 
     await waitFor(() => {
-      expect(getByText(students[0].name)).toBeInTheDocument()
+      expect(screen.getByText(students[0].name)).toBeInTheDocument()
     })
 
-    expect(getByText(outcomes[0].title)).toBeInTheDocument()
-    expect(getByText('rating description!')).toBeInTheDocument()
+    expect(screen.getAllByText(outcomes[0].title)[0]).toBeInTheDocument()
+    expect(await screen.findByLabelText('rating description!')).toBeInTheDocument()
   })
 
   it('calls useRollups with the provided courseId', () => {

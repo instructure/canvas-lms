@@ -29,6 +29,7 @@ class SVGWrapper extends React.Component {
     fillColor: PropTypes.string,
     style: PropTypes.any,
     ariaHidden: PropTypes.bool,
+    ariaLabel: PropTypes.string,
   }
 
   componentDidMount() {
@@ -62,6 +63,10 @@ class SVGWrapper extends React.Component {
 
         if (this.props.ariaHidden !== undefined) {
           this.svg.setAttribute('aria-hidden', this.props.ariaHidden)
+        }
+
+        if (this.props.ariaLabel) {
+          this.svg.setAttribute('aria-label', this.props.ariaLabel)
         }
 
         this.setSVGFillColor(this.props.fillColor)

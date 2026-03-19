@@ -26,7 +26,7 @@ module Api
       let_once(:course) { ::Course.create! }
       let(:course_json) { CourseJson.new(course, nil, includes, []) }
       let(:includes) { [] }
-      let(:user) { double(:user) }
+      let(:user) { instance_double(User) }
 
       describe "#to_hash" do
         let_once(:student) { course_with_user("StudentEnrollment", course:, active_all: true).user }
@@ -498,7 +498,7 @@ module Api
       describe "#include_total_scores?" do
         let(:predicate) { course_json.include_total_scores? }
         let(:course_settings) { {} }
-        let(:course) { double(course_settings) }
+        let(:course) { instance_double(::Course, course_settings) }
 
         describe "when total scores key is set" do
           before { includes << :total_scores }
@@ -595,7 +595,7 @@ module Api
       end
 
       describe "#description" do
-        let(:course) { double(public_description: "an eloquent anecdote") }
+        let(:course) { instance_double(::Course, public_description: "an eloquent anecdote") }
 
         it "returns the description when its configured for inclusion" do
           includes << :public_description
@@ -612,7 +612,7 @@ module Api
       describe "#initialization" do
         subject { @json }
 
-        let(:enrollments) { double(:enrollments) }
+        let(:enrollments) { instance_double(ActiveRecord::Relation, :enrollments) }
         let(:hash) { { a: "1", b: "2" } }
         let(:includes) { %w[these three keys] }
 
@@ -652,9 +652,9 @@ module Api
       end
 
       describe "#set_sis_course_id" do
-        let(:sis_course) { double(grants_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account:) }
+        let(:sis_course) { instance_double(::Course, grants_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account:) }
         let(:sis_course_json) { CourseJson.new(sis_course, user, includes, []) }
-        let(:root_account) { double(grants_right?: @has_right) }
+        let(:root_account) { instance_double(::Account, grants_right?: @has_right) }
         let(:hash) { {} }
 
         before do
@@ -703,7 +703,7 @@ module Api
       end
 
       describe "#permissions" do
-        let(:course) { double(public_description: "an eloquent anecdote") }
+        let(:course) { instance_double(::Course, public_description: "an eloquent anecdote") }
 
         it "returns the permissions when its configured for inclusion" do
           includes << :permissions

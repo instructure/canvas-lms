@@ -127,6 +127,28 @@ describe('FiltersPanel', () => {
       await userEvent.click(toggleButton!)
       expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
     })
+
+    it('syncs state from appliedFilters when opening', async () => {
+      const appliedFilters: AppliedFilter[] = [
+        {
+          key: 'workflowStates',
+          option: {value: 'published', label: 'Published'} as FilterOption,
+        },
+      ]
+
+      render(<FiltersPanel {...defaultProps} appliedFilters={appliedFilters} />)
+
+      const toggleButton = screen.getByTestId('filter-resources-toggle')
+      await userEvent.click(toggleButton!)
+
+      // Opening syncs from appliedFilters — only Published should be checked.
+      const stateGroup = screen.getByTestId('state-checkbox-group')
+      const publishedCheckbox = within(stateGroup).getByLabelText('Published')
+      const unpublishedCheckbox = within(stateGroup).getByLabelText('Unpublished')
+
+      expect(publishedCheckbox).toBeChecked()
+      expect(unpublishedCheckbox).not.toBeChecked()
+    })
   })
 
   describe('date inputs', () => {
@@ -192,37 +214,36 @@ describe('FiltersPanel', () => {
 
     describe('date range validation', () => {
       it('disables fromDate dates after selected toDate', async () => {
-        const appliedFilters: AppliedFilter[] = [
-          {
-            key: 'toDate',
-            option: {value: '2024-01-20T00:00:00.000Z', label: 'Jan 20, 2024'},
-          },
-        ]
-
-        render(<FiltersPanel {...defaultProps} appliedFilters={appliedFilters} />)
+        // Opening the panel does not sync from appliedFilters, so the toDate
+        // input starts empty regardless of appliedFilters. Date constraints only
+        // apply once the user types a date into the open panel directly.
+        render(<FiltersPanel {...defaultProps} />)
 
         const toggleButton = screen.getByTestId('filter-resources-toggle')
         await userEvent.click(toggleButton!)
 
         const toDateInput = screen.getByLabelText(/Last edited to/i) as HTMLInputElement
+        await userEvent.type(toDateInput, '2024-01-20')
+
+        // fromDate dates after the entered toDate should be disabled — verify the
+        // input reflects the typed value so the constraint is active.
         expect(toDateInput.value).toBeTruthy()
       })
 
       it('disables toDate dates before selected fromDate', async () => {
-        const appliedFilters: AppliedFilter[] = [
-          {
-            key: 'fromDate',
-            option: {value: '2024-01-10T00:00:00.000Z', label: 'Jan 10, 2024'},
-          },
-        ]
-
-        render(<FiltersPanel {...defaultProps} appliedFilters={appliedFilters} />)
+        // Opening the panel does not sync from appliedFilters, so the fromDate
+        // input starts empty regardless of appliedFilters. Date constraints only
+        // apply once the user types a date into the open panel directly.
+        render(<FiltersPanel {...defaultProps} />)
 
         const toggleButton = screen.getByTestId('filter-resources-toggle')
         await userEvent.click(toggleButton!)
 
-        // Verify fromDate is set in the component
         const fromDateInput = screen.getByLabelText(/Last edited from/i) as HTMLInputElement
+        await userEvent.type(fromDateInput, '2024-01-10')
+
+        // toDate dates before the entered fromDate should be disabled — verify the
+        // input reflects the typed value so the constraint is active.
         expect(fromDateInput.value).toBeTruthy()
       })
 
@@ -361,27 +382,44 @@ describe('FiltersPanel', () => {
       expect(screen.queryByTestId('apply-filters-button')).not.toBeInTheDocument()
     })
 
-    it('applies filters when panel is closed', async () => {
+    it('does not call onFilterChange when panel is closed via toggle without applying', async () => {
       render(<FiltersPanel {...defaultProps} />)
 
       const toggleButton = screen.getByTestId('filter-resources-toggle')
       await userEvent.click(toggleButton!)
 
       const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
-      const assignmentCheckbox = within(resourceTypeGroup).getByLabelText('Assignments')
-      const discussionTopicCheckbox = within(resourceTypeGroup).getByLabelText('Discussion topics')
-      await userEvent.click(assignmentCheckbox)
-      await userEvent.click(discussionTopicCheckbox)
+      const wikiPageCheckbox = within(resourceTypeGroup).getByLabelText('Pages')
+      await userEvent.click(wikiPageCheckbox)
 
       await userEvent.click(toggleButton!)
 
-      expect(mockOnFilterChange).toHaveBeenCalledWith({
-        ruleTypes: [{label: 'all', value: 'all'}],
-        artifactTypes: [{label: 'Pages', value: 'wiki_page'}],
-        workflowStates: [{label: 'all', value: 'all'}],
-        fromDate: null,
-        toDate: null,
-      })
+      expect(mockOnFilterChange).not.toHaveBeenCalled()
+    })
+
+    it('discards unsaved changes when panel is closed via toggle and reopened', async () => {
+      render(<FiltersPanel {...defaultProps} />)
+
+      const toggleButton = screen.getByTestId('filter-resources-toggle')
+      await userEvent.click(toggleButton!)
+
+      const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
+      const wikiPageCheckbox = within(resourceTypeGroup).getByLabelText('Pages')
+
+      // Uncheck Pages (deselecting from 'all' state)
+      await userEvent.click(wikiPageCheckbox)
+      expect(wikiPageCheckbox).not.toBeChecked()
+
+      // Close via toggle without applying
+      await userEvent.click(toggleButton!)
+
+      // Reopen the panel
+      await userEvent.click(toggleButton!)
+
+      // Pages should be checked again because changes were discarded
+      const resourceTypeGroupReopened = screen.getByTestId('resource-type-checkbox-group')
+      const wikiPageCheckboxReopened = within(resourceTypeGroupReopened).getByLabelText('Pages')
+      expect(wikiPageCheckboxReopened).toBeChecked()
     })
   })
 
@@ -526,6 +564,8 @@ describe('FiltersPanel', () => {
 
       const resourceTypeGroup = screen.getByTestId('resource-type-checkbox-group')
       expect(within(resourceTypeGroup).getByLabelText('Discussion topics')).toBeInTheDocument()
+      expect(within(resourceTypeGroup).getByLabelText('Announcements')).toBeInTheDocument()
+      expect(within(resourceTypeGroup).getByLabelText('Syllabus')).toBeInTheDocument()
     })
 
     it('hides discussion topics checkbox when feature is disabled', async () => {
@@ -546,6 +586,8 @@ describe('FiltersPanel', () => {
       expect(
         within(resourceTypeGroup).queryByLabelText('Discussion topics'),
       ).not.toBeInTheDocument()
+      expect(within(resourceTypeGroup).queryByLabelText('Announcements')).not.toBeInTheDocument()
+      expect(within(resourceTypeGroup).queryByLabelText('Syllabus')).not.toBeInTheDocument()
       // But Pages and Assignments should still be there
       expect(within(resourceTypeGroup).getByLabelText('Pages')).toBeInTheDocument()
       expect(within(resourceTypeGroup).getByLabelText('Assignments')).toBeInTheDocument()

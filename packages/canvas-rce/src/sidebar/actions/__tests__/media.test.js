@@ -234,5 +234,111 @@ describe('Media actions', () => {
         expect(alertHandler.alertFunc).toHaveBeenCalled()
       }
     })
+
+    it('skips updateClosedCaptions when skipCaptionUpdate is true', async () => {
+      const updateSpy = jest.fn(updateMediaObject)
+      const updateCCSpy = jest.fn(updateClosedCaptions)
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
+        return state
+      }
+      await actions.updateMediaObject({
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        skipCaptionUpdate: true, // Explicitly skip caption update
+      })(dispatch, getState)
+      expect(updateSpy).toHaveBeenCalled()
+      expect(updateCCSpy).not.toHaveBeenCalled()
+    })
+
+    it('calls updateClosedCaptions when skipCaptionUpdate is false', async () => {
+      const updateSpy = jest.fn(updateMediaObject)
+      const updateCCSpy = jest.fn(updateClosedCaptions)
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
+        return state
+      }
+      await actions.updateMediaObject({
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        skipCaptionUpdate: false,
+      })(dispatch, getState)
+      expect(updateSpy).toHaveBeenCalled()
+      expect(updateCCSpy).toHaveBeenCalled()
+    })
+
+    it('calls updateClosedCaptions by default when skipCaptionUpdate is omitted', async () => {
+      const updateSpy = jest.fn(updateMediaObject)
+      const updateCCSpy = jest.fn(updateClosedCaptions)
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
+        return state
+      }
+      await actions.updateMediaObject({
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: undefined, // Even with undefined subtitles, should call updateClosedCaptions
+      })(dispatch, getState)
+      expect(updateSpy).toHaveBeenCalled()
+      expect(updateCCSpy).toHaveBeenCalled()
+      expect(updateCCSpy.mock.calls[0][1]).toEqual({
+        media_object_id: 'moid',
+        subtitles: undefined,
+      })
+    })
+
+    it('calls updateClosedCaptions when subtitles is an empty array', async () => {
+      const updateSpy = jest.fn(updateMediaObject)
+      const updateCCSpy = jest.fn(updateClosedCaptions)
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
+        return state
+      }
+      await actions.updateMediaObject({
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: [], // Empty array should still call the API (delete all captions)
+      })(dispatch, getState)
+      expect(updateSpy).toHaveBeenCalled()
+      expect(updateCCSpy).toHaveBeenCalled()
+      expect(updateCCSpy.mock.calls[0][1]).toEqual({
+        media_object_id: 'moid',
+        subtitles: [],
+      })
+    })
+
+    it('calls updateClosedCaptions with empty array and attachment_id', async () => {
+      const updateSpy = jest.fn(updateMediaObject)
+      const updateCCSpy = jest.fn(updateClosedCaptions)
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
+        return state
+      }
+      await actions.updateMediaObject({
+        attachment_id: '456',
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: [],
+      })(dispatch, getState)
+      expect(updateSpy).toHaveBeenCalled()
+      expect(updateCCSpy).toHaveBeenCalled()
+      expect(updateCCSpy.mock.calls[0][1]).toEqual({
+        attachment_id: '456',
+        media_object_id: 'moid',
+        subtitles: [],
+      })
+    })
   })
 })

@@ -41,7 +41,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
     }.freeze
   end
 
-  let(:help_links_builder_double) { double(:help_links_builder) }
+  let(:help_links_builder_double) { instance_double(Account::HelpLinks) }
 
   before(:once) do
     @account = Account.create!(root_account_id: nil)

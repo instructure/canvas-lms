@@ -283,7 +283,7 @@ describe MicrosoftSync::GroupsController do
           expect(response.parsed_body["message"]).to match(
             /allows a maximum of 2 owners/
           )
-          expect(response).to have_http_status :unprocessable_entity
+          expect(response).to have_http_status :unprocessable_content
         end
       end
 
@@ -297,7 +297,7 @@ describe MicrosoftSync::GroupsController do
           expect(response.parsed_body["message"]).to match(
             /allows a maximum of 2 members/
           )
-          expect(response).to have_http_status :unprocessable_entity
+          expect(response).to have_http_status :unprocessable_content
         end
       end
     end

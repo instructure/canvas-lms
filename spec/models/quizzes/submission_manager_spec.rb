@@ -30,7 +30,7 @@ describe Quizzes::SubmissionManager do
     context "for a masquerading user" do
       it "uses to_s on the user to query the db when temporary is set to false" do
         @quiz.quiz_submissions.create!(temporary_user_code: "asdf")
-        stub_user = double(to_s: "asdf")
+        stub_user = instance_double(User, to_s: "asdf")
 
         s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, false)
 
@@ -39,7 +39,7 @@ describe Quizzes::SubmissionManager do
 
       it "uses to_s on the user to query the db when temporary is set to true" do
         @quiz.quiz_submissions.create!(temporary_user_code: "asdf")
-        stub_user = double(to_s: "asdf")
+        stub_user = instance_double(User, to_s: "asdf")
 
         s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, true)
 

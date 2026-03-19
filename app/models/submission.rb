@@ -344,13 +344,27 @@ class Submission < ActiveRecord::Base
   scope :unposted, -> { where(posted_at: nil) }
 
   scope :in_current_grading_period_for_courses, lambda { |course_ids|
-    current_period_clause = ""
-    course_ids.uniq.each_with_index do |course_id, i|
-      grading_period_id = GradingPeriod.current_period_for(Course.find(course_id))&.id
-      current_period_clause += grading_period_id.nil? ? sanitize_sql(["course_id = ?", course_id]) : sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
-      current_period_clause += " OR " if i < course_ids.length - 1
+    unique_course_ids = course_ids.uniq
+    return none if unique_course_ids.empty?
+
+    courses = Course.where(id: unique_course_ids).preload(
+      :grading_period_groups,
+      :grading_periods,
+      enrollment_term: [:grading_period_group, :grading_periods]
+    ).index_by(&:id)
+
+    clauses = unique_course_ids.map do |course_id|
+      course = courses[course_id]
+      grading_period_id = course ? GradingPeriod.for(course).find(&:current?)&.id : nil
+
+      if grading_period_id.nil?
+        sanitize_sql(["course_id = ?", course_id])
+      else
+        sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
+      end
     end
-    where(current_period_clause)
+
+    where(clauses.join(" OR "))
   }
 
   workflow do
@@ -664,6 +678,16 @@ class Submission < ActiveRecord::Base
       assignment.context.participating_students.where(id: self.user).exists? &&
       user &&
       assessment_requests.map(&:assessor_id).include?(user.id)
+  end
+
+  # Cached version of peer_reviewer? to prevent N+1 queries when checking
+  # multiple times for the same user (e.g., when loading multiple file attachments)
+  def peer_reviewer_for?(user)
+    @_peer_reviewer_cache ||= {}
+    user_id = user&.id
+    return @_peer_reviewer_cache[user_id] if @_peer_reviewer_cache.key?(user_id)
+
+    @_peer_reviewer_cache[user_id] = peer_reviewer?(user)
   end
 
   def can_view_details?(user)
@@ -2775,9 +2799,48 @@ class Submission < ActiveRecord::Base
     def time_of_submission
       time = submitted_at || Time.zone.now
       time -= 60.seconds if submission_type == "online_quiz" || cached_quiz_lti?
+
+      if discussion_checkpoint_submission_with_required_replies?
+        checkpoint_completion_time = calculate_checkpoint_completion_time
+        time = checkpoint_completion_time if checkpoint_completion_time.present?
+      end
+
       time
     end
     private :time_of_submission
+
+    def discussion_checkpoint_submission_with_required_replies?
+      return false unless submission_type == "discussion_topic"
+      return false unless assignment
+
+      assignment.is_a?(SubAssignment) && assignment.sub_assignment_tag == "reply_to_entry"
+    end
+
+    def calculate_checkpoint_completion_time
+      return @calculate_checkpoint_completion_time if defined?(@calculate_checkpoint_completion_time)
+
+      @calculate_checkpoint_completion_time = fetch_checkpoint_completion_time
+    end
+
+    def fetch_checkpoint_completion_time
+      return nil unless user_id && assignment
+
+      discussion_topic = assignment.parent_assignment&.discussion_topic
+      return nil unless discussion_topic
+
+      required_count = discussion_topic.reply_to_entry_required_count
+      return nil if required_count <= 0
+
+      discussion_topic.discussion_entries
+                      .non_top_level_for_user(user_id)
+                      .order(created_at: :asc)
+                      .offset(required_count - 1)
+                      .limit(1)
+                      .pick(:created_at)
+    end
+    private :discussion_checkpoint_submission_with_required_replies?,
+            :calculate_checkpoint_completion_time,
+            :fetch_checkpoint_completion_time
   end
   include Tardiness
 

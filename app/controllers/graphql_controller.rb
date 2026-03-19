@@ -36,7 +36,7 @@ class GraphQLController < ApplicationController
     query_errors = result.to_h["data"]&.values&.map { |res| (res.is_a?(Hash) && res["errors"].present?) ? res["errors"] : "" }&.reject(&:blank?)
 
     any_error_occured = graphql_errors.present? || query_errors.present?
-    RequestContext::Generator.add_meta_header("ge", any_error_occured ? "f" : "t")
+    RequestContext::Generator.add_meta_header("ge", any_error_occured ? "t" : "f")
     if any_error_occured
       disable_page_views
       Rails.logger.info "There are GraphQL errors: #{safe_to_json({ graphql_errors:, query_errors: }.compact)}"

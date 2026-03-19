@@ -171,7 +171,11 @@ export const saveRubric = async (
   }
 
   return {
-    rubric: {...mapRubricUnderscoredKeysToCamelCase(savedRubric), association_count: 1},
+    rubric: {
+      ...mapRubricUnderscoredKeysToCamelCase(savedRubric),
+      association_count: 1,
+      public: savedRubric.public,
+    },
     rubricAssociation: rubric_association,
   }
 }

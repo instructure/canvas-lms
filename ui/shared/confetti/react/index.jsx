@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import Confetti from './Confetti'
 
 export {Confetti}
 
 export default function renderConfettiApp(env, elt) {
-  const root = createRoot(elt)
-  root.render(<Confetti />)
+  render(<Confetti />, elt)
 }

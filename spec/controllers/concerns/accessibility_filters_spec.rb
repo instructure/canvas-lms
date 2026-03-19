@@ -265,6 +265,48 @@ describe AccessibilityFilters do
           expect(result.to_a).to match_array(expected_scans)
         end
       end
+
+      context "with syllabus" do
+        let!(:syllabus_scan) do
+          AccessibilityResourceScan.create!(
+            course_id: course.id,
+            is_syllabus: true,
+            resource_name: "Course Syllabus",
+            resource_workflow_state: "published",
+            resource_updated_at: today,
+            workflow_state: "completed",
+            issue_count: 1
+          )
+        end
+
+        before do
+          create_issue(syllabus_scan, list_structure_rule)
+        end
+
+        it "returns only syllabus scans" do
+          filters = { artifactTypes: ["syllabus"] }
+          result = controller.apply_accessibility_filters(base_relation, filters)
+
+          expected_scans = [syllabus_scan]
+
+          expect(result.to_a).to match_array(expected_scans)
+        end
+
+        it "returns syllabus with other resource types" do
+          filters = { artifactTypes: ["wiki_page", "syllabus"] }
+          result = controller.apply_accessibility_filters(base_relation, filters)
+
+          expected_scans = [
+            page_published_today_list,
+            page_published_yesterday_heading,
+            page_unpublished_today_list,
+            page_unpublished_yesterday_heading,
+            syllabus_scan
+          ]
+
+          expect(result.to_a).to match_array(expected_scans)
+        end
+      end
     end
 
     context "with workflow state filters" do

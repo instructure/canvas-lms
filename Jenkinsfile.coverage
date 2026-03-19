@@ -94,191 +94,170 @@ def sendSkippedSpecsSlackReport() {
   slackSend channel: '#canvas-test-stats', color: color, message: "$rubySkippedSpecs skipped specs in $jobInfo! "
 }
 
-pipeline {
-  agent none
-  options {
-    ansiColor('xterm')
-    timeout(60)
-    timestamps()
+def collectCoverageReport() {
+  stage('Collect Coverage Report') {
+    copyArtifacts(
+      filter: 'tmp/*/coverage/**',
+      optional: false,
+      projectName: env.JOB_NAME,
+      selector: specific(env.BUILD_NUMBER),
+    )
+
+    withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
+      sh """
+        docker compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
+        --name coverage-collator canvas bash -c \
+        "bundle install; bundle exec rake coverage:report['/tmp/*/coverage/**']"
+      """
+
+      sh 'docker cp coverage-collator:/usr/src/app/coverage/ coverage'
+
+      archiveArtifacts allowEmptyArchive: true, artifacts: 'coverage/**'
+
+      publishHTML target: [
+        allowMissing: false,
+        alwaysLinkToLastBuild: false,
+        keepAll: true,
+        reportDir: './coverage',
+        reportFiles: 'index.html',
+        reportName: 'Ruby Coverage Report'
+      ]
+
+      uploadCoverage([
+        uploadSource: '/coverage',
+        uploadDest: env.COVERAGE_LOCATION
+      ])
+    }
+
+    if (env.GERRIT_EVENT_TYPE != 'comment-added' && env.COVERAGE_TYPE == 'ruby-total') {
+      generateSkippedSpecsReport()
+    }
   }
+}
 
-  environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
-    COMPOSE_PROJECT_NAME = 'coverage'
-    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
-    RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
-    RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
-    RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
-    SELENIUM_TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/selenium'
-    TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
-    EXCLUDE_TESTS = '.*/(selenium|contracts)'
-    ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
-    POSTGRES_PASSWORD = 'sekret'
-    RSPECQ_REDIS_URL = redisUrl()
-    PATCHSET_TAG = getPatchsetTag()
+env.COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+env.COMPOSE_PROJECT_NAME = 'coverage'
+env.FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
+env.RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
+env.RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
+env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
+env.SELENIUM_TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/selenium'
+env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
+env.EXCLUDE_TESTS = '.*/(selenium|contracts)'
+env.ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
+env.POSTGRES_PASSWORD = 'sekret'
+env.RSPECQ_REDIS_URL = redisUrl()
+env.PATCHSET_TAG = getPatchsetTag()
+env.DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+env.POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
+env.IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+env.RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
+env.DYNAMODB_IMAGE_TAG = "$env.DYNAMODB_PREFIX:$env.IMAGE_CACHE_MERGE_SCOPE-$env.RSPEC_PROCESSES"
+env.POSTGRES_IMAGE_TAG = "$env.POSTGRES_PREFIX:$env.IMAGE_CACHE_MERGE_SCOPE-$env.RSPEC_PROCESSES"
+env.COVERAGE_LOCATION = "${env.COVERAGE_TYPE == 'ruby-selenium' ? 'canvas__master__selenium--coverage/coverage' : (env.COVERAGE_TYPE == 'ruby-nonselenium' ? 'canvas__master__rspec--coverage/coverage' : 'canvas-lms-rspec/coverage')}"
+env.LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
 
-    DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
-    POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
+node(nodeLabel()) {
+  timeout(time: 60, unit: 'MINUTES') {
+    ansiColor('xterm') {
+      timestamps {
+        try {
+          stage('Clean Workspace') {
+            pipelineHelpers.cleanupWorkspace()
+          }
 
-    IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
-    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
+          stage('Setup') {
+            setupNode()
+          }
 
-    DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
-    POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+          stage('Run Tests') {
+            def rspecqStages = [:]
 
-    COVERAGE_LOCATION = "${env.COVERAGE_TYPE == 'ruby-selenium' ? 'canvas__master__selenium--coverage/coverage' : (env.COVERAGE_TYPE == 'ruby-nonselenium' ? 'canvas__master__rspec--coverage/coverage' : 'canvas-lms-rspec/coverage')}"
-  }
-
-  stages {
-    stage('Environment') {
-      steps {
-        script {
-          def rspecNodeRequirements = [label: 'canvas-docker']
-
-          def postBuildHandler = [
-            onNodeReleasing: { stageName, stageConfig, result ->
-              buildSummaryReport.saveRunManifest()
-
-              copyArtifacts(
-                filter: 'tmp/*/coverage/**',
-                optional: false,
-                projectName: env.JOB_NAME,
-                selector: specific(env.BUILD_NUMBER),
-              )
-
-              withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
-                sh """
-                  docker compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
-                  --name coverage-collator canvas bash -c \
-                  "bundle install; bundle exec rake coverage:report['/tmp/*/coverage/**']"
-                """
-
-                sh 'docker cp coverage-collator:/usr/src/app/coverage/ coverage'
-
-                archiveArtifacts allowEmptyArchive: true, artifacts: 'coverage/**'
-
-                publishHTML target: [
-                  allowMissing: false,
-                  alwaysLinkToLastBuild: false,
-                  keepAll: true,
-                  reportDir: './coverage',
-                  reportFiles: 'index.html',
-                  reportName: 'Ruby Coverage Report'
-                ]
-
-                uploadCoverage([
-                  uploadSource: '/coverage',
-                  uploadDest: env.COVERAGE_LOCATION
-                ])
-              }
-              if (env.GERRIT_EVENT_TYPE != 'comment-added' && env.COVERAGE_TYPE == 'ruby-total') {
-                generateSkippedSpecsReport()
+            // Reporters run on coordinator node
+            if (env.COVERAGE_TYPE != 'ruby-selenium') {
+              rspecqStages['RSpecQ Reporter for Rspec'] = {
+                try {
+                  sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $env.PATCHSET_TAG bundle exec rspecq \
+                    --build=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec \
+                    --queue-wait-timeout 240 \
+                    --redis-url $env.RSPECQ_REDIS_URL \
+                    --report", label: 'Reporter')
+                } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                  if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+                    sh '''#!/bin/bash
+                      ids=($(docker ps -aq --filter "name=canvas-"))
+                      for i in "${ids[@]}"
+                        do
+                          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+                      done
+                    '''
+                  }
+                  throw e
+                }
               }
             }
-          ]
 
-          def postStageHandler = [
-            onStageEnded: { stageName, stageConfig, result ->
-              buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
-            }
-          ]
-
-          extendedStage('Runner').obeysAllowStages(false).execute {
-            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
-              stage('Setup') {
-                setupNode()
+            if (env.COVERAGE_TYPE != 'ruby-nonselenium') {
+              rspecqStages['RSpecQ Reporter for Selenium'] = {
+                try {
+                  sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $env.PATCHSET_TAG bundle exec rspecq \
+                    --build=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium \
+                    --queue-wait-timeout 120 \
+                    --redis-url $env.RSPECQ_REDIS_URL \
+                    --report", label: 'Reporter')
+                } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                  if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+                    sh '''#!/bin/bash
+                      ids=($(docker ps -aq --filter "name=canvas-"))
+                      for i in "${ids[@]}"
+                        do
+                          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+                      done
+                    '''
+                  }
+                  throw e
+                }
               }
+            }
 
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
-                def rspecqStages = [:]
-
-                if (env.COVERAGE_TYPE != 'ruby-selenium') {
-                  extendedStage('RSpecQ Reporter for Rspec').timeout(30).queue(rspecqStages) {
-                    try {
-                      sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
-                        --build=${JOB_NAME}_build${BUILD_NUMBER}_rspec \
-                        --queue-wait-timeout 240 \
-                        --redis-url $RSPECQ_REDIS_URL \
-                        --report", label: 'Reporter')
-                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-                      if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-                        /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
-                        sh '''#!/bin/bash
-                          ids=( $(docker ps -aq --filter "name=canvas-") )
-                          for i in "${ids[@]}"
-                            do
-                              docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-                          done
-                        '''
-                      }
-                      throw e
-                    }
-                  }
+            // Selenium worker nodes grab their own nodes
+            if (env.COVERAGE_TYPE != 'ruby-nonselenium') {
+              for (int i = 0; i < rspecqNodeTotal; i++) {
+                def index = i
+                def indexStr = (index).toString().padLeft(2, '0')
+                rspecqStages["RSpecQ Selenium Set ${indexStr}"] = {
+                  rspecStage.runRspecQWorkerNode(String.valueOf(index), [
+                    "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
+                    "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
+                    "EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)"
+                  ])
                 }
+              }
+            }
 
-                if (env.COVERAGE_TYPE != 'ruby-nonselenium') {
-                  extendedStage('RSpecQ Reporter for Selenium').timeout(30).queue(rspecqStages) {
-                    try {
-                      sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
-                        --build=${JOB_NAME}_build${BUILD_NUMBER}_selenium \
-                        --queue-wait-timeout 120 \
-                        --redis-url $RSPECQ_REDIS_URL \
-                        --report", label: 'Reporter')
-                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-                      if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-                        /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
-                        sh '''#!/bin/bash
-                          ids=($(docker ps -aq --filter "name=canvas-"))
-                          for i in "${ids[@]}"
-                            do
-                              docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-                          done
-                          '''
-                      }
-                      throw e
-                    }
-                  }
-
-                  extendedStage('RSpecQ Selenium Set 00')
-                      .envVars(['CI_NODE_INDEX=0',
-                          "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
-                          "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
-                          'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
-                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
-                      .timeout(30)
-                      .queue(rspecqStages) { rspecStage.runRspecqSuite() }
-
-                  for (int i = 1; i < rspecqNodeTotal; i++) {
-                    def index = i
-                    extendedStage("RSpecQ Selenium Set ${(index).toString().padLeft(2, '0')}")
-                      .envVars(["CI_NODE_INDEX=$index",
-                          "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
-                          "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
-                          'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
-                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
-                      .nodeRequirements(rspecNodeRequirements)
-                      .timeout(30)
-                      .queue(rspecqStages) { rspecStage.runRspecqSuite() }
-                  }
+            // Non-Selenium worker nodes grab their own nodes
+            if (env.COVERAGE_TYPE != 'ruby-selenium') {
+              for (int i = 0; i < rspecNodeTotal; i++) {
+                def index = i
+                def indexStr = (index + 1).toString().padLeft(2, '0')
+                rspecqStages["RSpecQ Rspec Set ${indexStr}"] = {
+                  rspecStage.runRspecQWorkerNode(String.valueOf(index), [
+                    "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"
+                  ])
                 }
+              }
+            }
 
-                if (env.COVERAGE_TYPE != 'ruby-selenium') {
-                  rspecNodeTotal.times { index ->
-                    extendedStage("RSpecQ Rspec Set ${(index + 1).toString().padLeft(2, '0')}")
-                      .envVars(["CI_NODE_INDEX=$index", "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
-                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
-                      .nodeRequirements(rspecNodeRequirements)
-                      .timeout(30)
-                      .queue(rspecqStages) { rspecStage.runRspecqSuite() }
-                  }
-                }
+            parallel(rspecqStages)
+          }
+        } finally {
+          pipelineHelpers.cleanupDocker()
 
-                parallel(rspecqStages)
-              } //rspecQ
-            } //builder
-          } //runner
-        } //script
-      } //steps
-    } //environment
-  } //stages
-} //pipeline
+          collectCoverageReport()
+
+          buildSummaryReport.saveRunManifest()
+        }
+      }
+    }
+  }
+}

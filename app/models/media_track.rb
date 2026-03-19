@@ -19,6 +19,7 @@
 
 class MediaTrack < ActiveRecord::Base
   include MasterCourses::CollectionRestrictor
+  include Workflow
 
   self.collection_owner_association = :attachment
 
@@ -33,11 +34,17 @@ class MediaTrack < ActiveRecord::Base
   before_update :mark_downstream_changes
   before_destroy :mark_downstream_create_destroy
   before_destroy :check_for_restricted_updates, prepend: true
+  workflow do
+    state :ready
+    state :failed
+    state :processing
+  end
+
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
-  validates :content, presence: true
-  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }, uniqueness: { scope: :attachment_id, unless: ->(mt) { mt.attachment_id.blank? } }
-  restrict_columns :content, %i[attachment_id content locale media_object_id webvtt_content]
+  validates :content, presence: true, unless: -> { it.asr? && (it.processing? || it.failed?) }
+  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }, uniqueness: { scope: :attachment_id, unless: -> { it.attachment_id.blank? } }
+  restrict_columns :content, %i[attachment_id content locale media_object_id webvtt_content external_id]
 
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
   validates :content, format: {
@@ -72,5 +79,9 @@ class MediaTrack < ActiveRecord::Base
       srt_content.gsub!("\r\n", "\n")
       self.webvtt_content = "WEBVTT\n\n#{srt_content}".strip
     end
+  end
+
+  def asr?
+    kind == "subtitles" && external_id?
   end
 end

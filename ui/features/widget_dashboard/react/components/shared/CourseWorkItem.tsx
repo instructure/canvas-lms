@@ -75,14 +75,14 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                   isWithinText={false}
                   data-testid={`course-work-item-link-${item.id}`}
                 >
-                  <Text weight="bold" size="small">
+                  <Text weight="bold" size="small" wrap="break-word">
                     {item.title}
                   </Text>
                 </Link>
               </Flex.Item>
               <Flex.Item overflowY="visible">
                 <Flex direction="row" gap="x-small" alignItems="center">
-                  <Text size="x-small" color="secondary">
+                  <Text size="x-small" color="secondary" wrap="break-word">
                     {item.course.name}
                   </Text>
                   <Text size="x-small" color="secondary">

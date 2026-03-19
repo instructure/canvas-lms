@@ -33,9 +33,7 @@ shared_examples_for "Quiz Submissions API Restricted Endpoints" do
     allow(subject).to receive(:ldb_plugin).and_return fake_plugin
     allow(Canvas::LockdownBrowser).to receive(:plugin).and_return fake_plugin
 
-    @request_proxy.call true, {
-      attempt: 1
-    }
+    @request_proxy.call({ attempt: 1 }, raw: true)
 
     assert_forbidden
     expect(response.body).to match(/requires the lockdown browser/i)
@@ -69,7 +67,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     value.to_json
   end
 
-  def qs_api_index(raw = false, data = {})
+  def qs_api_index(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions.json"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "index",
@@ -83,7 +81,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  def qs_api_submission(raw = false, data = {})
+  def qs_api_submission(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission.json"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "submission",
@@ -97,7 +95,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  def qs_api_show(raw = false, data = {})
+  def qs_api_show(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}.json"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "show",
@@ -112,7 +110,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  def qs_api_create(raw = false, data = {})
+  def qs_api_create(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "create",
@@ -126,7 +124,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  def qs_api_complete(raw = false, data = {})
+  def qs_api_complete(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/complete"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "complete",
@@ -145,7 +143,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  def qs_api_update(raw = false, data = {})
+  def qs_api_update(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "update",
@@ -160,7 +158,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
   end
 
-  def qs_api_time(raw = false, data = {})
+  def qs_api_time(data = {}, raw: false)
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/time"
     params = { controller: "quizzes/quiz_submissions_api",
                action: "time",
@@ -253,25 +251,25 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     it "restricts access to itself" do
       student_in_course
-      qs_api_index(true)
+      qs_api_index(raw: true)
       assert_forbidden
     end
 
     it "includes submissions" do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ["submission"] })
+      json = qs_api_index({ include: ["submission"] })
       expect(json).to have_key "submissions"
     end
 
     it "includes submission grading_status" do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ["submission", "grading_status"] })
+      json = qs_api_index({ include: ["submission", "grading_status"] })
       expect(json.fetch("submissions")).to all have_key "grading_status"
     end
 
     it "includes submission submission_status" do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ["submission", "submission_status"] })
+      json = qs_api_index({ include: ["submission", "submission_status"] })
       expect(json.fetch("submissions")).to all have_key "submission_status"
     end
   end
@@ -362,7 +360,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     it "denies access by other students" do
       student_in_course
-      qs_api_show(true)
+      qs_api_show(raw: true)
       assert_forbidden
     end
 
@@ -420,9 +418,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     context "Links" do
       it "includes its linked user" do
-        json = qs_api_show(false, {
-                             include: ["user"]
-                           })
+        json = qs_api_show({ include: ["user"] })
 
         expect(json).to have_key("users")
         expect(json["quiz_submissions"].size).to eq 1
@@ -431,9 +427,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it "includes its linked quiz" do
-        json = qs_api_show(false, {
-                             include: ["quiz"]
-                           })
+        json = qs_api_show({ include: ["quiz"] })
 
         expect(json).to have_key("quizzes")
         expect(json["quiz_submissions"].size).to eq 1
@@ -442,9 +436,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it "includes its linked submission" do
-        json = qs_api_show(false, {
-                             include: ["submission"]
-                           })
+        json = qs_api_show({ include: ["submission"] })
 
         expect(json).to have_key("submissions")
         expect(json["quiz_submissions"].size).to eq 1
@@ -453,9 +445,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it "includes its linked user, quiz, and submission" do
-        json = qs_api_show(false, {
-                             include: %w[user quiz submission]
-                           })
+        json = qs_api_show({ include: %w[user quiz submission] })
 
         expect(json).to have_key("users")
         expect(json).to have_key("quizzes")
@@ -465,16 +455,14 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     context "JSON-API compliance" do
       it "conforms to the JSON-API spec when returning the object" do
-        json = qs_api_show(false)
+        json = qs_api_show
         assert_jsonapi_compliance(json, "quiz_submissions")
       end
 
       it "conforms to the JSON-API spec when returning linked objects" do
         includes = %w[user quiz submission]
 
-        json = qs_api_show(false, {
-                             include: includes
-                           })
+        json = qs_api_show({ include: includes })
 
         assert_jsonapi_compliance(json, "quiz_submissions", includes)
       end
@@ -484,7 +472,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   describe "POST /courses/:course_id/quizzes/:quiz_id/submissions [create]" do
     context "as a teacher" do
       it "creates a preview quiz submission" do
-        json = qs_api_create false, { preview: true }
+        json = qs_api_create({ preview: true })
         expect(Quizzes::QuizSubmission.find(json["quiz_submissions"][0]["id"]).preview?).to be_truthy
       end
     end
@@ -518,7 +506,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       context "access validations" do
-        include_examples "Quiz Submissions API Restricted Endpoints"
+        it_behaves_like "Quiz Submissions API Restricted Endpoints"
 
         before do
           @request_proxy = method(:qs_api_create)
@@ -526,7 +514,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
         it "rejects creating a QS when one already exists" do
           qs_api_create
-          qs_api_create(true)
+          qs_api_create(raw: true)
           expect(response.status.to_i).to eq 409
         end
 
@@ -536,7 +524,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           qs.mark_completed
           qs.save!
 
-          qs_api_create(true)
+          qs_api_create(raw: true)
           expect(response.status.to_i).to eq 409
         end
       end
@@ -625,9 +613,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     it "completes a quiz submission" do
-      json = qs_api_complete false, {
-        attempt: 1
-      }
+      json = qs_api_complete({ attempt: 1 })
 
       expect(json).to have_key("quiz_submissions")
       expect(json["quiz_submissions"].length).to eq 1
@@ -635,7 +621,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     context "access validations" do
-      include_examples "Quiz Submissions API Restricted Endpoints"
+      it_behaves_like "Quiz Submissions API Restricted Endpoints"
 
       before do
         @request_proxy = method(:qs_api_complete)
@@ -645,34 +631,28 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         @quiz_submission.mark_completed
         Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
-        qs_api_complete true, {
-          attempt: 1
-        }
+        qs_api_complete({ attempt: 1 }, raw: true)
 
         assert_status(400)
         expect(response.body).to match(/already complete/)
       end
 
       it "requires the attempt index" do
-        qs_api_complete true
+        qs_api_complete(raw: true)
 
         assert_status(400)
         expect(response.body).to match(/invalid attempt/)
       end
 
       it "requires the current attempt index" do
-        qs_api_complete true, {
-          attempt: 123_123_123
-        }
+        qs_api_complete({ attempt: 123_123_123 }, raw: true)
 
         assert_status(400)
         expect(response.body).to match(/attempt.*can not be modified/)
       end
 
       it "requires a valid validation token" do
-        qs_api_complete true, {
-          validation_token: "aaaooeeeee"
-        }
+        qs_api_complete({ validation_token: "aaaooeeeee" }, raw: true)
 
         assert_forbidden
         expect(response.body).to match(/invalid token/)
@@ -703,12 +683,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     it "fudges points" do
-      json = qs_api_update false, {
-        quiz_submissions: [{
-          attempt: @quiz_submission.attempt,
-          fudge_points: 2.5
-        }]
-      }
+      json = qs_api_update({
+                             quiz_submissions: [{
+                               attempt: @quiz_submission.attempt,
+                               fudge_points: 2.5
+                             }]
+                           })
 
       expect(json).to have_key("quiz_submissions")
       expect(json["quiz_submissions"].length).to eq 1
@@ -717,16 +697,16 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     it "modifies a question score" do
-      json = qs_api_update false, {
-        quiz_submissions: [{
-          attempt: @quiz_submission.attempt,
-          questions: {
-            @qq1.id.to_s => {
-              score: 10
-            }
-          }
-        }]
-      }
+      json = qs_api_update({
+                             quiz_submissions: [{
+                               attempt: @quiz_submission.attempt,
+                               questions: {
+                                 @qq1.id.to_s => {
+                                   score: 10
+                                 }
+                               }
+                             }]
+                           })
 
       expect(json).to have_key("quiz_submissions")
       expect(json["quiz_submissions"].length).to eq 1
@@ -734,16 +714,16 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     it "sets a comment" do
-      qs_api_update false, {
-        quiz_submissions: [{
-          attempt: @quiz_submission.attempt,
-          questions: {
-            @qq2.id.to_s => {
-              comment: "Aaaaaughibbrgubugbugrguburgle"
-            }
-          }
-        }]
-      }
+      qs_api_update({
+                      quiz_submissions: [{
+                        attempt: @quiz_submission.attempt,
+                        questions: {
+                          @qq2.id.to_s => {
+                            comment: "Aaaaaughibbrgubugbugrguburgle"
+                          }
+                        }
+                      }]
+                    })
 
       @quiz_submission.reload
       expect(@quiz_submission.submission_data[1]["more_comments"]).to eq "Aaaaaughibbrgubugbugrguburgle"
@@ -755,9 +735,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
-    now = Time.now.utc
-    around(:once_and_each) do |block|
-      Timecop.freeze(now) { block.call }
+    let_once(:now) { Time.zone.now }
+    around(:once_and_each) do |example|
+      Timecop.freeze(now) { example.call }
     end
 
     before :once do
@@ -765,12 +745,12 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @user = @student
 
       @quiz_submission = @quiz.generate_submission(@student)
-      @quiz_submission.update_attribute(:end_at, now + 1.hour)
-      Quizzes::QuizSubmission.where(id: @quiz_submission).update_all(updated_at: now - 1.hour)
+      @quiz_submission.update_attribute(:end_at, 1.hour.from_now)
+      Quizzes::QuizSubmission.where(id: @quiz_submission).update_all(updated_at: 1.hour.ago)
     end
 
     it "gives times for the quiz" do
-      json = qs_api_time(false)
+      json = qs_api_time
       expect(json).to have_key("time_left")
       expect(json).to have_key("end_at")
       expect(json["time_left"]).to be_within(5.0).of(60 * 60)
@@ -778,14 +758,14 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     it "rejects a teacher other student" do
       @user = @teacher
-      qs_api_time(true)
+      qs_api_time(raw: true)
       assert_forbidden
     end
 
     it "rejects another student" do
       enroll_student
       @user = @student
-      qs_api_time(true)
+      qs_api_time(raw: true)
       assert_forbidden
     end
   end

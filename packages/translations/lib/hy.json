@@ -146,6 +146,9 @@
     "external_tools_6e77821": {
         "message": "Արտաքին գործիքներ"
     },
+    "failed_276786d": {
+        "message": "Սխալ"
+    },
     "files_c300e900": {
         "message": "Ֆայլեր"
     },
@@ -329,6 +332,9 @@
     "previous_bd2ac015": {
         "message": "Նախորդը"
     },
+    "processing_8c569014": {
+        "message": "Մշակվում է..."
+    },
     "published_c944a23d": {
         "message": "հրապարակված"
     },
@@ -418,6 +424,9 @@
     },
     "up_c553575d": {
         "message": "Վերև"
+    },
+    "upload_8b403d05": {
+        "message": "Բեռնել"
     },
     "upload_file_fd2361b8": {
         "message": "Բեռնել ֆայլը "

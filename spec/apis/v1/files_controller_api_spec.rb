@@ -29,7 +29,7 @@ describe "Files API", type: :request do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
   end
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "file" }
 
     let(:locked_item) do
@@ -44,8 +44,6 @@ describe "Files API", type: :request do
         { controller: "files", action: "api_show", format: "json", id: locked_item.id.to_s }
       )
     end
-
-    include_examples "a locked api item"
   end
 
   describe "create file" do
@@ -689,7 +687,7 @@ describe "Files API", type: :request do
         json = api_call(:get, @files_path, @files_path_options, {})
         res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
-        json.pluck("url").each { |url| expect(url).to include "verifier=" } unless disable_adding_uuid_verifier_in_api
+        expect(json.pluck("url")).to all(include "verifier=") unless disable_adding_uuid_verifier_in_api
       end
 
       it "does not omit verifiers using session auth if params[:use_verifiers] is given" do
@@ -697,7 +695,7 @@ describe "Files API", type: :request do
         get @files_path + "?use_verifiers=1"
         expect(response).to be_successful
         json = json_parse
-        json.pluck("url").each { |url| expect(url).to include "verifier=" } unless disable_adding_uuid_verifier_in_api
+        expect(json.pluck("url")).to all(include "verifier=") unless disable_adding_uuid_verifier_in_api
       end
     end
 

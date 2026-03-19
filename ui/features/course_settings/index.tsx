@@ -56,6 +56,7 @@ const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
 const CourseNavigationSettings = React.lazy(
   () => import('./react/components/CourseNavigationSettings'),
 )
+const CanvasCourseCriteria = React.lazy(() => import('./react/components/CanvasCourseCriteria'))
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const ErrorMessage = () => (
@@ -65,6 +66,8 @@ const ErrorMessage = () => (
 )
 
 ready(() => {
+  const canEditContent = ENV.PERMISSIONS?.manage_course_content_edit !== false
+
   const blueprint = document.getElementById('blueprint_menu')
   if (blueprint) {
     render(
@@ -103,26 +106,28 @@ ready(() => {
   // @ts-expect-error
   $(() => navView.render())
 
-  render(
-    <CourseImageSelector
-      store={configureStore(initialState)}
-      courseId={ENV.COURSE_ID}
-      setting="image"
-    />,
-    $('.CourseImageSelector__Container')[0],
-  )
-
-  const bannerImageContainer = document.getElementById('course_banner_image_selector_container')
-  if (bannerImageContainer) {
+  if (canEditContent) {
     render(
       <CourseImageSelector
         store={configureStore(initialState)}
         courseId={ENV.COURSE_ID}
-        setting="banner_image"
-        wide={true}
+        setting="image"
       />,
-      bannerImageContainer,
+      $('.CourseImageSelector__Container')[0],
     )
+
+    const bannerImageContainer = document.getElementById('course_banner_image_selector_container')
+    if (bannerImageContainer) {
+      render(
+        <CourseImageSelector
+          store={configureStore(initialState)}
+          courseId={ENV.COURSE_ID}
+          setting="banner_image"
+          wide={true}
+        />,
+        bannerImageContainer,
+      )
+    }
   }
 
   const availabilityOptionsContainer = document.getElementById('availability_options_container')
@@ -131,7 +136,7 @@ ready(() => {
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<ErrorMessage />}>
           <CourseAvailabilityOptions
-            canManage={ENV.PERMISSIONS.edit_course_availability}
+            canManage={ENV.PERMISSIONS.edit_course_availability && canEditContent}
             viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
             viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
           />
@@ -147,7 +152,9 @@ ready(() => {
   if (restrictQuantitativeDataContainer) {
     render(
       <Suspense fallback={<Loading />}>
-        <QuantitativeDataOptions canManage={ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA} />
+        <QuantitativeDataOptions
+          canManage={ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA && canEditContent}
+        />
       </Suspense>,
       restrictQuantitativeDataContainer,
     )
@@ -160,7 +167,7 @@ ready(() => {
     render(
       <Suspense fallback={<Loading />}>
         <CourseDefaultDueTime
-          canManage={ENV.PERMISSIONS.manage}
+          canManage={ENV.PERMISSIONS.manage && canEditContent}
           container={defaultDueTimeContainer}
           value={defaultValue}
         />
@@ -253,6 +260,30 @@ ready(() => {
         </ErrorBoundary>
       </Suspense>,
       navSettingsContainer,
+    )
+  }
+
+  const criteriaContainer = document.getElementById('tab-criteria-mount')
+  if (criteriaContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CanvasCourseCriteria />
+        </ErrorBoundary>
+      </Suspense>,
+      criteriaContainer,
+    )
+  }
+
+  const sidebarCriteriaContainer = document.getElementById('criteria-mount')
+  if (sidebarCriteriaContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CanvasCourseCriteria />
+        </ErrorBoundary>
+      </Suspense>,
+      sidebarCriteriaContainer,
     )
   }
 })

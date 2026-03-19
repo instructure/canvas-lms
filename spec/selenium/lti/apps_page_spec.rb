@@ -25,10 +25,6 @@ describe "Apps Page" do
 
   include_context "in-process server selenium tests"
 
-  before(:once) do
-    account.enable_feature!(:lti_registrations_page)
-  end
-
   before do
     user_session(user)
   end

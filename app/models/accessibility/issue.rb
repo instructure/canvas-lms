@@ -18,11 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Accessibility
+  # TODO: RCX-4765 - This class generates accessibility issue data for the old wizard UI
+  # that was removed in commit 70d63e25976. The new accessibility checker uses
+  # AccessibilityResourceScan instead. This may still be used by external tools
+  # via the /accessibility/issues API endpoints, but has no Canvas UI consumers.
   class Issue
     include WikiPageIssues
     include AssignmentIssues
     include AttachmentIssues
+    include AnnouncementIssues
     include DiscussionTopicIssues
+    include SyllabusIssues
     include ContentChecker
 
     attr_reader :context
@@ -33,13 +39,16 @@ module Accessibility
 
     def generate
       skip_scan = @context.exceeds_accessibility_scan_limit?
+      syllabus_data = generate_syllabus_resources(skip_scan:)
       {
         pages: generate_wiki_page_resources(skip_scan:),
         assignments: generate_assignment_resources(skip_scan:),
+        announcements: generate_announcement_resources(skip_scan:),
         discussion_topics: generate_discussion_topic_resources(skip_scan:),
         # TODO: Disable PDF Accessibility Checks Until Post-InstCon
         # attachments: generate_attachment_resources(skip_scan:),
         attachments: {},
+        syllabus: syllabus_data[:syllabus],
         last_checked: Time.zone.now.strftime("%b %-d, %Y"),
         accessibility_scan_disabled: skip_scan
       }
@@ -52,8 +61,10 @@ module Accessibility
       {
         pages: filter_resources(data[:pages], query),
         assignments: filter_resources(data[:assignments], query),
+        announcements: filter_resources(data[:announcements], query),
         discussion_topics: filter_resources(data[:discussion_topics], query),
         attachments: filter_resources(data[:attachments], query),
+        syllabus: filter_single_resource(data[:syllabus], query),
         last_checked: data[:last_checked],
         accessibility_scan_disabled: data[:accessibility_scan_disabled]
       }
@@ -64,6 +75,9 @@ module Accessibility
       HtmlFixer.new(rule_id, resource, path, value).apply_fix!
     end
 
+    # TODO: This method is only used by PreviewController#create and should be eliminated.
+    # The preview should use issue_id (like PreviewController#show does) to load the
+    # AccessibilityIssue from DB and use its resource, ensuring consistency with the fix action.
     def update_preview(rule_id, resource_type, resource_id, path, value)
       resource = self.class.find_resource(context, resource_type, resource_id)
       HtmlFixer.new(rule_id, resource, path, value).preview_fix(element_only: path.present?)
@@ -80,8 +94,12 @@ module Accessibility
         context.wiki_pages.find(resource_id)
       when "Assignment"
         context.assignments.find(resource_id)
-      when "DiscussionTopic"
+      when "DiscussionTopic", "Announcement"
         context.discussion_topics.find(resource_id)
+      when "Syllabus"
+        # Syllabus is part of Course, wrap it in SyllabusResource
+        # resource_id is actually the course_id for syllabus
+        Accessibility::SyllabusResource.new(context)
       else
         raise ArgumentError, "Unsupported resource type: #{resource_type}"
       end
@@ -92,6 +110,16 @@ module Accessibility
     def filter_resources(resources, query)
       resources.values&.select do |resource|
         resource.values&.any? { |value| value.to_s.downcase.include?(query.downcase) }
+      end
+    end
+
+    def filter_single_resource(resource, query)
+      return {} unless resource.present?
+
+      if resource.values&.any? { |value| value.to_s.downcase.include?(query.downcase) }
+        resource
+      else
+        {}
       end
     end
 

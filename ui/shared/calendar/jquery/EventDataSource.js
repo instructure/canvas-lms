@@ -635,7 +635,7 @@ export default class EventDataSource {
           {
             registration_status: registrationStatus,
             ...(appointmentGroup.context_codes.length > 0 && {
-              context_code: appointmentGroup.context_codes[0],
+              context_code: appointmentGroup.context_codes,
             }),
           },
         ],

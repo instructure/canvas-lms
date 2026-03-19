@@ -210,6 +210,25 @@ class LearningObjectDatesController < ApplicationController
   #   'title', 'due_at', 'unlock_at', 'lock_at', 'student_ids', and 'course_section_id', 'course_id',
   #   'noop_id', and 'unassign_item'.
   #
+  # @argument peer_review [Hash]
+  #   Optional peer review configuration for assignments with peer reviews enabled.
+  #   Requires the peer_review_allocation_and_grading feature flag.
+  #   Keys can include: 'due_at', 'unlock_at', 'lock_at', 'peer_review_overrides'
+  #
+  # @argument peer_review[due_at] [DateTime]
+  #   The peer review due date
+  #
+  # @argument peer_review[unlock_at] [DateTime]
+  #   The peer review unlock date (when peer reviews become available)
+  #
+  # @argument peer_review[lock_at] [DateTime]
+  #   The peer review lock date (when peer reviews are no longer available)
+  #
+  # @argument peer_review[peer_review_overrides][] [Array]
+  #   List of peer review overrides. Each override can include: 'id', 'due_at',
+  #   'unlock_at', 'lock_at', 'student_ids', 'course_section_id', 'course_id',
+  #   'group_id', 'unassign_item'
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/assignments/:assignment_id/date_details \
   #     -X PUT \
@@ -229,7 +248,19 @@ class LearningObjectDatesController < ApplicationController
   #               "title": "an assignment override",
   #               "student_ids": [1, 2, 3]
   #             }
-  #           ]
+  #           ],
+  #           "peer_review": {
+  #             "due_at": "2012-07-05T23:59:00-06:00",
+  #             "unlock_at": "2012-07-02T23:59:00-06:00",
+  #             "lock_at": "2012-07-10T23:59:00-06:00",
+  #             "peer_review_overrides": [
+  #               {
+  #                 "id": 312,
+  #                 "course_section_id": 3564,
+  #                 "due_at": "2012-07-06T23:59:00-06:00"
+  #               }
+  #             ]
+  #           }
   #         }'
   def update
     if overridable.try(:is_child_content?)
@@ -519,9 +550,15 @@ class LearningObjectDatesController < ApplicationController
                       :lock_at,
                       :only_visible_to_overrides,
                       { assignment_overrides: strong_anything }]
+
     allowed_params.unshift(:due_at) if allow_due_at?
     allowed_params.unshift(:reply_to_topic_due_at) if allow_due_at?
     allowed_params.unshift(:required_replies_due_at) if allow_due_at?
+    allowed_params.push({ peer_review: strong_anything }) if allow_peer_reviews?
     params.permit(*allowed_params)
+  end
+
+  def allow_peer_reviews?
+    asset.is_a?(Assignment) && asset.peer_reviews? && @context.feature_enabled?(:peer_review_allocation_and_grading)
   end
 end

@@ -59,7 +59,7 @@ const formatTimeAgo = (dateString: string | null): string => {
   }
 }
 
-export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
+export const GradeItem: React.FC<GradeItemProps> = ({submission, isRightColumn = false}) => {
   const {isMobile} = useResponsiveContext()
   const [isExpanded, setIsExpanded] = useState(false)
   const isGraded = submission.gradedAt !== null
@@ -72,12 +72,22 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
 
   const assignmentTitle = (
     <View>
-      <Text size="medium" weight="bold" data-testid={`assignment-title-${submission._id}`}>
+      <Text
+        size="medium"
+        wrap="break-word"
+        weight="bold"
+        data-testid={`assignment-title-${submission._id}`}
+      >
         {submission.assignment.name}
       </Text>
       {submission.assignment.course?.name && (
         <View as="div">
-          <Text size="small" color="secondary" data-testid={`course-name-${submission._id}`}>
+          <Text
+            size="small"
+            color="secondary"
+            wrap="break-word"
+            data-testid={`course-name-${submission._id}`}
+          >
             {submission.assignment.course.name}
           </Text>
         </View>
@@ -118,11 +128,17 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
 
   if (isMobile) {
     return (
-      <View as="div" padding="small 0" data-testid={`grade-item-${submission._id}`}>
+      <View
+        as="div"
+        padding="small 0"
+        data-testid={`grade-item-${submission._id}`}
+        role="group"
+        aria-label={submission.assignment.name}
+      >
         <Flex direction="column" gap="x-small">
           <Flex.Item>{assignmentTitle}</Flex.Item>
           <Flex.Item>{timestamp}</Flex.Item>
-          <Flex.Item>
+          <Flex.Item overflowY="visible">
             <Flex direction="row" gap="x-small" alignItems="center">
               <Flex.Item>{statusPill}</Flex.Item>
               {expandButton && <Flex.Item>{expandButton}</Flex.Item>}
@@ -143,7 +159,12 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
   }
 
   return (
-    <View as="div" data-testid={`grade-item-${submission._id}`}>
+    <View
+      as="div"
+      data-testid={`grade-item-${submission._id}`}
+      role="group"
+      aria-label={submission.assignment.name}
+    >
       <Flex direction="column" gap="x-small">
         <Flex.Item padding="small">
           <Flex gap="small" alignItems="center">
@@ -173,7 +194,11 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission}) => {
           <Flex.Item>
             <Expandable expanded={isExpanded} onToggle={handleToggleExpand}>
               {({expanded}) => (
-                <div>{expanded && <ExpandedGradeView submission={submission} />}</div>
+                <div>
+                  {expanded && (
+                    <ExpandedGradeView submission={submission} isRightColumn={isRightColumn} />
+                  )}
+                </div>
               )}
             </Expandable>
           </Flex.Item>

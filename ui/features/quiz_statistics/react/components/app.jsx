@@ -18,6 +18,7 @@
 
 import {extend} from 'es-toolkit/compat'
 import CalculatedRenderer from './questions/calculated'
+import config from '../../config'
 import EssayRenderer from './questions/essay'
 import FileUploadRenderer from './questions/file_upload'
 import FillInMultipleBlanksRenderer from './questions/fill_in_multiple_blanks'
@@ -136,7 +137,9 @@ class Statistics extends React.Component {
   renderQuizReports() {
     const quizReports = this.props.quizReports
     if (typeof quizReports !== 'undefined' && quizReports !== null && quizReports.length) {
-      return quizReports.map(this.renderReport.bind(this))
+      return quizReports
+        .filter(report => report.includesAllVersions === config.includesAllVersions)
+        .map(this.renderReport.bind(this))
     }
   }
 

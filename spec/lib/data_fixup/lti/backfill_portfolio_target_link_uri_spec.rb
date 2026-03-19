@@ -232,11 +232,11 @@ RSpec.describe DataFixup::Lti::BackfillPortfolioTargetLinkUri do
         registration.update_column(:lti_tool_configuration, config_without_uri)
         registration
       end
-      let(:scope) { double("scope") }
+      let(:scope) { instance_double(Sentry::Scope) }
 
       it "skips the registration and notifies Sentry" do
         expect(Sentry).to receive(:with_scope).and_yield(scope)
-        expect(scope).to receive(:set_tags).with(lti_ims_registration_id: ims_registration.global_id)
+        expect(scope).to receive(:set_tags).with(lti_ims_registration_id: ims_registration.global_id).and_return(nil)
         expect(Sentry).to receive(:capture_message)
           .with("DataFixup#backfill_portfolio_target_link_uri: missing target_link_uri in messages", { level: :warning })
 
@@ -290,15 +290,15 @@ RSpec.describe DataFixup::Lti::BackfillPortfolioTargetLinkUri do
         registration.update_column(:lti_tool_configuration, config_without_uri)
         registration
       end
-      let(:scope) { double("scope") }
+      let(:scope) { instance_double(Sentry::Scope) }
 
       it "captures the error using Sentry and continues" do
         expect(Sentry).to receive(:with_scope).and_yield(scope)
         expect(Sentry).to receive(:capture_message)
           .with("DataFixup#backfill_portfolio_target_link_uri", { level: :warning })
-        expect(scope).to receive(:set_tags).with(lti_ims_registration_id: ims_registration.global_id)
+        expect(scope).to receive(:set_tags).with(lti_ims_registration_id: ims_registration.global_id).and_return(nil)
         expect(scope).to receive(:set_context)
-          .with("exception", { name: "StandardError", message: "whoops!" })
+          .with("exception", { name: "StandardError", message: "whoops!" }).and_return(nil)
 
         allow_any_instance_of(Lti::IMS::Registration).to receive(:update!).and_raise(StandardError.new("whoops!"))
 

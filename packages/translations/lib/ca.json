@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Afegeix la imatge"
     },
+    "add_new_a9226085": {
+        "message": "Afegeix elements nous"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Afegiu-hi un subtítol nou"
+    },
     "add_one_9e34a6f8": {
         "message": "Afegiu-ne una!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "Producte amb tapa"
     },
+    "caption_manager_aae0906f": {
+        "message": "Gestor de subtítols"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "S’han afegit els subtítols en { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "S’han suprimit els subtítols en { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Els subtítols heretats d’una assignatura principal no es poden suprimir."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Tria un fitxer de subtítols"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Trieu un fitxer"
     },
     "choose_usage_rights_33683854": {
         "message": "Tria els drets d''ús..."
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Fletxa descendent dreta en diagonal"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Baixeu { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Baixa { filename }"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "No s’ha pogut recuperant el contingut de l''eina externa"
+    },
+    "file_d1b70050": {
+        "message": "Fitxer*"
     },
     "file_name_8fd421ff": {
         "message": "Nom del fitxer"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "Lambda"
+    },
+    "language_91effaa0": {
+        "message": "Idioma*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "Icona d''arts lingüístiques"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Seleccioneu un fitxer d’un tipus admès"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Seleccioneu un idioma"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Seleccioneu un fitxer .vtt o .srt"
+    },
     "plus_d43cd4ec": {
         "message": "Més"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Números primers"
+    },
+    "processing_8c569014": {
+        "message": "S''està processant..."
     },
     "product_39cf144f": {
         "message": "Producte"
@@ -1994,9 +2030,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Elimina l''enllaç"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Suprimiu l''element multimèdia de l’Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Substitueix-ho tot"
     },
@@ -2017,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "S’ha substituït tot { alertFindText } amb { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Sol·licita-ho"
     },
     "reset_95a81614": {
         "message": "Restableix"
@@ -2165,6 +2201,9 @@
     "selected_274ce24f": {
         "message": "Seleccionat"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Fitxer seleccionat: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } seleccionat"
     },
@@ -2198,20 +2237,11 @@
     "show_all_967a90f0": {
         "message": "Mostra-ho tot"
     },
-    "show_audio_options_b489926b": {
-        "message": "Mostra les opcions de so"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Mostra les opcions d''imatge"
     },
     "show_link_options_545338fd": {
         "message": "Mostra les opcions d''enllaç"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostra les opcions d’elements multimèdia de l’Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Mostra les opcions de vídeo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Els usuaris vistos naveguen ràpidament per les pàgines web i hi cerquen capçaleres grans o en negreta. Els usuaris del lector de pantalla es basen en les capçaleres per obtenir-ne el significat contextual. Les capçaleres han de tenir l''estructura adequada."
@@ -2602,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "S’ha actualitzat l''enllaç"
+    },
+    "upload_8b403d05": {
+        "message": "Penja-ho"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Pengeu una pista de subtítols en format SRT o WebVTT."
     },
     "upload_document_253f0478": {
         "message": "Penja un document"

@@ -35,7 +35,7 @@ describe Canvas::Apm::InstJobs::Plugin do
   end
 
   describe "instrumenting worker execution" do
-    let(:worker) { double(:worker, name: "worker") }
+    let(:worker) { instance_double(Delayed::Worker, name: "worker") }
 
     it "execution callback yields control" do
       expect { |b| Delayed::Worker.lifecycle.run_callbacks(:execute, worker, &b) }.to yield_with_args(worker)

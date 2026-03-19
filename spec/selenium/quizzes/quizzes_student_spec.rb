@@ -53,7 +53,7 @@ describe "quizzes" do
 
     context "with a quiz started" do
       before(:once) do
-        @qsub = quiz_with_submission(false)
+        @qsub = quiz_with_submission(complete_quiz: false)
       end
 
       context "when attempting to resume a quiz" do

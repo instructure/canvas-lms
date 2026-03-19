@@ -86,7 +86,6 @@ shared_examples_for "module performance with module items" do |context|
       wait_for_ajaximations
 
       keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
-        puts "Previous Trying..."
         expect(module_item_page_button_selector(@module_list[0].id, "Previous")).to be_truthy
       end
 

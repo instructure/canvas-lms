@@ -166,25 +166,22 @@ describe ContentMigration do
       mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "WEBVTT\n00:00.001 --> 00:00.900\n- Hi!\n", attachment_id: nil)
       page = @copy_from.wiki_pages.create!(title: "watch this y'all", body: %(<iframe data-media-type="video" src="/media_objects_iframe/#{mo.media_id}" data-media-id="#{mo.media_id}"/>))
 
-      kaltura_session = double("kaltura_admin_session")
-      expect(CC::CCHelper).to receive_messages(kaltura_admin_session: kaltura_session)
-      expect(kaltura_session).to receive(:flavorAssetGetByEntryId).and_return([
-                                                                                {
-                                                                                  isOriginal: 1,
-                                                                                  containerFormat: "mp4",
-                                                                                  fileExt: "mp4",
-                                                                                  id: "one",
-                                                                                  size: 15,
-                                                                                }
-                                                                              ])
-      expect(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_session.flavorAssetGetByEntryId.first)
-      expect(kaltura_session).to receive(:media_sources).and_return([{
-                                                                      isOriginal: "0",
-                                                                      fileExt: "mp4",
-                                                                      url: "http://example.com/media_path",
-                                                                      content_type: "video/mp4"
-                                                                    }])
-      expect(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_session)
+      kaltura_session = instance_double(CanvasKaltura::ClientV3)
+      flavor_asset = {
+        isOriginal: 1,
+        containerFormat: "mp4",
+        fileExt: "mp4",
+        id: "one",
+        size: 15,
+      }
+      allow(CC::CCHelper).to receive_messages(kaltura_admin_session: kaltura_session)
+      allow(kaltura_session).to receive_messages(flavorAssetGetByEntryId: [flavor_asset], flavorAssetGetOriginalAsset: flavor_asset, media_sources: [{
+                                                   isOriginal: "0",
+                                                   fileExt: "mp4",
+                                                   url: "http://example.com/media_path",
+                                                   content_type: "video/mp4"
+                                                 }])
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_session)
       allow(kaltura_session).to receive_messages(media_sources:
         [{ height: "240",
            bitrate: "382",

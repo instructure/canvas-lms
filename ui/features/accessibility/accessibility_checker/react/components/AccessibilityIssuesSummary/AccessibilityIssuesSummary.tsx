@@ -25,6 +25,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
 import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
+import {IssueStatusBarChart} from '../../../../shared/react/components/BarChart/IssueStatusBarChart'
 import {responsiveQuerySizes} from '@canvas/breakpoints'
 
 const I18n = createI18nScope('accessibility_checker')
@@ -38,8 +39,8 @@ function renderLoading() {
 }
 
 export const AccessibilityIssuesSummary = () => {
-  const [issuesSummary, loadingOfSummary] = useAccessibilityScansStore(
-    useShallow(state => [state.issuesSummary, state.loadingOfSummary]),
+  const [issuesSummary, loadingOfSummary, isGA2FeaturesEnabled] = useAccessibilityScansStore(
+    useShallow(state => [state.issuesSummary, state.loadingOfSummary, state.isGA2FeaturesEnabled]),
   )
 
   if (window.ENV.SCAN_DISABLED === true) return null
@@ -62,11 +63,26 @@ export const AccessibilityIssuesSummary = () => {
           direction={props?.direction}
           data-testid="accessibility-issues-summary"
         >
-          <Flex.Item>
-            <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
-              <IssuesCounter count={issuesSummary?.total ?? 0} />
-            </View>
-          </Flex.Item>
+          {isGA2FeaturesEnabled ? (
+            <Flex.Item width={props?.direction === 'row' ? 260 : undefined}>
+              <IssueStatusBarChart
+                open={issuesSummary?.active || 0}
+                resolved={issuesSummary?.resolved || 0}
+              />
+            </Flex.Item>
+          ) : (
+            <Flex.Item>
+              <View
+                as="div"
+                padding="medium"
+                borderWidth="small"
+                borderRadius="medium"
+                height="100%"
+              >
+                <IssuesCounter count={issuesSummary?.active ?? 0} />
+              </View>
+            </Flex.Item>
+          )}
           <Flex.Item shouldGrow shouldShrink>
             <View
               as="div"

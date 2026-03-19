@@ -14,18 +14,3 @@ translate_inbox_messages:
   display_name: IgniteAI Translations for Inbox
   description: Enable translation software when composing messages. Translate inbound messages  into user's preferred language.
   beta: true
-
-ai_translation_improvements:
-  state: hidden
-  applies_to: RootAccount
-  display_name: AI Translation Improvements
-  description: Improve the ui and ux around AI translation features.
-  shadow: true
-
-cedar_translation:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Cedar Translation
-  description: |-
-    Uses Cedar for translations
-  shadow: true

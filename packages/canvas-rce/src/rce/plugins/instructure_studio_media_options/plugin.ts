@@ -110,7 +110,6 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       },
       icon: 'thumbnail-view-icon',
       text: formatMessage('Thumbnail'),
-      tooltip: formatMessage('Thumbnail'),
     })
 
     ed.ui.registry.addToggleButton('learn-view', {
@@ -127,7 +126,6 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       },
       icon: 'learn-view-icon',
       text: formatMessage('Learn'),
-      tooltip: formatMessage('Learn'),
     })
 
     ed.ui.registry.addToggleButton('collab-view', {
@@ -144,7 +142,6 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       },
       icon: 'collab-view-icon',
       text: formatMessage('Collab'),
-      tooltip: formatMessage('Collab'),
     })
 
     ed.ui.registry.addButton('studio-media-options', {
@@ -156,7 +153,6 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       },
       icon: 'options-icon',
       text: formatMessage('Options'),
-      tooltip: formatMessage('Options'),
     })
 
     ed.ui.registry.addButton('remove-studio-media', {
@@ -178,7 +174,6 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       },
       icon: 'remove-icon',
       text: formatMessage('Remove'),
-      tooltip: formatMessage('Remove Studio Media'),
     })
 
     ed.ui.registry.addContextToolbar('studio-extra-toolbar', {
@@ -200,7 +195,6 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
         studioTrayController.showTrayForEditor(ed)
       },
       text: formatMessage('Studio Media Options'),
-      tooltip: formatMessage('Show Studio media options'),
     })
 
     ed.ui.registry.addContextToolbar('studio-media-options-toolbar', {

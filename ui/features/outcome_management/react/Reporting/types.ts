@@ -84,6 +84,7 @@ export type MasteryLevel =
   | 'remediation'
   | 'unassessed'
   | 'no_evidence'
+  | number // Numeric levels for scales with >5 levels or non-standard mastery positions
 
 export type MasteryFilter = 'all' | 'mastery' | 'not_started' | 'in_progress'
 
@@ -100,5 +101,7 @@ export interface Outcome {
   totalAlignmentsCount: number
   masteryScore: number | null
   masteryLevel: MasteryLevel
+  masteryPoints: number
+  ratings?: LMGBRating[]
   scores?: LMGBScoreReporting[]
 }

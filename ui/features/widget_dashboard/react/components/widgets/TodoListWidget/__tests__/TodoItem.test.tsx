@@ -90,14 +90,14 @@ describe('TodoItem', () => {
     const item = mockPlannerItems[0]
     renderWithProvider(<TodoItem item={item} />)
 
-    expect(screen.getByText(/100 pts/)).toBeInTheDocument()
+    expect(screen.getByText(/100 points/)).toBeInTheDocument()
   })
 
   it('does not display points for items without points_possible', () => {
     const item = mockPlannerItems[3]
     renderWithProvider(<TodoItem item={item} />)
 
-    expect(screen.queryByText('pts')).not.toBeInTheDocument()
+    expect(screen.queryByText('points')).not.toBeInTheDocument()
   })
 
   it('displays item type label', () => {
@@ -292,6 +292,40 @@ describe('TodoItem', () => {
       const button = screen.getByTestId(`todo-checkbox-${redoItem.plannable_id}`)
       expect(button).toBeInTheDocument()
       expect(screen.getByText('Mark Lab Report: Cell Structure as complete')).toBeInTheDocument()
+    })
+  })
+
+  describe('announcement display', () => {
+    it('shows "Posted" date for announcements without overdue styling', () => {
+      const announcementItem = {
+        ...mockPlannerItems[0],
+        plannable_type: 'announcement' as const,
+        plannable_date: '2026-01-22T18:00:00Z',
+        plannable: {
+          ...mockPlannerItems[0].plannable,
+          title: 'Important Announcement',
+        },
+      }
+      renderWithProvider(<TodoItem item={announcementItem} />)
+
+      expect(screen.getByText(/Posted/)).toBeInTheDocument()
+      expect(screen.queryByText('Overdue')).not.toBeInTheDocument()
+    })
+
+    it('does not apply danger color to announcement date', () => {
+      const announcementItem = {
+        ...mockPlannerItems[0],
+        plannable_type: 'announcement' as const,
+        plannable_date: '2020-01-01T00:00:00Z',
+        plannable: {
+          ...mockPlannerItems[0].plannable,
+          title: 'Old Announcement',
+        },
+      }
+      renderWithProvider(<TodoItem item={announcementItem} />)
+
+      const postedText = screen.getByText(/Posted/)
+      expect(postedText).toHaveAttribute('color', 'secondary')
     })
   })
 })

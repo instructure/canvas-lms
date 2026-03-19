@@ -80,7 +80,10 @@ export const GRADEBOOK_QUERY = gql`
         }
       }
       submissionsConnection(
-        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+        filter: {
+          states: [graded, pending_review, submitted, ungraded, unsubmitted]
+          includePeerReviewSubmissions: true
+        }
       ) {
         nodes {
           grade
@@ -128,6 +131,7 @@ export const GRADEBOOK_QUERY = gql`
               name
               omitFromFinalGrade
               pointsPossible
+              position
               submissionTypes
               dueAt
               groupCategoryId
@@ -149,6 +153,30 @@ export const GRADEBOOK_QUERY = gql`
                 name
                 pointsPossible
                 tag
+              }
+              peerReviewSubAssignment {
+                anonymizeStudents
+                assignmentGroupId
+                gradingType
+                id: _id
+                name
+                omitFromFinalGrade
+                pointsPossible
+                position
+                submissionTypes
+                dueAt
+                groupCategoryId
+                gradeGroupStudentsIndividually
+                allowedAttempts
+                anonymousGrading
+                courseId
+                gradesPublished
+                htmlUrl
+                moderatedGrading: moderatedGradingEnabled
+                postManually
+                published
+                hasSubmittedSubmissions
+                inClosedGradingPeriod
               }
             }
           }
@@ -193,7 +221,10 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
         first: 100
         after: $cursor
         studentIds: [$userId]
-        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+        filter: {
+          states: [graded, pending_review, submitted, ungraded, unsubmitted]
+          includePeerReviewSubmissions: true
+        }
       ) {
         nodes {
           grade
@@ -305,7 +336,10 @@ export const GRADEBOOK_SUBMISSIONS_QUERY = gql`
       submissionsConnection(
         after: $cursor
         first: 100
-        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+        filter: {
+          states: [graded, pending_review, submitted, ungraded, unsubmitted]
+          includePeerReviewSubmissions: true
+        }
       ) {
         nodes {
           grade
@@ -427,6 +461,7 @@ export const GRADEBOOK_ASSIGNMENTS_QUERY = gql`
           name
           omitFromFinalGrade
           pointsPossible
+          position
           submissionTypes
           dueAt
           groupCategoryId
@@ -448,6 +483,30 @@ export const GRADEBOOK_ASSIGNMENTS_QUERY = gql`
             name
             pointsPossible
             tag
+          }
+          peerReviewSubAssignment {
+            anonymizeStudents
+            assignmentGroupId
+            gradingType
+            id: _id
+            name
+            omitFromFinalGrade
+            pointsPossible
+            position
+            submissionTypes
+            dueAt
+            groupCategoryId
+            gradeGroupStudentsIndividually
+            allowedAttempts
+            anonymousGrading
+            courseId
+            gradesPublished
+            htmlUrl
+            moderatedGrading: moderatedGradingEnabled
+            postManually
+            published
+            hasSubmittedSubmissions
+            inClosedGradingPeriod
           }
         }
         pageInfo {

@@ -19,7 +19,7 @@
 #
 
 describe Quizzes::QuizzesController do
-  def course_quiz(active = false, title = nil)
+  def course_quiz(active: false, title: nil)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
     @quiz.title = title if title
@@ -35,12 +35,8 @@ describe Quizzes::QuizzesController do
     @quiz.quiz_groups.create
   end
 
-  def temporary_user_code(generate = true)
-    if generate
-      session[:temporary_user_code] ||= "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
-    else
-      session[:temporary_user_code]
-    end
+  def temporary_user_code
+    session[:temporary_user_code] ||= "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
   end
 
   def logged_out_survey_with_submission(user, questions)
@@ -98,7 +94,7 @@ describe Quizzes::QuizzesController do
     it "filters out unpublished quizzes for student" do
       user_session(@student)
       course_quiz
-      course_quiz(true)
+      course_quiz(active: true)
 
       get "index", params: { course_id: @course.id }
 
@@ -110,7 +106,7 @@ describe Quizzes::QuizzesController do
 
     it "implicitly grades outstanding submissions for user in course" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
 
       expect(Quizzes::OutstandingQuizSubmissionManager).to receive(:grade_by_course)
 
@@ -217,19 +213,6 @@ describe Quizzes::QuizzesController do
                                             tool_id: "Quizzes 2")
       get "index", params: { course_id: @course.id }
       expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to be(true)
-    end
-
-    it "js_env new_quizzes_surveys_enabled is true when new_quizzes_surveys feature is enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_surveys)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_surveys_enabled]).to be true
-    end
-
-    it "js_env new_quizzes_surveys_enabled is false when new_quizzes_surveys feature is disabled" do
-      user_session(@teacher)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_surveys_enabled]).to be false
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
@@ -351,7 +334,7 @@ describe Quizzes::QuizzesController do
       end
 
       let_once(:course_quizzes) do
-        [course_quiz(false, "quiz 1"), course_quiz(true, "quiz 2")]
+        [course_quiz(title: "quiz 1"), course_quiz(active: true, title: "quiz 2")]
       end
 
       let_once(:workflow_states) do
@@ -385,11 +368,6 @@ describe Quizzes::QuizzesController do
         course_quizzes
       end
 
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-      end
-
       context "teacher interface" do
         it "includes all old quizzes and new quizzes, sorted by [due_date, title]" do
           user_session(@teacher)
@@ -411,26 +389,6 @@ describe Quizzes::QuizzesController do
           ).to eq([
                     [course_assignments[4].id, due_at, "some assignment 4"],
                     [course_assignments[5].id, due_at, "some assignment 5"],
-                  ])
-        end
-
-        it "lists new quiz surveys as assignments when new_quizzes_surveys feature flag is disabled" do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-          user_session(@teacher)
-          get "index", params: { course_id: @course.id }
-          expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
-          expect(controller.js_env[:QUIZZES][:surveys].count).to eq(0)
-          expect(controller.js_env[:QUIZZES][:assignment].count).to eq(6)
-
-          expect(
-            controller.js_env[:QUIZZES][:assignment].map { |x| [x[:id], x[:due_at], x[:title]] }
-          ).to eq([
-                    [course_assignments[2].id, due_at, "some assignment 2"],
-                    [course_assignments[3].id, due_at, "some assignment 3"],
-                    [course_assignments[4].id, due_at, "some assignment 4"],
-                    [course_assignments[5].id, due_at, "some assignment 5"],
-                    [course_quizzes[0].id, nil, "quiz 1"],
-                    [course_quizzes[1].id, nil, "quiz 2"]
                   ])
         end
 
@@ -686,7 +644,7 @@ describe Quizzes::QuizzesController do
 
     it "allows forcing authentication on public quiz pages" do
       @course.update_attribute :is_public, true
-      course_quiz(true)
+      course_quiz(active: true)
       get "show", params: { course_id: @course.id, id: @quiz.id, force_user: 1 }
       expect(response).to be_redirect
       expect(response.location).to match(/login/)
@@ -694,14 +652,14 @@ describe Quizzes::QuizzesController do
 
     it "renders the show page for public courses" do
       @course.update_attribute :is_public, true
-      course_quiz(true)
+      course_quiz(active: true)
       get "show", params: { course_id: @course.id, id: @quiz.id, take: "1" }
       expect(response).to be_successful
     end
 
     it "sets session[headless_quiz] if persist_headless param is sent" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       get "show", params: { course_id: @course.id, id: @quiz.id, persist_headless: 1 }
       expect(controller.session[:headless_quiz]).to be_truthy
       expect(assigns[:headers]).to be_falsey
@@ -709,7 +667,7 @@ describe Quizzes::QuizzesController do
 
     it "does not render headers if session[:headless_quiz] is set" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       controller.session[:headless_quiz] = true
       get "show", params: { course_id: @course.id, id: @quiz.id }
       expect(assigns[:headers]).to be_falsey
@@ -717,7 +675,7 @@ describe Quizzes::QuizzesController do
 
     it "assigns js_env for attachments if submission is present" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       submission = @quiz.generate_submission @student
       create_attachment_for_file_upload_submission!(submission)
       get "show", params: { course_id: @course.id, id: @quiz.id }
@@ -733,7 +691,7 @@ describe Quizzes::QuizzesController do
         @course.root_account.enable_feature!(:ams_root_account_integration)
         @course.enable_feature!(:ams_course_integration)
         user_session(@teacher)
-        course_quiz(true)
+        course_quiz(active: true)
       end
 
       it "uses the ams service logic with a quiz id" do
@@ -846,7 +804,7 @@ describe Quizzes::QuizzesController do
     describe "js_env SUBMISSION_VERSIONS_URL" do
       before do
         user_session(@student)
-        course_quiz(true)
+        course_quiz(active: true)
       end
 
       let(:submission) { @quiz.generate_submission(@student) }
@@ -878,7 +836,7 @@ describe Quizzes::QuizzesController do
 
     it "doesn't show unpublished quizzes to students with draft state" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.unpublish!
       get "show", params: { course_id: @course.id, id: @quiz.id }
       expect(response).not_to be_successful
@@ -901,7 +859,7 @@ describe Quizzes::QuizzesController do
     it "locks results if there is a submission and one_time_results is on" do
       user_session(@student)
 
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.one_time_results = true
       @quiz.save!
       @quiz.publish!
@@ -919,7 +877,7 @@ describe Quizzes::QuizzesController do
     it "does not attempt to lock results if there is a settings only submission" do
       user_session(@student)
 
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.lock_at = 2.days.ago
       @quiz.one_time_results = true
       @quiz.save!
@@ -948,7 +906,7 @@ describe Quizzes::QuizzesController do
       end
 
       before do
-        course_quiz(true)
+        course_quiz(active: true)
 
         @quiz.quiz_questions.create!(question_data: {
                                        "question_type" => "multiple_dropdowns_question",
@@ -978,7 +936,7 @@ describe Quizzes::QuizzesController do
           Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
           @course.enable_feature!(:enhanced_rubrics)
           rubric = @course.rubrics.create! { |r| r.user = @teacher }
-          course_quiz(true)
+          course_quiz(active: true)
           rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
                                                                                      hide_score_total: "0",
                                                                                      purpose: "grading",
@@ -1323,14 +1281,14 @@ describe Quizzes::QuizzesController do
 
   describe "POST 'take'" do
     it "requires authorization" do
-      course_quiz(true)
+      course_quiz(active: true)
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
       assert_unauthorized
     end
 
     it "allows taking the quiz" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
       expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
@@ -1370,7 +1328,7 @@ describe Quizzes::QuizzesController do
 
     context "verification" do
       before :once do
-        course_quiz(true)
+        course_quiz(active: true)
         @quiz.access_code = "bacon"
         @quiz.save!
       end
@@ -1409,7 +1367,7 @@ describe Quizzes::QuizzesController do
 
     it "does not let them take the quiz if it's locked" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.locked = true
       @quiz.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
@@ -1419,7 +1377,7 @@ describe Quizzes::QuizzesController do
 
     it "lets them take the quiz if it's locked but unlocked by an override" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.lock_at = Time.zone.now
       @quiz.save!
       override = AssignmentOverride.new
@@ -1437,7 +1395,7 @@ describe Quizzes::QuizzesController do
 
     it "lets them take the quiz if it's locked but they've been explicitly unlocked" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.locked = true
       @quiz.save!
       @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, "settings_only")
@@ -1449,7 +1407,7 @@ describe Quizzes::QuizzesController do
 
     it "uses default duration if no extensions specified" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.time_limit = 60
       @quiz.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
@@ -1461,7 +1419,7 @@ describe Quizzes::QuizzesController do
 
     it "gives user more time if specified" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.time_limit = 60
       @quiz.save!
       @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, "settings_only")
@@ -1476,7 +1434,7 @@ describe Quizzes::QuizzesController do
 
     it "renders ip_filter page if ip_filter doesn't match" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.ip_filter = "123.123.123.123"
       @quiz.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
@@ -1485,7 +1443,7 @@ describe Quizzes::QuizzesController do
 
     it "lets the user take the quiz if the ip_filter matches" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.ip_filter = "123.123.123.123"
       @quiz.save!
       request.env["REMOTE_ADDR"] = "123.123.123.123"
@@ -1495,7 +1453,7 @@ describe Quizzes::QuizzesController do
 
     it "works without a user for non-graded quizzes in public courses" do
       @course.update_attribute :is_public, true
-      course_quiz :active
+      course_quiz(active: true)
       @quiz.update_attribute :quiz_type, "practice_quiz"
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
       expect(response).to redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
@@ -1504,7 +1462,7 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'take'" do
     before :once do
-      course_quiz(true)
+      course_quiz(active: true)
     end
 
     it "requires authorization" do
@@ -1574,7 +1532,7 @@ describe Quizzes::QuizzesController do
     end
 
     describe "valid_question?" do
-      let(:submission) { double }
+      let(:submission) { instance_double(Quizzes::QuizSubmission) }
 
       context "when the passed in question ID is in the submission" do
         it "returns true" do
@@ -1777,7 +1735,7 @@ describe Quizzes::QuizzesController do
       render_views
 
       before do
-        course_quiz(true)
+        course_quiz(active: true)
 
         @question = @quiz.quiz_questions.create!(question_data: {
                                                    "question_text" => "<p>[color]是我最喜欢的颜色</p>",
@@ -2271,7 +2229,7 @@ describe Quizzes::QuizzesController do
 
     it "removes points_possible when changing from a graded quiz to ungraded" do
       user_session(@teacher)
-      quiz_with_submission(false, true)
+      quiz_with_submission(complete_quiz: false, skip_submission: true)
       expect(@quiz.current_points_possible).to be > 0
       post "update", params: {
         course_id: @course.id,
@@ -2980,7 +2938,7 @@ describe Quizzes::QuizzesController do
   end
 
   describe "GET 'submission_html'" do
-    before(:once) { course_quiz(true) }
+    before(:once) { course_quiz(active: true) }
 
     before { user_session(@teacher) }
 
@@ -3003,7 +2961,7 @@ describe Quizzes::QuizzesController do
   describe "GET 'submission_html' (as a student)" do
     before do
       user_session(@student)
-      course_quiz(true)
+      course_quiz(active: true)
     end
 
     it "locks results if there is a submission and one_time_results is on" do
@@ -3103,7 +3061,7 @@ describe Quizzes::QuizzesController do
       course_with_teacher(active_all: true)
       @student1, @student2 = n_students_in_course(2, active_all: true, course: @course)
       @course_section = @course.course_sections.create!
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.only_visible_to_overrides = true
       @quiz.save!
       student_in_section(@course_section, user: @student1)
@@ -3155,7 +3113,7 @@ describe Quizzes::QuizzesController do
 
     before do
       course_with_teacher
-      course_quiz(true)
+      course_quiz(active: true)
       @quiz.save!
       allow(@quiz).to receive(:grants_right?) do |_user, sess, rights|
         if rights.nil?

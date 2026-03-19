@@ -20,8 +20,6 @@
 class ImpossibleCredentialsError < ArgumentError; end
 
 class Pseudonym < ActiveRecord::Base
-  self.ignored_columns += %w[auth_type login_attribute verification_token]
-
   # this field is used for audit logging.
   # if a request is deleting a pseudonym, it should set this value
   # before persisting the change.
@@ -259,22 +257,14 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  scope :by_unique_id, lambda { |unique_id|
-    # only do normalized lookups once the migration has completed on this shard
-    if ((s = primary_shard).is_a?(Shard) && s.settings["pseudonyms_normalized"]) ||
-       s.is_a?(Switchman::DefaultShard)
-      unique_id = if unique_id.is_a?(Array)
-                    unique_id.map { |uid| Pseudonym.normalize(uid) }
-                  else
-                    Pseudonym.normalize(unique_id.to_s)
-                  end
-      where(unique_id_normalized: unique_id)
-    elsif unique_id.is_a?(Array)
-      where("LOWER(unique_id) IN (?)", unique_id)
-    else
-      where("LOWER(unique_id)=LOWER(?)", unique_id.to_s)
-    end
-  }
+  scope(:by_unique_id, lambda do |unique_id|
+    unique_id = if unique_id.is_a?(Array)
+                  unique_id.map { |uid| Pseudonym.normalize(uid) }
+                else
+                  Pseudonym.normalize(unique_id.to_s)
+                end
+    where(unique_id_normalized: unique_id)
+  end)
   scope :sis, -> { where.not(sis_user_id: nil) }
   scope :not_instructure_identity, -> { all }
 
@@ -319,10 +309,17 @@ class Pseudonym < ActiveRecord::Base
 
   def audit_log_update
     return if Setting.get("pseudonym_auditor_killswitch", "false") == "true"
-    return unless workflow_state_changed? && workflow_state == "deleted"
+    return unless workflow_state_changed?
+
+    action = if %w[deleted suspended].include?(workflow_state)
+               workflow_state
+             elsif workflow_state_was == "suspended"
+               "unsuspended"
+             end
+    return unless action
 
     performing_user = @current_user || Canvas.infer_user
-    Auditors::Pseudonym.record(self, performing_user, action: "deleted")
+    Auditors::Pseudonym.record(self, performing_user, action:)
   end
 
   def set_password_changed
@@ -386,7 +383,7 @@ class Pseudonym < ActiveRecord::Base
     :email_login
   end
 
-  def works_for_account?(_account, _allow_implicit = false, ignore_types: [:implicit])
+  def works_for_account?(_account, allow_implicit: false, ignore_types: [:implicit])
     true
   end
 

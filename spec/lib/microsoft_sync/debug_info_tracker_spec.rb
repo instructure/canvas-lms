@@ -81,9 +81,10 @@ describe MicrosoftSync::DebugInfoTracker do
 
   describe "#record_diff_stats" do
     it "adds an i18nized message about the number of owners and members" do
-      diff = double(
-        local_owners: Set.new([double]),
-        local_owners_or_members: Set.new([double, double])
+      diff = instance_double(
+        MicrosoftSync::MembershipDiff,
+        local_owners: Set.new(["owner1"]),
+        local_owners_or_members: Set.new(%w[owner1 member1])
       )
       subject.record_diff_stats(diff)
       expect(group.debug_info.length).to eq(2)

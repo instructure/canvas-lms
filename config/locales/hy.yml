@@ -2136,6 +2136,7 @@ hy:
       graded_quiz: "Գնահատվող թեստ"
       graded_survey: "Գնահատվող հարցում"
       ungraded_survey: "Չգնահատված հարցում"
+  assignment_rubric_details_1b6723b2: "Հանձնարարության ռուբրիկի մանրամասներ"
   assignment_selection_6bff05c4: "Հանձնարարության ընտրություն"
   assignment_title_8a707dd2: "հանձնարարության անվանում"
   assignment_url_37c849c6: "Հանձնարարության url հասցեն"
@@ -4860,6 +4861,7 @@ hy:
   course_groups_e8239a1e: "Դասընթացի խմբեր"
   course_home_4c4c0107: "Դասընթացի սկիզբ"
   course_home_sub_navigation_b1ee6b03: "Դասընթացի հիմնական էջի ենթանավարկման ֆունկցիա"
+  course_id_33633604: "Դասընթացի նույնականացուցիչ"
   course_id_8bd2a21c: "Դասընթացի նույնականացուցիչ"
   course_id_course_id_2841413a: "\"%{course_id}\" դասընթացի նույնականացուցիչ"
   course_id_f8640bb8: "դասընթացի նույնականացուցիչ"
@@ -8909,6 +8911,7 @@ hy:
     lock_module_until: "Արգելափակել մինչև"
   language_6b3e2c7c: Լեզուն
   last_activity_a983e541: "Վերջին գործողությունը"
+  last_e159dbd: Վերջին
   last_enrollment_activity_10fe15ba: "Վերջին գրանցման հետ կապված գործողություն"
   last_error_a3832668: "Վերջին սխալ"
   last_item_79583712: "Վերջին տարրը՝"

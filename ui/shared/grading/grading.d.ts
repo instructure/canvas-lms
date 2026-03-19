@@ -323,13 +323,13 @@ export type GradingPeriodGrade = {
   assignmentGroups: AssignmentGroupGradeMap
   scoreUnit: 'points' | 'percentage'
   final: {
-    score: number
+    score: number | null
     possible: number
     submission_count?: number
     submissions?: Submission[]
   }
   current: {
-    score: number
+    score: number | null
     possible: number
     submission_count?: number
     submissions?: Submission[]

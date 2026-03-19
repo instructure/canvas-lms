@@ -23,7 +23,8 @@ require "active_support/time_with_zone"
 module CanvasErrors
   describe JobInfo do
     let(:job) do
-      double(
+      double( # rubocop:disable RSpec/VerifiedDoubles -- no database here to infer the columns
+        Delayed::Job,
         id: 42,
         source: "controller:discussion_topics_api,action:add_entry," \
                 "hostname:app010001063068-vpc.us-east-1.canvas.insops.net," \
@@ -35,11 +36,11 @@ module CanvasErrors
         run_at: Time.zone.now,
         max_attempts: 1,
         tag: "TAG",
-        current_shard: double(id: 1)
+        current_shard: instance_double(ActiveRecord::Base, id: 1)
       )
     end
 
-    let(:worker) { double(name: "workername") }
+    let(:worker) { instance_double(Delayed::Worker, name: "workername") }
 
     let(:info) { described_class.new(job, worker) }
 

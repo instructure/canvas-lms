@@ -35,6 +35,7 @@ window.top.postMessage({ subject: 'ASGMT.togglePeerReviews', enabled: false }, '
 | Grading Type → "Not Graded" | Disables peer reviews |
 | Moderated Grading enabled | Disables peer reviews + group assignments |
 | Group Category selected | Shows "within groups" peer review option |
+| Submission Type → "External Tool" | Disables peer reviews |
 
 ### Rubrics Are Different
 
@@ -64,7 +65,7 @@ Rubrics use a **separate API** (`POST /api/v1/courses/:id/rubrics`), not the ass
 
 ## Adding New Settings
 
-1. Set ENV in controller: `js_env(MY_FLAG: @context.feature_enabled?(:my_flag))`
+1. Set ENV in controller: `js_env({ MY_FLAG: @context.feature_enabled?(:my_flag) })`
 2. Create React component with hidden input: `<input type="hidden" id="my_setting_hidden" value={value} />`
 3. Add mount point in `EditView.handlebars`
 4. Mount from `EditView.jsx`

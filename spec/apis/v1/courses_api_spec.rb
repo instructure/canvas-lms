@@ -434,8 +434,8 @@ describe Api::V1::Course do
     subject { result }
 
     let(:hash) { {} }
-    let(:course) { double(feed_code: 573, id: 42, syllabus_body: "syllabus text").as_null_object }
-    let(:course_json) { double.as_null_object }
+    let(:course) { instance_double(Course, feed_code: 573, id: 42, syllabus_body: "syllabus text", method_missing: nil) }
+    let(:course_json) { instance_double(Api::V1::CourseJson).as_null_object }
     let(:api) { TestCourseApi.new }
 
     let(:result) do
@@ -461,7 +461,7 @@ describe Api::V1::Course do
     end
 
     describe "when the include options are all set off" do
-      let(:course_json) { double(include_syllabus: false, include_url: false) }
+      let(:course_json) { instance_double(Api::V1::CourseJson, include_syllabus: false, include_url: false) }
 
       describe "#syllabus_body" do
         subject { super().syllabus_body }
@@ -477,7 +477,7 @@ describe Api::V1::Course do
     end
 
     describe "when everything is included" do
-      let(:course_json) { double(include_syllabus: true, include_url: true) }
+      let(:course_json) { instance_double(Api::V1::CourseJson, include_syllabus: true, include_url: true) }
 
       describe "#syllabus_body" do
         subject { super().syllabus_body }
@@ -835,6 +835,25 @@ describe CoursesController, type: :request do
                                   format: "json" })
         entry = json.detect { |course| course["id"] == @course.id }
         expect(entry["sis_course_id"]).to eq "TEST-SIS-ONE.2011"
+      end
+
+      it "allows an admin with :read_roster to access the endpoint" do
+        role = custom_account_role("less_limited", account: Account.default)
+        role.role_overrides.create!(account: Account.default,
+                                    permission: :read_roster,
+                                    enabled: true)
+        less_limited_admin = account_admin_user(account: Account.default,
+                                                role:)
+        api_call_as_user(less_limited_admin,
+                         :get,
+                         "/api/v1/users/#{@student.id}/courses",
+                         { user_id: @student.to_param,
+                           controller: "courses",
+                           action: "user_index",
+                           format: "json" },
+                         {},
+                         {},
+                         { expected_status: 200 })
       end
 
       context "with temporary enrollments enabled" do
@@ -1370,6 +1389,48 @@ describe CoursesController, type: :request do
           end
         end
 
+        describe "career_learning_library_only" do
+          before :once do
+            @horizon_account = Account.create!
+            @horizon_account.enable_feature!(:horizon_course_setting)
+            @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+            @horizon_account.horizon_account = true
+            @horizon_account.save!
+            account_admin_user(account: @horizon_account)
+          end
+
+          it "allows creating a career learning library course in a horizon account" do
+            json = api_call(:post,
+                            "/api/v1/accounts/#{@horizon_account.id}/courses",
+                            { controller: "courses", action: "create", format: "json", account_id: @horizon_account.id.to_s },
+                            { account_id: @horizon_account.id, course: { name: "CLL Course", career_learning_library_only: true } })
+            new_course = Course.find(json["id"])
+            expect(new_course.career_learning_library_only).to be true
+          end
+
+          it "forces career_learning_library_only to false without feature flag" do
+            @horizon_account.disable_feature!(:horizon_learning_library_ms2)
+            json = api_call(:post,
+                            "/api/v1/accounts/#{@horizon_account.id}/courses",
+                            { controller: "courses", action: "create", format: "json", account_id: @horizon_account.id.to_s },
+                            { account_id: @horizon_account.id, course: { name: "CLL Course", career_learning_library_only: true } })
+            new_course = Course.find(json["id"])
+            expect(new_course.career_learning_library_only).to be false
+          end
+
+          it "forces career_learning_library_only to false in non-horizon account" do
+            non_horizon_account = Account.create!
+            non_horizon_account.enable_feature!(:horizon_learning_library_ms2)
+            account_admin_user(account: non_horizon_account)
+            json = api_call(:post,
+                            "/api/v1/accounts/#{non_horizon_account.id}/courses",
+                            { controller: "courses", action: "create", format: "json", account_id: non_horizon_account.id.to_s },
+                            { account_id: non_horizon_account.id, course: { name: "CLL Course", career_learning_library_only: true } })
+            new_course = Course.find(json["id"])
+            expect(new_course.career_learning_library_only).to be false
+          end
+        end
+
         it "offers a course if passed the 'offer' parameter" do
           expect(Auditors::Course).to receive(:record_published).once
           json = api_call(:post,
@@ -1781,6 +1842,56 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, course: { grade_passback_setting: "invalid" })
           expect(json["errors"]["grade_passback_setting"].first["message"]).to eq "Invalid grade_passback_setting"
           expect(@course.reload.grade_passback_setting).to be_nil
+        end
+
+        describe "career_learning_library_only updates" do
+          before :once do
+            @horizon_account = Account.create!
+            @horizon_account.enable_feature!(:horizon_course_setting)
+            @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+            @horizon_account.horizon_account = true
+            @horizon_account.save!
+            @horizon_course = @horizon_account.courses.create!(name: "Horizon Course")
+            account_admin_user(account: @horizon_account)
+          end
+
+          it "allows updating career_learning_library_only to true in a horizon account" do
+            path = "/api/v1/courses/#{@horizon_course.id}"
+            params = { controller: "courses", action: "update", format: "json", id: @horizon_course.id.to_s }
+            api_call(:put, path, params, { course: { career_learning_library_only: true } })
+            @horizon_course.reload
+            expect(@horizon_course.career_learning_library_only).to be true
+          end
+
+          it "allows updating career_learning_library_only to false" do
+            @horizon_course.update!(career_learning_library_only: true)
+            path = "/api/v1/courses/#{@horizon_course.id}"
+            params = { controller: "courses", action: "update", format: "json", id: @horizon_course.id.to_s }
+            api_call(:put, path, params, { course: { career_learning_library_only: false } })
+            @horizon_course.reload
+            expect(@horizon_course.career_learning_library_only).to be false
+          end
+
+          it "forces career_learning_library_only to false without feature flag" do
+            @horizon_account.disable_feature!(:horizon_learning_library_ms2)
+            path = "/api/v1/courses/#{@horizon_course.id}"
+            params = { controller: "courses", action: "update", format: "json", id: @horizon_course.id.to_s }
+            api_call(:put, path, params, { course: { career_learning_library_only: true } })
+            @horizon_course.reload
+            expect(@horizon_course.career_learning_library_only).to be false
+          end
+
+          it "forces career_learning_library_only to false in non-horizon account" do
+            non_horizon_account = Account.create!
+            non_horizon_account.enable_feature!(:horizon_learning_library_ms2)
+            non_horizon_course = non_horizon_account.courses.create!(name: "Non-Horizon Course")
+            account_admin_user(account: non_horizon_account)
+            path = "/api/v1/courses/#{non_horizon_course.id}"
+            params = { controller: "courses", action: "update", format: "json", id: non_horizon_course.id.to_s }
+            api_call(:put, path, params, { course: { career_learning_library_only: true } })
+            non_horizon_course.reload
+            expect(non_horizon_course.career_learning_library_only).to be false
+          end
         end
 
         it "updates the grading standard with account level standard" do
@@ -3256,9 +3367,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "available"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "available")
       end
 
       it "returns only courses with state unpublished on ?state[]=unpublished" do
@@ -3267,9 +3376,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course3.id, @course4.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "unpublished"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
       it "returns only courses with state unpublished and available on ?state[]=unpublished, available" do
@@ -3278,9 +3385,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished", "available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id, @course3.id, @course4.id].sort
-        json.pluck("workflow_state").each do |s|
-          expect(s).to be_in %w[available unpublished]
-        end
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available unpublished]))
       end
 
       it "returns courses by custom role and state unpublished" do
@@ -3295,9 +3400,7 @@ describe CoursesController, type: :request do
                                                 "user_id" => @me.id,
                                                 "enrollment_state" => "invited",
                                                 "limit_privileges_to_course_section" => false }]
-        json.pluck("workflow_state").each do |s|
-          expect(s).to eql "unpublished"
-        end
+        expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
       it "does not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
@@ -3525,7 +3628,7 @@ describe CoursesController, type: :request do
       end
 
       it "is not paginated (for legacy reasons)" do
-        controller = double
+        controller = instance_double(CoursesController)
         allow(controller).to receive(:params).and_return({})
         course_with_teacher(active_all: true)
         num = Api.per_page_for(controller) + 1 # get the default api per page value
@@ -4354,7 +4457,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus without verifiers" do
-      should_translate_user_content(@course1, false) do |content|
+      should_translate_user_content(@course1, include_verifiers: false) do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
         @course1.save!
@@ -4922,8 +5025,8 @@ describe CoursesController, type: :request do
     end
 
     context "course files" do
-      include_examples "file uploads api with folders"
-      include_examples "file uploads api with quotas"
+      it_behaves_like "file uploads api with folders"
+      it_behaves_like "file uploads api with quotas"
 
       before do
         @context = @course

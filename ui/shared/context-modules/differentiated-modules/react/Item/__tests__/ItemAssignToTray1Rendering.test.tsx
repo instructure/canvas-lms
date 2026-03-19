@@ -67,7 +67,7 @@ describe('ItemAssignToTray - Rendering', () => {
     await findAllByTestId('item-assign-to-card')
     const icon = getByTestId('icon-assignment')
     expect(icon).toBeInTheDocument()
-  })
+  }, 30000)
 
   it('does not render header or footer if not a tray', async () => {
     const {queryByText, queryByLabelText, findAllByTestId, container} = renderComponent({

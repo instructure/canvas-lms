@@ -3713,6 +3713,7 @@ hu:
       graded_quiz: "Értékelésbe számító kvíz"
       graded_survey: "Értékelésbe számító felmérés"
       ungraded_survey: "Nem értékelt felmérés"
+  assignment_rubric_details_1b6723b2: "Feladat értékelőtáblájának részletei"
   assignment_scheduling_e2a3eaf6: "Feladat ütemezése"
   assignment_score_summary_f1dc9708: "Feladat pontszám összefoglalója"
   assignment_selection_6bff05c4: Feladatkiválasztás
@@ -7580,6 +7581,7 @@ hu:
   course_home_4c4c0107: "Kurzus főoldala"
   course_home_page_5c61dba7: "A kurzus kezdőlapja"
   course_home_sub_navigation_b1ee6b03: "Kurzus kezdőlap alnavigáció"
+  course_id_33633604: "Kurzusazonosító:"
   course_id_8bd2a21c: Kurzusazonosító
   course_id_a7c924d5: kurzusazonosító
   course_id_b0bc82d4: Kurzusazonosító
@@ -13678,6 +13680,7 @@ hu:
   last_bounced_before_601c221a: "Utoljára visszapattant ezelőtt"
   last_changed_b544504d: "Utoljára módosítva:"
   last_day_attended_b72d623c: "Az utolsó részvételi nap"
+  last_e159dbd: Utolsó
   last_edit_ascending_6a18dba4: "Utolsó szerkesztés:Növekvő"
   last_edit_descending_6b7ee755: "Utolsó szerkesztés:Csökkenő"
   last_enrollment_activity_10fe15ba: "Legutóbbi beiratkozási tevékenység"

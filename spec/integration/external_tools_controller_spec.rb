@@ -144,7 +144,7 @@ describe ExternalToolsController do
     context "form post" do
       include WebMock::API
 
-      let(:config_response) { double(body: valid_tool_config) }
+      let(:config_response) { instance_double(Net::HTTPResponse, body: valid_tool_config) }
 
       let(:post_body) do
         {

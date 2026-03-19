@@ -141,10 +141,15 @@ module Canvas::Vault
       Rails.logger.info("Vault: Authenticating with AWS IAM auth")
       client = Vault::Client.new(address: addr)
 
-      auth_opts = { role: iam_auth_role, mount: iam_auth_path }
-      auth_opts[:iam_server_id_header_value] = iam_auth_header_value if iam_auth_header_value.present?
+      credentials_provider = Aws::CredentialProviderChain.new.resolve
 
-      secret = client.auth.aws_iam(**auth_opts)
+      secret = client.auth.aws_iam(
+        iam_auth_role,
+        credentials_provider,
+        iam_auth_header_value.presence,
+        "https://sts.amazonaws.com",
+        iam_auth_path
+      )
 
       # Cache token in memory (not in LocalCache which may persist to Redis)
       @iam_token_cache = {

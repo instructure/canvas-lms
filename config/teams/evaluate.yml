@@ -43,3 +43,5 @@ owned_globs:
 - app/models/standard_grade_status.rb
 - app/models/submission*
 - app/models/viewed_submission_comment.rb
+github:
+  team: ''

@@ -21,14 +21,24 @@ require "spec_helper"
 
 describe CanvasKaltura do
   describe ".timeout_protector" do
-    it "call block if not set" do
+    subject(:run_with_timeout_protector) { CanvasKaltura.with_timeout_protector { 2 } }
+
+    around do |example|
+      CanvasKaltura.timeout_protector_proc = timeout_protector_proc
+      example.run
       CanvasKaltura.timeout_protector_proc = nil
-      expect(CanvasKaltura.with_timeout_protector { 2 }).to be 2
     end
 
-    it "call timeout protector if set" do
-      CanvasKaltura.timeout_protector_proc = proc { 27 }
-      expect(CanvasKaltura.with_timeout_protector).to be 27
+    context "when call block if not set" do
+      let(:timeout_protector_proc) { nil }
+
+      it { expect(run_with_timeout_protector).to be 2 }
+    end
+
+    context "when call timeout protector if set" do
+      let(:timeout_protector_proc) { proc { 27 } }
+
+      it { expect(run_with_timeout_protector).to be 27 }
     end
   end
 end

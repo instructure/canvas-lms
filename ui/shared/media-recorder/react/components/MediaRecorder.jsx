@@ -22,7 +22,7 @@ import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new
 import $ from 'jquery'
 import {func, string} from 'prop-types'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {mediaExtension} from '../../mimetypes'
 
 import {Spinner} from '@instructure/ui-spinner'
@@ -126,6 +126,7 @@ export function fileWithExtension(file) {
 
 export default class CanvasMediaRecorder extends React.Component {
   dialogRef = React.createRef()
+  _indicatorRoot = null
 
   static propTypes = {
     onSaveFile: func,
@@ -152,7 +153,7 @@ export default class CanvasMediaRecorder extends React.Component {
       dialogContent.innerHTML = ''
       dialogContent.appendChild(spinnerContainer)
 
-      ReactDOM.render(
+      createRoot(spinnerContainer).render(
         <div style={{padding: '2rem', textAlign: 'center'}}>
           <div style={{marginBottom: '1rem'}}>
             <Spinner renderTitle={I18n.t('Saving media file')} size="large" />
@@ -163,7 +164,6 @@ export default class CanvasMediaRecorder extends React.Component {
             )}
           </div>
         </div>,
-        spinnerContainer,
       )
     }
   }
@@ -191,20 +191,21 @@ export default class CanvasMediaRecorder extends React.Component {
     if (!indicatorBarMountPointId) return
     const mountPoint = document.getElementById(indicatorBarMountPointId)
     if (mountPoint) {
-      ReactDOM.render(
+      this._indicatorRoot = createRoot(mountPoint)
+      this._indicatorRoot.render(
         <ScreenCaptureIndicatorBar
           onFinishClick={this.handleFinishClick}
           onCancelClick={this.handleCancelClick}
         />,
-        mountPoint,
       )
     }
   }
 
   removeIndicatorBar = () => {
-    const {indicatorBarMountPointId} = this.props
-    const mountPoint = document.getElementById(indicatorBarMountPointId)
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    if (this._indicatorRoot) {
+      this._indicatorRoot.unmount()
+      this._indicatorRoot = null
+    }
   }
 
   handleCancelClick = () => {

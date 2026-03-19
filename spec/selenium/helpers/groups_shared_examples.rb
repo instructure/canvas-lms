@@ -311,7 +311,7 @@ shared_examples "files_page_old_ui" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  folder_name = "new folder"
+  let(:folder_name) { "new folder" }
 
   it "allows group members to add a new folder", priority: pick_priority(context, student: "1", teacher: "2") do
     get files_page
@@ -329,7 +329,7 @@ shared_examples "files_page_old_ui" do |context|
 
   it "allows a group member to delete a file", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
-    add_test_files(false)
+    add_test_files(context_test: false)
     get files_page
     delete_file(0, :cog_icon)
     wait_for_ajaximations
@@ -392,7 +392,7 @@ shared_examples "files_page_files_rewrite_ui" do |context|
   include SharedExamplesCommon
   include FilesPage
 
-  folder_name = "new folder"
+  let(:folder_name) { "new folder" }
 
   it "allows group members to add a new folder on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
     get files_page
@@ -421,7 +421,7 @@ shared_examples "files_page_files_rewrite_ui" do |context|
 
   it "allows a group member to delete a file on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
-    add_test_files(false)
+    add_test_files(context_test: false)
     get files_page
     expect(all_files_table_rows.count).to eq 2
     delete_file_from(1, :toolbar_menu)

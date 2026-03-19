@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import CoursesListRow from '../CoursesListRow'
+import axios from '@canvas/axios'
+
+vi.mock('@canvas/axios')
 
 function renderRow(row) {
   return render(
@@ -95,6 +98,32 @@ it('does not indicate a course is a course template if it is not', () => {
 it('indiates a course is a course template if it is', () => {
   const {getAllByText} = renderRow(<CoursesListRow {...props} template={true} />)
   expect(getAllByText('This is a course template').length).toBeGreaterThan(0)
+})
+
+describe('opening add enrollment modal', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('displays a flash error if fetching sections fails when opening add-enrollment', async () => {
+    axios.get.mockRejectedValueOnce(new Error('Network error'))
+    const {getAllByText, getByTestId} = renderRow(
+      <CoursesListRow {...props} can_create_enrollments={true} concluded={false} />,
+    )
+    getByTestId('add-enrollments-tooltip').click()
+    await waitFor(() => {
+      expect(getAllByText('Failed to open the Add People dialog')[0]).toBeInTheDocument()
+    })
+  })
+
+  it('fetches sections and opens add-enrollment modal when clicking add-enrollment', () => {
+    axios.get.mockResolvedValue({data: [{id: '1', name: 'Section 1'}]})
+    const {getByTestId} = renderRow(
+      <CoursesListRow {...props} can_create_enrollments={true} concluded={false} />,
+    )
+    getByTestId('add-enrollments-tooltip').click()
+    expect(axios.get).toHaveBeenCalledWith('/api/v1/courses/1/sections?per_page=100')
+  })
 })
 
 it('shows add-enrollment if it makes sense', () => {

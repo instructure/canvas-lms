@@ -34,7 +34,7 @@ describe Polling::PollSessionsController, type: :request do
       end
     end
 
-    def get_index(raw = false, data = {}, header = {})
+    def get_index(data = {}, header = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
@@ -59,7 +59,7 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     it "paginates to the jsonapi standard if requested" do
-      json = get_index(false, {}, "Accept" => "application/vnd.api+json")
+      json = get_index({}, { "Accept" => "application/vnd.api+json" })
       poll_sessions_json = json["poll_sessions"]
       session_ids = @poll.poll_sessions.pluck(:id)
 
@@ -92,7 +92,7 @@ describe Polling::PollSessionsController, type: :request do
       @poll_session.publish!
     end
 
-    def get_show(raw = false, data = {})
+    def get_show(data = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
@@ -163,7 +163,7 @@ describe Polling::PollSessionsController, type: :request do
 
         student_in_course(active_all: true, course: @course)
 
-        get_show(true)
+        get_show(raw: true)
 
         expect(response).to have_http_status :forbidden
         @poll_session.reload
@@ -256,7 +256,7 @@ describe Polling::PollSessionsController, type: :request do
       @poll = @teacher.polls.create!(question: "An Example Poll")
     end
 
-    def post_create(params, raw = false)
+    def post_create(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
@@ -271,21 +271,21 @@ describe Polling::PollSessionsController, type: :request do
 
     context "as a teacher" do
       it "creates a poll session successfully" do
-        post_create(course_section_id: @section.id, course_id: @course.id, has_public_results: true)
+        post_create({ course_section_id: @section.id, course_id: @course.id, has_public_results: true })
         expect(@poll.poll_sessions.size).to eq 1
         expect(@poll.poll_sessions.first.course_section).to eq @section
         expect(@poll.poll_sessions.first.has_public_results).to be_truthy
       end
 
       it "defaults has_public_results to false if has_public_results is blank" do
-        post_create(course_section_id: @section.id, course_id: @course.id, has_public_results: "")
+        post_create({ course_section_id: @section.id, course_id: @course.id, has_public_results: "" })
         expect(@poll.poll_sessions.size).to eq 1
         expect(@poll.poll_sessions.first.course_section).to eq @section
         expect(@poll.poll_sessions.first.has_public_results).to be_falsey
       end
 
       it "returns an error if the supplied course section is invalid" do
-        post_create({ course_section_id: @section.id + 666, course_id: @course.id }, true)
+        post_create({ course_section_id: @section.id + 666, course_id: @course.id }, raw: true)
 
         expect(response).to have_http_status :not_found
         expect(response.body).to match(/The specified resource does not exist/)
@@ -299,7 +299,7 @@ describe Polling::PollSessionsController, type: :request do
       @poll_session = @poll.poll_sessions.create!(course: @course, course_section: @section)
     end
 
-    def put_update(params, raw = false)
+    def put_update(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
@@ -318,7 +318,7 @@ describe Polling::PollSessionsController, type: :request do
       it "updates a session successfully" do
         section = @course.course_sections.create!(name: "Another Section")
 
-        put_update(course_section_id: section.id, has_public_results: true)
+        put_update({ course_section_id: section.id, has_public_results: true })
         @poll_session.reload
         expect(@poll_session.course_section.id).to eq section.id
         expect(@poll_session.has_public_results).to be_truthy
@@ -331,7 +331,7 @@ describe Polling::PollSessionsController, type: :request do
 
         expect(new_course).not_to eq @course
 
-        put_update(course_section_id: new_section.id, course_id: new_course.id)
+        put_update({ course_section_id: new_section.id, course_id: new_course.id })
         @poll_session.reload
         expect(@poll_session.course).to eq new_course
         expect(@poll_session.course_section).to eq new_section
@@ -344,7 +344,7 @@ describe Polling::PollSessionsController, type: :request do
         section = @course.course_sections.create!(name: "Another Section")
         original_id = @poll_session.course_section.id
 
-        put_update({ course_section_id: section.id }, true)
+        put_update({ course_section_id: section.id }, raw: true)
 
         @poll_session.reload
         expect(response).to have_http_status :forbidden

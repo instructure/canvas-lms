@@ -108,7 +108,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       practice_quizzes   = scoped_quizzes_index.select { |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
       surveys            = scoped_quizzes_index.select { |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
-      if @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+      if @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         surveys += scoped_new_quizzes_index.select do |q|
           Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type"))
         end
@@ -165,7 +165,6 @@ class Quizzes::QuizzesController < ApplicationController
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
           DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share),
-          new_quizzes_surveys_enabled: Account.site_admin.feature_enabled?(:new_quizzes_surveys),
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
         quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
@@ -272,11 +271,11 @@ class Quizzes::QuizzesController < ApplicationController
       end
       if @submission
         upload_url = api_v1_quiz_submission_files_path(course_id: @context.id, quiz_id: @quiz.id)
-        js_env UPLOAD_URL: upload_url
-        js_env SUBMISSION_VERSIONS_URL: course_quiz_submission_versions_url(@context, @quiz) unless hide_quiz?
+        js_env({ UPLOAD_URL: upload_url })
+        js_env({ SUBMISSION_VERSIONS_URL: course_quiz_submission_versions_url(@context, @quiz) }) unless hide_quiz?
         if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
           events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
-          js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
+          js_env({ QUIZ_SUBMISSION_EVENTS_URL: events_url })
         end
       end
 
@@ -777,9 +776,9 @@ class Quizzes::QuizzesController < ApplicationController
         return
       end
       if params[:score_updated]
-        js_env SCORE_UPDATED: true
+        js_env({ SCORE_UPDATED: true })
       end
-      js_env GRADE_BY_QUESTION: @current_user&.preferences&.dig(:enable_speedgrader_grade_by_question)
+      js_env({ GRADE_BY_QUESTION: @current_user&.preferences&.dig(:enable_speedgrader_grade_by_question) })
       if authorized_action(@submission, @current_user, :read)
         if @current_user && !@quiz.visible_to_user?(@current_user)
           flash.now[:notice] = t "notices.submission_doesnt_count", "This quiz will no longer count towards your grade."
@@ -866,7 +865,7 @@ class Quizzes::QuizzesController < ApplicationController
       @banks_hash = get_banks(@quiz)
 
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-      js_env(quiz_max_combination_count: QUIZ_MAX_COMBINATION_COUNT)
+      js_env({ quiz_max_combination_count: QUIZ_MAX_COMBINATION_COUNT })
       render
     end
   end
@@ -1029,15 +1028,15 @@ class Quizzes::QuizzesController < ApplicationController
 
     if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
       events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
-      js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
+      js_env({ QUIZ_SUBMISSION_EVENTS_URL: events_url })
     end
 
-    js_env IS_PREVIEW: true if @submission.preview?
+    js_env({ IS_PREVIEW: true }) if @submission.preview?
 
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
     if params[:persist_headless]
       add_meta_tag(name: "viewport", id: "vp", content: "initial-scale=1.0,user-scalable=yes,width=device-width")
-      js_env MOBILE_UI: true
+      js_env({ MOBILE_UI: true })
     end
     render :take_quiz
   end
@@ -1081,8 +1080,8 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def set_download_submission_dialog_title
-    js_env SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t("#quizzes.download_all_quiz_file_upload_submissions",
-                                                    "Download All Quiz File Upload Submissions")
+    js_env({ SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t("#quizzes.download_all_quiz_file_upload_submissions",
+                                                      "Download All Quiz File Upload Submissions") })
   end
 
   # Handler for quiz option: one_time_results
@@ -1134,11 +1133,7 @@ class Quizzes::QuizzesController < ApplicationController
       return quizzes_json(old_quizzes, *serializer_options)
     end
 
-    new_quizzes = if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
-                    scoped_new_quizzes_index.reject { |q| Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type")) }
-                  else
-                    scoped_new_quizzes_index
-                  end
+    new_quizzes = scoped_new_quizzes_index.reject { |q| Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type")) }
 
     quizzes_next_json(
       sort_quizzes(old_quizzes + new_quizzes),
@@ -1163,10 +1158,10 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def render_ams_service
-    js_env(
-      context_url: named_context_url(@context, :context_quizzes_url),
-      PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) }
-    )
+    js_env({
+             context_url: named_context_url(@context, :context_quizzes_url),
+             PERMISSIONS: { manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics) }
+           })
     enhanced_rubrics_context_js_env
     remote_env(ams:
       {
@@ -1253,14 +1248,16 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def set_section_list_js_env
-    js_env SECTION_LIST: @context.course_sections.active.map { |section|
-      {
-        id: section.id,
-        name: section.name,
-        start_at: section.start_at,
-        end_at: section.end_at,
-        override_course_and_term_dates: section.restrict_enrollments_to_section_dates
-      }
-    }
+    js_env({
+             SECTION_LIST: @context.course_sections.active.map do |section|
+               {
+                 id: section.id,
+                 name: section.name,
+                 start_at: section.start_at,
+                 end_at: section.end_at,
+                 override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+               }
+             end
+           })
   end
 end

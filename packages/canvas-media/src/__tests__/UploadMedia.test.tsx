@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {act, render, fireEvent, waitFor, cleanup} from '@testing-library/react'
-import ComputerPanel from '../ComputerPanel'
-import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
-import {vi} from 'vitest'
+import {act, cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
+import {vi} from 'vitest'
+import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
+import ComputerPanel from '../ComputerPanel'
 
 vi.mock('@instructure/studio-player/dist/index.css', () => ({}))
 

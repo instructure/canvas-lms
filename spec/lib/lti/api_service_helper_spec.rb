@@ -34,7 +34,7 @@ module Lti
     subject { TestClass.new(request) }
 
     let(:request) do
-      m = double("request")
+      m = instance_double(ActionDispatch::Request)
       allow(m).to receive_messages(authorization: "")
       body = StringIO.new
       body.write("abc123")

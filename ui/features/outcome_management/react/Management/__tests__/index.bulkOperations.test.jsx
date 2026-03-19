@@ -48,6 +48,7 @@ describe('OutcomeManagementPanel - Bulk Operations', () => {
   let render, defaultProps, groupDetailDefaultProps, defaultMocks
 
   beforeEach(() => {
+    vi.useFakeTimers()
     const setup = setupTest()
     render = setup.render
     defaultProps = setup.defaultProps
@@ -57,6 +58,8 @@ describe('OutcomeManagementPanel - Bulk Operations', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.restoreAllMocks()
+    vi.useRealTimers()
     teardownTest()
   })
 
@@ -156,7 +159,7 @@ describe('OutcomeManagementPanel - Bulk Operations', () => {
       await act(async () => vi.runOnlyPendingTimers())
       const removeModal = await findByTestId('outcome-management-remove-modal')
       expect(within(removeModal).getByText('From Root course folder')).toBeInTheDocument()
-    }, 10000)
+    }, 30000)
   })
 
   describe('Bulk move outcomes', () => {

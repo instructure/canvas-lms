@@ -231,6 +231,9 @@ class User < ActiveRecord::Base
   has_many :announcements
   has_many :discussion_topics, -> { where(type: nil) }
   has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
+  has_many :all_comment_bank_items, class_name: "CommentBankItem"
+  has_many :bookmarks, class_name: "Bookmarks::Bookmark"
+  has_many :all_group_memberships, class_name: "GroupMembership"
 
   has_one :profile, class_name: "UserProfile"
   has_many :profile_links, through: :profile, source: :links
@@ -400,14 +403,13 @@ class User < ActiveRecord::Base
   # a student, this first enrollment stays the same, but a new one with an associated_user_id is added. thusly to find
   # course observers, you take the difference between all active observers and active observers with associated users
   scope :observing_full_course, lambda { |course_ids|
-    active_observer_scope = joins(:enrollments).where(enrollments: { type: "ObserverEnrollment", course_id: course_ids, workflow_state: ["active", "invited"] })
-    users_observing_students = active_observer_scope.where.not(enrollments: { associated_user_id: nil }).pluck(:id)
-
-    if users_observing_students == [] || users_observing_students.nil?
-      active_observer_scope
-    else
-      active_observer_scope.where.not(users: { id: users_observing_students })
-    end
+    joins(:observer_enrollments)
+      .where(observer_enrollments: { course_id: course_ids, workflow_state: ["active", "invited"] })
+      .where.not(
+        ObserverEnrollment.where("enrollments.user_id=users.id and observer_enrollments.course_id=enrollments.course_id")
+                          .where(workflow_state: ["active", "invited"])
+                          .where.not(associated_user_id: nil).arel.exists
+      )
   }
 
   scope :linked_through_root_account, lambda { |root_account|
@@ -2885,6 +2887,29 @@ class User < ActiveRecord::Base
       end
     end
 
+    enabled_peer_review_ids = course_ids_with_peer_review_enabled
+    peer_review_context_codes = context_codes.select do |code|
+      type, id = ActiveRecord::Base.parse_asset_string(code)
+      type == "Course" && enabled_peer_review_ids.include?(id)
+    end
+
+    if peer_review_context_codes.any?
+      peer_review_sub_assignments = PeerReviewSubAssignment.published
+                                                           .for_context_codes(peer_review_context_codes)
+                                                           .due_between_with_overrides(now, opts[:end_at])
+                                                           .include_submitted_count.to_a
+
+      if peer_review_sub_assignments.any?
+        if AssignmentOverrideApplicator.should_preload_override_students?(peer_review_sub_assignments, self, "upcoming_events")
+          AssignmentOverrideApplicator.preload_assignment_override_students(peer_review_sub_assignments, self)
+        end
+
+        events += select_available_assignments(
+          select_upcoming_assignments(peer_review_sub_assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
+        )
+      end
+    end
+
     sorted_events = events.sort_by do |e|
       due_date = e.start_at
       if e.respond_to? :dates_hash_visible_to
@@ -2900,6 +2925,10 @@ class User < ActiveRecord::Base
 
   def course_ids_with_checkpoints_enabled
     courses.select(&:discussion_checkpoints_enabled?).map(&:id)
+  end
+
+  def course_ids_with_peer_review_enabled
+    courses.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
@@ -3654,10 +3683,53 @@ class User < ActiveRecord::Base
     Rails.cache.delete(adminable_accounts_cache_key)
   end
 
+  def adminable_horizon_accounts_cache_key
+    ["adminable_horizon_accounts_1", self, ApplicationController.region].cache_key
+  end
+
+  def clear_adminable_horizon_accounts_cache!
+    Rails.cache.delete(adminable_horizon_accounts_cache_key)
+  end
+
   def adminable_accounts_scope(shard_scope: in_region_associated_shards)
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
     account_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     Account.active.where(id: account_ids)
+  end
+
+  def adminable_horizon_accounts_scope(shard_scope: in_region_associated_shards)
+    adminable_accounts_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
+    root_accounts = Account.active.where(
+      id: Account.active
+               .where(id: adminable_accounts_ids)
+               .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
+    )
+
+    horizon_account_ids = Set.new
+    adminable_accounts_set = Set.new(adminable_accounts_ids)
+
+    root_accounts.each do |root_account|
+      root_account.shard.activate do
+        horizon_parent_ids = root_account.settings[:horizon_account_ids] || []
+
+        next if horizon_parent_ids.empty?
+
+        all_horizon_accounts = Account.multi_parent_sub_accounts_recursive(horizon_parent_ids)
+        all_horizon_ids = all_horizon_accounts.pluck(:id)
+
+        matching_ids = Set.new(all_horizon_ids) & adminable_accounts_set
+
+        matching_ids.each do |local_id|
+          horizon_account_ids.add(Shard.global_id_for(local_id, root_account.shard))
+        end
+      end
+    end
+
+    if horizon_account_ids.any? && account_users.active.where(account: Account.site_admin).exists?
+      horizon_account_ids.add(Account.site_admin.global_id)
+    end
+
+    Account.active.where(id: horizon_account_ids.to_a)
   end
 
   def adminable_accounts
@@ -3668,8 +3740,20 @@ class User < ActiveRecord::Base
     end
   end
 
+  def adminable_horizon_accounts
+    @adminable_horizon_accounts ||= shard.activate do
+      Rails.cache.fetch(adminable_horizon_accounts_cache_key) do
+        adminable_horizon_accounts_scope.order(:id).to_a
+      end
+    end
+  end
+
   def all_paginatable_accounts
     ShardedBookmarkedCollection.build(Account::Bookmarker, adminable_accounts_scope.order(:name, :id))
+  end
+
+  def all_paginatable_horizon_accounts
+    ShardedBookmarkedCollection.build(Account::Bookmarker, adminable_horizon_accounts_scope.order(:name, :id))
   end
 
   def all_pseudonyms_loaded?

@@ -63,7 +63,6 @@ function initStore(initProps) {
         })
         // @ts-expect-error
         .catch(_err => {
-           
           console.error('The Paste plugin failed to get canvas session data.')
         })
     } else {
@@ -128,15 +127,7 @@ tinymce.PluginManager.add(
           domObject: file,
         }
 
-        let tabContext = 'documents'
-
-        if (isImage(file.type)) {
-          tabContext = 'images'
-        } else if (isAudioOrVideo(file.type)) {
-          tabContext = 'media'
-        }
-
-        store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
+        store.dispatch(uploadToMediaFolder(fileMetaProps))
 
         return 'submitted'
       }
@@ -189,7 +180,7 @@ tinymce.PluginManager.add(
 
         // This will finish once the dialog is closed, if one was created, putting this in a loop allows us
         // to show a dialog for each file without them conflicting.
-         
+
         await requestFileInsertion(file)
       }
     }

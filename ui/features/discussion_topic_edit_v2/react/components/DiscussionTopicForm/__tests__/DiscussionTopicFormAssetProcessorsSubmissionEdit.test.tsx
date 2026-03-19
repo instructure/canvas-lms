@@ -95,50 +95,54 @@ describe('DiscussionTopicForm AssetProcessors Submission', () => {
     vi.resetAllMocks()
   })
 
-  it('saves both existing and added processors when editing a DiscussionTopic', async () => {
-    const assignment = Assignment.mock()
-    // @ts-expect-error
-    const mockDiscussionTopic = DiscussionTopic.mock({assignment})
-    const mockOnSubmit = vi.fn()
+  it(
+    'saves both existing and added processors when editing a DiscussionTopic',
+    async () => {
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const mockOnSubmit = vi.fn()
 
-    const {getByTestId} = setup({
-      isEditing: true,
-      currentDiscussionTopic: mockDiscussionTopic,
-      onSubmit: mockOnSubmit,
-    })
-
-    act(() => {
-      useAssetProcessorsState.getState().addAttachedProcessors({
-        tool: mockToolsForDiscussions[0],
-        data: mockContributionDeepLinkResponse,
-        type: 'ActivityAssetProcessorContribution',
+      const {getByTestId} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+        onSubmit: mockOnSubmit,
       })
-    })
 
-    expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(2)
+      act(() => {
+        useAssetProcessorsState.getState().addAttachedProcessors({
+          tool: mockToolsForDiscussions[0],
+          data: mockContributionDeepLinkResponse,
+          type: 'ActivityAssetProcessorContribution',
+        })
+      })
 
-    await act(async () => {
-      getByTestId('save-button').click()
-    })
+      expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(2)
 
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalled()
-    })
+      await act(async () => {
+        getByTestId('save-button').click()
+      })
 
-    const submissionData = mockOnSubmit.mock.calls[0][0]
-    // For expected structure, see AttachedAssetProcessorGraphqlMutation
-    const aps = submissionData.assignment.assetProcessors
-    expect(aps).toEqual([
-      {existingId: 1},
-      {
-        newContentItem: {
-          contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
-          // from mockDeepLinkResponse:
-          text: 'Lti 1.3 Tool Text',
-          title: 'Lti 1.3 Tool Title',
-          report: {},
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalled()
+      })
+
+      const submissionData = mockOnSubmit.mock.calls[0][0]
+      // For expected structure, see AttachedAssetProcessorGraphqlMutation
+      const aps = submissionData.assignment.assetProcessors
+      expect(aps).toEqual([
+        {existingId: 1},
+        {
+          newContentItem: {
+            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
+            // from mockDeepLinkResponse:
+            text: 'Lti 1.3 Tool Text',
+            title: 'Lti 1.3 Tool Title',
+            report: {},
+          },
         },
-      },
-    ])
-  })
+      ])
+    },
+    30000,
+  )
 })

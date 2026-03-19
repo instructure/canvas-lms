@@ -23,6 +23,7 @@ module Lti
     TII_TOOL_VENDOR_CODE = Rails.env.development? ? "Instructure.com" : "turnitin.com"
     TII_TOOL_PRODUCT_CODE = Rails.env.development? ? "similarity detection reference tool" : "turnitin-lti"
     MIGRATED_ASSET_REPORT_TYPE = "originality_report"
+    TRUSTED_MIGRATION_DOMAINS = %w[turnitin.com turnitin.dev turnitin.net turnitin.org turnitinuk.com].freeze
     PROGRESS_TAG = "lti_tii_ap_migration"
     COORDINATOR_TAG = "lti_tii_ap_migration_coordinator"
 
@@ -40,6 +41,7 @@ module Lti
         @progress.calculate_completion!(0, actls_for_account_count)
         generate_migration_report do |csv|
           migrate_actls(csv)
+          migrate_orphan_proxies(csv)
         end
       end
       save_migration_report
@@ -70,7 +72,78 @@ module Lti
       end
     end
 
+    # This method is only called from rails console, manually
+    def rollback(recursive: false)
+      Rails.logger.info("#{"Recursive " if recursive}Rolling back Asset Processor migration in this account=#{@account.global_id}")
+      actls_for_account.find_each do |actl|
+        tool_proxy = actl.associated_tool_proxy
+        next unless tool_proxy.present?
+        next unless tool_proxy.migrated_to_context_external_tool.present?
+        next unless proxy_in_account?(tool_proxy, @account) || recursive
+
+        resubscribe_tool_proxy(tool_proxy)
+
+        migration_id = generate_migration_id(tool_proxy, actl)
+        aps = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:)
+        aps.find_each do |ap|
+          Rails.logger.info("Rolling back Asset Processor ID=#{ap.id} for ACTL ID=#{actl.id} and tool_proxy ID=#{tool_proxy.id}")
+          ap.destroy
+        end
+      rescue => e
+        capture_and_log_exception(e)
+        Rails.logger.error("Failed to rollback migration for ACTL ID=#{actl.id}: #{e.message}")
+      end
+
+      account_ids = recursive ? sub_account_ids : [@account.id]
+      rollback_orphan_proxies(account_ids)
+
+      @migrated_tool_proxies.each do |tp|
+        Rails.logger.info("Set migrated_to_context_external_tool to nil from #{tp.migrated_to_context_external_tool_id} for TP #{tp.id}")
+        tp.update!(migrated_to_context_external_tool_id: nil)
+      end
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_recursive
+      rollback(recursive: true)
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_progress
+      Progress.where(tag: "lti_tii_ap_migration", context: @account).update_all(tag: "lti_tii_ap_migration_rolled_back")
+      Progress.where(tag: "lti_tii_ap_migration_coordinator", context: @account).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
+    end
+
+    # This method is only called from rails console, manually
+    def rollback_progress_recursive
+      ids = sub_account_ids
+      Progress.where(tag: "lti_tii_ap_migration", context_type: "Account", context_id: ids).update_all(tag: "lti_tii_ap_migration_rolled_back")
+      Progress.where(tag: "lti_tii_ap_migration_coordinator", context_type: "Account", context_id: ids).update_all(tag: "lti_tii_ap_migration_coordinator_rolled_back")
+    end
+
     private
+
+    def rollback_orphan_proxies(account_ids)
+      Rails.logger.info("Rolling back orphan tool proxies for account=#{@account.global_id}")
+      migrated_orphan_proxies(account_ids).find_each do |tool_proxy|
+        resubscribe_tool_proxy(tool_proxy)
+      rescue => e
+        capture_and_log_exception(e)
+        Rails.logger.error("Failed to rollback orphan tool proxy ID=#{tool_proxy.id}: #{e.message}")
+      end
+    end
+
+    def resubscribe_tool_proxy(tool_proxy)
+      return if @migrated_tool_proxies.include?(tool_proxy)
+
+      @migrated_tool_proxies << tool_proxy
+      Rails.logger.info("Resubscribe tool_proxy #{tool_proxy.id}")
+      tool_proxy.manage_subscription
+    end
+
+    def migrated_orphan_proxies(account_ids)
+      tii_tool_proxies_base_query(account_ids).where.not(lti_tool_proxies: { migrated_to_context_external_tool_id: nil })
+    end
 
     def migrate_actls(csv)
       actls_for_account.find_each do |actl|
@@ -124,6 +197,50 @@ module Lti
             report_warning_message(tool_proxy, actl).join(", ")
           ]
         end
+      end
+    end
+
+    def migrate_orphan_proxies(csv)
+      tii_orphan_proxies.find_each do |tool_proxy|
+        next if @migrated_tool_proxies.include?(tool_proxy)
+        next if @results[:proxies][tool_proxy.id]
+
+        initialize_proxy_results(tool_proxy)
+        add_proxy_warning(tool_proxy, "This tool proxy was not associated with any assignment")
+
+        migrate_tool_proxy(tool_proxy)
+
+        if proxy_errors(tool_proxy).empty? && tool_proxy.reload.migrated_to_context_external_tool.present?
+          @migrated_tool_proxies << tool_proxy
+        end
+      rescue => e
+        capture_and_log_exception(e)
+        add_proxy_error(tool_proxy, "Unexpected error migrating orphan Tool Proxy ID=#{tool_proxy.id}")
+      ensure
+        next unless @results[:proxies][tool_proxy.id]
+
+        if tool_proxy.context_type == "Course"
+          proxy_account = tool_proxy.context.account
+          course_id = tool_proxy.context_id
+        else
+          proxy_account = tool_proxy.context
+          course_id = ""
+        end
+
+        csv << [
+          proxy_account.id,
+          proxy_account.name,
+          "",
+          "",
+          course_id,
+          tool_proxy.id,
+          tool_proxy.migrated_to_context_external_tool_id || "",
+          "",
+          "",
+          0,
+          report_error_message(tool_proxy, nil).join(", "),
+          report_warning_message(tool_proxy, nil).join(", ")
+        ]
       end
     end
 
@@ -181,6 +298,28 @@ module Lti
       actls_for_account.count
     end
 
+    def tii_orphan_proxies(account_ids = [@account.id])
+      tii_tool_proxies_base_query(account_ids).where(lti_tool_proxies: { migrated_to_context_external_tool_id: nil })
+    end
+
+    def tii_tool_proxies_base_query(account_ids)
+      Lti::ToolProxy
+        .joins(:product_family)
+        .joins("LEFT JOIN #{Course.quoted_table_name} ON courses.id = lti_tool_proxies.context_id AND lti_tool_proxies.context_type = 'Course'")
+        .where(
+          lti_product_families: {
+            vendor_code: TII_TOOL_VENDOR_CODE,
+            product_code: TII_TOOL_PRODUCT_CODE
+          }
+        )
+        .where(lti_tool_proxies: { workflow_state: "active" })
+        .where(
+          "(lti_tool_proxies.context_type = 'Account' AND lti_tool_proxies.context_id IN (:account_ids)) OR " \
+          "(lti_tool_proxies.context_type = 'Course' AND courses.account_id IN (:account_ids) AND courses.workflow_state <> 'deleted')",
+          account_ids:
+        )
+    end
+
     def migrate_tool_proxy(tool_proxy)
       # Find LTI 1.3 deployments with ActivityAssetProcessor placement and Turnitin developer key
       deployments = find_tii_asset_processor_deployments(tool_proxy.context)
@@ -215,7 +354,7 @@ module Lti
     def tii_developer_key
       return @tii_developer_key if defined?(@tii_developer_key)
 
-      dk_id = Setting.get("turnitin_asset_processor_client_id", "")
+      dk_id = @account.root_account.turnitin_asset_processor_client_id
       @tii_developer_key = if dk_id.blank?
                              nil
                            else
@@ -320,9 +459,8 @@ module Lti
       # Construct migration endpoint URL from base endpoint
       uri = URI.parse(endpoint)
 
-      # Validate that the endpoint is from turnitin.com or a subdomain
-      unless uri.host == "turnitin.com" || uri.host&.end_with?(".turnitin.com")
-        Rails.logger.error("Invalid migration endpoint host: #{uri.host}. Must be turnitin.com or a subdomain")
+      unless trusted_migration_host?(uri.host)
+        Rails.logger.error("Invalid migration endpoint host: #{uri.host}. Must be a trusted Turnitin domain")
         return nil
       end
 
@@ -331,6 +469,14 @@ module Lti
       capture_and_log_exception(e)
       Rails.logger.error("Failed to extract migration endpoint from Tool Proxy: #{e.message}")
       nil
+    end
+
+    def trusted_migration_host?(host)
+      return false if host.blank?
+
+      extra = Setting.get("asset_processor_tii_migration_extra_domains", "").split(",").map(&:strip).reject(&:empty?)
+      domains = TRUSTED_MIGRATION_DOMAINS + extra
+      domains.any? { |domain| host == domain || host.end_with?(".#{domain}") }
     end
 
     def construct_pns_url(deployment)
@@ -422,7 +568,7 @@ module Lti
         return [:failed, nil]
       end
 
-      migration_id = "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
+      migration_id = generate_migration_id(tool_proxy, actl)
       existing_ap = Lti::AssetProcessor.active.where(assignment: actl.assignment, migration_id:).first
       if existing_ap.present?
         Rails.logger.warn("Asset Processor already exists for ACTL ID=#{actl.id} and migration_id=#{migration_id}, skipping")
@@ -653,8 +799,7 @@ module Lti
       Rails.application.routes.url_helpers.account_file_download_url(
         account.id,
         attachment_id,
-        host: HostUrl.context_host(account),
-        protocol: HostUrl.protocol
+        host: account.environment_specific_domain
       )
     end
 
@@ -842,6 +987,10 @@ module Lti
       @results[:fatal_error].present? ||
         @results[:proxies].values.any? { |r| r[:errors].any? } ||
         @results[:actl_errors].present?
+    end
+
+    def generate_migration_id(tool_proxy, actl)
+      "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
     end
   end
 end

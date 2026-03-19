@@ -67,7 +67,7 @@ describe DataFixup::GetMediaFromNotoriousIntoInstfs do
 
   describe ".get_it_to_instfs" do
     before do
-      client = double(CanvasKaltura::ClientV3)
+      client = instance_double(CanvasKaltura::ClientV3)
       expect(client).to receive(:startSession).and_return("sessioninfo")
       expect(client).to receive(:flavorAssetGetByEntryId).with("m-frommediaobject-3").and_return([{ id: 11, fileExt: "mp3" }])
       expect(client).to receive(:flavorAssetGetDownloadUrl).with(11).and_return("http://example.com/asset")
@@ -75,8 +75,7 @@ describe DataFixup::GetMediaFromNotoriousIntoInstfs do
     end
 
     it "downloads from kaltura and cleans up afterward" do
-      http_return = double
-      expect(http_return).to receive(:body).and_return("request_body")
+      http_return = instance_double(Net::HTTPResponse, body: "request_body")
       expect(CanvasHttp).to receive(:get).with("http://example.com/asset").and_return(http_return)
 
       expect(InstFS).to receive(:direct_upload).with(file_name: "11.mp3", file_object: anything).and_return(true)

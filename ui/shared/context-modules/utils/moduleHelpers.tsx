@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {createRoot, Root} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {Mathml} from '@instructure/canvas-rce/enhance-user-content'
 import ModuleFileDrop from '@canvas/context-module-file-drop/react'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
@@ -155,17 +156,25 @@ export function addEmptyModuleUI(module: HTMLElement) {
   const contextModules = document.getElementById('context_modules')
 
   if (!module_dnd.reactRoot) {
-    module_dnd.reactRoot = createRoot(module_dnd)
+    module_dnd.reactRoot = render(
+      <ModuleFileDrop
+        courseId={ENV.course_id}
+        moduleId={moduleId}
+        contextModules={contextModules}
+        moduleName={moduleName}
+      />,
+      module_dnd,
+    )
+  } else {
+    module_dnd.reactRoot.render(
+      <ModuleFileDrop
+        courseId={ENV.course_id}
+        moduleId={moduleId}
+        contextModules={contextModules}
+        moduleName={moduleName}
+      />,
+    )
   }
-
-  module_dnd.reactRoot.render(
-    <ModuleFileDrop
-      courseId={ENV.course_id}
-      moduleId={moduleId}
-      contextModules={contextModules}
-      moduleName={moduleName}
-    />,
-  )
 }
 
 export function removeEmptyModuleUI(module: HTMLElement) {

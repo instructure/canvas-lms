@@ -42,13 +42,11 @@ describe Attachments::S3Storage do
     BASE64
     let(:signature) { "8afdbf4008c03f22c2cd3cdb72e4afbb1f6a588f3255ac628749a66d7f09699e" }
     let(:bucket) do
-      config = double("config", {
-                        secret_access_key:,
-                        region: "us-east-1",
-                        credentials: double(credentials: double(access_key_id:, secret_access_key:)),
-                      })
-      client = double("client", config:)
-      double("bucket", client:)
+      credentials = instance_double(Aws::Credentials, access_key_id:, secret_access_key:)
+      credentials_provider = instance_double(Aws::CredentialProvider, credentials:)
+      config = Struct.new(:region, :credentials).new("us-east-1", credentials_provider)
+      client = instance_double(Aws::S3::Client, config:)
+      instance_double(Aws::S3::Bucket, client:)
     end
 
     it "follows the v4 signing example from AWS" do
@@ -80,7 +78,7 @@ describe Attachments::S3Storage do
     end
 
     context "when the S3 object is missing" do
-      let(:s3_error) { Aws::S3::Errors::NoSuchKey.new(double("ctx"), "no such key") }
+      let(:s3_error) { Aws::S3::Errors::NoSuchKey.new(instance_double(Seahorse::Client::RequestContext), "no such key") }
 
       before do
         attachment.update!(file_state: "available")

@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Adicionar imagem"
     },
+    "add_new_a9226085": {
+        "message": "Adicionar novo"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Adicionar nova legenda"
+    },
     "add_one_9e34a6f8": {
         "message": "Adicionar uma!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "Produto de limite"
     },
+    "caption_manager_aae0906f": {
+        "message": "Gerenciador de legendas"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Legendas foram adicionadas para { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "As legendas foram excluídas para { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "As legendas herdadas de um curso principal não podem ser removidas."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Escolher arquivo de legenda"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Escolher arquivo"
     },
     "choose_usage_rights_33683854": {
         "message": "Escolher direitos de uso..."
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Seta diagonal para baixo e direita"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Baixar { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Baixar { filename }"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Falha ao recuperar o conteúdo da ferramenta externa"
+    },
+    "file_d1b70050": {
+        "message": "Arquivo*"
     },
     "file_name_8fd421ff": {
         "message": "Nome do arquivo"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "Lambda"
+    },
+    "language_91effaa0": {
+        "message": "Linguagem*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "Ícone de artes linguísticas"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Selecione um arquivo de um tipo compatível"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Selecione um idioma"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Selecione um arquivo .vtt ou .srt."
+    },
     "plus_d43cd4ec": {
         "message": "Mais"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Números primos"
+    },
+    "processing_8c569014": {
+        "message": "Processando..."
     },
     "product_39cf144f": {
         "message": "Produto"
@@ -1994,9 +2030,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Remover link"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Remover mídia do Studio"
-    },
     "replace_all_d3d68b3": {
         "message": "Substituir todos"
     },
@@ -2017,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Substituído todos { alertFindText } por { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Pedido"
     },
     "reset_95a81614": {
         "message": "Redefinir"
@@ -2165,6 +2201,9 @@
     "selected_274ce24f": {
         "message": "Selecionado"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Arquivo selecionado: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Selecionado { linkFileName }"
     },
@@ -2198,20 +2237,11 @@
     "show_all_967a90f0": {
         "message": "Mostrar tudo"
     },
-    "show_audio_options_b489926b": {
-        "message": "Mostrar opções de áudio"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Exibir opções de imagem"
     },
     "show_link_options_545338fd": {
         "message": "Exibir opções de link"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostrar opções de mídia do Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Exibir opções de vídeo"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Deficientes visuais navegam rapidamente nas páginas web, buscando títulos grandes ou negritos. Usuários de leitores de tela dependem dos cabeçalhos para entendimento contextual. Os cabeçalhos devem usar a estrutura adequada."
@@ -2602,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "Link atualizado"
+    },
+    "upload_8b403d05": {
+        "message": "Carregar"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Faça o upload de uma faixa de legenda no formato SRT ou WebVTT."
     },
     "upload_document_253f0478": {
         "message": "Carregar documento"

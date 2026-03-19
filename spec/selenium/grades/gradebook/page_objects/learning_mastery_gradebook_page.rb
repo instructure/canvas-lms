@@ -70,7 +70,7 @@ class LearningMasteryGradebookPage
     end
 
     def outcome_headers
-      ff('#outcomes-header [data-testid="column-header"]')
+      ff('[data-testid^="outcome-header"]')
     end
 
     def student_outcome_cell(student_id, outcome_id)

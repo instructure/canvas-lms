@@ -977,55 +977,55 @@ describe GradeCalculator do
   describe "GradeCalculator.recompute_final_score" do
     it "accepts a course" do
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, Hash)
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it "accepts a course id" do
       expect(GradeCalculator).to receive(:new).with([@student.id], Course, Hash)
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course.id)
     end
 
     it "fetches assignments for GradeCalculator" do
       expect(@course).to receive_message_chain(:assignments, :published, :gradeable, to_a: [5, 6])
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5, 6]))
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it "does not fetch assignments if they are already passed" do
       expect(@course).not_to receive(:assignments)
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5, 6]))
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course, assignments: [5, 6])
     end
 
     it "fetches groups for GradeCalculator" do
       expect(@course).to receive_message_chain(:assignment_groups, :active, to_a: [5, 6])
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5, 6]))
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it "does not fetch groups if they are already passed" do
       expect(@course).not_to receive(:assignment_groups)
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5, 6]))
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course, groups: [5, 6])
     end
 
     it "fetches periods for GradeCalculator" do
       expect(GradingPeriod).to receive(:for).with(@course).and_return([5, 6])
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5, 6]))
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it "does not fetch periods if they are already passed" do
       expect(GradingPeriod).not_to receive(:for)
       expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5, 6]))
-                                              .and_return(double("GradeCalculator", compute_and_save_scores: "hi"))
+                                              .and_return(instance_double(GradeCalculator, compute_and_save_scores: "hi"))
       GradeCalculator.recompute_final_score(@student.id, @course, periods: [5, 6])
     end
   end

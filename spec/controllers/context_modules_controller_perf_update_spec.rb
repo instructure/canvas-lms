@@ -267,9 +267,9 @@ describe ContextModulesController do
             end
 
             it "has the @menu_tools variable" do
-              finder_double = double("Lti::ContextToolFinder")
-              tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
-              tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+              finder_double = instance_double(Lti::ContextToolFinder)
+              tool_double_1 = instance_double(ContextExternalTool, has_placement?: true, cache_key: "key")
+              tool_double_2 = instance_double(ContextExternalTool, has_placement?: false, cache_key: "key")
 
               allow_any_instance_of(ContextExternalToolsHelper)
                 .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
@@ -380,9 +380,9 @@ describe ContextModulesController do
           end
 
           it "has the @menu_tools variable" do
-            finder_double = double("Lti::ContextToolFinder")
-            tool_double_1 = double("Tool 1", has_placement?: true)
-            tool_double_2 = double("Tool 2", has_placement?: false)
+            finder_double = instance_double(Lti::ContextToolFinder)
+            tool_double_1 = instance_double(ContextExternalTool, has_placement?: true)
+            tool_double_2 = instance_double(ContextExternalTool, has_placement?: false)
 
             allow(Lti::ContextToolFinder)
               .to receive(:new)

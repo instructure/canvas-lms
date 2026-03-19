@@ -204,7 +204,7 @@ describe Accessibility::CourseStatisticCalculatorService do
       end
 
       it "logs an error report" do
-        error_report = instance_double("ErrorReport", id: 12_345)
+        error_report = instance_double(ErrorReport, id: 12_345)
         expect(ErrorReport).to receive(:log_exception).with(
           "accessibility_course_statistics_error",
           kind_of(StandardError),

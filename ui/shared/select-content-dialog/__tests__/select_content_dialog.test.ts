@@ -25,6 +25,7 @@ import {
   deepLinkingResponseHandler,
   extractContextExternalToolItemData,
   resetExternalToolFields,
+  resetItemTypeSelect,
   selectContentDialog,
 } from '../jquery/select_content_dialog'
 import $ from 'jquery'
@@ -643,5 +644,29 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
 
     expect($('#select_context_content_dialog').is(':visible')).toBe(false)
     expect(window.confirm).toHaveBeenCalledTimes(0)
+  })
+
+  it('clears URL and title after deep linking when form is reset', async () => {
+    deepLinkingResponseHandler(deepLinkingEvent as MessageEvent)
+    expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/launch-url')
+    expect($('#external_tool_create_title').val()).toEqual('My Tool')
+
+    resetExternalToolFields()
+
+    expect($('#external_tool_create_url').val()).toEqual('')
+    expect($('#external_tool_create_title').val()).toEqual('')
+  })
+
+  it('resets dropdown to first option when resetItemTypeSelect is called', async () => {
+    $('#fixtures').append(
+      '<select id="add_module_item_select"><option value="first">First</option><option value="second">Second</option></select>',
+    )
+    $('#add_module_item_select').prop('selectedIndex', 1)
+
+    expect($('#add_module_item_select').prop('selectedIndex')).toEqual(1)
+
+    resetItemTypeSelect()
+
+    expect($('#add_module_item_select').prop('selectedIndex')).toEqual(0)
   })
 })

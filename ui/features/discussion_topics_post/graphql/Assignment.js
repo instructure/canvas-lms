@@ -27,7 +27,7 @@ import {Checkpoint} from './Checkpoint'
 
 export const Assignment = {
   fragment: gql`
-    fragment Assignment on Assignment {
+    fragment DiscussionPostAssignment on Assignment {
       id
       _id
       dueAt(applyOverrides: false)
@@ -38,7 +38,7 @@ export const Assignment = {
       restrictQuantitativeData(checkExtraPermissions: true)
       assignmentOverrides {
         nodes {
-          ...AssignmentOverride
+          ...DiscussionPostAssignmentOverride
         }
       }
       checkpoints {
@@ -46,11 +46,11 @@ export const Assignment = {
       }
       mySubAssignmentSubmissionsConnection {
         nodes {
-          ...Submission
+          ...DiscussionSubmission
         }
       }
       assessmentRequestsForCurrentUser {
-        ...AssessmentRequest
+        ...DiscussionPostAssessmentRequest
       }
       peerReviews {
         ...PeerReviews

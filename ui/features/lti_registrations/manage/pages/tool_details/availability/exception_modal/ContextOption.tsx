@@ -23,6 +23,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {SearchableContexts} from '../../../../model/SearchableContext'
+import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+
 const I18n = createI18nScope('lti_registrations')
 
 type ContextOptionProps = {
@@ -37,59 +39,67 @@ export const ContextOption = React.memo(
     const {name, display_path, sis_id} = context
     const course_code = 'course_code' in context ? context.course_code : undefined
     const hasPath = display_path.length > 0 && includePath
+
     return (
-      <Flex alignItems="start" direction="row" margin={margin}>
+      <Flex alignItems="center" direction="row" margin={margin}>
         {icon ? <Flex.Item margin="0 x-small 0 0">{icon}</Flex.Item> : undefined}
-        <Flex.Item>
+        <Flex.Item shouldGrow shouldShrink>
           <Flex alignItems="start" direction="column" as="div">
-            <Text wrap="break-word">{name}</Text>
-            <Flex.Item shouldShrink>
-              <Text size="small">
-                <Flex alignItems="center" gap="xx-small">
-                  {hasPath ? (
-                    <EllipsifiedItem>{display_path.join(' / ')}</EllipsifiedItem>
-                  ) : undefined}
-                  {hasPath && (course_code || sis_id) ? <View>·</View> : undefined}
-                  {course_code ? (
-                    <EllipsifiedItem>
-                      <View>
+            <Flex.Item shouldShrink shouldGrow>
+              <Text wrap="break-word">{name}</Text>
+            </Flex.Item>
+            <Flex.Item shouldShrink overflowX="hidden" width="100%">
+              <Flex gap="none" wrap="wrap">
+                {hasPath ? (
+                  // @ts-expect-error: Flex.Item has incorrect props, maxWidth exists
+                  // and works great here.
+                  <Flex.Item shouldShrink maxWidth="33%">
+                    <Text size="small">
+                      <TruncateWithTooltip position="middle">
+                        {display_path.join(' / ')}
+                      </TruncateWithTooltip>
+                    </Text>
+                  </Flex.Item>
+                ) : undefined}
+                {hasPath && (course_code || sis_id) ? (
+                  <Flex.Item padding="0 xx-small">
+                    <Text size="small">·</Text>
+                  </Flex.Item>
+                ) : undefined}
+                {course_code ? (
+                  // @ts-expect-error: Flex.Item has incorrect props, maxWidth exists
+                  // and works great here.
+                  <Flex.Item shouldShrink maxWidth="33%">
+                    <Text size="small">
+                      <TruncateWithTooltip position="middle">
                         {I18n.t('Course Code: %{course_code}', {
                           course_code: course_code,
                         })}
-                      </View>
-                    </EllipsifiedItem>
-                  ) : undefined}
-                  {sis_id && course_code ? <View>|</View> : undefined}
-                  {sis_id ? (
-                    <EllipsifiedItem>
-                      <View>{I18n.t('SIS ID: %{sis_id}', {sis_id: sis_id})}</View>
-                    </EllipsifiedItem>
-                  ) : undefined}
-                </Flex>
-              </Text>
+                      </TruncateWithTooltip>
+                    </Text>
+                  </Flex.Item>
+                ) : undefined}
+                {sis_id && course_code ? (
+                  <Flex.Item padding="0 xx-small">
+                    <Text size="small">·</Text>
+                  </Flex.Item>
+                ) : undefined}
+                {sis_id ? (
+                  // @ts-expect-error: Flex.Item has incorrect props, maxWidth exists
+                  // and works great here.
+                  <Flex.Item shouldShrink maxWidth="33%">
+                    <Text size="small">
+                      <TruncateWithTooltip position="middle">
+                        {I18n.t('SIS ID: %{sis_id}', {sis_id: sis_id})}
+                      </TruncateWithTooltip>
+                    </Text>
+                  </Flex.Item>
+                ) : undefined}
+              </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>
       </Flex>
     )
   },
-)
-
-const EllipsifiedItem = ({
-  children,
-  style,
-}: {
-  children: React.ReactNode
-  style?: React.CSSProperties
-}) => (
-  <div
-    style={{
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-      ...style,
-    }}
-  >
-    {children}
-  </div>
 )

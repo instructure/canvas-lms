@@ -86,11 +86,13 @@ Returning postMessage includes the following properties:
 
 - subject: "lti.getPageContent"
 - pageContent: a string containing HTML
+- contentId: the ID of the content (Assignment or WikiPage)
 
 ```js
 {
   subject: 'lti.getPageContent.response',
-  content: '<div>...</div>'
+  content: '<div>...</div>',
+  content_id: 11
 }
 ```
 

@@ -761,11 +761,11 @@ describe NotificationMessageCreator do
 
   describe "#cancel_pending_duplicate_messages" do
     context "partitions" do
-      let(:subject) { NotificationMessageCreator.new(double("notification", name: nil), nil) }
+      let(:subject) { NotificationMessageCreator.new(instance_double(Notification, name: nil), nil) }
       let(:count_of_updated_record) { 10 }
 
       def set_up_stubs(start_time, *conditions)
-        scope = double("Message Scope")
+        scope = class_double(Message)
         expect(Message).to receive(:in_partition).ordered.with("created_at" => start_time).and_return(scope)
         expect(scope).to receive(:where).ordered.and_return(scope)
         expect(scope).to receive(:for).ordered.and_return(scope)

@@ -44,6 +44,9 @@ module NewLoginHelper
       invalid_login_faq_url:,
       help_link: help_link_info,
       require_aup:,
+      custom_message_login:,
+      custom_message_registration:,
+      custom_message_registration_parent:
     }.compact
   end
 
@@ -173,5 +176,26 @@ module NewLoginHelper
 
   def require_aup
     (TermsOfService.ensure_terms_for_account(@domain_root_account)&.terms_type == "no_terms") ? nil : "true"
+  end
+
+  # custom messages as defined in the theme editor for login, registration, and parent registration
+  def custom_message_for(var_name)
+    return nil unless Account.site_admin.feature_enabled?(:new_login_ui_custom_labels)
+
+    # read explicit values directly to avoid defaults, indirection, CSS processing, or schema coupling
+    value = active_brand_config&.get_value(var_name).presence
+    value&.gsub(/[\r\n]+/, " ")&.strip
+  end
+
+  def custom_message_login
+    custom_message_for("ic-brand-Login-custom-message")
+  end
+
+  def custom_message_registration
+    custom_message_for("ic-brand-Registration-custom-message")
+  end
+
+  def custom_message_registration_parent
+    custom_message_for("ic-brand-Registration-parent-custom-message")
   end
 end

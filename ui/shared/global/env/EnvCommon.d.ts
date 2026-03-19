@@ -120,6 +120,7 @@ export interface EnvCommon {
   csp?: string
   current_user_id: string | null
   current_user_global_id: string
+  current_user_uuid: string | null
   current_user_usage_metrics_id: string
   COURSE_ROLES: Role[]
   COURSE_USERS_PATH?: string
@@ -263,8 +264,6 @@ export interface EnvCommon {
 
   breadcrumbs?: {name: string; url: string}[]
   enhanced_rubrics_enabled?: boolean
-  enhanced_rubrics_copy_to?: boolean
-  rubric_imports_exports?: boolean
 
   /**
    * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
@@ -295,6 +294,7 @@ export type SiteAdminFeatureId =
   | 'a11y_checker_ai_table_caption_generation'
   | 'a11y_checker_additional_resources'
   | 'a11y_checker_close_issues'
+  | 'a11y_checker_ga2_features'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
@@ -313,8 +313,8 @@ export type SiteAdminFeatureId =
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
-  | 'new_quizzes_surveys'
   | 'permanent_page_links'
+  | 'rce_asr_captioning_improvements'
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
@@ -350,8 +350,9 @@ export type RootAccountFeatureId =
   | 'lti_asset_processor'
   | 'lti_asset_processor_discussions'
   | 'lti_link_to_apps_from_developer_keys'
+  | 'lti_deactivate_registrations'
   | 'lti_registrations_next'
-  | 'lti_registrations_page'
+  | 'lti_registrations_templates'
   | 'lti_dr_registrations_update'
   | 'lti_registrations_usage_data'
   | 'lti_registrations_usage_data_dev'
@@ -359,6 +360,7 @@ export type RootAccountFeatureId =
   | 'lti_registrations_usage_tab'
   | 'mobile_offline_mode'
   | 'modules_requirements_allow_percentage'
+  | 'nav_menu_links'
   | 'non_scoring_rubrics'
   | 'open_tools_in_new_tab'
   | 'pendo_extended'
@@ -394,6 +396,7 @@ export type OtherFeatureId =
   | 'canvas_k6_theme'
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
+  | 'peer_review_allocation_and_grading'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

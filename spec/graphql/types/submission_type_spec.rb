@@ -539,6 +539,18 @@ describe Types::SubmissionType do
           resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
         ).to eq [student_2_comment.id.to_s]
       end
+
+      it "returns only reviewer's own comments with status ALL and peerReview true" do
+        student_2_comment = @peer_review_submission.add_comment(author: @student2, comment: "student2 peer review")
+        student_3_comment = @peer_review_submission.add_comment(author: @student3, comment: "student3 peer review")
+
+        result = GraphQLTypeTester.new(@peer_review_submission, current_user: @student2).resolve(
+          "commentsConnection(filter: { status: [ALL], peerReview: true }) { nodes { _id } }"
+        )
+
+        expect(result).to eq [student_2_comment.id.to_s]
+        expect(result).not_to include(student_3_comment.id.to_s)
+      end
     end
 
     context "draft comments" do
@@ -577,6 +589,190 @@ describe Types::SubmissionType do
         expect(
           submission_type.resolve("commentsConnection(includeDraftComments: true, includeDraftsFromOthers: true) { nodes { _id }}", current_user: @student)
         ).to eq [@comment2.id.to_s]
+      end
+    end
+
+    context "status filter argument" do
+      before(:once) do
+        @filter_student = student_in_course(course: @course, active_all: true).user
+        @teacher2 = teacher_in_course(course: @course, active_all: true).user
+        @filter_submission = @assignment.submit_homework(@filter_student, body: "student work")
+        @teacher_comment = @filter_submission.add_comment(author: @teacher, comment: "teacher comment")
+        @teacher_draft = @filter_submission.add_comment(author: @teacher, comment: "teacher draft", draft_comment: true)
+        @teacher2_comment = @filter_submission.add_comment(author: @teacher2, comment: "teacher2 comment")
+        @teacher2_draft = @filter_submission.add_comment(author: @teacher2, comment: "teacher2 draft", draft_comment: true)
+        @student_comment = @filter_submission.add_comment(author: @filter_student, comment: "student comment")
+      end
+
+      it "returns published comments for student with status ALL" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @filter_student).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@filter_student)
+        expect(result).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "returns published and draft comments for teacher with status ALL" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expect(result).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "delegates to visible_submission_comments_for when status is ALL" do
+        expect_any_instance_of(Submission).to receive(:visible_submission_comments_for).with(@teacher).and_call_original
+
+        GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+      end
+
+      it "falls back to published comments only when status array is empty" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [] }) { nodes { _id } }"
+        )
+
+        expect(result).to match_array([
+                                        @teacher_comment.id.to_s,
+                                        @teacher2_comment.id.to_s,
+                                        @student_comment.id.to_s
+                                      ])
+        expect(result).not_to include(@teacher_draft.id.to_s)
+        expect(result).not_to include(@teacher2_draft.id.to_s)
+      end
+
+      it "falls back to published comments only when status is null" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: null }) { nodes { _id } }"
+        )
+
+        expect(result).to match_array([
+                                        @teacher_comment.id.to_s,
+                                        @teacher2_comment.id.to_s,
+                                        @student_comment.id.to_s
+                                      ])
+        expect(result).not_to include(@teacher_draft.id.to_s)
+        expect(result).not_to include(@teacher2_draft.id.to_s)
+      end
+
+      it "overrides includeDraftComments parameter when status is ALL" do
+        result_with_false = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, includeDraftComments: false) { nodes { _id } }"
+        )
+        result_with_true = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, includeDraftComments: true) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expect(result_with_false).to match_array(visible_comments.map { |c| c.id.to_s })
+        expect(result_with_true).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "filters to specified attempt only when combined with forAttempt" do
+        @filter_submission.update!(attempt: 2)
+        attempt_1_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 1 comment", attempt: 1)
+        attempt_2_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 2 comment", attempt: 2)
+
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL], forAttempt: 2 }) { nodes { _id } }"
+        )
+
+        expect(result).to include(attempt_2_comment.id.to_s)
+        expect(result).not_to include(attempt_1_comment.id.to_s)
+      end
+
+      it "sorts comments newest first when sortOrder is desc" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, sortOrder: desc) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expected_order = visible_comments.sort_by { |c| [c.created_at.to_i, c.id] }.reverse.map { |c| c.id.to_s }
+        expect(result).to eq(expected_order)
+      end
+
+      it "sorts comments oldest first when sortOrder is asc" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, sortOrder: asc) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expected_order = visible_comments.sort_by { |c| [c.created_at.to_i, c.id] }.map { |c| c.id.to_s }
+        expect(result).to eq(expected_order)
+      end
+
+      it "returns comments from all attempts when allComments overrides forAttempt" do
+        @filter_submission.update!(attempt: 2)
+        attempt_1_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 1 comment", attempt: 1)
+        attempt_2_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 2 comment", attempt: 2)
+
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL], allComments: true, forAttempt: 2 }) { nodes { _id } }"
+        )
+
+        expect(result).to include(attempt_1_comment.id.to_s)
+        expect(result).to include(attempt_2_comment.id.to_s)
+      end
+
+      context "with provisional comments" do
+        before(:once) do
+          @final_grader = @teacher
+          @provisional_grader1 = teacher_in_course(course: @course, active_all: true).user
+          @provisional_grader2 = teacher_in_course(course: @course, active_all: true).user
+
+          @moderated_assignment = @course.assignments.create!(
+            name: "moderated assignment",
+            moderated_grading: true,
+            grader_count: 3,
+            final_grader: @final_grader
+          )
+          @moderated_submission = @moderated_assignment.submit_homework(@filter_student, body: "student work")
+
+          @moderated_assignment.grade_student(@filter_student, grade: 8, grader: @final_grader, provisional: true)
+          @moderated_assignment.grade_student(@filter_student, grade: 9, grader: @provisional_grader1, provisional: true)
+          @moderated_assignment.grade_student(@filter_student, grade: 7, grader: @provisional_grader2, provisional: true)
+
+          @final_grader_comment = @moderated_submission.add_comment(
+            author: @final_grader,
+            comment: "final grader provisional comment",
+            provisional: true
+          )
+          @provisional_comment1 = @moderated_submission.add_comment(
+            author: @provisional_grader1,
+            comment: "provisional grader 1 comment",
+            provisional: true
+          )
+          @provisional_comment2 = @moderated_submission.add_comment(
+            author: @provisional_grader2,
+            comment: "provisional grader 2 comment",
+            provisional: true
+          )
+        end
+
+        it "returns provisional comments regardless of includeProvisionalComments parameter when status is ALL" do
+          result_with_false = GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader1).resolve(
+            "commentsConnection(filter: { status: [ALL] }, includeProvisionalComments: false) { nodes { _id } }"
+          )
+          result_with_true = GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader1).resolve(
+            "commentsConnection(filter: { status: [ALL] }, includeProvisionalComments: true) { nodes { _id } }"
+          )
+
+          visible_comments = @moderated_submission.visible_submission_comments_for(@provisional_grader1)
+          expect(result_with_false).to match_array(visible_comments.map { |c| c.id.to_s })
+          expect(result_with_true).to match_array(visible_comments.map { |c| c.id.to_s })
+          expect(result_with_false).to include(@provisional_comment1.id.to_s)
+        end
+
+        it "returns no provisional comments to students when grades are unpublished" do
+          result = GraphQLTypeTester.new(@moderated_submission, current_user: @filter_student).resolve(
+            "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+          )
+
+          expect(result).to eq([])
+        end
       end
     end
   end
@@ -796,6 +992,60 @@ describe Types::SubmissionType do
               "submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) { nodes { attempt }}"
             )
           ).to eq [1, 2]
+        end
+      end
+    end
+
+    context "previewUrl with legacy version missing course_id" do
+      let(:legacy_student) { student_in_course(course: @course, active_all: true).user }
+      let(:legacy_submission) { legacy_student.submissions.find_by!(assignment: legacy_assignment) }
+      let(:legacy_resolver) { GraphQLTypeTester.new(legacy_submission, current_user: @teacher, request: ActionDispatch::TestRequest.create) }
+
+      before do
+        legacy_assignment.submit_homework(legacy_student, submitted_at: 3.hours.ago, **legacy_homework_opts)
+        legacy_assignment.submit_homework(legacy_student, submitted_at: 2.hours.ago, **legacy_homework_opts)
+        legacy_assignment.submit_homework(legacy_student, **legacy_homework_opts)
+        legacy_submission.versions.each do |version|
+          model = version.model
+          model.course_id = nil
+          version.model = model
+          version.save!
+        end
+      end
+
+      context "regular submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy regular", submission_types: "online_text_entry", points_possible: 10) }
+        let(:legacy_homework_opts) { { body: "An attempt" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("http://test.host/courses/#{@course.id}/assignments/#{legacy_assignment.id}/submissions/#{legacy_student.id}"))
+        end
+      end
+
+      context "anonymous submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy anon", submission_types: "online_text_entry", points_possible: 10, anonymous_grading: true) }
+        let(:legacy_homework_opts) { { body: "An attempt" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("http://test.host/courses/#{@course.id}/assignments/#{legacy_assignment.id}/anonymous_submissions/#{legacy_submission.anonymous_id}"))
+        end
+      end
+
+      context "basic_lti_launch submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy lti", submission_types: "external_tool", points_possible: 10) }
+        let(:legacy_homework_opts) { { submission_type: "basic_lti_launch", url: "http://example.com/launch" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("/courses/#{@course.id}/external_tools/retrieve"))
         end
       end
     end
@@ -1051,6 +1301,22 @@ describe Types::SubmissionType do
         submission_type.resolve(query)
       end
 
+      it "does not call visible_provisional_comments when includeProvisionalComments is true and filter status [ALL]" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {status: [ALL]}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is true and includeDraftComments and includeDraftsFromOthers are true" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeDraftComments: true, includeDraftsFromOthers: true, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
       it "does not call visible_provisional_comments when includeProvisionalComments is false" do
         expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments)
 
@@ -1126,6 +1392,489 @@ describe Types::SubmissionType do
 
     it "returns assetString" do
       expect(submission_type.resolve("turnitinData { assetString }")).to eq [@submission.asset_string]
+    end
+
+    context "with originality reports" do
+      before(:once) do
+        @assignment_with_tii = @course.assignments.create!(
+          name: "assignment with turnitin",
+          submission_types: "online_upload",
+          turnitin_enabled: true
+        )
+        @assignment_with_tii.update(
+          turnitin_settings: { originality_report_visibility: "after_grading" }
+        )
+
+        @attachment = attachment_model
+        @attachment.context = @student
+        @attachment.save!
+
+        @submission_with_tii = @assignment_with_tii.submit_homework(
+          @student,
+          submission_type: "online_upload",
+          attachments: [@attachment]
+        )
+
+        @originality_report = OriginalityReport.create!(
+          attachment: @attachment,
+          submission: @submission_with_tii,
+          originality_score: 75.5,
+          workflow_state: "scored",
+          submission_time: @submission_with_tii.submitted_at,
+          originality_report_url: "http://example.com/report"
+        )
+      end
+
+      let(:submission_with_tii_type) { GraphQLTypeTester.new(@submission_with_tii, current_user: @teacher) }
+
+      it "returns data from originality reports" do
+        expect(
+          submission_with_tii_type.resolve("turnitinData { score }")
+        ).to eq [75.5]
+      end
+
+      it "returns status from originality report" do
+        expect(
+          submission_with_tii_type.resolve("turnitinData { status }")
+        ).to eq ["scored"]
+      end
+
+      it "returns state from originality report" do
+        # State is calculated from originality_score: 75.5% >= 75 = "failure"
+        expect(
+          submission_with_tii_type.resolve("turnitinData { state }")
+        ).to eq ["failure"]
+      end
+
+      it "returns reportUrl from originality report" do
+        result = submission_with_tii_type.resolve("turnitinData { reportUrl }")
+        expect(result).to eq ["http://example.com/report"]
+      end
+
+      context "permissions" do
+        it "returns turnitin data for teachers" do
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to eq [75.5]
+        end
+
+        it "does not return turnitin data for students before grading" do
+          student_type = GraphQLTypeTester.new(@submission_with_tii, current_user: @student)
+          result = student_type.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+
+        it "returns turnitin data for students after grading" do
+          @assignment_with_tii.grade_student(@student, grade: 80, grader: @teacher)
+          student_type = GraphQLTypeTester.new(@submission_with_tii, current_user: @student)
+          result = student_type.resolve("turnitinData { score }")
+          expect(result).to eq [75.5]
+        end
+
+        it "does not return turnitin data for unauthorized users" do
+          other_student = student_in_course(active_all: true).user
+          other_type = GraphQLTypeTester.new(@submission_with_tii, current_user: other_student)
+          result = other_type.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+      end
+
+      context "edge cases" do
+        it "returns nil when no originality reports exist" do
+          # Create a new assignment without any turnitin setup to avoid data from parent test
+          clean_assignment = @course.assignments.create!(
+            name: "clean assignment",
+            submission_types: "online_text_entry"
+          )
+          submission_without_data = clean_assignment.submit_homework(@student, body: "test")
+          type_without = GraphQLTypeTester.new(submission_without_data, current_user: @teacher)
+          result = type_without.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+
+        it "returns nil for unsubmitted submissions" do
+          # Create a second student who hasn't submitted yet
+          other_student = student_in_course(course: @course, active_all: true).user
+          unsubmitted = @assignment_with_tii.submissions.find_by!(user: other_student)
+          type_unsubmitted = GraphQLTypeTester.new(unsubmitted, current_user: @teacher)
+          result = type_unsubmitted.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+      end
+
+      context "with CPF migration" do
+        before(:once) do
+          @assignment_with_tii.assignment_configuration_tool_lookups.create!(
+            tool_product_code: "turnitin-lti",
+            tool_vendor_code: "turnitin.com",
+            tool_resource_type_code: "resource-type-code",
+            tool_type: "Lti::MessageHandler"
+          )
+        end
+
+        it "returns nil when assignment is CPF migrated" do
+          allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(true)
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to be_nil
+        end
+
+        it "returns turnitin data when assignment is not CPF migrated" do
+          allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:migrated?).and_return(false)
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to eq [75.5]
+        end
+      end
+
+      context "with multiple originality reports" do
+        before(:once) do
+          # Create a pending report
+          @pending_report = OriginalityReport.create!(
+            attachment: @attachment,
+            submission: @submission_with_tii,
+            workflow_state: "pending",
+            originality_score: nil
+          )
+
+          # Create a second scored report (should be preferred)
+          @scored_report = OriginalityReport.create!(
+            attachment: @attachment,
+            submission: @submission_with_tii,
+            originality_score: 85.0,
+            workflow_state: "scored"
+          )
+        end
+
+        it "prefers scored report over pending report" do
+          result = submission_with_tii_type.resolve("turnitinData { score }")
+          expect(result).to include(85.0)
+        end
+      end
+    end
+
+    context "with timestamp-based asset strings" do
+      before(:once) do
+        @submission_with_timestamp = @course.assignments.create!(
+          name: "assignment for resubmission",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "attempt 1", submission_type: "online_text_entry")
+
+        @timestamp1 = @submission_with_timestamp.submitted_at.utc.iso8601
+        @asset_string_with_timestamp = "#{@submission_with_timestamp.asset_string}_#{@timestamp1}"
+
+        @submission_with_timestamp.turnitin_data[@asset_string_with_timestamp] = {
+          similarity_score: 88.0,
+          state: "failure",
+          report_url: "http://example.com/report1",
+          status: "scored"
+        }
+        @submission_with_timestamp.save!
+      end
+
+      let(:submission_with_timestamp_type) { GraphQLTypeTester.new(@submission_with_timestamp, current_user: @teacher) }
+
+      it "handles submission asset strings with ISO8601 timestamps" do
+        result = submission_with_timestamp_type.resolve("turnitinData { assetString }")
+        expect(result).to eq [@asset_string_with_timestamp]
+      end
+
+      it "returns correct target for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { target { ...on Submission { _id } } }")
+        expect(result).to eq [@submission_with_timestamp.id.to_s]
+      end
+
+      it "returns correct score for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { score }")
+        expect(result).to eq [88.0]
+      end
+
+      it "returns correct state for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { state }")
+        expect(result).to eq ["failure"]
+      end
+
+      it "returns correct status for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { status }")
+        expect(result).to eq ["scored"]
+      end
+
+      it "returns correct reportUrl for timestamp-based asset strings" do
+        result = submission_with_timestamp_type.resolve("turnitinData { reportUrl }")
+        expect(result).to eq ["http://example.com/report1"]
+      end
+    end
+
+    context "with multiple resubmissions" do
+      before(:once) do
+        @assignment_multi = @course.assignments.create!(
+          name: "assignment with multiple attempts",
+          submission_types: "online_text_entry"
+        )
+
+        # First submission
+        @submission_multi = @assignment_multi.submit_homework(@student, body: "attempt 1", submission_type: "online_text_entry")
+        @timestamp1 = @submission_multi.submitted_at.utc.iso8601
+        @asset_string1 = "#{@submission_multi.asset_string}_#{@timestamp1}"
+
+        # Resubmit
+        Timecop.freeze(1.hour.from_now) do
+          @submission_multi = @assignment_multi.submit_homework(@student, body: "attempt 2", submission_type: "online_text_entry")
+          @timestamp2 = @submission_multi.submitted_at.utc.iso8601
+          @asset_string2 = "#{@submission_multi.asset_string}_#{@timestamp2}"
+        end
+
+        # Add turnitin data for both attempts
+        @submission_multi.turnitin_data[@asset_string1] = {
+          similarity_score: 88.0,
+          state: "failure",
+          report_url: "http://example.com/attempt1",
+          status: "scored"
+        }
+        @submission_multi.turnitin_data[@asset_string2] = {
+          similarity_score: 35.0,
+          state: "warning",
+          report_url: "http://example.com/attempt2",
+          status: "scored"
+        }
+        @submission_multi.save!
+      end
+
+      let(:submission_multi_type) { GraphQLTypeTester.new(@submission_multi, current_user: @teacher) }
+
+      it "returns turnitin data for all resubmissions" do
+        result = submission_multi_type.resolve("turnitinData { assetString }")
+        expect(result).to contain_exactly(@asset_string1, @asset_string2)
+      end
+
+      it "returns different scores for different attempts" do
+        result = submission_multi_type.resolve("turnitinData { score }")
+        expect(result).to contain_exactly(88.0, 35.0)
+      end
+
+      it "returns different states for different attempts" do
+        result = submission_multi_type.resolve("turnitinData { state }")
+        expect(result).to contain_exactly("failure", "warning")
+      end
+
+      it "returns different reportUrls for different attempts" do
+        result = submission_multi_type.resolve("turnitinData { reportUrl }")
+        expect(result).to contain_exactly("http://example.com/attempt1", "http://example.com/attempt2")
+      end
+
+      it "returns same target (submission) for all attempts" do
+        result = submission_multi_type.resolve("turnitinData { target { ...on Submission { _id } } }")
+        expect(result).to eq [@submission_multi.id.to_s, @submission_multi.id.to_s]
+      end
+    end
+
+    context "with attachment asset strings" do
+      before(:once) do
+        @assignment_with_attachment = @course.assignments.create!(
+          name: "assignment with attachment",
+          submission_types: "online_upload"
+        )
+
+        @attachment = attachment_model(context: @student, filename: "test.pdf")
+        @submission_with_attachment = @assignment_with_attachment.submit_homework(
+          @student,
+          submission_type: "online_upload",
+          attachments: [@attachment]
+        )
+
+        @attachment_asset_string = @attachment.asset_string
+
+        @submission_with_attachment.turnitin_data[@attachment_asset_string] = {
+          similarity_score: 50.0,
+          state: "problem",
+          report_url: "http://example.com/attachment_report",
+          status: "scored"
+        }
+        @submission_with_attachment.save!
+      end
+
+      let(:submission_with_attachment_type) { GraphQLTypeTester.new(@submission_with_attachment, current_user: @teacher) }
+
+      it "returns attachment asset string" do
+        result = submission_with_attachment_type.resolve("turnitinData { assetString }")
+        expect(result).to eq [@attachment_asset_string]
+      end
+
+      it "resolves target to File type for attachment asset strings" do
+        result = submission_with_attachment_type.resolve("turnitinData { target { ...on File { _id } } }")
+        expect(result).to eq [@attachment.id.to_s]
+      end
+
+      it "returns correct score for attachment" do
+        result = submission_with_attachment_type.resolve("turnitinData { score }")
+        expect(result).to eq [50.0]
+      end
+
+      it "returns correct state for attachment" do
+        result = submission_with_attachment_type.resolve("turnitinData { state }")
+        expect(result).to eq ["problem"]
+      end
+    end
+
+    context "edge cases" do
+      it "returns nil when turnitin_data is empty" do
+        empty_submission = @course.assignments.create!(
+          name: "assignment without turnitin",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        empty_type = GraphQLTypeTester.new(empty_submission, current_user: @teacher)
+        result = empty_type.resolve("turnitinData { score }")
+        expect(result).to be_nil
+      end
+
+      it "filters out entries where target is nil" do
+        @submission_edge = @course.assignments.create!(
+          name: "edge case assignment",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        # Add entry with valid submission asset string
+        valid_asset_string = "#{@submission_edge.asset_string}_2026-01-01T00:00:00Z"
+        @submission_edge.turnitin_data[valid_asset_string] = {
+          similarity_score: 10.0,
+          state: "acceptable",
+          report_url: "http://example.com",
+          status: "scored"
+        }
+
+        # Add entry with non-existent attachment (should be filtered out)
+        @submission_edge.turnitin_data["attachment_99999999"] = {
+          similarity_score: 20.0,
+          state: "acceptable",
+          report_url: "http://example.com",
+          status: "scored"
+        }
+        @submission_edge.save!
+
+        edge_type = GraphQLTypeTester.new(@submission_edge, current_user: @teacher)
+        result = edge_type.resolve("turnitinData { assetString }")
+        # Should only return the valid submission asset string
+        expect(result).to eq [valid_asset_string]
+      end
+
+      it "handles malformed asset strings gracefully" do
+        @submission_malformed = @course.assignments.create!(
+          name: "malformed assignment",
+          submission_types: "online_text_entry"
+        ).submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        # Add entry with completely malformed asset string (not submission_ or attachment_)
+        @submission_malformed.turnitin_data["invalid_asset_string"] = {
+          similarity_score: 10.0,
+          state: "acceptable",
+          report_url: "http://example.com",
+          status: "scored"
+        }
+        @submission_malformed.save!
+
+        malformed_type = GraphQLTypeTester.new(@submission_malformed, current_user: @teacher)
+        result = malformed_type.resolve("turnitinData { assetString }")
+        # Should return empty array for invalid asset strings
+        expect(result).to eq([])
+      end
+    end
+  end
+
+  describe "vericite_data" do
+    before(:once) do
+      @assignment_vericite = @course.assignments.create!(
+        name: "assignment with vericite",
+        submission_types: "online_text_entry",
+        vericite_enabled: true
+      )
+      @submission_vericite = @assignment_vericite.submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+      @vericite_asset_string = @submission_vericite.asset_string
+      @submission_vericite.turnitin_data[@vericite_asset_string] = {
+        similarity_score: 45.0,
+        state: "warning",
+        report_url: "http://vericite.example.com",
+        status: "scored"
+      }
+      @submission_vericite.turnitin_data[:provider] = "vericite"
+      @submission_vericite.save!
+    end
+
+    let(:submission_vericite_type) { GraphQLTypeTester.new(@submission_vericite, current_user: @teacher) }
+
+    it "returns vericite data when enabled" do
+      result = submission_vericite_type.resolve("vericiteData { score }")
+      expect(result).to eq [45.0]
+    end
+
+    it "returns correct state" do
+      result = submission_vericite_type.resolve("vericiteData { state }")
+      expect(result).to eq ["warning"]
+    end
+
+    it "returns correct status" do
+      result = submission_vericite_type.resolve("vericiteData { status }")
+      expect(result).to eq ["scored"]
+    end
+
+    it "returns correct reportUrl" do
+      result = submission_vericite_type.resolve("vericiteData { reportUrl }")
+      expect(result).to eq ["http://vericite.example.com"]
+    end
+
+    it "returns correct assetString" do
+      result = submission_vericite_type.resolve("vericiteData { assetString }")
+      expect(result).to eq [@vericite_asset_string]
+    end
+
+    it "returns correct target" do
+      result = submission_vericite_type.resolve("vericiteData { target { ...on Submission { _id } } }")
+      expect(result).to eq [@submission_vericite.id.to_s]
+    end
+
+    context "with timestamp-based asset strings" do
+      before(:once) do
+        @timestamp_vericite = @submission_vericite.submitted_at.utc.iso8601
+        @vericite_asset_with_timestamp = "#{@submission_vericite.asset_string}_#{@timestamp_vericite}"
+
+        @submission_vericite.turnitin_data[@vericite_asset_with_timestamp] = {
+          similarity_score: 65.0,
+          state: "problem",
+          report_url: "http://vericite.example.com/timestamp",
+          status: "scored"
+        }
+        @submission_vericite.save!
+      end
+
+      it "handles vericite data with timestamps" do
+        result = submission_vericite_type.resolve("vericiteData { assetString }")
+        expect(result).to include(@vericite_asset_with_timestamp)
+      end
+
+      it "returns correct score for timestamp-based vericite data" do
+        result = submission_vericite_type.resolve("vericiteData { score }")
+        expect(result).to include(65.0)
+      end
+    end
+
+    context "permissions" do
+      it "returns nil when vericite is not enabled" do
+        @assignment_no_vericite = @course.assignments.create!(
+          name: "assignment without vericite",
+          submission_types: "online_text_entry",
+          vericite_enabled: false
+        )
+        @submission_no_vericite = @assignment_no_vericite.submit_homework(@student, body: "test", submission_type: "online_text_entry")
+
+        no_vericite_type = GraphQLTypeTester.new(@submission_no_vericite, current_user: @teacher)
+        result = no_vericite_type.resolve("vericiteData { score }")
+        expect(result).to be_nil
+      end
+
+      it "checks view_vericite_report permission" do
+        other_student = student_in_course(active_all: true).user
+        other_type = GraphQLTypeTester.new(@submission_vericite, current_user: other_student)
+        result = other_type.resolve("vericiteData { score }")
+        expect(result).to be_nil
+      end
     end
   end
 

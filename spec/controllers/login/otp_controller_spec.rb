@@ -167,7 +167,7 @@ describe Login::OtpController do
 
       it "returns an error message if the OTP verification fails" do
         post :create, params: { otp_login: { verification_code: "invalid_code" } }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body).to eq({ "error" => "Invalid verification code, please try again" })
       end
     end

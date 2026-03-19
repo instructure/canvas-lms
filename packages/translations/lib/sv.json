@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "Lägg till bild"
     },
+    "add_new_a9226085": {
+        "message": "Lägg till ny"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Lägg till ny undertext"
+    },
     "add_one_9e34a6f8": {
         "message": "Lägg till en!"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "Takprodukt"
     },
+    "caption_manager_aae0906f": {
+        "message": "Undertexthanterare"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Undertexter har lagts till för { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Undertexter har raderats för { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Undertexten som ärvts från en överordnad kurs kan inte tas bort."
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Välj undertextfil"
+    },
+    "choose_file_8d89ccab": {
+        "message": "Välj fil"
     },
     "choose_usage_rights_33683854": {
         "message": "Välj användningsrättigheter ..."
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Diagonal pil, nedåt och till höger"
     },
+    "download_captionname_2e5eea35": {
+        "message": "Ladda ner { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "Ladda ner { filename }"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Det gick inte att hämta innehåll från externt verktyg"
+    },
+    "file_d1b70050": {
+        "message": "Fil*"
     },
     "file_name_8fd421ff": {
         "message": "Filnamn"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "Lambda"
+    },
+    "language_91effaa0": {
+        "message": "Språk*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "Språkvetenskapsikon"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Välj en fil som stöds."
     },
+    "please_select_a_language_d90256fb": {
+        "message": "Välj ett språk"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Välj en VTT- eller SRT-fil"
+    },
     "plus_d43cd4ec": {
         "message": "Plus"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Primtal"
+    },
+    "processing_8c569014": {
+        "message": "Bearbetar ..."
     },
     "product_39cf144f": {
         "message": "Produkt"
@@ -1994,9 +2030,6 @@
     "remove_link_d1f2f4d0": {
         "message": "Ta bort länk"
     },
-    "remove_studio_media_f913e502": {
-        "message": "Ta bort Studio-mediefiler"
-    },
     "replace_all_d3d68b3": {
         "message": "Ersätt alla"
     },
@@ -2017,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Ersatte alla { alertFindText } med { alertReplaceText }"
+    },
+    "request_d1129f7d": {
+        "message": "Begäran"
     },
     "reset_95a81614": {
         "message": "Återställ"
@@ -2165,6 +2201,9 @@
     "selected_274ce24f": {
         "message": "Valda"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Vald fil: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Markerade { linkFileName }"
     },
@@ -2198,20 +2237,11 @@
     "show_all_967a90f0": {
         "message": "Visa alla"
     },
-    "show_audio_options_b489926b": {
-        "message": "Visa ljudalternativ"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Visa bildalternativ"
     },
     "show_link_options_545338fd": {
         "message": "Visa länkalternativ"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Visa mediealternativ för Studio"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Visa videoalternativ"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Seende användare bläddrar snabbt bland webbsidor och letar efter stora rubriker eller rubriker i fetstil. Användare av skärmläsare använder sig av rubriker för kontextuell förståelse. Rubriker ska använda rätt struktur."
@@ -2602,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "Uppdaterad länk"
+    },
+    "upload_8b403d05": {
+        "message": "Ladda upp"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Ladda upp ett undertextspår i antingen SRT- eller WebVTT-format."
     },
     "upload_document_253f0478": {
         "message": "Ladda upp dokument"

@@ -20,7 +20,7 @@ module Accessibility
   class Issue
     module DiscussionTopicIssues
       def generate_discussion_topic_resources(skip_scan: false)
-        discussion_topics = context.discussion_topics
+        discussion_topics = context.discussion_topics.scannable
         return discussion_topics.map { |discussion_topic| discussion_topic_attributes(discussion_topic) } if skip_scan
 
         discussion_topics.each_with_object({}) do |discussion_topic, issues|

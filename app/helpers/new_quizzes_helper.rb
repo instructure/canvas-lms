@@ -18,6 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module NewQuizzesHelper
+  def setup_new_quizzes_env(signed_launch_data)
+    add_new_quizzes_bundle
+    js_env({ NEW_QUIZZES: signed_launch_data })
+    add_body_class("native-new-quizzes full-width")
+  end
+
   def add_new_quizzes_bundle
     return unless @context.respond_to?(:feature_enabled?)
     return unless @context.feature_enabled?(:new_quizzes_native_experience)
@@ -27,5 +33,20 @@ module NewQuizzesHelper
     remote_env(new_quizzes: {
                  launch_url: Services::NewQuizzes.launch_url
                })
+  end
+
+  def self.override_item_banks_tab(tabs:, href:, context:)
+    item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
+    return unless item_banks_index
+
+    overridden_item_banks_tab = {
+      id: Course::TAB_ITEM_BANKS,
+      label: I18n.t("#tabs.item_banks", "Item Banks"),
+      css_class: "item_banks",
+      href:,
+    }
+
+    tabs.delete_at(item_banks_index)
+    tabs.insert(item_banks_index, overridden_item_banks_tab)
   end
 end

@@ -181,6 +181,18 @@ class LLMConversationClient
     }
   end
 
+  def evaluation
+    raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
+
+    response = make_request(
+      method: :post,
+      path: "/conversations/#{@conversation_id}/evaluate",
+      error_message: "Failed to evaluate conversation"
+    )
+
+    response["data"]
+  end
+
   private
 
   def make_request(method:, path:, payload: nil, error_message:)
@@ -215,7 +227,15 @@ class LLMConversationClient
     response = http.request(request)
 
     unless response.is_a?(Net::HTTPSuccess)
-      raise LlmConversation::Errors::ConversationError, "#{error_message}: #{response.code} - #{response.body}"
+      # Try to extract error message from JSON response
+      begin
+        error_json = JSON.parse(response.body)
+        error_detail = error_json["message"] || error_json["error"] || response.body
+      rescue JSON::ParserError
+        error_detail = response.body
+      end
+
+      raise LlmConversation::Errors::ConversationError, "#{error_message}: #{error_detail}"
     end
 
     JSON.parse(response.body)

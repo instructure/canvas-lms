@@ -27,7 +27,7 @@
         <option value="on_paper" {{selectedIf defaultToOnPaper}} {{disabledIf isHorizonCourse}}>
           {{#t "submission_types.on_paper"}}On Paper{{/t}}
         </option>
-        <option value="external_tool" {{selectedIf isGenericExternalTool}}>
+        <option value="external_tool" {{selectedIf isGenericExternalTool}} {{disabledIf hasPeerReviewSubmissions}}>
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
         {{#if submissionTypeSelectionTools}}

@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
 import {statusesTitleMap} from '../../utils/accountStatusUtils'
+import {STATUS_ICONS} from '@canvas/grading/gradingStatus'
 
 const I18n = createI18nScope('standard_grading_status')
 
@@ -46,6 +47,8 @@ export const StandardStatusItem = ({
   const standardStatusRef = useRef<HTMLDivElement | undefined>(undefined)
 
   const statusName = statusesTitleMap[name as StandardStatusAllowedName]
+  const icon = STATUS_ICONS?.[name as string]
+
   return (
     <View
       as="div"
@@ -63,6 +66,7 @@ export const StandardStatusItem = ({
       >
         <Grid vAlign="middle">
           <Grid.Row>
+            <Grid.Col width="auto">{icon && <img src={icon} alt="" title={statusName} />}</Grid.Col>
             <Grid.Col>
               <Text weight="bold">{statusName}</Text>
             </Grid.Col>

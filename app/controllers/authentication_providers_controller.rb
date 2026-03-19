@@ -701,7 +701,7 @@ class AuthenticationProvidersController < ApplicationController
         end
         format.json do
           msg = "duplicate provider #{account_config.auth_type}"
-          render json: { errors: [{ message: msg }] }, status: :unprocessable_entity
+          render json: { errors: [{ message: msg }] }, status: :unprocessable_content
         end
       end
       return
@@ -824,14 +824,18 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   def sso_settings_json(account)
-    {
-      sso_settings: {
-        login_handle_name: account.login_handle_name,
-        change_password_url: account.change_password_url,
-        auth_discovery_url: account.auth_discovery_url,
-        unknown_user_url: account.unknown_user_url,
-      }
+    settings = {
+      login_handle_name: account.login_handle_name,
+      change_password_url: account.change_password_url,
+      auth_discovery_url: account.auth_discovery_url,
+      unknown_user_url: account.unknown_user_url
     }
+
+    if account.discovery_page_allowed?
+      settings[:discovery_page_active] = account.discovery_page_active?
+    end
+
+    { sso_settings: settings }
   end
 
   # @API Show account auth settings
@@ -872,10 +876,19 @@ class AuthenticationProvidersController < ApplicationController
   #
   # @returns SSOSettings
   def update_sso_settings
-    sets = params.require(:sso_settings).permit(:login_handle_name,
-                                                :change_password_url,
-                                                :auth_discovery_url,
-                                                :unknown_user_url)
+    permitted_params = %i[
+      login_handle_name
+      change_password_url
+      auth_discovery_url
+      unknown_user_url
+    ]
+
+    if @account.discovery_page_allowed?
+      permitted_params << :discovery_page_active
+    end
+
+    sets = params.fetch(:sso_settings, {}).permit(*permitted_params)
+
     update_account_settings_from_hash(sets)
 
     respond_to do |format|

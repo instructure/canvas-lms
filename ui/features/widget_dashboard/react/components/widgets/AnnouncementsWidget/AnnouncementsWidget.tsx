@@ -49,6 +49,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
     goToPage,
     resetPagination,
     isLoading,
+    isPaginationLoading,
     error,
     refetch,
   } = useAnnouncementsPaginated({
@@ -153,8 +154,11 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
         currentPage: currentPageIndex + 1,
         totalPages,
         onPageChange: goToPage,
-        isLoading,
         ariaLabel: I18n.t('Announcements pagination'),
+      }}
+      loadingOverlay={{
+        isLoading: isPaginationLoading,
+        ariaLabel: I18n.t('Loading announcements'),
       }}
     >
       <Flex direction="column" gap="small">

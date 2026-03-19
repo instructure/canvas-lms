@@ -23,8 +23,10 @@ require "spec_helper"
 describe IncomingMailProcessor::SqsMailbox do
   subject { IncomingMailProcessor::SqsMailbox.new(default_config) }
 
-  let(:message_bucket) { double(object: double(get: double(body: StringIO.new("raw email")))) }
-  let(:sqs_message) { double(body: sqs_message_body) }
+  let(:s3_get_response) { instance_double(Aws::S3::Types::GetObjectOutput, body: StringIO.new("raw email")) }
+  let(:s3_object) { instance_double(Aws::S3::Object, get: s3_get_response) }
+  let(:message_bucket) { instance_double(Aws::S3::Bucket, object: s3_object) }
+  let(:sqs_message) { instance_double(Aws::SQS::Types::Message, body: sqs_message_body) }
   let(:sqs_message_body) do
     {
       Message: {
@@ -34,7 +36,7 @@ describe IncomingMailProcessor::SqsMailbox do
       }.to_json
     }.to_json
   end
-  let(:queue) { double }
+  let(:queue) { instance_double(Aws::SQS::QueuePoller) }
   let(:default_config) do
     {
       incoming_mail_queue_name: "incoming-mail-queue",
@@ -45,26 +47,26 @@ describe IncomingMailProcessor::SqsMailbox do
     }
   end
 
-  include_examples "Mailbox"
+  it_behaves_like "Mailbox"
 
   describe "#connect" do
     it "returns the incoming mail queue" do
-      expect_any_instance_of(Aws::SQS::Client).to receive(:get_queue_url).and_return(double(queue_url: "some_url"))
+      expect_any_instance_of(Aws::SQS::Client).to receive(:get_queue_url).and_return(instance_double(Aws::SQS::Types::GetQueueUrlResult, queue_url: "some_url"))
       expect(subject.connect).to be_a Aws::SQS::QueuePoller
     end
   end
 
   describe "#each_message" do
     it "yields the SQS message and raw message content from S3" do
-      s3 = double
+      s3 = instance_double(Aws::S3::Resource)
       expect(s3).to receive(:bucket)
         .with(default_config[:incoming_mail_bucket])
         .and_return(message_bucket)
       expect(Aws::S3::Resource).to receive(:new).and_return(s3)
-      sqs = double
+      sqs = instance_double(Aws::SQS::Client)
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:incoming_mail_queue_name])
-        .and_return(double(queue_url: "some_url"))
+        .and_return(instance_double(Aws::SQS::Types::GetQueueUrlResult, queue_url: "some_url"))
       expect(Aws::SQS::Client).to receive(:new).and_return(sqs)
       expect(Aws::SQS::QueuePoller).to receive(:new).and_return(queue)
       expect(queue).to receive(:before_request)
@@ -79,17 +81,17 @@ describe IncomingMailProcessor::SqsMailbox do
 
   describe "#move_message" do
     it "re-enqueues messages in the given queue" do
-      msg = double
+      msg = instance_double(Aws::SQS::Types::Message)
       expect(msg).to receive(:body).and_return("msg body")
 
-      sqs = double
+      sqs = instance_double(Aws::SQS::Client)
       expect(Aws::SQS::Client).to receive(:new).and_return(sqs)
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:incoming_mail_queue_name])
-        .and_return(double(queue_url: "incoming_url"))
+        .and_return(instance_double(Aws::SQS::Types::GetQueueUrlResult, queue_url: "incoming_url"))
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:error_folder])
-        .and_return(double(queue_url: "error_url"))
+        .and_return(instance_double(Aws::SQS::Types::GetQueueUrlResult, queue_url: "error_url"))
       expect(sqs).to receive(:send_message)
         .with(message_body: "msg body", queue_url: "error_url")
       subject.connect
@@ -99,12 +101,12 @@ describe IncomingMailProcessor::SqsMailbox do
 
   describe "#unprocessed_message_count" do
     it "fetches the number of visible messages from the queue" do
-      sqs = double
+      sqs = instance_double(Aws::SQS::Client)
       expect(Aws::SQS::Client).to receive(:new).and_return(sqs)
       expect(sqs).to receive(:get_queue_url)
         .with(queue_name: default_config[:incoming_mail_queue_name])
-        .and_return(double(queue_url: "my_url"))
-      response = double(attributes: { "ApproximateNumberOfMessages" => "5" })
+        .and_return(instance_double(Aws::SQS::Types::GetQueueUrlResult, queue_url: "my_url"))
+      response = instance_double(Aws::SQS::Types::GetQueueAttributesResult, attributes: { "ApproximateNumberOfMessages" => "5" })
       expect(sqs).to receive(:get_queue_attributes)
         .with(queue_url: "my_url", attribute_names: ["ApproximateNumberOfMessages"])
         .and_return(response)

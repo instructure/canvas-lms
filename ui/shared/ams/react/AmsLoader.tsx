@@ -17,7 +17,7 @@
  */
 
 import React, {useRef} from 'react'
-import {getAccessToken, refreshToken, getUser} from './auth'
+import {getAccessToken, refreshToken, getUser, getRcsToken, refreshRcsToken} from './auth'
 import {createRubricController} from '@canvas/rubrics/react/RubricAssignment'
 import type {RubricController} from '@canvas/rubrics/react/RubricAssignment'
 
@@ -86,6 +86,8 @@ export function AmsLoader({
               getAccessToken,
               refreshToken,
               getUser,
+              getRcsToken,
+              refreshRcsToken,
             },
             rubrics: {
               createController: createRubricController,

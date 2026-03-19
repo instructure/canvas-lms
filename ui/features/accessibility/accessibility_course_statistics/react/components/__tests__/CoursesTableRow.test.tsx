@@ -248,7 +248,7 @@ describe('CoursesTableRow', () => {
 
       const link = screen.getByRole('link', {name: 'College of Engineering'})
       expect(link).toBeInTheDocument()
-      expect(link).toHaveAttribute('href', '/accounts/5')
+      expect(link).toHaveAttribute('href', '/accounts/5/accessibility')
     })
 
     it('renders empty string when subaccount is missing', () => {

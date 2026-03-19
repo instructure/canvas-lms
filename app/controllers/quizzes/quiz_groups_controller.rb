@@ -140,7 +140,7 @@ class Quizzes::QuizGroupsController < ApplicationController
         render json: quiz_groups_compound_json([@group], @context, @current_user, session),
                status: :created
       else
-        render json: format_errors(@group), status: :unprocessable_entity
+        render json: format_errors(@group), status: :unprocessable_content
       end
     end
   end
@@ -171,7 +171,7 @@ class Quizzes::QuizGroupsController < ApplicationController
       if update_api_quiz_group(@group, quiz_group_params)
         render json: quiz_groups_compound_json([@group], @context, @current_user, session)
       else
-        render json: format_errors(@group), status: :unprocessable_entity
+        render json: format_errors(@group), status: :unprocessable_content
       end
     end
   end

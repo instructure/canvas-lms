@@ -42,7 +42,7 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "expands/collapses module with 0 items", priority: "2" do
-    modules = create_modules(1, true)
+    modules = create_modules(1, published: true)
     get "/courses/#{@course.id}/modules"
     expect(module_content(modules[0].id)).to be_displayed
     f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
@@ -57,7 +57,7 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "rearranges child objects in same module", priority: "1" do
-    modules = create_modules(1, true)
+    modules = create_modules(1, published: true)
     # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     item1 = modules[0].add_item({ id: @assignment.id, type: "assignment" })
     item2 = modules[0].add_item({ id: @assignment2.id, type: "assignment" })
@@ -74,7 +74,7 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "rearranges child object to new module", priority: "1" do
-    modules = create_modules(2, true)
+    modules = create_modules(2, published: true)
     uncollapse_modules(modules, @user)
     # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     item1_mod1 = modules[0].add_item({ id: @assignment.id, type: "assignment" })
@@ -373,7 +373,7 @@ shared_examples_for "context modules for teachers" do
 
   describe "expand|collapse all" do
     before do
-      @modules = create_modules(2, true)
+      @modules = create_modules(2, published: true)
       @modules[0].add_item({ id: @assignment.id, type: "assignment" })
       @modules[1].add_item({ id: @assignment2.id, type: "assignment" })
     end
@@ -416,7 +416,7 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "indicates when course sections have multiple due dates" do
-      modules = create_modules(1, true)
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -432,7 +432,7 @@ shared_examples_for "context modules for teachers" do
 
     it "does not indicate multiple due dates if the sections' dates are the same" do
       skip("2025-04-11 needs to ignore base if all visible sections are overridden LX-3349")
-      modules = create_modules(1, true)
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -449,7 +449,7 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "uses assignment due date if there is no section override" do
-      modules = create_modules(1, true)
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -467,7 +467,7 @@ shared_examples_for "context modules for teachers" do
 
     it "only uses the sections the user is restricted to" do
       skip("2025-04-11 needs to ignore base if all visible sections are overridden LX-3349")
-      modules = create_modules(1, true)
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -500,7 +500,7 @@ shared_examples_for "context modules for teachers" do
       end
 
       it "does not show due dates" do
-        modules = create_modules(1, true)
+        modules = create_modules(1, published: true)
         modules[0].add_item({ id: @assignment.id, type: "assignment", title: "An Assignment" })
 
         @assignment.due_at = 3.days.from_now
@@ -752,8 +752,7 @@ shared_examples_for "context modules for teachers" do
       expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
     end
 
-    it "shows quiz type selector without scrolling when creating new quiz with new_quizzes_surveys enabled" do
-      Account.site_admin.enable_feature!(:new_quizzes_surveys)
+    it "shows quiz type selector without scrolling when creating new quiz" do
       @course.disable_feature!(:new_quizzes_by_default)
       get "/courses/#{@course.id}/modules"
 
@@ -774,7 +773,7 @@ shared_examples_for "context modules for teachers" do
   context "with discussion_checkpoints enabled" do
     before :once do
       @course.root_account.enable_feature! :discussion_checkpoints
-      @modules = create_modules(1, true)
+      @modules = create_modules(1, published: true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
     end

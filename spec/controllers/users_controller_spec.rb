@@ -89,7 +89,7 @@ describe UsersController do
     before do
       account.account_users.create!(user:)
       allow(Lti::LogService).to receive(:new) do
-        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        instance_double(Lti::LogService, call: nil)
       end
       user_session(user)
     end
@@ -303,7 +303,7 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive_messages(settings: {}, enabled?: true)
 
       user_factory(active_all: true)
@@ -329,7 +329,7 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
@@ -363,7 +363,7 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
@@ -387,7 +387,7 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = double
+      settings_mock = instance_double(PluginSetting)
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = instance_double(Google::Auth::UserRefreshCredentials)
       allow(authorization_mock).to receive_messages(:code= => nil,
@@ -824,7 +824,7 @@ describe UsersController do
         end
 
         it "redirects users to the oauth confirmation when registering through oauth" do
-          redis = double("Redis")
+          redis = instance_double(Redis)
           allow(redis).to receive(:setex)
           allow(redis).to receive(:hmget)
           allow(redis).to receive(:del)
@@ -919,7 +919,7 @@ describe UsersController do
         expect(CommunicationChannel.last.confirmation_redirect).to be_nil
       end
 
-      it "creates a registered user if the skip_registration flag is passed in" do
+      it "ignores skip_registration flag for unauthenticated self-registering users" do
         post("create", params: {
                pseudonym: { unique_id: "jacob@instructure.com" },
                user: { name: "Jacob Fugal", terms_of_use: "1", skip_registration: "1" }
@@ -928,12 +928,26 @@ describe UsersController do
 
         p = Pseudonym.where(unique_id: "jacob@instructure.com").first
         expect(p).to be_active
-        expect(p.user).to be_registered
+        expect(p.user).to be_pre_registered
         expect(p.user.name).to eq "Jacob Fugal"
         expect(p.user.communication_channels.length).to eq 1
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq "jacob@instructure.com"
         expect(p.user.associated_accounts).to eq [Account.default]
+      end
+
+      it "allows skip_registration for admin users with manage_user_logins" do
+        account_admin_user(account: Account.default)
+        user_session(@admin)
+        post("create", params: {
+               pseudonym: { unique_id: "jacob@instructure.com" },
+               user: { name: "Jacob Fugal", skip_registration: "1" }
+             })
+        expect(response).to be_successful
+
+        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+        expect(p).to be_active
+        expect(p.user).to be_registered
       end
 
       it "complains about conflicting unique_ids" do
@@ -3195,7 +3209,7 @@ describe UsersController do
 
       context "disabled" do
         before(:once) do
-          toggle_k5_setting(@account, false)
+          toggle_k5_setting(@account, enable: false)
         end
 
         it_behaves_like "observer list"
@@ -3214,7 +3228,7 @@ describe UsersController do
 
       context "enabled" do
         before(:once) do
-          toggle_k5_setting(@account, true)
+          toggle_k5_setting(@account)
         end
 
         it_behaves_like "observer list"
@@ -3342,7 +3356,7 @@ describe UsersController do
           end
 
           it "does not include classic accounts in the list" do
-            toggle_k5_setting(@account2, false)
+            toggle_k5_setting(@account2, enable: false)
             get "user_dashboard"
             account_contexts = assigns[:js_env][:ACCOUNT_CALENDAR_CONTEXTS]
             expect(account_contexts.length).to be 1
@@ -3894,7 +3908,7 @@ describe UsersController do
       user.access_tokens.create!(purpose: "active mobile token")
       user.access_tokens.create!(purpose: "expired mobile token", permanent_expires_at: 1.day.ago)
 
-      @sns_client = double
+      @sns_client = instance_double(Aws::SNS::Client)
       allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
       allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
       user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }
@@ -4190,16 +4204,69 @@ describe UsersController do
         @assignment = @course.assignments.create!(title: "Test", points_possible: 100)
       end
 
-      it "displays override score when present" do
+      it "displays override score when course allows final grade override" do
+        @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
+
         submission = @assignment.submit_homework(@student, body: "test")
         submission.update_column(:score, 80)
-        @enrollment.find_score(course_score: true).update!(override_score: 95)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80)
 
         get :user_dashboard
         expect(response).to be_successful
 
         course_data = assigns[:js_env][:SHARED_COURSE_DATA]
         expect(course_data.first[:currentGrade]).to eq(95.0)
+      end
+
+      it "displays current score when override exists but course does not allow final grade override" do
+        @course.disable_feature!(:final_grades_override)
+
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data.first[:currentGrade]).to eq(80.0)
+      end
+
+      it "matches mobile API grade calculation (effective_current_score) with override allowed" do
+        @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
+
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80, final_score: 85)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expected_grade = @enrollment.effective_current_score(course_score: true)
+        expect(course_data.first[:currentGrade]).to eq(expected_grade)
+      end
+
+      it "matches mobile API grade calculation (effective_current_score) with override not allowed" do
+        @course.disable_feature!(:final_grades_override)
+
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(override_score: 95, current_score: 80, final_score: 85)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expected_grade = @enrollment.effective_current_score(course_score: true)
+        expect(course_data.first[:currentGrade]).to eq(expected_grade)
+        expect(expected_grade).to eq(80.0)
       end
 
       it "displays current score when no override present" do

@@ -39,8 +39,8 @@ module GroupCategories
 
     describe "intializer" do
       it "accepts a category and context" do
-        category = double("group_category")
-        context = double("course")
+        category = instance_double(GroupCategory)
+        context = instance_double(Course)
         policy = ParamsPolicy.new(category, context)
         expect(policy.group_category).to eq category
         expect(policy.context).to eq context
@@ -49,7 +49,7 @@ module GroupCategories
 
     describe "#populate_with" do
       let(:category) { MockGroupCategory.new }
-      let(:context) { double("course") }
+      let(:context) { instance_double(Course) }
       let(:policy) { ParamsPolicy.new(category, context) }
 
       it "configures the self_signup accoring to the params" do

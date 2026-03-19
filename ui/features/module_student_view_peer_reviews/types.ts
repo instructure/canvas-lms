@@ -41,7 +41,12 @@ export type GraphQLAssignment = {
   name: string
   peerReviews: {
     anonymousReviews: boolean
+    count: number | null
+    pointsPossible: number | null
   }
+  peerReviewSubAssignment: {
+    dueAt: string | null
+  } | null
 }
 
 export type GraphQLModuleItemsNode = {
@@ -77,6 +82,9 @@ export type AssignmentPeerReviewSubset = Pick<
 
 export type ExpandedAssignmentPeerReview = AssignmentPeerReviewSubset & {
   assessment_requests: Array<AssessmentRequest> | []
+  peer_review_count?: number | null
+  peer_review_points_possible?: number | null
+  peer_review_due_at?: string | null
 }
 
 export type StudentViewPeerReviewsAssignment = {

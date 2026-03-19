@@ -600,7 +600,7 @@ describe Assignment do
               post_to_sis: true,
               due_at: nil
             )
-            allow(new_assignment).to receive_messages(checkpoints_parent?: true, sub_assignments: double(empty?: true))
+            allow(new_assignment).to receive_messages(checkpoints_parent?: true, sub_assignments: instance_double(ActiveRecord::Relation, empty?: true))
 
             expect(new_assignment.valid?).to be true
           end

@@ -28,6 +28,7 @@ export type ReviewScreenWrapperProps = {
   internalConfig: InternalLtiConfiguration
   transitionTo: (step: Lti1p3RegistrationWizardStep) => void
   includeLaunchSettings?: boolean
+  includeIconUrls?: boolean
 }
 
 export const ReviewScreenWrapper = ({
@@ -35,6 +36,7 @@ export const ReviewScreenWrapper = ({
   internalConfig,
   transitionTo,
   includeLaunchSettings = true,
+  includeIconUrls = true,
 }: ReviewScreenWrapperProps) => {
   const {state} = overlayStore()
   const placements = filterPlacementsByFeatureFlags(state.placements.placements ?? [])
@@ -102,6 +104,7 @@ export const ReviewScreenWrapper = ({
         defaultPlacementIconUrls={defaultPlacementIconUrls}
         defaultIconUrl={internalConfig.launch_settings?.icon_url}
         nickname={name}
+        includeIconUrls={includeIconUrls}
         onEditLaunchSettings={() => transitionTo('LaunchSettings')}
         onEditPlacements={() => transitionTo('Placements')}
         onEditNaming={() => transitionTo('Naming')}

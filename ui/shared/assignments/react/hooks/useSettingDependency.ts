@@ -70,6 +70,15 @@ export function useSettingDependency(
 /**
  * Known message subjects for setting dependencies.
  * Use these constants instead of magic strings.
+ *
+ * IMPORTANT: These messages control checkbox INTERACTION state, not checked state:
+ *
+ * TOGGLE_PEER_REVIEWS:
+ *   - enabled: false → Disables checkbox interaction AND unchecks it
+ *   - enabled: true  → Enables checkbox interaction only (does NOT check it)
+ *
+ * This asymmetry is intentional: disabling a feature should turn it off,
+ * but re-enabling interaction should let the user decide whether to turn it back on.
  */
 export const SETTING_MESSAGES = {
   TOGGLE_PEER_REVIEWS: 'ASGMT.togglePeerReviews',

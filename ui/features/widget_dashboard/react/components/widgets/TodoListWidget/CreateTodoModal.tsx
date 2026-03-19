@@ -154,8 +154,6 @@ const CreateTodoModal: React.FC<CreateTodoModalProps> = ({
     }
   }
 
-  const isFormValid = title.trim().length > 0 && todoDate && todoDate.isValid()
-
   const noneOption = {
     value: 'none',
     label: I18n.t('Optional: Add Course'),
@@ -199,6 +197,7 @@ const CreateTodoModal: React.FC<CreateTodoModalProps> = ({
             <TextInput
               data-testid="create-todo-title-input"
               renderLabel={I18n.t('Title')}
+              isRequired={true}
               value={title}
               onChange={(_e, value) => {
                 setTitle(value)
@@ -213,6 +212,7 @@ const CreateTodoModal: React.FC<CreateTodoModalProps> = ({
           </Flex.Item>
           <Flex.Item data-testid="create-todo-date-input" overflowX="visible" overflowY="visible">
             <DateTimeInput
+              isRequired={true}
               description={
                 <ScreenReaderContent>
                   {I18n.t('The date and time this to do is due')}
@@ -285,7 +285,7 @@ const CreateTodoModal: React.FC<CreateTodoModalProps> = ({
               data-testid="create-todo-submit-button"
               onClick={handleSubmit}
               color="primary"
-              interaction={isCreating || !isFormValid ? 'disabled' : 'enabled'}
+              interaction={isCreating ? 'disabled' : 'enabled'}
             >
               {isCreating ? I18n.t('Creating...') : I18n.t('Save')}
             </Button>

@@ -90,7 +90,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "kicks off a sis import via multipart attachment" do
-    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(double("Delayed::Job", id: 123))
+    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(instance_double(Delayed::Job, id: 123))
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: "sis_imports_api",
@@ -1123,7 +1123,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "works with import permissions" do
-    account_admin_user_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
+    account_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
              { controller: "sis_imports_api",
@@ -1152,6 +1152,52 @@ describe SisImportsApiController, type: :request do
                       id: batch.id.to_s })
     expect(json).to have_key("errors_attachment")
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
+  end
+
+  describe "pre-attachment workflow" do
+    it "supports direct upload to the file store in a separate request" do
+      json = api_call(:post,
+                      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                      { controller: "sis_imports_api",
+                        action: "create",
+                        format: "json",
+                        account_id: @account.to_param },
+                      { import_type: "instructure_csv",
+                        pre_attachment: { name: "test_user_1.csv", size: 159 } },
+                      {},
+                      { as: :json })
+
+      expect(json["pre_attachment"]).to be_present
+      expect(json["pre_attachment"]["upload_url"]).to be_present
+      expect(json["pre_attachment"]["upload_params"]).to be_present
+
+      batch = SisBatch.find(json["id"])
+      expect(batch.attachment).to be_nil
+      expect(batch.workflow_state).to eq "initializing"
+
+      # simulate upload success
+      attachment = attachment_model(context: batch,
+                                    folder: nil,
+                                    uploaded_data: fixture_file_upload("sis/test_user_1.csv", "text/csv"))
+      batch.file_upload_success_callback(attachment)
+
+      expect(batch.workflow_state).to eq "created"
+      expect(batch.attachment).to eq attachment
+    end
+
+    it "rejects attachment and pre_attachment parameters provided together" do
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/sis_imports.json",
+               { controller: "sis_imports_api",
+                 action: "create",
+                 format: "json",
+                 account_id: @account.id.to_s },
+               { import_type: "instructure_csv",
+                 attachment: fixture_file_upload("/sis/test_user_1.csv", "text/csv"),
+                 pre_attachment: { name: "test_user_1.csv" } },
+               {},
+               { expected_status: 400 })
+    end
   end
 
   shared_examples_for "disable_adding_uuid_verifier_in_api" do

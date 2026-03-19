@@ -45,7 +45,7 @@ describe GradebooksController do
         user_session(@student)
         @assignment = @course.assignments.create!(title: "Example Assignment")
         @media_object = MediaObject.create!(media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
-        @mock_kaltura = double("CanvasKaltura::ClientV3")
+        @mock_kaltura = instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
         @media_sources = [{
           height: "240",
@@ -2042,6 +2042,40 @@ describe GradebooksController do
           end
         end
 
+        describe "permissions" do
+          describe "allow_assign_to_differentiation_tags" do
+            it "is false when account setting is disabled" do
+              @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+              @course.account.save!
+              get :show, params: { course_id: @course.id }
+              gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+              expect(gradebook_env[:permissions][:allow_assign_to_differentiation_tags]).to be false
+            end
+
+            it "is false when account setting is enabled but user lacks manage_tags_add permission" do
+              @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+              @course.account.save!
+              teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
+              @course.root_account.role_overrides.create!(
+                permission: :manage_tags_add,
+                role: teacher_role,
+                enabled: false
+              )
+              get :show, params: { course_id: @course.id }
+              gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+              expect(gradebook_env[:permissions][:allow_assign_to_differentiation_tags]).to be false
+            end
+
+            it "is true when account setting is enabled and user has manage_tags_add permission" do
+              @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+              @course.account.save!
+              get :show, params: { course_id: @course.id }
+              gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+              expect(gradebook_env[:permissions][:allow_assign_to_differentiation_tags]).to be true
+            end
+          end
+        end
+
         describe "outcome_service_results_to_canvas" do
           it "is set to true if outcome_service_results_to_canvas feature flag is enabled" do
             get :show, params: { course_id: @course.id }
@@ -2295,7 +2329,7 @@ describe GradebooksController do
       {
         assignment_id: @assignment.id,
         course_id: @course.id,
-        submissions_zip: fixture_file_upload("docs/txt.txt", "text/plain", true)
+        submissions_zip: fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       }
     end
 
@@ -2606,7 +2640,7 @@ describe GradebooksController do
       end
 
       it "allows attaching files to comments for submission" do
-        data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+        data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
         post "update_submission",
              params: { course_id: @course.id,
                        attachments: { "0" => { uploaded_data: data } },
@@ -2696,7 +2730,7 @@ describe GradebooksController do
       user_session(@teacher)
       @assignment = @course.assignments.create!(title: "some assignment")
       @student = @course.enroll_user(User.create!(name: "some user"))
-      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+      data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
       post "update_submission",
            params: { course_id: @course.id,
                      attachments: { "0" => { uploaded_data: data } },
@@ -3682,20 +3716,6 @@ describe GradebooksController do
         @course.root_account.enable_feature!(:assignment_comment_library)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env.fetch(:assignment_comment_library_feature_enabled)).to be true
-      end
-
-      context "comment library v2" do
-        it "sets use_comment_library_v2 to true when enabled" do
-          Account.site_admin.enable_feature!(:use_comment_library_v2)
-          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-          expect(js_env.fetch(:use_comment_library_v2)).to be true
-        end
-
-        it "sets use_comment_library_v2 to false when disabled" do
-          Account.site_admin.disable_feature!(:use_comment_library_v2)
-          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-          expect(js_env.fetch(:use_comment_library_v2)).to be false
-        end
       end
 
       it "sets outcomes keys" do

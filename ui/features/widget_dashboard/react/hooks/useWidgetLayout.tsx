@@ -21,6 +21,10 @@ import type {WidgetConfig, Widget} from '../types'
 import {DEFAULT_WIDGET_CONFIG, LEFT_COLUMN, RIGHT_COLUMN} from '../constants'
 import {useWidgetDashboardEdit} from './useWidgetDashboardEdit'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {announceToScreenReader} from '../utils/screenReaderAnnounce'
+
+const I18n = createI18nScope('widget_dashboard')
 
 export type MoveAction =
   | 'move-left'
@@ -29,14 +33,39 @@ export type MoveAction =
   | 'move-right-top'
   | 'move-up'
   | 'move-down'
+  | 'move-up-cross'
+  | 'move-down-cross'
   | 'move-to-top'
   | 'move-to-bottom'
+
+export const getMoveActionDescription = (action: MoveAction): string => {
+  switch (action) {
+    case 'move-to-top':
+      return I18n.t('to top')
+    case 'move-up':
+    case 'move-up-cross':
+      return I18n.t('up')
+    case 'move-down':
+    case 'move-down-cross':
+      return I18n.t('down')
+    case 'move-to-bottom':
+      return I18n.t('to bottom')
+    case 'move-left':
+      return I18n.t('to left bottom')
+    case 'move-left-top':
+      return I18n.t('to left top')
+    case 'move-right':
+      return I18n.t('to right bottom')
+    case 'move-right-top':
+      return I18n.t('to right top')
+  }
+}
 
 interface WidgetLayoutContextType {
   config: WidgetConfig
   moveWidget: (widgetId: string, action: MoveAction) => void
   moveWidgetToPosition: (widgetId: string, targetCol: number, targetRow: number) => void
-  removeWidget: (widgetId: string) => void
+  removeWidget: (widgetId: string, widgetName?: string) => void
   addWidget: (type: string, displayName: string, col: number, row: number) => void
   resetConfig: () => void
   saveLayout: () => Promise<void>
@@ -123,6 +152,51 @@ const moveWidgetRightTop = (widgets: Widget[], widgetId: string): Widget[] => {
       return {...w, position: {...w.position, col: RIGHT_COLUMN, row: 1}}
     }
     if (w.position.col === RIGHT_COLUMN) {
+      return {...w, position: {...w.position, row: w.position.row + 1}}
+    }
+    return w
+  })
+}
+
+const moveWidgetUpCross = (widgets: Widget[], widgetId: string): Widget[] => {
+  const widget = widgets.find(w => w.id === widgetId)
+  if (!widget || widget.position.col !== RIGHT_COLUMN) return widgets
+
+  const leftWidgets = widgets.filter(w => w.position.col === LEFT_COLUMN)
+  if (leftWidgets.length === 0) {
+    return widgets.map(w =>
+      w.id === widgetId ? {...w, position: {...w.position, col: LEFT_COLUMN, row: 1}} : w,
+    )
+  }
+
+  const maxRow = Math.max(...leftWidgets.map(w => w.position.row))
+  return widgets.map(w => {
+    if (w.id === widgetId) {
+      return {...w, position: {...w.position, col: LEFT_COLUMN, row: maxRow}}
+    }
+    if (w.position.col === LEFT_COLUMN && w.position.row === maxRow) {
+      return {...w, position: {...w.position, row: w.position.row + 1}}
+    }
+    return w
+  })
+}
+
+const moveWidgetDownCross = (widgets: Widget[], widgetId: string): Widget[] => {
+  const widget = widgets.find(w => w.id === widgetId)
+  if (!widget || widget.position.col !== LEFT_COLUMN) return widgets
+
+  const rightWidgets = widgets.filter(w => w.position.col === RIGHT_COLUMN)
+  if (rightWidgets.length === 0) {
+    return widgets.map(w =>
+      w.id === widgetId ? {...w, position: {...w.position, col: RIGHT_COLUMN, row: 1}} : w,
+    )
+  }
+
+  return widgets.map(w => {
+    if (w.id === widgetId) {
+      return {...w, position: {...w.position, col: RIGHT_COLUMN, row: 2}}
+    }
+    if (w.position.col === RIGHT_COLUMN && w.position.row >= 2) {
       return {...w, position: {...w.position, row: w.position.row + 1}}
     }
     return w
@@ -269,6 +343,12 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
           case 'move-down':
             updatedWidgets = moveWidgetDown(updatedWidgets, widgetId)
             break
+          case 'move-up-cross':
+            updatedWidgets = moveWidgetUpCross(updatedWidgets, widgetId)
+            break
+          case 'move-down-cross':
+            updatedWidgets = moveWidgetDownCross(updatedWidgets, widgetId)
+            break
           case 'move-to-top':
             updatedWidgets = moveWidgetToTop(updatedWidgets, widgetId)
             break
@@ -317,7 +397,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
   )
 
   const removeWidget = useCallback(
-    (widgetId: string) => {
+    (widgetId: string, widgetName: string = I18n.t('Widget')) => {
       setConfig(prevConfig => {
         const updatedWidgets = prevConfig.widgets.filter(w => w.id !== widgetId)
         const normalizedWidgets = normalizeRowNumbers(
@@ -328,6 +408,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
         return {...prevConfig, widgets: finalWidgets}
       })
       markDirty()
+      announceToScreenReader(I18n.t('%{widgetName} removed', {widgetName}))
     },
     [markDirty],
   )
@@ -361,6 +442,7 @@ export const WidgetLayoutProvider: React.FC<{children: React.ReactNode}> = ({chi
         return {...prevConfig, widgets: finalWidgets}
       })
       markDirty()
+      announceToScreenReader(I18n.t('%{widgetName} added', {widgetName: displayName}))
     },
     [markDirty],
   )

@@ -43,7 +43,7 @@ describe "quiz restrictions as a teacher" do
     it "has a checkbox on the quiz creation page", priority: "1" do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
-      expect("#enable_quiz_access_code").to be
+      expect(f("#enable_quiz_access_code")).not_to be_nil
     end
 
     it "shows a password field when checking the checkbox", priority: "1" do
@@ -95,7 +95,7 @@ describe "quiz restrictions as a teacher" do
     it "has a checkbox on the quiz creation page", priority: "1" do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
-      expect("#enable_quiz_ip_filter").to be
+      expect(f("#enable_quiz_ip_filter")).not_to be_nil
     end
 
     it "shows a password field when checking the checkbox", priority: "1" do
@@ -125,7 +125,7 @@ describe "quiz restrictions as a teacher" do
       f("#quiz_ip_filter").send_keys("7.7.7.7")
 
       # save and verify that the page changes (passes validation)
-      expect(f("#quiz_title")).to be
+      expect(f("#quiz_title")).not_to be_nil
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
       expect(f(".unpublished_quiz_warning")).to include_text("This quiz is unpublished")
     end
@@ -138,7 +138,7 @@ describe "quiz restrictions as a teacher" do
       f("#quiz_ip_filter").send_keys("7.7.7.7/255.255.255.0")
 
       # save and verify that the page changes (passes validation)
-      expect(f("#quiz_title")).to be
+      expect(f("#quiz_title")).not_to be_nil
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
       expect(f(".unpublished_quiz_warning")).to include_text("This quiz is unpublished")
     end
@@ -151,7 +151,7 @@ describe "quiz restrictions as a teacher" do
       f("#quiz_ip_filter").send_keys("2001:0db8:85a3:0000:0000:8a2e:0370:7334")
 
       # save and verify that the page changes (passes validation)
-      expect(f("#quiz_title")).to be
+      expect(f("#quiz_title")).not_to be_nil
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
       expect(f(".unpublished_quiz_warning")).to include_text("This quiz is unpublished")
     end

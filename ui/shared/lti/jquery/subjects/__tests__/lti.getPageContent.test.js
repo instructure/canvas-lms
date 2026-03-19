@@ -21,6 +21,7 @@ import getPageContent from '../lti.getPageContent'
 describe('lti.getPageContent handler', () => {
   let responseMessages
   let originalDocument
+  const assignmentId = 10
 
   beforeEach(() => {
     responseMessages = {
@@ -33,6 +34,7 @@ describe('lti.getPageContent handler', () => {
     const testdiv = document.createElement('div')
     document.body.innerHTML = ''
     document.body.appendChild(testdiv)
+    window.ENV.ASSIGNMENT_ID = assignmentId
   })
 
   afterEach(() => {
@@ -40,16 +42,29 @@ describe('lti.getPageContent handler', () => {
     document.body.innerHTML = ''
   })
 
-  function expectContent(expectedContent) {
+  function expectContent(expectedContent, expectedContentId) {
     expect(getPageContent({responseMessages})).toEqual(true)
-    expect(responseMessages.sendResponse).toHaveBeenCalledWith({content: expectedContent})
+    expect(responseMessages.sendResponse).toHaveBeenCalledWith({
+      content: expectedContent,
+      content_id: expectedContentId,
+    })
     expect(responseMessages.sendResponse).toHaveBeenCalledTimes(1)
     expect(responseMessages.sendError).not.toHaveBeenCalled()
   }
 
   describe('when lti-page-content elements are not present', () => {
     it('responds with an empty string message', () => {
-      expectContent('')
+      expectContent('', window.ENV.ASSIGNMENT_ID)
+    })
+
+    it('fallsback to the url when ENV.ASSIGNMENT_ID is not present', () => {
+      delete window.ENV.ASSIGNMENT_ID
+      delete window.ENV.WIKI_PAGE
+      delete window.location
+      window.location = {
+        pathname: '/assignments/150',
+      }
+      expectContent('', 150)
     })
   })
 
@@ -81,7 +96,26 @@ describe('lti.getPageContent handler', () => {
               page content2c
             </div>
           </div>`,
+        assignmentId,
       )
+    })
+  })
+
+  describe('when the content is a WikiPage', () => {
+    const wikiPageId = 11
+
+    beforeEach(() => {
+      document.body.innerHTML = `<div>
+          <div data-lti-page-content="true">WikiPage content</div>
+        </div>`
+      delete window.ENV.ASSIGNMENT_ID
+      delete window.location
+      window.location = {pathname: '/pages'}
+      window.ENV.WIKI_PAGE = {page_id: wikiPageId}
+    })
+
+    it("responds with a message containing the WikiPage's id", () => {
+      expectContent(`<div data-lti-page-content="true">WikiPage content</div>`, wikiPageId)
     })
   })
 })

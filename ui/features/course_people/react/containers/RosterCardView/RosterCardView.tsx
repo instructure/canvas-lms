@@ -20,25 +20,37 @@ import React from 'react'
 import {List} from '@instructure/ui-list'
 import RosterCard from '../../components/RosterCard/RosterCard'
 
+interface Section {
+  _id: string
+  name: string
+}
+
+interface AssociatedUser {
+  _id: string
+  name: string
+}
+
+interface Enrollment {
+  id: string
+  type: string
+  state: string
+  htmlUrl: string
+  totalActivityTime?: number
+  canBeRemoved: boolean
+  sisRole: string
+  lastActivityAt: string | null
+  section: Section
+  associatedUser?: AssociatedUser
+}
+
 interface CourseUserNode {
   _id: string
   name: string
   sisId?: string
-  enrollments: Array<{
-    id: string
-    type: string
-    totalActivityTime?: number
-    htmlUrl: string
-    state: string
-    canBeRemoved: boolean
-    section?: any
-    associatedUser?: any
-    [key: string]: any
-  }>
+  enrollments: Enrollment[]
   loginId?: string
   avatarUrl?: string
   pronouns?: string
-  [key: string]: any
 }
 
 interface RosterCardViewProps {

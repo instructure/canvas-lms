@@ -137,26 +137,28 @@ describe "ExternalFeedsController", type: :request do
   end
 
   describe "in a Course" do
-    include_examples "Announcement External Feeds"
-    before :once do
-      @allowed_user = teacher_in_course(active_all: true).user
-      @context = @course
-      @denied_user = student_in_course(course: @course, active_all: true).user
-      @url_base = "/api/v1/courses/#{@course.id}/external_feeds"
-      @url_params.merge!({ course_id: @course.to_param })
+    it_behaves_like "Announcement External Feeds" do
+      before :once do
+        @allowed_user = teacher_in_course(active_all: true).user
+        @context = @course
+        @denied_user = student_in_course(course: @course, active_all: true).user
+        @url_base = "/api/v1/courses/#{@course.id}/external_feeds"
+        @url_params.merge!({ course_id: @course.to_param })
+      end
     end
   end
 
   describe "in a Group" do
-    include_examples "Announcement External Feeds"
-    before :once do
-      group_with_user(moderator: true, active_all: true)
-      @allowed_user = @user
-      @allowed_user.pseudonyms.create!(unique_id: "user1", account: Account.default)
-      @context = @group
-      @denied_user = user_with_pseudonym(active_all: true, unique_id: "user2")
-      @url_base = "/api/v1/groups/#{@group.id}/external_feeds"
-      @url_params.merge!({ group_id: @group.to_param })
+    it_behaves_like "Announcement External Feeds" do
+      before :once do
+        group_with_user(moderator: true, active_all: true)
+        @allowed_user = @user
+        @allowed_user.pseudonyms.create!(unique_id: "user1", account: Account.default)
+        @context = @group
+        @denied_user = user_with_pseudonym(active_all: true, unique_id: "user2")
+        @url_base = "/api/v1/groups/#{@group.id}/external_feeds"
+        @url_params.merge!({ group_id: @group.to_param })
+      end
     end
   end
 end

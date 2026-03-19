@@ -280,3 +280,38 @@ function fetchNewQuizzesApp(resolve, reject) {
 }
 
 exports.fetchNewQuizzesApp = fetchNewQuizzesApp
+
+function fetchCanvasCourseCriteria(resolve, reject) {
+  const script = document.createElement('script')
+
+  if (!window.REMOTES?.canvas_course_criteria?.launch_url) {
+    console.debug(`Canvas Criteria remote not configured; using ${DEV_HOST}`)
+  }
+
+  script.src = window.REMOTES?.canvas_course_criteria?.launch_url || DEV_HOST
+  script.onload = () => {
+    const module = {
+      get: request => window.CanvasCourseCriteria.get(request),
+      init: arg => {
+        try {
+          return window.CanvasCourseCriteria.init(arg)
+        } catch (e) {
+          console.warn('Remote Canvas Criteria has already been loaded')
+        }
+      },
+    }
+    resolve(module)
+  }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
+  document.head.appendChild(script)
+}
+
+exports.fetchCanvasCourseCriteria = fetchCanvasCourseCriteria

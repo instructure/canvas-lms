@@ -26,6 +26,12 @@
     "add_image_60b2de07": {
         "message": "添加影像"
     },
+    "add_new_a9226085": {
+        "message": "添加新項目"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "添加新字幕"
+    },
     "add_one_9e34a6f8": {
         "message": "添加一個！"
     },
@@ -248,6 +254,15 @@
     "cap_product_3a5265a6": {
         "message": "便帽產品"
     },
+    "caption_manager_aae0906f": {
+        "message": "字幕管理員"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "已為 { lang } 添加字幕"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "已為 { lang } 刪除字幕"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "自父項課程繼承的字幕已移除。"
     },
@@ -307,6 +322,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "選擇字幕檔案"
+    },
+    "choose_file_8d89ccab": {
+        "message": "選擇檔案"
     },
     "choose_usage_rights_33683854": {
         "message": "選擇使用權限…"
@@ -650,6 +668,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "向下和向右對角箭頭"
     },
+    "download_captionname_2e5eea35": {
+        "message": "下載 { captionName }"
+    },
     "download_filename_2baae924": {
         "message": "下載 { filename }"
     },
@@ -844,6 +865,9 @@
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "無法從外部工具擷取內容"
+    },
+    "file_d1b70050": {
+        "message": "檔案*"
     },
     "file_name_8fd421ff": {
         "message": "檔案名稱"
@@ -1276,6 +1300,9 @@
     },
     "lambda_4f602498": {
         "message": "λ"
+    },
+    "language_91effaa0": {
+        "message": "語言*"
     },
     "language_arts_icon_a798b0f8": {
         "message": "語言文學圖示"
@@ -1862,6 +1889,12 @@
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "請選取支援類型的檔案"
     },
+    "please_select_a_language_d90256fb": {
+        "message": "請選取語言"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "請選取 .vtt 或 .srt 檔案"
+    },
     "plus_d43cd4ec": {
         "message": "+"
     },
@@ -1921,6 +1954,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "質數"
+    },
+    "processing_8c569014": {
+        "message": "處理中..."
     },
     "product_39cf144f": {
         "message": "產品"
@@ -1994,9 +2030,6 @@
     "remove_link_d1f2f4d0": {
         "message": "移除連結"
     },
-    "remove_studio_media_f913e502": {
-        "message": "移除 Studio 媒體"
-    },
     "replace_all_d3d68b3": {
         "message": "全部取代"
     },
@@ -2017,6 +2050,9 @@
     },
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "以 { alertReplaceText } 取代所有的 { alertFindText }"
+    },
+    "request_d1129f7d": {
+        "message": "請求"
     },
     "reset_95a81614": {
         "message": "重設"
@@ -2165,6 +2201,9 @@
     "selected_274ce24f": {
         "message": "已選擇"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "選取的檔案：{ name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "已選定 { linkFileName }"
     },
@@ -2198,20 +2237,11 @@
     "show_all_967a90f0": {
         "message": "全部顯示"
     },
-    "show_audio_options_b489926b": {
-        "message": "顯示音訊選項"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "顯示影像選項"
     },
     "show_link_options_545338fd": {
         "message": "顯示連結選項"
-    },
-    "show_studio_media_options_a0c748c6": {
-        "message": "顯示 Studio 媒體選項"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "顯示影片選項"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "有視力的使用者能迅速瀏覽網頁，尋找大型或粗體標題。屏幕閱讀器使用者依靠標題理解內容背景。標題應使用適當的結構。"
@@ -2602,6 +2632,12 @@
     },
     "updated_link_a827e441": {
         "message": "更新的連結"
+    },
+    "upload_8b403d05": {
+        "message": "上傳"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "上傳 SRT 或 WebVTT 格式的字幕軌道。"
     },
     "upload_document_253f0478": {
         "message": "上傳文件"

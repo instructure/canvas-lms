@@ -27,7 +27,7 @@ RSpec.describe PeerReview::DateOverrider do
   end
 
   let(:test_instance) { test_class.new }
-  let(:mock_override) { double("override") }
+  let(:mock_override) { instance_double(AssignmentOverride) }
 
   describe "#apply_overridden_dates" do
     context "with all date fields present in override_params" do

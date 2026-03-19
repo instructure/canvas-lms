@@ -20,6 +20,7 @@ export type GradingStatusQueryResult = {
   color: string
   id: string
   name: string
+  icon?: string
 }
 
 export type AccountGradingStatusQueryResults = {

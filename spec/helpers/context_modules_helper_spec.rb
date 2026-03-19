@@ -309,8 +309,8 @@ describe ContextModulesHelper do
     end
 
     describe "load_content_tags" do
-      let(:visible_content_tag_mock) { double("ContentTag1", content: double("Content1", hide_on_modules_view?: false)) }
-      let(:hidden_content_tag_mock) { double("ContentTag2", content: double("Content2", hide_on_modules_view?: true)) }
+      let(:visible_content_tag_mock) { instance_double(ContentTag, content: instance_double(Assignment, hide_on_modules_view?: false)) }
+      let(:hidden_content_tag_mock) { instance_double(ContentTag, content: instance_double(Assignment, hide_on_modules_view?: true)) }
 
       before do
         allow(t_module)
@@ -468,8 +468,8 @@ describe ContextModulesHelper do
     end
 
     context "when provided context and user exist" do
-      let(:current_user) { double("current_user") }
-      let(:visible_items) { double("count_mock", count: items_count) }
+      let(:current_user) { instance_double(User) }
+      let(:visible_items) { instance_double(ActiveRecord::Relation, count: items_count) }
       let(:items_count) { 100 }
       let(:context) do
         course = course_model
@@ -526,8 +526,8 @@ describe ContextModulesHelper do
   end
 
   describe "cache_if_no_module_perf_enabled" do
-    let(:context) { double("Context", account: double("Account")) }
-    let(:user) { double("User") }
+    let(:context) { instance_double(Course, account: instance_double(Account)) }
+    let(:user) { instance_double(User) }
     let(:cache_key) { "test_cache_key" }
 
     before do
@@ -552,9 +552,9 @@ describe ContextModulesHelper do
   describe "cache_if_module" do
     subject { helper.cache_if_module(nil, true, true, true, true, true, true, user, context, &proc {}) }
 
-    let(:context_module) { double("ContextModule", cache_key: "context_module_key", id: 1) }
-    let(:user) { double("User", learning_object_visibilities: %w[assignment1 assignment2]) }
-    let(:context) { double("Context") }
+    let(:context_module) { instance_double(ContextModule, cache_key: "context_module_key", id: 1) }
+    let(:user) { instance_double(User, learning_object_visibilities: %w[assignment1 assignment2]) }
+    let(:context) { instance_double(Course) }
     let(:cache_key) { "test_cache_key" }
 
     before do

@@ -1101,7 +1101,6 @@
 #
 class Lti::RegistrationsController < ApplicationController
   before_action :require_root_account_instrumented_or_sub_account_and_feature_flag
-  before_action :require_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
@@ -1133,7 +1132,7 @@ class Lti::RegistrationsController < ApplicationController
     end
 
     if @account.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
-      turnitin_devkey_id = Setting.get("turnitin_asset_processor_client_id", "")
+      turnitin_devkey_id = @account.root_account.turnitin_asset_processor_client_id
       if turnitin_devkey_id.present?
         js_env({
                  turnitinAPClientId: turnitin_devkey_id
@@ -1435,7 +1434,7 @@ class Lti::RegistrationsController < ApplicationController
         @current_user,
         session,
         @context,
-        includes: [:account_binding, :configuration],
+        includes: %i[account_binding configuration overlaid_configuration],
         account_binding: registration.account_binding_for(@context)
       )
     end
@@ -1604,14 +1603,61 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
+    workflow_state = params.require(:workflow_state).to_sym
+    to_bind = if @context.feature_enabled?(:lti_registrations_templates)
+                # for backwards compatibility with UI until template flag is fully on.
+                # use the local copy to bind
+                Lti::InstallTemplateRegistrationService.call(
+                  template: registration,
+                  account: @context,
+                  user: @current_user
+                )
+              else
+                registration
+              end
+
     Lti::AccountBindingService.call(
+      registration: to_bind,
       account: @context,
-      registration:,
-      workflow_state: params.require(:workflow_state),
+      workflow_state:,
       user: @current_user
     ) => { lti_registration_account_binding: }
 
     render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
+  end
+
+  # @API Install an LTI Registration from a Template
+  # This endpoint installs a local copy of a "template" LTI registration from Site Admin into the specified account.
+  # The local copy can then be customized for the account without affecting the template registration.
+  #
+  # Only allowed for root accounts and for registrations from Site Admin marked as templates.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would install the specified template LTI registration into the specified account
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/install_from_template' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Type: application/json"
+  def install_from_template
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return head :not_found
+    end
+
+    local_registration = Lti::InstallTemplateRegistrationService.call(
+      template: registration,
+      account: @context,
+      user: @current_user,
+      create_binding: true
+    )
+
+    account_binding = local_registration.account_binding_for(@context)
+    overlay = local_registration.overlay_for(@context)
+    includes = %i[account_binding configuration overlay]
+    json = lti_registration_json(local_registration, @current_user, session, @context, includes:, account_binding:, overlay:)
+
+    render json:
   end
 
   # @API Search for Accounts and Courses
@@ -2004,15 +2050,6 @@ class Lti::RegistrationsController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     report_error(e)
     raise e
-  end
-
-  def require_feature_flag
-    unless @account.root_account.feature_enabled?(:lti_registrations_page)
-      respond_to do |format|
-        format.html { render "shared/errors/404_message", status: :not_found }
-        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
-      end
-    end
   end
 
   def require_lti_registrations_next_feature_flag

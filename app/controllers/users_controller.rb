@@ -153,7 +153,7 @@ class UsersController < ApplicationController
         @presenter, params[:course_id], params[:grading_period_id]
       )
       @grades = grades_for_presenter(@presenter, @grading_periods)
-      js_env(grades_for_student_url:)
+      js_env({ grades_for_student_url: })
 
       ActiveRecord::Associations.preload(@observed_enrollments, :course)
 
@@ -398,22 +398,24 @@ class UsersController < ApplicationController
       css_bundle :act_as_modal
 
       @page_title = t("Act as %{user_name}", user_name: @user.short_name)
-      js_env act_as_user_data: {
-        user: {
-          name: @user.name,
-          pronouns: @user.pronouns,
-          short_name: @user.short_name,
-          id: @user.id,
-          avatar_image_url: @user.avatar_image_url,
-          sortable_name: @user.sortable_name,
-          email: @user.email,
-          pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
-            { login_id: pseudonym.unique_id,
-              sis_id: pseudonym.sis_user_id,
-              integration_id: pseudonym.integration_id }
-          end
-        }
-      }
+      js_env({
+               act_as_user_data: {
+                 user: {
+                   name: @user.name,
+                   pronouns: @user.pronouns,
+                   short_name: @user.short_name,
+                   id: @user.id,
+                   avatar_image_url: @user.avatar_image_url,
+                   sortable_name: @user.sortable_name,
+                   email: @user.email,
+                   pseudonyms: @user.pseudonyms_visible_to(@current_user).map do |pseudonym|
+                     { login_id: pseudonym.unique_id,
+                       sis_id: pseudonym.sis_user_id,
+                       integration_id: pseudonym.integration_id }
+                   end
+                 }
+               }
+             })
       render html: '<div id="application"></div><div id="act_as_modal"></div>'.html_safe, layout: "layouts/bare"
     end
   end
@@ -478,7 +480,7 @@ class UsersController < ApplicationController
     @current_user.reload unless @domain_root_account&.feature_enabled?(:widget_dashboard)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
-    js_env({ K5_USER: k5_user && !k5_disabled }, true)
+    js_env({ K5_USER: k5_user && !k5_disabled }, overwrite: true)
 
     course_permissions = @current_user.create_courses_permissions(@domain_root_account)
     js_env({
@@ -591,9 +593,9 @@ class UsersController < ApplicationController
   end
 
   def cached_submissions(user, upcoming_events)
-    Rails.cache.fetch(["cached_user_submissions2", user].cache_key,
+    Rails.cache.fetch(["cached_user_submissions3", user].cache_key,
                       expires_in: 3.minutes) do
-      assignments = upcoming_events.select { |e| e.is_a?(Assignment) }
+      assignments = upcoming_events.select { |e| e.is_a?(Assignment) || e.is_a?(PeerReviewSubAssignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
         Submission.active
                   .select(%i[id assignment_id score grade workflow_state updated_at])
@@ -1152,7 +1154,8 @@ class UsersController < ApplicationController
 
         user = api_find(User, params[:observed_user_id])
         valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-        return render_unauthorized_action unless (included_course_ids - valid_course_ids).empty?
+        included_course_ids &= valid_course_ids
+        return render_unauthorized_action if included_course_ids.empty?
       end
 
       filter = Array(params[:filter])
@@ -1198,7 +1201,7 @@ class UsersController < ApplicationController
       return render(json: { ignored: false }, status: :bad_request)
     end
 
-    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ["Assignment", "AssessmentRequest", "Quizzes::Quiz", "SubAssignment"]),
+    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ["Assignment", "AssessmentRequest", "Quizzes::Quiz", "SubAssignment", "PeerReviewSubAssignment"]),
                                params[:purpose],
                                params[:permanent] == "1")
     render json: { ignored: true }
@@ -1471,8 +1474,10 @@ class UsersController < ApplicationController
     @return_url = named_context_url(@current_user, :context_external_content_success_url, "external_tool_redirect", { include_host: true })
     @redirect_return = true
     @context = @current_user
-    js_env(redirect_return_success_url: success_url,
-           redirect_return_cancel_url: success_url)
+    js_env({
+             redirect_return_success_url: success_url,
+             redirect_return_cancel_url: success_url
+           })
 
     @lti_launch = @tool.settings["post_only"] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     opts = {
@@ -1482,7 +1487,7 @@ class UsersController < ApplicationController
     }
 
     @tool_form_id = random_lti_tool_form_id
-    js_env(LTI_TOOL_FORM_ID: @tool_form_id)
+    js_env({ LTI_TOOL_FORM_ID: @tool_form_id })
 
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                     current_user: @current_user,
@@ -1535,8 +1540,10 @@ class UsersController < ApplicationController
 
     run_login_hooks
     @include_recaptcha = recaptcha_enabled?
-    js_env ACCOUNT: account_json(@domain_root_account, nil, session, ["registration_settings"]),
-           PASSWORD_POLICY: @domain_root_account.password_policy
+    js_env({
+             ACCOUNT: account_json(@domain_root_account, nil, session, ["registration_settings"]),
+             PASSWORD_POLICY: @domain_root_account.password_policy
+           })
     render layout: "bare"
   end
 
@@ -2320,6 +2327,7 @@ class UsersController < ApplicationController
           next if p.active? && event == "unsuspend"
           next if p.suspended? && event == "suspend"
 
+          p.current_user = @current_user # performing user for audit logging
           p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
         end
       end
@@ -2341,7 +2349,7 @@ class UsersController < ApplicationController
         session.delete(:require_terms)
         flash[:notice] = t("user_updated", "User was successfully updated.")
         unless params[:redirect_to_previous].blank?
-          return redirect_back fallback_location: user_url(@user)
+          return redirect_back_or_to(user_url(@user))
         end
 
         format.html { redirect_to user_url(@user) }
@@ -2369,7 +2377,7 @@ class UsersController < ApplicationController
     user.update!(last_logged_out: now)
     user.access_tokens.active.update_all(updated_at: now, permanent_expires_at: now)
 
-    render json: "ok"
+    render json: { message: "All sessions terminated" }
   end
 
   # @API Log users out of all mobile apps
@@ -2389,7 +2397,7 @@ class UsersController < ApplicationController
     skip_admins = value_to_boolean(params[:skip_admins])
     AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:, skip_admins:)
 
-    render json: "ok"
+    render json: { message: "All mobile sessions terminated" }
   end
 
   def media_download
@@ -2462,9 +2470,11 @@ class UsersController < ApplicationController
     return unless authorized_action(@user, @current_user, :merge)
 
     merge_data = UserMergeData.active.splitable.where(user_id: @user).shard(@user).preload(:from_user).to_a
-    js_env ADMIN_SPLIT_USER: user_display_json(@user),
-           ADMIN_SPLIT_URL: api_v1_split_url(@user),
-           ADMIN_SPLIT_USERS: merge_data.map { |md| user_display_json(md.from_user) }
+    js_env({
+             ADMIN_SPLIT_USER: user_display_json(@user),
+             ADMIN_SPLIT_URL: api_v1_split_url(@user),
+             ADMIN_SPLIT_USERS: merge_data.map { |md| user_display_json(md.from_user) }
+           })
   end
 
   def mark_avatar_image
@@ -3231,7 +3241,7 @@ class UsersController < ApplicationController
       includes << "terms_of_use" unless accepted_terms.nil?
     end
     @user.name ||= params[:pseudonym][:unique_id]
-    skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))
+    skip_registration = manage_user_logins && value_to_boolean(params[:user].try(:[], :skip_registration))
     unless @user.registered?
       @user.workflow_state = if require_password || skip_registration
                                # no email confirmation required (self_enrollment_code and password
@@ -3531,24 +3541,27 @@ class UsersController < ApplicationController
       last_updated = nil
 
       if can_read_grades
+        display_grade = enrollment.effective_current_score(course_score: true)
         course_score = enrollment.find_score(course_score: true)
-        if course_score
-          display_grade = course_score.override_score.presence || course_score.current_score
-          last_updated = course_score.updated_at
-        end
+        last_updated = course_score&.updated_at
 
         if course.grading_standard_enabled? && course.grading_standard
           grading_scheme = course.grading_standard.data
         end
       end
 
+      nickname = @current_user.course_nickname(course)
       {
         courseId: course.id.to_s,
         courseCode: course.course_code || "N/A",
-        courseName: course.name,
+        courseName: nickname || course.name,
+        originalName: course.name,
         currentGrade: display_grade,
         gradingScheme: grading_scheme,
-        lastUpdated: last_updated&.iso8601
+        lastUpdated: last_updated&.iso8601,
+        courseColor: @current_user.custom_colors[course.asset_string],
+        term: course.enrollment_term&.name,
+        image: course.image
       }
     end
 

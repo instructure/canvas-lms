@@ -158,6 +158,9 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Alt yazı dosyasını seçin"
     },
+    "choose_file_8d89ccab": {
+        "message": "Dosya Seç"
+    },
     "choose_usage_rights_33683854": {
         "message": "Kullanıcı haklarını seçin..."
     },
@@ -368,6 +371,9 @@
     "fail_544e5dde": {
         "message": "BAŞARISIZ (FAIL)"
     },
+    "failed_276786d": {
+        "message": "Başarısız"
+    },
     "file_name_8fd421ff": {
         "message": "Dosya adı"
     },
@@ -563,6 +569,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Harici bir siteye bağlantılar."
     },
+    "list_collapsed_9ac35920": {
+        "message": "Liste daraltıldı."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste genişletildi."
+    },
     "lists_cd1336fc": {
         "message": "Listeler"
     },
@@ -677,11 +689,17 @@
     "none_3b5e34d2": {
         "message": "Yok"
     },
+    "olive_6a3e4d6b": {
+        "message": "Zeytin"
+    },
     "operators_a2ef9a93": {
         "message": "Operatörler"
     },
     "options_3ab0ea65": {
         "message": "Seçenekler"
+    },
+    "or_9b70ccaa": {
+        "message": "Veya"
     },
     "orange_81386a62": {
         "message": "Turuncu"
@@ -692,6 +710,12 @@
     "pages_e5414c2c": {
         "message": "Sayfalar"
     },
+    "pass_1c19a2b3": {
+        "message": "GEÇTİ"
+    },
+    "pause_12af3bb4": {
+        "message": "Duraklat"
+    },
     "people_b4ebb13c": {
         "message": "Katılımcılar"
     },
@@ -701,17 +725,41 @@
     "pink_68ad45cb": {
         "message": "Pembe"
     },
+    "play_1a47eaa7": {
+        "message": "Oynat"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Lütfen Canvas''ın mikrofonunuza ve web kameranıza erişmesine izin verin."
+    },
+    "please_choose_a_file_c2449cc": {
+        "message": "Lütfen bir dosya seçin"
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Lütfen bir dosya adı girin"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Desteklenen türde bir dosya seçin"
+    },
     "prev_f82cbc48": {
         "message": "Önceki"
     },
     "preview_53003fd2": {
         "message": "Önizleme"
     },
+    "preview_a3f8f854": {
+        "message": "ÖN İZLEME"
+    },
     "previous_bd2ac015": {
         "message": "Önceki"
     },
+    "processing_8c569014": {
+        "message": "İşleniyor..."
+    },
     "published_c944a23d": {
         "message": "yayınlandı"
+    },
+    "pumpkin_904428d5": {
+        "message": "Balkabağı"
     },
     "purple_7678a9fc": {
         "message": "Mor"
@@ -749,20 +797,50 @@
     "rich_content_editor_2708ef21": {
         "message": "Zengin İçerik Editörü"
     },
+    "russian_1e3e197": {
+        "message": "Rusça"
+    },
     "save_11a80ec3": {
         "message": "Kaydet"
+    },
+    "save_media_cb9e786e": {
+        "message": "Medyayı Kaydet"
     },
     "search_280d00bd": {
         "message": "Ara"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Ses kaynağı seçin"
+    },
+    "select_language_7c93a900": {
+        "message": "Dil Seçin"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Video kaynağı seçin"
+    },
+    "selected_274ce24f": {
+        "message": "Seçildi"
+    },
     "size_b30e1077": {
         "message": "Boyut"
+    },
+    "small_b070434a": {
+        "message": "Küçük"
     },
     "something_went_wrong_89195131": {
         "message": "Bazı sorunlar oluştu."
     },
+    "something_went_wrong_d238c551": {
+        "message": "Bir sorun oluştu"
+    },
     "sort_by_e75f9e3e": {
         "message": "Sırala"
+    },
+    "spanish_de9de5d6": {
+        "message": "İspanyolca"
+    },
+    "square_511eb3b3": {
+        "message": "Kare"
     },
     "star_8d156e09": {
         "message": "Yıldız"
@@ -770,14 +848,32 @@
     "start_over_f7552aa9": {
         "message": "Baştan Başla"
     },
+    "start_recording_9a65141a": {
+        "message": "Kaydı Başlat"
+    },
     "submit_a3cc6859": {
         "message": "Gönder"
     },
     "submitting_b90fac62": {
         "message": "Gönderiliyor..."
     },
+    "swedish_59a593ca": {
+        "message": "İsveççe"
+    },
     "syllabus_f191f65b": {
         "message": "Ders Programı"
+    },
+    "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+        "message": "Tablolarda, tablonun içeriğini açıklayan bir açıklama bulunmalıdır."
+    },
+    "teal_f729a294": {
+        "message": "Turkuaz"
+    },
+    "text_7f4593da": {
+        "message": "Metin"
+    },
+    "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+        "message": "Metin ile arka plan arasında yeterli kontrast olmadığında metni okumak zordur; özellikle düşük görme düzeyine sahip kullanıcılar için."
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Döküman ön izlemesi hala işleniyor. Lütfen daha sonra tekrar deneyin."
@@ -793,6 +889,9 @@
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Bu denklem Temel Görünümde işlenemez."
+    },
+    "timebar_a4d18443": {
+        "message": "Zaman çubuğu"
     },
     "title_ee03d132": {
         "message": "Başlık"
@@ -821,6 +920,9 @@
     "up_c553575d": {
         "message": "Yukarı"
     },
+    "upload_8b403d05": {
+        "message": "Yükle"
+    },
     "upload_document_253f0478": {
         "message": "Belge Yükle"
     },
@@ -845,6 +947,9 @@
     "usage_right_ff96f3e2": {
         "message": "Kullanım Şartları:"
     },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Seçeneklerde gezinmek için ok tuşlarını kullanın."
+    },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
     },
@@ -853,6 +958,9 @@
     },
     "user_documents_c206e61f": {
         "message": "Kullanıcı Belgeleri"
+    },
+    "user_files_78e21703": {
+        "message": "Kullanıcı Dosyaları"
     },
     "user_images_b6490852": {
         "message": "Kullanıcı Görselleri"
@@ -875,8 +983,14 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Klavye Kısayollarını Göster"
     },
+    "webcam_disabled_30c66986": {
+        "message": "Web kamerası devre dışı"
+    },
     "webcam_fe91b20f": {
         "message": "Web Kamerası"
+    },
+    "white_87fa64fd": {
+        "message": "Beyaz"
     },
     "width_492fec76": {
         "message": "Genişlik"
@@ -890,8 +1004,14 @@
     "wiki_home_9cd54d0": {
         "message": "Wiki Ana Sayfası"
     },
+    "word_count_c77fe3a6": {
+        "message": "Kelime Sayısı"
+    },
     "yes_dde87d5": {
         "message": "Evet"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Yeni bir altyazı dosyası yükleyerek değiştirebilirsiniz."
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Web kameranız kullanılıyor olabilir."

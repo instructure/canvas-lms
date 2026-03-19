@@ -52,14 +52,12 @@ export default function propsFromDispatch(dispatch) {
     fetchInitialImages: (opts = {category: DEFAULT_FILE_CATEGORY}) =>
       dispatch(fetchInitialImages(opts)),
     fetchNextImages: (opts = {category: DEFAULT_FILE_CATEGORY}) => dispatch(fetchNextImages(opts)),
-    startUpload: (tabContext, fileMetaProps) =>
-      dispatch(uploadPreflight(tabContext, fileMetaProps)),
+    startUpload: fileMetaProps => dispatch(uploadPreflight(fileMetaProps)),
     toggleUploadForm: () => dispatch(openOrCloseUploadForm()),
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
     startIconMakerUpload: (fileMetaProps, uploadSettings) =>
       dispatch(uploadToIconMakerFolder(fileMetaProps, uploadSettings)),
-    startMediaUpload: (tabContext, fileMetaProps) =>
-      dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
+    startMediaUpload: fileMetaProps => dispatch(uploadToMediaFolder(fileMetaProps)),
     startMediaUploadInStandaloneMode: fileMetaProps =>
       dispatch(uploadToMediaFolderWithoutEditor(fileMetaProps)),
     createMediaServerSession: () => dispatch(createMediaServerSession()),

@@ -653,8 +653,6 @@ describe SIS::CSV::UserImporter do
   end
 
   it "skips a row with invalid Unicode characters in login_id (rather than failing the entire import)" do
-    @account.shard.update!(settings: { "pseudonyms_normalized" => true }) unless @account.shard.is_a?(Switchman::DefaultShard)
-
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user1,user1\ufffd,User,Uno,user1@example.com,active",

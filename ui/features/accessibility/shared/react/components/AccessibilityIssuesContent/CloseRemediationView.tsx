@@ -90,6 +90,7 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
     if (closeRemediationMutation.isPending) return
     closeRemediationMutation.mutate()
   }
+
   return (
     <Flex as="div" direction="column" height="100%" width="100%">
       <Flex.Item shouldGrow={true} overflowY="auto">
@@ -129,6 +130,7 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
                 </Flex>
               ) : (
                 <Button
+                  data-testid="close-remediation-button"
                   color="primary"
                   onClick={handleCloseRemediation}
                   disabled={closeRemediationMutation.isPending}
@@ -144,12 +146,30 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
         <View as="footer" background="secondary">
           <Flex justifyItems="space-between" alignItems="center" padding="small">
             <Flex.Item>
-              {!isClosed && <Button onClick={onBack}>{I18n.t('Back to start')}</Button>}
+              {!isClosed && (
+                <Button data-testid="back-to-start-button" onClick={onBack}>
+                  {I18n.t('Back to start')}
+                </Button>
+              )}
             </Flex.Item>
             <Flex.Item>
-              <Button color="primary" onClick={handleNextResource}>
-                {I18n.t('Next resource')}
-              </Button>
+              {nextResource.index >= 0 ? (
+                <Button
+                  data-testid="next-resource-button"
+                  color="primary"
+                  onClick={handleNextResource}
+                >
+                  {I18n.t('Next resource')}
+                </Button>
+              ) : (
+                <Button
+                  data-testid="close-remediation-view-button"
+                  color="primary"
+                  onClick={onClose}
+                >
+                  {I18n.t('Close')}
+                </Button>
+              )}
             </Flex.Item>
           </Flex>
         </View>

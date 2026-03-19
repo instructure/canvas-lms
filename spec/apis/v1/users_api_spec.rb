@@ -236,7 +236,9 @@ describe Api::V1::User do
       @account2 = Account.create!
       @user.pseudonyms.destroy_all
       p = @user.pseudonyms.create!(unique_id: "abc", account: @account2, sis_user_id: "a")
-      allow(p).to receive(:works_for_account?).with(Account.default, true).and_return(true)
+      allow(p).to receive(:works_for_account?)
+        .with(Account.default, allow_implicit: true)
+        .and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trust_exists?).and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@account2.id])
       expect(HostUrl).to receive(:context_host).with(@account2).and_return("school1")
@@ -259,7 +261,7 @@ describe Api::V1::User do
       @account2 = Account.create!
       @user.pseudonyms.create!(unique_id: "abc", account: @account2)
       @pseudonym = @user.pseudonyms.create!(unique_id: "xyz", account: Account.default)
-      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false, root_account: Account.default, in_region: true).and_return(@pseudonym)
+      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false, root_account: Account.default, in_region: true, current_user: @admin).and_return(@pseudonym)
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
                                                                                   "name" => "User",
                                                                                   "sortable_name" => "User",
@@ -2588,12 +2590,20 @@ describe "Users API", type: :request do
       it "can suspend all pseudonyms" do
         api_call(:put, @path, @path_options, { user: { event: "suspend" } })
         expect(@student.pseudonym.reload).to be_suspended
+
+        audit_record = @student.pseudonym.auditor_records.last
+        expect(audit_record.action).to eq "suspended"
+        expect(audit_record.performing_user_id).to eq @admin.id
       end
 
       it "can unsuspend all pseudonyms" do
         @student.pseudonym.update!(workflow_state: "suspended")
         api_call(:put, @path, @path_options, { user: { event: "unsuspend" } })
         expect(@student.pseudonym.reload).to be_active
+
+        audit_record = @student.pseudonym.auditor_records.last
+        expect(audit_record.action).to eq "unsuspended"
+        expect(audit_record.performing_user_id).to eq @admin.id
       end
     end
 
@@ -2963,8 +2973,8 @@ describe "Users API", type: :request do
       @context = @user
     end
 
-    include_examples "file uploads api with folders"
-    include_examples "file uploads api with quotas"
+    it_behaves_like "file uploads api with folders"
+    it_behaves_like "file uploads api with quotas"
 
     def preflight(preflight_params, opts = {})
       api_call(:post,
@@ -3876,13 +3886,15 @@ describe "Users API", type: :request do
         assert_forbidden
       end
 
-      it "renders forbidden if the observer isn't observing the student in a passed course" do
+      it "filters to valid courses when observer isn't linked to student in all passed courses" do
         course1 = @course
         course2 = course_factory(active_all: true)
         course2.enroll_student(@student, enrollment_state: "active")
         course2.enroll_user(@observer, "ObserverEnrollment")
-        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
-        assert_forbidden
+        course2.assignments.create!(name: "A2", due_at: 3.days.ago, workflow_state: "published", submission_types: "online_text_entry")
+        json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
+        expect(response).to be_successful
+        expect(json.pluck("course_id").uniq).to eq([course1.id])
       end
 
       it "returns missing assignments for all courses provided" do

@@ -53,9 +53,13 @@ export interface SharedCourseData {
   courseId: string
   courseCode: string
   courseName: string
+  originalName?: string
   currentGrade: number | null
   gradingScheme: 'percentage' | Array<[string, number]>
   lastUpdated: string
+  courseColor?: string
+  term?: string | null
+  image?: string
 }
 
 interface DashboardFeatures {
@@ -73,6 +77,8 @@ const WidgetDashboardContext = createContext<{
   dashboardFeatures: DashboardFeatures
   widgetConfig: Record<string, Record<string, unknown>>
   updateWidgetConfig: (widgetId: string, config: Record<string, unknown>) => void
+  updateCourseColor: (courseId: string, color: string) => void
+  updateCourseNickname: (courseId: string, nickname: string) => void
 }>({
   preferences: {
     dashboard_view: 'cards',
@@ -88,6 +94,8 @@ const WidgetDashboardContext = createContext<{
   dashboardFeatures: {},
   widgetConfig: {},
   updateWidgetConfig: () => {},
+  updateCourseColor: () => {},
+  updateCourseNickname: () => {},
 })
 
 export const WidgetDashboardProvider = ({
@@ -123,6 +131,35 @@ export const WidgetDashboardProvider = ({
     }))
   }, [])
 
+  const [courseColorOverrides, setCourseColorOverrides] = useState<Record<string, string>>({})
+  const [courseNicknameOverrides, setCourseNicknameOverrides] = useState<Record<string, string>>({})
+
+  const updateCourseColor = useCallback((courseId: string, color: string) => {
+    setCourseColorOverrides(prev => ({
+      ...prev,
+      [courseId]: color,
+    }))
+  }, [])
+
+  const updateCourseNickname = useCallback((courseId: string, nickname: string) => {
+    setCourseNicknameOverrides(prev => ({
+      ...prev,
+      [courseId]: nickname,
+    }))
+  }, [])
+
+  const mergedCourseData = useMemo(() => {
+    const baseData = sharedCourseData ?? widgetDashboardDefaultProps.sharedCourseData
+    return baseData.map(course => {
+      const nicknameOverride = courseNicknameOverrides[course.courseId]
+      return {
+        ...course,
+        courseColor: courseColorOverrides[course.courseId] ?? course.courseColor,
+        courseName: nicknameOverride ?? course.courseName,
+      }
+    })
+  }, [sharedCourseData, courseColorOverrides, courseNicknameOverrides])
+
   const contextValue = useMemo(
     () => ({
       preferences: preferences ?? widgetDashboardDefaultProps.preferences,
@@ -131,10 +168,12 @@ export const WidgetDashboardProvider = ({
       currentUser: currentUser ?? widgetDashboardDefaultProps.currentUser,
       observedUserId: observedUserId ?? widgetDashboardDefaultProps.observedUserId,
       currentUserRoles: currentUserRoles ?? widgetDashboardDefaultProps.currentUserRoles,
-      sharedCourseData: sharedCourseData ?? widgetDashboardDefaultProps.sharedCourseData,
+      sharedCourseData: mergedCourseData,
       dashboardFeatures: dashboardFeatures ?? widgetDashboardDefaultProps.dashboardFeatures,
       widgetConfig,
       updateWidgetConfig,
+      updateCourseColor,
+      updateCourseNickname,
     }),
     [
       preferences,
@@ -143,10 +182,12 @@ export const WidgetDashboardProvider = ({
       currentUser,
       observedUserId,
       currentUserRoles,
-      sharedCourseData,
+      mergedCourseData,
       dashboardFeatures,
       widgetConfig,
       updateWidgetConfig,
+      updateCourseColor,
+      updateCourseNickname,
     ],
   )
 

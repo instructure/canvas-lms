@@ -34,14 +34,14 @@ spec/dr_diff_spec.rb)
       end
 
       it "excludes files that do not exist" do
-        git = double("git", files: git_files_output + "\nREADME.md")
+        git = instance_double(DrDiff::GitProxy, files: git_files_output + "\nREADME.md")
         subject = described_class.new(git:)
         allow(File).to receive(:exist?).with("README.md").and_return(false)
         expect(subject.files).to eq(file_list)
       end
 
       context "regex is given" do
-        let(:git) { double("git", files: git_files_output + "\nbuild.js") }
+        let(:git) { instance_double(DrDiff::GitProxy, files: git_files_output + "\nbuild.js") }
         let(:subject) { described_class.new(git:) }
         let(:ruby_regex) { /\.rb$/ }
 
@@ -52,7 +52,7 @@ spec/dr_diff_spec.rb)
 
       context "git_dir is given" do
         let(:git_dir) { "some/path/" }
-        let(:git) { double("git", files: git_files_output) }
+        let(:git) { instance_double(DrDiff::GitProxy, files: git_files_output) }
         let(:subject) { described_class.new(git:, git_dir:) }
 
         it "prepends the results with the git_dir" do
@@ -64,9 +64,9 @@ spec/dr_diff_spec.rb)
     describe ".comments" do
       let(:format) { "rubocop" }
       let(:command) { "rubocop" }
-      let(:diff_parser) { double("diff parser") }
-      let(:command_capture) { double("command capture") }
-      let(:git) { double("git", diff: "diff") }
+      let(:diff_parser) { instance_double(DrDiff::DiffParser) }
+      let(:command_capture) { instance_double(DrDiff::CommandCapture) }
+      let(:git) { instance_double(DrDiff::GitProxy, diff: "diff") }
       let(:subject) { described_class.new(git:) }
 
       let(:command_capture_comments) do

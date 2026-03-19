@@ -68,7 +68,7 @@ describe "Services API", type: :request do
   end
 
   it "returns a new kaltura session" do
-    kal = double("CanvasKaltura::ClientV3")
+    kal = instance_double(CanvasKaltura::ClientV3)
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post,
@@ -85,7 +85,7 @@ describe "Services API", type: :request do
   end
 
   it "returns a new kaltura session with upload config if param provided" do
-    kal = double("CanvasKaltura::ClientV3")
+    kal = instance_double(CanvasKaltura::ClientV3)
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post,
@@ -113,11 +113,7 @@ describe "Services API", type: :request do
                                                                         "entryUrl" => "http://kaltura.example.com/index.php/partnerservices2/addEntry",
                                                                         "uiconfUrl" => "http://kaltura.example.com/index.php/partnerservices2/getuiconf",
                                                                         "uploadUrl" => "http://kaltura.example.com/index.php/partnerservices2/upload",
-                                                                        "partner_data" => {
-                                                                          "root_account_id" => @user.account.root_account.id,
-                                                                          "sis_source_id" => nil,
-                                                                          "sis_user_id" => nil
-                                                                        },
+                                                                        "partner_data" => "root_account_uuid=#{@user.account.root_account.uuid}&user_uuid=#{@user.uuid}",
                                                                       },
                                                                     })
   end
@@ -194,6 +190,7 @@ describe "Services API", type: :request do
                                                RICH_CONTENT_INST_RECORD_TAB_DISABLED: nil,
                                                RICH_CONTENT_FILES_TAB_DISABLED: nil,
                                                RICH_CONTENT_CAN_EDIT_FILES: nil,
+                                               RICH_CONTENT_APP_HOST: nil,
                                                K5_SUBJECT_COURSE: nil,
                                                K5_HOMEROOM_COURSE: nil,
                                                context_asset_string: nil,
@@ -234,6 +231,11 @@ describe "Services API", type: :request do
                                              id: an_instance_of_integer
                                            }))
 
+      allow_any_instance_of(ApplicationController).to receive(:rce_js_env).and_wrap_original do |original_method, *args|
+        original_result = original_method.call(*args) || {}
+        original_result.merge(RICH_CONTENT_APP_HOST: "https://rich-content-service.example.com")
+      end
+
       json = rce_config_api_call
 
       expect(json).to include({
@@ -242,6 +244,7 @@ describe "Services API", type: :request do
                                 RICH_CONTENT_INST_RECORD_TAB_DISABLED: a_bool_value,
                                 RICH_CONTENT_FILES_TAB_DISABLED: a_bool_value,
                                 RICH_CONTENT_CAN_EDIT_FILES: a_bool_value,
+                                RICH_CONTENT_APP_HOST: an_instance_of_string,
                                 LOCALE: an_instance_of_string,
                                 LOCALES: a_not_empty_string_array,
                                 rce_auto_save_max_age_ms: an_instance_of_integer,

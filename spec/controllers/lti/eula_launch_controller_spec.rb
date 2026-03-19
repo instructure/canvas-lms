@@ -40,7 +40,7 @@ module Lti
       shared_examples "logs launch with Lti::LogService" do
         before do
           allow(Lti::LogService).to receive(:new) do
-            double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+            instance_double(Lti::LogService, call: nil)
           end
         end
 

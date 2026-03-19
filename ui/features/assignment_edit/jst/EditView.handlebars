@@ -60,7 +60,7 @@
     </div>
   {{/unless}}
 
-  {{#if newQuizzesSurveysFFEnabled}}
+  {{#if isQuizLTIAssignment}}
     <div id="quiz_type_selector" class="control-group"></div>
   {{/if}}
 
@@ -84,7 +84,7 @@
           {{/ifAny}}
           {{disabledIfIncludes frozenAttributes "points_possible"}}
         ></input>
-        {{#if newQuizzesSurveysFFEnabled}}
+        {{#if isQuizLTIAssignment}}
           <div id="points_tooltip"></div>
         {{/if}}
       </div>
@@ -100,7 +100,7 @@
 
   </div>
 
-  {{#if newQuizzesSurveysFFEnabled}}
+  {{#if isQuizLTIAssignment}}
     <div id="anonymous_submission_selector" class="control-group" style="{{hiddenUnless showAnonymousSubmissionSelector}}"></div>
   {{/if}}
 

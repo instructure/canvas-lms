@@ -48,7 +48,16 @@ namespace :db do
     end
 
     # we will happily ignore any columns on tables that don't currently exist, since nothing can depend on them yet
-    columns = args[:columns].split(",")
+    delimiter = args[:columns].include?("+") ? "+" : ","
+    columns = if delimiter == "+"
+                args[:columns].split("+")
+              else
+                warn "DEPRECATED: Using comma-separated columns. Use '+' as delimiter instead."
+                args[:columns].split(",")
+              end
+
+    puts "Ignoring columns for #{args[:table_name]}: [#{columns.join(", ")}] (parsed from '#{args[:columns]}' using delimiter '#{delimiter}')"
+
     real_columns = model.column_names & columns
 
     if real_columns.size.positive?

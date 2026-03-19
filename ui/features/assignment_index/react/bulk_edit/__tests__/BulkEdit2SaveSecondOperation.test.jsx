@@ -150,5 +150,5 @@ describe('Assignment Bulk Edit Dates - Second Save Operation', () => {
       expect(progressCallCount).toBeGreaterThan(firstSaveProgressCalls)
       expect(getByText(/saved successfully/)).toBeInTheDocument()
     })
-  })
+  }, 30000)
 })

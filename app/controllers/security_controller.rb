@@ -111,7 +111,7 @@ class SecurityController < ApplicationController
       return
     end
 
-    host = Lti::Oidc.auth_domain(HostUrl.context_host(account, request.host_with_port))
+    host = Lti::Oidc.auth_domain(account.environment_specific_domain)
 
     render json: {
       issuer: Canvas::Security.config["lti_iss"],

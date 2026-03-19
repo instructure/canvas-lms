@@ -25,6 +25,7 @@ import {
   DragSourceMonitor,
   DropTargetMonitor,
   ConnectDragSource,
+  ConnectDragPreview,
   ConnectDropTarget,
 } from 'react-dnd'
 import {flowRight as compose} from 'es-toolkit/compat'
@@ -33,10 +34,12 @@ interface DragItem {
   id: string | number
   index: number
   originalIndex: number
+  label?: string
 }
 
 export interface DragDropConnectorProps {
   connectDragSource?: ConnectDragSource
+  connectDragPreview?: ConnectDragPreview
   connectDropTarget?: ConnectDropTarget
   isDragging?: boolean
 }
@@ -46,9 +49,10 @@ interface DragDropWrapperConfig {
   type: string
   itemId: string | number
   index: number
+  dragLabel?: string
+  [key: string]: any
   onMove: (draggedId: string | number, hoverIndex: number) => void
   onDragEnd?: () => void
-  [key: string]: any
 }
 
 type DragDropWrapperComponentProps = DragDropWrapperConfig & DragDropConnectorProps
@@ -66,6 +70,7 @@ const dragSource = {
       id: props.itemId,
       index: props.index,
       originalIndex: props.index,
+      label: props.dragLabel,
     }
   },
   endDrag(props: DragDropWrapperComponentProps, monitor: DragSourceMonitor) {
@@ -82,9 +87,11 @@ const dragSource = {
 const dropTarget = {
   hover(props: DragDropWrapperComponentProps, monitor: DropTargetMonitor) {
     const dragItem = monitor.getItem() as DragItem
+    const hoverIndex = props.index
+
     if (dragItem.id !== props.itemId) {
-      props.onMove(dragItem.id, props.index)
-      dragItem.index = props.index
+      props.onMove(dragItem.id, hoverIndex)
+      dragItem.index = hoverIndex
     }
   },
 }
@@ -102,6 +109,7 @@ export default compose(
     dragSource,
     (connect, monitor) => ({
       connectDragSource: connect.dragSource(),
+      connectDragPreview: connect.dragPreview(),
       isDragging: monitor.isDragging(),
     }),
   ),

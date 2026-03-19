@@ -21,13 +21,12 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-def setupNode() {
-  sh 'rm -vrf ./tmp'
-
-  checkout scm
-
-  distribution.stashBuildScripts()
-}
+env.BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
+env.COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
+env.COVERAGE = '1'
+env.DOCKER_BUILDKIT = 1
+env.FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
+env.LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
 
 def getKarmaRunnerImage() {
   KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
@@ -88,100 +87,138 @@ def sendSkippedSpecsSlackReport() {
   slackSend channel: '#canvas-test-stats', color: color, message: "$jsSkippedSpecs skipped specs in $jobInfo! "
 }
 
-pipeline {
-  agent none
-  options {
-    ansiColor('xterm')
-    timeout(60)
-    timestamps()
+def collectCoverageReport(karmaRunnerImage) {
+  stage('Collect Coverage Report') {
+    copyArtifacts(
+      filter: 'coverage-report-js/**',
+      optional: false,
+      projectName: env.JOB_NAME,
+      selector: specific(env.BUILD_NUMBER),
+    )
+
+    withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
+      sh """
+        docker run --interactive \
+        --volume \$(pwd)/coverage-report-js:/usr/src/app/tmp/coverage-report-js \
+        --name coverage-collator \
+        $karmaRunnerImage bash -c "./build/new-jenkins/js/coverage-report.sh"
+      """
+
+      sh 'docker cp coverage-collator:/usr/src/app/report-html coverage-report-js/report-html'
+
+      publishHTML target: [
+        allowMissing: false,
+        alwaysLinkToLastBuild: false,
+        keepAll: true,
+        reportDir: './coverage-report-js/report-html',
+        reportFiles: 'index.html',
+        reportName: 'Coverage Report'
+      ]
+
+      uploadCoverage([
+        uploadSource: '/coverage-report-js/report-html',
+        uploadDest: 'canvas-lms-js/coverage'
+      ])
+    }
   }
+}
 
-  environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-js.yml'
-    FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
+node(nodeLabel()) {
+  timeout(time: 60, unit: 'MINUTES') {
+    ansiColor('xterm') {
+      timestamps {
+        def karmaRunnerImage = getKarmaRunnerImage()
+        def patchsetTag = getPatchsetTag()
+        def tests = [:]
 
-    KARMA_RUNNER_IMAGE = getKarmaRunnerImage()
-    PATCHSET_TAG = getPatchsetTag()
+        env.PATCHSET_TAG = patchsetTag
 
-    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    COMPOSE_DOCKER_CLI_BUILD = 1
-    DOCKER_BUILDKIT = 1
-    PROGRESS_NO_TRUNC = 1
-  }
+        try {
+          stage('Clean Workspace') {
+            pipelineHelpers.cleanupWorkspace()
+          }
 
-  stages {
-    stage('Environment') {
-      steps {
-        script {
-          def rspecNodeRequirements = [label: 'canvas-docker']
+          stage('Checkout Code') {
+            sh 'rm -vrf ./tmp'
+            checkout scm
+            distribution.stashBuildScripts()
+          }
 
-          def postBuildHandler = [
-            onNodeReleasing: { stageName, stageConfig, result ->
-              buildSummaryReport.saveRunManifest()
+          stage('Run Tests') {
+            def additionalEnvVars = ["NODE_OPTIONS=--max-old-space-size=6144"]
 
-              copyArtifacts(
-                filter: 'coverage-report-js/**',
-                optional: false,
-                projectName: env.JOB_NAME,
-                selector: specific(env.BUILD_NUMBER),
-              )
-
-              withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
-                sh """
-                  docker run --interactive \
-                  --volume \$(pwd)/coverage-report-js:/usr/src/app/tmp/coverage-report-js \
-                  --name coverage-collator \
-                  $KARMA_RUNNER_IMAGE bash -c "./build/new-jenkins/js/coverage-report.sh"
-                  """
-
-                sh 'docker cp coverage-collator:/usr/src/app/report-html coverage-report-js/report-html'
-
-                publishHTML target: [
-                  allowMissing: false,
-                  alwaysLinkToLastBuild: false,
-                  keepAll: true,
-                  reportDir: './coverage-report-js/report-html',
-                  reportFiles: 'index.html',
-                  reportName: 'Coverage Report'
-                ]
-
-                uploadCoverage([
-                  uploadSource: '/coverage-report-js/report-html',
-                  uploadDest: 'canvas-lms-js/coverage'
-                ])
-              }
-              if (env.GERRIT_EVENT_TYPE != 'comment-added') {
-                generateSkippedSpecsReport()
-              }
-            }
-          ]
-
-          extendedStage('Runner').obeysAllowStages(false).execute {
-            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
-              stage('Setup') {
-                setupNode()
-              }
-
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
-                def jsStages = [:]
-
-                for (int i = 0; i < jsStage.VITEST_NODE_COUNT; i++) {
-                  String index = i
-                  extendedStage("Runner - Vitest ${i}").nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.vitestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(jsStages) {
-                    def tests = [:]
-
-                    callableWithDelegate(jsStage.queueVitestDistribution(index))(tests)
-
-                    parallel(tests)
-                  }
+            // Vitest 0 runs on main coordinator node
+            tests['Vitest 0'] = {
+              def stageName = 'Vitest 0'
+              def stageStartTime = System.currentTimeMillis()
+              try {
+                stage("${stageName} - Cleanup") {
+                  pipelineHelpers.cleanupWorkspace()
                 }
 
-                parallel(jsStages)
-              } //parallel tests
-            } //builder
-          } //runner
-        } //script
-      } //steps
-    } //environment
-  } //stages
-} //pipeline
+                stage("${stageName} - Setup") {
+                  jsTestsStage.checkoutCode()
+                  jsTestsStage.provisionDocker()
+                  jsTestsStage.startServices()
+                }
+
+                def baseEnvVars = [
+                  "CI_NODE_INDEX=1",
+                  "CI_NODE_TOTAL=${jsTestsStage.VITEST_NODE_COUNT}",
+                  "FORCE_FAILURE=${env.FORCE_FAILURE}",
+                  "RAILS_ENV=test",
+                  "TEST_RESULT_OUTPUT_DIR=js-results/vitest-0"
+                ]
+                def envVars = baseEnvVars + additionalEnvVars
+                def envFlags = envVars.collect { "-e ${it}" }.join(' ')
+
+                stage("${stageName} - Run Tests") {
+                  try {
+                    sh("docker compose -f ${env.COMPOSE_FILE} exec -T ${envFlags} canvas yarn test:build")
+                  } finally {
+                    buildSummaryReport.trackStage(stageName, stageStartTime)
+
+                    pipelineHelpers.copyFromContainer('canvas', '/usr/src/app/js-results/vitest-0', './js-results/vitest-0')
+                    archiveArtifacts artifacts: 'js-results/vitest-0/**/*.xml'
+                    junit 'js-results/vitest-0/**/*.xml'
+
+                    if (env.COVERAGE == '1') {
+                      jsTestsStage.collectCoverage(stageName)
+                    }
+                  }
+                }
+              } finally {
+                pipelineHelpers.cleanupDocker()
+              }
+            }
+
+            // Remaining nodes (1 through VITEST_NODE_COUNT-1)
+            for (int i = 1; i < jsTestsStage.VITEST_NODE_COUNT; i++) {
+              def index = i
+              tests["Vitest ${index}"] = {
+                jsTestsStage.runVitestNode(index, additionalEnvVars)
+              }
+            }
+
+            parallel(tests)
+          }
+        } finally {
+          stage('Collect Build Summary Data') {
+            tests.each { stageName, closure ->
+              buildSummaryReport.addFailureRun(stageName, currentBuild)
+              buildSummaryReport.addRunTestActions(stageName, currentBuild)
+            }
+          }
+
+          collectCoverageReport(karmaRunnerImage)
+
+          if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+            generateSkippedSpecsReport()
+          }
+
+          buildSummaryReport.saveRunManifest()
+        }
+      }
+    }
+  }
+}

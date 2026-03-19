@@ -36,6 +36,7 @@ import {createRoot} from 'react-dom/client'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
+import {SETTING_MESSAGES} from '@canvas/assignments/react/hooks/useSettingDependency'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
 // Mock the horizon utils module
@@ -263,6 +264,92 @@ describe('EditView - Peer Reviews and Configuration Tools', () => {
       const view = createEditView()
       view.$el.appendTo($('#fixtures'))
       expect(view.$('#intra_group_peer_reviews').is(':visible')).toBeFalsy()
+    })
+
+    it('does not send re-enable postMessage from handleSubmissionTypeChange when feature flag is off', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+      const view = createEditView()
+      view.$el.appendTo($('#fixtures'))
+
+      const postMessageSpy = vi.spyOn(window.top, 'postMessage')
+      view.$submissionType.val('online')
+      view.handleSubmissionTypeChange()
+
+      const calls = postMessageSpy.mock.calls.filter(
+        call =>
+          call[0]?.subject === SETTING_MESSAGES.TOGGLE_PEER_REVIEWS && call[0]?.enabled === true,
+      )
+      expect(calls).toHaveLength(0)
+      postMessageSpy.mockRestore()
+    })
+
+    it('sends re-enable postMessage from handleSubmissionTypeChange when feature flag is on', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView()
+      view.$el.appendTo($('#fixtures'))
+
+      const postMessageSpy = vi.spyOn(window.top, 'postMessage')
+      view.$submissionType.val('online')
+      view.$('#assignment_grading_type').val('points')
+      view.handleSubmissionTypeChange()
+
+      expect(postMessageSpy).toHaveBeenCalledWith(
+        {subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, enabled: true},
+        '*',
+      )
+      postMessageSpy.mockRestore()
+    })
+  })
+
+  describe('External Tool and Peer Review Helpers', () => {
+    describe('#isExternalToolSubmissionType', () => {
+      it('returns true when submission type is external_tool', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$submissionType.val('external_tool')
+        expect(view.isExternalToolSubmissionType()).toBe(true)
+      })
+
+      it('returns false when submission type is online', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$submissionType.val('online')
+        expect(view.isExternalToolSubmissionType()).toBe(false)
+      })
+    })
+
+    describe('#canEnablePeerReviews', () => {
+      it('returns false when moderated grading is enabled', () => {
+        const view = createEditView({moderated_grading: true})
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('points')
+        view.$submissionType.val('online')
+        expect(view.canEnablePeerReviews()).toBe(false)
+      })
+
+      it('returns false when grading type is not_graded', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('not_graded')
+        view.$submissionType.val('online')
+        expect(view.canEnablePeerReviews()).toBe(false)
+      })
+
+      it('returns false when submission type is external_tool', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('points')
+        view.$submissionType.val('external_tool')
+        expect(view.canEnablePeerReviews()).toBe(false)
+      })
+
+      it('returns true when none of the blocking conditions are met', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('points')
+        view.$submissionType.val('online')
+        expect(view.canEnablePeerReviews()).toBe(true)
+      })
     })
   })
 

@@ -30,8 +30,8 @@ RSpec.describe RSpec::SkipTrackerFormatter do
 
   # Helper to create a mock example
   def create_example(description:, location:, pending_message:, metadata: {})
-    execution_result = double(
-      "ExecutionResult",
+    execution_result = instance_double(
+      RSpec::Core::Example::ExecutionResult,
       status: :pending,
       pending_message:,
       pending_fixed: false
@@ -50,8 +50,8 @@ RSpec.describe RSpec::SkipTrackerFormatter do
       }
     }
 
-    double(
-      "Example",
+    instance_double(
+      RSpec::Core::Example,
       full_description: description,
       location:,
       execution_result:,
@@ -61,13 +61,13 @@ RSpec.describe RSpec::SkipTrackerFormatter do
 
   # Helper to create a notification
   def create_notification(example)
-    double("Notification", example:)
+    instance_double(RSpec::Core::Notifications::ExampleNotification, example:)
   end
 
   # Helper to create summary notification
   def create_summary_notification(example_count: 10, failed_examples: [])
-    double(
-      "SummaryNotification",
+    instance_double(
+      RSpec::Core::Notifications::SummaryNotification,
       example_count:,
       failed_examples:
     )
@@ -366,6 +366,41 @@ RSpec.describe RSpec::SkipTrackerFormatter do
         expect(result[:pending].pluck(:description)).to include("Existing test", "New test")
 
         ENV.delete("RSPEC_SKIP_TRACKER_OUTPUT")
+      end
+    end
+
+    context "close behavior" do
+      it "does not close the inner IO when output is an OutputWrapper" do
+        inner = StringIO.new
+        wrapper = RSpec::Core::OutputWrapper.new(inner)
+        f = described_class.new(wrapper)
+        f.dump_summary(create_summary_notification)
+        f.close(nil)
+        expect(inner).not_to be_closed
+      end
+
+      it "closes the File handle after writing" do
+        temp = Tempfile.new(["close_test", ".json"])
+        ENV["RSPEC_SKIP_TRACKER_OUTPUT"] = temp.path
+        f = described_class.new(StringIO.new)
+        f.dump_summary(create_summary_notification)
+        f.close(nil)
+        expect(f.output).to be_closed
+      ensure
+        ENV.delete("RSPEC_SKIP_TRACKER_OUTPUT")
+        temp.unlink
+      end
+
+      it "can be called twice without raising IOError" do
+        temp = Tempfile.new(["idempotent_test", ".json"])
+        ENV["RSPEC_SKIP_TRACKER_OUTPUT"] = temp.path
+        f = described_class.new(StringIO.new)
+        f.dump_summary(create_summary_notification)
+        f.close(nil)
+        expect { f.close(nil) }.not_to raise_error
+      ensure
+        ENV.delete("RSPEC_SKIP_TRACKER_OUTPUT")
+        temp.unlink
       end
     end
 

@@ -26,8 +26,8 @@ describe "BigBlueButton conferences" do
   include ConferencesCommon
   include WebMock::API
 
-  bbb_endpoint = "bbb.blah.com"
-  bbb_secret = "mock-secret"
+  let(:bbb_endpoint) { "bbb.blah.com" }
+  let(:bbb_secret) { "mock-secret" }
 
   before(:once) do
     initialize_big_blue_button_conference_plugin bbb_endpoint, bbb_secret

@@ -141,7 +141,7 @@ module Canvas::OAuth
 
       it "sets token to expire if the key is set to expire" do
         allow(key).to receive(:mobile_app?).and_return(true)
-        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 30 }))
+        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: { mobile_timeout: 30 }))
         expect(token.access_token.permanent_expires_at).not_to be_nil
       end
     end
@@ -275,12 +275,12 @@ module Canvas::OAuth
 
     describe ".generate_code_for" do
       let(:code) { "brand_new_code" }
-      let(:redis) { double(setex: true) }
+      let(:redis) { instance_double(Redis, setex: true) }
 
       before { allow(SecureRandom).to receive_messages(hex: code) }
 
       it "returns the new code" do
-        allow(Canvas).to receive_messages(redis: double(setex: true))
+        allow(Canvas).to receive_messages(redis: instance_double(Redis, setex: true))
         expect(Token.generate_code_for(1, 2, 3)).to eq code
       end
 

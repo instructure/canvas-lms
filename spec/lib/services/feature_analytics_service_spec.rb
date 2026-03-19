@@ -22,7 +22,7 @@ module Services
   describe FeatureAnalyticsService do
     context "message delivery" do
       before do
-        @client = double("sqs client")
+        @client = instance_double(Aws::SQS::Client)
         @config = {
           "queue_url" => "http://queue.url"
         }

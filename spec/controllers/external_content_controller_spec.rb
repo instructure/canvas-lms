@@ -179,7 +179,7 @@ describe ExternalContentController do
 
         context "when returning from a non-internal service" do
           it "does not set the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
-            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, overwrite: true)
             subject
           end
         end
@@ -193,7 +193,7 @@ describe ExternalContentController do
           it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
             allow(controller).to receive(:js_env)
             subject
-            expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+            expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, overwrite: true)
           end
 
           context "when the tool has a domain and not a url" do
@@ -212,7 +212,7 @@ describe ExternalContentController do
             it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
               allow(controller).to receive(:js_env)
               subject
-              expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "https://test.com" }, true)
+              expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "https://test.com" }, overwrite: true)
             end
           end
         end
@@ -418,7 +418,7 @@ describe ExternalContentController do
     let(:expected_oembed_uri) { "#{endpoint}&url=#{CGI.escape(url)}&format=json" }
     let(:oembed_token) { "" }
     let(:params) { { endpoint:, url: } }
-    let(:success_double) { double("success", body: oembed_resource.to_json) }
+    let(:success_double) { instance_double(Net::HTTPSuccess, body: oembed_resource.to_json) }
     let(:tool) { external_tool_model }
     let(:url) { "https://www.test.edu/new_actionicons/oembed-endpoint" }
     let(:user) { user_model }

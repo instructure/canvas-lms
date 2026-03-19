@@ -1712,7 +1712,7 @@ describe Enrollment do
         end
       end
 
-      def course_section_availability_test(should_be_invited = false)
+      def course_section_availability_test(should_be_invited: false)
         @section = @course.course_sections.first
         expect(@section).not_to be_nil
         @enrollment.course_section = @section
@@ -1947,7 +1947,7 @@ describe Enrollment do
         end
 
         it "accepts into the right state based on availability dates on course_section" do
-          course_section_availability_test(true)
+          course_section_availability_test(should_be_invited: true)
         end
 
         it "accepts into the right state based on availability dates on course" do
@@ -3331,8 +3331,8 @@ describe Enrollment do
 
   describe "#can_be_deleted_by" do
     describe "on a student enrollment" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
+      let(:user) { instance_double(User, id: 42) }
+      let(:session) { instance_double(ActionDispatch::Request::Session) }
 
       before do
         course_with_student
@@ -3367,8 +3367,8 @@ describe Enrollment do
     end
 
     describe "on an observer enrollment" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
+      let(:user) { instance_double(User, id: 42) }
+      let(:session) { instance_double(ActionDispatch::Request::Session) }
 
       before do
         course_with_observer
@@ -3394,8 +3394,8 @@ describe Enrollment do
     end
 
     describe "on a teacher enrollment" do
-      let(:user) { double(id: 42) }
-      let(:session) { double }
+      let(:user) { instance_double(User, id: 42) }
+      let(:session) { instance_double(ActionDispatch::Request::Session) }
 
       before do
         course_with_teacher

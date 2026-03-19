@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {View} from '@instructure/ui-view'
@@ -60,6 +61,7 @@ import {EditConfirmModal} from '../RubricAssignment/components/EditConfirmModal'
 import {SaveRubricConfirmationModal} from './components/SaveRubricConfirmationModal'
 import {AssignmentPointsDifferenceModal} from './components/AssignmentPointsDifferenceModal'
 import {useGenerateCriteria} from './hooks/useGenerateCriteria'
+import {RubricGenericErrorPage} from './components/RubricGenericErrorPage'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -83,6 +85,7 @@ export type RubricFormComponentProp = {
   rubric?: Rubric
   rubricAssociation?: RubricAssociation
   showAdditionalOptions?: boolean
+  canUseForGrading?: boolean
   onLoadRubric?: (rubricTitle: string) => void
   onSaveRubric: (savedRubricResponse: SaveRubricResponse, updatePointsPossible?: boolean) => void
   onCancel: () => void
@@ -102,6 +105,7 @@ export const RubricForm = ({
   rubric,
   rubricAssociation,
   showAdditionalOptions = false,
+  canUseForGrading = true,
   onLoadRubric,
   onSaveRubric,
   onCancel,
@@ -170,6 +174,9 @@ export const RubricForm = ({
   )
 
   const isAIRubricsAvailable = aiRubricsEnabled && isNewRubric && hasAssignment
+  const canRegenerate = useMemo(() => {
+    return isAIRubricsAvailable && rubricForm.criteria.some(c => !c.learningOutcomeId)
+  }, [isAIRubricsAvailable, rubricForm.criteria])
 
   const {generateCriteriaIsPending, generateCriteriaIsSuccess, generateCriteriaMutation} =
     useGenerateCriteria({
@@ -193,11 +200,11 @@ export const RubricForm = ({
     })
 
   const header = isNewRubric ? I18n.t('Create New Rubric') : I18n.t('Edit Rubric')
-  const queryKey = ['fetch-rubric', rubricId ?? '']
+  const queryKey = ['fetch-rubric', rubricId ?? '', accountId ?? '', courseId ?? '']
   const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
-  const criteriaBeingGenerated = generateCriteriaIsPending || regenerateCriteriaIsPending
+  const criteriaBeingGenerated = (generateCriteriaIsPending || regenerateCriteriaIsPending) ?? false
 
-  const {data, isLoading} = useQuery({
+  const {data, isLoading, isError, error, isSuccess} = useQuery({
     queryKey,
     queryFn: fetchRubric,
     enabled: !!rubricId && canManageRubrics && !rubric,
@@ -362,6 +369,14 @@ export const RubricForm = ({
     return <LoadingIndicator />
   }
 
+  if (!isLoading && isError && error && !!rubricId) {
+    return <RubricGenericErrorPage />
+  }
+
+  if (isSuccess && !data && !!rubricId) {
+    return <NotFoundArtwork />
+  }
+
   return (
     <View as="div" margin="0 0 medium 0" overflowY="hidden" overflowX="hidden" padding="large">
       <Flex as="div" direction="column" style={{minHeight: '100%'}}>
@@ -402,6 +417,7 @@ export const RubricForm = ({
               hidePoints={rubricForm.hidePoints}
               useForGrading={rubricForm.useForGrading}
               hideScoreTotal={rubricForm.hideScoreTotal}
+              canUseForGrading={canUseForGrading}
               setRubricFormField={setRubricFormField}
             />
           )}
@@ -429,6 +445,7 @@ export const RubricForm = ({
               aiFeedbackLink={window.ENV.AI_FEEDBACK_LINK}
               onRegenerateAll={regenerateAllCriteria}
               isGenerating={criteriaBeingGenerated}
+              canRegenerate={canRegenerate}
             />
           )}
         </Flex.Item>
@@ -447,6 +464,7 @@ export const RubricForm = ({
           openCriterionModal={openCriterionModal}
           openOutcomeDialog={openOutcomeDialog}
           onRegenerateCriterion={regenerateSingleCriterion}
+          isAIRubricsAvailable={isAIRubricsAvailable}
           isGenerating={criteriaBeingGenerated}
           showCriteriaRegeneration={isAIRubricsAvailable}
         />
@@ -463,7 +481,12 @@ export const RubricForm = ({
         handleSave={() => {
           if (rubric && hasAssignment && isAssignmentPointsDifferent) {
             setIsAssignmentPointsDifferenceModalOpen(true)
-          } else if (rubric && hasAssignment && hasRubricChanged(rubricForm, rubric)) {
+          } else if (
+            rubric &&
+            hasAssignment &&
+            hasRubricChanged(rubricForm, rubric) &&
+            !rubricForm.unassessed
+          ) {
             setIsEditConfirmModalOpen(true)
           } else if (rubricForm.unassessed) {
             handleSave()

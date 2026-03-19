@@ -154,7 +154,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup()
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     expect(result.current.data).toHaveLength(2)
@@ -189,7 +189,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup({}, {filter: 'unread'})
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     cleanup()
@@ -207,7 +207,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup({}, {filter: 'all'})
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     cleanup()
@@ -217,7 +217,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup({}, {filter: 'all'})
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     expect(result.current.data).toHaveLength(2)
@@ -246,7 +246,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup()
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     expect(result.current.data).toEqual([])
@@ -266,10 +266,8 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup()
 
     await waitFor(() => {
-      expect(result.current.isError).toBe(true)
+      expect(result.current.error).toBeTruthy()
     })
-
-    expect(result.current.error).toBeTruthy()
 
     cleanup()
     consoleError.mockRestore()
@@ -279,7 +277,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup()
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     expect(result.current.data?.[0].messagePreview).toBe('This is a test message')
@@ -342,7 +340,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup()
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     expect(result.current.data?.[0].messagePreview).toHaveLength(83)
@@ -355,7 +353,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup({current_user_id: undefined})
 
     expect(result.current.data).toBeUndefined()
-    expect(result.current.isPending).toBe(true)
+    expect(result.current.isLoading).toBe(false)
 
     cleanup()
   })
@@ -405,7 +403,7 @@ describe('useInboxMessages', () => {
     const {result, cleanup} = setup()
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toBeDefined()
     })
 
     expect(result.current.data?.[0].subject).toBe('(No subject)')

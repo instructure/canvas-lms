@@ -2495,6 +2495,7 @@ uk:
       graded_quiz: "Контрольну роботу оцінено"
       graded_survey: "Огляд оцінено"
       ungraded_survey: "Неоцінене Опитування"
+  assignment_rubric_details_1b6723b2: "Вказати подробиці для категорії"
   assignment_selection_6bff05c4: "Вибір завдання"
   assignment_title_82b4422e: "Назва завдання:"
   assignment_title_8a707dd2: "назва завдання"
@@ -5382,6 +5383,7 @@ uk:
   course_groups_e8239a1e: "Групи курсу"
   course_home_4c4c0107: "Домівка курсу"
   course_home_sub_navigation_b1ee6b03: "Домашні додаткова навігація курсу"
+  course_id_33633604: "Ідентифікатор курсу:"
   course_id_8bd2a21c: "ID курсу"
   course_id_a7c924d5: "ідентифікатор курса"
   course_id_b0bc82d4: "Ідентифікатор курсу"
@@ -9398,6 +9400,7 @@ uk:
     lock_module_until: "Заблоковано до"
   language_6b3e2c7c: Мова
   last_activity_a983e541: "Остання активність"
+  last_e159dbd: Останній
   last_enrollment_activity_10fe15ba: "Остання активність реєстрації"
   last_error_a3832668: "Остання помилка"
   last_export_899a04c5: "Останній експорт:"

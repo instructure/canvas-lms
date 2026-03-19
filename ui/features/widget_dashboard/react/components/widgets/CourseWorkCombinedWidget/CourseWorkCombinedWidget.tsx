@@ -76,6 +76,7 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
     resetPagination,
     refetch,
     isLoading: courseWorkLoading,
+    isPaginationLoading: courseWorkPaginationLoading,
     error: courseWorkError,
   } = useCourseWorkPaginated({
     pageSize,
@@ -133,8 +134,11 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
         currentPage: currentPageIndex + 1,
         totalPages,
         onPageChange: goToPage,
-        isLoading: courseWorkLoading,
         ariaLabel: I18n.t('Course work pagination'),
+      }}
+      loadingOverlay={{
+        isLoading: courseWorkPaginationLoading,
+        ariaLabel: I18n.t('Loading course work'),
       }}
     >
       <Flex direction="column" gap="small" height="100%">

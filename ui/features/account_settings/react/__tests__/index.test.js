@@ -16,9 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {start} from '../index'
 
+const server = setupServer(
+  http.get('/api/v1/accounts/1/csp_settings', () =>
+    HttpResponse.json({
+      enabled: false,
+      inherited: false,
+      effective_whitelist: [],
+      current_account_whitelist: [],
+      tools_whitelist: {},
+    }),
+  ),
+)
+
 describe('start', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   beforeEach(() => {
     window.ENV = {
       ACCOUNT: {id: '1234'},
@@ -26,7 +44,7 @@ describe('start', () => {
   })
 
   afterEach(() => {
-    document.getElementById('fixtures').remove()
+    document.getElementById('fixtures')?.remove()
   })
 
   it('renders without errors', () => {
@@ -34,18 +52,8 @@ describe('start', () => {
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
 
-    const fakeAxios = {
-      put: vi.fn(() => ({then() {}})),
-      get: vi.fn(() => ({then() {}})),
-    }
-
     expect(() => {
-      start(fixtures, {
-        context: 'account',
-        contextId: '1',
-        api: fakeAxios,
-        liveRegion: [],
-      })
+      start(fixtures, {context: 'account', contextId: '1'})
     }).not.toThrow()
   })
 })

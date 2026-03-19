@@ -21,7 +21,7 @@
 describe Quizzes::QuizUserFinder do
   before :once do
     course_with_teacher(course: @course, active_all: true)
-    course_quiz(true)
+    course_quiz(active: true)
     course_with_student(active_all: true, course: @course)
     @submitted_student = @student
     course_with_student(active_all: true, course: @course)

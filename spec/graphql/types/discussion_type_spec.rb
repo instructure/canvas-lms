@@ -1189,9 +1189,7 @@ describe Types::DiscussionType do
       expect(discussion_type.resolve("author { htmlUrl }")).to end_with("/groups/#{@group.id}/users/#{@group_teacher.id}")
       entries_url = discussion_type.resolve("discussionEntriesConnection { nodes { author { htmlUrl }}}")
 
-      entries_url.each do |entry|
-        expect(entry).to end_with("/groups/#{@group.id}/users/#{@group_student.id}")
-      end
+      expect(entries_url).to all(end_with("/groups/#{@group.id}/users/#{@group_student.id}"))
     end
   end
 

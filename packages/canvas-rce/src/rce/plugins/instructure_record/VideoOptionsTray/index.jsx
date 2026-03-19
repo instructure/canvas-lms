@@ -15,44 +15,54 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect, useCallback} from 'react'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+
+import {ClosedCaptionPanel, ClosedCaptionPanelV2, CONSTANTS} from '@instructure/canvas-media'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {TextArea} from '@instructure/ui-text-area'
-import {Text} from '@instructure/ui-text'
-import {IconQuestionLine} from '@instructure/ui-icons'
+import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {IconQuestionLine} from '@instructure/ui-icons'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
+import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
-import {StoreProvider} from '../../shared/StoreContext'
-import {ClosedCaptionPanel} from '@instructure/canvas-media'
+import {View} from '@instructure/ui-view'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import React, {useCallback, useEffect, useState} from 'react'
+import Bridge from '../../../../bridge'
+import formatMessage from '../../../../format-message'
+import RCEGlobals from '../../../../rce/RCEGlobals'
+import RceApiSource, {originFromHost} from '../../../../rcs/api'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {
   CUSTOM,
-  MIN_WIDTH_VIDEO,
-  MIN_PERCENTAGE,
-  videoSizes,
-  studioPlayerSizes,
   labelForImageSize,
-  scaleVideoSize,
-  scaleToSize,
-  MIN_WIDTH_STUDIO_PLAYER,
   MIN_HEIGHT_STUDIO_PLAYER,
+  MIN_PERCENTAGE,
+  MIN_WIDTH_STUDIO_PLAYER,
+  MIN_WIDTH_VIDEO,
+  scaleToSize,
+  scaleVideoSize,
+  studioPlayerSizes,
+  videoSizes,
 } from '../../instructure_image/ImageEmbedOptions'
-import Bridge from '../../../../bridge'
-import RceApiSource from '../../../../rcs/api'
-import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
-import {getTrayHeight} from '../../shared/trayUtils'
-import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
+import {StoreProvider} from '../../shared/StoreContext'
 import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
-import RCEGlobals from '../../../../rce/RCEGlobals'
-import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
+import {getTrayHeight} from '../../shared/trayUtils'
+import {
+  getPlayerLayoutSizes,
+  labelForPlayerLayoutSize,
+  playerLayoutDimensions,
+  scalePlayerLayoutForHeight,
+  scalePlayerLayoutForWidth,
+  SMALL,
+} from '../playerLayoutOptions'
+
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
 function mapStudioEmbedOptions(embedOptions) {
@@ -76,24 +86,43 @@ export default function VideoOptionsTray({
   studioOptions = null,
   forBlockEditorUse = false,
   onStudioEmbedOptionChanged = () => {},
+  onCaptionsModified = null,
+  isLoading = false,
 }) {
   const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
+  const isAsrCaptioningImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
   const [titleText, setTitleText] = useState(videoOptions.titleText)
   const [displayAs, setDisplayAs] = useState('embed')
-  const [videoSize, setVideoSize] = useState(videoOptions.videoSize)
+  const [videoSize, setVideoSize] = useState(() => {
+    if (isAsrCaptioningImprovements) {
+      const match = Object.entries(playerLayoutDimensions).find(
+        ([, dims]) => dims.width === videoOptions.appliedWidth,
+      )
+      if (match) return match[0]
+    }
+    return videoOptions.videoSize
+  })
   const [videoHeight, setVideoHeight] = useState(currentHeight)
   const [videoWidth, setVideoWidth] = useState(currentWidth)
   const [subtitles, setSubtitles] = useState(videoOptions.tracks || [])
-  const [minWidth] = useState(isConsolidatedMediaPlayer ? MIN_WIDTH_STUDIO_PLAYER : MIN_WIDTH_VIDEO)
-  const [minHeight] = useState(
-    isConsolidatedMediaPlayer
+  const [minWidth] = useState(() => {
+    if (isAsrCaptioningImprovements) {
+      return playerLayoutDimensions[SMALL].width
+    }
+    return isConsolidatedMediaPlayer ? MIN_WIDTH_STUDIO_PLAYER : MIN_WIDTH_VIDEO
+  })
+  const [minHeight] = useState(() => {
+    if (isAsrCaptioningImprovements) {
+      return playerLayoutDimensions[SMALL].height
+    }
+    return isConsolidatedMediaPlayer
       ? MIN_HEIGHT_STUDIO_PLAYER
-      : Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO),
-  )
+      : Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO)
+  })
   const [minPercentage] = useState(MIN_PERCENTAGE)
   const [editLocked, setEditLocked] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -105,9 +134,19 @@ export default function VideoOptionsTray({
   const isStudio = !!studioOptions
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
   const showSizeControls = (!isStudio || studioOptions.resizable) && !forBlockEditorUse
-  const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth, minPercentage})
+  const dimensionsState = useDimensionsState(
+    videoOptions,
+    {minHeight, minWidth, minPercentage},
+    isAsrCaptioningImprovements
+      ? {scaleFns: {width: scalePlayerLayoutForWidth, height: scalePlayerLayoutForHeight}}
+      : {},
+  )
   const api = new RceApiSource(trayProps)
-  const videoSizeOptions = isConsolidatedMediaPlayer ? studioPlayerSizes : videoSizes
+  const videoSizeOptions = isConsolidatedMediaPlayer
+    ? isAsrCaptioningImprovements
+      ? getPlayerLayoutSizes(isStudio)
+      : studioPlayerSizes
+    : videoSizes
 
   useEffect(() => {
     if (videoOptions.attachmentId) {
@@ -126,8 +165,10 @@ export default function VideoOptionsTray({
   }, [videoOptions.attachmentId])
 
   useEffect(() => {
-    if (subtitles.length === 0) requestSubtitlesFromIframe(setSubtitles)
-  }, [])
+    if (!isLoading && subtitles.length === 0) {
+      requestSubtitlesFromIframe(setSubtitles)
+    }
+  }, [isLoading, subtitles.length, requestSubtitlesFromIframe])
 
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
@@ -143,6 +184,10 @@ export default function VideoOptionsTray({
     if (selectedOption.value === CUSTOM) {
       setVideoHeight(currentHeight)
       setVideoWidth(currentWidth)
+    } else if (isAsrCaptioningImprovements) {
+      const {width, height} = playerLayoutDimensions[selectedOption.value]
+      setVideoHeight(height)
+      setVideoWidth(width)
     } else {
       const {height, width} = isConsolidatedMediaPlayer
         ? scaleVideoSize(selectedOption.value, naturalWidth, naturalHeight)
@@ -216,7 +261,7 @@ export default function VideoOptionsTray({
     </Flex>
   )
   const messagesForSize = []
-  if (videoSize !== CUSTOM) {
+  if (videoSize !== CUSTOM && !isAsrCaptioningImprovements) {
     messagesForSize.push({
       text: formatMessage('{width} x {height}px', {height: videoHeight, width: videoWidth}),
       type: 'hint',
@@ -267,7 +312,7 @@ export default function VideoOptionsTray({
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            {loading && videoOptions.attachmentId ? (
+            {(loading && videoOptions.attachmentId) || isLoading ? (
               <Flex.Item textAlign="center" margin="xx-large" padding="xx-large">
                 <Spinner renderTitle={formatMessage('Loading')} />
               </Flex.Item>
@@ -322,7 +367,11 @@ export default function VideoOptionsTray({
                               id={`${id}-size`}
                               mountNode={instuiPopupMountNodeFn}
                               disabled={displayAs !== 'embed'}
-                              renderLabel={formatMessage('Size')}
+                              renderLabel={
+                                isAsrCaptioningImprovements
+                                  ? formatMessage('Player layout')
+                                  : formatMessage('Size')
+                              }
                               messages={messagesForSize}
                               assistiveText={formatMessage('Use arrow keys to navigate options.')}
                               onChange={handleVideoSizeChange}
@@ -334,7 +383,9 @@ export default function VideoOptionsTray({
                                   key={size}
                                   value={size}
                                 >
-                                  {labelForImageSize(size)}
+                                  {isAsrCaptioningImprovements
+                                    ? labelForPlayerLayoutSize(size)
+                                    : labelForImageSize(size)}
                                 </SimpleSelect.Option>
                               ))}
                             </SimpleSelect>
@@ -348,6 +399,13 @@ export default function VideoOptionsTray({
                                 minWidth={minWidth}
                                 minPercentage={minPercentage}
                                 hidePercentage={true}
+                                additionalHintText={
+                                  isAsrCaptioningImprovements
+                                    ? formatMessage(
+                                        'Transcript panel is available at widths above 720px.',
+                                      )
+                                    : undefined
+                                }
                               />
                             </View>
                           )}
@@ -355,19 +413,64 @@ export default function VideoOptionsTray({
                       )}
                       {!isStudio && !editLocked && (
                         <Flex.Item padding="small">
-                          <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                            <ClosedCaptionPanel
-                              subtitles={subtitles.map(st => ({
-                                locale: st.locale,
-                                inherited: st.inherited,
-                                file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
-                              }))}
-                              uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                              userLocale={Bridge.userLocale}
-                              updateSubtitles={handleUpdateSubtitles}
-                              liveRegion={getLiveRegion}
-                              mountNode={instuiPopupMountNodeFn}
-                            />
+                          <FormFieldGroup
+                            description={
+                              isAsrCaptioningImprovements
+                                ? formatMessage('Caption Manager')
+                                : formatMessage('Closed Captions/Subtitles')
+                            }
+                          >
+                            {!isAsrCaptioningImprovements && (
+                              <ClosedCaptionPanel
+                                key={subtitles.reduce((acc, track) => acc + track.locale, '')}
+                                subtitles={subtitles.map(st => ({
+                                  locale: st.locale,
+                                  inherited: st.inherited,
+                                  file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
+                                }))}
+                                uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                                userLocale={Bridge.userLocale}
+                                updateSubtitles={handleUpdateSubtitles}
+                                liveRegion={getLiveRegion}
+                                mountNode={instuiPopupMountNodeFn}
+                              />
+                            )}
+                            {isAsrCaptioningImprovements && (
+                              <ClosedCaptionPanelV2
+                                subtitles={subtitles.map(st => ({
+                                  locale: st.locale,
+                                  inherited: st.inherited,
+                                  file: {name: st.language || st.locale},
+                                  asr: Boolean(st.asr),
+                                }))}
+                                uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                                userLocale={Bridge.userLocale}
+                                onUpdateSubtitles={handleUpdateSubtitles}
+                                liveRegion={getLiveRegion}
+                                mountNode={instuiPopupMountNodeFn}
+                                uploadConfig={{
+                                  mediaObjectId: videoOptions.id,
+                                  attachmentId: videoOptions.attachmentId,
+                                  origin: originFromHost(api.host),
+                                  headers: api.jwt
+                                    ? {Authorization: `Bearer ${api.jwt}`}
+                                    : undefined,
+                                  maxBytes: CONSTANTS.CC_FILE_MAX_BYTES,
+                                }}
+                                onCaptionUploaded={subtitle => {
+                                  // Update local state so "Done" button knows about it
+                                  setSubtitles(prev => [
+                                    ...prev.filter(s => s.locale !== subtitle.locale),
+                                    subtitle,
+                                  ])
+                                  onCaptionsModified?.()
+                                }}
+                                onCaptionDeleted={locale => {
+                                  setSubtitles(prev => prev.filter(s => s.locale !== locale))
+                                  onCaptionsModified?.()
+                                }}
+                              />
+                            )}
                           </FormFieldGroup>
                         </Flex.Item>
                       )}
@@ -455,4 +558,6 @@ VideoOptionsTray.propTypes = {
   studioOptions: parsedStudioOptionsPropType,
   requestSubtitlesFromIframe: func,
   onStudioEmbedOptionChanged: func,
+  onCaptionsModified: func,
+  isLoading: bool,
 }

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
 import {svgUrl} from '@canvas/outcomes/react/utils/icons'
 import {Outcome, Rating} from '@canvas/outcomes/react/types/rollup'
@@ -25,6 +25,12 @@ import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 
 vi.mock('@canvas/outcomes/react/utils/icons', () => ({
   svgUrl: vi.fn(() => 'http://test.com'),
+}))
+
+vi.mock('@canvas/svg-wrapper', () => ({
+  default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
+    <svg aria-label={ariaLabel} aria-hidden={ariaHidden} data-testid="mock-svg" />
+  ),
 }))
 
 describe('StudentOutcomeScore', () => {
@@ -83,24 +89,17 @@ describe('StudentOutcomeScore', () => {
     expect(svgUrl).toHaveBeenCalledWith(3, 5)
   })
 
-  it('renders ScreenReaderContent with the rating description', () => {
-    const {getByText} = render(<StudentOutcomeScore {...defaultProps()} />)
-    expect(getByText('great!')).toBeInTheDocument()
+  it('renders ScreenReaderContent with the rating description', async () => {
+    render(<StudentOutcomeScore {...defaultProps()} />)
+    expect(await screen.findByLabelText('great!')).toBeInTheDocument()
   })
 
-  it('renders ScreenReaderContent with "Unassessed" if there is no score', () => {
-    const {getByText} = render(<StudentOutcomeScore {...defaultProps({score: undefined})} />)
-    expect(getByText('Unassessed')).toBeInTheDocument()
+  it('renders ScreenReaderContent with "Unassessed" if there is no score', async () => {
+    render(<StudentOutcomeScore {...defaultProps({score: undefined})} />)
+    expect(await screen.findByLabelText('Unassessed')).toBeInTheDocument()
   })
 
   describe('scoreDisplayFormat', () => {
-    it('renders only ScreenReaderContent with ICON_ONLY format (default)', () => {
-      const {getByText} = render(<StudentOutcomeScore {...defaultProps()} />)
-      const srContent = getByText('great!')
-      expect(srContent).toBeInTheDocument()
-      expect(srContent.closest('[class*="screenReaderContent"]')).toBeInTheDocument()
-    })
-
     it('renders visible text with rating description when ICON_AND_LABEL format is used', () => {
       const {getByText} = render(
         <StudentOutcomeScore

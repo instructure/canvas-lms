@@ -40,7 +40,7 @@ ENV["RAILS_ENV"] = "test"
 if ENV["COVERAGE"] == "1" && (ENV["SUPPRESS_OUTPUT"] != "1")
   require_relative("canvas_simplecov")
   require_relative("coverage_tool")
-  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1"
+  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
   CoverageTool.start("RSpec")
 end
 
@@ -62,7 +62,7 @@ if ENV["CRYSTALBALL_MAP"] == "1"
         end
 
         def call(example_map, example)
-          puts "Calling Coverage Strategy for #{example.inspect}"
+          puts "Calling Coverage Strategy for #{example.inspect}" # rubocop:disable RSpec/Output
           before = Coverage.peek_result
           yield example_map, example
           after = Coverage.peek_result
@@ -263,10 +263,12 @@ module ReadOnlySecondaryStub
     if readonly_user_exists? && readonly_user_can_read?
       ActiveRecord::Base.connection.execute((env == :secondary) ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
     else
-      puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
-      puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"
-      puts "psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}"
-      puts "RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306"
+      warn <<~TEXT
+        The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following.
+        psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}
+        psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}
+        RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306
+      TEXT
     end
   end
 
@@ -331,8 +333,8 @@ module RenderWithHelpers
 
       controller_class._helper_methods.each do |helper|
         class_eval <<~RUBY, __FILE__, __LINE__ + 1
-          def #{helper}(*args, **kwargs, &block)
-            real_controller.send(:#{helper}, *args, **kwargs, &block)
+          def #{helper}(...)
+            real_controller.send(:#{helper}, ...)
           end
         RUBY
       end
@@ -549,10 +551,36 @@ RSpec.configure do |config|
     use_transactional_tests
   end
 
+  config.after(:context) do
+    non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
+    next if non_empty_tables.empty?
+
+    message = "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}"
+    non_empty_tables.each do |table|
+      model = ActiveRecord::Base.descendants.find { |m| m.table_name == table }
+      records = model.limit(5).to_a
+      count = model.count
+
+      message += records.map do |record|
+        "\n  #{record.inspect}"
+      end.join
+
+      if count > 5
+        message += "\n ... #{count - 5} more #{model.name} records"
+      end
+    end
+
+    # If you're seeing this error, your spec has left extra data around.
+    # The test database should be completely empty after migrations run
+    # with the exception of the core tables mentioned in the method above,
+    # and a single row in the accounts table for the dummy root account.
+    raise message
+  end
+
   config.before :suite do
     if ENV["COVERAGE"] == "1"
       simple_cov_cmd = "rspec:#{Process.pid}"
-      puts "Starting SimpleCov command: #{simple_cov_cmd}"
+      puts "Starting SimpleCov command: #{simple_cov_cmd}" # rubocop:disable RSpec/Output
       SimpleCov.command_name(simple_cov_cmd)
       SimpleCov.pid = Process.pid # because https://github.com/colszowka/simplecov/pull/377
     end
@@ -645,7 +673,7 @@ RSpec.configure do |config|
          params: { "pseudonym_session[unique_id]" => username,
                    "pseudonym_session[password]" => password }
     follow_redirect! while response.redirect?
-    assert_response :success
+    expect(response).to have_http_status(:success)
     expect(request.fullpath).to eq "/?login_success=1"
   end
 
@@ -673,12 +701,12 @@ RSpec.configure do |config|
     end
   end
 
-  def fixture_file_upload(path, mime_type = nil, binary = false)
+  def fixture_file_upload(path, mime_type = nil, binary: false)
     Rack::Test::UploadedFile.new(file_fixture(path), mime_type, binary)
   end
 
   def default_uploaded_data
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def create_temp_dir!
@@ -766,10 +794,10 @@ RSpec.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = true)
+  def enable_forgery_protection
     old_value = ActionController::Base.allow_forgery_protection
-    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
-    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
+    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
+    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
 
     yield if block_given?
   ensure
@@ -998,7 +1026,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def consider_all_requests_local(value)

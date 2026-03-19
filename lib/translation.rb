@@ -16,9 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "aws-sdk-translate"
-require "nokogiri"
-
 module Translation
   class TranslationError < StandardError
   end
@@ -35,15 +32,6 @@ module Translation
   class ValidationError < TranslationError
   end
 
-  class CedarLimitReachedError < TranslationError
-  end
-
-  module TranslationType
-    AWS_TRANSLATE = :aws_translate
-    CEDAR = :cedar
-    DISABLED = nil
-  end
-
   module TranslationSlugs
     DEFAULT = "content-translation"
     INBOX = "inbox"
@@ -52,79 +40,110 @@ module Translation
   end
 
   class << self
-    # The languages are imported from https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
-    # TODO: Currently we don't support dialects(trim_locale function) because the currently implemented
-    # language detector supports dialects that the translator does not. Probably we should migrate to the
-    # automatic language detection that AWS translate provides but it needs additional discovery since
-    # it incurs cost and not necessarily available in all the regions.
-    # List of languages supported by our current detector: https://github.com/google/cld3
-    def languages(flags)
-      case current_translation_provider_type(flags)
-      when TranslationType::AWS_TRANSLATE
-        AwsTranslator.languages
-      when TranslationType::CEDAR
-        CedarTranslator.languages
-      else
-        []
-      end
+    def languages
+      [
+        { id: "ca", name: I18n.t("Catalan"), translated_to_name: I18n.t("Translated to Catalan") },
+        { id: "de", name: I18n.t("German"), translated_to_name: I18n.t("Translated to German") },
+        { id: "en", name: I18n.t("English"), translated_to_name: I18n.t("Translated to English") },
+        { id: "es", name: I18n.t("Spanish"), translated_to_name: I18n.t("Translated to Spanish") },
+        { id: "fr", name: I18n.t("French"), translated_to_name: I18n.t("Translated to French") },
+        { id: "nl", name: I18n.t("Dutch"), translated_to_name: I18n.t("Translated to Dutch") },
+        { id: "pt-BR", name: I18n.t("Portuguese (Brazil)"), translated_to_name: I18n.t("Translated to Portuguese (Brazil)") },
+        { id: "ru", name: I18n.t("Russian"), translated_to_name: I18n.t("Translated to Russian") },
+        { id: "sv", name: I18n.t("Swedish"), translated_to_name: I18n.t("Translated to Swedish") },
+        { id: "zh-Hans", name: I18n.t("Chinese (Simplified)"), translated_to_name: I18n.t("Translated to Chinese (Simplified)") },
+      ].sort_by { |language| Canvas::ICU.collation_key(language[:name]) }
     end
 
     delegate :logger, to: :Rails
 
-    def current_translation_provider_type(flags)
-      return nil unless flags.key?(:translation) && flags[:translation]
-
-      return TranslationType::AWS_TRANSLATE if flags[:ai_translation_improvements] && !flags[:cedar_translation]
-
-      TranslationType::CEDAR
+    def available?
+      CedarClient.enabled?
     end
 
-    def translation_client(flags)
-      @translation_client ||= begin
-        provider_type = current_translation_provider_type(flags)
-        case provider_type
-        when TranslationType::AWS_TRANSLATE
-          AwsTranslator.new
-        when TranslationType::CEDAR
-          CedarTranslator.new
-        else
-          nil
-        end
-      end
-    end
-
-    def available?(flags)
-      return false unless flags[:translation]
-
-      translation_client(flags)&.available? || false
-    end
-
-    def translate_text(text:, tgt_lang:, options: {}, flags: {})
-      return nil unless translation_client(flags)&.available?
+    def translate_text(text:, tgt_lang:, options: {})
+      return nil unless available?
+      return nil if tgt_lang.nil?
 
       unless options[:feature_slug] && TranslationSlugs::TYPES.include?(options[:feature_slug])
         options[:feature_slug] = TranslationSlugs::DEFAULT
       end
 
-      translation_client(flags).translate_text(text:, tgt_lang:, options:)
+      root_account_uuid = options[:root_account_uuid]
+      feature_slug = options.fetch(:feature_slug)
+      current_user = options.fetch(:current_user)
+
+      handle_cedar_errors do
+        translation_response = CedarClient.translate_text(
+          content: text,
+          target_language: tgt_lang,
+          feature_slug:,
+          root_account_uuid:,
+          current_user:
+        )
+
+        check_same_language(translation_response.source_language, tgt_lang)
+        collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type: feature_slug)
+        translation_response.translation
+      end
     end
 
-    def translate_html(html_string:, tgt_lang:, options: {}, flags: {})
-      return nil unless translation_client(flags)&.available?
+    def translate_html(html_string:, tgt_lang:, options: {})
+      return nil unless available?
+      return nil if tgt_lang.nil?
 
       unless options[:feature_slug] && TranslationSlugs::TYPES.include?(options[:feature_slug])
         options[:feature_slug] = TranslationSlugs::DEFAULT
       end
 
-      translation_client(flags).translate_html(html_string:, tgt_lang:, options:)
+      root_account_uuid = options[:root_account_uuid]
+      feature_slug = options.fetch(:feature_slug)
+      current_user = options.fetch(:current_user)
+
+      handle_cedar_errors do
+        translation_response = CedarClient.translate_html(
+          content: html_string,
+          target_language: tgt_lang,
+          feature_slug:,
+          root_account_uuid:,
+          current_user:
+        )
+
+        check_same_language(translation_response.source_language, tgt_lang)
+        collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type: feature_slug)
+        translation_response.translation
+      end
     end
 
-    def get_translation_flags(enabled, domain_root_account)
-      {
-        translation: enabled,
-        ai_translation_improvements: domain_root_account.feature_enabled?(:ai_translation_improvements),
-        cedar_translation: domain_root_account.feature_enabled?(:cedar_translation),
-      }
+    private
+
+    def check_same_language(source, target)
+      if source == target
+        InstStatsd::Statsd.distributed_increment("translation.errors", tags: ["error:same_language"])
+        raise Translation::SameLanguageTranslationError
+      end
+    end
+
+    def collect_translation_stats(src_lang:, tgt_lang:, type:)
+      tags = %W[type:#{type} source_language:#{src_lang} dest_language:#{tgt_lang}]
+      InstStatsd::Statsd.distributed_increment("translation.invocations", tags:)
+    end
+
+    def handle_cedar_errors
+      yield
+    rescue => e
+      case e.class.name
+      when /SameLanguageTranslationError/
+        raise SameLanguageTranslationError
+      when /ContentTooLongError/
+        raise TextTooLongError
+      when /UnsupportedLanguageError/
+        raise UnsupportedLanguageError
+      when /ValidationError/
+        raise ValidationError
+      else
+        raise TranslationError, e.message
+      end
     end
   end
 end

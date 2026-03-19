@@ -194,7 +194,9 @@ development:
       #     environment: "dev"
       #     feedback_url: "https://docs.google.com/forms/d/e/1FAIpQLScj-OKZVmsva-OE6T5rcvvm9fI6_eLtt2tk8pkgQ24DjSAPDQ/viewform"
       # new_quizzes.yml: |
-      #   launch_url: http://quizzes-ui-app.inseng.test:8082/none/remoteEntry.js
+      #   new_quizzes_cloudfront_host_production: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_cloudfront_host_beta: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_cloudfront_host_edge: http://quizzes-ui-app.inseng.test:8082
 
   store:
     canvas:

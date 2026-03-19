@@ -20,6 +20,7 @@ import {captureException} from '@sentry/browser'
 import {useEffect, useRef} from 'react'
 import {fetchNewQuizzesToken} from '../api/jwt'
 import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
+import {useModuleItemSequence} from '../hooks/useModuleItemSequence'
 
 interface RemoteModule {
   render?: (element: HTMLDivElement, props: any) => void
@@ -33,6 +34,12 @@ export function NewQuizzesApp() {
   const mountPoint = useRef<HTMLDivElement>(null)
   const quizzesData = ENV.NEW_QUIZZES
 
+  const courseId = quizzesData?.params?.custom_canvas_course_id?.toString()
+
+  // Only show module navigation when accessed from the modules tab.
+  const moduleItemId =
+    new URLSearchParams(window.location.search).get('module_item_id') ?? undefined
+  const moduleNavigation = useModuleItemSequence(courseId, moduleItemId)
   useEffect(() => {
     let unmount = () => {}
 
@@ -53,6 +60,7 @@ export function NewQuizzesApp() {
             themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES || null,
             basename,
             fetchToken: () => fetchNewQuizzesToken(accountId),
+            moduleNavigation,
           })
         } else {
           captureException(new Error('Remote module does not have a render function'))
@@ -70,7 +78,13 @@ export function NewQuizzesApp() {
     return () => {
       unmount()
     }
-  }, [quizzesData])
+  }, [quizzesData, moduleNavigation])
 
-  return <div id="root" ref={mountPoint} />
+  return (
+    <>
+      <div id="alertHolder" role="alert" aria-live="assertive" />
+      <div id="politeAlertHolder" role="alert" aria-live="polite" />
+      <div id="root" ref={mountPoint} />
+    </>
+  )
 }

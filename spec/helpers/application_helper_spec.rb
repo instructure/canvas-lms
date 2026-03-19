@@ -107,17 +107,17 @@ describe ApplicationHelper do
 
     describe "#context_sensitive_datetime_title" do
       it "produces a string showing the local time and the course time" do
-        context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"])
         expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am\""
       end
 
       it "only prints the text if just_text option passed" do
-        context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"])
         expect(context_sensitive_datetime_title(Time.zone.now, context, just_text: true)).to eq "Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am"
       end
 
       it "uses the simple title if theres no timezone difference" do
-        context = double(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
+        context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Anchorage"])
         expect(context_sensitive_datetime_title(Time.zone.now, context, just_text: true)).to eq "Mar 13 at 1:12am"
         expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at 1:12am\""
       end
@@ -128,14 +128,14 @@ describe ApplicationHelper do
 
       it "crosses date boundaries appropriately" do
         Timecop.freeze(Time.utc(2013, 3, 13, 7, 12)) do
-          context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
+          context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"])
           expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at 1:12am\""
         end
       end
     end
 
     describe "#friendly_datetime" do
-      let(:context) { double(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
+      let(:context) { instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"]) }
 
       it "spits out a friendly time tag" do
         tag = friendly_datetime(Time.zone.now)
@@ -637,7 +637,7 @@ describe ApplicationHelper do
   describe "UI path checking" do
     describe "#active_path?" do
       context "when the request path is the course show page" do
-        let(:request) { double("request", fullpath: "/courses/2") }
+        let(:request) { instance_double(ActionDispatch::Request, fullpath: "/courses/2") }
 
         it "returns true for paths that match" do
           expect(active_path?("/courses")).to be_truthy
@@ -653,7 +653,7 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the account external tools path" do
-        let(:request) { double("request", fullpath: "/accounts/2/external_tools/27") }
+        let(:request) { instance_double(ActionDispatch::Request, fullpath: "/accounts/2/external_tools/27") }
 
         before do
           @context = Account.default
@@ -666,7 +666,7 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the course external tools path" do
-        let(:request) { double("request", fullpath: "/courses/2/external_tools/27") }
+        let(:request) { instance_double(ActionDispatch::Request, fullpath: "/courses/2/external_tools/27") }
 
         before do
           @context = Account.default.courses.create!
@@ -992,7 +992,7 @@ describe ApplicationHelper do
     let(:host) { "test.host" }
 
     context "not on the files domain" do
-      let(:request) { double("request", host_with_port: host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: host) }
       let(:logged_in_user) { user_model }
 
       before do
@@ -1035,7 +1035,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { user_model }
       let(:current_host) { "non-files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates an authenticator for the logged in user" do
         expect(file_authenticator.user).to eql logged_in_user
@@ -1067,7 +1067,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { nil }
       let(:current_host) { "non-files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates a public authenticator" do
         expect(file_authenticator.user).to be_nil
@@ -1093,7 +1093,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { nil }
       let(:current_host) { "files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates an authenticator for the real access user" do
         expect(file_authenticator.user).to eql real_access_user
@@ -1126,7 +1126,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { nil }
       let(:current_host) { "files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates a public authenticator" do
         authenticator = file_authenticator
@@ -1597,8 +1597,8 @@ describe ApplicationHelper do
   end
 
   describe "#thumbnail_image_url" do
-    let(:root_account) { double("Account") }
-    let(:attachment) { double("Attachment", root_account:, uuid: "abc123") }
+    let(:root_account) { instance_double(Account) }
+    let(:attachment) { instance_double(Attachment, root_account:, uuid: "abc123") }
 
     context "when :file_association_access feature is enabled" do
       before do

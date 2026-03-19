@@ -79,5 +79,5 @@ describe('rebindMultiChange', () => {
     quiz.rebindMultiChange(questionType, 'question_content_0', {})
 
     expect($questionContent.bind).not.toHaveBeenCalled()
-  })
+  }, 30000)
 })

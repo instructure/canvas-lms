@@ -51,6 +51,7 @@ describe('quizReports:generate', function () {
         {
           id: '1',
           report_type: 'student_analysis',
+          includes_all_versions: true,
           file: {
             url: '/attachments/1',
           },
@@ -58,15 +59,8 @@ describe('quizReports:generate', function () {
       ],
     })
 
-    // The dispatcher returns a promise, so we can check if it rejects
-    try {
-      await new Promise((resolve, reject) => {
-        Dispatcher.dispatch('quizReports:generate', 'student_analysis').then(resolve).catch(reject)
-      })
-      // If we get here, the test should fail
-      expect(true).toBe(false)
-    } catch (error) {
-      expect(error.message).toContain('report is already generated')
-    }
+    await expect(Dispatcher.dispatch('quizReports:generate', 'student_analysis')).rejects.toThrow(
+      'report is already generated',
+    )
   })
 })

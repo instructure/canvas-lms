@@ -742,6 +742,70 @@ describe "Feature Flags API", type: :request do
       expect(t_root_account.feature_flags.where(feature: "course_feature")).to be_empty
     end
 
+    it "does not delete a root_opt_in feature flag on a root account" do
+      t_root_account.feature_flags.create! feature: "root_opt_in_feature", state: "allowed"
+      json = api_call_as_user(t_root_admin,
+                              :delete,
+                              "/api/v1/accounts/#{t_root_account.id}/features/flags/root_opt_in_feature",
+                              { controller: "feature_flags", action: "delete", format: "json", account_id: t_root_account.to_param, feature: "root_opt_in_feature" },
+                              {},
+                              {},
+                              { expected_status: 403 })
+      expect(t_root_account.feature_flags.where(feature: "root_opt_in_feature")).not_to be_empty
+      expect(json["message"]).to eq("once a root account has opted in with root_opt_in: true, it cannot be deleted")
+    end
+
+    it "allows deleting a root_opt_in feature flag on a sub-account" do
+      t_root_account.feature_flags.create! feature: "root_opt_in_feature", state: "allowed"
+      t_sub_account.feature_flags.create! feature: "root_opt_in_feature", state: "on"
+      api_call_as_user(t_root_admin,
+                       :delete,
+                       "/api/v1/accounts/#{t_sub_account.id}/features/flags/root_opt_in_feature",
+                       { controller: "feature_flags", action: "delete", format: "json", account_id: t_sub_account.to_param, feature: "root_opt_in_feature" },
+                       {},
+                       {},
+                       { expected_status: 200 })
+      expect(t_sub_account.feature_flags.where(feature: "root_opt_in_feature")).to be_empty
+    end
+
+    it "rejects deleting a nonexistent feature" do
+      json = api_call_as_user(t_root_admin,
+                              :delete,
+                              "/api/v1/accounts/#{t_root_account.id}/features/flags/nonexistent_feature",
+                              { controller: "feature_flags", action: "delete", format: "json", account_id: t_root_account.to_param, feature: "nonexistent_feature" },
+                              {},
+                              {},
+                              { expected_status: 400 })
+      expect(json["message"]).to eq("invalid feature")
+    end
+
+    it "rejects deleting a feature that does not apply to the context" do
+      json = api_call_as_user(t_root_admin,
+                              :delete,
+                              "/api/v1/accounts/#{t_root_account.id}/features/flags/user_feature",
+                              { controller: "feature_flags", action: "delete", format: "json", account_id: t_root_account.to_param, feature: "user_feature" },
+                              {},
+                              {},
+                              { expected_status: 400 })
+      expect(json["message"]).to eq("invalid feature")
+    end
+
+    it "returns errors when flag destroy fails" do
+      flag = t_root_account.feature_flags.create! feature: "course_feature"
+      errors = ActiveModel::Errors.new(flag)
+      errors.add(:base, "cannot be destroyed")
+      allow_any_instance_of(FeatureFlag).to receive(:destroy).and_return(false)
+      allow_any_instance_of(FeatureFlag).to receive(:errors).and_return(errors)
+      json = api_call_as_user(t_root_admin,
+                              :delete,
+                              "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature",
+                              { controller: "feature_flags", action: "delete", format: "json", account_id: t_root_account.to_param, feature: "course_feature" },
+                              {},
+                              {},
+                              { expected_status: 422 })
+      expect(json["errors"]).to eq(["cannot be destroyed"])
+    end
+
     it "does not delete an inherited flag" do
       t_root_account.feature_flags.create! feature: "course_feature"
       api_call_as_user(t_root_admin,

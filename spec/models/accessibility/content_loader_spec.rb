@@ -26,9 +26,11 @@ describe Accessibility::ContentLoader do
   let(:assignment) { assignment_model(course:, description: assignment_content) }
   let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: page_content) }
   let(:discussion_topic) { discussion_topic_model(context: course, message: discussion_content) }
+  let(:announcement) { announcement_model(context: course, message: announcement_content) }
   let(:assignment_content) { "<div><h1>Assignment Title</h1><p>Assignment description</p></div>" }
   let(:page_content) { "<div><h2>Page Title</h2><p>Page body content</p></div>" }
   let(:discussion_content) { "<div><h3>Discussion Title</h3><p>Discussion message</p></div>" }
+  let(:announcement_content) { "<div><h4>Announcement Title</h4><p>Announcement message</p></div>" }
 
   describe "#content" do
     context "for Assignments" do
@@ -61,6 +63,17 @@ describe Accessibility::ContentLoader do
         result = content_loader.content
 
         expect(result).to eq({ content: discussion_content, metadata: {} })
+      end
+    end
+
+    context "for Announcements" do
+      let!(:issue) { accessibility_issue_model(course:, context: announcement, node_path: nil) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+      it "returns announcement message" do
+        result = content_loader.content
+
+        expect(result).to eq({ content: announcement_content, metadata: {} })
       end
     end
 
@@ -124,6 +137,18 @@ describe Accessibility::ContentLoader do
         result = content_loader.content
 
         expect(result).to eq({ content: "<h3>Discussion Title</h3>", metadata: {} })
+      end
+    end
+
+    context "when extracting from announcement" do
+      let!(:issue) { accessibility_issue_model(course:, context: announcement, node_path: xpath) }
+      let(:content_loader) { described_class.new(issue_id: issue.id) }
+      let(:xpath) { ".//h4" }
+
+      it "returns announcement element" do
+        result = content_loader.content
+
+        expect(result).to eq({ content: "<h4>Announcement Title</h4>", metadata: {} })
       end
     end
 
@@ -193,12 +218,35 @@ describe Accessibility::ContentLoader do
     end
   end
 
+  describe "#resource_updated_since_issue?" do
+    let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
+    let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+    context "when resource was updated after the issue was created" do
+      it "returns true" do
+        issue.update_columns(created_at: 1.hour.ago)
+        wiki_page.update_columns(updated_at: Time.now.utc)
+
+        expect(content_loader.resource_updated_since_issue?).to be true
+      end
+    end
+
+    context "when resource was updated before the issue was created" do
+      it "returns false" do
+        wiki_page.update_columns(updated_at: 1.hour.ago)
+        issue.update_columns(created_at: Time.now.utc)
+
+        expect(content_loader.resource_updated_since_issue?).to be false
+      end
+    end
+  end
+
   describe "issue preview with rule_id" do
     let(:test_content) do
       "<html><body><div><h1>Test Element</h1></div></body></html>"
     end
     let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: test_content) }
-    let(:mock_rule_instance) { double("RuleInstance") }
+    let(:mock_rule_instance) { instance_double(Accessibility::Rule) }
     let(:mock_rule_registry) { { "img-alt" => mock_rule_instance } }
 
     context "when rule_id is provided and rule exists" do

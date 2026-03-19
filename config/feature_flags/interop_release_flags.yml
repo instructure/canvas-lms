@@ -175,6 +175,19 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
+lti_deactivate_registrations:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Registration Deactivation
+  description: >-
+    When enabled, allows deactivating and reactivating
+    LTI registrations from the Apps page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_target_link_uri_for_assignment_edit_view:
   state: hidden
   shadow: true
@@ -390,7 +403,6 @@ lti_registrations_discover_page:
       state: allowed_on
     ci:
       state: allowed_on
-  custom_transition_proc: lti_registrations_discover_page_hook
 lti_registrations_history:
   state: hidden
   shadow: true
@@ -423,16 +435,6 @@ lti_registrations_next:
   applies_to: RootAccount
   display_name: LTI Apps Page Features In-Development
   description: When enabled, the LTI Apps page will have features that are currently in-development.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_registrations_page:
-  state: hidden
-  applies_to: RootAccount
-  display_name: LTI Apps Page
-  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar.
   environments:
     development:
       state: allowed_on
@@ -537,22 +539,6 @@ lti_v2_turnitin_usage_log:
       state: allowed_on
     ci:
       state: allowed_on
-lti_variable_expansions_use_group_course_as_course:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: "LTI Variable Expansions: Use Group's Course as Course"
-  description: >-
-    If enabled, if an LTI tool is launched in the context of Course-based Group (Group within a Course), Course-related LTI variable expansions will use
-    the Group's Course as the Course. If disabled, legacy behavior will apply -- Course-related LTI variable expansions will only apply when the Course
-    is the direct context of the launch.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 microsoft_group_enrollments_syncing:
   state: hidden
   display_name: Microsoft Group enrollment syncing
@@ -578,7 +564,7 @@ nav_menu_links:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: "Nav Menu Links"
+  display_name: "Custom Links"
   description: |-
     Enables the creation of links at the account navigation, user navigation, and course navigation level.
     This is a replacement of the Redirect Tool functionality.

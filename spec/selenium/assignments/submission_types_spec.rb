@@ -29,7 +29,7 @@ describe "assignments" do
     driver.switch_to.alert.accept # doing this step and the step above to avoid the alert from failing other selenium specs
   end
 
-  def update_assignment_attributes(assignment, attribute, values, click_submit_link = true)
+  def update_assignment_attributes(assignment, attribute, values, click_submit_link: true)
     assignment.update(attribute => values)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
     f(".submit_assignment_link").click if click_submit_link
@@ -62,12 +62,12 @@ describe "assignments" do
     end
 
     it "validates on paper submission assignment type" do
-      update_assignment_attributes(@assignment, :submission_types, "on_paper", false)
+      update_assignment_attributes(@assignment, :submission_types, "on_paper", click_submit_link: false)
       expect(f("#content")).not_to contain_css(".submit_assignment_link")
     end
 
     it "validates no submission assignment type" do
-      update_assignment_attributes(@assignment, :submission_types, nil, false)
+      update_assignment_attributes(@assignment, :submission_types, nil, click_submit_link: false)
       expect(f("#content")).not_to contain_css(".submit_assignment_link")
     end
 

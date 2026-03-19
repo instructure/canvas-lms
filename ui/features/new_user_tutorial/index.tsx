@@ -56,7 +56,11 @@ const initializeNewUserTutorials = () => {
         const Tray = trayObj.component
 
         legacyRender(
-          <TutorialTray store={store} returnFocusToFunc={getReturnFocus} label={trayObj.label}>
+          <TutorialTray
+            store={store}
+            returnFocusToFunc={getReturnFocus as any}
+            label={trayObj.label}
+          >
             <Tray />
           </TutorialTray>,
           document.querySelector('.NewUserTutorialTray__Container'),

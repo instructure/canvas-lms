@@ -96,8 +96,7 @@ module Lti
         logo_uri: new_config["logo_uri"],
         client_uri: new_config["client_uri"],
         tos_uri: new_config["tos_uri"],
-        policy_uri: new_config["policy_uri"],
-        registration_overlay: new_config["registration_overlay"] || {}
+        policy_uri: new_config["policy_uri"]
       )
     end
 

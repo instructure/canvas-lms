@@ -197,10 +197,7 @@ module ConditionalRelease
         expected_assignment_set([@student_id], @as2)
 
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
-        details[:follow_on_assignments].each do |detail|
-          expect(detail).to have_key :score
-          expect(detail).to have_key :trend
-        end
+        expect(details[:follow_on_assignments]).to all(have_key(:score).and(have_key(:trend)))
       end
 
       it "includes course_id for trigger_assignment" do

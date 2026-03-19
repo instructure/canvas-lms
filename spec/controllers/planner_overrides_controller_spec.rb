@@ -127,6 +127,34 @@ describe PlannerOverridesController do
       end
     end
 
+    describe "authorization" do
+      before :once do
+        @other_student = user_factory(active_all: true)
+        @course.enroll_student(@other_student, enrollment_state: "active")
+        @other_override = PlannerOverride.create!(plannable_id: @assignment.id,
+                                                  plannable_type: "Assignment",
+                                                  marked_complete: false,
+                                                  user_id: @other_student.id)
+      end
+
+      it "returns 404 when showing another user's override" do
+        get :show, params: { id: @other_override.id }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 when updating another user's override" do
+        put :update, params: { id: @other_override.id, marked_complete: true }
+        expect(response).to have_http_status(:not_found)
+        expect(@other_override.reload.marked_complete).to be_falsey
+      end
+
+      it "returns 404 when deleting another user's override" do
+        delete :destroy, params: { id: @other_override.id }
+        expect(response).to have_http_status(:not_found)
+        expect(@other_override.reload).not_to be_deleted
+      end
+    end
+
     describe "DELETE #destroy" do
       it "returns http success" do
         delete :destroy, params: { id: @planner_override.id }

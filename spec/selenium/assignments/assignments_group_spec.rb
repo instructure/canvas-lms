@@ -143,7 +143,7 @@ describe "assignment groups" do
     # set assignment to never drop
     fj(".add_never_drop:visible").click
     select = f(".never_drop_rule select")
-    expect(select).to be
+    expect(select).not_to be_nil
     # Use JavaScript to set the value and trigger change event for React controlled component
     driver.execute_script(<<~JS, select, assignment.id.to_s)
       var select = arguments[0];

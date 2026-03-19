@@ -793,6 +793,9 @@ class GradebooksController < ApplicationController
                ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
                OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
                outcome_proficiency:,
+               permissions: {
+                 allow_assign_to_differentiation_tags: @context.account.allow_assign_to_differentiation_tags? && @context.grants_right?(@current_user, session, :manage_tags_add)
+               },
                sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
@@ -826,12 +829,12 @@ class GradebooksController < ApplicationController
       @page_title = t("Gradebook History")
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
-      js_env(
-        COURSE_URL: named_context_url(@context, :context_url),
-        COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
-        OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
-        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?)
-      )
+      js_env({
+               COURSE_URL: named_context_url(@context, :context_url),
+               COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
+               OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
+               OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?)
+             })
 
       render html: "", layout: true
     end
@@ -858,7 +861,7 @@ class GradebooksController < ApplicationController
       user_ids = submissions.pluck(:user_id)
       assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
-      assignments = assignment_scope.active.find(assignment_ids).index_by(&:id)
+      assignments = AbstractAssignment.assignment_scope_for_context(@context).active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,
       # so we pull the records here in order to check hide_grade_from_student?
       # on each submission below.
@@ -1072,7 +1075,7 @@ class GradebooksController < ApplicationController
     @assignment = if params[:assignment_id].blank?
                     nil
                   else
-                    assignment_scope.active.find(params[:assignment_id])
+                    AbstractAssignment.assignment_scope_for_context(@context).active.find(params[:assignment_id])
                   end
 
     platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
@@ -1229,7 +1232,6 @@ class GradebooksController < ApplicationController
           enhanced_rubrics_enabled:,
           rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : [],
           multiselect_filters_enabled: multiselect_filters_enabled?,
-          use_comment_library_v2: Account.site_admin.feature_enabled?(:use_comment_library_v2),
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1592,14 +1594,6 @@ class GradebooksController < ApplicationController
   end
 
   private
-
-  def assignment_scope
-    @assignment_scope ||= if @context.feature_enabled?(:peer_review_allocation_and_grading)
-                            AbstractAssignment.assignment_or_peer_review.where(context: @context)
-                          else
-                            @context.assignments
-                          end
-  end
 
   def multiselect_filters_enabled?
     return @multiselect_filters_enabled if defined?(@multiselect_filters_enabled)

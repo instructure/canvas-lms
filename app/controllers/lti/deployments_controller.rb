@@ -122,7 +122,7 @@ module Lti
     #        -H "Authorization: Bearer <token>"
     def create
       if params[:for_subaccount_id].present? && params[:for_course_id].present?
-        return render json: { error: "Cannot specify both for_subaccount_id and for_course_id" }, status: :unprocessable_entity
+        return render json: { error: "Cannot specify both for_subaccount_id and for_course_id" }, status: :unprocessable_content
       end
 
       context = if params[:for_subaccount_id].present?

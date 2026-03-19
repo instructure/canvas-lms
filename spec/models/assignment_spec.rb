@@ -109,6 +109,21 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  it "versions attachment associations with the assignment" do
+    attachment_model(context: @course)
+    assignment = @course.assignments.create!(description: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+    assignment.update(description: "meh")
+
+    expect(YAML.load(assignment.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                              attachment_id: @attachment.id,
+                                                                                                              context_id: assignment.id,
+                                                                                                              context_type: "Assignment",
+                                                                                                              root_account_id: @course.root_account_id,
+                                                                                                              user_id: @teacher.id,
+                                                                                                              context_concern: nil
+                                                                                                            })
+  end
+
   describe "#question_count" do
     let(:assignment) { Assignment.new }
 
@@ -2217,14 +2232,14 @@ describe Assignment do
 
   describe ".cleanup_importing_assignments" do
     before do
-      importing_for_too_long_result = double
-      @in_batches_result = double
+      importing_for_too_long_result = instance_double(ActiveRecord::Relation)
+      @in_batches_result = instance_double(ActiveRecord::Batches::BatchEnumerator)
       allow(described_class).to receive(:importing_for_too_long).and_return(importing_for_too_long_result)
       allow(importing_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
     end
 
     it "marks all assignments that have been importing for too long as fail_to_import" do
-      now = double("now")
+      now = instance_double(ActiveSupport::TimeWithZone)
       expect(Time.zone).to receive(:now).and_return(now)
       expect(@in_batches_result).to receive(:update_all).with(
         importing_started_at: nil,
@@ -2341,9 +2356,9 @@ describe Assignment do
 
     context "when duplicate_of and context are present" do
       it "calls delay_if_production with LOW_PRIORITY and call_outcome_alignment_service_clone" do
-        delayed_object = double("delayed")
-        expect(duplicated_assignment).to receive(:delay_if_production).with(priority: Delayed::LOW_PRIORITY).and_return(delayed_object)
-        expect(delayed_object).to receive(:call_outcome_alignment_service_clone)
+        expect(duplicated_assignment).to receive(:delay_if_production).with(priority: Delayed::LOW_PRIORITY).and_call_original
+        allow(duplicated_assignment).to receive(:__calculate_sender_for_delay).and_return(duplicated_assignment)
+        expect(duplicated_assignment).to receive(:call_outcome_alignment_service_clone)
         duplicated_assignment.send(:start_outcome_alignment_service_clone)
       end
 
@@ -2463,14 +2478,14 @@ describe Assignment do
 
   describe ".clean_up_cloning_alignments" do
     before do
-      cloning_alignments_for_too_long_result = double
-      @in_batches_result = double
+      cloning_alignments_for_too_long_result = instance_double(ActiveRecord::Relation)
+      @in_batches_result = instance_double(ActiveRecord::Batches::BatchEnumerator)
       allow(described_class).to receive(:cloning_alignments_for_too_long).and_return(cloning_alignments_for_too_long_result)
       allow(cloning_alignments_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
     end
 
     it "marks all assignments that have been in the status cloning assignment for too long as failed_to_clone_outcome_alignment" do
-      now = double("now")
+      now = instance_double(ActiveSupport::TimeWithZone)
       expect(Time.zone).to receive(:now).and_return(now)
       expect(@in_batches_result).to receive(:update_all).with(
         duplication_started_at: nil,
@@ -2648,10 +2663,10 @@ describe Assignment do
         group_two = @course.groups.create!(name: "Group A", group_category:)
         group_three = @course.groups.create!(name: "Group C", group_category:)
 
-        add_user_to_group(student_one, group_one, true)
-        add_user_to_group(student_two, group_two, true)
-        add_user_to_group(student_three, group_three, true)
-        add_user_to_group(@initial_student, group_three, true)
+        add_user_to_group(student_one, group_one, is_leader: true)
+        add_user_to_group(student_two, group_two, is_leader: true)
+        add_user_to_group(student_three, group_three, is_leader: true)
+        add_user_to_group(@initial_student, group_three, is_leader: true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -2720,8 +2735,8 @@ describe Assignment do
         group_one = @course.groups.create!(name: "Group B", group_category:)
         group_two = @course.groups.create!(name: "Group A", group_category:)
 
-        add_user_to_group(student_one, group_one, true)
-        add_user_to_group(student_two, group_two, true)
+        add_user_to_group(student_one, group_one, is_leader: true)
+        add_user_to_group(student_two, group_two, is_leader: true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -2844,10 +2859,10 @@ describe Assignment do
       group_two = @course.groups.create!(name: "Group A", group_category:)
       group_three = @course.groups.create!(name: "Group C", group_category:)
 
-      add_user_to_group(student_one, group_one, true)
-      add_user_to_group(student_two, group_two, true)
-      add_user_to_group(student_three, group_three, true)
-      add_user_to_group(@initial_student, group_three, true)
+      add_user_to_group(student_one, group_one, is_leader: true)
+      add_user_to_group(student_two, group_two, is_leader: true)
+      add_user_to_group(student_three, group_three, is_leader: true)
+      add_user_to_group(@initial_student, group_three, is_leader: true)
 
       assignment = @course.assignments.create!(
         assignment_valid_attributes.merge(
@@ -2967,7 +2982,7 @@ describe Assignment do
     end
 
     it "returns a jwt" do
-      expect(Canvas::Security.decode_jwt(@assignment.secure_params)).to be
+      expect(Canvas::Security.decode_jwt(@assignment.secure_params)).not_to be_nil
     end
 
     it "contains the description when the assignment isn't locked" do
@@ -4060,7 +4075,7 @@ describe Assignment do
     end
 
     it "delegates to NeedsGradingCountQuery" do
-      query = double("Assignments::NeedsGradingCountQuery")
+      query = instance_double(Assignments::NeedsGradingCountQuery)
       expect(query).to receive(:manual_count)
       expect(Assignments::NeedsGradingCountQuery).to receive(:new).with(@assignment).and_return(query)
       @assignment.needs_grading_count
@@ -6794,6 +6809,50 @@ describe Assignment do
     end
   end
 
+  describe "#quiz_lti_assignment?" do
+    before :once do
+      @course = course_model
+      @assignment = @course.assignments.build
+    end
+
+    context "when no URL is provided" do
+      it "returns false" do
+        expect(@assignment.quiz_lti_assignment?).to be false
+      end
+    end
+
+    context "when URL is not a quiz LTI tool" do
+      before do
+        @tool = @course.context_external_tools.create!(
+          name: "Regular Tool",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "returns false" do
+        expect(@assignment.quiz_lti_assignment?(external_tool_url: @tool.url)).to be false
+      end
+    end
+
+    context "when URL is a quiz LTI tool" do
+      before do
+        @tool = @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      it "returns true" do
+        expect(@assignment.quiz_lti_assignment?(external_tool_url: @tool.url)).to be true
+      end
+    end
+  end
+
   describe "scope :type_quiz_lti" do
     context "with a quiz_lti assignment" do
       before :once do
@@ -6888,6 +6947,73 @@ describe Assignment do
 
     it "includes parent assignments" do
       expect(AbstractAssignment.assignment_or_peer_review).to include(@parent_assignment)
+    end
+  end
+
+  describe ".assignment_scope_for_context" do
+    context "when peer_review_allocation_and_grading is enabled" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @older_assignment = @course.assignments.create!(title: "Older Assignment")
+        @older_assignment.update_column(:created_at, 2.days.ago)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @parent_assignment.update_column(:created_at, 1.day.ago)
+        @newer_assignment = @course.assignments.create!(title: "Newer Assignment")
+        @peer_review_assignment = peer_review_model(parent_assignment: @parent_assignment)
+      end
+
+      it "includes regular assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@older_assignment)
+      end
+
+      it "includes assignments with peer reviews" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@parent_assignment)
+      end
+
+      it "includes peer review sub assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@peer_review_assignment)
+      end
+
+      it "does not include assignments from other courses" do
+        other_course = Course.create!
+        other_course.enable_feature!(:peer_review_allocation_and_grading)
+        other_assignment = other_course.assignments.create!(title: "Other")
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).not_to include(other_assignment)
+      end
+    end
+
+    context "when peer_review_allocation_and_grading is disabled" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @older_assignment = @course.assignments.create!(title: "Older Assignment")
+        @older_assignment.update_column(:created_at, 2.days.ago)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          automatic_peer_reviews: false
+        )
+        @parent_assignment.update_column(:created_at, 1.day.ago)
+        @newer_assignment = @course.assignments.create!(title: "Newer Assignment")
+      end
+
+      it "includes regular assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@older_assignment)
+      end
+
+      it "does not include peer review sub-assignments" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = @parent_assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).not_to include(peer_review)
+      end
     end
   end
 
@@ -13788,78 +13914,59 @@ describe Assignment do
       @assignment.quiz_lti! && @assignment.save!
     end
 
-    context "when the new_quizzes_surveys feature is disabled" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
-      end
-
-      it "assignment is valid" do
-        @assignment.new_quizzes_type = "anything"
-        expect(@assignment).to be_valid
-      end
+    it "assignment is valid if no new_quizzes_type is set" do
+      @assignment.settings = nil
+      expect(@assignment).to be_valid
+      @assignment.settings = {}
+      expect(@assignment).to be_valid
+      @assignment.settings = { "new_quizzes" => nil }
+      expect(@assignment).to be_valid
     end
 
-    context "when the new_quizzes_surveys feature is enabled" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
-      end
+    it "sets the settings->new_quizzes->type attribute when settings is nil" do
+      @assignment.settings = nil
+      @assignment.new_quizzes_type = "graded_survey"
+      expect(@assignment.new_quizzes_type).to eq("graded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "graded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "assignment is valid if no new_quizzes_type is set" do
-        @assignment.settings = nil
-        expect(@assignment).to be_valid
-        @assignment.settings = {}
-        expect(@assignment).to be_valid
-        @assignment.settings = { "new_quizzes" => nil }
-        expect(@assignment).to be_valid
-      end
+    it "sets the settings->new_quizzes->type attribute when new_quizzes key does not exist" do
+      @assignment.settings = {}
+      @assignment.new_quizzes_type = "ungraded_survey"
+      expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "sets the settings->new_quizzes->type attribute when settings is nil" do
-        @assignment.settings = nil
-        @assignment.new_quizzes_type = "graded_survey"
-        expect(@assignment.new_quizzes_type).to eq("graded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "graded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "sets the settings->new_quizzes->type attribute when new_quizzes key already exists and empty" do
+      @assignment.settings = { "new_quizzes" => nil }
+      @assignment.new_quizzes_type = "ungraded_survey"
+      expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "sets the settings->new_quizzes->type attribute when new_quizzes key does not exist" do
-        @assignment.settings = {}
-        @assignment.new_quizzes_type = "ungraded_survey"
-        expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "leaves the existing other keys in tact" do
+      @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
+      @assignment.new_quizzes_type = "graded_survey"
+      expect(@assignment.new_quizzes_type).to eq("graded_survey")
+      expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
+      expect(@assignment).to be_valid
+    end
 
-      it "sets the settings->new_quizzes->type attribute when new_quizzes key already exists and empty" do
-        @assignment.settings = { "new_quizzes" => nil }
-        @assignment.new_quizzes_type = "ungraded_survey"
-        expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "gives validation error" do
+      @assignment.new_quizzes_type = "invalid_type"
+      expect(@assignment.new_quizzes_type).to eq("invalid_type")
+      expect(@assignment).not_to be_valid
+    end
 
-      it "leaves the existing other keys in tact" do
-        @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
-        @assignment.new_quizzes_type = "graded_survey"
-        expect(@assignment.new_quizzes_type).to eq("graded_survey")
-        expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
-        expect(@assignment).to be_valid
-      end
-
-      it "gives validation error" do
-        @assignment.new_quizzes_type = "invalid_type"
-        expect(@assignment.new_quizzes_type).to eq("invalid_type")
-        expect(@assignment).not_to be_valid
-      end
-
-      it "overwrites existing type with new type" do
-        @assignment.settings = { "new_quizzes" => { "type" => "old_value", "other_key" => "other_value" } }
-        @assignment.new_quizzes_type = "graded_survey"
-        expect(@assignment.new_quizzes_type).to eq("graded_survey")
-        expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
-        expect(@assignment).to be_valid
-      end
+    it "overwrites existing type with new type" do
+      @assignment.settings = { "new_quizzes" => { "type" => "old_value", "other_key" => "other_value" } }
+      @assignment.new_quizzes_type = "graded_survey"
+      expect(@assignment.new_quizzes_type).to eq("graded_survey")
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
+      expect(@assignment).to be_valid
     end
   end
 
@@ -14112,6 +14219,78 @@ describe Assignment do
         @peer_review_sub.destroy
         expect(@assignment.reload.peer_review_overrides_for_dates).to be_nil
       end
+    end
+  end
+
+  describe ".not_ignored_by" do
+    let(:course) { course_model }
+    let(:teacher) { user_model }
+    let!(:assignment1) { assignment_model(course:) }
+    let!(:assignment2) { assignment_model(course:, title: "Assignment 2") }
+
+    it "includes assignments that are not ignored" do
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment1, assignment2)
+    end
+
+    it "excludes assignments that are ignored with correct asset_type" do
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment2)
+      expect(result).not_to include(assignment1)
+    end
+
+    it "respects different purposes" do
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "grading"
+      )
+
+      # Ignored for "grading" but not for "viewing"
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment1, assignment2)
+
+      # Check for "grading" purpose
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "grading")
+      expect(result).to include(assignment2)
+      expect(result).not_to include(assignment1)
+    end
+
+    it "respects different users" do
+      other_teacher = user_model
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      # teacher has ignored assignment1
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).not_to include(assignment1)
+
+      # other_teacher has not ignored it
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(other_teacher, "viewing")
+      expect(result).to include(assignment1)
+    end
+
+    it "uses correct asset_type for Assignment class" do
+      # Create ignore with "Assignment" asset_type (the actual class name)
+      ignore = Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      expect(ignore.asset_type).to eq("Assignment")
+
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).not_to include(assignment1)
     end
   end
 end

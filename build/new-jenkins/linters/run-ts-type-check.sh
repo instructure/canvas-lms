@@ -19,6 +19,6 @@ yarn run graphql:codegen || {
 }
 
 echo "Running TypeScript type check..."
-node_modules/.bin/tsc -p tsconfig.json --noEmit || { echo "TypeScript type checking failed"; exit_status=1; }
+gergich capture custom:./build/gergich/tsc:Gergich::TSC 'node_modules/.bin/tsc -p tsconfig.json --noEmit' || { echo "TypeScript type checking failed"; exit_status=1; }
 
 exit $exit_status

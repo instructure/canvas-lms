@@ -52,7 +52,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -83,7 +83,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {},
     })
     const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
@@ -101,7 +101,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
     const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
@@ -123,7 +123,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
     const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
@@ -145,7 +145,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
     const {result, waitForNextUpdate} = renderHook(() => useGradebookSettings(courseId))
@@ -168,7 +168,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -190,7 +190,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -215,7 +215,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -237,7 +237,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -262,7 +262,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -284,7 +284,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -310,7 +310,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -335,7 +335,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {learning_mastery_gradebook_settings: mockSettings},
     })
 
@@ -354,7 +354,7 @@ describe('useGradebookSettings', () => {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: {} as any},
       data: {
         learning_mastery_gradebook_settings: {
           secondary_info_display: SecondaryInfoDisplay.SIS_ID,

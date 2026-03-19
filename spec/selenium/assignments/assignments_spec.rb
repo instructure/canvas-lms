@@ -81,14 +81,14 @@ describe "assignments" do
     end
 
     context "save and publish button" do
-      def create_assignment(publish = true, params = { name: "Test Assignment" })
+      def create_assignment(params = { name: "Test Assignment" }, publish: true)
         @assignment = @course.assignments.create(params)
         @assignment.unpublish unless publish
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       end
 
       it "can save and publish an assignment", priority: "1" do
-        create_assignment false
+        create_assignment(publish: false)
 
         expect(f("#assignment-draft-state")).to be_displayed
 
@@ -1745,7 +1745,7 @@ describe "assignments" do
   end
 
   context "with restrict_quantitative_data" do
-    all_options = ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"]
+    let(:all_options) { ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"].freeze }
 
     before do
       course_with_teacher_logged_in

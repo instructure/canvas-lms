@@ -37,6 +37,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
           account = course.root_account
           account.enable_feature!(:a11y_checker)
           course.enable_feature!(:a11y_checker_eap)
+          account.enable_feature!(:accessibility_automatic_scanning)
         end
 
         context "when there is a successful course scan" do
@@ -68,6 +69,22 @@ RSpec.shared_examples "an accessibility scannable resource" do
           resource_class.create!(valid_attributes)
         end
       end
+
+      context "when the automatic scanning feature flag is disabled" do
+        before do
+          account = course.root_account
+          account.disable_feature!(:accessibility_automatic_scanning)
+          account.enable_feature!(:a11y_checker)
+          course.enable_feature!(:a11y_checker_eap)
+          Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+        end
+
+        it "does not trigger the scanner service" do
+          expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+          resource_class.create!(valid_attributes)
+        end
+      end
     end
 
     describe "#trigger_accessibility_scan_on_update" do
@@ -79,6 +96,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
           account.enable_feature!(:a11y_checker)
           resource.context.enable_feature!(:a11y_checker_eap)
           resource.context.reload
+          account.enable_feature!(:accessibility_automatic_scanning)
         end
 
         context "when there is a successful course scan" do
@@ -136,6 +154,23 @@ RSpec.shared_examples "an accessibility scannable resource" do
           resource.update!(relevant_attributes_for_scan)
         end
       end
+
+      context "when automatic scanning feature flag is disabled" do
+        before do
+          account = resource.root_account
+          account.disable_feature!(:accessibility_automatic_scanning)
+          account.enable_feature!(:a11y_checker)
+          resource.context.enable_feature!(:a11y_checker_eap)
+          resource.context.reload
+          Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
+        end
+
+        it "does not trigger the scanner service" do
+          expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+          resource.update!(relevant_attributes_for_scan)
+        end
+      end
     end
 
     describe "cascade deletion" do
@@ -156,6 +191,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
       account.enable_feature!(:a11y_checker)
       resource.context.enable_feature!(:a11y_checker_eap)
       resource.context.reload
+      account.enable_feature!(:accessibility_automatic_scanning)
       Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
     end
 
@@ -191,6 +227,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
       account.enable_feature!(:a11y_checker)
       resource.context.enable_feature!(:a11y_checker_eap)
       resource.context.reload
+      account.enable_feature!(:accessibility_automatic_scanning)
       Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: course, workflow_state: "completed")
     end
 
@@ -243,6 +280,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
         account = course.root_account
         account.enable_feature!(:a11y_checker)
         course.enable_feature!(:a11y_checker_eap)
+        account.enable_feature!(:accessibility_automatic_scanning)
         Progress.create!(
           tag: Accessibility::CourseScanService::SCAN_TAG,
           context: course,
@@ -257,6 +295,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
           account = course.root_account
           account.enable_feature!(:a11y_checker)
           course.enable_feature!(:a11y_checker_eap)
+          account.enable_feature!(:accessibility_automatic_scanning)
           Progress.create!(
             tag: Accessibility::CourseScanService::SCAN_TAG,
             context: course,

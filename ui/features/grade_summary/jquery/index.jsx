@@ -822,7 +822,7 @@ function addAssetProcessorToLegacyTable() {
   const fetchParams = {
     courseId: ENV.course_id,
     studentId: ENV.student_id,
-    gradingPeriodId: ENV.current_grading_period_id,
+    gradingPeriodId: GradeSummary.getSelectedGradingPeriodId(),
   }
 
   if (!fetchParams.courseId || !fetchParams.studentId) {

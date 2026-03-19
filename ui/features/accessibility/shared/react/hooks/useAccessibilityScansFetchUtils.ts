@@ -29,12 +29,7 @@ import {
   API_FETCH_ERROR_MESSAGE_PREFIX,
   IssuesTableHeaderApiNames,
 } from '../../../accessibility_checker/react/constants'
-import {
-  AccessibilityIssuesSummaryData,
-  AccessibilityResourceScan,
-  Filters,
-  ParsedFilters,
-} from '../types'
+import {AccessibilityIssuesSummaryData, AccessibilityResourceScan, Filters} from '../types'
 import {convertKeysToCamelCase, getParsedFilters} from '../utils/apiData'
 import {getCourseBasedPath, updateQueryParams} from '../utils/query'
 

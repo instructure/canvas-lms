@@ -600,7 +600,7 @@ describe Attachment do
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
       s3_storage!
       a = attachment_model
-      allow(a).to receive(:s3object).and_return(double("s3object"))
+      allow(a).to receive(:s3object).and_return(instance_double(Aws::S3::Object))
       s3object = a.s3object
       expect(s3object).not_to receive(:delete)
       a.destroy_content
@@ -952,7 +952,7 @@ describe Attachment do
           dup = nil
           @shard1.activate do
             dup = Attachment.new
-            expect(dup).to receive(:s3object).at_least(:once).and_return(double("Aws::S3::Object", exists?: false))
+            expect(dup).to receive(:s3object).at_least(:once).and_return(instance_double(Aws::S3::Object, exists?: false))
             att.clone_for(shard1_account, dup)
           end
           expect(dup.content_type).to eq att.content_type
@@ -1394,7 +1394,7 @@ describe Attachment do
 
     context "attachments with quiz context" do
       before :once do
-        quiz_with_submission(true)
+        quiz_with_submission
         @course.enroll_teacher(user_model).accept
         @teacher = @user
       end
@@ -2079,8 +2079,8 @@ describe Attachment do
       @root = attachment_model(filename: "unknown 2.example")
       @child = attachment_model(root_attachment: @root)
 
-      @old_object = double("old object")
-      @new_object = double("new object")
+      @old_object = instance_double(Aws::S3::Object)
+      @new_object = instance_double(Aws::S3::Object)
       new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
       allow(@root.bucket).to receive(:object).with(@root.full_filename).and_return(@old_object)
       allow(@root.bucket).to receive(:object).with(new_full_filename).and_return(@new_object)
@@ -2813,7 +2813,7 @@ describe Attachment do
 
     before do
       allow(Attachment).to receive_messages(local_storage?: false, s3_storage?: true)
-      allow(@attachment).to receive(:s3object).and_return(double("s3object"))
+      allow(@attachment).to receive(:s3object).and_return(instance_double(Aws::S3::Object))
       allow(@attachment).to receive(:after_attachment_saved)
     end
 
@@ -2826,7 +2826,7 @@ describe Attachment do
       end
 
       before do
-        allow(@existing_attachment).to receive(:s3object).and_return(double("existing_s3object"))
+        allow(@existing_attachment).to receive(:s3object).and_return(instance_double(Aws::S3::Object))
         allow(@attachment).to receive(:find_existing_attachment_for_md5).and_return(@existing_attachment)
       end
 
@@ -3342,7 +3342,7 @@ describe Attachment do
       it "applies a time limit" do
         attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
         Setting.set("attachment_calculate_words_time_limit", "0.001")
-        expect(PDF::Reader).to receive(:new) { sleep 1 } # rubocop:disable Lint/NoSleep
+        allow(PDF::Reader).to receive(:new) { sleep 1 } # rubocop:disable Lint/NoSleep
         expect(Canvas::Errors).to receive(:capture_exception).with(:word_count, an_instance_of(Timeout::Error), :info)
         @attachment.calculate_words
       end
@@ -3513,6 +3513,133 @@ describe Attachment do
     end
   end
 
+  describe "kaltura_media?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "returns false when Kaltura is not configured" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
+      @attachment = attachment_model(context: @course, media_entry_id: "0_testentry")
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns false when media_entry_id is nil" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @attachment = attachment_model(context: @course, media_entry_id: nil)
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns false when media_entry_id is 'maybe'" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @attachment = attachment_model(context: @course, media_entry_id: "maybe")
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns false when media_object_by_media_id is nil" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @attachment = attachment_model(context: @course, media_entry_id: "0_nonexistent")
+      expect(@attachment.kaltura_media?).to be false
+    end
+
+    it "returns true when Kaltura is configured and media object exists" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      @media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
+      @attachment = attachment_model(context: @course, media_entry_id: @media_object.media_id)
+      expect(@attachment.kaltura_media?).to be true
+    end
+  end
+
+  describe "kaltura_media_download_url" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "returns nil when not a Kaltura media file" do
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: nil)
+      attachment = attachment_model(context: @course)
+      expect(attachment.kaltura_media_download_url).to be_nil
+    end
+
+    it "returns nil when no download url exist" do
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: {})
+      media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id)
+
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client)
+      allow(kaltura_client).to receive(:media_download_url)
+        .with("0_feedbeef")
+        .and_return(nil)
+
+      expect(attachment.kaltura_media_download_url).to be_nil
+    end
+
+    it "returns download URL from Kaltura V3" do
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: {})
+      media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id, display_name: "test_video.mp4")
+
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client)
+      allow(kaltura_client).to receive(:media_download_url)
+        .with("0_feedbeef")
+        .and_return("https://kaltura.example.com/download/asset2")
+
+      result = attachment.kaltura_media_download_url
+      expect(result).to include("https://kaltura.example.com/download/asset2")
+      expect(result).to include("filename=test_video.mp4")
+    end
+  end
+
+  describe "kaltura_manifest_file?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "returns false when not a kaltura media file" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
+      attachment = attachment_model(context: @course, media_entry_id: "0_feedbeef")
+      expect(attachment.kaltura_manifest_file?).to be false
+    end
+
+    it "returns false when HTTP response is not XML" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      media_object = @course.media_objects.create!(
+        media_id: "0_feedbeef",
+        attachment: attachment_model(context: @course)
+      )
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id)
+      allow(attachment).to receive_messages(
+        stored_locally?: false,
+        public_url: "http://example.com/video.mp4"
+      )
+      http_response = instance_double(Net::HTTPPartialContent, read_body: "\x00\x00\x00\x1Cf")
+      allow(CanvasHttp).to receive(:get)
+        .with("http://example.com/video.mp4", { "Range" => "bytes=0-4" })
+        .and_return(http_response)
+      expect(attachment.kaltura_manifest_file?).to be false
+    end
+
+    it "returns true when HTTP response starts with <?xml" do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      media_object = @course.media_objects.create!(
+        media_id: "0_feedbeef",
+        attachment: attachment_model(context: @course)
+      )
+      attachment = attachment_model(context: @course, media_entry_id: media_object.media_id)
+      allow(attachment).to receive_messages(
+        stored_locally?: false,
+        public_url: "http://example.com/manifest.mpd"
+      )
+      http_response = instance_double(Net::HTTPPartialContent, read_body: "<?xml")
+      allow(CanvasHttp).to receive(:get)
+        .with("http://example.com/manifest.mpd", { "Range" => "bytes=0-4" })
+        .and_return(http_response)
+      expect(attachment.kaltura_manifest_file?).to be true
+    end
+  end
+
   describe "used_in_submission_history?" do
     before do
       course_with_student
@@ -3581,7 +3708,7 @@ describe Attachment do
         file_state: "available"
       )
     end
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(
@@ -3653,7 +3780,7 @@ describe Attachment do
         filename: "test.pdf"
       )
     end
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(
@@ -3679,7 +3806,7 @@ describe Attachment do
     let(:course) { Course.create! }
     let(:public_download_url) { "https://s3.amazonaws.com/bucket/file.pdf" }
     let(:attachment) { attachment_model(context: course, content_type: "application/pdf", filename: "test.pdf") }
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, ingest_url: true)
@@ -3752,7 +3879,7 @@ describe Attachment do
         file_state: "available"
       )
     end
-    let(:pine_client_mock) { double("PineClient") }
+    let(:pine_client_mock) { class_double(PineClient) }
     let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
 
     before do

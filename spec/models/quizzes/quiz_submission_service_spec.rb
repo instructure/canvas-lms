@@ -100,7 +100,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it "regenerates when possible" do
-          expect(Quizzes::QuizSubmission).to receive(:for_participant).with(participant) { double(first: retriable_qs) }
+          expect(Quizzes::QuizSubmission).to receive(:for_participant).with(participant) { instance_double(ActiveRecord::Relation, first: retriable_qs) }
 
           expect do
             subject.create quiz
@@ -108,7 +108,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it "does not regenerate if the QS is not retriable" do
-          expect(Quizzes::QuizSubmission).to receive(:for_participant).with(participant) { double(first: unretriable_qs) }
+          expect(Quizzes::QuizSubmission).to receive(:for_participant).with(participant) { instance_double(ActiveRecord::Relation, first: unretriable_qs) }
 
           expect do
             subject.create quiz

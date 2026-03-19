@@ -39,7 +39,7 @@ describe Api::V1::AssignmentOverride do
                    unlock_at: nil,
                    lock_at: nil }
       allow(subject).to receive(:api_find_all).and_return []
-      assignment = double(context: double(all_students: []))
+      assignment = instance_double(Assignment, context: instance_double(Course, all_students: []))
       result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
       expect(result.first[:due_at]).to be_nil
       expect(result.first[:unlock_at]).to be_nil
@@ -59,7 +59,7 @@ describe Api::V1::AssignmentOverride do
         override = { student_ids: [@student.global_id] }
 
         allow(subject).to receive(:api_find_all).and_return [@student]
-        assignment = double(context: double(all_students: []))
+        assignment = instance_double(Assignment, context: instance_double(Course, all_students: []))
         result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
         expect(result[1]).to be_nil
         expect(result.first[:students]).to eq [@student]

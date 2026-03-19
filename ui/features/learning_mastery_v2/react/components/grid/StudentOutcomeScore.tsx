@@ -43,6 +43,8 @@ const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
     <ScoreWithLabel
       icon={
         <SVGWrapper
+          ariaLabel={rating?.description || I18n.t('Unassessed')}
+          ariaHidden={scoreDisplayFormat === ScoreDisplayFormat.ICON_AND_LABEL}
           fillColor={rating?.color}
           url={svgUrl(rating?.points, outcome.mastery_points)}
           style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}

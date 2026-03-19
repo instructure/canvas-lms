@@ -144,4 +144,58 @@ describe Mutations::SetRubricSelfAssessment do
       expect(result.dig("errors", 0, "message")).to eq "Cannot set rubric self assessment for group assignments"
     end
   end
+
+  context "when executed on a quiz assignment" do
+    it "returns error for quiz_lti assignments" do
+      quiz_assignment = course.assignments.create!(
+        title: "Quiz LTI Assignment",
+        submission_types: "external_tool"
+      )
+      tool = course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        tool_id: "Quizzes 2",
+        consumer_key: "test",
+        shared_secret: "secret",
+        url: "http://example.com/launch"
+      )
+      quiz_assignment.external_tool_tag = ContentTag.create!(
+        context: course,
+        content: tool,
+        url: "http://example.com/launch"
+      )
+      quiz_assignment.save!
+      rubric_association_model(user: teacher, context: course, association_object: quiz_assignment, purpose: "grading", rubric: @rubric)
+
+      result = CanvasSchema.execute(mutation_str(assignment_id: quiz_assignment.id), context:)
+      expect(result.dig("errors", 0, "message")).to eq "Cannot set rubric self assessment for quiz assignments"
+    end
+
+    it "returns error for classic quiz assignments" do
+      quiz_assignment = course.assignments.create!(
+        title: "Quiz Assignment",
+        submission_types: "online_quiz"
+      )
+      quiz = Quizzes::Quiz.where(assignment_id: quiz_assignment.id).first
+      quiz.workflow_state = "available"
+      quiz.save!
+      rubric_association_model(user: teacher, context: course, association_object: quiz_assignment, purpose: "grading", rubric: @rubric)
+
+      result = CanvasSchema.execute(mutation_str(assignment_id: quiz_assignment.id), context:)
+      expect(result.dig("errors", 0, "message")).to eq "Cannot set rubric self assessment for quiz assignments"
+    end
+  end
+
+  context "when executed on a discussion assignment" do
+    it "returns error for discussion topic assignments" do
+      discussion_assignment = assignment_model(course:, submission_types: "discussion_topic", title: "Discussion Assignment")
+      course.discussion_topics.create!(
+        title: "Discussion Topic",
+        assignment: discussion_assignment
+      )
+      rubric_association_model(user: teacher, context: course, association_object: discussion_assignment, purpose: "grading", rubric: @rubric)
+
+      result = CanvasSchema.execute(mutation_str(assignment_id: discussion_assignment.id), context:)
+      expect(result.dig("errors", 0, "message")).to eq "Cannot set rubric self assessment for discussion assignments"
+    end
+  end
 end

@@ -182,6 +182,35 @@ describe AuthenticationProvidersPresenter do
     end
   end
 
+  describe "#discovery_page_active?" do
+    it "returns true when account.discovery_page_active is true" do
+      account = Account.create!(name: "Test")
+      account.discovery_page_active = true
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(true)
+    end
+
+    it "returns false when account.discovery_page_active is false" do
+      account = Account.create!(name: "Test")
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when active is nil" do
+      account = Account.create!(name: "Test")
+      account.settings[:discovery_page] = { active: nil }
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when discovery_page is not set" do
+      account = Account.create!(name: "Test")
+      account.settings.delete(:discovery_page)
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+  end
+
   describe "#ldap_configs" do
     it "selects out all ldap configs" do
       config = AuthenticationProvider::LDAP.new

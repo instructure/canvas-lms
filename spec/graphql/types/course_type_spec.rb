@@ -617,7 +617,7 @@ describe Types::CourseType do
           end
         end
 
-        include_examples "userId filter tests"
+        it_behaves_like "userId filter tests"
       end
 
       context "with new quizzes enabled" do
@@ -680,7 +680,7 @@ describe Types::CourseType do
           end
         end
 
-        include_examples "userId filter tests"
+        it_behaves_like "userId filter tests"
       end
     end
 
@@ -970,9 +970,9 @@ describe Types::CourseType do
       student_in_course(active_all: true)
       @student2 = @student
 
-      @student1a1_submission, _ = a1.grade_student(@student1, grade: 1, grader: @teacher)
-      @student1a2_submission, _ = a2.grade_student(@student1, grade: 9, grader: @teacher)
-      @student2a1_submission, _ = a1.grade_student(@student2, grade: 5, grader: @teacher)
+      @student1a1_submission = a1.grade_student(@student1, grade: 1, grader: @teacher).first
+      @student1a2_submission = a2.grade_student(@student1, grade: 9, grader: @teacher).first
+      @student2a1_submission = a1.grade_student(@student2, grade: 5, grader: @teacher).first
 
       @student1a1_submission.update_attribute :graded_at, 4.days.ago
       @student1a2_submission.update_attribute :graded_at, 2.days.ago
@@ -1156,6 +1156,96 @@ describe Types::CourseType do
               ) { nodes { _id } }
             GQL
           ).to include @student2a1_submission.id.to_s
+        end
+      end
+    end
+
+    context "with peer review sub assignments" do
+      before(:once) do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = course.assignments.create!(
+          title: "Parent Assignment",
+          submission_types: "online_text_entry",
+          points_possible: 100
+        )
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment: @parent_assignment,
+          title: "Peer Review",
+          points_possible: 50
+        )
+        @parent_assignment.submit_homework(@student1, body: "Student 1 submission")
+        @peer_review_submission = @peer_review_sub_assignment.grade_student(@student1, grade: 40, grader: @teacher).first
+      end
+
+      it "includes peer review sub assignment submissions when feature enabled and filter is true" do
+        result = course_type.resolve(<<~GQL, current_user: @teacher)
+          submissionsConnection(
+            studentIds: ["#{@student1.id}"],
+            filter: { includePeerReviewSubmissions: true },
+            orderBy: [{field: _id, direction: ascending}]
+          ) { edges { node { _id } } }
+        GQL
+
+        expect(result).to include(@peer_review_submission.id.to_s)
+      end
+
+      it "excludes peer review submissions when feature disabled" do
+        course.disable_feature!(:peer_review_allocation_and_grading)
+
+        result = course_type.resolve(<<~GQL, current_user: @teacher)
+          submissionsConnection(
+            studentIds: ["#{@student1.id}"],
+            orderBy: [{field: _id, direction: ascending}]
+          ) { edges { node { _id } } }
+        GQL
+
+        expect(result).not_to include(@peer_review_submission.id.to_s)
+      end
+
+      context "with include_peer_review_submissions filter" do
+        it "excludes peer review submissions when filter is false" do
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"],
+              filter: { includePeerReviewSubmissions: false }
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).not_to include(@peer_review_submission.id.to_s)
+        end
+
+        it "excludes peer review submissions when filter is not provided" do
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"]
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).not_to include(@peer_review_submission.id.to_s)
+        end
+
+        it "includes peer review submissions when filter is true and feature enabled" do
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"],
+              filter: { includePeerReviewSubmissions: true }
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).to include(@peer_review_submission.id.to_s)
+        end
+
+        it "excludes peer review submissions when filter is true but feature disabled" do
+          course.disable_feature!(:peer_review_allocation_and_grading)
+
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"],
+              filter: { includePeerReviewSubmissions: true }
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).not_to include(@peer_review_submission.id.to_s)
         end
       end
     end
@@ -2929,6 +3019,126 @@ describe Types::CourseType do
           externalToolsConnection(filter: { state: email_only }) { edges { node { name } } }
         GQL
       ).to match_array result_array
+    end
+  end
+
+  describe "career_learning_library_only field" do
+    before :once do
+      @horizon_account = Account.create!
+      @horizon_account.enable_feature!(:horizon_course_setting)
+      @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+      @horizon_account.horizon_account = true
+      @horizon_account.save!
+
+      @horizon_course = course_with_teacher(
+        account: @horizon_account,
+        course_name: "Horizon Course",
+        career_learning_library_only: true,
+        active_all: true
+      ).course
+
+      @teacher = @user
+    end
+
+    let(:course_type) { GraphQLTypeTester.new(@horizon_course, current_user: @teacher) }
+
+    it "returns nil when feature flag is not enabled" do
+      account = Account.create!
+      course = course_with_teacher(
+        account:,
+        course_name: "Regular Course",
+        active_all: true
+      ).course
+
+      result = GraphQLTypeTester.new(course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be_nil
+    end
+
+    it "returns boolean value when feature flag is enabled" do
+      result = GraphQLTypeTester.new(@horizon_course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be(true)
+    end
+
+    it "returns false for regular courses in horizon account" do
+      regular_course = course_with_teacher(
+        account: @horizon_account,
+        course_name: "Regular Course",
+        career_learning_library_only: false,
+        active_all: true
+      ).course
+
+      result = GraphQLTypeTester.new(regular_course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be(false)
+    end
+  end
+
+  context "rubrics_connection field" do
+    before(:once) do
+      @rubric1 = rubric_model(context: @course, title: "Rubric 1")
+      @rubric2 = rubric_model(context: @course, title: "Rubric 2")
+      @rubric3 = rubric_model(context: @course, title: "Rubric 3")
+
+      # Create rubric associations to make them bookmarked
+      @rubric1.associate_with(@course, @course, purpose: "bookmark")
+      @rubric2.associate_with(@course, @course, purpose: "bookmark")
+      @rubric3.associate_with(@course, @course, purpose: "bookmark")
+    end
+
+    it "returns all rubrics without filter" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric2.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "filters by rubric id" do
+      result_ids = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+      result_titles = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { title } }
+      GQL
+
+      expect(result_ids.length).to eq(1)
+      expect(result_ids[0]).to eq(@rubric2.id.to_s)
+      expect(result_titles[0]).to eq("Rubric 2")
+    end
+
+    it "returns empty array when filtered id does not match" do
+      non_existent_id = @rubric3.id + 999
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{non_existent_id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
+    end
+
+    it "does not return deleted rubrics" do
+      @rubric2.destroy
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "does not return deleted rubrics even when filtered by id" do
+      @rubric2.destroy
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
     end
   end
 end

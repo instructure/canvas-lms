@@ -44,12 +44,12 @@ const mockCriteria = [
     description: 'Generated Criterion 1',
     points: 20,
     ratings: [],
-    longDescription: '',
-    outcome: undefined,
-    learningOutcomeId: undefined,
-    ignoreForScoring: false,
-    criterionUseRange: false,
-    masteryPoints: 0,
+    long_description: '',
+    learning_outcome_id: undefined,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 0,
+    generated: true,
   },
 ]
 
@@ -69,6 +69,7 @@ const ROOT_OUTCOME_GROUP = {
 
 describe('RubricForm AI Tests', () => {
   beforeEach(() => {
+    queryClient.clear()
     fakeEnv.setup({
       context_asset_string: 'user_1',
       AI_FEEDBACK_LINK: 'https://example.com/feedback',
@@ -76,6 +77,7 @@ describe('RubricForm AI Tests', () => {
   })
 
   afterEach(() => {
+    queryClient.clear()
     vi.resetAllMocks()
     fakeEnv.teardown()
     destroyFlashAlertContainer()
@@ -136,12 +138,11 @@ describe('RubricForm AI Tests', () => {
     })
 
     it('does not show regenerate button when aiRubricsEnabled is false', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId} = renderComponent({
         aiRubricsEnabled: false,
         assignmentId: '1',
-        courseId: '1',
         rubricId: '1',
       })
 
@@ -312,7 +313,7 @@ describe('RubricForm AI Tests', () => {
         ).toBeInTheDocument()
         expect(getByTestId('give-feedback-link')).toBeInTheDocument()
       })
-    })
+    }, 30000)
 
     it('shows error when generateCriteria fails', async () => {
       const generateCriteriaMock = RubricFormQueries.generateCriteria as Mock

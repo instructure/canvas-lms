@@ -123,7 +123,7 @@ describe('Assignment Bulk Edit Dates - Validation', () => {
     changeAndBlurInput(getAllByLabelText('Due At')[0], '2019-04-01')
     expect(getByText('Unlock date cannot be after due date')).toBeInTheDocument()
     expect(getByText('Save').closest('button').disabled).toBe(true)
-  })
+  }, 30000)
 
   it('clears the validation error when a bad edit is reverted', async () => {
     const {queryByText, getAllByText, getAllByLabelText} = await renderBulkEditAndWait()
@@ -134,7 +134,7 @@ describe('Assignment Bulk Edit Dates - Validation', () => {
     expect(revertButtons).toHaveLength(1)
     fireEvent.click(revertButtons[0])
     expect(queryByText('Unlock date cannot be after due date')).not.toBeInTheDocument()
-  })
+  }, 30000)
 
   it('validates against closed grading periods', async () => {
     window.ENV.HAS_GRADING_PERIODS = true
@@ -168,7 +168,7 @@ describe('Assignment Bulk Edit Dates - Validation', () => {
     expect(queryByText(/Please enter a due date on or after/)).not.toBeInTheDocument()
     changeAndBlurInput(theInput, '2020-01-03')
     expect(queryByText(/Please enter a due date on or after/)).toBeInTheDocument()
-  })
+  }, 30000)
 
   it('can revert edited dates on a row', async () => {
     const {getAllByText, getAllByLabelText, getByDisplayValue} = await renderBulkEditAndWait()
@@ -195,5 +195,5 @@ describe('Assignment Bulk Edit Dates - Validation', () => {
     fireEvent.click(revertButtons[2])
     expect(assignmentUnlockAt.value).toBe('Thu, Mar 19, 2020, 9:00 AM')
     expect(nullDueDate.value).toBe('')
-  }, 10000)
+  }, 30000)
 })

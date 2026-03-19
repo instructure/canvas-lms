@@ -367,7 +367,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in discussion topic without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       discussion_topic_model(message: user_content, user: @user)
       json = api_call(:get,
@@ -390,7 +390,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in discussion entry without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       discussion_topic_model
       @topic.reply_from(user: @user, html: user_content)
@@ -445,7 +445,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in announcement messages without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       announcement_model(message: user_content, user: @user)
       json = api_call(:get,
@@ -468,7 +468,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in announcement discussion entries without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       announcement_model
       @a.reply_from(user: @user, html: user_content)

@@ -89,7 +89,7 @@ class SharedBrandConfigsController < ApplicationController
       if @shared_brand_config.save
         render json: @shared_brand_config.as_json(include_root: false), status: :created
       else
-        render json: @shared_brand_config.errors, status: :unprocessable_entity
+        render json: @shared_brand_config.errors, status: :unprocessable_content
       end
     end
   end
@@ -110,7 +110,7 @@ class SharedBrandConfigsController < ApplicationController
       if @shared_brand_config.update(shared_brand_config_params)
         render json: @shared_brand_config.as_json(include_root: false)
       else
-        render json: @shared_brand_config.errors, status: :unprocessable_entity
+        render json: @shared_brand_config.errors, status: :unprocessable_content
       end
     end
   end

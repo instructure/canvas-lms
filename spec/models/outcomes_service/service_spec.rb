@@ -118,9 +118,9 @@ describe OutcomesService::Service do
 
     describe ".start_outcome_alignment_service_clone" do
       let(:response_body) { { "job_id" => "123", "status" => "started" }.to_json }
-      let(:successful_response) { double(code: "200", body: response_body) }
-      let(:accepted_response) { double(code: "202", body: response_body) }
-      let(:error_response) { double(code: "500", body: "Internal Server Error") }
+      let(:successful_response) { instance_double(Net::HTTPResponse, code: "200", body: response_body) }
+      let(:accepted_response) { instance_double(Net::HTTPResponse, code: "202", body: response_body) }
+      let(:error_response) { instance_double(Net::HTTPResponse, code: "500", body: "Internal Server Error") }
 
       context "when service is enabled" do
         it "makes POST request to /api/alignment_sets/batch_clone with correct parameters" do
@@ -217,7 +217,7 @@ describe OutcomesService::Service do
         end
 
         it "handles empty response body gracefully" do
-          empty_response = double(code: "200", body: "")
+          empty_response = instance_double(Net::HTTPResponse, code: "200", body: "")
           allow(CanvasHttp).to receive(:post).and_return(empty_response)
 
           result = described_class.start_outcome_alignment_service_clone(

@@ -47,7 +47,7 @@ describe Collaboration do
       end
 
       it "uses Lti::ContextToolFinder.all_tools_scope_union to find tools" do
-        expect(Lti::ContextToolFinder).to receive(:all_tools_scope_union).and_return(double(exists?: true))
+        expect(Lti::ContextToolFinder).to receive(:all_tools_scope_union).and_return(instance_double(Lti::ScopeUnion, exists?: true))
         expect(Collaboration.any_collaborations_configured?(context)).to be true
       end
     end

@@ -175,7 +175,7 @@ describe "context modules" do
 
     context "Keyboard Accessibility", priority: "1" do
       before :once do
-        modules = create_modules(2, true)
+        modules = create_modules(2, published: true)
         modules[0].add_item({ id: @assignment.id, type: "assignment" })
         modules[0].add_item({ id: @assignment2.id, type: "assignment" })
         modules[1].add_item({ id: @assignment3.id, type: "assignment" })
@@ -246,7 +246,7 @@ describe "context modules" do
 
     context "Specific Keyboard Accessibility with differentiated modules", priority: "1" do
       before :once do
-        modules = create_modules(2, true)
+        modules = create_modules(2, published: true)
         modules[0].add_item({ id: @assignment.id, type: "assignment" })
         modules[0].add_item({ id: @assignment2.id, type: "assignment" })
         modules[1].add_item({ id: @assignment3.id, type: "assignment" })

@@ -40,20 +40,17 @@ describe "discussions index" do
   end
 
   context "as a student" do
-    discussion1_title = "Meaning of life"
-    discussion2_title = "Meaning of the universe"
-
     before :once do
       setup_course_and_students
       # Discussion attributes: title, message, delayed_post_at, user
       @discussion1 = @course.discussion_topics.create!(
-        title: discussion1_title,
+        title: "Meaning of life",
         message: "Is it really 42?",
         user: @teacher,
         pinned: false
       )
       @discussion2 = @course.discussion_topics.create!(
-        title: discussion2_title,
+        title: "Meaning of the universe",
         message: "Could it be 43?",
         delayed_post_at: 1.day.from_now,
         user: @teacher,

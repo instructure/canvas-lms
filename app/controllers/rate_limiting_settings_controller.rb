@@ -38,13 +38,13 @@ class RateLimitingSettingsController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
-        js_env(
-          ACCOUNT: {
-            "id" => @context.id,
-            "site_admin" => @context.site_admin?,
-            "root_account" => @context.root_account?
-          }
-        )
+        js_env({
+                 ACCOUNT: {
+                   "id" => @context.id,
+                   "site_admin" => @context.site_admin?,
+                   "root_account" => @context.root_account?
+                 }
+               })
         render :index
       end
       format.json do
@@ -117,7 +117,7 @@ class RateLimitingSettingsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: { errors: @oauth_client_config.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
     end
@@ -139,7 +139,7 @@ class RateLimitingSettingsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: { errors: @oauth_client_config.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
     end

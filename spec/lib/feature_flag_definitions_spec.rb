@@ -38,11 +38,10 @@ describe "feature_flag_definition_spec" do
     %i[custom_transition_proc after_state_change_proc visible_on].each do |hook|
       next unless definition[hook]
 
-      hook_name = definition[hook]
-      it "#{name} hook for #{hook} (#{hook_name}) should exist in FeatureFlags::Hooks as a static method" do
+      it "#{name} hook for #{hook} (#{definition[hook]}) should exist in FeatureFlags::Hooks as a static method" do
         skip if skip_features.include?(name)
 
-        expect(FeatureFlags::Hooks.respond_to?(hook_name)).to be true
+        expect(FeatureFlags::Hooks.respond_to?(definition[hook])).to be true
       end
     end
   end

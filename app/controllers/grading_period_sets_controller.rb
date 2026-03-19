@@ -108,7 +108,7 @@ class GradingPeriodSetsController < ApplicationController
 
         format.json { render json: serialized_set, status: :created }
       else
-        format.json { render json: grading_period_set.errors, status: :unprocessable_entity }
+        format.json { render json: grading_period_set.errors, status: :unprocessable_content }
       end
     end
   end
@@ -145,7 +145,7 @@ class GradingPeriodSetsController < ApplicationController
       if grading_period_set.update(set_params)
         format.json { head :no_content }
       else
-        format.json { render json: grading_period_set.errors, status: :unprocessable_entity }
+        format.json { render json: grading_period_set.errors, status: :unprocessable_content }
       end
     end
   end
