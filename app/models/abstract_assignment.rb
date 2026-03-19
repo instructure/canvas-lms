@@ -548,7 +548,7 @@ class AbstractAssignment < ApplicationRecord
       self.workflow_state = "outcome_alignment_cloning"
       start_outcome_alignment_service_clone
     else
-      self.workflow_state = (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
+      self.workflow_state = ((duplicate_of&.workflow_state == "published" || !can_unpublish?) && !quiz_lti?) ? "published" : "unpublished"
     end
   end
 
