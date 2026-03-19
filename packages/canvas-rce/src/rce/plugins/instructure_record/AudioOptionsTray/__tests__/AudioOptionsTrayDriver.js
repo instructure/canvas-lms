@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByLabelText, getByText, queryAllByLabelText, queryByTestId} from '@testing-library/dom'
+import {
+  getByPlaceholderText,
+  getByText,
+  queryAllByLabelText,
+  queryByTestId,
+} from '@testing-library/dom'
 
 export default class AudioOptionsTrayDriver {
   static find() {
@@ -54,7 +59,7 @@ export default class AudioOptionsTrayDriver {
   }
 
   get $manualCaptionsLanguageSelect() {
-    return getByLabelText(this.$closedCaptionPanel, /Select Language/i)
+    return getByPlaceholderText(this.$closedCaptionPanel, /Select Language/i)
   }
 
   get $manualCaptionsFileInput() {
@@ -74,7 +79,7 @@ export default class AudioOptionsTrayDriver {
   }
 
   get $automaticCaptionsLanguageSelect() {
-    return getByLabelText(this.$closedCaptionPanel, /Select Language/i)
+    return getByPlaceholderText(this.$closedCaptionPanel, /Select Language/i)
   }
 
   get $automaticCaptionsCancelButton() {

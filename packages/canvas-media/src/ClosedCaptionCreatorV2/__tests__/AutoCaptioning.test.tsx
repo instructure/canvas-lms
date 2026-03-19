@@ -63,7 +63,7 @@ describe('<AutoCaptioning />', () => {
     renderComponent()
 
     // Open the dropdown by clicking placeholder
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // Verify all languages are present
@@ -95,7 +95,7 @@ describe('<AutoCaptioning />', () => {
     expect(errorMessages.length).toBeGreaterThan(0)
 
     // Select a language
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -108,7 +108,7 @@ describe('<AutoCaptioning />', () => {
     renderComponent({onPrimary})
 
     // Open dropdown and select English
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -134,13 +134,50 @@ describe('<AutoCaptioning />', () => {
   it('renders with empty language list', () => {
     renderComponent({languages: []})
 
-    expect(screen.getByText('Select Language')).toBeInTheDocument()
-    expect(screen.getByText('Language Spoken in This Media*')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
+    expect(screen.getAllByText('Language Spoken in This Media*').length).toBeGreaterThan(0)
 
     // Should still render but with empty dropdown
-    expect(screen.getByText('Select Language')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
     expect(screen.getByText('Request')).toBeInTheDocument()
+  })
+
+  describe('a11y', () => {
+    it('a11y: focuses language dropdown when language is missing on submit', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText('Request'))
+
+      const languageInput = screen.getByPlaceholderText('Select Language')
+      expect(document.activeElement).toBe(languageInput)
+    })
+
+    it('a11y: sets aria-invalid and aria-describedby on language dropdown when error shown', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText('Request'))
+
+      const languageInput = screen.getByPlaceholderText('Select Language')
+      expect(languageInput).toHaveAttribute('aria-invalid', 'true')
+      expect(languageInput).toHaveAttribute('aria-describedby', 'cc-asr-language-error')
+    })
+
+    it('a11y: clears aria-invalid and aria-describedby after selecting a language', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText('Request'))
+
+      const languageInput = screen.getByPlaceholderText('Select Language')
+      expect(languageInput).toHaveAttribute('aria-invalid', 'true')
+      expect(languageInput).toHaveAttribute('aria-describedby', 'cc-asr-language-error')
+
+      fireEvent.click(languageInput)
+      fireEvent.click(screen.getByText('English'))
+
+      expect(languageInput).not.toHaveAttribute('aria-invalid')
+      expect(languageInput).not.toHaveAttribute('aria-describedby')
+    })
   })
 
   describe('Pendo tracking', () => {
@@ -174,7 +211,7 @@ describe('<AutoCaptioning />', () => {
         renderComponent({onDirtyStateChanged})
 
         // Select a language - click on placeholder text to open, then click option
-        const selectPlaceholder = screen.getByText('Select Language')
+        const selectPlaceholder = screen.getByPlaceholderText('Select Language')
         fireEvent.click(selectPlaceholder)
         fireEvent.click(screen.getByText('English'))
 
