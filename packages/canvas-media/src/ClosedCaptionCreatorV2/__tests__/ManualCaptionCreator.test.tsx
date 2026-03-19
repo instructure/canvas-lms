@@ -202,20 +202,26 @@ describe('<ManualCaptionCreator />', () => {
       })
     })
 
-    it('a11y: button aria-label shows "Choose File" when empty, "Selected File: filename" when file selected', async () => {
+    it('a11y: button has aria-describedby linking to format hint and file status', async () => {
       renderComponent()
 
-      // Initially button should have "Choose caption file" label
-      const chooseFileButton = screen.getByLabelText(/choose file/i)
-      expect(chooseFileButton).toBeInTheDocument()
+      const chooseFileButton = screen.getByText(/choose file/i).closest('button')
+      expect(chooseFileButton).toHaveAttribute('aria-describedby', 'cc-file-hint cc-file-status')
+
+      // Hint element should exist with correct id
+      expect(document.getElementById('cc-file-hint')).toHaveTextContent(/SRT or WebVTT/i)
+
+      // Status element should show "No file chosen" initially
+      expect(document.getElementById('cc-file-status')).toHaveTextContent(/no file chosen/i)
 
       // Select a file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
       const validFile = createValidFile('my-captions.vtt')
       fireEvent.change(fileInput, {target: {files: [validFile]}})
 
-      // Button aria-label should now indicate the selected file
-      expect(await screen.findByLabelText(/Selected file: my-captions.vtt/i)).toBeInTheDocument()
+      // Status element should now show the selected file name
+      expect(await screen.findByText('my-captions.vtt')).toBeInTheDocument()
+      expect(document.getElementById('cc-file-status')).toHaveTextContent('my-captions.vtt')
     })
   })
 
