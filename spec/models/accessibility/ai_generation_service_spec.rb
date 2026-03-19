@@ -236,7 +236,7 @@ describe Accessibility::AiGenerationService do
       end
 
       context "with full URLs (should NOT match)" do
-        it "raises InvalidParameterError for https://example.com/files/123" do
+        it "raises AttachmentNotFoundError for https://example.com/files/123" do
           wiki_page = create_wiki_page_with_body("<img src=\"https://example.com/files/123\" />")
 
           expect do
@@ -248,10 +248,10 @@ describe Accessibility::AiGenerationService do
               current_user: user,
               domain_root_account:
             ).generate_alt_text
-          end.to raise_error(Accessibility::AiGenerationService::InvalidParameterError)
+          end.to raise_error(Accessibility::AiGenerationService::AttachmentNotFoundError)
         end
 
-        it "raises InvalidParameterError for http://canvas.com/files/456" do
+        it "raises AttachmentNotFoundError for http://canvas.com/files/456" do
           wiki_page = create_wiki_page_with_body("<img src=\"http://canvas.com/files/456\" />")
 
           expect do
@@ -263,7 +263,7 @@ describe Accessibility::AiGenerationService do
               current_user: user,
               domain_root_account:
             ).generate_alt_text
-          end.to raise_error(Accessibility::AiGenerationService::InvalidParameterError)
+          end.to raise_error(Accessibility::AiGenerationService::AttachmentNotFoundError)
         end
       end
 
@@ -311,37 +311,37 @@ describe Accessibility::AiGenerationService do
         params[:path] = "./img"
       end
 
-      it "raises InvalidParameterError when attachment does not exist" do
+      it "raises AttachmentNotFoundError when attachment does not exist" do
         wiki_page_with_invalid_id = create_wiki_page_with_body("<img src=\"/files/999999\" />")
         params[:content_id] = wiki_page_with_invalid_id.id
 
-        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::InvalidParameterError)
+        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::AttachmentNotFoundError)
       end
 
-      it "raises InvalidParameterError when user lacks read permission" do
+      it "raises AttachmentPermissionError when user lacks read permission" do
         allow(Attachment).to receive(:find_by).and_call_original
         allow(Attachment).to receive(:find_by).with(id: attachment.id.to_s).and_return(attachment)
         allow(attachment).to receive(:grants_right?).with(user, :read).and_return(false)
 
-        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::InvalidParameterError)
+        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::AttachmentPermissionError)
       end
 
-      it "raises InvalidParameterError when file size exceeds limit" do
-        large_attachment = attachment_model(context: user, size: 11.megabytes, content_type: "image/png")
+      it "raises AttachmentTooLargeError when file size exceeds limit" do
+        large_attachment = attachment_model(context: user, size: 4.megabytes, content_type: "image/png")
         wiki_page_large = create_wiki_page_with_body("<img src=\"/files/#{large_attachment.id}\" />")
         params[:content_id] = wiki_page_large.id
         allow(large_attachment).to receive(:grants_right?).and_return(true)
 
-        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::InvalidParameterError)
+        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::AttachmentTooLargeError)
       end
 
-      it "raises InvalidParameterError when content type is unsupported" do
+      it "raises UnsupportedImageTypeError when content type is unsupported" do
         pdf_attachment = attachment_model(context: user, size: 1.megabyte, content_type: "application/pdf")
         wiki_page_pdf = create_wiki_page_with_body("<img src=\"/files/#{pdf_attachment.id}\" />")
         params[:content_id] = wiki_page_pdf.id
         allow(pdf_attachment).to receive(:grants_right?).and_return(true)
 
-        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::InvalidParameterError)
+        expect { described_class.new(**params).generate_alt_text }.to raise_error(Accessibility::AiGenerationService::UnsupportedImageTypeError)
       end
     end
 

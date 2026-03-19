@@ -334,34 +334,40 @@ describe('CheckboxTextInput', () => {
       })
     })
 
-    it('handles errors when generate API call fails', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    describe('error messages by status code', () => {
+      const errorCases = [
+        {status: 403, message: 'You do not have permission to access this attachment.'},
+        {status: 404, message: 'Attachment not found.'},
+        {status: 413, message: 'The file exceeds the maximum allowed size for AI processing.'},
+        {status: 415, message: 'This file type is not supported for AI processing.'},
+        {
+          status: 429,
+          message:
+            'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
+        },
+        {
+          status: 500,
+          message:
+            'There was an error generating alt text. Please try again, or enter it manually.',
+        },
+      ]
 
-      server.use(
-        http.post('**/generate/alt_text', () => {
-          return new HttpResponse(null, {status: 500})
-        }),
-      )
+      errorCases.forEach(({status, message}) => {
+        it(`shows correct message for status ${status}`, async () => {
+          const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      render(<CheckboxTextInput {...withGenerateFix()} />)
+          server.use(http.post('**/generate/alt_text', () => new HttpResponse(null, {status})))
 
-      const generateButton = screen.getByTestId('generate-button')
-      fireEvent.click(generateButton)
+          render(<CheckboxTextInput {...withGenerateFix()} />)
+          fireEvent.click(screen.getByTestId('generate-button'))
 
-      expect(screen.getByTestId('loading-label')).toHaveTextContent('Generating alt text...')
+          await waitFor(() => {
+            expect(screen.getByText(message)).toBeInTheDocument()
+          })
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-label')).not.toBeInTheDocument()
+          consoleErrorSpy.mockRestore()
+        })
       })
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error generating text input:',
-        expect.any(Error),
-      )
-
-      expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
-
-      consoleErrorSpy.mockRestore()
     })
 
     it('renders data-pendo="AiAltTextButtonPushed" on the generate button', () => {

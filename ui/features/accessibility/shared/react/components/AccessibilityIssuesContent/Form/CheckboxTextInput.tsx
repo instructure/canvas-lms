@@ -33,6 +33,7 @@ import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStor
 import {useShallow} from 'zustand/react/shallow'
 import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
 import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
+import {altTextGenerationErrorMessage} from '../../../utils/altTextErrors'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -160,14 +161,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             console.error('Error generating text input:', error)
             const statusCode = error?.response?.status || 0
 
-            const errorMessage =
-              statusCode === 429
-                ? I18n.t(
-                    'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
-                  )
-                : I18n.t(
-                    'There was an error generating alt text. Please try again, or enter it manually.',
-                  )
+            const errorMessage = altTextGenerationErrorMessage(statusCode)
 
             setGenerationError(errorMessage)
           })
