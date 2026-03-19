@@ -109,6 +109,59 @@ describe('RubricsQuery', () => {
     expect(await findByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
+  it('renders the rubric tab when pages contain proficiency rating nodes', async () => {
+    useAllPages.mockReturnValue({
+      data: {
+        pages: [
+          {
+            course: {
+              outcomeProficiency: {
+                proficiencyRatingsConnection: {
+                  nodes: [
+                    {color: 'green', description: 'Mastery', mastery: true, points: 3},
+                    {color: 'red', description: 'Below', mastery: false, points: 0},
+                  ],
+                  pageInfo: {hasNextPage: false, endCursor: null},
+                },
+              },
+            },
+          },
+        ],
+      },
+      isError: false,
+      isLoading: false,
+    })
+    const mocks = await makeMocks()
+    const props = await makeProps()
+    const {findByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <RubricsQuery {...props} />
+      </MockedProvider>,
+    )
+    expect(await findByTestId('rubric-tab')).toBeInTheDocument()
+  })
+
+  it('renders the rubric tab when pages have no proficiency rating nodes', async () => {
+    useAllPages.mockReturnValue({
+      data: {
+        pages: [
+          {course: {outcomeProficiency: {proficiencyRatingsConnection: {nodes: null}}}},
+          {course: null},
+        ],
+      },
+      isError: false,
+      isLoading: false,
+    })
+    const mocks = await makeMocks()
+    const props = await makeProps()
+    const {findByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <RubricsQuery {...props} />
+      </MockedProvider>,
+    )
+    expect(await findByTestId('rubric-tab')).toBeInTheDocument()
+  })
+
   it('renders the loading indicator when making a query', async () => {
     useAllPages.mockReturnValue({
       data: {},

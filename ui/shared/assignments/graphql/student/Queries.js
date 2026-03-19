@@ -76,16 +76,14 @@ export const RUBRIC_QUERY = gql`
 export const COURSE_PROFICIENCY_RATINGS_QUERY = gql`
   query GetCourseProficiencyRatings($courseID: ID!, $cursor: String) {
     course(id: $courseID) {
-      account {
-        outcomeProficiency {
-          proficiencyRatingsConnection (after: $cursor) {
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            nodes {
-              ...ProficiencyRating
-            }
+      outcomeProficiency {
+        proficiencyRatingsConnection (after: $cursor) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          nodes {
+            ...ProficiencyRating
           }
         }
       }
