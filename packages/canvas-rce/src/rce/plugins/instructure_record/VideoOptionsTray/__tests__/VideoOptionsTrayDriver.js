@@ -20,6 +20,7 @@ import {
   fireEvent,
   getAllByText,
   getByLabelText,
+  getByPlaceholderText,
   getByText,
   queryByLabelText,
   queryByTestId,
@@ -103,7 +104,7 @@ export default class VideoOptionsTrayDriver {
   }
 
   get $manualCaptionsLanguageSelect() {
-    return getByLabelText(this.$closedCaptionPanel, /Select Language/i)
+    return getByPlaceholderText(this.$closedCaptionPanel, /Select Language/i)
   }
 
   get $manualCaptionsFileInput() {
@@ -123,7 +124,7 @@ export default class VideoOptionsTrayDriver {
   }
 
   get $automaticCaptionsLanguageSelect() {
-    return getByLabelText(this.$closedCaptionPanel, /Select Language/i)
+    return getByPlaceholderText(this.$closedCaptionPanel, /Select Language/i)
   }
 
   get $automaticCaptionsCancelButton() {

@@ -123,7 +123,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButton)
 
     // Manual caption creator should be visible
-    expect(screen.getByText('Select Language')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
     expect(screen.getByText(/choose file/i)).toBeInTheDocument()
     expect(screen.getByText('Upload')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButton)
 
     // Select a language
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -193,7 +193,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
     // Open the language dropdown
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // English should not be in the dropdown (filtered out)
@@ -209,7 +209,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
 
     // Open the language dropdown
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // English should not be in the ASR dropdown (filtered out)
@@ -231,7 +231,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButton)
 
     // Select English and upload
-    let selectPlaceholder = screen.getByText('Select Language')
+    let selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -249,7 +249,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButtonAgain)
 
     // Open the language dropdown
-    selectPlaceholder = screen.getByText('Select Language')
+    selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // English should not be in the dropdown anymore
@@ -265,10 +265,10 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
 
     // Form should be visible
-    expect(screen.getByText('Language Spoken in This Media*')).toBeInTheDocument()
+    expect(screen.getAllByText('Language Spoken in This Media*').length).toBeGreaterThan(0)
 
     // Select a language
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('German'))
 
@@ -291,7 +291,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
 
     // Select a language from ASR dropdown
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('Spanish'))
 
@@ -372,7 +372,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
       // Select a language and file
-      const selectPlaceholder = screen.getByText('Select Language')
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
       fireEvent.click(selectPlaceholder)
       fireEvent.click(screen.getByText('Spanish'))
 
@@ -420,7 +420,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
       // Select a language and file
-      const selectPlaceholder = screen.getByText('Select Language')
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
       fireEvent.click(selectPlaceholder)
       fireEvent.click(screen.getByText('German'))
 
@@ -480,7 +480,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       // Open manual caption creator
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
-      const selectPlaceholder = screen.getByText('Select Language')
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
       fireEvent.click(selectPlaceholder)
       fireEvent.click(screen.getByText('German'))
 
@@ -550,7 +550,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
 
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('German'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -588,7 +588,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
 
       fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
 
@@ -612,7 +612,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
 
       fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
 
@@ -676,7 +676,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('English'))
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
       fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
@@ -693,7 +693,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     it('fires canvas_caption_submitted when ASR request is confirmed', async () => {
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
       await waitFor(() => {
@@ -711,7 +711,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('English'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -735,7 +735,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('German'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -757,7 +757,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('German'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},

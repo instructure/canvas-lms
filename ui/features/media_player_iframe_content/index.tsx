@@ -29,6 +29,7 @@ import {captionLanguageForLocale} from '@instructure/canvas-media'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {NoTranscript} from './components/NoTranscript'
 import {isAsrGenerating} from './utils/isAsrGenerating'
+import {getPlayerTracks} from './utils/getPlayerTracks'
 
 import {createOnTranscriptEdit, onConfirmEditChanges} from './transcriptEditing'
 import {createPendoTrackEventHandler} from './pendoTrackEventHandler'
@@ -185,11 +186,7 @@ ready(() => {
     r => r === 'teacher' || r === 'admin',
   )
   const isGenerating = isAsrGenerating(media_object?.media_tracks)
-  // Get rid of processing state ASR tracks, since their content will be empty anyway.
-  // append ASR track's label with "(Automatic)" to differentiate from human-created captions
-  const playerTracks = mediaTracks
-    ?.filter(t => !(t.asr && t.workflow_state === 'processing'))
-    .map(t => (t.asr ? {...t, label: I18n.t('%{language} (Automatic)', {language: t.label})} : t))
+  const playerTracks = getPlayerTracks(mediaTracks)
 
   const viewerRestrictions = media_object?.viewer_restrictions || {}
   const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
