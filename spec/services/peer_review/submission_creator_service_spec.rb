@@ -19,7 +19,7 @@
 
 require "spec_helper"
 
-RSpec.describe PeerReview::PeerReviewSubmitterService do
+RSpec.describe PeerReview::SubmissionCreatorService do
   let(:course) { course_model(name: "Course with Peer Review Assignment") }
   let(:assessor) { user_model(name: "Assessor User") }
   let(:student1) { user_model(name: "Student 1") }
@@ -35,11 +35,8 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
   end
 
   let(:peer_review_sub_assignment) do
-    PeerReviewSubAssignment.create!(
-      parent_assignment:,
-      peer_review_count: 2,
-      submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
-    )
+    peer_review_model(parent_assignment:)
+    parent_assignment.reload.peer_review_sub_assignment
   end
 
   let(:earliest_time) { 3.hours.ago }
@@ -144,8 +141,8 @@ RSpec.describe PeerReview::PeerReviewSubmitterService do
   end
 
   describe "#initialize" do
-    it "inherits from ApplicationService" do
-      expect(described_class.superclass).to eq(ApplicationService)
+    it "inherits from SubmissionCommonService" do
+      expect(described_class.superclass).to eq(PeerReview::SubmissionCommonService)
     end
 
     it "accepts parent_assignment and assessor parameters" do

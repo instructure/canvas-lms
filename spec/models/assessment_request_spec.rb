@@ -430,8 +430,8 @@ describe AssessmentRequest do
     end
   end
 
-  describe "#update_peer_review_submission" do
-    let(:service_double) { instance_double(PeerReview::PeerReviewSubmitterService) }
+  describe "#create_peer_review_submission" do
+    let(:service_double) { instance_double(PeerReview::SubmissionCreatorService) }
 
     before :once do
       @assignment.update!(peer_reviews: true)
@@ -441,8 +441,8 @@ describe AssessmentRequest do
       @request.save!
     end
 
-    it "calls PeerReviewSubmitterService when workflow state changes from assigned to completed and peer_review_sub_assignment exists" do
-      expect(PeerReview::PeerReviewSubmitterService).to receive(:new)
+    it "calls SubmissionCreatorService when workflow state changes from assigned to completed and peer_review_sub_assignment exists" do
+      expect(PeerReview::SubmissionCreatorService).to receive(:new)
         .with(parent_assignment: @assignment, assessor: @review_student)
         .and_return(service_double)
       expect(service_double).to receive(:call)
@@ -453,7 +453,7 @@ describe AssessmentRequest do
     it "does not call service when workflow state does not change" do
       @request.update!(workflow_state: "completed")
 
-      expect(PeerReview::PeerReviewSubmitterService).not_to receive(:new)
+      expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
 
       @request.save!
     end
@@ -461,7 +461,7 @@ describe AssessmentRequest do
     it "does not call service when workflow state changes but not from assigned to completed" do
       completed_request = create_assessment_request(workflow_state: "completed")
 
-      expect(PeerReview::PeerReviewSubmitterService).not_to receive(:new)
+      expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
 
       completed_request.update!(workflow_state: "assigned")
     end
@@ -470,22 +470,215 @@ describe AssessmentRequest do
       @request.peer_review_sub_assignment = nil
       @request.save!
       expect(@request.peer_review_sub_assignment).to be_nil
-      expect(PeerReview::PeerReviewSubmitterService).not_to receive(:new)
+      expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
 
       @request.complete!
     end
 
     context "with feature flag disabled but peer_review_sub_assignment present" do
-      it "calls PeerReviewSubmitterService even when feature flag is disabled" do
+      it "calls SubmissionCreatorService even when feature flag is disabled" do
         @assignment.context.disable_feature!(:peer_review_allocation_and_grading)
-        service_double = instance_double(PeerReview::PeerReviewSubmitterService)
+        service_double = instance_double(PeerReview::SubmissionCreatorService)
 
-        expect(PeerReview::PeerReviewSubmitterService).to receive(:new)
+        expect(PeerReview::SubmissionCreatorService).to receive(:new)
           .with(parent_assignment: @assignment, assessor: @review_student)
           .and_return(service_double)
         expect(service_double).to receive(:call)
 
         @request.complete!
+      end
+    end
+  end
+
+  describe "#update_peer_review_submission" do
+    before :once do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment.update!(peer_reviews: true, peer_review_count: 2)
+
+      @peer_review_sub = peer_review_model(parent_assignment: @assignment)
+      @assignment.reload
+
+      @reviewer1 = student_in_course(active_all: true, course: @course).user
+      @reviewee1 = student_in_course(active_all: true, course: @course).user
+      @reviewee2 = student_in_course(active_all: true, course: @course).user
+    end
+
+    def create_completed_review(reviewer, reviewee)
+      submission = @assignment.submit_homework(reviewee, submission_type: "online_text_entry", body: "test")
+      request = @assignment.assign_peer_review(reviewer, reviewee)
+      request.update!(workflow_state: "completed", peer_review_sub_assignment_id: @peer_review_sub.id)
+      SubmissionComment.create!(
+        submission:,
+        author: reviewer,
+        comment: "peer review feedback",
+        assessment_request: request,
+        workflow_state: "published"
+      )
+      request
+    end
+
+    def create_submitted_peer_review_submission(reviewer)
+      @peer_review_sub.submit_homework(
+        reviewer,
+        submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE,
+        submitted_at: Time.zone.now
+      )
+    end
+
+    context "with peer review submission comments" do
+      it "unsubmits peer review submission when completed peer reviews fall below threshold" do
+        request1 = create_completed_review(@reviewer1, @reviewee1)
+        create_completed_review(@reviewer1, @reviewee2)
+        submission = create_submitted_peer_review_submission(@reviewer1)
+
+        expect(submission).to be_present
+        expect(submission.workflow_state).to eq("submitted")
+
+        request1.destroy
+
+        submission.reload
+        expect(submission.workflow_state).to eq("unsubmitted")
+      end
+
+      it "does not unsubmit when peer reviews still meet threshold" do
+        reviewee3 = student_in_course(active_all: true, course: @course).user
+        request1 = create_completed_review(@reviewer1, @reviewee1)
+        create_completed_review(@reviewer1, @reviewee2)
+        create_completed_review(@reviewer1, reviewee3)
+        submission = create_submitted_peer_review_submission(@reviewer1)
+
+        expect(submission.workflow_state).to eq("submitted")
+
+        request1.destroy
+
+        submission.reload
+        expect(submission.workflow_state).to eq("submitted")
+      end
+
+      it "does not unsubmit if assessment request was not completed" do
+        create_completed_review(@reviewer1, @reviewee1)
+        create_completed_review(@reviewer1, @reviewee2)
+        submission = create_submitted_peer_review_submission(@reviewer1)
+
+        expect(submission.workflow_state).to eq("submitted")
+
+        request3 = @assignment.assign_peer_review(@reviewer1, student_in_course(active_all: true, course: @course).user)
+
+        request3.destroy
+
+        submission.reload
+        expect(submission.workflow_state).to eq("submitted")
+      end
+
+      context "with feature flag disabled" do
+        it "still unsubmits in legacy mode" do
+          request1 = create_completed_review(@reviewer1, @reviewee1)
+          create_completed_review(@reviewer1, @reviewee2)
+          submission = create_submitted_peer_review_submission(@reviewer1)
+
+          expect(submission.workflow_state).to eq("submitted")
+
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+
+          request1.destroy
+
+          submission.reload
+          expect(submission.workflow_state).to eq("unsubmitted")
+        end
+      end
+    end
+
+    context "with peer review rubric assessments" do
+      before :once do
+        rubric_model
+        @rubric_association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        @assignment.reload
+      end
+
+      def create_completed_review_with_rubric(reviewer, reviewee)
+        submission = @assignment.submit_homework(reviewee, submission_type: "online_text_entry", body: "test")
+        request = @assignment.assign_peer_review(reviewer, reviewee)
+        request.update!(workflow_state: "completed", peer_review_sub_assignment_id: @peer_review_sub.id)
+
+        rubric_assessment = RubricAssessment.create!(
+          rubric: @rubric,
+          artifact: submission,
+          assessment_type: "peer_review",
+          assessor: reviewer,
+          user: reviewee,
+          rubric_association: @rubric_association,
+          data: @rubric.criteria.map do |criterion|
+            {
+              criterion_id: criterion[:id],
+              points: criterion[:points],
+              comments: "Good work"
+            }
+          end
+        )
+
+        request.update!(rubric_assessment:)
+        request
+      end
+
+      it "unsubmits peer review submission when completed rubric-based peer reviews fall below threshold" do
+        request1 = create_completed_review_with_rubric(@reviewer1, @reviewee1)
+        create_completed_review_with_rubric(@reviewer1, @reviewee2)
+        submission = create_submitted_peer_review_submission(@reviewer1)
+
+        expect(submission).to be_present
+        expect(submission.workflow_state).to eq("submitted")
+
+        request1.destroy
+
+        submission.reload
+        expect(submission.workflow_state).to eq("unsubmitted")
+      end
+
+      it "does not unsubmit when rubric-based peer reviews still meet threshold" do
+        reviewee3 = student_in_course(active_all: true, course: @course).user
+        request1 = create_completed_review_with_rubric(@reviewer1, @reviewee1)
+        create_completed_review_with_rubric(@reviewer1, @reviewee2)
+        create_completed_review_with_rubric(@reviewer1, reviewee3)
+        submission = create_submitted_peer_review_submission(@reviewer1)
+
+        expect(submission.workflow_state).to eq("submitted")
+
+        request1.destroy
+
+        submission.reload
+        expect(submission.workflow_state).to eq("submitted")
+      end
+
+      it "does not unsubmit if rubric assessment request was not completed" do
+        create_completed_review_with_rubric(@reviewer1, @reviewee1)
+        create_completed_review_with_rubric(@reviewer1, @reviewee2)
+        submission = create_submitted_peer_review_submission(@reviewer1)
+
+        expect(submission.workflow_state).to eq("submitted")
+
+        request3 = @assignment.assign_peer_review(@reviewer1, student_in_course(active_all: true, course: @course).user)
+
+        request3.destroy
+
+        submission.reload
+        expect(submission.workflow_state).to eq("submitted")
+      end
+
+      context "with feature flag disabled" do
+        it "still unsubmits with rubric assessments in legacy mode" do
+          request1 = create_completed_review_with_rubric(@reviewer1, @reviewee1)
+          create_completed_review_with_rubric(@reviewer1, @reviewee2)
+          submission = create_submitted_peer_review_submission(@reviewer1)
+
+          expect(submission.workflow_state).to eq("submitted")
+
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+
+          request1.destroy
+
+          submission.reload
+          expect(submission.workflow_state).to eq("unsubmitted")
+        end
       end
     end
   end
