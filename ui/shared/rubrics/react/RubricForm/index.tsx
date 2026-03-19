@@ -126,7 +126,12 @@ export const RubricForm = ({
   const [savedRubricResponse, setSavedRubricResponse] = useState<SaveRubricResponse>()
   const [showWarningModal, setShowWarningModal] = useState(false)
   const [generateCriteriaFormOptions, setGenerateCriteriaFormOptions] =
-    useState<GenerateCriteriaFormProps>(defaultGenerateCriteriaForm)
+    useState<GenerateCriteriaFormProps>({
+      ...defaultGenerateCriteriaForm,
+      totalPoints: assignmentPointsPossible
+        ? assignmentPointsPossible.toString()
+        : defaultGenerateCriteriaForm.totalPoints,
+    })
   const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
   const [isAssignmentPointsDifferenceModalOpen, setIsAssignmentPointsDifferenceModalOpen] =
     useState(false)
@@ -458,7 +463,7 @@ export const RubricForm = ({
 
                 {showGenerateCriteriaForm && (
                   <GeneratedCriteriaForm
-                    totalPoints={assignmentPointsPossible}
+                    formOptions={generateCriteriaFormOptions}
                     criterionUseRangeEnabled={criterionUseRangeEnabled}
                     criteriaBeingGenerated={!!criteriaBeingGenerated}
                     generateCriteriaMutation={generateCriteriaMutation}
