@@ -238,5 +238,39 @@ describe UserProfile do
         end
       end
     end
+
+    describe "nav_menu_links" do
+      before :once do
+        user_factory(active_all: true)
+      end
+
+      context "when nav_menu_links feature is enabled" do
+        before { account.enable_feature!(:nav_menu_links) }
+
+        it "includes user_nav links in tabs" do
+          link = NavMenuLink.create!(context: account, user_nav: true, label: "My Link", url: "https://example.com")
+          tabs = @user.profile.tabs_available(@user, root_account: account)
+          expect(tabs.pluck(:id)).to include("nav_menu_link_#{link.id}")
+        end
+
+        it "does not include links without user_nav" do
+          NavMenuLink.create!(context: account, account_nav: true, label: "Account Only", url: "https://example.com")
+          tabs = @user.profile.tabs_available(@user, root_account: account)
+          tab_ids = tabs.pluck(:id).select { |id| id.to_s.start_with?("nav_menu_link_") }
+          expect(tab_ids).to be_empty
+        end
+      end
+
+      context "when nav_menu_links feature is disabled" do
+        before { account.disable_feature!(:nav_menu_links) }
+
+        it "does not include nav_menu_link tabs" do
+          NavMenuLink.create!(context: account, user_nav: true, label: "My Link", url: "https://example.com")
+          tabs = @user.profile.tabs_available(@user, root_account: account)
+          tab_ids = tabs.pluck(:id).select { |id| id.to_s.start_with?("nav_menu_link_") }
+          expect(tab_ids).to be_empty
+        end
+      end
+    end
   end
 end

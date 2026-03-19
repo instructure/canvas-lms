@@ -73,7 +73,7 @@ export default function NavMenuLinksSettings(): JSX.Element {
             <AddLinkModal
               onDismiss={() => setIsAddLinkModalOpen(false)}
               onAdd={appendLink}
-              availablePlacements={['course_nav', 'account_nav']}
+              availablePlacements={['course_nav', 'account_nav', 'user_nav']}
             />
           )}
         </View>

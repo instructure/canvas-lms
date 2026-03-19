@@ -307,6 +307,51 @@ describe NavMenuLinkTabs do
     end
   end
 
+  describe ".user_tabs" do
+    it "returns tabs for user navigation links" do
+      link1 = NavMenuLink.create!(context: @account, user_nav: true, label: "User Link 1", url: "https://user1.com")
+      link2 = NavMenuLink.create!(context: @account, user_nav: true, label: "User Link 2", url: "https://user2.com")
+
+      # Should not be included
+      NavMenuLink.create!(context: @account, course_nav: true, label: "Course Link", url: "https://course.com")
+      NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link", url: "https://account.com")
+
+      tabs = NavMenuLinkTabs.user_tabs(@account)
+
+      expect(tabs.length).to eq(2)
+      expect(tabs[0]).to include(
+        id: "nav_menu_link_#{link1.id}",
+        label: "User Link 1",
+        href: :nav_menu_link_url,
+        external: true,
+        target: "_blank",
+        link_context_type: "account"
+      )
+      expect(tabs[1]).to include(id: "nav_menu_link_#{link2.id}", label: "User Link 2")
+    end
+
+    it "returns user nav links from the account chain" do
+      parent_account = Account.create!(name: "Parent Account")
+      child_account = Account.create!(name: "Child Account", parent_account:)
+
+      NavMenuLink.create!(context: parent_account, user_nav: true, label: "Parent Link", url: "https://parent.com")
+      NavMenuLink.create!(context: child_account, user_nav: true, label: "Child Link", url: "https://child.com")
+
+      tabs = NavMenuLinkTabs.user_tabs(child_account)
+
+      expect(tabs.pluck(:label)).to include("Parent Link", "Child Link")
+    end
+
+    it "does not include user nav links from unrelated accounts" do
+      other_account = Account.create!(name: "Unrelated Account")
+      NavMenuLink.create!(context: other_account, user_nav: true, label: "Other Link", url: "https://other.com")
+
+      tabs = NavMenuLinkTabs.user_tabs(@account)
+
+      expect(tabs.pluck(:label)).not_to include("Other Link")
+    end
+  end
+
   describe ".nav_menu_link_tab_id?" do
     it "returns true for nav menu link tab ids" do
       expect(NavMenuLinkTabs.nav_menu_link_tab_id?("nav_menu_link_123")).to be true
