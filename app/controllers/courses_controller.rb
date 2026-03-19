@@ -558,8 +558,17 @@ class CoursesController < ApplicationController
     end
   end
 
+  def _load_enrollments_for_index
+    if Account.site_admin.feature_enabled?(:optimized_load_enrollments_for_index)
+      @current_user.user_preference_values.load
+      @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :role, :course_section, course: :enrollment_term).to_a
+    else
+      @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
+    end
+  end
+
   def load_enrollments_for_index
-    all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
+    all_enrollments = _load_enrollments_for_index
     if @current_user.roles(@domain_root_account).all? { |role| role == "student" || role == "user" }
       all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? || e.course.horizon_course? }
     end
@@ -569,6 +578,8 @@ class CoursesController < ApplicationController
 
     completed_states = %i[completed rejected]
     active_states = %i[active invited]
+    now = Time.now.utc
+
     all_enrollments.group_by { |e| [e.course_id, e.type] }.each_value do |enrollments|
       first_enrollment = enrollments.min_by(&:state_with_date_sortable)
       if enrollments.count > 1
@@ -585,8 +596,8 @@ class CoursesController < ApplicationController
         if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
            (first_enrollment.admin? &&
                first_enrollment.course.restrict_enrollments_to_course_dates &&
-               first_enrollment.course.start_at&.>(Time.now.utc) &&
-               (first_enrollment.course_section&.start_at&.>(Time.now.utc) || first_enrollment.course_section&.start_at.nil?)
+               first_enrollment.course.start_at&.>(now) &&
+               (first_enrollment.course_section&.start_at&.>(now) || first_enrollment.course_section&.start_at.nil?)
 
            )
           @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?
@@ -616,10 +627,12 @@ class CoursesController < ApplicationController
       sort_column = params[:fc_sort]
       order = params[:fc_order]
     end
+
+    favorite_course_ids = (sort_column == "favorite") ? @current_user.courses_with_primary_enrollment(:favorite_courses).to_set(&:id) : Set.new
     sorted_enrollments = enrollments.sort_by! do |e|
       case sort_column
       when "favorite"
-        @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id).include?(e.course_id) ? 0 : 1
+        favorite_course_ids.include?(e.course_id) ? 0 : 1
       when "course"
         e.course.name
       when "nickname"

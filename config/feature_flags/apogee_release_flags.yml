@@ -508,6 +508,19 @@ gradebook_use_sis_pseudonym_order_for_sorting:
       state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
+optimized_load_enrollments_for_index:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Optimized Load Enrollments for Courses Index
+  description: |
+    Optimizes the loading of enrollments for the courses index page by preloading correct 
+    object with a limited set of columns. This reduces memory usage and improves performance,
+    especially for users with many enrollments.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
 optimized_grading_rubrics:
   state: hidden
   applies_to: SiteAdmin
