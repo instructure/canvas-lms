@@ -380,6 +380,9 @@
   "close_d634289d": {
     "message": "Close"
   },
+  "close_keyboard_shortcuts_modal_291ce074": {
+    "message": "Close Keyboard Shortcuts Modal"
+  },
   "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
     "message": "Closed caption file must be less than { maxKb } kb"
   },
