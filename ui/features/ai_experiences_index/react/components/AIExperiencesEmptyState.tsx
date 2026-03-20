@@ -43,15 +43,15 @@ const AIExperiencesEmptyState: React.FC<AIExperiencesEmptyStateProps> = ({
       <Flex.Item margin="0 0 small 0">
         <Text size="large" weight="bold">
           {canManage
-            ? I18n.t('No AI experiences created yet.')
-            : I18n.t('No AI experiences available yet.')}
+            ? I18n.t('No Knowledge Chats created yet.')
+            : I18n.t('No Knowledge Chats available yet.')}
         </Text>
       </Flex.Item>
       <Flex.Item margin="0 0 medium 0">
         <Text size="medium" color="secondary">
           {canManage
-            ? I18n.t('Click the Create New button to start building your first AI experience.')
-            : I18n.t('Your instructor has not published any AI experiences yet.')}
+            ? I18n.t('Click the Create New button to start building your first Knowledge Chat.')
+            : I18n.t('Your instructor has not published any Knowledge Chats yet.')}
         </Text>
       </Flex.Item>
       {canManage && (

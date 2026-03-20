@@ -360,7 +360,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             <IconPlayLine size="small" />
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
               </Heading>
               <Text size="small">
                 {isTeacherPreview
@@ -413,7 +413,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             </IconButton>
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
               </Heading>
               <Text size="small">
                 {isTeacherPreview
@@ -481,7 +481,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                   <Flex gap="small" alignItems="center">
                     <View>
                       <Heading level="h3" margin="0 0 xx-small 0">
-                        {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+                        {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
                       </Heading>
                       <Text size="small">
                         {isTeacherPreview

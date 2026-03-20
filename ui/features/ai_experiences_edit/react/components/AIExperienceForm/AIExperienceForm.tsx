@@ -104,7 +104,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     const newErrors: Record<string, string> = {}
 
     if (!formData.title.trim()) {
-      newErrors.title = I18n.t('Title required')
+      newErrors.title = I18n.t('Knowledge chat name required')
     }
 
     if (!formData.facts.trim()) {
@@ -165,12 +165,12 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperience.id}`,
         method: 'DELETE',
       })
-      showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
+      showFlashSuccess(I18n.t('Knowledge Chat deleted successfully'))()
       window.location.href = `/courses/${courseId}/ai_experiences`
     } catch (error: any) {
       const errorMessage =
-        error?.message || I18n.t('An error occurred while deleting the AI Experience')
-      showFlashError(I18n.t('Failed to delete AI Experience: %{error}', {error: errorMessage}))()
+        error?.message || I18n.t('An error occurred while deleting the Knowledge Chat')
+      showFlashError(I18n.t('Failed to delete Knowledge Chat: %{error}', {error: errorMessage}))()
       setIsDeleting(false)
       setShowDeleteModal(false)
     }
@@ -199,7 +199,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         <View as="div" margin="0 0 large 0">
           <TextInput
             data-testid="ai-experience-edit-title-input"
-            renderLabel={I18n.t('Title')}
+            renderLabel={I18n.t('Knowledge chat name')}
             value={formData.title}
             onChange={handleInputChange('title')}
             isRequired
@@ -210,7 +210,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         <View as="div" margin="0 0 large 0">
           <TextArea
             data-testid="ai-experience-edit-description-input"
-            label={I18n.t('Description')}
+            label={I18n.t('Knowledge chat description')}
             value={formData.description}
             onChange={handleInputChange('description')}
             resize="vertical"

@@ -67,12 +67,52 @@ describe('AiExperiencesIndex', () => {
       render(<AiExperiencesIndex />)
 
       await waitFor(() =>
-        expect(screen.getByText('No AI experiences created yet.')).toBeInTheDocument(),
+        expect(screen.getByText('No Knowledge Chats created yet.')).toBeInTheDocument(),
       )
       expect(screen.getByText('Create new')).toBeInTheDocument()
       expect(
-        screen.getByText('Click the Create New button to start building your first AI experience.'),
+        screen.getByText(
+          'Click the Create New button to start building your first Knowledge Chat.',
+        ),
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('subtitle text', () => {
+    it('shows manager subtitle when can_manage is true', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: [], can_manage: true}),
+        ),
+      )
+
+      render(<AiExperiencesIndex />)
+
+      await waitFor(() =>
+        expect(
+          screen.getByText(
+            "Evaluate your students' comprehension of a topic with a configurable LLM chat (learning language model).",
+          ),
+        ).toBeInTheDocument(),
+      )
+    })
+
+    it('shows student subtitle when can_manage is false', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: [], can_manage: false}),
+        ),
+      )
+
+      render(<AiExperiencesIndex />)
+
+      await waitFor(() =>
+        expect(
+          screen.getByText(
+            'Check your understanding of a topic with an educator-configured Knowledge Chat.',
+          ),
+        ).toBeInTheDocument(),
+      )
     })
   })
 
