@@ -25,13 +25,15 @@ module BrandConfigHelpers
   end
 
   def effective_brand_config
-    shard_id, md5 = Rails.cache.fetch_with_batched_keys("effective_brand_config_ids", batch_object: self, batched_keys: [:account_chain, :brand_config]) do
-      branded_account = brand_config_chain(include_self: true).select(&:branding_allowed?).find(&:brand_config_md5)
-      [branded_account&.shard&.id, branded_account&.brand_config_md5]
-    end
-    return nil unless md5
+    RequestCache.cache("effective_brand_config", self) do
+      shard_id, md5 = Rails.cache.fetch_with_batched_keys("effective_brand_config_ids", batch_object: self, batched_keys: [:account_chain, :brand_config]) do
+        branded_account = brand_config_chain(include_self: true).select(&:branding_allowed?).find(&:brand_config_md5)
+        [branded_account&.shard&.id, branded_account&.brand_config_md5]
+      end
+      next nil unless md5
 
-    BrandConfig.find_cached_by_md5(shard_id, md5)
+      BrandConfig.find_cached_by_md5(shard_id, md5)
+    end
   end
 
   def first_parent_brand_config
