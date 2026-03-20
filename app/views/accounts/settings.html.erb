@@ -889,12 +889,6 @@
                   <%= settings.label     :kill_joy, :en => "Remove hidden game from 404 page" %>
                 </div>
               <% end %>
-              <% unless @account.site_admin? %>
-                <div>
-                  <%= settings.check_box :suppress_notifications, :checked => @account.suppress_notifications? %>
-                  <%= settings.label     :suppress_notifications, :en => "Suppress notifications from being created and sent out" %>
-                </div>
-              <% end %>
             <% end %>
             <% if @account.grants_right?(@current_user, :manage_site_settings) %>
               <div>
@@ -920,6 +914,22 @@
             <% end %>
           <% end %>
         </fieldset>
+
+        <% if !@account.site_admin? && @account.primary_settings_root_account? %>
+          <fieldset id="suppress_notifications_settings">
+            <h2 class="screenreader-only"><%= t('Suppress Notifications') %></h2>
+            <legend><%= t('Suppress Notifications') %></legend>
+            <div id="suppress-notifications-mount" data-values="<%=
+              {
+                suppressNotifications: @account.settings[:suppress_notifications].presence || false,
+                notificationCategories: Notification.all_cached
+                  .map { |n| { slug: n.category_slug, displayName: n.category_display_name } }
+                  .uniq { |c| c[:slug] }
+                  .sort_by { |c| c[:displayName] }
+              }.to_json
+            %>"></div>
+          </fieldset>
+        <% end %>
 
         <% unless @account.site_admin? %>
             <% if @account.feature_enabled?(:new_sis_integrations) %>
