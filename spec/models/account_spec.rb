@@ -4077,4 +4077,68 @@ describe Account do
       end
     end
   end
+
+  describe "#suppress_notifications?" do
+    let(:account) { Account.default }
+
+    it "returns true when setting is true" do
+      account.settings[:suppress_notifications] = true
+      expect(account.suppress_notifications?).to be true
+    end
+
+    it "returns false when setting is false" do
+      account.settings[:suppress_notifications] = false
+      expect(account.suppress_notifications?).to be false
+    end
+
+    it "returns false when setting is nil" do
+      account.settings.delete(:suppress_notifications)
+      expect(account.suppress_notifications?).to be false
+    end
+
+    it "returns false when setting is an array of categories" do
+      account.settings[:suppress_notifications] = %w[grading announcement]
+      expect(account.suppress_notifications?).to be false
+    end
+  end
+
+  describe "#suppress_notification?" do
+    let(:account) { Account.default }
+
+    let(:grading_notification) do
+      Notification.create!(name: "Test Grading Notification", category: "Grading")
+    end
+
+    let(:announcement_notification) do
+      Notification.create!(name: "Test Announcement Notification", category: "Announcement")
+    end
+
+    it "returns false when setting is nil" do
+      account.settings.delete(:suppress_notifications)
+      expect(account.suppress_notification?(grading_notification)).to be false
+    end
+
+    it "returns false when setting is false" do
+      account.settings[:suppress_notifications] = false
+      expect(account.suppress_notification?(grading_notification)).to be false
+    end
+
+    it "returns true for any notification when setting is true" do
+      account.settings[:suppress_notifications] = true
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be true
+    end
+
+    it "suppresses only notifications whose category_slug is in the array" do
+      account.settings[:suppress_notifications] = %w[grading]
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be false
+    end
+
+    it "suppresses multiple categories when all are in the array" do
+      account.settings[:suppress_notifications] = %w[grading announcement]
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be true
+    end
+  end
 end
