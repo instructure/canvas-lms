@@ -393,11 +393,12 @@ module UserSearch
     end
 
     def name_sql(users_scope, params)
+      name_condition = ActiveRecord::Base.coalesced_wildcard("users.name", "users.short_name", params[:db_id])
       users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
-                 .where(like_condition("users.name"), pattern: params[:pattern])
+                 .where(name_condition)
     end
 
     def login_sql(users_scope, params)

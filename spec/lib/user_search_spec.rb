@@ -48,6 +48,13 @@ describe UserSearch do
       expect(UserSearch.for_user_in_context("steWArt", course, user).size).to eq 3
     end
 
+    it "searches by both name and short_name" do
+      user_with_short_name = User.create!(name: "Nicknamed Student", short_name: "Name is Little")
+      StudentEnrollment.create!(user: user_with_short_name, course:, workflow_state: "active")
+
+      expect(UserSearch.for_user_in_context("little", course, user).size).to eq 2
+    end
+
     it "uses postgres lower(), not ruby downcase()" do
       # ruby 1.9 downcase doesn't handle the downcasing of many multi-byte characters correctly
       expect(UserSearch.for_user_in_context("Ĭńşŧřůćƭǜȑȩ", course, user).size).to eq 1
