@@ -31,9 +31,10 @@ const I18n = createI18nScope('accessibility_checker')
 interface WizardProps {
   title: string
   onDismiss: () => void
+  headingRef?: (el: Element | null) => void
 }
 
-export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss}) => {
+export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss, headingRef}) => {
   const [isHeaderTruncated, setIsHeaderTruncated] = React.useState(false)
   const getFeatureInfo = useAiFeatureInfo()
 
@@ -54,7 +55,7 @@ export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss}) => {
     >
       <GridArea area="title">
         <Tooltip on={isHeaderTruncated ? ['hover'] : []} placement="start center" renderTip={title}>
-          <Heading level="h2" variant="titleCardRegular">
+          <Heading level="h2" variant="titleCardRegular" elementRef={headingRef} tabIndex={-1}>
             <TruncateText onUpdate={isTruncated => setIsHeaderTruncated(isTruncated)}>
               {title}
             </TruncateText>
