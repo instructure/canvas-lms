@@ -53,7 +53,7 @@ module Services
 
     def self.cloudfront_host
       case environment
-      when "prod"
+      when "production"
         config[NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY]
       when "beta"
         config[NEW_QUIZZES_CLOUDFRONT_HOST_BETA_KEY] || config[NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY]
