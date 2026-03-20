@@ -150,6 +150,7 @@ export const AccessibilityWizard = () => {
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
   const formRef: Ref<FormHandle> = useRef<FormHandle>(null)
   const regionRef = useRef<HTMLDivElement | null>(null)
+  const wizardHeadingRef = useRef<HTMLHeadingElement | null>(null)
 
   // This debounces the preview update to prevent excessive API calls when the user is typing.
   const updatePreview = useDebouncedCallback((formValue: FormValue) => {
@@ -217,6 +218,9 @@ export const AccessibilityWizard = () => {
       const newNextResource = getNextResource(accessibilityScans, nextItem)
       if (newNextResource) {
         setNextResource(newNextResource)
+        setTimeout(() => {
+          wizardHeadingRef.current?.focus()
+        }, 0)
       }
     }
   }, [accessibilityScans, nextResource, setSelectedScan, setNextResource, getNextResource])
@@ -727,7 +731,13 @@ export const AccessibilityWizard = () => {
                 }
               }}
             >
-              <WizardHeader title={trayTitle} onDismiss={onDismiss} />
+              <WizardHeader
+                title={trayTitle}
+                onDismiss={onDismiss}
+                headingRef={el => {
+                  wizardHeadingRef.current = el as HTMLHeadingElement | null
+                }}
+              />
             </View>
           </Flex.Item>
           <Flex.Item
