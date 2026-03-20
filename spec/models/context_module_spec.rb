@@ -108,6 +108,33 @@ describe ContextModule do
         expect(@page2.reload).to be_published
       end
     end
+
+    context "with wiki page user tracking" do
+      before :once do
+        @user1 = user_model
+        @user2 = user_model
+        @page = @course.wiki_pages.create!(title: "tracked page", user: @user1, workflow_state: "unpublished")
+        @page_tag = @module.add_item(id: @page.id, type: "page")
+      end
+
+      it "sets the wiki page user from the explicit user argument" do
+        @module.publish_items!(user: @user2)
+        expect(@page.reload.user).to eq @user2
+      end
+
+      it "sets the wiki page user from the progress object" do
+        progress = Progress.create!(context: @course, tag: "test", user: @user2)
+        @module.publish_items!(progress:)
+        expect(@page.reload.user).to eq @user2
+      end
+
+      it "prefers the explicit user over the progress user" do
+        user3 = user_model
+        progress = Progress.create!(context: @course, tag: "test", user: @user2)
+        @module.publish_items!(progress:, user: user3)
+        expect(@page.reload.user).to eq user3
+      end
+    end
   end
 
   describe "unpublish_items!" do
@@ -182,6 +209,27 @@ describe ContextModule do
         @module.unpublish_items!
         expect(@context_visibility_tag.reload.published?).to be true
         expect(@context_visibility_file.reload.locked?).to be false
+      end
+    end
+
+    context "with wiki page user tracking" do
+      before :once do
+        @user1 = user_model
+        @user2 = user_model
+        @page = @course.wiki_pages.create!(title: "tracked page", user: @user1)
+        @page_tag = @module.add_item(id: @page.id, type: "page")
+        @page_tag.publish
+      end
+
+      it "sets the wiki page user from the explicit user argument" do
+        @module.unpublish_items!(user: @user2)
+        expect(@page.reload.user).to eq @user2
+      end
+
+      it "sets the wiki page user from the progress object" do
+        progress = Progress.create!(context: @course, tag: "test", user: @user2)
+        @module.unpublish_items!(progress:)
+        expect(@page.reload.user).to eq @user2
       end
     end
   end

@@ -8826,6 +8826,21 @@ describe Course do
       completed_ids = @course.batch_update_context_modules(module_ids: @ids_to_update, event: :publish)
       expect(completed_ids).to eq @ids_to_update
     end
+
+    it "sets the wiki page user to the progress user when publishing" do
+      user2 = user_model
+      progress = Progress.create!(context: @course, tag: "context_module_batch_update", user: user2)
+      @course.batch_update_context_modules(progress, module_ids: @ids_to_update, event: :publish)
+      expect(@wiki_page.reload.user).to eq user2
+    end
+
+    it "sets the wiki page user to the progress user when unpublishing" do
+      user2 = user_model
+      @wiki_page_tag.trigger_publish!
+      progress = Progress.create!(context: @course, tag: "context_module_batch_update", user: user2)
+      @course.batch_update_context_modules(progress, module_ids: @ids_to_update, event: :unpublish)
+      expect(@wiki_page.reload.user).to eq user2
+    end
   end
 
   describe "restrict quantitative data" do

@@ -1217,7 +1217,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       if params[:publish]
         @module.publish
-        @module.publish_items!
+        @module.publish_items!(user: @current_user)
       elsif params[:unpublish]
         @module.unpublish
       end
