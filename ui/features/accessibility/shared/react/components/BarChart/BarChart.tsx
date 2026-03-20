@@ -168,7 +168,7 @@ export const BarChart = (props: BarChartProps) => {
       width={'100%'}
       height={'100%'}
     >
-      <Heading level="h3" variant="titleCardRegular">
+      <Heading level="h2" variant="titleCardRegular">
         {props.title}
       </Heading>
       <View display="block">
