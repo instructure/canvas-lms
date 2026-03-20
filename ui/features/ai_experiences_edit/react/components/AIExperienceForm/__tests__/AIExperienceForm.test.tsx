@@ -58,7 +58,7 @@ describe('AIExperienceForm', () => {
   describe('rendering', () => {
     it('renders form for new AI experience', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-      expect(screen.getByText('New AI Experience')).toBeInTheDocument()
+      expect(screen.getByText('New Knowledge Chat')).toBeInTheDocument()
     })
 
     it('renders form for editing AI experience', () => {
@@ -75,11 +75,11 @@ describe('AIExperienceForm', () => {
     it('renders all form fields', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      expect(screen.getByLabelText(/Title/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Description/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Knowledge chat name/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Knowledge chat description/)).toBeInTheDocument()
       expect(screen.getByLabelText(/Text source/)).toBeInTheDocument()
       expect(screen.getByLabelText(/Learning objective targets/)).toBeInTheDocument()
-      expect(screen.getByLabelText(/Customize agent/)).toBeInTheDocument()
+      expect(screen.getByLabelText(/Pedagogical guidance/)).toBeInTheDocument()
     })
 
     it('renders configuration section', () => {
@@ -88,7 +88,7 @@ describe('AIExperienceForm', () => {
       expect(screen.getByText('Configurations')).toBeInTheDocument()
       expect(
         screen.getByText(
-          'Define the sourcing, completion rules, and personality of this IgniteAI.',
+          'Define the completion rules, pedagogical guidance, and sources of the large language model (LLM).',
         ),
       ).toBeInTheDocument()
     })
@@ -126,14 +126,16 @@ describe('AIExperienceForm', () => {
     it('calls onSubmit with form data when Save to preview button is clicked', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
-      const descriptionInput = screen.getByLabelText(/Description/) as HTMLTextAreaElement
+      const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
+      const descriptionInput = screen.getByLabelText(
+        /Knowledge chat description/,
+      ) as HTMLTextAreaElement
       const factsInput = screen.getByLabelText(/Text source/) as HTMLTextAreaElement
       const learningObjectivesInput = screen.getByLabelText(
         /Learning objective targets/,
       ) as HTMLTextAreaElement
       const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Customize agent/,
+        /Pedagogical guidance/,
       ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'New Title'}})
@@ -185,7 +187,7 @@ describe('AIExperienceForm', () => {
       fireEvent.click(saveButton)
 
       await waitFor(() => {
-        expect(screen.getByText('Title required')).toBeInTheDocument()
+        expect(screen.getByText('Knowledge chat name required')).toBeInTheDocument()
       })
 
       expect(mockOnSubmit).not.toHaveBeenCalled()
@@ -194,7 +196,7 @@ describe('AIExperienceForm', () => {
     it('shows error when facts is empty on submission', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
       const saveButton = screen.getByText('Save to preview')
@@ -210,7 +212,7 @@ describe('AIExperienceForm', () => {
     it('shows error when learning_objective is empty on submission', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
       const saveButton = screen.getByText('Save to preview')
@@ -228,7 +230,7 @@ describe('AIExperienceForm', () => {
     it('shows error when pedagogical_guidance is empty on submission', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
       const saveButton = screen.getByText('Save to preview')
@@ -259,7 +261,7 @@ describe('AIExperienceForm', () => {
     it('does not show errors until first submission attempt', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      expect(screen.queryByText('Title required')).not.toBeInTheDocument()
+      expect(screen.queryByText('Knowledge chat name required')).not.toBeInTheDocument()
       expect(
         screen.queryByText('Please provide facts students should know'),
       ).not.toBeInTheDocument()
@@ -276,27 +278,27 @@ describe('AIExperienceForm', () => {
       fireEvent.click(saveButton)
 
       await waitFor(() => {
-        expect(screen.getByText('Title required')).toBeInTheDocument()
+        expect(screen.getByText('Knowledge chat name required')).toBeInTheDocument()
       })
 
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
       await waitFor(() => {
-        expect(screen.queryByText('Title required')).not.toBeInTheDocument()
+        expect(screen.queryByText('Knowledge chat name required')).not.toBeInTheDocument()
       })
     })
 
     it('submits successfully when all required fields are filled', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const titleInput = screen.getByLabelText(/Title/) as HTMLInputElement
+      const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       const factsInput = screen.getByLabelText(/Text source/) as HTMLTextAreaElement
       const learningObjectivesInput = screen.getByLabelText(
         /Learning objective targets/,
       ) as HTMLTextAreaElement
       const pedagogicalGuidanceInput = screen.getByLabelText(
-        /Customize agent/,
+        /Pedagogical guidance/,
       ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'New Title'}})
@@ -322,12 +324,12 @@ describe('AIExperienceForm', () => {
 
   describe('context file handling', () => {
     const fillRequiredFields = () => {
-      fireEvent.change(screen.getByLabelText(/Title/), {target: {value: 'Title'}})
+      fireEvent.change(screen.getByLabelText(/Knowledge chat name/), {target: {value: 'Title'}})
       fireEvent.change(screen.getByLabelText(/Text source/), {target: {value: 'Facts'}})
       fireEvent.change(screen.getByLabelText(/Learning objective targets/), {
         target: {value: 'Objectives'},
       })
-      fireEvent.change(screen.getByLabelText(/Customize agent/), {target: {value: 'Guidance'}})
+      fireEvent.change(screen.getByLabelText(/Pedagogical guidance/), {target: {value: 'Guidance'}})
     }
 
     it('includes context_file_ids as empty array in submit payload when no files', async () => {
@@ -436,7 +438,7 @@ describe('AIExperienceForm', () => {
       fireEvent.click(deleteMenuItem)
 
       await waitFor(() => {
-        expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
+        expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
         expect(
           screen.getByText(
             'Are you sure you want to delete "Test Experience"? This action cannot be undone.',
@@ -465,7 +467,7 @@ describe('AIExperienceForm', () => {
       fireEvent.click(deleteMenuItem)
 
       await waitFor(() => {
-        expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
+        expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
       })
 
       const cancelButtons = screen.getAllByText('Cancel')
@@ -473,7 +475,7 @@ describe('AIExperienceForm', () => {
       fireEvent.click(modalCancelButton!)
 
       await waitFor(() => {
-        expect(screen.queryByText('Delete AI Experience')).not.toBeInTheDocument()
+        expect(screen.queryByText('Delete Knowledge Chat')).not.toBeInTheDocument()
       })
     })
 
@@ -505,7 +507,7 @@ describe('AIExperienceForm', () => {
       fireEvent.click(deleteMenuItem)
 
       await waitFor(() => {
-        expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
+        expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
       })
 
       const deleteButtons = screen.getAllByText('Delete')

@@ -154,7 +154,7 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
             <IconAiColoredSolid size="small" />
           </Flex.Item>
           <Flex.Item>
-            <Heading level="h1">{I18n.t('AI Conversations')}</Heading>
+            <Heading level="h1">{I18n.t('Conversations')}</Heading>
           </Flex.Item>
         </Flex>
       </View>

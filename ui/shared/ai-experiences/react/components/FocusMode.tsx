@@ -37,7 +37,7 @@ const FocusMode: React.FC<FocusModeProps> = ({
   isOpen,
   onClose,
   children,
-  title = I18n.t('Conversation'),
+  title = I18n.t('Knowledge Chat'),
 }) => {
   // Handle ESC key press
   const handleKeyDown = useCallback(

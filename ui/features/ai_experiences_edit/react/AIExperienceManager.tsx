@@ -110,7 +110,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
           // Use default message if response body cannot be parsed
         }
       }
-      showFlashError(I18n.t('Failed to save AI Experience: %{error}', {error: message}))()
+      showFlashError(I18n.t('Failed to save Knowledge Chat: %{error}', {error: message}))()
     } finally {
       setIsLoading(false)
     }

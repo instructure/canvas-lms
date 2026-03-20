@@ -51,8 +51,8 @@ describe "ai experiences form" do
       end
 
       describe "page structure" do
-        it "displays the New AI Experience heading" do
-          expect(AiExperiencesFormPage.page_heading_text).to eq("New AI Experience")
+        it "displays the New Knowledge Chat heading" do
+          expect(AiExperiencesFormPage.page_heading_text).to eq("New Knowledge Chat")
         end
 
         it "displays all form fields" do
@@ -155,7 +155,7 @@ describe "ai experiences form" do
       end
 
       it "cannot access the create page" do
-        expect(AiExperiencesFormPage.page_heading_text).not_to eq("New AI Experience")
+        expect(AiExperiencesFormPage.page_heading_text).not_to eq("New Knowledge Chat")
       end
     end
   end
@@ -169,7 +169,7 @@ describe "ai experiences form" do
       end
 
       describe "page structure" do
-        it "displays the Edit AI Experience heading" do
+        it "displays the Edit Knowledge Chat heading" do
           expect(AiExperiencesFormPage.page_heading_text).to eq("Edit Existing Experience")
         end
 
@@ -220,7 +220,7 @@ describe "ai experiences form" do
       end
 
       it "cannot access the edit page" do
-        expect(AiExperiencesFormPage.page_heading_text).not_to eq("Edit AI Experience")
+        expect(AiExperiencesFormPage.page_heading_text).not_to eq("Edit Knowledge Chat")
       end
     end
   end
