@@ -198,12 +198,14 @@ class RoleOverride < ApplicationRecord
       uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching:, preloaded_overrides:)
     else
       full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
-      LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
-        Rails.cache.fetch_with_batched_keys(full_base_key,
-                                            batch_object: account,
-                                            batched_keys: [:account_chain, :role_overrides],
-                                            skip_cache_if_disabled: true) do
-          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching: true, preloaded_overrides:)
+      RequestCache.cache(full_base_key, account) do
+        LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
+          Rails.cache.fetch_with_batched_keys(full_base_key,
+                                              batch_object: account,
+                                              batched_keys: [:account_chain, :role_overrides],
+                                              skip_cache_if_disabled: true) do
+            uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching: true, preloaded_overrides:)
+          end
         end
       end
     end.freeze
