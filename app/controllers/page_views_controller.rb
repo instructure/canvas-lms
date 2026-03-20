@@ -278,6 +278,8 @@ class PageViewsController < ApplicationController
   # Maximum number of user IDs allowed in a batch query
   BATCH_QUERY_MAX_USER_IDS = 10
 
+  before_action :require_pv5_configured!, only: %i[query poll_query query_results batch_query poll_batch_query batch_query_results]
+
   # @API List user page views
   # Return a paginated list of the user's page view history in json format,
   # similar to the available CSV download. Page views are returned in
@@ -892,5 +894,9 @@ class PageViewsController < ApplicationController
 
   def uuid?(string)
     !!(string =~ /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z/)
+  end
+
+  def require_pv5_configured!
+    render json: { error: t("Page views history is not available in this environment.") }, status: :not_found unless PageViews::Configuration.configured?
   end
 end

@@ -51,6 +51,7 @@ import {EnvAuthentication} from './EnvAuthentication'
 import {EnvWidgetDashboard} from './EnvWidgetDashboard'
 import {EnvUsageMetrics} from './EnvUsageMetrics'
 import {EnvOak} from './EnvOak'
+import {EnvPageViews} from './EnvPageViews'
 
 /**
  * Top level ENV variable.
@@ -100,5 +101,6 @@ export type GlobalEnv =
         EnvNewQuizzes &
         EnvNotices &
         EnvUsageMetrics &
-        EnvOak
+        EnvOak &
+        EnvPageViews
     >

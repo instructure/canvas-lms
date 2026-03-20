@@ -21,8 +21,14 @@ module PageViews
   class Configuration
     attr_reader :uri
 
+    def self.configured?
+      ConfigFile.load("pv5").present?
+    end
+
     def initialize(region: nil)
       config = ConfigFile.load("pv5")
+      raise Common::ConfigurationError, "PV5 is not configured for this environment" unless config.present?
+
       regional_config = get_regional_config(config, region) || {}
       @uri = URI.parse(regional_config["uri"] || config["uri"])
     rescue URI::InvalidURIError => e
