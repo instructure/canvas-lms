@@ -35,7 +35,7 @@ module Services
                                                        }))
       allow(ApplicationController).to receive(:region).and_return("us-west-2")
       allow(ENV).to receive(:fetch).and_call_original
-      allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("prod")
+      allow(ENV).to receive(:fetch).with("CANVAS_ENVIRONMENT").and_return("production")
     end
 
     describe ".launch_url" do
