@@ -183,6 +183,21 @@ describe LiveEventsObserver do
         attachment.touch
       end
     end
+
+    context "if the attachment is published" do
+      it "posts attachment_updated event" do
+        attachment.update(locked: true)
+        expect(Canvas::LiveEvents).to receive(:attachment_updated)
+        attachment.publish!
+      end
+    end
+
+    context "if the attachment is unpublished" do
+      it "posts attachment_updated event" do
+        expect(Canvas::LiveEvents).to receive(:attachment_updated)
+        attachment.update(locked: true)
+      end
+    end
   end
 
   describe "conversation" do

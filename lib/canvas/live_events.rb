@@ -457,6 +457,7 @@ module Canvas::LiveEvents
       folder_id: attachment.global_folder_id,
       unlock_at: attachment.unlock_at,
       lock_at: attachment.lock_at,
+      locked: attachment.locked,
       updated_at: attachment.updated_at
     }
   end
