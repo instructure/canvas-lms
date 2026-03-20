@@ -2082,8 +2082,10 @@ class AbstractAssignment < ApplicationRecord
   def graded_count
     return self["graded_count"].to_i if has_attribute?("graded_count")
 
-    Rails.cache.fetch(["graded_count", self].cache_key) do
-      submissions.graded.in_workflow_state("graded").count
+    RequestCache.cache("graded_count", self) do
+      Rails.cache.fetch(["graded_count", self].cache_key) do
+        submissions.graded.in_workflow_state("graded").count
+      end
     end
   end
 
