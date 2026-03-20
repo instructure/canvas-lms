@@ -1400,6 +1400,7 @@ class UsersController < ApplicationController
                    ROOT_ACCOUNT_ID: @context_account.root_account.id,
                    TIMEZONES: timezones,
                    DEFAULT_TIMEZONE_NAME: default_timezone_name,
+                   PV5_ENABLED: PageViews::Configuration.configured?,
                  })
           render status:
         end

@@ -181,7 +181,7 @@ describe PageViewsController do
     let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.test")) }
 
     before do
-      allow(PageViews::Configuration).to receive(:new).and_return(configuration)
+      allow(PageViews::Configuration).to receive_messages(new: configuration, configured?: true)
       account_admin_user
       user_session(@user)
     end
@@ -649,6 +649,42 @@ describe PageViewsController do
         expect(response.parsed_body["error"]).to eq("An unexpected error occurred.")
       end
     end
+
+    context "when PV5 is not configured" do
+      before do
+        allow(PageViews::Configuration).to receive(:configured?).and_return(false)
+      end
+
+      it "returns 404 for query" do
+        post "query", params: { user_id: @user.id, start_date: "2025-01-01", end_date: "2025-02-01", results_format: :csv }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for poll_query" do
+        get "poll_query", params: { user_id: @user.id, query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for query_results" do
+        get "query_results", params: { user_id: @user.id, query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for batch_query" do
+        post "batch_query", params: { user_ids: [@user.id], start_date: "2025-01-01", end_date: "2025-02-01", results_format: :csv }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for poll_batch_query" do
+        get "poll_batch_query", params: { query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for batch_query_results" do
+        get "batch_query_results", params: { query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 
   describe "Rate Limiting" do
@@ -656,6 +692,7 @@ describe PageViewsController do
       account_admin_user
       user_session(@user)
       allow(PageView).to receive(:pv4?).and_return(true)
+      allow(PageViews::Configuration).to receive(:configured?).and_return(true)
       ConfigFile.stub("pv4", { "uri" => "https://test.example.com" })
       # Mock the PageView fetch to avoid actual API calls
       allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_return([])
