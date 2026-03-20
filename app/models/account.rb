@@ -401,7 +401,8 @@ class Account < ApplicationRecord
   add_setting :usage_rights_required, boolean: true, default: false, inheritable: true
   add_setting :limit_parent_app_web_access, boolean: true, default: false, root_only: true
   add_setting :kill_joy, boolean: true, default: false, root_only: true
-  add_setting :suppress_notifications, boolean: true, default: false, root_only: true
+  # Value is set directly in AccountsController; does not flow through settings= coercion
+  add_setting :suppress_notifications, root_only: true
   add_setting :smart_alerts_threshold, default: 36, root_only: true
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
@@ -465,6 +466,27 @@ class Account < ApplicationRecord
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
   add_setting :onetrust_consent_domain_id, root_only: true
+
+  # suppress_notifications can be:
+  #   true          - suppress all notifications (backward compatible)
+  #   false/nil     - suppress none (backward compatible)
+  #   Array<String> - suppress only notifications whose category_slug matches an entry
+  def suppress_notifications?
+    settings[:suppress_notifications] == true
+  end
+
+  # Returns true if the given notification should be suppressed for this account.
+  # Supports both the legacy blanket suppression (true) and granular per-category suppression.
+  def suppress_notification?(notification)
+    case settings[:suppress_notifications]
+    when true
+      true
+    when Array
+      settings[:suppress_notifications].include?(notification.category_slug)
+    else
+      false
+    end
+  end
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)

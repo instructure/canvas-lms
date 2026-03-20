@@ -196,15 +196,15 @@ class Notification < Switchman::UnshardedRecord
   #
   def create_message(asset, to_list, options = {})
     if asset.respond_to?(:account)
-      return if asset.account&.root_account&.suppress_notifications?
+      return if asset.account&.root_account&.suppress_notification?(self)
     end
 
     if asset.respond_to?(:context) && asset.context.respond_to?(:root_account)
-      return if asset.context&.root_account&.suppress_notifications?
+      return if asset.context&.root_account&.suppress_notification?(self)
     end
 
     if asset.respond_to?(:context) && asset.context.respond_to?(:account)
-      return if asset.context.account&.root_account&.suppress_notifications?
+      return if asset.context.account&.root_account&.suppress_notification?(self)
     end
 
     preload_asset_roles_if_needed(asset)

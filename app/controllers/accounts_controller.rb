@@ -1156,6 +1156,9 @@ class AccountsController < ApplicationController
 
       # Set default Dashboard View
       set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
+      # Extract suppress_notifications from raw params before strong params coercion,
+      # since it accepts both boolean and array values
+      suppress_notifications_param = params.dig(:account, :settings)&.delete(:suppress_notifications)
       unauthorized = true if set_course_template == :unauthorized
 
       # account settings (:manage_account_settings)
@@ -1198,6 +1201,19 @@ class AccountsController < ApplicationController
 
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
+
+            # suppress_notifications accepts true/false (all/none) or an array of category slugs
+            account_settings[:settings].delete(:suppress_notifications)
+            unless suppress_notifications_param.nil?
+              validated = if suppress_notifications_param.is_a?(Array)
+                            valid_slugs = Notification.all_cached.map(&:category_slug).uniq
+                            suppress_notifications_param.map(&:to_s) & valid_slugs
+                          else
+                            value_to_boolean(suppress_notifications_param)
+                          end
+              @account.settings[:suppress_notifications] = validated.presence || false
+            end
+
             ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, "The account name cannot be blank")) if account_params.key?(:name) && account_params[:name].blank?
@@ -1350,6 +1366,13 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][enable_course_paces][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][suppress_notifications] [Boolean|Array]
+  #   Suppress notification messages from being created and sent. When set to
+  #   +true+, all notifications are suppressed. When set to an array of
+  #   notification category slugs (e.g. +["grading", "announcement"]+), only
+  #   notifications in those categories are suppressed. Set to +false+ to
+  #   allow all notifications. Root account setting only.
   #
   # @argument account[settings][password_policy] [Hash]
   #   Hash of optional password policy configuration parameters for a root account
@@ -1545,6 +1568,18 @@ class AccountsController < ApplicationController
         params[:account][:settings][:help_link_name] = nil if help_link_name == default_help_link_name
 
         ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
+
+        # Handle suppress_notifications: accepts "1"/"0" (boolean) or an array of category slugs
+        if params[:account][:settings]&.key?(:suppress_notifications)
+          suppress_val = params[:account][:settings].delete(:suppress_notifications)
+          if suppress_val.is_a?(Array)
+            valid_slugs = Notification.all_cached.map(&:category_slug).uniq
+            validated = suppress_val.map(&:to_s) & valid_slugs
+            @account.settings[:suppress_notifications] = validated.presence || false
+          else
+            @account.settings[:suppress_notifications] = value_to_boolean(suppress_val)
+          end
+        end
 
         if (sis_id = params[:account].delete(:sis_source_id)) &&
            !@account.root_account? && sis_id != @account.sis_source_id &&
@@ -2500,6 +2535,7 @@ class AccountsController < ApplicationController
        restrict_quantitative_data
        lock_all_announcements
        sis_assignment_name_length_input
+       suppress_notifications
        conditional_release
        enable_course_paces]
   end
