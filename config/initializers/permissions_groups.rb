@@ -487,6 +487,14 @@ PERMISSION_GROUPS = {
         description: -> { I18n.t("If any of these permissions are granted to a user role, that role will be able to view and access data about differentiation tags.") } }
     ]
   },
+  manage_institutional_tags: {
+    label: -> { I18n.t("Manage Institutional Tags") },
+    subtitle: -> { I18n.t("view / create / edit") },
+    account_details: [
+      { title: -> { I18n.t("Overview") },
+        description: -> { I18n.t("These permissions control the ability to view, create, and edit institutional tags.") } }
+    ]
+  },
   manage_files: {
     label: -> { I18n.t("Manage Course Files") },
     subtitle: -> { I18n.t("add / delete / edit") },

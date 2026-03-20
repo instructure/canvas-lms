@@ -2258,6 +2258,42 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Impact is an add-on to Canvas LMS. Contact your CSM if interested.") } }
     ]
   },
+  manage_institutional_tags_view: {
+    label: -> { I18n.t("Institutional Tags - view") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: :root,
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to view institutional tags.") } }
+    ]
+  },
+  manage_institutional_tags_create: {
+    label: -> { I18n.t("Institutional Tags - create") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: :root,
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to create institutional tags.") } }
+    ]
+  },
+  manage_institutional_tags_edit: {
+    label: -> { I18n.t("Institutional Tags - edit") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: :root,
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to edit institutional tags.") } }
+    ]
+  },
   access_oak: {
     label: -> { I18n.t("IgniteAI Agent - Admins") },
     available_to: %w[AccountAdmin AccountMembership],
