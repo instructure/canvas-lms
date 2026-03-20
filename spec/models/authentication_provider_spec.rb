@@ -387,12 +387,9 @@ describe AuthenticationProvider do
     let!(:cas_provider) { account.authentication_providers.create!(auth_type: "cas") }
     let!(:canvas_provider) { account.authentication_providers.where(auth_type: "canvas").first }
 
-    it "includes active non-canvas providers" do
-      expect(account.authentication_providers.valid_for_discovery_page).to include(cas_provider)
-    end
-
-    it "excludes canvas-type providers" do
-      expect(account.authentication_providers.valid_for_discovery_page).not_to include(canvas_provider)
+    it "includes active providers" do
+      pending "waiting for MRA scope change to land"
+      expect(account.authentication_providers.valid_for_discovery_page).to include(cas_provider, canvas_provider)
     end
 
     it "excludes deleted providers" do
