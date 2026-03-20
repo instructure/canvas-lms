@@ -77,7 +77,9 @@ const AiExperiencesIndex: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (
       !window.confirm(
-        I18n.t('Are you sure you want to delete this AI Experience? This action cannot be undone.'),
+        I18n.t(
+          'Are you sure you want to delete this Knowledge Chat? This action cannot be undone.',
+        ),
       )
     ) {
       return
@@ -93,8 +95,8 @@ const AiExperiencesIndex: React.FC = () => {
 
       // Remove from local state
       setExperiences(prevExperiences => prevExperiences.filter(exp => exp.id !== id))
-    } catch (err) {
-      showFlashError(I18n.t('Failed to delete AI Experience. Please try again.'))()
+    } catch {
+      showFlashError(I18n.t('Failed to delete Knowledge Chat. Please try again.'))()
     }
   }
 
@@ -102,7 +104,7 @@ const AiExperiencesIndex: React.FC = () => {
     try {
       const courseId = ENV.COURSE_ID
 
-      const {json: updatedExperience} = await doFetchApi({
+      const {json: updatedExperience} = await doFetchApi<AiExperience>({
         path: `/api/v1/courses/${courseId}/ai_experiences/${id}`,
         method: 'PUT',
         body: {ai_experience: {workflow_state: newState}},
@@ -115,13 +117,13 @@ const AiExperiencesIndex: React.FC = () => {
             ? {
                 ...exp,
                 workflow_state: newState,
-                can_unpublish: (updatedExperience as any)?.can_unpublish,
+                can_unpublish: updatedExperience?.can_unpublish,
               }
             : exp,
         ),
       )
-    } catch (err) {
-      showFlashError(I18n.t('Failed to update AI Experience. Please try again.'))()
+    } catch {
+      showFlashError(I18n.t('Failed to update Knowledge Chat. Please try again.'))()
     }
   }
 
@@ -133,7 +135,7 @@ const AiExperiencesIndex: React.FC = () => {
   if (loading) {
     return (
       <View as="div" textAlign="center" margin="large">
-        <Spinner renderTitle={I18n.t('Loading AI experiences')} />
+        <Spinner renderTitle={I18n.t('Loading Knowledge Chats')} />
       </View>
     )
   }
@@ -141,7 +143,7 @@ const AiExperiencesIndex: React.FC = () => {
   if (error) {
     return (
       <View as="div" margin="medium">
-        <Text color="danger">{I18n.t('Error loading AI experiences: %{error}', {error})}</Text>
+        <Text color="danger">{I18n.t('Error loading Knowledge Chats: %{error}', {error})}</Text>
       </View>
     )
   }
@@ -156,9 +158,20 @@ const AiExperiencesIndex: React.FC = () => {
                 <IconAiColoredSolid size="small" />
               </Flex.Item>
               <Flex.Item>
-                <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
+                <Heading level="h1">{I18n.t('Knowledge Chats')}</Heading>
               </Flex.Item>
             </Flex>
+            <View as="div" margin="x-small 0 0 0">
+              <Text color="secondary">
+                {canManage
+                  ? I18n.t(
+                      "Evaluate your students' comprehension of a topic with a configurable LLM chat (learning language model).",
+                    )
+                  : I18n.t(
+                      'Check your understanding of a topic with an educator-configured Knowledge Chat.',
+                    )}
+              </Text>
+            </View>
           </Flex.Item>
           {experiences.length > 0 && canManage && (
             <Flex.Item>

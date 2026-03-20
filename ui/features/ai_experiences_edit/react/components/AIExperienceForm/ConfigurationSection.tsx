@@ -64,52 +64,14 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
         </Heading>
         <View as="div" margin="0 0 large 0">
           <Text size="medium">
-            {I18n.t('Define the sourcing, completion rules, and personality of this IgniteAI.')}
+            {I18n.t(
+              'Define the completion rules, pedagogical guidance, and sources of the large language model (LLM).',
+            )}
           </Text>
         </View>
 
-        {/* Source materials section */}
-        <View as="div">
-          <Heading level="h3" margin="0 0 xx-small 0">
-            {I18n.t('Source materials')}
-          </Heading>
-          <View as="div" margin="0 0 small 0">
-            <Text size="small" color="secondary">
-              {I18n.t('Provide IgniteAI with a closed-loop of sources to reference.')}
-            </Text>
-          </View>
-          <FormFieldGroup description="" layout="stacked">
-            <TextArea
-              data-testid="ai-experience-edit-facts-input"
-              label={I18n.t('Text source')}
-              value={formData.facts}
-              onChange={onChange('facts')}
-              required
-              placeholder={I18n.t('Copy and paste information, data, key facts, etc.')}
-              resize="vertical"
-              height="80px"
-              maxHeight="300px"
-              messages={showErrors && errors.facts ? [{type: 'newError', text: errors.facts}] : []}
-            />
-          </FormFieldGroup>
-
-          {/* Only render if feature flag is enabled */}
-          {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload && (
-            <View as="div" margin="medium 0 0 0">
-              <CanvasFileUpload
-                files={contextFiles}
-                onFilesChange={onContextFilesChange}
-                courseId={courseId}
-                allowedFileTypes={['.docx', '.xlsx', '.xls', '.pptx', '.pdf', '.txt', '.html']}
-                maxFileSizeMB={300}
-                maxFiles={10}
-              />
-            </View>
-          )}
-        </View>
-
         {/* Completion rules section */}
-        <View as="div" margin="large 0 0 0">
+        <View as="div">
           <Heading level="h3" margin="0 0 xx-small 0">
             {I18n.t('Completion rules')}
           </Heading>
@@ -140,23 +102,25 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
           </FormFieldGroup>
         </View>
 
-        {/* Personality and guidance section */}
+        {/* Pedagogical activity guidance section */}
         <View as="div" margin="large 0 0 0">
           <Heading level="h3" margin="0 0 xx-small 0">
-            {I18n.t('Personality and guidance')}
+            {I18n.t('Pedagogical activity guidance')}
           </Heading>
           <View as="div" margin="0 0 small 0">
             <Text size="small" color="secondary">
-              {I18n.t('Decide the voice and instructional guidance of the IgniteAI.')}
+              {I18n.t('Define the instructions for the activity.')}
             </Text>
           </View>
           <FormFieldGroup description="" layout="stacked">
             <TextArea
               data-testid="ai-experience-edit-pedagogical-guidance-input"
-              label={I18n.t('Customize agent')}
+              label={I18n.t('Pedagogical guidance')}
               value={formData.pedagogical_guidance}
               onChange={onChange('pedagogical_guidance')}
-              placeholder={I18n.t('Provide your own role or style of IgniteAI')}
+              placeholder={I18n.t(
+                'Provide a prompt that tells the LLM (language learning model) how to facilitate the activity.',
+              )}
               resize="vertical"
               height="80px"
               maxHeight="300px"
@@ -167,6 +131,46 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
               }
             />
           </FormFieldGroup>
+        </View>
+
+        {/* Source materials section */}
+        <View as="div" margin="large 0 0 0">
+          <Heading level="h3" margin="0 0 xx-small 0">
+            {I18n.t('Source materials')}
+          </Heading>
+          <View as="div" margin="0 0 small 0">
+            <Text size="small" color="secondary">
+              {I18n.t('Set up a closed-loop of sources to reference.')}
+            </Text>
+          </View>
+          <FormFieldGroup description="" layout="stacked">
+            <TextArea
+              data-testid="ai-experience-edit-facts-input"
+              label={I18n.t('Text source')}
+              value={formData.facts}
+              onChange={onChange('facts')}
+              required
+              placeholder={I18n.t('Copy and paste information, data, key facts, etc.')}
+              resize="vertical"
+              height="80px"
+              maxHeight="300px"
+              messages={showErrors && errors.facts ? [{type: 'newError', text: errors.facts}] : []}
+            />
+          </FormFieldGroup>
+
+          {/* Only render if feature flag is enabled */}
+          {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload && (
+            <View as="div" margin="medium 0 0 0">
+              <CanvasFileUpload
+                files={contextFiles}
+                onFilesChange={onContextFilesChange}
+                courseId={courseId}
+                allowedFileTypes={['.docx', '.xlsx', '.xls', '.pptx', '.pdf', '.txt', '.html']}
+                maxFileSizeMB={300}
+                maxFiles={10}
+              />
+            </View>
+          )}
         </View>
       </View>
     </View>
