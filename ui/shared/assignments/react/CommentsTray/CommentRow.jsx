@@ -73,7 +73,7 @@ export default function CommentRow(props) {
       </div>
       <div className="comment-text-comment-container">
         {!read && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-        <Text weight="light" size="small">
+        <Text id={`comment-header-${props.comment._id}`} weight="light" size="small">
           {author ? stripHtmlTags(author.shortName) : I18n.t('Anonymous')}{' '}
           <FriendlyDatetime
             prefix={I18n.t('at')}
