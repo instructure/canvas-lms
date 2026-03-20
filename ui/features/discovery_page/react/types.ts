@@ -30,6 +30,7 @@ export interface DiscoveryConfig {
   discovery_page: {
     primary: AuthProviderConfig[]
     secondary: AuthProviderConfig[]
+    active?: boolean
   }
 }
 

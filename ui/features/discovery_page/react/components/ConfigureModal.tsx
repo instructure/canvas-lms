@@ -70,8 +70,8 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   const modalBodyRef = useRef<HTMLElement | null>(null)
   const savedConfigRef = useRef<CardConfig | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const activeRef = useRef<boolean>(false)
 
-  // Send config updates to iframe via postMessage for live preview
   useIframeMessaging({iframeRef, config, previewUrl})
 
   const isLoading = isLoadingConfig || isSaving
@@ -97,6 +97,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
 
         try {
           const data = await fetchDiscoveryConfig()
+          activeRef.current = data.discovery_page.active ?? false
           const cardConfig = toCardConfig(data)
           setConfig(cardConfig)
           savedConfigRef.current = cardConfig
@@ -118,7 +119,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     setIsSaving(true)
 
     try {
-      await saveDiscoveryConfig(toApiConfig(backfillLabels(config)))
+      await saveDiscoveryConfig(toApiConfig(backfillLabels(config), activeRef.current))
       resetAndClose()
     } catch (err) {
       const errorMessage =

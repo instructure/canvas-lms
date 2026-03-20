@@ -37,7 +37,7 @@ export function toCardConfig(api: DiscoveryConfig): CardConfig {
   }
 }
 
-export function toApiConfig(cards: CardConfig): DiscoveryConfig {
+export function toApiConfig(cards: CardConfig, active?: boolean): DiscoveryConfig {
   const toProvider = (card: AuthProviderCard): AuthProviderConfig => ({
     authentication_provider_id: card.authentication_provider_id,
     label: card.label,
@@ -48,6 +48,7 @@ export function toApiConfig(cards: CardConfig): DiscoveryConfig {
     discovery_page: {
       primary: cards.discovery_page.primary.map(toProvider),
       secondary: cards.discovery_page.secondary.map(toProvider),
+      active,
     },
   }
 }
