@@ -20,14 +20,9 @@ import {Mask, Overlay} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
 import {useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {LoadingSaveOverlayProps} from '../types'
 
 const I18n = createI18nScope('discovery_page')
-
-interface LoadingSaveOverlayProps {
-  isLoading: boolean
-  isLoadingConfig: boolean
-  mountNode: () => HTMLElement | null
-}
 
 export function LoadingSaveOverlay({
   isLoading,

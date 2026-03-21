@@ -21,10 +21,11 @@ import {useRef} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-themes'
+import type {PreviewAndSidebarProps} from '../types'
 
 const I18n = createI18nScope('discovery_page')
 
-const BORDER_COLOR = '#e5e5e5'
+const BORDER_COLOR = canvas.colors.ui.lineDivider
 
 const breakpoints = {
   tablet: {minWidth: canvas.breakpoints.tablet}, // 48em (768px)
@@ -38,17 +39,12 @@ const SIDEBAR_WIDTHS = {
   xLarge: 640,
 }
 
-interface PreviewAndSidebarProps {
-  previewUrl?: string
-  children?: React.ReactNode
-  iframeRef?: React.RefObject<HTMLIFrameElement>
-}
-
 export function PreviewAndSidebar({previewUrl, children, iframeRef}: PreviewAndSidebarProps) {
   const internalIframeRef = useRef<HTMLIFrameElement>(null)
   const frameRef = iframeRef || internalIframeRef
-  // <Responsive> renders as a <div> with display="block", so width and height must be
-  // set explicitly to ensure it fills its parent when used inside a flex container
+  // <Responsive> renders its own <div> with display="block", which doesn’t
+  // stretch inside a flex parent. There’s no style/height prop, so we set
+  // height and width imperatively via elementRef
   const setResponsiveRef = (el: HTMLDivElement | null) => {
     if (!el) return
     el.style.height = '100%'

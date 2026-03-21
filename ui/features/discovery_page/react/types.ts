@@ -17,13 +17,19 @@
  */
 
 // ---------------------------------------------------------------------------
-// api types (what the backend sends and receives)
+// api types (what the back-end sends and receives)
 // ---------------------------------------------------------------------------
 
 export interface AuthProviderConfig {
   authentication_provider_id: number
   label: string
   icon?: string
+}
+
+export interface AuthProviderOption {
+  id: string
+  url: string
+  auth_type: string
 }
 
 export interface DiscoveryConfig {
@@ -38,31 +44,96 @@ export interface DiscoveryConfig {
 // internal ui types (used by components and hooks)
 // ---------------------------------------------------------------------------
 
-export interface AuthProviderCard extends AuthProviderConfig {
+export type DiscoverySection = 'primary' | 'secondary'
+
+export type MoveDirection = 'up' | 'down'
+
+export interface AuthProviderCard extends Omit<AuthProviderConfig, 'authentication_provider_id'> {
   id: string
+  authentication_provider_id: number | null
+}
+
+export interface CardFormErrors {
+  label?: string
+  providerId?: string
 }
 
 export interface CardConfig {
   discovery_page: {
     primary: AuthProviderCard[]
     secondary: AuthProviderCard[]
+    active?: boolean
   }
 }
 
-export interface DiscoveryContextType {
-  modalOpen: boolean
-  setModalOpen: (val: boolean) => void
-  authProviders?: Array<{id: string; url: string; auth_type: string}>
-  previewUrl?: string
+export interface AuthProviderCardDraft {
+  label: string
+  authentication_provider_id: number
+  icon: string | undefined
 }
 
-export interface DiscoveryProviderProps {
-  children: React.ReactNode
+export interface DiscoveryPageIcon {
+  id: string
+  name: string
+  url: string
 }
+
+// ---------------------------------------------------------------------------
+// component props
+// ---------------------------------------------------------------------------
 
 export interface DiscoveryPageProps {
   initialEnabled: boolean
   onChange: (enabled: boolean) => void
+}
+
+export interface AuthProviderProps {
+  card: AuthProviderCard
+  isEditing: boolean
+  isDisabled: boolean
+  authProviders?: AuthProviderOption[]
+  authProviderUrl?: string
+  elementRef?: (el: HTMLElement | null) => void
+  onEditStart: () => void
+  onEditDone: (draft: AuthProviderCardDraft) => void
+  onEditCancel: () => void
+  disableMoveUp?: boolean
+  disableMoveDown?: boolean
+  onDelete: () => void
+  onMoveUp: () => void
+  onMoveDown: () => void
+}
+
+export interface AuthProviderFormProps {
+  authProviders?: AuthProviderOption[]
+  loginLabel: string
+  selectedProviderId: string
+  onLoginChange: (value: string) => void
+  onProviderChange: (value: string) => void
+  selectedIconId: string
+  onIconSelect: (iconId: string) => void
+  errors?: CardFormErrors
+  onLabelRef?: (el: HTMLInputElement | null) => void
+  onProviderRef?: (el: HTMLSelectElement | null) => void
+}
+
+export interface AuthProviderHeaderProps {
+  label: string
+  iconUrl?: string
+  providerUrl?: string
+  isEditing: boolean
+  isDisabled: boolean
+  disableMoveUp?: boolean
+  disableMoveDown?: boolean
+  onEditStart: () => void
+  onDelete: () => void
+  onMoveUp: () => void
+  onMoveDown: () => void
+}
+
+export interface ConfigureModalProps {
+  open: boolean
+  onClose: () => void
 }
 
 export interface ModalError {
@@ -70,8 +141,73 @@ export interface ModalError {
   code?: string
 }
 
-export interface DiscoveryPageIcon {
-  id: string
-  name: string
-  url: string
+export interface LoadingSaveOverlayProps {
+  isLoading: boolean
+  isLoadingConfig: boolean
+  mountNode: () => HTMLElement | null
+}
+
+export interface PreviewAndSidebarProps {
+  previewUrl?: string
+  children?: React.ReactNode
+  iframeRef?: React.RefObject<HTMLIFrameElement>
+}
+
+export interface SignInOptionsHeaderProps {
+  title: string
+  description?: string
+  onAddClick: () => void
+  disabled?: boolean
+}
+
+// ---------------------------------------------------------------------------
+// hook types
+// ---------------------------------------------------------------------------
+
+export interface UseCardEditingOptions {
+  config: CardConfig
+  handleAddCard: (section: DiscoverySection) => string
+  handleUpdateCard: (
+    section: DiscoverySection,
+    cardId: string,
+    updates: Partial<AuthProviderCard>,
+  ) => void
+  handleDeleteCard: (section: DiscoverySection, cardId: string) => void
+  setIsDirty: (dirty: boolean) => void
+}
+
+export interface UseCardEditingReturn {
+  editingCardId: string | null
+  isEditingAnyCard: boolean
+  cardRefs: React.RefObject<Map<string, HTMLElement>>
+  handleAddAndEdit: (section: DiscoverySection) => void
+  handleEditStart: (section: DiscoverySection, cardId: string) => void
+  handleEditDone: (section: DiscoverySection, cardId: string, draft: AuthProviderCardDraft) => void
+  handleEditCancel: (section: DiscoverySection, cardId: string) => void
+  resetEditing: () => void
+}
+
+export interface UseDiscoveryConfigOptions {
+  initialConfig: CardConfig
+}
+
+export interface UseDiscoveryConfigReturn {
+  config: CardConfig
+  setConfig: (config: CardConfig) => void
+  isDirty: boolean
+  setIsDirty: (dirty: boolean) => void
+  handleAddCard: (section: DiscoverySection) => string
+  handleUpdateCard: (
+    section: DiscoverySection,
+    cardId: string,
+    updates: Partial<AuthProviderCard>,
+  ) => void
+  handleDeleteCard: (section: DiscoverySection, cardId: string) => void
+  handleMoveCard: (section: DiscoverySection, cardId: string, direction: MoveDirection) => void
+}
+
+export interface UseIframeMessagingOptions {
+  iframeRef: React.RefObject<HTMLIFrameElement>
+  config: CardConfig
+  previewUrl?: string
 }

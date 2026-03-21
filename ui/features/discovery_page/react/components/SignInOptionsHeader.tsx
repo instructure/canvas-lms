@@ -19,26 +19,41 @@
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 import {IconAddLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {SignInOptionsHeaderProps} from '../types'
 
 const I18n = createI18nScope('discovery_page')
 
-interface SignInOptionsHeaderProps {
-  title: string
-  onAddClick: () => void
-}
-
-export function SignInOptionsHeader({title, onAddClick}: SignInOptionsHeaderProps) {
+export function SignInOptionsHeader({
+  title,
+  description,
+  onAddClick,
+  disabled,
+}: SignInOptionsHeaderProps) {
   return (
-    <Flex as="div" justifyItems="space-between" alignItems="center">
-      <Heading level="h4" margin="0">
-        {title}
-      </Heading>
+    <Flex as="div" direction="column" gap="xx-small">
+      <Flex as="div" justifyItems="space-between" alignItems="center">
+        <Heading level="h4" margin="0">
+          {title}
+        </Heading>
 
-      <Button size="small" renderIcon={<IconAddLine />} onClick={onAddClick}>
-        {I18n.t('Add')}
-      </Button>
+        <Button
+          size="small"
+          renderIcon={<IconAddLine />}
+          onClick={onAddClick}
+          interaction={disabled ? 'disabled' : 'enabled'}
+        >
+          {I18n.t('Add')}
+        </Button>
+      </Flex>
+
+      {description && (
+        <Text size="small" color="secondary">
+          {description}
+        </Text>
+      )}
     </Flex>
   )
 }
