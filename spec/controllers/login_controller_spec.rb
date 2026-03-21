@@ -204,6 +204,41 @@ describe LoginController do
       end
     end
 
+    describe "handling mobile web view" do
+      it "sets the token with true" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json, params: { mobile_consent: "true" }
+        parsed_body = response.parsed_body
+        stoken = SessionToken.parse(parsed_body["session_url"].split("session_token=").last)
+        expect(stoken.consent_from_mobile).to be(true)
+      end
+
+      it "sets the token with false" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json, params: { mobile_consent: "false" }
+        parsed_body = response.parsed_body
+        stoken = SessionToken.parse(parsed_body["session_url"].split("session_token=").last)
+        expect(stoken.consent_from_mobile).to be(false)
+      end
+
+      it "sets the token with nil if not a mobile web view" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json
+        parsed_body = response.parsed_body
+        stoken = SessionToken.parse(parsed_body["session_url"].split("session_token=").last)
+        expect(stoken.consent_from_mobile).to be_nil
+      end
+    end
+
     it "rejects javascript scheme" do
       user_session user_with_pseudonym(active: true)
       request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })

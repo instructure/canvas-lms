@@ -348,10 +348,21 @@ class ApplicationController < ActionController::Base
 
         if load_usage_metrics?
           @js_env[:PENDO_APP_ID] = usage_metrics_api_key
-          if cached_features[:cookie_consent_necessary] && !@domain_root_account&.feature_enabled?(:pendo_extended)
-            domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
-            onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
-            @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
+          if cached_features[:cookie_consent_necessary]
+            mobile_webview = session&.dig(:is_mobile_webview)
+            mobile_consent = session&.dig(:mobile_cookie_consent)
+
+            if !@domain_root_account&.feature_enabled?(:pendo_extended) && !mobile_webview && !native_app?
+              domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
+              onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
+              @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
+            end
+
+            if mobile_webview
+              @js_env[:MOBILE_COOKIE_CONSENT] = mobile_consent
+              # we could fall back to @current_user.custom_data like this:
+              # @current_user.custom_data.where(namespace: "MOBILE_CANVAS_COOKIE_CONSENT").first
+            end
           end
         end
 
@@ -1859,6 +1870,10 @@ class ApplicationController < ActionController::Base
             target_user = User.find(token.current_user_id)
             session[:become_user_id] = token.current_user_id if target_user.can_masquerade?(pseudonym.user, @domain_root_account)
           end
+          unless token.consent_from_mobile.nil?
+            session[:is_mobile_webview] = true
+            session[:mobile_cookie_consent] = token.consent_from_mobile == true
+          end
         end
         return redirect_to return_to if return_to
 
@@ -2913,9 +2928,7 @@ class ApplicationController < ActionController::Base
   end
 
   def in_mobile_webview?
-    # TODO: we need to set up adding :mobile_webview to the session
-    # when /login/session_token is called with mobile_webview=1
-    session&.dig(:mobile_webview) || params[:embedded] || params[:embed]
+    session&.dig(:is_mobile_webview) || params[:embedded] || params[:embed]
   end
 
   def stringify_json_ids?

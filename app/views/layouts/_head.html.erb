@@ -34,8 +34,14 @@
   <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Italic.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= stylesheet_link_tag(css_url_for('fonts')) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
-  <% if @js_env && @js_env[:ONETRUST_CONSENT_SCRIPT_ID].present? %>
-  <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_SCRIPT_ID] %>" ></script>
+  <% if @js_env && @js_env[:ONETRUST_CONSENT_DOMAIN_ID].present? %>
+  <% if Rails.env.development? %>
+  <script>
+    // This will be removed once the mobile web view subepic is complete.
+    console.warn("OneTrust would initialize.");
+  </script>
+  <% end %>
+  <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_DOMAIN_ID] %>" ></script>
   <script type="text/javascript">
     window.OT_CONSENT_STATE = null;
     window.addEventListener('OneTrustGroupsUpdated', e => {
