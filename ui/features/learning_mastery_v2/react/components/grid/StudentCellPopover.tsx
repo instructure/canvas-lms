@@ -20,20 +20,16 @@ import {Outcome, StudentRollupData, Student} from '@canvas/outcomes/react/types/
 
 import React, {useState} from 'react'
 import {Link} from '@instructure/ui-link'
-import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {Popover} from '@instructure/ui-popover'
-import {TruncateText} from '@instructure/ui-truncate-text'
-import {Avatar} from '@instructure/ui-avatar'
-import {Spinner} from '@instructure/ui-spinner'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import MessageStudents from '@canvas/message-students-modal'
 import {Img} from '@instructure/ui-img'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import MessageStudents from '@canvas/message-students-modal'
 import {useStudentMasteryScores} from '@canvas/outcomes/react/hooks/useStudentMasteryScores'
 import {useLmgbUserDetails} from '../../hooks/useLmgbUserDetails'
+import {StudentPopover} from '@instructure/outcomes-ui/es/components/Gradebook/popovers/StudentPopover'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 const t = I18n.t.bind(I18n)
@@ -89,139 +85,43 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
     return <Text size="legend" color="secondary">{`${t('Last Login')}: ${dateText}`}</Text>
   }
 
-  const ResultIcon: React.FC<{url: string}> = ({url}) => {
-    return <Img width="100%" height="100%" src={url} />
-  }
-
-  const renderScores = () => (
-    <View>
-      <Flex direction="row" alignItems="center" gap="x-small" margin="small none">
-        <Flex.Item width="1.7rem">
-          <ResultIcon url={scores?.averageIconURL || ''} />
-        </Flex.Item>
-        <Flex.Item>
-          <Text size="small">
-            {`${scores?.grossAverage && scores.grossAverage.toFixed(1) + ' '}${scores?.averageText}`}
-          </Text>
-        </Flex.Item>
-      </Flex>
-      <Flex gap="small" margin="small small small none">
-        {scores?.buckets &&
-          Object.values(scores.buckets)
-            .reverse()
-            .map(bucket => (
-              <Flex key={bucket.name} direction="row" alignItems="center" gap="xx-small">
-                <Flex.Item width="1.4rem">
-                  <ResultIcon url={bucket.iconURL} />
-                </Flex.Item>
-                <Flex.Item>
-                  <ScreenReaderContent>{`${bucket.name} ${bucket.count}`}</ScreenReaderContent>
-                  <Text size="medium" aria-hidden="true">
-                    {bucket.count}
-                  </Text>
-                </Flex.Item>
-              </Flex>
-            ))}
-      </Flex>
-    </View>
-  )
-
-  const renderPopoverContent = () => (
-    <View
-      padding="small"
-      display="block"
-      maxWidth="480px"
-      minWidth="300px"
-      minHeight="200px"
-    >
-      {isLoading && (
-        <View as="div" textAlign="center" margin="medium none">
-          <Spinner renderTitle={t('Loading user details')} size="small" />
-        </View>
-      )}
-      {error && (
-        <View as="div" margin="small none">
-          <Text>{error}</Text>
-        </View>
-      )}
-      {userDetails && (
-        <View as="div">
-          <Flex gap="small" alignItems="start">
-            <Flex.Item>
-              <Avatar
-                as="div"
-                size="large"
-                name={studentName}
-                src={student.avatar_url}
-                data-testid="lmgb-student-popover-avatar"
-              />
-            </Flex.Item>
-            <Flex.Item>
-              <View display="block" maxWidth={'320px'}>
-                <View>
-                  <Text size="content" weight="bold">
-                    <TruncateText>{studentName}</TruncateText>
-                  </Text>
-                </View>
-                <View>
-                  <Text size="contentSmall">
-                    <TruncateText>{userDetails.course.name}</TruncateText>
-                  </Text>
-                </View>
-                {userDetails.user.sections.length > 0 && (
-                  <View>
-                    <Text size="legend">
-                      <TruncateText>
-                        {userDetails.user.sections.map(section => section.name).join(', ')}
-                      </TruncateText>
+  const masteryScoresOverride = scores ? (
+    <Flex direction="column">
+      <Flex.Item>
+        <Flex direction="row" alignItems="center" gap="x-small" margin="small none">
+          <Flex.Item width="1.7rem">
+            <Img width="100%" height="100%" src={scores.averageIconURL} />
+          </Flex.Item>
+          <Flex.Item>
+            <Text size="small">
+              {`${scores.grossAverage ? scores.grossAverage.toFixed(1) + ' ' : ''}${scores.averageText}`}
+            </Text>
+          </Flex.Item>
+        </Flex>
+        <Flex gap="small" margin="small small small none">
+          {scores.buckets &&
+            Object.values(scores.buckets)
+              .reverse()
+              .map(bucket => (
+                <Flex key={bucket.name} direction="row" alignItems="center" gap="xx-small">
+                  <Flex.Item width="1.4rem">
+                    <Img width="100%" height="100%" src={bucket.iconURL} />
+                  </Flex.Item>
+                  <Flex.Item>
+                    <ScreenReaderContent>{`${bucket.name} ${bucket.count}`}</ScreenReaderContent>
+                    <Text size="medium" aria-hidden="true">
+                      {bucket.count}
                     </Text>
-                  </View>
-                )}
-              </View>
-              {renderScores()}
-              {renderLastLogin()}
-            </Flex.Item>
-          </Flex>
-          <View
-            as="div"
-            margin="small none x-small none"
-            borderWidth="small none none none"
-            height="0px"
-          />
-          <Flex direction="row" justifyItems="center">
-            <Flex.Item>
-              <Link onClick={() => setIsMessageModalOpen(true)}>
-                <Text size="small">{t('Message')}</Text>
-              </Link>
-            </Flex.Item>
-            <View
-              as="div"
-              margin="none small none small"
-              borderWidth="none small none none"
-              width="0px"
-              height="1.4rem"
-            />
-            <Flex.Item>
-              <Link href={studentGradesUrl}>
-                <Text size="small">{t('View Mastery Report')}</Text>
-              </Link>
-            </Flex.Item>
-          </Flex>
-        </View>
-      )}
-    </View>
-  )
+                  </Flex.Item>
+                </Flex>
+              ))}
+        </Flex>
+      </Flex.Item>
+      <Flex.Item>{renderLastLogin()}</Flex.Item>
+    </Flex>
+  ) : undefined
 
-  const renderCloseButton = () => (
-    <CloseButton
-      placement="end"
-      offset="small"
-      onClick={() => setIsShowingContent(false)}
-      screenReaderLabel={t('Close')}
-    />
-  )
-
-  return (
+  const actionsOverride = (
     <>
       {isMessageModalOpen && (
         <MessageStudents
@@ -239,36 +139,38 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
           title={t('Send a message')}
         />
       )}
-      <Popover
-        renderTrigger={
-          <Link
-            isWithinText={false}
-            onClick={() => {}}
-            data-testid="student-cell-link"
-            aria-haspopup="dialog"
-          >
-            <TruncateText>{studentName}</TruncateText>
+      <Flex direction="row" justifyItems="center">
+        <Flex.Item>
+          <Link onClick={() => setIsMessageModalOpen(true)}>
+            <Text size="small">{t('Message')}</Text>
           </Link>
-        }
-        isShowingContent={isShowingContent}
-        onShowContent={() => {
-          setIsShowingContent(true)
-        }}
-        onHideContent={() => {
-          setIsShowingContent(false)
-        }}
-        on="click"
-        screenReaderLabel={`${t('Student Details for')} ${studentName}`}
-        shouldContainFocus
-        shouldReturnFocus
-        shouldCloseOnDocumentClick
-        offsetY="16px"
-      >
-        <View padding="small" display="block">
-          {renderCloseButton()}
-        </View>
-        {renderPopoverContent()}
-      </Popover>
+        </Flex.Item>
+        <View
+          as="div"
+          margin="none small none small"
+          borderWidth="none small none none"
+          width="0px"
+          height="1.4rem"
+        />
+        <Flex.Item>
+          <Link href={studentGradesUrl}>
+            <Text size="small">{t('View Mastery Report')}</Text>
+          </Link>
+        </Flex.Item>
+      </Flex>
     </>
+  )
+
+  return (
+    <StudentPopover
+      studentName={studentName}
+      student={student}
+      userDetails={userDetails}
+      masteryScoresOverride={masteryScoresOverride}
+      actionsOverride={actionsOverride}
+      isLoading={isLoading}
+      error={error}
+      onShowingContentChange={setIsShowingContent}
+    />
   )
 }
