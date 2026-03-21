@@ -33,22 +33,26 @@ export function toCardConfig(api: DiscoveryConfig): CardConfig {
     discovery_page: {
       primary: api.discovery_page.primary.map(toCard),
       secondary: api.discovery_page.secondary.map(toCard),
+      active: api.discovery_page.active,
     },
   }
 }
 
-export function toApiConfig(cards: CardConfig, active?: boolean): DiscoveryConfig {
+export function toApiConfig(cards: CardConfig): DiscoveryConfig {
   const toProvider = (card: AuthProviderCard): AuthProviderConfig => ({
-    authentication_provider_id: card.authentication_provider_id,
+    authentication_provider_id: card.authentication_provider_id as number,
     label: card.label,
-    ...(card.icon ? {icon: card.icon} : {}),
+    ...(card.icon && {icon: card.icon}),
   })
+
+  const validCards = (list: AuthProviderCard[]) =>
+    list.filter(c => c.authentication_provider_id !== null).map(toProvider)
 
   return {
     discovery_page: {
-      primary: cards.discovery_page.primary.map(toProvider),
-      secondary: cards.discovery_page.secondary.map(toProvider),
-      active,
+      primary: validCards(cards.discovery_page.primary),
+      secondary: validCards(cards.discovery_page.secondary),
+      active: cards.discovery_page.active,
     },
   }
 }
@@ -63,7 +67,9 @@ export async function fetchDiscoveryConfig(): Promise<DiscoveryConfig> {
     method: 'GET',
   })
 
-  return json!
+  if (!json) throw new Error('fetchDiscoveryConfig: response contained no JSON body')
+
+  return json
 }
 
 export async function fetchPreviewToken(config: DiscoveryConfig): Promise<string> {
@@ -72,6 +78,7 @@ export async function fetchPreviewToken(config: DiscoveryConfig): Promise<string
     method: 'POST',
     body: config,
   })
+
   return json?.token ?? ''
 }
 
@@ -82,5 +89,7 @@ export async function saveDiscoveryConfig(config: DiscoveryConfig): Promise<Disc
     body: config,
   })
 
-  return json!
+  if (!json) throw new Error('saveDiscoveryConfig: response contained no JSON body')
+
+  return json
 }

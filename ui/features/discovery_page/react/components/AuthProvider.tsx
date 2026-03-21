@@ -16,75 +16,157 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ToggleGroup} from '@instructure/ui-toggle-details'
+import {useEffect, useRef, useState} from 'react'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AuthProviderHeader} from './AuthProviderHeader'
 import {AuthProviderForm} from './AuthProviderForm'
+import {DISCOVERY_PAGE_ICONS} from '../constants'
+import type {AuthProviderProps, CardFormErrors} from '../types'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('discovery_page')
 
-interface AuthProviderProps {
-  label: string
-  iconUrl?: string
-  loginLabel: string
-  selectedProviderId: string
-  onLoginChange: (value: string) => void
-  onProviderChange: (value: string) => void
-  selectedIconId: string
-  onIconSelect: (iconId: string) => void
-  expanded?: boolean
-  onToggle?: () => void
-  disableMoveUp?: boolean
-  disableMoveDown?: boolean
-  onDelete: () => void
-  onMoveUp: () => void
-  onMoveDown: () => void
-}
+const UNSAFE_LABEL_PATTERN = /[<>"]/
 
 export function AuthProvider({
-  label,
-  iconUrl,
-  loginLabel,
-  selectedProviderId,
-  onLoginChange,
-  onProviderChange,
-  selectedIconId,
-  onIconSelect,
-  expanded,
-  onToggle,
+  card,
+  isEditing,
+  isDisabled,
+  authProviders,
+  authProviderUrl,
+  elementRef,
+  onEditStart,
+  onEditDone,
+  onEditCancel,
   disableMoveUp,
   disableMoveDown,
   onDelete,
   onMoveUp,
   onMoveDown,
 }: AuthProviderProps) {
+  const [draftLabel, setDraftLabel] = useState(card.label)
+  const [draftProviderId, setDraftProviderId] = useState<number | null>(
+    card.authentication_provider_id,
+  )
+  const [draftIcon, setDraftIcon] = useState(card.icon ?? '')
+  const [errors, setErrors] = useState<CardFormErrors>({})
+  const labelRef = useRef<HTMLInputElement | null>(null)
+  const providerRef = useRef<HTMLSelectElement | null>(null)
+
+  // sync draft state on every edit mode transition (open and close) so stale
+  // draft values never flash on the next open after a cancelled edit
+  useEffect(() => {
+    setDraftLabel(card.label)
+    setDraftProviderId(card.authentication_provider_id)
+    setDraftIcon(card.icon ?? '')
+    setErrors({})
+
+    if (isEditing) {
+      labelRef.current?.focus()
+    }
+
+    // card is intentionally excluded: we only want to reset on isEditing transition
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing])
+
+  const handleDone = () => {
+    const newErrors: CardFormErrors = {}
+
+    if (!draftLabel.trim()) {
+      newErrors.label = I18n.t('Label is required')
+    } else if (UNSAFE_LABEL_PATTERN.test(draftLabel)) {
+      newErrors.label = I18n.t('Label must not contain <, >, or " characters')
+    }
+
+    if (draftProviderId === null) {
+      newErrors.providerId = I18n.t('Authentication provider is required')
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+
+      if (newErrors.label) {
+        labelRef.current?.focus()
+      } else if (newErrors.providerId) {
+        providerRef.current?.focus()
+      }
+
+      return
+    }
+
+    onEditDone({
+      label: draftLabel.trim(),
+      authentication_provider_id: draftProviderId!,
+      icon: draftIcon || undefined,
+    })
+  }
+
+  const draftIconUrl = DISCOVERY_PAGE_ICONS.find(i => i.id === draftIcon)?.url
+  const committedIconUrl = DISCOVERY_PAGE_ICONS.find(i => i.id === card.icon)?.url
+  const draftProviderUrl = authProviders?.find(p => p.id === String(draftProviderId))?.url
+
   return (
-    <ToggleGroup
+    <View
       as="div"
-      size="small"
-      expanded={expanded}
-      onToggle={() => onToggle?.()}
-      toggleLabel={I18n.t('Expand %{label} settings', {label})}
-      summary={
+      data-card-id={card.id}
+      borderColor={isEditing ? 'brand' : undefined}
+      borderRadius="medium"
+      borderWidth="small"
+      elementRef={el => elementRef?.(el instanceof HTMLElement ? el : null)}
+      padding="small"
+      shadow={isEditing ? 'above' : undefined}
+    >
+      <Flex as="div" direction="column" gap="small">
         <AuthProviderHeader
-          label={label}
-          iconUrl={iconUrl}
+          label={isEditing ? draftLabel : card.label}
+          iconUrl={isEditing ? draftIconUrl : committedIconUrl}
+          providerUrl={isEditing ? draftProviderUrl : authProviderUrl}
+          isEditing={isEditing}
+          isDisabled={isDisabled}
           disableMoveUp={disableMoveUp}
           disableMoveDown={disableMoveDown}
+          onEditStart={onEditStart}
           onDelete={onDelete}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
         />
-      }
-    >
-      <AuthProviderForm
-        loginLabel={loginLabel}
-        selectedProviderId={selectedProviderId}
-        onLoginChange={onLoginChange}
-        onProviderChange={onProviderChange}
-        selectedIconId={selectedIconId}
-        onIconSelect={onIconSelect}
-      />
-    </ToggleGroup>
+
+        {isEditing && (
+          <>
+            <View as="div" padding="small large">
+              <AuthProviderForm
+                authProviders={authProviders}
+                loginLabel={draftLabel}
+                selectedProviderId={draftProviderId ? String(draftProviderId) : ''}
+                selectedIconId={draftIcon}
+                onLoginChange={setDraftLabel}
+                onProviderChange={id => setDraftProviderId(id ? Number(id) : null)}
+                onIconSelect={setDraftIcon}
+                errors={errors}
+                onLabelRef={el => {
+                  labelRef.current = el
+                }}
+                onProviderRef={el => {
+                  providerRef.current = el
+                }}
+              />
+            </View>
+
+            <Flex gap="mediumSmall" direction="row-reverse">
+              <Button onClick={handleDone} size="small" data-testid="auth-provider-done-button">
+                {I18n.t('Done')}
+              </Button>
+
+              <Link isWithinText={false} onClick={onEditCancel}>
+                {I18n.t('Cancel')}
+              </Link>
+            </Flex>
+          </>
+        )}
+      </Flex>
+    </View>
   )
 }

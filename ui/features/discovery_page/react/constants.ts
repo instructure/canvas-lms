@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {DiscoveryPageIcon} from './types'
-
-import defaultIcon from './images/default.svg'
+import canvasIcon from './images/canvas.svg'
 import appleIcon from './images/apple.svg'
 import auth0Icon from './images/auth0.svg'
 import classlinkIcon from './images/classlink.svg'
+import cleverIcon from './images/clever.svg'
 import facebookIcon from './images/facebook.svg'
 import githubIcon from './images/github.svg'
 import googleIcon from './images/google.svg'
@@ -30,12 +29,14 @@ import microsoftIcon from './images/microsoft.svg'
 import oktaIcon from './images/okta.svg'
 import oneloginIcon from './images/onelogin.svg'
 import pingIcon from './images/ping.svg'
+import type {DiscoveryPageIcon} from './types'
 
 export const DISCOVERY_PAGE_ICONS: DiscoveryPageIcon[] = [
-  {id: 'default', name: 'Default', url: defaultIcon},
+  {id: 'canvas', name: 'Canvas LMS', url: canvasIcon},
   {id: 'apple', name: 'Apple', url: appleIcon},
   {id: 'auth0', name: 'Auth0', url: auth0Icon},
   {id: 'classlink', name: 'ClassLink', url: classlinkIcon},
+  {id: 'clever', name: 'Clever', url: cleverIcon},
   {id: 'facebook', name: 'Facebook', url: facebookIcon},
   {id: 'github', name: 'GitHub', url: githubIcon},
   {id: 'google', name: 'Google', url: googleIcon},

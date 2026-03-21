@@ -21,19 +21,19 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {fetchDiscoveryConfig, saveDiscoveryConfig, toApiConfig, toCardConfig} from '../api'
-import type {CardConfig, ModalError} from '../types'
+import type {CardConfig, ConfigureModalProps, DiscoverySection, ModalError} from '../types'
 import {LoadingSaveOverlay} from './LoadingSaveOverlay'
 import {useExitConfirmation} from '../hooks/useExitConfirmation'
-import {useDiscovery} from '../hooks/useDiscovery'
 import {useIframeMessaging} from '../hooks/useIframeMessaging'
+import {useCardEditing} from '../hooks/useCardEditing'
 import {Flex} from '@instructure/ui-flex'
 import {PreviewAndSidebar} from './PreviewAndSidebar'
 import {SignInOptionsHeader} from './SignInOptionsHeader'
-import {backfillLabels, useDiscoveryConfig} from '../hooks/useDiscoveryConfig'
+import {useDiscoveryConfig} from '../hooks/useDiscoveryConfig'
 import {AuthProvider} from './AuthProvider'
-import {DISCOVERY_PAGE_ICONS} from '../constants'
 
 const I18n = createI18nScope('discovery_page')
 
@@ -41,17 +41,12 @@ const EMPTY_CONFIG: CardConfig = {
   discovery_page: {primary: [], secondary: []},
 }
 
-interface ConfigureModalProps {
-  open: boolean
-  onClose: () => void
-}
-
 export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   const [isLoadingConfig, setIsLoadingConfig] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<ModalError | null>(null)
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
-  const {previewUrl, authProviders} = useDiscovery()
+  const authProviders = ENV.auth_providers
+  const previewUrl = ENV.discovery_page_url
   const {
     config,
     setConfig,
@@ -63,48 +58,73 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     handleMoveCard,
   } = useDiscoveryConfig({
     initialConfig: EMPTY_CONFIG,
-    authProviders,
   })
+  const {
+    editingCardId,
+    isEditingAnyCard,
+    cardRefs,
+    handleAddAndEdit,
+    handleEditStart,
+    handleEditDone,
+    handleEditCancel,
+    resetEditing,
+  } = useCardEditing({config, handleAddCard, handleUpdateCard, handleDeleteCard, setIsDirty})
   const handleConfirmedClose = useExitConfirmation(isDirty)
-
   const modalBodyRef = useRef<HTMLElement | null>(null)
-  const savedConfigRef = useRef<CardConfig | null>(null)
+  const hasLoaded = useRef(false)
+  const prevOpen = useRef(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const activeRef = useRef<boolean>(false)
+  const isLoading = isLoadingConfig || isSaving
+  const isActionsDisabled = isLoading || isEditingAnyCard
 
   useIframeMessaging({iframeRef, config, previewUrl})
 
-  const isLoading = isLoadingConfig || isSaving
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
 
   const resetAndClose = () => {
     setIsDirty(false)
-    setConfig(EMPTY_CONFIG)
-    savedConfigRef.current = null
+    resetEditing()
     onClose()
   }
 
-  const handleCloseModal = async () => {
-    await handleConfirmedClose(resetAndClose)
+  const handleCloseModal = () => {
+    handleConfirmedClose(resetAndClose)
   }
 
+  if (open && !prevOpen.current) {
+    setConfig(EMPTY_CONFIG)
+    setError(null)
+    setIsDirty(false)
+    setIsLoadingConfig(true)
+    hasLoaded.current = false
+  }
+  prevOpen.current = open
+
   useEffect(() => {
-    if (open && !savedConfigRef.current) {
-      setError(null)
-      setIsDirty(false)
-
+    if (open && !hasLoaded.current) {
       const loadConfig = async () => {
-        setIsLoadingConfig(true)
-
         try {
           const data = await fetchDiscoveryConfig()
-          activeRef.current = data.discovery_page.active ?? false
           const cardConfig = toCardConfig(data)
           setConfig(cardConfig)
-          savedConfigRef.current = cardConfig
+          hasLoaded.current = true
         } catch (err) {
-          const errorMessage =
-            err instanceof Error ? err.message : I18n.t('Failed to load configuration')
-          setError({message: errorMessage, code: 'LOAD_ERROR'})
+          console.error('Failed to load discovery configuration:', err)
+
+          setError({
+            message: I18n.t('Failed to load configuration. Please close and try again.'),
+            code: 'LOAD_ERROR',
+          })
         } finally {
           setIsLoadingConfig(false)
         }
@@ -112,19 +132,23 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
 
       loadConfig()
     }
-  }, [open, setConfig, setIsDirty])
+  }, [open, setConfig])
 
   const handleSave = async () => {
     setError(null)
     setIsSaving(true)
 
     try {
-      await saveDiscoveryConfig(toApiConfig(backfillLabels(config), activeRef.current))
-      resetAndClose()
+      await saveDiscoveryConfig(toApiConfig(config))
+      setIsDirty(false)
+      // keep modal open after save
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : I18n.t('Failed to save configuration')
-      setError({message: errorMessage, code: 'SAVE_ERROR'})
+      console.error('Failed to save discovery configuration:', err)
+
+      showFlashAlert({
+        message: I18n.t('Failed to save configuration. Please try again.'),
+        type: 'error',
+      })
     } finally {
       setIsSaving(false)
     }
@@ -133,7 +157,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   const renderCloseButton = () => {
     return (
       <CloseButton
-        disabled={isLoading}
+        disabled={isActionsDisabled}
         offset="small"
         onClick={handleCloseModal}
         placement="end"
@@ -142,53 +166,64 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     )
   }
 
-  const renderAuthProviderSection = (section: 'primary' | 'secondary', title: string) => (
+  const renderAuthProviderSection = (
+    section: DiscoverySection,
+    title: string,
+    description?: string,
+  ) => (
     <>
-      <SignInOptionsHeader title={title} onAddClick={() => handleAddCard(section)} />
+      <SignInOptionsHeader
+        title={title}
+        description={description}
+        onAddClick={() => handleAddAndEdit(section)}
+        disabled={isActionsDisabled}
+      />
 
       <Flex as="div" gap="x-small" direction="column">
-        {config.discovery_page[section].map((card, index) => (
-          <AuthProvider
-            key={card.id}
-            label={card.label}
-            iconUrl={DISCOVERY_PAGE_ICONS.find(i => i.id === card.icon)?.url}
-            loginLabel={card.label}
-            selectedProviderId={String(card.authentication_provider_id)}
-            onLoginChange={value =>
-              handleUpdateCard(section, card.id, {
-                label: value,
-              })
-            }
-            onProviderChange={providerId =>
-              handleUpdateCard(section, card.id, {
-                authentication_provider_id: Number(providerId),
-              })
-            }
-            selectedIconId={card.icon || ''}
-            onIconSelect={iconId => {
-              handleUpdateCard(section, card.id, {
-                icon: iconId,
-              })
-            }}
-            expanded={expandedCardId === card.id}
-            onToggle={() => setExpandedCardId(expandedCardId === card.id ? null : card.id)}
-            // cross-section moves are allowed: last primary item can move to secondary,
-            // first secondary item can move to primary (only disable at absolute boundaries)
-            disableMoveUp={section === 'primary' && index === 0}
-            disableMoveDown={
-              section === 'secondary' && index === config.discovery_page.secondary.length - 1
-            }
-            onDelete={() => handleDeleteCard(section, card.id)}
-            onMoveUp={() => {
-              setExpandedCardId(null)
-              handleMoveCard(section, card.id, 'up')
-            }}
-            onMoveDown={() => {
-              setExpandedCardId(null)
-              handleMoveCard(section, card.id, 'down')
-            }}
-          />
-        ))}
+        {config.discovery_page[section].map((card, index) => {
+          const providerEntry = authProviders?.find(
+            p => p.id === String(card.authentication_provider_id),
+          )
+
+          return (
+            <AuthProvider
+              key={card.id}
+              authProviders={authProviders}
+              card={card}
+              elementRef={el => {
+                if (el) {
+                  cardRefs.current?.set(card.id, el)
+                } else {
+                  cardRefs.current?.delete(card.id)
+                }
+              }}
+              isEditing={editingCardId === card.id}
+              isDisabled={isActionsDisabled && editingCardId !== card.id}
+              authProviderUrl={providerEntry?.url}
+              onEditStart={() => handleEditStart(section, card.id)}
+              onEditDone={draft => handleEditDone(section, card.id, draft)}
+              onEditCancel={() => handleEditCancel(section, card.id)}
+              // cross-section moves are allowed: last primary item can move to secondary,
+              // first secondary item can move to primary (only disable at absolute boundaries)
+              disableMoveUp={section === 'primary' && index === 0}
+              disableMoveDown={
+                section === 'secondary' && index === config.discovery_page.secondary.length - 1
+              }
+              onDelete={() => {
+                handleDeleteCard(section, card.id)
+                setIsDirty(true)
+              }}
+              onMoveUp={() => {
+                handleMoveCard(section, card.id, 'up')
+                setIsDirty(true)
+              }}
+              onMoveDown={() => {
+                handleMoveCard(section, card.id, 'down')
+                setIsDirty(true)
+              }}
+            />
+          )
+        })}
       </Flex>
     </>
   )
@@ -200,11 +235,11 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
       onClose={handleCloseModal}
       onDismiss={handleCloseModal}
       open={open}
-      shouldCloseOnDocumentClick={!isLoading}
       size="fullscreen"
     >
       <Modal.Header spacing="compact">
         {renderCloseButton()}
+
         <Heading>{I18n.t('Configure Discovery Page')}</Heading>
       </Modal.Header>
 
@@ -223,7 +258,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
         {!error && (
           <>
             <LoadingSaveOverlay
-              isLoading={isLoadingConfig || isSaving}
+              isLoading={isLoading}
               isLoadingConfig={isLoadingConfig}
               mountNode={() => modalBodyRef.current}
             />
@@ -235,7 +270,14 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
 
               <Flex as="div" gap="medium" direction="column">
                 {renderAuthProviderSection('primary', I18n.t('Main sign in options'))}
-                {renderAuthProviderSection('secondary', I18n.t('More sign in options'))}
+
+                {renderAuthProviderSection(
+                  'secondary',
+                  I18n.t('More sign in options'),
+                  I18n.t(
+                    'These options are hidden until a user expands the “More sign in options” section on the login page.',
+                  ),
+                )}
               </Flex>
             </PreviewAndSidebar>
           </>
@@ -244,14 +286,18 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
 
       <Modal.Footer>
         <Flex direction="row" gap="small">
-          <Button onClick={handleCloseModal} disabled={isLoading} data-testid="cancel-button">
-            {I18n.t('Cancel')}
+          <Button
+            onClick={handleCloseModal}
+            disabled={isActionsDisabled}
+            data-testid="close-button"
+          >
+            {I18n.t('Close')}
           </Button>
 
           <Button
             color="primary"
             data-testid="save-button"
-            disabled={isLoading}
+            disabled={isActionsDisabled || !isDirty}
             onClick={handleSave}
           >
             {isSaving ? I18n.t('Saving...') : I18n.t('Save')}

@@ -31,7 +31,7 @@ const I18n = createI18nScope('discovery_page')
  */
 export function useExitConfirmation(isDirty: boolean) {
   return useCallback(
-    async (onConfirmed: () => void) => {
+    (onConfirmed: () => void) => {
       if (!isDirty) {
         onConfirmed()
         return
