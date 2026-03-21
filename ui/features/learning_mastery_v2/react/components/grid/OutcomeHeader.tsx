@@ -26,7 +26,6 @@ import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {OutcomeDescriptionModal} from '../modals/OutcomeDescriptionModal'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
-import {DragDropConnectorProps} from './DragDropWrapper'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ColumnHeader} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ColumnHeader'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
@@ -34,7 +33,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-export interface OutcomeHeaderProps extends DragDropConnectorProps {
+export interface OutcomeHeaderProps {
   outcome: Outcome
   sorting: Sorting
   contributingScoresForOutcome: ContributingScoresForOutcome
