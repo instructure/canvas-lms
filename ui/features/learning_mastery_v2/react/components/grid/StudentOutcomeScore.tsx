@@ -21,31 +21,41 @@ import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {getTagIcon} from '@canvas/outcomes/react/utils/icons'
 import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
 import {findRating} from '@canvas/outcomes/react/utils/ratings'
-import {ScoreWithLabel} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ScoreCellContent/ScoreWithLabel'
+import {ScoreCellContent} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ScoreCellContent'
+import type {ViewProps} from '@instructure/ui-view'
 
-const I18n = createI18nScope('learning_mastery_gradebook')
+const I18n = createI18nScope('LearningMasteryGradebook')
 
 export interface StudentOutcomeScoreProps {
   outcome: Outcome
   score?: number
   scoreDisplayFormat?: ScoreDisplayFormat
+  background?: ViewProps['background']
+  onAction?: () => void
+  focus?: boolean
 }
 
 const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
   outcome,
   score,
   scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
+  background,
+  onAction,
+  focus,
 }) => {
   const rating = score !== undefined ? findRating(outcome.ratings, score) : undefined
   const masteryLevelResult = getTagIcon(rating?.points, outcome.mastery_points)
   const masteryLevel = typeof masteryLevelResult === 'string' ? masteryLevelResult : 'unassessed'
 
   return (
-    <ScoreWithLabel
+    <ScoreCellContent
       masteryLevel={masteryLevel}
       score={score ?? 0}
       scoreDisplayFormat={scoreDisplayFormat}
       label={rating?.description || I18n.t('Unassessed')}
+      background={background}
+      onAction={onAction}
+      focus={focus}
     />
   )
 }

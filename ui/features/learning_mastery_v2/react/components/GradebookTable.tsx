@@ -226,8 +226,8 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
       return (
         <View as="div" data-testid={`student-outcome-score-${rowData['student'].id}-${outcome.id}`}>
           <StudentOutcomeScore
-            score={cellData.rollup?.score}
             outcome={outcome}
+            score={cellData.rollup?.score}
             scoreDisplayFormat={gradebookSettings.scoreDisplayFormat}
           />
         </View>
