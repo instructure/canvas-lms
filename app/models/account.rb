@@ -2048,12 +2048,26 @@ class Account < ApplicationRecord
       RUBY
     end
 
+    def define_special_account_exists(key)
+      special_account_list << key
+      instance_eval <<~RUBY, __FILE__, __LINE__ + 1
+        # def site_admin_exists?
+        #   special_account_exists?(:site_admin)
+        # end
+        def self.#{key}_exists?
+          special_account_exists?(:#{key})
+        end
+      RUBY
+    end
+
     def all_special_accounts
       special_account_list.map { |key| send(key) }
     end
   end
   define_special_account(:default, "Default Account") # Account.default
   define_special_account(:site_admin) # Account.site_admin
+  define_special_account_exists(:default) # Account.default_exists?
+  define_special_account_exists(:site_admin) # Account.site_admin_exists?
 
   def clear_special_account_cache_if_special
     if shard == Shard.birth && Account.special_account_ids.values.map(&:to_i).include?(id)
@@ -2083,6 +2097,14 @@ class Account < ApplicationRecord
         account
       end
     end
+  end
+
+  # We can't just call get_special_account.present? because in non-production
+  # environments, that actually creates the account, which we want to avoid!
+  def self.special_account_exists?(special_account_type)
+    special_accounts[special_account_type].present? ||
+      special_account_ids[special_account_type] ||
+      Setting.get("#{special_account_type}_account_id", nil).present?
   end
 
   def self.get_special_account(special_account_type, default_account_name, force_create: false)
