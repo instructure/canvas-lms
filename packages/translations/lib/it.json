@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "Cap-prodotto"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Generazione sottotitolo non riuscita"
+    },
     "caption_manager_aae0906f": {
         "message": "Gestore sottotitolo"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "Eliminazione sottotitolo { captionName } non riuscita"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "Generazione sottotitolo { captionName } non riuscita"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "Caricamento sottotitolo { captionName } non riuscito"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "Aggiunti sottotitoli per { lang }"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Simbolo dei gradi"
     },
+    "delete_failed_6529e336": {
+        "message": "Eliminazione non riuscita"
+    },
     "delimiters_4db4840d": {
         "message": "Delimitatori"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Inglese (Regno Unito)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Inserisci un titolo multimediale"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Inserisci almeno 3 caratteri per la ricerca"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Extra Large"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Extra Large ({ width } x { height }px)"
     },
     "extra_small_9ae33252": {
         "message": "Extra piccola"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "Testo grande"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Large ({ width } x { height }px)"
+    },
     "latvian_2bbb6aab": {
         "message": "Lettone"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "Medio"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Medium ({ width } x { height }px)"
     },
     "merge_links_2478df96": {
         "message": "Unisci link"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Commento sulla riproduzione del contenuto multimediale da parte di { name } da { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Layout lettore"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Consenti a Canvas di accedere al tuo microfono e alla tua webcam."
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Risultato { index } di { max }."
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "Riprova { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "Riprova"
     },
@@ -2213,9 +2246,6 @@
     "selected_274ce24f": {
         "message": "Selezionato"
     },
-    "selected_file_name_93fa1a14": {
-        "message": "File selezionato: { name }"
-    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } selezionato"
     },
@@ -2255,6 +2285,9 @@
     "show_link_options_545338fd": {
         "message": "Mostra opzioni link"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "Mostra libretto graduale"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Gli utenti senza problemi di vista esplorano le pagine web velocemente, cercando intestazioni in grassetto o di grandi dimensioni. Gli utenti di screen reader si affidano alle intestazioni per la comprensione contestuale. Le intestazioni devono utilizzare la struttura appropriata."
     },
@@ -2287,6 +2320,9 @@
     },
     "small_b070434a": {
         "message": "Piccolo"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Small ({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Cerchio compatto"
@@ -2567,6 +2603,9 @@
     "timebar_a4d18443": {
         "message": "Barra del tempo"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Il titolo non può essere vuoto"
+    },
     "title_ee03d132": {
         "message": "Titolo"
     },
@@ -2587,6 +2626,9 @@
     },
     "top_66e0adb6": {
         "message": "Superiore"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Il pannello del libretto è disponibile a larghezze superiori a 720 px."
     },
     "tray_839df38a": {
         "message": "Barra delle applicazioni"
@@ -2627,6 +2669,9 @@
     "unpublished_dfd8801": {
         "message": "non pubblicato"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Le modifiche non salvate andranno perse."
+    },
     "untitled_16aa4f2b": {
         "message": "Senza titolo"
     },
@@ -2653,6 +2698,9 @@
     },
     "upload_document_253f0478": {
         "message": "Carica documento"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Caricamento non riuscito"
     },
     "upload_file_fd2361b8": {
         "message": "Carica File"
@@ -2815,6 +2863,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Visualizza conteggio parole e caratteri"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "Limitazioni visualizzatore"
     },
     "waiting_for_response_1efd0c50": {
         "message": "In attesa di risposta"

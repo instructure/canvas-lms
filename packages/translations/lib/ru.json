@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "Произведение Уитни"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Произошел сбой при создании надписи"
+    },
     "caption_manager_aae0906f": {
         "message": "Менеджер заголовков"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "Не удалось удалить надпись { captionName }"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "Произошел сбой при создании надписи { captionName }"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "Не удалось загрузить надпись { captionName }"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "Были добавлены заголовки для { lang }"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Символ градуса"
     },
+    "delete_failed_6529e336": {
+        "message": "Произошел сбой при удалении"
+    },
     "delimiters_4db4840d": {
         "message": "Разделители"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Английский язык (Великобритания)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Ввести название медиафайла"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Введите не менее 3 знаков для поиска"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Очень крупный"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Сверхбольшой ({ width } x { height }пикселей)"
     },
     "extra_small_9ae33252": {
         "message": "Очень мелкое изображение"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "Большой текст"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Большой ({ width } x { height }пикселей)"
+    },
     "latvian_2bbb6aab": {
         "message": "Латвийский"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "Средний"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Средний ({ width } x { height }пикселей)"
     },
     "merge_links_2478df96": {
         "message": "Объединить ссылки"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Воспроизвести мультимедийный комментарии { name } из { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Формат плеера"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Разрешите Canvas доступ к вашему микрофону и веб-камере."
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Результат { index } из { max }."
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "Повторить { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "Повторить"
     },
@@ -2213,9 +2246,6 @@
     "selected_274ce24f": {
         "message": "Выбрано"
     },
-    "selected_file_name_93fa1a14": {
-        "message": "Выбранный файл: { name }"
-    },
     "selected_linkfilename_c093b1f2": {
         "message": "Выбранное { linkFileName }"
     },
@@ -2255,6 +2285,9 @@
     "show_link_options_545338fd": {
         "message": "Показать параметры ссылки"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "Показать непрерывную стенограмму"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Зрячие пользователи быстро просматривают веб-страницы в поисках крупных или полужирных заголовков. Пользователи экранных дикторов полагаются на заголовки для контекстуального понимания. Заголовки должны иметь надлежащую структуру."
     },
@@ -2287,6 +2320,9 @@
     },
     "small_b070434a": {
         "message": "Маленький"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Малый ({ width } x { height }пикселей)"
     },
     "solid_circle_9f061dfc": {
         "message": "Темная точка"
@@ -2567,6 +2603,9 @@
     "timebar_a4d18443": {
         "message": "Шкала времени"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Заголовок не может быть пустым"
+    },
     "title_ee03d132": {
         "message": "Заголовок"
     },
@@ -2587,6 +2626,9 @@
     },
     "top_66e0adb6": {
         "message": "Верх"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Панель стенограммы доступна при ширине экрана более 720 пикселей."
     },
     "tray_839df38a": {
         "message": "Лоток"
@@ -2627,6 +2669,9 @@
     "unpublished_dfd8801": {
         "message": "не опубликовано"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Несохраненные изменения будут потеряны."
+    },
     "untitled_16aa4f2b": {
         "message": "Без названия"
     },
@@ -2653,6 +2698,9 @@
     },
     "upload_document_253f0478": {
         "message": "Загрузить документ"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Загрузка не выполнена"
     },
     "upload_file_fd2361b8": {
         "message": "Загрузить файл"
@@ -2815,6 +2863,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Просмотреть подсчет количества слов и символов"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "Ограничения просмотра"
     },
     "waiting_for_response_1efd0c50": {
         "message": "В ожидании ответа"
