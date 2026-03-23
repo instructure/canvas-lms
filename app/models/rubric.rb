@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Rubric < ActiveRecord::Base
+class Rubric < ApplicationRecord
   class RubricUniqueAlignments < ActiveModel::Validator
     def validate(record)
       return if record.criteria.nil?

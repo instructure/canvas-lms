@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DelayedMessage < ActiveRecord::Base
+class DelayedMessage < ApplicationRecord
   include NotificationPreloader
 
   belongs_to :notification_policy, inverse_of: :delayed_messages

@@ -20,7 +20,7 @@
 
 require "anonymity"
 
-class Submission < ActiveRecord::Base
+class Submission < ApplicationRecord
   include Canvas::GradeValidations
   include CustomValidations
   include SendToStream

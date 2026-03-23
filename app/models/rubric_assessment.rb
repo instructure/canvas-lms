@@ -21,7 +21,7 @@
 # Associates an artifact with a rubric while offering an assessment and
 # scoring using the rubric.  Assessments are grouped together in one
 # RubricAssociation, which may or may not have an association model.
-class RubricAssessment < ActiveRecord::Base
+class RubricAssessment < ApplicationRecord
   include TextHelper
   include HtmlTextHelper
   include Trackable

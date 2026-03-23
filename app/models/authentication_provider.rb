@@ -22,7 +22,7 @@ require "net-ldap"
 require "net_ldap_extensions"
 NetLdapExtensions.apply
 
-class AuthenticationProvider < ActiveRecord::Base
+class AuthenticationProvider < ApplicationRecord
   include Workflow
 
   validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }

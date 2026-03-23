@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class StreamItem < ActiveRecord::Base
+class StreamItem < ApplicationRecord
   serialize :data
 
   has_many :stream_item_instances

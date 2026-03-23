@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ObserverAlertThreshold < ActiveRecord::Base
+class ObserverAlertThreshold < ApplicationRecord
   belongs_to :student, class_name: "User", inverse_of: :as_student_observer_alert_thresholds, foreign_key: :user_id
   belongs_to :observer, class_name: "User", inverse_of: :as_observer_observer_alert_thresholds
   has_many :observer_alerts, inverse_of: :observer_alert_threshold

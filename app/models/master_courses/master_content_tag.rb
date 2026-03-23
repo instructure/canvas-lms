@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::MasterContentTag < ActiveRecord::Base
+class MasterCourses::MasterContentTag < ApplicationRecord
   # i want to get off content tag's wild ride
 
   # stores restriction data on the blueprint side

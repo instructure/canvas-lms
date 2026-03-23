@@ -34,7 +34,7 @@
 # Notable fields:
 # * ms_group_id -- Microsoft's ID used in the their Graph API for the group
 #
-class MicrosoftSync::Group < ActiveRecord::Base
+class MicrosoftSync::Group < ApplicationRecord
   extend RootAccountResolver
   include Workflow
 

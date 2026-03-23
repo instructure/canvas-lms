@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class DiscussionTopicInsight
-  class Entry < ActiveRecord::Base
+  class Entry < ApplicationRecord
     belongs_to :root_account, class_name: "Account"
     belongs_to :discussion_topic_insight, inverse_of: :entries
     belongs_to :discussion_topic, inverse_of: :insight_entries

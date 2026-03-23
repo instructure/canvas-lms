@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class SisBatchError < ActiveRecord::Base
+class SisBatchError < ApplicationRecord
   belongs_to :sis_batch, inverse_of: :sis_batch_errors
   belongs_to :parallel_importer, inverse_of: :sis_batch_errors
   belongs_to :root_account, class_name: "Account", inverse_of: :sis_batch_errors

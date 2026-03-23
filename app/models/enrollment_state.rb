@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class EnrollmentState < ActiveRecord::Base
+class EnrollmentState < ApplicationRecord
   PENDING_STATES = %w[pending_active pending_invited creation_pending].freeze
   # a 1-1 table with enrollments
   # that was really only a separate table because enrollments had a billion columns already

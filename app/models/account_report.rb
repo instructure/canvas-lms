@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AccountReport < ActiveRecord::Base
+class AccountReport < ApplicationRecord
   include Workflow
   include LocaleSelection
   include CaptureJobIds

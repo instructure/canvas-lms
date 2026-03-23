@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BlockEditor < ActiveRecord::Base
+class BlockEditor < ApplicationRecord
   belongs_to :context, polymorphic: [:wiki_page]
   before_create :set_root_account_id
 

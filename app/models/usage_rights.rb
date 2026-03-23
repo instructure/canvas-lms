@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UsageRights < ActiveRecord::Base
+class UsageRights < ApplicationRecord
   include ContentLicenses
 
   USE_JUSTIFICATIONS = %w[own_copyright public_domain used_by_permission fair_use creative_commons].freeze

@@ -22,7 +22,7 @@ require "icalendar"
 
 Icalendar::Event.optional_property :x_alt_desc
 
-class CalendarEvent < ActiveRecord::Base
+class CalendarEvent < ApplicationRecord
   include CopyAuthorizedLinks
   include TextHelper
   include HtmlTextHelper

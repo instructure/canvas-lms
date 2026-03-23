@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Alert < ActiveRecord::Base
+class Alert < ApplicationRecord
   belongs_to :context, polymorphic: [:account, :course]
   has_many :criteria, class_name: "AlertCriterion", dependent: :destroy, autosave: true
 

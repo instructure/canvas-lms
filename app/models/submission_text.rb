@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionText < ActiveRecord::Base
+class SubmissionText < ApplicationRecord
   belongs_to :submission, optional: false
   belongs_to :attachment, optional: false
   belongs_to :root_account, class_name: "Account", optional: false

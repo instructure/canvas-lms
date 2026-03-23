@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  class ToolConfiguration < ActiveRecord::Base
+  class ToolConfiguration < ApplicationRecord
     VISIBLE_TO_ADMINS = "admins"
     VISIBLE_TO_MEMBERS = "members"
     PUBLIC = "public"

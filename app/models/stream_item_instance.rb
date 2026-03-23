@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class StreamItemInstance < ActiveRecord::Base
+class StreamItemInstance < ApplicationRecord
   include Workflow
 
   belongs_to :user

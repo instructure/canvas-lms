@@ -19,7 +19,7 @@
 #
 
 module LiveAssessments
-  class Result < ActiveRecord::Base
+  class Result < ApplicationRecord
     belongs_to :assessor, class_name: "User"
     belongs_to :user
     belongs_to :assessment, class_name: "LiveAssessments::Assessment"

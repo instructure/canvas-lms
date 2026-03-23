@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class WikiPage < ActiveRecord::Base
+class WikiPage < ApplicationRecord
   attr_readonly :wiki_id
   attr_accessor :saved_by
 

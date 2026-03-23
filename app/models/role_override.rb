@@ -21,7 +21,7 @@
 require_relative "../../lib/enrollment_types"
 require_relative "../services/canvas_career/label_overrides"
 
-class RoleOverride < ActiveRecord::Base
+class RoleOverride < ApplicationRecord
   extend RootAccountResolver
 
   belongs_to :context, polymorphic: [:account]

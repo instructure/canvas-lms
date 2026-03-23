@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Score < ActiveRecord::Base
+class Score < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :enrollment, inverse_of: :scores

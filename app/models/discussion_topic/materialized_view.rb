@@ -20,7 +20,7 @@
 
 # This model is used internally by DiscussionTopic, it's not intended to be
 # queried directly by other code.
-class DiscussionTopic::MaterializedView < ActiveRecord::Base
+class DiscussionTopic::MaterializedView < ApplicationRecord
   class ReplicationTimeoutError < StandardError; end
 
   include Api::V1::DiscussionTopics

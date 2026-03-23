@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::RegistrationUpdateRequest < ActiveRecord::Base
+class Lti::RegistrationUpdateRequest < ApplicationRecord
   belongs_to :lti_registration, class_name: "Lti::Registration"
   belongs_to :root_account, class_name: "Account"
   belongs_to :created_by, class_name: "User"

@@ -19,7 +19,7 @@
 #
 class ImpossibleCredentialsError < ArgumentError; end
 
-class Pseudonym < ActiveRecord::Base
+class Pseudonym < ApplicationRecord
   # this field is used for audit logging.
   # if a request is deleting a pseudonym, it should set this value
   # before persisting the change.

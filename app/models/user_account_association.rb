@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UserAccountAssociation < ActiveRecord::Base
+class UserAccountAssociation < ApplicationRecord
   extend RootAccountResolver
 
   belongs_to :user

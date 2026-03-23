@@ -19,7 +19,7 @@
 #
 require "English"
 
-class ContentExport < ActiveRecord::Base
+class ContentExport < ApplicationRecord
   include Workflow
 
   belongs_to :context, polymorphic: [:course, :group, { context_user: "User" }]

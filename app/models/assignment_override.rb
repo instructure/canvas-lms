@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentOverride < ActiveRecord::Base
+class AssignmentOverride < ApplicationRecord
   include Workflow
   include TextHelper
 

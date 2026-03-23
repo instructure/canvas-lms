@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Auditors::ActiveRecord
-  class CourseRecord < ActiveRecord::Base
+  class CourseRecord < ApplicationRecord
     include Auditors::ActiveRecord::Attributes
     include CanvasPartman::Concerns::Partitioned
 

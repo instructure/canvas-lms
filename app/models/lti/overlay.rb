@@ -19,7 +19,7 @@
 
 require "hashdiff"
 
-class Lti::Overlay < ActiveRecord::Base
+class Lti::Overlay < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
 

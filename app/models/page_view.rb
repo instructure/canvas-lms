@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class PageView < ActiveRecord::Base
+class PageView < ApplicationRecord
   self.primary_key = "request_id"
 
   belongs_to :developer_key

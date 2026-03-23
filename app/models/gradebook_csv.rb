@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class GradebookCSV < ActiveRecord::Base
+class GradebookCSV < ApplicationRecord
   belongs_to :course, inverse_of: :gradebook_csvs
   belongs_to :user
   belongs_to :attachment

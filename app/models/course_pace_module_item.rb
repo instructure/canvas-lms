@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CoursePaceModuleItem < ActiveRecord::Base
+class CoursePaceModuleItem < ApplicationRecord
   belongs_to :course_pace
   belongs_to :module_item, class_name: "ContentTag"
   belongs_to :root_account, class_name: "Account"

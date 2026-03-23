@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Message < ActiveRecord::Base
+class Message < ApplicationRecord
   # Included modules
   include Rails.application.routes.url_helpers
 

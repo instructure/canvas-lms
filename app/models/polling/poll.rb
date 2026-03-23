@@ -19,7 +19,7 @@
 #
 
 module Polling
-  class Poll < ActiveRecord::Base
+  class Poll < ApplicationRecord
     belongs_to :user
     has_many :poll_choices, -> { order(:position) }, class_name: "Polling::PollChoice", dependent: :destroy
     has_many :poll_submissions, class_name: "Polling::PollSubmission", dependent: :destroy

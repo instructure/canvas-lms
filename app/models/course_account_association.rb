@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseAccountAssociation < ActiveRecord::Base
+class CourseAccountAssociation < ApplicationRecord
   belongs_to :course
   belongs_to :course_section
   belongs_to :account

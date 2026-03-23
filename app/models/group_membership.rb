@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupMembership < ActiveRecord::Base
+class GroupMembership < ApplicationRecord
   include Workflow
   extend RootAccountResolver
 

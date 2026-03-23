@@ -23,7 +23,7 @@
 # then you can write it to users with `User#set_preference`
 # and retrieve the values using `User#get_preference`
 
-class UserPreferenceValue < ActiveRecord::Base
+class UserPreferenceValue < ApplicationRecord
   belongs_to :user
   serialize :value
   serialize :sub_key, coder: JSON # i'm too lazy to force a distinction between integer and string/symbol keys

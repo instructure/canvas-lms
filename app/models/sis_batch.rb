@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SisBatch < ActiveRecord::Base
+class SisBatch < ApplicationRecord
   include Workflow
   include CaptureJobIds
 

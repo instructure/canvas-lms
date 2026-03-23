@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CommunicationChannel < ActiveRecord::Base
+class CommunicationChannel < ApplicationRecord
   # You should start thinking about communication channels
   # as independent of pseudonyms
   include ManyRootAccounts

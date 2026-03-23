@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Conversation < ActiveRecord::Base
+class Conversation < ApplicationRecord
   include SimpleTags
   include ModelCache
   include SendToStream

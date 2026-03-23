@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionEntry < ActiveRecord::Base
+class DiscussionEntry < ApplicationRecord
   # The maximum discussion entry threading depth that is allowed
   MAX_DEPTH = 50
 

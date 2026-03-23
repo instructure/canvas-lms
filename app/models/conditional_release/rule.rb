@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class Rule < ActiveRecord::Base
+  class Rule < ApplicationRecord
     include Deletion
 
     validates :course_id, presence: true
