@@ -29,6 +29,13 @@ import {createMockCourses, createMockLinkHeaderString} from '../../../__tests__/
 
 vi.mock('../../../../shared/react/hooks/useA11yTracking')
 
+vi.mock('@canvas/breakpoints', async () => ({
+  ...(await vi.importActual('@canvas/breakpoints')),
+  responsiveQuerySizes: () => ({
+    desktop: {minWidth: '0px'},
+  }),
+}))
+
 const mockTrackA11yEvent = vi.fn()
 
 const server = setupServer()

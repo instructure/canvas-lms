@@ -40,6 +40,7 @@ const I18n = createI18nScope('accessibility_course_statistics')
 interface CoursesTableRowProps {
   course: Course
   showSISIds: boolean
+  isMobile?: boolean
 }
 
 const getStatusDisplay = (workflowState: Course['workflow_state']) => {
@@ -65,11 +66,14 @@ const getStatusDisplay = (workflowState: Course['workflow_state']) => {
   }
 }
 
-const StatusCell: React.FC<{workflowState: Course['workflow_state']}> = ({workflowState}) => {
+const StatusCell: React.FC<{workflowState: Course['workflow_state']; isMobile: boolean}> = ({
+  workflowState,
+  isMobile,
+}) => {
   const {tooltip, classname, icon} = getStatusDisplay(workflowState)
 
   return (
-    <Table.RowHeader textAlign="center">
+    <Table.RowHeader textAlign={isMobile ? 'start' : 'center'}>
       <span className={`published-status ${classname}`}>
         <Tooltip renderTip={tooltip}>
           {icon}
@@ -230,10 +234,14 @@ const ResolvedIssuesCell: React.FC<{statistic?: Course['accessibility_course_sta
   )
 }
 
-export const CoursesTableRow: React.FC<CoursesTableRowProps> = ({course, showSISIds}) => {
+export const CoursesTableRow: React.FC<CoursesTableRowProps> = ({
+  course,
+  showSISIds,
+  isMobile = false,
+}) => {
   return (
     <Table.Row key={course.id}>
-      <StatusCell workflowState={course.workflow_state} />
+      <StatusCell workflowState={course.workflow_state} isMobile={isMobile} />
       <CourseNameCell courseId={course.id} courseName={course.name} />
       <ActiveIssuesCell statistic={course.accessibility_course_statistic} />
       <ResolvedIssuesCell statistic={course.accessibility_course_statistic} />
