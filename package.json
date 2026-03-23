@@ -28,6 +28,7 @@
     "@instructure/outcomes-ui": "4.1.2",
     "@instructure/platform-images": "0.2.0",
     "@instructure/platform-learning-agent-launcher": "1.1.1",
+    "@instructure/platform-loading-indicator": "0.2.0",
     "@instructure/platform-provider": "0.1.1",
     "@instructure/platform-study-assist": "0.4.0",
     "@instructure/platform-widget-dashboard": "0.2.1",

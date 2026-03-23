@@ -19,7 +19,7 @@
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React, {lazy, Suspense} from 'react'
 import SubmissionManager from './SubmissionManager'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'

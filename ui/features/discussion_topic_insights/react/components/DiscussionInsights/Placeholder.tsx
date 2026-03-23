@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconAiLine, IconRefreshLine} from '@instructure/ui-icons'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import noDiscussion from '../../../images/no-discussion.svg'

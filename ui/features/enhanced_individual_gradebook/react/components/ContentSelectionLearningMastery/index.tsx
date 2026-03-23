@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {View} from '@instructure/ui-view'
 import type {GradebookOptions, Outcome, SortableStudent} from '../../../types'
 import {studentDisplayName} from '../../../utils/gradebookUtils'

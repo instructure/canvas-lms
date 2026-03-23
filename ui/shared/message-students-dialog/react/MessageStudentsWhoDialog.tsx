@@ -33,7 +33,7 @@ import UploadMedia from '@instructure/canvas-media'
 import {formatTracksForMediaPlayer} from '@canvas/canvas-media-player'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Link} from '@instructure/ui-link'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,

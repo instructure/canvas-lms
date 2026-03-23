@@ -21,7 +21,7 @@ import CourseNotificationSettingsManager from './CourseNotificationSettingsManag
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React from 'react'
 import {string} from 'prop-types'
 import {useQuery} from '@apollo/client'
