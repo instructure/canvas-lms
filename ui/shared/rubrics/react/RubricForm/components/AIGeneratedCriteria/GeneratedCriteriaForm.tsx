@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {IconAiColoredSolid, IconAiSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {SimpleSelect, SimpleSelectOption} from '@instructure/ui-simple-select'
@@ -93,6 +94,12 @@ const gradeLevelLabel = (k: GradeLevel) => {
   }
 }
 
+const RESPONSIVE_QUERY = {
+  small: {maxWidth: 479},
+  medium: {minWidth: 480, maxWidth: 767},
+  large: {minWidth: 768},
+}
+
 type GeneratedCriteriaFormProps = {
   formOptions: GenerateCriteriaFormProps
   criterionUseRangeEnabled: boolean
@@ -131,182 +138,219 @@ export const GeneratedCriteriaForm = ({
           <Text>{I18n.t('Auto-Generate Criteria')}</Text>
         </Flex>
       </Heading>
-      <Flex alignItems="end" gap="medium" margin="medium 0 0">
-        <Flex.Item shouldShrink={true}>
-          <SimpleSelect
-            data-testid="grade-level-input"
-            renderLabel={I18n.t('Grade Level')}
-            value={generateCriteriaForm.gradeLevel}
-            onChange={(_event, {value}) => {
-              if (value) {
-                onFormOptionsChange({
-                  ...generateCriteriaForm,
-                  gradeLevel: value.toString(),
-                })
-              }
-            }}
-          >
-            {GRADE_LEVEL_KEYS.map(key => (
-              <SimpleSelectOption key={key} id={`grade-level-${key}`} value={key}>
-                {gradeLevelLabel(key)}
-              </SimpleSelectOption>
-            ))}
-          </SimpleSelect>
-        </Flex.Item>
-        <Flex.Item shouldShrink={true}>
-          <SimpleSelect
-            data-testid="criteria-count-input"
-            renderLabel={I18n.t('Number of Criteria')}
-            value={generateCriteriaForm.criteriaCount.toString()}
-            onChange={(_event, {value}) =>
-              onFormOptionsChange({
-                ...generateCriteriaForm,
-                criteriaCount: value ? parseInt(value.toString(), 10) : 0,
-              })
-            }
-          >
-            {[2, 3, 4, 5, 6, 7, 8].map(num => {
-              const value = num.toString()
-              return (
-                <SimpleSelectOption key={value} id={`criteria-count-${value}`} value={value}>
-                  {value}
-                </SimpleSelectOption>
-              )
-            })}
-          </SimpleSelect>
-        </Flex.Item>
-        <Flex.Item shouldShrink={true}>
-          <SimpleSelect
-            data-testid="rating-count-input"
-            renderLabel={I18n.t('Number of Ratings')}
-            value={generateCriteriaForm.ratingCount.toString()}
-            onChange={(_event, {value}) =>
-              onFormOptionsChange({
-                ...generateCriteriaForm,
-                ratingCount: value ? parseInt(value.toString(), 10) : 0,
-              })
-            }
-          >
-            {[2, 3, 4, 5, 6, 7, 8].map(num => {
-              const value = num.toString()
-              return (
-                <SimpleSelectOption key={value} id={`rating-count-${value}`} value={value}>
-                  {value}
-                </SimpleSelectOption>
-              )
-            })}
-          </SimpleSelect>
-        </Flex.Item>
-        <Flex.Item shouldShrink={true}>
-          <TextInput
-            data-testid="criteria-total-points-input"
-            renderLabel={I18n.t('Total points')}
-            value={generateCriteriaForm.totalPoints}
-            onChange={(_event, value) =>
-              onFormOptionsChange({
-                ...generateCriteriaForm,
-                totalPoints: value,
-              })
-            }
-            type="text"
-          />
-        </Flex.Item>
-        {criterionUseRangeEnabled && (
-          <Flex.Item padding="0 0 x-small 0">
-            <Checkbox
-              data-testid="use-range-input"
-              label={I18n.t('Enable Range')}
-              checked={generateCriteriaForm.useRange}
-              onChange={_event =>
-                onFormOptionsChange({
-                  ...generateCriteriaForm,
-                  useRange: !generateCriteriaForm.useRange,
-                })
-              }
-            />
-          </Flex.Item>
-        )}
-        <Flex.Item shouldGrow={true}></Flex.Item>
-      </Flex>
-      <Flex alignItems="end" gap="medium" margin="medium 0 0">
-        <Flex.Item shouldGrow={true} overflowX="visible" overflowY="visible">
-          <Flex direction="column" gap="medium">
-            <Flex.Item overflowX="visible" overflowY="visible">
-              <TextArea
-                data-testid="standard-objective-input"
-                label={I18n.t('Standard / Outcome Information')}
-                placeholder={I18n.t(
-                  'Optional. Place standard or outcome here. For example, "Students will analyze primary sources".',
+
+      <Responsive match="element" query={RESPONSIVE_QUERY}>
+        {(_props, matches) => {
+          const isLarge = matches?.includes('large') ?? false
+          const isMedium = matches?.includes('medium') ?? false
+          const isSmall = matches?.includes('small') ?? false
+
+          const fieldWidth = isSmall ? '100%' : isMedium ? '45%' : undefined
+
+          return (
+            <>
+              <Flex
+                gap="small"
+                margin="medium 0 0"
+                wrap="wrap"
+                alignItems={isLarge ? 'end' : 'start'}
+              >
+                <Flex.Item size={fieldWidth} shouldGrow shouldShrink>
+                  <SimpleSelect
+                    data-testid="grade-level-input"
+                    renderLabel={I18n.t('Grade Level')}
+                    value={generateCriteriaForm.gradeLevel}
+                    onChange={(_event, {value}) => {
+                      if (value) {
+                        onFormOptionsChange({
+                          ...generateCriteriaForm,
+                          gradeLevel: value.toString(),
+                        })
+                      }
+                    }}
+                  >
+                    {GRADE_LEVEL_KEYS.map(key => (
+                      <SimpleSelectOption key={key} id={`grade-level-${key}`} value={key}>
+                        {gradeLevelLabel(key)}
+                      </SimpleSelectOption>
+                    ))}
+                  </SimpleSelect>
+                </Flex.Item>
+                <Flex.Item size={fieldWidth} shouldGrow shouldShrink>
+                  <SimpleSelect
+                    data-testid="criteria-count-input"
+                    renderLabel={I18n.t('Number of Criteria')}
+                    value={generateCriteriaForm.criteriaCount.toString()}
+                    onChange={(_event, {value}) =>
+                      onFormOptionsChange({
+                        ...generateCriteriaForm,
+                        criteriaCount: value ? parseInt(value.toString(), 10) : 0,
+                      })
+                    }
+                  >
+                    {[2, 3, 4, 5, 6, 7, 8].map(num => {
+                      const value = num.toString()
+                      return (
+                        <SimpleSelectOption
+                          key={value}
+                          id={`criteria-count-${value}`}
+                          value={value}
+                        >
+                          {value}
+                        </SimpleSelectOption>
+                      )
+                    })}
+                  </SimpleSelect>
+                </Flex.Item>
+                <Flex.Item size={fieldWidth} shouldGrow shouldShrink>
+                  <SimpleSelect
+                    data-testid="rating-count-input"
+                    renderLabel={I18n.t('Number of Ratings')}
+                    value={generateCriteriaForm.ratingCount.toString()}
+                    onChange={(_event, {value}) =>
+                      onFormOptionsChange({
+                        ...generateCriteriaForm,
+                        ratingCount: value ? parseInt(value.toString(), 10) : 0,
+                      })
+                    }
+                  >
+                    {[2, 3, 4, 5, 6, 7, 8].map(num => {
+                      const value = num.toString()
+                      return (
+                        <SimpleSelectOption key={value} id={`rating-count-${value}`} value={value}>
+                          {value}
+                        </SimpleSelectOption>
+                      )
+                    })}
+                  </SimpleSelect>
+                </Flex.Item>
+                <Flex.Item size={fieldWidth} shouldGrow shouldShrink>
+                  <TextInput
+                    data-testid="criteria-total-points-input"
+                    renderLabel={I18n.t('Total points')}
+                    value={generateCriteriaForm.totalPoints}
+                    onChange={(_event, value) =>
+                      onFormOptionsChange({
+                        ...generateCriteriaForm,
+                        totalPoints: value,
+                      })
+                    }
+                    type="text"
+                  />
+                </Flex.Item>
+                {criterionUseRangeEnabled && (
+                  <Flex.Item
+                    size={isLarge ? undefined : '100%'}
+                    padding={isLarge ? '0 0 x-small 0' : undefined}
+                  >
+                    <Checkbox
+                      data-testid="use-range-input"
+                      label={I18n.t('Enable Range')}
+                      checked={generateCriteriaForm.useRange}
+                      onChange={_event =>
+                        onFormOptionsChange({
+                          ...generateCriteriaForm,
+                          useRange: !generateCriteriaForm.useRange,
+                        })
+                      }
+                    />
+                  </Flex.Item>
                 )}
-                value={generateCriteriaForm.standard}
-                onChange={event =>
-                  onFormOptionsChange({
-                    ...generateCriteriaForm,
-                    standard: event.target.value,
-                  })
-                }
-                messages={
-                  generateCriteriaForm.standard.length > 1000
-                    ? [
-                        {
-                          text: I18n.t(
-                            'Standard and Outcome information must be less than 1000 characters',
-                          ),
-                          type: 'error',
-                        },
-                      ]
-                    : undefined
-                }
-                height="4rem"
-              />
-            </Flex.Item>
-            <Flex.Item overflowX="visible" overflowY="visible">
-              <TextArea
-                data-testid="additional-prompt-info-input"
-                label={I18n.t('Additional Prompt Information')}
-                placeholder={I18n.t(
-                  'Optional. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient."',
-                )}
-                value={generateCriteriaForm.additionalPromptInfo}
-                onChange={event =>
-                  onFormOptionsChange({
-                    ...generateCriteriaForm,
-                    additionalPromptInfo: event.target.value,
-                  })
-                }
-                messages={
-                  generateCriteriaForm.additionalPromptInfo.length > 1000
-                    ? [
-                        {
-                          text: I18n.t(
-                            'Additional prompt information must be less than 1000 characters',
-                          ),
-                          type: 'error',
-                        },
-                      ]
-                    : undefined
-                }
-                height="4rem"
-              />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-        <Flex.Item>
-          <Button
-            onClick={handleGenerateButton}
-            data-testid="generate-criteria-button"
-            color="ai-primary"
-            renderIcon={<IconAiSolid />}
-            disabled={
-              generateCriteriaForm.additionalPromptInfo.length > 1000 ||
-              generateCriteriaForm.standard.length > 1000 ||
-              criteriaBeingGenerated
-            }
-          >
-            {I18n.t('Generate Criteria')}
-          </Button>
-        </Flex.Item>
-      </Flex>
+              </Flex>
+
+              <Flex gap="medium" margin="medium 0 0" alignItems="end" wrap="wrap">
+                <Flex.Item
+                  size={!isLarge ? '100%' : undefined}
+                  shouldGrow
+                  shouldShrink
+                  overflowX="visible"
+                  overflowY="visible"
+                >
+                  <Flex direction="column" gap="medium">
+                    <Flex.Item overflowX="visible" overflowY="visible">
+                      <TextArea
+                        data-testid="standard-objective-input"
+                        label={I18n.t('Standard / Outcome Information')}
+                        placeholder={I18n.t(
+                          'Optional. Place standard or outcome here. For example, "Students will analyze primary sources".',
+                        )}
+                        value={generateCriteriaForm.standard}
+                        onChange={event =>
+                          onFormOptionsChange({
+                            ...generateCriteriaForm,
+                            standard: event.target.value,
+                          })
+                        }
+                        messages={
+                          generateCriteriaForm.standard.length > 1000
+                            ? [
+                                {
+                                  text: I18n.t(
+                                    'Standard and Outcome information must be less than 1000 characters',
+                                  ),
+                                  type: 'error',
+                                },
+                              ]
+                            : undefined
+                        }
+                        height={isSmall ? '6rem' : '4rem'}
+                      />
+                    </Flex.Item>
+                    <Flex.Item overflowX="visible" overflowY="visible">
+                      <TextArea
+                        data-testid="additional-prompt-info-input"
+                        label={I18n.t('Additional Prompt Information')}
+                        placeholder={I18n.t(
+                          'Optional. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient."',
+                        )}
+                        value={generateCriteriaForm.additionalPromptInfo}
+                        onChange={event =>
+                          onFormOptionsChange({
+                            ...generateCriteriaForm,
+                            additionalPromptInfo: event.target.value,
+                          })
+                        }
+                        messages={
+                          generateCriteriaForm.additionalPromptInfo.length > 1000
+                            ? [
+                                {
+                                  text: I18n.t(
+                                    'Additional prompt information must be less than 1000 characters',
+                                  ),
+                                  type: 'error',
+                                },
+                              ]
+                            : undefined
+                        }
+                        height={isSmall ? '6rem' : '4rem'}
+                      />
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+                <Flex.Item>
+                  <Flex justifyItems="end">
+                    <Flex.Item>
+                      <Button
+                        onClick={handleGenerateButton}
+                        data-testid="generate-criteria-button"
+                        color="ai-primary"
+                        renderIcon={<IconAiSolid />}
+                        disabled={
+                          generateCriteriaForm.additionalPromptInfo.length > 1000 ||
+                          generateCriteriaForm.standard.length > 1000 ||
+                          criteriaBeingGenerated
+                        }
+                      >
+                        {I18n.t('Generate Criteria')}
+                      </Button>
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+              </Flex>
+            </>
+          )
+        }}
+      </Responsive>
     </View>
   )
 }
