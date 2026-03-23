@@ -271,6 +271,13 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       expect(await screen.findByText('Custom', {selector: '[role="option"]'})).toBeInTheDocument()
     })
 
+    it('links the 720px helper text to the dropdown via aria-describedby', () => {
+      render(<VideoOptionsTray {...props} />)
+      const input = screen.getByLabelText('Player layout')
+      const helperId = 'video-options-tray-size-helper-text'
+      expect(input.getAttribute('aria-describedby')).toContain(helperId)
+    })
+
     it('does not show dimension hint below dropdown for fixed sizes', async () => {
       render(<VideoOptionsTray {...props} />)
       fireEvent.click(screen.getByLabelText('Player layout'))
