@@ -688,6 +688,7 @@ da-x-k12:
   account_creation_still_in_progress_ac0e0a18: "Kontooprettelse er stadig i gang"
   account_custom_statuses_f9bbfb1f: "Brugerdefinerede kontostatusser"
   account_datetime_c4e540ee: "Konto: %{datetime}"
+  account_default_705974c6: "Konto (standard)"
   account_default_grading_scheme_83bdc8fd: "Kontoens standard vurderingssystem"
   account_default_grading_scheme_was_successfully_sa_88d66a2e: "Kontoens standard vurderingssystem blev gemt."
   account_default_time_8c7ab62d: "Kontostandard (%{time})"
@@ -2849,6 +2850,7 @@ da-x-k12:
   all_changes_were_applied_to_the_pacescount_student_cfe9e7bf: "Alle ændringer blev anvendt på de %{pacesCount} fagtempoer for elever."
   all_changes_were_saved_f6f3ddcc: "Alle ændringer blev gemt"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle afslutningsdatoer skal være på eller efter slutdatoen"
+  all_collaborators_removed_6e9295c3: "Alle samarbejdspartnere blev fjernet"
   all_comments_578fa2b0: "Alle kommentarer"
   all_comments_are_sent_to_the_whole_group_284591e7: "Alle kommentarer sendes til hele gruppen"
   all_comments_are_sent_to_the_whole_group_778126f3: "Alle kommentarer sendes til hele gruppen."
@@ -2936,10 +2938,14 @@ da-x-k12:
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alle vægtninger skal være større end eller lig med 0"
   allocate_peer_reviews_6ee21bd8: "Tildel elev-elev-vurderinger"
   allocating_peer_reviews_d193503e: "Tildeling af elev-elev vurderinger"
+  allocation_conversion_in_progress_484f1e43: "Allokeringskonvertering i gang"
+  allocation_deletion_in_progress_2e19d790: "Sletning af allokering i gang"
   allocation_of_peer_reviews_happens_behind_the_scen_88690128: "Tildeling af elev-elev vurdering sker bag kulisserne og er optimeret for en retfærdig fordeling til alle deltagere."
   allocation_rule_not_found_c123e54b: "Tildelingsregel ikke fundet"
   allocation_rules_dc7e96f8: Tildelingsregler
   allocations_ee614a0f: Tildelinger
+  allocations_have_been_converted_successfully_2279fd43: "Allokeringerne er blevet konverteret."
+  allocations_have_been_deleted_successfully_29a51b09: "Allokeringerne er blevet slettet."
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige vurderinger for de valgte afleveringer"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Lader en lærer angive antallet af tilladte forsøg på en opgave via grænsefladen"
   allow_access_to_discussion_insights_ad50085d: "Tillad adgang til diskussionsindsigt"
@@ -3042,6 +3048,7 @@ da-x-k12:
   allow_to_clone_alignments_after_the_course_copy_pr_2f3a6421: "Tillad at klone justeringer efter fagkopieringsprocessen"
   allow_to_clone_alignments_after_the_course_copy_pr_75e05d22: "Tillad at klone justeringer efter fagkopieringsprocessen. Dette hænger sammen med New Quizzes-justeringer."
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Tillad ubekræftede e-mailadresser, når du tilføjer brugere"
+  allow_users_to_access_files_associated_with_a_conv_c069804e: "Lad brugere få adgang til filer, der er knyttet til en samtale, når de ser samtalebeskeder (dette gør det samme som file_association_access, forskellen er, at det kun gælder for samtalebeskederne)"
   allow_users_to_access_files_associated_with_a_cour_43f01878: "Tillad brugere at få adgang til filer forbundet med et fag"
   allow_users_to_comment_45b8f753: "Tillad brugere at kommentere"
   allow_users_to_remediate_certain_accessibility_iss_d0fb935b: "Giv brugerne mulighed for at afhjælpe visse tilgængelighedsproblemer med AI via tilgængelighedskontrollen for fag."
@@ -3808,6 +3815,7 @@ da-x-k12:
   allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Tillader brugere at redigere en eksisterende midlertidig tilmelding"
   allows_users_to_edit_conferences_2d3c960c: "Gør det muligt for brugere at redigere konferencer."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillader brugere at aktivere \"Start SpeedGrader Filtreret efter studiegruppe\" i fag på siden med fagindstillinger. Når aktiveret, og en elevgruppe er valgt i Ny vurderingsoversigt, så vil SpeedGrader kun indlæse elever i den valgte gruppe."
+  allows_users_to_enable_the_rolling_transcript_for__fc94d9e1: "Giver brugerne mulighed for at aktivere den rullende transskription for Canvas-medier og anmode om undertekster til medier, der er blevet tilføjet til RCE-indhold."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Lader brugeren importere grupper i et fag."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Lader brugere flette flere konti sammen (med korrekte legitimationsoplysninger)."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Lader brugere slå feedback fra på fagniveau."
@@ -3949,6 +3957,7 @@ da-x-k12:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Der opstod en fejl under forsøget på at kontakte Turnitin."
   an_error_occurred_while_attempting_to_contact_turn_c987545: "Der opstod en fejl under forsøget på at kontakte Turnitin. Statuskode: %{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Der opstod en fejl under kontrol af overførselsstatus"
+  an_error_occurred_while_converting_allocations_f0c96ed7: "Der opstod en fejl under konvertering af allokeringer."
   an_error_occurred_while_creating_the_rule_d89f6f9c: "Der opstod en fejl under oprettelsen af reglen"
   an_error_occurred_while_creating_this_group_please_ec96f426: "Der opstod en fejl under oprettelse af denne gruppe. Prøv igen."
   an_error_occurred_while_creating_this_outcome_54842fbd: "Der opstod en fejl under oprettelse af dette læringsudbytte."
@@ -3956,6 +3965,7 @@ da-x-k12:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Der opstod en fejl under oprettelse af dette læringsudbytte: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Der opstod en fejl under oprettelse af dette læringsudbytte. Prøv igen."
   an_error_occurred_while_declining_the_invitation_f6fdb44e: "Der opstod en fejl under afvisningen af invitationen"
+  an_error_occurred_while_deleting_allocations_1f2e7a6: "Der opstod en fejl under sletning af allokeringer."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Der opstod en fejl under sletning af beskeder"
   an_error_occurred_while_deleting_the_ai_experience_c7218f7f: "Der opstod en fejl under sletning af AI-oplevelsen"
   an_error_occurred_while_deleting_the_allocation_ru_b2179de9: "Der opstod en fejl under sletning af tildelingsreglen"
@@ -3970,6 +3980,7 @@ da-x-k12:
   an_error_occurred_while_fetching_course_modules_9f87557e: "Der opstod en fejl under hentning af fagforløb."
   an_error_occurred_while_fetching_differentiation_t_e85f7d49: "Der opstod en fejl under hentning af differentierede tags"
   an_error_occurred_while_fetching_groups_6f2e91be: "Der opstod en fejl under hentning af grupper"
+  an_error_occurred_while_fetching_job_progress_5e27b561: "Der opstod en fejl under hentning af jobstatus."
   an_error_occurred_while_fetching_sections_253619f4: "Der opstod en fejl under hentning af sektioner"
   an_error_occurred_while_fetching_students_aac9d7de: "Der opstod en fejl under hentning af elever"
   an_error_occurred_while_fetching_the_folders_dff70881: "Der opstod en fejl under hentning af mapperne."
@@ -4049,6 +4060,8 @@ da-x-k12:
   an_error_occurred_while_searching_for_your_institu_16a1ace4: "Der opstod en fejl under søgning efter din institution"
   an_error_occurred_while_setting_permissions_please_b43bae6b: "Der opstod en fejl under indstilling af tilladelser. Prøv igen."
   an_error_occurred_while_starting_migration_8e6015e2: "Der opstod en fejl under opstart af overførsel"
+  an_error_occurred_while_starting_the_conversion_fc58ac38: "Der opstod en fejl under start af konverteringen."
+  an_error_occurred_while_starting_the_deletion_9227c647: "Der opstod en fejl under start af sletningen."
   an_error_occurred_while_switching_dashboard_views_6a9ca00f: "Der opstod en fejl under skift af oversigtsvisninger"
   an_error_occurred_while_terminating_sessions_pleas_86af4411: "Der opstod en fejl under afslutning af sessioner. Prøv igen."
   an_error_occurred_while_trying_to_change_the_setti_6fb01994: "Der opstod en fejl under forsøg på at ændre indstillingen"
@@ -4108,6 +4121,7 @@ da-x-k12:
   an_unexpected_error_happened_while_loading_the_ign_fce4bac6: "Der opstod en uventet fejl under indlæsning af Ignite Agent."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Der er opstået en uventet fejl: se fejlrapport %{id}"
   an_unexpected_error_occurred_15bae9ec: "En uventet fejl opstod."
+  an_unexpected_error_occurred_please_try_again_a06e425f: "En uventet fejl opstod. Prøv igen."
   an_unexpected_error_occurred_please_try_again_late_19f6d055: "En uventet fejl opstod. Prøv igen senere."
   an_unexpected_error_occurred_please_try_again_late_c58da3e4: "Der opstod en uventet fejl, prøv igen senere"
   an_unexpected_error_occurred_while_grading_570e2035: "Der opstod en uventet fejl under vurderingen."
@@ -4313,6 +4327,7 @@ da-x-k12:
   api_7bd66e19: API
   api_get_requests_with_a_body_instead_of_query_para_18e63089: "API GET-anmodninger med en brødtekst i stedet for forespørgselsparametre vil blive blokeret i produktion i februar-udgivelsen som del af at fronte Canvas med et CDN. Disse anmodninger er allerede blokeret i Beta og Test."
   api_get_requests_with_a_body_instead_of_query_para_d554be31: "API GET-anmodninger med en brødtekst i stedet for forespørgselsparametre vil blive blokeret i produktion i april-udgivelsen som del af at fronte Canvas med et CDN. Disse anmodninger er allerede blokeret i Beta og Test."
+  api_get_requests_with_a_body_instead_of_query_para_edc1ccf7: "API GET-anmodninger med en brødtekst i stedet for forespørgselsparametre vil snart blive blokeret i produktion som en del af overgangen til at levere Canvas ved hjælp af AWS CloudFront. Disse anmodninger er allerede blokeret i Beta og Test."
   api_host_ddaf400e: "API-vært:"
   api_key_eeeb2167: API-kode
   api_keys_393d8b5c: API-nøgler
@@ -4654,6 +4669,7 @@ da-x-k12:
   asset_code_ef611162: Aktivkode
   asset_group_code_d476ed05: Aktivgruppekode
   asset_id_4b786f8f: Aktiv-ID
+  asset_processor_2d04eae5: Aktivbehandler
   asset_processor_bulk_migration_partial_success_email_body: |-
       Den samlede Turnitin-overførsel fra LTI 2.0 til LTI 1.3 Asset Processor blev gennemført med nogle fejl.
       
@@ -5811,6 +5827,7 @@ da-x-k12:
   automated_6838ce36: Automatiseret
   automatic_migration_all_institutions_that_have_not_4d05d143: "Automatisk overførsel: Alle institutioner, som ikke har tilmeldt sig den nye login-grænseflade inden denne dato, vil automatisk blive overført."
   automatic_migration_all_institutions_that_have_not_ccc65045: "*Automatisk overførsel:* Alle institutioner, som ikke har tilmeldt sig den nye login-grænseflade inden denne dato, vil automatisk blive overført."
+  automatic_missing_policy_warning_426507f1: "Automatisk advarsel om manglende politik"
   automatic_mobile_app_login_3724af59: "Automatisk login til mobilapp"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Anvend automatisk fratrækning til sene afleveringer"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Anvend automatisk vurdering for manglende aflevering"
@@ -6128,6 +6145,7 @@ da-x-k12:
   bosnian_6603d3e6: Bosnisk
   boston_students_access_report_bd285b2e: "Boston elevadgangsrapport"
   both_bf140d0c: Begge
+  both_courses_have_automatic_missing_policy_enabled_795379c0: "Begge fag har automatisk politik for manglende oplysninger aktiveret. Kildefagets politikindstillinger kopieres til dit fag. Hvis importerede opgaver har overskredne afleveringsdatoer, kan de modtage automatisk nuller."
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "Både Diskussioner - oprettelse og Diskussioner - bedøm giver brugeren mulighed for at oprette en diskussion på diskussionssiden. Hvis denne tilladelse er aktiveret, er ’Diskussioner - opret’ ikke nødvendig. For at få vist diskussioner i et fag skal Diskussioner - vis være aktiveret. For at svare i en diskussion skal Diskussioner - slå op også være aktiveret. For at redigere opgaveoplysninger i en diskussion skal Opgaver og quizzer - tilføj/redigér/slet også være aktiveret."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Både ’Diskussioner - opret’ og ’Diskussioner - bedøm’ tillader en bruger at oprette en diskussion på diskussionssiden. Hvis denne tilladelse er aktiveret, er ’Diskussioner - opret’ ikke nødvendig. For at få vist diskussioner i et fag skal Diskussioner - vis være aktiveret. For at svare i en diskussion skal Diskussioner - slå op også være aktiveret. For at redigere opgaveoplysninger i en diskussion skal Opgaver og quizzer - tilføj/redigér/slet også være aktiveret."
   both_discussions_create_and_discussions_moderate_a_482e4c7e: "Både Diskussioner - oprettelse og Diskussioner - bedøm giver brugeren mulighed for at oprette en diskussion på diskussionssiden."
@@ -6934,6 +6952,7 @@ da-x-k12:
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikke ændre en tilsidesæt forfaldsdato til en dato inden for en lukket vurderingsperiode"
   cannot_change_locked_status_on_granular_permission_6f13bf4f: "Kan ikke ændre den låste status med detaljeret tilladelse"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan ikke ændre navn til %{label}: allerede i brug"
+  cannot_change_state_students_have_conversations_or_3fa6757c: "Kan ikke ændre status: Elever har samtaler, eller kildefilerne behandles stadig"
   cannot_change_the_default_term_name_edc2279b: "Kan ikke ændre standardnavnet for skoleåret"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikke ændre forfaldsdatoen på en tilsidesættelse i en lukket vurderingsperiode"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan ikke ændre forfaldsdatoen til en dato inden for en lukket vurderingsperiode"
@@ -6970,6 +6989,9 @@ da-x-k12:
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Kan ikke flytte planlægningsværktøjets aftaler mellem kalendere"
   cannot_observe_user_with_another_user_that_is_bein_f2773e49: "Kan ikke observere bruger med en anden bruger, der bliver observeret af den aktuelle bruger."
   cannot_publish_block_templates_61db9f37: "Kan ikke offentliggøre blokskabeloner."
+  cannot_publish_source_files_are_still_processing_3b9bc0ce: "Kan ikke offentliggøres – kildefilerne behandles stadig"
+  cannot_publish_source_files_are_still_processing_a68db351: "Kan ikke offentliggøres: Kildefilerne behandles stadig"
+  cannot_publish_while_source_files_are_still_proces_ef5c9003: "Kan ikke offentliggøres, mens kildefilerne stadig behandles"
   cannot_reference_self_16dfcd49: "kan ikke referere til sig selv"
   cannot_relink_unsaved_paces_3ed42012: "Kan ikke linke ikke-gemte tempoer igen"
   cannot_relink_unsaved_plans_2ccef56a: "Kan ikke genlinke ikke-gemte planer"
@@ -6987,7 +7009,11 @@ da-x-k12:
   cannot_set_the_student_view_module_5e3fe3c8: "Kan ikke indstille elevvisningsforløb"
   cannot_set_the_teacher_view_module_5f835281: "Kan ikke indstille lærervisningsforløb"
   cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Kan ikke fortryde sletning af et underordnet emne, når rodfagets emne også er slettet. Fortryd sletningen af rodfagets emne i stedet."
+  cannot_unpublish_if_students_have_started_conversa_70181111: "Kan ikke fjerne offentliggørelse, hvis de elever har startet samtaler"
   cannot_unpublish_students_have_conversations_386f9145: "Kan ikke fjerne offentliggørelse – eleverne har samtaler"
+  cannot_unpublish_students_have_conversations_or_so_bf6bb468: "Kan ikke fjerne offentliggørelse – de elever har samtaler, eller kildefilerne behandles stadig"
+  cannot_unpublish_students_have_started_conversatio_a9746bf2: "Kan ikke fjerne offentliggørelse: De elever har startet samtaler, eller kildefilerne behandles stadig"
+  cannot_unpublish_while_source_files_are_still_proc_9db30c56: "Kan ikke fjerne offentliggørelse, mens kildefilerne stadig behandles"
   cannot_update_block_templates_11a49655: "Kan ikke opdatere blokskabeloner."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "kan ikke bruge reserverede navne i vurderingsoversigt-importør"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Kan ikke se detaljerede rapporter for anonyme opgaver, før der offentliggøres feedback for opgaverne."
@@ -7083,6 +7109,7 @@ da-x-k12:
   canvas_career_roles_permissions_f8acf32a: "Canvas Career: Roller og tilladelser"
   canvas_career_root_account_experience_485e496f: "Canvas Career: Erfaring med root-konto"
   canvas_career_skill_management_a0bc3dd6: "Canvas Career: Færdighedsstyring"
+  canvas_career_study_tools_b4805897: "Canvas Career: Studieværktøjer"
   canvas_career_sub_account_b1da8954: "Canvas Career-underkonto"
   canvas_career_syncable_objects_redesign_afa5321: "Canvas Career: Nyt design af synkroniserbare objekter"
   canvas_career_tab_52fd2091: "Fanen Canvas Career"
@@ -7188,6 +7215,7 @@ da-x-k12:
   caption_cannot_be_empty_67f12e96: "Billedteksten må ikke være tom."
   caption_sorted_by_sortby_in_direction_order_7e98ca69: "%{caption}: sorteret efter %{sortBy} i %{direction} rækkefølge"
   captions_99c57b5c: Billedtekster
+  captions_are_being_generated_for_this_media_5b177dc7: "Der genereres undertekster til dette medie."
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "Billedtekster, der nedarves fra forældrefag, kan ikke fjernes."
   captions_off_2ae45751: "Tekstning slukket"
   captions_subtitles_af2c47e: "Billedtekster / undertekster"
@@ -8292,6 +8320,7 @@ da-x-k12:
   configure_aspen_client_integration_91f8c934: "Konfigurer Aspen-klientintegration"
   configure_cedar_client_integration_7024ba39: "Konfigurer cedar-klientintegration"
   configure_ecb97e30: Konfigurer
+  configure_identity_service_discovery_page_4350db61: "Konfigurer siden for opdagelse af identitetstjenester"
   configure_impact_integration_9bd1189f: "Konfigurer indvirkningsintegration"
   configure_individual_learning_paths_for_students_b_e2fce294: "Konfigurer individuelle læringsstier for elever ud fra bedømmelsesresultater."
   configure_mastery_6d4517fe: "Konfigurer beherskelse"
@@ -8302,6 +8331,7 @@ da-x-k12:
   configure_rules_for_limiting_the_api_usage_rates_o_174145f2: "Konfigurer regler for at begrænse API-brugshastighederne for forskellige klienter."
   configure_run_ad23fd92: "Konfigurer Kør ..."
   configure_settings_for_toolname_10f51f11: "Konfigurer indstillinger for %{toolName}."
+  configure_sign_in_options_4888ab31: "Konfigurer loginindstillinger"
   configure_the_identity_service_discovery_page_when_5384c24f: "Konfigurer side for opdagelse af identitetstjenester. Når aktiveret, erstatter den standardopdagelsesoplevelsen på /login/discovery."
   configure_tool_app_3b1bb50b: "Konfigurer %{tool} app?"
   configure_toolname_app_651371be: "Konfigurer %{toolName} app"
@@ -8361,6 +8391,7 @@ da-x-k12:
   consistent_inheritance_logic_for_developer_keys_in_167f9061: "Konsistent nedarvningslogik for udvikler-nøgler i ikke-CMC-konsortier"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Konsistente LTI AGS-ID'er baseret på kontoens hoveddomæne"
   consolidated_media_player_d39a16fd: "Konsolideret medieafspiller"
+  consortium_5d61844f: Konsortium
   consortium_parent_keys_803547b: "Consortium overordnede nøgler"
   constraint_9eeab2e0: Begrænsning
   consumer_key_6f94ba11: Forbrugernøgle
@@ -8807,6 +8838,7 @@ da-x-k12:
   context_external_tool: 
     url_or_domain_no_valid: "Forkert url til %{url}"
     url_or_domain_required: "Webadressen (url) eller domænet skal indstilles."
+  context_files_are_being_indexed_83d98c37: "(Kontekstfiler indekseres)"
   context_id_3de7d6da: Kontekst-id
   context_id_689f612: Kontekst-ID
   context_id_83fdfe0d: context_id
@@ -9207,6 +9239,7 @@ da-x-k12:
   convert_quizzes_4cfd1b66: "Konverter quiz"
   converted_3e1ee830: Konverteret
   converting_1e281d6e: "Konverterer ..."
+  converting_allocations_23711ab8: "Konvertering af allokeringer"
   converting_course_to_canvas_career_c9ea22ff: "Konverter fag til Canvas Career ..."
   converting_e721aa0a: Konverterer
   converting_tag_overrides_105bf8f2: "Konvertering af tagtilsidesættelser"
@@ -11097,6 +11130,7 @@ da-x-k12:
   custom_text_6ff710d5: "Brugerdefineret tekst"
   custom_variables_returns_booleans_as_strings_bbe060c9: "Brugerdefinerede variabler returnerer booleske værdier som strenge"
   customer_3edcd3c0: Kunde
+  customizable_dashboard_for_learners_926cfe98: "Tilpasset oversigt for elev"
   customizable_default_due_date_a987fbfa: "Tilpasset standard for afleveringsdato"
   customize_74cdc895: Tilpas
   customize_agent_b28d19c0: "Tilpas agent"
@@ -11521,6 +11555,7 @@ da-x-k12:
   delete_group_86c381ec: "Slet gruppe"
   delete_groups_c637c07: "Slet grupper"
   delete_in_progress_2d3f0e0d: "Sletning i gang"
+  delete_item_f10f02b: "Slet element"
   delete_items_a1d2c64: "Slet elementer"
   delete_key_developername_be80e695: "Slet nøgle %{developerName}"
   delete_live_events_subscriptions_b15bc9a6: "Slet abonnementer på live-begivenheder"
@@ -11605,6 +11640,7 @@ da-x-k12:
       
       Denne handling er irreversibel. Er du sikker på, at du vil slette %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Sletning af en bruger sletter alle deres ePortfolios. Alternativt kan ePortfolios markeres individuelt som 'spam' eller 'sikker' for at ændre deres synlighed."
+  deleting_allocations_4a3b4f82: "Sletter allokeringer"
   deleting_app_9b50f706: "Sletter app"
   deleting_assignment_22d5851d: "sletter en opgave"
   deleting_b896f5f: sletter
@@ -11920,8 +11956,10 @@ da-x-k12:
   disable_keyboard_shortcuts_9db78832: "Deaktiver tastaturgenveje"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktiver afkrydsningsfelter for import og overførsel af New Quizzes, indstil som standard til aktiveret"
   disable_oembed_retrieve_endpoint_56c050c8: "Deaktiver oembed_retrieve slutpunkt"
+  disable_policy_94276647: "Deaktiver politik"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deaktiver Slå op til SIS for opgaver i lukkede vurderingsperioder."
   disable_scope_6ba4e4d4: "Deaktiver omfang"
+  disable_skip_policy_import_c90a0812: "Deaktiver og spring politikimport over"
   disable_smart_app_banner_on_mobile_devices_bed9bf3b: "Deaktiver Smart App-banner på mobile enheder"
   disable_summary_55869621: "Deaktiver opsummering"
   disable_sync_to_name_10c371dc: "Deaktiver synkronisering til %{name}"
@@ -12420,6 +12458,7 @@ da-x-k12:
   displayname_loading_in_progress_2be325fd: "%{displayName} indlæsning i gang"
   displayname_loading_pending_3aa2723e: "%{displayName} indlæsning afventer"
   displayname_loading_success_8177d735: "%{displayName} blev indlæst"
+  displays_a_button_to_launch_the_learning_agent_in__27abfa89: "Viser en knap til at starte læringsagenten i en separat fane."
   displays_a_survey_link_for_discussion_translate_an_87959f5c: "Viser et link til undersøgelsen for Diskussionsoversættelse og Diskussionsindsigter"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Viser konfetti for lærere, der bruger linkvalideratoren på
@@ -12503,6 +12542,7 @@ da-x-k12:
   domains_count_max_a52b7947: "Domæner (%{count}/%{max})"
   dominican_republic_1_3cef4021: "Dominikanske republik (+1)"
   don_t_add_this_user_for_now_32912974: "Tilføj ikke denne bruger nu."
+  don_t_import_policy_541f9a96: "Importér ikke-politik"
   don_t_indent_b4f6eccd: "Brug ikke indrykning"
   don_t_miss_notifications_from_your_students_900e9e30: "Gå ikke glip af meddelelser fra dine elever."
   don_t_move_lti_query_params_to_post_body_5c80e037: "Flyt ikke LTI Query Params til POST Body"
@@ -13155,6 +13195,9 @@ da-x-k12:
   enable_to_sync_authentication_providers_e59f9f84: "Aktivér synkronisering af godkendelsesudbydere"
   enable_to_sync_user_pseudonym_and_communicationcha_94e81ba4: "Aktiver for at synkronisere bruger, pseudonym og CommunicationChannel data til identitetstjeneste."
   enable_to_use_federated_pseudonym_attributes_usern_637ff9d4: "Aktiver brugen af fødererede pseudonymattributter (brugernavn, SIS-bruger-ID) fra godkendelsesudbydere i livebegivenheder og andre Canvas-funktioner. Når deaktiveret, bruger Canvas lokale pseudonymattributter som reserve."
+  enable_to_use_the_organization_scoped_delete_endpo_6df2e837: |-
+      Aktiver brugen af det organisationsbaserede sletningsslutpunkt til sletning af Instructure Identity-brugere.
+      Når aktiveret, vil sletningsanmodninger bruge /organizations/:orgId/users/:id i stedet for /api/users/:id.
   enable_tools_to_use_asset_processor_related_servic_fcc4f960: "Aktiver værktøjer til at bruge tjenester og placeringer relateret til aktivbehandler"
   enable_tools_to_use_document_processor_related_ser_deb64b2d: "Aktiver værktøjer til at bruge tjenester og placeringer relateret til dokumentbehandling"
   enable_translation_c8508b49: "Aktiver oversættelse"
@@ -13282,6 +13325,13 @@ da-x-k12:
   enabling_app_1d15f0ca: "Aktiverer app"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Aktivering af temaet til folkeskolen vil ændre skrifttypen i Canvas-grænsefladen og forenkle fagnavigationsmenuen for alle brugere i dit fag."
   enabling_the_youtube_migration_new_quizzes_feature_75a77eab: "Aktivering af funktionen YouTube Overførsel – New Quizzes tilføjer scannings- og konverteringsmuligheden på YouTube-indlejringer i New Quizzes."
+  enabling_this_feature_moves_the_new_quizzes_experi_d2f290dd: |-
+      Aktivering af denne funktion flytter New Quizzes-oplevelsen ud af dens
+      isoleringslag (iframe) til at køre indlejret på Canvas' hovedside.
+      
+      Bemærk: Denne funktionsmulighed fjernes den 1. juli 2026, da
+      indlejret integration bliver standardoplevelsen for alle produktions-
+      miljøer.
   enabling_this_option_automatically_moves_course_pa_15f755b3: "Aktivering af denne indstilling flytter automatisk forfaldsdatoer for fagtempo-opgaver til efter slutdatoen. Input for tid, sted og kalender vil blive deaktiveret."
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "Aktivering af denne indstilling flytter automatisk forfaldsdatoer for fagtempo-opgaver til efter slutdatoen."
   encourage_class_participation_4e069479: "Tilskynd klassedeltagelse"
@@ -14271,6 +14321,7 @@ da-x-k12:
   existing_courses_must_be_removed_before_making_the_1c3dd30: "Eksisterende fag skal fjernes, før du skifter til Canvas Career. For at fortsætte skal du sørge for, at alle fag er blevet slettet."
   existing_courses_must_be_removed_before_making_the_b9c843bd: "Eksisterende fag skal fjernes, før du skifter til Canvas Career. For at fortsætte skal du sikre dig, at alle fag er blevet slettet eller overført."
   existing_question_banks_and_classic_quizzes_will_b_6dd18d67: "Eksisterende spørgsmålsbanker og Classic Quizzes vil blive importeret som elementbanker og New Quizzes."
+  existing_tag_aece43b6: "Eksisterende tag"
   exists_under_path_segments_2b0a54bc: "Eksisterer under %{path_segments}"
   exit_confirmation_d4a533b5: "Bekræftelse af afslutning"
   exit_d0c7b013: Afslut
@@ -14291,6 +14342,7 @@ da-x-k12:
   expand_description_for_outcome_title_abc8f30: "Udvid beskrivelse for læringsudbytte %{title}"
   expand_discussion_thread_fcbb2bcc: "Udvid diskussionstråd"
   expand_discussion_thread_from_author_829cfae1: "Udvid diskussionstråd fra %{author}"
+  expand_distribution_for_outcome_735c9dee: "Udvid distributionen for %{outcome}"
   expand_general_button_settings_9866663c: "Udvid generelle knapindstillinger"
   expand_global_navigation_2c28d5d4: "Udvid global navigation"
   expand_grade_details_1c6f21d9: "Udvid vurderingsdetaljer"
@@ -14298,6 +14350,7 @@ da-x-k12:
   expand_image_settings_4d34431b: "Udvid billedindstillinger"
   expand_individual_button_settings_74a9f40a: "Udvid individuelle knapindstillinger"
   expand_it_ca5d9c6e: "Udvid den"
+  expand_label_settings_84302ab7: "Udvid %{label} indstillinger"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Udvid listen over gruppemedlemmer for %{groupName}"
   expand_media_settings_cda5e301: "Udvid medieindstillinger"
   expand_module_e74868cf: "Udvid forløb"
@@ -14613,6 +14666,7 @@ da-x-k12:
   failed_to_load_assignments_in_important_dates_ce3b4227: "Kunne ikke indlæse opgaver på vigtige datoer."
   failed_to_load_assignments_used_locations_2b37a5dd: "Kunne ikke indlæse opgaver brugte placeringer"
   failed_to_load_available_reports_bd55905b: "Kunne ikke indlæse tilgængelige rapporter"
+  failed_to_load_configuration_b7248c63: "Konfigurationen kunne ikke indlæses"
   failed_to_load_content_security_policy_settings_cc668a42: "Indstillinger for indholdssikkerhedspolitik kunne ikke indlæses"
   failed_to_load_contenttype_error_5bb75c75: "Kunne ikke indlæse %{contentType}: %{error}"
   failed_to_load_contributing_scores_f9401d2b: "Kunne ikke indlæse bidragende resultater"
@@ -14700,7 +14754,9 @@ da-x-k12:
   failed_to_retrieve_temporary_enrollment_pairing_ecb274d: "Kunne ikke hente midlertidig tilmeldingsparring"
   failed_to_revert_account_please_try_again_6ef1f42c: "Kontoen kunne ikke gendannes. Prøv igen."
   failed_to_revert_sub_account_please_try_again_5451d2ef: "Kunne ikke gendanne underkontoen. Prøv igen."
+  failed_to_save_ai_experience_error_ae7e1de2: "Kunne ikke gemme AI-oplevelsen: %{error}"
   failed_to_save_changes_errors_6920f334: "Kunne ikke gemme ændringer: %{errors}%"
+  failed_to_save_configuration_8cf99186: "Konfigurationen kunne ikke gemmes"
   failed_to_save_dashboard_selection_32e71c72: "Kunne ikke gemme valg af oversigt"
   failed_to_save_outcome_order_e233ecb0: "Kunne ikke gemme rækkefølgen af læringsudbytter"
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke gemmes, prøv igen senere"
@@ -14742,6 +14798,7 @@ da-x-k12:
   failed_to_update_internal_setting_ab3d0a4a: "Kunne ikke opdatere intern indstilling"
   failed_to_update_item_indentation_fd7fbf4f: "Kunne ikke opdatere elementindrykning"
   failed_to_update_item_please_try_again_fd2ee896: "Kunne ikke opdatere element. Prøv igen."
+  failed_to_update_missing_submission_policy_setting_95fbc669: "Kunne ikke opdatere manglende indstillinger for politik for manglende afleveringer."
   failed_to_update_page_23766e21: "Siden kunne ikke opdateres"
   failed_to_update_permission_33c493f: "Kunne ikke opdatere tilladelse"
   failed_to_update_portfolio_be886af7: "Kunne ikke opdatere porteføljen"
@@ -14858,6 +14915,7 @@ da-x-k12:
   file_added_successfully_from_canvas_files_db31e4d: "Fil tilføjet fra Canvas Files"
   file_already_exists_bdc61895: "fil eksisterer allerede"
   file_association_access_a820d755: Filtilknytningsadgang
+  file_association_access_for_conversations_a69c498f: "Adgang til filtilknytning for samtaler"
   file_attachment_8e7dbfd1: "Vedhæftet fil"
   file_c851020d: Fil
   file_content_a99b5c6b: Filindhold
@@ -15365,6 +15423,7 @@ da-x-k12:
   generating_alt_text_a8819f13: "Genererer alternativ tekst ..."
   generating_alt_text_e1a02958: "Generer alternativ tekst ..."
   generating_c2aabc02: "Genererer ..."
+  generating_caption_d804516d: "Genererer billedtekst ..."
   generating_discussion_summary_44867397: "Genererer diskussionsopsummering"
   generating_pairing_code_251b7fc8: "Genererer parringskode ..."
   generating_pairing_code_d480ccf4: "Genererer parringskode"
@@ -17633,9 +17692,11 @@ da-x-k12:
   immersive_reader_7b87538: "Immersive Reader"
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader kunne ikke indlæses"
   impact_58f41b1d: Indvirkning
+  impact_account_type_8a130240: "Impact kontotype"
   impact_integration_for_new_quizzes_be080a96: "Impact-integration til New Quizzes"
   impact_is_an_add_on_to_canvas_lms_contact_your_csm_23307a67: "Impact er en tilføjelse til Canvas LMS. Kontakt din CSM, hvis du er interesseret."
   impact_manage_3641fd7f: "Impact – administrer"
+  impact_settings_89f4c217: "Indstillinger for Impact"
   implementation_resources_57b889a2: Implementeringsressourcer
   import_1b31507: Importer
   import_a_set_of_outcomes_6b782192: "Importer et sæt læringsudbytter"
@@ -17787,6 +17848,7 @@ da-x-k12:
   inbox_settings_feature_is_disabled_31bc4dce: "funktionen til indbakkeindstillinger er deaktiveret"
   inbox_settings_qw_updates_a3eb954b: "Indbakkeindstillinger – QW-opdateringer"
   inbox_settings_saved_2127ed7c: "Indbakkeindstillinger gemt!"
+  inbox_sis_id_for_duplicate_names_3acecbc8: "Indbakke – SIS-ID for dubletter af navne"
   include_a_download_link_next_to_each_file_link_in__481761de: "Inkluder et downloadlink ved siden af hvert fillink i RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluder et link til et screencast/screenshot ved brug af f.eks. *Jing*"
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Inkluder et link for at vise en QR-kode for let mobil login på profilsiden."
@@ -18083,6 +18145,7 @@ da-x-k12:
   instructure_identity_onboarding_allow_user_facing__7dc6038e: "Instructure Identity Onboarding – Tillad brugervendte ændringer"
   instructure_identity_only_supports_using_canvas_a__b6d79938: "Instructure Identity understøtter kun brug af en SAML-proxy på Canvas. Dette flag aktiverer proxyindstillingen"
   instructure_identity_org_id_dda9c75a: "Instructure-identitet org-ID"
+  instructure_identity_organization_scoped_delete_en_8e68b86c: "Instructure Identity Organisationsberegnet sletningsslutpunkt"
   instructure_identity_organization_v1_api_b24d3d5a: "Instructure Identity Organization V1 API"
   instructure_identity_periodic_redirect_rate_increm_428f0115: "Periodisk omdirigeringshastighedsforøgelse for Instructure Identity"
   instructure_identity_prepend_org_id_7ebafb27: "Instructure-identitet prepend org-ID"
@@ -18577,6 +18640,7 @@ da-x-k12:
   kazakh_63a96134: Kasakhisk
   kazakhstan_7_8fe892c: "Kasakhstan (+7)"
   keep_8f3e7c16: Behold
+  keep_alt_text_under_count_characters_209fbe82: "Hold alt-teksten på under %{count} tegn."
   keep_alt_text_under_max_length_characters_f1144984: "Hold alt-teksten på under %{max_length} tegn."
   keep_alt_text_under_maxlength_characters_5fa475db: "Hold alt-teksten på under %{maxLength} tegn."
   keep_editing_11ff42e5: "Gå videre med redigeringen"
@@ -18662,6 +18726,7 @@ da-x-k12:
   labels_292cd90b: Mærkater
   language_6b3e2c7c: Sprog
   language_arts_35b79a8b: Sprog
+  language_automatic_f39137cb: "%{language} (Automatisk)"
   language_missing_94f237c3: "Sprog mangler"
   languages_835813f0: Sprog
   lao_675e7f05: Lao
@@ -18692,6 +18757,7 @@ da-x-k12:
   last_change_undone_283e9f96: "Sidste ændring fortrudt"
   last_changed_b544504d: "Sidst ændret:"
   last_checked_at_af36da71: "Sidst tjekket kl. "
+  last_checked_date_b3853b0d: "Sidst kontrolleret %{date}"
   last_day_attended_b72d623c: "Sidste dag tilstedeværende"
   last_e159dbd: Sidste
   last_edit_ascending_6a18dba4: "Sidste redigering: Stigende"
@@ -18766,6 +18832,7 @@ da-x-k12:
   late_policy_minus_count_points_1a945541: 
     one: "Sen-politik: minus 1 point"
     other: "Sen-politik: minus %{count} point"
+  late_policy_will_not_be_imported_from_the_source_c_d1b5d7bb: "Forsinket aflevering vil ikke blive importeret fra kildefaget."
   late_submission_96752a0e: "Sen aflevering"
   late_submission_deduction_3e87f1fa: "Fratrækning for sen aflevering %"
   late_submission_deduction_5d7fa3cb: "Fratrækning for sen aflevering"
@@ -18847,6 +18914,7 @@ da-x-k12:
   learner_passport_prototype_1c3446b3: "Studenterpas prototype"
   learner_passport_prototype_r2_98517178: "Studenterpas prototype R2"
   learner_preview_562438f0: "Forhåndsvisning af studerende"
+  learning_agent_button_5b3f09c8: Læringsagent-knap
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (Beta) - vis"
   learning_design_7a7cac04: Læringsdesign
   learning_design_7dd0a932: Læringsdesign
@@ -18860,6 +18928,7 @@ da-x-k12:
       i fagenes læringsudbytter. Læringsudbytter præsenteres i et Vurderingsoversigt-lignende
       format, og elevernes fremskridt vises både som et numerisk resultat og som behersker / nær
       beherskelse / middelmådig.
+  learning_mastery_gradebook_enhancements_5dd9bf93: "Forbedringer af vurderingoversigten for opsyldelse af læringsmål"
   learning_mastery_gradebook_error_page_58fbea43: "Fejlside for vurderingsoversigt for opfyldelse af læringsmål"
   learning_mastery_gradebook_redesign_9ca88020: "Nyt design af Vurderingsoversigten for opfyldelse af læringsmål"
   learning_mastery_gradebook_student_reporting_32125d51: "Vurderingsoversigt for opfyldelse as læringsmål elevrapportering"
@@ -19233,6 +19302,7 @@ da-x-k12:
   loading_comments_32366acf: "Indlæser kommentarer"
   loading_completion_b62ca82f: "Indlæser færdiggørelse"
   loading_compose_modal_f6da0e8b: "Indlæser modal til at komponere"
+  loading_configuration_a0f96cd3: "Indlæser konfiguration"
   loading_content_for_import_4ed89a17: "Indlæser indhold til import."
   loading_contributing_scores_5f68330f: "Indlæser bidragende resultater"
   loading_conversation_863855ee: "Indlæser samtale"
@@ -19620,6 +19690,7 @@ da-x-k12:
   lti_asset_processor_turnitin_migration_bc484419: "LTI-aktivprocessor Turnitin-overførsel"
   lti_context_id_d6a24cfc: LTI-kontekst-ID
   lti_context_id_should_be_unique_7437a74d: "lti_context_id skal være unik"
+  lti_contextcontrols_91b76c7a: LTI-kontekstkontroller
   lti_deep_linking_for_module_index_menu_881feeee: "LTI dyblinkning til Forløbindeksmenu"
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking linjeelementer"
   lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "LTI dyblinkning-linjeelementer på opgavens opret/rediger side"
@@ -19676,6 +19747,7 @@ da-x-k12:
   machine_translation_may_not_fully_capture_the_mean_aca7918: "Maskinoversættelse indfanger muligvis ikke betydningen af den oprindelige besked fuldt ud."
   magenta_4a65993c: Magenta
   mailbox_selection_92d9cbf: "Valg af postkasse"
+  main_sign_in_options_a98b3c1b: "Primære loginmuligheder"
   main_text_color_7d65ab1b: Hovedtekstfarve
   maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Vedligeholdelsesvinduer: %{days} %{weekday} i måneden fra %{time_range} (%{utc_time_range} UTC)"
   make_all_discussions_threaded_7f0af690: "Gør alle diskussioner til tråde"
@@ -21967,6 +22039,8 @@ da-x-k12:
   missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: "Vurdering for manglende aflevering skal være mellem 0 og 100"
   missing_submission_grade_must_be_numeric_1a142ef2: "Vurdering for manglende aflevering skal være numerisk"
   missing_submission_grade_percent_34428feb: "Vurdering for manglende aflevering procent"
+  missing_submission_policy_has_been_disabled_a92307c3: "Politikken for manglende afleveringer er blevet deaktiveret."
+  missing_submission_policy_has_been_disabled_and_la_30cf6470: "Politikken for manglende afleveringer er blevet deaktiveret, og politikken for forsinket aflevering vil ikke blive importeret."
   missing_table_caption_37a6379e: "Manglende tabeltekst"
   missing_table_headers_36d9317e: "Manglende tabeloverskrifter"
   mobile_a08ef8fa: Mobil
@@ -22425,6 +22499,7 @@ da-x-k12:
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Navn
   name_3806192d: "Navn:"
+  name_added_6257decb: "%{name} tilføjet"
   name_already_has_enough_must_review_allocations_to_319b3007: "%{name} har allerede nok \"skal gennemgås\"-tildelinger til at opfylde de nødvendige elev-elev vurderinger. Yderligere tildelinger vil følge tilgængelige afleveringer og præference."
   name_app_has_been_deleted_fb2d9426: "%{name} app er blevet slettet"
   name_badfe525: navn
@@ -22643,6 +22718,7 @@ da-x-k12:
   new_quizzes_banks_migrations_9ab4de4a: "New Quizzes Banker Overførsler"
   new_quizzes_build_button_in_module_items_10f651fb: "New Quizzes-byggeknap i forløbelementer"
   new_quizzes_build_button_on_list_views_62c7c0e8: "New Quizzes-byggeknap for listevisninger"
+  new_quizzes_canvas_native_integration_945b2754: "New Quizzes Canvas indlejret integration"
   new_quizzes_common_cartridge_support_250780be: "New Quizzes Common Cartridge-support"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_description: "Denne funktion forbedrer Canvas-oplevelsen for quizzer. Når dette flag er aktiveret, er værktøjet New Quizzes tilgængeligt. For flere detaljer henvises der til *New Quizzes brugergruppe* i Canvas Community."
@@ -22688,6 +22764,7 @@ da-x-k12:
   new_rule_rule_has_been_created_successfully_fead4008: "Ny regel \"%{rule}\" blev oprettet"
   new_setting_name_2bfbaeec: "Nyt indstillingsnavn ..."
   new_setting_value_373a7dc7: "Ny indstillingsværdi ..."
+  new_single_tag_a25a577f: "Nyt enkelt tag"
   new_sis_integrations: |-
       Denne funktion gælder for institutioner med en eksisterende SIS Canvas-integration.
       Kunder, der i øjeblikket bruger vurderingstilbagesendelsesløsninger i Canvas eller
@@ -22701,6 +22778,7 @@ da-x-k12:
   new_student_group_e31b7cb5: "Ny elevgruppe"
   new_tab_ab7629d2: "Ny fane"
   new_tag_db1cdd5d: "Nyt tag"
+  new_tag_with_variants_a7fca374: "Nyt tag med varianter"
   new_text_color_9f964d9c: "Ny tekstfarve"
   new_text_color_picker_e5bbc916: "Ny tekstfarvevælger"
   new_to_do_cb9429d7: "+ Nyt element på opgavelisten"
@@ -22708,6 +22786,7 @@ da-x-k12:
   new_user_bd194843: "Ny bruger"
   new_user_s_name_909b6267: "Ny brugers navn"
   new_user_tutorial_cdd3a446: "Ny brugervejledning"
+  new_variant_of_existing_tag_41a900b: "Ny variant af eksisterende tag"
   new_video_conference_17817456: "Ny videokonference"
   new_way_to_create_deeeff5e: "Ny måde at oprette på"
   new_way_to_create_pages_d544bec0: "Ny måde at oprette sider på"
@@ -23148,6 +23227,7 @@ da-x-k12:
   note_that_as_long_as_this_option_is_enabled_studen_9ed99069: "Bemærk, at eleverne frit kan af-og tilmelde sig grupper, så længe denne mulighed er aktiveret."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Bemærk, at e-mailen ikke altid er udfyldt i brugerens profil hos Microsoft. Oid er ikke udfyldt for personlige Microsoft-konti."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Bemærk, at nogle attributter eventuelt ikke er udfyldt for alle brugere hos Clever."
+  note_that_we_can_only_accurately_detect_color_cont_6c2b90a3: "Bemærk, at vi kun præcist kan registrere problemer med farvekontrast i indhold oprettet i Canvas ved hjælp af Rich Content Editor (vha. indlejrede CSS- og Hex-kodeværdier for farver). Hvis farverne i dette indhold er defineret af intern eller ekstern CSS eller af andre farveværdier end hex-kode, kan resultaterne være unøjagtige."
   note_the_following_content_types_will_be_imported__34541c86: "Bemærk, at følgende indholdstyper vil blive importeret: Fagindstillinger, fagplanens brødtekst, forløb, opgaver, quiz, spørgsmålsbanker, diskussionsemner, sider, beskeder, vurderingskriterier, filer og kalenderbegivenheder."
   note_this_code_will_expire_in_15_minutes_c743de99: "*BEMÆRK*: Denne kode udløber om 15 minutter."
   note_this_is_not_your_official_score_f2d4582f: "*BEMÆRK*: Dette er IKKE dit officielle resultat."
@@ -23898,6 +23978,7 @@ da-x-k12:
   opens_in_new_window_b4b99243: "åbnes i et nyt vindue"
   opportunities_eb978a67: Muligheder
   opportunities_popup_f6703842: "muligheder popup"
+  optimized_grading_rubrics_b529d7c2: "Optimerede vurderingskriterier"
   optimized_the_visibility_services_used_by_selectiv_d8abb7be: "Optimeret de synlighedstjenester, der anvendes af selektiv frigivelse."
   option_1_dea39f90: "Mulighed 1"
   option_2_47aace2a: "Mulighed 2"
@@ -24803,6 +24884,7 @@ da-x-k12:
   planner_note_id_9ed85d04: Planlægger-bemærkning-ID
   planner_notes_1b5fef2b: Planlægger-bemærkninger
   planner_override_13b23f6e: "Planlægger tilsidesæt"
+  planner_submittable_completion_filter_3d94d710: "Filter til planlægger for færdiggørelse i Submittable"
   planner_support_for_account_calendars_3a7bfdc5: "Planlægningssupport for kontokalendere"
   platform_ui_unified_widgets_dashboard_bc9cc83e: "Platformsgrænseflade – Ensartet widget-oversigt"
   play_1a47eaa7: Afspil
@@ -24944,6 +25026,8 @@ da-x-k12:
   please_select_a_role_before_submitting_7f6cc61a: "Vælg en rolle, før du indsender"
   please_select_a_score_eb5f9b9: "Vælg et resultat"
   please_select_a_student_cd3e2311: "Vælg en elev"
+  please_select_a_tag_5a46b089: "Vælg et tag"
+  please_select_a_tag_set_ae8b8336: "Vælg et tagsæt"
   please_select_a_user_role_for_this_link_9fb4e655: "Vælg venligst en brugerrole for dette link."
   please_select_a_valid_date_range_where_the_start_m_41498a7c: "Vælg et gyldigt datointerval, hvor startmåneden ikke er efter slutmåneden."
   please_select_an_item_first_89ef5c37: "Vælg et element først."
@@ -25593,6 +25677,7 @@ da-x-k12:
   possible_points_b1df0a5c: "Mulige point"
   possible_pts_b63dff4c: "%{possible} point"
   possible_score_5e0a328e: "Muligt: %{score}"
+  possible_to_min_pts_8e5a3f34: "%{possible} til >%{min} point"
   post_1e445890: Post
   post_at_be4b826d: "Læg ud kl."
   post_by_displayedauthor_from_date_3a372f3d: "Opslag af %{displayedAuthor} fra %{date}"
@@ -25680,6 +25765,7 @@ da-x-k12:
   preview_9cbd064e: forhåndsvisning
   preview_a3f8f854: FORHÅNDSVISNING
   preview_ai_experience_51e65049: "Forhåndsvisning af AI-oplevelsen"
+  preview_and_ai_conversations_will_be_available_onc_e0ad1fa7: "Forhåndsvisning og AI-samtaler vil være tilgængelige, når behandlingen er færdig. Kom tilbage senere."
   preview_confirm_8b9986a8: "Forhåndsvisning og bekræft"
   preview_experience_6fdb7129: "Forhåndsvisning af oplevelse"
   preview_filename_f1b58572: "Forhåndsvisning %{filename}"
@@ -27616,6 +27702,7 @@ da-x-k12:
   range_must_be_a_valid_number_cannot_have_negative__d4efa7d1: "Intervallet skal være et gyldigt nummer. Må ikke indeholde negative tal eller tal, der er større end det øvre pointområde. Ret intervallerne, og prøv at klikke på 'Gem' igen."
   range_name_90614433: Intervalnavn
   rangestart_to_c41e0bba: "%{rangeStart} til "
+  rangestart_to_d064bdb: ">%{rangeStart} til "
   rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} ud af %{totalStudents} elever"
   rate_limit_for_create_conversation_graphql_mutatio_718d60ce: "Hastighedsgrænse for Opret samtale GraphQL-mutation"
   rate_limit_set_for_identifier_identifier_to_limit_e2d33dcf: "Hastighedsbegrænsning angivet for identifikator %{identifier} til %{limit}"
@@ -27744,7 +27831,13 @@ da-x-k12:
   reactivate_user_e058db8b: "Genaktiver bruger"
   reactivation_will_allow_all_logins_for_name_to_log_455df70: "Genaktivering vil tillade, at alle logins til %{name} logger ind på Canvas og får adgang til tidligere godkendte API-integrationer igen."
   read_7cabda44: læs
+  read_about_accessible_lists_22008d39: "Læs om tilgængelige lister"
+  read_about_heading_accessibility_a5431cca: "Læs om tilgængelighed af overskrifter"
   read_about_key_features_and_discover_what_you_can__9a8e4c27: "Læs om nøglefunktioner, og find ud af, hvad du kan oprette ved hjælp af Block Editor."
+  read_about_link_accessibility_526eb1: "Læs om tilgængelighed af links"
+  read_about_table_accessibility_5a94abeb: "Læs om tilgængelighed af tabeller"
+  read_about_text_contrast_66ed4e5c: "Læs om tekstkontrast"
+  read_about_writing_alt_text_30e189c7: "Læs om at skrive alt-tekst"
   read_comments_3fcc7590: "Læs kommentarer"
   read_context_membership_data_cf406033: "Læs kontekstmedlemskabsdata"
   read_dc99757a: Læs
@@ -27873,6 +27966,8 @@ da-x-k12:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Uanset om denne tilladelse er aktiveret eller deaktiveret, kan brugere stadig administrere begivenheder på deres personlige kalender."
   regenerate_3e4679f8: Regenerer
   regenerate_alt_text_1be48296: "Regenerer alt-tekst"
+  regenerate_alt_text_42a04ffe: "Regenerer alt-tekst"
+  regenerate_caption_f8f18807: "Genskab billedtekst"
   regenerate_criteria_7301f7fc: "Regenerer kriterier"
   regenerate_criterion_8a7d4a61: "Regenerer kriterie"
   regenerate_epub_395c8e56: "Gendan ePub"
@@ -28307,6 +28402,7 @@ da-x-k12:
   request_failed_with_status_status_47054af0: "Forespørgsel mislykkedes med status %{status}"
   request_id_1499afb0: Anmodnings-id
   request_name_is_required_ebc2fda0: "Anmodningsnavn er påkrævet"
+  request_or_upload_to_show_transcript_dc03caf0: "Anmod om eller upload for at vise transskription."
   request_successfully_sent_note_that_applying_score_ee8665b6: "Anmodningen blev sendt. Bemærk, at det kan tage et stykke tid at indlæse resultater, og ændringer vises ikke, før du genindlæser siden."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Anmod om, at DocViewer bruger CloudFront til at sende pdf-aktiver."
   request_type_9e3cc7aa: Anmodningstype
@@ -28470,6 +28566,7 @@ da-x-k12:
   restricted_access_d3e99a39: "Begrænset adgang"
   restricted_inbox_files_and_calendar_functionality_66abfbbb: "Begrænset indbakke-, fil- og kalenderfunktionalitet"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Begrænset visning for lærere i LMGB"
+  restricts_ai_study_tools_to_page_and_file_learning_2a8d6ab3: "Begrænser AI-værktøjer til læringsobjektruter for sider og filer i Canvas Career."
   resubmission_failed_9cc3cbc: "Genindsendelse mislykkedes"
   resubmit_63cf65ef: "Indsend igen"
   resubmit_all_files_6cf409a9: "Send alle filer igen"
@@ -28950,6 +29047,7 @@ da-x-k12:
   save_this_comment_for_reuse_5eda0b70: "Gem denne kommentar til genbrug"
   save_this_pace_as_a_draft_without_publishing_b40c9f0d: "Gem dette tempo som et udkast uden at offentliggøre."
   save_this_rating_scale_as_default_a3f27305: "Gem denne bedømmelsesskala som standard"
+  save_to_preview_30f60b4d: "Gem til forhåndsvisning"
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Spar masser af tid ved kun at tilføje de læringsudbytter, der er specifikke for dit fagindhold."
   saved_3cd67a7c: Gemt
   saved_comments_2f6ba95: "Gem kommentarer"
@@ -28964,6 +29062,7 @@ da-x-k12:
   saving_associations_complete_e4b9634d: "Det lykkedes at gemme associationer"
   saving_associations_started_8ac85360: "Gemmer associationer"
   saving_blackout_dates_be03e6ee: "Gemmer blackout-datoer ..."
+  saving_configuration_1463971f: "Gemmer konfiguration"
   saving_custom_status_name_e1b66f6e: "Gemmer tilpasset status %{name}"
   saving_d55dd90e: "Gemmer ..."
   saving_dates_2472a539: "Gemmer datoer"
@@ -29544,6 +29643,7 @@ da-x-k12:
   select_at_least_one_person_4bacf489: "Vælg mindst én person"
   select_audio_file_7d905cce: "Vælg lydfil"
   select_audio_source_21043cd5: "Vælg lydkilde"
+  select_authentication_provider_c1dd584b: "Vælg godkendelsesudbyder"
   select_by_date_range_c3af0101: "Vælg efter datointerval"
   select_calendars_d5fa50b6: "Vælg kalendere"
   select_calendars_to_retrieve_important_dates_from_26dc92b7: "Vælg kalendere, du vil hente vigtige datoer fra"
@@ -29695,6 +29795,7 @@ da-x-k12:
   select_who_should_be_assigned_and_use_the_drop_dow_a28535c3: "Vælg, hvem der skal tildeles, og brug rullemenuerne, eller indtast dato og tidspunkt manuelt."
   selectable_outcomes_during_course_content_migratio_3f108a1a: "Valgbare læringsudbytter under overførsel af fagindhold"
   selected_274ce24f: Valgt
+  selected_6b7f16dc: " (valgt)"
   selected_all_courses_9cfef57f: "Vælg alle fag"
   selected_and_self_assessment_a0ed1d63: "Udvalgt og selvvurdering"
   selected_answer: "Du valgte dette svar."
@@ -29816,6 +29917,7 @@ da-x-k12:
       på LtiContextCopyNotice-meddelelsestypen, når der udføres fagkopier eller anden import af indhold.
       Erstatter behovet for at bruge 1.1 Content Migration-værktøjskonfigurationen.
   send_a_reply_message_81d0600e: "Send en svarbesked"
+  send_a_unique_id_as_a_partner_account_id_oemaccoun_bbab2df4: "Send et unikt ID som et partnerkonto-ID (oemAccountId). Brug dette i særlige tilfælde, fx hvis Impact købes til en enkelt underkonto."
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Send en individuel besked til hver modtager"
   send_assignment_name_to_another_user_e2ca494d: "Send opgave %{name} til en anden bruger"
   send_automatic_replies_to_incoming_mail_c18da8eb: "Send automatiske svar på indgående mail."
@@ -29846,6 +29948,7 @@ da-x-k12:
   send_private_chat_messages_67890e5d: "Send private chatbeskeder"
   send_public_chat_messages_9b62951a: "Send offentlige chatbeskeder"
   send_quiz_to_user_e8c47177: "Send quiz til bruger"
+  send_the_salesforce_id_as_a_partner_account_id_oem_6c9ca50d: "Send Salesforce-ID'et som et partnerkonto-ID (oemAccountId). Brug dette i særlige tilfælde, fx hvis Impact købes til et konsortium."
   send_this_announcement_to_unenrolled_users_4ea549d7: "Send denne meddelelse til ikke tilmeldte brugere"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Send denne meddelelse til brugere med kontorollen %{role}"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Send denne meddelelse til brugere med fagrollen %{role}"
@@ -29901,6 +30004,7 @@ da-x-k12:
   service_c3d74594: "Service:"
   service_cloud_ticketing_connector_889e1b7b: "Service Cloud Ticketing Connector"
   service_domain_6107fb0c: Servicedomæne
+  service_preview_a081df35: "Forhåndsvisning af tjenesten"
   service_type_2fd854bc: Tjenestetype
   service_user_id_4f2d0897: "Bruger-ID for tjenesten"
   service_user_key_f0621115: Servicebrugernøgle
@@ -31202,6 +31306,8 @@ da-x-k12:
   source_c377a469: Kilde
   source_code_2395ca74: Kildekode
   source_context_does_not_match_group_context_4b55cee4: "kildekontekst matcher ikke gruppekontekst"
+  source_files_127d642f: Kildefiler
+  source_files_are_still_being_processed_a4477749: "Kildefilerne behandles stadig"
   source_link_c21ecc23: Kilde-link
   source_materials_4124431c: Kildematerialer
   sourcecontextid_required_if_sourcecontexttype_prov_473c67b1: "sourceContextId krævet, hvis sourceContextType er angivet"
@@ -31683,6 +31789,7 @@ da-x-k12:
   students_remove_4b27390b: "Elever - fjern"
   students_remove_4c8b3c3d: "Elever - fjern"
   students_see_their_grades_here_ae80f808: "Eleverne ser deres vurderinger her."
+  students_tagged_successfully_58904166: "De elever er blevet tagget"
   students_view_2bcb78b2: "Visning for elever"
   students_who_are_enrolled_in_multiple_sections_wil_596112c0: "Elever, der er tilmeldt flere sektioner, vil blive placeret i en gruppe for sig selv."
   students_who_have_received_a_grade_or_a_submission_7ef046cc: "Elever, der har modtaget en vurdering eller en afleveringskommentar, vil kunne se deres vurdering og/eller afleveringskommentarer."
@@ -31714,6 +31821,7 @@ da-x-k12:
   studio_capture_a88ec4e: Studio-skærmbillede
   studio_media_options_in_rce_1118428b: "Studio-medieindstillinger i RCE"
   style_f6881133: Stil
+  sub_account_c213944c: Underkonto
   sub_account_daeadd0: Underkonto
   sub_accounts: 
     alerts: 
@@ -32315,17 +32423,22 @@ da-x-k12:
   tag_count: 
     one: "%{count} tag"
     other: "%{count} tags"
+  tag_created_successfully_e5bcaff8: "Tagget blev oprettet"
   tag_mode_1d907df4: Tagtilstand
   tag_name_bd6c8adf: "Tagnavn *"
   tag_name_d4794459: Tagnavn
+  tag_name_is_required_4c4b5601: "Tagnavn er påkrævet"
   tag_name_is_required_5b742d7c: "Tagnavn er påkrævet"
   tag_name_variant_tagcount_5c43a5dd: "Tagnavn (variant %{tagCount})"
   tag_name_variant_tagcount_d4c8ed91: "Tagnavn (variant %{tagCount}) *"
+  tag_option_e47d54c: Tag-mulighed
   tag_removed_successfully_e8b4fc23: "Tag blev fjernet"
   tag_set_65e5916: Tagsæt
   tag_set_name_46fc3e7f: Tagsætnavn
   tag_set_name_is_required_553beb05: "Tagsætnavn er påkrævet"
   tag_starts_with_9d5646eb: "Tag starter med"
+  tag_students_as_3b3d279b: "Tag elever som"
+  tag_students_f2c1f762: "Tag elever"
   tag_upload_failed_please_check_the_file_format_and_171af184: "Tagupload mislykkedes. Kontrollér filformatet, og prøv igen."
   tagalog_74906db7: Tagalog
   tags_2b72a03b: Tags
@@ -32703,6 +32816,7 @@ da-x-k12:
   the_conversations_has_been_successfully_unstarred_fb69c53d: 
     one: "Stjernemarkeringen for diskussionen blev fjernet."
     other: "Stjernemarkeringen for diskussionerne blev fjernet."
+  the_conversion_job_failed_9d8eee55: "Konverteringsjobbet mislykkedes."
   the_course_accessibility_checker_is_not_yet_availa_b8425664: "Fagtilgængelighedskontrollen er endnu ikke tilgængelig for fag med mere end 1.000 ressourcer (sider, opgaver og vedhæftede filer samlet)."
   the_course_accessibility_checker_is_not_yet_availa_dbc51b93: "Fagtilgængelighedskontrollen er endnu ikke tilgængelig for fag med mere end 1.000 ressourcer (sider og opgaver samlet)."
   the_course_end_date_can_not_occur_before_the_cours_384dd741: "Fagets slutdato kan ikke komme før fagets startdato."
@@ -33400,6 +33514,7 @@ da-x-k12:
   this_assignment_has_failed_to_unpublish_a201797c: "Denne opgave kunne ikke få fjernet offentliggørelsen"
   this_assignment_has_failed_to_unpublish_f16da8d5: "Denne opgave kunne ikke få fjernet offentliggørelsen."
   this_assignment_has_no_default_dates_ae314295: "Denne opgave har ingen standarddatoer."
+  this_assignment_has_peer_review_allocations_that_a_39c703db: "Denne opgave har elev-elev vurdering-tildelinger i det gamle format. For at fortsætte skal du enten slette disse allokeringer eller konvertere dem til det nye format."
   this_assignment_has_too_many_dates_to_display_262f555f: "Denne opgave har for mange datoer til at blive vist."
   this_assignment_is_complete_5e096a06: "Denne opgave er afsluttet!"
   this_assignment_is_currently_being_moderated_ffd280f2: "Denne opgave bliver for øjeblikket bedømt"
@@ -33587,6 +33702,7 @@ da-x-k12:
   this_file_16b24f02: "denne fil"
   this_file_9443cda1: "Denne fil"
   this_file_appears_to_be_empty_do_you_still_want_to_26ff72f4: "Denne fil ser ud til at være tom. Vil du stadig fortsætte med indholdsvalg?"
+  this_file_couldn_t_be_processed_it_may_be_corrupte_183bf4eb: "Denne fil kunne ikke behandles. Den kan være beskadiget eller i et ikke-understøttet format. Upload en anden fil."
   this_file_has_already_been_added_5c2a1f21: "Denne fil er allerede blevet tilføjet."
   this_file_is_too_large_to_check_pdf_attachments_mu_94f8b8ee: "Denne fil er for stor til at kunne kontrolleres. PDF-vedhæftninger må ikke være større end %{size} MB."
   this_file_must_be_csv_aca2c67c: "Denne fil skal være i csv-format."
@@ -33673,6 +33789,9 @@ da-x-k12:
   this_is_a_what_if_score_cbdc04f9: "Dette er et 'Hvad-nu-hvis-resultat\""
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Det her er en kontoindstilling, som din kundesuccesmanager skal aktivere. Varslinger er en sjældent brugt funktion, der er beregnet til at sende en varsling til elever, lærere eller admins om bestemte udløsere (fx ingen interaktion mellem elev-lærer i 7 dage). De tjekkes hver dag, og der sendes meddelelser til eleven og/eller læreren, indtil det udløsende problem udbedres."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Denne er en kontoindstilling, som din kundesuccesmanager skal slå til."
+  this_is_an_announcement_from_7e5531ce: "Dette er en meddelelse fra "
+  this_is_an_announcement_from_canvas_administration_fc2dc20d: "Dette er en meddelelse fra *Canvas Administration*"
+  this_is_an_announcement_from_name_c00d0fa1: "Dette er en meddelelse fra *%{name}*"
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Dette er en anonym diskussion. Elevernes navne og profilbilleder er skjult."
   this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Dette er en anonym diskussion. Selvom elevens navne og profilbilleder vil være skjult, vil dit navn og profilbillede være synligt for alle fagets medlemmer. Omtaler er også blevet deaktiveret."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Dette er en anonym diskussion. Selvom elevens navne og profilbilleder vil være skjult, vil dit navn og profilbillede være synligt for alle fagets medlemmer."
@@ -33717,6 +33836,7 @@ da-x-k12:
   this_may_take_a_bit_c061d0f6: "det kan tage lidt tid ..."
   this_may_take_a_few_minutes_e2df06d6: "Det kan tage nogle minutter."
   this_may_take_a_while_d07790f2: "Det kan tage lidt tid ..."
+  this_may_take_up_to_24_hours_99de965d: "Dette kan tage op til 24 timer."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Denne besked inkluderer mediekommentarer. Klik på dette link: %{link} for at lytte eller svare."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "Denne besked indeholder mediekommentarer. For at lytte eller svare skal du klikke på linket herunder:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Denne besked indeholder mediekommentarer. For at lytte eller svare skal du klikke på dette link: %{link}.  Når det er tilladt skal du logge ind på Canvas og svare på afleveringen, hvis du vil inkludere en vedhæftet fil."
@@ -34417,6 +34537,9 @@ da-x-k12:
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "For at gøre det muligt at få vist/redigere/slette funktionalitet i samarbejder, der er oprettet af andre brugere, skal Fagindhold - tilføj/rediger/slet også være aktiveret. Hvis Fagindhold - tilføj / rediger / slet er aktiveret, og Elevernes samarbejder - opret er deaktiveret, kan brugeren ikke oprette nye samarbejder, men vil være i stand til at se, redigere og slette alle samarbejder. For at føje elever til et samarbejde skal Brugere - vis liste også være aktiveret. For at føje en faggruppe til et samarbejde skal Grupper - vis alle studiegrupper også være aktiveret."
   to_allow_view_edit_delete_functionality_of_collabo_f46fade2: "For at gøre det muligt at få vist/redigere/slette funktionalitet i samarbejder, der er oprettet af andre brugere, skal Fagindhold - tilføj/rediger/slet også være aktiveret."
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: "For at tildele elever til en gruppe skal du indtaste gruppenavne i kolonnen \"group_name\"."
+  to_avoid_this_you_can_cancel_and_adjust_due_dates__139d53da: "For at undgå dette kan du annullere og justere afleveringsdatoer eller deaktivere den manglende politik i dette fag."
+  to_avoid_this_you_can_cancel_and_adjust_due_dates__32d22df8: "For at undgå dette kan du annullere og justere afleveringsdatoer eller deaktivere den manglende politik i dette fag og springe importen af den fra kilden over."
+  to_avoid_this_you_can_cancel_and_adjust_due_dates__52143f14: "For at undgå dette kan du annullere og justere afleveringsdatoer eller vælge ikke at importere den manglende politik fra kildefaget."
   to_be_added_2959cc72: "Skal tilføjes"
   to_be_removed_d4b48586: "Skal fjernes"
   to_bottom_14d51cd1: "til nederst"
@@ -35706,6 +35829,7 @@ da-x-k12:
   update_public_jwk_9f25f520: "Opdater Offentlig JWK"
   update_quota_81381226: "Opdater kvote"
   update_rating_6d29c2ef: "Opdater bedømmelse"
+  update_report_7623967f: "Opdater rapport"
   update_settings_9b422d0f: "Opdater indstillinger"
   update_settings_for_portfolioname_1e2d7e97: "Opdater indstillinger for %{portfolioName}"
   update_summary_d6b180ff: Opdateringsoversigt
@@ -35801,6 +35925,7 @@ da-x-k12:
   upload_percent_complete_d533d3e2: "Upload procent fuldført"
   upload_progress_df577c48: Upload-status
   upload_progress_for_name_39f03acf: "Upload fremskridt for %{name}"
+  upload_progress_progress_4b29d973: "Uploadstatus: %{progress}%"
   upload_record_media_b893dcd6: "Upload / optag medier"
   upload_scores_csv_a8416cf: "Upload resultater (.csv)"
   upload_subtitles_280bedce: "Upload undertekster"
@@ -35822,6 +35947,7 @@ da-x-k12:
   uploading_media_progress_c23a953b: "Status for Upload af mediefil"
   uploading_progress_2f5dd4bf: Upload-status
   uploading_progress_d62bb6e9: Upload-status
+  uploading_sis_package_2f429cd6: "Uploader SIS-pakke ..."
   uploading_submission_4c8d944b: "Uploader aflevering"
   upper_limit_of_range_c454a8f2: "Intervallets øvre grænse"
   upper_lower_56cad16c: "%{upper} - %{lower}"
@@ -35892,6 +36018,7 @@ da-x-k12:
   use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Brug gem under fagimport til at opdatere Canvas-ressourcelinks"
   use_graphql_for_gradebook_60936cf5: "Brug GraphQL til vurderingsoversigt"
   use_high_contrast_ui_a5917282: "Brug grænseflade med høj kontrast"
+  use_identity_service_discovery_page_77223240: "Brug siden til at opdage identitetstjenester"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Brug forbedrede pladsholdere til indsat indhold i RCE."
   use_instui_for_the_course_copy_page_6af58b87: "Brug InstUI til fagkopieringssiden"
   use_instui_for_the_course_import_page_1906ef55: "Brug InstUI til fagimportsiden"
@@ -36052,6 +36179,7 @@ da-x-k12:
     users_to_add: 
       one: "Hvis du fortsætter, tilføjes 1 bruger."
       other: "Hvis du fortsætter, tilføjes %{count} brugere."
+  user_login_151eb34e: Brugerlogin
   user_login_id_7d5a6d2a: "Bruger-login-ID:"
   user_login_id_d40cab16: bruger-login-id
   user_login_logout_activity_90fbbd9a: "Bruger-log ind / log ud aktivitet"
@@ -36504,6 +36632,9 @@ da-x-k12:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Brugere med denne tilladelse kan bruge funktionen Funger som til at administrere kontoindstillinger, se og justere vurderinger, få adgang til brugeroplysninger osv. Denne tilladelse tillader også, at administratorer, som er udpeget til en underkonto, tager adgang til indstillinger og information uden for deres underkonto."
   uses_batch_processing_orchestrator_when_account_le_580b00a4: "Bruger batchbehandlingsorkestrator, når læringsudbytter på kontoniveau opdateres, for at genberegne akkumuleringer for berørte fag."
   uses_cedar_for_translations_7bfb6b44: "Bruger Cedar til oversættelser"
+  uses_optimized_implementation_for_grading_rubrics__f9a18a27: |
+      Bruger optimeret implementering til slutpunkt for vurderinggivningsrubrikker med N+1 rettelser til forespørgsler
+      og kontekstfiltrering. Forbedrer ydeevnen for brugere med mange fagtilmeldinger.
   uses_the_enhanced_igniteai_search_ui_search_for_co_137b2eb8: "Bruger den forbedrede IgniteAI Search-grænseflade. Søgning efter fag skal være aktiveret for at dette kan træde i kraft."
   uses_the_enhanced_smart_search_ui_smart_search_mus_42d23095: "Bruger den forbedrede Smart Search UI. Smart Search skal være aktiveret for at dette kan træde i kraft."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Benytter det nye planlægningsværktøj og dets funktioner"
@@ -36545,6 +36676,8 @@ da-x-k12:
   value_too_long_allowed_length_is_length_a81d4cf: "Værdien er for lang, tilladt længde er %{length}"
   vanity_url_76f93382: "Vanity URL"
   variant_limit_reached_current_limit_is_limit_10917429: "Variantgrænse nået. Den nuværende grænse er %{limit}"
+  variant_name_dc9e5fea: Variantnavn
+  variant_name_is_required_ad8b3061: "Variantnavn er påkrævet"
   vendor_code_lti_2_ef36207b: "Leverandørkode (LTI 2):"
   venezuela_58_959d01f7: "Venezuela (+58)"
   vericite: 
@@ -36568,6 +36701,7 @@ da-x-k12:
   vertical_17932955: Vertikal
   video_78335c71: video
   video_b9f27375: Video
+  video_caption_generation_4aba1de4: "Generering af videotekster"
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Video-konferencevejledninger til klasseværelser på afstand"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Videokonferenceværktøjer muliggør ansigt til ansigt-forbindelse mellem lærere og elever."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoindhold understøttes ikke af din enhed eller app."
@@ -36743,6 +36877,7 @@ da-x-k12:
   warning_6576b5b8: advarsel
   warning_aacb8c24: Advarsel
   warning_all_permissions_will_change_to_match_the_s_e3c9819f: "Advarsel: Alle tilladelser ændres for at matche den valgte basisrolle."
+  warning_both_courses_have_automatic_missing_policy_62296661: "Advarsel: Begge fag har automatisk politik for manglende elementer aktiveret"
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Advarsel: Crocodoc har begrænsninger, når den bruges i Firefox. Kommentarer gemmes ikke altid."
   warning_d9ac42ef: "Advarsel:"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advarsel: Brug indstillingen Flyt til dialog, som findes i menuen for forbedret tilgængelighed, når der flyttes filer."
@@ -36756,7 +36891,9 @@ da-x-k12:
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Advarsel: Dette trin har to StepItems med statussen Igangværende"
   warning_the_placement_placement_is_only_allowed_fo_4e119a65: "Advarsel: %{placement} placeringen er kun tilladt for Instructure-godkendte LTI-værktøjer. Hvis du mener, at du har modtaget denne meddelelse ved en fejl, bedes du kontakte dit supportteam."
   warning_the_resource_selection_placement_is_deprec_458af5b2: "Advarsel: Placeringen resource_selection er forældet. Brug assignment_selection og/eller link_selection i stedet."
+  warning_the_source_course_has_automatic_missing_po_a66e1c71: "Advarsel: Kildefaget har automatisk politik for manglende elementer aktiveret"
   warning_the_submission_type_selection_placement_is_d327c8d: "Advarsel: submission_type_selection placeringen er kun tilladt for Instructure-godkendte LTI-værktøjer. Hvis du mener, at du har modtaget denne meddelelse ved en fejl, bedes du kontakte dit supportteam."
+  warning_this_course_has_automatic_missing_policy_e_f2e9b0c3: "Advarsel: Dette fag har automatisk politik for manglende elementer aktiveret"
   warning_this_identity_provider_recently_violated_t_5c4b42f2: "Advarsel: Denne identitetsudbyder overtrådte for nylig engangsbrugsbetingelsen i et SAML-svar på %{timestamp}."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Advarsel! Du er ved at tilpasse denne gruppes medlemskab. *Denne ændring påvirker eksisterende gruppeafleveringer, anmærkninger og kommentarer og resulterer i tab af data for både denne gruppe og den elevs tidligere gruppe.*** For at forhindre utilsigtede konsekvenser med eksisterende gruppeafleveringer, skal du oprette et nyt gruppesæt til fremtidige opgaver. **"
   warnings: 
@@ -36989,6 +37126,10 @@ da-x-k12:
       udviklernøglers konfigurationer.
   when_enabled_canvas_will_inherit_account_survey_se_39875d62: "Når aktiveret, vil Canvas arve indstillinger for kontoundersøgelser fra feltet Canvas_Survey_Opt_Out__c i Salesforce. En tilbagevendende opgave synkroniserer denne indstilling hver 24. time, og brugergrænsefladen bliver skrivebeskyttet."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Når aktiveret, skal du indsamle interne analytiske målinger ved hjælp af et distribueret system."
+  when_enabled_displays_sis_ids_in_the_inbox_recipie_71241a17: |-
+      Når aktiveret, vises SIS-ID'er i modtagervælgeren i indbakken
+      for at hjælpe med at skelne brugere med identiske navne. Kun synlig
+      for brugere med read_sis tilladelse (lærere som standard).
   when_enabled_external_url_module_items_set_to_load_eacdb54b: |-
       Når aktiveret, åbnes eksterne URL-forløbelementer, der er indstillet til "Indlæs i ny fane",
       problemfrit i en ny fane. Canvas-mellemsiden (som sporer fremskridt)
@@ -37098,6 +37239,11 @@ da-x-k12:
   when_enabled_the_monitor_tab_on_the_lti_apps_page__a6687c3: "Når aktiveret, inkluderer fanen Overvåg på siden LTI-apps funktionen til advarsler om lavt forbrug."
   when_enabled_the_monitor_tab_will_appear_in_canvas_57f54296: "Når aktiveret, vises fanen Overvågning i Canvas Apps."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "Når aktiveret, vil det nye ressourcekort for afleveringsformen blive vist på opgaveredigeringssiden."
+  when_enabled_the_planner_s_complete_incomplete_fil_77098539: |-
+      Når aktiveret, vil planlæggerens filtre for fuldstændig/ufuldstændig korrekt
+      tage højde for bedømte quiz, bedømte diskussioner og wikisideopgaver,
+      hvis færdiggørelsesstatus spores via en planlægger-tilsidesættelse på det indsendte objekt,
+       i stedet for direkte på opgaven.
   when_enabled_the_submission_type_selection_placeme_dc9226b2: |-
       Når aktiveret, vises submission_type_selection placeringen ikke i
       brugergrænsefladen til udvikler-nøgler, som ikke allerede har det. Værktøjer kan stadig have
@@ -37541,6 +37687,7 @@ da-x-k12:
                     ved at navigere til Fag > Alle fag fra hovedmenuen.
   you_are_already_enrolled_in_this_course_7b661f7a: "Du er allerede tilmeldt dette fag."
   you_are_being_notified_because_this_canvas_instanc_5d338532: "Du modtager en underretning, fordi denne Canvas-instans for nylig har modtaget anmodninger, der ville blive blokeret. Du kan læse mere i *API-ændringsloggen* og lære, hvordan du kan afbøde denne ændring, i blogindlægget, der er et link til."
+  you_are_being_notified_because_this_canvas_instanc_ecd4561a: "Du modtager en underretning, fordi denne Canvas-instans for nylig har modtaget anmodninger, der ville blive blokeret. Du kan gennemgå alle aktuelle GET-anmodninger med en brødtekst på *Rapporter-siden*, læs mere i **API-ændringsloggen**, og lær, hvordan du kan afbøde denne ændring, i blogindlægget, der er linket dertil."
   you_are_currently_acting_as_user_name_8d2be0ee: "Du fungerer aktuelt som %{user_name}"
   you_are_currently_in_the_environment_environment_t_449c4c0f: "Du er i øjeblikket i %{environment} miljø. Dette vil påvirke alle kunder. Er du sikker?"
   you_are_currently_logged_into_student_view_3e8a1da: "Du er aktuelt logget i visning som elev"
@@ -37778,6 +37925,7 @@ da-x-k12:
   you_have_unpublished_changes_to_your_student_pace__41f251bd: "Du har ikke-offentliggjorte ændringer i dit tempo for den elev. Hvis du fortsætter, kasseres disse ændringer."
   you_have_unsaved_changes_are_you_sure_you_want_to__1e6aaefd: "Du har ændringer, der ikke er gemt. Er du sikker på, du vil annullere?"
   you_have_unsaved_changes_are_you_sure_you_want_to__e91bbc81: "Du har ændringer, der ikke er gemt. Er du sikker på, at du vil stoppe?"
+  you_have_unsaved_changes_are_you_sure_you_want_to__f349d9fd: "Du har ændringer, der ikke er gemt. Er du sikker på, at du vil lukke?"
   you_have_unsaved_changes_c906db8e: "Du har ikke-gemte ændringer"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Du har usynkroniserede ændringer, der synkroniseres med alle tilknyttede fag, når en ny tilknytning gemmes."
   you_haven_t_generated_any_insights_yet_6c937b72: "Du har ikke genereret nogen indsigter endnu"
@@ -37870,6 +38018,8 @@ da-x-k12:
   you_or_we_can_end_your_participation_anytime_and_w_ab05c2b0: "Du eller vi kan til enhver tid afslutte din deltagelse, og vi kan deaktivere funktionerne uden varsel. Funktioner kan ændres, og support er begrænset. Fortsat tilgængelighed af funktionerne er ikke en garanti for, at funktionerne vil blive generelt tilgængelige."
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "Du redigerer dit Canvas-tema! Anvend eller annuller ændringer fra *Theme Editor*."
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Du redigerer dit Canvas-tema! Ændringerne er endnu ikke trådt i kraft."
+  you_re_importing_from_a_course_with_automatic_miss_d11d4f0e: "Du importerer fra et fag, hvor politikken for automatisk manglende elementer er aktiveret. Denne politik og dens indstillinger vil blive kopieret til dit fag. Hvis importerede opgaver har overskredne afleveringsdatoer, kan de modtage automatisk nuller."
+  you_re_importing_into_a_course_with_automatic_miss_fb9a1c75: "Du importerer til et fag, hvor politikken for automatisk manglende elementer er aktiveret. Hvis importerede opgaver har overskredne afleveringsdatoer, kan de modtage automatiske nuller baseret på din nuværende vurderingpolitik."
   you_re_probably_using_safari_with_prevent_cross_si_4ab1b645: "Du bruger sandsynligvis Safari med \"Forebyg sporing på tværs af websteder\" aktiveret. Dette kan forårsage, at dine loginoplysninger ikke sendes korrekt med LTI-lanceringen. Lad os prøve at ordne det."
   you_scored_a_score_a5dd5561: "Du opnåede %{score}."
   you_successfully_uploaded_1_student_into_count_tag_c0e49079: 
