@@ -27,7 +27,7 @@ import {get, set} from 'es-toolkit/compat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Mask} from '@instructure/ui-overlays'

@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import {EmptyDesert} from '@instructure/platform-images'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = createI18nScope('files_v2')

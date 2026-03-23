@@ -26,7 +26,7 @@ import _AlertManager from '@canvas/alerts/react/AlertManager'
 // @ts-expect-error - breakpoints is injected by the HOC, not by consumers
 const AlertManager: React.ComponentType<React.PropsWithChildren<{}>> = _AlertManager
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import type {ApolloClient, InMemoryCache} from '@apollo/client'

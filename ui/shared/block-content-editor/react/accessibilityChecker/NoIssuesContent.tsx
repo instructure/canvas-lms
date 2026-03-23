@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import celebratePandaUrl from '@canvas/images/CelebratePanda.svg'
+import celebratePandaUrl from '@instructure/platform-images/assets/CelebratePanda.svg'
 
 const I18n = createI18nScope('block_content_editor')
 

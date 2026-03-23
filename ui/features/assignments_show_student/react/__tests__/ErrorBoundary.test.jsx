@@ -21,7 +21,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 // Component that throws an error during render
 class ThrowsErrorComponent extends React.Component {

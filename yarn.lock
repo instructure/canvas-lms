@@ -2939,6 +2939,11 @@
     "@graphql-typed-document-node/core" "^3.2.0"
     graphql "^16.9.0"
 
+"@instructure/platform-images@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-images/-/platform-images-0.2.0.tgz#79d1ca8c212eff72f6819cd78692f76548c0fe7f"
+  integrity sha512-V46mmESkQHObnJ9yEC7IkI5iC1yagPj5bSzE+0DcMEWIdWXl7wzE/i7sbo33CgJXVToYWlxvlPmx9tFWzBfMXw==
+
 "@instructure/platform-learning-agent-launcher@1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@instructure/platform-learning-agent-launcher/-/platform-learning-agent-launcher-1.1.1.tgz#fd880710d0c0a7520fba0e48bb8d48c884b85172"

@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Spinner} from '@instructure/ui-spinner'
 import {AccountNavigation} from './AccountNavigation'
 import {useScope as createI18nScope} from '@canvas/i18n'

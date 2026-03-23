@@ -26,7 +26,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'

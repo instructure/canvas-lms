@@ -27,7 +27,7 @@ import {Tray} from '@instructure/ui-tray'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('tray')
 

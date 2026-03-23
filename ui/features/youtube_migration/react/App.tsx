@@ -26,8 +26,8 @@ import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
-import celebratePandaUrl from '@canvas/images/CelebratePanda.svg'
+import {EmptyDesert} from '@instructure/platform-images'
+import celebratePandaUrl from '@instructure/platform-images/assets/CelebratePanda.svg'
 import {
   QueryClient,
   type QueryFunctionContext,
@@ -38,7 +38,7 @@ import {
 import {YoutubeEmbed, YoutubeScanResource, YoutubeScanResultReport} from '../../../api'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Link} from '@instructure/ui-link'
 import {

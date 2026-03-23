@@ -26,7 +26,7 @@ import LMGBContext, {
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'

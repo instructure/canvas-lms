@@ -19,7 +19,7 @@
 import {arrayOf, func, shape, string} from 'prop-types'
 import axios from '@canvas/axios'
 import BreadcrumbLinkWithTip from './BreadcrumbLinkWithTip'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'

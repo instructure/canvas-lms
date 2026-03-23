@@ -22,7 +22,7 @@ import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apoll
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import GradeSummaryContainer from './GradeSummaryContainer'
 

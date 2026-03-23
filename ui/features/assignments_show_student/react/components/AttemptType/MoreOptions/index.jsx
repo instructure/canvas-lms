@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, element, func, shape, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles/index'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
