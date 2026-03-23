@@ -136,6 +136,21 @@ export default function VideoOptionsTray({
   const titleInputRef = useRef(null)
 
   const isStudio = !!studioOptions
+
+  const applyDescribedBy = useCallback(
+    playerLayoutInput => {
+      if (isAsrCaptioningImprovements && !isStudio && playerLayoutInput) {
+        const helperId = `${id}-size-helper-text`
+        const existing = playerLayoutInput.getAttribute('aria-describedby') || ''
+        const ids = existing.split(' ').filter(Boolean)
+        if (!ids.includes(helperId)) {
+          playerLayoutInput.setAttribute('aria-describedby', [...ids, helperId].join(' '))
+        }
+      }
+    },
+    [isAsrCaptioningImprovements, isStudio, id],
+  )
+
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
   const showSizeControls = (!isStudio || studioOptions.resizable) && !forBlockEditorUse
   const dimensionsState = useDimensionsState(
@@ -377,6 +392,7 @@ export default function VideoOptionsTray({
                         <Flex.Item margin="small none xx-small none">
                           <View as="div" padding="small small xx-small small">
                             <SimpleSelect
+                              inputRef={applyDescribedBy}
                               id={`${id}-size`}
                               mountNode={instuiPopupMountNodeFn}
                               disabled={displayAs !== 'embed'}
@@ -403,7 +419,11 @@ export default function VideoOptionsTray({
                               ))}
                             </SimpleSelect>
                             {isAsrCaptioningImprovements && !isStudio && (
-                              <View as="div" margin="xx-small none none none">
+                              <View
+                                as="div"
+                                id={`${id}-size-helper-text`}
+                                margin="xx-small none none none"
+                              >
                                 <Text size="small">
                                   {formatMessage(
                                     'Transcript panel is available at widths above 720px.',
