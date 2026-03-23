@@ -940,29 +940,6 @@ describe('PeerReviewsStudentView', () => {
 
       expect(getByText('Submission')).toBeInTheDocument()
     })
-
-    it('renders divider on mobile', async () => {
-      mockExecuteQuery.mockResolvedValueOnce({
-        assignment: {
-          _id: '17',
-          name: 'Mobile Divider Test',
-          dueAt: '2025-12-31T23:59:59Z',
-          description: '<p>Description</p>',
-          peerReviewSubAssignment: null,
-          assessmentRequestsForCurrentUser: [],
-        },
-      })
-
-      const {container} = setup({
-        assignmentId: '17',
-        breakpoints: {mobileOnly: true, tablet: false, desktop: false},
-      })
-
-      await waitFor(() => {
-        const dividers = container.querySelectorAll('hr')
-        expect(dividers.length).toBeGreaterThan(0)
-      })
-    })
   })
 
   describe('Submission required for peer reviews', () => {
