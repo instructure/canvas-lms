@@ -25,6 +25,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex, FlexItemProps} from '@instructure/ui-flex'
 import {
   IconEditLine,
+  IconNoSolid,
   IconPublishSolid,
   IconQuestionLine,
   IconWarningLine,
@@ -178,10 +179,13 @@ const ClosedIssuesText = ({
   isMobile: boolean
 }) => {
   const closedText = I18n.t('Closed (%{count})', {count: item.closedIssueCount})
+  const accessibleText = I18n.t('Closed remediation (%{count} issues set aside)', {
+    count: item.closedIssueCount,
+  })
   return (
     <ScanStateWithIcon
-      icon={<IconPublishSolid color="success" aria-hidden="true" />}
-      text={closedText}
+      icon={<IconNoSolid color="secondary" aria-hidden="true" />}
+      text={<AccessibleContent alt={accessibleText}>{closedText}</AccessibleContent>}
       isMobile={isMobile}
     />
   )
