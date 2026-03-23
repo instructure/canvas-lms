@@ -44,7 +44,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Drilldown} from '@instructure/ui-drilldown'
 import {getGroupDiscussionUrl} from '../../utils'
 import SortOrderDropDown from './SortOrderDropDown'
@@ -364,11 +363,11 @@ DiscussionPostButtonsToolbar.propTypes = {
   manageAssignTo: PropTypes.bool,
   isCheckpointed: PropTypes.bool,
   isExpanded: PropTypes.bool,
-  breakpoints: breakpointsShape,
   showAssignTo: PropTypes.bool,
   isSortOrderLocked: PropTypes.bool,
   isExpandedLocked: PropTypes.bool,
   isAnnouncement: PropTypes.bool,
+  breakpoints: PropTypes.object,
 }
 
 export default DiscussionPostButtonsToolbar

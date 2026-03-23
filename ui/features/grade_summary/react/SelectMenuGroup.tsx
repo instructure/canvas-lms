@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -64,7 +64,6 @@ class SelectMenuGroup extends React.Component {
         sortable_name: PropTypes.string.isRequired,
       }),
     ).isRequired,
-    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {

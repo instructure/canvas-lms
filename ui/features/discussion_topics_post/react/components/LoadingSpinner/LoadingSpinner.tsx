@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -44,10 +44,6 @@ const LoadingSpinnerBase = props => {
       <Spinner renderTitle={I18n.t('Loading')} size={size} margin="0" />
     </View>
   )
-}
-
-LoadingSpinnerBase.propTypes = {
-  breakpoints: breakpointsShape,
 }
 
 export const LoadingSpinner = WithBreakpoints(LoadingSpinnerBase)

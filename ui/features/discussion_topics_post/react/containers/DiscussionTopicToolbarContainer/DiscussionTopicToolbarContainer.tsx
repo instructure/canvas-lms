@@ -17,7 +17,6 @@
  */
 
 import {useMutation} from '@apollo/client'
-import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
@@ -260,7 +259,7 @@ DiscussionTopicToolbarContainer.propTypes = {
   setUserSplitScreenPreference: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
   closeView: PropTypes.func,
-  breakpoints: breakpointsShape,
+  breakpoints: PropTypes.object,
 }
 
 export default DiscussionTopicToolbarContainer

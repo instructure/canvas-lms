@@ -52,7 +52,7 @@ import {Table} from '@instructure/outcomes-ui/es/components/Gradebook/table/Tabl
 import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
 import {ContributingScoreCellContent} from './table/ContributingScoreCellContent'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
-import WithBreakpoints, {Breakpoints} from '@canvas/with-breakpoints/src'
+import {WithBreakpoints, Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

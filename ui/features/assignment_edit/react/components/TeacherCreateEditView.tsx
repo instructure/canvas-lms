@@ -18,7 +18,7 @@
 
 import React from 'react'
 import AssignmentHeader from '@canvas/assignments/react/AssignmentHeader'
-import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
+import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentTypes'
 
