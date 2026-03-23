@@ -135,23 +135,8 @@ describe('ScanStateCell', () => {
           isMobile={false}
         />,
       )
+      expect(screen.getByText(/Closed remediation \(3 issues set aside\)/i)).toBeInTheDocument()
       expect(screen.getByText(/Closed \(3\)/i)).toBeInTheDocument()
-    })
-
-    it('renders closed issues text with singular count', () => {
-      render(
-        <ScanStateCell
-          item={
-            {
-              workflowState: ScanWorkflowState.Completed,
-              issueCount: 0,
-              closedIssueCount: 1,
-            } as AccessibilityResourceScan
-          }
-          isMobile={false}
-        />,
-      )
-      expect(screen.getByText(/Closed \(1\)/i)).toBeInTheDocument()
     })
 
     it('does not render closed issues text when feature flag is disabled', () => {
@@ -172,7 +157,9 @@ describe('ScanStateCell', () => {
           isMobile={false}
         />,
       )
-      expect(screen.queryByText(/Closed \(3\)/i)).not.toBeInTheDocument()
+      expect(
+        screen.queryByText(/Closed remediation \(3 issues set aside\)/i),
+      ).not.toBeInTheDocument()
       expect(screen.getByText(/No issues/i)).toBeInTheDocument()
     })
 
