@@ -107,7 +107,7 @@ module LinkedAttachmentHandler
                           })
         Sentry.capture_message(error, level: :warning)
       end
-      raise error if Rails.env.development?
+      raise error if Rails.env.local?
 
       return
     end
