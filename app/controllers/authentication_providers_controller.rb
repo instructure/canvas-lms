@@ -255,7 +255,7 @@ class AuthenticationProvidersController < ApplicationController
       @presenter = AuthenticationProvidersPresenter.new(@account, @current_user)
       @page_title = t("Authentication Settings")
 
-      if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
+      if @account.discovery_page_allowed?
         auth_providers = @account.authentication_providers.valid_for_discovery_page
                                  .map { |ap| { id: ap.id, url: ap.login_authentication_provider_path, auth_type: ap.auth_type } }
         discovery_page_url = @domain_root_account.discovery_page_url

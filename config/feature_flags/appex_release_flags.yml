@@ -91,3 +91,18 @@ new_login_ui_identity_discovery_page:
       state: hidden
     production:
       state: hidden
+new_login_ui_identity_discovery_page_root_account:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "New Canvas Login UI: Identity Service Discovery Page"
+  description: >-
+    Enable Identity Service Discovery Page for the new Canvas
+    Login/Registration UI at the root account level.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
