@@ -26,6 +26,7 @@
     "@instructure/media-capture": "^9.0.0",
     "@instructure/media-capture-new": "npm:@instructure/media-capture@11.3.0",
     "@instructure/outcomes-ui": "4.1.2",
+    "@instructure/platform-error-boundary": "0.2.0",
     "@instructure/platform-images": "0.2.0",
     "@instructure/platform-learning-agent-launcher": "1.1.1",
     "@instructure/platform-loading-indicator": "0.2.0",
