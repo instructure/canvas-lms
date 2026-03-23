@@ -7,13 +7,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (8.0.4)
-      activesupport (= 8.0.4)
-    activerecord (8.0.4)
-      activemodel (= 8.0.4)
-      activesupport (= 8.0.4)
+    activemodel (8.0.4.1)
+      activesupport (= 8.0.4.1)
+    activerecord (8.0.4.1)
+      activemodel (= 8.0.4.1)
+      activesupport (= 8.0.4.1)
       timeout (>= 0.4.0)
-    activesupport (8.0.4)
+    activesupport (8.0.4.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -22,7 +22,7 @@ GEM
       drb
       i18n (>= 1.6, < 2)
       logger (>= 1.4.2)
-      minitest (>= 5.1)
+      minitest (>= 5.1, < 6)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
@@ -36,10 +36,7 @@ GEM
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     logger (1.7.0)
-    minitest (6.0.2)
-      drb (~> 2.0)
-      prism (~> 1.5)
-    prism (1.9.0)
+    minitest (5.27.0)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
