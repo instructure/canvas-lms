@@ -74,7 +74,9 @@ export const CoursesSearch: React.FC<{
   return (
     <View as="div">
       <TextInput
-        renderLabel={() => <ScreenReaderContent>{I18n.t('Search courses')}</ScreenReaderContent>}
+        renderLabel={() => (
+          <ScreenReaderContent>{I18n.t('Search by course title, SIS ID...')}</ScreenReaderContent>
+        )}
         placeholder={I18n.t('Search by course title, SIS ID...')}
         value={localValue}
         onChange={handleChange}

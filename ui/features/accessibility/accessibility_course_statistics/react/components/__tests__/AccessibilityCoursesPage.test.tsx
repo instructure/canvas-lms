@@ -75,6 +75,14 @@ describe('AccessibilityCoursesPage', () => {
       </MemoryRouter>,
     )
 
+  it('search input accessible name matches visible placeholder text', () => {
+    server.use(http.get('/api/v1/accounts/123/courses', () => HttpResponse.json([])))
+    renderPage()
+    expect(
+      screen.getByRole('searchbox', {name: 'Search by course title, SIS ID...'}),
+    ).toBeInTheDocument()
+  })
+
   it('renders the page heading', () => {
     server.use(
       http.get('/api/v1/accounts/123/courses', () => {
