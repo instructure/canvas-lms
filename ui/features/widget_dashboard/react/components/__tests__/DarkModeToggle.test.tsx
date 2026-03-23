@@ -46,14 +46,15 @@ describe('DarkModeToggle', () => {
     ENV.current_user_id = '1'
   })
 
-  it('renders the toggle', () => {
+  it('renders the toggle with off test ID when light mode', () => {
     renderToggle()
-    expect(screen.getByTestId('dark-mode-toggle')).toBeInTheDocument()
+    expect(screen.getByTestId('dashboard-darkmode-toggle-off')).toBeInTheDocument()
     expect(screen.getByText('Switch to dark mode')).toBeInTheDocument()
   })
 
-  it('reflects isDark state as checked', () => {
+  it('renders the toggle with on test ID when dark mode', () => {
     renderToggle({isDark: true})
+    expect(screen.getByTestId('dashboard-darkmode-toggle-on')).toBeInTheDocument()
     expect(screen.getByText('Switch to light mode')).toBeInTheDocument()
   })
 
@@ -71,7 +72,7 @@ describe('DarkModeToggle', () => {
     )
 
     const {setIsDark} = renderToggle({isDark: false})
-    await user.click(screen.getByTestId('dark-mode-toggle'))
+    await user.click(screen.getByTestId('dashboard-darkmode-toggle-off'))
 
     await waitFor(() => {
       expect(setIsDark).toHaveBeenCalledWith(true)
@@ -87,7 +88,7 @@ describe('DarkModeToggle', () => {
     )
 
     const {setIsDark} = renderToggle({isDark: true})
-    await user.click(screen.getByTestId('dark-mode-toggle'))
+    await user.click(screen.getByTestId('dashboard-darkmode-toggle-on'))
 
     await waitFor(() => {
       expect(setIsDark).toHaveBeenCalledWith(false)

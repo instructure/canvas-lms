@@ -56,7 +56,11 @@ const DarkModeToggle = () => {
   }
 
   return (
-    <Button onClick={handleToggle} disabled={loading} data-testid="dark-mode-toggle">
+    <Button
+      onClick={handleToggle}
+      disabled={loading}
+      data-testid={isDark ? 'dashboard-darkmode-toggle-on' : 'dashboard-darkmode-toggle-off'}
+    >
       {isDark ? I18n.t('Switch to light mode') : I18n.t('Switch to dark mode')}
     </Button>
   )
