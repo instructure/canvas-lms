@@ -41,6 +41,7 @@ class NewQuizzesController < ApplicationController
 
     # Check authorization based on the action being performed
     return unless authorized_action(@assignment, @current_user, :read)
+    return if assignment_locked_for_student?
 
     signed_launch_data = Services::NewQuizzes::Routes::LaunchHelper.default_launch_data(
       tool: @tool,
@@ -94,11 +95,12 @@ class NewQuizzesController < ApplicationController
   end
 
   def setup_content_tag_context
+    return if params[:sessionless_launch]
+
     @tag = @assignment.external_tool_tag
     return unless @tag
 
     @resource_url = @tag.url
-    return if params[:content_only]
 
     @module_tag = if params[:module_item_id]
                     @context.context_module_tags.not_deleted.find(params[:module_item_id])
@@ -123,8 +125,20 @@ class NewQuizzesController < ApplicationController
     Lti::ToolFinder.from_context(@context, scope:)
   end
 
+  def assignment_locked_for_student?
+    return false unless @context.grants_right?(@current_user, :participate_as_student)
+    return false if @context.grants_right?(@current_user, :manage_assignments)
+
+    assignment_with_overrides = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
+    return false unless assignment_with_overrides.locked_for?(@current_user)
+
+    render_unauthorized_action
+    true
+  end
+
   def render_native_experience(signed_launch_data)
-    setup_new_quizzes_env(signed_launch_data)
+    launch_url = Services::NewQuizzes.launch_url(tool_url: @tool&.url)
+    setup_new_quizzes_env(signed_launch_data, launch_url:)
 
     render "assignments/native_new_quizzes", layout: "application"
   end

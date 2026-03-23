@@ -21,8 +21,12 @@
 body.native-new-quizzes {
   .ic-Layout-wrapper {
     max-width: 100%;
-    overflow: hidden;
-    height: 100vh;
+    // Cap at viewport height so flex children stay within visible area.
+    // Only on desktop — mobile webviews need unconstrained height for scrolling.
+    @include desktop-only {
+      height: 100vh;
+      overflow: hidden;
+    }
   }
 
   .ic-Layout-columns {
@@ -35,7 +39,6 @@ body.native-new-quizzes {
   .ic-app-main-content {
     display: flex;
     flex: 1;
-    overflow: auto;
   }
 
   .ic-Layout-contentWrapper {
@@ -63,11 +66,32 @@ body.native-new-quizzes {
     display: flex;
     flex: 1;
     flex-direction: column;
-    overflow: hidden;
+    overflow: auto;
+    // this is a hack to Constraint InstUI modals/trays to this element
+    // instead of the full viewport, so they don't cover Canvas nav.
+    @include desktop-only {
+      transform: translateZ(0);
+    }
   }
 
   #new-quizzes-root > #root {
     overflow: auto;
     flex: 1;
+  }
+
+  // When embedded=true is in the URL, Canvas adds body.embedded which applies
+  // header styles to all h2/.h2 elements.
+  //  In native launch, quizzes-ui renders directly in the Canvas DOM
+  // (not in an iframe like LTI), so these styles bleed into quiz headings.
+  // Reset them within the quiz container.
+  &.embedded #new-quizzes-root {
+    h2,
+    .h2 {
+      border: initial;
+      background: initial;
+      margin: initial;
+      padding: initial;
+      line-height: initial;
+    }
   }
 }

@@ -2046,42 +2046,54 @@ describe ExternalToolsController do
         user_session(@teacher)
       end
 
-      it "redirects to the New Quizzes native launch" do
+      it "redirects to the New Quizzes native launch with sessionless_launch" do
         get :retrieve, params: {
           course_id: @course.id,
           url: quiz_lti_tool.url,
           assignment_id: assignment.id
         }
-        expect(response).to redirect_to(
-          course_assignment_new_quizzes_launch_path(@course, assignment)
-        )
+        launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+        expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&sessionless_launch=true&url=#{CGI.escape(quiz_lti_tool.url)}")
       end
 
       context "when borderless param is set" do
-        it "redirects with content_only" do
+        it "redirects with content_only and sessionless_launch" do
           get :retrieve, params: {
             course_id: @course.id,
             url: quiz_lti_tool.url,
             assignment_id: assignment.id,
             borderless: true
           }
-          expect(response).to redirect_to(
-            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
-          )
+          launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+          expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&borderless=true&content_only=true&sessionless_launch=true&url=#{CGI.escape(quiz_lti_tool.url)}")
         end
       end
 
       context "when display=borderless" do
-        it "redirects with content_only" do
+        it "redirects with content_only and sessionless_launch" do
           get :retrieve, params: {
             course_id: @course.id,
             url: quiz_lti_tool.url,
             assignment_id: assignment.id,
             display: "borderless"
           }
-          expect(response).to redirect_to(
-            course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
-          )
+          launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+          expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&content_only=true&display=borderless&sessionless_launch=true&url=#{CGI.escape(quiz_lti_tool.url)}")
+        end
+      end
+
+      context "when submission URL contains session params" do
+        let(:submission_url) { "#{quiz_lti_tool.url}?participant_session_id=85&quiz_session_id=53" }
+
+        it "forwards participant_session_id and quiz_session_id in redirect" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: submission_url,
+            assignment_id: assignment.id,
+            display: "borderless"
+          }
+          launch_path = course_assignment_new_quizzes_launch_path(@course, assignment)
+          expect(response).to redirect_to("#{launch_path}?assignment_id=#{assignment.id}&content_only=true&display=borderless&participant_session_id=85&quiz_session_id=53&sessionless_launch=true&url=#{CGI.escape(submission_url)}")
         end
       end
 
@@ -2122,6 +2134,57 @@ describe ExternalToolsController do
             url: quiz_lti_tool.url
           }
           expect(response).not_to be_redirect
+        end
+      end
+
+      context "new_quizzes_native_experience_sessionless param" do
+        it "redirects when param is true" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: true
+          }
+          expect(response).to be_redirect
+        end
+
+        it "does not redirect when param is false" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: false
+          }
+          expect(response).not_to be_redirect
+        end
+
+        it "falls back to feature flag when param is an empty string" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: ""
+          }
+          expect(response).to be_redirect
+        end
+
+        it "falls back to feature flag when param is a random string" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id,
+            new_quizzes_native_experience_sessionless: "foo"
+          }
+          expect(response).to be_redirect
+        end
+
+        it "falls back to feature flag when param is not provided" do
+          get :retrieve, params: {
+            course_id: @course.id,
+            url: quiz_lti_tool.url,
+            assignment_id: assignment.id
+          }
+          expect(response).to be_redirect
         end
       end
     end
@@ -3852,10 +3915,10 @@ describe ExternalToolsController do
         @course.enable_feature!(:new_quizzes_native_experience_sessionless)
       end
 
-      it "redirects to the New Quizzes native launch with content_only" do
+      it "redirects to the New Quizzes native launch with content_only and sessionless_launch" do
         get :sessionless_launch, params: { course_id: @course.id, verifier: }
         expect(response).to redirect_to(
-          course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true)
+          course_assignment_new_quizzes_launch_path(@course, assignment, content_only: true, sessionless_launch: true)
         )
       end
 

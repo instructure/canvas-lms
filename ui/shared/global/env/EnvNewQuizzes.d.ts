@@ -110,6 +110,7 @@ export interface NewQuizzesContext {
   }
   basename: string
   signature: string
+  launchType: 'regular' | 'respondus'
 }
 
 export interface EnvNewQuizzes {

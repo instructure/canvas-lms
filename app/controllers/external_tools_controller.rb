@@ -697,10 +697,23 @@ class ExternalToolsController < ApplicationController
         prefer_1_1: !!params[:prefer_1_1]
       )
       @tool = tool
-      if @tool.quiz_lti? && params[:assignment_id] && new_quizzes_native_experience_enabled? && new_quizzes_native_experience_sessionless_enabled?
+      native_nq_redirect = @tool.quiz_lti? &&
+                           params[:assignment_id] &&
+                           new_quizzes_native_experience_enabled? &&
+                           new_quizzes_native_experience_sessionless_enabled?
+      if native_nq_redirect
         @assignment = @context.assignments.find(params[:assignment_id])
-        redirect_params = { context: @context, assignment: @assignment }
+        redirect_params = { context: @context, assignment: @assignment, sessionless_launch: true, **request.query_parameters }
         redirect_params[:content_only] = true if params[:borderless] || params[:display] == "borderless"
+
+        # Forward participant_session_id and quiz_session_id from the submission URL
+        # so quiz_lti can detect result/grading launches
+        if params[:url].present?
+          tool_url_params = Rack::Utils.parse_query(URI.parse(params[:url]).query)
+          redirect_params[:participant_session_id] = tool_url_params["participant_session_id"] if tool_url_params["participant_session_id"]
+          redirect_params[:quiz_session_id] = tool_url_params["quiz_session_id"] if tool_url_params["quiz_session_id"]
+        end
+
         return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(**redirect_params)
       end
       placement = placement_from_params
@@ -890,7 +903,8 @@ class ExternalToolsController < ApplicationController
           return redirect_to Services::NewQuizzes::Routes::Redirects.assignment_launch(
             context: @context,
             assignment: @assignment,
-            content_only: true
+            content_only: true,
+            sessionless_launch: true
           )
         end
         # Use domain-specific URL for environment overrides
@@ -2158,6 +2172,11 @@ class ExternalToolsController < ApplicationController
   end
 
   def new_quizzes_native_experience_sessionless_enabled?
+    param = params[:new_quizzes_native_experience_sessionless]
+    if param.present? && %w[true false].include?(param)
+      return param == "true"
+    end
+
     return false unless @context.respond_to?(:feature_enabled?)
 
     @context.feature_enabled?(:new_quizzes_native_experience_sessionless)
