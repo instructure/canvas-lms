@@ -565,6 +565,7 @@ ca:
   account_creation_still_in_progress_ac0e0a18: "Encara s’està creant l'usuari"
   account_custom_statuses_f9bbfb1f: "Estats personalitzats del compte"
   account_datetime_c4e540ee: "Compte: %{datetime}"
+  account_default_705974c6: "Compte (per defecte)"
   account_default_grading_scheme_83bdc8fd: "Esquema de qualificació per defecte del compte"
   account_default_grading_scheme_was_successfully_sa_88d66a2e: "S’ha desat correctament l’esquema de qualificació per defecte del compte."
   account_default_time_8c7ab62d: "Valor predeterminat del compte usuari (%{time})"
@@ -2647,6 +2648,7 @@ ca:
   all_changes_were_applied_to_the_pacescount_student_cfe9e7bf: "S’han aplicat correctament tots els canvis als %{pacesCount} ritmes de l'assignatura de l'estudiant."
   all_changes_were_saved_f6f3ddcc: "S'han desat tots els canvis"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Totes les dates de fi han de ser iguals o posteriors a la data de lliurament"
+  all_collaborators_removed_6e9295c3: "S’han suprimit tots els col·laboradors"
   all_comments_578fa2b0: "Tots els comentaris"
   all_comments_are_sent_to_the_whole_group_284591e7: "Tots els comentaris s'envien a tot el grup"
   all_comments_are_sent_to_the_whole_group_778126f3: "Tots els comentaris s'envien a tot el grup."
@@ -2732,10 +2734,14 @@ ca:
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Totes les ponderacions han de ser majors o igual a 0"
   allocate_peer_reviews_6ee21bd8: "Assigneu les revisions entre companys"
   allocating_peer_reviews_d193503e: "S’estan assignant les revisions entre companys"
+  allocation_conversion_in_progress_484f1e43: "Conversió d’assignacions en curs"
+  allocation_deletion_in_progress_2e19d790: "Supressió d’assignacions en curs"
   allocation_of_peer_reviews_happens_behind_the_scen_88690128: "Les revisions entre companys s’assignen en secret, d’una manera optimitzada perquè la distribució sigui justa entre tots els participants."
   allocation_rule_not_found_c123e54b: "No s’ha trobat la norma d’assignació"
   allocation_rules_dc7e96f8: "Normes d’assignació"
   allocations_ee614a0f: Assignació
+  allocations_have_been_converted_successfully_2279fd43: "S’han convertit correctament les assignacions."
+  allocations_have_been_deleted_successfully_29a51b09: "S’han suprimit correctament les assignacions."
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Permet a un professor establir el nombre d'intents permesos d'un tasca a través de la IU"
   allow_access_to_discussion_insights_ad50085d: "Permeteu l’accés a les dades dels fòrums"
   allow_account_administrators_to_manage_api_rate_li_1ded6de: "Permeteu que els administradors de comptes gestionin els límits de classificació d’API per a les eines externes i les integracions mitjançant UTID"
@@ -2829,6 +2835,7 @@ ca:
   allow_to_clone_alignments_after_the_course_copy_pr_2f3a6421: "Permet clonar les alineacions després del procés de còpia de l’assignatura"
   allow_to_clone_alignments_after_the_course_copy_pr_75e05d22: "Permeteu clonar les alineacions després del procés de còpia de l’assignatura. Això està relacionat amb les alineacions de proves noves."
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Permetre adreces electròniques sense confirmar en afegir usuaris"
+  allow_users_to_access_files_associated_with_a_conv_c069804e: "Permeteu als usuaris accedir als fitxers associats a una conversa en visualitzar-ne els missatges (això fa el que fa file_association_access, la diferència és que només s’aplica als missatges de la conversa)."
   allow_users_to_access_files_associated_with_a_cour_43f01878: "Permeteu als usuaris accedir als fitxers associats a una assignatura"
   allow_users_to_comment_45b8f753: "Permet que els usuaris facin comentaris"
   allow_users_to_remediate_certain_accessibility_iss_d0fb935b: "Permet als usuaris resoldre certs problemes d'accessibilitat amb IA a través del verificador d'accessibilitat de l'assignatura."
@@ -3436,6 +3443,7 @@ ca:
   allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Permet als usuaris suprimir una inscripció temporal"
   allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Permet als usuaris editar una inscripció temporal existent"
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet als usuaris habilitar l'opció \"Inicia SpeedGrader filtrat per grups d'estudiants\" per a les assignatures a la pàgina de configuració de l'assignatura. Si està actiu i se selecciona un grup d'estudiants al Llibre de notes nou, SpeedGrader només carregarà els estudiants del grup seleccionat."
+  allows_users_to_enable_the_rolling_transcript_for__fc94d9e1: "Permet als usuaris activar l’expedient acadèmic de manera escalonada per als mitjans multimèdia del Canvas i sol·licitar subtítols per als mitjans multimèdia afegits al contingut de l’editor de contingut enriquit."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Permet a l'usuari importar grups en una assignatura."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Permet als usuaris combinar diversos comptes (si disposen de les credencials adequades)."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Permet als usuaris ocultar les notificacions amb granularitat de nivell de curs."
@@ -3567,6 +3575,7 @@ ca:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "S'ha produït un error en intentar contactar amb el Turnitin."
   an_error_occurred_while_attempting_to_contact_turn_c987545: "S’ha produït un error en intentar contactar amb el Turnitin. Codi d'estat: %{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "S’ha produït un error en comprovar l’estat de la migració"
+  an_error_occurred_while_converting_allocations_f0c96ed7: "S'ha produït un error en convertir les assignacions."
   an_error_occurred_while_creating_the_rule_d89f6f9c: "S'ha produït un error en crear la regla"
   an_error_occurred_while_creating_this_group_please_ec96f426: "S’ha produït un error en crear aquest grup. Torneu-ho a provar."
   an_error_occurred_while_creating_this_outcome_54842fbd: "S'ha produït un error en crear aquest resultat."
@@ -3574,6 +3583,7 @@ ca:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "S'ha produït un error en crear aquest resultat: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "S’ha produït un error en crear aquesta competència. Torneu-ho a provar."
   an_error_occurred_while_declining_the_invitation_f6fdb44e: "S'ha produït un error en rebutjar la invitació"
+  an_error_occurred_while_deleting_allocations_1f2e7a6: "S'ha produït un error en suprimir les assignacions."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "S’ha produït un error en suprimir els anuncis."
   an_error_occurred_while_deleting_the_ai_experience_c7218f7f: "S'ha produït un error en suprimir l’experiència amb IA"
   an_error_occurred_while_deleting_the_allocation_ru_b2179de9: "S'ha produït un error en suprimir la regla d’assignació"
@@ -3588,6 +3598,7 @@ ca:
   an_error_occurred_while_fetching_course_modules_9f87557e: "S’ha produït un error en recollir els continguts de l’assignatura."
   an_error_occurred_while_fetching_differentiation_t_e85f7d49: "S’ha produït un error en recollir les etiquetes de diferenciació."
   an_error_occurred_while_fetching_groups_6f2e91be: "S’ha produït un error en obtenir els grups"
+  an_error_occurred_while_fetching_job_progress_5e27b561: "S'ha produït un error en obtenir el progrés de la feina."
   an_error_occurred_while_fetching_sections_253619f4: "S’ha produït un error en obtenir les seccions"
   an_error_occurred_while_fetching_students_aac9d7de: "S’ha produït un error en obtenir els estudiants"
   an_error_occurred_while_fetching_the_folders_dff70881: "S'ha produït un error en obtenir les carpetes."
@@ -3667,6 +3678,8 @@ ca:
   an_error_occurred_while_searching_for_your_institu_16a1ace4: "S’ha produït un error en cercar la vostra institució"
   an_error_occurred_while_setting_permissions_please_b43bae6b: "S'ha produït un error en establir els permisos. Torneu a provar-ho."
   an_error_occurred_while_starting_migration_8e6015e2: "S’ha produït un error en iniciar la migració"
+  an_error_occurred_while_starting_the_conversion_fc58ac38: "S'ha produït un error en iniciar la conversió."
+  an_error_occurred_while_starting_the_deletion_9227c647: "S'ha produït un error en iniciar la supressió."
   an_error_occurred_while_switching_dashboard_views_6a9ca00f: "S’ha produït un error en canviar les vistes del panell de control"
   an_error_occurred_while_terminating_sessions_pleas_86af4411: "S'ha produït un error en finalitzar les sessions. Torneu a provar-ho."
   an_error_occurred_while_trying_to_change_the_setti_6fb01994: "S'ha produït un error en provar de canviar el paràmetre"
@@ -3725,6 +3738,7 @@ ca:
   an_unexpected_error_happened_while_loading_the_ign_fce4bac6: "S’ha produït un error inesperat en carregar l’Ignite Agent."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "S’ha produït un error inesperat: vegeu l’informe d’errors %{id}"
   an_unexpected_error_occurred_15bae9ec: "S'ha produït un error inesperat."
+  an_unexpected_error_occurred_please_try_again_a06e425f: "S'ha produït un error inesperat. Torneu a provar-ho."
   an_unexpected_error_occurred_please_try_again_late_19f6d055: "S’ha produït un error inesperat. Torneu a provar-ho més endavant."
   an_unexpected_error_occurred_please_try_again_late_c58da3e4: "S’ha produït un error inesperat; torneu-ho a provar més endavant."
   an_unexpected_error_occurred_while_grading_570e2035: "S'ha produït un error inesperat durant la qualificació."
@@ -3904,6 +3918,7 @@ ca:
   api_7bd66e19: API
   api_get_requests_with_a_body_instead_of_query_para_18e63089: "Les sol·licituds API GET amb cos en lloc de paràmetres de consulta es bloquejaran a la secció Producció en la versió de febrer, com a part de la presentació del Canvas amb una CDN. Aquestes sol·licituds ja estan bloquejades a les versions beta i de prova."
   api_get_requests_with_a_body_instead_of_query_para_d554be31: "Les sol·licituds API GET amb cos en lloc de paràmetres de consulta es bloquejaran a la secció Producció en la versió d’abril, com a part de la presentació del Canvas amb una CDN. Aquestes sol·licituds ja estan bloquejades a les versions beta i de prova."
+  api_get_requests_with_a_body_instead_of_query_para_edc1ccf7: "Les sol·licituds API GET amb cos en lloc de paràmetres de consulta es bloquejaran aviat a la secció Producció, com a part de la transició cap a la prestació del Canvas mitjançant AWS CloudFront. Aquestes sol·licituds ja estan bloquejades a les versions beta i de prova."
   api_host_ddaf400e: "Amfitrió de l’API:"
   api_key_eeeb2167: "Clau d'API"
   api_keys_393d8b5c: "Claus d'API"
@@ -4233,6 +4248,7 @@ ca:
   asset_code_ef611162: "Codi del recurs"
   asset_group_code_d476ed05: "Codi del grup de recursos"
   asset_id_4b786f8f: "ID del recurs"
+  asset_processor_2d04eae5: "Processador d'actius"
   asset_processor_bulk_migration_partial_success_email_body: |-
       La migració en massa a Turnitin del processador de recursos d’LTI 2.0 a LTI 1.3 s’ha efectuat amb algunes fallades.
       
@@ -5247,6 +5263,7 @@ ca:
   automated_6838ce36: Automatitzat
   automatic_migration_all_institutions_that_have_not_4d05d143: "Migració automàtica: En aquesta data, totes les institucions que encara no hagin optat per canviar a la nova IU d'inici de sessió s’hi migraran automàticament."
   automatic_migration_all_institutions_that_have_not_ccc65045: "*Migració automàtica:* En aquesta data, totes les institucions que encara no hagin optat per canviar a la nova IU d'inici de sessió s’hi migraran automàticament."
+  automatic_missing_policy_warning_426507f1: "Advertiment sobre la política automàtica d’entregues no presentades"
   automatic_mobile_app_login_3724af59: "Inici de sessió automàtica a l’aplicació mòbil"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Aplica la deducció automàticament a les entregues endarrerides"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Aplica automàticament la nota als lliuraments no presentats"
@@ -5514,6 +5531,7 @@ ca:
   bosnian_6603d3e6: Bosnià
   boston_students_access_report_bd285b2e: "Informe d’accés dels estudiants de Boston"
   both_bf140d0c: Ambdós
+  both_courses_have_automatic_missing_policy_enabled_795379c0: "Ambdues assignatures tenen activada la política automàtica d’entregues no presentades. La configuració d’origen de la política de l'assignatura es copiarà a la vostra assignatura. Si alguna activitat importada té dates de lliurament que ja han passat, és possible que rebi zeros automàtics."
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "Debats - crea i Debats - modera permeten a l'usuari crear un debat a la pàgina Debats. Si aquest permís s'habilita, Debats - crea no és necessari. Per visualitzar els debats d'un curs, Debats - visualitza s'ha d'habilitar. Per respondre a un debat, Debats - publica també s'ha d'habilitar. Per editar els detalls de la tasca en un debat, Tasques i qüestionaris - afegeix/edita/suprimeix cursos també ha d'estar habilitat."
   both_discussions_create_and_discussions_moderate_a_482e4c7e: "Fòrums - crea i Fòrums - modera permeten a l’usuari crear un fòrum a la pàgina Fòrums."
   both_discussions_create_and_discussions_moderate_a_ca6f38a2: "Fòrums - crea i Fòrums - modera permeten a l’usuari crear un fòrum a la pàgina Fòrums. Si aquest permís s’habilita, Fòrums - crea no és necessari."
@@ -6252,6 +6270,7 @@ ca:
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "No es pot canviar la data de lliurament de substitució a una data dins d'un període de qualificació tancat"
   cannot_change_locked_status_on_granular_permission_6f13bf4f: "No es pot canviar l'estat bloquejat del permís de granularitat"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "No es pot canviar el nom de rol a %{label}: ja s'està utilitzant"
+  cannot_change_state_students_have_conversations_or_3fa6757c: "No es pot canviar l'estat: els estudiants tenen converses o els fitxers d’origen encara s’estan processant"
   cannot_change_the_default_term_name_edc2279b: "No es pot canviar el nom del període acadèmic per defecte"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "No pot canviar la data de lliurament d'una substitució si és dins d'un període de qualificació tancat"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "No pot canviar la data de lliurament a una data dins d'un període de qualificació tancat"
@@ -6288,6 +6307,9 @@ ca:
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "No es poden desplaçar les cites del Planificador entre calendaris"
   cannot_observe_user_with_another_user_that_is_bein_f2773e49: "No es pot observar un usuari amb un altre usuari que observa l’usuari actual."
   cannot_publish_block_templates_61db9f37: "No es poden publicar les plantilles de blocs."
+  cannot_publish_source_files_are_still_processing_3b9bc0ce: "No es pot publicar: els fitxers d’origen encara s’estan processant"
+  cannot_publish_source_files_are_still_processing_a68db351: "No es pot publicar: els fitxers d’origen encara s’estan processant"
+  cannot_publish_while_source_files_are_still_proces_ef5c9003: "No es pot publicar mentre els fitxers d’origen encara s’estan processant"
   cannot_reference_self_16dfcd49: "no pot fer referència a si mateix"
   cannot_relink_unsaved_paces_3ed42012: "No es poden tornar a enllaçar els ritmes no desats"
   cannot_relink_unsaved_plans_2ccef56a: "No es poden tornar a enllaçar els canvis no desats"
@@ -6305,7 +6327,11 @@ ca:
   cannot_set_the_student_view_module_5e3fe3c8: "No es pot establir el contingut de vista d’estudiant"
   cannot_set_the_teacher_view_module_5f835281: "No es pot establir el contingut de vista de professor"
   cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "No es pot desfer la supressió d’un tema secundari quan també s’ha suprimit el tema de l’assignatura arrel. Primer desfeu la supressió del tema de l’assignatura arrel."
+  cannot_unpublish_if_students_have_started_conversa_70181111: "No se’n pot anul·lar la publicació si els estudiants han iniciat converses"
   cannot_unpublish_students_have_conversations_386f9145: "No se’n pot anul·lar la publicació: els estudiants tenen converses"
+  cannot_unpublish_students_have_conversations_or_so_bf6bb468: "No se’n pot anul·lar la publicació: els estudiants tenen converses o els fitxers d’origen encara s’estan processant"
+  cannot_unpublish_students_have_started_conversatio_a9746bf2: "No se’n pot anul·lar la publicació: els estudiants han iniciat converses o els fitxers d’origen encara s’estan processant"
+  cannot_unpublish_while_source_files_are_still_proc_9db30c56: "No se’n pot anul·lar la publicació mentre els fitxers d’origen encara s’estan processant"
   cannot_update_block_templates_11a49655: "No es poden actualitzar les plantilles de blocs."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "no podeu utilitzar noms reservats per a importadors del llibre de notes"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Els informes detallats de les activitats anònimes no es poden visualitzar fins que es publiquin les notes."
@@ -6400,6 +6426,7 @@ ca:
   canvas_career_roles_permissions_f8acf32a: "Canvas Career: Rols i permisos"
   canvas_career_root_account_experience_485e496f: "Canvas Career: Experiència amb el compte arrel"
   canvas_career_skill_management_a0bc3dd6: "Canvas Career: Gestió d’aptituds"
+  canvas_career_study_tools_b4805897: "Canvas Career: Eines d’estudi"
   canvas_career_sub_account_b1da8954: "Compte secundari del Canvas Career"
   canvas_career_syncable_objects_redesign_afa5321: "Canvas Career: Disseny nou dels objectes que es poden sincronitzar"
   canvas_career_tab_52fd2091: "Pestanya del Canvas Career"
@@ -6502,6 +6529,7 @@ ca:
   caption_cannot_be_empty_67f12e96: "El subtítol no pot estar buit."
   caption_sorted_by_sortby_in_direction_order_7e98ca69: "%{caption}: ordenat per %{sortBy} en ordre %{direction}"
   captions_99c57b5c: Subtítols
+  captions_are_being_generated_for_this_media_5b177dc7: "S’estan generant subtítols per a aquest element multimèdia."
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "Els subtítols heretats d’una assignatura principal no es poden suprimir."
   captions_off_2ae45751: "Subtítols desactivats"
   captions_subtitles_af2c47e: Llegendes/subtítols
@@ -7581,6 +7609,7 @@ ca:
   configure_aspen_client_integration_91f8c934: "Configureu la integració de clients d’Aspen"
   configure_cedar_client_integration_7024ba39: "Configureu la integració de clients de Cedar"
   configure_ecb97e30: Configura
+  configure_identity_service_discovery_page_4350db61: "Configureu la pàgina de detecció del servei d’identitat"
   configure_impact_integration_9bd1189f: "Configura la integració de l’impacte"
   configure_individual_learning_paths_for_students_b_e2fce294: "Permet configurar camins d'aprenentatge individuals per als estudiants en funció dels resultats de l'avaluació."
   configure_mastery_6d4517fe: "Configureu el domini"
@@ -7591,6 +7620,7 @@ ca:
   configure_rules_for_limiting_the_api_usage_rates_o_174145f2: "Configureu les regles per limitar les classificacions d’ús d’API de diversos clients."
   configure_run_ad23fd92: "Configureu Executa…"
   configure_settings_for_toolname_10f51f11: "Establiu la configuració de %{toolName}."
+  configure_sign_in_options_4888ab31: "Configureu les opcions d’inici de sessió"
   configure_the_identity_service_discovery_page_when_5384c24f: "Configureu la pàgina de detecció del servei d’identitat. Quan aquesta opció està activada, aquesta pàgina substitueix la experiència de detecció per defecte a /login/discovery."
   configure_tool_app_3b1bb50b: "Voleu configurar l'aplicació %{tool}?"
   configure_toolname_app_651371be: "Configura l'aplicació %{toolName}"
@@ -7649,6 +7679,7 @@ ca:
   consistent_inheritance_logic_for_developer_keys_in_167f9061: "Lògica d’herència coherent per a claus de desenvolupador en consorcis aliens a CMC"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "ID d’LTI AGS consistents basats en el domini principal del compte"
   consolidated_media_player_d39a16fd: "Reproductor multimèdia consolidat"
+  consortium_5d61844f: Consorci
   consortium_parent_keys_803547b: "Claus principals del consorci"
   constraint_9eeab2e0: Restricció
   consumer_key_6f94ba11: "Clau de consumidor"
@@ -8069,6 +8100,7 @@ ca:
   context_external_tool: 
     url_or_domain_no_valid: "URL de %{url} incorrecte"
     url_or_domain_required: "S'ha de definir l'URL o el domini."
+  context_files_are_being_indexed_83d98c37: "(S'estan indexant els fitxers de context)"
   context_id_3de7d6da: "ID de context"
   context_id_689f612: "ID de context"
   context_id_83fdfe0d: context_id
@@ -8408,6 +8440,7 @@ ca:
   convert_quizzes_4cfd1b66: "Converteix les proves"
   converted_3e1ee830: "S’ha convertit"
   converting_1e281d6e: "S’està convertint…"
+  converting_allocations_23711ab8: "S'estan convertint les assignacions"
   converting_course_to_canvas_career_c9ea22ff: "S’està convertint l’assignatura al Canvas Career…"
   converting_e721aa0a: "S’està convertint"
   converting_tag_overrides_105bf8f2: "S’estan convertint les substitucions d’etiquetes"
@@ -10246,6 +10279,7 @@ ca:
   custom_text_6ff710d5: "Text personalitzat"
   custom_variables_returns_booleans_as_strings_bbe060c9: "Les variables personalitzades retornen els valors booleans com a cadenes"
   customer_3edcd3c0: Client
+  customizable_dashboard_for_learners_926cfe98: "Panell de control personalitzable per a alumnes"
   customizable_default_due_date_a987fbfa: "Data de lliurament per defecte personalitzable"
   customize_74cdc895: Personalitza
   customize_agent_b28d19c0: "Personalitzeu l’agent"
@@ -10666,6 +10700,7 @@ ca:
   delete_group_86c381ec: "Suprimeix el grup"
   delete_groups_c637c07: "Suprimeix els grups"
   delete_in_progress_2d3f0e0d: "Supressió en curs"
+  delete_item_f10f02b: "Suprimiu l’element"
   delete_items_a1d2c64: "Suprimeix els elements"
   delete_key_developername_be80e695: "Suprimeix la clau %{developerName}"
   delete_live_events_subscriptions_b15bc9a6: "Suprimeix les subscripcions als esdeveniments en directe"
@@ -10747,6 +10782,7 @@ ca:
       
       Aquesta acció és irreversible. Segur que voleu suprimir %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La supressió d'un usuari destruirà tots els seus ePortfolios. Alternativament, els ePortfolios es poden marcar individualment com a \"correu brossa\" o com a \"segurs\" per modificar-ne la visibilitat."
+  deleting_allocations_4a3b4f82: "S’estan suprimint les assignacions"
   deleting_app_9b50f706: "S'està suprimint l'aplicació"
   deleting_assignment_22d5851d: "s'està suprimint l'activitat"
   deleting_b896f5f: "s'està suprimint"
@@ -10964,8 +11000,10 @@ ca:
   disable_keyboard_shortcuts_9db78832: "Inhabilita les dreceres del teclat"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Inhabilita les caselles de selecció d'importació i migració de Proves noves, deixant-les habilitades per defecte"
   disable_oembed_retrieve_endpoint_56c050c8: "Desactiveu l’extrem oembed_retrieve"
+  disable_policy_94276647: "Desactiveu la política"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Desactivar la funció POST a SIS per a activitats en períodes de qualificació tancats"
   disable_scope_6ba4e4d4: "Inhabilita l'abast"
+  disable_skip_policy_import_c90a0812: "Desactiveu i ometeu la importació de la política"
   disable_smart_app_banner_on_mobile_devices_bed9bf3b: "Desactiveu el banner de l’aplicació intel·ligent als dispositius mòbils"
   disable_summary_55869621: "Desactiva el resum"
   disable_sync_to_name_10c371dc: "Inhabilita la sincronització a %{name}"
@@ -11377,6 +11415,7 @@ ca:
   displayname_loading_in_progress_2be325fd: "La càrrega de %{displayName} està en curs"
   displayname_loading_pending_3aa2723e: "La càrrega de %{displayName} està pendent"
   displayname_loading_success_8177d735: "S’ha carregat %{displayName} correctament"
+  displays_a_button_to_launch_the_learning_agent_in__27abfa89: "Mostra un botó per iniciar l’Agent d’aprenentatge en una pestanya a part."
   displays_a_survey_link_for_discussion_translate_an_87959f5c: "Mostra un enllaç a l’enquesta per a la traducció dels fòrums i per a la informació dels fòrums"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Mostra confeti per als professors que executen el validador d'enllaços en
@@ -11460,6 +11499,7 @@ ca:
   domains_count_max_a52b7947: "Dominis (%{count}/%{max})"
   dominican_republic_1_3cef4021: "República Dominicana (+1)"
   don_t_add_this_user_for_now_32912974: "No afegeixis aquest usuari per ara."
+  don_t_import_policy_541f9a96: "No importeu la política"
   don_t_indent_b4f6eccd: "Sense sagnia"
   don_t_miss_notifications_from_your_students_900e9e30: "No us perdeu les notificacions dels vostres estudiants."
   don_t_move_lti_query_params_to_post_body_5c80e037: "No desplacis els paràmetres de consulta LTI al cos del POST"
@@ -12075,6 +12115,9 @@ ca:
   enable_to_sync_authentication_providers_e59f9f84: "Activeu aquesta opció per sincronitzar els proveïdors d'autenticació"
   enable_to_sync_user_pseudonym_and_communicationcha_94e81ba4: "Activeu-ho per fer la sincronització d’Usuari, de Pseudònim i de les dades de CommunicationChannel amb el servei d’identitat."
   enable_to_use_federated_pseudonym_attributes_usern_637ff9d4: "Activeu l’ús d'atributs pseudònims federats (nom d’usuari, ID d'usuari del SIS, etc.) de proveïdors d'autenticació en esdeveniments en directe i en altres característiques opcionals del Canvas. Quan aquesta opció està desactivada, al Canvas es faran servir els atributs pseudònims locals com a reserva."
+  enable_to_use_the_organization_scoped_delete_endpo_6df2e837: |-
+      Activeu l’opció d’utilitzar l'extrem de supressió des de diversos àmbits de l’organització per a les supressions d’usuaris de la identitat d’Instructure.
+      Un cop activada, les sol·licituds de supressió faran servir /organizations/:orgId/users/:id en lloc de /api/users/:id.
   enable_tools_to_use_asset_processor_related_servic_fcc4f960: "Activeu les eines per fer servir els serveis i les ubicacions relacionats amb el processador de recursos"
   enable_tools_to_use_document_processor_related_ser_deb64b2d: "Activeu les eines per fer servir els serveis i les ubicacions relacionats amb el processador de documents"
   enable_translation_c8508b49: "Activeu la traducció"
@@ -12200,6 +12243,13 @@ ca:
   enabling_app_1d15f0ca: "S'està activant l’aplicació"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "En habilitar el tema per a l'educació primària, canviarà el tipus de lletra a la interfície del Canvas i es simplificarà el menú de navegació de l'assignatura per a tots els usuaris de l'assignatura."
   enabling_the_youtube_migration_new_quizzes_feature_75a77eab: "Activar la característica opcional Migració a YouTube - Proves noves afegeix la capacitat d’escaneig i l’opció de conversió a les integracions en YouTube en les proves noves."
+  enabling_this_feature_moves_the_new_quizzes_experi_d2f290dd: |-
+      En activar aquesta característica opcional, l’experiència de Proves noves es desplaça fora de la seva
+      capa d’aïllament (iframe) per executar-se de manera nativa dins de la pàgina principal del Canvas.
+      
+      Nota: Aquesta característica opcional se suprimirà l’1 de juliol de 2026, quan la
+      integració nativa es converteixi en l’experiència estàndard per a tots els entorns de
+      producció.
   enabling_this_option_automatically_moves_course_pa_15f755b3: "Si activeu aquesta opció automàticament, les dates de lliurament de la tasca de ritme de l'assignatura es mouen més enllà de la data de finalització. Es desactivaran les dades introduïdes a Hora, Ubicació i Calendari."
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "Si activeu aquesta opció automàticament, les dates de lliurament de la tasca de ritme de l'assignatura es mouen més enllà de la data de finalització."
   encourage_student_discourse_7836b9f7: "Fomenteu el debat entre els estudiants"
@@ -13179,6 +13229,7 @@ ca:
   existing_courses_must_be_removed_before_making_the_1c3dd30: "Cal suprimir les assignatures existents abans de canviar al Canvas Career. Per continuar, assegureu-vos que s’hagin suprimit totes les assignatures."
   existing_courses_must_be_removed_before_making_the_b9c843bd: "Cal suprimir les assignatures existents abans de canviar al Canvas Career. Per continuar, assegureu-vos que s’hagin suprimit o migrat totes les assignatures."
   existing_question_banks_and_classic_quizzes_will_b_6dd18d67: "S’importaran els bancs de preguntes i les proves clàssiques existents com a bancs d'elements i proves noves."
+  existing_tag_aece43b6: "Etiqueta existent"
   exists_under_path_segments_2b0a54bc: "Es troba a %{path_segments}"
   exit_confirmation_d4a533b5: "Sortiu de la confirmació"
   exit_d0c7b013: Surt
@@ -13199,6 +13250,7 @@ ca:
   expand_description_for_outcome_title_abc8f30: "Desplega la descripció de la competència %{title}"
   expand_discussion_thread_fcbb2bcc: "Desplega el fil del fòrum"
   expand_discussion_thread_from_author_829cfae1: "Desplegueu el fil del fòrum de %{author}"
+  expand_distribution_for_outcome_735c9dee: "Desplegueu la distribució per a %{outcome}"
   expand_general_button_settings_9866663c: "Desplegueu la configuració general del botó"
   expand_global_navigation_2c28d5d4: "Desplega la navegació global"
   expand_grade_details_1c6f21d9: "Desplegueu la informació de les notes"
@@ -13206,6 +13258,7 @@ ca:
   expand_image_settings_4d34431b: "Desplegueu la configuració de la imatge"
   expand_individual_button_settings_74a9f40a: "Desplegueu la configuració individual del botó"
   expand_it_ca5d9c6e: Desplega-ho
+  expand_label_settings_84302ab7: "Desplegueu la configuració de %{label}"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Desplega la llista de membres del grup %{groupName}"
   expand_media_settings_cda5e301: "Desplegueu la configuració d’elements multimèdia"
   expand_module_e74868cf: "Desplegueu el contingut"
@@ -13490,6 +13543,7 @@ ca:
   failed_to_load_assignments_in_important_dates_ce3b4227: "No s’han pogut carregar activitats en dates importants."
   failed_to_load_assignments_used_locations_2b37a5dd: "No s’han pogut carregar les ubicacions utilitzades de les activitats"
   failed_to_load_available_reports_bd55905b: "No s’han pogut carregar els informes disponibles"
+  failed_to_load_configuration_b7248c63: "No s’ha pogut carregar la configuració"
   failed_to_load_content_security_policy_settings_cc668a42: "No s’ha pogut carregar la configuració de la Política de seguretat del contingut"
   failed_to_load_contenttype_error_5bb75c75: "No s’ha pogut carregar l’%{contentType} %{error}"
   failed_to_load_contributing_scores_f9401d2b: "No s’han pogut carregar les puntuacions de les contribucions"
@@ -13577,7 +13631,9 @@ ca:
   failed_to_retrieve_temporary_enrollment_pairing_ecb274d: "No s’ha pogut recuperar l’aparellament d’inscripció temporal"
   failed_to_revert_account_please_try_again_6ef1f42c: "No s’ha pogut revertir el compte. Torneu a provar-ho."
   failed_to_revert_sub_account_please_try_again_5451d2ef: "No s’ha pogut revertir el compte secundari. Torneu a provar-ho."
+  failed_to_save_ai_experience_error_ae7e1de2: "No s'ha pogut desar l’experiència amb IA: %{error}"
   failed_to_save_changes_errors_6920f334: "No s'han pogut desar els canvis: %{errors}%"
+  failed_to_save_configuration_8cf99186: "No s’ha pogut desar la configuració"
   failed_to_save_dashboard_selection_32e71c72: "No s'ha pogut desar la selecció del panell de control"
   failed_to_save_outcome_order_e233ecb0: "No s’ha pogut desar l’ordre de les competències"
   failed_to_save_please_try_again_later_bb7070fb: "No s'ha pogut desar, torneu-ho a provar més tard"
@@ -13619,6 +13675,7 @@ ca:
   failed_to_update_internal_setting_ab3d0a4a: "No s’ha pogut actualitzar el paràmetre intern"
   failed_to_update_item_indentation_fd7fbf4f: "No s'ha pogut actualitzar el sagnat de l'element"
   failed_to_update_item_please_try_again_fd2ee896: "No s'ha pogut actualitzar l'element. Torneu a provar-ho."
+  failed_to_update_missing_submission_policy_setting_95fbc669: "No s’ha pogut actualitzar la configuració de la política d’entregues no presentades."
   failed_to_update_page_23766e21: "No s'ha pogut actualitzar la pàgina"
   failed_to_update_permission_33c493f: "No s'ha pogut actualitzar el permís"
   failed_to_update_portfolio_be886af7: "No s'ha pogut actualitzar el portafolis"
@@ -13727,6 +13784,7 @@ ca:
   file_added_successfully_from_canvas_files_db31e4d: "S’ha afegit correctament el fitxer des de Fitxers del Canvas"
   file_already_exists_bdc61895: "el fitxer ja existeix"
   file_association_access_a820d755: "Accés a l’associació de fitxers"
+  file_association_access_for_conversations_a69c498f: "Accés a l’associació de fitxers per a converses"
   file_attachment_8e7dbfd1: "Fitxer adjunt"
   file_c851020d: Fitxer
   file_content_a99b5c6b: "Contingut del fitxer"
@@ -14213,6 +14271,7 @@ ca:
   generating_alt_text_a8819f13: "S’està generant text alternatiu…"
   generating_alt_text_e1a02958: "S’està generant text alternatiu…"
   generating_c2aabc02: "S'està generant..."
+  generating_caption_d804516d: "S'està generant el subtítol…"
   generating_discussion_summary_44867397: "S’està generant el resum del fòrum."
   generating_pairing_code_251b7fc8: "S'està generant el codi d'emparellament..."
   generating_pairing_code_d480ccf4: "S'està generant el codi d'emparellament"
@@ -16208,9 +16267,11 @@ ca:
   immersive_reader_7b87538: "Lector immersiu"
   immersive_reader_failed_to_load_bc8d4dd4: "No s'ha pogut carregar el lector immersiu"
   impact_58f41b1d: Impact
+  impact_account_type_8a130240: "Tipus de compte de l’Impact"
   impact_integration_for_new_quizzes_be080a96: "Integració de l’Impact per a proves noves"
   impact_is_an_add_on_to_canvas_lms_contact_your_csm_23307a67: "L’Impact és un complement de la Plataforma d'ensenyament virtual del Canvas. Si us interessa, poseu-vos en contacte amb el CSM."
   impact_manage_3641fd7f: "Impact: gestiona"
+  impact_settings_89f4c217: "Configuració de l’Impact"
   implementation_resources_57b889a2: "Recursos d’implementació"
   import_1b31507: Importa
   import_a_set_of_outcomes_6b782192: "Importa un conjunt de competències"
@@ -16361,6 +16422,7 @@ ca:
   inbox_settings_feature_is_disabled_31bc4dce: "la característica opcional de configuració de la safata d'entrada està desactivada"
   inbox_settings_qw_updates_a3eb954b: "Configuració de la safata d'entrada: actualitzacions de QW"
   inbox_settings_saved_2127ed7c: "S’ha desat la configuració de la safata d'entrada!"
+  inbox_sis_id_for_duplicate_names_3acecbc8: "Safata d'entrada: ID del SIS per a noms duplicats"
   include_a_download_link_next_to_each_file_link_in__481761de: "Inclou un enllaç de baixada al costat de cada enllaç de fitxer a l’RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inclogueu un enllaç a una captura o gravació de pantalla mitjançant una eina com el *Jing*."
   include_access_tokens_from_deleted_users_d142dad3: "Incloeu-hi els testimonis d'accés dels usuaris suprimits"
@@ -16595,6 +16657,7 @@ ca:
   instructure_identity_onboarding_allow_user_facing__7dc6038e: "Incorporació de la identitat d’Instructure: permet canvis adreçats a l’usuari"
   instructure_identity_only_supports_using_canvas_a__b6d79938: "La identitat d’Instructure només admet l’ús d’un servidor intermediari SAML del Canvas. Aquest marcador activarà el paràmetre del servidor intermediari"
   instructure_identity_org_id_dda9c75a: "ID de l’organització d’identitat d’Instructure"
+  instructure_identity_organization_scoped_delete_en_8e68b86c: "Extrem de supressió des de diversos àmbits de l’organització de la identitat d’Instructure"
   instructure_identity_organization_v1_api_b24d3d5a: "API d’Instructure Identity Organization V1"
   instructure_identity_periodic_redirect_rate_increm_428f0115: "Augment de la taxa de redirecció periòdica a la identitat d’Instructure"
   instructure_identity_prepend_org_id_7ebafb27: "ID de l’organització amb el prefix de la identitat d’Instructure"
@@ -17086,6 +17149,7 @@ ca:
   kazakh_63a96134: Kazakh
   kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_8f3e7c16: Conserva
+  keep_alt_text_under_count_characters_209fbe82: "El text alternatiu ha de tenir menys de %{count} caràcters."
   keep_alt_text_under_max_length_characters_f1144984: "El text alternatiu ha de tenir menys de %{max_length} caràcters."
   keep_alt_text_under_maxlength_characters_5fa475db: "El text alternatiu ha de tenir menys de %{maxLength} caràcters."
   keep_editing_11ff42e5: "Continua l’edició"
@@ -17171,6 +17235,7 @@ ca:
   labels_292cd90b: Etiquetes
   language_6b3e2c7c: Idioma
   language_arts_35b79a8b: "Arts lingüístiques"
+  language_automatic_f39137cb: "%{language} (automàtic)"
   language_missing_94f237c3: "Falta l’idioma"
   languages_835813f0: Idiomes
   lao_675e7f05: Laosià
@@ -17201,6 +17266,7 @@ ca:
   last_change_undone_283e9f96: "S’ha desfet el darrer canvi"
   last_changed_b544504d: "Última modificació:"
   last_checked_at_af36da71: "Última comprovació a les "
+  last_checked_date_b3853b0d: "S’ha comprovat per darrer cop el %{date}"
   last_day_attended_b72d623c: "Últim dia d'assistència"
   last_e159dbd: Últim
   last_edit_ascending_6a18dba4: "Última edició: Ascendent"
@@ -17273,6 +17339,7 @@ ca:
   late_policy_minus_count_points_1a945541: 
     one: "Penalització per norma endarrerida: 1 punt menys"
     other: "Penalització per norma endarrerida: %{count} punts menys"
+  late_policy_will_not_be_imported_from_the_source_c_d1b5d7bb: "La política sobre entregues endarrerides no s’importarà des de l’assignatura d’origen."
   late_submission_96752a0e: "Entrega endarrerida"
   late_submission_deduction_3e87f1fa: "Percentatge de deducció per entrega endarrerida"
   late_submission_deduction_5d7fa3cb: "Deducció per entrega endarrerida"
@@ -17353,6 +17420,7 @@ ca:
   learner_passport_prototype_1c3446b3: "Prototip de Learner Passport"
   learner_passport_prototype_r2_98517178: "Prototip de Learner Passport R2"
   learner_preview_562438f0: "Visualització prèvia de l’alumne"
+  learning_agent_button_5b3f09c8: "Botó de l’Agent d’aprenentatge"
   learning_design_7a7cac04: "Disseny de l’aprenentatge"
   learning_design_7dd0a932: "Disseny de l’aprenentatge"
   learning_mastery_5fc34276: "Domini de l'aprenentatge"
@@ -17365,6 +17433,7 @@ ca:
       i de l'assignatura pel que fa les competències d'aprenentatge de l'assignatura. Les competències es presenten en un format similar a un llibre de notes
       i el progrés de l'estudiant es mostra com a puntuació numèrica i com a domini assolit/domini
       gairebé assolit/endarrerit.
+  learning_mastery_gradebook_enhancements_5dd9bf93: "Millores del llibre de notes de domini de l'aprenentatge"
   learning_mastery_gradebook_error_page_58fbea43: "Pàgina d’errors del llibre de notes de domini de l'aprenentatge"
   learning_mastery_gradebook_redesign_9ca88020: "Disseny nou del llibre de notes de domini de l'aprenentatge"
   learning_mastery_gradebook_student_reporting_32125d51: "Informe de l’estudiant al llibre de notes de domini de l'aprenentatge"
@@ -17732,6 +17801,7 @@ ca:
   loading_comments_32366acf: "S'estan carregant els comentaris"
   loading_completion_b62ca82f: "S'està completant la càrrega"
   loading_compose_modal_f6da0e8b: "S’està carregant la composició de modal"
+  loading_configuration_a0f96cd3: "S’està carregant la configuració"
   loading_content_for_import_4ed89a17: "S’està carregant el contingut que s’ha d’importar."
   loading_contributing_scores_5f68330f: "S’estan carregant les puntuacions de les contribucions"
   loading_conversation_863855ee: "S’està carregant la conversa"
@@ -18113,6 +18183,7 @@ ca:
   lti_asset_processor_turnitin_migration_bc484419: "Migració de Turnitin amb el processador de recursos d’LTI"
   lti_context_id_d6a24cfc: "ID de context d’LTI"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id ha de ser únic"
+  lti_contextcontrols_91b76c7a: "Controls de context de l’LTI"
   lti_deep_linking_for_module_index_menu_881feeee: "Enllaç profund a LTI ( interoperabilitat d'eines d'aprenentatge) per al menú de l’índex de continguts"
   lti_deep_linking_line_items_5e0079f7: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge"
   lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge, a la pàgina de creació o edició d'activitats"
@@ -18169,6 +18240,7 @@ ca:
   machine_translation_may_not_fully_capture_the_mean_aca7918: "És possible que la traducció automàtica no reflecteixi completament el significat del missatge original."
   magenta_4a65993c: Magenta
   mailbox_selection_92d9cbf: "Selecció de bústia"
+  main_sign_in_options_a98b3c1b: "Opcions d’inici de sessió principals"
   main_text_color_7d65ab1b: "Color del text principal"
   maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Finestres de manteniment: %{days} %{weekday} del mes, a partir de les %{time_range} (%{utc_time_range} UTC)"
   make_all_discussions_threaded_7f0af690: "Enllaça tots els fòrums"
@@ -20305,6 +20377,8 @@ ca:
   missing_state_parameter_from_external_authenticati_bc33a718: "Falta el paràmetre d’estat en el servei d’autenticació extern"
   missing_submission_ec204c33: "Eentrega no presentada"
   missing_submission_grade_must_be_numeric_1a142ef2: "La nota de l'entrega no presentada ha de ser numèrica"
+  missing_submission_policy_has_been_disabled_a92307c3: "S’ha desactivat la política d'entregues no presentades."
+  missing_submission_policy_has_been_disabled_and_la_30cf6470: "S’ha desactivat la política d'entregues no presentades i no s’importarà la política d'entregues endarrerides."
   missing_table_caption_37a6379e: "Falta el subtítol de la taula"
   missing_table_headers_36d9317e: "Falten les capçaleres de la taula"
   mobile_a08ef8fa: Mòbil
@@ -20748,6 +20822,7 @@ ca:
   name: "Importador d'Academic Benchmarks"
   name_1aed4a1b: Nom
   name_3806192d: "Nom:"
+  name_added_6257decb: "S'ha afegit %{name}"
   name_already_has_enough_must_review_allocations_to_319b3007: "%{name} ja té prou assignacions “ha de revisar” per encarregar-se de les revisions entre companys requerides. Les assignacions addicionals seguiran les entregues disponibles i la precedència."
   name_app_has_been_deleted_fb2d9426: "S'ha suprimit l'aplicació %{name}"
   name_badfe525: nom
@@ -20957,6 +21032,7 @@ ca:
   new_quizzes_banks_migrations_9ab4de4a: "Migracions de bancs de proves noves"
   new_quizzes_build_button_in_module_items_10f651fb: "Botó de compilació de nous qüestionaris a Elements del mòdul"
   new_quizzes_build_button_on_list_views_62c7c0e8: "Nou botó de compilació de proves a les visualitzacions de llista"
+  new_quizzes_canvas_native_integration_945b2754: "Integració nativa al Canvas de Proves noves"
   new_quizzes_common_cartridge_support_250780be: "Compatibilitat amb el Common Cartridge per a proves noves"
   new_quizzes_dbda7e0a: "Proves noves"
   new_quizzes_description: "Aquesta característica millora la realització de proves al Canvas. Quan aquesta marca està habilitada, l’eina Noves proves estarà disponible. Per obtenir informació completa, consulteu el *grup d’usuaris de Noves proves* a la Canvas Community."
@@ -21002,6 +21078,7 @@ ca:
   new_rule_rule_has_been_created_successfully_fead4008: "S’ha creat correctament la regla nova “%{rule}”"
   new_setting_name_2bfbaeec: "Nom del paràmetre nou…"
   new_setting_value_373a7dc7: "Valor del paràmetre nou…"
+  new_single_tag_a25a577f: "Nova etiqueta única"
   new_sis_integrations: |-
       Aquesta característica s'aplica a les institucions amb una integració existent del SIS al Canvas.
       Els clients que estan utilitzant les solucions de retorn de notes del Canvas, o bé
@@ -21015,6 +21092,7 @@ ca:
   new_student_group_e31b7cb5: "Grup d'estudiants nou"
   new_tab_ab7629d2: "Pestanya nova"
   new_tag_db1cdd5d: "Etiqueta nova"
+  new_tag_with_variants_a7fca374: "Etiqueta nova amb variants"
   new_text_color_9f964d9c: "Color nou del text"
   new_text_color_picker_e5bbc916: "Selector de color nou del text"
   new_to_do_cb9429d7: "Més tasques pendents noves"
@@ -21022,6 +21100,7 @@ ca:
   new_user_bd194843: "Usuari nou"
   new_user_s_name_909b6267: "Nom de l'usuari nou"
   new_user_tutorial_cdd3a446: "Tutorial per a nous usuaris"
+  new_variant_of_existing_tag_41a900b: "Variant nova d’una etiqueta existent"
   new_video_conference_17817456: "Nova videoconferència"
   new_way_to_create_deeeff5e: "Nova manera de crear"
   new_way_to_create_pages_d544bec0: "Nova manera de crear pàgines"
@@ -21454,6 +21533,7 @@ ca:
   note_that_as_long_as_this_option_is_enabled_studen_9ed99069: "Teniu en compte que, mentre aquesta opció estigui habilitada, els estudiants es poden moure d'un grup a un altre ells mateixos."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Tingueu en compte que l'adreça electrònica no estarà sempre emplenada al perfil de l'usuari de Microsoft. L'OID no s'emplenarà per als comptes personals de Microsoft."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Tingueu en compte que pot ser que alguns atributs no s'hagin emplenat per a tots els usuaris del Clever."
+  note_that_we_can_only_accurately_detect_color_cont_6c2b90a3: "Tingueu en compte que només podem detectar amb precisió problemes de contrast de color en el contingut creat al Canvas mitjançant l’editor de contingut enriquit (amb CSS i valors de codi hexadecimal en línia per als colors). Si els colors d’aquest contingut estan definits amb CSS interns o externs, o amb valors de color diferents del codi hexadecimal, és possible que els resultats no siguin precisos."
   note_the_following_content_types_will_be_imported__34541c86: "Teniu en compte que s’importaran els següents tipus de contingut: Configuració de l'assignatura, Cos del temari, Continguts, Activitats, Proves, Bancs de preguntes, Temes de debat, Pàgines, Anuncis, Rúbriques, Fitxers i Esdeveniments del calendari."
   note_this_code_will_expire_in_15_minutes_c743de99: "*NOTA*: aquest codi caducarà d’aquí a 15 minuts."
   note_this_is_not_your_official_score_f2d4582f: "*NOTA*: Aquesta NO és la vostra puntuació oficial."
@@ -22175,6 +22255,7 @@ ca:
   opens_in_new_window_b4b99243: "S’obre en una finestra nova"
   opportunities_eb978a67: Oportunitats
   opportunities_popup_f6703842: "finestra emergent d'oportunitats"
+  optimized_grading_rubrics_b529d7c2: "Rúbriques de qualificació optimitzades"
   optimized_the_visibility_services_used_by_selectiv_d8abb7be: "S’han optimitzat els serveis de visibilitat que fa servir Llançament selectiu."
   option_1_dea39f90: "Opció 1"
   option_2_47aace2a: "Opció 2"
@@ -23011,6 +23092,7 @@ ca:
   planner_7fd46783: Planificador
   planner_note_id_9ed85d04: "ID de la nota del planificador"
   planner_notes_1b5fef2b: "Notes del planificador"
+  planner_submittable_completion_filter_3d94d710: "Filtre de tasques completades que ja es poden entregar del planificador"
   planner_support_for_account_calendars_3a7bfdc5: "Compatibilitat del planificador per als calendaris del compte"
   platform_ui_unified_widgets_dashboard_bc9cc83e: "IU de la plataforma: panell de control de ginys unificat"
   play_1a47eaa7: Reprodueix
@@ -23152,6 +23234,8 @@ ca:
   please_select_a_role_before_submitting_7f6cc61a: "Seleccioneu un rol abans de fer l’enviament"
   please_select_a_score_eb5f9b9: "Seleccioneu una puntuació"
   please_select_a_student_cd3e2311: "Seleccioneu un estudiant"
+  please_select_a_tag_5a46b089: "Seleccioneu una etiqueta"
+  please_select_a_tag_set_ae8b8336: "Seleccioneu un conjunt d’etiquetes"
   please_select_a_user_role_for_this_link_9fb4e655: "Seleccioneu un rol d'usuari per a aquest enllaç."
   please_select_a_valid_date_range_where_the_start_m_41498a7c: "Seleccioneu un interval de dates vàlid en què el mes d’inici no sigui posterior al mes final."
   please_select_an_item_first_89ef5c37: "Seleccioneu primer un element."
@@ -23782,6 +23866,7 @@ ca:
   possible_points_b1df0a5c: "Punts possibles"
   possible_pts_b63dff4c: "%{possible} punts"
   possible_score_5e0a328e: "Possible: %{score}"
+  possible_to_min_pts_8e5a3f34: "%{possible} a >%{min} punts"
   post_1e445890: Publica
   post_at_be4b826d: "Publica a les"
   post_by_displayedauthor_from_date_3a372f3d: "Publicació de %{displayedAuthor} feta el %{date}"
@@ -23866,6 +23951,7 @@ ca:
   preview_9cbd064e: "visualització prèvia"
   preview_a3f8f854: "VISUALITZACIÓ PRÈVIA"
   preview_ai_experience_51e65049: "Feu una visualització prèvia de l’experiència amb IA"
+  preview_and_ai_conversations_will_be_available_onc_e0ad1fa7: "Les opcions Visualització prèvia i Converses basades en IA estaran disponibles un cop completat el processament. Torneu a comprovar-ho més endavant."
   preview_confirm_8b9986a8: "Fes una visualització prèvia i confirma-ho"
   preview_experience_6fdb7129: "Feu una visualització prèvia de l’experiència"
   preview_filename_f1b58572: "Visualització prèvia de %{filename}"
@@ -25630,6 +25716,7 @@ ca:
   range_must_be_a_valid_number_cannot_have_negative__d4efa7d1: "L’interval ha de comprendre números vàlids. No poden tenir números negatius ni superiors a l’interval dels punts més alts. Corregiu els intervals i proveu de tornar a fer clic a “Desa”."
   range_name_90614433: "Nom de l'interval"
   rangestart_to_c41e0bba: "%{rangeStart} fins a "
+  rangestart_to_d064bdb: ">%{rangeStart} a "
   rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} de %{totalStudents} estudiants"
   rate_limit_for_create_conversation_graphql_mutatio_718d60ce: "Límit de qualificació en la mutació de GraphQL de Crea una conversa"
   rate_limit_set_for_identifier_identifier_to_limit_e2d33dcf: "S’ha establert el límit de classificació per a l’identificador %{identifier} en %{limit}"
@@ -25756,7 +25843,13 @@ ca:
     updated_at_short: Modificat
   reactivate_user_e058db8b: "Reactiva l'usuari"
   reactivation_will_allow_all_logins_for_name_to_log_455df70: "Amb la reactivació, %{name} podrà iniciar la sessió al Canvas i recuperar l'accés a les integracions de l’API autoritzades anteriorment."
+  read_about_accessible_lists_22008d39: "Obteniu informació sobre les llistes accessibles"
+  read_about_heading_accessibility_a5431cca: "Obteniu informació sobre l’accessibilitat de les capçaleres"
   read_about_key_features_and_discover_what_you_can__9a8e4c27: "Obteniu més informació sobre les característiques opcionals clau i esbrineu què podeu crear amb l’editor de blocs."
+  read_about_link_accessibility_526eb1: "Obteniu informació sobre l’accessibilitat dels enllaços"
+  read_about_table_accessibility_5a94abeb: "Obteniu informació sobre l’accessibilitat de les taules"
+  read_about_text_contrast_66ed4e5c: "Obteniu informació sobre el contrast del text"
+  read_about_writing_alt_text_30e189c7: "Obteniu informació sobre la redacció de text alternatiu"
   read_comments_3fcc7590: "Llegeix els comentaris"
   read_context_membership_data_cf406033: "Llegeix les dades d'afiliació a continguts"
   read_dc99757a: Llegeix-ho
@@ -25881,6 +25974,8 @@ ca:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Independentment de si el permís està habilitat o inhabilitat, els usuaris encara podran administrar els esdeveniments al seu calendari personal."
   regenerate_3e4679f8: "Torna a generar"
   regenerate_alt_text_1be48296: "Torneu a generar el text alternatiu"
+  regenerate_alt_text_42a04ffe: "Torneu a generar el text alternatiu"
+  regenerate_caption_f8f18807: "Torneu a generar el subtítol"
   regenerate_criteria_7301f7fc: "Regenereu els criteris"
   regenerate_criterion_8a7d4a61: "Regenereu el criteri"
   regenerate_epub_395c8e56: "Torna a generar l'ePub"
@@ -26307,6 +26402,7 @@ ca:
   request_failed_with_status_status_47054af0: "S’ha produït un error a la sol·licitud amb l’estat %{status}"
   request_id_1499afb0: "ID de la sol·licitud"
   request_name_is_required_ebc2fda0: "El nom de la sol·licitud és obligatori"
+  request_or_upload_to_show_transcript_dc03caf0: "Sol·liciteu o pengeu l'expedient acadèmic perquè es mostri."
   request_successfully_sent_note_that_applying_score_ee8665b6: "S’ha enviat correctament la sol·licitud. Teniu en compte que aplicar puntuacions pot tardar una mica i que els canvis no es mostraran fins que torneu a carregar la pàgina."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Sol·licita que DocViewer utilitzi CloudFront per servir actius pdf."
   request_type_9e3cc7aa: "Tipus de sol·licitud"
@@ -26468,6 +26564,7 @@ ca:
   restrict_view_of_quantitative_data_b6089ee9: "Restringiu la visualització de les dades quantitatives"
   restricted_inbox_files_and_calendar_functionality_66abfbbb: "Funcions restringides de Safata d'entrada, Fitxers i Calendari"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Visualització restringida per als professors a LMGB"
+  restricts_ai_study_tools_to_page_and_file_learning_2a8d6ab3: "Restringeix les eines d’estudi basades en IA als encaminaments d’objectes d'aprenentatge Pàgina i Fitxer al Canvas Career."
   resubmission_failed_9cc3cbc: "No s’ha pogut tornar a fer l’entrega"
   resubmit_63cf65ef: "Torna a entregar"
   resubmit_all_files_6cf409a9: "Torneu a entregar tots els fitxers"
@@ -26894,6 +26991,7 @@ ca:
   save_this_comment_for_reuse_5eda0b70: "Desa aquest comentari per reutilitzar-lo"
   save_this_pace_as_a_draft_without_publishing_b40c9f0d: "Deseu aquest ritme com a esborrany sense publicar."
   save_this_rating_scale_as_default_a3f27305: "Desa aquesta escala de classificació com a opció per defecte"
+  save_to_preview_30f60b4d: "Deseu-ho per fer-ne una visualització prèvia"
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Podeu estalviar molt temps si només afegiu les competències que siguin específics del contingut de la vostra assignatura."
   saved_3cd67a7c: Desat
   saved_comments_2f6ba95: "Comentaris desats"
@@ -26908,6 +27006,7 @@ ca:
   saving_associations_complete_e4b9634d: "S'han acabat de desar les associacions"
   saving_associations_started_8ac85360: "S'han començat a desar les associacions"
   saving_blackout_dates_be03e6ee: "S'estan desant les dates sense descomptes…"
+  saving_configuration_1463971f: "S’està desant la configuració"
   saving_custom_status_name_e1b66f6e: "S’està desant l'estat personalitzat %{name}"
   saving_d55dd90e: "S'està desant…"
   saving_discussion_topic_a3cb589e: "S’està desant el tema de debat"
@@ -27469,6 +27568,7 @@ ca:
   select_at_least_one_person_4bacf489: "Seleccioneu una persona com a mínim."
   select_audio_file_7d905cce: "Selecciona un fitxer d'àudio"
   select_audio_source_21043cd5: "Selecciona una font d'àudio"
+  select_authentication_provider_c1dd584b: "Seleccioneu el proveïdor d’autenticació"
   select_by_date_range_c3af0101: "Selecciona per interval de dates"
   select_calendars_d5fa50b6: "Selecciona calendaris"
   select_calendars_to_retrieve_important_dates_from_26dc92b7: "Seleccioneu un calendari per recuperar dates importants dels"
@@ -27614,6 +27714,7 @@ ca:
   select_who_should_be_assigned_and_use_the_drop_dow_a28535c3: "Seleccioneu qui s’hauria d’assignar i utilitzeu els menús desplegables o introduïu manualment la data i l’hora."
   selectable_outcomes_during_course_content_migratio_3f108a1a: "Competències seleccionables durant la migració del contingut de l'assignatura"
   selected_274ce24f: Seleccionat
+  selected_6b7f16dc: " (s’ha seleccionat)"
   selected_all_courses_9cfef57f: "S'han seleccionat totes les assignatures"
   selected_and_self_assessment_a0ed1d63: "Avaluació seleccionada i autoavaluació"
   selected_answer: "Heu seleccionat aquesta resposta."
@@ -27735,6 +27836,7 @@ ca:
       al tipus d'avís LtiContextCopyNotice quan es produeixen còpies d'assignatures o altres importacions de contingut.
       Això substitueix la necessitat d’utilitzar la configuració de l'eina Migració de contingut 1.1.
   send_a_reply_message_81d0600e: "Envieu un missatge de resposta"
+  send_a_unique_id_as_a_partner_account_id_oemaccoun_bbab2df4: "Envieu un ID únic com a ID de compte de col·laborador (oemAccountId). Utilitzeu aquesta opció per a casos especials, com ara la compra de l’Impact per a un sol compte secundari."
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Envia un missatge individual a cada destinatari"
   send_assignment_name_to_another_user_e2ca494d: "Envia l'activitat %{name} a un altre usuari"
   send_automatic_replies_to_incoming_mail_c18da8eb: "Envieu respostes automàtiques al correu entrant."
@@ -27765,6 +27867,7 @@ ca:
   send_private_chat_messages_67890e5d: "Envieu missatges de xat privats"
   send_public_chat_messages_9b62951a: "Envieu missatges de xat públics"
   send_quiz_to_user_e8c47177: "Enviar la prova a l'usuari"
+  send_the_salesforce_id_as_a_partner_account_id_oem_6c9ca50d: "Envieu l’ID de Salesforce com a ID de compte de col·laborador (oemAccountId). Utilitzeu aquesta opció per a casos especials, com ara la compra de l’Impact per a un consorci."
   send_this_announcement_to_unenrolled_users_4ea549d7: "Envia aquest anunci als usuaris desinscrits"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Envia aquest anunci als usuaris amb el rol de l'usuari %{role}"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Envia aquest anunci als usuaris amb el rol de l'assignatura %{role}"
@@ -27820,6 +27923,7 @@ ca:
   service_c3d74594: "Servei:"
   service_cloud_ticketing_connector_889e1b7b: "Connector de sol·licituds de Service Cloud"
   service_domain_6107fb0c: "Domini del servei"
+  service_preview_a081df35: "Visualització prèvia del servei"
   service_type_2fd854bc: "Tipus de servei"
   service_user_id_4f2d0897: "ID d'usuari del servei"
   service_user_key_f0621115: "Clau de l’usuari del servei"
@@ -28946,6 +29050,8 @@ ca:
   source_c377a469: Origen
   source_code_2395ca74: "Codi font"
   source_context_does_not_match_group_context_4b55cee4: "el context d’origen no coincideix amb el context del grup"
+  source_files_127d642f: "Fitxers d’origen"
+  source_files_are_still_being_processed_a4477749: "Els fitxers d’origen encara s’estan processant"
   source_link_c21ecc23: "Enllaç original"
   source_materials_4124431c: "Materials d’origen"
   sourcecontextid_required_if_sourcecontexttype_prov_473c67b1: "es requereix sourceContextId si es proporciona sourceContextType"
@@ -29420,6 +29526,7 @@ ca:
   students_remove_4b27390b: "Estudiants - elimina"
   students_remove_4c8b3c3d: "Estudiants - Suprimeix"
   students_see_their_grades_here_ae80f808: "Els estudiants veuen les seves notes aquí."
+  students_tagged_successfully_58904166: "S'han etiquetat correctament els estudiants"
   students_view_2bcb78b2: "Vista d'estudiant"
   students_who_are_enrolled_in_multiple_sections_wil_596112c0: "Als estudiants inscrits en diverses seccions els posaran a part en un grup."
   students_who_have_received_a_grade_or_a_submission_7ef046cc: "Els estudiants que han rebut una nota o un comentari sobre l'entrega podran veure la seva nota i/o els comentaris sobre l'entrega."
@@ -29451,6 +29558,7 @@ ca:
   studio_capture_a88ec4e: "Captura d'estudi"
   studio_media_options_in_rce_1118428b: "Opcions d’elements multimèdia de Studio a l’RCE"
   style_f6881133: Estil
+  sub_account_c213944c: "Compte secundari"
   sub_account_daeadd0: "Compte secundari"
   sub_accounts: 
     alerts: 
@@ -30035,17 +30143,22 @@ ca:
   tag_count: 
     one: "%{count} etiqueta"
     other: "%{count} etiquetes"
+  tag_created_successfully_e5bcaff8: "S'ha creat correctament l’etiqueta"
   tag_mode_1d907df4: "Mode d'etiqueta"
   tag_name_bd6c8adf: "Nom de l’etiqueta *"
   tag_name_d4794459: "Nom de l’etiqueta"
+  tag_name_is_required_4c4b5601: "El nom de l’etiqueta és obligatori"
   tag_name_is_required_5b742d7c: "El nom de l’etiqueta és obligatori."
   tag_name_variant_tagcount_5c43a5dd: "Nom de l’etiqueta (variant %{tagCount})"
   tag_name_variant_tagcount_d4c8ed91: "Nom de l’etiqueta (variant %{tagCount}) *"
+  tag_option_e47d54c: "Opció d’etiqueta"
   tag_removed_successfully_e8b4fc23: "S’han suprimit correctament les etiquetes"
   tag_set_65e5916: "Conjunt d'etiquetes"
   tag_set_name_46fc3e7f: "Nom del conjunt d’etiquetes"
   tag_set_name_is_required_553beb05: "El nom del conjunt d’etiquetes és obligatori."
   tag_starts_with_9d5646eb: "L’etiqueta comença per"
+  tag_students_as_3b3d279b: "Etiqueteu els estudiants com a"
+  tag_students_f2c1f762: "Etiqueteu els estudiants"
   tag_upload_failed_please_check_the_file_format_and_171af184: "No s'ha pogut penjar l’etiqueta. Comproveu el format del fitxer i torneu a provar-ho."
   tagalog_74906db7: Tagal
   tags_2b72a03b: Etiquetes
@@ -30391,9 +30504,9 @@ ca:
   the_content_security_policy_allows_you_to_restrict_e262485f: |-
       La Política de seguretat del contingut us permet restringir el
                    JavaScript personalitzat que s'executa a la instància del Canvas. Podeu afegir manualment
-                   fins a %{max_domains} dominis permesos. Es recomanen els caràcters comodí
+                   fins a %{max_domains} dominis permesos. Es recomanen els caràcters comodí
                    (p. ex. *.instructure.com). Els dominis del Canvas i de l'Instructure s'inclouen
-                   automàticament i no compten per al límit de %{max_domains} dominis.
+                   automàticament i no compten per al límit de %{max_domains} dominis.
   the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
       La Norma de seguretat de contingut us permet restringir el
                      JavaScript personalitzar que s'executa a la vostra instància del Canvas. Podeu afegir manualment
@@ -30409,6 +30522,7 @@ ca:
   the_conversations_has_been_successfully_unstarred_fb69c53d: 
     one: "S’ha retirat correctament la marca d'estrelles de la conversa."
     other: "S’han retirat correctament les marques d'estrelles de les converses."
+  the_conversion_job_failed_9d8eee55: "No s’ha pogut dur a terme la feina de conversió."
   the_course_accessibility_checker_is_not_yet_availa_b8425664: "El verificador d'accessibilitat de l'assignatura encara no està disponible per a assignatures amb més de 1.000 recursos (combinació de pàgines, d’activitats i de fitxers adjunts)."
   the_course_accessibility_checker_is_not_yet_availa_dbc51b93: "El verificador d'accessibilitat de l'assignatura encara no està disponible per a assignatures amb més de 1.000 recursos (combinació de pàgines i activitats)."
   the_course_end_date_can_not_occur_before_the_cours_384dd741: "La data de finalització de l'assignatura no pot ser anterior a la data d'inici de l'assignatura."
@@ -31085,6 +31199,7 @@ ca:
   this_assignment_has_failed_to_unpublish_a201797c: "No s’ha pogut anul·lar la publicació d’aquesta activitat"
   this_assignment_has_failed_to_unpublish_f16da8d5: "No s’ha pogut anul·lar la publicació d’aquesta activitat."
   this_assignment_has_no_default_dates_ae314295: "Aquesta activitat no té cap data per defecte."
+  this_assignment_has_peer_review_allocations_that_a_39c703db: "Aquesta activitat té assignacions de revisions entre companys amb el format antic. Per continuar, suprimiu aquestes assignacions o convertiu-les al format nou."
   this_assignment_has_too_many_dates_to_display_262f555f: "Aquesta activitat té massa dates per mostrar."
   this_assignment_is_complete_5e096a06: "Aquesta activitat s'ha completat!"
   this_assignment_is_currently_being_moderated_ffd280f2: "Aquesta activitat s'està moderant actualment"
@@ -31269,6 +31384,7 @@ ca:
   this_file_16b24f02: "aquest fitxer"
   this_file_9443cda1: "Aquest fitxer"
   this_file_appears_to_be_empty_do_you_still_want_to_26ff72f4: "Sembla que aquest fitxer és buit. Encara voleu procedir amb la selecció de contingut?"
+  this_file_couldn_t_be_processed_it_may_be_corrupte_183bf4eb: "No s’ha pogut processar aquest fitxer. Pot ser que estigui corrupte o tingui un format no admès. Pengeu un fitxer diferent."
   this_file_has_already_been_added_5c2a1f21: "Ja s’ha afegit aquest fitxer."
   this_file_is_too_large_to_check_pdf_attachments_mu_94f8b8ee: "Aquest fitxer és massa gran per comprovar-lo. Els fitxers adjunts PDF no han de tenir més de %{size} MB."
   this_file_must_be_csv_aca2c67c: "El format del fitxer ha de ser .csv."
@@ -31354,6 +31470,9 @@ ca:
   this_is_a_what_if_score_cbdc04f9: "Això és una puntuació Què passaria si"
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Un administrador d’èxit del client ha d’habilitar aquest paràmetre de l'usuari. Els avisos són una característica que no es fa servir gaire, dissenyada per enviar un avís als estudiants, professors o administradors sobre disparadors concrets (p. ex., cap interacció entre estudiant i professor durant 7 dies). Aquests es comproven cada dia, i s’enviaran notificacions a l’estudiant i/o el professor fins que es resolgui el problema que ho ha disparat."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Aquesta configuració del compte l'ha d'activar l'administrador d'èxit del client."
+  this_is_an_announcement_from_7e5531ce: "Això és un anunci de "
+  this_is_an_announcement_from_canvas_administration_fc2dc20d: "Això és un anunci de l’equip d’*Administració del Canvas*"
+  this_is_an_announcement_from_name_c00d0fa1: "Això és un anunci de *%{name}*"
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Aquest és un fòrum anònim. Algunes imatges de perfil i alguns noms estan amagats."
   this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Aquest és un fòrum anònim. Tot i que s’amagaran els noms i les imatges de perfil dels estudiants, tots els membres del curs podran veure el vostre nom i la vostra imatge de perfil. També s’han desactivat les mencions."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Aquest és un fòrum anònim. Tot i que s’amagaran els noms i les imatges de perfil dels estudiants, tots els membres del curs podran veure el vostre nom i la vostra imatge de perfil."
@@ -31395,6 +31514,7 @@ ca:
   this_may_take_a_bit_c061d0f6: "pot ser que trigui una estona..."
   this_may_take_a_few_minutes_e2df06d6: "Pot ser que trigui uns minuts."
   this_may_take_a_while_d07790f2: "Pot ser que trigui una estona…"
+  this_may_take_up_to_24_hours_99de965d: "Pot ser que aquesta operació trigui fins a 24 hores."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Aquest missatge inclou comentaris multimèdia. Per escoltar-lo o respondre, feu clic en aquest enllaç: %{link}."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "Aquest missatge inclou comentaris multimèdia. Per escoltar-lo o respondre, feu clic a l'enllaç següent:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Aquest missatge inclou comentaris multimèdia. Per escoltar-lo o respondre, feu clic en aquest enllaç: %{link}.  Si teniu permís i necessiteu incloure un fitxer adjunt, inicieu la sessió al Canvas i responeu a l'entrega."
@@ -31873,8 +31993,8 @@ ca:
   title_52b8638d: "Títol:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*Grup de cites %{title}* Us hi podeu **registrar**."
   title_bar_chart_showing_count_issues_e2e882ee: 
-    one: "Gràfica de barres de %{title} en què es mostra %{count} problema."
-    other: "Gràfica de barres de %{title} en què es mostren %{count} problemes."
+    one: "Gràfica de barres de %{title} en què es mostra %{count} problema."
+    other: "Gràfica de barres de %{title} en què es mostren %{count} problemes."
   title_can_t_exceed_max_characters_b42b03cc: "El títol no pot tenir més de %{max} caràcters"
   title_color_725b497b: "Color del títol"
   title_color_b39a667f: "Color del títol"
@@ -32019,6 +32139,9 @@ ca:
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "Per permetre la funcionalitat de visualitzar, editar i suprimir les col·laboracions creades per altres usuaris, Contingut del curs - afegeix/edita/suprimeix també ha d'estar habilitat. Si Contingut del curs - afegeix/edita/suprimeix està habilitat i Col·laboracions entre estudiants - crea està inhabilitat, l'usuari no podrà crear col·laboracions noves, però podrà visualitza, editar i suprimir totes les col·laboracions. Per afegir estudiants a una col·laboració, també s'ha d'habilitar Usuaris - visualitza la llista. Per afegir un grup de cursos a una col·laboració, Grups - visualitza tots els grups d'estudiants també ha d'estar habilitat."
   to_allow_view_edit_delete_functionality_of_collabo_f46fade2: "Per permetre la funcionalitat de visualitzar, editar i suprimir les col·laboracions creades per altres usuaris, Contingut de l'assignatura - afegeix/edita/suprimeix també ha d’estar habilitat."
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: "Per assignar estudiants a un grup, introduïu els noms del grup a la columna “group_name”."
+  to_avoid_this_you_can_cancel_and_adjust_due_dates__139d53da: "Per evitar-ho, podeu cancel·lar i ajustar les dates de lliurament o desactivar la política d’entregues no presentades en aquesta assignatura."
+  to_avoid_this_you_can_cancel_and_adjust_due_dates__32d22df8: "Per evitar-ho, podeu cancel·lar i ajustar les dates de lliurament o desactivar la política d’entregues no presentades en aquesta assignatura i ometre’n la importació des de l’origen."
+  to_avoid_this_you_can_cancel_and_adjust_due_dates__52143f14: "Per evitar-ho, podeu cancel·lar i ajustar les dates de lliurament o optar per no importar la política d’entregues no presentades des de l’assignatura d’origen."
   to_be_added_2959cc72: "Per afegir"
   to_be_removed_d4b48586: "Per suprimir"
   to_bottom_14d51cd1: "a la part inferior"
@@ -33166,6 +33289,7 @@ ca:
   update_public_jwk_9f25f520: "Actualitza el JWK públic"
   update_quota_81381226: "Actualitza la quota"
   update_rating_6d29c2ef: "Actualitza la classificació"
+  update_report_7623967f: "Actualitzeu l’informe"
   update_settings_9b422d0f: "Actualitza la configuració"
   update_settings_for_portfolioname_1e2d7e97: "Actualitza la configuració de %{portfolioName}"
   update_summary_d6b180ff: "Actualitzeu el resum"
@@ -33255,6 +33379,7 @@ ca:
   upload_percent_complete_d533d3e2: "Penja el percentatge completat"
   upload_progress_df577c48: "Progrés de la penjada"
   upload_progress_for_name_39f03acf: "Progrés de la càrrega de %{name}"
+  upload_progress_progress_4b29d973: "Progrés de la penjada: %{progress}%"
   upload_record_media_b893dcd6: "Penja o enregistra l'element multimèdia"
   upload_scores_csv_a8416cf: "Pengeu les puntuacions (.csv)"
   upload_subtitles_280bedce: "Penja els subtítols"
@@ -33276,6 +33401,7 @@ ca:
   uploading_media_progress_c23a953b: "Progrés de càrrega de multimèdia"
   uploading_progress_2f5dd4bf: "Progrés de la penjada"
   uploading_progress_d62bb6e9: "Progrés de la penjada"
+  uploading_sis_package_2f429cd6: "S’està penjant el paquet del SIS…"
   uploading_submission_4c8d944b: "S'està carregant l'entrega"
   upper_limit_of_range_c454a8f2: "Límit superior de l'interval"
   upper_lower_56cad16c: "%{upper}: %{lower}"
@@ -33346,6 +33472,7 @@ ca:
   use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Feu servir Gem durant la importació de l'assignatura per actualitzar els enllaços de recursos del Canvas"
   use_graphql_for_gradebook_60936cf5: "Utilitzeu el GraphQL per al Llibre de notes"
   use_high_contrast_ui_a5917282: "Utilitza la IU de contrast alt"
+  use_identity_service_discovery_page_77223240: "Utilitzeu la pàgina de detecció del servei d’identitat"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Utilitzeu marcadors de posició millorats per al contingut inserit a l’RCE."
   use_instui_for_the_course_copy_page_6af58b87: "Utilitza InstUI per a la pàgina de còpia d'assignatures"
   use_instui_for_the_course_import_page_1906ef55: "Utilitzeu InstUI per a la pàgina d’importació d'assignatures"
@@ -33495,6 +33622,7 @@ ca:
     users_to_add: 
       one: "Si continueu així, s'afegirà un usuari."
       other: "Si continueu així, s'afegiran %{count} usuaris."
+  user_login_151eb34e: "Inici de sessió de l’usuari"
   user_login_id_7d5a6d2a: "ID d’inici de sessió de l’usuari:"
   user_login_id_d40cab16: "id d'inici de sessió de l’usuari"
   user_login_logout_activity_90fbbd9a: "Activitat d'inici/tancament de sessió de l'usuari"
@@ -33931,6 +34059,9 @@ ca:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Els usuaris amb aquest permís poden utilitzar la característica Actua com per administrar la configuració de l'usuari, visualitzar i ajustar notes, accedir a la informació de l’usuari, etc. Aquests permisos també permetran als administradors designats a un usuari secundari accedir a la configuració i a la informació fora del seu usuari secundari."
   uses_batch_processing_orchestrator_when_account_le_580b00a4: "Utilitza l’orquestrador del processament per lots quan s’actualitzen les competències de l’assignatura per tornar a calcular els resums de les assignatures afectades."
   uses_cedar_for_translations_7bfb6b44: "Utilitza Cedar per a les traduccions"
+  uses_optimized_implementation_for_grading_rubrics__f9a18a27: |
+      Utilitza la implementació optimitzada de l’extrem de rúbriques de qualificació amb correccions de consultes N+1
+      i filtres de context. Millora el rendiment d’usuaris amb moltes inscripcions d’assignatures.
   uses_the_enhanced_igniteai_search_ui_search_for_co_137b2eb8: "Utilitza la IU millorada de la cerca a l’IgniteAI. Cal que l’opció Cerca d’assignatures estigui activada perquè això tingui efecte."
   uses_the_enhanced_smart_search_ui_smart_search_mus_42d23095: "Utilitzeu la IU millorada de Cerca intel·ligent. Cal que l’opció Cerca intel·ligent estigui activada perquè això tingui efecte."
   using_correct_list_formatting_helps_learners_using_55736a4e: "Utilitzar el format de llista correcte ajuda els alumnes que fan servir lectors de pantalla a entendre’n el contingut."
@@ -33971,6 +34102,8 @@ ca:
   value_too_long_allowed_length_is_length_a81d4cf: "El valor és massa llarg, la longitud permesa és %{length}"
   vanity_url_76f93382: "URL de Vanity"
   variant_limit_reached_current_limit_is_limit_10917429: "S'ha arribat al límit de variants. El límit actual és %{limit}"
+  variant_name_dc9e5fea: "Nom de la variant"
+  variant_name_is_required_ad8b3061: "El nom de la variant és obligatori"
   vendor_code_lti_2_ef36207b: "Codi de proveïdor (LTI 2):"
   venezuela_58_959d01f7: "Veneçuela (+58)"
   vericite: 
@@ -33994,6 +34127,7 @@ ca:
   vertical_17932955: Vertical
   video_78335c71: vídeo
   video_b9f27375: Vídeo
+  video_caption_generation_4aba1de4: "Generació de subtítols del vídeo"
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Directrius sobre videoconferències per a aules remotes"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Les eines de videoconferències permeten la connexió cara a cara entre professors i estudiants."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "El vostre dispositiu o aplicació no admet el contingut de vídeo."
@@ -34166,6 +34300,7 @@ ca:
   warning_6576b5b8: advertiment
   warning_aacb8c24: Advertiment
   warning_all_permissions_will_change_to_match_the_s_e3c9819f: "Advertiment: Es modificaran tots els permisos perquè coincideixin amb el rol bàsic seleccionat."
+  warning_both_courses_have_automatic_missing_policy_62296661: "Advertiment: Ambdues assignatures tenen activada la política automàtica d’entregues no presentades"
   warning_d9ac42ef: "Advertiment:"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advertiment: Per a una millor accessibilitat en desplaçar els fitxers, utilitzeu l'opció del menú Desplaça al quadre de diàleg."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Advertiment: Per a una millor accessibilitat en reordenar activitats i grups, utilitzeu l'opció del menú Desplaça al quadre de diàleg."
@@ -34175,7 +34310,9 @@ ca:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Advertiment: Si hi ha usuaris amb aquest rol, mantindran els permisos actuals, però no podran crear nous usuaris amb aquest rol."
   warning_the_placement_placement_is_only_allowed_fo_4e119a65: "Advertiment: la ubicació %{placement} només està permesa per a les eines d’LTI aprovades d’Instructure. Si creieu que heu rebut aquest missatge per error, poseu-vos en contacte amb l'equip d'assistència tècnica."
   warning_the_resource_selection_placement_is_deprec_458af5b2: "Advertiment: la ubicació de resource_selection és obsoleta. Feu servir assignment_selection o link_selection en el seu lloc."
+  warning_the_source_course_has_automatic_missing_po_a66e1c71: "Advertiment: L’assignatura d’origen té activada la política automàtica d’entregues no presentades"
   warning_the_submission_type_selection_placement_is_d327c8d: "Advertiment: la ubicació submission_type_selection només està permesa per a les eines d’LTI aprovades d’Instructure. Si creieu que heu rebut aquest missatge per error, poseu-vos en contacte amb l'equip d'assistència."
+  warning_this_course_has_automatic_missing_policy_e_f2e9b0c3: "Advertiment: Aquesta assignatura té activada la política automàtica d’entregues no presentades"
   warning_this_identity_provider_recently_violated_t_5c4b42f2: "Advertiment: Recentment, aquest proveïdor d’identitat ha violat la condició d’un sol ús en una resposta de SAML a les %{timestamp}."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Advertiment. Esteu a punt d'ajustar la pertinença d'aquest grup. *Aquest canvi afectarà les entregues, les anotacions i els comentaris del grup existent, i resultarà en una pèrdua de dades TANT per aquest grup COM per al grup anterior de l'estudiant.*** Per impedir les conseqüències no desitjades amb les entregues existents del grup, creeu un conjunt de grups nou per a les activitats futures. **"
   warnings: 
@@ -34405,6 +34542,10 @@ ca:
       les configuracions de les claus de desenvolupador.
   when_enabled_canvas_will_inherit_account_survey_se_39875d62: "Un cop activada, el Canvas heretarà la configuració d’enquestes sobre el compte del camp Canvas_Survey_Opt_Out__c del Salesforce. Una tasca recurrent sincronitzarà aquesta configuració cada 24 hores i la IU serà només de lectura."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Un cop activat, feu servir un sistema distribuït per recollir mètriques d'analítica interna."
+  when_enabled_displays_sis_ids_in_the_inbox_recipie_71241a17: |-
+      Quan aquesta opció està activada, es mostren els ID del SIS al selector de destinataris de la safata d'entrada
+      per poder diferenciar els usuaris amb noms idèntics. Només és visible
+      per als usuaris amb permís de read_sis (per defecte, els professors).
   when_enabled_external_url_module_items_set_to_load_eacdb54b: |-
       Quan aquesta opció està activada, els elements del mòdul de l’URL extern establerts en “Carrega’ls en una pestanya nova” s’obriran
       ininterrompudament en una pestanya nova. La pàgina intermèdia del Canvas (en què es fa un seguiment de la progressió)
@@ -34514,6 +34655,11 @@ ca:
   when_enabled_the_monitor_tab_on_the_lti_apps_page__a6687c3: "Quan aquesta opció està activada, la pestanya Monitor a la pàgina d'aplicacions d’LTI inclourà la característica opcional d’avisos de nivell baix d’ús."
   when_enabled_the_monitor_tab_will_appear_in_canvas_57f54296: "Quan aquesta opció està activada, es mostrarà la pestanya Monitor a les aplicacions del Canvas."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "Quan aquesta opció estigui activada, es mostrarà la nova targeta del recurs del tipus d'entrega a la pàgina d'edició de l’activitat."
+  when_enabled_the_planner_s_complete_incomplete_fil_77098539: |-
+      Quan aquesta opció està activada, els filtres complets i incomplets del planificador mostraran correctament
+      les proves qualificades, els fòrums qualificats i les activitats de les pàgines wiki
+      el seguiment de l’estat de compleció dels quals es faci a través d’una substitució del planificador a l’objecte
+      entregable en lloc de fer-ho directament a l’activitat.
   when_enabled_the_submission_type_selection_placeme_dc9226b2: |-
       Quan aquesta opció està activada, la ubicació de submission_type_selection no es mostrarà a
       l’IU en el cas de les claus de desenvolupador que ja no en tinguin. Les eines encara poden tenir la
@@ -34927,6 +35073,7 @@ ca:
                     navegant a Assignatures > Totes les assignatures des del menú principal.
   you_are_already_enrolled_in_this_course_7b661f7a: "Ja esteu inscrit en aquesta assignatura."
   you_are_being_notified_because_this_canvas_instanc_5d338532: "Se us ha enviat una notificació perquè, recentment, aquesta instància del Canvas ha rebut sol·licituds que estarien bloquejades. Al *registre de canvis de l’API*, podeu obtenir-ne més informació i, a través de l’enllaç a la publicació al blog que hi trobareu, saber com es mitiga aquest canvi."
+  you_are_being_notified_because_this_canvas_instanc_ecd4561a: "Se us ha enviat una notificació perquè, recentment, aquesta instància del Canvas ha rebut sol·licituds que estarien bloquejades. Podeu revisar qualsevol sol·licitud actual de GET amb un cos a la *pàgina Informes*; al **registre de canvis de l’API**, podeu obtenir-ne més informació i, a través de l’enllaç a la publicació al blog que hi trobareu, saber com es mitiga aquest canvi."
   you_are_currently_acting_as_user_name_8d2be0ee: "Esteu actuant com a %{user_name}"
   you_are_currently_in_the_environment_environment_t_449c4c0f: "Actualment sou a l’entorn %{environment}. Això afectarà tots els clients. Segur que voleu fer-ho?"
   you_are_currently_logged_into_student_view_3e8a1da: "Actualment teniu la sessió iniciada a la Vista d'estudiant"
@@ -35150,6 +35297,7 @@ ca:
   you_have_unpublished_changes_to_your_student_pace__41f251bd: "Hi ha canvis no publicats al ritme de l'estudiant. Si continueu, es descartaran aquests canvis."
   you_have_unsaved_changes_are_you_sure_you_want_to__1e6aaefd: "No heu desat alguns canvis. Segur que voleu cancel·lar-ho?"
   you_have_unsaved_changes_are_you_sure_you_want_to__e91bbc81: "No heu desat alguns canvis. Segur que voleu sortir-ne?"
+  you_have_unsaved_changes_are_you_sure_you_want_to__f349d9fd: "No heu desat alguns canvis. Segur que voleu tancar-ho?"
   you_have_unsaved_changes_c906db8e: "No heu desat alguns canvis"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Heu anul·lat la sincronització dels canvis que se sincronitzaran amb totes les assignatures associades quan es desi una associació nova."
   you_haven_t_generated_any_insights_yet_6c937b72: "Encara no heu generat cap dada."
@@ -35240,6 +35388,8 @@ ca:
   you_or_we_can_end_your_participation_anytime_and_w_ab05c2b0: "Podeu finalitzar la vostra participació en qualsevol moment; nosaltres també podem fer-ho, així com desactivar les característiques opcionals sense avisar. És possible que les característiques opcionals canviïn, i el suport és limitat. La disponibilitat continuada de les característiques opcionals no és cap garantia que acabin estant disponibles de manera general."
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "Esteu editant el vostre tema del Canvas! Podeu aplicar o cancel·lar els canvis des de l'*Editor de temes*."
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Esteu editant el vostre tema del Canvas! Els canvis encara no s'han aplicat."
+  you_re_importing_from_a_course_with_automatic_miss_d11d4f0e: "Esteu fent una importació des d’una assignatura que té activada la política automàtica d’entregues no presentades. Aquesta política i la seva configuració es copiaran a la vostra assignatura. Si alguna activitat importada té dates de lliurament que ja han passat, és possible que rebi zeros automàtics."
+  you_re_importing_into_a_course_with_automatic_miss_fb9a1c75: "Esteu fent una importació en una assignatura que té activada la política automàtica d’entregues no presentades. Si alguna activitat importada té dates de lliurament que ja han passat, és possible que rebi zeros automàtics segons la normativa de qualificació actual."
   you_re_probably_using_safari_with_prevent_cross_si_4ab1b645: "Probablement feu servir Safari amb l’opció “Evita el seguiment en diversos llocs” activada. Això pot fer que no s’enviï correctament la informació d'inici de sessió amb el llançament d’LTI. Anem a provar de corregir-ho."
   you_scored_a_score_a5dd5561: "La vostra puntuació és %{score}."
   you_successfully_uploaded_1_student_into_count_tag_c0e49079: 
