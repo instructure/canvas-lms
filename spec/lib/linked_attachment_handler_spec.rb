@@ -179,7 +179,7 @@ describe LinkedAttachmentHandler do
 
       context "in production environment" do
         before do
-          allow(Rails.env).to receive_messages(development?: false, test?: false)
+          allow(Rails.env).to receive(:local?).and_return(false)
         end
 
         it "captures error to Sentry and does not raise" do
