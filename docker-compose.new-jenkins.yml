@@ -30,12 +30,16 @@ services:
       RSPECQ_FILE_SPLIT_THRESHOLD:
       RSPECQ_MAX_REQUEUES:
       RSPECQ_WORKER_LIVENESS_SEC:
+      RSPECQ_CHUNK_TARGET_DURATION:
 
       # rspec-parallel-log build
       RSPEC_LOG:
     # this will stop passenger from booting so the container isn't running anything at all once up
     command: sleep infinity
     init: true
+    # Cap the web container so Docker OOM-kills it before the EC2 node dies.
+    # The node has 16 GiB; 6g here leaves headroom for the other containers and the OS.
+    mem_limit: 6g
 
   redis:
     image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/library/redis:alpine

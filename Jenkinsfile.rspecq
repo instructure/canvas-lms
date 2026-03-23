@@ -209,6 +209,7 @@ env.FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
 env.RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
 env.RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
 env.RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
+env.RSPECQ_CHUNK_TARGET_DURATION = commitMessageFlag('rspecq-chunk-target-duration').asType(Integer)
 env.RSPECQ_WORKER_LIVENESS_SEC = commitMessageFlag('worker-liveness-sec').asType(Integer)
 env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
 env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
