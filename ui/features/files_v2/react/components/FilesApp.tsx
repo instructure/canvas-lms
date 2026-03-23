@@ -189,7 +189,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     folderId,
     contextType,
     contextId,
-    enabled: !isLoading && !!filesEnv.isDuplicateFoldersFeatureEnabled,
+    enabled:
+      !isLoading && !!filesEnv.isDuplicateFoldersFeatureEnabled && userCanEditFilesForContext,
   })
 
   useEffect(() => {
