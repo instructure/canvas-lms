@@ -115,7 +115,7 @@ describe('CoursesTableRow', () => {
       expect(screen.queryByText('SIS-101')).not.toBeInTheDocument()
     })
 
-    it('renders empty string when SIS ID is missing', () => {
+    it('renders SR fallback when SIS ID is missing', () => {
       const course = createMockCourse({sis_course_id: undefined})
       render(
         <table>
@@ -125,8 +125,7 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const sisIdCell = screen.getByTestId('sis-id-cell')
-      expect(sisIdCell).toHaveTextContent('')
+      expect(screen.getByText('No data')).toBeInTheDocument()
     })
   })
 
@@ -144,7 +143,7 @@ describe('CoursesTableRow', () => {
       expect(screen.getByText('Fall 2026')).toBeInTheDocument()
     })
 
-    it('renders empty string when term is missing', () => {
+    it('renders SR fallback when term is missing', () => {
       const course = createMockCourse({term: undefined})
       render(
         <table>
@@ -154,8 +153,7 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const termCell = screen.getByTestId('term-cell')
-      expect(termCell).toHaveTextContent('')
+      expect(screen.getByText('No data')).toBeInTheDocument()
     })
   })
 
@@ -220,7 +218,7 @@ describe('CoursesTableRow', () => {
       expect(screen.queryByRole('button', {name: 'Show More'})).not.toBeInTheDocument()
     })
 
-    it('renders empty cell when no teachers', () => {
+    it('renders SR fallback when no teachers', () => {
       const course = createMockCourse({teachers: undefined})
       render(
         <table>
@@ -230,8 +228,7 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const teachersCell = screen.getByTestId('teachers-cell')
-      expect(teachersCell).toHaveTextContent('')
+      expect(screen.getByText('No data')).toBeInTheDocument()
     })
   })
 
@@ -251,7 +248,7 @@ describe('CoursesTableRow', () => {
       expect(link).toHaveAttribute('href', '/accounts/5/accessibility')
     })
 
-    it('renders empty string when subaccount is missing', () => {
+    it('renders SR fallback when subaccount is missing', () => {
       const course = createMockCourse({subaccount_id: undefined, subaccount_name: undefined})
       render(
         <table>
@@ -261,8 +258,7 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const subaccountCell = screen.getByTestId('subaccount-cell')
-      expect(subaccountCell).toHaveTextContent('')
+      expect(screen.getByText('No data')).toBeInTheDocument()
     })
   })
 
@@ -487,7 +483,7 @@ describe('CoursesTableRow', () => {
   })
 
   describe('Resolved Issues column', () => {
-    it('shows empty cell when statistic is undefined', () => {
+    it('renders SR fallback when statistic is undefined', () => {
       const course = createMockCourse({accessibility_course_statistic: undefined})
       render(
         <table>
@@ -497,11 +493,10 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
-      expect(resolvedIssuesCell).toHaveTextContent('')
+      expect(screen.getByTestId('resolved-issues-cell')).toHaveTextContent('No data')
     })
 
-    it('shows empty cell when statistic is null', () => {
+    it('renders SR fallback when statistic is null', () => {
       const course = createMockCourse({accessibility_course_statistic: null})
       render(
         <table>
@@ -511,11 +506,10 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
-      expect(resolvedIssuesCell).toHaveTextContent('')
+      expect(screen.getByTestId('resolved-issues-cell')).toHaveTextContent('No data')
     })
 
-    it('shows empty cell when resolved_issue_count is null', () => {
+    it('renders SR fallback when resolved_issue_count is null', () => {
       const course = createMockCourse({
         accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           resolved_issue_count: null,
@@ -529,11 +523,10 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
-      expect(resolvedIssuesCell).toHaveTextContent('')
+      expect(screen.getByTestId('resolved-issues-cell')).toHaveTextContent('No data')
     })
 
-    it('shows empty cell when resolved_issue_count is 0', () => {
+    it('renders SR fallback when resolved_issue_count is 0', () => {
       const course = createMockCourse({
         accessibility_course_statistic: createMockAccessibilityCourseStatistic({
           resolved_issue_count: 0,
@@ -547,8 +540,7 @@ describe('CoursesTableRow', () => {
         </table>,
       )
 
-      const resolvedIssuesCell = screen.getByTestId('resolved-issues-cell')
-      expect(resolvedIssuesCell).toHaveTextContent('')
+      expect(screen.getByTestId('resolved-issues-cell')).toHaveTextContent('No data')
     })
 
     it('shows success badge with count when resolved_issue_count > 0', () => {

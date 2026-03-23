@@ -92,11 +92,15 @@ const CourseNameCell: React.FC<{courseId: string; courseName: string}> = ({
 )
 
 const SISIdCell: React.FC<{sisId?: string}> = ({sisId}) => (
-  <Table.Cell data-testid="sis-id-cell">{sisId || ''}</Table.Cell>
+  <Table.Cell data-testid="sis-id-cell">
+    {sisId || <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>}
+  </Table.Cell>
 )
 
 const TermCell: React.FC<{termName?: string}> = ({termName}) => (
-  <Table.Cell data-testid="term-cell">{termName || ''}</Table.Cell>
+  <Table.Cell data-testid="term-cell">
+    {termName || <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>}
+  </Table.Cell>
 )
 
 const TeachersCell: React.FC<{teachers?: Course['teachers']}> = ({teachers}) => {
@@ -106,6 +110,9 @@ const TeachersCell: React.FC<{teachers?: Course['teachers']}> = ({teachers}) => 
 
   return (
     <Table.Cell data-testid="teachers-cell">
+      {nonNullTeachers.length === 0 && (
+        <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>
+      )}
       {teachersToShow.map(teacher => (
         <div key={teacher.id}>
           <Link href={teacher.html_url} isWithinText={false}>
@@ -139,7 +146,7 @@ const SubaccountCell: React.FC<{
         {subaccountName}
       </Link>
     ) : (
-      ''
+      <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>
     )}
   </Table.Cell>
 )
@@ -214,7 +221,11 @@ const ResolvedIssuesCell: React.FC<{statistic?: Course['accessibility_course_sta
   const issueCount = statistic?.resolved_issue_count ?? 0
   return (
     <Table.Cell data-testid="resolved-issues-cell">
-      {issueCount === 0 ? null : <IssuesBadgeContent variant="success" count={issueCount} />}
+      {issueCount === 0 ? (
+        <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>
+      ) : (
+        <IssuesBadgeContent variant="success" count={issueCount} />
+      )}
     </Table.Cell>
   )
 }
