@@ -23,7 +23,7 @@ import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import React from 'react'
 

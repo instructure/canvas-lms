@@ -19,7 +19,7 @@
 import React, {useState, useContext} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import AlertManager, {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 import {Flex} from '@instructure/ui-flex'

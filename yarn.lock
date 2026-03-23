@@ -2949,6 +2949,11 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-learning-agent-launcher/-/platform-learning-agent-launcher-1.1.1.tgz#fd880710d0c0a7520fba0e48bb8d48c884b85172"
   integrity sha512-zclm+wH+HQcvZ6HILWlbw2mmhp3+0Chyjy1OW1Xka4BshkeQbe41cJ9jyy93+G/sCEM5qdl0YT/AXVWwmdMfoA==
 
+"@instructure/platform-loading-indicator@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-loading-indicator/-/platform-loading-indicator-0.2.0.tgz#6e345adee0316dedc07a266bfa34d6b8d42e8bb0"
+  integrity sha512-FMkWqvW6TJHYAdqLKMgLZsBsfAZrmBsMTAkT5TX9Adp7KjuiQVvM29kRkh4jkuaDfzSe5SK0i9oRtHtOQTgc9A==
+
 "@instructure/platform-provider@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.1.1.tgz#10feedcc51bf0cf1597921efcc7041065b5ecc85"

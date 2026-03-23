@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'

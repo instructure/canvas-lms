@@ -19,7 +19,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'

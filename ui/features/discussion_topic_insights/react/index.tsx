@@ -28,7 +28,7 @@ const AlertManager: React.ComponentType<React.PropsWithChildren<{}>> = _AlertMan
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {ApolloClient, InMemoryCache} from '@apollo/client'
 
 const I18n = createI18nScope('discussion_insights')

@@ -22,7 +22,7 @@ import CanvasInbox from './containers/CanvasInbox'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React, {useEffect, useState} from 'react'
 
 export const CanvasInboxApp = () => {
