@@ -18,7 +18,7 @@
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'

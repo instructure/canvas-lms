@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ErrorBoundary from '@canvas/error-boundary/react'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {PropsWithChildren} from 'react'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'

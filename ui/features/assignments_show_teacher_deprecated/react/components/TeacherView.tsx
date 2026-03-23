@@ -25,7 +25,7 @@ import produce from 'immer'
 import {get, set} from 'es-toolkit/compat'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 

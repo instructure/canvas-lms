@@ -22,7 +22,7 @@ import WidgetDashboardContainer from './react/WidgetDashboardContainer'
 import EducatorDashboardContainer from './react/EducatorDashboardContainer'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {

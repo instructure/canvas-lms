@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
