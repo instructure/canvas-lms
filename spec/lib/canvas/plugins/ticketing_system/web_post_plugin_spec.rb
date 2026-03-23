@@ -30,6 +30,24 @@ module Canvas::Plugins::TicketingSystem
         expect(HTTParty).to receive(:post).with(endpoint, include(body: document.to_json))
         plugin.export_error(report, config)
       end
+
+      it "truncates become_user_uri to the maximum string length" do
+        ticketing = instance_double(Canvas::Plugins::TicketingSystem)
+        long_uri = "http://something.com/path?become_user_id=42&state=#{"x" * 300}"
+        document = { reporter: { become_user_uri: long_uri } }
+        report = instance_double(Canvas::Plugins::TicketingSystem::CustomError, to_document: document)
+        endpoint = "http://someserver.com/some/endpoint"
+        config = { endpoint_uri: endpoint }
+        plugin = WebPostPlugin.new(ticketing)
+
+        allow(HTTParty).to receive(:post)
+        plugin.export_error(report, config)
+
+        expect(HTTParty).to have_received(:post) do |_url, opts|
+          request_body = JSON.parse(opts[:body])
+          expect(request_body.dig("reporter", "become_user_uri").length).to be <= ErrorReport.maximum_string_length
+        end
+      end
     end
   end
 end
