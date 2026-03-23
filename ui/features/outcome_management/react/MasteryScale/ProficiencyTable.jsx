@@ -29,7 +29,7 @@ import {memoize, isEqual} from 'es-toolkit/compat'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '@canvas/i18n/numberHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
 const I18n = createI18nScope('ProficiencyTable')
@@ -69,7 +69,6 @@ class ProficiencyTable extends React.Component {
     canManage: PropTypes.bool.isRequired,
     update: PropTypes.func.isRequired,
     focusTab: PropTypes.func,
-    breakpoints: breakpointsShape,
     contextType: PropTypes.string.isRequired,
     onNotifyPendingChanges: PropTypes.func,
   }

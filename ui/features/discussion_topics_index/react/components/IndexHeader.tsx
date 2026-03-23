@@ -35,7 +35,7 @@ import {legacyRender} from '@canvas/react'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 import {SearchField} from '@canvas/discussions/react/components/SearchField'
 
@@ -54,7 +54,6 @@ const getFilters = () => ({
 
 export default class IndexHeader extends Component {
   static propTypes = {
-    breakpoints: breakpointsShape.isRequired,
     contextId: string,
     contextType: string,
     courseSettings: propTypes.courseSettings,

@@ -23,7 +23,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
-import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('discussions_posts')
@@ -90,7 +89,7 @@ DiscussionPostSearchTool.propTypes = {
   onSearchChange: PropTypes.func,
   searchTerm: PropTypes.string,
   discussionAnonymousState: PropTypes.string,
-  breakpoints: breakpointsShape,
+  breakpoints: PropTypes.object,
 }
 
 export default DiscussionPostSearchTool

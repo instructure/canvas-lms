@@ -81,7 +81,7 @@ import {
 } from '../../util/utils'
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
 import {flushSync} from 'react-dom'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrapper'
 import {SendEditNotificationModal} from '../SendEditNotificationModal'
 import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewSelector'
@@ -1706,7 +1706,6 @@ DiscussionTopicForm.propTypes = {
   apolloClient: PropTypes.object,
   isSubmitting: PropTypes.bool,
   setIsSubmitting: PropTypes.func,
-  breakpoints: breakpointsShape,
 }
 
 DiscussionTopicForm.defaultProps = {
