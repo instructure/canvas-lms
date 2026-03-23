@@ -107,7 +107,7 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
                 {I18n.t('Closing remediation, please wait...')}
               </ScreenReaderContent>
             )}
-            <Heading level="h2" margin="0 0 small 0">
+            <Heading level="h3" margin="0 0 small 0">
               {I18n.t('%{count} outstanding issues remaining', {count: scan.issueCount})}
             </Heading>
             <View as="div" margin="medium 0">
