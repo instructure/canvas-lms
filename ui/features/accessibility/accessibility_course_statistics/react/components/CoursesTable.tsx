@@ -41,7 +41,7 @@ export const CoursesTable: React.FC<CoursesTableProps> = ({
   const showSISIds = courses.some(course => course.sis_course_id)
 
   return (
-    <Table margin="small 0" caption={I18n.t('Courses')}>
+    <Table margin="small 0" caption={I18n.t('Course Accessibility Report')}>
       <Table.Head>
         <Table.Row>
           <Table.ColHeader id="header-course-status">

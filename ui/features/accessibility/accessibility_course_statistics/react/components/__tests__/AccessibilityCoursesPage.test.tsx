@@ -75,6 +75,15 @@ describe('AccessibilityCoursesPage', () => {
       </MemoryRouter>,
     )
 
+  it('courses table has a descriptive caption for screen readers', async () => {
+    const mockCourses = createMockCourses(2)
+    server.use(http.get('/api/v1/accounts/123/courses', () => HttpResponse.json(mockCourses)))
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByText('Course Accessibility Report')).toBeInTheDocument()
+    })
+  })
+
   it('search input accessible name matches visible placeholder text', () => {
     server.use(http.get('/api/v1/accounts/123/courses', () => HttpResponse.json([])))
     renderPage()
