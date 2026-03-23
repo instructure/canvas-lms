@@ -27,6 +27,8 @@ import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -569,6 +571,20 @@ export default function VideoOptionsTray({
                               variant="toggle"
                             />
                           </CheckboxGroup>
+                        </Flex.Item>
+                      ) : null}
+                      {!isStudio && isAsrCaptioningImprovements ? (
+                        <Flex.Item padding="small">
+                          <Link
+                            id="tray-transcript-help-link"
+                            variant="standalone"
+                            renderIcon={<IconExternalLinkLine />}
+                            href="https://productmarketing.instructuremedia.com/embed/32388c5a-580c-40f0-85a2-6b4042ddcccb"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {formatMessage('How to request and edit captions?')}
+                          </Link>
                         </Flex.Item>
                       ) : null}
                     </Flex>
