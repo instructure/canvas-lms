@@ -111,19 +111,6 @@ feature_flag_ui_sorting:
       state: allowed_on
     ci:
       state: allowed_on
-import_numeric_lti_custom_params_as_string:
-  state: hidden
-  shadow: true
-  applies_to: SiteAdmin
-  display_name: Copy numeric lti custom params as strings on imports.
-  description: Prevent ResourceLink custom parameters from being converted to numbers during course copy.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lock_lti_registrations:
   state: hidden
   shadow: true
