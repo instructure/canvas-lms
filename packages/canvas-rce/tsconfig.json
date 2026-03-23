@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "allowJs": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -19,6 +20,7 @@
     "composite": true,
     "rootDir": "src",
     "verbatimModuleSyntax": false,
+    "types": ["node"],
     "paths": {
       "@instructure/*": ["../packages/*"]
     }
