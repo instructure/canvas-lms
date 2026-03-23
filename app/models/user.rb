@@ -2900,11 +2900,12 @@ class User < ApplicationRecord
       end
     end
 
-    enabled_peer_review_ids = course_ids_with_peer_review_enabled
-    peer_review_context_codes = context_codes.select do |code|
+    course_code_by_id = context_codes.each_with_object({}) do |code, map|
       type, id = ActiveRecord::Base.parse_asset_string(code)
-      type == "Course" && enabled_peer_review_ids.include?(id)
+      map[id] = code if type == "Course"
     end
+    enabled_peer_review_ids = course_ids_with_peer_review_enabled(course_ids: course_code_by_id.keys)
+    peer_review_context_codes = course_code_by_id.values_at(*enabled_peer_review_ids).compact
 
     if peer_review_context_codes.any?
       peer_review_sub_assignments = PeerReviewSubAssignment.published
@@ -2946,8 +2947,9 @@ class User < ApplicationRecord
            .flat_map { |a| course_ids_by_account_id[a.id] }
   end
 
-  def course_ids_with_peer_review_enabled
-    courses.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
+  def course_ids_with_peer_review_enabled(course_ids: nil)
+    courses_to_check = course_ids ? courses.where(id: course_ids) : courses
+    courses_to_check.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
