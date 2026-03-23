@@ -2218,26 +2218,26 @@ describe Types::SubmissionType do
         expect(result).to eq []
       end
 
-      it "uses for_student=true loader for students viewing their own submission" do
+      it "uses for_student=true, latest=false loader for students when latest not specified" do
         loader = instance_double(Loaders::SubmissionLtiAssetReportsLoader)
         allow(Loaders::SubmissionLtiAssetReportsLoader).to receive(:for)
-          .with(for_student: true, latest: true)
+          .with(for_student: true, latest: false)
           .and_return(loader)
         allow(loader).to receive(:load).with(submission.id).and_return(Promise.resolve([]))
 
         submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
 
-        expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: true, latest: true)
+        expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: true, latest: false)
       end
 
-      it "always uses latest=true for students" do
+      it "passes latest=true through for students when requested (e.g. grades page)" do
         loader = instance_double(Loaders::SubmissionLtiAssetReportsLoader)
         allow(Loaders::SubmissionLtiAssetReportsLoader).to receive(:for)
           .with(for_student: true, latest: true)
           .and_return(loader)
         allow(loader).to receive(:load).with(submission.id).and_return(Promise.resolve([]))
 
-        submission_type.resolve("ltiAssetReportsConnection(latest: false) { nodes { _id } }")
+        submission_type.resolve("ltiAssetReportsConnection(latest: true) { nodes { _id } }")
 
         expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: true, latest: true)
       end

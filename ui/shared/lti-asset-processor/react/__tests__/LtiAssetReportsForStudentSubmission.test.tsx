@@ -29,6 +29,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
   const defaultProps = {
     submissionId: 'submission-123',
     submissionType: 'online_upload',
+    attempt: 1,
     attachmentId: 'attachment-456',
   }
 
