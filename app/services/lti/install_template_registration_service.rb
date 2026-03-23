@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::InstallTemplateRegistrationService < ApplicationService
-  attr_reader :account, :user, :template, :binding_state, :local_copy
+  attr_reader :account, :user, :template, :binding_state, :local_copy, :create_tool
 
-  def initialize(account:, user:, template:, binding_state: :on)
+  def initialize(account:, template:, user: nil, binding_state: :on, create_tool: true)
     raise ArgumentError, "template registration must be provided" if template.nil?
     raise ArgumentError, "template registration is off" if template.workflow_state != "active"
     raise ArgumentError, "root account must be provided" if account.nil? || !account.root_account?
-    raise ArgumentError, "user must be provided" if user.nil?
     raise ArgumentError, "Dynamic Registrations cannot be used as templates" if template.dynamic_registration?
 
     super()
 
     @account = account
     @template = template
+    @create_tool = create_tool
     @user = user
     @binding_state = binding_state.to_sym
   end
@@ -101,7 +101,7 @@ class Lti::InstallTemplateRegistrationService < ApplicationService
     )
 
     # deploy tool to root account
-    local_copy.new_external_tool(account, current_user: user, available: false)
+    local_copy.new_external_tool(account, current_user: user, available: false) if create_tool
 
     @local_copy = local_copy
   end
