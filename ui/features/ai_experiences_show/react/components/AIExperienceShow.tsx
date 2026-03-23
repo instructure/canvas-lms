@@ -67,10 +67,10 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         path: `/api/v1/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}`,
         method: 'DELETE',
       })
-      showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
+      showFlashSuccess(I18n.t('Knowledge Chat deleted successfully'))()
       window.location.href = `/courses/${aiExperience.course_id}/ai_experiences`
     } catch (_error) {
-      showFlashError(I18n.t('Failed to delete AI Experience'))()
+      showFlashError(I18n.t('Failed to delete Knowledge Chat'))()
       setIsDeleting(false)
       setIsDeleteModalOpen(false)
     }
@@ -108,7 +108,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                       interaction="disabled"
                       data-testid="ai-experience-show-ai-conversations-button"
                     >
-                      {I18n.t('AI Conversations')}
+                      {I18n.t('Conversations')}
                     </Button>
                   </Tooltip>
                 ) : (
@@ -117,7 +117,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                     href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
                     data-testid="ai-experience-show-ai-conversations-button"
                   >
-                    {I18n.t('AI Conversations')}
+                    {I18n.t('Conversations')}
                   </Button>
                 )}
               </Flex.Item>
@@ -126,7 +126,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   placement="bottom end"
                   trigger={
                     <IconButton
-                      screenReaderLabel={I18n.t('AI Experience settings')}
+                      screenReaderLabel={I18n.t('Knowledge Chat settings')}
                       withBackground={false}
                       withBorder={false}
                     >
@@ -193,7 +193,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
       )}
 
       <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Experience')}
+        {I18n.t('Activity')}
       </Heading>
 
       {canManage && isIndexing ? (
@@ -216,7 +216,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
             <Flex.Item>
               <Text color="secondary">
                 {I18n.t(
-                  'Preview and AI Conversations will be available once processing is complete. Check back later.',
+                  'Preview and Conversations will be available once processing is complete. Check back later.',
                 )}
               </Text>
             </Flex.Item>
@@ -283,17 +283,6 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
             </div>
 
             <View as="div" padding="medium" background="primary">
-              {aiExperience.facts && (
-                <View as="div" margin="0 0 medium 0">
-                  <Heading level="h3" margin="0 0 small 0">
-                    {I18n.t('Facts Students Should Know')}
-                  </Heading>
-                  <Text data-testid="ai-experience-show-facts-text">
-                    <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
-                  </Text>
-                </View>
-              )}
-
               {aiExperience.learning_objective && (
                 <View as="div" margin="0 0 medium 0">
                   <Heading level="h3" margin="0 0 small 0">
@@ -306,9 +295,9 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
               )}
 
               {aiExperience.pedagogical_guidance && (
-                <View as="div" margin="0 0 0 0">
+                <View as="div" margin="0 0 medium 0">
                   <Heading level="h3" margin="0 0 small 0">
-                    {I18n.t('Pedagogical Guidance')}
+                    {I18n.t('Pedagogical activity guidance')}
                   </Heading>
                   <Text data-testid="ai-experience-show-pedagogical-guidance-text">
                     <span style={{whiteSpace: 'pre-wrap'}}>
@@ -318,11 +307,22 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                 </View>
               )}
 
+              {aiExperience.facts && (
+                <View as="div" margin="0 0 medium 0">
+                  <Heading level="h3" margin="0 0 small 0">
+                    {I18n.t('Text source')}
+                  </Heading>
+                  <Text data-testid="ai-experience-show-facts-text">
+                    <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
+                  </Text>
+                </View>
+              )}
+
               {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload &&
                 (aiExperience.context_files?.length ?? 0) > 0 && (
                   <View as="div" margin="medium 0 0 0">
                     <Heading level="h3" margin="0 0 small 0">
-                      {I18n.t('Source Files')}
+                      {I18n.t('File sources')}
                     </Heading>
                     <View as="div" borderWidth="small" borderRadius="medium">
                       {aiExperience.context_files!.map((file, index) => (
@@ -355,11 +355,11 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         open={isDeleteModalOpen}
         onDismiss={() => setIsDeleteModalOpen(false)}
         size="small"
-        label={I18n.t('Delete AI Experience')}
+        label={I18n.t('Delete Knowledge Chat')}
         shouldCloseOnDocumentClick={true}
       >
         <Modal.Header>
-          <Heading>{I18n.t('Delete AI Experience')}</Heading>
+          <Heading>{I18n.t('Delete Knowledge Chat')}</Heading>
         </Modal.Header>
         <Modal.Body>
           <Text>

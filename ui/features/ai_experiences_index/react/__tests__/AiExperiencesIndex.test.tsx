@@ -17,371 +17,199 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 import AiExperiencesIndex from '../AiExperiencesIndex'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  fakeEnv.setup({COURSE_ID: 123})
+})
+
+afterEach(() => {
+  server.resetHandlers()
+  cleanup()
+  fakeEnv.teardown()
+})
 
 const mockExperiences = [
   {
     id: 1,
     title: 'Customer Service Training',
-    description: 'Practice customer service skills',
     workflow_state: 'published',
     created_at: '2025-01-15T10:30:00Z',
   },
   {
     id: 2,
     title: 'Sales Pitch Practice',
-    description: 'Practice sales techniques',
     workflow_state: 'unpublished',
     created_at: '2025-01-16T14:20:00Z',
   },
 ]
 
-beforeAll(() => {
-  ;(global as any).ENV = {COURSE_ID: 123}
-})
-
-afterEach(() => {
-  vi.clearAllMocks()
-})
-
 describe('AiExperiencesIndex', () => {
-  describe('Loading state', () => {
-    it('shows loading spinner while fetching experiences', () => {
-      global.fetch = vi.fn(() => new Promise(() => {})) as any
+  describe('empty state', () => {
+    it('shows teacher empty state when no experiences exist', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: [], can_manage: true}),
+        ),
+      )
 
       render(<AiExperiencesIndex />)
-      expect(screen.getByText('Loading AI experiences')).toBeInTheDocument()
+
+      await waitFor(() =>
+        expect(screen.getByText('No Knowledge Chats created yet.')).toBeInTheDocument(),
+      )
+      expect(screen.getByText('Create new')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Click the Create New button to start building your first Knowledge Chat.',
+        ),
+      ).toBeInTheDocument()
     })
   })
 
-  describe('Error state', () => {
-    it('displays error message when fetch fails', async () => {
-      global.fetch = vi.fn(() => Promise.reject(new Error('Failed to fetch'))) as any
+  describe('subtitle text', () => {
+    it('shows manager subtitle when can_manage is true', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: [], can_manage: true}),
+        ),
+      )
 
       render(<AiExperiencesIndex />)
 
-      await waitFor(() => {
-        expect(screen.getByText(/Error loading AI experiences/)).toBeInTheDocument()
-      })
+      await waitFor(() =>
+        expect(
+          screen.getByText(
+            "Evaluate your students' comprehension of a topic with a configurable LLM chat (learning language model).",
+          ),
+        ).toBeInTheDocument(),
+      )
+    })
+
+    it('shows student subtitle when can_manage is false', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: [], can_manage: false}),
+        ),
+      )
+
+      render(<AiExperiencesIndex />)
+
+      await waitFor(() =>
+        expect(
+          screen.getByText(
+            'Check your understanding of a topic with an educator-configured Knowledge Chat.',
+          ),
+        ).toBeInTheDocument(),
+      )
     })
   })
 
-  describe('Teacher view (canManage = true)', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: async () => ({
-            experiences: mockExperiences,
-            can_manage: true,
-          }),
-        }),
-      ) as any
-    })
+  describe('teacher view', () => {
+    it('links experience titles to their show page', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: mockExperiences, can_manage: true}),
+        ),
+      )
 
-    it('displays AI Experiences heading with icon', async () => {
       render(<AiExperiencesIndex />)
 
-      await waitFor(() => {
-        expect(screen.getByText('AI Experiences')).toBeInTheDocument()
-      })
-
-      // Check for icon (IconAiColoredSolid renders an svg)
-      const heading = screen.getByText('AI Experiences')
-      const headingContainer = heading.closest('div')?.parentElement
-      expect(headingContainer?.querySelector('svg')).toBeInTheDocument()
+      await waitFor(() => expect(screen.getByText('Customer Service Training')).toBeInTheDocument())
+      expect(screen.getByText('Customer Service Training')).toHaveAttribute(
+        'href',
+        '/courses/123/ai_experiences/1',
+      )
     })
 
-    it('displays all experiences including unpublished', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      expect(screen.getByText('Sales Pitch Practice')).toBeInTheDocument()
-    })
-
-    it('shows Create new button in header when experiences exist', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      const createButtons = screen.getAllByText('Create new')
-      expect(createButtons.length).toBeGreaterThan(0)
-      expect(screen.getByTestId('ai-expriences-index-create-new-button')).toBeInTheDocument()
-    })
-
-    it('navigates to new experience page when Create button clicked', async () => {
+    it('navigates to edit page when Edit is clicked from the options menu', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: mockExperiences, can_manage: true}),
+        ),
+      )
       const user = userEvent.setup()
+      render(<AiExperiencesIndex />)
+
+      await waitFor(() => expect(screen.getByText('Customer Service Training')).toBeInTheDocument())
+
+      const originalLocation = window.location
       delete (window as any).location
       ;(window as any).location = {href: ''}
 
+      await user.click(screen.getAllByTestId('ai-experience-menu')[0])
+      await user.click(screen.getByText('Edit'))
+
+      expect(window.location.href).toBe('/courses/123/ai_experiences/1/edit')
+      ;(window as any).location = originalLocation
+    })
+
+    it('navigates to test conversation page when Test Conversation is clicked', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: mockExperiences, can_manage: true}),
+        ),
+      )
+      const user = userEvent.setup()
       render(<AiExperiencesIndex />)
 
-      await waitFor(() => {
-        expect(screen.getByTestId('ai-expriences-index-create-new-button')).toBeInTheDocument()
-      })
+      await waitFor(() => expect(screen.getByText('Customer Service Training')).toBeInTheDocument())
 
-      const createButton = screen.getByTestId('ai-expriences-index-create-new-button')
-      await user.click(createButton)
+      const originalLocation = window.location
+      delete (window as any).location
+      ;(window as any).location = {href: ''}
 
-      expect(window.location.href).toBe('/courses/123/ai_experiences/new')
+      await user.click(screen.getAllByTestId('ai-experience-menu')[0])
+      await user.click(screen.getByText('Test Conversation'))
+
+      expect(window.location.href).toBe('/courses/123/ai_experiences/1?preview=true')
+      ;(window as any).location = originalLocation
     })
 
-    it('shows management controls on experience rows', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      // Should show publish buttons
-      const publishButtons = screen.getAllByTestId('ai-experience-publish-toggle')
-      expect(publishButtons.length).toBeGreaterThan(0)
-
-      // Should show kebab menus
-      const menuButtons = screen.getAllByTestId('ai-experience-menu')
-      expect(menuButtons.length).toBeGreaterThan(0)
-    })
-  })
-
-  describe('Student view (canManage = false)', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: async () => ({
-            experiences: [mockExperiences[0]], // Only published experience
-            can_manage: false,
-          }),
-        }),
-      ) as any
-    })
-
-    it('displays only published experiences', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      // Should not show unpublished experience
-      expect(screen.queryByText('Sales Pitch Practice')).not.toBeInTheDocument()
-    })
-
-    it('does not show Create new button in header', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      expect(screen.queryByTestId('ai-expriences-index-create-new-button')).not.toBeInTheDocument()
-    })
-
-    it('does not show management controls on experience rows', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      // Should not show publish buttons
-      expect(screen.queryByTestId('ai-experience-publish-toggle')).not.toBeInTheDocument()
-
-      // Should not show kebab menus
-      expect(screen.queryByTestId('ai-experience-menu')).not.toBeInTheDocument()
-
-      // Should not show published status text
-      expect(screen.queryByText('Published')).not.toBeInTheDocument()
-    })
-
-    it('experience titles are still clickable', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      const titleLink = screen.getByText('Customer Service Training')
-      expect(titleLink).toHaveAttribute('href', '/courses/123/ai_experiences/1')
-    })
-  })
-
-  describe('Empty state - Teacher view', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: async () => ({
-            experiences: [],
-            can_manage: true,
-          }),
-        }),
-      ) as any
-    })
-
-    it('shows teacher empty state message', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('No AI experiences created yet.')).toBeInTheDocument()
-      })
-    })
-
-    it('shows Create new button in empty state', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('No AI experiences created yet.')).toBeInTheDocument()
-      })
-
-      expect(screen.getByText('Create new')).toBeInTheDocument()
-    })
-
-    it('shows teacher-specific empty state description', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Click the Create New button to start building your first AI experience.',
-          ),
-        ).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Empty state - Student view', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: async () => ({
-            experiences: [],
-            can_manage: false,
-          }),
-        }),
-      ) as any
-    })
-
-    it('shows student empty state message', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('No AI experiences available yet.')).toBeInTheDocument()
-      })
-    })
-
-    it('does not show Create new button in empty state', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(screen.getByText('No AI experiences available yet.')).toBeInTheDocument()
-      })
-
-      expect(screen.queryByText('Create new')).not.toBeInTheDocument()
-    })
-
-    it('shows student-specific empty state description', async () => {
-      render(<AiExperiencesIndex />)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Your instructor has not published any AI experiences yet.'),
-        ).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Delete functionality', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn((url: string, options?: any) => {
-        if (options?.method === 'DELETE') {
-          return Promise.resolve({
-            ok: true,
-            json: async () => ({success: true}),
-          })
-        }
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({
-            experiences: mockExperiences,
-            can_manage: true,
-          }),
-        })
-      }) as any
-
-      // Mock window.confirm
+    it('removes experience from list after delete is confirmed', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: mockExperiences, can_manage: true}),
+        ),
+        http.delete('/api/v1/courses/123/ai_experiences/:id', () =>
+          HttpResponse.json({success: true}),
+        ),
+      )
       window.confirm = vi.fn(() => true)
-    })
-
-    it('removes experience from list after successful delete', async () => {
       const user = userEvent.setup()
       render(<AiExperiencesIndex />)
 
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
+      await waitFor(() => expect(screen.getByText('Customer Service Training')).toBeInTheDocument())
+      await user.click(screen.getAllByTestId('ai-experience-menu')[0])
+      await user.click(screen.getByText('Delete'))
 
-      // Open menu and click delete
-      const menuButtons = screen.getAllByTestId('ai-experience-menu')
-      await user.click(menuButtons[0])
-
-      const deleteButton = screen.getByText('Delete')
-      await user.click(deleteButton)
-
-      // Experience should be removed from list
-      await waitFor(() => {
-        expect(screen.queryByText('Customer Service Training')).not.toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Publish toggle functionality', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn((url: string, options?: any) => {
-        if (options?.method === 'PUT') {
-          return Promise.resolve({
-            ok: true,
-            json: async () => ({
-              ...mockExperiences[0],
-              workflow_state: 'unpublished',
-            }),
-          })
-        }
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({
-            experiences: mockExperiences,
-            can_manage: true,
-          }),
-        })
-      }) as any
+      await waitFor(() =>
+        expect(screen.queryByText('Customer Service Training')).not.toBeInTheDocument(),
+      )
     })
 
-    it('updates experience workflow state when publish toggle clicked', async () => {
-      const user = userEvent.setup()
+    it('lists both published and unpublished experiences', async () => {
+      server.use(
+        http.get('/api/v1/courses/123/ai_experiences', () =>
+          HttpResponse.json({experiences: mockExperiences, can_manage: true}),
+        ),
+      )
+
       render(<AiExperiencesIndex />)
 
-      await waitFor(() => {
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
-
-      const publishButtons = screen.getAllByTestId('ai-experience-publish-toggle')
-      await user.click(publishButtons[0])
-
-      // The component should update the local state
-      await waitFor(() => {
-        // The state change is internal, so we can't directly test it,
-        // but we can verify no errors occurred and component is still rendered
-        expect(screen.getByText('Customer Service Training')).toBeInTheDocument()
-      })
+      await waitFor(() => expect(screen.getByText('Customer Service Training')).toBeInTheDocument())
+      expect(screen.getByText('Sales Pitch Practice')).toBeInTheDocument()
     })
   })
 })

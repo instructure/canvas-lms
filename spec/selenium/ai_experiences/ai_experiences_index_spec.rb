@@ -66,8 +66,8 @@ describe "ai experiences index" do
     end
 
     describe "page structure" do
-      it "displays the AI Experiences heading" do
-        expect(AiExperiencesIndexPage.page_heading_text).to eq("AI Experiences")
+      it "displays the Knowledge Chats heading" do
+        expect(AiExperiencesIndexPage.page_heading_text).to eq("Knowledge Chats")
       end
 
       it "displays the Create new button" do
@@ -142,9 +142,9 @@ describe "ai experiences index" do
       get AiExperiencesIndexPage.ai_experiences_url(@course.id)
     end
 
-    it "can access the AI Experiences index page but with view-only access" do
-      # Students can now view the AI Experiences page (they will only see published experiences)
-      expect(AiExperiencesIndexPage.page_heading_text).to eq("AI Experiences")
+    it "can access the Knowledge Chats index page but with view-only access" do
+      # Students can now view the Knowledge Chats page (they will only see published experiences)
+      expect(AiExperiencesIndexPage.page_heading_text).to eq("Knowledge Chats")
       # Create button should not be visible for students
       expect(AiExperiencesIndexPage.create_new_button_displayed?).to be false
     end
@@ -163,7 +163,7 @@ describe "ai experiences index" do
     end
 
     it "displays the page with no AI experiences" do
-      expect(AiExperiencesIndexPage.page_heading_text).to eq("AI Experiences")
+      expect(AiExperiencesIndexPage.page_heading_text).to eq("Knowledge Chats")
       expect(AiExperiencesIndexPage.ai_experience_count).to eq(0)
     end
 
@@ -185,9 +185,9 @@ describe "ai experiences index" do
       get AiExperiencesIndexPage.ai_experiences_url(@disabled_course.id)
     end
 
-    it "cannot access AI Experiences page when feature flag is disabled" do
-      # Should show error or redirect - verify AI Experiences heading doesn't exist
-      expect(AiExperiencesIndexPage.page_heading_text).not_to eq("AI Experiences")
+    it "cannot access Knowledge Chats page when feature flag is disabled" do
+      # Should show error or redirect - verify Knowledge Chats heading doesn't exist
+      expect(AiExperiencesIndexPage.page_heading_text).not_to eq("Knowledge Chats")
     end
   end
 end

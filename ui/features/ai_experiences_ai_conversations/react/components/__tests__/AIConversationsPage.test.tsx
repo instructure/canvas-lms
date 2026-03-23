@@ -145,7 +145,7 @@ describe('AIConversationsPage', () => {
     render(<AIConversationsPage aiExperience={mockAiExperience} courseId="123" />)
 
     await waitFor(() => {
-      expect(screen.getByText('AI Conversations')).toBeInTheDocument()
+      expect(screen.getByText('Conversations')).toBeInTheDocument()
       expect(screen.getByText('Student')).toBeInTheDocument()
     })
   })

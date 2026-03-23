@@ -24,7 +24,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {IconPlayLine, IconXLine, IconRefreshLine, IconFullScreenLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -36,6 +35,7 @@ import type {
 } from '../../types'
 import ConversationProgressComponent from './ConversationProgress'
 import FocusMode from './FocusMode'
+import MessageThread from './MessageThread'
 
 const I18n = createI18nScope('ai_experiences')
 
@@ -72,20 +72,25 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const normalModeMessagesContainerRef = useRef<HTMLDivElement | null>(null)
   const focusModeMessagesContainerRef = useRef<HTMLDivElement | null>(null)
+  const normalModeBottomRef = useRef<HTMLDivElement | null>(null)
+  const focusModeBottomRef = useRef<HTMLDivElement | null>(null)
+  const hasInitializedRef = useRef(false)
+  const lastAssistantMessageRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    // Scroll the appropriate container based on which mode is active
-    const containerRef = isFocusModeOpen
-      ? focusModeMessagesContainerRef
-      : normalModeMessagesContainerRef
-
-    if (containerRef.current && typeof containerRef.current.scrollTo === 'function') {
-      containerRef.current.scrollTo({
-        top: containerRef.current.scrollHeight,
-        behavior: 'smooth',
-      })
+    // Reset on new initialization so instant-scroll applies again after restart
+    if (isInitializing) {
+      hasInitializedRef.current = false
     }
-  }, [messages, isLoading, isFocusModeOpen])
+    const bottomRef = isFocusModeOpen ? focusModeBottomRef : normalModeBottomRef
+    // Use instant on initial load so buttons are fully in view immediately;
+    // use smooth for subsequent messages to preserve the original UX.
+    const behavior = hasInitializedRef.current ? 'smooth' : 'instant'
+    if (!isInitializing) {
+      hasInitializedRef.current = true
+    }
+    bottomRef.current?.scrollIntoView({behavior, block: 'end'})
+  }, [messages, isLoading, isFocusModeOpen, isInitializing])
 
   useEffect(() => {
     if (isOpen && isExpanded && messages.length === 0) {
@@ -106,8 +111,15 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     const lastMessage = messages[messages.length - 1]
     if (lastMessage?.role === 'Assistant' && !isLoading) {
       setScreenReaderAnnouncement(I18n.t('Assistant: %{message}', {message: lastMessage.text}))
-      // Focus the text input after AI response arrives
-      textAreaRef.current?.focus({preventScroll: true})
+      // Only move focus if the user isn't already focused on another interactive
+      // element (e.g. the feedback form textarea or a button)
+      const active = document.activeElement
+      const isFocusIdle = !active || active === document.body || active === textAreaRef.current
+      if (isFocusIdle) {
+        // Focus the message bubble so keyboard/SR users can read it and Tab
+        // naturally to the Like/Dislike buttons, then the message input
+        lastAssistantMessageRef.current?.focus({preventScroll: true})
+      }
     }
   }, [messages, isLoading])
 
@@ -256,8 +268,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
       )}
       <View
         as="div"
-        height="400px"
-        overflowY="auto"
         margin="0 0 medium 0"
         padding="xx-small"
         role="log"
@@ -266,51 +276,16 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           normalModeMessagesContainerRef.current = el as HTMLDivElement | null
         }}
       >
-        {isInitializing ? (
-          <Flex justifyItems="center" alignItems="center" height="100%">
-            <Spinner renderTitle={I18n.t('Initializing conversation...')} />
-          </Flex>
-        ) : (
-          <>
-            {messages.slice(1).map((message, index) => {
-              const isUser = message.role === 'User'
-              const isLastMessage = index === messages.slice(1).length - 1
-              const isLastAssistantMessage = isLastMessage && !isUser
-              return (
-                <View
-                  key={index}
-                  as="div"
-                  display="block"
-                  margin="small 0"
-                  textAlign={isUser ? 'end' : 'start'}
-                >
-                  <View
-                    as="div"
-                    display="inline-block"
-                    maxWidth="70%"
-                    padding="small"
-                    background={isUser ? 'primary' : undefined}
-                    borderRadius="medium"
-                    borderWidth={isUser ? 'small' : undefined}
-                    role="article"
-                    aria-label={isUser ? I18n.t('Your message') : I18n.t('Message from Assistant')}
-                    tabIndex={isLastAssistantMessage ? -1 : undefined}
-                    textAlign="start"
-                  >
-                    <Text data-testid={`llm-conversation-message-${message.role}`}>
-                      <span style={{whiteSpace: 'pre-wrap'}}>{message.text}</span>
-                    </Text>
-                  </View>
-                </View>
-              )
-            })}
-            {isLoading && (
-              <View as="div" margin="small 0" textAlign="center">
-                <Spinner renderTitle={I18n.t('Thinking...')} size="small" />
-              </View>
-            )}
-          </>
-        )}
+        <MessageThread
+          messages={messages}
+          conversationId={conversationId}
+          courseId={courseId ?? ''}
+          aiExperienceId={aiExperienceId ?? ''}
+          isLoading={isLoading}
+          isInitializing={isInitializing}
+          lastAssistantMessageRef={lastAssistantMessageRef}
+          bottomRef={normalModeBottomRef}
+        />
       </View>
 
       <View as="div" padding="small" background="primary" borderWidth="small" borderRadius="medium">
@@ -385,7 +360,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             <IconPlayLine size="small" />
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
               </Heading>
               <Text size="small">
                 {isTeacherPreview
@@ -406,7 +381,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
   // Expanded state - full conversation interface
   return (
-    <View as="div" borderWidth="small" borderRadius="medium" overflowX="hidden" overflowY="hidden">
+    <View as="div" borderWidth="small" borderRadius="medium" overflowX="hidden">
       <div aria-live="polite" aria-atomic="true">
         <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
       </div>
@@ -438,7 +413,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             </IconButton>
             <View>
               <Heading level="h3" margin="0 0 xx-small 0">
-                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
               </Heading>
               <Text size="small">
                 {isTeacherPreview
@@ -506,7 +481,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                   <Flex gap="small" alignItems="center">
                     <View>
                       <Heading level="h3" margin="0 0 xx-small 0">
-                        {isTeacherPreview ? I18n.t('Preview') : I18n.t('Conversation')}
+                        {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
                       </Heading>
                       <Text size="small">
                         {isTeacherPreview
@@ -563,53 +538,16 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                       focusModeMessagesContainerRef.current = el as HTMLDivElement | null
                     }}
                   >
-                    {isInitializing ? (
-                      <Flex justifyItems="center" alignItems="center" height="100%">
-                        <Spinner renderTitle={I18n.t('Initializing conversation...')} />
-                      </Flex>
-                    ) : (
-                      <>
-                        {messages.slice(1).map((message, index) => {
-                          const isUser = message.role === 'User'
-                          const isLastMessage = index === messages.slice(1).length - 1
-                          const isLastAssistantMessage = isLastMessage && !isUser
-                          return (
-                            <View
-                              key={index}
-                              as="div"
-                              display="block"
-                              margin="small 0"
-                              textAlign={isUser ? 'end' : 'start'}
-                            >
-                              <View
-                                as="div"
-                                display="inline-block"
-                                maxWidth="70%"
-                                padding="small"
-                                background={isUser ? 'primary' : undefined}
-                                borderRadius="medium"
-                                borderWidth={isUser ? 'small' : undefined}
-                                role="article"
-                                aria-label={
-                                  isUser ? I18n.t('Your message') : I18n.t('Message from Assistant')
-                                }
-                                tabIndex={isLastAssistantMessage ? -1 : undefined}
-                                textAlign="start"
-                              >
-                                <Text data-testid={`llm-conversation-message-${message.role}`}>
-                                  <span style={{whiteSpace: 'pre-wrap'}}>{message.text}</span>
-                                </Text>
-                              </View>
-                            </View>
-                          )
-                        })}
-                        {isLoading && (
-                          <View as="div" margin="small 0" textAlign="center">
-                            <Spinner renderTitle={I18n.t('Thinking...')} size="small" />
-                          </View>
-                        )}
-                      </>
-                    )}
+                    <MessageThread
+                      messages={messages}
+                      conversationId={conversationId}
+                      courseId={courseId ?? ''}
+                      aiExperienceId={aiExperienceId ?? ''}
+                      isLoading={isLoading}
+                      isInitializing={isInitializing}
+                      lastAssistantMessageRef={lastAssistantMessageRef}
+                      bottomRef={focusModeBottomRef}
+                    />
                   </div>
                   <div
                     style={{

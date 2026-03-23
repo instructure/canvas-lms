@@ -1304,6 +1304,8 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id", action: :show, as: "course_ai_experience_conversation"
       post "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :create
       post "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages", action: :post_message, as: "course_ai_experience_conversation_messages"
+      post "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages/:message_id/feedback", action: :create_feedback, as: "course_ai_experience_conversation_message_feedback"
+      delete "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages/:message_id/feedback/:feedback_id", action: :delete_feedback, as: "course_ai_experience_conversation_message_feedback_delete"
       delete "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id", action: :destroy
       get "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/evaluation", action: :evaluation, as: "course_ai_experience_conversation_evaluation"
     end

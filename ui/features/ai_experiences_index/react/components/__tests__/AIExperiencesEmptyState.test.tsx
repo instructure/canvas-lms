@@ -40,14 +40,16 @@ describe('AIExperiencesEmptyState', () => {
     it('renders the teacher empty state heading', () => {
       render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
 
-      expect(screen.getByText('No AI experiences created yet.')).toBeInTheDocument()
+      expect(screen.getByText('No Knowledge Chats created yet.')).toBeInTheDocument()
     })
 
     it('renders the teacher empty state description', () => {
       render(<AIExperiencesEmptyState canManage={true} onCreateNew={mockOnCreateNew} />)
 
       expect(
-        screen.getByText('Click the Create New button to start building your first AI experience.'),
+        screen.getByText(
+          'Click the Create New button to start building your first Knowledge Chat.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -89,14 +91,14 @@ describe('AIExperiencesEmptyState', () => {
     it('renders the student empty state heading', () => {
       render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-      expect(screen.getByText('No AI experiences available yet.')).toBeInTheDocument()
+      expect(screen.getByText('No Knowledge Chats available yet.')).toBeInTheDocument()
     })
 
     it('renders the student empty state description', () => {
       render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
       expect(
-        screen.getByText('Your instructor has not published any AI experiences yet.'),
+        screen.getByText('Your instructor has not published any Knowledge Chats yet.'),
       ).toBeInTheDocument()
     })
 
@@ -109,10 +111,10 @@ describe('AIExperiencesEmptyState', () => {
     it('does not show teacher-specific messaging', () => {
       render(<AIExperiencesEmptyState canManage={false} onCreateNew={mockOnCreateNew} />)
 
-      expect(screen.queryByText('No AI experiences created yet.')).not.toBeInTheDocument()
+      expect(screen.queryByText('No Knowledge Chats created yet.')).not.toBeInTheDocument()
       expect(
         screen.queryByText(
-          'Click the Create New button to start building your first AI experience.',
+          'Click the Create New button to start building your first Knowledge Chat.',
         ),
       ).not.toBeInTheDocument()
     })
