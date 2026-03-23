@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "Extremo de producto"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "No se pudieron generar los subtítulos"
+    },
     "caption_manager_aae0906f": {
         "message": "Administrador de subtítulos"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "No se pudieron eliminar los subtítulos { captionName }"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "No se pudieron generar los subtítulos { captionName }"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "No se pudieron cargar los subtítulos { captionName }"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "Se agregaron subtítulos para { lang }"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Símbolo de grados"
     },
+    "delete_failed_6529e336": {
+        "message": "La eliminación falló"
+    },
     "delimiters_4db4840d": {
         "message": "Delimitadores"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Inglés (Reino Unido)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Ingresar un título para el contenido multimedia"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Ingresar al menos 3 caracteres para buscar"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Extra grande"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Extragrande ({ width } x { height } px)"
     },
     "extra_small_9ae33252": {
         "message": "Extra pequeño"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "Texto grande"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Grande ({ width } x { height } px)"
+    },
     "latvian_2bbb6aab": {
         "message": "Letón"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "Regular"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Intermedio ({ width } x { height } px)"
     },
     "merge_links_2478df96": {
         "message": "Fusionar enlaces"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Reproducir comentario multimedia de { name } desde { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Diseño del reproductor"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Deje que Canvas acceda a su micrófono y cámara web."
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Resultado { index } de { max }."
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "Volver a intentar { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "Reintentar"
     },
@@ -2213,9 +2246,6 @@
     "selected_274ce24f": {
         "message": "Seleccionado"
     },
-    "selected_file_name_93fa1a14": {
-        "message": "Archivo seleccionado: { name }"
-    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } seleccionado"
     },
@@ -2255,6 +2285,9 @@
     "show_link_options_545338fd": {
         "message": "Mostrar opciones de enlace"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "Mostrar transcripción continua"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Los usuarios detectados navegan rápido por las páginas web, buscando títulos grandes o en negrita. Los usuarios del lector de pantalla solo utilizan los encabezados para una comprensión contextual. Los encabezados deben tener la estructura apropiada."
     },
@@ -2287,6 +2320,9 @@
     },
     "small_b070434a": {
         "message": "Pequeño"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Pequeño ({ width } x { height } px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Círculo continuo"
@@ -2567,6 +2603,9 @@
     "timebar_a4d18443": {
         "message": "Barra de tiempo"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "El título no se puede dejar en blanco"
+    },
     "title_ee03d132": {
         "message": "Título"
     },
@@ -2587,6 +2626,9 @@
     },
     "top_66e0adb6": {
         "message": "Arriba"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "El panel de transcripción está disponible a partir de un ancho de 720 px."
     },
     "tray_839df38a": {
         "message": "Bandeja"
@@ -2627,6 +2669,9 @@
     "unpublished_dfd8801": {
         "message": "no publicado"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Se perderán todos los cambios no guardados."
+    },
     "untitled_16aa4f2b": {
         "message": "Sin título"
     },
@@ -2653,6 +2698,9 @@
     },
     "upload_document_253f0478": {
         "message": "Cargar documento"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Se produjo un error en la carga"
     },
     "upload_file_fd2361b8": {
         "message": "Cargar archivo"
@@ -2815,6 +2863,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Ver recuento de palabras y caracteres"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "Limitaciones del visor"
     },
     "waiting_for_response_1efd0c50": {
         "message": "Esperando respuesta"

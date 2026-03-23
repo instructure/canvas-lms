@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "कैप उत्पाद"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "कैप्शन जेनरेट नहीं किया जा सका"
+    },
     "caption_manager_aae0906f": {
         "message": "कैप्शन मैनेजर"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "{ captionName } कैप्शन मिटाया नहीं जा सका"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "{ captionName } कैप्शन जेनरेट नहीं किया जा सका"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "{ captionName } कैप्शन अपलोड नहीं किया जा सका"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "{ lang } के लिए कैप्शन जोड़े गए हैं"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "डिग्री प्रतीक"
     },
+    "delete_failed_6529e336": {
+        "message": "मिटाया नहीं जा सका"
+    },
     "delimiters_4db4840d": {
         "message": "परिसीमक"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "अंग्रेज़ी (यूनाइटेड किंगडम)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "मीडिया शीर्षक दर्ज करें"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "खोजने के लिए कम से कम 3 कैरेक्टर दर्ज करें"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "ज़्यादा बड़ा"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "एक्स्ट्रा लार्ज ({ width } x { height }px)"
     },
     "extra_small_9ae33252": {
         "message": "ज़्यादा छोटा"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "बड़ा पाठ"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "लार्ज ({ width } x { height }px)"
+    },
     "latvian_2bbb6aab": {
         "message": "लातवियाई"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "मध्यम"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "मीडियम ({ width } x { height }px)"
     },
     "merge_links_2478df96": {
         "message": "लिंक मर्ज करें"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "{ createdAt } से { name } द्वारा मीडिया टिप्पणी चलाएं।"
     },
+    "player_layout_14e09a29": {
+        "message": "प्लेयर लेआउट"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "कृपया Canvas को अपने माइक्रोफ़ोन और वेबकैम के लिए एक्सेस की अनुमति दें।"
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "कुल{ max } में से { index } नतीजा।"
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "{ captionName } की फिर से कोशिश करें"
+    },
     "retry_ebd5f8ba": {
         "message": "फिर से कोशिश करें"
     },
@@ -2213,9 +2246,6 @@
     "selected_274ce24f": {
         "message": "चुना गया"
     },
-    "selected_file_name_93fa1a14": {
-        "message": "चयनित फ़ाइल: { name }"
-    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } चुना गया"
     },
@@ -2255,6 +2285,9 @@
     "show_link_options_545338fd": {
         "message": "लिंक विकल्प दिखाएं"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "रोलिंग ट्रांसक्रिप्ट दिखाएं"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "दृष्टिबाधित उपयोगकर्ता बड़ी या बोल्ड हेडिंग की तलाश में तेज़ी से वेब पेज ब्राउज़ करते हैं। स्क्रीन रीडर उपयोगकर्ता प्रासंगिक समझ के लिए हेडर पर भरोसा करते हैं। हेडर को उचित संरचना का उपयोग करना चाहिए।"
     },
@@ -2287,6 +2320,9 @@
     },
     "small_b070434a": {
         "message": "छोटा"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "स्मॉल ({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "ठोस वृत्त"
@@ -2567,6 +2603,9 @@
     "timebar_a4d18443": {
         "message": "टाइमबार"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "शीर्षक खाली नहीं हो सकता"
+    },
     "title_ee03d132": {
         "message": "शीर्षक"
     },
@@ -2587,6 +2626,9 @@
     },
     "top_66e0adb6": {
         "message": "शीर्ष"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "ट्रांसक्रिप्ट पैनल 720px से अधिक की चौड़ाई पर उपलब्ध है।"
     },
     "tray_839df38a": {
         "message": "ट्रे"
@@ -2627,6 +2669,9 @@
     "unpublished_dfd8801": {
         "message": "अप्रकाशित"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "बिना सहेजे गए बदलाव गायब हो जाएंगे।"
+    },
     "untitled_16aa4f2b": {
         "message": "शीर्षकहीन"
     },
@@ -2653,6 +2698,9 @@
     },
     "upload_document_253f0478": {
         "message": "दस्तावेज़ अपलोड करें"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "अपलोड करना विफल रहा"
     },
     "upload_file_fd2361b8": {
         "message": "फ़ाइल अपलोड करें"
@@ -2815,6 +2863,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "शब्द और कैरेक्टर गिनती देखें"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "दर्शक प्रतिबंध"
     },
     "waiting_for_response_1efd0c50": {
         "message": "प्रतिक्रिया की प्रतिक्षा है"

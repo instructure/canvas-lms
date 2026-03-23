@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "Cynnyrch Cap"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Wedi methu creu''r capsiwn"
+    },
     "caption_manager_aae0906f": {
         "message": "Rheolwr Capsiwn"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "Wedi methu dileu''r capsiwn { captionName }"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "Wedi methu creu''r capsiwn { captionName }"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "Wedi methu uwchlwytho''r capsiwn { captionName }"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "Mae capsiynau wedi’u hychwanegu ar gyfer { lang }"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Symbol Gradd"
     },
+    "delete_failed_6529e336": {
+        "message": "Wedi Methu Dileu"
+    },
     "delimiters_4db4840d": {
         "message": "Amffinyddion"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Saesneg (Y Deyrnas Unedig)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Rhowch deitl cyfryngau"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Rhowch o leiaf 3 nod i chwilio"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Mawr Iawn"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Mawr Iawn ({ width } x { height }px)"
     },
     "extra_small_9ae33252": {
         "message": "Bach Iawn"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "Testun mawr"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Mawr ({ width } x { height }px)"
+    },
     "latvian_2bbb6aab": {
         "message": "Latfieg"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "Cyfrwng"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Canolig ({ width } x { height }px)"
     },
     "merge_links_2478df96": {
         "message": "Cyfuno dolenni"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Chwarae sylw ar gyfryngau gan { name } o { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Cynllyn y chwaraewr"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Gadewch i Canvas gael mynediad at eich microffon a gwe-gamera."
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Canlyniad { index } o { max }."
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "Ailgynnig { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "Ailgynnig"
     },
@@ -2213,9 +2246,6 @@
     "selected_274ce24f": {
         "message": "Wedi dewis"
     },
-    "selected_file_name_93fa1a14": {
-        "message": "Ffeil dan sylw: { name }"
-    },
     "selected_linkfilename_c093b1f2": {
         "message": "Wedi dewis { linkFileName }"
     },
@@ -2255,6 +2285,9 @@
     "show_link_options_545338fd": {
         "message": "Dangos opsiynau dolen"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "Dangos Trawsgrifiad Rholio"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Mae defnyddwyr sy''n gweld yn dda yn pori drwy dudalennau gwe yn gyflym, gan chwilio am benawdau mawr neu drwm. Mae defnyddwyr darllenydd sgrin yn dibynnu ar benawdau i ddeall y cyd-destun. Dylai penawdau ddefnyddio''r strwythur priodol."
     },
@@ -2287,6 +2320,9 @@
     },
     "small_b070434a": {
         "message": "Bach"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Bach ({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Cylch Solid"
@@ -2567,6 +2603,9 @@
     "timebar_a4d18443": {
         "message": "Bar amser"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Does dim modd i''r teitl fod yn wag"
+    },
     "title_ee03d132": {
         "message": "Teitl"
     },
@@ -2587,6 +2626,9 @@
     },
     "top_66e0adb6": {
         "message": "Y Brig"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Mae panel trawsgrifio ar gael â lled sy’n fwy na 720px."
     },
     "tray_839df38a": {
         "message": "Ardal"
@@ -2627,6 +2669,9 @@
     "unpublished_dfd8801": {
         "message": "heb gyhoeddi"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Bydd unrhyw newidiadau sydd heb eu cadw yn cael eu colli."
+    },
     "untitled_16aa4f2b": {
         "message": "Dideitl"
     },
@@ -2653,6 +2698,9 @@
     },
     "upload_document_253f0478": {
         "message": "Llwytho Dogfen i fyny"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Wedi methu llwytho i fyny"
     },
     "upload_file_fd2361b8": {
         "message": "Llwytho Ffeil i Fyny"
@@ -2815,6 +2863,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Gweld y cyfrif geiriau a’r cyfrif nodau"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "Cyfyngiadau Gwyliwr"
     },
     "waiting_for_response_1efd0c50": {
         "message": "Yn aros yn ymateb"
