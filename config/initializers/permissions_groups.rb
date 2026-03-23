@@ -701,6 +701,10 @@ PERMISSION_GROUPS = {
         title: -> { I18n.t("Access Tokens - view") },
         description: -> { I18n.t("Allows user to view access tokens on behalf of another user. This does not include viewing the token string, which is only shown at the time of creation.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   manage_temporary_enrollments: {

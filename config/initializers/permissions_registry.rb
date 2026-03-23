@@ -80,6 +80,10 @@ BASE_PERMISSIONS = {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to create and update other user's access tokens.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   delete_access_tokens: {
@@ -96,6 +100,10 @@ BASE_PERMISSIONS = {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to delete other user's access tokens.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   view_user_generated_access_tokens: {
@@ -110,6 +118,10 @@ BASE_PERMISSIONS = {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to view other user's manually generated access tokens. This does not let them read the actual token value itself, just the information about it.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   manage_account_memberships: {
