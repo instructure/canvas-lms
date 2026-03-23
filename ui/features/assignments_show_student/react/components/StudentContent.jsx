@@ -241,7 +241,11 @@ function renderContentBaseOnAvailability(
                   submission={{
                     submissionId: submission._id,
                     submissionType: submission.submissionType,
-                    ifLastAttemptIsNumber: submission.attempt,
+                    attempt: submission.attempt,
+                    attachmentId: submission.attachments?.[0]?._id,
+                    attachmentIds: submission.attachments?.[0]?._id
+                      ? [submission.attachments[0]._id]
+                      : undefined,
                   }}
                 />
               )

@@ -25,8 +25,6 @@
 class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
   def initialize(for_student:, latest:)
     super()
-    raise ArgumentError if for_student && !latest
-
     @for_student = for_student
     @last_submission_attempt_only = latest
   end
@@ -44,7 +42,9 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
   end
 
   # Returns a hash of submission_id => [Lti::AssetReport1, Lti::AssetReport2] | [] | nil
-  # for_student implies last_submission_attempt_only, because students can only see last attempt.
+  # When latest: true, filters to only the latest submission attempt.
+  # For students (for_student: true), all visible reports across all attempts are returned;
+  # attempt-filtering is done client-side using asset.submission_attempt / asset.attachment_id.
   def raw_asset_reports(submission_ids:, for_student:, last_submission_attempt_only:)
     mate_submissions_by_primary = mate_submissions(submission_ids)
     all_submission_ids = [submission_ids, mate_submissions_by_primary.values].flatten.uniq
@@ -71,10 +71,12 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
     visible_reports = visible_reports.where(visible_to_owner: true) if for_student
     visible_reports = visible_reports.order("#{Lti::Asset.quoted_table_name}.created_at DESC")
 
-    if last_submission_attempt_only || for_student
+    all_reports_by_submission = nil
+    if last_submission_attempt_only
       visible_reports = visible_reports.preload(asset: :submission)
                                        .preload(asset: { submission: :attachment_associations })
-      visible_reports = visible_reports.filter do |report|
+      all_loaded_reports = visible_reports.to_a
+      visible_reports = all_loaded_reports.filter do |report|
         submission = report.asset.submission
         next false if submission.blank?
 
@@ -85,6 +87,7 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
 
         attachment_ids.include?(report.asset.attachment_id.to_s) || report.asset.submission_attempt == submission.attempt
       end
+      all_reports_by_submission = all_loaded_reports.group_by { |rep| rep.asset.submission_id }
     end
 
     reports_by_submission = visible_reports.group_by { |rep| rep.asset.submission_id }
@@ -97,11 +100,14 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
                       processed_visible_reports = reports.select { |r| r.processing_progress == Lti::AssetReport::PROGRESS_PROCESSED }
                       if processed_visible_reports.any?
                         processed_visible_reports
-                      elsif reports.any?
+                      elsif reports.any? || (all_reports_by_submission && sub_ids.any? { |id| all_reports_by_submission[id]&.any? })
                         # There are visible reports, but not processed yet -> Show "No results" on the UI
+                        # OR
+                        # Latest attempt has no reports, but prior attempts do.
+                        # Processor is active for this submission -> Show "No result" for latest attempt.
                         []
                       else
-                        # No reports or not visible for students -> Hide the whole Document Processors column on the UI
+                        # No reports at all for students -> Hide the whole Document Processors column on the UI
                         nil
                       end
                     else
