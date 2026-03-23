@@ -19,7 +19,7 @@
 #
 
 module Polling
-  class PollChoice < ActiveRecord::Base
+  class PollChoice < ApplicationRecord
     self.table_name = "polling_poll_choices"
 
     belongs_to :poll, class_name: "Polling::Poll"

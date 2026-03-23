@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AccountUser < ActiveRecord::Base
+class AccountUser < ApplicationRecord
   attr_writer :current_user # used for audit logging
 
   extend RootAccountResolver

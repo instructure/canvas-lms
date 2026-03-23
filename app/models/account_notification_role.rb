@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AccountNotificationRole < ActiveRecord::Base
+class AccountNotificationRole < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :account_notification

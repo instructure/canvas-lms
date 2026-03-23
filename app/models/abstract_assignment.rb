@@ -20,7 +20,7 @@
 
 require "canvas/draft_state_validations"
 
-class AbstractAssignment < ActiveRecord::Base
+class AbstractAssignment < ApplicationRecord
   self.table_name = "assignments"
 
   include Workflow

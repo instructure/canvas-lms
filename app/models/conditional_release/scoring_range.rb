@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class ScoringRange < ActiveRecord::Base
+  class ScoringRange < ApplicationRecord
     include BoundsValidations
     include Deletion
 

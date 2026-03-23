@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupCategory < ActiveRecord::Base
+class GroupCategory < ApplicationRecord
   attr_reader :create_group_count
   attr_reader :create_group_member_count
   attr_accessor :group_by_section

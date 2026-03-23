@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentOverrideStudent < ActiveRecord::Base
+class AssignmentOverrideStudent < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :assignment, class_name: "AbstractAssignment"

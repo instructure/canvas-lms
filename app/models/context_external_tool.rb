@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require "redcarpet"
 
-class ContextExternalTool < ActiveRecord::Base
+class ContextExternalTool < ApplicationRecord
   include Workflow
   include SearchTermHelper
   include PermissionsHelper

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionComment < ActiveRecord::Base
+class SubmissionComment < ApplicationRecord
   include SendToStream
   include HtmlTextHelper
   include Workflow

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GradingStandard < ActiveRecord::Base
+class GradingStandard < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :context, polymorphic: [:account, :course], optional: false

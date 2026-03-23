@@ -19,7 +19,7 @@
 #
 
 module Polling
-  class PollSession < ActiveRecord::Base
+  class PollSession < ApplicationRecord
     belongs_to :course
     belongs_to :course_section
     belongs_to :poll, class_name: "Polling::Poll"

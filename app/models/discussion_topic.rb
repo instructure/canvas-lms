@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionTopic < ActiveRecord::Base
+class DiscussionTopic < ApplicationRecord
   include Workflow
   include SendToStream
   include HasContentTags

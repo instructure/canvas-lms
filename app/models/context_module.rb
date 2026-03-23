@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContextModule < ActiveRecord::Base
+class ContextModule < ApplicationRecord
   include Workflow
   include SearchTermHelper
   include DuplicatingObjects

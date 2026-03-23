@@ -18,7 +18,7 @@
 
 # Custom (teacher/admin-added) Links (aka "tabs") for Navigation
 # Menus. Referenced in the contexts' tabs_available
-class NavMenuLink < ActiveRecord::Base
+class NavMenuLink < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
   include CustomValidations

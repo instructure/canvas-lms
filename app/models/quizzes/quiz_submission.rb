@@ -20,7 +20,7 @@
 
 require "sanitize"
 
-class Quizzes::QuizSubmission < ActiveRecord::Base
+class Quizzes::QuizSubmission < ApplicationRecord
   extend RootAccountResolver
 
   self.table_name = "quiz_submissions"

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DelayedNotification < ActiveRecord::Base
+class DelayedNotification < ApplicationRecord
   include Workflow
 
   belongs_to :asset,

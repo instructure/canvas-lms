@@ -107,7 +107,9 @@ Rails:
 Rails/ActionControllerFlashBeforeRender:
   AutoCorrect: false # auto-correct just changes it to `flash.now`, when that may not be appropriate
 Rails/ApplicationRecord:
-  Enabled: false # we never bothered creating an ApplicationRecord
+  Include:
+    - "app/models/**/*.rb"
+    - "gems/plugins/*/app/models/**/*.rb"
 Rails/Blank:
   UnlessPresent: false # allow `unless foo.present?`
 Rails/ContentTag:

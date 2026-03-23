@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class ContextModuleProgression < ActiveRecord::Base
+class ContextModuleProgression < ApplicationRecord
   include Workflow
 
   belongs_to :context_module

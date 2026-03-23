@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GradebookUpload < ActiveRecord::Base
+class GradebookUpload < ApplicationRecord
   belongs_to :course
   belongs_to :user
   belongs_to :progress

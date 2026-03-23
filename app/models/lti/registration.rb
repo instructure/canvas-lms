@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::Registration < ActiveRecord::Base
+class Lti::Registration < ApplicationRecord
   DEFAULT_PRIVACY_LEVEL = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
   TRACKED_ATTRIBUTES = %w[

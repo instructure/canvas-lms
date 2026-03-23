@@ -19,7 +19,7 @@
 #
 
 module Lti
-  class ToolProxy < ActiveRecord::Base
+  class ToolProxy < ApplicationRecord
     has_many :bindings, class_name: "Lti::ToolProxyBinding", dependent: :destroy
     has_many :resources, class_name: "Lti::ResourceHandler", dependent: :destroy
     has_many :tool_settings, class_name: "Lti::ToolSetting", dependent: :destroy

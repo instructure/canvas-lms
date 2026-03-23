@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class DiscussionEntryVersion < ActiveRecord::Base
+class DiscussionEntryVersion < ApplicationRecord
   belongs_to :discussion_entry, inverse_of: :discussion_entry_versions
   belongs_to :root_account, class_name: "Account"
   belongs_to :user, inverse_of: :discussion_entry_versions

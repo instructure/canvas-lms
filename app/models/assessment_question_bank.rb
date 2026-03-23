@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentQuestionBank < ActiveRecord::Base
+class AssessmentQuestionBank < ApplicationRecord
   extend RootAccountResolver
   include Workflow
 

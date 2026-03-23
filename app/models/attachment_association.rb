@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AttachmentAssociation < ActiveRecord::Base
+class AttachmentAssociation < ApplicationRecord
   belongs_to :attachment
   belongs_to :context, polymorphic: [
     :account,

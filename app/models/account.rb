@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   include Context
   include OutcomeImportContext
   include Pronouns

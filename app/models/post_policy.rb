@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class PostPolicy < ActiveRecord::Base
+class PostPolicy < ApplicationRecord
   belongs_to :course, optional: false, inverse_of: :post_policies
   belongs_to :assignment, optional: true, touch: true, inverse_of: :post_policy, class_name: "AbstractAssignment"
   has_one :scheduled_post, dependent: :destroy, inverse_of: :post_policy

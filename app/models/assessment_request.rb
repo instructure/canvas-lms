@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentRequest < ActiveRecord::Base
+class AssessmentRequest < ApplicationRecord
   include Workflow
   include SendToStream
   include Plannable

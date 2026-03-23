@@ -19,7 +19,7 @@
 #
 
 module Lti
-  class ResourceHandler < ActiveRecord::Base
+  class ResourceHandler < ApplicationRecord
     attr_readonly :created_at
 
     belongs_to :tool_proxy, class_name: "Lti::ToolProxy"

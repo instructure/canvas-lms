@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LearningOutcome < ActiveRecord::Base
+class LearningOutcome < ApplicationRecord
   include ManyRootAccounts
   include Workflow
   include MasterCourses::Restrictor

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EportfolioCategory < ActiveRecord::Base
+class EportfolioCategory < ApplicationRecord
   attr_readonly :eportfolio_id
 
   has_many :eportfolio_entries, -> { ordered }, dependent: :destroy

@@ -19,7 +19,7 @@
 #
 
 # See the uploads controller and views for examples on how to use this model.
-class Attachment < ActiveRecord::Base
+class Attachment < ApplicationRecord
   class UniqueRenameFailure < StandardError; end
 
   def self.display_name_order_by_clause(table = nil)
