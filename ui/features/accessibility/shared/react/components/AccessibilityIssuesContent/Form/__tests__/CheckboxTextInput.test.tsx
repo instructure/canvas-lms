@@ -213,6 +213,35 @@ describe('CheckboxTextInput', () => {
       expect(message).not.toBeInTheDocument()
     })
 
+    it('button has aria-describedby pointing to helper text when isCanvasImage is false', () => {
+      const props = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            isCanvasImage: false,
+          },
+        },
+      }
+
+      render(<CheckboxTextInput {...props} />)
+
+      const button = screen.getByTestId('generate-button')
+      const helperText = screen.getByTestId('alt-text-generation-not-available-message')
+
+      expect(helperText).toHaveAttribute('id')
+      expect(button).toHaveAttribute('aria-describedby', helperText.id)
+    })
+
+    it('button does not have aria-describedby when isCanvasImage is true', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+
+      const button = screen.getByTestId('generate-button')
+      expect(button).not.toHaveAttribute('aria-describedby')
+    })
+
     describe('during generation loading', () => {
       beforeEach(() => {
         server.use(

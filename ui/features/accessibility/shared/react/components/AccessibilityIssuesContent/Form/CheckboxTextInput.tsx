@@ -68,6 +68,8 @@ export const CheckboxTextButtonLabels: ButtonLabelByState = {
   loaded: GENERATE_ALT_TEXT_LOADED_LABEL,
 }
 
+const ALT_TEXT_HELPER_ID = 'alt-text-generation-helper-text'
+
 const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
     (
@@ -216,9 +218,14 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                   pendoId="AiAltTextButtonPushed"
                   selectedItem={selectedItem}
                   ruleId={issue.ruleId}
+                  helperTextId={!issue.form.isCanvasImage ? ALT_TEXT_HELPER_ID : undefined}
                 />
                 {!issue.form.isCanvasImage && (
-                  <Text data-testid="alt-text-generation-not-available-message" size="small">
+                  <Text
+                    id={ALT_TEXT_HELPER_ID}
+                    data-testid="alt-text-generation-not-available-message"
+                    size="small"
+                  >
                     {I18n.t(
                       'AI alt text generation is only available for images uploaded to Canvas.',
                     )}

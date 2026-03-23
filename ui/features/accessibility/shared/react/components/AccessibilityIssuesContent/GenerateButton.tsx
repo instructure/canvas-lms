@@ -53,6 +53,7 @@ export interface GenerateButtonProps {
   pendoId: 'AiTableCaptionButtonPushed' | 'AiAltTextButtonPushed'
   selectedItem: AccessibilityResourceScan | null
   ruleId: string
+  helperTextId?: string
 }
 
 export const GenerateButton: React.FC<GenerateButtonProps> = ({
@@ -63,6 +64,7 @@ export const GenerateButton: React.FC<GenerateButtonProps> = ({
   pendoId,
   selectedItem,
   ruleId,
+  helperTextId,
 }: GenerateButtonProps) => {
   const {trackA11yIssueEvent} = useA11yTracking()
   const [hasGenerated, setHasGenerated] = useState(false)
@@ -85,6 +87,7 @@ export const GenerateButton: React.FC<GenerateButtonProps> = ({
       interaction={isDisabled ? 'disabled' : 'enabled'}
       aria-disabled={isLoading || isDisabled}
       aria-busy={isLoading}
+      {...(helperTextId ? {'aria-describedby': helperTextId} : {})}
       data-testid="generate-button"
       {...(pendoId ? {'data-pendo': pendoId} : {})}
     >

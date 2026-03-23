@@ -42,6 +42,21 @@ describe('GenerateButton', () => {
     expect(screen.getByTestId('generate-button')).toBeInTheDocument()
   })
 
+  describe('helperTextId prop', () => {
+    it('renders aria-describedby when helperTextId is provided', () => {
+      render(<GenerateButton {...defaultProps} helperTextId="helper-123" />)
+      expect(screen.getByTestId('generate-button')).toHaveAttribute(
+        'aria-describedby',
+        'helper-123',
+      )
+    })
+
+    it('does not render aria-describedby when helperTextId is not provided', () => {
+      render(<GenerateButton {...defaultProps} />)
+      expect(screen.getByTestId('generate-button')).not.toHaveAttribute('aria-describedby')
+    })
+  })
+
   describe('pendoId prop', () => {
     it('renders data-pendo attribute with the pendoId value', () => {
       render(<GenerateButton {...defaultProps} pendoId="AiAltTextButtonPushed" />)
