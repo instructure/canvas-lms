@@ -43,6 +43,11 @@ describe Lti::AccountBindingService do
   let_once(:workflow_state) { nil }
   let_once(:overwrite_created_by) { false }
 
+  before do
+    # bindings default to off, so match state
+    registration.update!(workflow_state: "inactive")
+  end
+
   it "returns a hash with the registration and developer key account bindings" do
     expect(subject).to eq(lti_registration_account_binding: registration_account_binding, developer_key_account_binding:)
   end
@@ -58,6 +63,7 @@ describe Lti::AccountBindingService do
 
       expect(registration_account_binding.workflow_state).to eq("off")
       expect(developer_key_account_binding.workflow_state).to eq("off")
+      expect(registration.reload.workflow_state).to eq("inactive")
     end
   end
 
@@ -114,6 +120,122 @@ describe Lti::AccountBindingService do
         expect { subject }
           .to change { registration_account_binding.reload.workflow_state }.to(workflow_state)
           .and change { developer_key_account_binding.reload.workflow_state }.to(workflow_state)
+      end
+    end
+  end
+
+  context "syncing registration workflow_state" do
+    before do
+      registration_account_binding
+    end
+
+    context "workflow_state is :on" do
+      let(:workflow_state) { :on }
+
+      it "sets registration workflow_state to active" do
+        expect { subject }.to change { registration.reload.workflow_state }.to("active")
+      end
+
+      it "records the user as the updater on the registration" do
+        expect { subject }.to change { registration.reload.updated_by }.to(user)
+      end
+    end
+
+    context "workflow_state is :off" do
+      let(:workflow_state) { :off }
+
+      it "sets registration workflow_state to inactive" do
+        registration.update!(workflow_state: "active")
+        expect { subject }.to change { registration.reload.workflow_state }.to("inactive")
+      end
+    end
+
+    context "workflow_state is :allow" do
+      let_once(:sa_developer_key) { lti_developer_key_model(account: Account.site_admin) }
+      let_once(:sa_registration) { sa_developer_key.lti_registration }
+      let_once(:sa_binding) do
+        Lti::RegistrationAccountBinding.create!(
+          account: Account.site_admin,
+          registration: sa_registration,
+          created_by: other_user,
+          updated_by: other_user
+        )
+      end
+
+      subject do
+        Lti::AccountBindingService.call(
+          account: Account.site_admin,
+          registration: sa_registration,
+          user:,
+          workflow_state: :allow,
+          overwrite_created_by:
+        )
+      end
+
+      before { sa_binding }
+
+      it "sets registration workflow_state to active" do
+        sa_registration.update!(workflow_state: "inactive")
+        expect { subject }.to change { sa_registration.reload.workflow_state }.to("active")
+      end
+    end
+
+    context "workflow_state is not mapped" do
+      subject do
+        Lti::AccountBindingService.call(
+          account:,
+          registration:,
+          user:,
+          workflow_state: :unmapped_state,
+          overwrite_created_by:
+        )
+      end
+
+      it "does not change registration workflow_state" do
+        expect { subject }.not_to change { registration.reload.workflow_state }
+      end
+    end
+
+    context "registration is already in the target state" do
+      let(:workflow_state) { :off }
+
+      it "does not save the registration" do
+        expect { subject }.not_to change { registration.reload.updated_at }
+      end
+    end
+
+    context "when the registration belongs to a different account (inherited)" do
+      let_once(:sa_developer_key) { lti_developer_key_model(account: Account.site_admin) }
+      let_once(:sa_registration) { sa_developer_key.lti_registration }
+      let_once(:sa_root_account_binding) do
+        Lti::RegistrationAccountBinding.create!(
+          account:,
+          registration: sa_registration,
+          created_by: user,
+          updated_by: user,
+          workflow_state: :on
+        )
+      end
+
+      subject do
+        Lti::AccountBindingService.call(
+          account:,
+          registration: sa_registration,
+          user:,
+          workflow_state: :off,
+          overwrite_created_by:
+        )
+      end
+
+      before { sa_root_account_binding }
+
+      it "does not change the registration workflow_state when a root account turns it off" do
+        sa_registration.update!(workflow_state: "active")
+        expect { subject }.not_to change { sa_registration.reload.workflow_state }
+      end
+
+      it "still updates the account binding workflow_state" do
+        expect { subject }.to change { sa_root_account_binding.reload.workflow_state }.to("off")
       end
     end
   end
