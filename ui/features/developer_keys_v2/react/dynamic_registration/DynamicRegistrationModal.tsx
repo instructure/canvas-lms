@@ -33,7 +33,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('react_developer_keys')
 type DynamicRegistrationModalProps = {

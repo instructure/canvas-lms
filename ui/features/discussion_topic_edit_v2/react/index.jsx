@@ -22,7 +22,7 @@ import AlertManager from '@canvas/alerts/react/AlertManager'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import DiscussionTopicFormContainer from './containers/DiscussionTopicFormContainer/DiscussionTopicFormContainer'
 

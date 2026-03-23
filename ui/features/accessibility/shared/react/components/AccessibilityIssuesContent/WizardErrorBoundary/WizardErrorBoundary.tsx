@@ -18,7 +18,7 @@
 
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import React from 'react'
 
 interface WizardErrorBoundaryProps {

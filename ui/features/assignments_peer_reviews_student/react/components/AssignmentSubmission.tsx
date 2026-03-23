@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useRef, useCallback} from 'react'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'

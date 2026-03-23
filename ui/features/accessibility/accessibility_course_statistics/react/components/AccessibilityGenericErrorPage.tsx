@@ -18,7 +18,7 @@
 
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 

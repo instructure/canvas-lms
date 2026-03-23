@@ -18,7 +18,7 @@
 
 import {COURSE_NOTIFICATIONS_QUERY} from '../graphql/Queries'
 import CourseNotificationSettingsManager from './CourseNotificationSettingsManager'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'

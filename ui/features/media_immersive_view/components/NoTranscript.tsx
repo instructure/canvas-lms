@@ -20,7 +20,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
+import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
 
 const I18n = createI18nScope('media_immersive_view')
 

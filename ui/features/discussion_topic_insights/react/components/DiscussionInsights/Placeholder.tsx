@@ -17,13 +17,13 @@
  */
 import React from 'react'
 import {Text} from '@instructure/ui-text'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import {EmptyDesert} from '@instructure/platform-images'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconAiLine, IconRefreshLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import noDiscussion from '../../../images/no-discussion.svg'
 

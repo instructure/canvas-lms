@@ -21,7 +21,7 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Pill} from '@instructure/ui-pill'

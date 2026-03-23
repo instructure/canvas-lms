@@ -21,7 +21,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import PleaseWaitWrist from '@canvas/images/PleaseWaitWrist.svg'
+import PleaseWaitWrist from '@instructure/platform-images/assets/PleaseWaitWrist.svg'
 
 const I18n = createI18nScope('CanvasMediaPlayer')
 

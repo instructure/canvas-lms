@@ -19,7 +19,7 @@
 import ErrorBoundary from '@canvas/error-boundary/react'
 import {PropsWithChildren} from 'react'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block_content_editor')

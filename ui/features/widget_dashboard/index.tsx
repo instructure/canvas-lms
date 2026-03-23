@@ -24,7 +24,7 @@ import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {
   WidgetDashboardProvider,
   WidgetDashboardEditProvider,

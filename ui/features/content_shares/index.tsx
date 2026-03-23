@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ReceivedContentView from './react/ReceivedContentView'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import ready from '@instructure/ready'
 
 const I18n = createI18nScope('content_share')

@@ -39,7 +39,7 @@ import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import GenericErrorPage from '@canvas/generic-error-page'
 import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import type {ActionMenuProps} from './components/ActionMenu'
 import type {SubmissionTrayProps} from './components/SubmissionTray'
 import type {

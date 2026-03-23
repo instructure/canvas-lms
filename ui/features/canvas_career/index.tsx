@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('canvascareer')
 
