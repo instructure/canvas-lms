@@ -215,55 +215,72 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     }
   }
 
+  const renderPointsPossible = () =>
+    !ENV.restrict_quantitative_data &&
+    peerReviews?.pointsPossible != null && (
+      <Flex.Item>
+        <Text size={isMobile ? 'large' : 'x-large'} data-testid="total-points">
+          {I18n.t(
+            {one: '1 Point Possible', other: '%{formattedPoints} Points Possible'},
+            {
+              count: peerReviews.pointsPossible,
+              formattedPoints: numberFormat._format(peerReviews.pointsPossible, {
+                precision: 2,
+                strip_insignificant_zeros: true,
+              }),
+            },
+          )}
+        </Text>
+      </Flex.Item>
+    )
+
   const renderHeader = () => {
+    const pointsPossible = renderPointsPossible()
+
     return (
-      <Flex justifyItems="space-between">
-        <Flex.Item shouldGrow={true}>
-          <Flex direction="column">
-            <Flex.Item>
-              <Heading level="h1" aria-labelledby="peer-review-heading">
-                <Text
-                  id="peer-review-heading"
-                  size="x-large"
-                  wrap="break-word"
-                  data-testid="title"
-                  weight={isMobile ? 'normal' : 'light'}
-                >
-                  {I18n.t('%{name} Peer Review', {name: name})}
-                </Text>
-              </Heading>
-            </Flex.Item>
-            {peerReviewDueAt && (
-              <Flex.Item>
-                <Text size="medium" weight="bold">
-                  <FriendlyDatetime
-                    data-testid="due-date"
-                    prefix={I18n.t('Due:')}
-                    format={I18n.t('#date.formats.full_with_weekday')}
-                    dateTime={peerReviewDueAt}
-                  />
-                </Text>
-              </Flex.Item>
-            )}
-          </Flex>
-        </Flex.Item>
-        {!ENV.restrict_quantitative_data && peerReviews?.pointsPossible != null && (
+      <View
+        as="div"
+        borderWidth="0 0 small 0"
+        borderColor="primary"
+        padding="0 0 small 0"
+        margin="0 0 medium 0"
+      >
+        <Flex gap="xSmall" direction="column">
           <Flex.Item>
-            <Text size="x-large" data-testid="total-points">
-              {I18n.t(
-                {one: '1 Point Possible', other: '%{formattedPoints} Points Possible'},
-                {
-                  count: peerReviews.pointsPossible,
-                  formattedPoints: numberFormat._format(peerReviews.pointsPossible, {
-                    precision: 2,
-                    strip_insignificant_zeros: true,
-                  }),
-                },
-              )}
-            </Text>
+            <Flex justifyItems="space-between" wrap="wrap" alignItems="center">
+              <Flex.Item shouldGrow>
+                <Heading level="h1" aria-labelledby="peer-review-heading">
+                  <Text
+                    id="peer-review-heading"
+                    size="x-large"
+                    wrap="break-word"
+                    data-testid="title"
+                    weight={isMobile ? 'normal' : 'light'}
+                  >
+                    {I18n.t('%{name} Peer Review', {name: name})}
+                  </Text>
+                </Heading>
+              </Flex.Item>
+              {!isMobile && pointsPossible}
+            </Flex>
           </Flex.Item>
-        )}
-      </Flex>
+          {peerReviewDueAt && (
+            <Flex.Item>
+              <Text size="medium" weight="bold">
+                <FriendlyDatetime
+                  data-testid="due-date"
+                  prefix={I18n.t('Due:')}
+                  prefixMobile={I18n.t('Due:')}
+                  format={I18n.t('#date.formats.full_with_weekday')}
+                  dateTime={peerReviewDueAt}
+                  alwaysUseSpecifiedFormat
+                />
+              </Text>
+            </Flex.Item>
+          )}
+          {isMobile && pointsPossible}
+        </Flex>
+      </View>
     )
   }
 
@@ -346,7 +363,6 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
     <>
       <View as="div">
         {renderHeader()}
-        <Divider />
         {isPastLockDate && <LockedPeerReview assignment={data.assignment} isPastLockDate={true} />}
         {data.assignment && !showSubmissionRequiredView && !isLocked && (
           <View as="div">
