@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {extend} from '@canvas/backbone/utils'
 import turnitinSettingsDialog from '../../jst/TurnitinSettingsDialog.handlebars'
 import {extend as lodashExtend} from 'es-toolkit/compat'
@@ -169,18 +169,19 @@ TurnitinSettingsDialog.prototype.showErrorMessage = function (
   inputContainer?.setAttribute('aria-label', message)
   const errorsContainer = this.getElement(selectors.ERROR_CLASS)
   if (errorsContainer) {
-    const root = this.errorRoots[selectors.TYPE] ?? createRoot(errorsContainer)
-    root.render(
+    const element = (
       <FormattedErrorMessage
         message={message}
         margin="xx-small 0 small 0"
         iconMargin="0 xx-small xxx-small 0"
-      />,
+      />
     )
-
-    Object.assign(this.errorRoots, {
-      [selectors.TYPE]: root,
-    })
+    const existingRoot = this.errorRoots[selectors.TYPE]
+    if (existingRoot) {
+      rerender(existingRoot, element)
+    } else {
+      this.errorRoots[selectors.TYPE] = render(element, errorsContainer)
+    }
   }
 }
 
