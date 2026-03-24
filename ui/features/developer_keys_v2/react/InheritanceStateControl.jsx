@@ -82,6 +82,14 @@ export default class DeveloperKeyStateControl extends React.Component {
   }
 
   radioGroupValue() {
+    if (
+      ENV.FEATURES?.lti_deactivate_registrations &&
+      this.props.developerKey.is_lti_key &&
+      !this.isSiteAdmin()
+    ) {
+      return this.props.developerKey.lti_registration_workflow_state === 'active' ? 'on' : 'off'
+    }
+
     const devKeyBinding = this.props.developerKey.developer_key_account_binding
     if (devKeyBinding) {
       return devKeyBinding.workflow_state || 'allow'
@@ -222,6 +230,8 @@ DeveloperKeyStateControl.propTypes = {
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     inherited_to: PropTypes.string,
+    is_lti_key: PropTypes.bool,
+    lti_registration_workflow_state: PropTypes.string,
     workflow_state: PropTypes.string,
     name: PropTypes.string,
     developer_key_account_binding: PropTypes.shape({

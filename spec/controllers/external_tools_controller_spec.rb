@@ -2513,11 +2513,23 @@ describe ExternalToolsController do
 
       context "with no account binding" do
         before do
+          account.disable_feature! :lti_deactivate_registrations
           developer_key.lti_registration.lti_registration_account_bindings.each(&:destroy!)
           developer_key.developer_key_account_bindings.each(&:destroy!)
         end
 
-        it "return 422" do
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status :unprocessable_content
+        end
+      end
+
+      context "with inactive registration" do
+        before do
+          developer_key.lti_registration.deactivate
+        end
+
+        it "returns 422" do
           subject
           expect(response).to have_http_status :unprocessable_content
         end

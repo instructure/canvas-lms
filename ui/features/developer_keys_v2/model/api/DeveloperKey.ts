@@ -56,4 +56,5 @@ export interface DeveloperKey {
   is_lti_key: boolean
   is_lti_registration: boolean
   lti_registration?: LtiRegistration
+  lti_registration_workflow_state?: string
 }

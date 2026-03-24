@@ -1072,12 +1072,18 @@ def enable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
     workflow_state: "on"
   )
+  if developer_key.is_lti_key
+    developer_key.lti_registration&.activate
+  end
 end
 
 def disable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
     workflow_state: "off"
   )
+  if developer_key.is_lti_key
+    developer_key.lti_registration&.deactivate
+  end
 end
 
 def enable_default_developer_key!
