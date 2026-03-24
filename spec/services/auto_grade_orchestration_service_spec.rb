@@ -294,8 +294,13 @@ RSpec.describe AutoGradeOrchestrationService do
         p
       end
 
-      it "sets progress.message to the specific error message" do
+      it "sets progress.message to a generic message for non-GraderErrors (retryable: false)" do
         service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: false)
+        expect(progress.message).to eq("An error occurred while grading. Please try again later.")
+      end
+
+      it "sets progress.message to the specific error message for GraderErrors (retryable: true)" do
+        service.handle_grading_failure(error_message:, submission:, auto_grade_result: nil, progress:, retryable: true)
         expect(progress.message).to eq(error_message)
       end
 
