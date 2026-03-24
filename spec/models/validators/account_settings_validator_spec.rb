@@ -140,5 +140,48 @@ describe Validators::AccountSettingsValidator do
       expect(account).not_to be_valid
       expect(account.errors[:settings]).to include("discovery_page.primary[0].authentication_provider_id is invalid or inactive")
     end
+
+    context "label validation" do
+      it "fails when label exceeds max length" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "a" * 256)],
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page.primary[0].label must be 255 characters or fewer")
+      end
+
+      it "passes when label is exactly at max length" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "a" * 255)],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with plain text label" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "Students")],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with label containing single quotes" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "Students' Portal")],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with label containing ampersand" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "Arts & Sciences")],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+    end
   end
 end

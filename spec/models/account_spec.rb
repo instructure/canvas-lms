@@ -2693,6 +2693,12 @@ describe Account do
       link = account.discovery_page_link_for(provider, entry)
       expect(link).not_to have_key(:icon)
     end
+
+    it "sanitizes HTML from the label" do
+      entry = { label: "<script>alert('xss')</script>CAS Login" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("CAS Login")
+    end
   end
 
   describe "#multi_parent_sub_accounts_recursive" do
