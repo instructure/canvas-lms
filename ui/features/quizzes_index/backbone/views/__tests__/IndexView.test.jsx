@@ -24,7 +24,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
-import ReactDOM from 'react-dom'
+import * as CanvasReact from '@canvas/react'
 
 describe('IndexView', () => {
   let fixtures
@@ -178,10 +178,10 @@ describe('IndexView', () => {
 
   it('renders choose quiz engine modal', () => {
     ENV.flags.quiz_lti_enabled = true
-    mockRenderSpy = vi.spyOn(ReactDOM, 'render').mockImplementation(() => {})
+    const mockRender = vi.spyOn(CanvasReact, 'legacyRender').mockImplementation(() => {})
     view = createIndexView()
     view.$('.choose-quiz-engine')[0].click()
-    expect(mockRenderSpy.mock.calls[0][0].props.setOpen).toBe(true)
+    expect(mockRender.mock.calls[0][0].props.setOpen).toBe(true)
   })
 
   it('should render the view', () => {
