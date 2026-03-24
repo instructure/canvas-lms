@@ -488,7 +488,10 @@ module UserLearningObjectScopes
         as # This needs the below `select` somehow to work
       else
         GuardRail.activate(:secondary) do
-          as.lazy.reject { |a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+          # improvement idea: restore laziness if necessary
+          assignments_arr = as.to_a
+          counts = Assignments::NeedsGradingCountQuery.new(assignments_arr, self).count
+          assignments_arr.reject { |a| counts[a.global_id] == 0 }.first(limit)
         end
       end
     end

@@ -41,6 +41,75 @@ module Assignments
       end
     end
 
+    def initialize(assignments, user = nil)
+      @assignments = Array(assignments)
+      @user = user
+    end
+
+    # Returns { assignment.global_id => Integer }, defaults to 0 for unknown keys
+    def count
+      fetch_or_compute(:count, default: 0) { |assignments| map_results(assignments, &:count) }
+    end
+
+    # Returns { assignment.global_id => Integer }, defaults to 0 for unknown keys
+    def manual_count
+      fetch_or_compute(:manual_count, default: 0) { |assignments| map_results(assignments, &:manual_count) }
+    end
+
+    # Returns { assignment.global_id => Array<Hash> }, defaults to [] for unknown keys
+    def count_by_section
+      fetch_or_compute(:count_by_section, default: []) { |assignments| map_results(assignments, &:count_by_section) }
+    end
+
+    private
+
+    # Checks the request cache for each assignment, computes only for missing ones,
+    # writes the new values back, and returns the complete hash keyed by global_id.
+    # When the optimized implementation lands, only the block passed by the public
+    # methods needs to change — this layer stays untouched.
+    def fetch_or_compute(method_key, default: nil)
+      missing = @assignments.reject { |a| RequestCache.exist?("ngcq_#{method_key}", a.global_id, @user&.global_id) }
+
+      new_values = {}
+      if missing.any?
+        new_values = yield(missing)
+        # Populate the request cache so subsequent single-assignment lookups
+        # within the same request are free in-memory hash reads.
+        new_values.each do |gid, val|
+          RequestCache.cache("ngcq_#{method_key}", gid, @user&.global_id) { val }
+        end
+      end
+
+      result = Hash.new(default)
+      @assignments.each do |a|
+        # Every assignment must be in either new_values (just computed) or the
+        # request cache (warmed by a prior call). The 0 fallback is a safety
+        # net that should never be reached in normal operation.
+        result[a.global_id] = new_values.fetch(a.global_id) do
+          RequestCache.cache("ngcq_#{method_key}", a.global_id, @user&.global_id) do
+            default
+          end
+        end
+      end
+      result
+    end
+
+    def map_results(assignments)
+      assignments.each_with_object({}) do |assignment, h|
+        proxy = course_proxy_for(assignment)
+        legacy = NeedsGradingCountQueryLegacy.new(assignment, @user, proxy)
+        h[assignment.global_id] = yield legacy
+      end
+    end
+
+    def course_proxy_for(assignment)
+      @course_proxies ||= {}
+      global_course_id = assignment.context.global_id
+      @course_proxies[global_course_id] ||= CourseProxy.new(assignment.context, @user)
+    end
+  end
+
+  class NeedsGradingCountQueryLegacy
     attr_reader :assignment, :user, :course_proxy
 
     delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, to: :course_proxy
@@ -48,7 +117,7 @@ module Assignments
     def initialize(assignment, user = nil, course_proxy = nil)
       @assignment = assignment
       @user = user
-      @course_proxy = course_proxy || CourseProxy.new(@assignment.context, @user)
+      @course_proxy = course_proxy || NeedsGradingCountQuery::CourseProxy.new(@assignment.context, @user)
     end
 
     def count

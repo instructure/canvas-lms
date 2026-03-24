@@ -4076,20 +4076,20 @@ describe Assignment do
 
     it "delegates to NeedsGradingCountQuery" do
       query = instance_double(Assignments::NeedsGradingCountQuery)
-      expect(query).to receive(:manual_count)
-      expect(Assignments::NeedsGradingCountQuery).to receive(:new).with(@assignment).and_return(query)
+      expect(query).to receive(:manual_count).and_return({ @assignment.global_id => 1 })
+      expect(Assignments::NeedsGradingCountQuery).to receive(:new).with([@assignment]).and_return(query)
       @assignment.needs_grading_count
     end
 
     it "updates when section (and its enrollments) are moved" do
       @assignment.update_attribute(:updated_at, 1.minute.ago)
       expect(@assignment.needs_grading_count).to be(1)
-      expect(Assignments::NeedsGradingCountQuery.new(@assignment, nil).manual_count).to be(1)
+      expect(Assignments::NeedsGradingCountQuery.new([@assignment], nil).manual_count[@assignment.global_id]).to be(1)
       course2 = @course.account.courses.create!
       e = @course.enrollments.where(user_id: @user.id).first.course_section
       e.move_to_course(course2)
       @assignment.reload
-      expect(Assignments::NeedsGradingCountQuery.new(@assignment, nil).manual_count).to be(0)
+      expect(Assignments::NeedsGradingCountQuery.new([@assignment], nil).manual_count[@assignment.global_id]).to be(0)
       expect(@assignment.needs_grading_count).to be(0)
     end
 

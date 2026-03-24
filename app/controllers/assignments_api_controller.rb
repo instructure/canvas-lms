@@ -1117,14 +1117,21 @@ class AssignmentsApiController < ApplicationController
         Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
       end
 
+      # Prewarm the request cache for needs_grading_count so that assignment_json
+      # can read results without triggering per-assignment queries.
+      # Permission check must match the condition in assignment_json:
+      #   include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
+      # exclude_response_fields is not passed from this action so needs_grading_count
+      # is never excluded here — manage_grades is the only effective condition.
+      if @context.grants_right?(user, session, :manage_grades)
+        grading_query = Assignments::NeedsGradingCountQuery.new(assignments, user)
+        grading_query.count
+        grading_query.count_by_section if needs_grading_count_by_section
+      end
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        needs_grading_course_proxy = if @context.grants_right?(user, session, :manage_grades)
-                                       Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user)
-                                     else
-                                       nil
-                                     end
 
         assignment_json(assignment,
                         user,
@@ -1134,7 +1141,6 @@ class AssignmentsApiController < ApplicationController
                         include_visibility:,
                         assignment_visibilities: visibility_array,
                         needs_grading_count_by_section:,
-                        needs_grading_course_proxy:,
                         include_all_dates:,
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
