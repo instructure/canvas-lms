@@ -650,7 +650,7 @@ module Types
     def needs_grading_count
       return unless assignment.context.grants_right?(current_user, :manage_grades)
 
-      Assignments::NeedsGradingCountQuery.new([assignment], current_user).count[assignment.global_id]
+      Loaders::AssignmentNeedsGradingCountLoader.for(current_user).load(assignment)
     end
 
     field :grading_type, AssignmentGradingType, null: true
