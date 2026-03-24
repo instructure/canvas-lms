@@ -39,6 +39,11 @@ disable_file_verifiers_in_public_syllabus:
   applies_to: RootAccount
   display_name: Disable verifiers in Public Syllabus
   description: Disable url file verifiers in the public syllabus
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 disable_verified_content_export_links:
   state: allowed_on
   shadow: true
