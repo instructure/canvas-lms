@@ -126,6 +126,7 @@ class NewQuizzesController < ApplicationController
 
   def assignment_locked_for_student?
     return false unless @context.grants_right?(@current_user, :participate_as_student)
+    return false unless taking_action?
     return false if @context.grants_right?(@current_user, :manage_assignments)
 
     assignment_with_overrides = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
@@ -133,6 +134,10 @@ class NewQuizzesController < ApplicationController
 
     render_unauthorized_action
     true
+  end
+
+  def taking_action?
+    request.path.include?("/taking")
   end
 
   def render_native_experience(signed_launch_data)
