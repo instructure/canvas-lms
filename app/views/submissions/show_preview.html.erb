@@ -321,7 +321,7 @@
   </div>
 <% elsif @submission.submission_type == 'media_recording' && @submission.media_comment_id %>
   <% wrapper = tag.div do
-       tag.a "\1", href: "#", class: "play_media_recording_link", data: @submission.slice(:media_comment_id, :media_comment_type)
+       tag.a "\\1", href: "#", class: "play_media_recording_link", data: @submission.slice(:media_comment_id, :media_comment_type)
      end
   %>
   <%= t('media_comment_link', "This submission is a media recording. *click here to view.*", wrapper:) %>
