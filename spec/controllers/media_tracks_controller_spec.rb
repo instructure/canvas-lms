@@ -785,6 +785,26 @@ describe MediaTracksController do
         get "show", params: { media_object_id: @mo.media_id, id: track.id }
         expect(response).to have_http_status(:not_found)
       end
+
+      context "location-based access for unauthenticated users" do
+        before do
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          @course.root_account.enable_feature!(:file_association_access)
+          html = "<p><iframe src='/media_attachments_iframe/#{@attachment.id}'></iframe></p>"
+          @course.syllabus_body = html
+          @course.public_syllabus = true
+          @course.updating_user = @teacher
+          @course.save!
+          remove_user_session
+        end
+
+        it "allows unauthenticated access with valid course_syllabus location parameter" do
+          track = @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "public subs", media_object: @mo)
+          get "show", params: { attachment_id: @attachment.id, id: track.id, location: "course_syllabus_#{@course.id}" }
+          expect(response).to be_successful
+          expect(response.body).to eq "WEBVTT\n\npublic subs"
+        end
+      end
     end
 
     describe "#destroy" do
