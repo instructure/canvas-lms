@@ -2376,7 +2376,7 @@ class CoursesController < ApplicationController
           @course_notifications_enabled = NotificationPolicyOverride.enabled_for(@current_user, @context)
         end
 
-        @accessibility_scan_enabled = @context.try(:a11y_checker_enabled?) || false
+        @accessibility_scan_enabled = tab_enabled?(Course::TAB_ACCESSIBILITY, no_render: true)
       end
 
       return if check_for_xlist
