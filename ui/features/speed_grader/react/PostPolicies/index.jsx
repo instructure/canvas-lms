@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
-import {flushSync} from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 
 import HideAssignmentGradesTray from '@canvas/hide-assignment-grades-tray'
 import PostAssignmentGradesTray from '@canvas/post-assignment-grades-tray'
@@ -50,16 +49,14 @@ export default class PostPolicies {
       this._hideAssignmentGradesTray = ref
     }
 
-    this._hideRoot = createRoot($hideContainer)
-    flushSync(() => this._hideRoot.render(<HideAssignmentGradesTray ref={bindHideTray} />))
+    legacyRender(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
 
     const $postContainer = document.getElementById('post-assignment-grades-tray')
     const bindPostTray = ref => {
       this._postAssignmentGradesTray = ref
     }
 
-    this._postRoot = createRoot($postContainer)
-    flushSync(() => this._postRoot.render(<PostAssignmentGradesTray ref={bindPostTray} />))
+    legacyRender(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
   }
 
   destroy() {
@@ -67,13 +64,11 @@ export default class PostPolicies {
     const $postContainer = document.getElementById('post-assignment-grades-tray')
 
     if ($hideContainer) {
-      this._hideRoot?.unmount()
-      this._hideRoot = null
+      legacyUnmountComponentAtNode($hideContainer)
     }
 
     if ($postContainer) {
-      this._postRoot?.unmount()
-      this._postRoot = null
+      legacyUnmountComponentAtNode($postContainer)
     }
   }
 
