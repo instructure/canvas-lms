@@ -91,7 +91,7 @@ class AutoGradeOrchestrationService
         current_user: @current_user
       ).call
 
-      merged_data = merge_new_grade_data_with_existing(grade_data, auto_grade_result.grade_data)
+      merged_data = merge_new_grade_data_with_existing(grade_data, auto_grade_result.grade_data || [])
 
       unless get_criteria_missing_grades(merged_data, rubric).empty?
         raise CedarAi::Errors::GraderError, "Number of graded criteria (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
@@ -128,7 +128,8 @@ class AutoGradeOrchestrationService
     current_attempts = progress&.delayed_job&.attempts&.next
     raise Delayed::RetriableError, error_message if retryable && current_attempts && current_attempts < MAX_ATTEMPTS
 
-    fail_progress(progress, error_message)
+    progress_message = retryable ? error_message : I18n.t("An error occurred while grading. Please try again later.")
+    fail_progress(progress, progress_message)
   end
 
   private
