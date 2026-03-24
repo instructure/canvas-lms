@@ -19,7 +19,6 @@
 #
 
 require_relative "../graphql_spec_helper"
-require_relative "../../spec_helper"
 require_relative "../../outcome_alignments_spec_helper"
 
 describe Types::OutcomeAlignmentType do

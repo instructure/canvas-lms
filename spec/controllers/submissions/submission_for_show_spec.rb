@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Submissions::SubmissionForShow do
   subject { Submissions::SubmissionForShow.new(assignment_id: assignment.id, context: course, id: student.id) }
 

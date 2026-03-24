@@ -19,7 +19,6 @@
 #
 
 require "feedjira"
-require_relative "../spec_helper"
 
 describe DiscussionTopicsController do
   before :once do

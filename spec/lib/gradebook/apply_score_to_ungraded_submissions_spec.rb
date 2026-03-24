@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe Gradebook::ApplyScoreToUngradedSubmissions do
   let(:course) { Course.create! }
   let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }

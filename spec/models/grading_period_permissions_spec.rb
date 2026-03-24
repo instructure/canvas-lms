@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe GradingPeriod, "permissions:" do
   let(:period_helper) { Factories::GradingPeriodHelper.new }
   let(:permissions) { %i[read create update delete] }

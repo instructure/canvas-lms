@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe StringifyIds do
   describe ".recursively_stringify_ids" do
     it "stringifies in a sub-hash" do

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe PostPolicy do
   describe "validation" do
     let(:course) { Course.create! }

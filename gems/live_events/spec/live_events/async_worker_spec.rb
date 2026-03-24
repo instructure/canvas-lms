@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LiveEvents::AsyncWorker do
   let(:put_records_return) { [] }
   let(:stream_client) { instance_double(Aws::Kinesis::Client) }

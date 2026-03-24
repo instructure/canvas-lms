@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
-
 describe MicrosoftSync::SyncerSteps do
   let(:syncer_steps) { described_class.new(group) }
   let(:course) do

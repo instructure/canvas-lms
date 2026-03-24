@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 RSpec.describe Lti::Result do
   let_once(:assignment) { assignment_model(points_possible: 5) }
 

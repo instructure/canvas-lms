@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative("../../spec_helper")
-
 describe Courses::TimetableEventBuilder do
   describe "#process_and_validate_timetables" do
     let(:builder) { described_class.new(course: course_factory) }

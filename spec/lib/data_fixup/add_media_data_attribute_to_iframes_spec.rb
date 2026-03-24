@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe DataFixup::AddMediaDataAttributeToIframes do
   let(:course) { course_model }
   let(:assignment) { course.assignments.create!(submission_types: "online_text_entry", points_possible: 2) }

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe Messages::SubmissionCommentForTeacher::SummaryPresenter do
   let_once(:course) { course_model(name: "MATH-101") }
   let_once(:teacher) { course_with_teacher(course:, active_all: true).user }

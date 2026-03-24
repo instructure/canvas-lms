@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe "Date#in_time_zone" do
   before do
     @zones = ["America/Juneau", "America/Denver", "UTC", "Asia/Baghdad", "Asia/Shanghai"].map { |tzname| ActiveSupport::TimeZone.new(tzname) }

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 RSpec.describe Lti::Pns::LtiAssetProcessorContributionNoticeBuilder do
   let!(:course) do
     course_with_teacher_and_student_enrolled

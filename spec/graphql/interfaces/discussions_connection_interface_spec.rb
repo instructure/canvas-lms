@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Interfaces::DiscussionsConnectionInterface do
   # Create a test class that includes the interface to test the methods
   let(:test_class) do

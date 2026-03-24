@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "spec_helper"
+
 require_relative "../graphql_spec_helper"
+
 describe Mutations::UpdateInternalSetting do
   let(:internal_setting) { Setting.create!(name: "setting_to_be_updated", value: "change me") }
   let(:secret_internal_setting) { Setting.create!(name: "secret_setting_to_be_deleted", value: "supersecret", secret: true) }

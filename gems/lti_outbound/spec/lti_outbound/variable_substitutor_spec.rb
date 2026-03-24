@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LtiOutbound::VariableSubstitutor do
   describe "#substitute" do
     it "leaves the value unchanged for unkown keys" do

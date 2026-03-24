@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe "Unidecoder" do
   # Silly phrases courtesy of Frank da Cruz
   # http://www.columbia.edu/kermit/utf8.html

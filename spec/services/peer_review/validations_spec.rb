@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 RSpec.describe PeerReview::Validations do
   let(:course) { course_model(name: "Course with Assignment") }
   let(:parent_assignment) do
