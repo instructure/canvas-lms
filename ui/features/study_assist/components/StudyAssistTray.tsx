@@ -24,18 +24,11 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {AssistProvider, AssistContent} from '@instructure/platform-study-assist'
 import type {AssistRequest, AssistResponse} from '@instructure/platform-study-assist'
-import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {IconAiSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('study_assist')
 
 const GRADIENT = 'linear-gradient(135deg, #7b5ea7 0%, #5b7fa6 60%, #4a919e 100%)'
-
-const renderMessage = (text: string) => <span style={{color: 'white'}}>{text}</span>
-
-const renderRichContent = (html: string) => (
-  <span style={{color: 'white'}} dangerouslySetInnerHTML={{__html: sanitizeHtml(html)}} />
-)
 
 type Props = {
   open: boolean
@@ -52,7 +45,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
       open={open}
       onDismiss={onDismiss}
     >
-      <div style={{background: GRADIENT, color: 'white', minHeight: '100vh', padding: '12px'}}>
+      <div style={{background: GRADIENT, color: 'white', minHeight: '100vh'}}>
         <Flex as="div" padding="small" alignItems="center">
           <Flex.Item shouldGrow={true}>
             <Flex gap="x-small" alignItems="center">
@@ -79,14 +72,14 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
           courseId={window.ENV.COURSE_ID}
           moduleItemId={window.ENV.WIKI_PAGE_ID}
         >
-          <AssistContent
-            chatEnabled={false}
-            showLargePrompts={true}
-            thumbsColor="primary-inverse"
-            renderMessage={renderMessage}
-            renderRichContent={renderRichContent}
-            onAnalyticsEvent={() => null}
-          />
+          <div style={{padding: '0 1rem'}}>
+            <AssistContent
+              chatEnabled={false}
+              showLargePrompts={true}
+              onAnalyticsEvent={() => null}
+              allowedPrompts={['Summarize', 'Quiz me', 'Flashcards']}
+            />
+          </div>
         </AssistProvider>
       </div>
     </Tray>
