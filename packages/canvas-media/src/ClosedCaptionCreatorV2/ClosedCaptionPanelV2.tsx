@@ -173,6 +173,17 @@ export function ClosedCaptionPanelV2({
         <View>
           {state.subtitles.map(subtitle => {
             const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
+            const deleteHandler = () => {
+              trackPendoEvent('canvas_caption_item_action', {
+                action: 'delete',
+                caption_source: subtitle.asr ? 'automatic' : 'uploaded',
+                language: subtitle.locale,
+              })
+              upload.deleteCaption(subtitle.locale)
+            }
+            // Client-side failures (failedOperation is set) get retry only.
+            // Server-side failures (no failedOperation) get delete only.
+            const showDelete = subtitle.workflow_state !== 'failed' || !subtitle.failedOperation
             return (
               <CaptionRow
                 url={subtitle.url}
@@ -183,14 +194,7 @@ export function ClosedCaptionPanelV2({
                 errorMessage={subtitle.errorMessage}
                 onRetry={getRetryHandler(subtitle)}
                 isInherited={subtitle.inherited}
-                onDelete={() => {
-                  trackPendoEvent('canvas_caption_item_action', {
-                    action: 'delete',
-                    caption_source: subtitle.asr ? 'automatic' : 'uploaded',
-                    language: subtitle.locale,
-                  })
-                  upload.deleteCaption(subtitle.locale)
-                }}
+                onDelete={showDelete ? deleteHandler : undefined}
               />
             )
           })}

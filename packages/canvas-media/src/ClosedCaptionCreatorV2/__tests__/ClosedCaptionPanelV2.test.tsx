@@ -578,6 +578,36 @@ describe('<ClosedCaptionPanelV2 />', () => {
       expect(screen.getByText('Delete Failed')).toBeInTheDocument()
     })
 
+    it('server-side failed caption shows delete but not retry', () => {
+      const initialSubtitles: Subtitle[] = [{locale: 'en', workflow_state: 'failed', asr: true}]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      expect(screen.getByText('English (Automatic)')).toBeInTheDocument()
+      expect(screen.getByText('Delete English (Automatic)')).toBeInTheDocument()
+      expect(screen.queryByText(/retry/i)).not.toBeInTheDocument()
+    })
+
+    it('deleting a server-side failed ASR caption re-enables the Request button', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [{locale: 'en', workflow_state: 'failed', asr: true}]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Request button should be hidden (asr caption exists)
+      expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+
+      // Delete the failed ASR caption
+      fireEvent.click(screen.getByText('Delete English (Automatic)'))
+
+      // Caption should be removed and Request button should reappear
+      expect(await screen.findByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+      expect(screen.queryByText('English (Automatic)')).not.toBeInTheDocument()
+    })
+
     it('a11y: announces when ASR caption generation fails', async () => {
       server.use(
         http.post('/api/v1/media_objects/*/asr', () =>
