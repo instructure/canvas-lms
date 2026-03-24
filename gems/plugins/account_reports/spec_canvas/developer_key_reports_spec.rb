@@ -164,6 +164,29 @@ describe AccountReports::DeveloperKeyReports do
     end
   end
 
+  context "with the lti_deactivate_registrations feature flag enabled" do
+    before { account.root_account.enable_feature!(:lti_deactivate_registrations) }
+
+    it "shows 'On' for an LTI key with an active registration" do
+      expect(subject.find { |row| row[0] == third_key.global_id.to_s }[6]).to eq("On")
+    end
+
+    it "shows 'On' for an LTI key with an active registration even when the account binding is disabled" do
+      second_key.lti_registration.activate
+      expect(subject.find { |row| row[0] == second_key.global_id.to_s }[6]).to eq("On")
+    end
+
+    it "shows 'Off' for an LTI key with an inactive registration" do
+      third_key.lti_registration.deactivate
+      expect(subject.find { |row| row[0] == third_key.global_id.to_s }[6]).to eq("Off")
+    end
+
+    it "still uses account binding for non-LTI keys" do
+      # first_key is an API key with enable_developer_key_account_binding! → "On"
+      expect(subject.find { |row| row[0] == first_key.global_id.to_s }[6]).to eq("On")
+    end
+  end
+
   context "one of the keys has an overlay that adds an additional placement" do
     let(:user) { user_model }
     let(:overlay) do

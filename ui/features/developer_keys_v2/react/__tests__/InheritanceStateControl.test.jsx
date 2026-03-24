@@ -371,6 +371,54 @@ describe('InheritanceStateControl', () => {
     expect(allowRadioInput.checked).toBe(true)
   })
 
+  describe('when lti_deactivate_registrations is enabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES = {...window.ENV.FEATURES, lti_deactivate_registrations: true}
+    })
+
+    it('shows "on" when lti_registration_workflow_state is active, ignoring the binding', () => {
+      const key = {
+        ...mockDevKey('off'),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'active',
+      }
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(true)
+    })
+
+    it('shows "off" when lti_registration_workflow_state is inactive, ignoring the binding', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(false)
+    })
+
+    it('shows "off" when lti_registration_workflow_state is absent', () => {
+      const key = {...mockDevKey('on', true), is_lti_key: true}
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(false)
+    })
+
+    it('falls back to the binding when the key is not an LTI key', () => {
+      const key = {...mockDevKey('on', true), is_lti_key: false}
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(true)
+    })
+
+    it('uses the binding state for site admin, ignoring registration state', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const onRadio = componentNode(key, siteAdminCTX).querySelector('input[value="on"]')
+      expect(onRadio.checked).toBe(true)
+    })
+  })
+
   describe('when devKeysReadOnly is true', () => {
     beforeEach(() => {
       fakeENV.setup({FEATURES: {}, devKeysReadOnly: true})
