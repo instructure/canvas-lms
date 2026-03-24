@@ -73,7 +73,9 @@ export const AutoCaptioning = ({
   return (
     <Flex as="div" direction="column" gap="medium">
       <Flex.Item overflowY="hidden" overflowX="hidden">
-        <Heading variant="titleCardMini">{formatMessage('Automatic captioning')}</Heading>
+        <Heading as="h4" variant="titleCardMini">
+          {formatMessage('Automatic captioning')}
+        </Heading>
         <Text variant="contentSmall">
           {formatMessage('Our technology generates ~85% accurate captions.')}
         </Text>

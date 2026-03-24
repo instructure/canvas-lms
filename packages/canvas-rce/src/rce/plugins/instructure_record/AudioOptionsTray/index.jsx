@@ -150,7 +150,11 @@ export default function AudioOptionsTray({
                             name="viewer-restrictions"
                             onChange={setViewerRestrictions}
                             defaultValue={viewerRestrictions}
-                            description={formatMessage('Viewer Restrictions')}
+                            description={
+                              <Heading level="h4" as="h3">
+                                {formatMessage('Viewer Restrictions')}
+                              </Heading>
+                            }
                           >
                             <Checkbox
                               variant="toggle"
@@ -161,7 +165,13 @@ export default function AudioOptionsTray({
                         </Flex.Item>
                       )}
                       <Flex.Item padding="small">
-                        <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
+                        <FormFieldGroup
+                          description={
+                            <Heading level="h4" as="h3">
+                              {formatMessage('Closed Captions/Subtitles')}
+                            </Heading>
+                          }
+                        >
                           {!isAsrCaptioningImprovements ? (
                             <ClosedCaptionPanel
                               key={subtitles.reduce((acc, track) => acc + track.locale, '')}

@@ -432,7 +432,11 @@ export default function VideoOptionsTray({
                             name="viewer-restrictions"
                             onChange={setViewerRestrictions}
                             defaultValue={viewerRestrictions}
-                            description={formatMessage('Viewer Restrictions')}
+                            description={
+                              <Heading level="h4" as="h3">
+                                {formatMessage('Viewer Restrictions')}
+                              </Heading>
+                            }
                           >
                             <Checkbox
                               variant="toggle"
@@ -446,9 +450,11 @@ export default function VideoOptionsTray({
                         <Flex.Item padding="small">
                           <FormFieldGroup
                             description={
-                              isAsrCaptioningImprovements
-                                ? formatMessage('Caption Manager')
-                                : formatMessage('Closed Captions/Subtitles')
+                              <Heading level="h4" as="h3">
+                                {isAsrCaptioningImprovements
+                                  ? formatMessage('Caption Manager')
+                                  : formatMessage('Closed Captions/Subtitles')}
+                              </Heading>
                             }
                           >
                             {!isAsrCaptioningImprovements && (
@@ -511,7 +517,11 @@ export default function VideoOptionsTray({
                             name="studio-embed-options"
                             onChange={handleEmbedOptionChange}
                             value={studioEmbedOptions}
-                            description={formatMessage('Viewer Restrictions')}
+                            description={
+                              <Heading level="h4" as="h3">
+                                {formatMessage('Viewer Restrictions')}
+                              </Heading>
+                            }
                           >
                             <Text variant="contentSmall">
                               {formatMessage('Changes will apply after you save this page.')}
