@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {legacyRender} from '@canvas/react'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import page from 'page'
 import qs from 'qs'
 import DeveloperKeysApp from './App'
@@ -104,12 +103,12 @@ page('*', parseQueryString) // Middleware to parse querystring to object
 
 page('/accounts/:contextId/developer_keys', renderShowDeveloperKeys)
 page.exit('/accounts/:contextId/developer_keys', (_ctx, next) => {
-  ReactDOM.unmountComponentAtNode(reactRoot())
+  legacyUnmountComponentAtNode(reactRoot())
   next()
 })
 page('/accounts/:contextId/developer_keys/:developerKeyId', renderDeveloperKeySettings)
 page.exit('/accounts/:contextId/developer_keys/:developerKeyId', (_ctx, next) => {
-  ReactDOM.unmountComponentAtNode(reactRoot())
+  legacyUnmountComponentAtNode(reactRoot())
   next()
 })
 
