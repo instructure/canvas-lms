@@ -95,6 +95,7 @@ const CoursesPagination: React.FC<{
   return (
     <Pagination
       data-testid="courses-pagination"
+      aria-label={I18n.t('Pagination')}
       as="nav"
       variant="compact"
       labelNext={I18n.t('Next Page')}
