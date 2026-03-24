@@ -42,6 +42,19 @@ function getJwt(): Promise<string> {
   return jwtPromise
 }
 
+const CHIP_LABEL_MAP: Array<[RegExp, string]> = [
+  [/^Summarize/i, 'Summarize'],
+  [/^Quiz me/i, 'Quiz me'],
+  [/^Flash Cards$/i, 'Flashcards'],
+]
+
+function normalizeChipLabel(chip: string): string {
+  for (const [pattern, label] of CHIP_LABEL_MAP) {
+    if (pattern.test(chip)) return label
+  }
+  return chip
+}
+
 async function fetchAssistResponse(request: AssistRequest): Promise<AssistResponse> {
   const token = await getJwt()
   const journeyUrl = window.ENV.JOURNEY_URL
@@ -55,7 +68,14 @@ async function fetchAssistResponse(request: AssistRequest): Promise<AssistRespon
     body: JSON.stringify(request),
   })
   if (!response.ok) throw new Error(`Assist request failed: ${response.status}`)
-  return response.json() as Promise<AssistResponse>
+  const data = (await response.json()) as AssistResponse
+  if (data.chips) {
+    data.chips = data.chips.map(c => {
+      const label = normalizeChipLabel(c.chip)
+      return {...c, chip: label, prompt: label}
+    })
+  }
+  return data
 }
 
 function StudyAssistApp() {

@@ -86,7 +86,7 @@ describe('StudyAssistTray', () => {
     )
   })
 
-  it('configures AssistContent for prompts-only mode with white text', () => {
+  it('configures AssistContent for prompts-only mode with filtered prompts', () => {
     render(
       <StudyAssistTray
         open={true}
@@ -98,24 +98,8 @@ describe('StudyAssistTray', () => {
       expect.objectContaining({
         chatEnabled: false,
         showLargePrompts: true,
-        thumbsColor: 'primary-inverse',
-        renderMessage: expect.any(Function),
-        renderRichContent: expect.any(Function),
+        allowedPrompts: ['Summarize', 'Quiz me', 'Flashcards'],
       }),
     )
-  })
-
-  it('renderMessage wraps text in a white span', () => {
-    render(
-      <StudyAssistTray
-        open={true}
-        onDismiss={onDismiss}
-        fetchAssistResponse={fetchAssistResponse}
-      />,
-    )
-    const {renderMessage} = mockAssistContent.mock.calls[0][0] as any
-    const result = render(renderMessage('Hello world'))
-    expect(result.container.querySelector('span')).toHaveStyle({color: 'rgb(255, 255, 255)'})
-    expect(result.container).toHaveTextContent('Hello world')
   })
 })
