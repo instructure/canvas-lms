@@ -1932,6 +1932,9 @@
   "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
     "message": "Please enter a valid video URL from a supported platform."
   },
+  "please_select_a_file_before_uploading_4cd6e2db": {
+    "message": "Please select a file before uploading."
+  },
   "please_select_a_file_of_a_supported_type_1fc578f2": {
     "message": "Please select a file of a supported type"
   },
@@ -2100,6 +2103,9 @@
   "request_d1129f7d": {
     "message": "Request"
   },
+  "required_choose_file_cd796eaa": {
+    "message": "Required: Choose File"
+  },
   "reset_95a81614": {
     "message": "Reset"
   },
@@ -2249,6 +2255,9 @@
   },
   "selected_274ce24f": {
     "message": "Selected"
+  },
+  "selected_file_name_93fa1a14": {
+    "message": "Selected file: { name }"
   },
   "selected_linkfilename_c093b1f2": {
     "message": "Selected { linkFileName }"

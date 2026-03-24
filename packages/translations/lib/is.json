@@ -2246,6 +2246,9 @@
     "selected_274ce24f": {
         "message": "Valið"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Valin skrá: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Valið { linkFileName }"
     },

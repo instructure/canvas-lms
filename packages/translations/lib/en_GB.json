@@ -2246,6 +2246,9 @@
     "selected_274ce24f": {
         "message": "Selected"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Selected file: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Selected { linkFileName }"
     },
