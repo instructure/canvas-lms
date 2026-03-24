@@ -666,7 +666,7 @@ GEM
       ruby2ruby (~> 2.4)
       sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
-    icalendar (2.12.1)
+    icalendar (2.12.2)
       base64
       ice_cube (~> 0.16)
       logger
