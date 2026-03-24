@@ -28,7 +28,12 @@ jobs:
           node-version: '20'
           cache: 'yarn'
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile || (
+            yarn cache clean &&
+            rm -rf ~/.cache/yarn &&
+            yarn install --frozen-lockfile
+          )
       - name: Build Packages
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -47,7 +52,12 @@ jobs:
           node-version: '20'
           cache: 'yarn'
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile || (
+            yarn cache clean &&
+            rm -rf ~/.cache/yarn &&
+            yarn install --frozen-lockfile
+          )
       - name: Build Packages
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -68,7 +78,12 @@ jobs:
           node-version: '20'
           cache: 'yarn'
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile || (
+            yarn cache clean &&
+            rm -rf ~/.cache/yarn &&
+            yarn install --frozen-lockfile
+          )
       - name: Build Packages
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -99,7 +114,12 @@ jobs:
           node-version: '20'
           cache: 'yarn'
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile || (
+            yarn cache clean &&
+            rm -rf ~/.cache/yarn &&
+            yarn install --frozen-lockfile
+          )
       - name: Build Packages
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
@@ -120,7 +140,12 @@ jobs:
           node-version: '20'
           cache: 'yarn'
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile || (
+            yarn cache clean &&
+            rm -rf ~/.cache/yarn &&
+            yarn install --frozen-lockfile
+          )
       - name: Build Packages
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
