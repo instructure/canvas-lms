@@ -194,6 +194,96 @@ module ConditionalRelease
         expect(progression.workflow_state).to eq("unlocked")
       end
 
+      it "evaluates module progressions when mastery path assignment is added as a wiki page" do
+        assignment = @course.assignments.create!(
+          title: "Graded Page",
+          submission_types: "wiki_page",
+          only_visible_to_overrides: true
+        )
+        wiki_page = @course.wiki_pages.create!(title: "Graded Page", assignment:)
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment:,
+          root_account_id: @course.root_account_id
+        )
+
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+        tag = module_with_sequential.add_item(type: "wiki_page", id: wiki_page.id)
+        module_with_sequential.completion_requirements = [{ id: tag.id, type: "must_view" }]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
+      it "evaluates module progressions when mastery path assignment is added as a discussion topic" do
+        discussion = @course.discussion_topics.create!(
+          title: "Graded Discussion",
+          assignment: @course.assignments.create!(
+            title: "Graded Discussion",
+            submission_types: "discussion_topic",
+            only_visible_to_overrides: true
+          )
+        )
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment: discussion.assignment,
+          root_account_id: @course.root_account_id
+        )
+
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+        tag = module_with_sequential.add_item(type: "discussion_topic", id: discussion.id)
+        module_with_sequential.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
+      it "evaluates module progressions when mastery path assignment is added as a quiz" do
+        quiz = @course.quizzes.create!(title: "Quiz 1", quiz_type: "assignment", only_visible_to_overrides: true)
+        quiz.workflow_state = "available"
+        quiz.save!
+        quiz.assignment.update!(only_visible_to_overrides: true)
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment: quiz.assignment,
+          root_account_id: @course.root_account_id
+        )
+
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+        tag = module_with_sequential.add_item(type: "quiz", id: quiz.id)
+        module_with_sequential.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
       it "assigns due dates to quizzes with course pacing enabled" do
         quiz = @course.quizzes.create!(title: "Quiz 1", quiz_type: "assignment")
         quiz.workflow_state = "available"

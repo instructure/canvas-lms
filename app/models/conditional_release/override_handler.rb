@@ -154,18 +154,31 @@ module ConditionalRelease
         if course
           affected_assignments = assignments_to_assign.concat(assignments_to_unassign)
           SubmissionLifecycleManager.recompute_users_for_course([student_id], course, affected_assignments)
-          affected_context_modules = ContextModule.active.joins(:content_tags).where(content_tags: { content_type: "Assignment", content_id: affected_assignments }).distinct
+          affected_assignment_ids = affected_assignments.map(&:id)
+          ct = ContentTag.arel_table
+          conditions = ct[:content_type].eq("Assignment").and(ct[:content_id].in(affected_assignment_ids))
+
+          wiki_page_ids = WikiPage.where(assignment_id: affected_assignment_ids).pluck(:id)
+          conditions = conditions.or(ct[:content_type].eq("WikiPage").and(ct[:content_id].in(wiki_page_ids))) if wiki_page_ids.any?
+
+          discussion_ids = DiscussionTopic.where(assignment_id: affected_assignment_ids).pluck(:id)
+          conditions = conditions.or(ct[:content_type].eq("DiscussionTopic").and(ct[:content_id].in(discussion_ids))) if discussion_ids.any?
+
+          quiz_ids = Quizzes::Quiz.where(assignment_id: affected_assignment_ids).pluck(:id)
+          conditions = conditions.or(ct[:content_type].in(Quizzes::Quiz.class_names).and(ct[:content_id].in(quiz_ids))) if quiz_ids.any?
+
+          affected_context_modules = ContextModule.active.joins(:content_tags).where(conditions).distinct
+
+          if course.root_account.feature_enabled? :mastery_path_invalidate_assignment_visibility_cache
+            AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(course_ids: [course.id], user_ids: [student_id])
+            QuizVisibility::QuizVisibilityService.invalidate_cache(user_ids: [student_id], course_ids: [course.id])
+          end
 
           student = User.find(student_id)
           affected_context_modules.each do |context_module|
             progression = context_module.find_or_create_progression(student)
             progression.mark_as_outdated!
             progression.reload.evaluate
-          end
-
-          if course.root_account.feature_enabled? :mastery_path_invalidate_assignment_visibility_cache
-            AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(course_ids: [course.id], user_ids: [student_id])
-            QuizVisibility::QuizVisibilityService.invalidate_cache(user_ids: [student_id], course_ids: [course.id])
           end
         end
       end
