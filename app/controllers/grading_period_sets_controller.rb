@@ -180,12 +180,13 @@ class GradingPeriodSetsController < ApplicationController
   end
 
   def check_read_rights
-    render_json_unauthorized and return unless @context.grants_right?(@current_user, :read)
+    render_json_unauthorized unless @context.grants_right?(@current_user, :read)
   end
 
   def check_manage_rights
-    render_json_unauthorized and return unless @context.root_account?
-    render_json_unauthorized and return unless @context.grants_right?(@current_user, :manage)
+    return render_json_unauthorized unless @context.root_account?
+
+    render_json_unauthorized unless @context.grants_right?(@current_user, :manage)
   end
 
   def serialize_json_api(grading_period_sets, meta = {})

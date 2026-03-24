@@ -67,9 +67,9 @@ class ExternalContentController < ApplicationController
     end
     if params[:id]
       message_auth = Lti::MessageAuthenticator.new(request.original_url, request.GET.merge(request.POST))
-      render_unauthorized_action and return unless message_auth.valid?
-      render_unauthorized_action and return unless json_data[:content_item_id] == params[:id]
-      render_unauthorized_action and return unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
+      return render_unauthorized_action unless message_auth.valid?
+      return render_unauthorized_action unless json_data[:content_item_id] == params[:id]
+      return render_unauthorized_action unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
     end
     @headers = false
 
