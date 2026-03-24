@@ -138,7 +138,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0303)
+    mime-types-data (3.2026.0317)
     minitest (5.27.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
