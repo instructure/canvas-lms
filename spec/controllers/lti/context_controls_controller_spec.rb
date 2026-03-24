@@ -233,9 +233,19 @@ describe Lti::ContextControlsController, type: :request do
         )
       end
 
-      it "sorts deployments by account hierarchy" do
+      it "sorts deployments: root account first, then subaccounts, then courses" do
         subject
-        expect(response_json.pluck("id")).to eq([deployment.id, course_deployment.id, subaccount_deployment.id])
+        expect(response_json.pluck("id")).to eq([deployment.id, subaccount_deployment.id, course_deployment.id])
+      end
+
+      it "sorts by context type, not by deployment id" do
+        # course_deployment has a lower id than subaccount_deployment
+        # (created first in the before block), so without explicit sorting
+        # it would appear before subaccount_deployment in the response
+        expect(course_deployment.id).to be < subaccount_deployment.id
+        subject
+        ids = response_json.pluck("id")
+        expect(ids.index(subaccount_deployment.id)).to be < ids.index(course_deployment.id)
       end
 
       context "when deployment has many controls" do
@@ -376,6 +386,36 @@ describe Lti::ContextControlsController, type: :request do
           first_account_index = all_control_ids.index { |id| account_control_ids.include?(id) }
 
           expect(last_course_index).to be < first_account_index
+        end
+      end
+
+      context "when paginating across deployment types" do
+        let(:params) { { per_page: 3 } }
+
+        before do
+          # Add 2 extra controls to subaccount_deployment (3 total).
+          # With per_page=3, the page boundary will be in between
+          # the subaccount deployments, putting the course deployment on page 2.
+          2.times { control_for(subaccount_deployment, account_model(parent_account: subaccount)) }
+        end
+
+        it "returns root account, then subaccount, then course across page boundaries" do
+          # Make sure the course's deployment ID comes first, otherwise this test will still
+          # pass but not necessarily because the sorting logic is working.
+          expect(course_deployment.id).to be < subaccount_deployment.id
+
+          # Total is 1 root account + 3 subaccounts + 1 course = 5 deployments
+          # Page 1 has [ root_account[control], subaccount[control1, control2] ]
+          # Page 2 has [ subaccount[control3], course[control] ]
+          subject
+          expect(response_json.pluck("id")).to eq([deployment.id, subaccount_deployment.id])
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+          next_link = links.detect { |link| link[:rel] == "next" }
+
+          get next_link[:uri].to_s
+          page2_json = response.parsed_body
+          expect(page2_json.pluck("id")).to eq([subaccount_deployment.id, course_deployment.id])
         end
       end
     end
