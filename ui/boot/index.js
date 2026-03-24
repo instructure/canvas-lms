@@ -102,6 +102,8 @@ const urlParams = new URLSearchParams(window.location.search)
 const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'
 const hasCareerQueryParam =
   urlParams.get('instui_theme') === 'career' || urlParams.get('instui_theme') === 'career-dark'
+const storedThemePreference = window.localStorage.getItem('canvas_theme_preference')
+const hasStoredDarkPreference = storedThemePreference === 'dark'
 
 if (ENV.use_high_contrast || hasHighContrastQueryParam) {
   canvasHighContrastTheme.use({overrides: {typography}})
@@ -131,7 +133,96 @@ if (hasCareerQueryParam) {
       baseTheme.use({overrides: careerTheme})
     }
   })
+} else if (hasStoredDarkPreference) {
+  loadCareerTheme(true).then(careerTheme => {
+    if (careerTheme !== null) {
+      canvasBaseTheme.use({overrides: careerTheme})
+    }
+  })
 }
+
+const DARK_MODE_STYLE_ID = 'canvas-dark-mode-custom-style'
+const DARK_MODE_TOGGLE_ID = 'canvas-dark-mode-toggle'
+
+const setDarkModeStyle = enabled => {
+  const existingStyle = document.getElementById(DARK_MODE_STYLE_ID)
+
+  if (!enabled) {
+    existingStyle?.remove()
+    return
+  }
+
+  if (existingStyle) return
+
+  const style = document.createElement('style')
+  style.id = DARK_MODE_STYLE_ID
+  style.textContent = `
+    html, body {
+      background: #111827 !important;
+      color: #f3f4f6 !important;
+    }
+
+    #application, #wrapper, #main {
+      background: #111827 !important;
+      color: #f3f4f6 !important;
+    }
+
+    a { color: #93c5fd !important; }
+    a:visited { color: #c4b5fd !important; }
+  `
+  document.head.appendChild(style)
+}
+
+const applyDarkMode = enabled => {
+  window.localStorage.setItem('canvas_theme_preference', enabled ? 'dark' : 'light')
+  setDarkModeStyle(enabled)
+  loadCareerTheme(enabled).then(careerTheme => {
+    if (careerTheme !== null) {
+      canvasBaseTheme.use({overrides: careerTheme})
+    }
+  })
+}
+
+const renderDarkModeToggle = () => {
+  const toggle = document.createElement('button')
+  toggle.id = DARK_MODE_TOGGLE_ID
+  toggle.type = 'button'
+  toggle.style.position = 'fixed'
+  toggle.style.right = '1rem'
+  toggle.style.bottom = '1rem'
+  toggle.style.zIndex = '9999'
+  toggle.style.padding = '0.5rem 0.75rem'
+  toggle.style.borderRadius = '999px'
+  toggle.style.border = '1px solid #6b7280'
+  toggle.style.background = '#ffffff'
+  toggle.style.color = '#111827'
+  toggle.style.cursor = 'pointer'
+
+  const syncToggleState = () => {
+    const isDarkMode = window.localStorage.getItem('canvas_theme_preference') === 'dark'
+    toggle.textContent = isDarkMode ? 'Disable dark mode' : 'Enable dark mode'
+    toggle.setAttribute('aria-label', toggle.textContent)
+  }
+
+  toggle.addEventListener('click', () => {
+    const isDarkMode = window.localStorage.getItem('canvas_theme_preference') === 'dark'
+    applyDarkMode(!isDarkMode)
+    syncToggleState()
+  })
+
+  syncToggleState()
+  document.body.appendChild(toggle)
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.localStorage.getItem('canvas_theme_preference') === 'dark') {
+    setDarkModeStyle(true)
+  }
+
+  if (!document.getElementById(DARK_MODE_TOGGLE_ID)) {
+    renderDarkModeToggle()
+  }
+})
 
 /* #__PURE__ */ if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
   // This is for the `wait_for_ajax_requests` method in selenium
