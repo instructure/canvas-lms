@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
@@ -42,7 +42,7 @@ const I18n = createI18nScope('OutcomeManagement')
 
 const unmount = mount => {
   if (mount && mount.nodeType === Node.ELEMENT_NODE) {
-    ReactDOM.unmountComponentAtNode(mount)
+    legacyUnmountComponentAtNode(mount)
   }
 }
 

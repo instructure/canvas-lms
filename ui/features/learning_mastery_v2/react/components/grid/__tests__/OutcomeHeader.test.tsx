@@ -28,6 +28,11 @@ import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useCont
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
+vi.mock('../../charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
+
 vi.mock('@instructure/ui-icons', async () => {
   const actual = await vi.importActual('@instructure/ui-icons')
   return {

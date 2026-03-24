@@ -2246,6 +2246,9 @@
     "selected_274ce24f": {
         "message": "Kua tīpakohia"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Kōnae kua tīpakohia: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Tīpakohia { linkFileName }"
     },

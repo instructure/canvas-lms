@@ -538,6 +538,47 @@ describe ContentTag do
     expect(@tag2.workflow_state).to eq "unpublished"
   end
 
+  it "sets the wiki page user when publishing with a user" do
+    course_factory
+    user1 = user_model
+    user2 = user_model
+    @page = @course.wiki_pages.create!(title: "some page", user: user1)
+    @page.workflow_state = "unpublished"
+    @page.save!
+    @module = @course.context_modules.create!(name: "module")
+    @tag = @module.add_item({ type: "WikiPage", title: "some page", id: @page.id })
+    @tag.workflow_state = "active"
+    @tag.save!
+    @tag.update_asset_workflow_state!(user: user2)
+    expect(@page.reload.user).to eq user2
+  end
+
+  it "sets the wiki page user when unpublishing with a user" do
+    course_factory
+    user1 = user_model
+    user2 = user_model
+    @page = @course.wiki_pages.create!(title: "some page", user: user1)
+    @module = @course.context_modules.create!(name: "module")
+    @tag = @module.add_item({ type: "WikiPage", title: "some page", id: @page.id })
+    @tag.workflow_state = "unpublished"
+    @tag.save!
+    @tag.update_asset_workflow_state!(user: user2)
+    expect(@page.reload.user).to eq user2
+  end
+
+  it "does not set user on non-wiki-page content" do
+    course_factory
+    user2 = user_model
+    assignment_model
+    @assignment.unpublish!
+    @module = @course.context_modules.create!
+    @tag = @module.add_item(type: "Assignment", id: @assignment.id)
+    @tag.workflow_state = "active"
+    @tag.save!
+    @tag.update_asset_workflow_state!(user: user2)
+    expect(@assignment.reload).to be_published
+  end
+
   it "publishes the linked file when the tag is published" do
     file = attachment_model(locked: true)
     mod = @course.context_modules.create!(name: "module")
@@ -1306,6 +1347,17 @@ describe ContentTag do
       tag.trigger_publish!
       expect(tag.reload.published?).to be(false)
     end
+
+    it "sets the wiki page user when publishing with a user" do
+      course_factory
+      user1 = user_model
+      user2 = user_model
+      page = @course.wiki_pages.create!(title: "test page", user: user1, workflow_state: "unpublished")
+      mod = @course.context_modules.create!(name: "module")
+      tag = mod.add_item(type: "WikiPage", id: page.id)
+      tag.trigger_publish!(user: user2)
+      expect(page.reload.user).to eq user2
+    end
   end
 
   describe "#trigger_unpublish!" do
@@ -1324,6 +1376,17 @@ describe ContentTag do
       expect(tag.published?).to be(true)
       tag.trigger_unpublish!
       expect(tag.reload.published?).to be(true)
+    end
+
+    it "sets the wiki page user when unpublishing with a user" do
+      course_factory
+      user1 = user_model
+      user2 = user_model
+      page = @course.wiki_pages.create!(title: "test page", user: user1)
+      mod = @course.context_modules.create!(name: "module")
+      tag = mod.add_item(type: "WikiPage", id: page.id)
+      tag.trigger_unpublish!(user: user2)
+      expect(page.reload.user).to eq user2
     end
   end
 

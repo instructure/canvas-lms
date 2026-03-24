@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
@@ -142,13 +142,13 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
   parent.setAttribute('class', 'flashalert-message')
   getBoxContainer().appendChild(parent)
 
-  ReactDOM.render(
+  legacyRender(
     <ImportConfirmBox
       count={count}
       onImportHandler={onImportHandler}
       onCloseHandler={() => {
         onCloseHandler()
-        ReactDOM.unmountComponentAtNode(parent)
+        legacyUnmountComponentAtNode(parent)
         parent.remove()
       }}
     />,

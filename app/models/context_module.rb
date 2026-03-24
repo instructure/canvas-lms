@@ -383,19 +383,21 @@ class ContextModule < ActiveRecord::Base
 
   alias_method :published?, :active?
 
-  def publish_items!(progress: nil)
+  def publish_items!(progress: nil, user: nil)
+    user ||= progress&.user
     content_tags.preload(content: %i[assignment_overrides discussion_topic_section_visibilities sub_assignments context_module_tags]).load.each do |content_tag|
       break if progress&.reload&.failed?
 
-      content_tag.trigger_publish!
+      content_tag.trigger_publish!(user:)
     end
   end
 
-  def unpublish_items!(progress: nil)
+  def unpublish_items!(progress: nil, user: nil)
+    user ||= progress&.user
     content_tags.preload(:content).load.each do |content_tag|
       break if progress&.reload&.failed?
 
-      content_tag.trigger_unpublish!
+      content_tag.trigger_unpublish!(user:)
     end
   end
 

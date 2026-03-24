@@ -2246,6 +2246,9 @@
     "selected_274ce24f": {
         "message": "已選擇"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "選取的檔案：{ name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "已選定 { linkFileName }"
     },

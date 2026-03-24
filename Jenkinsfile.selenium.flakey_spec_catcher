@@ -215,7 +215,7 @@ env.LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
 env.FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
 // fsc errors when running specs from gems.
 // until we figure out how to run them, we should ignore them
-env.FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,spec/selenium/performance/'
+env.FSC_IGNORE_FILES = 'gems/.*/spec/,spec/selenium/performance/'
 env.POSTGRES_PASSWORD = 'sekret'
 env.FSC_NODE_COUNT = getNodeCount()
 

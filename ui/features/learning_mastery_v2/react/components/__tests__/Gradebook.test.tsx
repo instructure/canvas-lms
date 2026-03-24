@@ -25,6 +25,11 @@ import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 
+vi.mock('../charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
+
 // Helper to render with MockedQueryClientProvider
 const renderWithQueryClient = (ui: React.ReactElement) => {
   const queryClient = new QueryClient({

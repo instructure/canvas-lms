@@ -413,16 +413,18 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  def update_asset_workflow_state!
+  def update_asset_workflow_state!(user: nil)
     return unless sync_workflow_state_to_asset?
     return unless asset_context_matches?
     return unless content.respond_to?(:publish!)
 
     # update the asset and also update _other_ content tags that point at it
     if unpublished? && content.published? && content.can_unpublish?
+      content.user = user if user && content.is_a?(WikiPage)
       content.unpublish!
       self.class.update_for(content, exclude_tag: self)
     elsif active? && !content.published?
+      content.user = user if user && content.is_a?(WikiPage)
       content.publish!
       self.class.update_for(content, exclude_tag: self)
     end
@@ -866,7 +868,7 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  def trigger_publish!
+  def trigger_publish!(user: nil)
     enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
     if unpublished? && (!content.respond_to?(:can_publish?) || content&.can_publish?)
       if content_type == "Attachment"
@@ -878,10 +880,10 @@ class ContentTag < ActiveRecord::Base
       end
     end
 
-    update_asset_workflow_state!
+    update_asset_workflow_state!(user:)
   end
 
-  def trigger_unpublish!
+  def trigger_unpublish!(user: nil)
     if published? && (!content.respond_to?(:can_unpublish?) || content&.can_unpublish?)
       if content_type == "Attachment"
         content.locked = true
@@ -890,6 +892,6 @@ class ContentTag < ActiveRecord::Base
       unpublish
     end
 
-    update_asset_workflow_state!
+    update_asset_workflow_state!(user:)
   end
 end

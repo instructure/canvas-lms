@@ -17,7 +17,8 @@
  */
 
 import React, {useMemo, useCallback} from 'react'
-import {StudentCell} from './grid/StudentCell'
+import {StudentCell} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/StudentCell'
+import {StudentCellPopover} from './grid/StudentCellPopover'
 import {StudentHeader} from './grid/StudentHeader'
 import {OutcomeHeader} from './grid/OutcomeHeader'
 import {
@@ -161,19 +162,46 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   )
 
   const renderStudentCell = useCallback(
-    (cellData: any) => (
-      <StudentCell
-        courseId={courseId}
-        student={cellData}
-        secondaryInfoDisplay={gradebookSettings.secondaryInfoDisplay}
-        showStudentAvatar={gradebookSettings.displayFilters.includes(
-          DisplayFilter.SHOW_STUDENT_AVATARS,
-        )}
-        nameDisplayFormat={gradebookSettings.nameDisplayFormat}
-        outcomes={outcomes}
-        rollups={rollups}
-      />
-    ),
+    (cellData: any) => {
+      const student = cellData
+      const studentName =
+        gradebookSettings.nameDisplayFormat === NameDisplayFormat.LAST_FIRST
+          ? student.sortable_name
+          : student.display_name
+      const studentGradesUrl = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
+
+      return (
+        <StudentCell
+          student={{
+            id: String(student.id),
+            name: student.name,
+            display_name: student.display_name,
+            sortable_name: student.sortable_name,
+            avatar_url: student.avatar_url,
+            sis_id: student.sis_id,
+            integration_id: student.integration_id,
+            login_id: student.login_id,
+            status: student.status,
+          }}
+          studentPopover={
+            <StudentCellPopover
+              key={student.id}
+              student={student}
+              studentName={studentName}
+              studentGradesUrl={studentGradesUrl}
+              courseId={courseId}
+              outcomes={outcomes}
+              rollups={rollups}
+            />
+          }
+          secondaryInfoDisplay={gradebookSettings.secondaryInfoDisplay}
+          showStudentAvatar={gradebookSettings.displayFilters.includes(
+            DisplayFilter.SHOW_STUDENT_AVATARS,
+          )}
+          nameDisplayFormat={gradebookSettings.nameDisplayFormat}
+        />
+      )
+    },
     [courseId, gradebookSettings, outcomes, rollups],
   )
 

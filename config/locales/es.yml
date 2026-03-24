@@ -5139,7 +5139,7 @@ es:
   assignment_id_b040cee0: "Identificador de la tarea"
   assignment_ids_param_is_invalid_7dc5c327: "El parámetro %{assignment_ids} no es válido"
   assignment_information_e871d0e0: "Información de la tarea"
-  assignment_is_incomplete_ff55e07c: "%{assignment} está completo"
+  assignment_is_incomplete_ff55e07c: "%{assignment} está incompleto"
   assignment_is_not_assigned_to_you_c86f9960: "La tarea no está asignada a usted"
   assignment_is_reassigned_dd6b6ef2: "La tarea se reasignó."
   assignment_is_reassigned_ebb31807: "%{assignment} está reasignado"

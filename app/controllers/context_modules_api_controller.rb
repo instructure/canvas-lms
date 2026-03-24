@@ -437,13 +437,13 @@ class ContextModulesApiController < ApplicationController
         if value_to_boolean(params[:module][:published])
           @module.publish
           unless value_to_boolean(params[:module][:skip_content_tags])
-            @module.publish_items!
+            @module.publish_items!(user: @current_user)
             publish_warning = @module.content_tags.any?(&:unpublished?)
           end
         else
           @module.unpublish
           unless value_to_boolean(params[:module][:skip_content_tags])
-            @module.unpublish_items!
+            @module.unpublish_items!(user: @current_user)
           end
         end
       end
