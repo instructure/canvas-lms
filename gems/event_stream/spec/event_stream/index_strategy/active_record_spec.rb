@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EventStream::IndexStrategy::ActiveRecord do
   let(:fake_record_type) do
     Class.new do

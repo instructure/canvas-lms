@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 describe Utils::InstStatsdUtils::Tags do
   describe(".tags_for") do
     subject(:tags) { described_class.tags_for(Shard.current) }

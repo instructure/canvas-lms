@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 RSpec.describe Lti::LineItem do
   context "when validating" do
     let(:line_item) { line_item_model }

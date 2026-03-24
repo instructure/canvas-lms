@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-require_relative "../../spec_helper"
 
 describe DiscussionTopic::ScopedToSections do
   let_once(:context) { course_with_teacher.course }

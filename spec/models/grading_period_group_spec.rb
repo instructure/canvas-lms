@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe GradingPeriodGroup do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:valid_attributes) { { title: "A Title" } }

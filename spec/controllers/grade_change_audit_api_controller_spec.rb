@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe GradeChangeAuditApiController do
   let_once(:admin) { account_admin_user }
   let_once(:course) { Course.create! }

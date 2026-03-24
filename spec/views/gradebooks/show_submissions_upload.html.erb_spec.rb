@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../views_helper"
 
 describe "gradebooks/show_submissions_upload" do

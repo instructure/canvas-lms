@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe GradebookFilter do
   describe "validations" do
     it "requires the payload to be a hash" do

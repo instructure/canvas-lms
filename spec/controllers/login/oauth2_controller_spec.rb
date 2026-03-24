@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Login::OAuth2Controller do
   let(:aac) { Account.default.authentication_providers.create!(auth_type: "facebook") }
 

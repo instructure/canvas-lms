@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 def gen_ssha_password(password)
   salt = SecureRandom.random_bytes(10)
   "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password + salt).unpack1("H*") + salt).gsub(/\s/, "")

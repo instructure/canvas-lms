@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../spec_helper"
-
 # See module_visibility_service_spec for more (integration) tests that exercise this repository
 describe ModuleVisibility::Repositories::ModuleVisibleToStudentRepository do
   describe "testing things" do

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe JSONToken do
   it "encodes" do
     expect(JSONToken.encode({ a: 123, b: [1, 2, "13"] })).to eq "eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19"

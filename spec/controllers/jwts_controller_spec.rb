@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe JwtsController do
   include_context "JWT setup"
   let(:token_user) { user_with_pseudonym }

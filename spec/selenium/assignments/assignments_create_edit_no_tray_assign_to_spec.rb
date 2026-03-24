@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../common"
-require_relative "../../spec_helper"
 require_relative "page_objects/assignments_index_page"
 require_relative "page_objects/assignment_create_edit_page"
 require_relative "page_objects/assignment_page"

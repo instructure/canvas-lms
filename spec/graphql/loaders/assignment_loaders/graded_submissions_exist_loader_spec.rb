@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 RSpec.describe Loaders::AssignmentLoaders::GradedSubmissionsExistLoader do
   before :once do
     @student1 = user_with_pseudonym(username: "student@example.com", active_all: 1)

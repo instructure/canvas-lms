@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe InstitutionalTagCategory do
   let(:account) { account_model }
   let(:valid_params) { { name: "Category", account: } }

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 RSpec.describe PeerReview::AllocationRuleConverterService do
   let(:course) { course_model }
   let(:assignment) { assignment_model(course:, peer_reviews: true) }

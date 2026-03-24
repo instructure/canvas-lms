@@ -22,7 +22,6 @@ require_relative "page_objects/assignment_page"
 require_relative "../shared_components/copy_to_tray_page"
 require_relative "../shared_components/send_to_dialog_page"
 require_relative "../admin/pages/account_content_share_page"
-require_relative "../../spec_helper"
 
 describe "assignments" do
   include_context "in-process server selenium tests"

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Login::SamlController do
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?

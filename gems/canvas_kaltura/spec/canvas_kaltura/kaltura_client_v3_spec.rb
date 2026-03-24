@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 require "active_support"
 
 describe CanvasKaltura::ClientV3 do
