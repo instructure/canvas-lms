@@ -210,6 +210,10 @@ describe NewQuizzesController do
       end
 
       context "when assignment is locked" do
+        before do
+          allow(controller).to receive(:taking_action?).and_return(true)
+        end
+
         it "returns unauthorized when before unlock_at" do
           assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
           get :launch, params: { course_id: course.id, assignment_id: assignment.id }
@@ -224,6 +228,13 @@ describe NewQuizzesController do
 
         it "renders when within the lock window" do
           assignment.update!(due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+
+        it "does not block non-taking actions" do
+          allow(controller).to receive(:taking_action?).and_call_original
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
           get :launch, params: { course_id: course.id, assignment_id: assignment.id }
           expect(response).to render_template("assignments/native_new_quizzes")
         end
