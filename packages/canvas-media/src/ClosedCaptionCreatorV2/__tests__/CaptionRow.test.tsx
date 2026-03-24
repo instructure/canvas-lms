@@ -109,6 +109,32 @@ describe('<CaptionRow />', () => {
     expect(onRetry).toHaveBeenCalledTimes(1)
   })
 
+  it('failed state: shows delete button and calls onDelete when clicked', () => {
+    const onDelete = vi.fn()
+    renderComponent({
+      workflow_state: 'failed',
+      captionName: 'Spanish Caption',
+      errorMessage: 'Caption generation failed',
+      onDelete,
+    })
+
+    const deleteButton = screen.getByText('Delete Spanish Caption')
+    expect(deleteButton).toBeInTheDocument()
+
+    fireEvent.click(deleteButton)
+    expect(onDelete).toHaveBeenCalledTimes(1)
+  })
+
+  it('failed state: does not show delete button when onDelete is not provided', () => {
+    renderComponent({
+      workflow_state: 'failed',
+      captionName: 'French Caption',
+      errorMessage: 'Caption generation failed',
+    })
+
+    expect(screen.queryByText('Delete French Caption')).not.toBeInTheDocument()
+  })
+
   it('failed state: does not show retry button when onRetry is not provided', () => {
     renderComponent({
       workflow_state: 'failed',
