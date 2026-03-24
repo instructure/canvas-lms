@@ -124,7 +124,9 @@ export function ManualCaptionCreator({
   return (
     <Flex as="div" direction="column" gap="medium">
       <Flex.Item overflowY="hidden" overflowX="hidden">
-        <Heading variant="titleCardMini">{formatMessage('Add New Caption')}</Heading>
+        <Heading as="h4" variant="titleCardMini">
+          {formatMessage('Add New Caption')}
+        </Heading>
         <Text id="cc-file-hint" variant="contentSmall">
           {formatMessage('Upload a subtitle track in either the SRT or WebVTT format.')}
         </Text>
