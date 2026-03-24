@@ -163,28 +163,6 @@ describe RubricLLMService do
           parse_and_transform_generated_criteria(response, generate_options)
         end
 
-        def public_build_regenerate_dynamic_content(
-          assignment,
-          criteria_as_text,
-          regeneration_target_prompt,
-          regenerate_options,
-          generate_options,
-          criterion_id,
-          structure_directives,
-          current_criteria_count = nil
-        )
-          build_regenerate_dynamic_content(
-            assignment,
-            criteria_as_text,
-            regeneration_target_prompt,
-            regenerate_options,
-            generate_options,
-            criterion_id,
-            structure_directives,
-            current_criteria_count
-          )
-        end
-
         def public_build_regenerate_dynamic_content(**)
           build_regenerate_dynamic_content(**)
         end
