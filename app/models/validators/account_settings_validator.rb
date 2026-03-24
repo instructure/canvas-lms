@@ -25,7 +25,9 @@ module Validators
     DISCOVERY_PAGE_ICON_VALUES = %w[
       apple
       auth0
+      canvas
       classlink
+      clever
       default
       facebook
       github

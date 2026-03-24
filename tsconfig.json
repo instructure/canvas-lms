@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "allowJs": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -9,6 +10,7 @@
     "module": "es2020",
     "moduleResolution": "node",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": false,
     "skipLibCheck": true,

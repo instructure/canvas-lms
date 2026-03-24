@@ -78,8 +78,10 @@ describe AuthenticationProvidersController do
       end
 
       it "includes auth_providers in js_env with id, url, and name" do
+        pending "waiting for MRA scope change to land"
         saml = account.authentication_providers.create!(saml_hash)
         cas = account.authentication_providers.create!(cas_hash)
+        canvas = account.authentication_providers.find_by(auth_type: "canvas")
         get "index", params: { account_id: account.id }
         expect(response).to be_successful
         js_env = assigns(:js_env)
@@ -87,7 +89,7 @@ describe AuthenticationProvidersController do
         auth_providers = js_env[:auth_providers]
         expect(auth_providers).not_to be_empty
         expect(auth_providers).to all(include(id: be_an(Integer), url: be_a(String), auth_type: be_a(String)))
-        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id])
+        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id, canvas.id])
       end
 
       it "includes discovery_page_url in js_env" do

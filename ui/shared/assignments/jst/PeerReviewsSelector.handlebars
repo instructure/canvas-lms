@@ -19,6 +19,13 @@
         {{#t "labels.require_peer_reviews"}}Require Peer Reviews{{/t}}
       </label>
 
+      {{#if lockPeerReviewSettings}}
+        <div class="alert assignment-edit-group-alert">
+          {{#t "peer_reviews_locked_legacy_mode"}}
+            Peer review settings cannot be changed for this assignment because it was created with graded peer reviews.
+          {{/t}}
+        </div>
+      {{else}}
       <div id="peer_reviews_details" style="{{hiddenUnless peerReviews}}">
         <div class="nested">
           <div class="subtitle">
@@ -128,6 +135,7 @@
           </div>
         {{/unless}}
       </div>
+      {{/if}}
     </div>
   {{/if}}
 </div>

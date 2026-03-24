@@ -308,7 +308,7 @@ export default forwardRef(function ItemAssignToCard(
     if (
       !arrayEquals(newBadDates, oldBadDates) ||
       validateTermForDueDate(newErrors) ||
-      validatePeerReviewDates(newErrors)
+      (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && validatePeerReviewDates(newErrors))
     ) {
       setValidationErrors(newErrors)
     }

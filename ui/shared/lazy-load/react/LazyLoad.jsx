@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense} from 'react'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'

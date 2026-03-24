@@ -19,7 +19,7 @@ import React, {useState, useEffect} from 'react'
 import DiscussionInsightsPage from './DiscussionInsightsPage'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import _AlertManager from '@canvas/alerts/react/AlertManager'
 
 // WithBreakpoints HOC incorrectly requires breakpoints in consumer type

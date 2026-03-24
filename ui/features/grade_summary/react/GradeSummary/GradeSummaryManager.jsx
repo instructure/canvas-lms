@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 

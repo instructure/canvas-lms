@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -85,11 +85,11 @@ ready(() => {
     const container = document.getElementById('create_subject_modal_container')
     if (container) {
       startButton.addEventListener('click', () => {
-        ReactDOM.render(
+        legacyRender(
           <CreateCourseModal
             isModalOpen={true}
             setModalOpen={isOpen => {
-              if (!isOpen) ReactDOM.unmountComponentAtNode(container)
+              if (!isOpen) legacyUnmountComponentAtNode(container)
             }}
             permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
             restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}

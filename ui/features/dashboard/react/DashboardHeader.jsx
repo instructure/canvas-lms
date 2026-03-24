@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
@@ -570,10 +570,7 @@ function loadStartNewCourseHandler() {
   if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
     let root = null
     startButton.addEventListener('click', () => {
-      if (!root) {
-        root = createRoot(modalContainer)
-      }
-      root.render(
+      const element = (
         <CreateCourseModal
           isModalOpen={true}
           setModalOpen={isOpen => {
@@ -585,8 +582,13 @@ function loadStartNewCourseHandler() {
           permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
           restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
           isK5User={false} // can't be k5 user if classic dashboard is showing
-        />,
+        />
       )
+      if (!root) {
+        root = render(element, modalContainer)
+      } else {
+        rerender(root, element)
+      }
     })
   }
 }

@@ -19,7 +19,7 @@
 import React, {FC} from 'react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import CoursePeople from './CoursePeople'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import CoursePeopleContext, {getCoursePeopleContext} from './contexts/CoursePeopleContext'
