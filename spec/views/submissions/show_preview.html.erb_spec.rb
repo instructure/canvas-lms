@@ -42,6 +42,20 @@ describe "submissions/show_preview" do
     expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
+  it "renders a visible 'click here to view' link for media recording submissions" do
+    course_with_student
+    view_context
+    a = @course.assignments.create!(title: "media assignment", submission_types: "media_recording")
+    MediaObject.create!(media_id: "1_abc12345", media_type: "video", context: @user)
+    sub = a.submit_homework(@user, submission_type: "media_recording", media_comment_id: "1_abc12345", media_comment_type: "video")
+    assign(:assignment, a)
+    assign(:submission, sub)
+    render "submissions/show_preview"
+    link = Nokogiri::HTML5.fragment(response.body).at_css("a.play_media_recording_link")
+    expect(link).not_to be_nil
+    expect(link.text).to eq("click here to view.")
+  end
+
   it "gives a user-friendly explanation why there's no preview" do
     course_with_student
     view_context
