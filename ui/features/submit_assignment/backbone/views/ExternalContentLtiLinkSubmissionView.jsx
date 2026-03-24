@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {legacyRender} from '@canvas/react'
+import {render, rerender} from '@canvas/react'
 import template from '../../jst/ExternalContentHomeworkUrlSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
@@ -42,15 +42,19 @@ class ExternalContentLtiLinkSubmissionView extends ExternalContentHomeworkSubmis
         const pledgeText = pledgeMount.dataset.pledge
         const setShouldShowPledgeError = shouldShow => (this.shouldShowPledgeError = shouldShow)
         const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
-        legacyRender(
+        const element = (
           <SimilarityPledge
             inputId="turnitin_pledge_external_content"
             setShouldShowPledgeError={setShouldShowPledgeError}
             getShouldShowPledgeError={getShouldShowFileRequiredError}
             pledgeText={pledgeText}
-          />,
-          pledgeMount,
+          />
         )
+        if (this.pledgeRoot) {
+          rerender(this.pledgeRoot, element)
+        } else {
+          this.pledgeRoot = render(element, pledgeMount)
+        }
       }
     }
   }
