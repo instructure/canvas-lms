@@ -33,8 +33,8 @@ import userSettings from '@canvas/user-settings'
 import TurnitinSettings from '@canvas/assignments/TurnitinSettings'
 import VeriCiteSettings from '@canvas/assignments/VeriCiteSettings'
 import File from '@canvas/files/backbone/models/File'
-import TurnitinSettingsDialog from './TurnitinSettingsDialog'
-import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialogView'
+import TurnitinSettingsModal from '../../react/TurnitinSettingsModal'
+import MissingDateConfirmationModal from '../../react/MissingDateConfirmationModal'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GroupCategorySelector, {
   GROUP_CATEGORY_SELECT,
@@ -53,7 +53,6 @@ import {attach as assetProcessorsAttach} from '../../react/AssetProcessorsForAss
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import setUsageRights from '@canvas/files/util/setUsageRights'
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/rails-flash-notifications'
 import '@canvas/common/activateTooltips'
@@ -706,30 +705,44 @@ EditView.prototype.cacheAssignmentSettings = function () {
   return userSettings.contextSet('new_assignment_settings', new_assignment_settings)
 }
 
+EditView.prototype._ensureTurnitinModal = function () {
+  if (this._turnitinModalRef) return
+  this._turnitinModalRef = React.createRef()
+  const mountPoint = document.createElement('div')
+  document.body.appendChild(mountPoint)
+  const _this = this
+  render(
+    <TurnitinSettingsModal
+      ref={this._turnitinModalRef}
+      onSettingsChange={newSettings => {
+        if (_this.$vericiteEnabled.prop('checked'))
+          _this.assignment.set({
+            type: 'vericite',
+            settings: new VeriCiteSettings(newSettings),
+          })
+        else
+          _this.assignment.set({
+            type: 'turnitin',
+            settings: new TurnitinSettings(newSettings),
+          })
+      }}
+    />,
+    mountPoint,
+    {sync: true},
+  )
+}
+
 EditView.prototype.showTurnitinDialog = function (ev) {
-  let model, type
   ev.preventDefault()
-  type = 'turnitin'
-  model = this.assignment.get('turnitin_settings')
+  this._ensureTurnitinModal()
+  let type = 'turnitin'
+  let model = this.assignment.get('turnitin_settings')
   if (this.$vericiteEnabled.prop('checked')) {
     type = 'vericite'
     model = this.assignment.get('vericite_settings')
   }
-  const turnitinDialog = new TurnitinSettingsDialog(model, type)
-  return turnitinDialog.render().on(
-    'settings:change',
-    (function (_this) {
-      return function (settings) {
-        if (_this.$vericiteEnabled.prop('checked')) {
-          _this.assignment.set('vericite_settings', new VeriCiteSettings(settings))
-        } else {
-          _this.assignment.set('turnitin_settings', new TurnitinSettings(settings))
-        }
-        turnitinDialog.off()
-        return turnitinDialog.remove()
-      }
-    })(this),
-  )
+  const settings = typeof model.toJSON === 'function' ? model.toJSON() : model
+  this._turnitinModalRef.current.open(type, settings)
 }
 
 EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
@@ -776,21 +789,16 @@ EditView.prototype.handleContentItem = function (item) {
   const lineItem = item.lineItem
   if (lineItem) {
     this.$externalToolsLineItem.val(JSON.stringify(lineItem))
-    if ('scoreMaximum' in lineItem) {
-      this.$assignmentPointsPossible.val(lineItem.scoreMaximum)
-    }
+    if ('scoreMaximum' in lineItem) this.$assignmentPointsPossible.val(lineItem.scoreMaximum)
   }
 
   const newAssignmentName = lineItem && 'label' in lineItem ? lineItem.label : item.title
   const replaceAssignmentName =
     !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
-  if (newAssignmentName && (replaceAssignmentName || this.$name.val() === '')) {
+  if (newAssignmentName && (replaceAssignmentName || this.$name.val() === ''))
     this.$name.val(newAssignmentName)
-  }
 
-  if (item.text) {
-    RichContentEditor.callOnRCE(this.$description, 'set_code', item.text)
-  }
+  if (item.text) RichContentEditor.callOnRCE(this.$description, 'set_code', item.text)
 
   this.renderAssignmentSubmissionTypeContainer()
 
@@ -904,11 +912,8 @@ EditView.prototype.getAnnotatedDocumentContainer = function () {
 EditView.prototype.setAnnotatedDocument = function (file) {
   const $annotatableAttachmentInput = document.getElementById('annotatable_attachment_id')
   this.annotatedDocument = file
-  if (this.annotatedDocument === null) {
-    return ($annotatableAttachmentInput.value = '')
-  } else {
-    return ($annotatableAttachmentInput.value = this.annotatedDocument.id)
-  }
+  if (this.annotatedDocument === null) return ($annotatableAttachmentInput.value = '')
+  else return ($annotatableAttachmentInput.value = this.annotatedDocument.id)
 }
 
 EditView.prototype.getAnnotatedDocument = function () {
@@ -1733,8 +1738,23 @@ EditView.prototype.saveFormData = function () {
   }
 }
 
+EditView.prototype._ensureMissingDateModal = function () {
+  if (this._missingDateModalRef) return
+  this._missingDateModalRef = React.createRef()
+  const mountPoint = document.createElement('div')
+  document.body.appendChild(mountPoint)
+  const _this = this
+  render(
+    <MissingDateConfirmationModal
+      ref={this._missingDateModalRef}
+      onContinue={() => ValidatedFormView.prototype.submit.call(_this)}
+    />,
+    mountPoint,
+    {sync: true},
+  )
+}
+
 EditView.prototype.submit = function (event) {
-  let missingDateDialog
   event.preventDefault()
   event.stopPropagation()
   this.cacheAssignmentSettings()
@@ -1743,18 +1763,8 @@ EditView.prototype.submit = function (event) {
       !this.dueDateOverrideView.containsDiffTagOverrides()) &&
     this.dueDateOverrideView.containsSectionsWithoutOverrides()
   ) {
-    missingDateDialog = new MissingDateDialog({
-      success: (function (_this) {
-        return function (dateDialog) {
-          dateDialog.dialog('close').remove()
-          return ValidatedFormView.prototype.submit.call(_this)
-        }
-      })(this),
-    })
-    missingDateDialog.cancel = function (_e) {
-      return missingDateDialog.$dialog.dialog('close').remove()
-    }
-    return missingDateDialog.render()
+    this._ensureMissingDateModal()
+    this._missingDateModalRef.current.open()
   } else {
     return EditView.__super__.submit.apply(this, arguments)
   }
