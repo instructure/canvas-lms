@@ -39,8 +39,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
   end
 
   def up
-    connection.transaction(requires_new: true) do
+    trgm = connection.transaction(requires_new: true) do
       create_extension(:pg_trgm, schema: connection.shard.name, if_not_exists: true)
+      # the connection might be in a different schema if it already exists, so re-fetch
+      # its information rather than assuming it's where we (attempted to) create it
+      connection.extension(:pg_trgm).schema
     rescue ActiveRecord::StatementInvalid
       raise ActiveRecord::Rollback
     end
@@ -234,19 +237,17 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
       t.index :grading_standard_id, name: "index_courses_on_grading_standard"
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "(
-            coalesce(lower(name), '') || ' ' ||
-            coalesce(lower(sis_source_id), '') || ' ' ||
-            coalesce(lower(course_code), '')
-          ) #{trgm}.gin_trgm_ops",
-                name: "index_gin_trgm_courses_composite_search",
-                using: :gin
-        t.index [:integration_id, :root_account_id],
-                unique: true,
-                name: "index_courses_on_integration_id",
-                where: "integration_id IS NOT NULL"
-      end
+      t.index "(
+          coalesce(lower(name), '') || ' ' ||
+          coalesce(lower(sis_source_id), '') || ' ' ||
+          coalesce(lower(course_code), '')
+        ) #{trgm}.gin_trgm_ops",
+              name: "index_gin_trgm_courses_composite_search",
+              using: :gin
+      t.index [:integration_id, :root_account_id],
+              unique: true,
+              name: "index_courses_on_integration_id",
+              where: "integration_id IS NOT NULL"
       t.index :archived_at, where: "archived_at IS NOT NULL"
     end
 
@@ -347,14 +348,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.replica_identity_index :root_account_ids
       t.index [:avatar_state, :avatar_image_updated_at]
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
-        t.index "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
-        t.index "LOWER(name) #{trgm}.gin_trgm_ops",
-                name: "index_gin_trgm_users_name_active_only",
-                using: :gin,
-                where: "workflow_state IN ('registered', 'pre_registered')"
-      end
+      t.index "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
+      t.index "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
+      t.index "LOWER(name) #{trgm}.gin_trgm_ops",
+              name: "index_gin_trgm_users_name_active_only",
+              using: :gin,
+              where: "workflow_state IN ('registered', 'pre_registered')"
       t.index "(sortable_name COLLATE public.\"und-u-kn-true\"), id",
               name: :index_users_on_sortable_name
       t.index :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
@@ -1409,12 +1408,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:pseudonym_id, :position]
       t.index [:user_id, :position]
       t.index "LOWER(path), path_type", name: "index_communication_channels_on_path_and_path_type"
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
-        t.index "user_id, LOWER(path), path_type",
-                unique: true,
-                name: "index_communication_channels_on_user_id_and_path_and_path_type"
-      end
+      t.index "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
+      t.index "user_id, LOWER(path), path_type",
+              unique: true,
+              name: "index_communication_channels_on_user_id_and_path_and_path_type"
     end
 
     create_table :conditional_release_rules do |t|
@@ -2189,9 +2186,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:id, :type]
       t.index %i[context_id context_type root_topic_id], unique: true, name: "index_discussion_topics_unique_subtopic_per_context"
       t.index [:context_id, :last_reply_at], name: "index_discussion_topics_on_context_and_last_reply_at"
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "LOWER(title) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_discussion_topics_title", using: :gin
-      end
+      t.index "LOWER(title) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_discussion_topics_title", using: :gin
     end
 
     create_table :discussion_topic_insights do |t|
@@ -4200,10 +4195,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :unique_id_normalized, limit: 255, null: false
 
       t.replica_identity_index :account_id
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
-        t.index "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
-      end
+      t.index "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
+      t.index "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
       t.index [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true
       t.index [:integration_id, :account_id],
               unique: true,
