@@ -301,6 +301,17 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         mountComponent()
         expect(getSecondaryDetailText()).toBe('Unpublished')
       })
+
+      test('displays post policy "Manual" text when manually posted', () => {
+        props.assignment.postManually = true
+        mountComponent()
+        expect(getSecondaryDetailText()).toContain('Manual')
+      })
+
+      test('does not display "Manual" text when auto-posted', () => {
+        mountComponent()
+        expect(getSecondaryDetailText()).not.toContain('Manual')
+      })
     })
 
     describe('when the assignment is manually posted', () => {
