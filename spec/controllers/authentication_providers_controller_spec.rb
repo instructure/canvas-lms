@@ -78,7 +78,7 @@ describe AuthenticationProvidersController do
       end
 
       it "includes auth_providers in js_env with id, url, and name" do
-        pending "waiting for MRA scope change to land"
+        skip "waiting for MRA scope change to land, AE-3665, 2026-03-24"
         saml = account.authentication_providers.create!(saml_hash)
         cas = account.authentication_providers.create!(cas_hash)
         canvas = account.authentication_providers.find_by(auth_type: "canvas")
