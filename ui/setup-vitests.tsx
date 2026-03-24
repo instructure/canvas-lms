@@ -115,6 +115,13 @@ afterEach(() => {
   // Transition animations that create new timers via setTimeout.
   cleanup()
 
+  // Some suites switch to fake timers and can leave scheduled work behind.
+  // Flush and clear them before returning to avoid post-teardown exceptions.
+  if (vi.isFakeTimers()) {
+    vi.runOnlyPendingTimers()
+    vi.clearAllTimers()
+  }
+
   // Clear all pending timers from InstUI transitions, animations, etc.
   // These can cause "document is not defined" errors when they fire after jsdom teardown
   for (const id of pendingTimeouts) {
