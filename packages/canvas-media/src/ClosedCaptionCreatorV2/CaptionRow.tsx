@@ -46,6 +46,7 @@ interface FailedCaptionRowProps extends BaseCaptionRowProps {
   workflow_state: 'failed'
   errorMessage?: string
   onRetry?: () => void
+  onDelete?: () => void
 }
 
 /**
@@ -55,7 +56,7 @@ interface UploadedCaptionRowProps extends BaseCaptionRowProps {
   workflow_state: 'ready'
   filename?: string
   url?: string
-  onDelete: () => void
+  onDelete?: () => void
   isInherited?: boolean
 }
 
@@ -117,6 +118,19 @@ export function CaptionRow(props: CaptionRowProps) {
                   withBorder={false}
                 >
                   <IconRefreshLine />
+                </IconButton>
+              )}
+              {props.onDelete && (
+                <IconButton
+                  screenReaderLabel={formatMessage(DELETE_CAPTIONS_MESSAGE, {
+                    captionName: props.captionName,
+                  })}
+                  onClick={props.onDelete}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  <IconTrashLine />
                 </IconButton>
               )}
             </Flex>
