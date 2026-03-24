@@ -91,7 +91,7 @@ class ConditionalReleaseObjects
 
     # Common Selectors
     def conditional_release_link
-      f("#conditional_release_link")
+      fxpath("//*[@role='tab' and contains(text(),'Mastery Paths')]")
     end
 
     def conditional_release_editor_exists?
