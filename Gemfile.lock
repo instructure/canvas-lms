@@ -448,9 +448,10 @@ GEM
     canvas_connect (0.3.16)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
-    canvas_link_migrator (1.0.18)
+    canvas_link_migrator (1.0.19)
       activesupport
       addressable
+      bigdecimal
       nokogiri
       rack
     canvas_webex (0.18.2)
