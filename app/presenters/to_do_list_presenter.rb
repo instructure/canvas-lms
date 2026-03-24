@@ -175,7 +175,7 @@ class ToDoListPresenter
     end
 
     def needs_grading_count
-      @needs_grading_count ||= Assignments::NeedsGradingCountQuery.new(@assignment, @user).count
+      @needs_grading_count ||= Assignments::NeedsGradingCountQuery.new([@assignment], @user).count[@assignment.global_id]
     end
 
     def needs_grading_badge

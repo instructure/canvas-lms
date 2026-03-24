@@ -72,7 +72,7 @@ describe "courses/_to_do_list" do
                          points_possible: 15,
                          title: "GradeMe")
         allow(@teacher).to receive(:assignments_needing_grading).and_return(Assignment.where(id: @assignment.id))
-        allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1000)
+        allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:count).and_return({ @assignment.global_id => 1000 })
         @user = @teacher
         @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context

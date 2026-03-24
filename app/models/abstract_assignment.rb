@@ -3899,7 +3899,7 @@ class AbstractAssignment < ApplicationRecord
   end
 
   def needs_grading_count
-    Assignments::NeedsGradingCountQuery.new(self).manual_count
+    Assignments::NeedsGradingCountQuery.new([self]).manual_count[global_id]
   end
 
   def can_publish?

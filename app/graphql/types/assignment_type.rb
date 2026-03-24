@@ -650,15 +650,7 @@ module Types
     def needs_grading_count
       return unless assignment.context.grants_right?(current_user, :manage_grades)
 
-      # NOTE: this query (as it exists right now) is not batch-able.
-      # make this really expensive cost-wise?
-      Assignments::NeedsGradingCountQuery.new(
-        assignment,
-        current_user
-        # TODO: course proxy stuff
-        # (actually for some reason not passing along a course proxy doesn't
-        # seem to matter)
-      ).count
+      Assignments::NeedsGradingCountQuery.new([assignment], current_user).count[assignment.global_id]
     end
 
     field :grading_type, AssignmentGradingType, null: true

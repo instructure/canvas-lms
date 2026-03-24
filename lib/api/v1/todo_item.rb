@@ -51,7 +51,7 @@ module Api::V1::TodoItem
                           end
 
         if todo_type == "grading"
-          hash["needs_grading_count"] = Assignments::NeedsGradingCountQuery.new(assignment, user).count
+          hash["needs_grading_count"] = Assignments::NeedsGradingCountQuery.new([assignment], user).count[assignment.global_id]
         end
       end
     end
