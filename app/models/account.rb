@@ -1896,7 +1896,7 @@ class Account < ApplicationRecord
   end
 
   def discovery_page_link_for(provider, entry)
-    { label: entry[:label], icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
+    { label: Sanitize.clean(entry[:label].to_s), icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
   end
 
   def validate_auth_discovery_url

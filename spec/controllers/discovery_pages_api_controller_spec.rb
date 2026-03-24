@@ -437,6 +437,18 @@ describe DiscoveryPagesApiController do
         post :token
         expect(response).to have_http_status(:bad_request)
       end
+
+      it "sanitizes HTML from labels before including them in the JWT" do
+        post :token, params: {
+          discovery_page: {
+            primary: [{ authentication_provider_id: auth_provider.id, label: "<script>alert('xss')</script>Students" }],
+            secondary: []
+          }
+        }
+        token = json_parse(response.body)["token"]
+        decoded = CanvasSecurity.decode_jwt(token, [CanvasSecurity::ServicesJwt::KeyStorage.present_key])
+        expect(decoded["primary"].first["label"]).to eq("Students")
+      end
     end
   end
 end
