@@ -219,6 +219,22 @@ describe "Accessibility Checker", :ignore_js_errors do
 
         expect(f("#content")).not_to contain_css("#course_check_accessibility_btn")
       end
+
+      context "when course home page is set to a front page" do
+        before do
+          page = @course.wiki_pages.create!(title: "Home", body: "<p>Welcome</p>")
+          page.set_as_front_page!
+          @course.update_attribute(:default_view, "wiki")
+          @course.account.enable_feature!(:a11y_checker_ga1)
+        end
+
+        it "does not display the Check Accessibility button and loads the page successfully" do
+          get "/courses/#{@course.id}"
+
+          expect(f("#content")).not_to contain_css("#course_check_accessibility_btn")
+          expect(f("#wiki_page_show")).to be_displayed
+        end
+      end
     end
   end
 

@@ -2560,6 +2560,24 @@ describe CoursesController do
         end
       end
     end
+
+    context "accessibility_scan_enabled" do
+      before do
+        Account.default.enable_feature!(:a11y_checker_ga1)
+      end
+
+      it "is true for teachers" do
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+        expect(assigns(:accessibility_scan_enabled)).to be true
+      end
+
+      it "is false for students" do
+        user_session(@student)
+        get "show", params: { id: @course.id }
+        expect(assigns(:accessibility_scan_enabled)).to be false
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
