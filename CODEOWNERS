@@ -518,6 +518,7 @@
 /ui/shared/enhanced-user-content/ @instructure/rich-content-experience
 /ui/shared/files/ @instructure/rich-content-experience
 /ui/shared/files_v2/ @instructure/rich-content-experience
+/ui/shared/immersive-reader/ @instructure/rich-content-experience
 /ui/shared/rce/ @instructure/rich-content-experience
 /ui/shared/rce-command-shim/ @instructure/rich-content-experience
 /ui/shared/select-content-dialog/ @instructure/rich-content-experience
@@ -538,7 +539,6 @@
 /ui/features/media_player_iframe_content/ @instructure/studio
 /ui/shared/canvas-media-player/ @instructure/studio
 /ui/shared/canvas-studio-player/ @instructure/studio
-/ui/shared/immersive-reader/ @instructure/studio
 /ui/shared/media-comments/ @instructure/studio
 /ui/shared/media-recorder/ @instructure/studio
 /ui/shared/mediaelement/ @instructure/studio
