@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../app/services/grade_service"
-
 GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, :points)
 
 RSpec.describe GradeService do

@@ -18,9 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../lib/enrollment_types"
-require_relative "../services/canvas_career/label_overrides"
-
 class RoleOverride < ApplicationRecord
   extend RootAccountResolver
 

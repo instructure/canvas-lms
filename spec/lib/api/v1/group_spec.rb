@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../../lib/api/v1/group"
-
 describe Api::V1::Group do
   include Api::V1::Group
   include Api::V1::User

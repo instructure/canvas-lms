@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,13 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe Quizzes::QuizQuestion::AnswerParsers::AnswerParser do
-  describe "#parse" do
-    let(:answer_parser) { Quizzes::QuizQuestion::AnswerParsers::AnswerParser.new([]) }
-
-    it "returns the question with answers assigned" do
-      question = Quizzes::QuizQuestion::AnswerGroup.new
-      expect(answer_parser.parse(question).answers).to eq []
-    end
+module Types
+  # We can add additional placements as they are needed.
+  class ExternalToolPlacementType < Types::BaseEnum
+    graphql_name "ExternalToolPlacement"
+    description "Placements that an External Tool can have"
+    value "homework_submission"
+    value "ActivityAssetProcessor"
+    value "link_selection"
+    value "resource_selection"
   end
 end
