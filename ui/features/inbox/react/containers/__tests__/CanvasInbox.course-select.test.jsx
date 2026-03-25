@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, within} from '@testing-library/react'
+import {act, render, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from '@apollo/client'
@@ -157,8 +157,12 @@ describe('CanvasInbox App Container - Course Select', () => {
     await userEvent.click(document.body)
     await waitForApolloLoading()
 
-    window.location.hash = '#filter=type=inbox&course=FAKE_COURSE'
-    await waitForApolloLoading()
+    // Wrap hash change in act() so React processes the hashchange event and
+    // all resulting state updates before we assert on the URL
+    await act(async () => {
+      window.location.hash = '#filter=type=inbox&course=FAKE_COURSE'
+      await waitForApolloLoading()
+    })
 
     // The main behavior: invalid course should be removed from URL
     await waitFor(() => expect(window.location.hash).toBe('#filter=type=inbox'), {timeout: 5000})
