@@ -150,6 +150,56 @@ describe SectionTabHelper do
           end
         end
 
+        context "and new_quizzes_native_experience flag changes" do
+          before do
+            allow(course).to receive(:tabs_available).and_call_original
+            course.set_feature_flag!(:new_quizzes_native_experience, "off")
+          end
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              course, current_user, domain_root_account, session
+            )
+          end
+
+          it "uncaches tabs when new_quizzes_native_experience FF is updated" do
+            enable_cache do
+              expect(course).to receive(:tabs_available).twice.and_call_original
+              available_section_tabs.to_a
+              course.remove_instance_variable(:@tabs_available) if course.instance_variable_defined?(:@tabs_available)
+
+              course.set_feature_flag!(:new_quizzes_native_experience, "on")
+              available_section_tabs.to_a
+            end
+          end
+        end
+
+        context "when context is an Account" do
+          let_once(:account) { Account.default }
+          let_once(:account_admin) { account_admin_user(account:) }
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              account, account_admin, domain_root_account, session
+            )
+          end
+
+          before do
+            allow(account).to receive(:tabs_available).and_call_original
+          end
+
+          it "includes feature flag states in cache key for accounts" do
+            enable_cache do
+              expect(account).to receive(:tabs_available).twice.and_call_original
+              account.set_feature_flag!(:smart_search, "off")
+              available_section_tabs.to_a
+
+              account.set_feature_flag!(:smart_search, "on")
+              available_section_tabs.to_a
+            end
+          end
+        end
+
         context "and YouTube Migration is available" do
           before do
             allow(course).to receive(:tabs_available).and_call_original
