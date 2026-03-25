@@ -168,11 +168,11 @@ ready(() => {
   }
 
   const isAsrCaptioningImprovements = ENV.FEATURES?.rce_asr_captioning_improvements
-  const isEditMode = isRceEditMode()
-  const RCE_ENV = window.parent.parent.ENV
+  const isEditMode = isAsrCaptioningImprovements && isRceEditMode()
+  const RCE_ENV = isAsrCaptioningImprovements ? window.parent.parent.ENV : undefined
 
   const handleTranscriptEdit =
-    isAsrCaptioningImprovements && isEditMode && attachment_id && RCE_ENV.JWT
+    isAsrCaptioningImprovements && isEditMode && attachment_id && RCE_ENV?.JWT
       ? createOnTranscriptEdit(attachment_id, RCE_ENV.JWT)
       : undefined
 
