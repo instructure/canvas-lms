@@ -20,7 +20,8 @@ import PropTypes from 'prop-types'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import MentionDropdown from './MentionDropdown'
 import React from 'react'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import AlertManager from '@canvas/alerts/react/AlertManager'
@@ -35,7 +36,12 @@ const MentionsUI = ({rceRef, onFocusedUserChange, onExited, onSelect, editor}) =
     <ApolloProvider client={client}>
       <ErrorBoundary
         errorComponent={
-          <GenericErrorPage imageUrl={errorShipUrl} errorCategory={I18n.t('Mentions Error Page')} />
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
+            errorCategory={I18n.t('Mentions Error Page')}
+          />
         }
       >
         <AlertManager>

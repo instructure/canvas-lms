@@ -25,7 +25,8 @@ import LMGBContext, {
   getLMGBContext,
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Gradebook} from './components/Gradebook'
@@ -207,8 +208,10 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     if (error !== null || contributingScoresError !== null)
       return (
         <GenericErrorPage
-          errorMessage={error || contributingScoresError}
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorMessage={error ?? contributingScoresError ?? undefined}
           errorSubject={I18n.t('Error loading rollups')}
           errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
         />

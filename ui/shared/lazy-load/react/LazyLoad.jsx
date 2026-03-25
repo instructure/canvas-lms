@@ -19,7 +19,8 @@
 import React, {Suspense} from 'react'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 
 export function retry(fn, retriesLeft = 3, interval = 1000) {
@@ -50,6 +51,8 @@ export default function LazyLoad({children, errorCategory}) {
         return (
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorSubject={error.message}
             errorCategory={errorCategory}
             stack={error.stack}

@@ -19,7 +19,8 @@
 import {ACCOUNT_NOTIFICATIONS_QUERY} from '../graphql/Queries'
 import AccountNotificationSettingsManager from './AccountNotificationSettingsManager'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React from 'react'
@@ -41,6 +42,8 @@ export default function AccountNotificationSettingsQuery(props) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Account Notification Settings initial query error')}
         errorCategory={I18n.t('Account Notification Settings Error Page')}
       />

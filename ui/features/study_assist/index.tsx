@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {PlatformUiProvider} from '@instructure/platform-provider'
-import {executeQuery} from '@canvas/graphql'
+import {platformExecuteQuery} from '@canvas/graphql'
 import type {AssistRequest, AssistResponse} from '@instructure/platform-study-assist'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -103,7 +103,7 @@ ready(() => {
 
   render(
     <PlatformUiProvider
-      executeQuery={executeQuery}
+      executeQuery={platformExecuteQuery}
       locale={window.ENV.LOCALE ?? 'en'}
       timezone={window.ENV.TIMEZONE ?? 'UTC'}
       currentUserId={window.ENV.current_user_id ?? undefined}

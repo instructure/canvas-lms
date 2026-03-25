@@ -21,7 +21,8 @@ import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import ObserverOptions from '@canvas/observer-picker'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
@@ -45,6 +46,8 @@ export default function renderAssignmentsApp(env, elt) {
           errorComponent={({error}) => (
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorSubject={error.message}
               errorCategory="Assignments 2 Student Error Page"
               errorMessage={error.message}

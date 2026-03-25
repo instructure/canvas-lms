@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import {ScanHandler} from './ScanHandler'
 import type {ScanViewProps} from '../types'
@@ -38,6 +39,8 @@ export const LastScanFailedResultView: React.FC<ScanViewProps> = ({
     >
       <GenericErrorPage
         imageUrl={ErrorShip}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Last accessibility content scan failed.')}
         errorCategory={I18n.t('Accessibility Scan Error Page.')}
         errorMessage={I18n.t('Try to scan again.')}

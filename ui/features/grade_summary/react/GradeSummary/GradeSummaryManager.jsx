@@ -21,7 +21,8 @@ import React, {useEffect, useState} from 'react'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import GradeSummaryContainer from './GradeSummaryContainer'
@@ -61,6 +62,8 @@ const GradeSummaryManager = () => {
           errorComponent={
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorCategory={I18n.t('Grade Summary Error Page')}
             />
           }

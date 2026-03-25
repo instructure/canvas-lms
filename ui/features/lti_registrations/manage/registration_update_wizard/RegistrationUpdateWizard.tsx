@@ -17,7 +17,8 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -84,6 +85,8 @@ export const RegistrationUpdateWizard = ({
         <RegistrationModalBody>
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorSubject={I18n.t('Registration Update Wizard Error')}
             errorCategory="Registration Update Wizard"
             errorMessage={errorMessage}

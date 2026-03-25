@@ -18,7 +18,8 @@
 
 import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
@@ -523,9 +524,11 @@ const DiscussionTopicManager = props => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Discussion Topic initial query error')}
         errorCategory={I18n.t('Discussion Topic Post Error Page')}
-        errorMessage={discussionTopicQuery.error}
+        errorMessage={discussionTopicQuery.error?.message}
       />
     )
   }

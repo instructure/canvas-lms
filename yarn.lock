@@ -2889,6 +2889,11 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-error-boundary/-/platform-error-boundary-0.2.0.tgz#85b5410242dce59bef779b7a26e5daba47f9bea2"
   integrity sha512-Te/TvjWmWzWp+igX0nHpbfHBjighpHmQqsrbtO+3haEFqlXVR9fN5XCwJlN+N7KpfR+0YuSFYyZlCDYk1H1jng==
 
+"@instructure/platform-generic-error-page@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-generic-error-page/-/platform-generic-error-page-1.0.0.tgz#2fdf851e38c14b28caed54f125ab5cc0c2678b01"
+  integrity sha512-/gArvHy0BIHD9gPKnbTUtKM/+R+neLUn89WDHo8fYyhVFMFTiFCqawqG9TbcKsLC1TYGlYntzaRf1Pc09eNPiA==
+
 "@instructure/platform-get-cookie@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@instructure/platform-get-cookie/-/platform-get-cookie-0.2.0.tgz#db5c7d9f8381e3e2a058715e2733ecf4da08cfcf"
@@ -2917,10 +2922,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-loading-indicator/-/platform-loading-indicator-0.2.0.tgz#6e345adee0316dedc07a266bfa34d6b8d42e8bb0"
   integrity sha512-FMkWqvW6TJHYAdqLKMgLZsBsfAZrmBsMTAkT5TX9Adp7KjuiQVvM29kRkh4jkuaDfzSe5SK0i9oRtHtOQTgc9A==
 
-"@instructure/platform-provider@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.1.1.tgz#10feedcc51bf0cf1597921efcc7041065b5ecc85"
-  integrity sha512-9ICAUGylCpZtTvN2f8SZoZ+32L6+SxArYgGAuzW54F6fPPBiXZv4zUZna2N4ymAadOkaU312DUN9SBsr329oBA==
+"@instructure/platform-provider@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.3.0.tgz#5787be34111afffe3fe045d25a29bf8faacab8bb"
+  integrity sha512-Nv/iiUPtIxsHkU3MmF+Gkumnk2JrTh1sWPYk+sg3ua4l4W6mL12QB8TgJBmdP4N/uGXE8gwOS7tXDJMsX6lxyg==
 
 "@instructure/platform-study-assist@0.10.0":
   version "0.10.0"

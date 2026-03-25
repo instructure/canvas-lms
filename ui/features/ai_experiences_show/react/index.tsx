@@ -19,7 +19,8 @@
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {AIExperienceShowProps} from '../types'
@@ -33,6 +34,8 @@ export const AIExperiencesShow: React.FC<AIExperienceShowProps> = props => {
       errorComponent={
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorCategory={I18n.t('AI Experience Show Error Page')}
         />
       }

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {executeQuery} from '@canvas/graphql'
+import {platformExecuteQuery} from '@canvas/graphql'
 import {queryClient} from '@canvas/query'
 import {PlatformUiProvider} from '@instructure/platform-provider'
 import {TranslationsProvider} from '@instructure/platform-widget-dashboard'
@@ -284,7 +284,7 @@ function translate(key: string, options?: Record<string, unknown>): string {
 export function PlatformBridge({children}: {children: React.ReactNode}) {
   return (
     <PlatformUiProvider
-      executeQuery={executeQuery}
+      executeQuery={platformExecuteQuery}
       currentUserId={ENV.current_user?.id ?? ''}
       locale={ENV.LOCALE}
       timezone={ENV.TIMEZONE}

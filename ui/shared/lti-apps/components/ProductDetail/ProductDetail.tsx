@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import {pickPreferredIntegration} from '@canvas/lti-apps/utils/pickPreferredIntegration'
@@ -484,7 +486,14 @@ const ProductDetail = (props: ProductDetailProps) => {
   )
 
   const ErrorPage = () => {
-    return <GenericErrorPage errorMessage={I18n.t('Error loading product details')} />
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
+        errorMessage={I18n.t('Error loading product details')}
+      />
+    )
   }
 
   if (isError) {
