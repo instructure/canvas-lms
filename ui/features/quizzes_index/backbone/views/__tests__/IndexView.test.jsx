@@ -26,8 +26,6 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import ReactDOM from 'react-dom'
 
-vi.useFakeTimers()
-
 describe('IndexView', () => {
   let fixtures
   let view
@@ -88,7 +86,10 @@ describe('IndexView', () => {
     return view.render()
   }
 
+  let mockRenderSpy = null
+
   beforeEach(() => {
+    vi.useFakeTimers()
     fixtures = document.createElement('div')
     fixtures.id = 'fixtures'
     document.body.appendChild(fixtures)
@@ -107,10 +108,17 @@ describe('IndexView', () => {
         new_assignment_url: '/courses/1/assignments/new',
         question_banks_url: '/courses/1/question_banks',
       },
+      NEW_QUIZZES_SELECTED: null,
+      horizon_course: false,
     })
   })
 
   afterEach(() => {
+    if (mockRenderSpy) {
+      mockRenderSpy.mockRestore()
+      mockRenderSpy = null
+    }
+    vi.useRealTimers()
     fakeENV.teardown()
     document.body.removeChild(fixtures)
     vi.resetAllMocks()
@@ -170,12 +178,10 @@ describe('IndexView', () => {
 
   it('renders choose quiz engine modal', () => {
     ENV.flags.quiz_lti_enabled = true
-    const mockRender = vi.spyOn(ReactDOM, 'render').mockImplementation(() => {})
+    mockRenderSpy = vi.spyOn(ReactDOM, 'render').mockImplementation(() => {})
     view = createIndexView()
-    // Use native DOM click instead of simulate
     view.$('.choose-quiz-engine')[0].click()
-    expect(mockRender.mock.calls[0][0].props.setOpen).toBe(true)
-    mockRender.mockRestore()
+    expect(mockRenderSpy.mock.calls[0][0].props.setOpen).toBe(true)
   })
 
   it('should render the view', () => {
