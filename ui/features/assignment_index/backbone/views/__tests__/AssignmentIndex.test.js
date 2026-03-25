@@ -122,8 +122,12 @@ describe('AssignmentIndex', () => {
     })
   })
 
-  afterEach(() => {
-    vi.runOnlyPendingTimers()
+  afterEach(async () => {
+    // Clear (don't run) pending timers to prevent React updates after teardown
+    vi.clearAllTimers()
+    // Drain React's scheduler before removing app to prevent "Should not already
+    // be working" errors from concurrent mode updates after DOM teardown
+    await act(async () => {})
     app?.remove()
     app = null
     fakeENV.teardown()
