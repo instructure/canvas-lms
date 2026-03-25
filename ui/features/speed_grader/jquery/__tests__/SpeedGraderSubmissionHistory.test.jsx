@@ -17,6 +17,7 @@
  */
 
 import 'jquery-migrate'
+import $ from 'jquery'
 import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import SpeedGrader from '../speed_grader'
@@ -55,6 +56,7 @@ describe('SpeedGrader Submission History', () => {
   `
 
   let fixtures
+  let ajaxJSONSpy
 
   beforeAll(() => {
     // Register jQuery plugin needed by dialogs
@@ -63,6 +65,9 @@ describe('SpeedGrader Submission History', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
+
+    // Prevent real network calls from SpeedGrader.setup()
+    ajaxJSONSpy = vi.spyOn($, 'ajaxJSON').mockReturnValue($.Deferred())
 
     fixtures = document.createElement('div')
     fixtures.id = 'fixtures'
@@ -133,10 +138,12 @@ describe('SpeedGrader Submission History', () => {
     }
   })
 
-  afterEach(async () => {
-    // Flush all pending timers and microtasks before teardown to prevent
-    // async React operations from running after the test environment is destroyed
-    await vi.runAllTimersAsync()
+  afterEach(() => {
+    // Clear (don't run) pending timers to prevent React updates after teardown
+    vi.clearAllTimers()
+
+    ajaxJSONSpy?.mockRestore()
+    ajaxJSONSpy = null
 
     SpeedGrader.teardown()
     fixtures.remove()
