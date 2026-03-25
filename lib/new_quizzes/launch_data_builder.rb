@@ -199,11 +199,18 @@ module NewQuizzes
     end
 
     def backend_url
+      return nil unless @tool
+
+      # When API gateway feature flag is ON, route through the gateway
+      if api_gateway_enabled?
+        gateway_host = Services::NewQuizzes.api_gateway_host
+        return "#{gateway_host}/new-quizzes-lti" if gateway_host.present?
+      end
+
       # Extract the backend URL from the tool's launch URL or domain
       # The launch_url typically contains the environment (region-env format)
       # Example: https://account.quiz-lti-region-env.instructure.com/lti/launch
       # We want to extract: https://account.quiz-lti-region-env.instructure.com
-      return nil unless @tool
 
       tool_url = @tool.launch_url
       tool_domain = @tool.domain
@@ -225,6 +232,12 @@ module NewQuizzes
     rescue URI::InvalidURIError => e
       Rails.logger.error("Failed to parse tool URL for backend_url: #{e.message}")
       nil
+    end
+
+    def api_gateway_enabled?
+      return false unless @context.respond_to?(:feature_enabled?)
+
+      @context.feature_enabled?(:new_quizzes_native_experience_api_gateway)
     end
 
     # Signs the launch parameters with HMAC-SHA256 using the tool's shared secret

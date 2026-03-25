@@ -142,5 +142,31 @@ module Services
         expect(NewQuizzes.ui_version).to eq("none")
       end
     end
+
+    describe ".api_gateway_host" do
+      before do
+        NewQuizzes.instance_variable_set(:@config, nil)
+      end
+
+      it "returns the gateway host from config" do
+        allow(DynamicSettings).to receive(:find)
+          .with(tree: :private)
+          .and_return(DynamicSettings::FallbackProxy.new({
+                                                           "new_quizzes.yml" => {
+                                                             NewQuizzes::NEW_QUIZZES_API_GATEWAY_HOST_KEY => "https://gateway.example.com"
+                                                           }.to_yaml
+                                                         }))
+        expect(NewQuizzes.api_gateway_host).to eq("https://gateway.example.com")
+      end
+
+      it "returns nil when gateway host is not configured" do
+        allow(DynamicSettings).to receive(:find)
+          .with(tree: :private)
+          .and_return(DynamicSettings::FallbackProxy.new({
+                                                           "new_quizzes.yml" => {}.to_yaml
+                                                         }))
+        expect(NewQuizzes.api_gateway_host).to be_nil
+      end
+    end
   end
 end

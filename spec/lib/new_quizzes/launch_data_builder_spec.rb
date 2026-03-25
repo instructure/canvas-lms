@@ -576,6 +576,49 @@ module NewQuizzes
       end
     end
 
+    describe "API gateway routing" do
+      context "when new_quizzes_native_experience_api_gateway feature flag is enabled" do
+        before do
+          allow(course).to receive(:feature_enabled?).with(:new_quizzes_native_experience_api_gateway).and_return(true)
+          allow(Services::NewQuizzes).to receive(:api_gateway_host).and_return("https://gateway-prod.example.com")
+        end
+
+        it "routes backend_url through the API gateway" do
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://gateway-prod.example.com/new-quizzes-lti")
+        end
+
+        it "appends /new-quizzes-lti to the gateway host" do
+          allow(Services::NewQuizzes).to receive(:api_gateway_host).and_return("https://gateway-beta.example.com")
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://gateway-beta.example.com/new-quizzes-lti")
+        end
+      end
+
+      context "when feature flag is enabled but gateway host is blank" do
+        before do
+          allow(course).to receive(:feature_enabled?).with(:new_quizzes_native_experience_api_gateway).and_return(true)
+          allow(Services::NewQuizzes).to receive(:api_gateway_host).and_return(nil)
+        end
+
+        it "falls back to direct tool URL" do
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://account.quiz-lti-dub-prod.instructure.com")
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          allow(course).to receive(:feature_enabled?).with(:new_quizzes_native_experience_api_gateway).and_return(false)
+        end
+
+        it "uses the direct tool URL" do
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://account.quiz-lti-dub-prod.instructure.com")
+        end
+      end
+    end
+
     describe "non-result launch includes outcome service params" do
       it "includes outcome service params when participant_session_id is absent" do
         course.enroll_student(user, enrollment_state: "active")
