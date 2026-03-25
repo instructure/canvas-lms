@@ -50,7 +50,7 @@ describe('useSvgSettings()', () => {
   describe('when a new icon is being created (not editing)', () => {
     beforeEach(() => {
       editing = false
-      global.fetch = jest.fn()
+      jest.spyOn(global, 'fetch').mockImplementation(jest.fn())
     })
 
     it('initializes settings to the default', () => {
@@ -1065,7 +1065,7 @@ describe('useSvgSettings()', () => {
       })
     })
 
-    afterEach(() => fetchMock.reset())
+    afterEach(() => fetchMock.restore())
 
     it('loads the correct metadata', async () => {
       const {result, rerender, waitForValueToChange} = renderHook(() =>
