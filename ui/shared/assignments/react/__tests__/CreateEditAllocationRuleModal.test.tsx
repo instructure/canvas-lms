@@ -138,30 +138,117 @@ describe('CreateEditAllocationRuleModal', () => {
     })
   })
 
-  describe('Review type selection', () => {
+  describe('Review permission selection', () => {
     beforeEach(() => {
       renderWithProviders()
     })
 
-    it('renders all review type options', () => {
-      expect(screen.getByTestId('review-type-must-review')).toBeInTheDocument()
-      expect(screen.getByTestId('review-type-must-not-review')).toBeInTheDocument()
-      expect(screen.getByTestId('review-type-should-review')).toBeInTheDocument()
-      expect(screen.getByTestId('review-type-should-not-review')).toBeInTheDocument()
+    it('renders will review and will not review options', () => {
+      expect(screen.getByTestId('review-type-will-review')).toBeInTheDocument()
+      expect(screen.getByTestId('review-type-will-not-review')).toBeInTheDocument()
     })
 
-    it('defaults to "Must review"', () => {
-      const mustReviewRadio = screen.getByTestId('review-type-must-review')
-      expect(mustReviewRadio).toBeChecked()
+    it('defaults to "Will review"', () => {
+      const willReviewRadio = screen.getByTestId('review-type-will-review')
+      expect(willReviewRadio).toBeChecked()
     })
 
-    it('allows selection of different review types', async () => {
-      const shouldReviewRadio = screen.getByTestId('review-type-should-review')
+    it('allows toggling between will and will not review', async () => {
+      const willNotReviewRadio = screen.getByTestId('review-type-will-not-review')
 
-      await user.click(shouldReviewRadio)
+      await user.click(willNotReviewRadio)
 
-      expect(shouldReviewRadio).toBeChecked()
-      expect(screen.getByTestId('review-type-must-review')).not.toBeChecked()
+      expect(willNotReviewRadio).toBeChecked()
+      expect(screen.getByTestId('review-type-will-review')).not.toBeChecked()
+    })
+
+    it('shows "Will be reviewed by" labels for reviewee target type', async () => {
+      const revieweeRadio = screen.getByTestId('target-type-reviewee')
+      await user.click(revieweeRadio)
+
+      expect(screen.getByText('Will be reviewed by')).toBeInTheDocument()
+      expect(screen.getByText('Will not be reviewed by')).toBeInTheDocument()
+    })
+
+    it('hides review action group for reciprocal target type', async () => {
+      const reciprocalRadio = screen.getByTestId('target-type-reciprocal')
+      await user.click(reciprocalRadio)
+
+      expect(screen.queryByTestId('review-type-group')).not.toBeInTheDocument()
+    })
+
+    it('resets to will review when switching to reciprocal', async () => {
+      const willNotReviewRadio = screen.getByTestId('review-type-will-not-review')
+      await user.click(willNotReviewRadio)
+      expect(willNotReviewRadio).toBeChecked()
+
+      const reciprocalRadio = screen.getByTestId('target-type-reciprocal')
+      await user.click(reciprocalRadio)
+
+      const reviewerRadio = screen.getByTestId('target-type-reviewer')
+      await user.click(reviewerRadio)
+
+      expect(screen.getByTestId('review-type-will-review')).toBeChecked()
+    })
+  })
+
+  describe('Enforcement type selection', () => {
+    beforeEach(() => {
+      renderWithProviders()
+    })
+
+    it('renders flexible and strict options', () => {
+      expect(screen.getByTestId('enforcement-type-flexible')).toBeInTheDocument()
+      expect(screen.getByTestId('enforcement-type-strict')).toBeInTheDocument()
+    })
+
+    it('defaults to Flexible', () => {
+      const flexibleRadio = screen.getByTestId('enforcement-type-flexible')
+      expect(flexibleRadio).toBeChecked()
+    })
+
+    it('shows correct helper text for will review + flexible', () => {
+      expect(
+        screen.getByText(
+          'If the allocated submission is not available another submission will be substituted',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('shows correct helper text for will not review + flexible', async () => {
+      const willNotReviewRadio = screen.getByTestId('review-type-will-not-review')
+      await user.click(willNotReviewRadio)
+
+      expect(
+        screen.getByText(
+          'If only excluded submissions are available another submission will be substituted',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('shows correct helper text for will review + strict', async () => {
+      const strictRadio = screen.getByTestId('enforcement-type-strict')
+      await user.click(strictRadio)
+
+      expect(
+        screen.getByText(
+          'If the allocated submission is not available the student will be blocked from completing the assignment',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('shows correct helper text for will not review + strict', async () => {
+      const willNotReviewRadio = screen.getByTestId('review-type-will-not-review')
+      await user.click(willNotReviewRadio)
+
+      const strictRadio = screen.getByTestId('enforcement-type-strict')
+      await user.click(strictRadio)
+
+      expect(
+        screen.getByText(
+          'If only excluded submissions are available the student will be blocked from completing the assignment',
+        ),
+      ).toBeInTheDocument()
     })
   })
 
@@ -266,16 +353,17 @@ describe('CreateEditAllocationRuleModal', () => {
   })
 
   describe('Edit mode', () => {
-    it('populates fields with existing rule data', () => {
+    it('populates fields with existing rule data (strict + will review)', () => {
       renderWithProviders({isEdit: true, rule: sampleRule})
 
       expect(screen.getByTestId('target-type-reviewer')).toBeChecked()
-      expect(screen.getByTestId('review-type-must-review')).toBeChecked()
+      expect(screen.getByTestId('review-type-will-review')).toBeChecked()
+      expect(screen.getByTestId('enforcement-type-strict')).toBeChecked()
       expect(screen.getByDisplayValue('Pikachu')).toBeInTheDocument()
       expect(screen.getByDisplayValue('Piplup')).toBeInTheDocument()
     })
 
-    it('populates fields for reviewee-focused rule', () => {
+    it('populates fields for reviewee-focused flexible rule', () => {
       const revieweeRule: AllocationRuleType = {
         ...sampleRule,
         appliesToAssessor: false,
@@ -286,7 +374,8 @@ describe('CreateEditAllocationRuleModal', () => {
       renderWithProviders({isEdit: true, rule: revieweeRule})
 
       expect(screen.getByTestId('target-type-reviewee')).toBeChecked()
-      expect(screen.getByTestId('review-type-should-review')).toBeChecked()
+      expect(screen.getByTestId('review-type-will-review')).toBeChecked()
+      expect(screen.getByTestId('enforcement-type-flexible')).toBeChecked()
     })
   })
 
@@ -334,11 +423,12 @@ describe('CreateEditAllocationRuleModal', () => {
       })
       mockExecuteQuery.mockClear()
 
-      const shouldReviewRadio = screen.getByTestId('review-type-should-review')
-      await user.click(shouldReviewRadio)
+      // Toggle enforcement from strict to flexible and back
+      const flexibleRadio = screen.getByTestId('enforcement-type-flexible')
+      await user.click(flexibleRadio)
 
-      const mustReviewRadio = screen.getByTestId('review-type-must-review')
-      await user.click(mustReviewRadio)
+      const strictRadio = screen.getByTestId('enforcement-type-strict')
+      await user.click(strictRadio)
 
       const saveButton = screen.getByTestId('save-button')
       await user.click(saveButton)
@@ -368,17 +458,16 @@ describe('CreateEditAllocationRuleModal', () => {
       renderWithProviders()
     })
 
-    it('has exactly two radio groups: target type and review type', () => {
+    it('has three radio groups: target type, review permission, and enforcement type', () => {
       expect(screen.getByTestId('target-type-radio-group')).toBeInTheDocument()
       expect(screen.getByTestId('review-type-group')).toBeInTheDocument()
+      expect(screen.getByTestId('enforcement-type-group')).toBeInTheDocument()
     })
 
-    it('displays "Rule Type" description for target type radio group', () => {
+    it('has visually hidden descriptions for all radio groups', () => {
       expect(screen.getByText('Rule Type')).toBeInTheDocument()
-    })
-
-    it('displays "Review Requirement" description for review type group', () => {
-      expect(screen.getByText('Review Requirement')).toBeInTheDocument()
+      expect(screen.getByText('Review Action')).toBeInTheDocument()
+      expect(screen.getByText('Enforcement')).toBeInTheDocument()
     })
 
     it('provides correct aria-label for add subject button based on target type', async () => {
@@ -442,7 +531,8 @@ describe('CreateEditAllocationRuleModal', () => {
       await user.click(reciprocalRadio)
 
       await waitFor(() => {
-        expect(screen.getAllByText('Recipient Name')).toHaveLength(1)
+        expect(screen.getByText('Review Partner 1')).toBeInTheDocument()
+        expect(screen.getByText('Review Partner 2')).toBeInTheDocument()
         expect(
           screen.queryByTestId('delete-additional-subject-field-1-button'),
         ).not.toBeInTheDocument()
