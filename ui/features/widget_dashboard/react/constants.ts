@@ -88,6 +88,30 @@ export const DEFAULT_WIDGET_CONFIG = {
   ],
 }
 
+export const DEFAULT_EDUCATOR_WIDGET_CONFIG = {
+  columns: 2,
+  widgets: [
+    {
+      id: 'educator-announcement-creation-widget',
+      type: WIDGET_TYPES.EDUCATOR_ANNOUNCEMENT_CREATION,
+      position: {col: 1, row: 1, relative: 1},
+      title: I18n.t('Announcement Creation'),
+    },
+    {
+      id: 'educator-todo-list-widget',
+      type: WIDGET_TYPES.EDUCATOR_TODO_LIST,
+      position: {col: 2, row: 1, relative: 2},
+      title: I18n.t('Todo List'),
+    },
+    {
+      id: 'educator-content-quality-widget',
+      type: WIDGET_TYPES.EDUCATOR_CONTENT_QUALITY,
+      position: {col: 1, row: 2, relative: 3},
+      title: I18n.t('Content Quality'),
+    },
+  ],
+}
+
 // Course Grades Widget Constants
 export const COURSE_GRADES_WIDGET = {
   MAX_GRID_ITEMS: 6,
