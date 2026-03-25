@@ -388,7 +388,6 @@ describe AuthenticationProvider do
     let!(:canvas_provider) { account.authentication_providers.where(auth_type: "canvas").first }
 
     it "includes active providers" do
-      skip "waiting for MRA scope change to land, AE-3665, 2026-03-24"
       expect(account.authentication_providers.valid_for_discovery_page).to include(cas_provider, canvas_provider)
     end
 
