@@ -250,9 +250,7 @@ describe WikiPagesApiController, type: :request do
 
   describe "horizon_block_content_editor" do
     let(:external_content_id) { "87654321-4321-4321-4321-210987654321" }
-    let(:template_layout) { [{ "type" => "section", "children" => [] }] }
-    let(:template_data) { [{ "id" => "content-1", "type" => "text", "content" => "sample" }] }
-    let(:block_editor_data) { { template_layout:, template_data: } }
+    let(:block_editor_data) { { "content" => "test content", "version" => "1.0" } }
 
     before :once do
       account = @course.account
@@ -272,7 +270,7 @@ describe WikiPagesApiController, type: :request do
       allow(ContentServiceClient).to receive_messages(
         create_content: double(external_content_id:),
         update_content: nil,
-        get_content: double(template_layout:, template_data:)
+        get_content: double(data: block_editor_data)
       )
     end
 
@@ -298,13 +296,29 @@ describe WikiPagesApiController, type: :request do
           expect(page.external_content_reference).to be_present
           expect(page.external_content_reference.content_id).to eq external_content_id
         end
+
+        it "sends the data parameter to ContentServiceClient.create_content" do
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            hash_including(
+              data: block_editor_data,
+              context_type: "WikiPage",
+              context_id: WikiPage.last.id
+            )
+          )
+        end
       end
 
       context "when block_editor_data is absent" do
-        it "does not create an ExternalContentReference" do
-          expect(ContentServiceClient).not_to receive(:create_content)
-
+        it "calls create_content with nil data and creates an ExternalContentReference" do
           create_wiki_page(@teacher, { title: "New Page" })
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            hash_including(data: nil)
+          )
+          page = WikiPage.last
+          expect(page.external_content_reference).to be_present
         end
       end
 
@@ -340,13 +354,26 @@ describe WikiPagesApiController, type: :request do
             hash_including(external_content_id: "existing-ext-uuid")
           )
         end
+
+        it "sends the data parameter to ContentServiceClient.update_content" do
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
+
+          expect(ContentServiceClient).to have_received(:update_content).with(
+            hash_including(
+              data: block_editor_data,
+              external_content_id: "existing-ext-uuid"
+            )
+          )
+        end
       end
 
       context "when block_editor_data is absent" do
-        it "does not call the Content Service" do
-          expect(ContentServiceClient).not_to receive(:update_content)
-
+        it "calls update_content with nil data" do
           update_wiki_page(@teacher, @wiki_page, { title: "Updated title" })
+
+          expect(ContentServiceClient).to have_received(:update_content).with(
+            hash_including(data: nil)
+          )
         end
       end
 
@@ -378,8 +405,7 @@ describe WikiPagesApiController, type: :request do
         it "returns block_editor_data from the Content Service" do
           json = get_wiki_page(@teacher, @wiki_page)
 
-          expect(json["block_editor_data"]["template_layout"]).to eq template_layout
-          expect(json["block_editor_data"]["template_data"]).to eq template_data
+          expect(json["block_editor_data"]).to eq block_editor_data
         end
       end
 
