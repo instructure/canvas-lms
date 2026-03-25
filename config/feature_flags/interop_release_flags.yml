@@ -17,20 +17,6 @@ course_settings_navigation_react:
       state: allowed_on
     ci:
       state: allowed_on
-custom_variables_booleans_as_strings:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Custom variables returns booleans as strings
-  description: |-
-    If enabled, custom variables that are booleans will be returned as strings.
-    This is to ensure we are conforming to the LTI 1.3 specification.
-    If disabled, boolean results will not be converted to strings.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 developer_key_user_agent_alert:
   state: hidden
   display_name: Show User-Agent alert on Developer Keys page
