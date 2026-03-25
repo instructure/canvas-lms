@@ -777,6 +777,14 @@ class FilesController < ApplicationController
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
+          if @context.is_a?(Course) && @context.feature_enabled?(:study_assist)
+            js_env[:FEATURES][:study_assist] = true
+            js_env({
+                     COURSE_ID: @context.id.to_s,
+                     FILE_ID: attachment.id.to_s,
+                     JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey")
+                   })
+          end
           if attachment.locked_for?(@current_user, check_policies: true)
             render :show, status: :forbidden
           elsif attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]

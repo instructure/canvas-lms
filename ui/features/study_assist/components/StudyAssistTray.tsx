@@ -99,6 +99,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
           fetchAssistResponse={fetchAssistResponse}
           courseId={window.ENV.COURSE_ID}
           pageId={window.ENV.WIKI_PAGE_ID}
+          fileId={window.ENV.FILE_ID}
         >
           <div style={{padding: '0 1rem'}}>
             <AssistContent

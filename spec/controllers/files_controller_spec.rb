@@ -1295,6 +1295,55 @@ describe FilesController do
     end
   end
 
+  describe "GET 'show' study_assist feature" do
+    before :once do
+      course_file
+    end
+
+    before do
+      user_session(@student)
+      config = instance_double(CanvasCareer::Config)
+      allow(CanvasCareer::Config).to receive(:new).and_return(config)
+      allow(config).to receive(:public_app_config).and_return({ "hosts" => { "journey" => "http://journey.test" } })
+    end
+
+    context "when enabled" do
+      before { @course.enable_feature!(:study_assist) }
+
+      it "sets study_assist in FEATURES" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:FEATURES][:study_assist]).to be true
+      end
+
+      it "sets FILE_ID to the attachment id" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:FILE_ID]).to eq @file.id.to_s
+      end
+
+      it "sets COURSE_ID to the course id" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:COURSE_ID]).to eq @course.id.to_s
+      end
+
+      it "sets JOURNEY_URL from CanvasCareer config" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+      end
+    end
+
+    context "when disabled" do
+      it "does not set FILE_ID" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h).not_to have_key :FILE_ID
+      end
+
+      it "does not set JOURNEY_URL" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h).not_to have_key :JOURNEY_URL
+      end
+    end
+  end
+
   describe "GET 'api_create_success'" do
     before do
       category = group_category

@@ -101,6 +101,7 @@ export interface EnvCommon {
   ASSET_HOST: string
   JOURNEY_URL?: string
   WIKI_PAGE_ID?: string
+  FILE_ID?: string
   DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
