@@ -217,6 +217,12 @@ describe('RubricForm AI Regenerate Submit Test', () => {
 
     fireEvent.click(getByTestId('regenerate-criteria-submit-button'))
 
+    // Advance fake timers to trigger the monitorProgress setTimeout callback
+    // (same pattern as the initial generate step above)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(100)
+    })
+
     await waitFor(() => {
       expect(regenerateCriteriaMock).toHaveBeenCalledWith(
         courseId,
