@@ -219,12 +219,13 @@ describe('AIExperienceShow', () => {
     const deleteButton = screen.getByText('Delete')
     fireEvent.click(deleteButton)
 
+    // Wait for both the modal title AND the cancel button to be ready
+    const cancelButton = await screen.findByTestId('ai-experience-show-delete-cancel-button')
     await waitFor(() => {
       expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
     })
 
-    // Click Cancel - use testid to target the button directly
-    fireEvent.click(screen.getByTestId('ai-experience-show-delete-cancel-button'))
+    fireEvent.click(cancelButton)
 
     await waitFor(
       () => {
