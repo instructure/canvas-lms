@@ -87,6 +87,7 @@ describe('ItemAssignToCard - Due Date ENV Null Defaults', () => {
   })
 
   afterEach(() => {
+    queryClient.clear()
     server.resetHandlers()
     fakeEnv.teardown()
     vi.clearAllMocks()
@@ -103,13 +104,16 @@ describe('ItemAssignToCard - Due Date ENV Null Defaults', () => {
     await userEvent.type(dateInput, 'Nov 10, 2020')
     const dateOption = await findByRole('option', {name: /10 november 2020/i})
     await userEvent.click(dateOption)
-    await waitFor(() => {
-      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
-        expect.any(String),
-        'due_at',
-        '2020-11-10T08:00:00.000Z',
-      )
-    }, {timeout: 30000})
+    await waitFor(
+      () => {
+        expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+          expect.any(String),
+          'due_at',
+          '2020-11-10T08:00:00.000Z',
+        )
+      },
+      {timeout: 30000},
+    )
     const timeInputs = await findAllByLabelText('Time')
     expect(timeInputs[0]).toHaveValue('8:00 AM')
   })
