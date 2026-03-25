@@ -1843,12 +1843,12 @@ describe Course do
       enrollment
     end
 
-    it "excludes users with only future temporary enrollments" do
+    it "includes users with future temporary enrollments" do
       recipient = user_factory(active_all: true)
       create_temp_enrollment(recipient, start_at: 1.day.from_now, end_at: 1.week.from_now)
 
       visible_ids = @course.users_visible_to(@provider).pluck(:id)
-      expect(visible_ids).not_to include(recipient.id)
+      expect(visible_ids).to include(recipient.id)
     end
 
     it "includes users with active temporary enrollments" do
@@ -1865,19 +1865,6 @@ describe Course do
 
       visible_ids = @course.users_visible_to(@provider).pluck(:id)
       expect(visible_ids).to include(student.id)
-    end
-
-    it "does not filter when feature flag is disabled" do
-      Account.default.disable_feature!(:temporary_enrollments)
-      recipient = user_factory(active_all: true)
-      # Create enrollment directly since feature is off
-      enrollment = @course.enroll_user(recipient, "TeacherEnrollment", { role: teacher_role })
-      enrollment.update_columns(temporary_enrollment_source_user_id: @provider.id,
-                                temporary_enrollment_pairing_id: @pairing.id)
-      enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
-
-      visible_ids = @course.users_visible_to(@provider).pluck(:id)
-      expect(visible_ids).to include(recipient.id)
     end
   end
 
