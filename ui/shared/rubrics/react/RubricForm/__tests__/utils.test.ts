@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {translateRubricQueryResponse, translateRubricData} from '../utils'
+import {translateRubricQueryResponse, translateRubricData, autoGeneratePoints} from '../utils'
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 import type {Rubric, RubricAssociation} from '@canvas/rubrics/react/types/rubric'
 
@@ -101,6 +101,39 @@ describe('RubricForm utils', () => {
 
       expect(result.associationTypeId).toBe('999')
       expect(result.associationType).toBe('Account')
+    })
+  })
+
+  describe('autoGeneratePoints', () => {
+    const makeRating = (points: number) => ({
+      id: String(points),
+      description: '',
+      longDescription: '',
+      points,
+    })
+
+    it('rounds generated points to 2 decimal places', () => {
+      // 1/3 of 10 = 3.333... → rounds to 3.33
+      const ratings = [makeRating(3), makeRating(2), makeRating(1)]
+      const result = autoGeneratePoints(ratings, 10)
+      result.forEach(r => {
+        const decimals = (r.points.toString().split('.')[1] ?? '').length
+        expect(decimals).toBeLessThanOrEqual(2)
+      })
+    })
+
+    it('scales points proportionally to the new max', () => {
+      const ratings = [makeRating(3), makeRating(2), makeRating(1)]
+      const result = autoGeneratePoints(ratings, 9)
+      expect(result[0].points).toBe(9)
+      expect(result[1].points).toBe(6)
+      expect(result[2].points).toBe(3)
+    })
+
+    it('returns 0 for all ratings when new max is 0', () => {
+      const ratings = [makeRating(3), makeRating(2), makeRating(1)]
+      const result = autoGeneratePoints(ratings, 0)
+      expect(result.every(r => r.points === 0)).toBe(true)
     })
   })
 
