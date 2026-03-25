@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../app/services/auto_grade_orchestration_service"
-require_relative "../../app/services/grade_service"
 require_relative "../factory_bot_spec_helper"
 
 RSpec.describe AutoGradeOrchestrationService do

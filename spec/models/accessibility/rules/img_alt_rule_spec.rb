@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "rule_test_helper"
-require_relative "../../../../app/models/accessibility/rules/img_alt_rule_helper"
 
 describe Accessibility::Rules::ImgAltRule do
   include RuleTestHelper

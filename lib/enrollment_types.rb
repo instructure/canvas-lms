@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../app/services/canvas_career/label_overrides"
-
 module EnrollmentTypes
   ENROLLMENT_TYPE_DEFINITIONS = {
     "StudentEnrollment" => {
