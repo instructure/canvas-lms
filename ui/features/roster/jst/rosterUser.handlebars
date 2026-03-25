@@ -17,6 +17,9 @@
     accepted the invitation to the course{{/t}}">{{#t "pending_acceptance_of_invitation"}}pending{{/t}}</span>{{/if}}
   {{#if isInactive}}<span class="label"
     title="{{#t}}This user is currently not able to access the course{{/t}}">{{#t}}inactive{{/t}}</span>{{/if}}
+  {{!-- temporaryEnrollmentLabel is pre-translated in User.js, not wrapped in {{#t}} --}}
+  {{#if temporaryEnrollmentLabel}}<span class="{{temporaryEnrollmentLabelClass}}"
+    title="{{#t}}Temporary enrollment status{{/t}}">{{temporaryEnrollmentLabel}}</span>{{/if}}
 </td>
 {{#if canViewLoginIdColumn}}
 <td>
@@ -42,9 +45,6 @@
 <td>
   {{#each enrollments}}
   <div>
-    {{#if temporary_enrollment_source_user_id}}
-    {{#t}}Temporary:{{/t}}
-    {{/if}}
     {{enrollmentName role}}
   </div>
   {{/each}}

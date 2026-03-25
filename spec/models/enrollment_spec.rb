@@ -3355,6 +3355,51 @@ describe Enrollment do
         expect(Enrollment.excluding_pending_temporary_enrollments).to include(@recipient_temp_enrollment)
       end
     end
+
+    describe "#temporary_enrollment_display_state" do
+      it "returns nil for non-temporary enrollments" do
+        student = user_factory(active_all: true)
+        enrollment = @course1.enroll_student(student, enrollment_state: "active")
+        expect(enrollment.temporary_enrollment_display_state).to be_nil
+      end
+
+      it "returns 'active' for current temporary enrollments" do
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("active")
+      end
+
+      it "returns 'future' for future temporary enrollments" do
+        @recipient_temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("future")
+      end
+
+      it "returns 'completed' for completed temporary enrollments" do
+        @recipient_temp_enrollment.enrollment_state.update!(state: "completed", state_is_current: true)
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("completed")
+      end
+
+      it "returns 'inactive' for deactivated temporary enrollments" do
+        @recipient_temp_enrollment.enrollment_state.update!(state: "inactive", state_is_current: true, state_valid_until: nil)
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("inactive")
+      end
+
+      it "returns 'future' for future student temporary enrollments" do
+        student = user_factory(active_all: true)
+        pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+        enrollment = @course1.enroll_user(
+          student,
+          "StudentEnrollment",
+          {
+            role: student_role,
+            temporary_enrollment_source_user_id: @source_user.id,
+            temporary_enrollment_pairing_id: pairing.id
+          }
+        )
+        enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+        # Student enrollments (view_restrictable?) get pending_active when future
+        expect(enrollment.enrollment_state.state).to eq("pending_active")
+        expect(enrollment.temporary_enrollment_display_state).to eq("future")
+      end
+    end
   end
 
   describe "#can_be_deleted_by" do

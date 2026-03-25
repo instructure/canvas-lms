@@ -687,6 +687,11 @@ describe Api::V1::User do
           enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
           expect(enrollment_json).to include("temporary_enrollment_source_user_id")
         end
+
+        it "includes temporary_enrollment_display_state attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).to have_key(:temporary_enrollment_display_state)
+        end
       end
 
       context "when feature flag is disabled" do
@@ -697,6 +702,11 @@ describe Api::V1::User do
         it "excludes temporary_enrollment_source_user_id attribute" do
           enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
           expect(enrollment_json).not_to include("temporary_enrollment_source_user_id")
+        end
+
+        it "excludes temporary_enrollment_display_state attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).not_to have_key(:temporary_enrollment_display_state)
         end
       end
     end

@@ -353,7 +353,7 @@ class Enrollment < ApplicationRecord
   scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
 
   # SQL condition that excludes temporary enrollments that are not currently
-  # active by date. Admin temp enrollments get 'inactive' state when
+  # active by date. Course admin temp enrollments get 'inactive' state when
   # future (not view_restrictable?), while student/observer ones get
   # 'pending_active', so we check for state = 'active' to cover all types.
   def self.pending_temporary_enrollment_exclusion_sql
@@ -1321,6 +1321,26 @@ class Enrollment < ApplicationRecord
 
   def temporary_enrollment?
     temporary_enrollment_source_user_id.present?
+  end
+
+  def temporary_enrollment_display_state
+    return nil unless temporary_enrollment?
+
+    es = enrollment_state
+    case es.state
+    when "pending_active", "pending_invited"
+      "future"
+    when "active", "invited"
+      "active"
+    when "completed"
+      "completed"
+    when "inactive"
+      # Future admin-type enrollments get "inactive" with state_valid_until
+      # set to the start date; truly inactive enrollments do not
+      es.state_valid_until.present? ? "future" : "inactive"
+    else
+      es.state
+    end
   end
 
   def temporary_enrollment_source_user

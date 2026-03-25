@@ -32,6 +32,7 @@ interface RosterEnrollment extends Record<string, unknown> {
   id?: Identifier
   course_section_id: Identifier
   enrollment_state: string
+  temporary_enrollment_display_state?: string
   html_url?: string
   total_activity_time?: number
 }
