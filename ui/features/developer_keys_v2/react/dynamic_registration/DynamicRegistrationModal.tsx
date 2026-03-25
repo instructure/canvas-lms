@@ -32,7 +32,8 @@ import type {AnyAction} from 'redux'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('react_developer_keys')
@@ -163,7 +164,9 @@ const DynamicRegistrationModalBody = ({contextId}: DynamicRegistrationModalBodyP
         <Modal.Body>
           <GenericErrorPage
             imageUrl={errorShipUrl}
-            error={state.error}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
+            errorMessage={state.error?.message}
             errorCategory="Dynamic Registration"
           />
         </Modal.Body>

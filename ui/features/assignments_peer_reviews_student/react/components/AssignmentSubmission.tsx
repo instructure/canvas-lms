@@ -19,7 +19,8 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {
@@ -235,6 +236,8 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     return (
       <GenericErrorPage
         imageUrl={ErrorShip}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={subject}
         errorCategory={category}
         errorMessage={message}

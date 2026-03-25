@@ -19,13 +19,13 @@
 import React from 'react'
 import {PlatformUiProvider} from '@instructure/platform-provider'
 import {LearningAgentLauncher} from '@instructure/platform-learning-agent-launcher'
-import {executeQuery} from '@canvas/graphql'
+import {platformExecuteQuery} from '@canvas/graphql'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 
 const LearningAgentButton = () => (
   <ErrorBoundary errorComponent={<></>}>
     <PlatformUiProvider
-      executeQuery={executeQuery}
+      executeQuery={platformExecuteQuery}
       locale={window.ENV.LOCALE ?? 'en'}
       timezone={window.ENV.TIMEZONE ?? 'UTC'}
       currentUserId={window.ENV.current_user_id ?? undefined}

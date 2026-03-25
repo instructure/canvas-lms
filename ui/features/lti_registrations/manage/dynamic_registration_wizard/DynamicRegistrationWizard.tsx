@@ -17,7 +17,8 @@
  */
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
@@ -390,6 +391,8 @@ const renderStepContent = (
         <RegistrationModalBody>
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorSubject={I18n.t('Dynamic Registration error')}
             errorCategory="Dynamic Registration"
             errorMessage={state.message}

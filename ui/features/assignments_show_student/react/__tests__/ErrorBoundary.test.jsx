@@ -20,7 +20,8 @@ import '@instructure/canvas-theme'
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 // Component that throws an error during render
@@ -57,14 +58,14 @@ describe('Assignments Show Student ErrorBoundary', () => {
 
   describe('with function errorComponent', () => {
     it('passes error information to GenericErrorPage when an error occurs', () => {
-      const originalNodeEnv = process.env.NODE_ENV
-      process.env.NODE_ENV = 'development'
-
       render(
         <ErrorBoundary
           errorComponent={({error}) => (
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
+              showDevError={true}
               errorSubject={error.message}
               errorCategory="Assignments 2 Student Error Page"
               errorMessage={error.message}
@@ -76,25 +77,22 @@ describe('Assignments Show Student ErrorBoundary', () => {
         </ErrorBoundary>,
       )
 
-      // The error message should be visible in development mode
+      // The error message should be visible when showDevError is true
       expect(screen.getByText('Test error message for assignments')).toBeInTheDocument()
 
       // The error page header should always be rendered
       expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
       expect(screen.getByText('Help us improve by telling us what happened')).toBeInTheDocument()
-
-      process.env.NODE_ENV = originalNodeEnv
     })
 
     it('does not display "No Error Message" when error occurs', () => {
-      const originalNodeEnv = process.env.NODE_ENV
-      process.env.NODE_ENV = 'development'
-
       render(
         <ErrorBoundary
           errorComponent={({error}) => (
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorSubject={error.message}
               errorCategory="Assignments 2 Student Error Page"
               errorMessage={error.message}
@@ -108,21 +106,19 @@ describe('Assignments Show Student ErrorBoundary', () => {
 
       // Should NOT show the default error message
       expect(screen.queryByText('No Error Message')).not.toBeInTheDocument()
-
-      process.env.NODE_ENV = originalNodeEnv
     })
   })
 
   describe('with static JSX errorComponent (incorrect pattern)', () => {
     it('shows "No Error Message" when error information is not passed', () => {
-      const originalNodeEnv = process.env.NODE_ENV
-      process.env.NODE_ENV = 'development'
-
       render(
         <ErrorBoundary
           errorComponent={
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
+              showDevError={true}
               errorCategory="Assignments 2 Student Error Page"
             />
           }
@@ -136,8 +132,6 @@ describe('Assignments Show Student ErrorBoundary', () => {
 
       // The error page header should still be rendered
       expect(screen.getByText('Sorry, Something Broke')).toBeInTheDocument()
-
-      process.env.NODE_ENV = originalNodeEnv
     })
   })
 
@@ -148,6 +142,8 @@ describe('Assignments Show Student ErrorBoundary', () => {
           errorComponent={({error}) => (
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorSubject={error.message}
               errorCategory="Assignments 2 Student Error Page"
               errorMessage={error.message}

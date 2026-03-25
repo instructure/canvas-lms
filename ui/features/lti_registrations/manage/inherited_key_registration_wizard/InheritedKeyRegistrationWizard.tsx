@@ -45,7 +45,8 @@ import {NamingConfirmationWrapper} from '../lti_1p3_registration_form/components
 import {ReviewScreenWrapper} from '../lti_1p3_registration_form/components/ReviewScreenWrapper'
 import {Header} from '../registration_wizard_forms/Header'
 import {PermissionConfirmationWrapper} from '../lti_1p3_registration_form/components/PermissionConfirmationWrapper'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('lti_registrations')
@@ -282,9 +283,10 @@ const renderCustomizationBody = (
       const message = formatApiResultError(state.result as UnsuccessfulApiResult)
       return (
         <GenericErrorPage
-          image={errorShipUrl}
-          title={I18n.t('Error')}
-          message={message}
+          imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorSubject={I18n.t('Error')}
           errorMessage={message}
         />
       )
@@ -321,9 +323,10 @@ const renderBody = (state: InheritedKeyWizardState) => {
       const message = formatApiResultError(state.result as UnsuccessfulApiResult)
       return (
         <GenericErrorPage
-          image={errorShipUrl}
-          title={I18n.t('Error')}
-          message={message}
+          imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorSubject={I18n.t('Error')}
           errorMessage={message}
         />
       )

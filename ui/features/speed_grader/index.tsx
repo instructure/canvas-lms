@@ -25,7 +25,8 @@ import ready from '@instructure/ready'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
@@ -187,14 +188,16 @@ ready(() => {
     legacyRender(
       <GenericErrorPage
         imageUrl={errorShipUrl}
-        errorMessage={
-          <>
-            {/* @ts-expect-error */}
-            {window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED ||
-              I18n.t('SpeedGrader Platform is not enabled')}
-            {window.REMOTES?.speedgrader || 'window.REMOTES?.speedgrader is missing'}
-          </>
-        }
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
+        errorMessage={[
+          // @ts-expect-error
+          !window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED &&
+            I18n.t('SpeedGrader Platform is not enabled'),
+          !window.REMOTES?.speedgrader && 'window.REMOTES?.speedgrader is missing',
+        ]
+          .filter(Boolean)
+          .join('; ')}
         errorSubject={I18n.t('SpeedGrader loading error')}
         errorCategory={I18n.t('SpeedGrader Error Page')}
       />,
@@ -216,6 +219,8 @@ ready(() => {
       legacyRender(
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorMessage={error.message}
           errorSubject={I18n.t('SpeedGrader loading error')}
           errorCategory={I18n.t('SpeedGrader Error Page')}

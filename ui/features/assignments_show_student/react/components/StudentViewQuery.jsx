@@ -17,7 +17,8 @@
  */
 
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
@@ -74,6 +75,8 @@ const ErrorPage = ({error}) => {
   return (
     <GenericErrorPage
       imageUrl={errorShipUrl}
+      onReportError={reportError}
+      translations={canvasErrorPageTranslations}
       errorSubject={I18n.t('Assignments 2 Student initial query error')}
       errorCategory={I18n.t('Assignments 2 Student Error Page')}
       errorMessage={error.message}

@@ -19,7 +19,8 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('course_settings')
@@ -58,6 +59,8 @@ const CanvasCourseCriteria: React.FC = () => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorMessage={I18n.t(
           'We were unable to load Canvas Criteria. Please try refreshing the page.',
         )}

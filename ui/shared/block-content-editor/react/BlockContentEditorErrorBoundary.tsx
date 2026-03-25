@@ -18,7 +18,8 @@
 
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {PropsWithChildren} from 'react'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -26,7 +27,12 @@ const I18n = createI18nScope('block_content_editor')
 
 const BlockContentEditorGenericErrorPage = () => {
   return (
-    <GenericErrorPage imageUrl={errorShipUrl} errorSubject={I18n.t('Block Content Editor Error')} />
+    <GenericErrorPage
+      imageUrl={errorShipUrl}
+      onReportError={reportError}
+      translations={canvasErrorPageTranslations}
+      errorSubject={I18n.t('Block Content Editor Error')}
+    />
   )
 }
 

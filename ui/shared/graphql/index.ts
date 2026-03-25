@@ -59,3 +59,18 @@ export const executeQuery = async <TResult, TVariables extends Variables = Varia
     ...customHeaders,
   })
 }
+
+/**
+ * Adapter for PlatformUiProvider's executeQuery prop.
+ * Bridges the gap between the typed `executeQuery` signature (TypedDocumentNode)
+ * and the platform-ui provider's looser `(query: unknown, variables) => Promise` contract.
+ */
+export const platformExecuteQuery = async <TResult, TVariables = Record<string, unknown>>(
+  query: unknown,
+  variables: TVariables,
+): Promise<TResult> => {
+  return executeQuery(
+    query as TypedDocumentNode<TResult, TVariables & Variables>,
+    variables as TVariables & Variables,
+  )
+}

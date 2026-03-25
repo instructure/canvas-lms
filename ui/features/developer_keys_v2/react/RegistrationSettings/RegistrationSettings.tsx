@@ -17,7 +17,8 @@
  */
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
@@ -112,8 +113,12 @@ export const RegistrationSettings = React.memo((props: RegistrationSettingsProps
             return (
               <GenericErrorPage
                 imageUrl={errorShipUrl}
+                onReportError={reportError}
+                translations={canvasErrorPageTranslations}
                 errorSubject="LTI Registration Error"
-                error={devKeyData.error}
+                errorMessage={
+                  devKeyData.error instanceof Error ? devKeyData.error.message : undefined
+                }
               />
             )
           case 'success': {
@@ -131,8 +136,12 @@ export const RegistrationSettings = React.memo((props: RegistrationSettingsProps
               return (
                 <GenericErrorPage
                   imageUrl={errorShipUrl}
+                  onReportError={reportError}
+                  translations={canvasErrorPageTranslations}
                   errorSubject="No LTI Registration"
-                  error={devKeyData.error}
+                  errorMessage={
+                    devKeyData.error instanceof Error ? devKeyData.error.message : undefined
+                  }
                 />
               )
             }
