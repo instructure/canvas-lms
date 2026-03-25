@@ -130,6 +130,25 @@ describe "submissions/show_preview" do
     end
   end
 
+  describe "media recording submissions" do
+    it "renders data attributes with underscores for JavaScript compatibility" do
+      course_with_student
+      view_context
+      assignment = @course.assignments.create!(title: "media assignment", submission_types: "media_recording")
+      submission = assignment.submit_homework(@user, submission_type: "media_recording", media_comment_id: "test_media_id", media_comment_type: "video")
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+
+      render "submissions/show_preview"
+
+      # Verify data attributes use underscores (data-media_comment_id) not hyphens (data-media-comment-id)
+      # This is required for the JavaScript thumbnail generation to find the media ID
+      expect(response.body).to include('data-media_comment_id="test_media_id"')
+      expect(response.body).to include('data-media_comment_type="video"')
+      expect(response.body).to include('class="play_media_recording_link"')
+    end
+  end
+
   describe "originality score" do
     let(:course) { Course.create! }
     let(:assignment) { course.assignments.create!(title: "an assignment", submission_types: "online_text_entry") }
