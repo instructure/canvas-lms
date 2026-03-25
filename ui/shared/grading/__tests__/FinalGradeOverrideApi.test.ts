@@ -19,6 +19,8 @@
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
+import {gql} from '@canvas/apollo-v3'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 import type {FinalGradeOverrideMap} from '../grading.d'
 
@@ -41,6 +43,57 @@ describe('Gradebook FinalGradeOverrideApi', () => {
 
   afterAll(() => {
     server.close()
+  })
+
+  describe('.updateFinalGradeOverride()', () => {
+    const mutation = gql`
+      mutation SetOverrideScore($input: SetOverrideScoreInput!) {
+        setOverrideScore(input: $input) {
+          grades {
+            customGradeStatusId
+            overrideScore
+          }
+        }
+      }
+    `
+
+    afterEach(() => {
+      MockCanvasClient.uninstall()
+    })
+
+    it('sends null overrideScore when removing an override', async () => {
+      MockCanvasClient.install([
+        {
+          request: {
+            query: mutation,
+            variables: {input: {enrollmentId: '1101', overrideScore: null}},
+          },
+          result: {
+            data: {setOverrideScore: {grades: {overrideScore: null, customGradeStatusId: null}}},
+          },
+        },
+      ])
+      const result = await FinalGradeOverrideApi.updateFinalGradeOverride('1101')
+      expect(result).toBeNull()
+    })
+
+    it('includes gradingPeriodId in variables when provided', async () => {
+      MockCanvasClient.install([
+        {
+          request: {
+            query: mutation,
+            variables: {input: {enrollmentId: '1101', gradingPeriodId: '701', overrideScore: 88.5}},
+          },
+          result: {
+            data: {setOverrideScore: {grades: {overrideScore: 88.5, customGradeStatusId: null}}},
+          },
+        },
+      ])
+      const result = await FinalGradeOverrideApi.updateFinalGradeOverride('1101', '701', {
+        percentage: 88.5,
+      })
+      expect(result).toEqual({percentage: 88.5, customGradeStatusId: null})
+    })
   })
 
   describe('.getFinalGradeOverrides()', () => {
