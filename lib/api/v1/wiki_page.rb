@@ -77,10 +77,7 @@ module Api::V1::WikiPage
           external_content_id: wiki_page.external_content_reference.content_id
         )
 
-        hash["block_editor_data"] = {
-          template_layout: content.template_layout,
-          template_data: content.template_data
-        }
+        hash["block_editor_data"] = content.data
       elsif @context.try(:block_content_editor_enabled?) && wiki_page.block_editor
         hash["block_editor_attributes"] = {
           id: wiki_page.block_editor.id,

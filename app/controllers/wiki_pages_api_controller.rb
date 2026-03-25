@@ -931,14 +931,13 @@ class WikiPagesApiController < ApplicationController
   end
 
   def create_external_content_ref
-    if @context.account.horizon_block_content_editor? && @block_editor_data
+    if @context.account.horizon_block_content_editor?
       response = ContentServiceClient.create_content(
         root_account_uuid: @context.root_account.uuid,
         user_uuid: @current_user.uuid,
         context_type: "WikiPage",
         context_id: @page.id,
-        template_layout: @block_editor_data[:template_layout],
-        template_data: @block_editor_data[:template_data]
+        data: @block_editor_data
       )
 
       @page.create_external_content_reference(content_id: response.external_content_id)
@@ -946,19 +945,26 @@ class WikiPagesApiController < ApplicationController
   end
 
   def update_external_content_ref
-    external_ref = @page.external_content_reference
-    if @context.account.horizon_block_content_editor? && @block_editor_data && external_ref
-      ContentServiceClient.update_content(
-        root_account_uuid: @context.root_account.uuid,
-        user_uuid: @current_user.uuid,
-        external_content_id: external_ref.content_id,
-        template_layout: @block_editor_data[:template_layout],
-        template_data: @block_editor_data[:template_data]
-      )
+    if @context.account.horizon_block_content_editor?
+      external_ref = @page.external_content_reference
+      if external_ref
+        ContentServiceClient.update_content(
+          root_account_uuid: @context.root_account.uuid,
+          user_uuid: @current_user.uuid,
+          external_content_id: external_ref.content_id,
+          data: @block_editor_data
+        )
+      end
     end
   end
 
   def extract_block_editor_data
-    @block_editor_data = params[:wiki_page]&.delete(:block_editor_data)
+    return unless params[:wiki_page] && @context.account.horizon_block_content_editor?
+
+    if params[:wiki_page][:block_editor_data].present?
+      # Extract and convert to hash to avoid ActionController::UnfilteredParameters errors
+      block_editor_data_params = params[:wiki_page].delete(:block_editor_data)
+      @block_editor_data = block_editor_data_params.respond_to?(:to_unsafe_h) ? block_editor_data_params.to_unsafe_h : block_editor_data_params
+    end
   end
 end
