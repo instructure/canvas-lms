@@ -313,7 +313,7 @@ describe NewQuizzesController do
 
       context "when no quiz_lti tool is found" do
         before do
-          allow(Lti::ToolFinder).to receive(:from_context).and_return(nil)
+          tool.destroy
         end
 
         it "returns unauthorized" do
@@ -322,16 +322,16 @@ describe NewQuizzesController do
         end
       end
 
-      context "when tool is not quiz_lti" do
+      context "when only a non-quiz_lti tool with course_navigation exists" do
         before do
-          regular_tool = course.context_external_tools.create!(
+          tool.destroy
+          course.context_external_tools.create!(
             name: "Regular Tool",
             url: "http://example.com/launch",
             consumer_key: "key",
             shared_secret: "secret",
             course_navigation: { enabled: true }
           )
-          allow(Lti::ToolFinder).to receive(:from_context).and_return(regular_tool)
         end
 
         it "returns unauthorized" do
