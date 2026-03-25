@@ -155,6 +155,37 @@ describe LLMConversationContextManager do
         described_class.create_context(ai_experience:)
       end.to raise_error(LlmConversation::Errors::ConversationError, /llm_conversation_bearer_token not found/)
     end
+
+    context "with ai_experiences_context_file_upload feature flag enabled" do
+      let(:attachment) { attachment_model(context: course, size: 1.megabyte, filename: "syllabus.pdf") }
+
+      before do
+        course.enable_feature!(:ai_experiences_context_file_upload)
+        allow_any_instance_of(Attachment).to receive(:public_url).and_return("https://example.com/syllabus.pdf")
+
+        stub_request(:post, "http://localhost:3001/conversation-context")
+          .to_return(status: 200, body: create_context_response.to_json, headers: { "Content-Type" => "application/json" })
+      end
+
+      it "reloads context_files to avoid sending stale empty association cache" do
+        # Prime the AR association cache as empty before the file exists in DB
+        ai_experience.context_files.to_a
+
+        # Add a file directly to DB after the cache was primed
+        AiExperienceContextFile.create!(ai_experience:, attachment:)
+
+        described_class.create_context(ai_experience:)
+
+        expect(WebMock).to have_requested(:post, "http://localhost:3001/conversation-context")
+          .with(body: hash_including(
+            "data" => hash_including(
+              "context_files" => [
+                hash_including("sourceId" => "file-#{attachment.global_id}")
+              ]
+            )
+          ))
+      end
+    end
   end
 
   describe ".update_context" do
@@ -270,6 +301,27 @@ describe LLMConversationContextManager do
         expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
           .with(body: hash_including(
             "data" => hash_including("context_files" => [])
+          ))
+      end
+
+      it "reloads context_files to avoid sending stale empty association cache" do
+        # Prime the AR association cache as empty before the file exists in DB
+        ai_experience.context_files.to_a
+
+        # Add a file directly to DB after the cache was primed
+        attachment2 = attachment_model(context: course, size: 1.megabyte, filename: "notes.pdf")
+        allow(attachment2).to receive(:public_url).and_return("https://example.com/notes.pdf")
+        AiExperienceContextFile.create!(ai_experience:, attachment: attachment2)
+
+        described_class.update_context(ai_experience:)
+
+        expect(WebMock).to have_requested(:patch, "http://localhost:3001/conversation-context/context-uuid")
+          .with(body: hash_including(
+            "data" => hash_including(
+              "context_files" => array_including(
+                hash_including("sourceId" => "file-#{attachment2.global_id}")
+              )
+            )
           ))
       end
     end

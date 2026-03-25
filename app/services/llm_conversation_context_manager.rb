@@ -182,7 +182,7 @@ class LLMConversationContextManager
     }
 
     if @ai_experience.course.feature_enabled?(:ai_experiences_context_file_upload)
-      data[:context_files] = @ai_experience.context_files.map do |file|
+      data[:context_files] = @ai_experience.context_files.reload.map do |file|
         {
           source: "canvas",
           sourceType: "file",
