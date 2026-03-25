@@ -65,11 +65,11 @@ class NewQuizzesController < ApplicationController
   # - /courses/:course_id/banks/*
   # - /accounts/:account_id/banks/*
   def banks
-    @tool = find_context_quiz_lti_tool
+    placement = navigation_placement
+    @tool = find_context_quiz_lti_tool(placement)
     return render_unauthorized_action unless @tool&.quiz_lti?
     return unless authorized_action(@context, @current_user, :read)
 
-    placement = "#{@context.class.url_context_class.to_s.downcase}_navigation"
     signed_launch_data = Services::NewQuizzes::Routes::LaunchHelper.item_bank_launch_data(
       tool: @tool,
       context: @context,
@@ -119,9 +119,12 @@ class NewQuizzesController < ApplicationController
     Lti::ToolFinder.from_assignment(@assignment)
   end
 
-  def find_context_quiz_lti_tool
-    scope = ContextExternalTool.where(tool_id: ContextExternalTool::QUIZ_LTI)
-    Lti::ToolFinder.from_context(@context, scope:)
+  def find_context_quiz_lti_tool(placement)
+    Lti::ContextToolFinder.all_tools_for(@context, type: placement.to_sym).quiz_lti.order(:id).first
+  end
+
+  def navigation_placement
+    "#{@context.class.url_context_class.to_s.downcase}_navigation"
   end
 
   def assignment_locked_for_student?
