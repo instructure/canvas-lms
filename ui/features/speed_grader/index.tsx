@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
@@ -32,6 +32,7 @@ import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 import getRCSProps from '@canvas/rce/getRCSProps'
+import * as amsAuth from '@canvas/ams/react/auth'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -59,6 +60,8 @@ ready(() => {
       mutationFns: {
         postSubmissionCommentMedia: sgUploader?.doUploadByFile,
       },
+      amsRemote: window.REMOTES?.ams || null,
+      amsAuth,
       context: {
         userId: window.ENV.current_user_id,
         assignmentId: params.get('assignment_id'),
@@ -73,6 +76,7 @@ ready(() => {
         mediaSettings: window.INST.kalturaSettings,
         lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
         currentUserIsAdmin: ENV.current_user_is_admin ?? false,
+        canDeleteAttachments: window.ENV.can_delete_attachments,
         themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
         useHighContrast: window.ENV.use_high_contrast ?? false,
         commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
@@ -151,7 +155,7 @@ ready(() => {
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
-    ReactDOM.render(
+    legacyRender(
       <div
         style={{
           position: 'fixed',
@@ -179,7 +183,7 @@ ready(() => {
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   // @ts-expect-error
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
-    ReactDOM.render(
+    legacyRender(
       <GenericErrorPage
         imageUrl={errorShipUrl}
         errorMessage={
@@ -208,7 +212,7 @@ ready(() => {
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
 
-      ReactDOM.render(
+      legacyRender(
         <GenericErrorPage
           imageUrl={errorShipUrl}
           errorMessage={error.message}

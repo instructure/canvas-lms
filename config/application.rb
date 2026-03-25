@@ -358,7 +358,7 @@ module CanvasRails
       def call(env)
         req = ActionDispatch::Request.new(env)
         res = ApplicationController.make_response!(req)
-        ApplicationController.dispatch("rescue_action_dispatch_exception", req, res)
+        ApplicationController.dispatch(:rescue_action_dispatch_exception, req, res)
       end
     end
 

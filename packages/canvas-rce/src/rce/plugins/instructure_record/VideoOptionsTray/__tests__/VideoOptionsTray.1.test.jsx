@@ -97,6 +97,20 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       renderComponent()
       expect(tray.titleText).toEqual('')
     })
+
+    it('shows an error message when title is empty', () => {
+      props.videoOptions.titleText = ''
+      renderComponent()
+      expect(screen.getByText("Title can't be blank")).toBeInTheDocument()
+    })
+
+    it('clears the error message when a title is typed', () => {
+      props.videoOptions.titleText = ''
+      renderComponent()
+      expect(screen.getByText("Title can't be blank")).toBeInTheDocument()
+      tray.setTitleText('A turtle in a party suit.')
+      expect(screen.queryByText("Title can't be blank")).not.toBeInTheDocument()
+    })
   })
 
   describe('"Display Options" field', () => {
@@ -234,7 +248,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_studio_embed_improvements: true})
     })
 
-    describe('Studio Embed Options', () => {
+    describe('Studio Viewer Restrictions', () => {
       describe('when the media is a Studio media', () => {
         beforeEach(() => {
           props.studioOptions = {
@@ -251,7 +265,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
 
         it('shows the checkbox group', () => {
           renderComponent()
-          expect(screen.getByText('Embed Options')).toBeInTheDocument()
+          expect(screen.getByText('Viewer Restrictions')).toBeInTheDocument()
         })
 
         it('shows the "Allow media download" checkbox', () => {
@@ -272,25 +286,25 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         describe('and the media is external', () => {
           beforeEach(() => {
             props.studioOptions.embedOptions.isExternal = true
-          });
+          })
 
           it('does not show the "Allow media download" checkbox', () => {
             renderComponent()
             expect(screen.queryByLabelText('Allow media download')).not.toBeInTheDocument()
           })
-        });
-      });
+        })
+      })
 
       describe('when the media is not a Studio media', () => {
         beforeEach(() => {
           props.studioOptions = null
-        });
+        })
 
         it('does not show the checkbox group', () => {
           renderComponent()
-          expect(screen.queryByText('Embed Options')).not.toBeInTheDocument()
+          expect(screen.queryByText('Viewer Restrictions')).not.toBeInTheDocument()
         })
-      });
+      })
     })
   })
 
@@ -312,8 +326,26 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         tray.setTitleText('')
       })
 
-      it('is disabled ', () => {
-        expect(tray.doneButtonDisabled).toEqual(true)
+      it('does not call onSave when title is empty', () => {
+        tray.$doneButton.click()
+        expect(props.onSave).not.toHaveBeenCalled()
+      })
+
+      it('does not call onSave when title is whitespace only', () => {
+        tray.setTitleText('   ')
+        tray.$doneButton.click()
+        expect(props.onSave).not.toHaveBeenCalled()
+      })
+
+      it('focuses the title input after a blocked save attempt', () => {
+        tray.$doneButton.click()
+        expect(document.activeElement).toBe(tray.$titleTextField)
+      })
+
+      it('does not call onSave when display is link and title is empty', () => {
+        tray.setDisplayAs('link')
+        tray.$doneButton.click()
+        expect(props.onSave).not.toHaveBeenCalled()
       })
 
       it('is enabled when "Display Text Link" is selected', () => {

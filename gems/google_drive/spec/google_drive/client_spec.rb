@@ -66,6 +66,6 @@ describe GoogleDrive::Client do
 
     auth_uri = described_class.auth_uri(client, "scope")
     expect(auth_uri).to include "state=scope"
-    expect(auth_uri).to_not include "login_hint"
+    expect(auth_uri).not_to include "login_hint"
   end
 end

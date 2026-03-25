@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "स्वत: सहेजी गई सामग्री मौजूद है। क्या आप इसके बजाय स्वतः सहेजी गई सामग्री को लोड करना चाहेंगे?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "स्वचालित कैप्शनिंग"
+    },
     "available_folders_694d0436": {
         "message": "उपलब्ध फ़ोल्डर"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "({ TYPE } का वर्णन करें)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(वीडियो का वर्णन करें)"
-    },
     "description_436c48d7": {
         "message": "विवरण"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "छवि एम्बेड करें"
-    },
-    "embed_options_44c4cba8": {
-        "message": "एम्बेड विकल्प"
     },
     "embed_video_a97a64af": {
         "message": "वीडियो एम्बेड करें"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "भाषा कला आइकन"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "इस मीडिया में बोली जाने वाली भाषा*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (स्वचालित)"
+    },
     "languages_icon_9d20539": {
         "message": "भाषाएं आइकन"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "बाहरी साइट के लिए लिंक।"
+    },
+    "list_collapsed_9ac35920": {
+        "message": "सूची संक्षिप्त की गई।"
+    },
+    "list_expanded_efec2d0": {
+        "message": "सूची बढ़ाई गई।"
     },
     "lists_cd1336fc": {
         "message": "सूचियां"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "अन्य संपादक शॉर्टकट यहां पाए जा सकते हैं:"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "हमारी तकनीक ~85% सटीक कैप्शन जेनरेट करती है।"
     },
     "outline_color_3ef2cea7": {
         "message": "रूपरेखा रंग"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "छवि की सामग्री का वर्णन करने के लिए स्क्रीन रीडर द्वारा उपयोग किया जाता है"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "वीडियो का वर्णन करने के लिए स्क्रीन रीडर द्वारा उपयोग किया जाता है"
     },
     "user_documents_c206e61f": {
         "message": "उपयोगकर्ता दस्तावेज़"

@@ -18,7 +18,6 @@
 
 class TranslationController < ApplicationController
   before_action :require_context, only: :translate
-  before_action :require_user
   before_action :require_inbox_translation, only: %i[translate_paragraph]
 
   # Skip the authenticity token as this is an API endpoint.

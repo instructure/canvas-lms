@@ -246,7 +246,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     @request_password = true
     Rails.cache.write(["recent_password_reset", global_id].cache_key, true, expires_in: RESEND_PASSWORD_RESET_TIME)
-    set_confirmation_code(true, 2.hours.from_now)
+    set_confirmation_code(reset: true, expires_at: 2.hours.from_now)
     save!
     @request_password = false
   end
@@ -329,7 +329,7 @@ class CommunicationChannel < ActiveRecord::Base
           message,
           "sms",
           e164_path,
-          true
+          priority: true
         )
       else
         delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)
@@ -351,9 +351,9 @@ class CommunicationChannel < ActiveRecord::Base
 
   # If you are creating a new communication_channel, do nothing, this just
   # works.  If you are resetting the confirmation_code, call @cc.
-  # set_confirmation_code(true), or just save the record to leave the old
+  # set_confirmation_code(reset: true), or just save the record to leave the old
   # confirmation code in place.
-  def set_confirmation_code(reset = false, expires_at = nil)
+  def set_confirmation_code(reset: false, expires_at: nil)
     self.confirmation_code = nil if reset
     self.confirmation_code ||= if path_type == TYPE_EMAIL || path_type.nil?
                                  CanvasSlug.generate(nil, 25)
@@ -461,7 +461,7 @@ class CommunicationChannel < ActiveRecord::Base
     [Shard.default]
   end
 
-  def merge_candidates(break_on_first_found = false)
+  def merge_candidates(break_on_first_found: false)
     return [] if path_type == "push"
 
     shards = self.class.associated_shards(path) if Enrollment.cross_shard_invitations?
@@ -486,7 +486,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def has_merge_candidates?
-    !merge_candidates(true).empty?
+    !merge_candidates(break_on_first_found: true).empty?
   end
 
   def bouncing?

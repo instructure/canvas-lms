@@ -22,7 +22,6 @@ module Lti
     include SupportHelpers::ControllerHelpers
 
     before_action :require_context
-    before_action :require_user
     before_action :set_tool_proxy, only: %i[destroy update accept_update dismiss_update]
 
     def destroy

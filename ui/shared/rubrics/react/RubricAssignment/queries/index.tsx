@@ -42,7 +42,6 @@ export const removeRubricFromAssignment = async (courseId: string, rubricAssocia
 }
 
 export type AssignmentRubric = Rubric & {
-  can_update?: boolean
   association_count?: number
   public?: boolean
 }
@@ -87,7 +86,11 @@ export const addRubricToAssignment = async (
   )
 
   return {
-    rubricAssociation: mappedRubricAssociation,
+    rubricAssociation: {
+      ...mappedRubricAssociation,
+      canUpdate: result.rubric_association.permissions?.update,
+      canDelete: result.rubric_association.permissions?.delete,
+    },
     rubric: {
       ...mappedRubric,
       canUpdateRubric: result.rubric.permissions?.update,

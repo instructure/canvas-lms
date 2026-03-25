@@ -1336,6 +1336,21 @@ describe Types::AssignmentType do
           expect(query.resolve("checkpoints {dueAt}")).to eq [@section_due_at.iso8601]
           expect(query.resolve("checkpoints {assignmentOverrides {nodes {dueAt}}}")).to eq [[@section_due_at.iso8601]]
         end
+
+        it "SubAssignment htmlUrl links to the discussion topic" do
+          topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+          checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 2.days.from_now }],
+            points_possible: 10
+          )
+
+          checkpoint_query = GraphQLTypeTester.new(checkpoint, current_user: student)
+          html_url = checkpoint_query.resolve("htmlUrl", request: ActionDispatch::TestRequest.create)
+
+          expect(html_url).to eq("http://test.host/courses/#{course.id}/assignments/#{topic.assignment.id}")
+        end
       end
     end
   end

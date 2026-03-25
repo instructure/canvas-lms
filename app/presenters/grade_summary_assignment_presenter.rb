@@ -266,7 +266,7 @@ class GradeSummaryAssignmentPresenter
 
   def plagiarism(type)
     plag_data = if type == "vericite"
-                  submission.vericite_data(true)
+                  submission.vericite_data(lookup_data: true)
                 else
                   submission.originality_data
                 end
@@ -316,7 +316,7 @@ class GradeSummaryAssignmentPresenter
   def plagiarism_attachment?(a)
     @originality_reports.any? { |o| o.attachment == a } ||
       (submission.turnitin_data && submission.turnitin_data[a.asset_string]).present? ||
-      (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string]).present?
+      (submission.vericite_data(lookup_data: true) && submission.vericite_data(lookup_data: true)[a.asset_string]).present?
   end
 
   def comments

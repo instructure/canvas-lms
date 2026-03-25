@@ -28,23 +28,24 @@ module Api::V1::User
     methods: %w[sortable_name short_name].freeze
   }.freeze
 
-  def user_json_preloads(users, preload_email = false, opts = {})
+  def user_json_preloads(users, preload_email: false, accounts: true, pseudonyms: false, group_memberships: false, profile: false)
     # for User#account
-    ActiveRecord::Associations.preload(users, pseudonym: :account) if opts.fetch(:accounts, true)
+    ActiveRecord::Associations.preload(users, pseudonym: :account) if accounts
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
-    ActiveRecord::Associations.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) &&
-                                                                       (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
+    if accounts && (pseudonyms || user_json_is_admin?)
+      ActiveRecord::Associations.preload(users, pseudonyms: [:account, :authentication_provider])
+    end
 
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
       ActiveRecord::Associations.preload(no_email_users, :communication_channels)
     end
-    if opts[:group_memberships]
+    if group_memberships
       ActiveRecord::Associations.preload(users, :group_memberships)
     end
-    if opts[:profile]
+    if profile
       ActiveRecord::Associations.preload(users, :profile)
     end
   end
@@ -54,7 +55,7 @@ module Api::V1::User
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       json[:created_at] = json[:created_at]&.iso8601
-      enrollment_json_opts = {}
+      enrollment_json_opts = { preloaded_user: user }
       if grading_period.nil?
         enrollment_json_opts[:current_grading_period_scores] = includes.include?("current_grading_period_scores")
       else
@@ -302,7 +303,7 @@ module Api::V1::User
       end
       json[:role] = enrollment.role.name
       json[:role_id] = enrollment.role_id
-      if enrollment.user == user || enrollment.course.grants_right?(user, session, :read_reports)
+      if enrollment.user_id == user.id || enrollment.course.grants_right?(user, session, :read_reports)
         json[:last_activity_at] = enrollment.last_activity_at
         json[:last_attended_at] = enrollment.last_attended_at
         json[:total_activity_time] = enrollment.total_activity_time
@@ -320,7 +321,16 @@ module Api::V1::User
         json[:sis_section_id] = enrollment.course_section.sis_source_id
         json[:section_integration_id] = enrollment.course_section.integration_id
         pseudonym = opts[:sis_pseudonym] if opts.key?(:sis_pseudonym)
-        pseudonym ||= SisPseudonym.for(enrollment.user, enrollment, type: :trusted, root_account: @domain_root_account, current_user: @current_user) if enrollment.user
+        sis_lookup_user = (opts[:preloaded_user]&.id == enrollment.user_id) ? opts[:preloaded_user] : enrollment.user
+        if sis_lookup_user
+          pseudonym ||= SisPseudonym.for(
+            sis_lookup_user,
+            enrollment,
+            type: :trusted,
+            root_account: @domain_root_account,
+            current_user: @current_user
+          )
+        end
         json[:sis_user_id] = pseudonym&.sis_user_id
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)

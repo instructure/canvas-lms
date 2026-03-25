@@ -99,7 +99,6 @@
 #   }
 #
 class LatePolicyController < ApplicationController
-  before_action :require_user
   before_action :require_manage_grades_for_course, except: [:show]
   before_action :require_view_or_manage_grades_for_course, only: [:show]
 

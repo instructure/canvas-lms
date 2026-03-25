@@ -43,6 +43,7 @@ module Lti
 
       skip_before_action :load_user, only: :authorize_redirect
       skip_before_action :verify_authenticity_token, only: :authorize_redirect
+      skip_before_action :require_user, only: %i[authorize authorize_redirect]
 
       # Redirect the "authorize" action for the domain specified
       # in the lti_message_hint

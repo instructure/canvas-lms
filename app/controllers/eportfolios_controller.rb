@@ -24,7 +24,7 @@ class EportfoliosController < ApplicationController
   include Api::V1::Submission
   include HorizonMode
 
-  before_action :require_user, only: [:index, :user_index]
+  skip_before_action :require_user, only: %i[public_feed recent_submissions show]
   before_action :reject_student_view_student
   before_action :verified_user_check, only: %i[index user_index create]
   before_action :load_canvas_career, only: %i[user_index]

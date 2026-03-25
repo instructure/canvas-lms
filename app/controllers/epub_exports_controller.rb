@@ -95,7 +95,6 @@
 class EpubExportsController < ApplicationController
   include Api::V1::EpubExport
 
-  before_action :require_user
   before_action :require_context, only: [:create]
   before_action :check_feature_enabled
 

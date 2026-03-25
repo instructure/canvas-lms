@@ -478,12 +478,12 @@ describe Pseudonym do
     ap = p.account.authentication_providers.create!(auth_type: "ldap")
     expect(p).to be_passwordable
     p.authentication_provider = ap
-    expect(p).to_not be_passwordable
+    expect(p).not_to be_passwordable
     p.account.canvas_authentication_provider.destroy
     p.authentication_provider = nil
     p.save!
     p.reload
-    expect(p).to_not be_passwordable
+    expect(p).not_to be_passwordable
   end
 
   context "login assertions" do
@@ -988,7 +988,7 @@ describe Pseudonym do
     aac = Account.default.authentication_providers.create!(auth_type: "facebook")
     u.pseudonyms.create!(unique_id: "a", account: Account.default)
     p2 = u.pseudonyms.new(unique_id: "a", account: Account.default)
-    expect(p2).to_not be_valid
+    expect(p2).not_to be_valid
     expect(p2.errors.details[:unique_id].first[:error]).to eq :taken
     p2.authentication_provider = aac
     expect(p2).to be_valid

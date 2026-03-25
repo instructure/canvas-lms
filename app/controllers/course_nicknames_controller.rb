@@ -52,7 +52,6 @@
 #     }
 #
 class CourseNicknamesController < ApplicationController
-  before_action :require_user
   before_action :check_limited_access_for_students, only: %i[update delete clear]
 
   # @API List course nicknames

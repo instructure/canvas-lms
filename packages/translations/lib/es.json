@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Hay contenido guardado automáticamente. ¿Desea cargar el contenido guardado automáticamente?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Subtitulado automático"
+    },
     "available_folders_694d0436": {
         "message": "Carpetas disponibles"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Describir el { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Describir el video)"
-    },
     "description_436c48d7": {
         "message": "Descripción"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Incorporar imagen"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Opciones de incrustación"
     },
     "embed_video_a97a64af": {
         "message": "Incrustar video"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Ícono de artes del lenguaje"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Idioma utilizado en este contenido multimedia*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automático)"
+    },
     "languages_icon_9d20539": {
         "message": "Ícono de idiomas"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Enlaces a un sitio externo."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Lista colapsada."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lista expandida."
     },
     "lists_cd1336fc": {
         "message": "Listas"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Puede encontrar otros atajos de editor en"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Nuestra tecnología genera subtítulos con una precisión del ~85 %."
     },
     "outline_color_3ef2cea7": {
         "message": "Color de contorno"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Utilizado por los lectores de pantalla para describir el contenido de una imagen"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Usado por lectores de pantalla para describir el video"
     },
     "user_documents_c206e61f": {
         "message": "Documentos del usuario"

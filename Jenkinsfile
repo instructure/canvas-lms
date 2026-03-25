@@ -545,24 +545,6 @@ pipeline {
           }
         }
 
-        stage('Contract Tests') {
-          when {
-            expression { shouldStageRun('Contract') }
-          }
-          steps {
-            script {
-              pipelineHelpers.runTestSuite(
-                'Contract Tests',
-                '/Canvas/test-suites/contract-tests',
-                buildParameters + [
-                  string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                  string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                ]
-              )
-            }
-          }
-        }
-
         stage('Flakey Spec Catcher') {
           when {
             allOf {

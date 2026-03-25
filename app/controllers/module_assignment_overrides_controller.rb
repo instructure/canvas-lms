@@ -75,7 +75,6 @@ class ModuleAssignmentOverridesController < ApplicationController
   include Api::V1::ModuleAssignmentOverride
   include DifferentiationTag
 
-  before_action :require_user
   before_action :require_context
   before_action :check_authorized_action
   before_action :require_context_module

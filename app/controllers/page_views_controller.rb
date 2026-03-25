@@ -270,8 +270,6 @@
 #
 
 class PageViewsController < ApplicationController
-  before_action :require_user, only: [:index]
-
   include Api::V1::PageView
 
   # Maximum records per page for page views API (PV5 supports up to 200)
@@ -852,28 +850,33 @@ class PageViewsController < ApplicationController
 
   private
 
+  def pv5_config
+    current_region = Shard.current&.database_server&.config&.dig(:region) || ApplicationController.region
+    PageViews::Configuration.new(region: current_region)
+  end
+
   def pv5_enqueue_service
-    PageViews::EnqueueQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::EnqueueQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_poll_service
-    PageViews::PollQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::PollQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_fetch_result_service
-    PageViews::FetchResultService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::FetchResultService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_enqueue_batch_service
-    PageViews::EnqueueBatchQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::EnqueueBatchQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_poll_batch_service
-    PageViews::PollBatchQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::PollBatchQueryService.new(pv5_config, requestor_user: @current_user)
   end
 
   def pv5_fetch_batch_result_service
-    PageViews::FetchBatchResultService.new(PageViews::Configuration.new, requestor_user: @current_user)
+    PageViews::FetchBatchResultService.new(pv5_config, requestor_user: @current_user)
   end
 
   def validate_query_id!

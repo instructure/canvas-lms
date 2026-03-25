@@ -84,7 +84,6 @@ class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
   include HorizonMode
 
-  before_action :require_user
   before_action :require_account_admin, only: %i[create update destroy]
   before_action :check_user_param, only: %i[user_index_deprecated user_close_notification_deprecated show_deprecated]
   before_action :load_canvas_career, only: %i[render_past_global_announcements]

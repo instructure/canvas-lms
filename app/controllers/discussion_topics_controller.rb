@@ -270,6 +270,7 @@
 #
 class DiscussionTopicsController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
+  skip_before_action :require_user, only: %i[public_feed show]
 
   include HorizonMode
 
@@ -949,6 +950,7 @@ class DiscussionTopicsController < ApplicationController
     respond_to do |format|
       format.html do
         conditional_release_js_env(@topic.assignment)
+        add_body_class("mobile-embed") if params[:embed] == "true"
         render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       end
     end

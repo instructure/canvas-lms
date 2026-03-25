@@ -40,6 +40,58 @@ describe "Api::V1::Rubric" do
     allow(self).to receive(:session).and_return(session)
   end
 
+  describe "#enhanced_rubrics_assignments_js_env" do
+    let(:assignment) { assignment_model(course:) }
+    let(:rubric) { instance_double(Rubric, id: 1) }
+    let(:rubric_association) { instance_double(RubricAssociation, rubric:, id: 1) }
+
+    before do
+      allow(Rubric).to receive(:enhanced_rubrics_assignments_enabled?).and_return(true)
+      allow(assignment).to receive_messages(
+        active_rubric_association?: true,
+        rubric_association:,
+        rubric_self_assessment_enabled?: false,
+        can_update_rubric_self_assessment?: false
+      )
+      allow(self).to receive_messages(
+        rubric_json: {},
+        rubric_association_json: {},
+        enhanced_rubrics_context_js_env: nil,
+        can_do: false
+      )
+    end
+
+    it "sets assigned_rubric can_update based on :update permission on the rubric" do
+      allow(self).to receive(:can_do).with(rubric, teacher, :update).and_return(true)
+
+      enhanced_rubrics_assignments_js_env(assignment)
+
+      expect(self).to have_received(:js_env).with(
+        hash_including(assigned_rubric: hash_including(can_update: true))
+      )
+    end
+
+    it "sets rubric_association can_update based on :update permission on the association" do
+      allow(self).to receive(:can_do).with(rubric_association, teacher, :update).and_return(true)
+
+      enhanced_rubrics_assignments_js_env(assignment)
+
+      expect(self).to have_received(:js_env).with(
+        hash_including(rubric_association: hash_including(can_update: true))
+      )
+    end
+
+    it "sets rubric_association can_delete based on :delete permission on the association" do
+      allow(self).to receive(:can_do).with(rubric_association, teacher, :delete).and_return(true)
+
+      enhanced_rubrics_assignments_js_env(assignment)
+
+      expect(self).to have_received(:js_env).with(
+        hash_including(rubric_association: hash_including(can_delete: true))
+      )
+    end
+  end
+
   describe "#enhanced_rubrics_context_js_env" do
     let(:assignment) { assignment_model(course:) }
 

@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {createRoot} from 'react-dom/client'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -303,5 +303,5 @@ $(document).ready(() => {
 
   const errorRoots = {}
 
-  ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
+  legacyRender(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

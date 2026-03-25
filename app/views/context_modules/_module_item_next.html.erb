@@ -62,7 +62,7 @@
         <%= 'show_assignment_menu' %>
       <% end %>
     <% end %>
-    <%= module_item.content_type_class(@is_student) if module_item %>
+    <%= module_item.content_type_class(is_student: @is_student) if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
     indent_<%= @context.horizon_course? ? '0' : (module_item.try_rescue(:indent) || '0') %>
     <%= 'progression_requirement' if criterion %>

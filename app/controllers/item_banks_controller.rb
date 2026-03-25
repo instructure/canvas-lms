@@ -23,8 +23,10 @@ class ItemBanksController < ApplicationController
 
   add_crumb(proc { t("#crumbs.item_banks", "Item Banks") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_item_banks_url }
   before_action { |c| c.active_tab = "item_banks" }
+  before_action :rce_js_env, only: [:show]
 
   def show
+    return unless authorized_action(@context, @current_user, :read)
     return render status: :not_found, template: "shared/errors/404_message" unless ams_integration_enabled?
 
     js_env({ context_url: named_context_url(@context, :context_item_banks_url) })

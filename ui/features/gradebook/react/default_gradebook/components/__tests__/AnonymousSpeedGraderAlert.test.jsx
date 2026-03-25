@@ -18,7 +18,6 @@
 
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import AnonymousSpeedGraderAlert from '../AnonymousSpeedGraderAlert'
 
 describe('AnonymousSpeedGraderAlert', () => {
@@ -45,17 +44,20 @@ describe('AnonymousSpeedGraderAlert', () => {
     expect(component.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  describe('when opened', () => {
-    let component
-    let alertInstance
+  it('is open initially when initiallyOpen is true', async () => {
+    render(<AnonymousSpeedGraderAlert {...defaultProps} initiallyOpen={true} />, {
+      container: applicationElement,
+    })
+    await waitFor(() => {
+      expect(screen.getByText(/Anonymous Mode On/)).toBeInTheDocument()
+    })
+  })
 
+  describe('when opened', () => {
     beforeEach(() => {
-      const ref = React.createRef()
-      component = render(<AnonymousSpeedGraderAlert ref={ref} {...defaultProps} />, {
+      render(<AnonymousSpeedGraderAlert {...defaultProps} initiallyOpen={true} />, {
         container: applicationElement,
       })
-      alertInstance = ref.current
-      alertInstance.open()
     })
 
     it('has a label of "Anonymous Mode On"', async () => {

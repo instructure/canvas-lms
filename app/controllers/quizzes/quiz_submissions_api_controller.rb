@@ -145,7 +145,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_action :require_user, :require_context, :require_quiz
+  before_action :require_context, :require_quiz
   before_action :require_overridden_quiz, except: [:index]
   before_action :require_quiz_submission, except: %i[index submission create]
   before_action :prepare_service, only: %i[create update complete]

@@ -71,6 +71,45 @@ describe AuthenticationProvidersController do
         expect(response).to be_successful
       end
     end
+
+    context "when new_login_ui_identity_discovery_page feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_identity_discovery_page)
+      end
+
+      it "includes auth_providers in js_env with id, url, and name" do
+        saml = account.authentication_providers.create!(saml_hash)
+        cas = account.authentication_providers.create!(cas_hash)
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        js_env = assigns(:js_env)
+        expect(js_env).to include(auth_providers: be_an(Array))
+        auth_providers = js_env[:auth_providers]
+        expect(auth_providers).not_to be_empty
+        expect(auth_providers).to all(include(id: be_an(Integer), url: be_a(String), auth_type: be_a(String)))
+        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id])
+      end
+
+      it "includes discovery_page_base_url in js_env" do
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        expect(assigns(:js_env)).to include(:discovery_page_base_url)
+      end
+    end
+
+    context "when new_login_ui_identity_discovery_page feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:new_login_ui_identity_discovery_page)
+      end
+
+      it "does not include auth_providers in js_env" do
+        account.authentication_providers.create!(saml_hash)
+        get "index", params: { account_id: account.id }
+        expect(response).to be_successful
+        js_env = assigns(:js_env)
+        expect(js_env&.key?(:auth_providers)).to be_falsey
+      end
+    end
   end
 
   describe "refresh_saml_metadata" do
@@ -127,7 +166,7 @@ describe AuthenticationProvidersController do
         put "start_debugging", params: { account_id: account.id, authentication_provider_id: account.canvas_authentication_provider.id }, format: :json
         expect(response).to have_http_status :bad_request
         expect(response.body).to match("Unsupported authentication type")
-        expect(account.canvas_authentication_provider).to_not be_debugging
+        expect(account.canvas_authentication_provider).not_to be_debugging
       end
     end
 

@@ -202,8 +202,8 @@ describe Auditors::GradeChange do
       scope2 = Auditors::GradeChange.filter_by_assignment(scope2)
       expect(r2.reload.assignment_id).to be_nil
       expect(scope1.pluck(:id)).to include(r1.id)
-      expect(scope1.pluck(:id)).to_not include(r2.id)
-      expect(scope2.pluck(:id)).to_not include(r1.id)
+      expect(scope1.pluck(:id)).not_to include(r2.id)
+      expect(scope2.pluck(:id)).not_to include(r1.id)
       expect(scope2.pluck(:id)).to include(r2.id)
     end
   end

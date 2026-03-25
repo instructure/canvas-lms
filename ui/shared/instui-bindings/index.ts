@@ -81,9 +81,9 @@ function getTheme_(highContrast?: unknown, brandVariables?: BrandVariables) {
         },
       }
     : {
-        ...transitionOverride,
         ...canvasBaseTheme,
         ...brandVariables_,
+        ...transitionOverride,
         typography: {
           ...canvasBaseTheme.typography,
           ...typography,

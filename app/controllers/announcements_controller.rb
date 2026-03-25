@@ -22,6 +22,7 @@ class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
 
   before_action :require_context, except: :public_feed
+  skip_before_action :require_user, only: :public_feed
 
   include HorizonMode
 

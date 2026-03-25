@@ -27,10 +27,9 @@ describe('LoadingView', () => {
     expect(screen.getByTitle('Course scan result is loading')).toBeInTheDocument()
   })
 
-  it('has scan button disabled', () => {
+  it('does not render a scan button', () => {
     render(<LoadingView />)
 
-    const button = screen.getByRole('button', {name: /scan course/i})
-    expect(button).toBeDisabled()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 })

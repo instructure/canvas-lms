@@ -190,6 +190,7 @@ export default class TrayController {
         attachment_id: videoOptions.attachment_id,
         subtitles: videoOptions.subtitles,
         skipCaptionUpdate: isCaptionImprovements,
+        viewerRestrictions: videoOptions.viewerRestrictions,
       }
 
       // If the video just edited came from a file uploaded to canvas

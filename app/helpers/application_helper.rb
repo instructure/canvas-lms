@@ -51,16 +51,18 @@ module ApplicationHelper
   def keyboard_navigation(keys)
     # TODO: move this to JS, currently you have to know what shortcuts the JS has defined
     # making it very likely this list will not reflect the key bindings
-    content = "<ul class='navigation_list' tabindex='-1'>\n"
-    keys.each do |hash|
-      content += "  <li>\n"
-      content += "    <span class='keycode'>#{h(hash[:key])}</span>\n"
-      content += "    <span class='colon'>:</span>\n"
-      content += "    <span class='description'>#{h(hash[:description])}</span>\n"
-      content += "  </li>\n"
+
+    content_for(:keyboard_navigation) do
+      tag.ul class: "navigation_list", tabindex: "-1" do
+        keys.map do |hash|
+          tag.li do
+            tag.span(hash[:key], class: "keycode") +
+              tag.span(":", class: "colon") +
+              tag.span(hash[:description], class: "description")
+          end
+        end
+      end
     end
-    content += "</ul>"
-    content_for(:keyboard_navigation) { raw(content) }
   end
 
   def context_prefix(code)
@@ -182,7 +184,7 @@ module ApplicationHelper
   def load_scripts_async_in_order(script_urls, cors_anonymous: false)
     script_urls.map { |url| javascript_path(url) }.map do |url|
       javascript_include_tag(url, defer: true, crossorigin: cors_anonymous ? "anonymous" : nil)
-    end.join("\n  ").rstrip.html_safe
+    end.inject(&:<<)
   end
 
   # puts webpack entries and the moment & timezone files in the <head> of the document
@@ -271,8 +273,7 @@ module ApplicationHelper
       bundles = new_css_bundles.map { |(bundle, plugin)| css_url_for(bundle, plugin:) }
       bundles << css_url_for("disable_transitions") if disable_css_transitions?
       bundles << { media: "all" }
-      tags = bundles.map { |bundle| stylesheet_link_tag(bundle) }
-      tags.reject(&:empty?).join("\n  ").html_safe
+      bundles.filter_map { |bundle| stylesheet_link_tag(bundle) }.inject(&:<<)
     end
   end
 
@@ -403,7 +404,13 @@ module ApplicationHelper
   #
   # Returns an HTML string.
   def sidebar_button(url, label, img = nil)
-    link_to(url) { img ? ("<i class='icon-" + img + "'></i> ").html_safe + label : label }
+    link_to(url) do
+      if img
+        tag.i(class: "icon-#{img}") + label
+      else
+        label
+      end
+    end
   end
 
   def hash_get(hash, key, default = nil)
@@ -502,25 +509,12 @@ module ApplicationHelper
   end
 
   def nbsp
-    raw("&nbsp;")
-  end
-
-  def dataify(obj, *attributes)
-    hash = obj.respond_to?(:to_hash) && obj.to_hash
-    res = +""
-    if !attributes.empty?
-      attributes.each do |attribute|
-        res << " data-#{h attribute}=\"#{h(hash ? hash[attribute] : obj.send(attribute))}\""
-      end
-    elsif hash
-      res << hash.map { |key, value| "data-#{h key}=\"#{h value}\"" }.join(" ")
-    end
-    raw(" #{res} ")
+    "&nbsp;".html_safe
   end
 
   def inline_media_comment_link(comment = nil)
     if comment&.media_comment_id
-      raw "<a href=\"#\" class=\"instructure_inline_media_comment no-underline\" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>"
+      tag.a nbsp class: %w[instructure_inline_media_comment no-underline], data: comment.slice(:media_comment_id, :media_comment_type)
     end
   end
 
@@ -568,8 +562,10 @@ module ApplicationHelper
     end
 
     folders.each do |folder|
+      indentation = nbsp * opts[:indent_width] * opts[:depth]
+      indentation << "- " if opts[:depth] > 0
       opts[:options_so_far] <<
-        "<option value=\"#{folder.id}\" #{"selected" if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>"
+        tag.option(indentation + folder.name, value: folder.id, selected: (opts[:selected_folder_id] == folder.id))
       next unless opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
 
       child_folders =
@@ -582,7 +578,7 @@ module ApplicationHelper
         folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
-    (opts[:depth] == 0) ? raw(opts[:options_so_far].join("\n")) : nil
+    opts[:options_so_far].inject(&:<<) if opts[:depth] == 0
   end
 
   # this little helper just allows you to do <% ot(...) %> and have it output the same as <%= t(...) %>. The upside though, is you can interpolate whole blocks of HTML, like:
@@ -653,8 +649,7 @@ module ApplicationHelper
   end
 
   def help_link
-    link_content = help_link_name
-    link_to link_content.html_safe, help_link_url, class: help_link_classes, data: help_link_data
+    link_to help_link_name, help_link_url, class: help_link_classes, data: help_link_data
   end
 
   def active_brand_config_cache
@@ -699,7 +694,7 @@ module ApplicationHelper
     path ||=
       BrandableCSS.public_default_path(
         type,
-        @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
+        high_contrast: @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
       )
     "#{Canvas::Cdn.config.host}/#{path}"
   end
@@ -812,17 +807,16 @@ module ApplicationHelper
     local_time = datetime_string(datetime)
     text = local_time
     if context.present?
-      course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
+      course_time = datetime_string(datetime, :event, nil, shorten_midnight: false, zone: context.time_zone)
       if course_time != local_time
         text =
-          "#{h I18n.t("#helpers.local", "Local")}: #{h local_time}<br>#{h I18n.t("#helpers.course", "Course")}: #{h course_time}"
-          .html_safe
+          h("#{I18n.t("#helpers.local", "Local")}: #{local_time}") + tag.br + h("#{I18n.t("#helpers.course", "Course")}: #{course_time}")
       end
     end
 
     return text if just_text
 
-    "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe
+    "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe # rubocop:disable Rails/OutputSafety -- `data-tooltip` can't be reproduced with the tag helper
   end
 
   # used for generating a
@@ -932,7 +926,7 @@ module ApplicationHelper
     manifest_url = Setting.get("web_app_manifest_url", "")
     output << tag.link(rel: "manifest", href: manifest_url) if manifest_url.present?
 
-    output.join("\n").html_safe.presence
+    output.inject(&:<<).presence
   end
 
   def csp_context_is_submission?

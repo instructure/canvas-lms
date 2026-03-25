@@ -25,7 +25,7 @@ class LoginController < ApplicationController
   before_action :run_login_hooks, only: :new
   before_action :fix_ms_office_redirects, only: :new
   skip_before_action :require_reacceptance_of_terms
-  before_action :require_user, only: :session_token
+  skip_before_action :require_user, only: %i[clear_file_session logout_landing new]
 
   def new
     if @current_user &&

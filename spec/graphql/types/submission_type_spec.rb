@@ -2670,4 +2670,33 @@ describe Types::SubmissionType do
       end
     end
   end
+
+  describe "aiGradeResult" do
+    let(:grade_data) do
+      [{ "id" => "criterion_1", "description" => "desc", "comments" => nil, "rating" => { "id" => "r1", "description" => "r desc", "rating" => 3.0, "reasoning" => nil } }]
+    end
+
+    it "returns nil when no result exists for the current attempt" do
+      expect(submission_type.resolve("aiGradeResult { attempt }")).to be_nil
+    end
+
+    it "returns nil for a student" do
+      AutoGradeResult.create!(submission: @submission, attempt: 1, grade_data:, grading_attempts: 1, root_account_id: @course.root_account_id)
+      student_type = GraphQLTypeTester.new(@submission, current_user: @student, request: ActionDispatch::TestRequest.create)
+      expect(student_type.resolve("aiGradeResult { attempt }")).to be_nil
+    end
+
+    it "returns the result for the matching attempt" do
+      AutoGradeResult.create!(submission: @submission, attempt: 1, grade_data:, grading_attempts: 1, root_account_id: @course.root_account_id)
+      expect(submission_type.resolve("aiGradeResult { attempt }")).to eq 1
+    end
+
+    it "returns nil for a different attempt" do
+      AutoGradeResult.create!(submission: @submission, attempt: 1, grade_data:, grading_attempts: 1, root_account_id: @course.root_account_id)
+      submission_attempt_2 = @assignment.grade_student(@student, score: 9, grader: @teacher).first
+      submission_attempt_2.update!(attempt: 2)
+      type = GraphQLTypeTester.new(submission_attempt_2, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      expect(type.resolve("aiGradeResult { attempt }")).to be_nil
+    end
+  end
 end

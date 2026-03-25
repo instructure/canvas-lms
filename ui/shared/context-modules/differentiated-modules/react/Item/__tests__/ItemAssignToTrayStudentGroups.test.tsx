@@ -70,7 +70,7 @@ describe.skip('ItemAssignToTray - Student Groups', () => {
   })
 
   afterEach(() => {
-    window.location = originalLocation
+    Object.defineProperty(window, 'location', {value: originalLocation, writable: true})
     server.resetHandlers()
     cleanup()
   })

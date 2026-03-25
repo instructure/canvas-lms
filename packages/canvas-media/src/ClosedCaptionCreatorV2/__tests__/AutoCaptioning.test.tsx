@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {vi} from 'vitest'
 import {AutoCaptioning} from '../AutoCaptioning'
 
@@ -28,13 +28,7 @@ const mockLanguages = [
   {id: 'fr', label: 'French'},
 ]
 
-interface AutoCaptioningProps {
-  onCancel: () => void
-  onPrimary: (languageId: string) => void
-  liveRegion: () => HTMLElement | null
-  languages: {id: string; label: string}[]
-  mountNode?: HTMLElement | (() => HTMLElement | null)
-}
+type AutoCaptioningProps = Parameters<typeof AutoCaptioning>[0]
 
 function renderComponent(props: Partial<AutoCaptioningProps> = {}) {
   const liveRegion = document.getElementById(LIVE_REGION_ID)
@@ -147,5 +141,47 @@ describe('<AutoCaptioning />', () => {
     expect(screen.getByText('Select Language')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
     expect(screen.getByText('Request')).toBeInTheDocument()
+  })
+
+  describe('Pendo tracking', () => {
+    const mockTrack = vi.fn()
+
+    beforeEach(() => {
+      ;(window as any).canvasUsageMetrics = {track: mockTrack}
+    })
+
+    afterEach(() => {
+      delete (window as any).canvasUsageMetrics
+    })
+
+    it('fires canvas_caption_validation_error missing_language when Request clicked with no language', async () => {
+      renderComponent()
+      fireEvent.click(screen.getByText('Request'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_validation_error', {
+          type: 'track',
+          flow_type: 'request_auto',
+          error_type: 'missing_language',
+        })
+      })
+    })
+  })
+
+  describe('.onDirtyStateChanged', () => {
+    describe('called with true', () => {
+      it('when language is selected', async () => {
+        const onDirtyStateChanged = vi.fn()
+        renderComponent({onDirtyStateChanged})
+
+        // Select a language - click on placeholder text to open, then click option
+        const selectPlaceholder = screen.getByText('Select Language')
+        fireEvent.click(selectPlaceholder)
+        fireEvent.click(screen.getByText('English'))
+
+        await waitFor(() => {
+          expect(onDirtyStateChanged).toHaveBeenCalledWith(true)
+        })
+      })
+    })
   })
 })

@@ -63,7 +63,7 @@ class Conversation < ActiveRecord::Base
     super
   end
 
-  def participants(reload = false)
+  def participants(reload: false)
     if !@participants || reload
       Conversation.preload_participants([self])
     end
@@ -420,7 +420,7 @@ class Conversation < ActiveRecord::Base
 
           new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
           if new_tags.present?
-            updated_tags = if (active_tags = cp.user.conversation_context_codes(false)).present?
+            updated_tags = if (active_tags = cp.user.conversation_context_codes(include_concluded_codes: false)).present?
                              (cp.tags | new_tags) & active_tags
                            else
                              cp.tags | new_tags
@@ -484,7 +484,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def infer_new_tags_for(participant, all_new_tags)
-    active_tags   = participant.user.conversation_context_codes(false)
+    active_tags   = participant.user.conversation_context_codes(include_concluded_codes: false)
     context_codes = active_tags.presence || participant.user.conversation_context_codes
     visible_codes = all_new_tags & context_codes
 

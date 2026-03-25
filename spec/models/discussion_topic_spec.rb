@@ -3028,7 +3028,7 @@ describe DiscussionTopic do
     end
 
     it "returns active entries by default" do
-      expect(@topic.entries_for_feed(@student)).to_not be_empty
+      expect(@topic.entries_for_feed(@student)).not_to be_empty
     end
 
     it "returns empty if user cannot see posts" do
@@ -3042,12 +3042,12 @@ describe DiscussionTopic do
 
     it "returns student entries if specified" do
       @topic.update(podcast_has_student_posts: true)
-      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1, @entry2])
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).to match_array([@entry1, @entry2])
     end
 
     it "only returns admin entries if specified" do
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1])
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).to match_array([@entry1])
     end
 
     it "returns student entries for group discussions even if not specified" do
@@ -3056,7 +3056,7 @@ describe DiscussionTopic do
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to_not be_empty
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).not_to be_empty
     end
   end
 

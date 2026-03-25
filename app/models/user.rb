@@ -558,7 +558,7 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
+  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses: true)
     if associated_user && associated_user != self
       join = :observer_enrollments
       scope = Course.active.joins(join)
@@ -619,6 +619,9 @@ class User < ActiveRecord::Base
 
       # Skip if course is not published
       next false unless course.workflow_state == "available"
+
+      # Skip if course is concluded (term ended, course dates passed, etc.)
+      next false if course.concluded?
 
       # Skip completed or rejected
       next false if completed_states.include?(state)
@@ -1805,7 +1808,7 @@ class User < ActiveRecord::Base
   end
 
   AVATAR_SETTINGS = %w[enabled enabled_pending sis_only disabled].freeze
-  def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback = true)
+  def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback: true)
     return fallback if avatar_setting == "disabled"
 
     size ||= 50
@@ -2312,7 +2315,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = shard.activate do
         result = Rails.cache.fetch([self, "courses_with_primary_enrollment2", association, options, ApplicationController.region].cache_key, expires_in: 15.minutes) do
-          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], !!options[:include_completed_courses])
+          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], include_completed_courses: !!options[:include_completed_courses])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
@@ -2700,7 +2703,15 @@ class User < ActiveRecord::Base
 
           # when discussion_checkpoints FF is enabled, we filter out parent assignment submissions
           # when that FF is disabled, we filter out sub_assignment submissions
-          course_ids_with_active_checkpoints = Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?).map(&:id)
+          course_ids_by_account_id = Course.where(id: course_ids)
+                                           .group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+          course_ids_with_active_checkpoints = if course_ids_by_account_id.any?
+                                                 Account.where(id: course_ids_by_account_id.keys)
+                                                        .select(&:discussion_checkpoints_enabled?)
+                                                        .flat_map { |a| course_ids_by_account_id[a.id] }
+                                               else
+                                                 []
+                                               end
           submissions.delete_if do |sub|
             (sub.assignment.has_sub_assignments? && course_ids_with_active_checkpoints.include?(sub.course_id)) ||
               (sub.assignment.is_a?(SubAssignment) && !course_ids_with_active_checkpoints.include?(sub.course_id))
@@ -2827,7 +2838,7 @@ class User < ActiveRecord::Base
     filter_after_db = !opts[:use_db_filter] &&
                       (context_codes.grep(/\Acourse_\d+\z/).count > Setting.get("filter_events_by_section_code_threshold", "25").to_i)
 
-    section_codes = section_context_codes(context_codes, filter_after_db, include_concluded: false)
+    section_codes = section_context_codes(context_codes, skip_visibility_filter: filter_after_db, include_concluded: false)
     limit = filter_after_db ? opts[:limit] * 2 : opts[:limit] # pull extra events just in case
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes, section_codes)
                           .between(now, opts[:end_at]).limit(limit).order(:start_at).to_a.reject(&:hidden?)
@@ -2838,7 +2849,7 @@ class User < ActiveRecord::Base
         section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map { |s| s.delete_prefix("course_section_").to_i }
         section_course_codes = Course.joins(:course_sections).where(course_sections: { id: section_ids })
                                      .pluck(:id).map { |id| "course_#{id}" }
-        visible_section_codes = section_context_codes(section_course_codes, false, include_concluded: false)
+        visible_section_codes = section_context_codes(section_course_codes, skip_visibility_filter: false, include_concluded: false)
         events.reject! { |e| e.context_code.start_with?("course_section_") && !visible_section_codes.include?(e.context_code) }
         events = events.first(opts[:limit]) # strip down to the original limit
       end
@@ -2924,7 +2935,13 @@ class User < ActiveRecord::Base
   end
 
   def course_ids_with_checkpoints_enabled
-    courses.select(&:discussion_checkpoints_enabled?).map(&:id)
+    course_ids_by_account_id = courses.group("courses.account_id")
+                                      .pluck(Arel.sql("courses.account_id, ARRAY_AGG(courses.id)")).to_h
+    return [] if course_ids_by_account_id.empty?
+
+    Account.where(id: course_ids_by_account_id.keys)
+           .select(&:discussion_checkpoints_enabled?)
+           .flat_map { |a| course_ids_by_account_id[a.id] }
   end
 
   def course_ids_with_peer_review_enabled
@@ -3047,7 +3064,7 @@ class User < ActiveRecord::Base
   # include_concluded_codes - If true, include concluded courses (default: true).
   #
   # Returns an array of context code strings.
-  def conversation_context_codes(include_concluded_codes = true)
+  def conversation_context_codes(include_concluded_codes: true)
     return @conversation_context_codes[include_concluded_codes] if @conversation_context_codes
 
     Rails.cache.fetch([self, include_concluded_codes, "conversation_context_codes4"].cache_key, expires_in: 1.day) do
@@ -3130,7 +3147,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def section_context_codes(context_codes, skip_visibility_filter = false, include_concluded: true)
+  def section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: true)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map { |s| s.delete_prefix("course_").to_i }
     return [] unless course_ids.present?
 
@@ -3160,12 +3177,12 @@ class User < ActiveRecord::Base
     section_ids.map { |id| "course_section_#{id}" }
   end
 
-  def manageable_courses(include_concluded = false)
+  def manageable_courses(include_concluded: false)
     Course.manageable_by_user(id, include_concluded).not_deleted
   end
 
-  def manageable_courses_by_query(query = "", include_concluded = false)
-    manageable_courses(include_concluded).not_deleted.name_like(query).limit(50)
+  def manageable_courses_by_query(query = "", include_concluded: false)
+    manageable_courses(include_concluded:).not_deleted.name_like(query).limit(50)
   end
 
   def last_completed_module
@@ -3457,7 +3474,7 @@ class User < ActiveRecord::Base
     pseudonym = SisPseudonym.for(self, account, type: :trusted, require_sis: false)
     unless pseudonym
       # list of copyable pseudonyms
-      active_pseudonyms = all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
+      active_pseudonyms = all_active_pseudonyms(reload: true).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
       templates.concat(active_pseudonyms.select { |p| p.account_id == preferred_template_account.id }) if preferred_template_account
@@ -3549,7 +3566,7 @@ class User < ActiveRecord::Base
     "#{crocodoc_id!},#{short_name.delete(",")}"
   end
 
-  def moderated_grading_ids(create_crocodoc_id = false)
+  def moderated_grading_ids(create_crocodoc_id: false)
     {
       crocodoc_id: create_crocodoc_id ? crocodoc_id! : crocodoc_id,
       global_id: global_id.to_s
@@ -3781,7 +3798,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def all_active_pseudonyms(reload = false)
+  def all_active_pseudonyms(reload: false)
     @all_active_pseudonyms = nil if reload
     @all_active_pseudonyms ||= pseudonyms.shard(self).active.to_a
   end

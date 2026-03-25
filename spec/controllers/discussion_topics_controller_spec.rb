@@ -930,7 +930,7 @@ describe DiscussionTopicsController do
         message: "some message"
       )
       get "show", params: { course_id: @course.id, id: @announcement.id }
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
     end
 
     it "does not display announcements in private courses to users who aren't logged in" do
@@ -1099,6 +1099,18 @@ describe DiscussionTopicsController do
         subject
         expect(response.body).to match(/.+enrollment.+\.atom/)
         expect(response.body).to include("Discussion Atom Feed")
+      end
+
+      context "embed param" do
+        it "adds mobile-embed body class when embed=true" do
+          get "show", params: { course_id: course.id, id: discussion.id, embed: "true" }
+          expect(assigns(:body_classes)).to include("mobile-embed")
+        end
+
+        it "does not add mobile-embed body class without embed param" do
+          subject
+          expect(assigns(:body_classes)).not_to include("mobile-embed")
+        end
       end
     end
 
@@ -1684,7 +1696,7 @@ describe DiscussionTopicsController do
         mod.save!
         expect(@topic.read_state(@student)).to eq "unread"
         get "index", params: { course_id: @course.id, exclude_context_module_locked_topics: true }, format: "json"
-        expect(response.parsed_body.pluck("id")).to_not include @topic.id
+        expect(response.parsed_body.pluck("id")).not_to include @topic.id
       end
 
       it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS with group context" do
@@ -3003,8 +3015,8 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(force: true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(force: true)
 
       group_category = @course.group_categories.create(name: "gc")
       group = @course.groups.create!(group_category:)
@@ -3187,7 +3199,7 @@ describe DiscussionTopicsController do
       put("update", params: { course_id: @course.id, topic_id: @topic.id, pinned: "1" }, format: "json")
       @topic.reload
       expect(@topic.pinned).to be_truthy
-      expect(@topic.editor).to_not eq @teacher
+      expect(@topic.editor).not_to eq @teacher
     end
 
     it "does not clear delayed_post_at if published is not changed" do

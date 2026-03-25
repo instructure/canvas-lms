@@ -233,13 +233,13 @@ describe DeveloperKey do
     describe "client_type" do
       context "when client_type is Confidential" do
         it "does not raise an exception" do
-          expect { DeveloperKey.create!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }.to_not raise_error
+          expect { DeveloperKey.create!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }.not_to raise_error
         end
       end
 
       context "when client_type is Public" do
         it "does not raise an exception" do
-          expect { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }.to_not raise_error
+          expect { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }.not_to raise_error
         end
       end
 
@@ -279,11 +279,11 @@ describe DeveloperKey do
     end
 
     it "validates when public jwk is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk:) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk:) }.not_to raise_error
     end
 
     it "validates when public jwk url is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url:) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url:) }.not_to raise_error
     end
   end
 
@@ -1461,12 +1461,12 @@ describe DeveloperKey do
 
       context "when the developer key and account are on different, non site-admin shards" do
         it "doesn't return a binding for an account with the same local ID on a different shard" do
-          expect(root_account.shard.id).to_not eq(@shard2.id)
+          expect(root_account.shard.id).not_to eq(@shard2.id)
           @shard2.activate do
             account = Account.find_by(id: root_account.local_id)
             account ||= Account.create!(id: root_account.local_id)
             shard2_developer_key = DeveloperKey.create!(name: "Shard 2 Key", account_id: account.id)
-            expect(shard2_developer_key.account_binding_for(account)).to_not be_nil
+            expect(shard2_developer_key.account_binding_for(account)).not_to be_nil
             expect(shard2_developer_key.account_binding_for(root_account)).to be_nil
           end
         end
@@ -1536,8 +1536,8 @@ describe DeveloperKey do
       end
 
       it "finds existing keys" do
-        expect(DeveloperKey.default).to_not be_nil
-        expect(DeveloperKey.default(create_if_missing: false)).to_not be_nil
+        expect(DeveloperKey.default).not_to be_nil
+        expect(DeveloperKey.default(create_if_missing: false)).not_to be_nil
       end
     end
 

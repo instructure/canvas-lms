@@ -78,7 +78,7 @@ describe "assignments" do
       end
 
       it "does not show details container" do
-        expect(f("#content")).to_not include_text("Details")
+        expect(f("#content")).not_to include_text("Details")
       end
     end
 
@@ -114,7 +114,7 @@ describe "assignments" do
       end
 
       it "does not show details container" do
-        expect(f("#content")).to_not include_text("Details")
+        expect(f("#content")).not_to include_text("Details")
       end
 
       it "links to modules page" do

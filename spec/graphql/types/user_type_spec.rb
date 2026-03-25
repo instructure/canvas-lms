@@ -2872,6 +2872,45 @@ describe Types::UserType do
         expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
         expect(titles).not_to include("Unpublished Course Announcement")
       end
+
+      it "excludes announcements from courses with past enrollment term" do
+        past_term = @course1.account.enrollment_terms.create!(
+          name: "Past Term",
+          start_at: 6.months.ago,
+          end_at: 1.month.ago
+        )
+        past_term_course = course_factory(active_all: true, account: @course1.account)
+        past_term_course.update!(enrollment_term: past_term)
+        past_term_course.enroll_student(@student_user, enrollment_state: "active")
+
+        past_term_course.announcements.create!(
+          title: "Past Term Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Past Term Announcement")
+      end
+
+      it "excludes announcements from formally concluded courses" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_student(@student_user, enrollment_state: "active")
+        concluded_course.announcements.create!(
+          title: "Concluded Course Announcement",
+          message: "This should not appear"
+        )
+
+        concluded_course.complete!
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Concluded Course Announcement")
+      end
     end
   end
 
@@ -3700,6 +3739,39 @@ describe Types::UserType do
           expect(result).to include("Assignment in Current Period")
           expect(result).not_to include("Assignment in Closed Period")
         end
+      end
+    end
+
+    it "excludes parent assignments with checkpoints, shows only SubAssignments" do
+      Timecop.freeze(@frozen_time) do
+        @course.account.enable_feature!(:discussion_checkpoints)
+
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+        parent_assignment = topic.assignment
+        parent_assignment.update!(has_sub_assignments: true)
+
+        checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @frozen_time + 1.day }],
+          points_possible: 5
+        )
+        checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: @frozen_time + 2.days }],
+          points_possible: 10
+        )
+
+        # Create submissions for all (parent + checkpoints)
+        parent_assignment.submissions.find_or_create_by(user: @student)
+        checkpoint1.submissions.find_or_create_by(user: @student)
+        checkpoint2.submissions.find_or_create_by(user: @student)
+
+        ids = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { _id } } } }")
+
+        expect(ids).not_to include(parent_assignment.id.to_s)
+        expect(ids).to include(checkpoint1.id.to_s, checkpoint2.id.to_s)
       end
     end
   end

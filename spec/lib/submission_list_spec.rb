@@ -232,7 +232,7 @@ describe SubmissionList do
       @qs.score_before_regrade = 5.0
       @qs.score = 4.0
       @qs.attempt = 1
-      @qs.with_versioning(true, &:save!)
+      @qs.with_versioning(&:save!)
       @qs.save!
 
       expect(@qs.score_before_regrade).to eq 5.0

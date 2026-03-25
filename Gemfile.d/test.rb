@@ -21,7 +21,7 @@ group :test do
   gem "rails-controller-testing", "1.0.5"
 
   gem "dotenv", "~> 3.0", require: false
-  gem "brakeman", "~> 7.0", require: false
+  gem "brakeman", "~> 8.0", require: false
   gem "simplecov-rcov", "~> 0.3", require: false
 
   gem "db-query-matchers", "~> 0.12"
@@ -32,20 +32,15 @@ group :test do
 
   gem "once-ler", "~> 2.0"
 
-  gem "rspec-openapi", "0.16.1" # pinned for now, because it breaks specs
+  gem "rspec-openapi", "~> 0.25"
   gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
   gem "webmock", "~> 3.18", require: false
   gem "timecop", "~> 0.9"
-  gem "headless", "2.3.1", require: false
+  gem "headless", "~> 3.0", require: false
   gem "escape_code", "0.2", require: false
   gem "luminosity_contrast", "0.2.1"
-  # if pact is removed, please remove gems/autoextend/lib/rack/
-  gem "pact", "~> 1.57", require: false
-  gem "pact-messages", "0.2.0"
-  # pinned to 1.72 due to contract tests breaking with the following versions
-  gem "pact_broker-client", "1.72"
   gem "database_cleaner", "~> 2.0"
   gem "json-schema", "~> 6.0"
 

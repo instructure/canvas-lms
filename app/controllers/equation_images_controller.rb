@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class EquationImagesController < ApplicationController
+  skip_before_action :require_user, only: :show
+
   # Facade to codecogs API for gif generation or microservice MathMan for svg
   def show
     @latex = params[:id]

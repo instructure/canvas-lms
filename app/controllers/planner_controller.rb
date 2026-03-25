@@ -25,7 +25,7 @@
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
 
-  before_action :require_user, unless: :public_access?
+  skip_before_action :require_user, if: :public_access?
   before_action :check_limited_access_for_students, only: %i[index]
   before_action :set_user
   before_action :set_date_range
@@ -231,7 +231,8 @@ class PlannerController < ApplicationController
                    ungraded_discussion_collection(completion_filter:),
                    calendar_events_collection(completion_filter:),
                    peer_reviews_collection(completion_filter:),
-                   sub_assignment_collection(completion_filter:)]
+                   sub_assignment_collection(completion_filter:),
+                   peer_review_sub_assignment_collection(completion_filter:)]
     BookmarkedCollection.merge(*collections)
   end
 
@@ -279,6 +280,17 @@ class PlannerController < ApplicationController
     item_collection("sub_assignment_viewing",
                     scope,
                     SubAssignment,
+                    [{ submissions: :cached_due_date }, :due_at, :created_at],
+                    :id)
+  end
+
+  def peer_review_sub_assignment_collection(completion_filter: nil)
+    scope = @user.assignments_for_student("viewing", is_peer_review_sub_assignment: true, **default_opts)
+                 .preload(:parent_assignment)
+    scope = apply_completion_filter(scope, @user, completion_filter)
+    item_collection("peer_review_sub_assignment_viewing",
+                    scope,
+                    PeerReviewSubAssignment,
                     [{ submissions: :cached_due_date }, :due_at, :created_at],
                     :id)
   end
@@ -373,7 +385,7 @@ class PlannerController < ApplicationController
   end
 
   def calendar_events_collection(completion_filter: nil)
-    section_codes = @user.section_context_codes(@context_codes, false, include_concluded: false)
+    section_codes = @user.section_context_codes(@context_codes, skip_visibility_filter: false, include_concluded: false)
     scope = CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes, section_codes)
                          .between(@start_date, @end_date)
     scope = apply_completion_filter(scope, @user, completion_filter)
@@ -386,6 +398,22 @@ class PlannerController < ApplicationController
 
   def peer_reviews_collection(completion_filter: nil)
     scope = @user.submissions_needing_peer_review(**default_opts.except(:include_locked))
+
+    # Exclude AssessmentRequests that have non-null peer_review_sub_assignment_id
+    # in courses where peer_review_allocation_and_grading feature is enabled
+    # (those are handled in peer_review_sub_assignment_collection)
+    if @course_ids.present?
+      courses_with_feature = Course.where(id: @course_ids)
+                                   .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                                   .pluck(:id)
+      if courses_with_feature.present?
+        scope = scope.where.not(
+          "peer_review_sub_assignment_id IS NOT NULL AND submissions.course_id IN (?)",
+          courses_with_feature
+        )
+      end
+    end
+
     scope = apply_completion_filter(scope, @user, completion_filter)
     item_collection("peer_reviews",
                     scope,

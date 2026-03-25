@@ -24,6 +24,7 @@ import {EnvAiExperiences} from './EnvAiExperiences'
 import {EnvAlerts} from './EnvAlerts'
 import {EnvAms} from './EnvAms'
 import {EnvAssignments} from './EnvAssignments'
+import {EnvAthena} from './EnvAthena'
 import {EnvChangePassword} from './EnvChangePassword'
 import {EnvCommon} from './EnvCommon'
 import {EnvContextModules} from './EnvContextModules'
@@ -72,6 +73,7 @@ export type GlobalEnv =
         EnvAms &
         EnvAccessibilityChecker &
         EnvAssignments &
+        EnvAthena &
         EnvCourse &
         EnvCourseLinkValidator &
         EnvCoursePaces &

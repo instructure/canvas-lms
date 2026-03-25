@@ -104,8 +104,6 @@
 class AccountCalendarsApiController < ApplicationController
   include Api::V1::AccountCalendar
 
-  before_action :require_user
-
   # @API List available account calendars
   #
   # Returns a paginated list of account calendars available to the current user.

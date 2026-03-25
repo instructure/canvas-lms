@@ -329,7 +329,7 @@ describe FilesController do
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
     access = AssetUserAccess.for_user(@user).first
-    expect(access).to_not be_nil
+    expect(access).not_to be_nil
     expect(access.asset).to eq a1
   end
 
@@ -523,7 +523,7 @@ describe FilesController do
       expect(session["file_access_user_id"]).to be_present
 
       get "/courses/#{@course.id}/files/#{att.id}/file_preview"
-      expect(response.body).to_not include("This file has not been unlocked yet")
+      expect(response.body).not_to include("This file has not been unlocked yet")
       expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
     end
   end
@@ -554,6 +554,6 @@ describe FilesController do
 
     # course and file don't match
     get "http://files-test.host/users/#{secret_user.id}/files/#{some_file.id}?verifier=#{some_file.uuid}"
-    expect(response.body).to_not include(secret_user.name)
+    expect(response.body).not_to include(secret_user.name)
   end
 end

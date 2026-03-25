@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {func, number, node, object, oneOfType} from 'prop-types'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -37,10 +37,7 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
-  ReactDOM.render(
-    <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
-    parent,
-  )
+  legacyRender(<ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />, parent)
 }
 
 export default class ConfirmDeleteModal extends Component {
@@ -95,7 +92,7 @@ export default class ConfirmDeleteModal extends Component {
       // @ts-expect-error TS2339 (typescriptify)
       if (this.props.onHide) setTimeout(this.props.onHide)
       // @ts-expect-error TS2339 (typescriptify)
-      if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
+      if (this.props.parent) legacyUnmountComponentAtNode(this.props.parent)
     })
   }
 

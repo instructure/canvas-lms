@@ -23,7 +23,7 @@
 
 module Lti
   module Security
-    def self.signed_post_params(params, url, key, secret, disable_lti_post_only = false)
+    def self.signed_post_params(params, url, key, secret, disable_lti_post_only: false)
       # Signature is based on base string (POST&url&encodedparams) and secret
       # (no oauth token, so the HMAC secret is "secret&", where secret is the
       # shared_secret of the tool). See LTI 1.1 spec (section 4.2, OAuth Message Signing)

@@ -509,9 +509,6 @@
     "describe_the_icon_f6a18823": {
         "message": "(Írja le az ikont)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(A videó leírása)"
-    },
     "description_436c48d7": {
         "message": "Leírás"
     },
@@ -757,9 +754,6 @@
     },
     "f_function_fe422d65": {
         "message": "F (függvény)"
-    },
-    "failed_276786d": {
-        "message": "Sikertelen"
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Nem sikerült beolvasni a fájl tartalmát"
@@ -2476,9 +2470,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Képernyőolvasók által a videó leírásához használt szöveg"
     },
     "user_documents_c206e61f": {
         "message": "A felhasználó dokumentumai"

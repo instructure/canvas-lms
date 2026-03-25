@@ -97,8 +97,19 @@ module LinkedAttachmentHandler
 
     return if to_process.none?
     return unless attachment_associations_creation_enabled?
+
     unless user.present? || skip_user_verification || migration
-      raise "User is required to update attachment links for #{self.class}:#{try(:id)}"
+      error = "User is required to update attachment links for #{self.class}:#{try(:id)}"
+      Sentry.with_scope do |scope|
+        scope.set_context("attachment_associations", {
+                            class_name: self.class.name,
+                            context_id: try(:id)
+                          })
+        Sentry.capture_message(error, level: :warning)
+      end
+      raise error if Rails.env.development?
+
+      return
     end
 
     to_process.each_slice(1000) do |att_ids|

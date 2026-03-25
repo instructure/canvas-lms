@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import formatMessage from 'format-message'
 import {useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
+import {trackPendoEvent} from '../utils/trackPendoEvent'
 
 interface AutoCaptioningProps {
   onCancel: () => void
@@ -31,6 +32,7 @@ interface AutoCaptioningProps {
   liveRegion: () => HTMLElement | null
   languages: {id: string; label: string}[]
   mountNode?: HTMLElement | (() => HTMLElement | null)
+  onDirtyStateChanged?: (isDirty: boolean) => void
 }
 
 export const AutoCaptioning = ({
@@ -39,6 +41,7 @@ export const AutoCaptioning = ({
   liveRegion,
   languages,
   mountNode,
+  onDirtyStateChanged,
 }: AutoCaptioningProps) => {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [showLanguageError, setShowLanguageError] = useState(false)
@@ -48,10 +51,15 @@ export const AutoCaptioning = ({
       setSelectedLanguageId(languageId)
       setShowLanguageError(false)
     }
+    onDirtyStateChanged?.(Boolean(languageId))
   }
 
   const handlePrimaryClick = () => {
     if (!selectedLanguageId) {
+      trackPendoEvent('canvas_caption_validation_error', {
+        flow_type: 'request_auto',
+        error_type: 'missing_language',
+      })
       setShowLanguageError(true)
       return
     }
@@ -92,6 +100,7 @@ export const AutoCaptioning = ({
                 ]
               : []
           }
+          liveRegion={liveRegion}
         >
           {languages.map(option => (
             // @ts-expect-error - CanvasSelect.Option is a JS component without TS definitions

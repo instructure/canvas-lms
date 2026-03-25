@@ -27,7 +27,7 @@ module Canvadocs
       user = opts.delete(:user)
       enable_annotations = opts.delete(:enable_annotations)
       read_only = opts.delete(:read_only) || false
-      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations, read_only)
+      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations, read_only:)
       opts[:url] = attachment.public_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
       opts[:send_usage_metrics] = user.account.feature_enabled?(:send_usage_metrics) if user
@@ -44,7 +44,7 @@ module Canvadocs
     end
     private :canvadocs_api
 
-    def canvadoc_permissions_for_user(user, enable_annotations, read_only = false)
+    def canvadoc_permissions_for_user(user, enable_annotations, read_only: false)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)
 
       opts = canvadocs_default_options_for_user(user, read_only)

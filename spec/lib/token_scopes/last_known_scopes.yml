@@ -42,12 +42,6 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/app_center/apps'
 - verb: GET
-  path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self'
-- verb: POST
-  path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self'
-- verb: GET
   path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
 - verb: POST
   path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
@@ -287,10 +281,6 @@
   path: '/api/v1/accounts/:account_id/outcome_groups/:id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/outcome_groups/:id'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/outcome_groups/:id/available_outcomes'
-- verb: POST
-  path: '/api/v1/accounts/:account_id/outcome_groups/:id/batch'
 - verb: POST
   path: '/api/v1/accounts/:account_id/outcome_groups/:id/import'
 - verb: GET
@@ -619,6 +609,10 @@
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/evaluation'
 - verb: POST
   path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages/:message_id/feedback'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages/:message_id/feedback/:feedback_id'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: GET
@@ -641,12 +635,6 @@
   path: '/api/v1/courses/:course_id/announcements/:announcement_id/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/app_center/apps'
-- verb: GET
-  path: '/api/v1/courses/:course_id/app_center/apps/:app_id/reviews'
-- verb: GET
-  path: '/api/v1/courses/:course_id/app_center/apps/:app_id/reviews/self'
-- verb: POST
-  path: '/api/v1/courses/:course_id/app_center/apps/:app_id/reviews/self'
 - verb: PUT
   path: '/api/v1/courses/:course_id/apply_score_to_ungraded_submissions'
 - verb: POST
@@ -1285,10 +1273,6 @@
   path: '/api/v1/courses/:course_id/outcome_groups/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/outcome_groups/:id'
-- verb: GET
-  path: '/api/v1/courses/:course_id/outcome_groups/:id/available_outcomes'
-- verb: POST
-  path: '/api/v1/courses/:course_id/outcome_groups/:id/batch'
 - verb: POST
   path: '/api/v1/courses/:course_id/outcome_groups/:id/import'
 - verb: GET
@@ -1624,6 +1608,8 @@
 - verb: PUT
   path: '/api/v1/discovery_pages'
 - verb: POST
+  path: '/api/v1/discovery_pages/token'
+- verb: POST
   path: '/api/v1/enqueue_outcome_rollup_calculation'
 - verb: PUT
   path: '/api/v1/eportfolios/:eportfolio_id/moderate'
@@ -1693,10 +1679,6 @@
   path: '/api/v1/global/outcome_groups/:id'
 - verb: PUT
   path: '/api/v1/global/outcome_groups/:id'
-- verb: GET
-  path: '/api/v1/global/outcome_groups/:id/available_outcomes'
-- verb: POST
-  path: '/api/v1/global/outcome_groups/:id/batch'
 - verb: POST
   path: '/api/v1/global/outcome_groups/:id/import'
 - verb: GET
@@ -1897,10 +1879,6 @@
   path: '/api/v1/groups/:group_id/folders/media'
 - verb: GET
   path: '/api/v1/groups/:group_id/folders_and_files'
-- verb: DELETE
-  path: '/api/v1/groups/:group_id/followers/self'
-- verb: PUT
-  path: '/api/v1/groups/:group_id/followers/self'
 - verb: GET
   path: '/api/v1/groups/:group_id/front_page'
 - verb: PUT
@@ -2017,6 +1995,8 @@
   path: '/api/v1/media_attachments'
 - verb: PUT
   path: '/api/v1/media_attachments/:attachment_id'
+- verb: POST
+  path: '/api/v1/media_attachments/:attachment_id/asr'
 - verb: GET
   path: '/api/v1/media_attachments/:attachment_id/media_tracks'
 - verb: PUT
@@ -2027,6 +2007,8 @@
   path: '/api/v1/media_objects'
 - verb: PUT
   path: '/api/v1/media_objects/:media_object_id'
+- verb: POST
+  path: '/api/v1/media_objects/:media_object_id/asr'
 - verb: GET
   path: '/api/v1/media_objects/:media_object_id/media_tracks'
 - verb: PUT
@@ -2273,6 +2255,8 @@
   path: '/api/v1/support_helpers/turnitin/refresh_lti_attachment'
 - verb: GET
   path: '/api/v1/support_helpers/turnitin/shard'
+- verb: GET
+  path: '/api/v1/temporary_enrollment_status'
 - verb: DELETE
   path: '/api/v1/users/:id'
 - verb: GET
@@ -2431,10 +2415,6 @@
   path: '/api/v1/users/:user_id/folders/by_path/*full_path'
 - verb: GET
   path: '/api/v1/users/:user_id/folders_and_files'
-- verb: DELETE
-  path: '/api/v1/users/:user_id/followers/self'
-- verb: PUT
-  path: '/api/v1/users/:user_id/followers/self'
 - verb: GET
   path: '/api/v1/users/:user_id/history'
 - verb: GET

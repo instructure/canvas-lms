@@ -34,16 +34,16 @@ describe SplitUsers do
       UserMerge.from(restored_user).into(source_user)
       SplitUsers.split_db_users(restored_user)
       expect(restored_user.reload.preferences[:accepted_terms]).to be_nil
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
     end
 
     it "restores terms_of use other way" do
       restored_user.accept_terms
       restored_user.save!
       UserMerge.from(restored_user).into(source_user)
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
       SplitUsers.split_db_users(source_user)
-      expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(restored_user.reload.preferences[:accepted_terms]).not_to be_nil
       expect(source_user.reload.preferences[:accepted_terms]).to be_nil
     end
 
@@ -63,8 +63,8 @@ describe SplitUsers do
       source_user.save!
       UserMerge.from(restored_user).into(source_user)
       SplitUsers.split_db_users(source_user)
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
-      expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
+      expect(restored_user.reload.preferences[:accepted_terms]).not_to be_nil
     end
 
     it "restores names" do

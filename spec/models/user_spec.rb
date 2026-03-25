@@ -72,7 +72,7 @@ describe User do
       it "fails validation if lti_id changes" do
         user.short_name = "chewie"
         user.lti_id = "changedToThis"
-        expect(user).to_not be_valid
+        expect(user).not_to be_valid
       end
 
       it "passes validation if lti_id is not changed" do
@@ -171,7 +171,7 @@ describe User do
     user = User.new
     expect(user.lti_id).to be_blank
     user.save!
-    expect(user.lti_id).to_not be_blank
+    expect(user.lti_id).not_to be_blank
   end
 
   it "gets the first email from communication_channel" do
@@ -2939,12 +2939,12 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
 
         # With include_concluded: true (default), should see both sections
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: true)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: true)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).to include(section2.asset_string)
       end
@@ -2973,7 +2973,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3002,7 +3002,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3031,7 +3031,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3057,7 +3057,7 @@ describe User do
         # user instead of failing.
         expect do
           events = @user.upcoming_events(end_at: 1.week.from_now)
-        end.to_not raise_error
+        end.not_to raise_error
 
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment
@@ -4493,7 +4493,7 @@ describe User do
 
     it "optionally does not include concluded courses" do
       @enrollment.update_attribute(:workflow_state, "completed")
-      expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
+      expect(@user.conversation_context_codes(include_concluded_codes: false)).not_to include(@course.asset_string)
     end
 
     it "includes groups" do
@@ -4522,7 +4522,7 @@ describe User do
       it "optionally does not include concluded courses on other shards" do
         course_with_student(account: @shard1_account, user: @user, active_all: true)
         @enrollment.update_attribute(:workflow_state, "completed")
-        expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
+        expect(@user.conversation_context_codes(include_concluded_codes: false)).not_to include(@course.asset_string)
       end
 
       it "includes groups on other shards" do
@@ -6212,6 +6212,54 @@ describe User do
       private_course = course_factory
       private_course.update!(sis_source_id: "private_sis")
       expect(user.accessible_courses_by_sis_ids(["private_sis"])).to eq([])
+    end
+  end
+
+  describe "#current_course_ids_for_dashboard" do
+    before do
+      @student = user_factory(active_all: true)
+      @active_course = course_factory(active_all: true)
+      @active_course.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "includes courses with active enrollments" do
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+    end
+
+    it "excludes courses with past enrollment term" do
+      past_term = @active_course.account.enrollment_terms.create!(
+        name: "Past Term",
+        start_at: 6.months.ago,
+        end_at: 1.month.ago
+      )
+      past_course = course_factory(active_all: true, account: @active_course.account)
+      past_course.update!(enrollment_term: past_term)
+      past_course.enroll_student(@student, enrollment_state: "active")
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(past_course.id)
+    end
+
+    it "excludes courses with conclude_at in past" do
+      concluded_course = course_factory(active_all: true)
+      concluded_course.update!(conclude_at: 1.week.ago)
+      concluded_course.enroll_student(@student, enrollment_state: "active")
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(concluded_course.id)
+    end
+
+    it "excludes formally concluded courses" do
+      concluded_course = course_factory(active_all: true)
+      concluded_course.enroll_student(@student, enrollment_state: "active")
+      concluded_course.complete!
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(concluded_course.id)
     end
   end
 end

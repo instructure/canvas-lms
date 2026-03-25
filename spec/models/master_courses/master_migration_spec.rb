@@ -845,16 +845,16 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(qq1_to.reload.question_data["question_text"]).to eq new_text
-      expect(qq2_to.reload).to_not be_deleted # should not have overwritten because downstream changes
+      expect(qq2_to.reload).not_to be_deleted # should not have overwritten because downstream changes
 
       Timecop.freeze(4.minutes.from_now) do
         @template.content_tag_for(quiz).update_attribute(:restrictions, { content: true })
       end
       run_master_migration
 
-      expect(qq1_to.reload.question_data["question_text"]).to_not eq new_text # should overwrite now because locked
+      expect(qq1_to.reload.question_data["question_text"]).not_to eq new_text # should overwrite now because locked
       expect(qq2_to.reload).to be_deleted
-      expect(qq3_to.reload).to_not be_deleted
+      expect(qq3_to.reload).not_to be_deleted
     end
 
     it "does not restore quiz questions deleted downstream (unless locked)" do
@@ -1004,9 +1004,9 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      expect(aq2_to.reload).to_not be_deleted # should not have overwritten because downstream changes
+      expect(aq2_to.reload).not_to be_deleted # should not have overwritten because downstream changes
       expect(aq3_to.reload).to be_deleted # should be because no downstream changes
-      expect(aq4_to.reload).to_not be_deleted # should have been left alone
+      expect(aq4_to.reload).not_to be_deleted # should have been left alone
     end
 
     it "preserves all answer ids on re-copy" do
@@ -1072,7 +1072,7 @@ describe MasterCourses::MasterMigration do
 
       expect(qgroup_to.reload.name).to eq "upstream"
       # adding new questions was borking because a method i didn't think would ever get called was getting called >.<
-      expect(quiz_to.reload.quiz_questions.where(migration_id: mig_id(@new_qq)).first).to_not be_nil
+      expect(quiz_to.reload.quiz_questions.where(migration_id: mig_id(@new_qq)).first).not_to be_nil
     end
 
     it "creates submissions for assignments without due dates on initial sync" do
@@ -1117,11 +1117,11 @@ describe MasterCourses::MasterMigration do
 
       expect(ag1_to.reload).to be_deleted # should still delete
       expect(a1_to.reload).to be_deleted
-      expect(ag2_to.reload).to_not be_deleted # should skip deletion because a2's deletion was skipped
-      expect(a2_to.reload).to_not be_deleted
-      expect(ag3_to.reload).to_not be_deleted # should skip deletion because of @new_assmt
+      expect(ag2_to.reload).not_to be_deleted # should skip deletion because a2's deletion was skipped
+      expect(a2_to.reload).not_to be_deleted
+      expect(ag3_to.reload).not_to be_deleted # should skip deletion because of @new_assmt
       expect(a3_to.reload).to be_deleted # but should have still deleted the assigment
-      expect(@new_assmt.reload).to_not be_deleted
+      expect(@new_assmt.reload).not_to be_deleted
     end
 
     it "deletes an assignment group when all assignments are moved out in the same sync" do
@@ -1233,7 +1233,7 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!(workflow_state: "unpublished")
       qq = quiz.quiz_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question", "points_possible" => 1 })
-      quiz.root_entries(true)
+      quiz.root_entries(force_check: true)
       quiz.save!
 
       run_master_migration
@@ -1244,7 +1244,7 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(2.minutes.from_now) do
         qq.update_attribute(:question_data, qq.question_data.merge(points_possible: 2))
-        quiz.root_entries(true)
+        quiz.root_entries(force_check: true)
         quiz.save!
         expect(quiz.points_possible).to eq 2
       end
@@ -1527,8 +1527,8 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       @att1_to.reload
-      expect(@att1_to).to_not be_deleted
-      expect(@att1_to.folder).to_not be_deleted
+      expect(@att1_to).not_to be_deleted
+      expect(@att1_to.folder).not_to be_deleted
     end
 
     it "copies media tracks" do
@@ -2091,10 +2091,10 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration # re-copy all the content - but don't actually overwrite anything because it got changed downstream
 
-      expect(copied_bank.reload.title).to_not eq new_master_text
-      expect(copied_aq.reload.question_data["question_text"]).to_not eq new_master_text
-      expect(copied_quiz.reload.title).to_not eq new_master_text
-      expect(copied_qq.reload.question_data["question_text"]).to_not eq new_master_text
+      expect(copied_bank.reload.title).not_to eq new_master_text
+      expect(copied_aq.reload.question_data["question_text"]).not_to eq new_master_text
+      expect(copied_quiz.reload.title).not_to eq new_master_text
+      expect(copied_qq.reload.question_data["question_text"]).not_to eq new_master_text
 
       [bank, quiz].each do |c|
         mtag = @template.content_tag_for(c)
@@ -2297,8 +2297,8 @@ describe MasterCourses::MasterMigration do
       end
       run_master_migration
 
-      expect(topic_to.reload.assignment).to_not be_nil
-      expect(topic_to.assignment).to_not be_deleted
+      expect(topic_to.reload.assignment).not_to be_nil
+      expect(topic_to.assignment).not_to be_deleted
     end
 
     it "ignores course settings on selective export unless requested" do
@@ -2311,7 +2311,7 @@ describe MasterCourses::MasterMigration do
       @copy_from.restrict_enrollments_to_course_dates = true
       @copy_from.save!
       run_master_migration(copy_settings: false) # initial sync with explicit false
-      expect(@copy_to.reload.tab_configuration).to_not eq @copy_from.tab_configuration
+      expect(@copy_to.reload.tab_configuration).not_to eq @copy_from.tab_configuration
       expect(@copy_to.start_at).to be_nil
       expect(@copy_to.conclude_at).to be_nil
       expect(@copy_to.restrict_enrollments_to_course_dates).to be_falsy
@@ -2326,7 +2326,7 @@ describe MasterCourses::MasterMigration do
 
       @copy_from.update_attribute(:is_public, true)
       run_master_migration # selective without settings
-      expect(@copy_to.reload.is_public).to_not be_truthy
+      expect(@copy_to.reload.is_public).not_to be_truthy
 
       run_master_migration(copy_settings: true) # selective with settings
       expect(@copy_to.reload.is_public).to be_truthy
@@ -2335,8 +2335,8 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.restrict_enrollments_to_course_dates).to be_truthy
 
       run_master_migration # selective without settings
-      expect(@copy_to.reload.start_at).to_not be_nil # keep the dates
-      expect(@copy_to.conclude_at).to_not be_nil
+      expect(@copy_to.reload.start_at).not_to be_nil # keep the dates
+      expect(@copy_to.conclude_at).not_to be_nil
 
       Timecop.freeze(1.minute.from_now) do
         @copy_from.update(start_at: nil, conclude_at: nil)
@@ -2798,7 +2798,7 @@ describe MasterCourses::MasterMigration do
         mod.update_attribute(:name, "new title")
       end
       run_master_migration
-      expect(tag.reload).to_not be_deleted
+      expect(tag.reload).not_to be_deleted
     end
 
     it "syncs module item positions properly" do
@@ -3093,7 +3093,7 @@ describe MasterCourses::MasterMigration do
       MasterCourses::MasterMigration.start_new_migration!(@template2, @admin)
       run_jobs
 
-      expect(@copy_to.content_migrations.last.migration_issues).to_not be_exists
+      expect(@copy_to.content_migrations.last.migration_issues).not_to be_exists
       att2_to = @copy_to.attachments.where(migration_id: @template2.migration_id_for(att2)).first
       expect(att2_to).to be_present
     end
@@ -3176,7 +3176,7 @@ describe MasterCourses::MasterMigration do
 
       # should be unpublished
       copied_things.each do |copied_obj|
-        expect(copied_obj.reload).to_not be_published
+        expect(copied_obj.reload).not_to be_published
       end
 
       # republish everything
@@ -3209,7 +3209,7 @@ describe MasterCourses::MasterMigration do
 
       # should still be unpublished
       copied_things.each do |copied_obj|
-        expect(copied_obj.reload).to_not be_published
+        expect(copied_obj.reload).not_to be_published
       end
     end
 
@@ -3512,8 +3512,8 @@ describe MasterCourses::MasterMigration do
         expect(att_to.reload.migration_id).to eq mig_id(att) # should not have changed
 
         impostor_att_to = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(impostor_att, global: true)).first
-        expect(impostor_att_to.id).to_not eq att_to.id # should make a copy
-        expect(impostor_att_to.display_name).to_not eq att_to.display_name
+        expect(impostor_att_to.id).not_to eq att_to.id # should make a copy
+        expect(impostor_att_to.display_name).not_to eq att_to.display_name
       end
 
       def import_package(course)
@@ -3546,8 +3546,8 @@ describe MasterCourses::MasterMigration do
         expect(att_to.reload.migration_id).to eq mig_id(att) # should not have changed
 
         impostor_att_to = @copy_to.attachments.where(migration_id: att.migration_id).first # package should make a copy
-        expect(impostor_att_to.id).to_not eq att_to.id
-        expect(impostor_att_to.display_name).to_not eq att_to.display_name
+        expect(impostor_att_to.id).not_to eq att_to.id
+        expect(impostor_att_to.display_name).not_to eq att_to.display_name
       end
     end
 

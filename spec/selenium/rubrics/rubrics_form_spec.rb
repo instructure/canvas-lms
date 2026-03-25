@@ -178,6 +178,7 @@ describe "Rubric form page" do
     expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("4 pts")
     expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("No Evidence")
     expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("0 pts")
+    expect(RubricsForm.criterion_ratings_flex_direction).to eq("row")
   end
 
   it "allows creating rubrics with ratings scaled low to high" do
@@ -190,10 +191,15 @@ describe "Rubric form page" do
     RubricsForm.low_high_rating_order.click
     RubricsForm.preview_rubric_button.click
 
-    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("No Evidence")
-    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("0 pts")
-    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("Exceeds")
-    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("4 pts")
+    # Because we now use Flex row-reverse, data-testid and dom changes are not
+    # reflected in order of ratings so the ratings should be in the same order as high to low
+    # In addition, we check that the flex direction is row-reverse to ensure the ratings are
+    # displayed in the correct order for low to high
+    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("Exceeds")
+    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("4 pts")
+    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("No Evidence")
+    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("0 pts")
+    expect(RubricsForm.criterion_ratings_flex_direction).to eq("row-reverse")
   end
 
   it "creates criterion with an optional description" do

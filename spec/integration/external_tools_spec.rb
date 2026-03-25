@@ -260,7 +260,7 @@ describe "External Tools" do
         course_with_student_logged_in(account: @account, active_all: true)
         get "/courses"
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to_not be_present
+        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).not_to be_present
       end
 
       it "caches the template over courses if permissions are same" do
@@ -291,7 +291,7 @@ describe "External Tools" do
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses/#{c2.id}" # viewing different course but permissions are the same - should remain cached
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
+        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).not_to be_present
       end
 
       it "does not cache the template if permission overrides change" do
@@ -308,7 +308,7 @@ describe "External Tools" do
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses/#{@course.id}" # viewing different course but permissions are the same - should remain cached
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
+        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).not_to be_present
       end
 
       it "doesn't highlight the tool if the tool is no longer the current page" do
@@ -349,13 +349,13 @@ describe "External Tools" do
         get "/courses/#{@course.id}"
         doc = Nokogiri::HTML5(response.body)
         # should still have the old text cached (because we didn't detect a global nav tool change)
-        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to_not include("new text")
+        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).not_to include("new text")
 
         # now update it but it still shouldn't take effect because the callback hasn't hit
         ContextExternalTool.where(id: @admin_tool).update_all(updated_at: 1.minute.from_now)
         get "/courses/#{@course.id}"
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to_not include("new text")
+        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).not_to include("new text")
 
         @admin_tool.save! # trigger the callback - now it should rebuild
         get "/courses/#{@course.id}"

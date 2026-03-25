@@ -600,16 +600,38 @@ describe FeatureFlags::Hooks do
   end
 
   describe "oak_for_users_visible_on_hook" do
-    let(:context) { instance_double(Course) }
-    let(:domain_root_account) { instance_double(Account) }
+    let(:domain_root_account) { account_model }
 
     before do
       allow(Account).to receive(:current_domain_root_account).and_return(domain_root_account)
-      allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
       allow(Oak::PermissionChecker).to receive(:user_permitted?).and_return(true)
     end
 
+    context "when context is not a User" do
+      context "with Account context" do
+        let(:context) { account_model }
+
+        it "returns false" do
+          result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+          expect(result).to be false
+        end
+      end
+
+      context "with Course context" do
+        let(:context) { course_model }
+
+        it "returns false" do
+          result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+          expect(result).to be false
+        end
+      end
+    end
+
     context "when oak_visible_on_hook returns false" do
+      let(:context) { user_model }
+
       before do
         allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(false)
       end
@@ -624,6 +646,8 @@ describe FeatureFlags::Hooks do
     end
 
     context "when oak_visible_on_hook returns true" do
+      let(:context) { user_model }
+
       before do
         allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
       end

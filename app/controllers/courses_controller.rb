@@ -360,9 +360,30 @@ class CoursesController < ApplicationController
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
 
-  before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export new_quizzes_selection_update]
+  skip_before_action :require_user, only: %i[api_settings
+                                             enrollment_invitation
+                                             locks
+                                             permissions
+                                             ping
+                                             preview_html
+                                             public_feed
+                                             self_enrollment
+                                             show]
   before_action :require_user_or_observer, only: [:user_index]
-  before_action :require_context, only: %i[roster locks create_file ping confirm_action copy effective_due_dates offline_web_exports link_validator settings start_offline_web_export statistics user_progress]
+  before_action :require_context, only: %i[
+    confirm_action
+    copy
+    create_file
+    effective_due_dates
+    link_validator
+    locks
+    offline_web_exports
+    ping
+    settings
+    start_offline_web_export
+    statistics
+    user_progress
+  ]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
   before_action :check_limited_access_for_students, only: %i[create_file]
 
@@ -1091,7 +1112,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       proxy = @context.students_visible_to(@current_user).order_by_sortable_name
-      user_json_preloads(proxy, false)
+      user_json_preloads(proxy)
       render json: proxy.map { |u| user_json(u, @current_user, session) }
     end
   end
@@ -1216,9 +1237,22 @@ class CoursesController < ApplicationController
         # known case in the wild, each student had thousands of deleted
         # group memberships. Since we only care about active group
         # memberships for this course, load the data in a more targeted way.
-        user_json_preloads(users, includes.include?("email"))
+        user_json_preloads(users, preload_email: includes.include?("email"), profile: @domain_root_account&.enable_profiles?)
+        SisPseudonym.preload_enrollment_data(@context, users)
         UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
         include_group_ids = includes.delete("group_ids").present?
+        include_diff_tags = can_do(@context, @current_user, :manage_tags_manage)
+        if include_diff_tags
+          user_ids_with_diff_tags = GroupMembership
+                                    .joins(:group)
+                                    .where(user_id: users)
+                                    .merge(Group.non_collaborative)
+                                    .where(groups: { context: @context })
+                                    .where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'")
+                                    .distinct
+                                    .pluck(:user_id)
+                                    .to_set
+        end
 
         unless includes.include?("test_student") || Array(params[:enrollment_type]).include?("student_view")
           users.reject! do |u|
@@ -1228,7 +1262,7 @@ class CoursesController < ApplicationController
         if includes.include?("enrollments")
           enrollment_scope = @context.enrollments
                                      .where(user_id: users)
-                                     .preload(:course, :scores, :course_section)
+                                     .preload(:course, :user, :role, :scores, :course_section)
                                      .joins(:course_section)
                                      .order("course_sections.name")
 
@@ -1262,7 +1296,7 @@ class CoursesController < ApplicationController
           end
           user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
             json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
-            json[:has_non_collaborative_groups] = u.current_differentiation_tags.where(context: @context).count > 0 if can_do(@context, @current_user, :manage_tags_manage)
+            json[:has_non_collaborative_groups] = user_ids_with_diff_tags.include?(u.id) if include_diff_tags
           end
         }
       end
@@ -1303,12 +1337,11 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       includes = Array(params[:include])
-      users = api_find_all(@context.users_visible_to(@current_user, {
-                                                       include_inactive: includes.include?("inactive_enrollments")
-                                                     }),
+      users = api_find_all(@context.users_visible_to(@current_user,
+                                                     include_inactive: includes.include?("inactive_enrollments")),
                            [params[:id]])
 
-      user_json_preloads(users, includes.include?("email"))
+      user_json_preloads(users, preload_email: includes.include?("email"))
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments.where(course_id: @context).preload(:course, :root_account, :sis_pseudonym) if includes.include?("enrollments")
       render json: user_json(user, @current_user, session, includes, @context, enrollments)
@@ -1585,7 +1618,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read_as_admin)
       load_all_contexts(context: @context)
 
-      @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
+      @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, include_inactive: true)
 
       @invited_count = @context.invited_count_visible_to(@current_user)
 
@@ -2503,7 +2536,7 @@ class CoursesController < ApplicationController
             @contexts += @user_groups
           end
           web_conferences = @context.web_conferences.active.to_a
-          @current_conferences = web_conferences.select { |c| c.active?(false, false) && c.users.include?(@current_user) }
+          @current_conferences = web_conferences.select { |c| c.active?(allow_check: false) && c.users.include?(@current_user) }
           @scheduled_conferences = web_conferences.select { |c| c.scheduled? && c.users.include?(@current_user) }
           @stream_items = @current_user.try(:cached_recent_stream_items, { contexts: @contexts }) || []
         end

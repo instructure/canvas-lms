@@ -96,11 +96,6 @@ module Lti::IMS::Concerns
 
       private
 
-      def cache_public_jwk_url?
-        @cache_public_jwk_url ||=
-          developer_key.root_account.feature_enabled?(:lti_cache_tool_public_jwks_url)
-      end
-
       def verified_jwt
         @verified_jwt ||= begin
           jwt_hash = if developer_key&.public_jwk_url.present?
@@ -131,8 +126,6 @@ module Lti::IMS::Concerns
       end
 
       def verified_jwt_using_cached_jwks_url
-        return nil unless cache_public_jwk_url?
-
         jwk_set = Rails.cache.read(public_jwk_url_cache_key)
         return nil unless jwk_set.present?
 
@@ -160,10 +153,8 @@ module Lti::IMS::Concerns
             raise JSON::JWS::VerificationFailed
           end
 
-        if cache_public_jwk_url?
-          # Cache only if the JWT was successfully decoded
-          Rails.cache.write(public_jwk_url_cache_key, jwk_set, expires_in: JWK_SET_CACHE_EXPIRATION)
-        end
+        # Cache only if the JWT was successfully decoded
+        Rails.cache.write(public_jwk_url_cache_key, jwk_set, expires_in: JWK_SET_CACHE_EXPIRATION)
 
         jwt
       end

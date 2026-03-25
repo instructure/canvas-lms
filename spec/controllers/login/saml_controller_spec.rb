@@ -304,7 +304,7 @@ describe Login::SamlController do
     # Default to Login url if set to nil or blank
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_nil
+    expect(flash[:delegated_message]).not_to be_nil
     expect(session[:saml_unique_id]).to be_nil
 
     account.unknown_user_url = ""
@@ -312,7 +312,7 @@ describe Login::SamlController do
     controller.instance_variable_set(:@aac, nil)
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_nil
+    expect(flash[:delegated_message]).not_to be_nil
     expect(session[:saml_unique_id]).to be_nil
 
     # Redirect to a specifiec url
@@ -349,7 +349,7 @@ describe Login::SamlController do
     expect(controller).not_to receive(:logout_user_action)
     controller.request.env["canvas.domain_root_account"] = account
 
-    expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+    expect(account.pseudonyms.active.by_unique_id(unique_id)).not_to be_exists
     # Default to Login url if set to nil or blank
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(dashboard_url(login_success: 1))
@@ -384,7 +384,7 @@ describe Login::SamlController do
 
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_nil
+    expect(flash[:delegated_message]).not_to be_nil
     expect(session[:saml_unique_id]).to be_nil
   end
 
@@ -814,7 +814,7 @@ describe Login::SamlController do
         end
 
         it "is a bad request if there's no destination to send the request to" do
-          expect(controller).to_not receive(:logout_current_user)
+          expect(controller).not_to receive(:logout_current_user)
           @aac3 = @account.authentication_providers.build(auth_type: "saml")
           @aac3.idp_entity_id = "https://example.com/idp3"
           @aac3.log_in_url = "https://example.com/idp3/sso"

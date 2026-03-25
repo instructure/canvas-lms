@@ -70,7 +70,7 @@ class ContentMigration < ActiveRecord::Base
     state :failed
   end
 
-  def self.migration_plugins(exclude_hidden = false)
+  def self.migration_plugins(exclude_hidden: false)
     plugins = Canvas::Plugin.all_for_tag(:export_system)
     exclude_hidden ? plugins.reject { |p| p.meta[:hide_from_users] } : plugins
   end
@@ -747,7 +747,7 @@ class ContentMigration < ActiveRecord::Base
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
-    Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(data, force_utf8: true)
     data["all_files_export"] ||= {}
     data
   end

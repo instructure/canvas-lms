@@ -82,7 +82,7 @@ describe UserPreferenceValue do
   end
 
   it "does not query for preferences when saving an unrelated attribute on an already migrated user" do
-    expect(migrated_user).to_not receive(:user_preference_values)
+    expect(migrated_user).not_to receive(:user_preference_values)
     migrated_user.update_attribute(:name, "name1")
     User.find(migrated_user.id).update_attribute(:name, "name2")
   end
@@ -90,7 +90,7 @@ describe UserPreferenceValue do
   it "does not have to query to load preferences if the values are empty" do
     migrated_user.set_preference(regular_key, [])
     reloaded_user = User.find(migrated_user.id)
-    expect(reloaded_user).to_not receive(:user_preference_values)
+    expect(reloaded_user).not_to receive(:user_preference_values)
     expect(reloaded_user.get_preference(regular_key)).to eq []
   end
 
@@ -101,7 +101,7 @@ describe UserPreferenceValue do
     expect(migrated_user.preferences[subbed_key]).to eq({})
 
     reloaded_user = User.find(migrated_user.id)
-    expect(reloaded_user).to_not receive(:user_preference_values)
+    expect(reloaded_user).not_to receive(:user_preference_values)
     expect(reloaded_user.get_preference(subbed_key, :a)).to be_nil
   end
 

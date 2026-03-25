@@ -73,8 +73,6 @@
 class AiExperiencesController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create update destroy], with: :exception
-
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right, only: [:index, :show]
@@ -289,7 +287,7 @@ class AiExperiencesController < ApplicationController
     ActiveRecord::Associations.preload(students, enrollments: :sis_pseudonym)
 
     # Preload user associations for user_json
-    user_json_preloads(students, false, accounts: true, pseudonyms: true, profile: true)
+    user_json_preloads(students, accounts: true, pseudonyms: true, profile: true)
 
     # Build enrollment lookup hash: user_id => enrollment
     enrollments_by_user = students.flat_map(&:enrollments)
@@ -369,6 +367,7 @@ class AiExperiencesController < ApplicationController
     # The client handles communication with the external LLM service that stores the actual messages.
     client = LLMConversationClient.new(
       current_user: @conversation.user,
+      requesting_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
       conversation_context_id: @experience.llm_conversation_context_id,
       facts: @experience.facts,

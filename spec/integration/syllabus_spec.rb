@@ -78,7 +78,7 @@ describe "syllabus" do
       page = Nokogiri::HTML5(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css("#course_syllabus a")
-      expect(link.attributes["href"].value).to_not include("verifier=#{@attachment.uuid}")
+      expect(link.attributes["href"].value).not_to include("verifier=#{@attachment.uuid}")
     end
   end
 
@@ -121,7 +121,7 @@ describe "syllabus" do
         page = Nokogiri::HTML5(response.body)
         expect(page.css('#identity a[href="/login"]')).not_to be_nil
         link = page.at_css("#course_syllabus a")
-        expect(link.attributes["href"].value).to_not include("verifier=#{@attachment.uuid}")
+        expect(link.attributes["href"].value).not_to include("verifier=#{@attachment.uuid}")
       end
     end
   end

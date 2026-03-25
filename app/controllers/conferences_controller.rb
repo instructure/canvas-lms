@@ -157,7 +157,7 @@ class ConferencesController < ApplicationController
   include CalendarConferencesHelper
 
   before_action :require_context, except: :for_user
-  skip_before_action :load_user, only: [:recording_ready]
+  skip_before_action :load_user, :require_user, only: [:recording_ready]
 
   add_crumb(proc { t "#crumbs.conferences", "Conferences" }) do |c|
     if c.context.present?
@@ -416,7 +416,9 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_conferences_url)
         return
       end
-      if @conference.grants_right?(@current_user, session, :initiate) || @conference.grants_right?(@current_user, session, :resume) || @conference.active?(true)
+      if @conference.grants_right?(@current_user, session, :initiate) ||
+         @conference.grants_right?(@current_user, session, :resume) ||
+         @conference.active?(force_check: true)
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", "participate")

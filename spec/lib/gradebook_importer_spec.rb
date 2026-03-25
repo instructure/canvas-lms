@@ -790,7 +790,7 @@ describe GradebookImporter do
       "Points Possible,,,(read only),20,(read only),20,,,"
     )
     expect(@gi.assignments).to include(@assignment1, @assignment2)
-    expect(@gi.assignments.map(&:title)).to_not include("Final Score", "Current Points")
+    expect(@gi.assignments.map(&:title)).not_to include("Final Score", "Current Points")
     expect(@gi.missing_assignments).to be_empty
   end
 
@@ -1318,7 +1318,7 @@ describe GradebookImporter do
             ",#{@student.id},,5,5"
           )
           assignment_ids = assignments.pluck(:id)
-          expect(assignment_ids).to_not include @closed_assignment.id
+          expect(assignment_ids).not_to include @closed_assignment.id
         end
 
         it "includes assignments if there is at least one submission in the assignment being uploaded" do
@@ -1344,7 +1344,7 @@ describe GradebookImporter do
               ",#{@student.id},,5,5"
             )
             assignment_ids = student_submissions.pluck("assignment_id")
-            expect(assignment_ids).to_not include @closed_assignment.id
+            expect(assignment_ids).not_to include @closed_assignment.id
           end
 
           it "includes submissions that do not fall in closed grading periods" do
@@ -1363,7 +1363,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            expect(student_submissions.pluck("assignment_id")).to_not include @closed_assignment.id
+            expect(student_submissions.pluck("assignment_id")).not_to include @closed_assignment.id
           end
 
           it "includes submissions that will not fall in closed grading periods" do
@@ -1467,7 +1467,7 @@ describe GradebookImporter do
               ",#{@student.id},,5,5"
             )
             assignment_ids = student_submissions.pluck("assignment_id")
-            expect(assignment_ids).to_not include @open_assignment.id
+            expect(assignment_ids).not_to include @open_assignment.id
           end
 
           it "includes submissions that will not fall in closed grading periods" do

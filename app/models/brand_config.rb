@@ -187,11 +187,11 @@ class BrandConfig < ActiveRecord::Base
     define_method :"move_#{type}_to_s3_if_enabled!" do
       return unless Canvas::Cdn.enabled?
 
-      s3_uploader.upload_file(send(:"public_#{type}_path"))
       begin
+        s3_uploader.upload_file(send(:"public_#{type}_path"))
         File.delete(send(:"#{type}_file"))
       rescue Errno::ENOENT
-        # continue if something else deleted it in another process
+        # Another process already uploaded and cleaned up this file
       end
     end
   end

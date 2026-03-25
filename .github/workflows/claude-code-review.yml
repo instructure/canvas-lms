@@ -1,0 +1,62 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude-review:
+    # Skip for very large PRs to avoid excessive API usage
+    # Only run in the instructure-internal org
+    if: |
+      github.repository_owner == 'instructure-internal' &&
+      github.event.pull_request.changed_files <= 100 &&
+      github.event.pull_request.additions <= 5000
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@beta
+        continue-on-error: true
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            Please review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
+
+            Key things to check for this repo:
+            - React components live in ui/, Rails MVC in app/, Ruby business logic in lib/
+            - Feature flags should be used for gradual rollouts of new functionality
+            - JS/TS: prefer named exports, use InstUI components from @instructure/ui-*
+            - Ruby: follow Rails conventions, use Switchman-aware patterns for sharded queries
+            - Accessibility: Canvas has strong a11y requirements; check ARIA usage and keyboard navigation
+            - LTI integrations: be cautious with any changes affecting external tool workflows
+
+            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+
+          # Use sticky comments to reuse the same comment on subsequent pushes to the same PR
+          use_sticky_comment: true
+
+      - name: Handle Review Failure
+        if: failure()
+        run: |
+          echo "Claude review failed - this is expected occasionally and won't block the PR"
+          gh pr comment --body "🤖 Claude Code review encountered an issue and was skipped for this PR."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

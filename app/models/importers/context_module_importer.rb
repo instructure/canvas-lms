@@ -48,12 +48,12 @@ module Importers
       end
     end
 
-    def self.select_linked_module_items(mod, migration, select_all = false)
+    def self.select_linked_module_items(mod, migration, select_all: false)
       if select_all || migration.import_object?("context_modules", mod["migration_id"]) || migration.import_object?("modules", mod["migration_id"])
         (mod["items"] || []).each do |item|
           if item["type"] == "submodule"
             # recursively select content in submodules
-            select_linked_module_items(item, migration, true)
+            select_linked_module_items(item, migration, select_all: true)
           elsif (resource_class = linked_resource_type_class(item["linked_resource_type"]))
             migration.import_object!(resource_class.table_name, item["linked_resource_id"])
           end

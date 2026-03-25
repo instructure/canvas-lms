@@ -28,9 +28,14 @@ const I18n = createI18nScope('accessibility_scan')
 export const LastScanFailedResultView: React.FC<ScanViewProps> = ({
   handleCourseScan,
   isRequestLoading,
+  buttonLabel,
 }) => {
   return (
-    <ScanHandler handleCourseScan={handleCourseScan} scanButtonDisabled={isRequestLoading}>
+    <ScanHandler
+      handleCourseScan={handleCourseScan}
+      scanButtonDisabled={isRequestLoading}
+      buttonLabel={buttonLabel}
+    >
       <GenericErrorPage
         imageUrl={ErrorShip}
         errorSubject={I18n.t('Last accessibility content scan failed.')}

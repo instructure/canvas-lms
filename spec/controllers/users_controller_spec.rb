@@ -1821,7 +1821,7 @@ describe UsersController do
         course.enroll_student(snooping_student, active_all: true)
         user_session(snooping_student)
         get_grades!(grading_period.id)
-        expect(response).to_not be_ok
+        expect(response).not_to be_ok
       end
     end
   end
@@ -3106,6 +3106,67 @@ describe UsersController do
   end
 
   describe "#user_dashboard" do
+    context "learning agent env" do
+      before(:once) do
+        course_with_student(active_all: true)
+        @course.root_account.allow_feature!(:athena_learning_agent_button)
+      end
+
+      before do
+        Rails.cache.clear
+        user_session(@student)
+      end
+
+      it "does not set ATHENA when no course has the flag enabled" do
+        @course.disable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "sets ATHENA when at least one course has the flag enabled" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).to have_key(:ATHENA)
+      end
+
+      it "caches the enrollment check with enrollment-aware batched keys" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        allow(Rails.cache).to receive(:fetch_with_batched_keys).and_call_original
+        expect(Rails.cache).to receive(:fetch_with_batched_keys)
+          .with("learning_agent_dashboard/v1",
+                batch_object: @student,
+                batched_keys: :enrollments,
+                expires_in: 5.minutes)
+          .and_call_original
+        get :user_dashboard
+      end
+
+      it "does not set ATHENA for a teacher enrollment in a flagged course" do
+        course_with_teacher(active_all: true, user: @student)
+        @course.enable_feature!(:athena_learning_agent_button)
+        # student has no student enrollment in this new course
+        @student.enrollments.where(type: "StudentEnrollment").destroy_all
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "does not set ATHENA when the student enrollment is concluded" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        @course.update!(workflow_state: :completed)
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "sets ATHENA when only one of multiple courses has the flag enabled" do
+        course2 = course_with_student(active_all: true, user: @student).course
+        course2.root_account.allow_feature!(:athena_learning_agent_button)
+        @course.disable_feature!(:athena_learning_agent_button)
+        course2.enable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).to have_key(:ATHENA)
+      end
+    end
+
     context "with student planner feature enabled" do
       before(:once) do
         @account = Account.default
@@ -3163,7 +3224,7 @@ describe UsersController do
 
       it "loads nicknames" do
         @user.set_preference(:course_nicknames, @course1.id, "some nickname or whatever")
-        expect_any_instance_of(User).to_not receive(:course_nickname)
+        expect_any_instance_of(User).not_to receive(:course_nickname)
         get "user_dashboard"
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
         expect(course_data.detect { |h| h[:id] == @course1.id }[:shortName]).to eq "some nickname or whatever"
@@ -3528,6 +3589,16 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).to include :dashboard
           expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
           expect(assigns[:css_bundles].flatten).to include :dashboard
+        end
+
+        it "shows legacy dashboard to account admins even when opted in" do
+          account_admin_user
+          @admin.preferences[:widget_dashboard_user_preference] = true
+          @admin.save!
+          user_session(@admin)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
         end
 
         it "respects user preference when feature is allowed (can override)" do

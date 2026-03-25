@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Существует сохраненное в автоматическом режиме содержимое. Вы хотите загрузить сохраненное в автоматическом режиме содержимое?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Автоматическое добавление заголовков"
+    },
     "available_folders_694d0436": {
         "message": "Доступные папки"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Опишите { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(опишите видео)"
-    },
     "description_436c48d7": {
         "message": "Описание"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Вставить изображение"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Вставить варианты"
     },
     "embed_video_a97a64af": {
         "message": "Вставить видео"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Значок языковых дисциплин"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Язык, используемый в данном медиа*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Автоматически)"
+    },
     "languages_icon_9d20539": {
         "message": "Значок языков"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Ссылки на внешний сайт."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Список свернут."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Список развернут."
     },
     "lists_cd1336fc": {
         "message": "Списки"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Другие ярлыки редактора можно найти на"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Наша технология генерирует ~85% точных заголовков."
     },
     "outline_color_3ef2cea7": {
         "message": "Цвет контура"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Используется скринридерами для описания контента изображения"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Используется скринридерами для описания видео"
     },
     "user_documents_c206e61f": {
         "message": "Документы пользователя"

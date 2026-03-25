@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% vericite_data = @submission.vericite_data(true) %>
+<% vericite_data = @submission.vericite_data(lookup_data: true) %>
 <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && vericite_data[:provider] == :vericite &&
   (vericite_score = vericite_data[attachment&.asset_string] || @submission.originality_data[OriginalityReport.submission_asset_key(@submission)]) &&
   vericite_score[:similarity_score] %>

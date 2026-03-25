@@ -27,9 +27,17 @@ import type {ScanViewProps} from '../types'
 
 const I18n = createI18nScope('accessibility_scan')
 
-export const NoScanFoundView: React.FC<ScanViewProps> = ({handleCourseScan, isRequestLoading}) => {
+export const NoScanFoundView: React.FC<ScanViewProps> = ({
+  buttonLabel,
+  handleCourseScan,
+  isRequestLoading,
+}) => {
   return (
-    <ScanHandler handleCourseScan={handleCourseScan} scanButtonDisabled={isRequestLoading}>
+    <ScanHandler
+      handleCourseScan={handleCourseScan}
+      scanButtonDisabled={isRequestLoading}
+      buttonLabel={buttonLabel}
+    >
       <Flex justifyItems="center" margin="0 0 large">
         <Flex.Item>
           <EmptyDesert />
@@ -43,7 +51,7 @@ export const NoScanFoundView: React.FC<ScanViewProps> = ({handleCourseScan, isRe
       <Flex justifyItems="center" margin="0 0 large">
         <Flex.Item>
           <CondensedButton disabled={isRequestLoading} onClick={handleCourseScan}>
-            {I18n.t('Scan Course')}
+            {buttonLabel}
           </CondensedButton>
         </Flex.Item>
       </Flex>

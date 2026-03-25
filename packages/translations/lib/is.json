@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Sjálfvirkur myndatexti"
+    },
     "available_folders_694d0436": {
         "message": "Tiltækar möppur"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Lýsa { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Lýsa myndbandinu)"
-    },
     "description_436c48d7": {
         "message": "Lýsing"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Fella inn mynd"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Fella inn valkosti"
     },
     "embed_video_a97a64af": {
         "message": "Fella inn myndband"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Tungumálalistar tákn"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Tungumál sem talað er í þessu margmiðlunarefni*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (sjálfvirkur)"
+    },
     "languages_icon_9d20539": {
         "message": "Tungumála tákn"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Tenglar á ytra svæði."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Listi dreginn saman."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Listi víkkaður út."
     },
     "lists_cd1336fc": {
         "message": "Listar"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Aðra flýtivísa ritils má finna á"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Tæknin okkar býr til ~85% nákvæma skjátexta."
     },
     "outline_color_3ef2cea7": {
         "message": "Útlínulitur"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Notað af skjálesurum til að lýsa efni myndar"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Notað af skjálesurum til að lýsa myndbandinu"
     },
     "user_documents_c206e61f": {
         "message": "Notandaskjöl"

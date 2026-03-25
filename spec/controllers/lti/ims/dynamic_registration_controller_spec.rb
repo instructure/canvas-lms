@@ -781,6 +781,33 @@ describe Lti::IMS::DynamicRegistrationController do
         end
       end
     end
+
+    context "when trying to update a different tool's registration" do
+      let(:other_registration) { lti_ims_registration_model(account:) }
+      let(:other_developer_key) do
+        other_registration.developer_key.tap do |dk|
+          dk.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+        end
+      end
+
+      before do
+        developer_key.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+        request.headers["Authorization"] = "Bearer #{access_token}"
+      end
+
+      it "returns forbidden when trying to update another tool's registration" do
+        put :update, params: { registration_id: other_registration.id, **update_params }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body["errorMessage"]).to match(/not authorized/i)
+      end
+
+      it "does not create a registration update request" do
+        expect do
+          put :update, params: { registration_id: other_registration.id, **update_params }
+        end.not_to change { Lti::RegistrationUpdateRequest.count }
+      end
+    end
   end
 
   describe "#show" do
@@ -1400,6 +1427,27 @@ describe Lti::IMS::DynamicRegistrationController do
       it "returns a 404" do
         get :show_configuration, params: { registration_id: Lti::IMS::Registration.last.id + 1 }
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when trying to access a different tool's configuration" do
+      let(:other_registration) { lti_ims_registration_model(account:) }
+      let(:other_developer_key) do
+        other_registration.developer_key.tap do |dk|
+          dk.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+        end
+      end
+
+      before do
+        developer_key.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+        request.headers["Authorization"] = "Bearer #{access_token}"
+      end
+
+      it "returns forbidden when accessing another tool's configuration" do
+        get :show_configuration, params: { registration_id: other_registration.id }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body["errorMessage"]).to match(/not authorized/i)
       end
     end
   end

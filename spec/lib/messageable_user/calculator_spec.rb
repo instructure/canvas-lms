@@ -404,7 +404,7 @@ describe "MessageableUser::Calculator" do
 
       it "does not include groups in restricted visibility courses, even with the user in it" do
         RoleOverride.manage_role_override(Account.default, student_role, "send_messages", override: false)
-        expect(@calculator.uncached_section_visible_group_ids).to_not include(@group.id)
+        expect(@calculator.uncached_section_visible_group_ids).not_to include(@group.id)
       end
     end
 

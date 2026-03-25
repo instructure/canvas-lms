@@ -30,10 +30,12 @@ module Api::V1::MediaObject
       json["media_sources"] = media_sources_json(media_object) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_object_iframe_url(media_object.media_id)
       json["auto_caption_status"] = media_object.auto_caption_status
+      json["status"] = media_object.data[:status] if media_object.data[:status].present?
+      json["viewer_restrictions"] = media_object.viewer_restrictions || {}
 
       unless exclude.include?("tracks")
         json["media_tracks"] = media_object.media_tracks.map do |track|
-          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale status]).tap do |json2|
+          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale workflow_state]).tap do |json2|
             json2[:asr] = track.asr?
             json2[:url] = show_media_tracks_url(media_object.media_id, track.id)
           end
@@ -49,10 +51,12 @@ module Api::V1::MediaObject
       json["media_sources"] = media_sources_json(media_object, attachment:, verifier:, access_token:, instfs_id:, location:) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_attachment_iframe_url(attachment.id)
       json["auto_caption_status"] = media_object.auto_caption_status
+      json["status"] = media_object.data[:status] if media_object.data[:status].present?
+      json["viewer_restrictions"] = media_object.viewer_restrictions || {}
 
       unless exclude.include?("tracks")
         json["media_tracks"] = attachment.media_tracks_include_originals.map do |track|
-          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale status inherited]).tap do |json2|
+          api_json(track, current_user, session, only: %w[kind created_at updated_at id locale workflow_state inherited]).tap do |json2|
             json2[:asr] = track.asr?
             json2[:url] = show_media_attachment_tracks_url(attachment.id, track.id, access_token:, instfs_id:, location:)
           end

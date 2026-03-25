@@ -693,7 +693,7 @@ describe Account do
       subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
       subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
       @shard1.activate do
-        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+        expect(Account.select(:id).sub_accounts_recursive(sub.id, pluck: true).sort).to eq(subs.map(&:id).sort)
         expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
       end
     end
@@ -765,7 +765,7 @@ describe Account do
     subs << grand_sub = Account.create!(name: "grand_sub", parent_account: sub)
     subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
     subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
-    expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+    expect(Account.select(:id).sub_accounts_recursive(sub.id, pluck: true).sort).to eq(subs.map(&:id).sort)
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
   end
 
@@ -1104,7 +1104,7 @@ describe Account do
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL", root_account_only: true }
       tool.save!
       expect(@account.root_account.tabs_available(@teacher).pluck(:id)).to include(tool.asset_string)
-      expect(@account.tabs_available(@teacher).pluck(:id)).to_not include(tool.asset_string)
+      expect(@account.tabs_available(@teacher).pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "does not include external tools for non-admins if visibility is set" do
@@ -1114,7 +1114,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to_not include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
 
       admin = account_admin_user(account: @account)
       tabs = @account.tabs_available(admin)
@@ -1369,7 +1369,7 @@ describe Account do
 
     it "ignores deleted AACs" do
       aac.destroy
-      expect(account.authentication_providers.active).to_not include(aac)
+      expect(account.authentication_providers.active).not_to include(aac)
     end
   end
 
@@ -2627,6 +2627,66 @@ describe Account do
   describe "#discovery_page_allowed?" do
     it "always returns false" do
       expect(Account.new.discovery_page_allowed?).to be(false)
+    end
+  end
+
+  describe "#discovery_page_base_url" do
+    it "returns nil" do
+      expect(Account.new.discovery_page_base_url).to be_nil
+    end
+  end
+
+  describe "#discovery_page_claims_for" do
+    let(:account) { Account.default }
+    let(:user) { user_model }
+    let(:provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+    it "sets sub to the user global_id as a string" do
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:sub]).to eq(user.global_id.to_s)
+    end
+
+    it "sets org to the account uuid" do
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:org]).to eq(account.uuid)
+    end
+
+    it "builds primary links for matching providers" do
+      entry = { authentication_provider_id: provider.id, label: "CAS Login", icon: nil }
+      claims = account.discovery_page_claims_for(user, { primary: [entry], secondary: [] })
+      expect(claims[:primary].length).to eq(1)
+      expect(claims[:primary].first[:label]).to eq("CAS Login")
+    end
+
+    it "skips entries with no matching provider" do
+      entry = { authentication_provider_id: 0, label: "Ghost", icon: nil }
+      claims = account.discovery_page_claims_for(user, { primary: [entry], secondary: [] })
+      expect(claims[:primary]).to be_empty
+    end
+
+    it "treats nil config sections as empty" do
+      claims = account.discovery_page_claims_for(user, { primary: nil, secondary: nil })
+      expect(claims[:primary]).to eq([])
+      expect(claims[:secondary]).to eq([])
+    end
+  end
+
+  describe "#discovery_page_link_for" do
+    let(:account) { Account.default }
+    let(:provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+    it "includes label, icon, and path" do
+      entry = { label: "CAS Login", icon: "cas-icon" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("CAS Login")
+      expect(link[:icon]).to eq("cas-icon")
+      expect(link[:path]).to be_present
+    end
+
+    it "omits nil values via compact" do
+      entry = { label: "CAS Login", icon: nil }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link).not_to have_key(:icon)
     end
   end
 

@@ -2405,7 +2405,7 @@ module Lti
 
           it "has substitution when the user is a student and context is a course-based Group" do
             exp = VariableExpander.new(root_account, group, controller, current_user: user, tool:, assignment:)
-            expect(exp.lti_helper.course).to_not be_nil
+            expect(exp.lti_helper.course).not_to be_nil
             expect(exp.lti_helper.course).to receive(:user_is_student?).and_return(true)
             expect(expand!("$Canvas.assignment.submission.studentAttempts", expander: exp)).to eq 2
           end

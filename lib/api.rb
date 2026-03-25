@@ -633,7 +633,7 @@ module Api
                        user = @current_user,
                        preloaded_attachments = {},
                        options = {},
-                       is_public = false,
+                       is_public: false,
                        location: nil)
     return html if html.blank?
 
@@ -652,7 +652,7 @@ module Api
     end
     domain_root_account = @domain_root_account || options[:domain_root_account]
 
-    no_verifiers = domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
+    no_verifiers = params[:no_verifiers] if defined?(params)
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
       file_handler = proc do |match|

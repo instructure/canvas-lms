@@ -405,7 +405,7 @@ class WebConference < ActiveRecord::Base
     nil
   end
 
-  def active?(force_check = false, allow_check = true)
+  def active?(force_check: false, allow_check: true)
     unless force_check
       return false if ended_at && Time.zone.now > ended_at
       return true if self.start_at && (self.end_at.nil? || (self.end_at && Time.zone.now > self.start_at && Time.zone.now < self.end_at))

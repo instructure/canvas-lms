@@ -61,7 +61,6 @@
 
 class SharedBrandConfigsController < ApplicationController
   before_action :require_account_context, except: [:destroy]
-  before_action :require_user
   before_action :set_shared_brand_config, only: [:destroy, :update]
 
   # @API Share a BrandConfig (Theme)

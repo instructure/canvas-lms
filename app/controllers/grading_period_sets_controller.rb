@@ -44,7 +44,6 @@
 #    }
 #
 class GradingPeriodSetsController < ApplicationController
-  before_action :require_user
   before_action :get_context
   before_action :check_manage_rights, except: [:index]
   before_action :check_read_rights, except: %i[update create destroy]

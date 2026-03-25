@@ -149,7 +149,7 @@ module Canvas::OAuth
     describe "#create_access_token_if_needed" do
       it "deletes existing tokens for the same key when requested" do
         old_token = user.access_tokens.create! developer_key: key
-        token.create_access_token_if_needed(true)
+        token.create_access_token_if_needed(replace_tokens: true)
         expect(AccessToken.not_deleted.where(id: old_token.id).exists?).to be(false)
       end
 
@@ -206,7 +206,7 @@ module Canvas::OAuth
         access_token = AccessToken.authenticate(json["access_token"])
         # setup new token with existing access token
         new_token = Token.new(token.key, token.code, access_token)
-        expect(new_token.as_json.keys).to_not include "refresh_token"
+        expect(new_token.as_json.keys).not_to include "refresh_token"
       end
 
       it "grabs the user json as well" do

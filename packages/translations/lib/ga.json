@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Is ann d’ábhar uathshábháilte. Ar mhaith leat an t-ábhar sin a lódáil nó é a scriosadh?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Fotheidealú uathoibríoch"
+    },
     "available_folders_694d0436": {
         "message": "Fillteáin atá ar fáil"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Déan cur síos ar an { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Déan cur síos ar an bhfíseán)"
-    },
     "description_436c48d7": {
         "message": "Cur síos"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Leabaigh Íomhá"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Roghanna Leabaithe"
     },
     "embed_video_a97a64af": {
         "message": "Leabaigh Físeán "
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Deilbhín Ealaíona Teanga"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Teanga a Labhraítear sna Meáin seo*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Uathoibríoch)"
+    },
     "languages_icon_9d20539": {
         "message": "Deilbhín Teangacha"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Naisc chuig suíomh seachtrach."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Liosta tite."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liosta leathnaithe"
     },
     "lists_cd1336fc": {
         "message": "Liostaí"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Is féidir aicearraí eile d’eagarthóirí a fháil ag"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Gineann ár dteicneolaíocht ~85% fotheidil chruinn."
     },
     "outline_color_3ef2cea7": {
         "message": "Dath Imlíne"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Úsáidte ag léitheoirí scáileáin chun cur síos a dhéanamh ar ábhar íomhá"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Úsáidte ag léitheoirí scáileáin chun cur síos a dhéanamh ar an bhfíseán"
     },
     "user_documents_c206e61f": {
         "message": "Doiciméid Úsáideora"

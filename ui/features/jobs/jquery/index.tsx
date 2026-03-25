@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {JobDialog} from '../react/components'
@@ -611,8 +611,7 @@ ready(() => {
 
   const jobHandlerContainer = document.getElementById('job-handler-wrapper')
   if (jobHandlerContainer) {
-    const root = createRoot(jobHandlerContainer)
-    root.render(
+    render(
       <JobDialog
         label={I18n.t('Job Handler')}
         retrieveValue={async () => {
@@ -620,13 +619,13 @@ ready(() => {
           return job?.handler || ''
         }}
       />,
+      jobHandlerContainer,
     )
   }
 
   const jobLastErrorContainer = document.getElementById('job-last_error-wrapper')
   if (jobLastErrorContainer) {
-    const root = createRoot(jobLastErrorContainer)
-    root.render(
+    render(
       <JobDialog
         label={I18n.t('Last Error')}
         retrieveValue={async () => {
@@ -634,6 +633,7 @@ ready(() => {
           return job?.last_error || ''
         }}
       />,
+      jobLastErrorContainer,
     )
   }
 })

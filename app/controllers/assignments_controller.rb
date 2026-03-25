@@ -42,6 +42,7 @@ class AssignmentsController < ApplicationController
 
   before_action :load_canvas_career, only: %i[index show syllabus]
   before_action :redirect_peer_review_sub_assignment, only: [:show]
+  skip_before_action :require_user, only: %i[index show syllabus]
 
   include K5Mode
 
@@ -174,7 +175,7 @@ class AssignmentsController < ApplicationController
              scaling_factor: grading_standard.scaling_factor,
              enhanced_rubrics_enabled: @context.feature_enabled?(:enhanced_rubrics),
              course_pacing_enabled: @context.enable_course_paces,
-             peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading),
+             peer_review_allocation_and_grading: @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.peer_review_sub_assignment.present?,
            })
 
     if peer_review_mode_enabled
@@ -627,6 +628,8 @@ class AssignmentsController < ApplicationController
       assigned_rubric[:can_update] = can_update_rubric
       assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id).count
       rubric_association = rubric_association_json(rubric_association, @current_user, session)
+      rubric_association[:can_update] = can_do(assignment.rubric_association, @current_user, :update)
+      rubric_association[:can_delete] = can_do(assignment.rubric_association, @current_user, :delete)
     end
 
     render json: { assigned_rubric:, rubric_association: }
@@ -903,7 +906,7 @@ class AssignmentsController < ApplicationController
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
-      @assignment.ensure_assignment_group(false)
+      @assignment.ensure_assignment_group(save: false)
       if @context.root_account.suppress_assignments?
         @assignment.suppress_assignment = value_to_boolean(params[:suppress_assignment]) if params.key?(:suppress_assignment)
       end

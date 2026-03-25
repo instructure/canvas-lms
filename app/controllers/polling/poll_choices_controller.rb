@@ -57,7 +57,6 @@ module Polling
   class PollChoicesController < ApplicationController
     include ::Filters::Polling
 
-    before_action :require_user
     before_action :require_poll
 
     # @API List poll choices in a poll

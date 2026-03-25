@@ -197,7 +197,9 @@ class SubmissionSearch
   end
 
   def order_by_username(search_scope:, direction:, sortable_name: false)
-    return order_by_anonymous_username(search_scope:, direction:) if @assignment.anonymize_students?
+    if @assignment.anonymize_students? || @assignment.new_quizzes_anonymous_participants?
+      return order_by_anonymous_username(search_scope:, direction:)
+    end
 
     order_clause = sortable_name ? User.sortable_name_order_by_clause("users") : User.name_order_by_clause("users")
     search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
@@ -229,9 +231,9 @@ class SubmissionSearch
 
   def allowed_users
     users = if @options[:apply_gradebook_enrollment_filters]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
             elsif @options[:include_concluded] || @options[:include_deactivated]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
             else
               @course.users_visible_to(@searcher)
             end

@@ -16,26 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default class GridEvent {
-  handlers: any[] = []
+export default class GridEvent<TEvent = unknown, TData = unknown> {
+  handlers: ((event: TEvent, data: TData) => unknown)[] = []
 
-  // @ts-expect-error
-  subscribe(handler) {
+  subscribe(handler: (event: TEvent, data: TData) => unknown) {
     if (!this.handlers.includes(handler)) {
       this.handlers.push(handler)
     }
   }
 
-  // @ts-expect-error
-  unsubscribe(handler) {
+  unsubscribe(handler: (event: TEvent, data: TData) => unknown) {
     const index = this.handlers.indexOf(handler)
     if (index !== -1) {
       this.handlers.splice(index, 1)
     }
   }
 
-  // @ts-expect-error
-  trigger(event, data) {
+  trigger(event: TEvent, data: TData) {
     for (let i = 0; i < this.handlers.length; i++) {
       if (this.handlers[i](event, data) === false) {
         return false // prevent additional handlers from continuing

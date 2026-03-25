@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {DiscoveryPage} from './react'
 import ready from '@instructure/ready'
 
@@ -26,15 +25,18 @@ ready(() => {
   const hiddenField = document.getElementById(
     'discovery_page_active_field',
   ) as HTMLInputElement | null
+
   if (reactRoot && hiddenField) {
     const currentValue = hiddenField.value === 'true'
-    createRoot(reactRoot).render(
+
+    render(
       <DiscoveryPage
         initialEnabled={currentValue}
         onChange={newValue => {
           hiddenField.value = String(newValue)
         }}
       />,
+      reactRoot,
     )
   }
 })

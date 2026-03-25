@@ -573,7 +573,7 @@ describe DiscussionEntry do
       assignment = @course.assignments.create!(title: @topic.title, submission_types: "discussion_topic")
       topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment:)
       entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
-      expect { entry.destroy }.to_not raise_error
+      expect { entry.destroy }.not_to raise_error
     end
 
     it "decrements unread topic counts" do
@@ -633,7 +633,7 @@ describe DiscussionEntry do
         dt_assignment.has_sub_assignments = true
         dt_assignment.save(validate: false)
 
-        expect { entry.destroy }.to_not raise_error
+        expect { entry.destroy }.not_to raise_error
       end
     end
   end

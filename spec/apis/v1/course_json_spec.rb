@@ -407,7 +407,7 @@ module Api
 
             it "doesn't error when there is no grading period" do
               @gp1.destroy
-              expect { json_enrollment.fetch(:current_period_computed_current_score) }.to_not raise_error
+              expect { json_enrollment.fetch(:current_period_computed_current_score) }.not_to raise_error
             end
 
             context "when Final Grade Override is enabled and allowed" do
@@ -696,7 +696,7 @@ module Api
         it "uses precalculated permissions if available" do
           precalculated_permissions = { read_sis: false, manage_sis: true }
           course_json_with_perms = CourseJson.new(sis_course, user, includes, [], precalculated_permissions:)
-          expect(sis_course).to_not receive(:grants_right?)
+          expect(sis_course).not_to receive(:grants_right?)
           course_json_with_perms.set_sis_course_id(hash)
           expect(hash["sis_course_id"]).to eq 1357
         end

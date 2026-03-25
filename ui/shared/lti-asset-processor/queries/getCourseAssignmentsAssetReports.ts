@@ -73,6 +73,7 @@ export const COURSE_ASSIGNMENTS_ASSET_REPORTS_QUERY = gql`
 // This needs to be kept up to date with the GraphQL Codegen SubmissionType,
 // which eventually comes from app/graphql/types/assignment_submission_type.rb
 export const ZSubmissionType = z.enum([
+  'ams',
   'attendance',
   'basic_lti_launch',
   'discussion_topic',

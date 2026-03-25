@@ -438,7 +438,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           data-testid="pp-module-item-row"
           onMouseEnter={() => this.setState({hovering: true})}
           onMouseLeave={() => this.setState({hovering: false})}
-          {...pick(this.props, ['hover', 'isStacked', 'headers'])}
+          {...pick(this.props, ['hover', 'headers'])}
         >
           <Table.Cell data-testid="pp-title-cell">
             <Flex justifyItems="space-between">

@@ -1351,7 +1351,7 @@ describe "Submissions API", type: :request do
     Quizzes::SubmissionGrader.new(qs).grade_submission
     qs.reload
     qs.attempt = 2
-    qs.with_versioning(true, &:save)
+    qs.with_versioning(&:save)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",
@@ -2498,7 +2498,7 @@ describe "Submissions API", type: :request do
                           include: ["provisional_grades"]
                         })
 
-        expect(json.first["provisional_grades"]).to_not be_empty
+        expect(json.first["provisional_grades"]).not_to be_empty
         speedgrader_url = URI.parse(json.first["provisional_grades"].first["speedgrader_url"])
         expect(speedgrader_url).to match_path("/courses/#{@course.id}/gradebook/speed_grader")
           .and_query({ assignment_id: @assignment.id, student_id: @student.id })
@@ -7447,7 +7447,7 @@ describe "Submissions API", type: :request do
                grade_data)
       run_jobs
 
-      expect(@a1.submission_for_student(@student1)).to_not be_excused
+      expect(@a1.submission_for_student(@student1)).not_to be_excused
     end
 
     it "posts do not set grader_id for unchanged scores" do

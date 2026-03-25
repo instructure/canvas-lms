@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Mae cynnwys sydd wedi’i gadw’n awtomatig yn bodoli. Hoffech chi lwytho’r cynnwys sydd wedi’i gadw’n awtomatig?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Capsiynu awtomatig"
+    },
     "available_folders_694d0436": {
         "message": "Ffolderi sydd ar gael"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Disgrifiwch y { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Disgrifiwch y fideo)"
-    },
     "description_436c48d7": {
         "message": "Disgrifiad"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Plannu Delwedd"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Plannu Opsiynau"
     },
     "embed_video_a97a64af": {
         "message": "Plannu Fideo"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Eicon Celfyddydau Iaith"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Yr iaith sy''n cael ei siarad yn y cyfryngau hyn*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Awtomatig)"
+    },
     "languages_icon_9d20539": {
         "message": "Eicon Ieithoedd"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Dolenni at safle allanol."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Rhestr wedi crebachu."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Rhestr wedi ehangu."
     },
     "lists_cd1336fc": {
         "message": "Rhestrau"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Mae bysellau hwylus golygu eraill i''w cael yn"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Mae ein technoleg yn cynhyrchu capsiynau ~85% gywir."
     },
     "outline_color_3ef2cea7": {
         "message": "Lliw Amlinell"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Yn cael ei ddefnyddio gan ddarllenwyr sgrin i ddisgrifio cynnwys delwedd"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Yn cael ei ddefnyddio gan ddarllenwyr sgrin i ddisgrifio’r fideo"
     },
     "user_documents_c206e61f": {
         "message": "Dogfennau Defnyddiwr"

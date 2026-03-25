@@ -140,9 +140,24 @@ class AssessmentQuestion < ActiveRecord::Base
         file = file.replacement_attachment
       end
 
-      begin
-        raise "User does not have access to file" unless migration || (updating_user && file&.grants_right?(updating_user, nil, :create))
+      unless updating_user.present? || migration
+        error_message = "User is required for file translation in #{self.class}"
+        Sentry.with_scope do |scope|
+          scope.set_context("assessment_question_file_translation", {
+                              assessment_question_id: id
+                            })
+          Sentry.capture_message(error_message, level: :warning)
+        end
+        raise error_message if Rails.env.development?
 
+        return link
+      end
+
+      if updating_user && !file&.grants_right?(updating_user, nil, :create)
+        return link
+      end
+
+      begin
         new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil

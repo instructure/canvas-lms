@@ -199,10 +199,13 @@ class GroupMembership < ActiveRecord::Base
       quizzes += overrides.where.not(quiz_id: nil).pluck(:quiz_id)
       context_modules += overrides.where.not(context_module_id: nil).pluck(:context_module_id)
     else
-      assignments += Assignment.where(context_type: group.context_type, context_id: group.context_id)
-                               .where(group_category_id: group.group_category_id).pluck(:id)
-      assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
-                                    .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+      parent_assignment_ids = Assignment.where(context_type: group.context_type, context_id: group.context_id)
+                                        .where(group_category_id: group.group_category_id).pluck(:id)
+      parent_assignment_ids += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
+                                              .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+      parent_assignment_ids.uniq!
+      assignments += parent_assignment_ids
+      assignments += SubAssignment.active.where(parent_assignment_id: parent_assignment_ids).pluck(:id) if parent_assignment_ids.any?
     end
 
     process_cache_for_assignments(assignments)

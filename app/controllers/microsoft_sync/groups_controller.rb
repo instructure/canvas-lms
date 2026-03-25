@@ -96,7 +96,6 @@
 #     }
 class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_context
-  before_action :require_user
   before_action :validate_user_permissions
   before_action :require_feature
   before_action :require_integration_available

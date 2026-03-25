@@ -367,6 +367,11 @@ RSpec.describe ApplicationController do
               course2.enroll_student(@user).tap(&:accept!)
               expect(controller.js_env[:widget_dashboard_overridable]).to be false
             end
+
+            it "is not set for account admins" do
+              Account.default.account_users.create!(user: @user)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
           end
         end
       end
@@ -982,7 +987,7 @@ RSpec.describe ApplicationController do
         ctrl = ApplicationController.new
         ctrl.send(:assign_localizer)
         locale = nil
-        expect { locale = I18n.localizer.call }.to_not raise_error
+        expect { locale = I18n.localizer.call }.not_to raise_error
         expect(locale).to eq("en") # default locale
       end
 
@@ -1389,7 +1394,7 @@ RSpec.describe ApplicationController do
 
             it "does not display the assignment edit sidebar" do
               controller.send(:content_tag_redirect, course, content_tag, nil)
-              expect(assigns[:append_template]).to_not be_present
+              expect(assigns[:append_template]).not_to be_present
             end
 
             context "ENV.LTI_TOOL_FORM_ID" do
@@ -2614,7 +2619,7 @@ RSpec.describe ApplicationController do
 
         course_factory
         student_in_course(user: @user, course: @course)
-        expect(@course).to_not be_available
+        expect(@course).not_to be_available
         expect(@user.cached_currentish_enrollments).to be_empty
         @other_group = group_model(context: @course)
         group_model(context: @course)
@@ -2662,7 +2667,7 @@ RSpec.describe ApplicationController do
                           only_contexts: "Course_#{course2.id}",
                         })
         contexts = controller.instance_variable_get(:@contexts)
-        expect(contexts).to_not include course1
+        expect(contexts).not_to include course1
         expect(contexts).to include course2
       end
     end
@@ -3081,6 +3086,57 @@ RSpec.describe ApplicationController do
         controller.params[:action] = "syllabus"
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
+    end
+  end
+
+  describe "show_learning_agent_button? helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before do
+      user_session(@student)
+      controller.instance_variable_set(:@context, @course)
+      controller.instance_variable_set(:@context_enrollment, @enrollment)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "returns false when context is not a Course" do
+      controller.instance_variable_set(:@context, Account.default)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns false when enrollment is not a StudentEnrollment" do
+      controller.instance_variable_set(:@context_enrollment, nil)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns false when feature flag is off" do
+      @course.disable_feature!(:athena_learning_agent_button)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns true when all conditions are met" do
+      @course.enable_feature!(:athena_learning_agent_button)
+      expect(controller.send(:show_learning_agent_button?)).to be true
+    end
+  end
+
+  describe "load_learning_agent_env helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before do
+      user_session(@student)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "sets ATHENA in js_env via public_app_config" do
+      config = { authenticated: true, launch_domain: "athena.example.com", launch_path: "/agent" }
+      allow(Services::Athena).to receive(:public_app_config).with(@student).and_return(config)
+      expect(controller).to receive(:js_env).with({ ATHENA: config })
+      controller.send(:load_learning_agent_env)
     end
   end
 
@@ -3912,6 +3968,8 @@ RSpec.describe ApplicationController, "#compute_http_cost" do
   include WebMock::API
 
   controller do
+    skip_before_action :require_user
+
     def index
       if params[:do_http].to_i > 0
         CanvasHttp.get("http://www.example.com/test")

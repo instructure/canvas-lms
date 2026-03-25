@@ -29,6 +29,8 @@ wait
 # Ensure dependencies are installed in new worktrees
 # (Fallback in case node_modules wasn't copied or is stale)
 yarn = "yarn install --frozen-lockfile"
+# Build workspace packages (e.g. canvas-rce es/ output) needed for local vitest runs
+build = "yarn run build:packages"
 
 # Fast format check on changed files only (for agents)
 [pre-commit]

@@ -602,6 +602,36 @@ describe('transformApiToInternalItem', () => {
     expect(result.completed).toBe(false)
   })
 
+  it('extracts and transforms the proper data for a peer review sub-assignment', () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'peer_review_sub_assignment',
+      plannable: {
+        id: '42',
+        title: 'Assignment 1 Peer Review (2)',
+        due_at: '2024-10-15T05:59:59Z',
+        points_possible: 10,
+        submission_types: 'peer_review',
+      },
+      html_url: '/courses/1/assignments/10/peer_reviews',
+    })
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+
+    expect(result.type).toBe('Peer Review Sub Assignment')
+    expect(result.title).toBe('Assignment 1 Peer Review (2)')
+    expect(result.id).toBe('42')
+    expect(result.uniqueId).toBe('peer_review_sub_assignment-42')
+    expect(result.html_url).toBe('/courses/1/assignments/10/peer_reviews')
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+  })
+
   it('extracts and transforms the proper date for an account calendar event', () => {
     window.ENV = {}
     const apiResponse = makeApiResponse({

@@ -33,7 +33,6 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: %i[speed_grader speed_grader_settings grade_summary grading_rubrics update_final_grade_overrides]
 
   include HorizonMode
 
@@ -287,7 +286,8 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def grading_rubrics
+  # LEGACY: Original implementation
+  def grading_rubrics_legacy
     return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
 
     @rubric_contexts = @context.rubric_contexts(@current_user)
@@ -308,6 +308,46 @@ class GradebooksController < ApplicationController
       render json: StringifyIds.recursively_stringify_ids(data)
     else
       render json: @rubric_contexts
+    end
+  end
+
+  def grading_rubrics
+    if Account.site_admin.feature_enabled?(:optimized_grading_rubrics)
+      grading_rubrics_optimized
+    else
+      grading_rubrics_legacy
+    end
+  end
+
+  # OPTIMIZED: Uses context filtering to avoid loading all contexts when requesting specific one
+  def grading_rubrics_optimized
+    return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
+
+    # Only load requested context instead of all contexts when filtering
+    rubric_contexts = if params[:context_code]
+                        @context.rubric_contexts(@current_user, context_code: params[:context_code])
+                      else
+                        @context.rubric_contexts(@current_user)
+                      end
+
+    if params[:context_code]
+      # rubric_contexts already filtered by context_code, check if context exists
+      rubric_context = if rubric_contexts.any?
+                         Context.find_by_asset_string(params[:context_code])
+                       else
+                         @context
+                       end
+      rubric_associations = rubric_context.shard.activate { Context.sorted_rubrics(rubric_context) }
+      data = rubric_associations.map do |ra|
+        json = ra.as_json(methods: [:context_name], include: { rubric: { include_root: false } })
+        # return shard-aware context codes
+        json["rubric_association"]["context_code"] = ra.context.asset_string
+        json["rubric_association"]["rubric"]["context_code"] = ra.rubric.context.asset_string
+        json
+      end
+      render json: StringifyIds.recursively_stringify_ids(data)
+    else
+      render json: rubric_contexts
     end
   end
 
@@ -793,6 +833,7 @@ class GradebooksController < ApplicationController
                ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
                OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
                outcome_proficiency:,
+               message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
                permissions: {
                  allow_assign_to_differentiation_tags: @context.account.allow_assign_to_differentiation_tags? && @context.grants_right?(@current_user, session, :manage_tags_add)
                },
@@ -1114,6 +1155,7 @@ class GradebooksController < ApplicationController
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
         VIEW_ALL_GRADES: @context.grants_right?(@current_user, session, :view_all_grades),
+        can_delete_attachments: @context.root_account.grants_right?(@current_user, session, :become_user),
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),

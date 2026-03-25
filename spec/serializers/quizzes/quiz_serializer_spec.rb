@@ -502,7 +502,7 @@ describe Quizzes::QuizSerializer do
   end
 
   it "includes anonymous_submisions if quiz is a survey quiz" do
-    expect(json.keys).to_not include(:anonymous_submissions)
+    expect(json.keys).not_to include(:anonymous_submissions)
 
     quiz.quiz_type = "survey"
     quiz.anonymous_submissions = true

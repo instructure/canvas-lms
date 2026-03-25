@@ -41,6 +41,8 @@ export type RubricAssociation = {
   useForGrading: boolean
   hideOutcomeResults: boolean
   id: string
+  canUpdate?: boolean
+  canDelete?: boolean
 }
 
 export type RubricCriterion = {

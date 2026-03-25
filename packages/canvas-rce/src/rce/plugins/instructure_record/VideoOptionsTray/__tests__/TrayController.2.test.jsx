@@ -266,6 +266,26 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       })
     })
 
+    it('passes viewerRestrictions to updateMediaObject', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        viewerRestrictions: {show_rolling_transcript: true},
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          viewerRestrictions: {show_rolling_transcript: true},
+        }),
+      )
+    })
+
     it('does not try to save data to the db on a locked media attachment', () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])

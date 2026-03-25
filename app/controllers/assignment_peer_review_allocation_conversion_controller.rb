@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AssignmentPeerReviewAllocationConversionController < ApplicationController
-  before_action :require_user
   before_action :require_assignment
   before_action :check_authorized_action
 

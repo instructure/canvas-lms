@@ -19,7 +19,6 @@
 #
 
 class GradebookSettingsController < ApplicationController
-  before_action :require_user
   before_action :require_context
   before_action :authorize
 

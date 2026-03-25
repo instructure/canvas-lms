@@ -25,7 +25,7 @@ describe CanvasQuizStatistics::Analyzers::ShortAnswer do
   let(:question_data) { QuestionHelpers.fixture("short_answer_question") }
 
   it "does not blow up when no responses are provided" do
-    expect { expect(subject.run([])).to be_present }.to_not raise_error
+    expect { expect(subject.run([])).to be_present }.not_to raise_error
   end
 
   it_behaves_like "[:correct]"

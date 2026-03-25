@@ -437,18 +437,6 @@ RSpec.configure do |config|
   config.order = :random
   config.filter_run_when_matching :focus
 
-  # The Pact specs have prerequisite setup steps so we exclude them by default
-  config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
-
-  if ENV["CRYSTALBALL_MAP"] == "1"
-    config.filter_run_excluding :pact_live_events
-    config.filter_run_excluding :pact
-  end
-
-  # The Pact build needs RspecJunitFormatter and does not run RSpecQ
-  file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
-  config.add_formatter "RspecJunitFormatter", file if (ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]) || ENV["CRYSTALBALL_MAP"] == "1"
-
   config.include Helpers
   config.include Factories
   config.include RequestHelper, type: :request
@@ -496,7 +484,7 @@ RSpec.configure do |config|
     ReadOnlySecondaryStub.reset
     Time.zone = "UTC"
     LoadAccount.force_special_account_reload = true
-    Account.clear_special_account_cache!(true)
+    Account.clear_special_account_cache!(force: true)
     PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
@@ -555,26 +543,11 @@ RSpec.configure do |config|
     non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
     next if non_empty_tables.empty?
 
-    message = "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}"
-    non_empty_tables.each do |table|
-      model = ActiveRecord::Base.descendants.find { |m| m.table_name == table }
-      records = model.limit(5).to_a
-      count = model.count
-
-      message += records.map do |record|
-        "\n  #{record.inspect}"
-      end.join
-
-      if count > 5
-        message += "\n ... #{count - 5} more #{model.name} records"
-      end
-    end
-
     # If you're seeing this error, your spec has left extra data around.
     # The test database should be completely empty after migrations run
     # with the exception of the core tables mentioned in the method above,
     # and a single row in the accounts table for the dummy root account.
-    raise message
+    raise ActiveRecord::Base.connection.non_empty_tables_message(non_empty_tables)
   end
 
   config.before :suite do

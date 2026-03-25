@@ -22,7 +22,7 @@
 # API for creating and viewing user logins under an account
 class PseudonymsController < ApplicationController
   before_action :get_context, only: [:index, :create]
-  before_action :require_user, only: %i[create show edit update]
+  skip_before_action :require_user, only: %i[change_password confirm_change_password forgot_password]
   before_action :reject_student_view_student, only: %i[create show edit update]
   protect_from_forgery except: %i[registration_confirmation change_password forgot_password], with: :exception
 
@@ -217,7 +217,7 @@ class PseudonymsController < ApplicationController
           # If they changed the password (and we subsequently log them in) then
           # we're pretty confident this is the right user, and the communication
           # channel is valid, so register the user and approve the channel.
-          @cc.set_confirmation_code(true)
+          @cc.set_confirmation_code(reset: true)
           @cc.confirm
           @cc.save
           @pseudonym.user.register

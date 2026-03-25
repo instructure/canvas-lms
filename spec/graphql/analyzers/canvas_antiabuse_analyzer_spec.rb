@@ -75,7 +75,7 @@ describe Analyzers::CanvasAntiabuseAnalyzer do
       end
 
       it "returns an alias limit analysis error and sends metrics to Datadog" do
-        expect(InstStatsd::Statsd).to receive(:distribution).with("graphql.excessive_alias_count", 6, anything)
+        expect(InstStatsd::Statsd).to receive(:distribution).with("graphql.excessive_alias_count", 6)
 
         result = analyzer.result
         expect(result).to be_a(GraphQL::AnalysisError)
@@ -90,7 +90,7 @@ describe Analyzers::CanvasAntiabuseAnalyzer do
       end
 
       it "returns a directive limit analysis error and sends metrics to Datadog" do
-        expect(InstStatsd::Statsd).to receive(:distribution).with("graphql.excessive_directive_count", 4, anything)
+        expect(InstStatsd::Statsd).to receive(:distribution).with("graphql.excessive_directive_count", 4)
 
         result = analyzer.result
         expect(result).to be_a(GraphQL::AnalysisError)

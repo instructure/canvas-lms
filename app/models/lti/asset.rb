@@ -51,7 +51,9 @@ class Lti::Asset < ApplicationRecord
   belongs_to :submission,
              inverse_of: :lti_assets,
              class_name: "Submission",
-             optional: false
+             optional: true # submission can be hard deleted when "test student" got a reset
+
+  validates :submission, presence: true, on: :create
 
   belongs_to :discussion_entry_version,
              inverse_of: :lti_asset,

@@ -40,6 +40,7 @@ describe AssignmentsController do
 
   describe "GET 'index'" do
     it "throws 404 error without a valid context id" do
+      user_session(@student)
       get "index", params: { course_id: "notvalid" }
       assert_status(404)
     end
@@ -1266,11 +1267,19 @@ describe AssignmentsController do
             expect(assigns[:js_env][:REVIEWER_SUBMISSION_ID]).to eq @student_submission_id
           end
 
-          it "sets peer_review_allocation_and_grading to true when feature is enabled" do
+          it "sets peer_review_allocation_and_grading to true when feature is enabled and peer_review_sub_assignment is present" do
             @course.enable_feature!(:peer_review_allocation_and_grading)
+            peer_review_model(parent_assignment: @assignment)
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id }
             expect(assigns[:js_env][:peer_review_allocation_and_grading]).to be true
+          end
+
+          it "sets peer_review_allocation_and_grading to false when feature is enabled but peer_review_sub_assignment is not present" do
+            @course.enable_feature!(:peer_review_allocation_and_grading)
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env][:peer_review_allocation_and_grading]).to be false
           end
 
           it "sets peer_review_allocation_and_grading to false when feature is disabled" do
@@ -2198,6 +2207,7 @@ describe AssignmentsController do
       end
 
       it "notifies user and redirects back to assignments page" do
+        user_session(@student)
         subject
         expect(response).to be_redirect
         expect(flash[:error]).to match(/The assignment you requested is not associated with an LTI tool./)
@@ -2462,6 +2472,7 @@ describe AssignmentsController do
     end
 
     it "defaults to unpublished for draft state" do
+      user_session(@teacher)
       @course.require_assignment_group
 
       get "new", params: { course_id: @course.id }
@@ -2521,6 +2532,7 @@ describe AssignmentsController do
     end
 
     it "set active_tab to assignments" do
+      user_session(@teacher)
       get "new", params: { course_id: @course.id, quiz_lti: true }
       expect(assigns[:active_tab]).to eq("assignments")
     end
@@ -2653,6 +2665,7 @@ describe AssignmentsController do
     end
 
     it "defaults to unpublished if draft state is enabled" do
+      user_session(@teacher)
       post "create", params: { course_id: @course.id, assignment: { title: "some assignment" } }
       expect(assigns[:assignment]).to be_unpublished
     end
@@ -2676,6 +2689,7 @@ describe AssignmentsController do
     end
 
     it "uses the default post-to-SIS setting" do
+      user_session(@teacher)
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
@@ -2684,6 +2698,7 @@ describe AssignmentsController do
     end
 
     it "sets important_dates if provided" do
+      user_session(@teacher)
       post "create", params: { course_id: @course.id, assignment: { important_dates: true } }
       expect(assigns[:assignment].important_dates).to be true
     end
@@ -2700,6 +2715,7 @@ describe AssignmentsController do
       end
 
       it "sets new quizzes survey attributes if provided" do
+        user_session(@teacher)
         post "create", params: {
           course_id: @course.id,
           assignment: {
@@ -3020,7 +3036,7 @@ describe AssignmentsController do
         describe "require_resource_selection property" do
           context "when not given in the settings" do
             it "is not set in the js_env tool" do
-              expect(tool_in_js_env).to_not include(:require_resource_selection)
+              expect(tool_in_js_env).not_to include(:require_resource_selection)
             end
           end
 

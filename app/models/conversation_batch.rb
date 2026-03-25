@@ -37,7 +37,7 @@ class ConversationBatch < ActiveRecord::Base
 
   attr_reader :conversations
 
-  def deliver(update_progress = true)
+  def deliver(update_progress: true)
     shard.activate do
       chunk_size = 25
 
@@ -130,7 +130,7 @@ class ConversationBatch < ActiveRecord::Base
 
   def queue_delivery
     sync = (mode != :async)
-    delay(synchronous: sync).deliver(!sync)
+    delay(synchronous: sync).deliver(update_progress: !sync)
   end
 
   workflow do

@@ -23,6 +23,21 @@ module Services
     NEW_QUIZZES_CLOUDFRONT_HOST_PRODUCTION_KEY = "new_quizzes_cloudfront_host_production"
     NEW_QUIZZES_CLOUDFRONT_HOST_BETA_KEY = "new_quizzes_cloudfront_host_beta"
     NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY = "new_quizzes_cloudfront_host_edge"
+    NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY = "new_quizzes_importing_timeout_in_minutes"
+
+    def self.importing_timeout_in_minutes
+      value = config[NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY]
+      Integer(value).minutes
+    rescue => e
+      message = "Services::NewQuizzes#importing_timeout_in_minutes can't convert value (#{value}): #{e.message}"
+      Rails.logger.error(message)
+      Rails.logger.error(e.backtrace.join("\n"))
+      Sentry.capture_exception(e) do |scope|
+        scope.set_extra(message:)
+      end
+
+      30.minutes
+    end
 
     def self.launch_url(tool_url: nil)
       return "#{config[NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY]}/none/remoteEntry.js" if Rails.env.development?

@@ -58,7 +58,7 @@ template: |
   4. Rating language requirements
   <BLOOM_TAXONOMY_CONTEXT_PLACEHOLDER>
 
-  5. Output format: JSON only, no extra text. Example (illustrative only):
+  5. Output format: JSON only, no extra text. Example structure (with 2 ratings shown for brevity — use exactly <RATING_COUNT_PLACEHOLDER> ratings per criterion):
 
   {
     "criteria": [
@@ -71,14 +71,6 @@ template: |
             "description": "Designs a compelling concept and justifies key features with specific examples."
           },
           {
-            "title": "Proficient",
-            "description": "Explains the concept clearly and analyzes its main features, though some details lack depth."
-          },
-          {
-            "title": "Developing",
-            "description": "Demonstrates a basic understanding of the concept but does not yet connect features to broader objectives."
-          },
-          {
             "title": "Insufficient",
             "description": "Lists concept elements without explaining how they relate to the game idea."
           }
@@ -88,9 +80,9 @@ template: |
   }
 
   Ensure the rubric is comprehensive, grade-appropriate, and integrates only relevant standard expectations.
-  Identify the language of the assignment (english, spanish, etc.) and use the same language throughout.
+  Use the same language as the assignment for all rubric text.
   Now, create the rubric in JSON with exactly <CRITERIA_COUNT_PLACEHOLDER> criteria, each containing exactly <RATING_COUNT_PLACEHOLDER> ratings. Do not include any additional criteria or ratings beyond this number.
-  **IMPORTANT**: Validate the created JSON object and verify there are no unexpected characters and every comma is in place before returning.
+  **IMPORTANT**: Return the JSON object only. Do not include any text, labels, or commentary before or after it. Validate the JSON and verify there are no unexpected characters and every comma is in place before returning.
 
 options:
   max_tokens: 5000

@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Existeix contingut desat automàticament. Voleu carregar el contingut desat automàticament al seu lloc?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Subtitulació automàtica"
+    },
     "available_folders_694d0436": {
         "message": "Carpetes disponibles"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Descriviu el { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Descriu el vídeo)"
-    },
     "description_436c48d7": {
         "message": "Descripció"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Integra la imatge"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Integra les opcions"
     },
     "embed_video_a97a64af": {
         "message": "Integra el vídeo"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Icona d''arts lingüístiques"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Idioma que es parla en aquest element multimèdia*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automàtic)"
+    },
     "languages_icon_9d20539": {
         "message": "Icona d’idiomes"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Enllaça a un lloc extern."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "S’ha contret la llista."
+    },
+    "list_expanded_efec2d0": {
+        "message": "S’ha desplegat la llista."
     },
     "lists_cd1336fc": {
         "message": "Llistes"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Podeu trobar altres dreceres d''editor a"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Amb la nostra tecnologia es genera al voltant d’un 85 % de subtítols correctes."
     },
     "outline_color_3ef2cea7": {
         "message": "Color del contorn"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Els lectors de pantalla l''utilitzen per descriure el contingut d''una imatge"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Els lectors de pantalla l''utilitzen per descriure el vídeo"
     },
     "user_documents_c206e61f": {
         "message": "Documents de l''usuari"

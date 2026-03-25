@@ -288,8 +288,8 @@ describe "root account basic settings" do
         expect(modal_body.find("#parameters_include_deleted")).to be_disabled
 
         modal_body.find("#parameters_courses").click
-        expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
-        expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+        expect(modal_body.find("#parameters_created_by_sis")).not_to be_disabled
+        expect(modal_body.find("#parameters_include_deleted")).not_to be_disabled
       end
 
       it "disables report options for SIS export report form when a report hasn't been selected" do
@@ -301,8 +301,8 @@ describe "root account basic settings" do
         expect(modal_body.find("#parameters_include_deleted")).to be_disabled
 
         modal_body.find("#parameters_users").click
-        expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
-        expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+        expect(modal_body.find("#parameters_created_by_sis")).not_to be_disabled
+        expect(modal_body.find("#parameters_include_deleted")).not_to be_disabled
       end
 
       it "creates a report with correct parameters" do

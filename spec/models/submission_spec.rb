@@ -2474,7 +2474,7 @@ describe Submission do
         expect(@submission.assignment).to eql(@assignment)
         expect(@submission.assignment.state).to be(:published)
         @submission = @assignment.grade_student(@student, grader: @teacher, score: 5).first
-        expect(@submission.messages_sent).to_not include("Submission Graded")
+        expect(@submission.messages_sent).not_to include("Submission Graded")
       end
 
       it "notifies observers" do
@@ -2533,9 +2533,9 @@ describe Submission do
         expect(@submission.submission_comments.last).to be_hidden
         expect(@user.stream_item_instances.last).to be_hidden
         @assignment.post_submissions
-        expect(@submission.submission_comments.last).to_not be_hidden
+        expect(@submission.submission_comments.last).not_to be_hidden
         expect(@submission.reload.submission_comments_count).to eq 1
-        expect(@user.stream_item_instances.last).to_not be_hidden
+        expect(@user.stream_item_instances.last).not_to be_hidden
       end
 
       it "does not create hidden stream_item_instances for instructors when muted, graded, and published" do
@@ -2544,7 +2544,7 @@ describe Submission do
         expect do
           @submission.add_comment(author: @student, comment: "some comment")
         end.to change StreamItemInstance, :count
-        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        expect(@teacher.stream_item_instances.last).not_to be_hidden
       end
 
       it "does not hide any existing stream_item_instances for instructors when muted" do
@@ -2552,10 +2552,10 @@ describe Submission do
         expect do
           @submission.add_comment(author: @student, comment: "some comment")
         end.to change StreamItemInstance, :count
-        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        expect(@teacher.stream_item_instances.last).not_to be_hidden
         @assignment.mute!
         @teacher.reload
-        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        expect(@teacher.stream_item_instances.last).not_to be_hidden
       end
 
       it "does not create a message for admins and teachers with quiz submissions" do
@@ -2574,11 +2574,11 @@ describe Submission do
 
         user = account_admin_user
         communication_channel(user, { username: "admin@example.com" })
-        submission = quiz.generate_submission(user, false)
+        submission = quiz.generate_submission(user)
         Quizzes::SubmissionGrader.new(submission).grade_submission
 
         communication_channel(@teacher, { username: "chang@example.com" })
-        submission2 = quiz.generate_submission(@teacher, false)
+        submission2 = quiz.generate_submission(@teacher)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
         expect(submission.submission.messages_sent).not_to include("Submission Graded")
@@ -3212,6 +3212,20 @@ describe Submission do
 
       it "prevents TAs without view_all_grades permission from seeing names" do
         expect(@submission.can_read_submission_user_name?(@ta_without_permissions, nil)).to be false
+      end
+    end
+
+    context "with NQ anonymous participants" do
+      before(:once) do
+        @assignment.update!(anonymous_participants: true)
+      end
+
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false when the user is not the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
       end
     end
 
@@ -4554,7 +4568,7 @@ describe Submission do
     # set up the data to have a submission with a quiz submission with multiple versions
     course_factory
     quiz = @course.quizzes.create!
-    quiz_submission = quiz.generate_submission @user, false
+    quiz_submission = quiz.generate_submission @user, preview: false
     quiz_submission.save
 
     @assignment.submissions.find_by!(user: @user).update!(quiz_submission_id: quiz_submission.id)
@@ -4936,7 +4950,7 @@ describe Submission do
   describe "graded?" do
     it "is false before graded" do
       submission, _ = @assignment.find_or_create_submission(@user)
-      expect(submission).to_not be_graded
+      expect(submission).not_to be_graded
     end
 
     it "is true for graded assignments" do
@@ -4956,10 +4970,10 @@ describe Submission do
 
     it "returns false when its not autograded" do
       submission = Submission.new
-      expect(submission).to_not be_autograded
+      expect(submission).not_to be_autograded
 
       submission.grader_id = Shard.global_id_for(@user.id)
-      expect(submission).to_not be_autograded
+      expect(submission).not_to be_autograded
     end
 
     it "returns true when its autograded" do
@@ -6707,7 +6721,7 @@ describe Submission do
                                            @u2.id => { posted_grade: 10 }
                                          }
                                        })
-      end.to_not raise_error
+      end.not_to raise_error
       expect(@progress.reload.failed?).to be_truthy
 
       expect(@a1.submission_for_student(@u1).grade).to be_nil
@@ -6869,7 +6883,7 @@ describe Submission do
 
       it do
         expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }
-          .to_not change { AnonymousOrModerationEvent.provisional_grade_updated.count }
+          .not_to change { AnonymousOrModerationEvent.provisional_grade_updated.count }
       end
 
       context "given an existing provisional grade" do
@@ -7044,7 +7058,7 @@ describe Submission do
     end
 
     it "returns a collection of moderated grading ids" do
-      moderated_grading_ids = @student.moderated_grading_ids(false)
+      moderated_grading_ids = @student.moderated_grading_ids
       expect(@submission.moderated_grading_allow_list.first).to eq moderated_grading_ids
     end
 
@@ -8195,7 +8209,7 @@ describe Submission do
           it "creates an event when graded by a quiz" do
             real_submission = quiz_submission.submission
             real_submission.audit_grade_changes = true
-            expect { quiz_submission.with_versioning(true) { quiz_submission.save! } }.to change {
+            expect { quiz_submission.with_versioning { quiz_submission.save! } }.to change {
               AnonymousOrModerationEvent.where(assignment: quiz_assignment, submission: real_submission).count
             }.by(1)
           end
@@ -9860,7 +9874,7 @@ describe Submission do
       it "does nothing when there is no line item" do
         expect do
           submission.update!(score: 1.3)
-        end.to_not change { submission.lti_result }.from(nil)
+        end.not_to change { submission.lti_result }.from(nil)
       end
 
       context "when there is a line item" do
@@ -9869,7 +9883,7 @@ describe Submission do
         it "does nothing if score has not changed" do
           expect do
             submission.update!(body: "hello abc")
-          end.to_not change { submission.lti_result }.from(nil)
+          end.not_to change { submission.lti_result }.from(nil)
         end
 
         it "creates an the lti_result with the correct score_given if the score has changed" do
@@ -9881,7 +9895,7 @@ describe Submission do
         it "does nothing if the lti_result was updated by a tool" do
           expect do
             submission.update!(score: 1.3, grader_id: -123)
-          end.to_not change { submission.lti_result }.from(nil)
+          end.not_to change { submission.lti_result }.from(nil)
         end
       end
     end
@@ -9893,7 +9907,7 @@ describe Submission do
       it "does nothing if score has not changed" do
         expect do
           submission.save!
-        end.to_not change { lti_result.result_score }
+        end.not_to change { lti_result.result_score }
       end
 
       it "updates the lti_result score_given if the score has changed" do
@@ -9905,7 +9919,7 @@ describe Submission do
       it "does nothing if the lti_result was updated by a tool" do
         expect do
           submission.update!(score: 1.3, grader_id: -123)
-        end.to_not change { lti_result.reload.result_score }
+        end.not_to change { lti_result.reload.result_score }
       end
     end
   end
@@ -10069,7 +10083,7 @@ describe Submission do
           submission.assignment.submission_types = submission_type
           submission.assignment.save!
           submission.extra_attempts = 10
-          expect(submission).to_not be_valid
+          expect(submission).not_to be_valid
         end
       end
     end
@@ -10126,7 +10140,7 @@ describe Submission do
         context "the submitted_at changed" do
           it "is invalid" do
             submission.submitted_at = Time.zone.now
-            expect(submission).to_not be_valid
+            expect(submission).not_to be_valid
           end
         end
 
@@ -10541,7 +10555,7 @@ describe Submission do
     def check_cache_clear
       key = @student.cache_key(:submissions)
       yield
-      expect(@student.cache_key(:submissions)).to_not eq key
+      expect(@student.cache_key(:submissions)).not_to eq key
     end
 
     it "clears key when submission is deleted" do
@@ -10571,7 +10585,7 @@ describe Submission do
 
     it "works cross-shard" do
       @shard1.activate do
-        expect(@assignment.submissions.postable.to_sql).to_not include(@shard1.name)
+        expect(@assignment.submissions.postable.to_sql).not_to include(@shard1.name)
       end
     end
   end

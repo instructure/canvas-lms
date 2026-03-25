@@ -314,7 +314,6 @@ export type SiteAdminFeatureId =
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
   | 'permanent_page_links'
-  | 'rce_asr_captioning_improvements'
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
@@ -327,6 +326,7 @@ export type SiteAdminFeatureId =
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
+  | 'accessibility_automatic_scanning'
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
   | 'ams_advanced_content_organization'
@@ -365,6 +365,7 @@ export type RootAccountFeatureId =
   | 'open_tools_in_new_tab'
   | 'pendo_extended'
   | 'product_tours'
+  | 'rce_asr_captioning_improvements'
   | 'rce_lite_enabled_speedgrader_comments'
   | 'rce_studio_embed_improvements'
   | 'rce_transform_loaded_content'

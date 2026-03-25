@@ -19,7 +19,7 @@
 import {useState, useCallback, useMemo, useEffect, useRef} from 'react'
 import {useQuery, keepPreviousData} from '@tanstack/react-query'
 import {fetchPlannerItems, type FetchPlannerItemsParams} from '../api'
-import type {PlannerItem} from '../types'
+import type {PlannerItem, PlannerOverride} from '../types'
 import {widgetDashboardPersister} from '../../../../utils/persister'
 
 export const PLANNER_ITEMS_QUERY_KEY = 'plannerItems'
@@ -47,6 +47,11 @@ interface UsePlannerItemsResult {
   isPaginationLoading: boolean
   error: Error | null
   refetch: () => void
+  updateItemOverride: (
+    plannableId: string,
+    plannableType: string,
+    override: PlannerOverride,
+  ) => void
 }
 
 export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlannerItemsResult {
@@ -150,6 +155,21 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
     refetchInitial()
   }, [refetchInitial])
 
+  const updateItemOverride = useCallback(
+    (plannableId: string, plannableType: string, override: PlannerOverride) => {
+      setAllPages(prev =>
+        prev.map(page =>
+          page.map(item =>
+            item.plannable_id === plannableId && item.plannable_type === plannableType
+              ? {...item, planner_override: override}
+              : item,
+          ),
+        ),
+      )
+    },
+    [],
+  )
+
   const currentPage = allPages[currentPageIndex] || allPages[allPages.length - 1] || []
   const lastLoadedPageIndex = allPages.length - 1
   const hasMorePages =
@@ -168,5 +188,6 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
     isPaginationLoading: (isFetching || isLoadingMore) && allPages.length > 0,
     error: error as Error | null,
     refetch,
+    updateItemOverride,
   }
 }

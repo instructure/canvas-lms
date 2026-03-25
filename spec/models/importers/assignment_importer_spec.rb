@@ -112,14 +112,14 @@ describe "Importing assignments" do
             let(:migration) { course.content_migrations.create!(date_shift_options_settings) }
 
             it "should not set the skip_schedule_peer_reviews before save" do
-              expect(item).to_not receive(:skip_schedule_peer_reviews=)
+              expect(item).not_to receive(:skip_schedule_peer_reviews=)
               subject
             end
           end
 
           context "when migration not contains date_shift_options" do
             it "should not set the skip_schedule_peer_reviews before save" do
-              expect(item).to_not receive(:skip_schedule_peer_reviews=)
+              expect(item).not_to receive(:skip_schedule_peer_reviews=)
               subject
             end
           end
@@ -128,7 +128,7 @@ describe "Importing assignments" do
 
       context "when FF pre_date_shift_for_assignment_importing disabled" do
         it "should not use the try_to_save_with_date_shift method" do
-          expect(Importers::AssignmentImporter).to_not receive(:try_to_save_with_date_shift)
+          expect(Importers::AssignmentImporter).not_to receive(:try_to_save_with_date_shift)
           subject
         end
 
@@ -282,7 +282,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
           assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
           expect(assignment.lti_asset_processors.count).to eq 0
-          expect(migration.warnings).to_not be_empty
+          expect(migration.warnings).not_to be_empty
         end
       end
 
@@ -318,7 +318,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
           assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
           expect(assignment.lti_asset_processors.count).to eq 0
-          expect(migration.warnings).to_not be_empty
+          expect(migration.warnings).not_to be_empty
         end
       end
 
@@ -343,7 +343,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
           assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
           expect(assignment.lti_asset_processors.count).to eq 0
-          expect(migration.warnings).to_not be_empty
+          expect(migration.warnings).not_to be_empty
         end
       end
 
@@ -1172,7 +1172,7 @@ describe "Importing assignments" do
               expect do
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
-              end.to_not change { Assignment.count }
+              end.not_to change { Assignment.count }
               expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first))
                 .to eq(expected_created_line_items_fields)
             end
@@ -1502,7 +1502,7 @@ describe "Importing assignments" do
       course_model
       migration = @course.content_migrations.create!
       @course.assignments.create!(title: "test", due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id:)
-      expect(migration).to_not receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
+      expect(migration).not_to receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end
   end
@@ -2249,7 +2249,7 @@ describe "Importing assignments" do
 
       Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
 
-      expect(assignment.assignment_group.id).to_not eq(assignment_group.id)
+      expect(assignment.assignment_group.id).not_to eq(assignment_group.id)
       expect(assignment.assignment_group.name).to eq("Imported Assignments")
     end
 
@@ -2259,7 +2259,7 @@ describe "Importing assignments" do
 
       Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
 
-      expect(assignment.assignment_group.id).to_not eq(assignment_group.id)
+      expect(assignment.assignment_group.id).not_to eq(assignment_group.id)
       expect(assignment.assignment_group.name).to eq("Imported Assignments")
     end
   end

@@ -25,7 +25,7 @@ class I18nTimeZone < ActiveSupport::TimeZone
   @country_zones = Concurrent::Map.new
 
   # override to include both standard and DST offsets if they exist
-  def formatted_offset(colon = true)
+  def formatted_offset(colon = true) # rubocop:disable Style/OptionalBooleanParameter
     return super unless tzinfo
 
     period = tzinfo.current_period

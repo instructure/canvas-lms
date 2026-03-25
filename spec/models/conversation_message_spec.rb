@@ -578,20 +578,37 @@ describe ConversationMessage do
       student_in_course(active_all: true)
     end
 
-    it "returns true when feature is enabled on any root account" do
-      Account.default.enable_feature!(:file_association_access)
-      account2 = Account.create!
+    it "returns true when file_association_access_conversation is enabled" do
+      Account.default.enable_feature!(:file_association_access_conversation)
       conversation = @teacher.initiate_conversation([@student])
       message = conversation.add_message("test", root_account_id: Account.default.id)
-      message.root_account_ids = "#{Account.default.id},#{account2.id}"
 
       expect(message.attachment_associations_enabled?).to be true
     end
 
-    it "returns false when feature is disabled on root account" do
-      Account.default.disable_feature!(:file_association_access)
+    it "returns true on any root account with the flag enabled" do
+      account1 = Account.create!
+      account1.enable_feature!(:file_association_access_conversation)
+
       conversation = @teacher.initiate_conversation([@student])
       message = conversation.add_message("test", root_account_id: Account.default.id)
+      message.root_account_ids = "#{Account.default.id},#{account1.id}"
+
+      expect(message.attachment_associations_enabled?).to be true
+    end
+
+    it "returns false when feature is disabled" do
+      Account.default.disable_feature!(:file_association_access_conversation)
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.attachment_associations_enabled?).to be false
+    end
+
+    it "handles nil root_account_ids" do
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+      message.root_account_ids = nil
 
       expect(message.attachment_associations_enabled?).to be false
     end
@@ -601,7 +618,7 @@ describe ConversationMessage do
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
-      Account.default.enable_feature!(:file_association_access)
+      Account.default.enable_feature!(:file_association_access_conversation)
     end
 
     let(:attachment) { attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder) }
@@ -628,7 +645,7 @@ describe ConversationMessage do
     end
 
     it "denies access when feature flag is disabled" do
-      Account.default.disable_feature!(:file_association_access)
+      Account.default.disable_feature!(:file_association_access_conversation)
       conversation = @teacher.initiate_conversation([@student])
       message = conversation.add_message("test with attachment", attachment_ids: [attachment.id], root_account_id: Account.default.id)
 

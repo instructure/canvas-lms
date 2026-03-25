@@ -21,6 +21,7 @@
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
+  skip_before_action :require_user, only: :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap { |e| e.current_user = @current_user }
@@ -165,7 +166,7 @@ class DiscussionEntriesController < ApplicationController
       return
     end
     if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
-      @discussion_entries = @topic.entries_for_feed(@current_user, request.format == :rss)
+      @discussion_entries = @topic.entries_for_feed(@current_user, podcast_feed: request.format == :rss)
       respond_to do |format|
         format.atom do
           title = t :posts_feed_title, "%{title} Posts Feed", title: @topic.title

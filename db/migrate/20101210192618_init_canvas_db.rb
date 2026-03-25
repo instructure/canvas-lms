@@ -20,6 +20,7 @@
 
 # rubocop:disable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:disable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
+# rubocop:disable Migration/PolymorphicAssociations
 # rubocop:disable Rails/ThreeStateBooleanColumn
 class InitCanvasDb < ActiveRecord::Migration[7.0]
   prepend Canvas::ActiveRecord::Migration::DeferForeignKeys
@@ -5385,4 +5386,5 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 end
 # rubocop:enable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:enable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
+# rubocop:enable Migration/PolymorphicAssociations
 # rubocop:enable Rails/ThreeStateBooleanColumn

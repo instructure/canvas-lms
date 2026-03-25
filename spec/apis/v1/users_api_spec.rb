@@ -1523,7 +1523,7 @@ describe "Users API", type: :request do
       expect(response.headers["Link"]).to include("rel=\"next\"")
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: u.id.to_s, per_page: "1", page: "2" })
       expect(json).to be_empty
-      expect(response.headers["Link"]).to_not include("rel=\"next\"")
+      expect(response.headers["Link"]).not_to include("rel=\"next\"")
     end
 
     it "does not return a next-page link on the last page for session-authenticated requests" do
@@ -1539,7 +1539,7 @@ describe "Users API", type: :request do
                       {},
                       { skip_token_auth: true, expected_status: 200 })
       expect(json.length).to eq 1
-      expect(response.headers["Link"]).to_not include("rel=\"next\"")
+      expect(response.headers["Link"]).not_to include("rel=\"next\"")
     end
 
     it "does bookmarked pagination when sorting by id" do
@@ -1615,12 +1615,17 @@ describe "Users API", type: :request do
                            }] })
     end
 
-    context "user profile preloading" do
+    context "preloading" do
       before(:once) do
         @account = Account.default
+        @ap1 = @account.authentication_providers.create!(auth_type: "ldap")
+        @ap2 = @account.authentication_providers.create!(auth_type: "saml")
         @user1 = user_with_pseudonym(active_all: true, account: @account, name: "User One")
+        @user1.pseudonym.update!(authentication_provider: @ap1)
         @user2 = user_with_pseudonym(active_all: true, account: @account, name: "User Two")
+        @user2.pseudonym.update!(authentication_provider: @ap2)
         @user3 = user_with_pseudonym(active_all: true, account: @account, name: "User Three")
+        @user3.pseudonym.update!(authentication_provider: @ap1)
       end
 
       before do
@@ -1637,7 +1642,6 @@ describe "Users API", type: :request do
           user.profile.update!(bio: "Bio for #{user.name}", title: "Title for #{user.name}")
         end
 
-        # Since profiles are preloaded, we expect 0 individual user_profile queries
         expect do
           api_call(:get,
                    "/api/v1/accounts/#{@account.id}/users",
@@ -1647,6 +1651,18 @@ describe "Users API", type: :request do
         expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json).to be_an(Array)
+        expect(json.length).to be >= 3
+      end
+
+      it "avoids N+1 queries for authentication_providers on pseudonyms" do
+        expect do
+          api_call(:get,
+                   "/api/v1/accounts/#{@account.id}/users",
+                   { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param })
+        end.not_to make_database_queries(matching: /SELECT.*authentication_providers.*WHERE.*authentication_providers.*"id" = \d/)
+
+        expect(response).to be_successful
+        json = JSON.parse(response.body)
         expect(json.length).to be >= 3
       end
     end
@@ -1883,7 +1899,7 @@ describe "Users API", type: :request do
           other_user.reload
           @pseudonym.reload
           expect(other_user).to be_registered
-          expect(other_user.user_account_associations.where(account_id: Account.default).first).to_not be_nil
+          expect(other_user.user_account_associations.where(account_id: Account.default).first).not_to be_nil
           expect(@pseudonym).to be_active
           expect(other_user.communication_channel).to be_present
           expect(other_user.communication_channel.workflow_state).to eq("active")
@@ -2679,7 +2695,7 @@ describe "Users API", type: :request do
       it "cannot see avatar_state" do
         raw_api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id), { email: "test@example.com" })
         expect(response).to have_http_status :ok
-        expect(JSON.parse(response.body)).to_not have_key("avatar_state")
+        expect(JSON.parse(response.body)).not_to have_key("avatar_state")
       end
     end
 

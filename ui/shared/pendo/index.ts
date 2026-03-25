@@ -90,14 +90,24 @@ function init(): Promise<any> | null {
       Object.assign(visitorData, instanceVars, accountVars, userVars, courseVars)
     }
 
+    const accountData: {
+      id: string
+      surveyOptOut: boolean
+      oemAccountId?: string | null
+    } = {
+      id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
+      surveyOptOut: !ENV.FEATURES['account_survey_notifications'],
+    }
+
+    if (ENV.USAGE_METRICS_METADATA?.oem_account_id) {
+      accountData.oemAccountId = ENV.USAGE_METRICS_METADATA.oem_account_id
+    }
+
     return initialize({
       apiKey: ENV.PENDO_APP_ID,
       env: 'io',
       visitor: visitorData,
-      account: {
-        id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
-        surveyOptOut: !ENV.FEATURES['account_survey_notifications'],
-      },
+      account: accountData,
       globalKey: 'canvasUsageMetrics',
       plugins: [Replay, VocPortal],
     })

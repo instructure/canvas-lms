@@ -117,6 +117,7 @@ class FoldersController < ApplicationController
   before_action :require_context, except: %i[list_folders_and_files api_index show api_destroy update create create_file copy_folder copy_file]
   before_action :check_limited_access_for_students, only: %i[create_file]
   before_action :check_restricted_file_access_for_students, only: %i[create_file copy_file copy_folder]
+  skip_before_action :require_user, only: :list_folders_and_files
 
   def index
     if authorized_action(@context, @current_user, :read_files)
@@ -309,7 +310,7 @@ class FoldersController < ApplicationController
     # as long as one granted permission holds true, in most cases :read, user is authorized
     if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
-      folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
+      folders = Folder.resolve_path(@context, params[:full_path], include_hidden_and_locked: can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
 
       render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)

@@ -37,6 +37,8 @@ Gemspec/RequiredRubyVersion:
   # maintenance pain when updating ruby versions
   Enabled: false
 
+GraphQL:
+  Severity: error
 GraphQL/ArgumentDescription:
   Enabled: false
 GraphQL/FieldDescription:
@@ -178,8 +180,8 @@ RSpec/Output:
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
-#RSpec/Rails:
-#  Severity: error
+RSpecRails:
+  Severity: error
 
 Security:
   Severity: error
@@ -244,13 +246,25 @@ Style/WordArray:
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
 
+GraphQL/ExtractInputType:
+  Severity: convention
+GraphQL/ExtractType:
+  Severity: convention
 GraphQL/FieldMethod:
+  Severity: convention
   AutoCorrect: false
 GraphQL/FieldName:
+  Severity: convention
   AutoCorrect: false
+GraphQL/GraphqlName:
+  Severity: convention
 GraphQL/MultipleFieldDefinitions:
+  Severity: convention
   AutoCorrect: false
+GraphQL/NotAuthorizedNodeType:
+  Severity: convention
 GraphQL/UnusedArgument:
+  Severity: convention
   AutoCorrect: false
 
 Layout/LineLength:
@@ -312,10 +326,6 @@ Rails/FindByOrAssignmentMemoization:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/LexicallyScopedActionFilter:
-  Severity: convention
-Rails/OutputSafety:
-  Severity: convention
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false
@@ -368,9 +378,6 @@ RSpec/MultipleDescribes:
   Severity: convention
 RSpec/NamedSubject:
   Enabled: false
-RSpec/NotToNot:
-  Enabled: false
-  AutoCorrect: false
 RSpec/OverwritingSetup:
   Severity: convention
 RSpec/PendingWithoutReason:
@@ -447,8 +454,6 @@ Style/MultipleComparison:
   Severity: convention
   AutoCorrect: false
 Style/OptionalArguments:
-  Severity: convention
-Style/OptionalBooleanParameter:
   Severity: convention
 Style/StringConcatenation:
   Enabled: false

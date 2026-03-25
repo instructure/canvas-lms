@@ -240,7 +240,7 @@ describe('updateMediaData()', () => {
     expect(apiSource.apiPost).toHaveBeenCalledWith(
       'http://test.com/api/media_objects/m-id?user_entered_title=',
       expect.anything(),
-      null,
+      {viewer_restrictions: {}},
       expect.anything(),
     )
   })
@@ -251,7 +251,23 @@ describe('updateMediaData()', () => {
     expect(apiSource.apiPost).toHaveBeenCalledWith(
       'http://test.com/api/media_attachments/123?user_entered_title=',
       expect.anything(),
-      null,
+      {viewer_restrictions: {}},
+      expect.anything(),
+    )
+  })
+
+  it('sends provided viewerRestrictions in the body', async () => {
+    apiSource.apiPost = jest.fn()
+    await apiSource.updateMediaObject(apiProps, {
+      media_object_id,
+      title: '',
+      attachment_id: null,
+      viewerRestrictions: {show_rolling_transcript: true},
+    })
+    expect(apiSource.apiPost).toHaveBeenCalledWith(
+      'http://test.com/api/media_objects/m-id?user_entered_title=',
+      expect.anything(),
+      {viewer_restrictions: {show_rolling_transcript: true}},
       expect.anything(),
     )
   })

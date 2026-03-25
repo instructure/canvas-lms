@@ -52,27 +52,27 @@ shared_examples_for "an endpoint which uses parent_frame_context to set the CSP 
     pfc_tool.developer_key.update! internal_service: false
     subject
     expect(response).to be_successful
-    expect(csp_header).to_not include("inst-tool.example.com")
+    expect(csp_header).not_to include("inst-tool.example.com")
   end
 
   it "doesn't add the URL to the header if the parent_frame_context tool is not active" do
     pfc_tool.update! workflow_state: :deleted
     subject
     expect(response).to be_successful
-    expect(csp_header).to_not include("inst-tool.example.com")
+    expect(csp_header).not_to include("inst-tool.example.com")
   end
 
   it "doesn't add the URL to the header if the parent_frame_context tool's URL has unsafe characters" do
     pfc_tool.update_attribute :url, "http://inst-tool.example.com;default-src"
     subject
     expect(response).to be_successful
-    expect(csp_header).to_not include("inst-tool.example.com")
+    expect(csp_header).not_to include("inst-tool.example.com")
   end
 
   it "doesn't add the parent_frame_context tool's URL to the header if it is a data URL" do
     pfc_tool.update! url: "data:123"
     subject
     expect(response).to be_successful
-    expect(csp_header).to_not include("data:abc")
+    expect(csp_header).not_to include("data:abc")
   end
 end

@@ -20,6 +20,7 @@
 
 class Login::OAuth2Controller < Login::OAuthBaseController
   skip_before_action :verify_authenticity_token
+  skip_before_action :require_user, only: %i[new create]
 
   rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
 

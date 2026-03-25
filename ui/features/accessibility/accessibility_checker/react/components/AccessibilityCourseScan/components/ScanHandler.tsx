@@ -21,14 +21,18 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {responsiveQuerySizes} from '@canvas/breakpoints'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = createI18nScope('accessibility_scan')
 
 interface CourseScanWrapperProps {
   children: React.ReactNode
+  buttonLabel?: string
+  lastChecked?: string | null
   scanButtonDisabled?: boolean
   handleCourseScan?: () => void
 }
@@ -37,7 +41,12 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
   children,
   scanButtonDisabled,
   handleCourseScan,
+  buttonLabel,
+  lastChecked,
 }) => {
+  const formatScanDate = useDateTimeFormat('date.formats.full')
+  const formattedDate = lastChecked ? formatScanDate(lastChecked) : undefined
+
   return (
     <View as="div">
       <Responsive
@@ -64,19 +73,26 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
                 <Heading level="h1" margin="0 0 x-small">
                   {I18n.t('Course Accessibility Checker')}
                 </Heading>
+                {formattedDate && (
+                  <Text size="small" color="secondary">
+                    {I18n.t('Last checked %{date}', {date: formattedDate})}
+                  </Text>
+                )}
               </Flex.Item>
-              <Flex.Item align="start" overflowX="visible" width={props.flexItemWidth}>
-                <Button
-                  color="primary"
-                  margin="small 0"
-                  disabled={scanButtonDisabled}
-                  onClick={handleCourseScan}
-                  display={props.buttonDisplay}
-                  width={props.buttonWidth}
-                >
-                  {I18n.t('Scan Course')}
-                </Button>
-              </Flex.Item>
+              {buttonLabel && (
+                <Flex.Item align="start" overflowX="visible" width={props.flexItemWidth}>
+                  <Button
+                    color="primary"
+                    margin="small 0"
+                    disabled={scanButtonDisabled}
+                    onClick={handleCourseScan}
+                    display={props.buttonDisplay}
+                    width={props.buttonWidth}
+                  >
+                    {buttonLabel}
+                  </Button>
+                </Flex.Item>
+              )}
             </Flex>
           )
         }}

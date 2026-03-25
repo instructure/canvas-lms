@@ -60,7 +60,7 @@ module Lti
           end
 
           it "update public jwk was successful" do
-            expect(response.parsed_body["public_jwk"]).to_not eq old_public_jwk
+            expect(response.parsed_body["public_jwk"]).not_to eq old_public_jwk
             expect(response.parsed_body["public_jwk"]).to eq new_public_jwk
             expect(developer_key.reload.public_jwk).to eq new_public_jwk
           end

@@ -221,8 +221,8 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                     onClick={handlePublishToggle}
                     screenReaderLabel={
                       isPublished
-                        ? I18n.t('Unpublish AI Experience')
-                        : I18n.t('Publish AI Experience')
+                        ? I18n.t('Unpublish Knowledge Chat')
+                        : I18n.t('Publish Knowledge Chat')
                     }
                     data-testid="ai-experience-publish-toggle"
                   >
@@ -241,7 +241,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                       size="small"
                       withBackground={false}
                       withBorder={false}
-                      screenReaderLabel={I18n.t('AI Experience Options')}
+                      screenReaderLabel={I18n.t('Knowledge Chat Options')}
                       data-testid="ai-experience-menu"
                     >
                       <IconMoreLine />

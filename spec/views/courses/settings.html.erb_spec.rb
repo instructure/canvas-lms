@@ -42,7 +42,7 @@ describe "courses/settings" do
       view_context(@course, @user)
       assign(:current_user, @user)
       render
-      expect(response).to_not have_tag("input#course_hide_sections_on_course_users_page")
+      expect(response).not_to have_tag("input#course_hide_sections_on_course_users_page")
     end
 
     it "displays checkbox for teacher when there is more than one section" do

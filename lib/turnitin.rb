@@ -31,7 +31,7 @@ module Turnitin
   class Client
     attr_accessor :endpoint, :account_id, :shared_secret, :host, :testing
 
-    def initialize(account_id, shared_secret, host = nil, testing = false)
+    def initialize(account_id, shared_secret, host = nil, testing: false)
       @host = host || "api.turnitin.com"
       @endpoint = "/api.asp"
       raise "Account ID required" unless account_id

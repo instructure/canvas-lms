@@ -103,9 +103,12 @@ unless $canvas_tasks_loaded
 
       sentry_cli_path = (ENV["SENTRY_CLI_GLOBAL"] == "1") ? "sentry-cli" : "yarn run sentry-cli"
 
+      puts "--> Injecting Sentry debug IDs into source maps"
+      system "#{sentry_cli_path} sourcemaps inject public/dist/ --ignore-file .sentryignore"
+
       puts "--> Uploading source maps to Sentry at #{args.url}"
       system "SENTRY_AUTH_TOKEN=#{args.auth_token} SENTRY_URL=#{args.url} SENTRY_ORG=#{args.org} #{sentry_cli_path} " \
-             "releases --project #{args.project} files #{args.version} upload-sourcemaps public/dist/ --ignore-file " \
+             "sourcemaps upload --project #{args.project} --release #{args.version} public/dist/ --ignore-file " \
              ".sentryignore --url-prefix '~/dist/'"
     end
 

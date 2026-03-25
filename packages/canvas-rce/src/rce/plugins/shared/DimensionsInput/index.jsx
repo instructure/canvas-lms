@@ -41,10 +41,10 @@ const errorMessage = message => {
   )
 }
 
-const getMessage = (dimensionsState, minWidth, minHeight, minPercentage, additionalHintText) => {
+const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
   const baseHint = formatMessage('Aspect ratio will be preserved')
   let result = {
-    text: additionalHintText ? `${baseHint}. ${additionalHintText}` : baseHint,
+    text: baseHint,
     type: 'hint',
   }
   if (dimensionsState.usePercentageUnits) {
@@ -80,7 +80,6 @@ export default function DimensionsInput(props) {
     minPercentage,
     hidePercentage,
     dimensionsRef,
-    additionalHintText,
   } = props
 
   const handleDimensionTypeChange = e => {
@@ -92,7 +91,6 @@ export default function DimensionsInput(props) {
     minWidth,
     minHeight,
     minPercentage,
-    additionalHintText,
   )
   const secondaryMessage = {...message, text: ''}
 
@@ -208,7 +206,6 @@ DimensionsInput.propTypes = {
   minPercentage: number.isRequired,
   hidePercentage: bool,
   dimensionsRef: object,
-  additionalHintText: string,
 }
 
 DimensionsInput.defaultProps = {

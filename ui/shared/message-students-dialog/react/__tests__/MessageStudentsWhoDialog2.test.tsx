@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {render, waitFor} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import MessageStudentsWhoDialog, {
   type Student,
@@ -245,7 +246,7 @@ describe('MessageStudentsWhoDialog', () => {
     )
     const checkbox = await findByRole('checkbox', {name: /Observers/})
     expect(checkbox).toHaveAccessibleName('0 Observers')
-    fireEvent.click(checkbox)
+    await userEvent.click(checkbox)
     expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
   })
 
@@ -263,11 +264,11 @@ describe('MessageStudentsWhoDialog', () => {
 
     // Open recipient table
     const button = await findByRole('button', {name: 'Show all recipients'})
-    fireEvent.click(button)
+    await userEvent.click(button)
 
     // Select an observer cell
     const observerCells = await findAllByTestId('observer-pill')
-    fireEvent.click(observerCells[0])
+    await userEvent.click(observerCells[0])
 
     expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('1 Observers')
   })
@@ -276,14 +277,14 @@ describe('MessageStudentsWhoDialog', () => {
     it('includes score-related options but no "Marked incomplete" option for point-based assignments', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).toContain('Have not yet submitted')
       expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not been graded')
@@ -295,14 +296,14 @@ describe('MessageStudentsWhoDialog', () => {
     it('includes "Marked incomplete" but no score-related options for pass-fail assignments', async () => {
       makeMocks()
 
-      const {findByLabelText, getAllByRole} = render(
+      const {findByLabelText, findAllByRole} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).toContain('Have not yet submitted')
       expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not been graded')
@@ -320,24 +321,26 @@ describe('MessageStudentsWhoDialog', () => {
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
-      expect(criteriaLabels).not.toContain('Marked incomplete')
-      expect(criteriaLabels).not.toContain('Scored more than')
-      expect(criteriaLabels).not.toContain('Scored less than')
+      await userEvent.click(button)
+      await waitFor(() => {
+        const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+        expect(criteriaLabels).not.toContain('Marked incomplete')
+        expect(criteriaLabels).not.toContain('Scored more than')
+        expect(criteriaLabels).not.toContain('Scored less than')
+      })
     })
 
     it('includes "Have Submitted" and "Have not yet submitted" if the assignment accepts digital submissions', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not yet submitted')
     })
@@ -345,14 +348,14 @@ describe('MessageStudentsWhoDialog', () => {
     it('does not include "Have Submitted" and "Have not yet submitted" if the assignment does not accept digital submissions', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps({assignment: unsubmittableAssignment})} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).not.toContain('Have submitted')
       expect(criteriaLabels).not.toContain('Have not yet submitted')
     })
@@ -360,57 +363,100 @@ describe('MessageStudentsWhoDialog', () => {
     it('includes "Reassigned" if the assignment has a due date and allows more than one attempt', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).toContain('Reassigned')
     })
 
     it('does not include "Reassigned" if the assignment does not have a due date', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).not.toContain('Reassigned')
     })
 
     it('does not include "Reassigned" if the assignment does not allow more than one submission', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps({assignment: ungradedAssignment})} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).not.toContain('Reassigned')
     })
 
     it('does not include "Reassigned" if the assignment is on paper', async () => {
       makeMocks()
 
-      const {getAllByRole, findByLabelText} = render(
+      const {findAllByRole, findByLabelText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps({assignment: unsubmittableAssignment})} />
         </MockedQueryClientProvider>,
       )
       const button = await findByLabelText(/For students who/)
-      fireEvent.click(button)
-      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      await userEvent.click(button)
+      const criteriaLabels = (await findAllByRole('option')).map(option => option.textContent)
       expect(criteriaLabels).not.toContain('Reassigned')
+    })
+  })
+
+  describe('hideCriterionSection', () => {
+    it('hides the criterion dropdown when true', async () => {
+      makeMocks()
+
+      const {queryByTestId, findByTestId} = render(
+        <MockedQueryClientProvider client={queryClient}>
+          <MessageStudentsWhoDialog {...makeProps({hideCriterionSection: true})} />
+        </MockedQueryClientProvider>,
+      )
+      await findByTestId('total-student-checkbox')
+      expect(queryByTestId('criterion-dropdown')).not.toBeInTheDocument()
+    })
+
+    it('hides the cutoff input when true', async () => {
+      makeMocks()
+
+      const {queryByTestId, findByTestId} = render(
+        <MockedQueryClientProvider client={queryClient}>
+          <MessageStudentsWhoDialog {...makeProps({hideCriterionSection: true})} />
+        </MockedQueryClientProvider>,
+      )
+      await findByTestId('total-student-checkbox')
+      expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
+    })
+
+    it('shows all students unfiltered when true', async () => {
+      makeMocks()
+
+      const {getByRole, getAllByRole, getByTestId, findByTestId} = render(
+        <MockedQueryClientProvider client={queryClient}>
+          <MessageStudentsWhoDialog {...makeProps({hideCriterionSection: true})} />
+        </MockedQueryClientProvider>,
+      )
+      await findByTestId('total-student-checkbox')
+
+      await userEvent.click(getByTestId('show_all_recipients'))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const studentCells = (getAllByRole('row') as HTMLTableRowElement[]).map(row => row.cells[0])
+      expect(studentCells).toHaveLength(students.length + 1) // header + all students
     })
   })
 
@@ -418,7 +464,7 @@ describe('MessageStudentsWhoDialog', () => {
     it('is shown only when "Scored more than" or "Scored less than" is selected', async () => {
       makeMocks()
 
-      const {getByRole, findByTestId, getByTestId, queryByTestId} = render(
+      const {findByRole, findByTestId, getByTestId, queryByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedQueryClientProvider>,
@@ -429,17 +475,19 @@ describe('MessageStudentsWhoDialog', () => {
 
       const selector = await findByTestId('criterion-dropdown')
 
-      fireEvent.click(selector)
-      fireEvent.click(getByRole('option', {name: 'Scored more than'}))
+      await userEvent.click(selector)
+      await userEvent.click(await findByRole('option', {name: 'Scored more than'}))
       expect(getByTestId('cutoff-input')).toBeInTheDocument()
 
-      fireEvent.click(selector)
-      fireEvent.click(getByRole('option', {name: 'Scored less than'}))
+      await userEvent.click(selector)
+      await userEvent.click(await findByRole('option', {name: 'Scored less than'}))
       expect(getByTestId('cutoff-input')).toBeInTheDocument()
 
-      fireEvent.click(selector)
-      fireEvent.click(getByRole('option', {name: 'Reassigned'}))
-      expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
+      await userEvent.click(selector)
+      await userEvent.click(await findByRole('option', {name: 'Reassigned'}))
+      await waitFor(() => {
+        expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
+      })
     })
 
     it('foot-note is rendered along with the cutoff-input', async () => {
@@ -457,8 +505,8 @@ describe('MessageStudentsWhoDialog', () => {
 
       const selector = await findByTestId('criterion-dropdown')
 
-      fireEvent.click(selector)
-      fireEvent.click(getByText('Scored more than'))
+      await userEvent.click(selector)
+      await userEvent.click(getByText('Scored more than'))
 
       expect(getByTestId('cutoff-footnote')).toBeInTheDocument()
     })

@@ -41,7 +41,7 @@ module LuckySneaks
 
     # Removes HTML tags from text. This code is simplified from Tobias Luettke's regular expression
     # in Typo[http://typosphere.org].
-    def strip_html_tags(leave_whitespace = false)
+    def strip_html_tags(leave_whitespace: false)
       name = /[\w:_-]+/
       value = /([A-Za-z0-9]+|('[^']*?'|"[^"]*?"))/
       attr = /(#{name}(\s*=\s*#{value})?)/

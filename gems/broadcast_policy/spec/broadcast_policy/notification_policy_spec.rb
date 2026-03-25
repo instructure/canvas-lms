@@ -87,6 +87,6 @@ describe BroadcastPolicy::NotificationPolicy do
   it "sends even if there isn't data" do
     subject.data = ->(_) {}
     subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to_not be_empty
+    expect(BroadcastPolicy.notifier.messages).not_to be_empty
   end
 end

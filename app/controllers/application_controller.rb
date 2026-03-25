@@ -83,6 +83,7 @@ class ApplicationController < ActionController::Base
   before_action :manage_robots_meta
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
+  before_action :require_user, except: :rescue_action_dispatch_exception
 
   after_action :log_page_view
   after_action :discard_flash_if_xhr
@@ -178,14 +179,9 @@ class ApplicationController < ActionController::Base
 
   add_crumb(proc do
     title = I18n.t("links.dashboard", "My Dashboard")
-    crumb = <<~HTML
-      <i class="icon-home"
-         title="#{title}">
-        <span class="screenreader-only">#{title}</span>
-      </i>
-    HTML
-
-    crumb.html_safe
+    helpers.tag.i(class: "icon-home", title:) do
+      helpers.tag.span title, class: "screenreader-only"
+    end
   end,
             :root_path,
             class: "home")
@@ -403,6 +399,23 @@ class ApplicationController < ActionController::Base
           @js_env[:USAGE_METRICS_METADATA][:user_display_name] = @current_user&.short_name
           @js_env[:USAGE_METRICS_METADATA][:user_email] = @current_user&.email
           @js_env[:USAGE_METRICS_METADATA][:user_time_zone] = @current_user&.time_zone
+          # Calculate oem_account_id based on the current account's setting
+          # Root account can have 'account' or 'consortium', subaccount can have 'account' or 'subaccount' value independently
+          current_account = if @context.is_a?(Account)
+                              @context
+                            elsif @context.respond_to?(:account)
+                              @context.account
+                            else
+                              @domain_root_account
+                            end
+          oem_account_type = current_account.settings[:impact_account_type]
+          case oem_account_type
+          when "consortium"
+            @js_env[:USAGE_METRICS_METADATA][:oem_account_id] = @js_env[:DOMAIN_ROOT_ACCOUNT_SFID]
+          when "subaccount"
+            @js_env[:USAGE_METRICS_METADATA][:oem_account_id] = "#{@domain_root_account&.uuid}-#{current_account.shard.id}-#{current_account.id}"
+          end
+          # If 'account' or nil, don't set oem_account_id (leave it as nil/undefined)
 
           if @context.is_a?(Course)
             @js_env[:USAGE_METRICS_METADATA][:course_id] = @context.id
@@ -503,7 +516,6 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
-    rce_asr_captioning_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
@@ -514,6 +526,7 @@ class ApplicationController < ActionController::Base
     ux_list_concluded_courses_in_bp
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
+    accessibility_automatic_scanning
     account_level_mastery_scales
     ams_root_account_integration
     ams_advanced_content_organization
@@ -554,6 +567,7 @@ class ApplicationController < ActionController::Base
     open_tools_in_new_tab
     pendo_extended
     product_tours
+    rce_asr_captioning_improvements
     rce_lite_enabled_speedgrader_comments
     rce_transform_loaded_content
     react_discussions_post
@@ -1359,7 +1373,7 @@ class ApplicationController < ActionController::Base
       end
       format.all do
         flash[:warning] = flash_message
-        redirect_to_referrer_or_default(root_url)
+        redirect_back_or_to root_url
       end
     end
     set_no_cache_headers
@@ -2797,9 +2811,11 @@ class ApplicationController < ActionController::Base
   # please also note that if the html has any attachments, safe_html should be set to true!!!
   # since we neet to process the attachments in the html.
   def user_content(str, context: @context, user: @current_user, is_public: false, location: nil, safe_html: false)
+    # rubocop:todo Rails/OutputSafety
     return nil unless str
     return AttachmentLocationTagger.tag_url(str, location).html_safe if safe_html && !location.nil?
     return str.html_safe if safe_html
+    # rubocop:enable Rails/OutputSafety
 
     file_association_access_ff_enabled = if context.instance_of?(::User)
                                            context.associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) }
@@ -2828,7 +2844,7 @@ class ApplicationController < ActionController::Base
     end
     rewriter.set_handler("files", &file_handler)
     rewriter.set_handler("media_attachments_iframe", &file_handler)
-    UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_updated_math_rendering: use_new_math_equation_handling?)
   end
   helper_method :user_content
 
@@ -3252,7 +3268,7 @@ class ApplicationController < ActionController::Base
         mc_status = setup_master_course_restrictions(@page, @context, user_can_edit: true)
       end
 
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, deep_check_if_needed: true, master_course_status: mc_status)
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, include_body: true, deep_check_if_needed: true, master_course_status: mc_status)
       version_number = Rails.cache.fetch(["page_version", @page].cache_key) { @page.versions.maximum(:number) }
       hash[:WIKI_PAGE_REVISION] = version_number && StringifyIds.stringify_id(version_number)
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
@@ -3517,6 +3533,19 @@ class ApplicationController < ActionController::Base
     "quizzes/quizzes#show" => nil
   }.freeze
 
+  def show_learning_agent_button?
+    return false unless @context.is_a?(Course)
+    return false unless @context_enrollment.is_a?(StudentEnrollment)
+
+    @context.feature_enabled?(:athena_learning_agent_button)
+  end
+  helper_method :show_learning_agent_button?
+
+  def load_learning_agent_env
+    js_env({ ATHENA: Services::Athena.public_app_config(@current_user) })
+  end
+  helper_method :load_learning_agent_env
+
   def show_student_view_button?
     return false unless @context.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
 
@@ -3578,7 +3607,7 @@ class ApplicationController < ActionController::Base
   def widget_dashboard_eligible?
     return false unless @current_user
 
-    @current_user.observer_enrollments.active_or_pending.any? || !@current_user.active_non_student_enrollment?
+    @current_user.observer_enrollments.active_or_pending.any? || (!@current_user.active_non_student_enrollment? && !@current_user.account_membership?)
   end
 
   def use_classic_font?

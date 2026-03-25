@@ -702,7 +702,7 @@ describe "calendar2" do
         cancel_btn = f(".form-actions a")
         expect(cancel_btn.text).to eq "Cancel"
         expect(cancel_btn["href"]).to include("view_name=month")
-        expect(cancel_btn["href"]).to_not include(@course.asset_string)
+        expect(cancel_btn["href"]).not_to include(@course.asset_string)
       end
     end
   end

@@ -280,15 +280,15 @@ describe Folder do
       foo = @course.folders.create! name: "foo", parent_folder: @root_folder
       foo.update_attribute(:workflow_state, "hidden")
       bar = @course.folders.create! name: "bar", parent_folder: foo
-      expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
-      expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: true)).to eql [@root_folder, foo, bar]
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: false)).to be_nil
     end
 
     it "excludes locked if specified" do
       foo = @course.folders.create! name: "foo", parent_folder: @root_folder, locked: true
       bar = @course.folders.create! name: "bar", parent_folder: foo
-      expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
-      expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: true)).to eql [@root_folder, foo, bar]
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: false)).to be_nil
     end
 
     it "accepts an array" do

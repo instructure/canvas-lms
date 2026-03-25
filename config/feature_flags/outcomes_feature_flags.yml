@@ -67,8 +67,7 @@ improved_lmgb:
   type: setting
   state: hidden
   applies_to: Course
-  shadow: true
-  display_name: Learning Mastery Gradebook Redesign
+  display_name: Learning Mastery Gradebook Enhancements
   description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
   beta: true
   environments:

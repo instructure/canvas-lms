@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import axios from '@canvas/axios'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PublishButtonView from '@canvas/publish-button-view'
@@ -69,10 +69,11 @@ function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 function unmountRoot(elementId: string) {

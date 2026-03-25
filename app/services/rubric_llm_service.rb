@@ -61,10 +61,6 @@ class RubricLLMService
     @used_ids = {}
   end
 
-  # -----------------------------
-  # LLM Generation
-  # -----------------------------
-
   def generate_criteria_via_llm(association_object, generate_options = {})
     validate_rubric_and_association_object(association_object)
 
@@ -80,134 +76,6 @@ class RubricLLMService
 
     parse_and_transform_generated_criteria(response, generate_options)
   end
-
-  private
-
-  def validate_rubric_and_association_object(association_object)
-    unless association_object.is_a?(AbstractAssignment)
-      raise "LLM generation is only available for rubrics associated with an Assignment"
-    end
-    raise "User must be associated to rubric before LLM generation" unless @rubric.user
-  end
-
-  def build_generate_dynamic_content(assignment, generate_options)
-    {
-      CONTENT: {
-        id: assignment.id,
-        title: assignment.title,
-        description: html_to_text(assignment.description),
-      }.to_json,
-      CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
-      RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
-      ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
-      GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
-      STANDARD: generate_options[:standard].presence || "",
-      BLOOM_TAXONOMY_CONTEXT:,
-    }
-  end
-
-  def call_llm_with_prefill(llm_config, prompt, root_account_uuid)
-    response = nil
-    time = Benchmark.measure do
-      response = CedarClient.conversation(
-        messages:
-         [{ role: "User", text: prompt },
-          { role: "Assistant", text: "{" }],
-        model: llm_config.model_id,
-        feature_slug: GENERATE_FEATURE_SLUG,
-        root_account_uuid:,
-        current_user: @rubric.user
-      ).response
-    end
-    [response, time]
-  end
-
-  def persist_llm_response(response, assignment, llm_config, dynamic_content, time)
-    LLMResponse.create!(
-      associated_assignment: assignment,
-      user: @rubric.user,
-      prompt_name: llm_config.name,
-      prompt_model_id: llm_config.model_id,
-      prompt_dynamic_content: dynamic_content,
-      raw_response: response,
-      input_tokens: 0,
-      output_tokens: 0,
-      response_time: time.real.round(2),
-      root_account_id: assignment.root_account_id
-    )
-  end
-
-  def parse_and_transform_generated_criteria(response, generate_options)
-    ai_rubric = JSON.parse("{" + response, symbolize_names: true)
-
-    criteria_count = ai_rubric[:criteria].length
-    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
-    points_per_criterion = calculate_points_per_criterion(total_points, criteria_count)
-
-    ai_rubric[:criteria].each_with_index.map do |criterion_data, index|
-      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range] || DEFAULT_GENERATE_OPTIONS[:use_range])
-    end
-  rescue JSON::ParserError => e
-    Rails.logger.error("Failed to parse LLM response as JSON during generation: #{e.message}")
-    raise JSON::ParserError, "The AI response was not in the expected format. Please try again."
-  end
-
-  # Calculate points per criterion based on total_points and criteria_count
-  def calculate_points_per_criterion(total_points, criteria_count)
-    points_per_criterion = (total_points / criteria_count).round(ROUNDING_PRECISION)
-    points_for_criterion = {}
-    running_total = 0.0
-
-    Array(1..criteria_count).each_with_index do |_, index|
-      if index == criteria_count - 1
-        points_for_criterion[index] = (total_points - running_total).round(ROUNDING_PRECISION)
-      else
-        running_total += points_per_criterion
-        points_for_criterion[index] = points_per_criterion
-      end
-    end
-    points_for_criterion
-  end
-
-  # Transform one LLM criterion into Canvas format.
-  #
-  # - Renames fields (name → description, description → long_description)
-  # - Assigns decreasing points across ratings, based on total_points and criterion_points
-  # - Sorts ratings by points desc (and description as tiebreaker)
-  #
-  # Example:
-  #   criterion_points=10, 3 ratings → [10, 5, 0]
-  def build_criterion_from_llm(criterion_data, criterion_points, use_range)
-    criterion = {
-      id: @rubric.unique_item_id,
-      description: (criterion_data[:name].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
-      long_description: criterion_data[:description].presence
-    }
-
-    points_decrement = criterion_points.to_f / [(criterion_data[:ratings].length - 1), 1].max
-
-    ratings = criterion_data[:ratings].each_with_index.map do |rating_data, index|
-      {
-        description: (rating_data[:title].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
-        long_description: rating_data[:description].presence,
-        points: (criterion_points - (points_decrement * index)).round(ROUNDING_PRECISION),
-        criterion_id: criterion[:id],
-        id: @rubric.unique_item_id
-      }
-    end
-
-    criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
-    criterion[:points] = criterion[:ratings].pluck(:points).max || 0
-    criterion[:criterion_use_range] = !!use_range
-    criterion[:generated] = true
-    criterion
-  end
-
-  # -----------------------------
-  # LLM Regeneration
-  # -----------------------------
-
-  public
 
   # Regenerate either:
   # - A single criterion (keeping its ID and rating count), or
@@ -301,6 +169,143 @@ class RubricLLMService
   end
 
   private
+
+  def validate_rubric_and_association_object(association_object)
+    unless association_object.is_a?(AbstractAssignment)
+      raise "LLM generation is only available for rubrics associated with an Assignment"
+    end
+    raise "User must be associated to rubric before LLM generation" unless @rubric.user
+  end
+
+  def call_llm_with_prefill(llm_config, prompt, root_account_uuid)
+    response = nil
+    time = Benchmark.measure do
+      response = CedarClient.conversation(
+        messages:
+         [{ role: "User", text: prompt },
+          { role: "Assistant", text: "{" }],
+        model: llm_config.model_id,
+        feature_slug: GENERATE_FEATURE_SLUG,
+        root_account_uuid:,
+        current_user: @rubric.user
+      ).response
+    end
+    [response, time]
+  end
+
+  def call_llm_without_prefill(llm_config, prompt, assignment, feature_slug:)
+    response = nil
+    time = Benchmark.measure do
+      response = CedarClient.prompt(
+        prompt:,
+        model: llm_config.model_id,
+        feature_slug:,
+        root_account_uuid: assignment.root_account.uuid,
+        current_user: @rubric.user
+      ).response
+    end
+    [response, time]
+  end
+
+  def persist_llm_response(response, assignment, llm_config, dynamic_content, time)
+    LLMResponse.create!(
+      associated_assignment: assignment,
+      user: @rubric.user,
+      prompt_name: llm_config.name,
+      prompt_model_id: llm_config.model_id,
+      prompt_dynamic_content: dynamic_content,
+      raw_response: response,
+      input_tokens: 0,
+      output_tokens: 0,
+      response_time: time.real.round(2),
+      root_account_id: assignment.root_account_id
+    )
+  end
+
+  def build_generate_dynamic_content(assignment, generate_options)
+    {
+      CONTENT: {
+        id: assignment.id,
+        title: assignment.title,
+        description: html_to_text(assignment.description),
+      }.to_json,
+      CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
+      RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
+      ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
+      GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
+      STANDARD: generate_options[:standard].presence || "",
+      BLOOM_TAXONOMY_CONTEXT:,
+    }
+  end
+
+  def parse_and_transform_generated_criteria(response, generate_options)
+    json_str = "{" + response
+    last_index = json_str.rindex("}")
+    json_str = json_str[0..last_index] unless last_index.nil?
+    ai_rubric = JSON.parse(json_str, symbolize_names: true)
+
+    criteria_count = ai_rubric[:criteria].length
+    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    points_per_criterion = calculate_points_per_criterion(total_points, criteria_count)
+
+    ai_rubric[:criteria].each_with_index.map do |criterion_data, index|
+      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range] || DEFAULT_GENERATE_OPTIONS[:use_range])
+    end
+  rescue JSON::ParserError => e
+    Rails.logger.error("Failed to parse LLM response as JSON during generation: #{e.message}")
+    raise JSON::ParserError, "The AI response was not in the expected format. Please try again."
+  end
+
+  # Calculate points per criterion based on total_points and criteria_count
+  def calculate_points_per_criterion(total_points, criteria_count)
+    points_per_criterion = (total_points / criteria_count).round(ROUNDING_PRECISION)
+    points_for_criterion = {}
+    running_total = 0.0
+
+    Array(1..criteria_count).each_with_index do |_, index|
+      if index == criteria_count - 1
+        points_for_criterion[index] = (total_points - running_total).round(ROUNDING_PRECISION)
+      else
+        running_total += points_per_criterion
+        points_for_criterion[index] = points_per_criterion
+      end
+    end
+    points_for_criterion
+  end
+
+  # Transform one LLM criterion into Canvas format.
+  #
+  # - Renames fields (name → description, description → long_description)
+  # - Assigns decreasing points across ratings, based on total_points and criterion_points
+  # - Sorts ratings by points desc (and description as tiebreaker)
+  #
+  # Example:
+  #   criterion_points=10, 3 ratings → [10, 5, 0]
+  def build_criterion_from_llm(criterion_data, criterion_points, use_range)
+    criterion = {
+      id: @rubric.unique_item_id,
+      description: (criterion_data[:name].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
+      long_description: criterion_data[:description].presence
+    }
+
+    points_decrement = criterion_points.to_f / [(criterion_data[:ratings].length - 1), 1].max
+
+    ratings = criterion_data[:ratings].each_with_index.map do |rating_data, index|
+      {
+        description: (rating_data[:title].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
+        long_description: rating_data[:description].presence,
+        points: (criterion_points - (points_decrement * index)).round(ROUNDING_PRECISION),
+        criterion_id: criterion[:id],
+        id: @rubric.unique_item_id
+      }
+    end
+
+    criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
+    criterion[:points] = criterion[:ratings].pluck(:points).max || 0
+    criterion[:criterion_use_range] = !!use_range
+    criterion[:generated] = true
+    criterion
+  end
 
   # Normalize :criteria payload and produce two representations:
   # - existing_criteria_json: JSON blob of the incoming criteria
@@ -403,20 +408,6 @@ class RubricLLMService
       STRUCTURE_DIRECTIVES: structure_directives,
       BLOOM_TAXONOMY_CONTEXT:,
     }
-  end
-
-  def call_llm_without_prefill(llm_config, prompt, assignment, feature_slug:)
-    response = nil
-    time = Benchmark.measure do
-      response = CedarClient.prompt(
-        prompt:,
-        model: llm_config.model_id,
-        feature_slug:,
-        root_account_uuid: assignment.root_account.uuid,
-        current_user: @rubric.user
-      ).response
-    end
-    [response, time]
   end
 
   # Parse the <RUBRIC_DATA>...</RUBRIC_DATA> block, then:
@@ -853,10 +844,6 @@ class RubricLLMService
     Rails.logger.warn("Failed to unescape value: #{str.inspect} - #{e.message}. Using original value.")
     str.to_s
   end
-
-  # -----------------------------
-  # ID & Structure Helpers
-  # -----------------------------
 
   # Reserve IDs from existing criteria/ratings to avoid collisions when
   # creating new ones (e.g., mapping _new_* placeholders later).

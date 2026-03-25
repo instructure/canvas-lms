@@ -66,6 +66,7 @@ describe "Block Content Editor", :ignore_js_errors do
 
       add_to_page_button.click
       wait_for_ajaximations
+      keep_trying_until { !element_exists?(add_block_modal_selector) }
 
       expect(element_exists?(add_block_modal_selector)).to be false
       expect(block_layout).to be_displayed

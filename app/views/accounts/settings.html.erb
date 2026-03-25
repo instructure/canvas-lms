@@ -611,6 +611,35 @@
           </div>
           <div id="terms_of_service_preview_link"></div>
         <% end %>
+        <% if Account.site_admin.grants_right?(@current_user, :manage) %>
+          <fieldset>
+            <legend><%= t("Impact settings") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <table class="formtable narrow">
+                <tr>
+                  <td><%= settings.blabel :impact_account_type, t("Impact Account Type") %></td>
+                  <td>
+                    <% if @account.root_account? %>
+                      <%= settings.select :impact_account_type,
+                        options_for_select([
+                          [t("Account (default)"), "account"],
+                          [t("Consortium"), "consortium"]
+                        ], @account.settings[:impact_account_type] || "account") %>
+                      <p class="aside"><%= t("Send the Salesforce ID as a partner account ID (oemAccountId). Use this for special cases like Impact purchased for a consortium.") %></p>
+                    <% else %>
+                      <%= settings.select :impact_account_type,
+                        options_for_select([
+                          [t("Account (default)"), "account"],
+                          [t("Sub-account"), "subaccount"]
+                        ], @account.settings[:impact_account_type] || "account") %>
+                      <p class="aside"><%= t("Send a unique ID as a partner account ID (oemAccountId). Use this for special cases like Impact purchased for a single sub-account.") %></p>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            <% end %>
+          </fieldset>
+        <% end %>
         <% if !@account.site_admin? &&
                @account.primary_settings_root_account? &&
                @account.feature_enabled?(:google_docs_domain_restriction) &&
@@ -1183,7 +1212,7 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <% available_roles = @context.available_account_roles(false, @current_user).sort_by(&:display_sort_index) %>
+      <% available_roles = @context.available_account_roles(user: @current_user).sort_by(&:display_sort_index) %>
       <% unless available_roles.empty? %>
         <%= render :partial => 'account_user', :object => nil %>
       <% end %>
@@ -1454,9 +1483,9 @@ acknowledge that you have read and agreed to the
               </div>
               <span class="notification_account_content_text">
                 <% if @account.site_admin? %>
-                  <%= t("This is a message from *Canvas Administration*", wrapper: '<b>\1</b>') %>
+                  <%= t("This is an announcement from *Canvas Administration*", wrapper: '<b>\1</b>') %>
                 <% else %>
-                  <%= t("This is a message from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
+                  <%= t("This is an announcement from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
                 <% end %>
               </span>
             </div>

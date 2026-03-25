@@ -54,7 +54,7 @@ describe "as a teacher" do
       end
 
       it "shows assignment title" do
-        expect(TeacherViewPageV2.assignment_title(@assignment.title)).to_not be_nil
+        expect(TeacherViewPageV2.assignment_title(@assignment.title)).not_to be_nil
       end
 
       it "shows publish button" do
@@ -62,7 +62,7 @@ describe "as a teacher" do
       end
 
       it "shows publish status" do
-        expect(TeacherViewPageV2.publish_status(@assignment.workflow_state)).to_not be_nil
+        expect(TeacherViewPageV2.publish_status(@assignment.workflow_state)).not_to be_nil
       end
 
       it "shows edit button" do

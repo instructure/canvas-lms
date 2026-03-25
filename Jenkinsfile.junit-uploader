@@ -18,13 +18,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
-loadLocalLibrary('local-lib', 'build/new-jenkins/library')
-
 pipeline {
-  agent {
-    label nodeLabel()
-  }
+  agent { label 'canvas-docker' }
 
   options {
     ansiColor('xterm')
@@ -35,31 +30,24 @@ pipeline {
     stage('Upload Junit Results') {
       steps {
         script {
-          def buildLinks = buildSummaryReport.getSubBuildLinks(env.SOURCE)
+          def sourceParts = env.SOURCE.split('/')
+          def sourceBuildNumber = sourceParts[-1]
+          def sourceJobName = sourceParts[0..-2].join('/')
 
-          buildLinks.each { buildLink ->
-            echo "=== Processing ${buildLink}"
+          echo "=== Copying artifacts from ${sourceJobName} #${sourceBuildNumber}"
 
-            if(buildLink.contains("test-queue")) {
-              def subBuildName = "/Canvas/test-suites/test-queue"
-              def subBuildNumber = buildLink.split("/")[-1]
+          copyArtifacts(
+            filter: 'tmp/*/rspec_results.tgz',
+            optional: false,
+            projectName: sourceJobName,
+            selector: specific(sourceBuildNumber),
+          )
 
-              echo "=== Finding Test Results From ${subBuildName} ${subBuildNumber}"
-
-              copyArtifacts(
-                filter: 'tmp/*/rspec_results.tgz',
-                optional: false,
-                projectName: subBuildName,
-                selector: specific(subBuildNumber),
-              )
-
-              sh """
-              ls tmp/*/rspec_results.tgz | xargs -n1 tar xvf
-              touch tmp/*_rspec_results/**/*.xml
-              """
-              junit allowEmptyResults: true, testResults: "tmp/*_rspec_results/results/*.xml", skipMarkingBuildUnstable: true
-            }
-          }
+          sh """
+          ls tmp/*/rspec_results.tgz | xargs -n1 tar xf
+          touch tmp/*_rspec_results/**/*.xml
+          """
+          junit allowEmptyResults: true, testResults: "tmp/*_rspec_results/results/*.xml", skipMarkingBuildUnstable: true
         }
       }
     }

@@ -39,7 +39,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   before_action :load_canvas_career, only: [:index, :show]
 
-  before_action :rce_js_env, only: %i[show new edit]
+  before_action :rce_js_env, only: %i[index show new edit]
 
   include K5Mode
 
@@ -59,8 +59,9 @@ class Quizzes::QuizzesController < ApplicationController
                   submission_versions
                   submission_html
                 ],
-                unless: -> { ams_integration_enabled? }
+                unless: :ams_integration_enabled?
   before_action :set_download_submission_dialog_title, only: [:show, :statistics]
+  skip_before_action :require_user, only: %i[index show]
   after_action :lock_results, only: [:show, :submission_html]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -260,7 +261,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = get_submission
 
       @just_graded = false
-      if @submission&.needs_grading?(!!params[:take])
+      if @submission&.needs_grading?(strict: !!params[:take])
         GuardRail.activate(:primary) do
           Quizzes::SubmissionGrader.new(@submission).grade_submission(
             finished_at: @submission.finished_at_fallback
@@ -531,7 +532,7 @@ class Quizzes::QuizzesController < ApplicationController
       created_quiz = @quiz.created?
 
       Assignment.suspend_due_date_caching do
-        @quiz.with_versioning(false) do
+        @quiz.without_versioning do
           @quiz.did_edit if @quiz.created?
         end
       end
@@ -562,7 +563,7 @@ class Quizzes::QuizzesController < ApplicationController
 
             auto_publish = @quiz.published?
 
-            @quiz.with_versioning(auto_publish) do
+            @quiz.with_versioning(enabled: auto_publish) do
               # using attributes= here so we don't need to make an extra
               # database call to get the times right after save!
               @quiz.attributes = quiz_params
@@ -589,7 +590,7 @@ class Quizzes::QuizzesController < ApplicationController
             # quiz.rb restricts all assignment broadcasts if notify_of_update is
             # false, so we do the same here
             if @quiz.assignment.present? && old_assignment && (notify_of_update || old_assignment.due_at != @quiz.assignment.due_at)
-              @quiz.assignment.do_notifications!(old_assignment, notify_of_update)
+              @quiz.assignment.do_notifications!(old_assignment, notify: notify_of_update)
             end
             @quiz.reload
 
@@ -995,7 +996,7 @@ class Quizzes::QuizzesController < ApplicationController
       user_code = @current_user
       user_code = nil if preview
       user_code ||= temporary_user_code
-      @submission = @quiz.generate_submission(user_code, !!preview)
+      @submission = @quiz.generate_submission(user_code, preview: !!preview)
       log_asset_access(@quiz, "quizzes", "quizzes", "participate")
     end
     if quiz_submission_active?

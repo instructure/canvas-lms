@@ -255,7 +255,7 @@ if Qti.migration_executable
           expect(text.css("img").first["src"]).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
         end
       end
-      expect(quiz.assignment).to_not be_nil
+      expect(quiz.assignment).not_to be_nil
     end
 
     it "brings in canvas meta data" do

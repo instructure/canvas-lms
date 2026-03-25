@@ -138,7 +138,7 @@ describe "assignments" do
 
       @assignment.only_visible_to_overrides = true
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
-      expect(f(".no_students_message")).to_not be_displayed
+      expect(f(".no_students_message")).not_to be_displayed
     end
 
     context "rubric assessments" do
@@ -165,7 +165,7 @@ describe "assignments" do
 
         f(".assess_submission_link").click
         wait_for_animations
-        expect(f("#rubric_holder")).to_not contain_css(".save_rubric_button")
+        expect(f("#rubric_holder")).not_to contain_css(".save_rubric_button")
       end
 
       it "lets a student submit a rubric review even if already completed if a rubric is added afterwards" do
@@ -370,17 +370,6 @@ describe "assignments" do
                          user: reviewed
                        })
     end
-    let!(:submissionReviewer) do
-      submission_model({
-                         assignment:,
-                         body: "submission body reviewer",
-                         course: review_course,
-                         grade: "5",
-                         score: "5",
-                         submission_type: "online_text_entry",
-                         user: reviewer
-                       })
-    end
     let!(:comment) do
       submission_comment_model({
                                  author: reviewer,
@@ -409,7 +398,18 @@ describe "assignments" do
     end
     let!(:anonymous_submission_page) { "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}" }
 
-    before { assignment.assign_peer_review(reviewer, reviewed) }
+    before do
+      submission_model({
+                         assignment:,
+                         body: "submission body reviewer",
+                         course: review_course,
+                         grade: "5",
+                         score: "5",
+                         submission_type: "online_text_entry",
+                         user: reviewer
+                       })
+      assignment.assign_peer_review(reviewer, reviewed)
+    end
 
     context "when reviewed is logged in" do
       before { user_logged_in(user: reviewed) }
@@ -507,6 +507,67 @@ describe "assignments" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f(".turnitin_similarity_score")).to be_displayed
       end
+    end
+  end
+
+  context "PRSA to-do list item" do
+    let(:teacher_course) { course_factory(active_all: true, course_name: "Teacher Course") }
+    let(:student_course) { course_factory(active_all: true, course_name: "Student Course") }
+    let(:mixed_user) do
+      user_factory(active_all: true, name: "TA User").tap do |u|
+        teacher_course.enroll_teacher(u, enrollment_state: :active)
+        student_course.enroll_student(u, enrollment_state: :active)
+      end
+    end
+    let(:reviewee) { student_in_course(course: student_course, active_all: true).user }
+    let(:assignment) do
+      student_course.assignments.create!(
+        title: "Essay with Peer Review",
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        peer_review_count: 1,
+        points_possible: 20
+      ).tap(&:publish)
+    end
+    let(:prsa) do
+      PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: assignment,
+        points_possible: 10,
+        grading_type: "points"
+      )
+    end
+
+    before do
+      student_course.enable_feature!(:peer_review_allocation_and_grading)
+      assignment.submit_homework(reviewee, body: "My essay submission")
+      assignment.submit_homework(mixed_user, body: "Assessor submission")
+      sub_reviewee = assignment.submissions.find_by(user: reviewee)
+      sub_assessor = assignment.submissions.find_by(user: mixed_user)
+      AssessmentRequest.create!(
+        user: reviewee,
+        asset: sub_reviewee,
+        assessor_asset: sub_assessor,
+        assessor: mixed_user,
+        peer_review_sub_assignment: prsa,
+        workflow_state: "assigned"
+      )
+      user_session(mixed_user)
+    end
+
+    it "does not show the PRSA to-do item when assignments_2_student is disabled" do
+      student_course.disable_feature!(:assignments_2_student)
+      get "/"
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_css(".to-do-list")
+    end
+
+    it "shows the PRSA to-do item and links to peer reviews when assignments_2_student is enabled" do
+      student_course.enable_feature!(:assignments_2_student)
+      get "/"
+      wait_for_ajaximations
+      expect(f(".to-do-list")).to include_text(prsa.title)
+      todo_link = ff(".to-do-list li.todo a.item").find { |a| a.text.include?(prsa.title) }
+      expect(todo_link["href"]).to include("/peer_reviews")
     end
   end
 end

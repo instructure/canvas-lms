@@ -90,8 +90,6 @@
 class PlannerOverridesController < ApplicationController
   include Api::V1::PlannerOverride
 
-  before_action :require_user
-
   # @API List planner overrides
   #
   # Retrieve a planner override for the current user

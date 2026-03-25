@@ -46,7 +46,7 @@ describe SIS::Models::Enrollment do
 
   describe "#valid_context?" do
     it "detects an invalid context" do
-      expect(subject).to_not be_valid_context
+      expect(subject).not_to be_valid_context
     end
 
     it "has a valid context if there is a course_id" do
@@ -62,7 +62,7 @@ describe SIS::Models::Enrollment do
 
   describe "#valid_user?" do
     it "detects an invalid user" do
-      expect(subject).to_not be_valid_user
+      expect(subject).not_to be_valid_user
     end
 
     it "has a valid context if there is a user_id" do
@@ -78,12 +78,12 @@ describe SIS::Models::Enrollment do
 
   describe "#valid_status?" do
     it "detects an empty status" do
-      expect(subject).to_not be_valid_status
+      expect(subject).not_to be_valid_status
     end
 
     it "detects a bad status" do
       subject.status = "fake"
-      expect(subject).to_not be_valid_status
+      expect(subject).not_to be_valid_status
     end
 
     it "accepts the active status" do

@@ -20,7 +20,6 @@
 module Accessibility
   class GenerateController < ApplicationController
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
     before_action :check_table_caption_feature, only: [:create_table_caption]
     before_action :check_alt_text_feature, only: [:create_image_alt_text]

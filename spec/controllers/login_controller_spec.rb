@@ -195,6 +195,11 @@ describe LoginController do
   end
 
   describe "#logout" do
+    before do
+      user = user_with_pseudonym(active: true)
+      user_session(user, @pseudonym)
+    end
+
     it "logs out" do
       delete "destroy"
       expect(response).to redirect_to(login_url)

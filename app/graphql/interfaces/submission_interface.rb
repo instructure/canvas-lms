@@ -331,6 +331,17 @@ module Interfaces::SubmissionInterface
     Loaders::HasAutoGradeResultsLoader.load(submission)
   end
 
+  field :ai_grade_result, Types::AiGradeResultType, null: true, description: "The AI grading result for the current submission attempt, if any."
+  def ai_grade_result
+    load_association(:course).then do |course|
+      next nil unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+
+      load_association(:auto_grade_results).then do |results|
+        results.find { |r| r.attempt == (object.attempt || 1) }
+      end
+    end
+  end
+
   field :has_sub_assignment_submissions, Boolean, null: true
   def has_sub_assignment_submissions
     load_association(:assignment).then do
@@ -469,11 +480,11 @@ module Interfaces::SubmissionInterface
   field :vericite_data, [Types::VericiteDataType], null: true
   def vericite_data
     load_association(:assignment).then do
-      next nil unless object.vericite_data(false).present? &&
+      next nil unless object.vericite_data(lookup_data: false).present? &&
                       object.grants_right?(current_user, :view_vericite_report) &&
                       object.assignment.vericite_enabled
 
-      object.vericite_data(false)
+      object.vericite_data(lookup_data: false)
             .except(
               :provider,
               :last_processed_attempt,

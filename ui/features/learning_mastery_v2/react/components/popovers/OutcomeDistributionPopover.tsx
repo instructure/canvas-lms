@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactElement, useMemo, useState} from 'react'
+import React, {ReactElement, useEffect, useMemo, useState} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -36,10 +36,15 @@ import {
   RatingDistribution,
 } from '@canvas/outcomes/react/types/mastery_distribution'
 import {Avatar} from '@instructure/ui-avatar'
-import MessageStudents from '@canvas/message-students-modal'
+import MessageStudentsWhoDialog, {
+  type Student as MSWStudent,
+  type SendMessageArgs,
+} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
+import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import {Link} from '@instructure/ui-link'
-import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
+import TagAsModalManager from '@canvas/differentiation-tags/react/TagAsModal/TagAsModalManager'
 import {useAddTagMembership} from '@canvas/differentiation-tags/react/hooks/useAddTagMembership'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -191,6 +196,12 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   const [selectedRating, setSelectedRating] = useState<RatingDistribution | null>(null)
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false)
   const [isDifferentiationTagModalOpen, setIsDifferentiationTagModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedRating(null)
+    }
+  }, [isOpen])
   const {accountLevelMasteryScalesFF, allowDifferentiationTags} = useLMGBContext()
   const {mutate: addTagMembership} = useAddTagMembership()
   const calculationMethod = getCalculationMethod(outcome)
@@ -201,12 +212,29 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
     return distributionStudents.filter(student => studentIds.has(student.id))
   }, [selectedRating, distributionStudents])
 
-  const messageRecipients = useMemo(() => {
+  const mswStudents = useMemo<MSWStudent[]>(() => {
     return selectedStudents.map(student => ({
       id: student.id,
-      displayName: student.display_name || student.name,
+      name: student.display_name || student.name,
+      sortableName: student.display_name || student.name,
+      submittedAt: null,
+      workflowState: 'graded',
     }))
   }, [selectedStudents])
+
+  const handleSendMessage = React.useCallback(
+    ({recipientsIds, subject, body, mediaFile, attachmentIds}: SendMessageArgs) => {
+      MessageStudentsWhoHelper.sendMessageStudentsWho(
+        recipientsIds,
+        subject,
+        body,
+        `course_${courseId}`,
+        mediaFile,
+        attachmentIds,
+      )
+    },
+    [courseId],
+  )
 
   const handleBarClick = React.useCallback(
     (label: string, _value: number) => {
@@ -222,19 +250,19 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   )
 
   const handleTagCreationSuccess = React.useCallback(
-    (newCategoryID: number) => {
-      setIsDifferentiationTagModalOpen(false)
-      if (!newCategoryID) {
-        return
-      }
+    (groupId: number) => {
+      if (!groupId) return
 
-      // Assign selected students to the new tag
       const studentIds = selectedStudents.map(student => parseInt(student.id, 10))
+      if (studentIds.length === 0) return
 
-      addTagMembership({
-        groupId: newCategoryID,
-        userIds: studentIds,
-      })
+      addTagMembership(
+        {groupId, userIds: studentIds},
+        {
+          onSuccess: () => showFlashSuccess(I18n.t('Students tagged successfully'))(),
+          onError: (error: Error) => showFlashError(error.message)(new Error()),
+        },
+      )
     },
     [selectedStudents, addTagMembership],
   )
@@ -264,22 +292,22 @@ export const OutcomeDistributionPopover: React.FC<OutcomeDistributionPopoverProp
   return (
     <>
       {isMessageModalOpen && selectedStudents.length > 0 && (
-        <MessageStudents
-          contextCode={`course_${courseId}`}
-          onRequestClose={() => setIsMessageModalOpen(false)}
-          open={isMessageModalOpen}
-          bulkMessage={true}
-          groupConversation={true}
-          recipients={messageRecipients}
-          title={I18n.t('Send a message to students')}
+        <MessageStudentsWhoDialog
+          onClose={() => setIsMessageModalOpen(false)}
+          students={mswStudents}
+          onSend={handleSendMessage}
+          hideCriterionSection={true}
+          messageAttachmentUploadFolderId={
+            ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id ?? ''
+          }
+          userId={ENV.current_user_id ?? ''}
+          courseId={courseId}
         />
       )}
       {isDifferentiationTagModalOpen && (
-        <DifferentiationTagModalManager
+        <TagAsModalManager
           isOpen={isDifferentiationTagModalOpen}
           onClose={() => setIsDifferentiationTagModalOpen(false)}
-          mode="create"
-          differentiationTagCategoryId={undefined}
           onCreationSuccess={handleTagCreationSuccess}
           courseId={Number(courseId)}
         />

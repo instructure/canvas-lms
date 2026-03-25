@@ -82,7 +82,7 @@ class Quizzes::QuizSubmissionService
       reject! "you are not allowed to preview this quiz", 403
     end
 
-    quiz.generate_submission(participant.user_code, true)
+    quiz.generate_submission(participant.user_code, preview: true)
   end
 
   # Complete the quiz submission by marking it as complete and grading it. When
@@ -235,7 +235,7 @@ class Quizzes::QuizSubmissionService
   #   - #ensure_latest_attempt!
   #
   # @return [Hash] the recently-adjusted submission_data set
-  def update_question(question_record, quiz_submission, attempt, snapshot = true)
+  def update_question(question_record, quiz_submission, attempt, snapshot: true)
     unless quiz_submission.grants_right?(participant.user, :update)
       reject! "you are not allowed to update questions for this quiz submission", 403
     end

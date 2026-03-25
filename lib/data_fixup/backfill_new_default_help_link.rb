@@ -25,7 +25,7 @@ module DataFixup
       Account.root_accounts.active.non_shadow.find_each do |account|
         next unless account.settings[:custom_help_links]
 
-        link_config = account.help_links_builder.default_links(false).find { |hl| hl[:id] == help_link_id }
+        link_config = account.help_links_builder.default_links(filter: false).find { |hl| hl[:id] == help_link_id }
         next unless link_config
         next if account.settings[:custom_help_links].any? { |hl| hl.with_indifferent_access[:id]&.to_sym == help_link_id }
 

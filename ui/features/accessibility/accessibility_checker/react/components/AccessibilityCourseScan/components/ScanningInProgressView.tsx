@@ -23,12 +23,13 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScanHandler} from './ScanHandler'
+import {ScanInProgressViewProps} from '../types'
 
 const I18n = createI18nScope('accessibility_scan')
 
-export const ScanningInProgressView: React.FC = () => {
+export const ScanningInProgressView: React.FC<ScanInProgressViewProps> = ({buttonLabel}) => {
   return (
-    <ScanHandler scanButtonDisabled={true}>
+    <ScanHandler scanButtonDisabled={true} buttonLabel={buttonLabel}>
       <Flex justifyItems="center" margin="xx-large 0 small 0">
         <Flex.Item>
           <Spinner renderTitle={() => I18n.t('Scanning in progress')} size="small" />

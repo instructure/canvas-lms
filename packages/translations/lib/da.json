@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Der findes automatisk gemt indhold. Vil du indlæse det automatisk gemte indhold i stedet?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatisk billedtekst"
+    },
     "available_folders_694d0436": {
         "message": "Tilgængelige mapper"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Beskriv { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Beskriv videoen)"
-    },
     "description_436c48d7": {
         "message": "Beskrivelse"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Integrer billede"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Indlejringsindstillinger"
     },
     "embed_video_a97a64af": {
         "message": "Indlejr video"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Sprogkunst-ikon"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Sprog, der tales i dette medie*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automatisk)"
+    },
     "languages_icon_9d20539": {
         "message": "Sprog-ikon"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Links til en ekstern webside."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Listen skjult."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste udvidet."
     },
     "lists_cd1336fc": {
         "message": "Lister"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andre redigeringsgenveje kan findes på"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Vores teknologi genererer ~85 % nøjagtige billedtekster."
     },
     "outline_color_3ef2cea7": {
         "message": "Konturfarve"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Bruges af skærmlæsere til at beskrive et billedes indhold"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Bruges af skærmlæsere til at beskrive videoen"
     },
     "user_documents_c206e61f": {
         "message": "Brugerdokumenter"

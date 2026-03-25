@@ -49,5 +49,5 @@ export interface EnvAccountsAdminTools {
     restore_course: boolean
     view_messages: boolean
   }
-  bounced_emails_admin_tool: boolean
+  BOUNCED_EMAILS_ADMIN_TOOL: boolean
 }

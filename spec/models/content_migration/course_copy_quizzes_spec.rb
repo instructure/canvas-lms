@@ -955,8 +955,8 @@ describe ContentMigration do
       bank1_copy = @copy_to.assessment_question_banks.where(migration_id: mig_id(bank1)).first
       bank2_copy = @copy_to.assessment_question_banks.where(migration_id: mig_id(bank2)).first
 
-      expect(bank1_copy).to_not be_nil
-      expect(bank2_copy).to_not be_nil
+      expect(bank1_copy).not_to be_nil
+      expect(bank2_copy).not_to be_nil
 
       quiz_copy = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
       expect(quiz_copy.quiz_groups.count).to eq 2
@@ -1005,7 +1005,7 @@ describe ContentMigration do
       expect(q_copy.quiz_questions.count).to eq 3
       q_copy.quiz_questions.each do |qq|
         # should link quiz questions
-        expect(qq.assessment_question_id).to_not be_nil
+        expect(qq.assessment_question_id).not_to be_nil
       end
 
       @cm.copy_options = { all_quizzes: true }
@@ -1026,7 +1026,7 @@ describe ContentMigration do
       expect(q_copy.quiz_questions.count).to eq 3
       q_copy.quiz_questions.each do |qq|
         # should re-link them
-        expect(qq.assessment_question_id).to_not be_nil
+        expect(qq.assessment_question_id).not_to be_nil
       end
     end
 

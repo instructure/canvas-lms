@@ -37,7 +37,7 @@ describe DataFixup::MoveAttachmentAssociationsToReplacedAttachments do
         deleted_at: Time.zone.now
       )
 
-      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.run
+      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.new.run
 
       association1.reload
       association2.reload
@@ -66,7 +66,7 @@ describe DataFixup::MoveAttachmentAssociationsToReplacedAttachments do
         deleted_at: Time.zone.now
       )
 
-      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.run
+      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.new.run
 
       assoc1.reload
       assoc2.reload
@@ -86,7 +86,7 @@ describe DataFixup::MoveAttachmentAssociationsToReplacedAttachments do
         deleted_at: Time.zone.now
       )
 
-      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.run
+      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.new.run
 
       existing_assoc.reload
       expect(existing_assoc.attachment_id).to eq replacement.id
@@ -102,7 +102,7 @@ describe DataFixup::MoveAttachmentAssociationsToReplacedAttachments do
         deleted_at: Time.zone.now
       )
 
-      expect { DataFixup::MoveAttachmentAssociationsToReplacedAttachments.run }.not_to raise_error
+      expect { DataFixup::MoveAttachmentAssociationsToReplacedAttachments.new.run }.not_to raise_error
     end
 
     it "handles replacement chains (A replaced by B, but we only update A's associations)" do
@@ -125,7 +125,7 @@ describe DataFixup::MoveAttachmentAssociationsToReplacedAttachments do
         deleted_at: Time.zone.now
       )
 
-      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.run
+      DataFixup::MoveAttachmentAssociationsToReplacedAttachments.new.run
 
       assoc.reload
       expect(assoc.attachment_id).to eq replacement2.id

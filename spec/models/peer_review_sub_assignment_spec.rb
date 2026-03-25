@@ -631,4 +631,119 @@ RSpec.describe PeerReviewSubAssignment do
       expect(result).to include(peer_review_sub_assignment1)
     end
   end
+
+  context "broadcast policies" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @course.update!(workflow_state: "available")
+      @student1 = student_in_course(active_all: true, user_name: "student 1", active_cc: true).user
+      @student2 = student_in_course(active_all: true, user_name: "student 2", active_cc: true).user
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    context "due date changed" do
+      before :once do
+        Notification.create(name: "Assignment Due Date Changed")
+        @peer_review_sub = peer_review_model(course: @course)
+      end
+
+      it "creates a message when a peer review sub assignment due date has changed" do
+        @peer_review_sub.unlock_at = 2.weeks.ago
+        @peer_review_sub.lock_at = 1.week.from_now
+        @peer_review_sub.due_at = 1.day.from_now
+        @peer_review_sub.save!
+
+        expect(@peer_review_sub.messages_sent.keys).to include("Assignment Due Date Changed")
+      end
+
+      it "does not create a message when peer review sub assignmnt attributes other than due date have changed" do
+        @peer_review_sub.points_possible = 30
+        @peer_review_sub.save!
+
+        expect(@peer_review_sub.messages_sent).not_to include("Assignment Due Date Changed")
+      end
+    end
+
+    context "assignment changed" do
+      before :once do
+        Notification.create(name: "Assignment Changed", category: "TestImmediately")
+        @peer_review_sub = peer_review_model(course: @course)
+        @peer_review_sub.unmute!
+      end
+
+      it "creates a message when a peer review sub assignment changes after it's been published" do
+        @peer_review_sub.points_possible = 15
+        @peer_review_sub.save
+
+        expect(@peer_review_sub.messages_sent).to include("Assignment Changed")
+        expect(@peer_review_sub.messages_sent["Assignment Changed"]).not_to be_empty
+        expect(@peer_review_sub.messages_sent["Assignment Changed"].first.from_name).to eq @course.name
+      end
+
+      it "does not create a message when a peer review sub assignment changes SHORTLY AFTER it's been created" do
+        @peer_review_sub.lock_at = 1.week.from_now
+        @peer_review_sub.save
+
+        expect(@peer_review_sub.messages_sent).not_to include("Assignment Changed")
+      end
+
+      it "does not create a message when a muted assignment changes" do
+        @peer_review_sub.mute!
+        @peer_review_sub.points_possible = 15
+        @peer_review_sub.save
+
+        expect(@peer_review_sub.messages_sent).to be_empty
+      end
+    end
+
+    context "assignment created" do
+      before :once do
+        Notification.create(name: "Assignment Created", category: "TestImmediately")
+      end
+
+      it "creates a message when a peer review sub assignment is created in an available course" do
+        peer_review_sub = peer_review_model(course: @course)
+
+        expect(peer_review_sub.messages_sent).to include("Assignment Created")
+        expect(peer_review_sub.messages_sent["Assignment Created"]).not_to be_empty
+      end
+
+      it "does not create a message when course is not available" do
+        @course.update!(workflow_state: "created")
+        peer_review_sub = peer_review_model(course: @course)
+
+        expect(peer_review_sub.messages_sent).not_to include("Assignment Created")
+      end
+    end
+
+    context "submissions posted" do
+      before :once do
+        Notification.create(name: "Submissions Posted", category: "TestImmediately")
+      end
+
+      it "creates a message when submissions are posted" do
+        peer_review_sub = peer_review_model(course: @course)
+        peer_review_sub.broadcast_submissions_posted({ graded_only: false })
+
+        expect(peer_review_sub.messages_sent).to include("Submissions Posted")
+        expect(peer_review_sub.messages_sent["Submissions Posted"]).not_to be_empty
+      end
+
+      it "does not create a message when course is not available" do
+        @course.update!(workflow_state: "created")
+        peer_review_sub = peer_review_model(course: @course)
+        peer_review_sub.broadcast_submissions_posted({ graded_only: false })
+
+        expect(peer_review_sub.messages_sent).not_to include("Submissions Posted")
+      end
+
+      it "does not create a message when course is concluded" do
+        @course.update!(workflow_state: "completed")
+        peer_review_sub = peer_review_model(course: @course)
+        peer_review_sub.broadcast_submissions_posted({ graded_only: false })
+
+        expect(peer_review_sub.messages_sent).not_to include("Submissions Posted")
+      end
+    end
+  end
 end

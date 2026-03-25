@@ -27,7 +27,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
   it "does not blow up when no responses are provided" do
     expect do
       subject.run([])
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   describe "[:answer_sets]" do

@@ -507,3 +507,15 @@ gradebook_use_sis_pseudonym_order_for_sorting:
       state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
+optimized_grading_rubrics:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Optimized Grading Rubrics
+  description: |
+    Uses optimized implementation for grading rubrics endpoint with N+1 query fixes
+    and context filtering. Improves performance for users with many course enrollments.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

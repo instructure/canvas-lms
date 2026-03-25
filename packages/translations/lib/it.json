@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Contenuto salvataggio automatico esistente. Caricare al suo posto il contenuto salvato automaticamente?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Sottotitolaggio automatico"
+    },
     "available_folders_694d0436": {
         "message": "Cartelle disponibili"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Descrivi { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Descrivi il video)"
-    },
     "description_436c48d7": {
         "message": "Descrizione"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Incorpora immagine"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Incorpora opzioni"
     },
     "embed_video_a97a64af": {
         "message": "Incorpora il video"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Icona Studio della lingua"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Lingua parlata in questo contenuto multimediale*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automatico)"
+    },
     "languages_icon_9d20539": {
         "message": "Icona Lingue"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Collega a un sito esterno."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "L’elenco è stato compresso."
+    },
+    "list_expanded_efec2d0": {
+        "message": "L’elenco è stato espanso."
     },
     "lists_cd1336fc": {
         "message": "Elenchi"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Altre scorciatoie dell’editor possono essere trovate in"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "La nostra tecnologia genera sottotitoli accurati circa all’85%."
     },
     "outline_color_3ef2cea7": {
         "message": "Colore struttura"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Usato da screen reader per descrivere il contenuto di un’immagine"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Usato dagli screen reader per descrivere il video"
     },
     "user_documents_c206e61f": {
         "message": "Documenti utente"

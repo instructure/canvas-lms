@@ -43,10 +43,7 @@ module AssignmentsHelper
   def student_peer_review_link_for(context, assignment, assessment)
     options = assessment.completed? ? completed_link_options : in_progress_link_options
     icon_class = assessment.completed? ? "icon-check" : "icon-warning"
-    text = safe_join [
-      "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
-      submission_author_name_for(assessment)
-    ]
+    text = tag.i(class: icon_class, aria: { hidden: true }) + submission_author_name_for(assessment)
     href = if assignment.anonymous_peer_reviews?
              context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
            else

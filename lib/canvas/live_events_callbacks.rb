@@ -130,7 +130,7 @@ module Canvas::LiveEventsCallbacks
     when GroupMembership
       Canvas::LiveEvents.group_membership_updated(obj)
     when WikiPage
-      if changes["title"] || changes["body"]
+      if changes["title"] || changes["body"] || changes["workflow_state"]
         Canvas::LiveEvents.wiki_page_updated(obj,
                                              changes["title"]&.first,
                                              changes["body"]&.first)

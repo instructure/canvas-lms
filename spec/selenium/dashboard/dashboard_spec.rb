@@ -205,7 +205,7 @@ describe "dashboard" do
 
         list = fj("[aria-label='Groups tray']")
         expect(list).to include_text(group.name)
-        expect(list).to_not include_text(other_group.name)
+        expect(list).not_to include_text(other_group.name)
       end
 
       it "goes to a course when clicking a course link from the menu", priority: "1" do
@@ -253,7 +253,7 @@ describe "dashboard" do
       expect(alert_present?).to be_truthy
       accept_alert
       wait_for_ajaximations
-      expect(f(".conference")).to_not be_displayed
+      expect(f(".conference")).not_to be_displayed
       @conference.reload
       expect(@conference).to be_finished
     end
@@ -377,7 +377,7 @@ describe "dashboard" do
         a.save!
         get "/courses"
         expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
-        expect(f("#future_enrollments_table")).to_not include_text(@c2.name) # shouldn't be included at all
+        expect(f("#future_enrollments_table")).not_to include_text(@c2.name) # shouldn't be included at all
       end
     end
 

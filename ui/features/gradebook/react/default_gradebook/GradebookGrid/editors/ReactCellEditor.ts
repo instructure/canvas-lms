@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 
 /*
  * This editor is intended to be responsible for interfacing with SlickGrid and
@@ -52,7 +52,7 @@ export default class ReactCellEditor {
      */
     const element = this.createElement(props)
 
-    ReactDOM.render(element, this.container)
+    legacyRender(element, this.container)
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -73,7 +73,7 @@ export default class ReactCellEditor {
   destroy() {
     this.component = null
     this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown)
-    ReactDOM.unmountComponentAtNode(this.container)
+    legacyUnmountComponentAtNode(this.container)
   }
 
   /*

@@ -496,12 +496,12 @@ describe "API Authentication", type: :request do
 
         it "gives first token" do
           json = trusted_exchange
-          expect(json["access_token"]).to_not be_nil
+          expect(json["access_token"]).not_to be_nil
         end
 
         it "gives second token if not force_token_reuse" do
           json = trusted_exchange(create_token: true)
-          expect(json["access_token"]).to_not be_nil
+          expect(json["access_token"]).not_to be_nil
           expect(@user.access_tokens.count).to eq 2
         end
 
@@ -604,7 +604,7 @@ describe "API Authentication", type: :request do
     end
 
     def wrapped_jwt_from_service(payload = { sub: @user.global_id })
-      services_jwt = CanvasSecurity::ServicesJwt.generate(payload, false, symmetric: true)
+      services_jwt = CanvasSecurity::ServicesJwt.generate(payload, base64: false, symmetric: true)
       payload = {
         iss: "some other service",
         user_token: services_jwt

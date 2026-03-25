@@ -18,8 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
-import type {Root} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import axios from '@canvas/axios'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,7 +29,7 @@ import {captureException} from '@sentry/react'
 
 const I18n = createI18nScope('announcements_on_home_page')
 
-let _homeRoot: Root | null = null
+let _homeRoot: ReturnType<typeof render> | null = null
 
 // @ts-expect-error TS2339 (typescriptify)
 if (ENV.SHOW_ANNOUNCEMENTS) {
@@ -38,9 +37,9 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
     const container = document.querySelector('#announcements_on_home_page')
 
     if (container) {
-      if (!_homeRoot) _homeRoot = createRoot(container as HTMLElement)
-      _homeRoot.render(
+      _homeRoot = render(
         <Spinner delay={500} renderTitle={I18n.t('Loading Announcements')} size="small" />,
+        container as HTMLElement,
       )
 
       const url = '/api/v1/announcements'
@@ -61,21 +60,23 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
       axios
         .get(url, {params})
         .then(response => {
-          _homeRoot?.render(
-            <View display="block" margin="0 0 medium">
-              <Heading
-                // @ts-expect-error TS18048,TS2345 (typescriptify)
-                level={['wiki', 'syllabus'].includes(ENV.COURSE.default_view) ? 'h1' : 'h2'}
-                margin="0 0 small"
-              >
-                {I18n.t('Recent Announcements')}
-              </Heading>
-              {/* @ts-expect-error TS7006 (typescriptify) */}
-              {response.data.map(announcement => (
-                <AnnouncementRow key={announcement.id} announcement={announcement} />
-              ))}
-            </View>,
-          )
+          if (_homeRoot)
+            rerender(
+              _homeRoot,
+              <View display="block" margin="0 0 medium">
+                <Heading
+                  // @ts-expect-error TS18048,TS2345 (typescriptify)
+                  level={['wiki', 'syllabus'].includes(ENV.COURSE.default_view) ? 'h1' : 'h2'}
+                  margin="0 0 small"
+                >
+                  {I18n.t('Recent Announcements')}
+                </Heading>
+                {/* @ts-expect-error TS7006 (typescriptify) */}
+                {response.data.map(announcement => (
+                  <AnnouncementRow key={announcement.id} announcement={announcement} />
+                ))}
+              </View>,
+            )
         })
         .catch(error => {
           console.error('Error retrieving home page announcements')

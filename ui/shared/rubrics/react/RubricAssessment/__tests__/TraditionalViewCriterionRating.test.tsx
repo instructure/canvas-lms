@@ -86,7 +86,7 @@ describe('TraditionalViewCriterionRating', () => {
       render(<TraditionalViewCriterionRating {...defaultProps} min={5} />)
       expect(
         screen.getByTestId('traditional-criterion-criterion-1-ratings-0-points'),
-      ).toHaveTextContent('5 to 10 pts')
+      ).toHaveTextContent('10 to >5 pts')
     })
 
     it('should display single point value when min is not provided', () => {

@@ -635,7 +635,7 @@ describe "Outcomes API", type: :request do
                          {},
                          { expected_status: 400 })
                 @outcome.reload
-              end.to_not change { @outcome.calculation_int }
+              end.not_to change { @outcome.calculation_int }
 
               expect(@outcome.calculation_method).to eql(method)
             end

@@ -18,6 +18,7 @@
 
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import {act, screen} from '@testing-library/react'
 import {start} from '../index'
 
 const server = setupServer(
@@ -47,13 +48,15 @@ describe('start', () => {
     document.getElementById('fixtures')?.remove()
   })
 
-  it('renders without errors', () => {
+  it('renders without errors', async () => {
     const fixtures = document.createElement('div')
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
 
-    expect(() => {
+    await act(async () => {
       start(fixtures, {context: 'account', contextId: '1'})
-    }).not.toThrow()
+    })
+
+    await screen.findByText(/canvas content security policy/i)
   })
 })

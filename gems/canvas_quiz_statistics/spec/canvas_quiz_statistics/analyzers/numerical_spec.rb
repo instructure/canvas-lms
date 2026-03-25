@@ -27,7 +27,7 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
   it "does not blow up when no responses are provided" do
     expect do
       expect(subject.run([])).to be_present
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   it_behaves_like "essay [:responses]"

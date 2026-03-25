@@ -132,7 +132,23 @@ class FilesController < ApplicationController
   # an Account in show_relative
   protect_from_forgery except: [:api_capture, :show_relative], with: :exception
 
-  before_action :require_user, only: :create_pending
+  skip_before_action :require_user, only: %i[api_capture
+                                             api_create
+                                             api_create_success
+                                             api_create_success_cors
+                                             api_index
+                                             api_show
+                                             file_ref
+                                             icon_metadata
+                                             image_thumbnail
+                                             images
+                                             index
+                                             public_url
+                                             react_files
+                                             show
+                                             show_relative
+                                             show_thumbnail
+                                             update_word_count]
   before_action :require_context, except: %i[
     image_thumbnail
     show_thumbnail
@@ -816,38 +832,40 @@ class FilesController < ApplicationController
   protected :render_attachment
 
   def show_relative
-    require_context(user_scope: merged_user_scope)
+    GuardRail.activate(:secondary) do
+      require_context(user_scope: merged_user_scope)
 
-    path = params[:file_path]
-    file_id = params[:file_id]
-    file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
+      path = params[:file_path]
+      file_id = params[:file_id]
+      file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
 
-    # Manually-invoke verify_authenticity_token for non-Account contexts
-    # This is to allow Account-level file downloads to skip request forgery protection
-    verify_authenticity_token unless @context.is_a?(Account)
+      # Manually-invoke verify_authenticity_token for non-Account contexts
+      # This is to allow Account-level file downloads to skip request forgery protection
+      verify_authenticity_token unless @context.is_a?(Account)
 
-    # if the relative path matches the given file id use that file
-    if file_id && (@attachment = @context.attachments.where(id: file_id).first) &&
-       !(@attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path))
-      @attachment = nil
+      # if the relative path matches the given file id use that file
+      if file_id && (@attachment = @context.attachments.where(id: file_id).first) &&
+         !(@attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path))
+        @attachment = nil
+      end
+
+      @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
+
+      unless @attachment
+        # if the file doesn't exist, don't leak its existence (and the context's name) to an unauthenticated user
+        # (note that it is possible to have access to the file without :read on the context, e.g. with submissions)
+        return unless authorized_action(@context, @current_user, :read)
+
+        @include_js_env = true
+        return render "shared/errors/file_not_found",
+                      status: :bad_request,
+                      formats: [:html]
+      end
+
+      params[:id] = @attachment.id
+
+      params[:download] = "1"
     end
-
-    @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
-
-    unless @attachment
-      # if the file doesn't exist, don't leak its existence (and the context's name) to an unauthenticated user
-      # (note that it is possible to have access to the file without :read on the context, e.g. with submissions)
-      return unless authorized_action(@context, @current_user, :read)
-
-      @include_js_env = true
-      return render "shared/errors/file_not_found",
-                    status: :bad_request,
-                    formats: [:html]
-    end
-
-    params[:id] = @attachment.id
-
-    params[:download] = "1"
     show
   end
 

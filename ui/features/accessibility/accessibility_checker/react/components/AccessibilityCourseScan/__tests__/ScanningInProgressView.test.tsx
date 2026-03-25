@@ -22,19 +22,19 @@ import {ScanningInProgressView} from '../components/ScanningInProgressView'
 
 describe('ScanningInProgressView', () => {
   it('renders loading spinner with correct title', () => {
-    render(<ScanningInProgressView />)
+    render(<ScanningInProgressView buttonLabel="Scan Course" />)
 
     expect(screen.getByTitle('Scanning in progress')).toBeInTheDocument()
   })
 
   it('renders "Hang tight!" message', () => {
-    render(<ScanningInProgressView />)
+    render(<ScanningInProgressView buttonLabel="Scan Course" />)
 
     expect(screen.getByText('Hang tight!')).toBeInTheDocument()
   })
 
   it('renders scanning duration message', () => {
-    render(<ScanningInProgressView />)
+    render(<ScanningInProgressView buttonLabel="Scan Course" />)
 
     expect(
       screen.getByText(
@@ -44,7 +44,7 @@ describe('ScanningInProgressView', () => {
   })
 
   it('has scan button disabled', () => {
-    render(<ScanningInProgressView />)
+    render(<ScanningInProgressView buttonLabel="Scan Course" />)
 
     const button = screen.getByRole('button', {name: /scan course/i})
     expect(button).toBeDisabled()

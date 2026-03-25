@@ -36,7 +36,6 @@ export const ScoringTypeSelect = ({hidePoints, onChange}: ScoreTypeSelectProps) 
   return (
     <SimpleSelect
       renderLabel={I18n.t('Scoring')}
-      width="10.563rem"
       value={scoreType}
       onChange={(_e, {value}) => handleChange(value !== undefined ? value.toString() : '')}
       data-testid="rubric-rating-scoring-type-select"

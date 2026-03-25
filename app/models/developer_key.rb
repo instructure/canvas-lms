@@ -199,7 +199,7 @@ class DeveloperKey < ActiveRecord::Base
     self.icon_url = nil if icon_url.blank?
   end
 
-  def generate_api_key(overwrite = false)
+  def generate_api_key(overwrite: false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !api_key
   end
 

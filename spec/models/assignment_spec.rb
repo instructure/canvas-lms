@@ -299,7 +299,7 @@ describe Assignment do
         assignment.update!(due_at: 1.day.from_now)
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
         assignment.update!(due_at: nil)
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
       end
 
       it "deletes the ScheduledSmartAlert if the due date is changed to the past" do
@@ -307,7 +307,7 @@ describe Assignment do
         assignment.update!(due_at: 1.day.from_now)
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
         assignment.update!(due_at: 1.day.ago)
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
       end
 
       it "deletes associated ScheduledSmartAlerts when the Assignment is deleted" do
@@ -317,8 +317,8 @@ describe Assignment do
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
         assignment.destroy
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       end
     end
 
@@ -2989,7 +2989,7 @@ describe Assignment do
       @assignment.update!(due_at: 2.days.from_now, lock_at: 3.days.from_now)
       @assignment.reload
       decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
-      expect(decoded).to_not include(:description)
+      expect(decoded).not_to include(:description)
     end
 
     it "does not contain the description when the assignment is locked" do
@@ -3123,7 +3123,7 @@ describe Assignment do
       @assignment.grade_student(@student, grade: 10, grader: @teacher)
       @submission = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
 
-      expect(@submission.workflow_state).to_not eq("unsubmitted")
+      expect(@submission.workflow_state).not_to eq("unsubmitted")
     end
   end
 
@@ -4336,13 +4336,13 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
-    context "when force_letter_grade(the third argument of score_to_grade) is true" do
+    context "when force_letter_grade is true" do
       it "returns letter grading standard grade for points" do
         @assignment.grading_type = "points"
         @assignment.points_possible = 10
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: "9", grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A-"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "A-"
       end
 
       it "returns 'complete' for 0/0" do
@@ -4350,7 +4350,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: "0", grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "complete"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "complete"
       end
 
       it "returns given grade for -1/0" do
@@ -4358,7 +4358,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: -1, grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "-1"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "-1"
       end
 
       it "returns highest grading scheme grade when 1/0" do
@@ -4366,7 +4366,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: 1, grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "A"
       end
     end
 
@@ -11176,13 +11176,13 @@ describe Assignment do
           it "does not call refresh_course_content_participation_counts when not changing to a trigger workflow_state" do
             assignment.workflow_state = "duplicating"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
 
           it "does not call refresh_course_content_participation_counts when changing something other than workflow_state" do
             assignment.title = "New Title"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
         end
 
@@ -11211,13 +11211,13 @@ describe Assignment do
           it "does not call refresh_course_content_participation_counts when not changing to something other than not_graded" do
             assignment.submission_types = "on_paper"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
 
           it "does not call refresh_course_content_participation_counts when changing something other than submission_types" do
             assignment.title = "New Title"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
         end
       end
@@ -11738,7 +11738,7 @@ describe Assignment do
       @assignment.omit_from_final_grade = true
       @assignment.points_possible = 10
 
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "disallows hide_in_gradebook to be set to true if omit_from_final_grade is false" do
@@ -11746,14 +11746,14 @@ describe Assignment do
       @assignment.omit_from_final_grade = false
       @assignment.points_possible = 0
 
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "disallows hide_in_gradebook to be set to anything other than a boolean" do
       @assignment.hide_in_gradebook = 2
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
       @assignment.hide_in_gradebook = nil
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
   end
 
@@ -11769,12 +11769,12 @@ describe Assignment do
 
     it "disallows 0" do
       @assignment.allowed_attempts = 0
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "disallows values less than -1" do
       @assignment.allowed_attempts = -2
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "allows values greater than 0" do

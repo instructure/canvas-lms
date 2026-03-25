@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Le contenu enregistré automatiquement existe. Désirez-vous charger le contenu enregistré automatiquement à la place?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Sous-titrage automatique"
+    },
     "available_folders_694d0436": {
         "message": "Dossiers disponibles"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Décrire { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Décrire la vidéo)"
-    },
     "description_436c48d7": {
         "message": "Description"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Incorporer l’image"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Options intégrées"
     },
     "embed_video_a97a64af": {
         "message": "Intégrer la vidéo"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Icône Arts de la langue"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Langue parlée dans ce support*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automatique)"
+    },
     "languages_icon_9d20539": {
         "message": "Icône Langues"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Liens vers un site externe."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Liste réduite."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste développée."
     },
     "lists_cd1336fc": {
         "message": "Listes"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "D''autres raccourcis de l''éditeur peuvent être trouvés sur"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Notre technologie génère des sous-titres précis à environ 85 %."
     },
     "outline_color_3ef2cea7": {
         "message": "Couleur du contour"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Utilisé par les lecteurs d''écran pour décrire le contenu d''une image"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Utilisé par les lecteurs d''écran pour décrire la vidéo"
     },
     "user_documents_c206e61f": {
         "message": "Documents d''utilisateur"

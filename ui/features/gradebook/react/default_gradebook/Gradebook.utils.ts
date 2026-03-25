@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
@@ -176,17 +176,12 @@ export function onGridKeyDown(
   }
 }
 
-export function renderComponent(
-  reactClass: any,
-  mountPoint: Element | null,
-  props = {},
-): HTMLElement | undefined {
+export function renderComponent(reactClass: any, mountPoint: Element | null, props = {}): void {
   if (mountPoint == null) {
     throw new Error('mountPoint is required')
   }
   const component = React.createElement(reactClass, props)
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(component, mountPoint)
+  legacyRender(component, mountPoint)
 }
 
 export async function confirmViewUngradedAsZero({

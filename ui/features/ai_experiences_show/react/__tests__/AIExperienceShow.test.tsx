@@ -90,7 +90,7 @@ describe('AIExperienceShow', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     expect(screen.getByText('Configurations')).toBeInTheDocument()
-    expect(screen.getByText('Facts Students Should Know')).toBeInTheDocument()
+    expect(screen.getByText('Text source')).toBeInTheDocument()
     expect(
       screen.getByText(
         'You are a customer service representative helping customers with billing issues.',
@@ -100,13 +100,13 @@ describe('AIExperienceShow', () => {
     expect(
       screen.getByText('Students will learn to handle customer complaints professionally'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Pedagogical Guidance')).toBeInTheDocument()
+    expect(screen.getByText('Pedagogical activity guidance')).toBeInTheDocument()
     expect(screen.getByText('A customer calls about incorrect billing')).toBeInTheDocument()
   })
 
-  it('renders Experience section heading', () => {
+  it('renders Activity section heading', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    expect(screen.getByText('Experience')).toBeInTheDocument()
+    expect(screen.getByText('Activity')).toBeInTheDocument()
   })
 
   it('renders preview in collapsed state by default', () => {
@@ -151,14 +151,14 @@ describe('AIExperienceShow', () => {
 
   it('renders three-dot menu button', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    const menuButton = screen.getAllByText('AI Experience settings')[0].closest('button')
+    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     expect(menuButton).toBeInTheDocument()
   })
 
   it('shows menu options when menu button is clicked', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
-    const menuButton = screen.getAllByText('AI Experience settings')[0].closest('button')
+    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     fireEvent.click(menuButton!)
 
     await waitFor(() => {
@@ -177,7 +177,7 @@ describe('AIExperienceShow', () => {
   it('Run chat simulation option is disabled', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
-    const menuButton = screen.getAllByText('AI Experience settings')[0].closest('button')
+    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     fireEvent.click(menuButton!)
 
     await waitFor(() => {
@@ -189,7 +189,7 @@ describe('AIExperienceShow', () => {
   it('opens delete confirmation modal when Delete is clicked', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
-    const menuButton = screen.getAllByText('AI Experience settings')[0].closest('button')
+    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     fireEvent.click(menuButton!)
 
     await waitFor(() => {
@@ -200,7 +200,7 @@ describe('AIExperienceShow', () => {
     fireEvent.click(deleteButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
+      expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
       expect(
         screen.getByText(
           'Are you sure you want to delete "Customer Service Training"? This action cannot be undone.',
@@ -213,14 +213,14 @@ describe('AIExperienceShow', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     // Open menu and click Delete
-    const menuButton = screen.getAllByText('AI Experience settings')[0].closest('button')
+    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     fireEvent.click(menuButton!)
 
     const deleteButton = screen.getByText('Delete')
     fireEvent.click(deleteButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
+      expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
     })
 
     // Click Cancel - use testid to target the button directly
@@ -228,7 +228,7 @@ describe('AIExperienceShow', () => {
 
     await waitFor(
       () => {
-        expect(screen.queryByText('Delete AI Experience')).not.toBeInTheDocument()
+        expect(screen.queryByText('Delete Knowledge Chat')).not.toBeInTheDocument()
       },
       {timeout: 5000},
     )
@@ -246,7 +246,7 @@ describe('AIExperienceShow', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     // Open menu and click Delete
-    const menuButtons = screen.getAllByText('AI Experience settings')
+    const menuButtons = screen.getAllByText('Knowledge Chat settings')
     const menuButton = menuButtons[0].closest('button')
     fireEvent.click(menuButton!)
 
@@ -258,7 +258,7 @@ describe('AIExperienceShow', () => {
     fireEvent.click(deleteMenuItem)
 
     await waitFor(() => {
-      expect(screen.getByText('Delete AI Experience')).toBeInTheDocument()
+      expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
     })
 
     fireEvent.click(screen.getByTestId('ai-experience-show-delete-confirm-button'))
@@ -282,13 +282,13 @@ describe('AIExperienceShow', () => {
 
   it('renders kebab menu when can_manage is true', () => {
     render(<AIExperienceShow aiExperience={{...mockAiExperience, can_manage: true}} />)
-    const menuButton = screen.getAllByText('AI Experience settings')[0].closest('button')
+    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     expect(menuButton).toBeInTheDocument()
   })
 
   it('does not render kebab menu when can_manage is false', () => {
     render(<AIExperienceShow aiExperience={{...mockAiExperience, can_manage: false}} />)
-    const menuButton = screen.queryByText('AI Experience settings')
+    const menuButton = screen.queryByText('Knowledge Chat settings')
     expect(menuButton).not.toBeInTheDocument()
   })
 
@@ -302,7 +302,7 @@ describe('AIExperienceShow', () => {
       expect(screen.getByTestId('ai-experience-show-indexing-notice')).toBeInTheDocument()
       expect(
         screen.getByText(
-          'Preview and AI Conversations will be available once processing is complete. Check back later.',
+          'Preview and Conversations will be available once processing is complete. Check back later.',
         ),
       ).toBeInTheDocument()
       // Preview chat is hidden — replaced by the notice
@@ -353,7 +353,7 @@ describe('AIExperienceShow', () => {
       )
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
       // Students see the conversation view (not the teacher's "Preview" panel)
-      expect(screen.getByText('Conversation')).toBeInTheDocument()
+      expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
     })
   })
 
@@ -383,9 +383,9 @@ describe('AIExperienceShow', () => {
       fakeENV.teardown()
     })
 
-    it('renders Source Files section when flag is on and files are present', () => {
+    it('renders File sources section when flag is on and files are present', () => {
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
-      expect(screen.getByText('Source Files')).toBeInTheDocument()
+      expect(screen.getByText('File sources')).toBeInTheDocument()
     })
 
     it('renders each file as a list item with its name', () => {
@@ -400,20 +400,20 @@ describe('AIExperienceShow', () => {
       expect(item.closest('a')).toBeNull()
     })
 
-    it('does not render Source Files section when files array is empty', () => {
+    it('does not render File sources section when files array is empty', () => {
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: []}} />)
-      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+      expect(screen.queryByText('File sources')).not.toBeInTheDocument()
     })
 
-    it('does not render Source Files section when context_files is absent', () => {
+    it('does not render File sources section when context_files is absent', () => {
       render(<AIExperienceShow aiExperience={mockAiExperience} />)
-      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+      expect(screen.queryByText('File sources')).not.toBeInTheDocument()
     })
 
-    it('does not render Source Files section when feature flag is off', () => {
+    it('does not render File sources section when feature flag is off', () => {
       fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: false}})
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
-      expect(screen.queryByText('Source Files')).not.toBeInTheDocument()
+      expect(screen.queryByText('File sources')).not.toBeInTheDocument()
     })
   })
 })

@@ -168,6 +168,11 @@ module Types
         object.submission.grants_right?(current_user, :comment)
     end
 
+    field :publishable, Boolean, null: false
+    def publishable
+      object.publishable_for?(current_user)
+    end
+
     field :provisional, Boolean, null: false
     delegate :provisional, to: :object
   end

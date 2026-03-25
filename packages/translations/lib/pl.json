@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Istnieje automatycznie zapisana zawartość. Czy wolisz wczytać automatyczną zawartość?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatyczne napisy"
+    },
     "available_folders_694d0436": {
         "message": "Dostępne foldery"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(opisz { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(opisz wideo)"
-    },
     "description_436c48d7": {
         "message": "Opis"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Osadź obraz"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Opcje osadzania"
     },
     "embed_video_a97a64af": {
         "message": "Osadź wideo"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Ikona języków obcych"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Język używany w tych multimediach*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automatyczne)"
+    },
     "languages_icon_9d20539": {
         "message": "Ikona języków"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Łącza do strony zewnętrznej."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Lista zwinięta."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Rozszerzono listę."
     },
     "lists_cd1336fc": {
         "message": "Listy"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Skróty do innych edytorów można znaleźć na"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Nasza technologia pozwala generować napisy z ~85% dokładnością."
     },
     "outline_color_3ef2cea7": {
         "message": "Kolor konturu"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Używane przez czytniki ekranu do opisania zawartości obrazu"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Używane przez czytniki ekranu do opisania zawartości wideo"
     },
     "user_documents_c206e61f": {
         "message": "Dokumenty użytkownika"

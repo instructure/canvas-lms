@@ -151,7 +151,7 @@ describe "help dialog" do
       wait_for_ajaximations
       f("#global_nav_help_link").click
       wait_for_ajaximations
-      expect(f("#help_tray")).to_not include_text("Customize this menu")
+      expect(f("#help_tray")).not_to include_text("Customize this menu")
     end
   end
 

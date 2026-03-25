@@ -51,7 +51,7 @@ module CaptchaValidation
     respond_to do |format|
       format.html do
         flash[:error] = t "Try again"
-        redirect_back fallback_location: root_url
+        redirect_back_or_to root_url
       end
       format.json do
         render json: { errors: }, status: :bad_request

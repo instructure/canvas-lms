@@ -53,7 +53,7 @@ module AttachmentHelper
     end
     attrs.map do |attr, val|
       %(data-#{attr}="#{ERB::Util.html_escape(val)}")
-    end.join(" ").html_safe
+    end.join(" ").html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def media_preview_attributes(attachment, attrs = {})

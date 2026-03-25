@@ -84,7 +84,7 @@ export const RatingRow = ({
     onPointsBlur,
     setRatingForm,
     setPointsInputText,
-    rangeStart: rangeStart ?? 0,
+    rangeStart,
     pointsInputText,
     onRemove,
   }

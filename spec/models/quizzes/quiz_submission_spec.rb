@@ -426,13 +426,13 @@ describe Quizzes::QuizSubmission do
         @quiz.scoring_policy = "keep_highest"
         @quiz.save!
         @assignment = @quiz.assignment
-        @quiz_sub = @quiz.generate_submission @user, false
+        @quiz_sub = @quiz.generate_submission @user, preview: false
         @quiz_sub.workflow_state = "complete"
         @quiz_sub.save!
         @quiz_sub.score = 5
         @quiz_sub.fudge_points = 0
         @quiz_sub.kept_score = 5
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
         @submission = @quiz_sub.submission
       end
 
@@ -453,7 +453,7 @@ describe Quizzes::QuizSubmission do
       it "uses the explicit grade even if it isn't the highest score" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
 
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 4
@@ -477,7 +477,7 @@ describe Quizzes::QuizSubmission do
       it "does not have manually_scored set when updated normally" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
         @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @quiz_sub.reload
         expect(@quiz_sub.manually_scored).to be_truthy
@@ -507,7 +507,7 @@ describe Quizzes::QuizSubmission do
       it "only updates the last completed quiz submission" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
-        @quiz_sub.with_versioning(true, &:save!)
+        @quiz_sub.with_versioning(&:save!)
         @quiz.generate_submission(@user)
         @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
@@ -542,13 +542,13 @@ describe Quizzes::QuizSubmission do
       s.workflow_state = "complete"
       s.score = 5.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.score).to be(5.0)
       expect(s.kept_score).to be(5.0)
 
       s.score = 4.0
       s.attempt = 2
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(2)
       expect(s.kept_score).to be(4.0)
 
@@ -556,12 +556,12 @@ describe Quizzes::QuizSubmission do
       s.reload
       s.score = 3.0
       s.attempt = 3
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.kept_score).to be(5.0)
 
       q.update!(scoring_policy: "keep_average")
       s.reload
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.kept_score).to be(4.0)
 
       q.update!(scoring_policy: "keep_highest")
@@ -575,32 +575,32 @@ describe Quizzes::QuizSubmission do
       s.workflow_state = "complete"
       s.score = 2.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
 
       s.score = 4.0
       s.attempt = 2
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(2)
 
       s.score = 5.0
       s.attempt = 3
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(3)
 
       s.score = 6.0
       s.attempt = 4
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(4)
       expect(s.kept_score).to be(4.25)
 
       s.score = 7.0
       s.attempt = 5
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(5)
 
       s.score = 8.0
       s.attempt = 6
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(6)
       expect(s.kept_score).to be(5.33)
     end
@@ -612,7 +612,7 @@ describe Quizzes::QuizSubmission do
       s.workflow_state = "complete"
       s.score = 5.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(1)
       expect(s.score).to be(5.0)
       expect(s.kept_score).to be(5.0)
@@ -621,14 +621,14 @@ describe Quizzes::QuizSubmission do
       s.score_before_regrade = 5.0
       s.score = 4.0
       s.attempt = 1
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(2)
       expect(s.kept_score).to be(4.0)
 
       # new attempt
       s.score = 3.0
       s.attempt = 2
-      s.with_versioning(true, &:save!)
+      s.with_versioning(&:save!)
       expect(s.version_number).to be(3)
       expect(s.kept_score).to be(4.0)
     end
@@ -819,7 +819,7 @@ describe Quizzes::QuizSubmission do
         quiz
       end
       let(:assignment) { quiz.assignment }
-      let(:quiz_submission) { quiz.generate_submission(@user, false) }
+      let(:quiz_submission) { quiz.generate_submission(@user) }
       let(:submission) { quiz_submission.submission }
 
       def save_quiz_submission
@@ -828,7 +828,7 @@ describe Quizzes::QuizSubmission do
         quiz_submission.score = 5
         quiz_submission.fudge_points = 0
         quiz_submission.kept_score = 5
-        quiz_submission.with_versioning(true, &:save!)
+        quiz_submission.with_versioning(&:save!)
       end
 
       before do
@@ -1275,12 +1275,12 @@ describe Quizzes::QuizSubmission do
       let_once(:submission) { @quiz.quiz_submissions.create! }
 
       before do
-        submission.with_versioning(true) do |s|
+        submission.with_versioning do |s|
           s.score = 10
           s.save(validate: false)
         end
 
-        submission.with_versioning(true) do |s|
+        submission.with_versioning do |s|
           s.score = 15
           s.save(validate: false)
         end
@@ -1316,7 +1316,7 @@ describe Quizzes::QuizSubmission do
         submission.workflow_state = "complete"
         submission.score = 5.0
         submission.attempt = 1
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
         expect(submission.version_number).to be(1)
         expect(submission.score).to be(5.0)
 
@@ -1324,13 +1324,13 @@ describe Quizzes::QuizSubmission do
         submission.score_before_regrade = 5.0
         submission.score = 4.0
         submission.attempt = 1
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
         expect(submission.version_number).to be(2)
 
         # new attempt
         submission.score = 3.0
         submission.attempt = 2
-        submission.with_versioning(true, &:save!)
+        submission.with_versioning(&:save!)
         expect(submission.version_number).to be(3)
 
         attempts = submission.attempts
@@ -1400,7 +1400,7 @@ describe Quizzes::QuizSubmission do
 
           submission = @quiz.generate_submission(@student)
           submission.end_at = @quiz.due_at
-          expect(submission.needs_grading?(true)).to be_truthy
+          expect(submission.needs_grading?(strict: true)).to be_truthy
         end
 
         it "returns false if it isn't overdue" do
@@ -1408,7 +1408,7 @@ describe Quizzes::QuizSubmission do
           @quiz.save!
 
           submission = @quiz.generate_submission(@student)
-          expect(submission.needs_grading?(true)).to be_falsey
+          expect(submission.needs_grading?(strict: true)).to be_falsey
         end
       end
 
@@ -1495,7 +1495,7 @@ describe Quizzes::QuizSubmission do
         @submission.workflow_state = "complete"
         @submission.score = 5.0
         @submission.attempt = 1
-        @submission.with_versioning(true, &:save!)
+        @submission.with_versioning(&:save!)
         @submission.save
       end
 
@@ -1664,7 +1664,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not create quiz submission event on preview quiz submission" do
-        quiz_submission = @quiz.generate_submission(@student, true)
+        quiz_submission = @quiz.generate_submission(@student, preview: true)
         event = quiz_submission.events.last
         expect(event).to be_nil
       end
@@ -1701,7 +1701,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not include concluded teachers" do
-        expect(@quiz_submission.teachers).to_not include @concluded_teacher
+        expect(@quiz_submission.teachers).not_to include @concluded_teacher
       end
 
       it "includes teachers that were concluded and then later unconcluded" do
@@ -1711,12 +1711,12 @@ describe Quizzes::QuizSubmission do
 
       it "does not include teachers with deleted enrollments" do
         @active_enrollment.destroy
-        expect(@quiz_submission.teachers).to_not include @active_teacher
+        expect(@quiz_submission.teachers).not_to include @active_teacher
       end
 
       it "does not include inactive enrollments" do
         @active_enrollment.deactivate
-        expect(@quiz_submission.teachers).to_not include @active_teacher
+        expect(@quiz_submission.teachers).not_to include @active_teacher
       end
 
       it "includes teachers that were deactivated and then later reactivated" do
@@ -1730,7 +1730,7 @@ describe Quizzes::QuizSubmission do
         other_teacher = User.create!
         other_enrollment = @course.enroll_teacher(other_teacher, section: other_section, limit_privileges_to_course_section: true)
         other_enrollment.accept
-        expect(@quiz_submission.teachers).to_not include other_teacher
+        expect(@quiz_submission.teachers).not_to include other_teacher
       end
     end
 
@@ -1825,7 +1825,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "returns the correct soft (when the Attempt will timeout) time left" do
-        expect(subject.quiz).to_not receive(:timer_autosubmit_disabled?)
+        expect(subject.quiz).not_to receive(:timer_autosubmit_disabled?)
         expect(subject.time_left).to eql(60 * 60)
       end
 
@@ -1845,8 +1845,8 @@ describe Quizzes::QuizSubmission do
     end
 
     it "returns true if strictly overdue?" do
-      expect(subject).to receive(:overdue?).with(true).and_return(true)
-      expect(subject.overdue_and_needs_submission?(true)).to be(true)
+      expect(subject).to receive(:overdue?).with(strict: true).and_return(true)
+      expect(subject.overdue_and_needs_submission?(strict: true)).to be(true)
     end
 
     it "returns false if untaken" do
@@ -1883,13 +1883,13 @@ describe Quizzes::QuizSubmission do
 
     it "allows a 1 minute grace if strict" do
       subject.end_at = 50.seconds.ago
-      expect(subject.overdue?(true)).to be(false)
+      expect(subject.overdue?(strict: true)).to be(false)
 
       subject.end_at = 3.minutes.ago
-      expect(subject.overdue?(true)).to be(true)
+      expect(subject.overdue?(strict: true)).to be(true)
 
       subject.end_at = 6.minutes.ago
-      expect(subject.overdue?(true)).to be(true)
+      expect(subject.overdue?(strict: true)).to be(true)
     end
 
     it "allows a 5 minute grace if not strict" do
@@ -1901,7 +1901,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "uses end_at by default" do
-      expect(subject).to_not receive(:end_at_without_time_limit)
+      expect(subject).not_to receive(:end_at_without_time_limit)
 
       subject.end_at = 3.minutes.ago
       expect(subject.overdue?).to be(false)
@@ -1995,7 +1995,7 @@ describe Quizzes::QuizSubmission do
                                                                          data: snapshot_data.merge(subject.submission_data).with_indifferent_access
                                                                        })
 
-      subject.snapshot! snapshot_data, true
+      subject.snapshot! snapshot_data, full_snapshot: true
     end
   end
 

@@ -24,7 +24,7 @@ module CC
     def create_learning_outcomes(document = nil)
       return nil unless @course.has_outcomes?
 
-      root_group = @course.root_outcome_group(false)
+      root_group = @course.root_outcome_group(force: false)
       return nil unless root_group
 
       if document
@@ -60,7 +60,7 @@ module CC
       rel_path
     end
 
-    def process_outcome_group(node, group, force_export = false)
+    def process_outcome_group(node, group, force_export: false)
       migration_id = create_key(group)
       node.learningOutcomeGroup(identifier: migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
@@ -69,20 +69,20 @@ module CC
         group_node.source_outcome_group_id group.source_outcome_group_id if group.source_outcome_group_id.present?
 
         group_node.learningOutcomes do |lo_node|
-          process_outcome_group_content(lo_node, group, force_export)
+          process_outcome_group_content(lo_node, group, force_export:)
         end
       end
     end
 
-    def process_outcome_group_content(node, group, force_export = false)
+    def process_outcome_group_content(node, group, force_export: false)
       group.child_outcome_groups.active.each do |item|
         export_group = export_object?(item, asset_type: "learning_outcomes") || export_object?(item, asset_type: "learning_outcome_groups")
         export_group ||= force_export
         if export_group
-          process_outcome_group(node, item, true)
+          process_outcome_group(node, item, force_export: true)
         else
           # Skip importing this group, but continue with its contents
-          process_outcome_group_content(node, item, force_export)
+          process_outcome_group_content(node, item, force_export:)
         end
       end
       group.child_outcome_links.active.each do |item|

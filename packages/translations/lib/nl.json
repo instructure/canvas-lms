@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Er is automatisch opgeslagen inhoud aanwezig. Wil je liever  de automatisch opgeslagen inhoud laden?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatische ondertiteling"
+    },
     "available_folders_694d0436": {
         "message": "Beschikbare mappen"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Beschrijf het { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(beschrijf de video)"
-    },
     "description_436c48d7": {
         "message": "Beschrijving"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Afbeelding insluiten"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Opties voor insluiten"
     },
     "embed_video_a97a64af": {
         "message": "Video insluiten"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Linguïstiekpictogram"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Taal die wordt gesproken in deze media*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automatisch)"
+    },
     "languages_icon_9d20539": {
         "message": "Talenpictogram"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Koppelingen naar een externe site."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Lijst samengevouwen."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lijst uitgevouwen."
     },
     "lists_cd1336fc": {
         "message": "Lijsten"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andere editorsnelkoppelingen zijn te vinden op"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Onze technologie genereert ondertiteling met een nauwkeurigheid van ~85%."
     },
     "outline_color_3ef2cea7": {
         "message": "Omtrekkleur"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Gebruikt door schermlezers om de inhoud van een afbeelding te beschrijven"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Gebruikt door schermlezers om de video te beschrijven"
     },
     "user_documents_c206e61f": {
         "message": "Gebruikersdocumenten"

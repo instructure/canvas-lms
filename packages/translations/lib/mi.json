@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Tiaki-aunoa ngā ihirangi kei te tiari. Kei te hiahia koe ki te uta i te tiaki-aunoa ihirangi?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Te tapanga aunoa"
+    },
     "available_folders_694d0436": {
         "message": "Ngā kōpaki e wātea ana"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Whakaahuahia te { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Whakātu te ataata)"
-    },
     "description_436c48d7": {
         "message": "Whakāhuatanga"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Tāmau Āhua"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Ngā kōwhiringa whakauru"
     },
     "embed_video_a97a64af": {
         "message": "Whakauru Ataata"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Reo Toi Tohu"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Reo e Kōrerotia ana i roto i tēnei Pāpāho*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Aunoa)"
+    },
     "languages_icon_9d20539": {
         "message": "Nga reo Tohu"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Hononga ki te pae o waho."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "I hinga te rārangi."
+    },
+    "list_expanded_efec2d0": {
+        "message": "I whānuitia te rarangi."
     },
     "lists_cd1336fc": {
         "message": "Nga rarangi"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Ētahi atu etita pokatata i kitea ai"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Ko ta maatau hangarau e whakaputa ~85% nga tapanga tika."
     },
     "outline_color_3ef2cea7": {
         "message": "Tae Whakahuahua"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Whakamahia e ngā kaipānui mata hei whakāhua i ngā ihirangi o te āhua"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Whakamahia e ngā kaipānui mata hei whakāhua i te ataata"
     },
     "user_documents_c206e61f": {
         "message": "Kaiwhakamahi Tuhinga"

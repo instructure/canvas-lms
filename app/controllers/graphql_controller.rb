@@ -21,7 +21,7 @@
 class GraphQLController < ApplicationController
   include Api::V1
 
-  before_action :require_user, if: :require_auth?
+  skip_before_action :require_user, unless: :require_auth?
   # This makes sure that the liveEvents context is set up for graphql requests
   before_action :get_context
 

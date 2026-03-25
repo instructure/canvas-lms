@@ -23,51 +23,63 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {DiscoveryProvider, useDiscovery} from '../hooks/useDiscovery'
+import {ConfigureModal} from './ConfigureModal'
+import type {DiscoveryPageProps} from '../types'
 
-interface DiscoveryPageProps {
-  initialEnabled: boolean
-  onChange: (enabled: boolean) => void
-}
+const I18n = createI18nScope('discovery_page')
 
-export function DiscoveryPage({initialEnabled, onChange}: DiscoveryPageProps) {
-  const [enabled, setEnabled] = useState(initialEnabled)
+function DiscoveryPageInner({initialEnabled, onChange}: DiscoveryPageProps) {
+  const [isEnabled, setIsEnabled] = useState(initialEnabled)
+  const {modalOpen, setModalOpen} = useDiscovery()
 
   const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked
-    setEnabled(checked)
-    onChange(checked)
+    const newValue = event.target.checked
+    setIsEnabled(newValue)
+    onChange(newValue)
   }
 
-  const handleConfigure = () => {
-    // TODO: Open full-page modal for configuration
-    alert('Configuration modal will be implemented in future work')
-  }
+  const handleConfigure = () => setModalOpen(true)
 
   return (
     <View as="div" data-testid="discovery-page">
       <Flex as="div" direction="row" alignItems="center" gap="small">
         <Flex.Item>
           <Button onClick={handleConfigure} margin="0" data-testid="configure-button">
-            Configure
+            {I18n.t('Configure')}
           </Button>
         </Flex.Item>
+
         <Flex.Item>
           <FormFieldGroup
             description={
-              <ScreenReaderContent>Enable Identity Service Discovery Page</ScreenReaderContent>
+              <ScreenReaderContent>
+                {I18n.t('Use Identity Service discovery page')}
+              </ScreenReaderContent>
             }
           >
             <Checkbox
-              label="Enable Identity Service Discovery Page"
-              variant="toggle"
-              checked={enabled}
-              onChange={handleToggle}
-              labelPlacement="end"
+              checked={isEnabled}
               data-testid="discovery-page-toggle"
+              label={I18n.t('Use Identity Service discovery page')}
+              labelPlacement="end"
+              onChange={handleToggle}
+              variant="toggle"
             />
           </FormFieldGroup>
         </Flex.Item>
       </Flex>
+
+      <ConfigureModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </View>
+  )
+}
+
+export function DiscoveryPage({initialEnabled, onChange}: DiscoveryPageProps) {
+  return (
+    <DiscoveryProvider>
+      <DiscoveryPageInner initialEnabled={initialEnabled} onChange={onChange} />
+    </DiscoveryProvider>
   )
 }

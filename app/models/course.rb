@@ -243,8 +243,8 @@ class Course < ActiveRecord::Base
   has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: "Quizzes::Quiz", as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
-  def inherited_assessment_question_banks(include_self = false)
-    account.inherited_assessment_question_banks(true, *(include_self ? [self] : []))
+  def inherited_assessment_question_banks(include_self: false)
+    account.inherited_assessment_question_banks(*(include_self ? [self] : []), include_self: true)
   end
 
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
@@ -867,7 +867,7 @@ class Course < ActiveRecord::Base
     role_map = {}
     used_roles = Role.where(id: enrollments.distinct.select(:role_id)).to_a
     if used_roles.any?
-      available_roles = account.available_course_roles(true)
+      available_roles = account.available_course_roles(include_inactive: true)
       (used_roles - available_roles).each do |missing_role|
         replacement_role = available_roles.find do |role|
           role.built_in? == missing_role.built_in? &&
@@ -2104,7 +2104,7 @@ class Course < ActiveRecord::Base
 
     RoleOverride.permissions.each do |permission, details|
       given do |user|
-        active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) ||
+        active_enrollment_allows(user, permission, allow_future: !details[:restrict_future_enrollments]) ||
           account_membership_allows(user, permission)
       end
       can permission
@@ -2282,7 +2282,7 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def active_enrollment_allows(user, permission, allow_future = true)
+  def active_enrollment_allows(user, permission, allow_future: true)
     return false unless user && permission && !deleted?
 
     is_unpublished = created? || claimed?
@@ -2933,7 +2933,7 @@ class Course < ActiveRecord::Base
 
   def self_enroll_student(user, opts = {})
     enrollment = enroll_student(user, opts.merge(self_enrolled: true))
-    enrollment.accept(:force)
+    enrollment.accept(force: true)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
       new_pseudonym.save if new_pseudonym&.changed?
@@ -3311,13 +3311,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def users_visible_to(user, include_priors = false, opts = {})
+  def users_visible_to(user, include_priors: false, include_inactive: false, enrollment_state: nil, exclude_enrollment_state: nil, section_ids: nil)
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
 
     scope = if include_priors
               users
-            elsif opts[:include_inactive] && [:full, :sections].include?(visibility)
+            elsif include_inactive && [:full, :sections].include?(visibility)
               all_current_users
             else
               current_users
@@ -3327,9 +3327,9 @@ class Course < ActiveRecord::Base
                                            user,
                                            visibilities,
                                            visibility,
-                                           enrollment_state: opts[:enrollment_state],
-                                           exclude_enrollment_state: opts[:exclude_enrollment_state],
-                                           section_ids: opts[:section_ids])
+                                           enrollment_state:,
+                                           exclude_enrollment_state:,
+                                           section_ids:)
   end
 
   def enrollments_visible_to(user, opts = {})
@@ -4112,7 +4112,7 @@ class Course < ActiveRecord::Base
     false
   end
 
-  def restrict_quantitative_data?(user = nil, check_extra_permissions = false)
+  def restrict_quantitative_data?(user = nil, check_extra_permissions: false)
     return false unless user.is_a?(User)
 
     # When check_extra_permissions is true, return false for a teacher,ta, admin, or designer

@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "自动生成字幕"
+    },
     "available_folders_694d0436": {
         "message": "可用文件夹"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "（描述{ TYPE }）"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "（视频说明）"
-    },
     "description_436c48d7": {
         "message": "说明"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "嵌入图片"
-    },
-    "embed_options_44c4cba8": {
-        "message": "嵌入式选项"
     },
     "embed_video_a97a64af": {
         "message": "嵌入视频"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "语言艺术图标"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "此媒体中使用的语言*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel }（自动）"
+    },
     "languages_icon_9d20539": {
         "message": "语言图标"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "链接到外部网站。"
+    },
+    "list_collapsed_9ac35920": {
+        "message": "列表已折叠。"
+    },
+    "list_expanded_efec2d0": {
+        "message": "列表已展开。"
     },
     "lists_cd1336fc": {
         "message": "列表"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "其他编辑器快捷方式可见于"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "我们的技术生成准确度约为 85% 的字幕。"
     },
     "outline_color_3ef2cea7": {
         "message": "轮廓颜色"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "屏幕阅读器用它来描述图像内容"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "被屏幕阅读器用来描述视频"
     },
     "user_documents_c206e61f": {
         "message": "用户文档"

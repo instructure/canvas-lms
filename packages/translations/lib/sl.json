@@ -182,6 +182,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Obstaja samodejno shranjena vsebina. Ali želite namesto tega naložiti samodejno shranjeno vsebino?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Samodejno dodajanje napisov"
+    },
     "available_folders_694d0436": {
         "message": "Razpoložljive mape"
     },
@@ -581,9 +584,6 @@
     "describe_the_type_ff448da5": {
         "message": "(Opišite { TYPE })"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Opišite videoposnetek)"
-    },
     "description_436c48d7": {
         "message": "Opis"
     },
@@ -736,9 +736,6 @@
     },
     "embed_image_1080badc": {
         "message": "Vdelaj sliko"
-    },
-    "embed_options_44c4cba8": {
-        "message": "Možnosti vdelave"
     },
     "embed_video_a97a64af": {
         "message": "Vdelajte videoposnetek"
@@ -1307,6 +1304,12 @@
     "language_arts_icon_a798b0f8": {
         "message": "Ikona za jezikovni predmet"
     },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Jezik, ki se govori v tem mediju*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (samodejni)"
+    },
     "languages_icon_9d20539": {
         "message": "Ikona za jezike"
     },
@@ -1423,6 +1426,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Povezave na zunanje mesto."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Seznam je strnjen."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Seznam je razširjen."
     },
     "lists_cd1336fc": {
         "message": "Seznami"
@@ -1768,6 +1777,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Druge bližnjice urejevalnika je mogoče najti na"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Naša tehnologija napise ustvarja s približno 85-% natančnostjo."
     },
     "outline_color_3ef2cea7": {
         "message": "Barva orisa"
@@ -2743,9 +2755,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Uporabljajo ga bralniki zaslona za opisovanje vsebine slike"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Uporabljajo ga bralniki zaslona za opisovanje videoposnetka"
     },
     "user_documents_c206e61f": {
         "message": "Uporabniški dokumenti"

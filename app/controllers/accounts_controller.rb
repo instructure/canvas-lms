@@ -301,11 +301,13 @@
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, only: %i[index
-                                        help_links
-                                        manually_created_courses_account
-                                        account_calendar_settings
-                                        environment]
+  skip_before_action :require_user, only: %i[acceptable_use_policy
+                                             course_accounts
+                                             course_creation_accounts
+                                             courses_redirect
+                                             horizon_accounts
+                                             manageable_accounts
+                                             terms_of_service]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -356,7 +358,7 @@ class AccountsController < ApplicationController
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
-        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
       end
     end
   end
@@ -390,7 +392,7 @@ class AccountsController < ApplicationController
     ActiveRecord::Associations.preload(@accounts, :root_account)
 
     includes = params[:include] || params[:includes]
-    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
   end
 
   # @API Get accounts that admins can manage
@@ -409,7 +411,7 @@ class AccountsController < ApplicationController
       end
     end
     @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
-    render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
+    render json: @all_accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
   # @API Get accounts that users can create courses in
@@ -462,7 +464,7 @@ class AccountsController < ApplicationController
     account_active_records = Account.where(id: accounts)
     accounts_json = accounts.map do |a|
       a = account_active_records.find { |ar| ar.id == a }
-      hash = account_json(a, @current_user, session, [], false)
+      hash = account_json(a, @current_user, session, [])
       hash[:adminable] = adminable_accounts.include?(a) if Account.site_admin.feature_enabled?(:enhanced_course_creation_account_fetching)
       hash
     end
@@ -488,7 +490,7 @@ class AccountsController < ApplicationController
       @accounts = []
     end
     ActiveRecord::Associations.preload(@accounts, :root_account)
-    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], read_only: true) }
   end
 
   # @API Get a single account
@@ -510,7 +512,7 @@ class AccountsController < ApplicationController
                                   @current_user,
                                   session,
                                   params[:includes] || [],
-                                  !@account.grants_right?(@current_user, session, :manage))
+                                  read_only: !@account.grants_right?(@current_user, session, :manage))
       end
     end
   end
@@ -705,7 +707,7 @@ class AccountsController < ApplicationController
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account
     read_only = !account.grants_right?(@current_user, session, :read)
-    render json: account_json(account, @current_user, session, [], read_only)
+    render json: account_json(account, @current_user, session, [], read_only:)
   end
 
   include Api::V1::Course
@@ -1499,6 +1501,15 @@ class AccountsController < ApplicationController
              limit_parent_app_web_access].each do |key|
             params[:account][:settings].try(:delete, key)
           end
+        end
+
+        # Handle impact_account_type setting (site admin only)
+        if Account.site_admin.grants_right?(@current_user, :manage)
+          impact_account_type = params[:account][:settings].try(:delete, :impact_account_type)
+          @account.settings[:impact_account_type] = impact_account_type if impact_account_type.present?
+        else
+          # Remove the field from params if user is not a site admin
+          params[:account][:settings].try(:delete, :impact_account_type)
         end
 
         # For each inheritable setting, if the value for the account is the same as the inheritable value,

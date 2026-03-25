@@ -150,7 +150,7 @@ describe Quizzes::QuizSubmissionsController do
   describe "PUT 'backup'" do
     before :once do
       quiz_model(course: @course)
-      @qs = @quiz.generate_submission(@student, false)
+      @qs = @quiz.generate_submission(@student)
     end
 
     it "requires authentication" do

@@ -45,7 +45,7 @@ class MediaTracksController < ApplicationController
 
   before_action :load_media_object
   before_action :check_media_permissions, only: %i[index show]
-  before_action only: %i[create destroy update] do
+  before_action only: %i[create create_asr destroy update] do
     check_media_permissions(access_type: :update)
   end
 
@@ -118,13 +118,80 @@ class MediaTracksController < ApplicationController
   def create
     captioned_record = @attachment || @media_object
     if authorized_action(captioned_record, @current_user, :add_captions)
-      track = find_or_create_track(locale: params[:locale], attachment: @attachment, new_params: params)
+      track = find_or_create_track(locale: params[:locale])
+      track.update!(attachment: @attachment, **params.permit(*TRACK_SETTABLE_ATTRIBUTES))
       if @attachment.present?
         render json: media_track_api_json(track)
       else
         exclude = params[:exclude] || []
         render json: media_object_api_json(@media_object, @current_user, session, exclude)
       end
+    end
+  end
+
+  # @{not an}API Create ASR caption request
+  #
+  # Create a new ASR (Automatic Speech Recognition) caption request that will trigger
+  # asynchronous caption generation via Kaltura. The caption will be created in a
+  # "processing" state with an external_id linking to the Kaltura caption asset.
+  #
+  # @argument locale [String]
+  #   Language code of the captions to generate, examples: ["en", "es", "ru"]
+  #
+  # @example_request
+  #     curl https://<canvas>/media_objects/<media_object_id>/asr \
+  #         -F locale='es' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/media_attachments/<attachment_id>/asr \
+  #         -F locale='es' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns MediaObject | MediaTrack
+  def create_asr
+    return not_found unless @domain_root_account.feature_enabled?(:rce_asr_captioning_improvements)
+
+    return unless authorized_action?(@attachment || @media_object, @current_user, :add_captions)
+
+    # In the previous authorization line we checked if the attachment OR media_object has the
+    # right permissions, however we can generate caption only if the media object is present.
+    # This could catch the edge case where somebody tries to create captions before Kaltura finished
+    # processing the media.
+    unless @media_object
+      return render json: { error: "Media object not found or not yet processed" }, status: :unprocessable_content
+    end
+
+    locale = params[:locale]
+    unless locale.present? && locale.match?(/\A[A-Za-z-]+\z/)
+      return render json: { error: "Invalid or missing locale parameter" }, status: :bad_request
+    end
+
+    track = find_or_create_track(locale:)
+
+    unless track.persisted?
+      kaltura_client = CanvasKaltura::ClientV3.new
+      kaltura_client.startSession(CanvasKaltura::SessionType::ADMIN)
+      caption_asset = kaltura_client.create_caption_asset(@media_object.media_id, locale)
+
+      unless caption_asset
+        return render json: { error: "Failed to create caption asset" }, status: :unprocessable_content
+      end
+
+      track.assign_attributes(
+        attachment: @attachment,
+        kind: "subtitles",
+        external_id: caption_asset[:id]
+      )
+      track.sync_kaltura_caption_asset(caption_asset[:status], kaltura_client:)
+      track.save!
+    end
+
+    if @attachment.present?
+      render json: media_track_api_json(track)
+    else
+      exclude = params[:exclude] || []
+      render json: media_object_api_json(@media_object, @current_user, session, exclude)
     end
   end
 
@@ -218,20 +285,19 @@ class MediaTracksController < ApplicationController
     removed_tracks.destroy_all
 
     # create or update the new tracks
-    new_tracks.each do |t|
+    new_tracks.each do |track_params|
       # if the new track coming from the client has no content, it hasn't been updated. Leave it alone.
-      next if t["content"].blank?
+      next if track_params["content"].blank?
 
-      find_or_create_track(locale: t["locale"],
-                           attachment:,
-                           new_params: ActionController::Parameters.new(t))
+      find_or_create_track(locale: track_params["locale"])
+        .tap { it.update!(attachment:, **ActionController::Parameters.new(track_params).permit(*TRACK_SETTABLE_ATTRIBUTES)) }
     end
     index
   end
 
   private
 
-  def find_or_create_track(locale:, attachment:, new_params:)
+  def find_or_create_track(locale:)
     track = if @attachment.present?
               @attachment.media_tracks.find_by(media_object: @media_object, locale:)
             else
@@ -239,9 +305,7 @@ class MediaTracksController < ApplicationController
                                                  locale:,
                                                  attachment_id: [nil, @media_object.attachment_id])
             end
-    track ||= @media_object.media_tracks.new(user: @current_user, locale:)
-    track.update!(attachment:, **new_params.permit(*TRACK_SETTABLE_ATTRIBUTES))
-    track
+    track || @media_object.media_tracks.new(user: @current_user, locale:)
   end
 
   def media_object_tracks

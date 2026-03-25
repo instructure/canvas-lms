@@ -145,7 +145,7 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
     case value
     when String, Numeric, TrueClass, FalseClass
       true
-    when Hash
+    when Hash, ActionController::Parameters
       value.each_value { |v| validate_filter_value!(v) }
     when Array
       value.each { |v| validate_filter_value!(v) }

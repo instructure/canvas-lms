@@ -54,7 +54,7 @@ describe "courses/_recent_event" do
 
     render partial: "courses/recent_event", object: event, locals: { is_hidden: false }
 
-    expect(response.body).to_not include(@course.name)
+    expect(response.body).not_to include(@course.name)
   end
 
   it "updates the course code when it changes" do

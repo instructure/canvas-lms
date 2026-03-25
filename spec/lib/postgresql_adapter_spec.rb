@@ -19,6 +19,7 @@
 #
 
 require_relative "../spec_helper"
+require "irb"
 
 describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
   it "aborts a query when interrupted" do
@@ -46,8 +47,8 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
 
   it "differentiates between unique and non-unique indexes" do
     indexes = User.connection.indexes(User.table_name)
-    expect(indexes.select(&:unique)).to_not eq([])
-    expect(indexes.reject(&:unique)).to_not eq([])
+    expect(indexes.select(&:unique)).not_to eq([])
+    expect(indexes.reject(&:unique)).not_to eq([])
   end
 
   it "can handle an array of hosts, falling back to a successful connection" do

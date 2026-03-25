@@ -83,8 +83,6 @@
 #
 
 class HistoryController < ApplicationController
-  before_action :require_user
-
   include Api::V1::HistoryEntry
 
   # @API List recent history for a user

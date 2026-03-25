@@ -239,7 +239,7 @@ describe "settings tabs" do
         fj(".element_toggler:visible").click
         wait_for_ajaximations
         notification_form = f("#add_notification_form")
-        expect(notification_form).to_not contain_css("label[for=account_notification_send_message]")
+        expect(notification_form).not_to contain_css("label[for=account_notification_send_message]")
       end
 
       it "is able to send messages for an existing announcement" do

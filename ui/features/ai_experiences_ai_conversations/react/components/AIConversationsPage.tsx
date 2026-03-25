@@ -33,6 +33,7 @@ import {useStudentConversations, useConversationDetail} from '../hooks/useAIConv
 import {useConversationEvaluation} from '../hooks/useConversationEvaluation'
 import type {LLMConversationMessage} from '@canvas/ai-experiences/types'
 import FocusMode from '@canvas/ai-experiences/react/components/FocusMode'
+import MessageThread from '@canvas/ai-experiences/react/components/MessageThread'
 import {AIAnalysisTab} from './AIAnalysisTab'
 
 const I18n = createI18nScope('ai_experiences_ai_conversations')
@@ -134,63 +135,16 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
   // Convert messages to LLMConversationMessage format
   const messages: LLMConversationMessage[] =
     conversation?.messages.map(msg => ({
-      role: msg.role === 'assistant' || msg.role === 'Assistant' ? 'Assistant' : 'User',
+      id: msg.id,
+      role: msg.role.toLowerCase() === 'assistant' ? 'Assistant' : 'User',
       text: msg.content || msg.text || '',
       timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+      feedback: msg.feedback ?? [],
     })) || []
 
   // Count messages by role (exclude first User message which is the trigger)
   const aiMessageCount = messages.filter(m => m.role === 'Assistant').length
   const studentMessageCount = Math.max(0, messages.filter(m => m.role === 'User').length - 1)
-
-  const renderMessages = (inFocusMode = false) => {
-    const messageContent = messages.slice(1).map((message, index) => {
-      const isUser = message.role === 'User'
-      return (
-        <View key={index} as="div" margin="0 0 medium 0" textAlign={isUser ? 'end' : 'start'}>
-          <View
-            as="div"
-            display="inline-block"
-            maxWidth="70%"
-            padding="small medium"
-            background={isUser ? 'primary' : 'primary'}
-            borderRadius="medium"
-            textAlign="start"
-          >
-            <Text>{message.text}</Text>
-          </View>
-        </View>
-      )
-    })
-
-    if (inFocusMode) {
-      return (
-        <View
-          as="div"
-          padding="medium"
-          background="secondary"
-          borderRadius="medium"
-          overflowY="auto"
-          style={{flex: 1, boxSizing: 'border-box'}}
-        >
-          {messageContent}
-        </View>
-      )
-    }
-
-    return (
-      <View
-        as="div"
-        padding="medium"
-        background="secondary"
-        borderRadius="medium"
-        maxHeight="calc(100vh - 510px)"
-        overflowY="auto"
-      >
-        {messageContent}
-      </View>
-    )
-  }
 
   return (
     <View as="div" margin="medium">
@@ -200,7 +154,7 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
             <IconAiColoredSolid size="small" />
           </Flex.Item>
           <Flex.Item>
-            <Heading level="h1">{I18n.t('AI Conversations')}</Heading>
+            <Heading level="h1">{I18n.t('Conversations')}</Heading>
           </Flex.Item>
         </Flex>
       </View>
@@ -290,7 +244,21 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                       <Spinner renderTitle={I18n.t('Loading conversation')} />
                     </View>
                   ) : (
-                    renderMessages()
+                    <View
+                      as="div"
+                      padding="medium"
+                      background="secondary"
+                      borderRadius="medium"
+                      maxHeight="calc(100vh - 510px)"
+                      overflowY="auto"
+                    >
+                      <MessageThread
+                        messages={messages}
+                        conversationId={selectedConversationId ?? null}
+                        courseId={courseId}
+                        aiExperienceId={aiExperience.id}
+                      />
+                    </View>
                   )}
                 </Tabs.Panel>
 
@@ -385,7 +353,21 @@ const AIConversationsPage: React.FC<AIConversationsPageProps> = ({aiExperience, 
                         <Spinner renderTitle={I18n.t('Loading conversation')} />
                       </Flex>
                     ) : (
-                      renderMessages(true)
+                      <View
+                        as="div"
+                        padding="medium"
+                        background="secondary"
+                        borderRadius="medium"
+                        overflowY="auto"
+                        style={{flex: 1, boxSizing: 'border-box'}}
+                      >
+                        <MessageThread
+                          messages={messages}
+                          conversationId={selectedConversationId ?? null}
+                          courseId={courseId}
+                          aiExperienceId={aiExperience.id}
+                        />
+                      </View>
                     )}
                   </Tabs.Panel>
 

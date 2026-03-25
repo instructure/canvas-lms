@@ -250,7 +250,7 @@ describe Quizzes::QuizzesController do
 
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
-      expect(controller.remote_env[:ams]).to_not be_nil
+      expect(controller.remote_env[:ams]).not_to be_nil
       expect(controller.remote_env[:ams][:launch_url]).to eq(Services::Ams.launch_url)
       expect(controller.remote_env[:ams][:API_URL]).to eq(Services::Ams.api_url)
 
@@ -501,7 +501,6 @@ describe Quizzes::QuizzesController do
     it "requires authorization" do
       get "edit", params: { course_id: @course.id, id: @quiz.id }
       assert_unauthorized
-      expect(assigns[:quiz]).not_to be_nil
     end
 
     it "assigns variables" do
@@ -697,7 +696,7 @@ describe Quizzes::QuizzesController do
       it "uses the ams service logic with a quiz id" do
         get "show", params: { course_id: @course.id, id: @quiz.id }
         expect(response).to be_successful
-        expect(controller.remote_env[:ams]).to_not be_nil
+        expect(controller.remote_env[:ams]).not_to be_nil
 
         expect(controller.js_env[:QUIZZES]).to be_nil
         expect(controller.js_env[:context_url]).to eq("/courses/#{@course.id}/quizzes")
@@ -706,7 +705,7 @@ describe Quizzes::QuizzesController do
       it "uses the ams service logic without a valid quiz id" do
         get "show", params: { course_id: @course.id, id: "some_id" }
         expect(response).to be_successful
-        expect(controller.remote_env[:ams]).to_not be_nil
+        expect(controller.remote_env[:ams]).not_to be_nil
 
         expect(controller.js_env[:QUIZZES]).to be_nil
       end
@@ -747,7 +746,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:context_url]).to eq("/courses/#{shard_id}~#{local_course_id}/quizzes")
           # Verify it contains the shard prefix (format: <shard_id>~<course_id>)
           expect(controller.js_env[:context_url]).to match(%r{^/courses/\d+~\d+/quizzes$})
-          expect(controller.remote_env[:ams]).to_not be_nil
+          expect(controller.remote_env[:ams]).not_to be_nil
         end
 
         it "generates context_url with shard-aware ID format for cross-shard courses in index action" do
@@ -760,7 +759,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:context_url]).to eq("/courses/#{shard_id}~#{local_course_id}/quizzes")
           # Verify it contains the shard prefix (format: <shard_id>~<course_id>)
           expect(controller.js_env[:context_url]).to match(%r{^/courses/\d+~\d+/quizzes$})
-          expect(controller.remote_env[:ams]).to_not be_nil
+          expect(controller.remote_env[:ams]).not_to be_nil
         end
 
         it "generates regular context_url without shard prefix for same-shard courses" do
@@ -884,7 +883,7 @@ describe Quizzes::QuizzesController do
       @quiz.publish!
 
       sub_manager = Quizzes::SubmissionManager.new(@quiz)
-      submission = sub_manager.find_or_create_submission(@student, nil, "settings_only")
+      submission = sub_manager.find_or_create_submission(@student, state: "settings_only")
       submission.manually_unlocked = true
       submission.save!
 
@@ -1065,7 +1064,7 @@ describe Quizzes::QuizzesController do
       quiz = quiz_model(course: @course)
       quiz.publish!
 
-      quiz_submission = quiz.generate_submission(@teacher, true)
+      quiz_submission = quiz.generate_submission(@teacher, preview: true)
       quiz_submission.complete!
 
       get "managed_quiz_data", params: { course_id: @course.id, quiz_id: quiz.id }
@@ -1398,7 +1397,7 @@ describe Quizzes::QuizzesController do
       course_quiz(active: true)
       @quiz.locked = true
       @quiz.save!
-      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, "settings_only")
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, state: "settings_only")
       @sub.manually_unlocked = true
       @sub.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
@@ -1422,7 +1421,7 @@ describe Quizzes::QuizzesController do
       course_quiz(active: true)
       @quiz.time_limit = 60
       @quiz.save!
-      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, "settings_only")
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, state: "settings_only")
       @sub.extra_time = 30
       @sub.save!
       post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
@@ -3006,8 +3005,6 @@ describe Quizzes::QuizzesController do
     it "requires authorization" do
       get "submission_versions", params: { course_id: @course.id, quiz_id: @quiz.id }
       assert_unauthorized
-      expect(assigns[:quiz]).not_to be_nil
-      expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "assigns variables" do

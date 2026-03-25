@@ -1365,7 +1365,7 @@ describe AssignmentOverrideApplicator do
             # Assert that it won't call the "<=" method on nil
             expect do
               AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz.assignment, @student)
-            end.to_not raise_error
+            end.not_to raise_error
           end
         end
 
@@ -1396,7 +1396,7 @@ describe AssignmentOverrideApplicator do
             # Assert that it won't call the "<=" method on nil
             expect do
               AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz.assignment, @student)
-            end.to_not raise_error
+            end.not_to raise_error
           end
         end
       end

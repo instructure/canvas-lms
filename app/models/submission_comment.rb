@@ -523,6 +523,8 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def publishable_for?(user)
+    return false unless user
+
     draft? && author_id == user.id
   end
 
