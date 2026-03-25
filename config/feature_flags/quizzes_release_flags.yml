@@ -151,3 +151,9 @@ new_quizzes_native_experience_sessionless:
   state: hidden
   shadow: true
   applies_to: Course
+new_quizzes_native_experience_api_gateway:
+  display_name: New Quizzes Native Experience API Gateway
+  description: When enabled, New Quizzes requests are routed through the API Gateway.
+  state: hidden
+  shadow: true
+  applies_to: Course
