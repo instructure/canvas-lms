@@ -25,8 +25,16 @@ const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-con
 const mockAssistFlashCardsInteraction = vi.fn((_props: object) => <div />)
 
 vi.mock('@instructure/platform-study-assist', () => ({
-  AssistProvider: ({children, pageId}: {children: React.ReactNode; pageId: string}) => (
-    <div data-testid="assist-provider" data-page-id={pageId}>
+  AssistProvider: ({
+    children,
+    pageId,
+    fileId,
+  }: {
+    children: React.ReactNode
+    pageId?: string
+    fileId?: string
+  }) => (
+    <div data-testid="assist-provider" data-page-id={pageId} data-file-id={fileId}>
       {children}
     </div>
   ),
