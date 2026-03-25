@@ -28,7 +28,7 @@ import DashboardNotifications from './components/DashboardNotifications'
 import WidgetGrid from './components/WidgetGrid'
 import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
 import {useResponsiveContext} from './hooks/useResponsiveContext'
-import {useWidgetLayout} from './hooks/useWidgetLayout'
+import {DEFAULT_EDUCATOR_WIDGET_CONFIG} from './constants'
 import {EDUCATOR_DASHBOARD_THEME} from './educatorDashboardTheme'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -36,7 +36,6 @@ const I18n = createI18nScope('widget_dashboard')
 const EducatorDashboardContainer = () => {
   const {currentUser, dashboardFeatures} = useWidgetDashboard()
   const {isMobile} = useResponsiveContext()
-  const {config} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
 
   const greeting = currentUser?.display_name
@@ -71,7 +70,7 @@ const EducatorDashboardContainer = () => {
           )}
         </Flex>
         <View as="div" data-testid="educator-dashboard-content" padding="medium 0 0 0">
-          <WidgetGrid config={config} />
+          <WidgetGrid config={DEFAULT_EDUCATOR_WIDGET_CONFIG} />
         </View>
       </View>
     </InstUISettingsProvider>

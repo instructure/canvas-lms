@@ -32,11 +32,6 @@ vi.mock('../components/DashboardNotifications', () => ({
   default: () => <div data-testid="dashboard-notifications" />,
 }))
 
-vi.mock('../hooks/useWidgetLayout', () => ({
-  useWidgetLayout: () => ({config: {}}),
-  WidgetLayoutProvider: ({children}: {children: React.ReactNode}) => <>{children}</>,
-}))
-
 const setup = (contextProps = {}) => {
   return render(
     <PlatformTestWrapper>
