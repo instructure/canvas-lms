@@ -224,5 +224,16 @@ describe "student dashboard widget customization tests", :ignore_js_errors do
       cancel_customize_button.click
       verify_default_widget_count
     end
+
+    it "does not show educator widget cards for non-educator roles" do
+      go_to_dashboard
+      click_widget_customize_button
+      click_add_widget_button
+
+      expect(add_widget_modal).to be_displayed
+      expect(element_exists?(widget_card_selector("educator_announcement_creation"))).to be_falsey
+      expect(element_exists?(widget_card_selector("educator_todo_list"))).to be_falsey
+      expect(element_exists?(widget_card_selector("educator_content_quality"))).to be_falsey
+    end
   end
 end
