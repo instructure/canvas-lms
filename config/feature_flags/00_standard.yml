@@ -283,10 +283,10 @@ quizzes_next:
   display_name:
     features.quizzes.next: New Quizzes
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Quizzes-Users/gh-p/quizzes">\1</a>
+    wrapper: <a target="blank" href="https://community.instructure.com/en/kb/articles/664245-faq-new-quizzes?utm_source=community-search&utm_medium=organic-search&utm_term=new+quizzes">\1</a>
     new_quizzes_description: This feature enhances the Canvas experience for quizzing.
       When this flag is enabled, the New Quizzes tool will be available. For full details,
-      please see the *New Quizzes user group* in the Canvas Community.
+      please see the *New Quizzes FAQ* in the Instructure Community.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
 quizzes_next_submission_history:
