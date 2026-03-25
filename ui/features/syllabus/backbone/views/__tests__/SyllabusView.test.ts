@@ -33,6 +33,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import tzInTest from '@instructure/moment-utils/specHelpers'
+import {act} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
@@ -142,10 +143,11 @@ describe('SyllabusView', () => {
     })
   }, 30000) // Increase timeout to 30 seconds
 
-  afterEach(() => {
+  afterEach(async () => {
     fakeENV.teardown()
-    view?.remove()
     vi.clearAllTimers()
+    await act(async () => {})
+    view?.remove()
     vi.useRealTimers()
     fixtures.remove()
     tzInTest.restore()
