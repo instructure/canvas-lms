@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
@@ -87,17 +87,17 @@ export async function showConfirmationDialog({
   }
 
   const confirmationFunction = () => {
-    ReactDOM.unmountComponentAtNode(getDialogContainer())
+    legacyUnmountComponentAtNode(getDialogContainer())
     resolver(true)
   }
 
   const rejectFunction = () => {
-    ReactDOM.unmountComponentAtNode(getDialogContainer())
+    legacyUnmountComponentAtNode(getDialogContainer())
     resolver(false)
   }
 
   function renderDialog(parent) {
-    ReactDOM.render(
+    legacyRender(
       <ConfirmationDialog
         open={true}
         label={label}
