@@ -47,20 +47,38 @@ class PeerReview::SubmissionCommonService < ApplicationService
                                        )
   end
 
+  def required_peer_reviews_count
+    peer_review_sub_assignment&.peer_review_count || DEFAULT_PEER_REVIEW_COUNT
+  end
+
   def required_peer_reviews_met?
-    required_peer_reviews = peer_review_sub_assignment&.peer_review_count || DEFAULT_PEER_REVIEW_COUNT
-    completed_assessment_requests.count >= required_peer_reviews
+    completed_assessment_requests.count >= required_peer_reviews_count
   end
 
   def peer_reviews_submitted_at
     return @peer_reviews_submitted_at if defined?(@peer_reviews_submitted_at)
 
+    required_count = required_peer_reviews_count
+
+    # Use the timestamp of the last review needed to meet the requirement.
+    # Extra reviews beyond the required count are excluded so that late
+    # submissions cannot push the timestamp past the due date.
     @peer_reviews_submitted_at = if @parent_assignment.rubric.present?
                                    # For assignment with rubric, peer assessment is provided via RubricAssessments
-                                   completed_assessment_requests.joins(:rubric_assessment).minimum("rubric_assessments.created_at")
+                                   completed_assessment_requests
+                                     .joins(:rubric_assessment)
+                                     .order("rubric_assessments.created_at ASC")
+                                     .pluck("rubric_assessments.created_at")
+                                     .first(required_count)
+                                     .max
                                  else
                                    # For assignment without rubric, peer assessment is provided via SubmissionComments
-                                   completed_assessment_requests.joins(:submission_comments).minimum("submission_comments.created_at")
+                                   completed_assessment_requests
+                                     .joins(:submission_comments)
+                                     .order("submission_comments.created_at ASC")
+                                     .pluck("submission_comments.created_at")
+                                     .first(required_count)
+                                     .max
                                  end
   end
 end
