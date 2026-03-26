@@ -300,7 +300,7 @@ describe('<ManualCaptionCreator />', () => {
       renderComponent()
 
       const chooseFileButton = screen.getByText(/choose file/i).closest('button')
-      expect(chooseFileButton).toHaveAttribute('aria-label', 'Required: Choose File')
+      expect(chooseFileButton).toHaveAttribute('aria-label', 'Choose File (required)')
 
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
       const validFile = createValidFile('my-captions.vtt')
