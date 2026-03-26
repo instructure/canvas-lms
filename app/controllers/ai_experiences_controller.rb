@@ -169,6 +169,7 @@ class AiExperiencesController < ApplicationController
     js_env({ COURSE_ID: @context.id })
     js_env[:FEATURES] ||= {}
     js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
+    js_env[:CONTEXT_FILE_MAX_SIZE_MB] = AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte
   end
 
   # @API Show edit AI experience form
@@ -182,6 +183,7 @@ class AiExperiencesController < ApplicationController
     js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: params[:id] })
     js_env[:FEATURES] ||= {}
     js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
+    js_env[:CONTEXT_FILE_MAX_SIZE_MB] = AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte
   end
 
   # @API Create an AI experience

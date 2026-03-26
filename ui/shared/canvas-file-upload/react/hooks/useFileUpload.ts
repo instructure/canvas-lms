@@ -36,6 +36,8 @@ interface UseFileUploadOptions {
 
 interface UseFileUploadReturn {
   uploadingFileNames: Set<string>
+  failedFileNames: Set<string>
+  clearFailedFile: (name: string) => void
   handleDrop: (
     acceptedFiles: ArrayLike<DataTransferItem | File>,
     rejectedFiles: ArrayLike<DataTransferItem | File>,
@@ -52,6 +54,15 @@ export const useFileUpload = ({
   maxFiles,
 }: UseFileUploadOptions): UseFileUploadReturn => {
   const [uploadingFileNames, setUploadingFileNames] = useState<Set<string>>(new Set())
+  const [failedFileNames, setFailedFileNames] = useState<Set<string>>(new Set())
+
+  const clearFailedFile = (name: string) => {
+    setFailedFileNames(prev => {
+      const next = new Set(prev)
+      next.delete(name)
+      return next
+    })
+  }
 
   const handleDrop = async (
     acceptedFiles: ArrayLike<DataTransferItem | File>,
@@ -164,18 +175,19 @@ export const useFileUpload = ({
           })
 
           return uploadedFile
-        } catch (error: any) {
-          // Remove from uploading state on error
+        } catch (error: unknown) {
           setUploadingFileNames(prev => {
             const newSet = new Set(prev)
             newSet.delete(file.name)
             return newSet
           })
+          setFailedFileNames(prev => new Set(prev).add(file.name))
 
+          const message = error instanceof Error ? error.message : 'Unknown error'
           showFlashAlert({
             message: I18n.t('Failed to upload %{fileName}: %{error}', {
               fileName: file.name,
-              error: error.message || 'Unknown error',
+              error: message,
             }),
             type: 'error',
           })
@@ -208,6 +220,8 @@ export const useFileUpload = ({
 
   return {
     uploadingFileNames,
+    failedFileNames,
+    clearFailedFile,
     handleDrop,
     isUploading,
   }
