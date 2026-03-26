@@ -222,7 +222,7 @@ function renderContentBaseOnAvailability(
     return (
       <>
         <Flex margin="medium 0 0 0" alignItems="start">
-          <div style={{flexGrow: 1}}>
+          <div style={{flexGrow: 1, maxWidth: '100%'}} data-testid="student-content-flex-container">
             {/* EVAL-3711 Remove ICE Feature Flag */}
             {!window.ENV.FEATURES?.instui_nav &&
               !assignment.env.peerReviewModeEnabled &&
