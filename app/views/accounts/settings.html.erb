@@ -513,7 +513,7 @@
           <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
           <fieldset>
             <legend><%= t("Slack Api Key") %></legend>
-            <div class="dim-till-hover">
+            <div>
               <span><%= t("Current Slack Api Key:") %></span>
               <span id="current_slack_api_key"><%= slack_api_key.length > 4 ? "#{slack_api_key[0..3]}#{'*' * (slack_api_key.length - 4)}" : '****' %></span>
             </div>
