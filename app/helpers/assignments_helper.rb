@@ -154,7 +154,8 @@ module AssignmentsHelper
     !@context.horizon_course? &&
       @can_grade &&
       @context.feature_enabled?(:peer_review_allocation_and_grading) &&
-      @assignment.has_peer_reviews?
+      @assignment.has_peer_reviews? &&
+      @assignment.peer_review_sub_assignment.present?
   end
 
   def show_rubric_section?
@@ -164,6 +165,7 @@ module AssignmentsHelper
   def show_legacy_peer_reviews_link?
     @can_grade &&
       @assignment.has_peer_reviews? &&
-      !@assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      (!@assignment.context.feature_enabled?(:peer_review_allocation_and_grading) ||
+        @assignment.peer_review_sub_assignment.blank?)
   end
 end

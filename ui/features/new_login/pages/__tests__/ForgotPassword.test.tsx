@@ -76,7 +76,7 @@ describe('ForgotPassword', () => {
         setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
-        const emailInput = await screen.findByTestId('email-input')
+        const emailInput = await screen.findByTestId('username-input')
         expect(emailInput).toHaveAttribute('aria-invalid', 'true')
       })
 
@@ -84,7 +84,7 @@ describe('ForgotPassword', () => {
         setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
-        const errorMessage = await screen.findByText('Please enter a valid email.')
+        const errorMessage = await screen.findByText('Please enter your email.')
         expect(errorMessage).toBeInTheDocument()
       })
 
@@ -107,13 +107,13 @@ describe('ForgotPassword', () => {
         })
       })
 
-      it('shows validation error for invalid email format', async () => {
+      it('shows validation error for whitespace-only input', async () => {
         setup()
-        const emailInput = screen.getByTestId('email-input')
+        const emailInput = screen.getByTestId('username-input')
         const submitButton = screen.getByTestId('submit-button')
-        await userEvent.type(emailInput, 'invalid-email')
+        await userEvent.type(emailInput, '   ')
         await userEvent.click(submitButton)
-        const errorMessage = await screen.findByText('Please enter a valid email.')
+        const errorMessage = await screen.findByText('Please enter your email.')
         expect(errorMessage).toBeInTheDocument()
       })
     })
@@ -122,7 +122,7 @@ describe('ForgotPassword', () => {
       setup()
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.click(submitButton)
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       expect(document.activeElement).toBe(emailInput)
     })
   })
@@ -130,14 +130,14 @@ describe('ForgotPassword', () => {
   describe('user input', () => {
     it('allows user to enter an email', async () => {
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       await userEvent.type(emailInput, 'test@example.com')
       expect(emailInput).toHaveValue('test@example.com')
     })
 
     it('allows spaces to be typed in the email input', async () => {
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       await userEvent.type(emailInput, 'test user@example.com')
       expect(emailInput).toHaveValue('test user@example.com')
     })
@@ -159,7 +159,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
       await userEvent.click(submitButton)
@@ -185,7 +185,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       const cancelButton = screen.getByTestId('cancel-button')
       await userEvent.type(emailInput, 'test@example.com')
@@ -208,7 +208,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       await userEvent.type(emailInput, 'test@example.com')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.click(submitButton)
@@ -226,7 +226,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
       await userEvent.click(submitButton)
@@ -240,12 +240,27 @@ describe('ForgotPassword', () => {
   describe('api interactions', () => {
     it('calls forgotPassword API with the entered email', async () => {
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
       await userEvent.click(submitButton)
       await waitFor(() => {
         expect(forgotPassword).toHaveBeenCalledWith('test@example.com')
+      })
+    })
+
+    it('calls forgotPassword API with a plain username', async () => {
+      vi.mocked(forgotPassword).mockResolvedValueOnce({
+        status: 200,
+        data: {requested: true},
+      })
+      setup()
+      const emailInput = screen.getByTestId('username-input')
+      const submitButton = screen.getByTestId('submit-button')
+      await userEvent.type(emailInput, 'testuser')
+      await userEvent.click(submitButton)
+      await waitFor(() => {
+        expect(forgotPassword).toHaveBeenCalledWith('testuser')
       })
     })
   })

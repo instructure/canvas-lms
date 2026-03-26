@@ -19,7 +19,7 @@
 #
 
 module Polling
-  class PollSubmission < ActiveRecord::Base
+  class PollSubmission < ApplicationRecord
     belongs_to :poll, class_name: "Polling::Poll"
     belongs_to :poll_choice, class_name: "Polling::PollChoice"
     belongs_to :poll_session, class_name: "Polling::PollSession"

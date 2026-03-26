@@ -21,7 +21,7 @@ import {Popover} from '@instructure/ui-popover'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {useState} from 'react'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {GetRubricOutcomeQuery} from '@canvas/graphql/codegen/graphql'
 import {OutcomePopoverDisplay} from './OutcomePopoverDisplay'
 

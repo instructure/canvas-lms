@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe "feature_flag_definition_spec" do
   let(:skip_features) { %w[block_editor block_template_editor] }
 

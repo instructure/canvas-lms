@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {TEACHER_QUERY} from '@canvas/assignments/graphql/teacher/Queries'
 import GenericErrorPage from '@canvas/generic-error-page'
 import TeacherSavedView from './TeacherSavedView'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('assignments_2')
 

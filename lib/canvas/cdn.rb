@@ -17,11 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "base/canvas"
+require "base/canvas/reloader"
 require "canvas/cdn/registry"
 
 module Canvas
   module Cdn
     class << self
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
+
       def config
         @config ||= begin
           config = ActiveSupport::OrderedOptions.new

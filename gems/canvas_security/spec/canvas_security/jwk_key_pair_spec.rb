@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require "timecop"
-require "spec_helper"
 
 describe CanvasSecurity::JWKKeyPair do
   describe "#to_jwk" do

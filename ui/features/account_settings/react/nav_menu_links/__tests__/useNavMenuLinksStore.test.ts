@@ -34,7 +34,11 @@ describe('useNavMenuLinksStore', () => {
     const {result} = renderHook(() => useNavMenuLinksStore())
 
     act(() => {
-      result.current.appendLink({url: 'https://example.com', label: 'Test Link'})
+      result.current.appendLink({
+        url: 'https://example.com',
+        label: 'Test Link',
+        placements: {course_nav: true, account_nav: false, user_nav: false},
+      })
     })
 
     expect(result.current.links).toHaveLength(1)
@@ -42,6 +46,7 @@ describe('useNavMenuLinksStore', () => {
       type: 'new',
       url: 'https://example.com',
       label: 'Test Link',
+      placements: {course_nav: true, account_nav: false, user_nav: false},
     })
   })
 
@@ -52,8 +57,18 @@ describe('useNavMenuLinksStore', () => {
     act(() => {
       useNavMenuLinksStore.setState({
         links: [
-          {type: 'existing', id: '1', label: 'Link 1'},
-          {type: 'existing', id: '2', label: 'Link 2'},
+          {
+            type: 'existing',
+            id: '1',
+            label: 'Link 1',
+            placements: {course_nav: true, account_nav: false, user_nav: false},
+          },
+          {
+            type: 'existing',
+            id: '2',
+            label: 'Link 2',
+            placements: {course_nav: false, account_nav: true, user_nav: false},
+          },
         ],
       })
     })
@@ -66,6 +81,11 @@ describe('useNavMenuLinksStore', () => {
     })
 
     expect(result.current.links).toHaveLength(1)
-    expect(result.current.links[0]).toEqual({type: 'existing', id: '2', label: 'Link 2'})
+    expect(result.current.links[0]).toEqual({
+      type: 'existing',
+      id: '2',
+      label: 'Link 2',
+      placements: {course_nav: false, account_nav: true, user_nav: false},
+    })
   })
 })

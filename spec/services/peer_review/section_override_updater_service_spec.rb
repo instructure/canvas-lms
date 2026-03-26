@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 RSpec.describe PeerReview::SectionOverrideUpdaterService do
   let(:course) { course_model(name: "Test Course") }
   let(:peer_review_sub_assignment) { peer_review_model(course:) }

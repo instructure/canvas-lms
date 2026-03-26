@@ -27,7 +27,7 @@ import {Modal} from '@instructure/ui-modal'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 
 const I18n = createI18nScope('discussion_topics_post')
 

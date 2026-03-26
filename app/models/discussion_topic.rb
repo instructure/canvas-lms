@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionTopic < ActiveRecord::Base
+class DiscussionTopic < ApplicationRecord
   include Workflow
   include SendToStream
   include HasContentTags
@@ -209,14 +209,14 @@ class DiscussionTopic < ActiveRecord::Base
 
     if unlocked_teacher.count > 0
       CourseSection.where(id: DiscussionTopicSectionVisibility.active
-                                                              .where(discussion_topic_id: id)
+                              .where(discussion_topic_id: id)
                                                               .select("discussion_topic_section_visibilities.course_section_id"))
     else
       CourseSection.where(id: DiscussionTopicSectionVisibility.active.where(discussion_topic_id: id)
                                                               .where(Enrollment.active_or_pending
-                                                                                             .where(user_id: user)
-                                                                                             .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
-                                                                                             .arel.exists)
+                              .where(user_id: user)
+                              .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+                              .arel.exists)
                                                               .select("discussion_topic_section_visibilities.course_section_id"))
     end
   end
@@ -324,7 +324,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def set_schedule_delayed_transitions
     @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
-    if delayed_post_at? && @delayed_post_at_changed
+    if delayed_post_at? && (@delayed_post_at_changed || (saved_by == :after_migration && workflow_state == "post_delayed"))
       @should_schedule_delayed_post = true
       self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.zone.now
     end
@@ -1656,7 +1656,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     return unless submissions.any?
 
-    attachment_ids = all_entries_for_user.where.not(attachment_id: nil).pluck(:attachment_id).sort.map(&:to_s).join(",")
+    attachment_ids = all_entries_for_user.where.not(attachment_id: nil).pluck(:attachment_id).sort.join(",")
 
     submissions.each do |s|
       s.attachment_ids = attachment_ids

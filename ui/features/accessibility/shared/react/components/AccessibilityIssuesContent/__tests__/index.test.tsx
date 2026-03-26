@@ -223,6 +223,9 @@ describe('AccessibilityWizard', () => {
       await waitFor(() => {
         expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /close remediation/i})).toBeInTheDocument()
+        expect(
+          screen.getByRole('heading', {name: /outstanding issues remaining/i, level: 3}),
+        ).toBeInTheDocument()
       })
     })
 

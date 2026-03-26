@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class PluginSetting < ActiveRecord::Base
+class PluginSetting < ApplicationRecord
   validates :name, uniqueness: { if: :validate_uniqueness_of_name? }
   before_save :validate_posted_settings
   serialize :settings, yaml: { permitted_classes: [Symbol, Class] }

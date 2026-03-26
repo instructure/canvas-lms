@@ -15,11 +15,13 @@
     "useDefineForClassFields": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "rootDir": "src",
     "outDir": "es",
     "declaration": true,
     "esModuleInterop": true,
   },
   "include": [
     "src"
-  ]
+  ],
+  "exclude": ["**/node_modules", "**/__tests__/*", "**/__mocks__/*"]
 }

@@ -139,7 +139,7 @@ class PlannerOverridesController < ApplicationController
   #
   # Create a planner override for the current user
   #
-  # @argument plannable_type [Required, String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"|"calendar_event"|"assessment_request"|"sub_assignment"]
+  # @argument plannable_type [Required, String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"|"calendar_event"|"assessment_request"|"sub_assignment"|"peer_review_sub_assignment"]
   #   Type of the item that you are overriding in the planner
   #
   # @argument plannable_id [Required, Integer]
@@ -160,7 +160,7 @@ class PlannerOverridesController < ApplicationController
                                            marked_complete: value_to_boolean(params[:marked_complete]),
                                            user: @current_user,
                                            dismissed: value_to_boolean(params[:dismissed]))
-    planner_override.plannable_type = plannable.type if plannable.is_a?(SubAssignment)
+    planner_override.plannable_type = plannable.type if plannable.is_a?(SubAssignment) || plannable.is_a?(PeerReviewSubAssignment)
     sync_module_requirement_done(plannable, @current_user, value_to_boolean(params[:marked_complete]))
 
     begin

@@ -27,7 +27,11 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
+import {
+  clearWidgetDashboardCache,
+  defaultGraphQLHandlers,
+  PlatformTestWrapper,
+} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
@@ -244,6 +248,7 @@ const setup = (
   props: BaseWidgetProps = buildDefaultProps(),
   envOverrides = {},
   sharedCourseData: SharedCourseData[] = mockSharedCourseData,
+  observedUserId: string | null = null,
 ) => {
   // Set up Canvas ENV with current_user_id
   const originalEnv = window.ENV
@@ -264,13 +269,18 @@ const setup = (
 
   const result = render(<AnnouncementsWidget {...props} />, {
     wrapper: ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>
-        <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
-          <WidgetDashboardEditProvider>
-            <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-          </WidgetDashboardEditProvider>
-        </WidgetDashboardProvider>
-      </QueryClientProvider>
+      <PlatformTestWrapper>
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider
+            sharedCourseData={sharedCourseData}
+            observedUserId={observedUserId}
+          >
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </WidgetDashboardProvider>
+        </QueryClientProvider>
+      </PlatformTestWrapper>
     ),
   })
 
@@ -922,5 +932,24 @@ describe('AnnouncementsWidget', () => {
     )
 
     cleanup()
+  })
+
+  describe('observer mode', () => {
+    it('disables the read/unread button when observing a student', async () => {
+      server.use(
+        graphql.query('GetUserAnnouncements', () => {
+          return HttpResponse.json(mockUnreadAnnouncementsResponse)
+        }),
+      )
+
+      const {cleanup} = setup(buildDefaultProps(), {}, mockSharedCourseData, 'student-123')
+
+      await waitForLoadingToComplete()
+
+      const markReadButton = screen.getByTestId('mark-read-2')
+      expect(markReadButton).toBeDisabled()
+
+      cleanup()
+    })
   })
 })

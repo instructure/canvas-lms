@@ -10212,6 +10212,53 @@ describe Assignment do
         expect(assignment).to be_valid
       end
     end
+
+    context "compatibility with legacy and graded peer review modes" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment_with_graded_peer_reviews = @course.assignments.create!(
+          name: "assignment with graded peer reviews",
+          peer_reviews: true
+        )
+        peer_review_model(parent_assignment: @assignment_with_graded_peer_reviews)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        @assignment_with_legacy_peer_reviews = @course.assignments.create!(
+          name: "assignment with legacy peer reviews",
+          peer_reviews: true
+        )
+      end
+
+      context "when in legacy mode" do
+        it "prevents disabling peer reviews for assignments with graded peer reviews" do
+          @assignment_with_graded_peer_reviews.peer_reviews = false
+          expect(@assignment_with_graded_peer_reviews).not_to be_valid
+          expect(@assignment_with_graded_peer_reviews.errors[:peer_reviews]).to include(
+            "cannot be disabled for assignments with graded peer reviews in legacy mode"
+          )
+        end
+
+        it "allows disabling peer reviews for assignments with legacy peer reviews" do
+          @assignment_with_legacy_peer_reviews.peer_reviews = false
+          expect(@assignment_with_legacy_peer_reviews).to be_valid
+        end
+      end
+
+      context "when in graded mode" do
+        before :once do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "allows disabling peer reviews for assignments with graded peer reviews" do
+          @assignment_with_graded_peer_reviews.peer_reviews = false
+          expect(@assignment_with_graded_peer_reviews).to be_valid
+        end
+
+        it "allows disabling peer reviews for assignments with legacy peer reviews" do
+          @assignment_with_legacy_peer_reviews.peer_reviews = false
+          expect(@assignment_with_legacy_peer_reviews).to be_valid
+        end
+      end
+    end
   end
 
   describe "anonymous grading validation" do
@@ -13082,6 +13129,27 @@ describe Assignment do
       @parent.update!(grading_type: "pass_fail")
       expect(@first_checkpoint.reload.grading_type).to eq "pass_fail"
       expect(@second_checkpoint.reload.grading_type).to eq "pass_fail"
+    end
+
+    describe "#ensure_post_policy" do
+      it "syncs post_manually to all sub_assignments when set to true" do
+        @parent.ensure_post_policy(post_manually: true)
+        expect(@first_checkpoint.post_policy.reload.post_manually).to be true
+        expect(@second_checkpoint.post_policy.reload.post_manually).to be true
+      end
+
+      it "syncs post_manually to all sub_assignments when set to false" do
+        @parent.ensure_post_policy(post_manually: true)
+        @parent.ensure_post_policy(post_manually: false)
+        expect(@first_checkpoint.post_policy.reload.post_manually).to be false
+        expect(@second_checkpoint.post_policy.reload.post_manually).to be false
+      end
+
+      it "does not sync to sub_assignments when the assignment has none" do
+        assignment = @course.assignments.create!
+        expect { assignment.ensure_post_policy(post_manually: true) }.not_to raise_error
+        expect(assignment.post_policy.post_manually).to be true
+      end
     end
 
     it "will update the sub_assignment lock_at and unlock_at when parent updates" do

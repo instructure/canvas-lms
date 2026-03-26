@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import React from 'react'
+import {legacyUnmountComponentAtNode} from '@canvas/react'
 import BackboneMixin from '@canvas/files/react/mixins/BackboneMixin'
 import Folder from '@canvas/files/backbone/models/Folder'
 import FocusStore from '../modules/FocusStore'
@@ -159,7 +160,7 @@ export default {
         this.props.dndOptions.onItemDrop(event, this.props.model, ({success}) => {
           toggleActive(false)
           if (success)
-            ReactDOM.unmountComponentAtNode(
+            legacyUnmountComponentAtNode(
               ReactDOM.findDOMNode(this.folderChildRef.current).parentNode,
             )
         })

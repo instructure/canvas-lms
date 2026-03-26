@@ -46,7 +46,8 @@ describe Lti::CreateRegistrationService do
       name: "Foo bar baz",
       admin_nickname: "who named this tool",
       vendor: "acme",
-      description: "looney man"
+      description: "looney man",
+      lock_deploying: true
     }
   end
   let(:configuration_params) do

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ViewedSubmissionComment < ActiveRecord::Base
+class ViewedSubmissionComment < ApplicationRecord
   belongs_to :submission_comment
   belongs_to :user
   before_save :set_viewed_at

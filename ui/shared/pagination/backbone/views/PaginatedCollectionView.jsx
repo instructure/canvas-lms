@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {Spinner} from '@instructure/ui-spinner'
@@ -211,7 +211,7 @@ PaginatedCollectionView.prototype.showLoadingIndicator = function () {
   const ref = this.$loadingIndicator
   const node = ref?.get(0)
   if (node instanceof HTMLElement) {
-    ReactDOM.render(
+    legacyRender(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,

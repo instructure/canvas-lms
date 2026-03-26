@@ -870,8 +870,13 @@ module Types
       load_association(:context).then do |course|
         if course.grants_right?(current_user, :read_as_admin)
           object.score_statistic if object.can_view_score_statistics?(current_user)
-        elsif object.can_view_score_statistics?(current_user) && object.submissions.first.eligible_for_showing_score_statistics?
-          object.score_statistic
+        else
+          submission = object.submissions.find_by(user_id: current_user.id)
+          if submission &&
+             object.can_view_score_statistics?(current_user) &&
+             submission.eligible_for_showing_score_statistics?
+            object.score_statistic
+          end
         end
       end
     end
@@ -945,22 +950,30 @@ module Types
       assignment.anonymous_student_identities.values
     end
 
-    field :auto_grade_assignment_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the assignment"
+    field :auto_grade_assignment_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the assignment", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_assignment_issues
       load_association(:context).then do |course|
         next nil unless course.feature_enabled?(:project_lhotse)
 
-        GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:).first
       end
     end
 
-    field :auto_grade_assignment_errors, [String], null: false, description: "Errors related to the assignment"
+    field :auto_grade_assignment_errors, [String], null: false, description: "Errors related to the assignment", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_assignment_errors
       load_association(:context).then do |course|
         next [] unless course.feature_enabled?(:project_lhotse)
 
-        issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
-        issues ? [issues[:message]] : []
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:).pluck(:message)
+      end
+    end
+
+    field :auto_grade_eligibility, Types::AutoGradeEligibilityType, null: true, description: "Eligibility for auto-grading"
+    def auto_grade_eligibility
+      load_association(:context).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        { issues: GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:) }
       end
     end
 

@@ -163,7 +163,7 @@ module Api::V1::PlannerItem
     ActiveRecord::Associations.preload(notes, user: { pseudonym: :account }) if notes.any?
     ActiveRecord::Associations.preload(context_items, { context: :root_account }) if context_items.any?
     ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) || i.is_a?(::PeerReviewSubAssignment) }, user, opts:)
-    discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
+    discussions = context_items.grep(::DiscussionTopic)
     topics_status = topics_status_for(user, discussions.map(&:id))
 
     items = items.reject do |item|
@@ -204,7 +204,7 @@ module Api::V1::PlannerItem
     subs_data_hash = {}
 
     parent_assignment_ids = Array(assignments)
-                            .filter { |a| a.is_a?(SubAssignment) }
+                            .grep(SubAssignment)
                             .map(&:parent_assignment_id)
                             .uniq
     parent_subs = Submission.where(assignment_id: parent_assignment_ids, user:)
@@ -265,7 +265,7 @@ module Api::V1::PlannerItem
           .where(id: u_topic_ids)
           .group("discussion_topics.id, dtp.id")
           .each do |pi|
-            topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
+          topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
         end
       end
     end

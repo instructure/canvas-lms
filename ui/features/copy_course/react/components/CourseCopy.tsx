@@ -19,7 +19,7 @@
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'

@@ -235,7 +235,7 @@ class RceApiSource {
           apiProps.host,
         )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
 
-    const body = { viewer_restrictions: viewerRestrictions }
+    const body = {viewer_restrictions: viewerRestrictions}
 
     return this.apiPost(uri, headerFor(this.jwt), body, 'PUT')
   }
@@ -377,7 +377,7 @@ class RceApiSource {
     return fetch(preflightProps.upload_url, fetchOptions)
       .then(checkStatus)
       .then(res => {
-        if (res.headers.get('content-type').includes('application/xml')) {
+        if (res.headers.get('content-type')?.includes('application/xml')) {
           if (res.status === 201) {
             return res.text().then(text => {
               const xmldoc = new window.DOMParser().parseFromString(text, 'application/xml')
@@ -535,13 +535,14 @@ class RceApiSource {
       .then(checkStatus)
       .then(res => res.json())
       .catch(throwConnectionError)
-      .catch(e =>
-        e.response.json().then(responseBody => {
+      .catch(e => {
+        if (!e.response) throw e
+        return e.response.json().then(responseBody => {
           console.error(e)
           this.alertFunc(buildError(responseBody))
           throw e
-        }),
-      )
+        })
+      })
   }
 
   // @private

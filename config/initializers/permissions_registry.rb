@@ -80,6 +80,10 @@ BASE_PERMISSIONS = {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to create and update other user's access tokens.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   delete_access_tokens: {
@@ -96,6 +100,10 @@ BASE_PERMISSIONS = {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to delete other user's access tokens.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   view_user_generated_access_tokens: {
@@ -110,6 +118,10 @@ BASE_PERMISSIONS = {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to view other user's manually generated access tokens. This does not let them read the actual token value itself, just the information about it.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   manage_account_memberships: {
@@ -2244,6 +2256,42 @@ BASE_PERMISSIONS = {
     account_considerations: [
       { title: -> { I18n.t("Impact") },
         description: -> { I18n.t("Impact is an add-on to Canvas LMS. Contact your CSM if interested.") } }
+    ]
+  },
+  manage_institutional_tags_view: {
+    label: -> { I18n.t("Institutional Tags - view") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: :root,
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to view institutional tags.") } }
+    ]
+  },
+  manage_institutional_tags_create: {
+    label: -> { I18n.t("Institutional Tags - create") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: :root,
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to create institutional tags.") } }
+    ]
+  },
+  manage_institutional_tags_edit: {
+    label: -> { I18n.t("Institutional Tags - edit") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: :root,
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to edit institutional tags.") } }
     ]
   },
   access_oak: {

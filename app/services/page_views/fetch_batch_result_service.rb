@@ -21,8 +21,8 @@ module PageViews
   class FetchBatchResultService < PageViews::ServiceBase
     def call(query_id)
       uri = @configuration.uri.merge("/api/v5/pageviews/batch-query/#{query_id}/results")
-      CanvasHttp.get(
-        uri.to_s,
+      get_with_clean_redirect(
+        uri,
         request_headers
       ) do |response|
         handle_generic_errors(response) unless response.code.to_i == 200

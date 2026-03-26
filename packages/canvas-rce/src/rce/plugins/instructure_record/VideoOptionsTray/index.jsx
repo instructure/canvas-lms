@@ -27,6 +27,8 @@ import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -136,6 +138,21 @@ export default function VideoOptionsTray({
   const titleInputRef = useRef(null)
 
   const isStudio = !!studioOptions
+
+  const applyDescribedBy = useCallback(
+    playerLayoutInput => {
+      if (isAsrCaptioningImprovements && !isStudio && playerLayoutInput) {
+        const helperId = `${id}-size-helper-text`
+        const existing = playerLayoutInput.getAttribute('aria-describedby') || ''
+        const ids = existing.split(' ').filter(Boolean)
+        if (!ids.includes(helperId)) {
+          playerLayoutInput.setAttribute('aria-describedby', [...ids, helperId].join(' '))
+        }
+      }
+    },
+    [isAsrCaptioningImprovements, isStudio, id],
+  )
+
   const showDisplayOptions = (!isStudio || studioOptions.convertibleToLink) && !forBlockEditorUse
   const showSizeControls = (!isStudio || studioOptions.resizable) && !forBlockEditorUse
   const dimensionsState = useDimensionsState(
@@ -377,6 +394,7 @@ export default function VideoOptionsTray({
                         <Flex.Item margin="small none xx-small none">
                           <View as="div" padding="small small xx-small small">
                             <SimpleSelect
+                              inputRef={applyDescribedBy}
                               id={`${id}-size`}
                               mountNode={instuiPopupMountNodeFn}
                               disabled={displayAs !== 'embed'}
@@ -403,7 +421,11 @@ export default function VideoOptionsTray({
                               ))}
                             </SimpleSelect>
                             {isAsrCaptioningImprovements && !isStudio && (
-                              <View as="div" margin="xx-small none none none">
+                              <View
+                                as="div"
+                                id={`${id}-size-helper-text`}
+                                margin="xx-small none none none"
+                              >
                                 <Text size="small">
                                   {formatMessage(
                                     'Transcript panel is available at widths above 720px.',
@@ -432,7 +454,11 @@ export default function VideoOptionsTray({
                             name="viewer-restrictions"
                             onChange={setViewerRestrictions}
                             defaultValue={viewerRestrictions}
-                            description={formatMessage('Viewer Restrictions')}
+                            description={
+                              <Heading level="h4" as="h3">
+                                {formatMessage('Viewer Restrictions')}
+                              </Heading>
+                            }
                           >
                             <Checkbox
                               variant="toggle"
@@ -446,9 +472,11 @@ export default function VideoOptionsTray({
                         <Flex.Item padding="small">
                           <FormFieldGroup
                             description={
-                              isAsrCaptioningImprovements
-                                ? formatMessage('Caption Manager')
-                                : formatMessage('Closed Captions/Subtitles')
+                              <Heading level="h4" as="h3">
+                                {isAsrCaptioningImprovements
+                                  ? formatMessage('Caption Manager')
+                                  : formatMessage('Closed Captions/Subtitles')}
+                              </Heading>
                             }
                           >
                             {!isAsrCaptioningImprovements && (
@@ -505,13 +533,17 @@ export default function VideoOptionsTray({
                           </FormFieldGroup>
                         </Flex.Item>
                       )}
-                      {isStudio && isEmbedImprovements ? (
+                      {isStudio && isEmbedImprovements && studioOptions.isImprovedEmbed ? (
                         <Flex.Item padding="small">
                           <CheckboxGroup
                             name="studio-embed-options"
                             onChange={handleEmbedOptionChange}
                             value={studioEmbedOptions}
-                            description={formatMessage('Viewer Restrictions')}
+                            description={
+                              <Heading level="h4" as="h3">
+                                {formatMessage('Viewer Restrictions')}
+                              </Heading>
+                            }
                           >
                             <Text variant="contentSmall">
                               {formatMessage('Changes will apply after you save this page.')}
@@ -533,7 +565,26 @@ export default function VideoOptionsTray({
                               value="enableTranscriptDownload"
                               variant="toggle"
                             />
+                            <Checkbox
+                              label={formatMessage('Show rolling transcript')}
+                              value="showRollingTranscript"
+                              variant="toggle"
+                            />
                           </CheckboxGroup>
+                        </Flex.Item>
+                      ) : null}
+                      {!isStudio && isAsrCaptioningImprovements ? (
+                        <Flex.Item padding="small">
+                          <Link
+                            id="tray-transcript-help-link"
+                            variant="standalone"
+                            renderIcon={<IconExternalLinkLine />}
+                            href="https://productmarketing.instructuremedia.com/embed/32388c5a-580c-40f0-85a2-6b4042ddcccb"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {formatMessage('How to request and edit captions?')}
+                          </Link>
                         </Flex.Item>
                       ) : null}
                     </Flex>

@@ -91,6 +91,7 @@ module CC
     MODULE_META = "module_meta.xml"
     COURSE_PACES = "course_paces.xml"
     RUBRICS = "rubrics.xml"
+    NAV_MENU_LINKS = "nav_menu_links.xml"
     EXTERNAL_TOOLS = "external_tools.xml"
     FILES_META = "files_meta.xml"
     SYLLABUS = "syllabus.html"

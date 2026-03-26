@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Ignore < ActiveRecord::Base
+class Ignore < ApplicationRecord
   belongs_to :user
   belongs_to :asset, polymorphic: [:assignment, :assessment_request, { quiz: "Quizzes::Quiz" }, :peer_review_sub_assignment, :sub_assignment]
 

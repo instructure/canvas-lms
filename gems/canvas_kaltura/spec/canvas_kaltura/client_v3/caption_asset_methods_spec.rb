@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasKaltura::ClientV3::CaptionAssetMethods do
   subject(:kaltura_client) do
     CanvasKaltura::ClientV3.new.tap { it.ks = ks }

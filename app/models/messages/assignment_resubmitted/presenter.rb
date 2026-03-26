@@ -41,7 +41,11 @@ module Messages::AssignmentResubmitted
     end
 
     def anonymous?
-      assignment.anonymize_students?
+      if assignment.quiz_lti?
+        assignment.anonymous_participants?
+      else
+        assignment.anonymize_students?
+      end
     end
 
     def course

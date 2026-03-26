@@ -180,8 +180,8 @@ module Types
                   end&.map(&:course)
     end
 
-    InstructorWithEnrollments = Struct.new(:user, :enrollments, keyword_init: true)
-    InstructorEnrollmentInfo = Struct.new(:course, :type, :role, :state, keyword_init: true)
+    InstructorWithEnrollments = Struct.new(:user, :enrollments)
+    InstructorEnrollmentInfo = Struct.new(:course, :type, :role, :state)
 
     field :course_instructors_connection, InstructorWithEnrollmentsType.connection_type, null: true do
       description "Paginated instructors with their enrollments across multiple courses"

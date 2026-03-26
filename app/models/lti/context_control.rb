@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::ContextControl < ActiveRecord::Base
+class Lti::ContextControl < ApplicationRecord
   # While id, account_id, course_id, and deployment_id are tracked, they don't really change
   # (deployment_id & id literally can't), but it makes it easier in the UI to associate a
   # changed control with a specific context and deployment.
@@ -267,7 +267,7 @@ class Lti::ContextControl < ActiveRecord::Base
       .where(deployment_id:, registration_id:)
       .where.not(id:)
       .in_batches do |batch|
-        batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
+      batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
     end
   end
 

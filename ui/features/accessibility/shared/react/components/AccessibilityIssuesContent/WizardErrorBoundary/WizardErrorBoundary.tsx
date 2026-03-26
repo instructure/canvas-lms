@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import React from 'react'
 
 interface WizardErrorBoundaryProps {

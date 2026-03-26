@@ -3791,6 +3791,32 @@ describe GradebooksController do
             expect(js_env[:filter_speed_grader_by_student_group]).to be true
           end
 
+          context "when the assignment is a New Quizzes anonymous survey" do
+            before do
+              tool = @course.context_external_tools.create!(
+                name: "Quizzes.Next",
+                consumer_key: "test_key",
+                shared_secret: "test_secret",
+                tool_id: "Quizzes 2",
+                url: "http://example.com/launch"
+              )
+              @assignment.update!(
+                submission_types: "external_tool",
+                external_tool_tag_attributes: { content: tool, url: tool.url },
+                settings: { "new_quizzes" => { "anonymous_participants" => true } }
+              )
+            end
+
+            it "resolves the student from anonymous_id" do
+              submission = @assignment.submissions.find_by(user: @student)
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, anonymous_id: submission.anonymous_id }
+              @teacher.reload
+
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")&.last
+              expect(saved_group_id).to eq group1.id.to_s
+            end
+          end
+
           context "when loading a student causes a new group to be selected" do
             it "updates the viewing user's preferences for the course with the new group" do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }

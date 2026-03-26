@@ -31,9 +31,9 @@ class CoursePacing::RemoveOverridesService
                         .where(title: "Course Pacing", set_type: "ADHOC")
                         .preload(:assignment)
                         .find_each do |override|
-                          assignments_to_refresh << override.assignment
-                          override.destroy
-                          overrides_removed += 1
+        assignments_to_refresh << override.assignment
+        override.destroy
+        overrides_removed += 1
       end
 
       if overrides_removed > 0

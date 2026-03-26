@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   include Context
   include OutcomeImportContext
   include Pronouns
@@ -100,6 +100,7 @@ class Account < ActiveRecord::Base
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :account_reports, inverse_of: :account
+  has_many :institutional_tag_categories
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
@@ -461,6 +462,7 @@ class Account < ActiveRecord::Base
   add_setting :thousand_separator, inheritable: true
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
+  add_setting :onetrust_consent_domain_id, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -998,7 +1000,7 @@ class Account < ActiveRecord::Base
           # Prevent subsequent code using a stale Account object whose cached associations
           # or inherited settings were just invalidated.
           reload_if_cache_stale
-          Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}")
+          Account.delay(singleton: "Account.invalidate_inherited_caches_#{global_id}")
                  .invalidate_inherited_caches(self, @invalidations)
         end
       end
@@ -1180,7 +1182,8 @@ class Account < ActiveRecord::Base
         end
 
         if starting_account_id
-          GuardRail.activate(:secondary) do
+          guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
+          GuardRail.activate(guard_rail_env) do
             ids = Account.connection.select_values(<<~SQL.squish)
               WITH RECURSIVE t AS (
                 SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
@@ -1869,7 +1872,7 @@ class Account < ActiveRecord::Base
     false
   end
 
-  def discovery_page_base_url
+  def discovery_page_url
     nil
   end
 
@@ -1893,7 +1896,7 @@ class Account < ActiveRecord::Base
   end
 
   def discovery_page_link_for(provider, entry)
-    { label: entry[:label], icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
+    { label: Sanitize.clean(entry[:label].to_s), icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
   end
 
   def validate_auth_discovery_url
@@ -2294,7 +2297,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_DEVELOPER_KEYS, label: t("#account.tab_developer_keys", "Developer Keys"), css_class: "developer_keys", href: :account_developer_keys_path, account_id: root_account.id }
     end
 
-    if user && grants_right?(user, :view_analytics_hub)
+    if !root_account.site_admin? && user && grants_right?(user, :view_analytics_hub)
       tabs << { id: TAB_ANALYTICS_HUB, label: t("#account.tab_analytics_hub", "Analytics Hub"), css_class: "analytics_hub", href: :account_analytics_hub_path }
     end
 
@@ -2308,6 +2311,7 @@ class Account < ActiveRecord::Base
 
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
+    tabs += NavMenuLinkTabs.account_tabs(self) if root_account.feature_enabled?(:nav_menu_links)
     Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(tabs)
 
     if feature_enabled?(:new_quizzes_native_experience)
@@ -2920,6 +2924,12 @@ class Account < ActiveRecord::Base
     sub_accounts.where(grading_standard: nil).find_each do |sub_account|
       sub_account.recompute_assignments_using_account_default(grading_standard_id, grading_standard)
     end
+  end
+
+  def horizon_block_content_editor?
+    horizon_account? &&
+      root_account.feature_enabled?(:horizon_block_content_editor) &&
+      ContentServiceClient.enabled?
   end
 
   def horizon_account_locked?

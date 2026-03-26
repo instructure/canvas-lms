@@ -1810,12 +1810,15 @@ describe Account do
 
       account.default_storage_quota = 10.decimal_megabytes
       account.save! # clear here
+      run_jobs
 
       account.reload
       account.save!
+      run_jobs
 
       account.default_storage_quota = 10.decimal_megabytes
       account.save!
+      run_jobs
     end
 
     it "inherits from a parent account's default_storage_quota" do
@@ -1830,6 +1833,7 @@ describe Account do
 
         account.default_storage_quota = 20.decimal_megabytes
         account.save!
+        run_jobs
 
         # should clear caches
         account = Account.find(account.id)
@@ -1971,6 +1975,7 @@ describe Account do
 
           @sub1.settings = @sub1.settings.merge(restrict_student_future_view: { locked: true, value: true }, lock_all_announcements: { locked: true, value: true })
           @sub1.save!
+          run_jobs
 
           # hard reload
           @account = Account.find(@account.id)
@@ -2293,8 +2298,8 @@ describe Account do
       it "can handle lots of accounts" do
         accounts = Array.new(100) { Account.default.sub_accounts.create! }
         expect(Account.account_chain_ids_for_multiple_accounts(accounts.map(&:id))).to eq(
-          accounts.each_with_object({}) do |account, hash|
-            hash[account.id] = [account.id, Account.default.id]
+          accounts.to_h do |account|
+            [account.id, [account.id, Account.default.id]]
           end
         )
       end
@@ -2630,9 +2635,9 @@ describe Account do
     end
   end
 
-  describe "#discovery_page_base_url" do
+  describe "#discovery_page_url" do
     it "returns nil" do
-      expect(Account.new.discovery_page_base_url).to be_nil
+      expect(Account.new.discovery_page_url).to be_nil
     end
   end
 
@@ -2687,6 +2692,12 @@ describe Account do
       entry = { label: "CAS Login", icon: nil }
       link = account.discovery_page_link_for(provider, entry)
       expect(link).not_to have_key(:icon)
+    end
+
+    it "sanitizes HTML from the label" do
+      entry = { label: "<script>alert('xss')</script>CAS Login" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("CAS Login")
     end
   end
 
@@ -3296,6 +3307,53 @@ describe Account do
         subaccount = root_account.sub_accounts.create!
         expect(subaccount.horizon_account[:value]).to be false
         expect(subaccount.horizon_account[:inherited]).to be true
+      end
+    end
+
+    describe "#horizon_block_content_editor?" do
+      before do
+        @account.enable_feature!(:horizon_course_setting)
+        @account.horizon_account = true
+        @account.save!
+        @account.enable_feature!(:horizon_block_content_editor)
+        allow(ContentServiceClient).to receive(:enabled?).and_return(true)
+      end
+
+      context "when all conditions are met" do
+        it "returns true" do
+          expect(@account.horizon_block_content_editor?).to be true
+        end
+      end
+
+      context "when it is not a horizon account" do
+        before do
+          @account.horizon_account = false
+          @account.save!
+        end
+
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
+
+      context "when the horizon_block_content_editor flag is disabled" do
+        before do
+          @account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
+
+      context "when ContentServiceClient is not enabled" do
+        before do
+          allow(ContentServiceClient).to receive(:enabled?).and_return(false)
+        end
+
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
       end
     end
   end

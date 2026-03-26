@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AttachmentAssociation < ActiveRecord::Base
+class AttachmentAssociation < ApplicationRecord
   belongs_to :attachment
   belongs_to :context, polymorphic: [
     :account,
@@ -51,8 +51,6 @@ class AttachmentAssociation < ActiveRecord::Base
   ] }
 
   before_create :set_root_account_id
-
-  after_save :set_word_count
 
   def self.versioned_fields
     %i[attachment_id context_concern context_id context_type created_at root_account_id user_id]
@@ -143,11 +141,5 @@ class AttachmentAssociation < ActiveRecord::Base
       else
         context.root_account_id
       end
-  end
-
-  def set_word_count
-    if context_type == "Submission" && saved_change_to_attachment_id?
-      attachment&.set_word_count
-    end
   end
 end

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -41,6 +40,9 @@ interface ManualCaptionCreatorProps {
   onDirtyStateChanged?: (isDirty: boolean) => void
 }
 
+const LANGUAGE_ERROR_ID = 'cc-language-error'
+const FILE_ERROR_ID = 'cc-file-error'
+
 export function ManualCaptionCreator({
   languages,
   onPrimary,
@@ -53,7 +55,9 @@ export function ManualCaptionCreator({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [showLanguageError, setShowLanguageError] = useState(false)
   const [fileValidationError, setFileValidationError] = useState<string>('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const languageInputRef = useRef<HTMLInputElement | null>(null)
+  const fileButtonRef = useRef<HTMLElement | null>(null)
 
   const handleLanguageChange = (_event: React.SyntheticEvent, data: string) => {
     if (data) {
@@ -85,7 +89,10 @@ export function ManualCaptionCreator({
   }
 
   const handleUploadClick = () => {
-    if (!selectedLanguageId) {
+    const hasLanguageError = !selectedLanguageId
+    const hasFileError = !selectedFile
+
+    if (hasLanguageError) {
       trackPendoEvent('canvas_caption_validation_error', {
         flow_type: 'upload_file',
         error_type: 'missing_language',
@@ -93,12 +100,19 @@ export function ManualCaptionCreator({
       setShowLanguageError(true)
     }
 
-    if (!selectedFile) {
+    if (hasFileError) {
       trackPendoEvent('canvas_caption_validation_error', {
         flow_type: 'upload_file',
         error_type: 'missing_file',
       })
-      setFileValidationError(`Please select a file before uploading.`)
+      setFileValidationError(formatMessage('Please select a file before uploading.'))
+    }
+
+    // Focus the first faulty field
+    if (hasLanguageError) {
+      languageInputRef.current?.focus()
+    } else if (hasFileError) {
+      fileButtonRef.current?.focus()
     }
 
     // Only proceed if both are selected
@@ -110,8 +124,10 @@ export function ManualCaptionCreator({
   return (
     <Flex as="div" direction="column" gap="medium">
       <Flex.Item overflowY="hidden" overflowX="hidden">
-        <Heading variant="titleCardMini">{formatMessage('Add New Caption')}</Heading>
-        <Text variant="contentSmall">
+        <Heading as="h4" variant="titleCardMini">
+          {formatMessage('Add New Caption')}
+        </Heading>
+        <Text id="cc-file-hint" variant="contentSmall">
           {formatMessage('Upload a subtitle track in either the SRT or WebVTT format.')}
         </Text>
       </Flex.Item>
@@ -120,30 +136,36 @@ export function ManualCaptionCreator({
         layout="inline"
         width="100%"
         label={formatMessage('Language*')}
-        messages={
-          showLanguageError
-            ? [
-                {
-                  type: 'newError',
-                  text: formatMessage('Please select a language'),
-                },
-              ]
-            : []
-        }
       >
         <CanvasSelect
-          label={<ScreenReaderContent>{formatMessage('Select Language')}</ScreenReaderContent>}
+          id="cc-language-select"
+          inputRef={(el: HTMLInputElement | null) => {
+            languageInputRef.current = el
+          }}
+          label=""
           placeholder={formatMessage('Select Language')}
           value={selectedLanguageId}
           mountNode={mountNode}
           translatedStrings={{
-            USE_ARROWS: 'Use arrow keys to navigate options.',
-            LIST_COLLAPSED: 'List collapsed.',
-            LIST_EXPANDED: 'List expanded.',
+            USE_ARROWS: formatMessage('Use arrow keys to navigate options.'),
+            LIST_COLLAPSED: formatMessage('List collapsed.'),
+            LIST_EXPANDED: formatMessage('List expanded.'),
             OPTION_SELECTED: '{option} selected.',
           }}
           onChange={handleLanguageChange}
           liveRegion={liveRegion}
+          aria-invalid={showLanguageError ? 'true' : undefined}
+          aria-describedby={showLanguageError ? LANGUAGE_ERROR_ID : undefined}
+          messages={
+            showLanguageError
+              ? [
+                  {
+                    type: 'newError',
+                    text: formatMessage('Please select a language'),
+                  },
+                ]
+              : []
+          }
         >
           {languages.map(option => (
             // @ts-expect-error - CanvasSelect.Option is a JS component without TS definitions
@@ -153,14 +175,16 @@ export function ManualCaptionCreator({
           ))}
         </CanvasSelect>
         {showLanguageError && (
-          <Alert
-            variant="error"
-            screenReaderOnly={true}
-            isLiveRegionAtomic={true}
-            liveRegion={liveRegion}
-          >
-            {formatMessage('Please select a language')}
-          </Alert>
+          <span id={LANGUAGE_ERROR_ID}>
+            <Alert
+              variant="error"
+              screenReaderOnly={true}
+              isLiveRegionAtomic={true}
+              liveRegion={liveRegion}
+            >
+              {formatMessage('Please select a language')}
+            </Alert>
+          </span>
         )}
       </FormField>
 
@@ -191,19 +215,34 @@ export function ManualCaptionCreator({
           />
           <Flex.Item shouldShrink={false}>
             <Button
+              elementRef={(el: Element | null) => {
+                fileButtonRef.current = el as HTMLElement | null
+              }}
               onClick={() => fileInputRef.current?.click()}
+              aria-describedby={
+                fileValidationError
+                  ? FILE_ERROR_ID
+                  : selectedFile
+                    ? 'cc-file-status'
+                    : 'cc-file-hint cc-file-status'
+              }
               aria-label={
                 selectedFile
                   ? formatMessage('Selected file: {name}', {name: selectedFile.name})
-                  : formatMessage('Choose File')
+                  : formatMessage('Choose File (required)')
               }
+              aria-invalid={fileValidationError ? 'true' : undefined}
             >
               {formatMessage('Choose File')}
             </Button>
           </Flex.Item>
-          {!selectedFile && <Text variant="contentSmall">{formatMessage('No file chosen')}</Text>}
+          {!selectedFile && (
+            <Text id="cc-file-status" variant="contentSmall">
+              {formatMessage('No file chosen')}
+            </Text>
+          )}
           {selectedFile && (
-            <View minWidth={0}>
+            <View id="cc-file-status" minWidth={0}>
               <Text variant="contentSmall">
                 <TruncateText>{selectedFile.name}</TruncateText>
               </Text>
@@ -211,14 +250,16 @@ export function ManualCaptionCreator({
           )}
         </Flex>
         {fileValidationError && (
-          <Alert
-            variant="error"
-            screenReaderOnly={true}
-            isLiveRegionAtomic={true}
-            liveRegion={liveRegion}
-          >
-            {fileValidationError}
-          </Alert>
+          <span id={FILE_ERROR_ID}>
+            <Alert
+              variant="error"
+              screenReaderOnly={true}
+              isLiveRegionAtomic={true}
+              liveRegion={liveRegion}
+            >
+              {fileValidationError}
+            </Alert>
+          </span>
         )}
       </FormField>
 

@@ -313,6 +313,115 @@ describe Accessibility::ResourceScannerService do
       end
     end
 
+    context "when a11y_checker_ga2_features feature flag is enabled" do
+      let(:html_with_issues) do
+        <<~HTML
+          <div>
+            <h1>H1 Title</h1>
+            <h2>H2 Title</h2>
+            <h4>H4 Title</h4>
+          </div>
+        HTML
+      end
+
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        wiki_page.update!(body: html_with_issues)
+      end
+
+      context "when adding new issues would exceed the limit" do
+        before do
+          Setting.set("a11y_checker_course_issue_limit", "1")
+        end
+
+        it "marks the scan as failed" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+        end
+
+        it "sets the error_message to issue_limit_reached" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.error_message).to eq("issue_limit_reached")
+        end
+
+        it "sets issue_count to 0" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.issue_count).to eq(0)
+        end
+
+        it "does not create new accessibility issues" do
+          subject.scan_resource(scan:)
+
+          expect(AccessibilityIssue.where(context: wiki_page).active.count).to eq(0)
+        end
+
+        it "does not queue course statistics" do
+          expect(Accessibility::CourseStatisticCalculatorService).not_to receive(:queue_calculation)
+          subject.scan_resource(scan:)
+        end
+      end
+
+      context "when adding new issues stays within the limit" do
+        before do
+          Setting.set("a11y_checker_course_issue_limit", "2500")
+        end
+
+        it "completes the scan normally" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("completed")
+        end
+
+        it "creates the accessibility issues" do
+          subject.scan_resource(scan:)
+
+          expect(AccessibilityIssue.where(context: wiki_page).active.count).to eq(2)
+        end
+      end
+
+      context "when there are existing active issues from other scans in the same course" do
+        before do
+          Setting.set("a11y_checker_course_issue_limit", "1")
+          other_page = wiki_page_model(course:)
+          other_scan = accessibility_resource_scan_model(course:, context: other_page, workflow_state: "completed")
+          accessibility_issue_model(course:, context: other_page, accessibility_resource_scan: other_scan, workflow_state: "active")
+        end
+
+        it "counts existing course issues toward the limit" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.reload.error_message).to eq("issue_limit_reached")
+        end
+      end
+    end
+
+    context "when a11y_checker_ga2_features feature flag is disabled" do
+      let(:html_with_issues) do
+        <<~HTML
+          <div>
+            <h1>H1 Title</h1>
+            <h2>H2 Title</h2>
+            <h4>H4 Title</h4>
+          </div>
+        HTML
+      end
+
+      before do
+        Setting.set("a11y_checker_course_issue_limit", "1")
+        wiki_page.update!(body: html_with_issues)
+      end
+
+      it "ignores the issue limit and completes the scan" do
+        subject.scan_resource(scan:)
+
+        expect(scan.reload.workflow_state).to eq("completed")
+      end
+    end
+
     context "when the scan fails" do
       before do
         allow_any_instance_of(described_class).to receive(:scan_resource_for_issues).and_raise(StandardError, "Failure")

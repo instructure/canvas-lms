@@ -280,6 +280,14 @@ module Lti
               rejected_at: nil
             )
 
+            # Auto-accept if the registration attributes match
+            if registration_attrs_match?(registration.ims_registration, registration_attrs)
+              Lti::ApplyRegistrationUpdateRequestService.call(
+                registration_update_request:,
+                applied_by: @current_user
+              )
+            end
+
             root_deployment = ContextExternalTool.find_by(account: root_account, lti_registration: registration)
 
             render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
@@ -346,8 +354,9 @@ module Lti
         unless registration.root_account.feature_enabled?(:lti_dr_registrations_update)
           respond_to do |format|
             format.html { render "shared/errors/404_message", status: :not_found }
-            format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+            format.json { respond_with_error(:not_found, "The specified resource does not exist.") }
           end
+          return
         end
 
         validation_result = Lti::TokenValidationService.verify_developer_key_access_token_and_scopes(
@@ -382,6 +391,14 @@ module Lti
             accepted_at: nil,
             rejected_at: nil
           )
+
+          # Auto-accept if the registration attributes match
+          if registration_attrs_match?(ims_registration, registration_attrs)
+            Lti::ApplyRegistrationUpdateRequestService.call(
+              registration_update_request:,
+              applied_by: @current_user
+            )
+          end
 
           root_deployment = ContextExternalTool.find_by(account: registration.root_account, developer_key: registration.developer_key)
 
@@ -447,6 +464,32 @@ module Lti
                json: {
                  errorMessage: message
                }
+      end
+
+      def registration_attrs_match?(existing_registration, new_attrs)
+        comparable_attrs = %w[client_name redirect_uris initiate_login_uri jwks_uri logo_uri scopes]
+
+        existing_registration.slice(comparable_attrs)
+        new_attrs.slice(comparable_attrs)
+        attrs_match = comparable_attrs.all? do |attr|
+          first = existing_registration[attr]
+          second = new_attrs[attr]
+
+          # If the attribute we're look at is an array, sort it first before comparison
+          if existing_registration[attr].is_a? Array
+            first = existing_registration[attr].sort
+            second = new_attrs[attr].sort
+          end
+
+          first == second
+        end
+
+        config_match = Hashdiff.diff(
+          existing_registration.lti_tool_configuration.deep_stringify_keys,
+          new_attrs["lti_tool_configuration"].deep_stringify_keys
+        ).empty?
+
+        attrs_match && config_match
       end
     end
   end

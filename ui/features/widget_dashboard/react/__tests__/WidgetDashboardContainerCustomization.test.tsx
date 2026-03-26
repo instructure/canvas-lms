@@ -27,7 +27,7 @@ import {WidgetDashboardProvider} from '../hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from '../hooks/useWidgetDashboardEdit'
 import {WidgetLayoutProvider} from '../hooks/useWidgetLayout'
 import {ResponsiveProvider} from '../hooks/useResponsiveContext'
-import {defaultGraphQLHandlers, clearWidgetDashboardCache} from './testHelpers'
+import {defaultGraphQLHandlers, clearWidgetDashboardCache, PlatformTestWrapper} from './testHelpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const mockStatisticsData = {
@@ -109,17 +109,19 @@ const setup = (contextProps = {}, envOverrides = {}) => {
   })
 
   const renderResult = render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider {...contextProps}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <ResponsiveProvider matches={['desktop']}>
-              <WidgetDashboardContainer />
-            </ResponsiveProvider>
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider {...contextProps}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <ResponsiveProvider matches={['desktop']}>
+                <WidgetDashboardContainer />
+              </ResponsiveProvider>
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 
   return {

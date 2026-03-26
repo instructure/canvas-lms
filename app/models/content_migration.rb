@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentMigration < ActiveRecord::Base
+class ContentMigration < ApplicationRecord
   include Workflow
   include HtmlTextHelper
   include Rails.application.routes.url_helpers
@@ -1528,16 +1528,16 @@ class ContentMigration < ActiveRecord::Base
                          .joins(association_name)
                          .pluck(*src_fields)
                          .each do |src_results|
-                           src = src_fields.zip(src_results).to_h
-                           src[:id] = src[:content_id]
-                           mig_id = src[:migration_id]
-                           next unless mig_id_to_dest_id[mig_id]
+            src = src_fields.zip(src_results).to_h
+            src[:id] = src[:content_id]
+            mig_id = src[:migration_id]
+            next unless mig_id_to_dest_id[mig_id]
 
-                           add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
-                           src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && src[:assignment_id]
-                           next unless src_assignment_id
+            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
+            src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && src[:assignment_id]
+            next unless src_assignment_id
 
-                           add_asset_pair_to_mapping(mapping, "assignments", mig_id, { id: src_assignment_id }, { id: mig_id_to_dest_id[mig_id][:shell_id] })
+            add_asset_pair_to_mapping(mapping, "assignments", mig_id, { id: src_assignment_id }, { id: mig_id_to_dest_id[mig_id][:shell_id] })
           end
         end
       else
@@ -1547,8 +1547,8 @@ class ContentMigration < ActiveRecord::Base
         srcs = {}
         if source_course.present?
           source_course.shard.activate do
-            srcs = klass.where(context: source_course).select(*src_fields).each_with_object({}) do |src, by_mig_id|
-              by_mig_id[CC::CCHelper.create_key(src.asset_string, global: global_ids)] = src.attributes.with_indifferent_access.slice(*src_fields)
+            srcs = klass.where(context: source_course).select(*src_fields).to_h do |src|
+              [CC::CCHelper.create_key(src.asset_string, global: global_ids), src.attributes.with_indifferent_access.slice(*src_fields)]
             end
           end
         end
@@ -1625,7 +1625,7 @@ class ContentMigration < ActiveRecord::Base
                        .where(migration_id: mig_id_to_dest_id.keys)
                        .pluck(:content_id, :migration_id)
                        .each do |src_id, mig_id|
-                         mapping[asset_type][src_id] = mig_id_to_dest_id[mig_id]
+          mapping[asset_type][src_id] = mig_id_to_dest_id[mig_id]
         end
       else
         source_course.shard.activate do

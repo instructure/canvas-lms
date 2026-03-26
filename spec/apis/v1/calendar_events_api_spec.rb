@@ -72,9 +72,9 @@ describe CalendarEventsApiController, type: :request do
         rrule
       ].freeze
     end
-    let(:expected_slot_fields) { (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code]) }
-    let(:expected_reservation_event_fields) { (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type]) }
-    let(:expected_reserved_fields) { (expected_slot_fields + ["reserved", "reserve_comments"]) }
+    let(:expected_slot_fields) { expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code] }
+    let(:expected_reservation_event_fields) { expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type] }
+    let(:expected_reserved_fields) { expected_slot_fields + ["reserved", "reserve_comments"] }
     let(:expected_reservation_fields) { expected_reservation_event_fields - ["child_events"] }
     let(:expected_series_fields) { expected_fields + ["series_head", "series_natural_language"] }
 
@@ -1347,6 +1347,29 @@ describe CalendarEventsApiController, type: :request do
         a2 = json.detect { |h| h["id"] == ag.appointments.last.id }
         expect(a2["child_events_count"]).to eq 0
         expect(a2["child_events"]).to be_empty
+      end
+
+      it "does not include appointment groups from other courses when context_codes filter is applied" do
+        course1 = course_with_teacher(active_all: true).course
+        teacher = @teacher
+        course2 = course_with_teacher(user: teacher, active_all: true).course
+
+        ag = AppointmentGroup.create!(title: "course1 appointments",
+                                      participants_per_appointment: 4,
+                                      new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]],
+                                      contexts: [course1])
+        ag.publish!
+
+        json = api_call_as_user(teacher, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{course2.asset_string}", {
+                                  controller: "calendar_events_api",
+                                  action: "index",
+                                  format: "json",
+                                  context_codes: [course2.asset_string],
+                                  start_date: "2012-01-01",
+                                  end_date: "2012-01-31"
+                                })
+        ag_ids = json.filter_map { |e| e["appointment_group_id"] }
+        expect(ag_ids).not_to include(ag.id)
       end
 
       context "reservations" do

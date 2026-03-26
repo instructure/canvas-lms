@@ -16,11 +16,56 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {graphql, HttpResponse} from 'msw'
 import {clearWidgetDashboardCache} from '../utils/persister'
+import {TranslationsProvider} from '@instructure/platform-widget-dashboard'
+import type {WidgetDashboardTranslations} from '@instructure/platform-widget-dashboard'
+import {PlatformUiProvider} from '@instructure/platform-provider'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 // Export for use in tests - call this in beforeEach to prevent cache pollution
 export {clearWidgetDashboardCache}
+
+import enTranslations from '@instructure/platform-widget-dashboard/locales/en.json'
+
+const mockTranslations = enTranslations as unknown as WidgetDashboardTranslations
+
+const mockExecuteQuery = async (query: unknown, variables: unknown) => {
+  const queryStr = typeof query === 'string' ? query : (query as any)?.loc?.source?.body || ''
+  const operationName = queryStr.match(/(?:query|mutation)\s+(\w+)/)?.[1] || undefined
+  const response = await fetch('/api/graphql', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({query: queryStr, variables, operationName}),
+  })
+  const json = await response.json()
+  if (!response.ok || json.errors) {
+    throw new Error(json.errors?.[0]?.message || `GraphQL request failed: ${response.status}`)
+  }
+  return json.data ?? json
+}
+
+export function PlatformTestWrapper({children}: {children: React.ReactNode}) {
+  return React.createElement(
+    PlatformUiProvider,
+    {
+      executeQuery: mockExecuteQuery as any,
+      currentUserId: '1',
+      locale: 'en',
+      timezone: 'America/Denver',
+    },
+    React.createElement(
+      TranslationsProvider,
+      {
+        translations: mockTranslations,
+        translate: (key: string) => key,
+        announceForScreenReader: () => {},
+      } as any,
+      children,
+    ),
+  )
+}
 
 // Default mock data for GraphQL queries
 const mockCoursesWithGradesResponse = {

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
-
 describe Accessibility::SyllabusResource do
   let(:course) { course_model(syllabus_body: "<p>Course syllabus content</p>") }
   let(:syllabus_resource) { described_class.new(course) }

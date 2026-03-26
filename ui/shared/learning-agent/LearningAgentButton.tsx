@@ -20,7 +20,7 @@ import React from 'react'
 import {PlatformUiProvider} from '@instructure/platform-provider'
 import {LearningAgentLauncher} from '@instructure/platform-learning-agent-launcher'
 import {executeQuery} from '@canvas/graphql'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 
 const LearningAgentButton = () => (
   <ErrorBoundary errorComponent={<></>}>

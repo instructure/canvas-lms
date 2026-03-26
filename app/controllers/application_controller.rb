@@ -345,7 +345,16 @@ class ApplicationController < ActionController::Base
           canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme),
           lti_asset_processor_course: @context.try(:feature_enabled?, :lti_asset_processor_course)
         )
-        @js_env[:PENDO_APP_ID] = usage_metrics_api_key if load_usage_metrics?
+
+        if load_usage_metrics?
+          @js_env[:PENDO_APP_ID] = usage_metrics_api_key
+          if cached_features[:cookie_consent_necessary] && !@domain_root_account&.feature_enabled?(:pendo_extended)
+            domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
+            onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
+            @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
+          end
+        end
+
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(["user_display_json", @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback, :email]) } : {}
         @js_env[:current_user_is_admin] = @context.account_membership_allows(@current_user) if @context.is_a?(Course)
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
@@ -506,6 +515,7 @@ class ApplicationController < ActionController::Base
     feature_flag_ui_sorting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
+    files_a11y_folder_duplicates
     horizon_course_setting
     instui_for_import_page
     instui_header
@@ -533,6 +543,7 @@ class ApplicationController < ActionController::Base
     api_rate_limits
     buttons_and_icons_root_account
     canvas_apps_sub_account_access
+    cookie_consent_necessary
     course_pace_allow_bulk_pace_assign
     course_pace_download_document
     course_pace_draft_state
@@ -547,6 +558,7 @@ class ApplicationController < ActionController::Base
     file_verifiers_for_quiz_links
     instui_nav
     login_registration_ui_identity
+    lock_lti_registrations
     lti_apps_page_ai_translation
     lti_apps_page_instructors
     lti_asset_processor
@@ -564,7 +576,6 @@ class ApplicationController < ActionController::Base
     mobile_offline_mode
     modules_requirements_allow_percentage
     non_scoring_rubrics
-    open_tools_in_new_tab
     pendo_extended
     product_tours
     rce_asr_captioning_improvements
@@ -577,6 +588,7 @@ class ApplicationController < ActionController::Base
     send_usage_metrics
     top_navigation_placement
     youtube_migration
+    educator_dashboard
     widget_dashboard
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
@@ -2898,6 +2910,12 @@ class ApplicationController < ActionController::Base
     @embedded_view = params[:embedded]
     @headers = false if params[:no_headers]
     (@body_classes ||= []) << "embedded" if @embedded_view
+  end
+
+  def in_mobile_webview?
+    # TODO: we need to set up adding :mobile_webview to the session
+    # when /login/session_token is called with mobile_webview=1
+    session&.dig(:mobile_webview) || params[:embedded] || params[:embed]
   end
 
   def stringify_json_ids?

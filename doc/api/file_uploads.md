@@ -30,6 +30,8 @@ POST to `/api/v1/courses/:course_id/files`. Or to <a href="submissions.html">upl
 
 Note* The endpoint you choose to post files to will change the permissions set on the file. i.e. only files posted to the submissions comments endpoint can be attached to a submissions comment.
 
+Content migrations and SIS imports can be performed via file uploads also. In these cases, the arguments below are provided under a `pre_attachment` object in the initial POST to `/api/v1/accounts/:account_id/sis_imports` or `/api/v1/courses/:course_id/content_migrations`. The `upload_url` and `upload_params` in the response will also be under a `pre_attachment` object. Once the file is uploaded to the URL provided, the content migration or SIS import will begin.  
+
 Arguments:
 
 <dl>

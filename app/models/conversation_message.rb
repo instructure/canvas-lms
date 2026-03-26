@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ConversationMessage < ActiveRecord::Base
+class ConversationMessage < ApplicationRecord
   include HtmlTextHelper
   include ConversationHelper
   include ConversationsHelper

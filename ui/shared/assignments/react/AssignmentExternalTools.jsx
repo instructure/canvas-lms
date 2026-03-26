@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
@@ -152,7 +152,7 @@ const attach = function (element, placement, courseId, assignmentId) {
     />
   )
 
-  ReactDOM.render(configTools, element)
+  legacyRender(configTools, element)
 }
 
 const ConfigurationTools = {

@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
@@ -121,7 +121,7 @@ export const RubricSearchTray = ({
             padding="small 0"
             overflowY="auto"
           >
-            {selectedContext ? (
+            {selectedContext && (
               <RubricsForContext
                 courseId={courseId}
                 selectedAssociation={selectedAssociation}
@@ -133,8 +133,6 @@ export const RubricSearchTray = ({
                   setSelectedRubricId(rubricId)
                 }}
               />
-            ) : (
-              <LoadingIndicator />
             )}
           </View>
         </View>

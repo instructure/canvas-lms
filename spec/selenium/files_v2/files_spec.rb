@@ -169,8 +169,8 @@ describe "files index page", :ignore_js_errors do
           edit_name_from_kebab_menu(1, file_rename_to)
           expect(file_rename_to).to be_present
           expect(content).not_to contain_link(a_txt_file_name)
-          # TODO: restore focus assertion after ActionMenuButton
-          # focus restoration fix lands (next commit in series)
+          action_button = get_item_files_table(1, 7).find_element(:css, "button")
+          check_element_has_focus(action_button)
         end
 
         it "deletes file", priority: "1" do

@@ -79,7 +79,7 @@ module UserLearningObjectScopes
                  end
 
         result &= course_ids if course_ids
-        result &= Array.wrap(contexts).select { |c| c.is_a?(Course) }.map(&:id) if contexts
+        result &= Array.wrap(contexts).grep(Course).map(&:id) if contexts
         result
       end
     end
@@ -93,7 +93,7 @@ module UserLearningObjectScopes
     shard.activate do
       result = cached_current_group_memberships_by_date.map(&:group_id)
       result &= group_ids if group_ids
-      result &= Array.wrap(contexts).select { |g| g.is_a?(Group) }.map(&:id) if contexts
+      result &= Array.wrap(contexts).grep(Group).map(&:id) if contexts
       result
     end
   end
@@ -498,8 +498,8 @@ module UserLearningObjectScopes
                               .where(final_grader: self, moderated_grading: true)
                               .where(assignments: { grades_published_at: nil })
                               .where(id: ModeratedGrading::ProvisionalGrade.joins(:submission)
-          .where("submissions.assignment_id=assignments.id")
-          .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))
+                                         .where("submissions.assignment_id=assignments.id")
+                                         .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))
                               .preload(:context)
       if scope_only
         scope # Also need to check the rights like below

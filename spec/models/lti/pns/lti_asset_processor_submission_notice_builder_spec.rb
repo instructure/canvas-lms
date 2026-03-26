@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
   let!(:lti_student) { user_model }
   let(:developer_key) do

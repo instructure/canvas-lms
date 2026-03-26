@@ -126,9 +126,21 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_peer_review_student_view?
-    @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+    @current_user.present? && @assignment.a2_enabled? &&
+      (!can_do(@context, @current_user, :read_as_admin) || user_assigned_as_student?) &&
       @assignment.peer_reviews && @context.feature_enabled?(:peer_review_allocation_and_grading) &&
+      @assignment.peer_review_sub_assignment.present? &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+  end
+
+  def user_assigned_as_student?
+    @context.student_enrollments.where(user: @current_user).exists? &&
+      AssignmentVisibility::AssignmentVisibilityService
+        .assignments_visible_to_students(
+          assignment_ids: [@assignment.id],
+          course_ids: [@context.id],
+          user_ids: [@current_user.id]
+        ).any?
   end
 
   def a2_active_student_and_enrollment
@@ -367,9 +379,9 @@ class AssignmentsController < ApplicationController
           js_env({ OBSERVER_OPTIONS: {
                    OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
                    CAN_ADD_OBSERVEE: @current_user
-                                      .profile
-                                      .tabs_available(@current_user, root_account: @domain_root_account)
-                                      .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                                     .profile
+                                     .tabs_available(@current_user, root_account: @domain_root_account)
+                                     .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
                  } })
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment
@@ -402,6 +414,7 @@ class AssignmentsController < ApplicationController
                        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
                        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
                        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
+                       HAS_PEER_REVIEW_SUB_ASSIGNMENT: @assignment.peer_review_sub_assignment.present?,
                        CAN_EDIT_ASSIGNMENTS: @context.grants_right?(@current_user, session, :manage_assignments_edit)
                      })
         set_section_list_js_env
@@ -748,7 +761,19 @@ class AssignmentsController < ApplicationController
       return render_a2_peer_review_student_view
     end
 
-    if @context.feature_enabled?(:peer_review_allocation_and_grading) && authorized_action(@assignment, @current_user, :grade)
+    if @context.feature_enabled?(:peer_review_allocation_and_grading) && @assignment.peer_review_sub_assignment.present?
+      unless @assignment.grants_right?(@current_user, session, :grade) && !user_assigned_as_student?
+        @unauthorized_message = t("Please contact your Canvas Administrator, as one or more of the following feature options is not enabled to view this Peer Review Assignment:")
+        @unauthorized_details = [
+          t("Peer Review Allocation and Grading"),
+          t("Assignment Enhancements - Student"),
+          t("Enhanced Rubrics"),
+          t("Performance and Usability Upgrades for SpeedGrader"),
+        ]
+        render "shared/unauthorized", status: :unauthorized
+        return
+      end
+
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id, open_allocation_tray: true)
       return
     end
@@ -1002,7 +1027,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
-      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false, include_peer_review: @context.feature_enabled?(:peer_review_allocation_and_grading))
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false, include_peer_review: true)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = set_cancel_to_url

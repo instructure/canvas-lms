@@ -140,25 +140,27 @@ class OAuth2ProviderController < ApplicationController
     end
     return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
-    if Account.site_admin.feature_enabled?(:csrf_oauth2_fix)
-      unless session[:oauth2][:custom_csrf_token].present?
-        Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-missing]: #{loggable_session.inspect}" }
-      end
-      return render plain: t("Missing custom CSRF token"), status: :bad_request unless session[:oauth2][:custom_csrf_token].present?
-
-      unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
-        Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-invalid]: expected=#{session[:oauth2][:custom_csrf_token]} | got=#{params[:custom_csrf_token]} | #{loggable_session.inspect}" }
-      end
-      return render plain: t("Invalid custom CSRF token"), status: :bad_request unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
-
-      session[:oauth2][:custom_csrf_token] = nil
+    unless session[:oauth2][:custom_csrf_token].present?
+      Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-missing]: #{loggable_session.inspect}" }
     end
+    return render plain: t("Missing custom CSRF token"), status: :bad_request unless session[:oauth2][:custom_csrf_token].present?
+
+    unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
+      Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-invalid]: expected=#{session[:oauth2][:custom_csrf_token]} | got=#{params[:custom_csrf_token]} | #{loggable_session.inspect}" }
+    end
+    return render plain: t("Invalid custom CSRF token"), status: :bad_request unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
+
+    session[:oauth2][:custom_csrf_token] = nil
 
     redirect_params = Canvas::OAuth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user, remember_access: params[:remember_access])
     redirect_to Canvas::OAuth::Provider.final_redirect(self, redirect_params)
   end
 
   def deny
+    if @domain_root_account&.feature_enabled?(:oauth2_deny_post) && request.get?
+      return render plain: t("This endpoint requires a POST request"), status: :method_not_allowed
+    end
+
     return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
     params = { error: "access_denied" }
@@ -225,8 +227,8 @@ class OAuth2ProviderController < ApplicationController
   private
 
   def skip_csrf?
-    return true if %w[token destroy].include?(action_name)
-    return true if Account.site_admin.feature_enabled?(:csrf_oauth2_fix) && %w[accept].include?(action_name)
+    return true if %w[token destroy accept].include?(action_name)
+    return true if @domain_root_account&.feature_enabled?(:oauth2_deny_post) && action_name == "deny"
 
     false
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class WebConference < ActiveRecord::Base
+class WebConference < ApplicationRecord
   include SendToStream
   include TextHelper
 

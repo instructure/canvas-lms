@@ -20,13 +20,13 @@
 import React, {useEffect, useState} from 'react'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import GradeSummaryContainer from './GradeSummaryContainer'
 
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
 

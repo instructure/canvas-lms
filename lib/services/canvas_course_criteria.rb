@@ -30,6 +30,10 @@ module Services
       def config
         @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["canvas_course_criteria.yml", failsafe: nil] || "{}")
       end
+
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
     end
   end
 end

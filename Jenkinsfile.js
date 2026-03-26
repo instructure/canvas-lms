@@ -25,8 +25,8 @@ env.BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
 env.COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
 env.DOCKER_BUILDKIT = 1
 env.FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
-env.SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:126.0-20240621'
-env.SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.22.0'
+env.SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:145.0'
+env.SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.41.0'
 
 node(nodeLabel()) {
   timeout(time: 20, unit: 'MINUTES') {

@@ -39,7 +39,7 @@ import {
   VIEWABLE_SUBMISSIONS_QUERY,
 } from '../../graphql/Queries'
 import {decodeQueryString} from '@instructure/query-string-encoding'
-import WithBreakpoints from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'

@@ -18,7 +18,7 @@
 
 import {formatApiResultError, UnsuccessfulApiResult} from './ApiResult'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 type ApiResultErrorPageProps = {
   error: UnsuccessfulApiResult

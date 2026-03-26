@@ -915,7 +915,7 @@ class ExternalToolsController < ApplicationController
           )
         end
         # Use domain-specific URL for environment overrides
-        launch_url_with_overrides = tool.url_with_environment_overrides(launch_settings["launch_url"])
+        launch_url_with_overrides = tool.url_with_environment_overrides(launch_settings["launch_url"], include_launch_url: true)
         @lti_launch.resource_url = launch_url_with_overrides
 
         placement = launch_settings.dig("metadata", "placement")
@@ -1539,6 +1539,12 @@ class ExternalToolsController < ApplicationController
     verify_uniqueness = params.dig(:external_tool, :verify_uniqueness).present?
     if params.key?(:client_id)
       raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
+
+      if @context.root_account.feature_enabled?(:lock_lti_registrations) &&
+         developer_key.lti_registration&.lock_deploying?
+        return render json: { errors: [{ message: "This app has been locked by an administrator and cannot be installed via client ID." }] },
+                      status: :forbidden
+      end
 
       @tool = developer_key.lti_registration.new_external_tool(@context, verify_uniqueness:, current_user: @current_user)
     else

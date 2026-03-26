@@ -128,7 +128,7 @@ module Lti::IMS::Providers
     def queryable_roles(lti_role)
       # Roles represented as Strings are for system and institution roles, which we do not care about for
       # purposes of NRPS filtering by role
-      Lti::SubstitutionsHelper::INVERTED_LIS_V2_LTI_ADVANTAGE_ROLE_MAP[lti_role]&.reject { |r| r.is_a?(String) }
+      Lti::SubstitutionsHelper::INVERTED_LIS_V2_LTI_ADVANTAGE_ROLE_MAP[lti_role]&.grep_v(String)
     end
 
     def nonsense_role_filter?

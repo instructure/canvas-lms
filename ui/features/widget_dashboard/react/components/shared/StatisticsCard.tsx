@@ -24,9 +24,15 @@ interface StatisticsCardProps {
   count: number
   label: string
   backgroundColor: string
+  textColor?: string
 }
 
-const StatisticsCard: React.FC<StatisticsCardProps> = ({count, label, backgroundColor}) => {
+const StatisticsCard: React.FC<StatisticsCardProps> = ({
+  count,
+  label,
+  backgroundColor,
+  textColor,
+}) => {
   const formatCount = (num: number): string => {
     if (num >= 1000) {
       return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
@@ -46,11 +52,22 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({count, label, background
       }}
       data-testid={`statistics-card-${label}`}
     >
-      <Text size="x-large" weight="bold">
+      <Text
+        size="x-large"
+        weight="bold"
+        color="primary"
+        themeOverride={textColor ? {primaryColor: textColor} : {}}
+      >
         {formatCount(count)}
       </Text>
       <View as="div" margin="x-small 0 0">
-        <Text size="small">{label}</Text>
+        <Text
+          size="small"
+          color="primary"
+          themeOverride={textColor ? {primaryColor: textColor} : {}}
+        >
+          {label}
+        </Text>
       </View>
     </View>
   )

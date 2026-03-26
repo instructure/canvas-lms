@@ -1,5 +1,7 @@
 ---
 - verb: GET
+  path: '/accounts/:account_id/files/:file_id/download'
+- verb: GET
   path: '/api/sis/accounts/:account_id/assignments'
 - verb: GET
   path: '/api/sis/courses/:course_id/assignments'
@@ -240,6 +242,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/install_from_template'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/latest_update_request'
+- verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
@@ -269,6 +273,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/check_domain_duplicates'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET
@@ -1088,6 +1094,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/:id'
 - verb: GET
+  path: '/api/v1/courses/:course_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/courses/:course_id/folders/by_path'
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/by_path/*full_path'
@@ -1872,6 +1880,8 @@
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/:id'
 - verb: GET
+  path: '/api/v1/groups/:group_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/groups/:group_id/folders/by_path'
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/by_path/*full_path'
@@ -2410,6 +2420,8 @@
 - verb: GET
   path: '/api/v1/users/:user_id/folders/:id'
 - verb: GET
+  path: '/api/v1/users/:user_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/users/:user_id/folders/by_path'
 - verb: GET
   path: '/api/v1/users/:user_id/folders/by_path/*full_path'
@@ -2565,3 +2577,19 @@
   path: '/api/v1/users/self/todo_item_count'
 - verb: GET
   path: '/api/v1/users/self/upcoming_events'
+- verb: GET
+  path: '/assessment_questions/:assessment_question_id/files/:file_id/download'
+- verb: GET
+  path: '/assignments/:assignment_id/files/:id/download'
+- verb: GET
+  path: '/courses/:course_id/files/:file_id/download'
+- verb: GET
+  path: '/files/:file_id/download'
+- verb: GET
+  path: '/groups/:group_id/files/:file_id/download'
+- verb: GET
+  path: '/quiz_statistics/:quiz_statistics_id/files/:file_id/download'
+- verb: GET
+  path: '/quizzes/quiz_submissions/:quiz_submission_id/files/:file_id/download'
+- verb: GET
+  path: '/users/:user_id/files/:file_id/download'

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class DiscussionTopicSummary < ActiveRecord::Base
+class DiscussionTopicSummary < ApplicationRecord
   belongs_to :root_account, class_name: "Account"
   belongs_to :user
   belongs_to :discussion_topic, inverse_of: :summaries

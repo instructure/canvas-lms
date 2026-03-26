@@ -35,9 +35,7 @@ def setupNode() {
 
   distribution.stashBuildScripts()
 
-  credentials.withStarlordCredentials { ->
-    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-  }
+  sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
 
   sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 }
@@ -103,35 +101,25 @@ def collectCoverageReport() {
       selector: specific(env.BUILD_NUMBER),
     )
 
-    withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
-      sh """
-        docker compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
-        --name coverage-collator canvas bash -c \
-        "bundle install; bundle exec rake coverage:report['/tmp/*/coverage/**']"
-      """
+    sh "docker compose -f ${env.COMPOSE_FILE} cp tmp canvas:/usr/src/app/coverage-data"
+    sh "docker compose -f ${env.COMPOSE_FILE} exec -T canvas bash -c \"bundle exec rake coverage:report['/usr/src/app/coverage-data/*/coverage/**']\""
+    pipelineHelpers.copyFromContainer('canvas', '/usr/src/app/coverage', './coverage')
 
-      sh 'docker cp coverage-collator:/usr/src/app/coverage/ coverage'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'coverage/**'
 
-      archiveArtifacts allowEmptyArchive: true, artifacts: 'coverage/**'
+    publishHTML target: [
+      allowMissing: false,
+      alwaysLinkToLastBuild: false,
+      keepAll: true,
+      reportDir: './coverage',
+      reportFiles: 'index.html',
+      reportName: 'Ruby Coverage Report'
+    ]
 
-      publishHTML target: [
-        allowMissing: false,
-        alwaysLinkToLastBuild: false,
-        keepAll: true,
-        reportDir: './coverage',
-        reportFiles: 'index.html',
-        reportName: 'Ruby Coverage Report'
-      ]
-
-      uploadCoverage([
-        uploadSource: '/coverage',
-        uploadDest: env.COVERAGE_LOCATION
-      ])
-    }
-
-    if (env.GERRIT_EVENT_TYPE != 'comment-added' && env.COVERAGE_TYPE == 'ruby-total') {
-      generateSkippedSpecsReport()
-    }
+    uploadCoverage([
+      uploadSource: '/coverage',
+      uploadDest: env.COVERAGE_LOCATION
+    ])
   }
 }
 
@@ -143,7 +131,6 @@ env.RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold
 env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
 env.SELENIUM_TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/selenium'
 env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
-env.EXCLUDE_TESTS = '.*/(selenium|contracts)'
 env.ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
 env.POSTGRES_PASSWORD = 'sekret'
 env.RSPECQ_REDIS_URL = redisUrl()
@@ -179,7 +166,7 @@ node(nodeLabel()) {
                 try {
                   sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $env.PATCHSET_TAG bundle exec rspecq \
                     --build=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec \
-                    --queue-wait-timeout 240 \
+                    --queue-wait-timeout 300 \
                     --redis-url $env.RSPECQ_REDIS_URL \
                     --report", label: 'Reporter')
                 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
@@ -202,7 +189,7 @@ node(nodeLabel()) {
                 try {
                   sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $env.PATCHSET_TAG bundle exec rspecq \
                     --build=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium \
-                    --queue-wait-timeout 120 \
+                    --queue-wait-timeout 300 \
                     --redis-url $env.RSPECQ_REDIS_URL \
                     --report", label: 'Reporter')
                 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
@@ -226,10 +213,9 @@ node(nodeLabel()) {
                 def index = i
                 def indexStr = (index).toString().padLeft(2, '0')
                 rspecqStages["RSpecQ Selenium Set ${indexStr}"] = {
-                  rspecStage.runRspecQWorkerNode(String.valueOf(index), [
+                  rspecStage.runRspecQWorkerNode("Selenium_${indexStr}", [
                     "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
-                    "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
-                    "EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)"
+                    "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}"
                   ])
                 }
               }
@@ -241,8 +227,10 @@ node(nodeLabel()) {
                 def index = i
                 def indexStr = (index + 1).toString().padLeft(2, '0')
                 rspecqStages["RSpecQ Rspec Set ${indexStr}"] = {
-                  rspecStage.runRspecQWorkerNode(String.valueOf(index), [
-                    "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"
+                  rspecStage.runRspecQWorkerNode("Rspec_${indexStr}", [
+                    "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec",
+                    "TEST_PATTERN=${env.TEST_PATTERN}",
+                    "EXCLUDE_TESTS=.*/selenium"
                   ])
                 }
               }
@@ -251,11 +239,13 @@ node(nodeLabel()) {
             parallel(rspecqStages)
           }
         } finally {
-          pipelineHelpers.cleanupDocker()
-
           collectCoverageReport()
 
-          buildSummaryReport.saveRunManifest()
+          if (env.GERRIT_EVENT_TYPE != 'comment-added' && env.COVERAGE_TYPE == 'ruby-total') {
+            generateSkippedSpecsReport()
+          }
+
+          pipelineHelpers.cleanupDocker()
         }
       }
     }

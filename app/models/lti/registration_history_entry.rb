@@ -58,7 +58,7 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
     # @param [Proc] block
     # @returns The value returned by the block
     def track_changes(lti_registration:, current_user:, context:, comment: nil, update_type: "manual_edit", &)
-      raise ArgumentError if current_user.blank? || context.blank? || lti_registration.blank?
+      raise ArgumentError if context.blank? || lti_registration.blank?
 
       old_registration_values = lti_registration.current_tracked_attributes
       old_internal_config = Schemas::InternalLtiConfiguration.to_sorted(
@@ -116,6 +116,11 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
       diff[:overlay] = overlay_data_diff unless overlay_data_diff.empty?
 
       if diff.present?
+        # If we are saving a diff, we need a current_user who authorized this diff.
+        # The current_user argument is optional if we call this block without eventually
+        # saving a diff.
+        raise ArgumentError if current_user.blank?
+
         # We store a straight snapshot of configs as they were and now are.
         old_configuration = {
           internal_config: old_internal_config,

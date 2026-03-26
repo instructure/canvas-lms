@@ -20,6 +20,6 @@
 module AssignmentVisibility
   module Entities
     # When an assignment is visible to a (student) user
-    AssignmentVisibleToStudent = Struct.new(:course_id, :user_id, :assignment_id, keyword_init: true)
+    AssignmentVisibleToStudent = Struct.new(:course_id, :user_id, :assignment_id)
   end
 end

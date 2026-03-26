@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, element, func, shape, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles/index'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -26,14 +26,14 @@ import {IconFolderLine, IconLtiLine} from '@instructure/ui-icons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {useQuery} from '@apollo/client'
 import React, {useEffect, useState} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TakePhotoUrl from '../../../../images/TakePhoto.svg'
 import {Text} from '@instructure/ui-text'
 import WebcamCapture from './WebcamCapture'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {View} from '@instructure/ui-view'
 
@@ -331,7 +331,6 @@ function MoreOptions({
 
 MoreOptions.propTypes = {
   allowedExtensions: arrayOf(string),
-  breakpoints: breakpointsShape,
   courseID: string.isRequired,
   handleCanvasFiles: func,
   handleWebcamPhotoUpload: func,

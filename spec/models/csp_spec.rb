@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative "../spec_helper"
 
 describe Csp do
   def create_tool(context, attrs)
@@ -77,6 +76,7 @@ describe Csp do
       enable_cache do
         expect(@sub2.csp_enabled?).to be false
         @root.enable_csp!
+        run_jobs
         expect(Account.find(@sub2.id).csp_enabled?).to be true
       end
     end
@@ -88,6 +88,7 @@ describe Csp do
       enable_cache do
         expect(@sub2.csp_enabled?).to be true
         @root.unlock_csp!
+        run_jobs
         expect(Account.find(@sub2.id).csp_enabled?).to be false
       end
     end

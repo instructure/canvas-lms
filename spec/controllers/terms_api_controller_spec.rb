@@ -146,4 +146,50 @@ describe TermsApiController do
       expect(response).to have_http_status :not_found
     end
   end
+
+  context "permission checks" do
+    before(:once) do
+      account_model
+      @admin_user = account_admin_user(account: @account)
+      @term0 = @account.enrollment_terms.create!(name: "term 0")
+      course_with_teacher_and_student_enrolled(account: @account)
+    end
+
+    it "returns json for teachers" do
+      user_session(@teacher)
+      get "index", params: { account_id: @account.id, format: :json }
+
+      expect(response).to be_successful
+      terms = assigns[:terms]
+      expect(terms).to eq @account.enrollment_terms
+    end
+
+    it "renders unauthorized access for teachers" do
+      user_session(@teacher)
+      get "index", params: { account_id: @account.id, format: :html }
+      # render_unauthorized_action => 401 when html format
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "returns 403 for students" do
+      user_session(@student)
+      get "index", params: { account_id: @account.id, format: :json }
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "renders view for admin users" do
+      user_session(@admin_user)
+      get "index", params: { account_id: @account.id, format: :html }
+      expect(response).to be_successful
+    end
+
+    it "returns json for admin users" do
+      user_session(@admin_user)
+      get "index", params: { account_id: @account.id, format: :json }
+      expect(response).to be_successful
+      terms = assigns[:terms]
+      expect(terms).to eq @account.enrollment_terms
+    end
+  end
 end

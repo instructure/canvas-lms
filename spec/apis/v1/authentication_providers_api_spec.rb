@@ -517,6 +517,29 @@ describe "AuthenticationProviders API", type: :request do
       course_with_student(course: @course)
       call_destroy(0, 403)
     end
+
+    context "when provider is on the discovery page" do
+      let(:aac) { @account.authentication_providers.create!(@saml_hash) }
+
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?)
+          .with(:new_login_ui_identity_discovery_page).and_return(true)
+        @account.settings[:discovery_page] = {
+          active: true,
+          primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+          secondary: []
+        }
+        @account.save!
+      end
+
+      it "returns 422" do
+        json = call_destroy(aac.id, 422)
+
+        expect(json["errors"]).to include(match(/remove.*from the discovery page/))
+        expect(aac.reload.workflow_state).to eq("active")
+      end
+    end
   end
 
   describe "sso settings" do

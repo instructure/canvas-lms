@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe NavMenuLinkTabs do
   before :once do
     account_model
@@ -261,6 +259,51 @@ describe NavMenuLinkTabs do
 
       expect(tabs.pluck(:label)).to eq %w[parent1 parent2 child1 child2]
       expect(tabs.pluck(:link_context_type).uniq).to eq ["account"]
+    end
+  end
+
+  describe ".account_tabs" do
+    it "returns tabs for account navigation links" do
+      link1 = NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link 1", url: "https://account1.com")
+      link2 = NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link 2", url: "https://account2.com")
+
+      # Should not be included
+      NavMenuLink.create!(context: @account, course_nav: true, label: "Course Link", url: "https://course.com")
+      NavMenuLink.create!(context: @account, user_nav: true, label: "User Link", url: "https://user.com")
+
+      tabs = NavMenuLinkTabs.account_tabs(@account)
+
+      expect(tabs.length).to eq(2)
+      expect(tabs[0]).to include(
+        id: "nav_menu_link_#{link1.id}",
+        label: "Account Link 1",
+        href: :nav_menu_link_url,
+        external: true,
+        target: "_blank",
+        link_context_type: "account"
+      )
+      expect(tabs[1]).to include(id: "nav_menu_link_#{link2.id}", label: "Account Link 2")
+    end
+
+    it "returns account nav links from the account chain" do
+      parent_account = Account.create!(name: "Parent Account")
+      child_account = Account.create!(name: "Child Account", parent_account:)
+
+      NavMenuLink.create!(context: parent_account, account_nav: true, label: "Parent Link", url: "https://parent.com")
+      NavMenuLink.create!(context: child_account, account_nav: true, label: "Child Link", url: "https://child.com")
+
+      tabs = NavMenuLinkTabs.account_tabs(child_account)
+
+      expect(tabs.pluck(:label)).to include("Parent Link", "Child Link")
+    end
+
+    it "does not include account nav links from unrelated accounts" do
+      other_account = Account.create!(name: "Unrelated Account")
+      NavMenuLink.create!(context: other_account, account_nav: true, label: "Other Link", url: "https://other.com")
+
+      tabs = NavMenuLinkTabs.account_tabs(@account)
+
+      expect(tabs.pluck(:label)).not_to include("Other Link")
     end
   end
 

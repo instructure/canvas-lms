@@ -20,7 +20,7 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import preventDefault from '@canvas/util/preventDefault'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import SwitchEditorControl from '../../react/SwitchEditorControl'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
@@ -201,7 +201,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
     const component = <SwitchEditorControl textarea={this.textArea} />
     const $container = $("<div class='switch-views'></div>")
 
-    ReactDOM.render(component, $container[0])
+    legacyRender(component, $container[0])
     return $container
   },
 

@@ -376,6 +376,7 @@ describe('EditView - Peer Reviews and Configuration Tools', () => {
 
     it('attaches assignment configuration component', () => {
       const view = createEditView()
+
       expect(view.$similarityDetectionTools.children()).toHaveLength(1)
     })
 

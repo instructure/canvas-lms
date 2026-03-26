@@ -19,7 +19,6 @@
 #
 
 require "redis/cluster"
-require "spec_helper"
 require "timecop"
 
 describe CanvasCache::Redis do

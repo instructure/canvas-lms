@@ -80,7 +80,8 @@ describe CareerController do
             horizon_block_content_editor: false,
             horizon_course_academic_switcher: false,
             horizon_syncable_objects_redesign: false,
-            horizon_help_navigation: false
+            horizon_help_navigation: false,
+            horizon_native_inbox: false
           )
         end
 

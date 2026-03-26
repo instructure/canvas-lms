@@ -85,7 +85,7 @@ const ActionMenuButton = ({
   const name = getName(row)
   const actionLabel = I18n.t('Actions for "%{name}"', {name})
   const {contextType, fileMenuTools} = useFileManagement()
-  const {handleActionButtonRef} = useRowFocus()
+  const {handleActionButtonRef, setRowToFocus} = useRowFocus()
 
   const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
     if (tool.canvas_icon_class) {
@@ -324,7 +324,10 @@ const ActionMenuButton = ({
         <RenameModal
           renamingItem={row}
           isOpen={modalOrTray === 'rename'}
-          onClose={onDismissModalOrTray}
+          onClose={() => {
+            onDismissModalOrTray()
+            setRowToFocus(rowIndex)
+          }}
         />
         <DeleteModal
           open={modalOrTray === 'delete'}

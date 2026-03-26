@@ -32,7 +32,7 @@ import '@instructure/date-js' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import ReactDOM from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import ReportDescription from '@canvas/account_reports/react/ReportDescription'
 import RunReportForm from '@canvas/account_reports/react/RunReportForm'
 import RQDModal from '../react/components/RQDModal'
@@ -53,13 +53,23 @@ export function openReportDescriptionLink(event) {
   event.preventDefault()
 
   const closeModal = () => {
-    descRoot.render(null)
+    rerender(descRoot, null)
   }
   const title = $(this).parents('.title').find('span.title').text()
   const desc = $(this).parent('.reports').find('.report_description').html()
 
-  if (descMount && descRoot) {
-    descRoot.render(<ReportDescription title={title} descHTML={desc} closeModal={closeModal} />)
+  if (descMount) {
+    if (!descRoot) {
+      descRoot = render(
+        <ReportDescription title={title} descHTML={desc} closeModal={closeModal} />,
+        descMount,
+      )
+    } else {
+      rerender(
+        descRoot,
+        <ReportDescription title={title} descHTML={desc} closeModal={closeModal} />,
+      )
+    }
   }
 }
 
@@ -79,21 +89,12 @@ ready(function () {
   // for RQD popup (behind FF)
   const rqdMount = document.getElementById('rqd_mount')
   let rqdRoot
-  if (rqdMount) {
-    rqdRoot = ReactDOM.createRoot(rqdMount)
-  }
   // for open registration warning (renders based on auth providers)
   const openRegMount = document.getElementById('open_registration_mount')
   let openRegRoot
-  if (openRegMount) {
-    openRegRoot = ReactDOM.createRoot(openRegMount)
-  }
   // for service description modals (always in settings)
   const serviceMount = document.getElementById('service_mount')
   let serviceRoot
-  if (serviceMount) {
-    serviceRoot = ReactDOM.createRoot(serviceMount)
-  }
 
   function checkFutureListingSetting() {
     if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
@@ -179,9 +180,9 @@ ready(function () {
         try {
           $('#tab-reports-mount').html(html)
           descMount = document.getElementById('report_desc_mount')
-          descRoot = ReactDOM.createRoot(descMount)
+          descRoot = null
           reportMount = document.getElementById('run_report_mount')
-          reportRoot = ReactDOM.createRoot(reportMount)
+          reportRoot = null
 
           $('.open_report_description_link').click(openReportDescriptionLink)
           $('.run_report_link').click(function (clickEvent) {
@@ -220,9 +221,9 @@ ready(function () {
             const path = reportCell.find('.report_dialog form').attr('action')
             const html = reportCell.find('.report_dialog').html()
 
-            const closeModal = () => reportRoot.render(null)
+            const closeModal = () => rerender(reportRoot, null)
             const onSuccess = ({report}) => {
-              reportRoot.render(null)
+              rerender(reportRoot, null)
               $(`#${report}`)
                 .find('.run_report_link')
                 .hide()
@@ -237,15 +238,29 @@ ready(function () {
               nextRow.find('button.open_report_description_link').focus()
             }
 
-            reportRoot.render(
-              <RunReportForm
-                formHTML={html}
-                closeModal={closeModal}
-                onSuccess={onSuccess}
-                path={path}
-                reportName={reportName}
-              />,
-            )
+            if (!reportRoot) {
+              reportRoot = render(
+                <RunReportForm
+                  formHTML={html}
+                  closeModal={closeModal}
+                  onSuccess={onSuccess}
+                  path={path}
+                  reportName={reportName}
+                />,
+                reportMount,
+              )
+            } else {
+              rerender(
+                reportRoot,
+                <RunReportForm
+                  formHTML={html}
+                  closeModal={closeModal}
+                  onSuccess={onSuccess}
+                  path={path}
+                  reportName={reportName}
+                />,
+              )
+            }
           })
         } catch {
           $('#tab-reports-mount').text(I18n.t('There are no reports for you to view.'))
@@ -292,21 +307,32 @@ ready(function () {
     event.preventDefault()
 
     const closeModal = () => {
-      rqdRoot.render(null)
+      rerender(rqdRoot, null)
     }
 
-    rqdRoot.render(<RQDModal closeModal={closeModal} />)
+    if (!rqdRoot) {
+      rqdRoot = render(<RQDModal closeModal={closeModal} />, rqdMount)
+    } else {
+      rerender(rqdRoot, <RQDModal closeModal={closeModal} />)
+    }
   })
 
   $('.open_registration_delegated_warning_btn').click(event => {
     event.preventDefault()
 
     const closeModal = () => {
-      openRegRoot.render(null)
+      rerender(openRegRoot, null)
     }
 
     const loginUrl = $('.open_registration_delegated_warning_btn').data('url')
-    openRegRoot.render(<OpenRegistrationWarning loginUrl={loginUrl} closeModal={closeModal} />)
+    if (!openRegRoot) {
+      openRegRoot = render(
+        <OpenRegistrationWarning loginUrl={loginUrl} closeModal={closeModal} />,
+        openRegMount,
+      )
+    } else {
+      rerender(openRegRoot, <OpenRegistrationWarning loginUrl={loginUrl} closeModal={closeModal} />)
+    }
   })
 
   $('.custom_help_link .delete').click(function (event) {
@@ -441,16 +467,28 @@ ready(function () {
         event.preventDefault()
 
         const closeModal = () => {
-          serviceRoot.render(null)
+          rerender(serviceRoot, null)
         }
 
-        serviceRoot.render(
-          <ServiceDescriptionModal
-            descHTML={descHTML}
-            serviceTitle={serviceTitle}
-            closeModal={closeModal}
-          />,
-        )
+        if (!serviceRoot) {
+          serviceRoot = render(
+            <ServiceDescriptionModal
+              descHTML={descHTML}
+              serviceTitle={serviceTitle}
+              closeModal={closeModal}
+            />,
+            serviceMount,
+          )
+        } else {
+          rerender(
+            serviceRoot,
+            <ServiceDescriptionModal
+              descHTML={descHTML}
+              serviceTitle={serviceTitle}
+              closeModal={closeModal}
+            />,
+          )
+        }
       })
       .appendTo('label[for="account_services_' + serviceName + '"]')
   })

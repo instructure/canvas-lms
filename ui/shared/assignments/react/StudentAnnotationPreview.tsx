@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {View} from '@instructure/ui-view'
 import {Submission} from './AssignmentsPeerReviewsStudentTypes'

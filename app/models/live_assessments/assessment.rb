@@ -19,7 +19,7 @@
 #
 
 module LiveAssessments
-  class Assessment < ActiveRecord::Base
+  class Assessment < ApplicationRecord
     belongs_to :context, polymorphic: [:course]
     has_many :submissions, class_name: "LiveAssessments::Submission"
     has_many :results, class_name: "LiveAssessments::Result"

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import * as canvasReact from '@canvas/react'
 import PostPolicies from '../index'
 import SpeedGraderHelpers from '../../../jquery/speed_grader_helpers'
 
@@ -78,13 +79,15 @@ describe('SpeedGrader PostPolicies', () => {
 
   describe('#destroy', () => {
     test('unmounts the "Hide Assignment Grades" tray', () => {
+      const spy = vi.spyOn(canvasReact, 'legacyUnmountComponentAtNode')
       postPolicies.destroy()
-      strictEqual(postPolicies._hideRoot, null)
+      expect(spy).toHaveBeenCalledWith($hideTrayMountPoint)
     })
 
     test('unmounts the "Post Assignment Grades" tray', () => {
+      const spy = vi.spyOn(canvasReact, 'legacyUnmountComponentAtNode')
       postPolicies.destroy()
-      strictEqual(postPolicies._postRoot, null)
+      expect(spy).toHaveBeenCalledWith($postTrayMountPoint)
     })
   })
 

@@ -17,7 +17,7 @@
  */
 
 import {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
-import type {Breakpoints} from '@canvas/with-breakpoints'
+import type {Breakpoints} from '@instructure/platform-with-breakpoints'
 import type {SyntheticEvent} from 'react'
 
 export interface BaseDateDetails {

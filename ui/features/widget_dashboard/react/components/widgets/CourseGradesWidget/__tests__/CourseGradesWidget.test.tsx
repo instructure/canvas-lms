@@ -26,7 +26,7 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import * as useWidgetConfigModule from '../../../../hooks/useWidgetConfig'
@@ -93,15 +93,17 @@ const setup = (
   })
   const defaultProps = buildDefaultProps(props)
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <CourseGradesWidget {...defaultProps} />
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <CourseGradesWidget {...defaultProps} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 

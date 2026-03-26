@@ -36,6 +36,49 @@ def uploadCacheImages(includeWebpackCache = true) {
   sh(script: cacheScript, label: 'upload cache images')
 }
 
+def mirrorToStarlord() {
+  def isSuccess = currentBuild.currentResult == 'SUCCESS'
+  def isChangeMerged = configuration.isChangeMerged()
+
+  // Each entry is [sourceLocalImage, targetStarlordImage]
+  def alwaysImages = [
+    [env.PATCHSET_TAG,
+     env.PATCHSET_TAG.replace(configuration.buildRegistryPath(), configuration.starlordRegistryPath())],
+    [env.PATCHSET_TAG,
+     env.EXTERNAL_TAG.replace(configuration.buildRegistryPath(), configuration.starlordRegistryPath())],
+    [env.DYNAMODB_IMAGE_TAG,
+     env.DYNAMODB_IMAGE_TAG.replace(configuration.buildRegistryPath('dynamodb-migrations'), configuration.starlordRegistryPath('dynamodb-migrations'))],
+    [env.POSTGRES_IMAGE_TAG,
+     env.POSTGRES_IMAGE_TAG.replace(configuration.buildRegistryPath('postgres-migrations'), configuration.starlordRegistryPath('postgres-migrations'))],
+    [env.KARMA_RUNNER_IMAGE,
+     env.KARMA_RUNNER_IMAGE.replace(configuration.buildRegistryPath('karma-runner'), configuration.starlordRegistryPath('karma-runner'))],
+  ]
+
+  def mergeImages = (isChangeMerged && isSuccess) ? [
+    [env.PATCHSET_TAG,
+     env.MERGE_TAG.replace(configuration.buildRegistryPath(), configuration.starlordRegistryPath())],
+    [env.DYNAMODB_IMAGE_TAG,
+     env.DYNAMODB_MERGE_IMAGE.replace(configuration.buildRegistryPath('dynamodb-migrations'), configuration.starlordRegistryPath('dynamodb-migrations'))],
+    [env.POSTGRES_IMAGE_TAG,
+     env.POSTGRES_MERGE_IMAGE.replace(configuration.buildRegistryPath('postgres-migrations'), configuration.starlordRegistryPath('postgres-migrations'))],
+    [env.KARMA_RUNNER_IMAGE,
+     env.KARMA_MERGE_IMAGE.replace(configuration.buildRegistryPath('karma-runner'), configuration.starlordRegistryPath('karma-runner'))],
+  ] : []
+
+  (alwaysImages + mergeImages).each { pair ->
+    def localImage = pair[0]
+    def starlordImage = pair[1]
+    def tagged = sh(label: "tag ${localImage} as ${starlordImage}", script: "docker tag '${localImage}' '${starlordImage}'", returnStatus: true) == 0
+    if (!tagged) {
+      return
+    }
+
+    credentials.withStarlordCredentials {
+      sh(label: "push ${starlordImage} to starlord", script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push '${starlordImage}' || true")
+    }
+  }
+}
+
 def getPinnedGitHubGems() {
   return commitMessageFlag("pin-github-gems") as String
 }
@@ -107,36 +150,32 @@ def slackSendCacheBuild(block) {
 }
 
 def jsImage() {
-  credentials.withStarlordCredentials {
-    try {
-      def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+  try {
+    def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
-      withEnv([
-        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-        "CACHE_SAVE_SCOPE=${cacheScope}",
-        "PATCHSET_TAG=${env.PATCHSET_TAG}",
-        "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-        "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
-        "CRYSTALBALL_MAP=${env.CRYSTALBALL_MAP}"
-      ]) {
-        sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
-      }
-
-      sh """
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
-      """
-    } catch (e) {
-      handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
+    withEnv([
+      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+      "CACHE_SAVE_SCOPE=${cacheScope}",
+      "PATCHSET_TAG=${env.PATCHSET_TAG}",
+      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
+      "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
+      "CRYSTALBALL_MAP=${env.CRYSTALBALL_MAP}"
+    ]) {
+      sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
     }
+
+    sh """
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
+    """
+  } catch (e) {
+    handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
   }
 }
 
 def lintersImage() {
-  credentials.withStarlordCredentials {
-    sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
-    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push -a $LINTERS_RUNNER_PREFIX'
-  }
+  sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
+  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push -a $LINTERS_RUNNER_PREFIX'
 }
 
 def preloadCacheImagesAsync() {
@@ -144,7 +183,7 @@ def preloadCacheImagesAsync() {
   libraryScript.load('bash/docker-with-flakey-network-protection.sh', '/tmp/docker-with-flakey-network-protection.sh')
 
   sh """#!/bin/bash
-    /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.5.2 &
+    /tmp/docker-with-flakey-network-protection.sh pull 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/docker/dockerfile:1.5.2 &
     {
       /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}
       /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_BUILDER_PREFIX}:${getFuzzyTagSuffix()}
@@ -154,7 +193,6 @@ def preloadCacheImagesAsync() {
 }
 
 def premergeCacheImage() {
-  credentials.withStarlordCredentials {
     withEnv([
       "BASE_RUNNER_PREFIX=${env.BASE_RUNNER_PREFIX}",
       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
@@ -187,11 +225,9 @@ def premergeCacheImage() {
       // has changed between the post-merge build and this pre-merge build.
       uploadCacheImages(true)
     }
-  }
 }
 
 def patchsetImage(asyncStepsStr = '', platformSuffix = '') {
-  credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
     def readBuildCache = configuration.isChangeMerged() ? 0 : 1
     def webpackAssetsFuzzyTag = configuration.isChangeMerged() ? "" : "${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}"
@@ -243,7 +279,6 @@ def patchsetImage(asyncStepsStr = '', platformSuffix = '') {
     }
 
     uploadCacheImages(false)
-  }
 }
 
 def i18nExtract() {

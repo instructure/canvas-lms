@@ -570,4 +570,118 @@ describe "assignments" do
       expect(todo_link["href"]).to include("/peer_reviews")
     end
   end
+
+  context "graded peer reviews" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment = @course.assignments.create!(
+        title: "Assignment with Graded Peer Reviews",
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        points_possible: 10
+      )
+      peer_review_model(parent_assignment: @assignment)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "locks peer review settings in legacy mode", priority: "1" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      peer_reviews_checkbox = f("#assignment_peer_reviews")
+      expect(peer_reviews_checkbox).to be_disabled
+
+      expect(f("#content")).to include_text(
+        "Peer review settings cannot be changed for this assignment because it was created with graded peer reviews"
+      )
+
+      expect(element_exists?("#peer_reviews_details")).to be false
+    end
+
+    it "allows editing peer review settings in graded mode", priority: "1" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
+
+      wait_for(method: nil, timeout: 10) do
+        element_exists?("#peer_reviews_allocation_and_grading_details")
+      end
+
+      peer_reviews_checkbox = f("#assignment_peer_reviews_checkbox")
+      expect(peer_reviews_checkbox).not_to be_disabled
+
+      expect(f("#content")).not_to include_text(
+        "Peer review settings cannot be changed for this assignment because it was created with graded peer reviews"
+      )
+    end
+  end
+
+  context "legacy peer reviews" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @legacy_assignment = @course.assignments.create!(
+        title: "Assignment with Legacy Peer Reviews",
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        automatic_peer_reviews: true,
+        peer_review_count: 1,
+        points_possible: 10
+      )
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "allows editing peer review settings in graded mode", priority: "1" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      get "/courses/#{@course.id}/assignments/#{@legacy_assignment.id}/edit"
+      wait_for_ajaximations
+
+      wait_for(method: nil, timeout: 10) do
+        element_exists?("#peer_reviews_allocation_and_grading_details")
+      end
+
+      peer_reviews_checkbox = f("#assignment_peer_reviews_checkbox")
+      expect(peer_reviews_checkbox).not_to be_disabled
+
+      expect(f("#content")).not_to include_text(
+        "Peer review settings cannot be changed for this assignment because it was created with graded peer reviews"
+      )
+
+      reviews_required_input = f("#assignment_peer_reviews_count")
+      expect(reviews_required_input).not_to be_disabled
+      expect(reviews_required_input.attribute("value")).to eq("1")
+    end
+
+    it "allows editing peer review settings in legacy mode", priority: "1" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+
+      get "/courses/#{@course.id}/assignments/#{@legacy_assignment.id}/edit"
+      wait_for_ajaximations
+
+      peer_reviews_checkbox = f("#assignment_peer_reviews")
+      expect(peer_reviews_checkbox).not_to be_disabled
+      expect(peer_reviews_checkbox).to be_selected
+
+      expect(f("#content")).not_to include_text(
+        "Peer review settings cannot be changed for this assignment because it was created with graded peer reviews"
+      )
+
+      expect(element_exists?("#peer_reviews_details")).to be true
+      expect(f("#peer_reviews_details")).to be_displayed
+
+      peer_review_count_input = f("#assignment_peer_review_count")
+      expect(peer_review_count_input).not_to be_disabled
+      expect(peer_review_count_input.attribute("value")).to eq("1")
+    end
+  end
 end

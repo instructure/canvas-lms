@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Login::CanvasHelper do
   describe "#session_timeout_enabled" do
     context "when the sessions plugin is enabled" do

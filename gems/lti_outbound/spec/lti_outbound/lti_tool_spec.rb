@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LtiOutbound::LTITool do
   it_behaves_like "it has a proc attribute setter and getter for", :consumer_key
   it_behaves_like "it has a proc attribute setter and getter for", :privacy_level

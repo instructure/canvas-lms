@@ -1082,6 +1082,11 @@ class AccountsController < ApplicationController
       GuardRail.activate(:secondary) do
         courses = @account.associated_courses.where.not(workflow_state: "deleted")
 
+        if params[:enrollment_term_id]
+          term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+          courses = courses.for_term(term)
+        end
+
         stats_table = AccessibilityCourseStatistic.arel_table
         active_issues, resolved_issues = courses
                                          .left_joins(:accessibility_course_statistic)
@@ -1739,6 +1744,7 @@ class AccountsController < ApplicationController
 
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
+    search_as_subaccount = !@account.root_account.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
     mutation_logging = @account.feature_enabled?(:mutation_audit_log) &&
                        @account.grants_right?(@current_user, :manage_account_settings)
@@ -1746,6 +1752,7 @@ class AccountsController < ApplicationController
       logging = {
         authentication: authentication_logging,
         grade_change: grade_change_logging,
+        grade_change_search_as_subaccount: search_as_subaccount,
         course: course_logging,
         mutation: mutation_logging,
       }
@@ -2030,6 +2037,12 @@ class AccountsController < ApplicationController
   def sis_import
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
+
+      is_site_admin = Account.site_admin.grants_right?(@current_user, :read) &&
+                      !@account.account_users.active.where(user_id: @current_user).exists?
+      js_env({
+               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin
+             })
 
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order(created_at: :desc).first

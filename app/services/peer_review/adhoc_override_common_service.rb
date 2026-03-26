@@ -72,17 +72,17 @@ class PeerReview::AdhocOverrideCommonService < ApplicationService
       .where(set_type: AssignmentOverride::SET_TYPE_ADHOC)
       .where(
         id: AssignmentOverrideStudent
-          .active
-          .select(:assignment_override_id)
-          .where(user_id: normalized_student_ids)
-          .group(:assignment_override_id)
-          .having("COUNT(DISTINCT user_id) = ?", normalized_student_ids.length)
+            .active
+            .select(:assignment_override_id)
+            .where(user_id: normalized_student_ids)
+            .group(:assignment_override_id)
+            .having("COUNT(DISTINCT user_id) = ?", normalized_student_ids.length)
       )
       .where.not(
         id: AssignmentOverrideStudent
-          .active
-          .select(:assignment_override_id)
-          .where.not(user_id: normalized_student_ids)
+            .active
+            .select(:assignment_override_id)
+            .where.not(user_id: normalized_student_ids)
       )
       .first
   end

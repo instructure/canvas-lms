@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import ModuleDuplicationSpinner from '../react/ModuleDuplicationSpinner'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
@@ -55,7 +55,6 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import ExternalAppsMenuTray from '@canvas/external-apps/react/components/ExternalAppsMenuTray'
 import {PeerReviewInfo} from '@canvas/assignments/react/PeerReviewInfo'
-import {render} from '@canvas/react'
 import {captureException} from '@sentry/browser'
 import {
   initPublishButton,
@@ -936,8 +935,7 @@ const renderDifferentiatedModulesTray = (
 ) => {
   const container = document.getElementById('differentiated-modules-mount-point')
   if (container.reactRoot) container.reactRoot.unmount()
-  container.reactRoot = createRoot(container)
-  container.reactRoot.render(
+  container.reactRoot = render(
     <DifferentiatedModulesTray
       onDismiss={() => {
         container.reactRoot.unmount()
@@ -948,6 +946,7 @@ const renderDifferentiatedModulesTray = (
       courseId={ENV.COURSE_ID ?? ''}
       {...settingsProps}
     />,
+    container,
   )
 }
 
@@ -1060,16 +1059,18 @@ const updatePublishMenuDisabledState = function (disabled) {
       const $publishMenu = $(publishMenu)
       $publishMenu.data('disabled', disabled)
 
-      if (!publishMenu.reactRoot) {
-        publishMenu.reactRoot = createRoot(publishMenu)
-      }
-      publishMenu.reactRoot.render(
+      const menuElement = (
         <ContextModulesPublishMenu
           courseId={$publishMenu.data('courseId')}
           runningProgressId={$publishMenu.data('progressId')}
           disabled={disabled}
-        />,
+        />
       )
+      if (!publishMenu.reactRoot) {
+        publishMenu.reactRoot = render(menuElement, publishMenu)
+      } else {
+        rerender(publishMenu.reactRoot, menuElement)
+      }
     }
   }
 }
@@ -1231,9 +1232,10 @@ modules.initModuleManagement = async function (duplicate) {
     const spinnerContainer = $('#temporary-spinner')[0]
     if (spinnerContainer) {
       if (!spinnerContainer.reactRoot) {
-        spinnerContainer.reactRoot = createRoot(spinnerContainer)
+        spinnerContainer.reactRoot = render(spinner, spinnerContainer)
+      } else {
+        rerender(spinnerContainer.reactRoot, spinner)
       }
-      spinnerContainer.reactRoot.render(spinner)
     }
 
     $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
@@ -2367,8 +2369,7 @@ function handleRemoveDueDateInput(itemProps) {
 function renderItemAssignToTray(open, returnFocusTo, itemProps) {
   const container = document.getElementById('differentiated-modules-mount-point')
   if (container.reactRoot) container.reactRoot.unmount()
-  container.reactRoot = createRoot(container)
-  container.reactRoot.render(
+  container.reactRoot = render(
     <ItemAssignToManager
       open={open}
       onClose={() => {
@@ -2389,16 +2390,14 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
       removeDueDateInput={handleRemoveDueDateInput(itemProps)}
       isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
     />,
+    container,
   )
 }
 
 function renderCopyToTray(open, contentSelection, returnFocusTo) {
   const mountPoint = document.getElementById('direct-share-mount-point')
   if (!mountPoint) return
-  if (!mountPoint.reactRoot) {
-    mountPoint.reactRoot = createRoot(mountPoint)
-  }
-  mountPoint.reactRoot.render(
+  const element = (
     <DirectShareCourseTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2407,17 +2406,19 @@ function renderCopyToTray(open, contentSelection, returnFocusTo) {
         renderCopyToTray(false, contentSelection, returnFocusTo)
         returnFocusTo.focus()
       }}
-    />,
+    />
   )
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = render(element, mountPoint)
+  } else {
+    rerender(mountPoint.reactRoot, element)
+  }
 }
 
 function renderSendToTray(open, contentSelection, returnFocusTo) {
   const mountPoint = document.getElementById('direct-share-mount-point')
   if (!mountPoint) return
-  if (!mountPoint.reactRoot) {
-    mountPoint.reactRoot = createRoot(mountPoint)
-  }
-  mountPoint.reactRoot.render(
+  const element = (
     <DirectShareUserModal
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2426,17 +2427,19 @@ function renderSendToTray(open, contentSelection, returnFocusTo) {
         renderSendToTray(false, contentSelection, returnFocusTo)
         returnFocusTo.focus()
       }}
-    />,
+    />
   )
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = render(element, mountPoint)
+  } else {
+    rerender(mountPoint.reactRoot, element)
+  }
 }
 
 function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo) {
   const mountPoint = document.getElementById('direct-share-mount-point')
   if (!mountPoint) return
-  if (!mountPoint.reactRoot) {
-    mountPoint.reactRoot = createRoot(mountPoint)
-  }
-  mountPoint.reactRoot.render(
+  const element = (
     <ExternalAppsMenuTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2446,8 +2449,13 @@ function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo)
         renderExternalAppsTray(false, contentSelection, moduleId, returnFocusTo)
         returnFocusTo.focus()
       }}
-    />,
+    />
   )
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = render(element, mountPoint)
+  } else {
+    rerender(mountPoint.reactRoot, element)
+  }
 }
 
 // --------------------------------------------------------
@@ -2774,18 +2782,20 @@ function initContextModules() {
     const root = $('#context-modules-header-root')
     if (!root.length) return
     const mountPoint = root[0]
-    if (!mountPoint.reactRoot) {
-      mountPoint.reactRoot = createRoot(mountPoint)
-    }
-    mountPoint.reactRoot.render(
+    const element = (
       <ContextModulesHeader
         {...root.data('props')}
         expandCollapseAll={{
           onExpandCollapseAll: expandCollapseAllButtonHandler_instui_header,
           anyModuleExpanded,
         }}
-      />,
+      />
     )
+    if (!mountPoint.reactRoot) {
+      mountPoint.reactRoot = render(element, mountPoint)
+    } else {
+      rerender(mountPoint.reactRoot, element)
+    }
   }
 
   $(document).on('click', '.module_copy_to', event => {

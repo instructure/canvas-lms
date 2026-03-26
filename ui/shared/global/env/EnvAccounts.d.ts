@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type EnvAccounts = Partial<EnvAccountsAdminTools>
+export type EnvAccounts = Partial<EnvAccountsAdminTools & EnvAccountsSisImport>
 
 /**
  * From AccountsController#admin_tools
@@ -50,4 +50,11 @@ export interface EnvAccountsAdminTools {
     view_messages: boolean
   }
   BOUNCED_EMAILS_ADMIN_TOOL: boolean
+}
+
+/**
+ * From AccountsController#sis_import
+ */
+export interface EnvAccountsSisImport {
+  SHOW_SITE_ADMIN_CONFIRMATION: boolean
 }

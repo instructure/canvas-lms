@@ -160,6 +160,9 @@ export function createGradebook(
     performance_controls?: any
     gradebook_is_editable?: any
     gradebookGridNode?: HTMLElement
+    post_grades_enhanced_modal?: boolean
+    post_grades_ltis?: any[]
+    [key: string]: any
   } = {},
 ): Gradebook & {
   props: GradebookProps

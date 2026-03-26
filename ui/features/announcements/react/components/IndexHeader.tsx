@@ -32,7 +32,7 @@ import propTypes from '../propTypes'
 import select from '@canvas/obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 import {SearchField} from '@canvas/discussions/react/components/SearchField'
 import {ActionDropDown} from '@canvas/announcements/react/components/ActionDropDown'
@@ -55,7 +55,6 @@ const getFilters = () => ({
 
 export default class IndexHeader extends Component {
   static propTypes = {
-    breakpoints: breakpointsShape.isRequired,
     contextType: string,
     contextId: string,
     isBusy: bool,

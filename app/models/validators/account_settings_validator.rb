@@ -22,10 +22,14 @@ module Validators
   class AccountSettingsValidator < ActiveModel::Validator
     DISCOVERY_PAGE_REQUIRED_KEYS = %i[authentication_provider_id label].freeze
     DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon].freeze
+    DISCOVERY_PAGE_LABEL_MAX_LENGTH = 255
+
     DISCOVERY_PAGE_ICON_VALUES = %w[
       apple
       auth0
+      canvas
       classlink
+      clever
       default
       facebook
       github
@@ -79,10 +83,20 @@ module Validators
         end
       end
 
+      validate_discovery_page_label(record, section, entry[:label], index)
+
       return unless entry[:icon].present?
 
       unless DISCOVERY_PAGE_ICON_VALUES.include?(entry[:icon])
         record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon must be one of: #{DISCOVERY_PAGE_ICON_VALUES.join(", ")}")
+      end
+    end
+
+    def validate_discovery_page_label(record, section, label, index)
+      return if label.blank?
+
+      if label.length > DISCOVERY_PAGE_LABEL_MAX_LENGTH
+        record.errors.add(:settings, "discovery_page.#{section}[#{index}].label must be #{DISCOVERY_PAGE_LABEL_MAX_LENGTH} characters or fewer")
       end
     end
   end

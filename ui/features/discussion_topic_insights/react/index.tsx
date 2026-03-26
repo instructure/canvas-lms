@@ -19,16 +19,16 @@ import React, {useState, useEffect} from 'react'
 import DiscussionInsightsPage from './DiscussionInsightsPage'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import _AlertManager from '@canvas/alerts/react/AlertManager'
 
 // WithBreakpoints HOC incorrectly requires breakpoints in consumer type
 // @ts-expect-error - breakpoints is injected by the HOC, not by consumers
 const AlertManager: React.ComponentType<React.PropsWithChildren<{}>> = _AlertManager
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {ApolloClient, InMemoryCache} from '@apollo/client'
 
 const I18n = createI18nScope('discussion_insights')

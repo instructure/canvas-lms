@@ -122,7 +122,7 @@ describe "oauth2 flow" do
       redirect_uri = "http://www.example.com&scopes=/auth/userinfo"
       get "/login/oauth2/auth?response_type=code&client_id=#{expiring_key.id}&redirect_uri=#{redirect_uri}"
       f("#remember_access").click
-      f("input[type=submit]").click
+      f("input[type=submit].Button--primary").click
       f("body") # wait until the redirect page loads
 
       code = driver.current_url.match(/code=([^?&]+)/)[1]

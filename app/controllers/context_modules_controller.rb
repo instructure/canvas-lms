@@ -43,13 +43,14 @@ class ContextModulesController < ApplicationController
 
     def load_module_file_details
       attachment_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).where(content_type: "Attachment").preload(content: :folder).to_a }
-      attachment_tags.each_with_object({}) do |file_tag, items|
-        items[file_tag.id] = {
-          id: file_tag.id,
-          content_id: file_tag.content_id,
-          content_details: content_details(file_tag, @current_user, for_admin: true),
-          module_id: file_tag.context_module_id
-        }
+      attachment_tags.to_h do |file_tag|
+        [file_tag.id,
+         {
+           id: file_tag.id,
+           content_id: file_tag.content_id,
+           content_details: content_details(file_tag, @current_user, for_admin: true),
+           module_id: file_tag.context_module_id
+         }]
       end
     end
 
@@ -364,9 +365,9 @@ class ContextModulesController < ApplicationController
                      OBSERVER_OPTIONS: {
                        OBSERVED_USERS_LIST: observed_users_list,
                        CAN_ADD_OBSERVEE: @current_user
-                                               .profile
-                                               .tabs_available(@current_user, root_account: @domain_root_account)
-                                               .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                                         .profile
+                                         .tabs_available(@current_user, root_account: @domain_root_account)
+                                         .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
                      }
                    })
           end
@@ -1216,7 +1217,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       if params[:publish]
         @module.publish
-        @module.publish_items!
+        @module.publish_items!(user: @current_user)
       elsif params[:unpublish]
         @module.unpublish
       end

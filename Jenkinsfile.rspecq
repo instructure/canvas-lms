@@ -26,7 +26,7 @@ commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFl
 @groovy.transform.Field
 def rspecqNodeTotal = 50
 @groovy.transform.Field
-def rspecqTargetTime = 180
+def rspecqTargetTime = 240
 @groovy.transform.Field
 def summaryMessage = ''
 @groovy.transform.Field
@@ -72,60 +72,103 @@ def computeTestCountNecessary() {
 }
 
 def computeTestCount() {
-  credentials.withStarlordCredentials { ->
-    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-  }
+  def nodeHardCap = rspecqNodeTotal
 
-  sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
+  // Write spec paths one per line. xargs batches them into RPUSH calls of 100
+  // at a time, avoiding ARG_MAX while keeping the number of redis-cli invocations low.
+  def specListKey = "speclist_${env.BUILD_NUMBER}"
+  writeFile(file: 'build/new-jenkins/spec_list.txt', text: specUnique.join('\n'))
 
-  sh(script: "docker compose exec -T canvas bundle exec rspec --dry-run \
-                                      --require './spec/formatters/node_count_formatter.rb' \
-                                      --format NodeCountRecorder \
-                                      --out formatter_out.txt --pattern ${specUnique.join(',')}", label: 'Get Node Count')
+  def timingsRaw = sh(script: """#!/usr/bin/env bash
+    set -e
 
-  def formatterResult = sh(script: 'docker compose exec -T canvas cat formatter_out.txt', returnStdout: true).trim().split(" ")
+    docker run \\
+      -e TEST_QUEUE_HOST \\
+      -v \$(pwd)/build/new-jenkins/spec_list.txt:/spec_list.txt \\
+      -v \$(pwd)/build/new-jenkins/sumtimings.lua:/sumtimings.lua \\
+      --rm \\
+      948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/library/redis:alpine /bin/sh -c '
+        redis-cli -h \$TEST_QUEUE_HOST -p 6379 DEL "${specListKey}" > /dev/null 2>&1
+        cat /spec_list.txt | xargs -n 100 redis-cli -h \$TEST_QUEUE_HOST -p 6379 RPUSH "${specListKey}" > /dev/null 2>&1
+        redis-cli -h \$TEST_QUEUE_HOST -p 6379 EXPIRE "${specListKey}" 3600 > /dev/null 2>&1
+        redis-cli --raw -h \$TEST_QUEUE_HOST -p 6379 --eval /sumtimings.lua "${specListKey}" timings ,
+        redis-cli -h \$TEST_QUEUE_HOST -p 6379 DEL "${specListKey}" > /dev/null 2>&1
+      '
+  """, returnStdout: true).trim()
 
-  def nodeTotal = formatterResult[0].toInteger()
-  def specTotal = formatterResult[1].toInteger()
+  def timingsBased = false
 
-  summaryMessage += "${specTotal} specs across ${specUnique.size()} files using ${nodeTotal} nodes"
+  if (timingsRaw) {
+    try {
+      // Strip outer quotes that some redis-cli versions add around bulk string replies
+      def jsonText = (timingsRaw.startsWith('"') && timingsRaw.endsWith('"'))
+        ? timingsRaw[1..-2]
+        : timingsRaw
+      def timings = readJSON(text: jsonText)
+      def totalTime = timings.total_time as Double
+      def foundCount = timings.found_keys as Integer     // Redis keys — for time estimate
+      def foundEntries = timings.found_entries as Integer // spec entries — for coverage %
+      def missingSpecs = timings.missing.collect { it as String }
+      def coveragePct = (specUnique.size() > 0 ? (foundEntries * 100.0 / specUnique.size()) : 0) as Double
 
-  echo "=== Prediction Summary ===\n${summaryMessage}\n${specUnique.join('\n')}"
+      echo "=== Timing coverage: ${foundEntries}/${specUnique.size()} (${Math.round(coveragePct)}%), ${missingSpecs.size()} missing ==="
+      if (missingSpecs) {
+        def preview = missingSpecs.take(20)
+        def suffix = missingSpecs.size() > 20 ? " ... (${missingSpecs.size() - 20} more)" : ""
+        echo "=== No timing data for: ${preview.join(', ')}${suffix} ==="
+      }
 
-  crystalballColor = nodeTotal > rspecqNodeTotal ? 'warning' : 'good'
-  rspecqNodeTotal = nodeTotal > rspecqNodeTotal ? rspecqNodeTotal : nodeTotal
+      if (coveragePct >= 50 && totalTime > 0) {
+        if (missingSpecs && foundCount > 0) {
+          def estimatedExtra = (totalTime / foundCount) * missingSpecs.size()
+          echo "=== Estimating ${Math.round(estimatedExtra)}s for ${missingSpecs.size()} untracked files ==="
+          totalTime += estimatedExtra
+        }
 
-  def jqAddCommand = []
+        def bufferFactor = 1.15 // 15% buffer to account for variability and imperfect estimation
+        def newNodeTotal = (int) Math.ceil(totalTime * bufferFactor / (rspecqTargetTime * env.RSPEC_PROCESSES.toInteger()))
+        echo "=== Timing-based: ${Math.round(totalTime)}s → ${newNodeTotal} nodes ==="
 
-  specUnique.each { x ->
-    def globMatcher = x =~ /^(.+)\*spec\.rb$/
-    if (globMatcher.matches()) {
-      jqAddCommand.add("([with_entries(select(.key | match(\"${globMatcher.group(1)}\"))) | to_entries[] | .value] | add)")
-    } else {
-      jqAddCommand.add(".[\"./${x}\"]")
+        crystalballColor = newNodeTotal > nodeHardCap ? 'warning' : 'good'
+        rspecqNodeTotal = Math.min(newNodeTotal, nodeHardCap)
+        summaryMessage += "${specUnique.size()} files using ${rspecqNodeTotal} nodes (timing-based)"
+        timingsBased = true
+      }
+    } catch (e) {
+      echo "=== Failed to parse timing result: ${e.message} ==="
+      echo "=== Timing raw: ${timingsRaw} ==="
     }
   }
 
-  def specTimings = sh(script: """#!/usr/bin/env bash
-    set -ex
+  if (!timingsBased) {
+    // No timing data, parse failure, or coverage < 50% — fall back to spec count via dry-run
+    echo "=== Timing coverage insufficient, falling back to dry-run ==="
+    try {
+      sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+      sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 
-    docker run \
-      -e TEST_QUEUE_HOST \
-      -v \$(pwd)/build/new-jenkins/iterscores.lua:/iterscores.lua \
-      -t \
-      --rm \
-      $REGISTRY_BASE/redis:alpine /bin/sh -c 'redis-cli -h $TEST_QUEUE_HOST -p 6379 --eval /iterscores.lua' | jq 'fromjson | ${jqAddCommand.join(' + ')}'
-  """, returnStdout: true)
+      sh(script: "docker compose exec -T canvas bundle exec rspec --dry-run \
+                                          --require './spec/formatters/node_count_formatter.rb' \
+                                          --format NodeCountRecorder \
+                                          --out formatter_out.txt --pattern ${specUnique.join(',')}", label: 'Get Node Count')
 
-  if (specTimings && specTimings.isNumber()) {
-    echo "=== Total Spec Time $specTimings"
+      def rawResult = sh(script: 'docker compose exec -T canvas cat formatter_out.txt', returnStdout: true).trim()
+      def parts = rawResult.split(' ')
+      if (parts.size() < 2 || !parts[0].isInteger() || !parts[1].isInteger()) {
+        error("Unexpected formatter output: '${rawResult}'")
+      }
+      def nodeTotal = parts[0].toInteger()
+      def specTotal = parts[1].toInteger()
 
-    def newNodeTotal = Math.ceil(specTimings.toFloat() / (rspecqTargetTime * env.RSPEC_PROCESSES.toInteger()))
-
-    summaryMessage += " (new: ${newNodeTotal})"
-  } else {
-    echo "=== No Spec Timings Found! ==="
+      crystalballColor = nodeTotal > nodeHardCap ? 'warning' : 'good'
+      rspecqNodeTotal = Math.min(nodeTotal, nodeHardCap)
+      summaryMessage += "${specTotal} specs across ${specUnique.size()} files using ${rspecqNodeTotal} nodes (dry-run)"
+    } catch (e) {
+      echo "=== Dry-run failed: ${e.message} — using default node count (${rspecqNodeTotal}) ==="
+    }
   }
+
+  echo "=== Prediction Summary ===\n${summaryMessage}\n${specUnique.join('\n')}"
 }
 
 def sendRspecqSlack(status) {
@@ -141,7 +184,7 @@ def sendCrystalballSlack(summary, color, status) {
 }
 
 def sendCrystalballMetrics() {
-    def queueInfo = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+    def queueInfo = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/library/redis:alpine /bin/sh -c '\
                                           redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}:example_count;\
                                           redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}:build_time'", returnStdout: true).split('\n')
     def exampleCount = queueInfo[0].replaceAll('"', '').trim()
@@ -159,7 +202,7 @@ def redisUrl() {
   return "redis://${env.TEST_QUEUE_HOST}:6379"
 }
 
-env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
+env.REGISTRY_BASE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/canvas-builds'
 env.COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
 env.COMPOSE_PROJECT_NAME = 'test-queue'
 env.FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
@@ -169,7 +212,6 @@ env.RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold
 env.RSPECQ_WORKER_LIVENESS_SEC = commitMessageFlag('worker-liveness-sec').asType(Integer)
 env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
 env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
-env.EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
 env.RSPECQ_UPDATE_TIMINGS = "${env.RSPECQ_UPDATE_TIMINGS}"
 env.ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
 env.POSTGRES_PASSWORD = 'sekret'

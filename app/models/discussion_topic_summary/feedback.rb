@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class DiscussionTopicSummary
-  class Feedback < ActiveRecord::Base
+  class Feedback < ApplicationRecord
     belongs_to :root_account, class_name: "Account"
     belongs_to :discussion_topic_summary, inverse_of: :feedback
     belongs_to :user

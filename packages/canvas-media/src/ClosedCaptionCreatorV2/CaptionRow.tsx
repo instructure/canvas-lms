@@ -46,6 +46,7 @@ interface FailedCaptionRowProps extends BaseCaptionRowProps {
   workflow_state: 'failed'
   errorMessage?: string
   onRetry?: () => void
+  onDelete?: () => void
 }
 
 /**
@@ -53,8 +54,9 @@ interface FailedCaptionRowProps extends BaseCaptionRowProps {
  */
 interface UploadedCaptionRowProps extends BaseCaptionRowProps {
   workflow_state: 'ready'
-  onDownload?: () => void
-  onDelete: () => void
+  filename?: string
+  url?: string
+  onDelete?: () => void
   isInherited?: boolean
 }
 
@@ -118,24 +120,36 @@ export function CaptionRow(props: CaptionRowProps) {
                   <IconRefreshLine />
                 </IconButton>
               )}
+              {props.onDelete && (
+                <IconButton
+                  screenReaderLabel={formatMessage(DELETE_CAPTIONS_MESSAGE, {
+                    captionName: props.captionName,
+                  })}
+                  onClick={props.onDelete}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  <IconTrashLine />
+                </IconButton>
+              )}
             </Flex>
           )}
 
           {workflow_state === 'ready' && (
             <Flex alignItems="center" gap="small">
-              {props.onDownload && (
-                <IconButton
-                  screenReaderLabel={formatMessage('Download {captionName}', {
-                    captionName: props.captionName,
-                  })}
-                  onClick={props.onDownload}
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                >
-                  <IconDownloadLine />
-                </IconButton>
-              )}
+              <IconButton
+                screenReaderLabel={formatMessage('Download {captionName}', {
+                  captionName: props.captionName,
+                })}
+                size="small"
+                withBackground={false}
+                withBorder={false}
+                href={props.url}
+                download={props.filename}
+              >
+                <IconDownloadLine />
+              </IconButton>
 
               <IconButton
                 screenReaderLabel={

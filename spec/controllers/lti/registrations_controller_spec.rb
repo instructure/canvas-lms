@@ -926,6 +926,28 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET show (lock_deploying field)", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+
+    let_once(:registration) { lti_registration_model(account:) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+
+    before do
+      account_binding
+      registration.manual_configuration = lti_tool_configuration_model
+    end
+
+    it "includes lock_deploying in the response" do
+      subject
+      expect(response_json).to have_key(:lock_deploying)
+    end
+
+    it "returns lock_deploying: false by default" do
+      subject
+      expect(response_json[:lock_deploying]).to be(false)
+    end
+  end
+
   describe "GET show_by_client_id", type: :request do
     subject { get "/api/v1/accounts/#{account.id}/lti_registration_by_client_id/#{developer_key.id}" }
 
@@ -1128,8 +1150,27 @@ RSpec.describe Lti::RegistrationsController do
 
         it "doesn't let them update the registration" do
           expect { subject }.not_to change { registration.reload.internal_lti_configuration }
-          expect(response).to be_forbidden
+          expect(response).to have_http_status(:bad_request)
+          expect(response.parsed_body["errors"]).to eq("registration does not belong to account")
         end
+      end
+    end
+
+    context "with a root account registration from site admin" do
+      let_once(:root_account) { account_model }
+      let_once(:root_admin) { account_admin_user(account: root_account) }
+      let_once(:sa_admin) { site_admin_user }
+      let_once(:registration) { lti_registration_with_tool(account: root_account, created_by: root_admin) }
+      let(:account) { Account.site_admin }
+
+      before do
+        user_session(sa_admin)
+      end
+
+      it "doesn't let them update the registration" do
+        expect { subject }.not_to change { registration.reload.internal_lti_configuration }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to eq("registration does not belong to account")
       end
     end
 
@@ -1487,6 +1528,25 @@ RSpec.describe Lti::RegistrationsController do
         expect(subject).to be_forbidden
       end
     end
+
+    context "locking a registration" do
+      it "updates lock_deploying to true" do
+        put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}",
+            params: { lock_deploying: true },
+            as: :json
+        expect(response).to be_successful
+        expect(registration.reload.lock_deploying).to be(true)
+      end
+
+      it "updates lock_deploying to false" do
+        registration.update!(lock_deploying: true)
+        put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}",
+            params: { lock_deploying: false },
+            as: :json
+        expect(response).to be_successful
+        expect(registration.reload.lock_deploying).to be(false)
+      end
+    end
   end
 
   describe "PUT reset", type: :request do
@@ -1539,9 +1599,9 @@ RSpec.describe Lti::RegistrationsController do
       let_once(:other_reg) { lti_registration_model(account: Account.site_admin) }
       let_once(:other_ims_registration) { lti_ims_registration_model(lti_registration: other_reg) }
 
-      it "returns 403" do
+      it "returns 400" do
         subject
-        expect(response).to be_forbidden
+        expect(response).to be_bad_request
       end
     end
 
@@ -1992,6 +2052,244 @@ RSpec.describe Lti::RegistrationsController do
           end
         end
       end
+    end
+  end
+
+  describe "GET check_domain_duplicates", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/check_domain_duplicates", params: { domain: } }
+
+    let_once(:account) { account_model }
+    let_once(:admin) { account_admin_user(account:) }
+    let(:domain) { "example.com" }
+    let(:duplicates) { response_json[:duplicates] }
+
+    before { user_session(admin) }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    shared_examples "returns no duplicates" do
+      it "returns empty array" do
+        subject
+        expect(response).to be_successful
+        expect(duplicates).to eq([])
+      end
+    end
+
+    context "domain input edge cases" do
+      context "with blank domain" do
+        let(:domain) { "" }
+
+        it_behaves_like "returns no duplicates"
+      end
+
+      context "with whitespace-only domain" do
+        let(:domain) { "    " }
+
+        it_behaves_like "returns no duplicates"
+      end
+    end
+
+    context "with no matching registrations" do
+      let_once(:registration) { lti_registration_with_tool(account:, configuration_params: { domain: "different.com" }) }
+
+      it_behaves_like "returns no duplicates"
+    end
+
+    context "with matching account-owned registration" do
+      let_once(:registration) { lti_registration_with_tool(account:, configuration_params: { domain: "example.com" }) }
+
+      it "returns the matching registration" do
+        subject
+        expect(duplicates.length).to eq(1)
+        expect(duplicates.first.with_indifferent_access).to include(
+          id: registration.id,
+          name: registration.name,
+          admin_nickname: registration.admin_nickname
+        )
+      end
+
+      it "ignores casing in the domain" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/check_domain_duplicates", params: { domain: domain.upcase }
+        expect(duplicates).to contain_exactly(hash_including("id" => registration.id))
+      end
+
+      it "strips whitespace" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/check_domain_duplicates", params: { domain: "  #{domain}   " }
+        expect(duplicates).to contain_exactly(hash_including("id" => registration.id))
+      end
+    end
+
+    context "with matching IMS registration domain" do
+      let_once(:ims_registration) do
+        lti_ims_registration_model(account:, lti_tool_configuration: { "domain" => "example.com" })
+      end
+
+      it "finds the IMS registration" do
+        subject
+        expect(duplicates).to contain_exactly(hash_including(id: ims_registration.lti_registration.id))
+      end
+    end
+
+    context "with forced-on site admin registration" do
+      let_once(:site_admin_registration) do
+        registration = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+        Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration:, workflow_state: :on)
+        registration
+      end
+
+      it "includes the forced-on site admin registration" do
+        subject
+        expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.id))
+      end
+
+      context "with site admin registration set to off" do
+        before do
+          Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration: site_admin_registration, workflow_state: :off)
+        end
+
+        it_behaves_like "returns no duplicates"
+      end
+
+      context "with site admin registration set to allow" do
+        before do
+          Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration: site_admin_registration, workflow_state: :allow)
+        end
+
+        it_behaves_like "returns no duplicates"
+      end
+    end
+
+    context "with inherited-on registration" do
+      let_once(:parent_registration) do
+        registration = lti_registration_with_tool(account: Account.site_admin, registration_params: { name: "Inherited Tool" }, configuration_params: { domain: })
+        Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration:, workflow_state: :allow)
+        registration
+      end
+
+      before do
+        Lti::AccountBindingService.call(account:, user: admin, registration: parent_registration, workflow_state: :on)
+      end
+
+      it "includes the inherited registration" do
+        subject
+        expect(duplicates).to contain_exactly(hash_including(id: parent_registration.id))
+      end
+
+      context "and the registration is cross-shard" do
+        specs_require_sharding
+
+        let_once(:site_admin_registration) do
+          Shard.default.activate do
+            reg = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+            Lti::AccountBindingService.call(account: Account.site_admin, registration: reg, user: nil, workflow_state: "allow")
+            reg
+          end
+        end
+        let_once(:account) { @shard2.activate { account_model } }
+        let_once(:admin) { @shard2.activate { account_admin_user(account:) } }
+
+        before do
+          user_session(admin)
+          @shard2.activate { Lti::AccountBindingService.call(account:, registration: site_admin_registration, user: admin, workflow_state: "on") }
+        end
+
+        it "finds the inherited on registration and returns its global id" do
+          @shard2.activate { subject }
+          expect(response).to be_successful
+          expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.global_id))
+        end
+
+        # We've been burned by this in the past in the ListRegistrationService, make sure
+        # it doesn't happen here.
+        it "doesn't double count forced-on registration's" do
+          other_reg = Shard.default.activate do
+            r = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+            Lti::AccountBindingService.call(account: Account.site_admin, registration: r, user: nil, workflow_state: "on")
+            r
+          end
+
+          @shard2.activate { subject }
+          expect(response).to be_successful
+          expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.global_id), hash_including(id: other_reg.global_id))
+        end
+      end
+    end
+
+    context "with multiple matching registrations" do
+      before(:once) do
+        3.times do
+          lti_registration_with_tool(account:, configuration_params: { domain: "example.com" })
+        end
+      end
+
+      it "returns all matching registrations" do
+        subject
+        expect(duplicates.length).to eq(3)
+      end
+
+      it "does not return duplicates" do
+        subject
+        returned_ids = duplicates.pluck(:id)
+        expect(returned_ids).to eq(returned_ids.uniq)
+      end
+    end
+
+    context "with cross-shard forced-on site admin registration" do
+      specs_require_sharding
+
+      let_once(:site_admin_registration) do
+        Shard.default.activate do
+          lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+        end
+      end
+      let_once(:account) { @shard2.activate { account_model } }
+      let_once(:admin) { @shard2.activate { account_admin_user(account:) } }
+
+      before { user_session(admin) }
+
+      it "returns the global ID for cross-shard registration" do
+        @shard2.activate { subject }
+        expect(response).to be_successful
+        expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.global_id))
+      end
+    end
+
+    context "with inactive registration" do
+      let_once(:inactive_registration) do
+        registration = lti_registration_with_tool(account:, registration_params: { name: "Inactive Tool" })
+        Lti::AccountBindingService.call(account:, registration:, user: admin, workflow_state: :off)
+        registration
+      end
+
+      it_behaves_like "returns no duplicates"
+    end
+
+    context "with deleted registration" do
+      let_once(:deleted_registration) do
+        reg = lti_registration_model(account:, name: "Deleted Tool")
+        reg.destroy
+        reg
+      end
+
+      it_behaves_like "returns no duplicates"
     end
   end
 
@@ -3107,6 +3405,168 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "GET latest_registration_update_request", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/latest_update_request" }
+
+    let_once(:registration) do
+      ims_reg = lti_ims_registration_model(account:)
+      ims_reg.lti_registration
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "when registration does not belong to account" do
+      let_once(:other_account) { account_model }
+      let_once(:registration) { lti_registration_model(account: other_account) }
+
+      it "returns 400" do
+        subject
+        expect(response).to have_http_status(:bad_request)
+        expect(response_json["errors"]).to eq("registration does not belong to account")
+      end
+    end
+
+    context "when there are no update requests" do
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the most recent update request is pending" do
+      let_once(:update_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account
+        )
+      end
+
+      before { update_request }
+
+      it "returns the most recent pending update request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(update_request.id)
+        expect(response_json["status"]).to eq("pending")
+      end
+    end
+
+    context "when there are multiple pending update requests" do
+      let_once(:older_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 2.hours.ago
+        )
+      end
+      let_once(:newer_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 1.hour.ago
+        )
+      end
+
+      before do
+        older_request
+        newer_request
+      end
+
+      it "returns the most recent pending update request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(newer_request.id)
+        expect(response_json["status"]).to eq("pending")
+      end
+    end
+
+    context "when the most recent update request has been accepted" do
+      let_once(:update_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          accepted_at: 1.hour.ago
+        )
+      end
+
+      before { update_request }
+
+      it "returns the accepted request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(update_request.id)
+        expect(response_json["status"]).to eq("applied")
+      end
+    end
+
+    context "when the most recent update request has been rejected" do
+      let_once(:update_request) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          rejected_at: 1.hour.ago
+        )
+      end
+
+      before { update_request }
+
+      it "returns the rejected request" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(update_request.id)
+        expect(response_json["status"]).to eq("rejected")
+      end
+    end
+
+    context "when there is an older pending request and a newer accepted request" do
+      let_once(:older_pending) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 2.hours.ago
+        )
+      end
+      let_once(:newer_accepted) do
+        lti_ims_registration_update_request_model(
+          lti_registration: registration,
+          root_account: account,
+          created_at: 1.hour.ago,
+          accepted_at: 1.hour.ago
+        )
+      end
+
+      before do
+        older_pending
+        newer_accepted
+      end
+
+      it "returns the most recent (accepted) request, not the older pending one" do
+        subject
+        expect(response).to be_successful
+        expect(response_json["id"]).to eq(newer_accepted.id)
+        expect(response_json["status"]).to eq("applied")
+      end
+    end
+  end
+
   describe "PUT apply_registration_update_request", type: :request do
     subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/update_requests/#{registration_update_request.id}/apply", params:, as: :json }
 
@@ -3166,6 +3626,93 @@ RSpec.describe Lti::RegistrationsController do
         expect(response).to have_http_status(:ok)
         expect(response_json).to include("id" => registration.id)
       end
+
+      context "when it is the most recent pending request" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+
+        before do
+          # Ensure the older request exists
+          older_request
+        end
+
+        it "successfully applies the update" do
+          expect(older_request.reload.pending?).to be true
+
+          subject
+
+          expect(registration_update_request.reload.accepted_at).to be_present
+          expect(older_request.reload.pending?).to be true # Still pending
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when a newer pending request exists" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Ensure the newer request exists
+          newer_request
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
+      end
+
+      context "when a newer request has already been applied" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Mark the newer request as already applied
+          newer_request.update!(accepted_at: Time.current)
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
+      end
     end
 
     context "when accepted is false" do
@@ -3187,6 +3734,93 @@ RSpec.describe Lti::RegistrationsController do
         registration.reload
         expect(registration.name).to eq(original_name)
         expect(registration.updated_at).to eq(original_updated_at)
+      end
+
+      context "when it is the most recent pending request" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+
+        before do
+          # Ensure the older request exists
+          older_request
+        end
+
+        it "successfully rejects the update" do
+          expect(older_request.reload.pending?).to be true
+
+          subject
+
+          expect(registration_update_request.reload.rejected_at).to be_present
+          expect(older_request.reload.pending?).to be true # Still pending
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when a newer pending request exists" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Ensure the newer request exists
+          newer_request
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
+      end
+
+      context "when a newer request has already been applied" do
+        let_once(:older_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: 2.hours.ago
+          )
+        end
+        let_once(:registration_update_request) { older_request }
+        let_once(:newer_request) do
+          lti_ims_registration_update_request_model(
+            lti_registration: registration,
+            root_account: account,
+            created_at: Time.zone.now
+          )
+        end
+
+        before do
+          # Mark the newer request as already applied
+          newer_request.update!(accepted_at: Time.current)
+        end
+
+        it "returns 400 bad request" do
+          subject
+
+          expect(response).to have_http_status(:bad_request)
+          expect(response_json["errors"]).to include("newer update request exists")
+          expect(registration_update_request.reload.pending?).to be true
+        end
       end
     end
 
@@ -3329,6 +3963,35 @@ RSpec.describe Lti::RegistrationsController do
             expect(registration_data["pending_update"]).to be_nil
           end
         end
+
+        context "with older pending request and newer accepted request" do
+          before do
+            # Create an older pending request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 2.hours.ago
+            )
+            # Create a newer accepted request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 1.hour.ago,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false since most recent is accepted" do
+            subject
+            expect(response).to be_successful
+            registration_data = response_data.find { |r| r["id"] == registration.id }
+            expect(registration_data["pending_update"]).to be_nil
+          end
+        end
       end
 
       describe "GET show", type: :request do
@@ -3410,6 +4073,34 @@ RSpec.describe Lti::RegistrationsController do
           end
 
           it "includes pending_update as false" do
+            subject
+            expect(response).to be_successful
+            expect(response_json["pending_update"]).to be_nil
+          end
+        end
+
+        context "with older pending request and newer accepted request" do
+          before do
+            # Create an older pending request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 2.hours.ago
+            )
+            # Create a newer accepted request
+            lti_ims_registration_update_request_model(
+              lti_registration: registration,
+              root_account: account,
+              uuid: SecureRandom.uuid,
+              created_by: admin,
+              created_at: 1.hour.ago,
+              accepted_at: 1.hour.ago
+            )
+          end
+
+          it "includes pending_update as false since most recent is accepted" do
             subject
             expect(response).to be_successful
             expect(response_json["pending_update"]).to be_nil

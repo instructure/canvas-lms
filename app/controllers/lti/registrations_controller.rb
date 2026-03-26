@@ -1105,7 +1105,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
   before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
-  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history]
+  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history check_domain_duplicates]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
   before_action :validate_registration_params, only: %i[create update]
@@ -1279,6 +1279,30 @@ class Lti::RegistrationsController < ApplicationController
     render json: { configuration: }
   end
 
+  # @internal
+  # @API Check for Duplicate Domains
+  # Checks if any existing LTI registrations in the account have the same domain
+  # as the provided domain. This includes registrations owned by the account,
+  # Site Admin registrations forced on, and inherited registrations that are enabled.
+  # This is a utility endpoint for the LTI registration UI to warn administrators
+  # about potential conflicts.
+  #
+  # @argument domain [Required, String] The domain to check for duplicates.
+  #
+  # @returns { duplicates: [{ id: String, name: String, admin_nickname: String | null }] }
+  #
+  # @example_request
+  #
+  #   This would check for duplicate domains
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/check_domain_duplicates?domain=example.com' \
+  #        -H "Authorization: Bearer <token>"
+  def check_domain_duplicates
+    domain = params[:domain]
+    duplicates = Lti::CheckDomainDuplicatesService.call(account: @account, domain:)
+
+    render json: { duplicates: }
+  end
+
   # @API Show an LTI Registration
   # Return details about the specified LTI registration, including the
   # configuration and account binding.
@@ -1308,12 +1332,13 @@ class Lti::RegistrationsController < ApplicationController
       overlay = registration.overlay_for(@context) if includes.include?(:overlay)
 
       # Load pending update information if feature flag is enabled
+      # Only show the most recent update request if it's still pending
       pending_update = nil
       if Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
-        pending_update = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
-                                                       .pending
-                                                       .order(created_at: :desc)
-                                                       .first
+        most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                    .order(created_at: :desc)
+                                                    .first
+        pending_update = most_recent if most_recent&.pending?
       end
 
       render json: lti_registration_json(registration,
@@ -1456,6 +1481,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument workflow_state [String, "on" | "off" | "allow"]
   #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
   # @argument comment [String | nil] A comment explaining why this change was made. Cannot exceed 2000 characters.
+  # @argument lock_deploying [Boolean] When true, no new deployments of this registration can be created.
   #
   # @example_request
   #
@@ -1488,7 +1514,13 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    registration_params = params.permit(:admin_nickname, :vendor, :name, :description).to_h
+    permitted_params = %i[admin_nickname vendor name description lock_deploying]
+
+    if @context.feature_enabled?(:lock_lti_registrations)
+      permitted_params << :lock_deploying
+    end
+
+    registration_params = params.permit(*permitted_params).to_h
 
     binding_params = {
       workflow_state: params[:workflow_state],
@@ -1859,6 +1891,37 @@ class Lti::RegistrationsController < ApplicationController
     )
   end
 
+  # @API Get Latest LTI Registration Update Request
+  # Retrieves the most recent update request for a registration, regardless of its status.
+  # Returns 404 if there are no update requests for this registration.
+  #
+  # @argument id [Integer] The id of the registration.
+  # @returns Lti::RegistrationUpdateRequest
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<id>/latest_update_request' \
+  #        -H "Authorization: Bearer <token>"
+  def latest_registration_update_request
+    unless registration.account == @context
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
+    # Get the most recent update request regardless of status
+    most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                .order(created_at: :desc)
+                                                .first
+
+    raise ActiveRecord::RecordNotFound unless most_recent
+
+    render json: lti_registration_update_request_json(
+      most_recent,
+      @current_user,
+      session,
+      @context
+    )
+  end
+
   # @API Apply LTI Registration Update Requst
   # Applies a registration update request to an existing registration,
   # replacing the existing configuration and overlay with the new values.
@@ -1888,6 +1951,10 @@ class Lti::RegistrationsController < ApplicationController
 
     unless params.key?(:accepted)
       return render json: { errors: "accepted parameter is required" }, status: :bad_request
+    end
+
+    unless registration_update_request.most_recent?
+      return render json: { errors: "Cannot apply an outdated registration update request. A newer update request exists." }, status: :bad_request
     end
 
     accepted = params[:accepted]
@@ -2081,6 +2148,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_manage_lti_registrations_in_registrations_account
+    unless registration.account == @account
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
     require_context_with_permission(registration.account, :manage_lti_registrations)
   end
 

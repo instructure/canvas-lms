@@ -100,13 +100,14 @@ class GradebooksController < ApplicationController
         Submission.active
                   .where(user_id: @presenter.student_id, assignment_id: @context.assignments.active)
                   .select(:cached_due_date, :grading_period_id, :assignment_id, :user_id)
-                  .each_with_object({}) do |submission, hsh|
-                    hsh[submission.assignment_id] = {
-                      submission.user_id => {
-                        due_at: submission.cached_due_date,
-                        grading_period_id: submission.grading_period_id,
-                      }
-                    }
+                  .to_h do |submission|
+          [submission.assignment_id,
+           {
+             submission.user_id => {
+               due_at: submission.cached_due_date,
+               grading_period_id: submission.grading_period_id,
+             }
+           }]
         end
     end
 
@@ -1024,7 +1025,8 @@ class GradebooksController < ApplicationController
   def submissions_json(submissions:, assignments:)
     submissions.map do |submission|
       assignment = assignments[submission[:assignment_id].to_i]
-      omitted_field = assignment.anonymize_students? ? :user_id : :anonymous_id
+      anonymize = assignment.quiz_lti? ? assignment.anonymous_participants? : assignment.anonymize_students?
+      omitted_field = anonymize ? :user_id : :anonymous_id
       json_params = Submission.json_serialization_full_parameters(methods: %i[late missing grading_status]).merge(
         include: { submission_history: { methods: %i[late missing word_count], except: omitted_field } },
         except: [omitted_field, :submission_comments]
@@ -1304,9 +1306,10 @@ class GradebooksController < ApplicationController
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true
 
-          requested_student_id = if @assignment.anonymize_students? && params[:anonymous_id].present?
+          anonymize = @assignment.quiz_lti? ? @assignment.anonymous_participants? : @assignment.anonymize_students?
+          requested_student_id = if anonymize && params[:anonymous_id].present?
                                    @assignment.submissions.find_by(anonymous_id: params[:anonymous_id])&.user_id
-                                 elsif !@assignment.anonymize_students?
+                                 elsif !anonymize
                                    params[:student_id]
                                  end
 

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasQuizStatistics::Analyzers::Calculated do
   subject { described_class.new(question_data) }
 

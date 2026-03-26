@@ -295,7 +295,7 @@ export const RubricAssessmentContainer = ({
             toggleSelfAssessment={() => setShowSelfAssessment(!showSelfAssessment)}
           />
         </Flex.Item>
-        <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
+        <Flex.Item shouldGrow shouldShrink as="div" id="rubric-assessment-view-container">
           <View as="div" overflowY="auto">
             {renderViewContainer()}
           </View>

@@ -16,46 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createContext, useContext} from 'react'
-
-interface ResponsiveContextValue {
-  isMobile: boolean
-  isTablet: boolean
-  isDesktop: boolean
-  matches: string[]
-}
-
-const ResponsiveContext = createContext<ResponsiveContextValue>({
-  isMobile: false,
-  isTablet: false,
-  isDesktop: true,
-  matches: ['desktop'],
-})
-
-interface ResponsiveProviderProps {
-  matches: string[]
-  children: React.ReactNode
-}
-
-export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({matches, children}) => {
-  const isMobile = matches.includes('mobile')
-  const isTablet = matches.includes('tablet')
-  const isDesktop = matches.includes('desktop')
-
-  const value = {
-    isMobile,
-    isTablet,
-    isDesktop,
-    matches,
-  }
-
-  return <ResponsiveContext.Provider value={value}>{children}</ResponsiveContext.Provider>
-}
-
-export const useResponsiveContext = (): ResponsiveContextValue => {
-  const context = useContext(ResponsiveContext)
-  if (!context) {
-    throw new Error('useResponsiveContext must be used within a ResponsiveProvider')
-  }
-  return context
-}
+export {
+  ResponsiveProvider,
+  useResponsiveContext,
+} from '@instructure/platform-widget-dashboard'

@@ -283,8 +283,20 @@ describe Lti::IMS::AuthenticationController do
         end
 
         it "launches successfully" do
-          authorize
-          expect(id_token["nonce"]).to eq nonce
+          expect(authorize).to render_template("lti/ims/authentication/authorize")
+        end
+      end
+
+      context "when a registered redirect uri has a query string but the requested one does not" do
+        let(:redirect_uris) { ["https://redirect.tool.com?must_be_present=true", "https://redirect.tool.com"] }
+        let(:redirect_uri) { "https://redirect.tool.com" }
+
+        before do
+          developer_key.update!(redirect_uris:)
+        end
+
+        it "launches successfully" do
+          expect(authorize).to render_template("lti/ims/authentication/authorize")
         end
       end
 
@@ -321,11 +333,6 @@ describe Lti::IMS::AuthenticationController do
         end
 
         context "when hasn't retried yet" do
-          before do
-            account.root_account.settings[:lti_oidc_missing_cookie_retry] = true
-            account.root_account.save!
-          end
-
           it "renders a cookie fix page" do
             authorize
             expect(response).to have_http_status :ok

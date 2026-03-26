@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe "RequestContext::Session" do
   it "finds the session_id from the rack session and add it a cookie" do
     app_class = Class.new do

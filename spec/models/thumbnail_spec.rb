@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe Thumbnail do
   describe "#local_storage_path" do
     let(:attachment) { attachment_model(context:, root_account:) }

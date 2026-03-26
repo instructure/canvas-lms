@@ -30,7 +30,7 @@ import natcompare from '@canvas/util/natcompare'
 import TruncateWithTooltip from '../TruncateWithTooltip'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('IndividualStudentMasteryOutcomeGroup')
 
@@ -59,7 +59,6 @@ class OutcomeGroup extends React.Component {
     expandedOutcomes: ImmutablePropTypes.set.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {

@@ -19,7 +19,7 @@
 #
 require "canvas/draft_state_validations"
 
-class Quizzes::Quiz < ActiveRecord::Base
+class Quizzes::Quiz < ApplicationRecord
   extend RootAccountResolver
 
   self.table_name = "quizzes"

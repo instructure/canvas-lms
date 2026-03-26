@@ -23,6 +23,17 @@ describe PageViews::FetchResultService do
   let(:admin) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
   let(:service) { PageViews::FetchResultService.new(configuration, requestor_user: admin) }
 
+  let(:http_double) do
+    instance_double(Net::HTTP).tap do |http|
+      allow(http).to receive(:use_ssl=)
+      allow(http).to receive(:ssl_timeout=)
+      allow(http).to receive(:open_timeout=)
+      allow(http).to receive(:read_timeout=)
+      allow(http).to receive(:write_timeout=)
+      allow(http).to receive(:max_retries=)
+    end
+  end
+
   let(:example_jsonl_gz_response) do
     instance_double(Net::HTTPResponse,
                     code: 200,
@@ -73,10 +84,11 @@ describe PageViews::FetchResultService do
     allow(Account).to receive(:find_cached).and_return(account)
     allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
     allow(admin).to receive(:uuid).and_return("user-uuid-123")
+    allow(Net::HTTP).to receive(:new).and_return(http_double)
   end
 
   it "returns compressed jsonl result" do
-    allow(CanvasHttp).to receive(:get).and_yield(example_jsonl_gz_response)
+    allow(http_double).to receive(:request).and_return(example_jsonl_gz_response)
 
     result = service.call("123456")
 
@@ -88,7 +100,7 @@ describe PageViews::FetchResultService do
   end
 
   it "returns compressed csv result" do
-    allow(CanvasHttp).to receive(:get).and_yield(example_csv_gz_response)
+    allow(http_double).to receive(:request).and_return(example_csv_gz_response)
 
     result = service.call("123456")
 
@@ -100,7 +112,7 @@ describe PageViews::FetchResultService do
   end
 
   it "returns a csv result" do
-    allow(CanvasHttp).to receive(:get).and_yield(example_csv_response)
+    allow(http_double).to receive(:request).and_return(example_csv_response)
 
     result = service.call("123456")
 
@@ -112,13 +124,13 @@ describe PageViews::FetchResultService do
   end
 
   it "raises error when invalid format is returned" do
-    allow(CanvasHttp).to receive(:get).and_yield(example_invalid_format_response)
+    allow(http_double).to receive(:request).and_return(example_invalid_format_response)
 
     expect { service.call("123456") }.to raise_error(PageViews::Common::InvalidResultError)
   end
 
   it "raises error when there is no content disposition header" do
-    allow(CanvasHttp).to receive(:get).and_yield(
+    allow(http_double).to receive(:request).and_return(
       instance_double(Net::HTTPResponse,
                       code: 200,
                       body: Zlib.gzip('{"col1": "1", "col2": "2"}'),
@@ -132,23 +144,49 @@ describe PageViews::FetchResultService do
   end
 
   it "raises error when query id does not exist" do
-    allow(CanvasHttp).to receive(:get).and_yield(instance_double(Net::HTTPResponse, code: 404))
+    allow(http_double).to receive(:request).and_return(instance_double(Net::HTTPResponse, code: 404))
 
     expect { service.call("123456") }.to raise_error(PageViews::Common::NotFoundError)
   end
 
   it "raises no content error when no content is available yet" do
-    allow(CanvasHttp).to receive(:get).and_yield(instance_double(Net::HTTPResponse, code: 204))
+    allow(http_double).to receive(:request).and_return(instance_double(Net::HTTPResponse, code: 204))
+
     expect { service.call("123456") }.to raise_error(PageViews::Common::NoContentError)
   end
 
   it "includes request id in headers" do
     expected_request_id = SecureRandom.uuid
     allow(RequestContext::Generator).to receive(:request_id).and_return(expected_request_id)
-    allow(CanvasHttp).to receive(:get).and_yield(example_jsonl_gz_response)
+    allow(http_double).to receive(:request).and_return(example_jsonl_gz_response)
 
     service.call("123456")
 
-    expect(CanvasHttp).to have_received(:get).with(anything, hash_including("X-Request-Context-Id" => expected_request_id))
+    expect(http_double).to have_received(:request).with(
+      satisfy { |req| req["X-Request-Context-Id"] == expected_request_id }
+    )
+  end
+
+  it "follows PV5 redirect to S3 without forwarding auth headers" do
+    s3_url = "https://s3.amazonaws.com/bucket/page_views_123456.jsonl.gz?signature=abc"
+    redirect_response = instance_double(Net::HTTPTemporaryRedirect)
+    allow(redirect_response).to receive(:is_a?).with(Net::HTTPRedirection).and_return(true)
+    allow(redirect_response).to receive(:[]).with("Location").and_return(s3_url)
+    allow(http_double).to receive(:request).and_return(redirect_response)
+    allow(CanvasHttp).to receive(:get).and_yield(example_jsonl_gz_response)
+
+    result = service.call("123456")
+
+    expect(CanvasHttp).to have_received(:get).with(s3_url)
+    expect(result).to be_a(PageViews::Common::DownloadableResult)
+  end
+
+  it "raises error when redirect is missing Location header" do
+    redirect_response = instance_double(Net::HTTPTemporaryRedirect)
+    allow(redirect_response).to receive(:is_a?).with(Net::HTTPRedirection).and_return(true)
+    allow(redirect_response).to receive(:[]).with("Location").and_return(nil)
+    allow(http_double).to receive(:request).and_return(redirect_response)
+
+    expect { service.call("123456") }.to raise_error(RuntimeError, "Redirect response is missing a Location header")
   end
 end

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe SwaggerYard::CanvasAdapter do
   describe ".install!" do
     it "installs without errors" do

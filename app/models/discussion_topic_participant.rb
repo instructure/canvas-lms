@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionTopicParticipant < ActiveRecord::Base
+class DiscussionTopicParticipant < ApplicationRecord
   include Workflow
 
   belongs_to :discussion_topic

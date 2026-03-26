@@ -32,7 +32,7 @@ export function SelectedBadge() {
         height: BADGE_SIZE,
         borderRadius: '50%',
         backgroundColor: colors.dataVisualization.forest45Primary,
-        border: '1px solid white',
+        border: `1px solid ${colors.primitives.white}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

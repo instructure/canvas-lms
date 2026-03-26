@@ -18,8 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
-import {legacyRender} from '@canvas/react'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, render, rerender} from '@canvas/react'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -45,7 +44,6 @@ $(document).ready(() => {
   const peerReviewCountContainer = document.getElementById('reviews_per_user_container')
   const redirectToEditContainer = document.getElementById('redirect_to_edit_button')
   if (peerReviewCountContainer) {
-    const root = createRoot(peerReviewCountContainer)
     const initialCount = peerReviewCountContainer.dataset.count ?? '0'
     // @ts-expect-error
     const setValue = value => {
@@ -53,19 +51,19 @@ $(document).ready(() => {
       // @ts-expect-error
       peerReviewCount.value = value
     }
-    root.render(
+    render(
       <View as="div" margin="medium 0 large 0">
         <ReviewsPerUserInput initialCount={initialCount} onChange={setValue} />
       </View>,
+      peerReviewCountContainer,
     )
   }
 
   if (redirectToEditContainer) {
     const courseId = redirectToEditContainer.dataset.courseid
     const assignmentId = redirectToEditContainer.dataset.assignmentid
-    const root = createRoot(redirectToEditContainer)
     const editLink = `/courses/${courseId}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`
-    root.render(<Button href={editLink}>{I18n.t('Edit Assignment')}</Button>)
+    render(<Button href={editLink}>{I18n.t('Edit Assignment')}</Button>, redirectToEditContainer)
   }
 
   $('.peer_review').hover(
@@ -156,11 +154,7 @@ $(document).ready(() => {
         container.attr('aria-label', ERROR_MESSAGE)
       }
 
-      // @ts-expect-error
-      const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
-      // @ts-expect-error
-      errorRoots[form.attr('action')] = root
-      root.render(
+      const errorElement = (
         <Flex as="div" alignItems="start" margin="0 0 0 0">
           <Flex.Item as="div" margin="0 xx-small xxx-small 0">
             <IconWarningSolid color="error" />
@@ -168,8 +162,16 @@ $(document).ready(() => {
           <Text size="small" color="danger">
             {ERROR_MESSAGE}
           </Text>
-        </Flex>,
+        </Flex>
       )
+      // @ts-expect-error
+      const existingRoot = errorRoots[form.attr('action')]
+      if (existingRoot) {
+        rerender(existingRoot, errorElement)
+      } else {
+        // @ts-expect-error
+        errorRoots[form.attr('action')] = render(errorElement, errorsContainer)
+      }
       return false
     } else {
       const container = $(this)
@@ -196,12 +198,7 @@ $(document).ready(() => {
           container.attr('aria-label', ERROR_MESSAGE)
           container.focus()
         }
-        // @ts-expect-error
-        const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
-        // @ts-expect-error
-        errorRoots[form.attr('action')] = root
-
-        root.render(
+        const errorEl = (
           <Flex as="div" alignItems="start" margin="0 0 0 0">
             <Flex.Item as="div" margin="0 xx-small xxx-small 0">
               <IconWarningSolid color="error" />
@@ -209,8 +206,16 @@ $(document).ready(() => {
             <Text size="small" color="danger">
               {ERROR_MESSAGE}
             </Text>
-          </Flex>,
+          </Flex>
         )
+        // @ts-expect-error
+        const existing = errorRoots[form.attr('action')]
+        if (existing) {
+          rerender(existing, errorEl)
+        } else {
+          // @ts-expect-error
+          errorRoots[form.attr('action')] = render(errorEl, errorsContainer)
+        }
         return false
       }
       $(this).loadingImage()

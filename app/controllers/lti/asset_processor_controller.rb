@@ -63,15 +63,15 @@ module Lti
           .order(:discussion_entry_id, version: :desc)
           .preload(:discussion_entry, :user, :root_account)
           .find_in_batches(batch_size: 100) do |versions|
-            Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
-              assignment:,
-              submission:,
-              discussion_entry_versions: versions,
-              contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
-              current_user: student,
-              asset_processor: nil,
-              tool_id: nil
-            )
+          Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+            assignment:,
+            submission:,
+            discussion_entry_versions: versions,
+            contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+            current_user: student,
+            asset_processor: nil,
+            tool_id: nil
+          )
         end
       end
 

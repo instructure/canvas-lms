@@ -17,8 +17,8 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
-import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
+import DateAvailable from '@canvas/assignments/react/DateAvailable'
+import DateDue from '@canvas/assignments/react/DateDue'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import LockIconView from '@canvas/lock-icon'
@@ -35,6 +35,7 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import {assignLocation} from '@canvas/util/globalUtils'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {render, rerender} from '@canvas/react'
 
 const I18n = createI18nScope('quizzes.index')
 
@@ -47,8 +48,6 @@ export default class ItemView extends Backbone.View {
 
     this.child('publishIconView', '[data-view=publish-icon]')
     this.child('lockIconView', '[data-view=lock-icon]')
-    this.child('dateDueColumnView', '[data-view=date-due]')
-    this.child('dateAvailableColumnView', '[data-view=date-available]')
     this.child('sisButtonView', '[data-view=sis-button]')
 
     this.prototype.events = {
@@ -121,16 +120,85 @@ export default class ItemView extends Backbone.View {
         })
       }
     }
+  }
 
-    this.dateDueColumnView = new DateDueColumnView({model: this.model})
-    return (this.dateAvailableColumnView = new DateAvailableColumnView({model: this.model}))
+  cleanupDateDueColumn() {
+    if (this._dateDueRoot) {
+      this._dateDueRoot.unmount()
+      this._dateDueRoot = null
+    }
+  }
+
+  renderDateDueColumn() {
+    const mountPoint = this.$el.find('[data-view=date-due]')[0]
+
+    if (!mountPoint) return
+
+    const model = this.model.get('assignment') || this.model
+    const data = this.model.toView()
+
+    const component = (
+      <DateDue
+        multipleDueDates={data.multipleDueDates}
+        allDates={model.allDates()}
+        singleSectionDueDate={data.singleSectionDueDate}
+        todoDate={data.todo_date}
+        linkHref={model.htmlUrl()}
+      />
+    )
+
+    if (this._dateDueRoot) {
+      rerender(this._dateDueRoot, component)
+    } else {
+      this._dateDueRoot = render(component, mountPoint)
+    }
+  }
+
+  cleanupDateAvailableColumn() {
+    if (this._dateAvailableRoot) {
+      this._dateAvailableRoot.unmount()
+      this._dateAvailableRoot = null
+    }
+  }
+
+  renderDateAvailableColumn() {
+    const mountPoint = this.$el.find('[data-view=date-available]')[0]
+
+    if (!mountPoint) return
+
+    const group = this.model.defaultDates()
+    const data = this.model.toView()
+    const component = (
+      <DateAvailable
+        multipleDueDates={data.multipleDueDates}
+        allDates={this.model.allDates()}
+        defaultDates={group.toJSON()}
+        linkHref={this.model.htmlUrl()}
+      />
+    )
+
+    if (this._dateAvailableRoot) {
+      rerender(this._dateAvailableRoot, component)
+    } else {
+      this._dateAvailableRoot = render(component, mountPoint)
+    }
   }
 
   afterRender() {
     if (ENV.horizon_course) {
       this.publishIconView.$el.addClass('disabled')
     }
+    this.cleanupDateAvailableColumn()
+    this.cleanupDateDueColumn()
+    this.renderDateDueColumn()
+    this.renderDateAvailableColumn()
     return this.$el.toggleClass('quiz-loading-overrides', !!this.model.get('loadingOverrides'))
+  }
+
+  remove() {
+    this.cleanupDateDueColumn()
+    this.cleanupDateAvailableColumn()
+    return super.remove()
   }
 
   // make clicks follow through to url for entire row

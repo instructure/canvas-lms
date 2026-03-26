@@ -1114,7 +1114,7 @@ class AssignmentsApiController < ApplicationController
       if @context.feature_enabled?(:peer_review_allocation_and_grading)
         # Only preload for Assignment instances since SubAssignment and PeerReviewSubAssignment
         # cannot have AssessmentRequests
-        assignment_instances = assignments.select { |a| a.is_a?(Assignment) }
+        assignment_instances = assignments.grep(Assignment)
         Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
       end
 
@@ -1172,8 +1172,9 @@ class AssignmentsApiController < ApplicationController
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
   #   For "score_statistics" to be included, the "submission" option must also be set.
-  #   The "peer_review" option requires that the Peer Review Allocation and Grading
-  #   course feature be turned on.
+  #   The "peer_review" option returns peer review sub assignment data if it exists, regardless
+  #   of the Peer Review Allocation and Grading feature state. If no peer review sub assignment
+  #   exists, the feature must be enabled to receive a null value; otherwise the key is omitted.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]

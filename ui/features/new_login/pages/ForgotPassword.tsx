@@ -27,7 +27,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import React, {useEffect, useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
 import {forgotPassword} from '../services'
-import {createErrorMessage, EMAIL_REGEX} from '../shared/helpers'
+import {createErrorMessage} from '../shared/helpers'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {LOGIN_ENTRY_URL} from '../routes/routes'
 
@@ -37,30 +37,30 @@ const ForgotPassword = () => {
   const {isUiActionPending, setIsUiActionPending} = useNewLogin()
   const {loginHandleName} = useNewLoginData()
 
-  const [email, setEmail] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [emailSent, setEmailSent] = useState(false)
-  const [submittedEmail, setSubmittedEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [confirmationSent, setConfirmationSent] = useState(false)
+  const [submittedUsername, setSubmittedUsername] = useState('')
 
-  const emailInputRef = useRef<HTMLInputElement | null>(null)
+  const usernameInputRef = useRef<HTMLInputElement | null>(null)
 
   const confirmationHeadingRef = useRef<HTMLHeadingElement | null>(null)
   useEffect(() => {
-    if (emailSent) {
+    if (confirmationSent) {
       confirmationHeadingRef.current?.focus()
     }
-  }, [emailSent])
+  }, [confirmationSent])
 
   const validateForm = (): boolean => {
-    setEmailError('')
+    setUsernameError('')
 
-    if (!EMAIL_REGEX.test(email)) {
-      setEmailError(
-        I18n.t('Please enter a valid %{loginHandleName}.', {
+    if (username.trim() === '') {
+      setUsernameError(
+        I18n.t('Please enter your %{loginHandleName}.', {
           loginHandleName: loginHandleName?.toLowerCase(),
         }),
       )
-      emailInputRef.current?.focus()
+      usernameInputRef.current?.focus()
       return false
     }
 
@@ -75,15 +75,19 @@ const ForgotPassword = () => {
     setIsUiActionPending(true)
 
     try {
-      const response = await forgotPassword(email)
+      const response = await forgotPassword(username)
 
       if (response.status === 200 && response.data?.requested) {
-        setSubmittedEmail(email)
-        setEmail('')
-        setEmailSent(true)
+        setSubmittedUsername(username)
+        setUsername('')
+        setConfirmationSent(true)
       } else {
-        setEmailError(I18n.t('No account found for this email address.'))
-        emailInputRef.current?.focus()
+        setUsernameError(
+          I18n.t('No account found for this %{loginHandleName}.', {
+            loginHandleName: loginHandleName?.toLowerCase(),
+          }),
+        )
+        usernameInputRef.current?.focus()
       }
     } catch (error: any) {
       showFlashError(I18n.t('Something went wrong. Please try again later.'))(error)
@@ -92,8 +96,8 @@ const ForgotPassword = () => {
     }
   }
 
-  const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value)
+  const handleUsernameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    setUsername(value)
   }
 
   const handleCancel = () => assignLocation(LOGIN_ENTRY_URL)
@@ -116,18 +120,17 @@ const ForgotPassword = () => {
       <form onSubmit={handleForgotPassword} noValidate={true}>
         <Flex direction="column" gap="large">
           <TextInput
-            aria-describedby="emailHelp"
-            autoComplete="email"
+            autoComplete="username"
+            data-testid="username-input"
             disabled={isUiActionPending}
-            id="email"
-            inputRef={inputElement => (emailInputRef.current = inputElement)}
-            messages={createErrorMessage(emailError)}
-            onChange={handleEmailChange}
-            renderLabel={loginHandleName}
-            type="email"
-            value={email}
+            id="username"
+            inputRef={inputElement => (usernameInputRef.current = inputElement)}
             isRequired={true}
-            data-testid="email-input"
+            messages={createErrorMessage(usernameError)}
+            onChange={handleUsernameChange}
+            renderLabel={loginHandleName}
+            type="text"
+            value={username}
           />
 
           <Flex direction="row" gap="small">
@@ -178,8 +181,8 @@ const ForgotPassword = () => {
 
         <Text data-testid="confirmation-message">
           {I18n.t(
-            'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 10 minutes. If you don’t receive an email, be sure to check your spam folder.',
-            {email: submittedEmail},
+            'A recovery email has been sent to %{username}. Please check your inbox and follow the instructions to reset your password. This may take up to 10 minutes. If you don’t receive an email, be sure to check your spam folder.',
+            {username: submittedUsername},
           )}
         </Text>
       </Flex>
@@ -197,7 +200,7 @@ const ForgotPassword = () => {
 
   return (
     <Flex direction="column" gap="large">
-      {emailSent ? confirmationMessage : passwordRecoveryForm}
+      {confirmationSent ? confirmationMessage : passwordRecoveryForm}
     </Flex>
   )
 }

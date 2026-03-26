@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import {ScanHandler} from './ScanHandler'
 import type {ScanViewProps} from '../types'
 

@@ -25,7 +25,7 @@ import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconTrashLine, IconUploadLine, IconAttachMediaSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -39,7 +39,7 @@ import {
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -56,7 +56,6 @@ export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 class MediaAttempt extends React.Component {
   static propTypes = {
     assignment: Assignment.shape.isRequired,
-    breakpoints: breakpointsShape,
     createSubmissionDraft: func.isRequired,
     focusOnInit: bool.isRequired,
     submission: Submission.shape.isRequired,

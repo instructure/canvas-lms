@@ -10843,10 +10843,38 @@ describe AssignmentsApiController, type: :request do
             @course.disable_feature!(:peer_review_allocation_and_grading)
           end
 
-          it "does not include peer_review_sub_assignment in JSON" do
-            result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+          context "when peer review sub assignment does not exist" do
+            it "does not include peer_review_sub_assignment in JSON" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
 
-            expect(result).not_to have_key("peer_review_sub_assignment")
+              expect(result).not_to have_key("peer_review_sub_assignment")
+            end
+          end
+
+          context "when peer review sub assignment exists" do
+            before do
+              @peer_review_sub = peer_review_model(
+                parent_assignment: @assignment,
+                points_possible: 30
+              )
+              @assignment.reload
+            end
+
+            it "includes peer_review_sub_assignment in JSON" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              expect(result).to have_key("peer_review_sub_assignment")
+              expect(result["peer_review_sub_assignment"]).to be_a(Hash)
+            end
+
+            it "serializes peer review sub assignment with correct attributes" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              peer_review_data = result["peer_review_sub_assignment"]
+              expect(peer_review_data["name"]).to eq(@peer_review_sub.title)
+              expect(peer_review_data["points_possible"]).to eq(30)
+              expect(peer_review_data["grading_type"]).to eq("points")
+            end
           end
         end
 

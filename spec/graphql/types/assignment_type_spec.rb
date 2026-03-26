@@ -486,6 +486,40 @@ describe Types::AssignmentType do
       it "returns stats for admins" do
         expect(admin_user_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
       end
+
+      context "with manual posting and selective grade posting" do
+        let(:viewing_student) { student_in_course(course:, active_all: true).user }
+        let(:viewing_student_type) { GraphQLTypeTester.new(assignment, current_user: viewing_student) }
+
+        before do
+          # Grade additional students so we have 5+ submissions (3 from outer before + 2 more + viewing_student)
+          student_4 = student_in_course(course:, active_all: true).user
+          assignment.grade_student(student_4, grade: 10, grader: teacher)
+          # Grade the viewing student last so their submission is NOT first in the DB
+          assignment.grade_student(viewing_student, grade: 10, grader: teacher)
+
+          assignment.post_policy.update!(post_manually: true)
+          assignment.hide_submissions
+        end
+
+        it "checks the current user's submission, not another student's" do
+          # Post only the viewing student's grade; the first submission in the DB is still hidden
+          viewing_submission = assignment.submissions.find_by(user_id: viewing_student.id)
+          assignment.post_submissions(submission_ids: [viewing_submission.id])
+
+          # The viewing student should see stats since their own grade is posted
+          expect(viewing_student_type.resolve("scoreStatistic { mean }")).to be_present
+        end
+
+        it "returns null when the current user's grade is not posted" do
+          # Post another student's grade but NOT the viewing student's
+          other_submission = assignment.submissions.where.not(user_id: viewing_student.id).first
+          assignment.post_submissions(submission_ids: [other_submission.id])
+
+          # The viewing student should NOT see stats since their grade is hidden
+          expect(viewing_student_type.resolve("scoreStatistic { mean }")).to be_nil
+        end
+      end
     end
   end
 
@@ -3025,9 +3059,10 @@ describe Types::AssignmentType do
 
   describe "auto_grade_assignment_issues" do
     before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
         .with(assignment:)
-        .and_return({ level: "error", message: "Test error" })
+        .and_return([{ level: "error", message: "Test error" }])
     end
 
     it "returns nil when project_lhotse feature flag is disabled" do
@@ -3039,6 +3074,7 @@ describe Types::AssignmentType do
     it "returns issues when project_lhotse feature flag is enabled" do
       course.enable_feature!(:project_lhotse)
       expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .at_least(:once).and_return([{ level: "error", message: "Test error" }])
       level = assignment_type.resolve("autoGradeAssignmentIssues { level }")
       message = assignment_type.resolve("autoGradeAssignmentIssues { message }")
       expect(level).to eq "error"
@@ -3048,9 +3084,10 @@ describe Types::AssignmentType do
 
   describe "auto_grade_assignment_errors" do
     before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
         .with(assignment:)
-        .and_return({ level: "error", message: "Test error" })
+        .and_return([{ level: "error", message: "Test error" }])
     end
 
     it "returns empty array when project_lhotse feature flag is disabled" do
@@ -3061,8 +3098,42 @@ describe Types::AssignmentType do
 
     it "returns error messages when project_lhotse feature flag is enabled" do
       course.enable_feature!(:project_lhotse)
-      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
-      expect(assignment_type.resolve("autoGradeAssignmentErrors")).to eq(["Test error"])
+      result = assignment_type.resolve("autoGradeAssignmentErrors")
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to have_received(:validate_assignment)
+      expect(result).to eq(["Test error"])
+    end
+  end
+
+  describe "auto_grade_eligibility" do
+    before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .with(assignment:)
+        .and_return([{ level: "error", message: "No rubric is attached to this assignment." }, { level: "error", message: "Grading assistance is not available right now." }])
+    end
+
+    it "returns nil when project_lhotse feature flag is disabled" do
+      course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_assignment)
+      expect(assignment_type.resolve("autoGradeEligibility { issues { message } }")).to be_nil
+    end
+
+    it "returns all issues when project_lhotse feature flag is enabled" do
+      course.enable_feature!(:project_lhotse)
+      result = assignment_type.resolve("autoGradeEligibility { issues { message } }")
+      expect(result).to contain_exactly(
+        "No rubric is attached to this assignment.",
+        "Grading assistance is not available right now."
+      )
+    end
+
+    it "returns empty issues array when no issues exist" do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .with(assignment:)
+        .and_return([])
+      course.enable_feature!(:project_lhotse)
+      result = assignment_type.resolve("autoGradeEligibility { issues { message } }")
+      expect(result).to eq([])
     end
   end
 

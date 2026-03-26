@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 RSpec.describe PeerReviewSubAssignment do
   describe "associations" do
     it "belongs to a parent assignment" do

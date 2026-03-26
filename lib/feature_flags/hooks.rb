@@ -59,6 +59,10 @@ module FeatureFlags
       end
     end
 
+    def self.project_lhotse_visible_on_hook(_context)
+      false
+    end
+
     def self.quizzes_next_visible_on_hook(context)
       root_account = context.root_account
       # assume all Quizzes.Next provisions so far have been done through uuid_provisioner

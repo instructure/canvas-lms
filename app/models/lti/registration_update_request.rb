@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::RegistrationUpdateRequest < ActiveRecord::Base
+class Lti::RegistrationUpdateRequest < ApplicationRecord
   belongs_to :lti_registration, class_name: "Lti::Registration"
   belongs_to :root_account, class_name: "Account"
   belongs_to :created_by, class_name: "User"
@@ -52,5 +52,19 @@ class Lti::RegistrationUpdateRequest < ActiveRecord::Base
           end
       }
     )
+  end
+
+  # Returns true if this is the most recent update request for the registration, false otherwise.
+  # This is used to determine whether or not to apply an update request when it is accepted,
+  # as well as whether or not to show an update request as pending in the UI.
+  def most_recent?
+    return true unless Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+
+    most_recent = Lti::RegistrationUpdateRequest
+                  .where(lti_registration_id:)
+                  .order(created_at: :desc)
+                  .first
+
+    most_recent&.id == id
   end
 end

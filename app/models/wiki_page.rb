@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class WikiPage < ActiveRecord::Base
+class WikiPage < ApplicationRecord
   attr_readonly :wiki_id
   attr_accessor :saved_by
 
@@ -65,6 +65,7 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_lookups, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
+  has_one :external_content_reference, dependent: :destroy, inverse_of: :wiki_page
   has_one :estimated_duration, dependent: :destroy, inverse_of: :wiki_page
   has_many :attachment_associations, as: :context, inverse_of: :context
 
@@ -776,7 +777,7 @@ class WikiPage < ActiveRecord::Base
 
     # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
     # and the action is more of a system-initiated action than a user-initiated action
-    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
 
     PineClient.ingest_html(
       html_content: body,
@@ -807,7 +808,7 @@ class WikiPage < ActiveRecord::Base
 
     # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
     # and the action is more of a system-initiated action than a user-initiated action
-    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
 
     delay(
       n_strand: ["horizon_wiki_deletion", context.global_root_account_id],

@@ -135,23 +135,8 @@ describe('ScanStateCell', () => {
           isMobile={false}
         />,
       )
+      expect(screen.getByText(/Closed remediation \(3 issues set aside\)/i)).toBeInTheDocument()
       expect(screen.getByText(/Closed \(3\)/i)).toBeInTheDocument()
-    })
-
-    it('renders closed issues text with singular count', () => {
-      render(
-        <ScanStateCell
-          item={
-            {
-              workflowState: ScanWorkflowState.Completed,
-              issueCount: 0,
-              closedIssueCount: 1,
-            } as AccessibilityResourceScan
-          }
-          isMobile={false}
-        />,
-      )
-      expect(screen.getByText(/Closed \(1\)/i)).toBeInTheDocument()
     })
 
     it('does not render closed issues text when feature flag is disabled', () => {
@@ -172,7 +157,9 @@ describe('ScanStateCell', () => {
           isMobile={false}
         />,
       )
-      expect(screen.queryByText(/Closed \(3\)/i)).not.toBeInTheDocument()
+      expect(
+        screen.queryByText(/Closed remediation \(3 issues set aside\)/i),
+      ).not.toBeInTheDocument()
       expect(screen.getByText(/No issues/i)).toBeInTheDocument()
     })
 
@@ -231,6 +218,59 @@ describe('ScanStateCell', () => {
 
       const rescanButton = container.querySelector('[data-pendo="resource-rescan-button"]')
       expect(rescanButton).toHaveAttribute('data-pendo', 'resource-rescan-button')
+    })
+
+    it('renders limit reached text when errorMessage is issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'issue_limit_reached',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Limit reached/i)).toBeInTheDocument()
+    })
+
+    it('renders limit reached tooltip when errorMessage is issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'issue_limit_reached',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      expect(explanation).toBeInTheDocument()
+      explanation.focus()
+      expect(explanation).toHaveTextContent(
+        'Max issue count reached on course. Remediate found issues and update report to find additional issues.',
+      )
+    })
+
+    it('renders the normal failed scan state when errorMessage is not issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'other error',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.queryByText(/Limit reached/i)).not.toBeInTheDocument()
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      explanation.focus()
+      expect(explanation).toHaveTextContent('Failed scan')
     })
   })
 })

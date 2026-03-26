@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 BYROLE_FIXTURE_BASE = File.expand_path("fixtures/by_role_linter/__tests__/", __dir__)
 VALID_FILES = %w[valid.js valid.ts valid.tsx valid.jsx].map { |f| BYROLE_FIXTURE_BASE + "/" + f }
 CHANGE_LINE_NUMBERS = [26, 30, 34, 38, 42, 46].freeze

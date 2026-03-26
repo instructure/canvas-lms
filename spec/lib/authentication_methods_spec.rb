@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 # FIXME: these tests should all exist in a controller test,
 # since that's the context required to run any of them
 describe AuthenticationMethods do

@@ -460,13 +460,25 @@ describe Lti::RegistrationHistoryEntry do
           end
         end.to raise_error(ArgumentError)
 
+        # current_user is only required when a diff is produced
         expect do
           Lti::RegistrationHistoryEntry.track_changes(
             lti_registration: registration,
             current_user: nil,
             context:
           ) do
-            # No-op
+            # No-op - no diff, so no error
+          end
+        end.not_to raise_error
+
+        # current_user is required when a diff is produced
+        expect do
+          Lti::RegistrationHistoryEntry.track_changes(
+            lti_registration: registration,
+            current_user: nil,
+            context:
+          ) do
+            Lti::Registration.where(id: registration.id).update_all(name: "Changed Name")
           end
         end.to raise_error(ArgumentError)
       end

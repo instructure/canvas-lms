@@ -19,7 +19,7 @@
 import {Alert} from '@instructure/ui-alerts'
 import React, {createContext, type PropsWithChildren} from 'react'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import WithBreakpoints, {breakpointsShape, type Breakpoints} from '@canvas/with-breakpoints'
+import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 
 export type AlertManagerContextType = {
   setOnFailure: (alertMessage: string, screenReaderOnly?: boolean) => void
@@ -43,10 +43,6 @@ type AlertManagerProps = PropsWithChildren<{
 }>
 
 class AlertManager extends React.Component<AlertManagerProps, AlertManagerState> {
-  static propTypes = {
-    breakpoints: breakpointsShape,
-  }
-
   static defaultProps = {
     breakpoints: {} as Breakpoints,
   }
@@ -153,5 +149,4 @@ class AlertManager extends React.Component<AlertManagerProps, AlertManagerState>
   }
 }
 
-// @ts-expect-error
 export default WithBreakpoints<AlertManagerProps>(AlertManager)

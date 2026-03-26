@@ -18,13 +18,14 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import ReactDOM from 'react-dom'
+import ReactDOM, {flushSync} from 'react-dom'
 import {getTheme} from '@canvas/instui-bindings'
 import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 
 type Options = {
   highContrast?: boolean
   brandVariables?: Record<string, unknown>
+  sync?: boolean
 }
 
 export function legacyRender(
@@ -32,7 +33,9 @@ export function legacyRender(
   container: Element | null,
   options: Options = {},
 ) {
-  if (!(container instanceof HTMLElement)) {
+  // Use nodeType check instead of instanceof to support cross-frame elements
+  // (e.g. window.parent.document.getElementById from inside an iframe)
+  if (!container || container.nodeType !== 1) {
     throw new Error('Container must be an HTMLElement')
   }
 
@@ -50,16 +53,18 @@ export function render(
   container: Element | null,
   options: Options = {},
 ) {
-  if (!(container instanceof HTMLElement)) {
+  if (!container || container.nodeType !== 1) {
     throw new Error('Container must be an HTMLElement')
   }
 
   const theme = getTheme(options.highContrast, options.brandVariables)
+  const wrapped = (
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>
+  )
 
   const root = createRoot(container)
-  root.render(
-    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
-  )
+  if (options.sync) flushSync(() => root.render(wrapped))
+  else root.render(wrapped)
   return root
 }
 
@@ -69,13 +74,16 @@ export function rerender(
   options: Options = {},
 ) {
   const theme = getTheme(options.highContrast, options.brandVariables)
-  root.render(
-    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>,
+  const wrapped = (
+    <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>
   )
+
+  if (options.sync) flushSync(() => root.render(wrapped))
+  else root.render(wrapped)
 }
 
 export function legacyUnmountComponentAtNode(container: Element | null) {
-  if (!(container instanceof HTMLElement)) {
+  if (!container || container.nodeType !== 1) {
     return false
   }
   return ReactDOM.unmountComponentAtNode(container)

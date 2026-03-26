@@ -31,6 +31,7 @@ import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import * as useInboxMessagesModule from '../../../../hooks/useInboxMessages'
 import * as useWidgetConfigModule from '../../../../hooks/useWidgetConfig'
+import {PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 
 vi.mock('../../../../hooks/useInboxMessages')
 vi.mock('../../../../hooks/useWidgetConfig')
@@ -117,13 +118,15 @@ const renderWithProviders = (component: React.ReactElement) => {
   })
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>{component}</WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>{component}</WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 

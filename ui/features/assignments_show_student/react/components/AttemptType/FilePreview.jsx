@@ -19,7 +19,7 @@
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {colors, spacing} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'

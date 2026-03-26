@@ -80,6 +80,7 @@ describe AuthenticationProvidersController do
       it "includes auth_providers in js_env with id, url, and name" do
         saml = account.authentication_providers.create!(saml_hash)
         cas = account.authentication_providers.create!(cas_hash)
+        canvas = account.authentication_providers.find_by(auth_type: "canvas")
         get "index", params: { account_id: account.id }
         expect(response).to be_successful
         js_env = assigns(:js_env)
@@ -87,13 +88,13 @@ describe AuthenticationProvidersController do
         auth_providers = js_env[:auth_providers]
         expect(auth_providers).not_to be_empty
         expect(auth_providers).to all(include(id: be_an(Integer), url: be_a(String), auth_type: be_a(String)))
-        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id])
+        expect(auth_providers.pluck(:id)).to match_array([saml.id, cas.id, canvas.id])
       end
 
-      it "includes discovery_page_base_url in js_env" do
+      it "includes discovery_page_url in js_env" do
         get "index", params: { account_id: account.id }
         expect(response).to be_successful
-        expect(assigns(:js_env)).to include(:discovery_page_base_url)
+        expect(assigns(:js_env)).to include(:discovery_page_url)
       end
     end
 
@@ -530,6 +531,41 @@ describe AuthenticationProvidersController do
       expect(response).to be_redirect
       account.reload
       expect(account.discovery_page_active?).to be(false)
+    end
+  end
+
+  describe "#destroy with validation errors" do
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    before do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+      allow(Account.site_admin).to receive(:feature_enabled?)
+        .with(:new_login_ui_identity_discovery_page).and_return(true)
+      account.settings[:discovery_page] = {
+        active: true,
+        primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+        secondary: []
+      }
+      account.save!
+    end
+
+    context "HTML format" do
+      it "redirects with error flash" do
+        delete :destroy, params: { account_id: account.id, id: aac.id }
+
+        expect(response).to redirect_to(account_authentication_providers_path(account))
+        expect(flash[:error]).to include(match(/remove.*from the discovery page/))
+      end
+    end
+
+    context "JSON format" do
+      it "returns unprocessable_content with error messages" do
+        delete :destroy, params: { account_id: account.id, id: aac.id }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = response.parsed_body
+        expect(json["errors"]).to include(match(/remove.*from the discovery page/))
+      end
     end
   end
 end

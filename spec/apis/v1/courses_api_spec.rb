@@ -3403,28 +3403,94 @@ describe CoursesController, type: :request do
         expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
-      it "does not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
-        @course4.enrollments.each do |e|
-          e.type = "StudentEnrollment"
-          e.role_id = student_role.id
-          e.save!
-        end
+      it "returns courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
         json = api_call(:get,
                         "/api/v1/courses.json",
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
-        expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course3.id]
+        expect(json.pluck("id").sort).to eq [@course3.id, @course4.id].sort
 
-        @course3.enrollments.each do |e|
-          e.type = "ObserverEnrollment"
-          e.role_id = observer_role.id
-          e.save!
-        end
+        @course3.enrollments.each { |e| e.update!(type: "ObserverEnrollment", role_id: observer_role.id) }
         json = api_call(:get,
                         "/api/v1/courses.json",
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
-        expect(json.collect { |c| c["id"].to_i }).to eq []
+        expect(json.pluck("id").sort).to eq [@course3.id, @course4.id].sort
+      end
+
+      it "returns unpublished courses with invited_or_pending enrollment_state for students" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"], enrollment_state: "invited_or_pending" })
+        expect(json.pluck("id")).to include(@course4.id)
+      end
+
+      it "returns available and completed courses on ?state[]=current_and_concluded" do
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"] })
+        expect(json.pluck("id").sort).to eq [@course1.id, @course2.id].sort
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available completed]))
+      end
+
+      it "excludes student invited enrollments in future unpublished courses when restrict_student_future_listing is enabled" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        @course4.update!(restrict_enrollments_to_course_dates: true, start_at: 1.month.from_now)
+        @course4.enrollments.reload.each do |e|
+          e.enrollment_state.update!(state_is_current: false)
+          e.enrollment_state.ensure_current_state
+        end
+        @course4.account.settings[:restrict_student_future_listing] = { value: true, locked: false }
+        @course4.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"] })
+        expect(json.pluck("id")).not_to include(@course4.id)
+        expect(json.pluck("id")).to include(@course3.id)
+      end
+
+      it "includes student invited enrollments in future unpublished courses when restrict_student_future_listing is disabled" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        @course4.update!(restrict_enrollments_to_course_dates: true, start_at: 1.month.from_now)
+        @course4.enrollments.reload.each do |e|
+          e.enrollment_state.update!(state_is_current: false)
+          e.enrollment_state.ensure_current_state
+        end
+        @course4.account.settings[:restrict_student_future_listing] = { value: false, locked: false }
+        @course4.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"] })
+        expect(json.pluck("id")).to include(@course4.id)
+      end
+
+      it "includes both unpublished and available courses on ?state[]=unpublished&state[]=available" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished", "available"] })
+        course_ids = json.pluck("id")
+        expect(course_ids).to include(@course1.id, @course2.id, @course3.id, @course4.id)
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available unpublished]))
+      end
+
+      it "includes unpublished student enrollments on ?state[]=current_and_concluded&state[]=unpublished" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded", "unpublished"] })
+        course_ids = json.pluck("id")
+        expect(course_ids).to include(@course1.id, @course2.id, @course3.id, @course4.id)
       end
 
       it "returns courses with active StudentEnrollment or ObserverEnrollment when state[]=unpublished" do

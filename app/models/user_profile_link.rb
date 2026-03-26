@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class UserProfileLink < ActiveRecord::Base
+class UserProfileLink < ApplicationRecord
   belongs_to :user_profile
 
   validates :title, length: { maximum: maximum_string_length, allow_blank: true }

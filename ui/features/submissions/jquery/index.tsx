@@ -23,6 +23,7 @@ import round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import {colors} from '@instructure/canvas-theme'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import {Flex} from '@instructure/ui-flex'
@@ -42,7 +43,6 @@ import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
 import StudentAssetReportModalWrapper from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
-import theme from '@instructure/canvas-theme'
 import ready from '@instructure/ready'
 import TextEntryAssetReportStatusLink, {
   ZTextEntryAssetReportStatusLinkProps,
@@ -147,12 +147,11 @@ function formatGradeOptions(): {gradingType?: string} {
 }
 // @ts-expect-error - Legacy submission object structure not fully typed
 function showGrade(submission) {
-  if (['pass', 'fail', 'complete', 'incomplete'].indexOf(submission.entered_grade) > -1) {
-    $('.grading_box').val(submission.entered_grade)
+  const grade = submission.entered_grade === '-' ? null : submission.entered_grade
+  if (['pass', 'fail', 'complete', 'incomplete'].indexOf(grade) > -1) {
+    $('.grading_box').val(grade)
   } else {
-    $('.grading_box').val(
-      callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade, formatGradeOptions()),
-    )
+    $('.grading_box').val(callIfSet(grade, GradeFormatHelper.formatGrade, formatGradeOptions()))
   }
   $('.late_penalty').text(callIfSet(-submission.points_deducted, roundAndFormat))
   $('.published_grade').text(callIfSet(submission.published_grade, GradeFormatHelper.formatGrade))
@@ -260,7 +259,7 @@ function handleValidationClear($textArea: JQuery): void {
     setTimeout(() => {
       $wrapper.find('.error-message').remove()
       $textArea.removeClass('error-textarea')
-      $textArea.next('span').css('border-color', theme.colors?.ui?.surfaceAttention)
+      $textArea.next('span').css('border-color', colors.ui.surfaceAttention)
     }, 100)
   }
 }
@@ -305,7 +304,7 @@ function showErrorMessage(selector: JQuery, message: string): void {
     .text(message)
     .appendTo(errorContainer)
   selector.find('textarea').addClass('error-textarea')
-  selector.find('.error-textarea').next('span').css('border-color', theme.colors?.ui?.surfaceError)
+  selector.find('.error-textarea').next('span').css('border-color', colors.ui.surfaceError)
 }
 
 function windowResize(): void {
@@ -493,9 +492,8 @@ export function setup(): void {
         'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
       if ($('.grading_value:visible').length > 0) {
-        formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade(
-          $('.grading_value').val(),
-        )($ as any).ajaxJSON(url, method, formData, submissionLoaded)
+        formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade($('.grading_value').val())
+        ;($ as any).ajaxJSON(url, method, formData, submissionLoaded)
       } else {
         $('.submission_header').loadingImage('remove')
         $('.save_comment_button').prop('disabled', false)
@@ -742,14 +740,14 @@ export function teardown(): void {
   $(document).unbind('grading_change')
 }
 // @ts-expect-error - Legacy jQuery plugin fragmentChange not fully typed
-$(document).fragmentChange((event: any, hash: any) => {
+$(document).fragmentChange((_event: any, hash: any) => {
   if (hash === '#rubric') {
     $('.assess_submission_link:visible:first').click()
   } else if (hash.match(/^#comment/)) {
     let params: any = null
     try {
       params = JSON.parse(hash.substring(8))
-    } catch (e) {
+    } catch (_e) {
       // no-op
     }
     if (params && params.comment) {

@@ -32,6 +32,12 @@
 # Usage:
 #   PandataEvents.send_event(:an_event, { context_id: 2, meta: :data }, for_user_id: @current_user.global_id)
 module PandataEvents
+  Canvas::Reloader.on_reload do
+    @config = nil
+    @credentials = nil
+    @endpoint = nil
+  end
+
   def self.credentials
     @credentials ||= Rails.application.credentials.pandata_creds&.with_indifferent_access || {}
   end

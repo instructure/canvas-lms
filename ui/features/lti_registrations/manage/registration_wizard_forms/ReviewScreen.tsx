@@ -41,6 +41,9 @@ import {Link} from '@instructure/ui-link'
 import {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
 import {launchTypeSpecificSettingsLabels} from './LaunchTypeSpecificSettingsConfirmation'
 import {LtiPlacementlessMessageType} from '../model/LtiMessageType'
+import {Alert} from '@instructure/ui-alerts'
+import type {DuplicateRegistration} from '../api/domainDuplicates'
+import {AccountId} from '../model/AccountId'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -68,6 +71,8 @@ export type ReviewScreenProps = {
   eulaSettings?: MessageSetting
   defaultIconUrl?: string
   includeIconUrls?: boolean
+  domainDuplicates?: DuplicateRegistration[]
+  accountId: AccountId
   onEditScopes: () => void
   onEditPrivacyLevel: () => void
   onEditPlacements: () => void
@@ -90,6 +95,8 @@ export const ReviewScreen = ({
   defaultIconUrl,
   defaultPlacementIconUrls = {},
   includeIconUrls = true,
+  domainDuplicates = [],
+  accountId,
   onEditScopes,
   onEditLaunchSettings,
   onEditMessageSettings,
@@ -104,6 +111,7 @@ export const ReviewScreen = ({
         <Heading level="h3">{I18n.t('Review')}</Heading>
         <Text>{I18n.t('Review your changes before finalizing.')}</Text>
       </View>
+      <DuplicateAlert domainDuplicates={domainDuplicates} accountId={accountId} />
       {launchSettings && onEditLaunchSettings && (
         <LaunchSettingsSection {...launchSettings} onEditLaunchSettings={onEditLaunchSettings} />
       )}
@@ -238,7 +246,7 @@ export const ReviewScreen = ({
   )
 }
 
-export const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
+export const ReviewSection = ({children}: React.PropsWithChildren) => {
   return (
     <Flex margin="medium 0 medium 0" alignItems="start" justifyItems="space-between">
       {children}
@@ -246,7 +254,7 @@ export const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
   )
 }
 
-export const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
+export const LaunchSettingsHeader = ({children}: React.PropsWithChildren) => {
   return (
     <h5
       style={{
@@ -506,3 +514,67 @@ export const IconUrlsReviewSection = React.memo(
     )
   },
 )
+
+type DuplicateAlertProps = {
+  domainDuplicates: DuplicateRegistration[]
+  accountId: AccountId
+}
+
+const DuplicateAlert = ({domainDuplicates, accountId}: DuplicateAlertProps) => {
+  if (domainDuplicates.length === 0) {
+    return null
+  }
+
+  return (
+    <View margin="medium 0 0 0">
+      <Alert variant="warning" renderCloseButtonLabel={I18n.t('Close')}>
+        <Text
+          dangerouslySetInnerHTML={{
+            __html: createDuplicateMessage(domainDuplicates, accountId),
+          }}
+        />
+      </Alert>
+    </View>
+  )
+}
+
+const createDuplicateMessage = (
+  domainDuplicates: DuplicateRegistration[],
+  accountId: AccountId,
+): string => {
+  // It was way easier to just hard-code these messages than try and use Intl.ListFormat,
+  // especially with the wrappers. The routes also have to be hand-interpolated strings, as these
+  // routes only exist on the front-end, not the backend, so no Rails helpers available.
+  const unnamedTool = I18n.t('Unnamed Tool')
+  const dupes = domainDuplicates.slice(0, 3)
+
+  const getDisplayName = (dup: DuplicateRegistration) =>
+    htmlEscape(dup.admin_nickname || dup.name || unnamedTool)
+
+  const createLink = (dup: DuplicateRegistration) =>
+    `<strong><a href="/accounts/${htmlEscape(accountId)}/apps/manage/${htmlEscape(dup.id)}" target="_blank" rel="noopener noreferrer">$1</a></strong>`
+
+  const wrappers = dupes.map((dup, i) => createLink(dup))
+
+  if (dupes.length === 1) {
+    return I18n.t(
+      "Another tool configuration uses this domain: *%{name}*. To avoid conflicts, ensure the availability settings don't overlap.",
+      {name: getDisplayName(dupes[0]), wrappers},
+    )
+  } else if (dupes.length === 2) {
+    return I18n.t(
+      `Other tool configurations use this domain including *%{first}* and **%{second}**. To avoid conflicts, ensure the availability settings don't overlap.`,
+      {first: getDisplayName(dupes[0]), second: getDisplayName(dupes[1]), wrappers},
+    )
+  } else {
+    return I18n.t(
+      `Other tool configurations use this domain including *%{first}*, **%{second}**, and ***%{third}***. To avoid conflicts, ensure the availability settings don't overlap.`,
+      {
+        first: getDisplayName(dupes[0]),
+        second: getDisplayName(dupes[1]),
+        third: getDisplayName(dupes[2]),
+        wrappers,
+      },
+    )
+  }
+}

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Folder < ActiveRecord::Base
+class Folder < ApplicationRecord
   def self.name_order_by_clause(table = nil)
     col = table ? "#{table}.name" : "name"
     best_unicode_collation_key(col)

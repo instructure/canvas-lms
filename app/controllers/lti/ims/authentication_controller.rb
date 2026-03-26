@@ -97,7 +97,7 @@ module Lti
               account = context.account
             end
 
-            if !account.root_account.feature_enabled?(:lti_oidc_missing_cookie_retry) || params[:retried] == "true"
+            if params[:retried] == "true"
               Rails.logger.info("[LTI] OIDC login required error for account #{account&.global_id}, client_id #{oidc_params[:client_id]}")
               InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
               render("lti/ims/authentication/login_required_error_screen", status: :unauthorized, layout: "borderless_lti", formats: :html)
@@ -244,8 +244,12 @@ module Lti
             if uri.include? "?"
               # Verify the required query params are present
               required_params = CGI.parse(uri.split("?").last).to_a
-              requested_params = CGI.parse(requested_query_string).to_a
-              (required_params - requested_params).empty?
+              if requested_query_string.nil?
+                required_params.empty?
+              else
+                requested_params = CGI.parse(requested_query_string).to_a
+                (required_params - requested_params).empty?
+              end
             else
               uri == requested_redirect_base
             end

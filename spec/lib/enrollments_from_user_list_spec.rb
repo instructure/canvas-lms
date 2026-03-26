@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EnrollmentsFromUserList do
   def list_to_parse
     %(david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>)

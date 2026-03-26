@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import CourseTabContainer from './react/CourseTabContainer'
 import ready from '@instructure/ready'
 
 ready(() => {
-  ReactDOM.render(
+  legacyRender(
     <CourseTabContainer hasGradingPeriods={ENV.HAS_GRADING_PERIODS} />,
     document.getElementById('react_grading_tabs'),
   )

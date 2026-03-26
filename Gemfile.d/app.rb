@@ -75,7 +75,6 @@ gem "link_header", "0.0.8"
 gem "logger", "~> 1.5"
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
-gem "mimemagic", "~> 0.4.3"
 gem "mini_magick", "~> 5.0"
 gem "multi_json", "~> 1.19"
 gem "net-http", "~> 0.1", require: false
@@ -102,7 +101,6 @@ gem "rss", "~> 0.3", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
   gem "pstore", "~> 0.2", require: false
-gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "~> 3.0", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false
@@ -111,7 +109,6 @@ gem "sentry-rails", "~> 6.0"
 gem "sentry-inst_jobs", "~> 6.0"
 gem "soap4r-ng", github: "instructure/soap4r", require: false # dependency of respondus_soap_endpoint, but we need to use an unreleased fork
 gem "syslog", "~> 0.1"
-gem "twilio-ruby", "~> 7.0", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"

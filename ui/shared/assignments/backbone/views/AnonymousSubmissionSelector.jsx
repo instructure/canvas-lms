@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {AnonymousSubmissionComponent} from '../../react/AnonymousSubmissionComponent'
 
 extend(AnonymousSubmissionSelector, Backbone.View)
@@ -50,17 +50,17 @@ AnonymousSubmissionSelector.prototype.updateComponent = function (isAnonymous = 
   const currentIsAnonymous =
     isAnonymous !== null ? isAnonymous : this.parentModel.newQuizzesAnonymousSubmission() || false
 
-  if (!this.root) {
-    this.root = createRoot(this.el)
-  }
+  const element = React.createElement(AnonymousSubmissionComponent, {
+    isAnonymous: currentIsAnonymous,
+    disabled: !this.parentModel.isNew(),
+    onChange: this.handleAnonymousChange,
+  })
 
-  this.root.render(
-    React.createElement(AnonymousSubmissionComponent, {
-      isAnonymous: currentIsAnonymous,
-      disabled: !this.parentModel.isNew(),
-      onChange: this.handleAnonymousChange,
-    }),
-  )
+  if (!this.root) {
+    this.root = render(element, this.el)
+  } else {
+    rerender(this.root, element)
+  }
 }
 
 AnonymousSubmissionSelector.prototype.render = function () {

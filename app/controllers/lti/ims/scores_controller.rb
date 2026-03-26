@@ -613,11 +613,7 @@ module Lti::IMS
     end
 
     def trigger_submission?
-      if context.root_account.feature_enabled?(:ags_score_trigger_needs_grading_after_submitted)
-        Lti::Result::ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
-      else
-        params[:activityProgress] != "Initialized"
-      end
+      Lti::Result::ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
     end
   end
 end

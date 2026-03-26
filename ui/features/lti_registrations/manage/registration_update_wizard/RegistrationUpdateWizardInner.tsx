@@ -132,6 +132,7 @@ export const RegistrationUpdateWizardInner = ({
   const {state, advance, previous, isFirstStep, isLastStep} = wizardState
 
   const isAlreadyApplied = registrationUpdateRequest.status === 'applied'
+  const isRejected = registrationUpdateRequest.status === 'rejected'
 
   const overlayStore = React.useMemo(() => {
     return createLti1p3RegistrationOverlayStore(
@@ -273,6 +274,36 @@ export const RegistrationUpdateWizardInner = ({
               <span
                 dangerouslySetInnerHTML={{
                   __html: I18n.t('This update has already been applied to *%{appName}*.', {
+                    appName,
+                    wrappers: ['<strong>$1</strong>'],
+                  }),
+                }}
+              />
+            </Text>
+          </View>
+        </RegistrationModalBody>
+        <Modal.Footer>
+          <Button onClick={onDismiss} color="primary">
+            {I18n.t('Close')}
+          </Button>
+        </Modal.Footer>
+      </>
+    )
+  }
+
+  if (isRejected) {
+    return (
+      <>
+        <Header onClose={onDismiss} headerText={I18n.t('Already Rejected')} />
+        <RegistrationModalBody>
+          <View as="div" padding="large" textAlign="center">
+            <Heading level="h3" margin="0 0 medium 0">
+              {I18n.t('Update Already Rejected')}
+            </Heading>
+            <Text size="medium">
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: I18n.t('This update has already been rejected for *%{appName}*.', {
                     appName,
                     wrappers: ['<strong>$1</strong>'],
                   }),

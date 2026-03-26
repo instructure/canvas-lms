@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "Cap product"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Generering af undertekster mislykkedes"
+    },
     "caption_manager_aae0906f": {
         "message": "Håndtering af undertekster"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "{ captionName } sletning af undertekster mislykkedes"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "{ captionName } generering af undertekster mislykkedes"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "{ captionName } upload af undertekster mislykkedes"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "Der blev tilføjet undertekster til { lang }"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Grad-symbol"
     },
+    "delete_failed_6529e336": {
+        "message": "Sletning mislykkedes"
+    },
     "delimiters_4db4840d": {
         "message": "Begrænsere"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Engelsk (Storbrittanien)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Indtast en medietitel"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Indtast mindst 3 tegn for at søge"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra stor"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Ekstra stor ({ width } x { height } px)"
     },
     "extra_small_9ae33252": {
         "message": "Ekstra lille"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "Stor tekst"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Stor ({ width } x { height } px)"
+    },
     "latvian_2bbb6aab": {
         "message": "Lettisk"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "Medium"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Mellem ({ width } x { height } px)"
     },
     "merge_links_2478df96": {
         "message": "Sammenlæg links"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Afspil mediekommentar af { name } fra { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Spillerlayout"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Lad Canvas få adgang til din mikrofon og webcam."
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Resultat { index } af { max }."
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "Prøv igen { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "Prøv igen"
     },
@@ -2255,6 +2288,9 @@
     "show_link_options_545338fd": {
         "message": "Vis linkindstillinger"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "Vis rullende transkription"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Brugere, der er i stand til at se, gennemser websider hurtigt og leder efter store overskrifter. Skærmlæsere er afhængige af overskrifter for kontekstuel forståelse. Overskrifter bør anvende den rigtige struktur."
     },
@@ -2287,6 +2323,9 @@
     },
     "small_b070434a": {
         "message": "Lille"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Lille ({ width } x { height } px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Farvet cirkel"
@@ -2567,6 +2606,9 @@
     "timebar_a4d18443": {
         "message": "Tidslinje"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Titel må ikke være tom"
+    },
     "title_ee03d132": {
         "message": "Titel"
     },
@@ -2587,6 +2629,9 @@
     },
     "top_66e0adb6": {
         "message": "Top"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Transskriptionspanelet er tilgængeligt i bredder over 720 px."
     },
     "tray_839df38a": {
         "message": "Bakke"
@@ -2627,6 +2672,9 @@
     "unpublished_dfd8801": {
         "message": "Ikke offentliggjort"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Ikke-gemte ændringer vil gå tabt."
+    },
     "untitled_16aa4f2b": {
         "message": "Uden titel"
     },
@@ -2653,6 +2701,9 @@
     },
     "upload_document_253f0478": {
         "message": "Upload dokument"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Upload mislykkedes"
     },
     "upload_file_fd2361b8": {
         "message": "Overfør fil"
@@ -2815,6 +2866,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Se antal ord og tegn"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "Seerbegrænsninger"
     },
     "waiting_for_response_1efd0c50": {
         "message": "Venter på svar"

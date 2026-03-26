@@ -1062,22 +1062,6 @@ describe OAuth2ProviderController do
       expect(response).to have_http_status(:bad_request)
     end
 
-    context "with custom_csrf_token FF off" do
-      before do
-        Account.site_admin.disable_feature! :csrf_oauth2_fix
-      end
-
-      it "does NOT skip standard CSRF protection if :csrf_oauth2_fix is off" do
-        allow(controller).to receive(:action_name).and_return("accept")
-        expect(controller.send(:skip_csrf?)).to be false
-      end
-
-      it "and custom_csrf_token is empty" do
-        post :accept, session: session_hash
-        expect(response).to have_http_status(:redirect)
-      end
-    end
-
     it "uses the global id of the user for generating the code" do
       expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(
         user.global_id,
@@ -1171,6 +1155,8 @@ describe OAuth2ProviderController do
     let_once(:key) { DeveloperKey.create! }
     let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
 
+    before { Account.default.disable_feature!(:oauth2_deny_post) }
+
     it "forwards the oauth state if it was provided" do
       session_hash[:oauth2][:state] = "1234567890"
       get "deny", session: session_hash
@@ -1187,6 +1173,36 @@ describe OAuth2ProviderController do
     it "doesn't error on an empty session" do
       get "deny", session: {}
       expect(response).to be_bad_request
+    end
+  end
+
+  describe "POST deny" do
+    let_once(:key) { DeveloperKey.create! }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
+
+    before { Account.default.enable_feature!(:oauth2_deny_post) }
+
+    it "forwards the oauth state if it was provided" do
+      session_hash[:oauth2][:state] = "1234567890"
+      post "deny", session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).to match(/state=1234567890/)
+    end
+
+    it "does not provide state if there wasn't one provided" do
+      post "deny", session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).not_to match(/state=/)
+    end
+
+    it "doesn't error on an empty session" do
+      post "deny", session: {}
+      expect(response).to be_bad_request
+    end
+
+    it "rejects GET requests" do
+      get "deny", session: session_hash
+      expect(response).to have_http_status(:method_not_allowed)
     end
   end
 

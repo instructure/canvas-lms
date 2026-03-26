@@ -254,9 +254,11 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
           props.studioOptions = {
             resizable: true,
             convertibleToLink: true,
+            isImprovedEmbed: true,
             embedOptions: {
               enableMediaDownload: false,
               enableTranscriptDownload: false,
+              showRollingTranscript: false,
               lockSpeed: false,
               isExternal: false,
             },
@@ -281,6 +283,11 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         it('shows the "Lock speed at 1x" checkbox', () => {
           renderComponent()
           expect(screen.getByLabelText('Lock speed at 1x')).toBeInTheDocument()
+        })
+
+        it('shows the "Show rolling transcript" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Show rolling transcript')).toBeInTheDocument()
         })
 
         describe('and the media is external', () => {

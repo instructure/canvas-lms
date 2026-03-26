@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import RegenerateCriteria from '../RegenerateCriteria'
 
 describe('RegenerateCriteria', () => {
@@ -137,9 +137,7 @@ describe('RegenerateCriteria', () => {
 
     fireEvent.click(getByTestId('regenerate-criteria-cancel-button'))
 
-    await waitFor(() => {
-      expect(queryByText('Regenerate Criteria')).not.toBeInTheDocument()
-    })
+    await waitForElementToBeRemoved(() => queryByText('Regenerate Criteria'))
 
     // Reopen to verify input was cleared
     fireEvent.click(getByTestId('regenerate-criteria-button'))

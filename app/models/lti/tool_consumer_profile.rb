@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  class ToolConsumerProfile < ActiveRecord::Base
+  class ToolConsumerProfile < ApplicationRecord
     belongs_to :developer_key
 
     before_validation { self.uuid ||= SecureRandom.uuid }

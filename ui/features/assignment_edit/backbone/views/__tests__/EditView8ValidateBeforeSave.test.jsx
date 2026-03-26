@@ -18,6 +18,7 @@
 
 // IMPORTANT: Mock must be hoisted before other imports
 import {vi} from 'vitest'
+import {act} from 'react'
 
 // Mock the RCE loader to prevent dynamic import timeouts during tests
 // The RCE preloadRemoteModule() is called at the module level when EditView is imported,
@@ -179,18 +180,19 @@ describe('EditView - Peer Review Integration - validateBeforeSave', () => {
     view = editView()
   })
 
-  afterEach(() => {
-    // Flush all pending timers while still in fake timer mode, then restore
-    // real timers to prevent "window is not defined" errors from React
-    // scheduler tasks firing after test environment is torn down
-    vi.runAllTimers()
-    vi.useRealTimers()
+  afterEach(async () => {
+    // Clear pending timers and drain React scheduler before cleanup to
+    // prevent "window is not defined" errors from concurrent mode work
+    vi.clearAllTimers()
+    await act(async () => {})
 
     // Clean up view and all child views
     if (view) {
       view.remove()
       view = null
     }
+
+    vi.useRealTimers()
 
     // Clean up any jQuery event handlers
     $(document).off()

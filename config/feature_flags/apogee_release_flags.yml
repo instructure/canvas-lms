@@ -450,6 +450,7 @@ project_lhotse:
   root_opt_in: true
   description: Enables the new IgniteAI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
+  visible_on: project_lhotse_visible_on_hook
 performance_improvements_for_gradebook:
   state: hidden
   applies_to: Course
@@ -502,6 +503,19 @@ gradebook_use_sis_pseudonym_order_for_sorting:
     the wrong pseudonym when users have multiple login IDs. With this flag enabled, the backend
     sorting will correctly match the frontend's SisPseudonym.for logic to select the primary pseudonym.
   shadow: true
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+optimized_load_enrollments_for_index:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Optimized Load Enrollments for Courses Index
+  description: |
+    Optimizes the loading of enrollments for the courses index page by preloading correct 
+    object with a limited set of columns. This reduces memory usage and improves performance,
+    especially for users with many enrollments.
   environments:
     ci:
       state: allowed_on # enable for automated testing builds and local testing

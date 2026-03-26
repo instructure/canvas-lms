@@ -25,13 +25,13 @@ module FeatureFlags
     end
 
     def call
-      Rails.env.local? || in_approved_us_aws_region?
+      Rails.env.local? || in_approved_region?
     end
 
     private
 
-    def in_approved_us_aws_region?
-      %w[us-east-1 us-west-2].include? @region
+    def in_approved_region?
+      %w[us-east-1 us-west-2 eu-central-1 eu-west-1 ap-southeast-2].include? @region
     end
   end
 end

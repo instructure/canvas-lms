@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {render, screen, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {LtiAssetReportsForStudentSubmission} from '../LtiAssetReportsForStudentSubmission'
@@ -32,11 +33,14 @@ describe('LtiAssetReportsForStudentSubmission', () => {
   }
 
   beforeEach(() => {
-    window.ENV = {
-      ...window.ENV,
-      FEATURES: {lti_asset_processor: true},
-    }
+    fakeENV.setup({FEATURES: {lti_asset_processor: true}})
     queryClient.clear()
+  })
+
+  afterEach(() => {
+    cleanup()
+    queryClient.clear()
+    fakeENV.teardown()
   })
 
   it('returns null when no data is available', () => {

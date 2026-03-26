@@ -170,6 +170,23 @@ describe Lti::AccountExternalToolsController do
           expect(error_message).to eq "The tool is already installed in this context."
         end
       end
+
+      context "with a locked registration" do
+        before(:once) do
+          tool_configuration.developer_key.lti_registration.update!(lock_deploying: true)
+        end
+
+        it "returns 403 if the appropriate flag is enabled" do
+          send_request
+          expect(response).to have_http_status :forbidden
+        end
+
+        it "ignores the locked status if the appropriate flag is not enabled" do
+          root_account.disable_feature!(:lock_lti_registrations)
+          send_request
+          expect(response).to have_http_status :ok
+        end
+      end
     end
   end
 end

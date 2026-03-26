@@ -28,7 +28,7 @@ import {
   type Lti1p3RegistrationWizardStep,
   type Lti1p3RegistrationWizardStore,
 } from './Lti1p3RegistrationWizardState'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'

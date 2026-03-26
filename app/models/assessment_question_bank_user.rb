@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentQuestionBankUser < ActiveRecord::Base
+class AssessmentQuestionBankUser < ApplicationRecord
   belongs_to :assessment_question_bank
   belongs_to :user
 

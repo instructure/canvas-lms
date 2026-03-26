@@ -107,17 +107,6 @@ describe Lti::LogService do
       end
     end
 
-    context "when lti_v2_turnitin_usage_log feature flag is disabled" do
-      before do
-        context.root_account.disable_feature!(:lti_v2_turnitin_usage_log)
-      end
-
-      it "does not send an event to PandataEvents" do
-        subject
-        expect(PandataEvents).not_to have_received(:send_event)
-      end
-    end
-
     context "when launch URL is not turnitin" do
       let(:launch_url) { "https://example.com/launch" }
 

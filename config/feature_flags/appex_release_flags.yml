@@ -74,6 +74,16 @@ new_login_ui_custom_labels:
       state: hidden
     production:
       state: hidden
+record_saml_certificates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Record SAML Certificates
+  description: >-
+    Persist SAML signing certificates from authentication responses
+    when using fingerprint-based certificate matching.
+  environments:
+    development:
+      state: allowed
 new_login_ui_identity_discovery_page:
   state: hidden
   applies_to: SiteAdmin

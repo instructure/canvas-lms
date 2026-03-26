@@ -76,6 +76,7 @@ export default class LoggingContentPaneView extends Backbone.View {
 
     return new GradeChangeLoggingContentView({
       users: this.options.users,
+      searchAsSubaccount: this.permissions.grade_change_search_as_subaccount,
     })
   }
 

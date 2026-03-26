@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require_relative "../../app/services/file_text_extraction_service"
 
 RSpec.describe FileTextExtractionService do
