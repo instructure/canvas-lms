@@ -126,7 +126,6 @@ const mockAllocationRules: AllocationRuleType[] = [
 
 describe('PeerReviewAllocationRulesTray', () => {
   const defaultProps = {
-    courseId: '1',
     assignmentId: '456',
     requiredPeerReviewsCount: 2,
     isTrayOpen: true,

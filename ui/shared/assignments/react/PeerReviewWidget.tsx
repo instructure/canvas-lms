@@ -89,7 +89,6 @@ export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps
         closeTray={() => setIsConfigTrayOpen(false)}
       />
       <PeerReviewAllocationRulesTray
-        courseId={courseId}
         assignmentId={assignmentId}
         isTrayOpen={isAllocationTrayOpen}
         closeTray={() => setIsAllocationTrayOpen(false)}
