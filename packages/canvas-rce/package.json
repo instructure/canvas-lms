@@ -147,7 +147,7 @@
     "format-message-generate-id": "^6",
     "i18n-js": "^3",
     "isomorphic-fetch": "2.2.1",
-    "js-beautify": "1.14.9",
+    "js-beautify": "1.15.4",
     "keycode": "^2",
     "mathlive": "^0.77.0",
     "minimatch":  "^10.2.3",
