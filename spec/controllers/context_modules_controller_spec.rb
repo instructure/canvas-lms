@@ -1467,6 +1467,20 @@ describe ContextModulesController do
         get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
         expect(response).to have_http_status :ok
       end
+
+      it "allows item_redirect for published module items" do
+        assignment = @course.assignments.create!(title: "hello")
+        tag = @mod1.add_item(type: "assignment", id: assignment.id)
+        get "item_redirect", params: { course_id: @course.id, id: tag.id }
+        expect(response).to be_redirect
+      end
+
+      it "allows module_redirect for published modules" do
+        assignment = @course.assignments.create!(title: "hello")
+        @mod1.add_item(type: "assignment", id: assignment.id)
+        get "module_redirect", params: { course_id: @course.id, context_module_id: @mod1.id, first: 1 }
+        expect(response).to be_redirect
+      end
     end
 
     before :once do
