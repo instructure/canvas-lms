@@ -22,14 +22,16 @@ import userEvent from '@testing-library/user-event'
 import StudyAssistTray from '../StudyAssistTray'
 
 const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-content" />)
+const mockAssistFlashCardsInteraction = vi.fn((_props: object) => <div />)
 
 vi.mock('@instructure/platform-study-assist', () => ({
-  AssistProvider: ({children, moduleItemId}: {children: React.ReactNode; moduleItemId: string}) => (
-    <div data-testid="assist-provider" data-module-item-id={moduleItemId}>
+  AssistProvider: ({children, pageId}: {children: React.ReactNode; pageId: string}) => (
+    <div data-testid="assist-provider" data-page-id={pageId}>
       {children}
     </div>
   ),
   AssistContent: (props: object) => mockAssistContent(props),
+  AssistFlashCardsInteraction: (props: object) => mockAssistFlashCardsInteraction(props),
 }))
 
 describe('StudyAssistTray', () => {
@@ -44,6 +46,7 @@ describe('StudyAssistTray', () => {
     } as any
     onDismiss.mockReset()
     mockAssistContent.mockClear()
+    mockAssistFlashCardsInteraction.mockClear()
   })
 
   it('renders the heading when open', () => {
@@ -72,7 +75,7 @@ describe('StudyAssistTray', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
-  it('passes WIKI_PAGE_ID as moduleItemId to AssistProvider', () => {
+  it('passes WIKI_PAGE_ID as pageId to AssistProvider', () => {
     render(
       <StudyAssistTray
         open={true}
@@ -80,10 +83,7 @@ describe('StudyAssistTray', () => {
         fetchAssistResponse={fetchAssistResponse}
       />,
     )
-    expect(screen.getByTestId('assist-provider')).toHaveAttribute(
-      'data-module-item-id',
-      'test-page',
-    )
+    expect(screen.getByTestId('assist-provider')).toHaveAttribute('data-page-id', 'test-page')
   })
 
   it('configures AssistContent for prompts-only mode with filtered prompts', () => {
@@ -99,6 +99,35 @@ describe('StudyAssistTray', () => {
         chatEnabled: false,
         showLargePrompts: true,
         allowedPrompts: ['Summarize', 'Quiz me', 'Flashcards'],
+      }),
+    )
+  })
+
+  it('renderFlashCards renders AssistFlashCardsInteraction with cardHeight', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    const {renderFlashCards} = mockAssistContent.mock.calls[0][0] as {
+      renderFlashCards: (
+        cards: object[],
+        isFetching: boolean,
+        isError: boolean,
+        getFlashCards: () => void,
+      ) => React.ReactNode
+    }
+    const mockCards = [{question: 'Q', answer: 'A'}]
+    render(<>{renderFlashCards(mockCards, false, false, vi.fn())}</>)
+
+    expect(mockAssistFlashCardsInteraction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cardData: mockCards,
+        isFetching: false,
+        isError: false,
+        cardHeight: '60vh',
       }),
     )
   })
