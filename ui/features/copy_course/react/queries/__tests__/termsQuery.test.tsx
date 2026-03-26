@@ -173,7 +173,7 @@ describe('termsQuery', () => {
 
     const result = await termsQuery(context)
 
-    expect(capturedPath).toBe('/api/v1/accounts/1/terms?page=1&per_page=10')
+    expect(capturedPath).toBe('/api/v1/accounts/1/terms?page=1&per_page=100')
     expect(result.json).toEqual({enrollment_terms: []})
   })
 })

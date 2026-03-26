@@ -51,12 +51,12 @@ export const termsQuery = async ({
 
   // Handle the pageParam which might be unknown
   let page = '1'
-  let perPage = '10'
+  let perPage = '100'
 
   if (pageParam && typeof pageParam === 'object' && pageParam !== null) {
     const params = pageParam as Partial<NextPageTerms>
     page = params.page || '1'
-    perPage = params.per_page || '10'
+    perPage = params.per_page || '100'
   }
 
   const path = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`
