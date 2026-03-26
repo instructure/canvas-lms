@@ -41,9 +41,10 @@ module SectionTabHelper
   ].freeze
 
   # if a tab depends on a Course FF, it should be included here so that the cache is busted
-  FLAGS_FOR_CACHE_KEY = [
-    :smart_search,
-    :youtube_migration
+  FLAGS_FOR_CACHE_KEY = %i[
+    new_quizzes_native_experience
+    smart_search
+    youtube_migration
   ].freeze
 
   def available_section_tabs
@@ -144,10 +145,12 @@ module SectionTabHelper
         "section_tabs_hash",
         I18n.locale
       ]
-      # need to include FF for courses in order to bust the cache
-      if context.is_a?(Course)
+      # need to include FF for courses and accounts in order to bust the cache
+      if context.is_a?(Course) || context.is_a?(Account)
         flag_states = FLAGS_FOR_CACHE_KEY.map { |flag| context.feature_enabled?(flag) }
         k.concat(flag_states)
+      end
+      if context.is_a?(Course)
         if context.elementary_homeroom_course?
           k << "homeroom_course"
         end
