@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent} from '@testing-library/react'
+import {fireEvent, waitFor} from '@testing-library/react'
 import {Assignment} from '../../../../graphql/Assignment'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../../../util/constants'
@@ -61,7 +61,7 @@ describe('DiscussionTopicForm Checkpoints Additional Replies', () => {
     })
   }
 
-  it('reverts to minimum required count value if user has backspaced and leaves the input field', () => {
+  it('reverts to minimum required count value if user has backspaced and leaves the input field', async () => {
     const {getByTestId} = setupWithCheckpoints()
 
     const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
@@ -71,6 +71,8 @@ describe('DiscussionTopicForm Checkpoints Additional Replies', () => {
     expect(numberInputReplyToEntryRequiredCount.value).toBe('0')
 
     fireEvent.blur(numberInputReplyToEntryRequiredCount)
-    expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+    // React 18 concurrent mode batches state updates asynchronously;
+    // waitFor ensures we check the value after the revert state update flushes
+    await waitFor(() => expect(numberInputReplyToEntryRequiredCount.value).toBe('1'))
   })
 })
