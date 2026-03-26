@@ -34,8 +34,7 @@ end %>
 <% load_enrollments_for_index %>
 <% @visible_groups ||= @current_user.visible_groups %>
 
-<% @favorite_course_ids =
-  @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
+<% @favorite_course_ids = @current_user.favorite_context_ids("Course") %>
 <% @show_star_column = show_favorites_col_for_index?(:current) %>
 <%
   # TODO TEMPORARY TURNED OFF
