@@ -23,16 +23,36 @@ class InstitutionalTagCategory < ApplicationRecord
 
   belongs_to :account, optional: false
   belongs_to :sis_batch, optional: true
-  has_many :institutional_tags, foreign_key: :category_id, dependent: :restrict_with_exception, inverse_of: :category
+  has_many :institutional_tags, foreign_key: :category_id, inverse_of: :category
 
   resolves_root_account through: :account
+
+  before_validation :sanitize_name, if: :name_changed?
+  before_destroy :cascade_archive_tags
 
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :sis_source_id, length: { maximum: 255, allow_blank: true }
   validates :stuck_sis_fields, length: { maximum: 255, allow_blank: true }
   validates :sis_source_id, uniqueness: { scope: :root_account_id, case_sensitive: false }, allow_nil: true
-  sanitize_field :name, CanvasSanitize::SANITIZE
   sanitize_field :description, CanvasSanitize::SANITIZE
   validates :name, uniqueness: { scope: :root_account_id, conditions: -> { active }, case_sensitive: false }
+
+  private
+
+  def sanitize_name
+    self.name = Sanitize.clean((name || "").to_s, CanvasSanitize::SANITIZE)
+  end
+
+  def cascade_archive_tags
+    InstitutionalTagCategory.transaction do
+      now = Time.now.utc
+      InstitutionalTagAssociation
+        .active
+        .joins(:institutional_tag)
+        .where(institutional_tags: { category_id: id })
+        .update_all(workflow_state: "deleted", updated_at: now)
+      institutional_tags.active.update_all(workflow_state: "deleted", updated_at: now)
+    end
+  end
 end
