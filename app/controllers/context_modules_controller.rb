@@ -25,7 +25,7 @@ class ContextModulesController < ApplicationController
   include ObserverModuleInfo
 
   before_action :require_context
-  skip_before_action :require_user, only: %i[content_tag_assignment_data index progressions]
+  skip_before_action :require_user, only: %i[content_tag_assignment_data index item_redirect module_redirect progressions]
 
   include HorizonMode
 
