@@ -38,7 +38,7 @@ describe('GroupCategoryModal', () => {
     expect(getByText('Group Set Name')).toBeInTheDocument()
   })
   it('opens Leadership section when it clicks allows checkbox', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {queryByText, getAllByText, getByText} = setup()
     expect(queryByText('Leadership')).not.toBeInTheDocument()
     await user.click(getByText('Allow'))
@@ -46,7 +46,7 @@ describe('GroupCategoryModal', () => {
   })
 
   it('unchecks suboordinate options when it unchecks allow checkbox', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByText} = setup()
     await user.click(getByText('Allow'))
     getByText('Require group members to be in the same section').click()
@@ -55,7 +55,7 @@ describe('GroupCategoryModal', () => {
   })
 
   it('clears correct shown/hidden options when it unchecks allow checkbox', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByText} = setup()
     const allowCheckbox = getByText('Allow')
     await user.click(allowCheckbox)
@@ -68,7 +68,7 @@ describe('GroupCategoryModal', () => {
   })
 
   it('enables number input when it picks a group structure', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByLabelText, findByLabelText, findByText} = setup()
     const select = getByLabelText('Group Structure')
     await user.click(select)
@@ -78,7 +78,7 @@ describe('GroupCategoryModal', () => {
 
   // TODO: InstUI SimpleSelect + NumberInput interaction unreliable in CI
   it.skip('increments/decrements number input, which stays in bounds', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByText, findByText, findByLabelText} = setup()
     await user.click(getByText('Group Structure'))
     await user.click(await findByText('Split students by number of groups', {}, {timeout: 10000}))
@@ -100,7 +100,7 @@ describe('GroupCategoryModal', () => {
   }, 30000)
 
   it('calls submission function on submit', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const onSubmit = vi.fn()
     const {getByText} = setup(onSubmit)
     await user.click(getByText('Submit'))
