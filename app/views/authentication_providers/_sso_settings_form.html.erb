@@ -57,12 +57,15 @@
                            :class => 'ic-Input',
                            'aria-describedby' => 'auth_discovery_url_description' %>
           <div class="ic-Form-help-text" id="auth_discovery_url_description">
-            <%= t('discovery_url_description', <<~TEXT)
-If a discovery URL is set, Canvas will forward all users to that URL when they need to be authenticated.
-That page will need to then help the user figure out where they need to go to log in.
-If no discovery URL is configured, the first configuration will be used to attempt to authenticate the user.
-                 TEXT
+            <%= t(<<~TEXT)
+              Enter an external URL where users can choose how to log in.
+              This page should direct users to a specific Canvas authentication provider (e.g., /login/saml/3).
+              If left blank, Canvas defaults to your first listed authentication method.
+            TEXT
             %>
+            <% if @account.discovery_page_allowed? %>
+              <%= t("Use this option if you need more customization than the native Discovery Page offers.") %>
+            <% end %>
           </div>
         </div>
         <%# END discovery url logic %>
@@ -74,7 +77,13 @@ If no discovery URL is configured, the first configuration will be used to attem
             <%= f.hidden_field :discovery_page_active, id: 'discovery_page_active_field', value: presenter.discovery_page_active? %>
             <div id="discovery-page-root"></div>
             <div class="ic-Form-help-text">
-              <%= t('Configure the discovery page. When enabled, this page replaces the default discovery experience at /login/discovery.') %>
+              <%= t(<<~TEXT)
+                Configure a native Canvas discovery page.
+                When enabled, this page displays instead of the Discovery URL or the first listed authentication method.
+                You can configure this page before enabling it, and turning it on will not delete the Discovery URL saved above.
+                This page automatically inherits your Login page branding from the Theme Editor.
+              TEXT
+              %>
             </div>
           </div>
           <%# END discovery page logic %>
