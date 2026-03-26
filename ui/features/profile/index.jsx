@@ -21,7 +21,7 @@ import './jquery/index'
 import '@canvas/user-sortable-name'
 import './jquery/communication_channels'
 import React from 'react'
-import {render, legacyRender} from '@canvas/react'
+import {render} from '@canvas/react'
 import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import FeatureFlags from '@canvas/feature-flags'
@@ -38,12 +38,12 @@ ready(() => {
 
   const featureFlagContainer = document.querySelector('.feature-flag-wrapper') // there is only one of these
   if (featureFlagContainer) {
-    render(<FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />, featureFlagContainer)
+    render(<FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />, featureFlagContainer, {sync: true})
   }
 
   const pairingCodeContainer = document.querySelector('#pairing-code')
   if (pairingCodeContainer) {
-    render(<GeneratePairingCode userId={ENV.current_user.id} />, pairingCodeContainer)
+    render(<GeneratePairingCode userId={ENV.current_user.id} />, pairingCodeContainer, {sync: true})
   }
 
   const avatarModalMount = document.getElementById('avatar-modal-mount')
@@ -51,9 +51,11 @@ ready(() => {
   if (profilePicLink && avatarModalMount) {
     profilePicLink.addEventListener('click', event => {
       event.preventDefault()
-      legacyRender(
-        <AvatarModal onClose={() => legacyRender(null, avatarModalMount)} />,
-        avatarModalMount
+      let root
+      root = render(
+        <AvatarModal onClose={() => root.unmount()} />,
+        avatarModalMount,
+        {sync: true},
       )
     })
   }
