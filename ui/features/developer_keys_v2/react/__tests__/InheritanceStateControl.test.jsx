@@ -25,6 +25,7 @@ import {confirm as confirmDialog} from '@canvas/instui-bindings/react/Confirm'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import $ from 'jquery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/instui-bindings/react/Confirm')
 
@@ -50,6 +51,10 @@ beforeEach(() => {
   $.flashError = vi.fn()
   $.flashMessage = vi.fn()
   $.flashWarning = vi.fn()
+})
+
+afterEach(() => {
+  vi.clearAllMocks()
 })
 
 const sampleDeveloperKey = (defaults = {}) => {
@@ -84,15 +89,12 @@ const renderInheritanceStateControl = (developerKey, store = false, contextId = 
   render(<InheritanceStateControl {...defaultProps(developerKey, store, contextId)} />)
 
 describe('InheritanceStateControl', () => {
-  let oldFeatures = {}
-
   beforeEach(() => {
-    window.ENV.FEATURES ||= {}
-    oldFeatures = window.ENV.FEATURES
+    fakeENV.setup({FEATURES: {}})
   })
 
   afterEach(() => {
-    window.ENV.FEATURES = oldFeatures
+    fakeENV.teardown()
   })
 
   it('uses the "off" state from the store for a siteadmin key', () => {
@@ -230,11 +232,14 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
-    // It's hard to test "wait for nothing to happen", so just
-    // wait a bit and make sure nothing's changed. This seems to be
-    // enough time such that if the confirm() Promise resolves to true,
-    // this test fails.
-    await new Promise(resolve => setTimeout(resolve, 1))
+    // Use fake timers to avoid leaking real async timers between tests.
+    // Advance past any micro-task queue flush to confirm state stays unchanged.
+    vi.useFakeTimers()
+    try {
+      await vi.advanceTimersByTimeAsync(10)
+    } finally {
+      vi.useRealTimers()
+    }
     const updatedDevKey = store.getState().listDeveloperKeys.list[0]
     expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('on')
   })
@@ -367,15 +372,12 @@ describe('InheritanceStateControl', () => {
   })
 
   describe('when devKeysReadOnly is true', () => {
-    let originalEnv
-
     beforeEach(() => {
-      originalEnv = window.ENV
-      window.ENV = {...originalEnv, devKeysReadOnly: true}
+      fakeENV.setup({FEATURES: {}, devKeysReadOnly: true})
     })
 
     afterEach(() => {
-      window.ENV = originalEnv
+      fakeENV.teardown()
     })
 
     it('disables radio group for site admin context', () => {
