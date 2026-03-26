@@ -23,17 +23,29 @@ class InstitutionalTag < ApplicationRecord
 
   belongs_to :category, class_name: "InstitutionalTagCategory", optional: false, inverse_of: :institutional_tags
   belongs_to :sis_batch, optional: true
-  has_many :institutional_tag_associations, dependent: :restrict_with_exception, inverse_of: :institutional_tag
+  has_many :institutional_tag_associations, inverse_of: :institutional_tag
 
   resolves_root_account through: :category
 
+  before_validation :sanitize_name, if: :name_changed?
+  before_destroy :cascade_archive_associations
+
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, presence: true, length: { maximum: 500 }
-  sanitize_field :name, CanvasSanitize::SANITIZE
   sanitize_field :description, CanvasSanitize::SANITIZE
 
   validates :sis_source_id, length: { maximum: 255, allow_blank: true }
   validates :stuck_sis_fields, length: { maximum: 255, allow_blank: true }
   validates :sis_source_id, uniqueness: { scope: :root_account_id, case_sensitive: false }, allow_nil: true
   validates :name, uniqueness: { scope: :root_account_id, conditions: -> { active }, case_sensitive: false }
+
+  private
+
+  def sanitize_name
+    self.name = Sanitize.clean((name || "").to_s, CanvasSanitize::SANITIZE)
+  end
+
+  def cascade_archive_associations
+    institutional_tag_associations.active.update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+  end
 end

@@ -112,13 +112,25 @@ describe InstitutionalTag do
       expect(tag.institutional_tag_associations).to include(assoc)
     end
 
-    it "restricts deletion when associations exist" do
+    it "raises FK error on hard-delete when associations exist" do
       tag = InstitutionalTag.create!(valid_params)
-      InstitutionalTagAssociation.create!(
-        institutional_tag: tag,
-        context: user
-      )
-      expect { tag.destroy_permanently! }.to raise_error(ActiveRecord::DeleteRestrictionError)
+      InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      expect { tag.destroy_permanently! }.to raise_error(ActiveRecord::InvalidForeignKey)
+    end
+
+    it "cascade-archives active associations on soft-delete" do
+      tag = InstitutionalTag.create!(valid_params)
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      tag.destroy
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "does not touch already-deleted associations on soft-delete" do
+      tag = InstitutionalTag.create!(valid_params)
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      assoc.destroy
+      tag.destroy
+      expect(assoc.reload.workflow_state).to eq "deleted"
     end
   end
 
