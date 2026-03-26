@@ -9941,7 +9941,13 @@ describe Assignment do
     before :once do
       @course.enable_feature!(:peer_review_allocation_and_grading)
       @assignment = @course.assignments.create!(
-        name: "peer review assignment",
+        name: "Assignment with Graded Peer Reviews",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+      peer_review_model(parent_assignment: @assignment)
+      @assignment_with_legacy_reviews = @course.assignments.create!(
+        name: "Assignment with Legacy Peer Reviews",
         peer_reviews: true,
         peer_review_count: 2
       )
@@ -9983,45 +9989,111 @@ describe Assignment do
       end
     end
 
-    it "allows changes to peer review count before peer reviews are submitted" do
-      @assignment.peer_review_count = 3
-      expect(@assignment).to be_valid
+    describe "changes to peer review count for assignments with graded peer reviews" do
+      it "allows changes before peer reviews are submitted" do
+        @assignment.peer_review_count = 3
+        expect(@assignment).to be_valid
+      end
+
+      it "does not allow changes after peer reviews are submitted" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment.peer_review_count = 3
+        expect(@assignment).not_to be_valid
+        expect(@assignment.errors[:peer_review_count]).to include(
+          "Students have already submitted peer reviews, so reviews required and points cannot be changed."
+        )
+      end
+
+      it "allows validation to pass when peer_review_count is not changed" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment.name = "updated name"
+        expect(@assignment).to be_valid
+      end
+
+      context "when the feature flag is disabled" do
+        before { @course.disable_feature!(:peer_review_allocation_and_grading) }
+
+        it "does not allow changes after peer reviews are submitted" do
+          submission1 = @assignment.find_or_create_submission(@student1)
+          submission2 = @assignment.find_or_create_submission(@student2)
+          AssessmentRequest.create!(
+            user: @student1,
+            asset: submission1,
+            assessor_asset: submission2,
+            assessor: @student2,
+            workflow_state: "completed"
+          )
+
+          @assignment.peer_review_count = 3
+          expect(@assignment).not_to be_valid
+          expect(@assignment.errors[:peer_review_count]).to include(
+            "Students have already submitted peer reviews, so reviews required and points cannot be changed."
+          )
+        end
+
+        it "allows changes before peer reviews are submitted" do
+          @assignment.peer_review_count = 3
+          expect(@assignment).to be_valid
+        end
+      end
     end
 
-    it "does not allow changes to peer review count after peer reviews are submitted" do
-      submission1 = @assignment.find_or_create_submission(@student1)
-      submission2 = @assignment.find_or_create_submission(@student2)
-      AssessmentRequest.create!(
-        user: @student1,
-        asset: submission1,
-        assessor_asset: submission2,
-        assessor: @student2,
-        workflow_state: "completed"
-      )
+    describe "changes to peer review count for assignments with legacy peer reviews" do
+      it "allows changes before peer reviews are submitted" do
+        @assignment_with_legacy_reviews.peer_review_count = 3
+        expect(@assignment_with_legacy_reviews).to be_valid
+      end
 
-      @assignment.peer_review_count = 3
-      expect(@assignment).not_to be_valid
-      expect(@assignment.errors[:peer_review_count]).to include(
-        "Students have already submitted peer reviews, so reviews required and points cannot be changed."
-      )
+      it "allows changes after peer reviews are submitted" do
+        submission1 = @assignment_with_legacy_reviews.find_or_create_submission(@student1)
+        submission2 = @assignment_with_legacy_reviews.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment_with_legacy_reviews.peer_review_count = 3
+        expect(@assignment_with_legacy_reviews).to be_valid
+      end
+
+      it "allows validation to pass when peer_review_count is not changed" do
+        submission1 = @assignment_with_legacy_reviews.find_or_create_submission(@student1)
+        submission2 = @assignment_with_legacy_reviews.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment_with_legacy_reviews.name = "updated name"
+        expect(@assignment_with_legacy_reviews).to be_valid
+      end
     end
 
-    it "allows validation to pass when peer_review_count is not changed" do
-      submission1 = @assignment.find_or_create_submission(@student1)
-      submission2 = @assignment.find_or_create_submission(@student2)
-      AssessmentRequest.create!(
-        user: @student1,
-        asset: submission1,
-        assessor_asset: submission2,
-        assessor: @student2,
-        workflow_state: "completed"
-      )
-
-      @assignment.name = "updated name"
-      expect(@assignment).to be_valid
-    end
-
-    it "allows updating various assignment properties when peer review submissions exist" do
+    it "allows updating various properties except for peer review count for assignments with graded peer reviews after peer reviews are submitted" do
       submission1 = @assignment.find_or_create_submission(@student1)
       submission2 = @assignment.find_or_create_submission(@student2)
       AssessmentRequest.create!(
@@ -10056,22 +10128,6 @@ describe Assignment do
       expect(@assignment.errors[:peer_review_count]).to include(
         "Students have already submitted peer reviews, so reviews required and points cannot be changed."
       )
-    end
-
-    it "does not validate peer review count when feature flag is disabled" do
-      @course.disable_feature!(:peer_review_allocation_and_grading)
-      submission1 = @assignment.find_or_create_submission(@student1)
-      submission2 = @assignment.find_or_create_submission(@student2)
-      AssessmentRequest.create!(
-        user: @student1,
-        asset: submission1,
-        assessor_asset: submission2,
-        assessor: @student2,
-        workflow_state: "completed"
-      )
-
-      @assignment.peer_review_count = 3
-      expect(@assignment).to be_valid
     end
 
     describe ".assignment_ids_with_peer_review_submissions" do
@@ -10148,20 +10204,23 @@ describe Assignment do
     end
 
     context "when disabling peer reviews" do
-      it "allows disabling when no peer review submissions exist" do
+      it "allows disabling for assignments with graded peer reviews when no PR submissions exist and FF is enabled" do
         assignment = @course.assignments.create!(
-          name: "peer review assignment",
+          name: "Assignment with graded peer reviews",
           peer_reviews: true
         )
+        peer_review_model(parent_assignment: assignment)
+
         assignment.peer_reviews = false
         expect(assignment).to be_valid
       end
 
-      it "prevents disabling when peer review submissions exist" do
+      it "prevents disabling for assignments with graded peer reviews when PR submissions exist and FF is enabled" do
         assignment = @course.assignments.create!(
-          name: "peer review assignment",
+          name: "Assignment with graded peer reviews and submissions",
           peer_reviews: true
         )
+        peer_review_model(parent_assignment: assignment)
         create_completed_assessment_request(assignment, reviewer: @student2, reviewee: @student1)
 
         expect(assignment.peer_review_submissions?).to be true
@@ -10169,11 +10228,39 @@ describe Assignment do
         assignment.peer_reviews = false
         expect(assignment).not_to be_valid
         expect(assignment.errors[:peer_reviews]).to include(
-          "cannot be disabled when students have already submitted reviews"
+          "cannot be disabled for assignments with graded peer reviews when students have already submitted reviews"
         )
       end
 
-      it "allows disabling when feature flag is disabled" do
+      it "prevents disabling for assignments with graded peer reviews when FF is disabled" do
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: true
+        )
+        peer_review_model(parent_assignment: assignment)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        assignment.peer_reviews = false
+        expect(assignment).not_to be_valid
+        expect(assignment.errors[:peer_reviews]).to include(
+          "cannot be disabled for assignments with graded peer reviews in legacy mode"
+        )
+      end
+
+      it "allows disabling for assignments with legacy peer reviews when PR submissions exist when FF is enabled" do
+        assignment = @course.assignments.create!(
+          name: "Assignment with legacy peer reviews",
+          peer_reviews: true
+        )
+        create_completed_assessment_request(assignment, reviewer: @student2, reviewee: @student1)
+
+        expect(assignment.peer_review_submissions?).to be true
+
+        assignment.peer_reviews = false
+        expect(assignment).to be_valid
+      end
+
+      it "allows disabling for assignments with legacy peer reviews when PR submissions exist when FF is disabled" do
         @course.disable_feature!(:peer_review_allocation_and_grading)
         assignment = @course.assignments.create!(
           name: "peer review assignment",
