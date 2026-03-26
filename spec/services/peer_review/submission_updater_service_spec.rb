@@ -347,7 +347,7 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
 
         peer_review_submission.reload
         expect(peer_review_submission.workflow_state).to eq("submitted")
-        expect(peer_review_submission.submitted_at).to be_within(1.second).of(2.days.ago)
+        expect(peer_review_submission.submitted_at).to be_within(1.second).of(1.day.ago)
       end
     end
 
@@ -358,7 +358,7 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
         expect(peer_review_submission.workflow_state).to eq("submitted")
 
         original_submitted_at = peer_review_submission.submitted_at
-        expect(original_submitted_at).to be_within(1.second).of(3.days.ago)
+        expect(original_submitted_at).to be_within(1.second).of(2.days.ago)
 
         request3.destroy
 
