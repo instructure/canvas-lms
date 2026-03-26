@@ -229,7 +229,7 @@ export function ManualCaptionCreator({
               aria-label={
                 selectedFile
                   ? formatMessage('Selected file: {name}', {name: selectedFile.name})
-                  : formatMessage('Required: Choose File')
+                  : formatMessage('Choose File (required)')
               }
               aria-invalid={fileValidationError ? 'true' : undefined}
             >
