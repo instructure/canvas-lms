@@ -96,6 +96,25 @@ describe WikiPagesController do
     end
   end
 
+  context "unauthenticated user in public course" do
+    before do
+      @course.update!(is_public: true)
+      @page = @course.wiki_pages.create!(title: "a-page", body: "hello")
+      remove_user_session
+    end
+
+    it "allows access to the pages index" do
+      get "index", params: { course_id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+
+    it "allows access to the front page" do
+      @course.wiki.set_front_page_url!(@page.url)
+      get "front_page", params: { course_id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+  end
+
   context "with page" do
     before do
       @page = @course.wiki_pages.create!(title: "ponies5ever", body: "")
