@@ -151,11 +151,11 @@ export function loadDocPreview($container, options) {
     const canvadocWrapper = document.createElement('div')
     canvadocWrapper.setAttribute(
       'style',
-      'overflow: auto; resize: vertical; border: 1px solid transparent; height: 100%;',
+      'overflow: auto; resize: vertical; border: 1px solid transparent; min-height: 500px;',
     )
     $container.appendChild(canvadocWrapper)
 
-    const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '800px'
+    const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '500px'
     const sanitizedUrl = sanitizeUrl(opts.canvadoc_session_url)
     const iframe = document.createElement('iframe')
 
