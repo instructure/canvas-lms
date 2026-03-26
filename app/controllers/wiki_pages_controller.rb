@@ -34,7 +34,7 @@ class WikiPagesController < ApplicationController
   before_action :set_js_rights
   before_action :set_js_wiki_data
   before_action :rce_js_env, only: %i[edit index new]
-  skip_before_action :require_user, only: %i[show show_redirect]
+  skip_before_action :require_user, only: %i[front_page index show show_redirect]
 
   include K5Mode
 
