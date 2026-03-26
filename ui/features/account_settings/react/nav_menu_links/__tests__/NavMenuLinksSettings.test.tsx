@@ -18,13 +18,19 @@
  */
 
 import React from 'react'
-import {render, fireEvent, within} from '@testing-library/react'
+import {render, fireEvent, within, waitFor} from '@testing-library/react'
 import NavMenuLinksSettings from '../NavMenuLinksSettings'
 import {useNavMenuLinksStore} from '../useNavMenuLinksStore'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the store
 vi.mock('../useNavMenuLinksStore')
+
+// Mock confirmDanger
+vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+  confirmDanger: vi.fn(),
+}))
 
 // Mock the AddLinkModal
 vi.mock('@canvas/nav-menu-links/react/components/AddLinkModal', () => ({
@@ -108,8 +114,38 @@ describe('NavMenuLinksSettings', () => {
     })
   })
 
-  it('calls deleteLink when delete is clicked', () => {
+  it('shows confirmation dialog when delete is clicked', async () => {
+    vi.mocked(confirmDanger).mockResolvedValue(false)
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          label: 'Link to Delete',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: vi.fn(),
+    })
+
+    const {getByRole} = render(<NavMenuLinksSettings />)
+
+    fireEvent.click(getByRole('button', {name: 'Delete Link to Delete'}))
+
+    await waitFor(() =>
+      expect(confirmDanger).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Delete Custom Link',
+          confirmButtonLabel: 'Delete',
+        }),
+      ),
+    )
+  })
+
+  it('calls deleteLink when confirmed', async () => {
     const mockDeleteLink = vi.fn()
+    vi.mocked(confirmDanger).mockResolvedValue(true)
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
       links: [
         {
@@ -123,15 +159,35 @@ describe('NavMenuLinksSettings', () => {
       deleteLink: mockDeleteLink,
     })
 
-    const {getByRole, getByText} = render(<NavMenuLinksSettings />)
+    const {getByRole} = render(<NavMenuLinksSettings />)
 
-    const menuButton = getByRole('button', {name: /Settings for Link to Delete/i})
-    fireEvent.click(menuButton)
+    fireEvent.click(getByRole('button', {name: 'Delete Link to Delete'}))
 
-    const deleteButton = getByRole('menuitem', {name: /Delete/i})
-    fireEvent.click(deleteButton)
+    await waitFor(() => expect(mockDeleteLink).toHaveBeenCalledWith(0))
+  })
 
-    expect(mockDeleteLink).toHaveBeenCalledWith(0)
+  it('does not call deleteLink when dismissed', async () => {
+    const mockDeleteLink = vi.fn()
+    vi.mocked(confirmDanger).mockResolvedValue(false)
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          label: 'Link to Delete',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: mockDeleteLink,
+    })
+
+    const {getByRole} = render(<NavMenuLinksSettings />)
+
+    fireEvent.click(getByRole('button', {name: 'Delete Link to Delete'}))
+
+    await waitFor(() => expect(confirmDanger).toHaveBeenCalled())
+    expect(mockDeleteLink).not.toHaveBeenCalled()
   })
 
   it('renders hidden input with serialized links JSON', () => {
