@@ -64,7 +64,9 @@ describe('GroupCategoryModal', () => {
   })
 
   it('enables number input when it picks a group structure', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    // Use delay:0 (not null) so React gets event-loop ticks between clicks;
+    // delay:null fires synchronously and can miss InstUI dropdown state updates
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByLabelText, findByLabelText, findByText} = setup()
     const select = getByLabelText('Group Structure')
     await user.click(select)
