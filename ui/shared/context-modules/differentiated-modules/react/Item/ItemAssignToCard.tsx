@@ -63,8 +63,6 @@ export interface DateValidatorInputArgs {
   lock_at: string | null
   unlock_at: string | null
   due_at: string | null
-  peer_review_available_to: string | null
-  peer_review_available_from: string | null
   peer_review_due_at: string | null
   set_type?: string
   course_section_id?: string | null
@@ -171,10 +169,8 @@ export default forwardRef(function ItemAssignToCard(
     handleAvailableToDateChange,
     peerReviewAvailableToDate,
     setPeerReviewAvailableToDate,
-    handlePeerReviewAvailableToDateChange,
     peerReviewAvailableFromDate,
     setPeerReviewAvailableFromDate,
-    handlePeerReviewAvailableFromDateChange,
     peerReviewDueDate,
     setPeerReviewDueDate,
     handlePeerReviewDueDateChange,
@@ -245,9 +241,7 @@ export default forwardRef(function ItemAssignToCard(
       due_at: dueDate,
       unlock_at: availableFromDate,
       lock_at: availableToDate,
-      peer_review_available_from: peerReviewAvailableFromDate,
       peer_review_due_at: peerReviewDueDate,
-      peer_review_available_to: peerReviewAvailableToDate,
       student_ids: students.length === selectedAssigneeIds.length ? students : [],
       course_section_id: sectionId,
       persisted: !dueAtHasChanged(),
@@ -259,9 +253,7 @@ export default forwardRef(function ItemAssignToCard(
     availableToDate,
     requiredRepliesDueDate,
     replyToTopicDueDate,
-    peerReviewAvailableFromDate,
     peerReviewDueDate,
-    peerReviewAvailableToDate,
     dueAtHasChanged,
     selectedAssigneeIds,
   ])
@@ -277,16 +269,9 @@ export default forwardRef(function ItemAssignToCard(
 
   const validatePeerReviewDates = useCallback(
     (newErrors: Record<string, string>) => {
-      const peerReviewFields = [
-        'peer_review_due_at',
-        'peer_review_available_from',
-        'peer_review_available_to',
-      ] as const
-      return peerReviewFields.some(field => {
-        const oldError = validationErrors?.[field]
-        const newError = newErrors?.[field]
-        return oldError !== newError
-      })
+      const oldError = validationErrors?.['peer_review_due_at']
+      const newError = newErrors?.['peer_review_due_at']
+      return oldError !== newError
     },
     [validationErrors],
   )
@@ -375,11 +360,9 @@ export default forwardRef(function ItemAssignToCard(
         'required_replies_due_at',
         'reply_to_topic_due_at',
         'due_at',
+        'peer_review_due_at',
         'unlock_at',
         'lock_at',
-        'peer_review_available_from',
-        'peer_review_due_at',
-        'peer_review_available_to',
       ]
       let key
       if (Object.keys(validationErrors).length > 0) {
@@ -547,6 +530,26 @@ export default forwardRef(function ItemAssignToCard(
               disabledWithGradingPeriod={isInClosedGradingPeriod}
             />
           )}
+          <PeerReviewSelector
+            peerReviewsEnabled={peerReviewsEnabled}
+            assignmentDueDate={dueDate}
+            assignmentUntilDate={availableToDate}
+            setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
+            setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
+            peerReviewDueDate={peerReviewDueDate}
+            setPeerReviewDueDate={setPeerReviewDueDate}
+            handlePeerReviewDueDateChange={handlePeerReviewDueDateChange(
+              timeInputRefs.current.peer_review_due_at?.value || '',
+            )}
+            validationErrors={validationErrors}
+            unparsedFieldKeys={unparsedFieldKeys}
+            blueprintDateLocks={blueprintDateLocks}
+            dateInputRefs={dateInputRefs.current}
+            timeInputRefs={timeInputRefs.current}
+            handleBlur={handleBlur}
+            clearButtonAltLabel={cardActionLabels.clearPeerReviewDueAt}
+            {...commonDateTimeInputProps}
+          />
           {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
             <ReplyToTopicDueDateTimeInput
               {...{
@@ -622,37 +625,6 @@ export default forwardRef(function ItemAssignToCard(
               timeInputRefs.current.lock_at?.value || '',
             )}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
-          />
-          <PeerReviewSelector
-            peerReviewsEnabled={peerReviewsEnabled}
-            assignmentDueDate={dueDate}
-            peerReviewAvailableToDate={peerReviewAvailableToDate}
-            setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
-            handlePeerReviewAvailableToDateChange={handlePeerReviewAvailableToDateChange(
-              timeInputRefs.current.peer_review_available_to?.value || '',
-            )}
-            peerReviewAvailableFromDate={peerReviewAvailableFromDate}
-            setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
-            handlePeerReviewAvailableFromDateChange={handlePeerReviewAvailableFromDateChange(
-              timeInputRefs.current.peer_review_available_from?.value || '',
-            )}
-            peerReviewDueDate={peerReviewDueDate}
-            setPeerReviewDueDate={setPeerReviewDueDate}
-            handlePeerReviewDueDateChange={handlePeerReviewDueDateChange(
-              timeInputRefs.current.peer_review_due_at?.value || '',
-            )}
-            validationErrors={validationErrors}
-            unparsedFieldKeys={unparsedFieldKeys}
-            blueprintDateLocks={blueprintDateLocks}
-            dateInputRefs={dateInputRefs.current}
-            timeInputRefs={timeInputRefs.current}
-            handleBlur={handleBlur}
-            clearButtonAltLabels={{
-              dueDateLabel: cardActionLabels.clearPeerReviewDueAt,
-              availableFromLabel: cardActionLabels.clearPeerReviewAvailableFrom,
-              availableToLabel: cardActionLabels.clearPeerReviewAvailableTo,
-            }}
-            {...commonDateTimeInputProps}
           />
           <ContextModuleLink
             courseId={courseId}

@@ -1707,11 +1707,18 @@ EditView.prototype.getFormData = function () {
 
     // Add peer review due dates and overrides
     const storedPeerReviewData = this.assignment.get('peer_review_data')
-    if (data.peer_reviews && storedPeerReviewData) {
+    if (data.peer_reviews) {
       data.peer_review = {
         ...(data.peer_review || {}),
-        ...storedPeerReviewData,
+        ...(storedPeerReviewData || {}),
       }
+      // Auto-set peer review available/until from assignment dates
+      data.peer_review.unlock_at = data.due_at
+      data.peer_review.lock_at = data.lock_at
+      // JSON.stringify strips undefined but preserves null, so
+      // convert to ensure the API receives an explicit null when
+      // dates are cleared
+      data.peer_review.due_at = data.peer_review.due_at ?? null
     }
   }
 
