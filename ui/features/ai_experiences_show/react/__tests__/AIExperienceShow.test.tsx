@@ -395,10 +395,16 @@ describe('AIExperienceShow', () => {
       expect(screen.getByText('rubric.docx')).toBeInTheDocument()
     })
 
-    it('renders file names as plain text without links', () => {
+    it('renders a download button for each file', () => {
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
-      const item = screen.getByText('lecture-notes.pdf')
-      expect(item.closest('a')).toBeNull()
+      expect(screen.getByTestId('download-file-f1')).toBeInTheDocument()
+      expect(screen.getByTestId('download-file-f2')).toBeInTheDocument()
+    })
+
+    it('does not render remove buttons on the show page', () => {
+      render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
+      expect(screen.queryByTestId('remove-file-f1')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('remove-file-f2')).not.toBeInTheDocument()
     })
 
     it('does not render File sources section when files array is empty', () => {

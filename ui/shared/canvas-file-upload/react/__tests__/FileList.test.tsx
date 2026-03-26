@@ -21,107 +21,110 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {vi} from 'vitest'
 import FileList from '../FileList'
-import {ContextFile} from '../types'
+import type {ContextFile} from '../types'
+
+const mockFiles: ContextFile[] = [
+  {
+    id: '1',
+    display_name: 'test-file.pdf',
+    url: 'http://example.com/file1',
+    size: 1024 * 1024,
+    content_type: 'application/pdf',
+  },
+  {
+    id: '2',
+    display_name: 'document.docx',
+    url: 'http://example.com/file2',
+    size: 2048 * 1024,
+    content_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
+]
+
+const defaultProps = {
+  files: [],
+  uploadingFileNames: new Set<string>(),
+  failedFileNames: new Set<string>(),
+  onRemoveFile: vi.fn(),
+  onClearFailedFile: vi.fn(),
+}
 
 describe('FileList', () => {
-  const mockFiles: ContextFile[] = [
-    {
-      id: '1',
-      display_name: 'test-file.pdf',
-      url: 'http://example.com/file1',
-      size: 1024 * 1024, // 1 MB
-      content_type: 'application/pdf',
-    },
-    {
-      id: '2',
-      display_name: 'document.docx',
-      url: 'http://example.com/file2',
-      size: 2048 * 1024, // 2 MB
-      content_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    },
-  ]
-
-  const mockOnRemoveFile = vi.fn()
-
   beforeEach(() => {
-    mockOnRemoveFile.mockClear()
+    vi.clearAllMocks()
   })
 
-  it('should render uploaded files', () => {
-    render(
-      <FileList files={mockFiles} uploadingFileNames={new Set()} onRemoveFile={mockOnRemoveFile} />,
-    )
+  describe('uploaded files', () => {
+    it('renders uploaded file names', () => {
+      render(<FileList {...defaultProps} files={mockFiles} />)
+      expect(screen.getByText('test-file.pdf')).toBeInTheDocument()
+      expect(screen.getByText('document.docx')).toBeInTheDocument()
+    })
 
-    expect(screen.getByText('test-file.pdf')).toBeInTheDocument()
-    expect(screen.getByText('document.docx')).toBeInTheDocument()
+    it('renders remove buttons for each uploaded file', () => {
+      render(<FileList {...defaultProps} files={mockFiles} />)
+      expect(screen.getByTestId('remove-file-1')).toBeInTheDocument()
+      expect(screen.getByTestId('remove-file-2')).toBeInTheDocument()
+    })
+
+    it('calls onRemoveFile with the correct id when remove is clicked', async () => {
+      const user = userEvent.setup()
+      render(<FileList {...defaultProps} files={mockFiles} />)
+      await user.click(screen.getByTestId('remove-file-1'))
+      expect(defaultProps.onRemoveFile).toHaveBeenCalledWith('1')
+    })
+
+    it('renders download buttons for uploaded files', () => {
+      render(<FileList {...defaultProps} files={mockFiles} />)
+      expect(screen.getByTestId('download-file-1')).toBeInTheDocument()
+      expect(screen.getByTestId('download-file-2')).toBeInTheDocument()
+    })
   })
 
-  it('should display file sizes and content types', () => {
-    render(
-      <FileList files={mockFiles} uploadingFileNames={new Set()} onRemoveFile={mockOnRemoveFile} />,
-    )
+  describe('uploading files', () => {
+    it('renders uploading file names with "uploading" text', () => {
+      render(<FileList {...defaultProps} uploadingFileNames={new Set(['uploading-file.txt'])} />)
+      expect(screen.getByText('uploading-file.txt uploading')).toBeInTheDocument()
+    })
 
-    expect(screen.getByText(/1 MB/)).toBeInTheDocument()
-    expect(screen.getByText(/2 MB/)).toBeInTheDocument()
+    it('renders a spinner for uploading files', () => {
+      render(<FileList {...defaultProps} uploadingFileNames={new Set(['uploading-file.txt'])} />)
+      expect(screen.getByTitle('Uploading')).toBeInTheDocument()
+    })
   })
 
-  it('should render uploading files with spinner', () => {
-    const uploadingFileNames = new Set(['uploading-file.txt'])
-    render(
-      <FileList
-        files={[]}
-        uploadingFileNames={uploadingFileNames}
-        onRemoveFile={mockOnRemoveFile}
-      />,
-    )
+  describe('failed files', () => {
+    it('renders failed file names with "failed" text', () => {
+      render(<FileList {...defaultProps} failedFileNames={new Set(['broken.pdf'])} />)
+      expect(screen.getByText('broken.pdf failed')).toBeInTheDocument()
+    })
 
-    expect(screen.getByText('uploading-file.txt')).toBeInTheDocument()
-    expect(screen.getByTitle('Uploading')).toBeInTheDocument()
+    it('renders a dismiss button for failed files', () => {
+      render(<FileList {...defaultProps} failedFileNames={new Set(['broken.pdf'])} />)
+      expect(screen.getByTestId('dismiss-failed-broken.pdf')).toBeInTheDocument()
+    })
+
+    it('calls onClearFailedFile when dismiss is clicked', async () => {
+      const user = userEvent.setup()
+      render(<FileList {...defaultProps} failedFileNames={new Set(['broken.pdf'])} />)
+      await user.click(screen.getByTestId('dismiss-failed-broken.pdf'))
+      expect(defaultProps.onClearFailedFile).toHaveBeenCalledWith('broken.pdf')
+    })
   })
 
-  it('should show remove buttons for uploaded files', () => {
-    render(
-      <FileList files={mockFiles} uploadingFileNames={new Set()} onRemoveFile={mockOnRemoveFile} />,
-    )
-
-    const removeButton1 = screen.getByTestId('remove-file-1')
-    const removeButton2 = screen.getByTestId('remove-file-2')
-    expect(removeButton1).toBeInTheDocument()
-    expect(removeButton2).toBeInTheDocument()
-  })
-
-  it('should call onRemoveFile when remove button is clicked', async () => {
-    const user = userEvent.setup()
-    render(
-      <FileList files={mockFiles} uploadingFileNames={new Set()} onRemoveFile={mockOnRemoveFile} />,
-    )
-
-    const removeButton = screen.getByTestId('remove-file-1')
-    await user.click(removeButton)
-
-    expect(mockOnRemoveFile).toHaveBeenCalledWith('1')
-  })
-
-  it('should render both uploading and uploaded files', () => {
-    const uploadingFileNames = new Set(['new-file.txt'])
-    render(
-      <FileList
-        files={mockFiles}
-        uploadingFileNames={uploadingFileNames}
-        onRemoveFile={mockOnRemoveFile}
-      />,
-    )
-
-    expect(screen.getByText('new-file.txt')).toBeInTheDocument()
-    expect(screen.getByText('test-file.pdf')).toBeInTheDocument()
-    expect(screen.getByText('document.docx')).toBeInTheDocument()
-  })
-
-  it('should render header with "File Name" label', () => {
-    render(
-      <FileList files={mockFiles} uploadingFileNames={new Set()} onRemoveFile={mockOnRemoveFile} />,
-    )
-
-    expect(screen.getByText('File Name')).toBeInTheDocument()
+  describe('mixed states', () => {
+    it('renders uploading, failed, and uploaded files together', () => {
+      render(
+        <FileList
+          {...defaultProps}
+          files={mockFiles}
+          uploadingFileNames={new Set(['new-file.txt'])}
+          failedFileNames={new Set(['broken.pdf'])}
+        />,
+      )
+      expect(screen.getByText('new-file.txt uploading')).toBeInTheDocument()
+      expect(screen.getByText('broken.pdf failed')).toBeInTheDocument()
+      expect(screen.getByText('test-file.pdf')).toBeInTheDocument()
+      expect(screen.getByText('document.docx')).toBeInTheDocument()
+    })
   })
 })

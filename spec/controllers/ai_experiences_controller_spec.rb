@@ -1143,6 +1143,11 @@ describe AiExperiencesController do
         get :new, params: { course_id: @course.id }
         expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
       end
+
+      it "sets CONTEXT_FILE_MAX_SIZE_MB in js_env" do
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env][:CONTEXT_FILE_MAX_SIZE_MB]).to eq(AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte)
+      end
     end
 
     context "as student" do
@@ -1181,6 +1186,11 @@ describe AiExperiencesController do
         @course.disable_feature!(:ai_experiences_context_file_upload)
         get :edit, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
+      end
+
+      it "sets CONTEXT_FILE_MAX_SIZE_MB in js_env" do
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:CONTEXT_FILE_MAX_SIZE_MB]).to eq(AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte)
       end
     end
 
