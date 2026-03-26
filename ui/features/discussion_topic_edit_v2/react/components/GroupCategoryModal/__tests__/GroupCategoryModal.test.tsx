@@ -29,6 +29,10 @@ const setup = (onSubmit = vi.fn()) => {
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
 describe('GroupCategoryModal', () => {
+  beforeEach(() => {
+    vi.useRealTimers()
+  })
+
   it('renders', () => {
     const {getByText} = setup()
     expect(getByText('Group Set Name')).toBeInTheDocument()
@@ -64,9 +68,7 @@ describe('GroupCategoryModal', () => {
   })
 
   it('enables number input when it picks a group structure', async () => {
-    // Use delay:0 (not null) so React gets event-loop ticks between clicks;
-    // delay:null fires synchronously and can miss InstUI dropdown state updates
-    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByLabelText, findByLabelText, findByText} = setup()
     const select = getByLabelText('Group Structure')
     await user.click(select)
