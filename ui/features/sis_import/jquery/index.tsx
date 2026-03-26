@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
-import ReactDOM from 'react-dom/client'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import SisImportForm from '../react/SisImportForm'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
@@ -70,11 +70,11 @@ $(document).ready(function (_event) {
   const mountNode = document.getElementById('attachment_mount')
   if (!mountNode) return
 
-  const root = ReactDOM.createRoot(mountNode)
-  root.render(
+  legacyRender(
     <QueryClientProvider client={queryClient}>
       <SisImportForm onSuccess={onSuccess} />
     </QueryClientProvider>,
+    mountNode,
   )
   let state: 'nothing' | 'updating' | 'checking' = 'nothing'
 
@@ -376,7 +376,7 @@ $(document).ready(function (_event) {
   }
 
   function onSuccess(data: OnSuccessData): void {
-    root.render(null)
+    legacyUnmountComponentAtNode(mountNode)
     if (data && data.id) {
       startPoll()
     } else {
