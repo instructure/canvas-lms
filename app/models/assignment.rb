@@ -257,8 +257,12 @@ class Assignment < AbstractAssignment
     peer_review_sub_assignment&.destroy
   end
 
+  # These methods follow the Rails validation helper convention: they add errors
+  # and use early returns as guards, not to return a boolean predicate value.
+  # rubocop:disable Style/ReturnNilInPredicateMethodDefinition
   def peer_review_count_changes_ok?
-    return false unless peer_reviews? && context.feature_enabled?(:peer_review_allocation_and_grading)
+    return unless peer_reviews?
+    return unless peer_review_sub_assignment.present?
 
     if peer_review_submissions?
       errors.add :peer_review_count,
@@ -267,21 +271,21 @@ class Assignment < AbstractAssignment
   end
 
   def peer_reviews_changes_ok?
-    return true unless peer_reviews_change_to_be_saved == [true, false]
+    return unless peer_reviews_change_to_be_saved == [true, false]
+    return unless peer_review_sub_assignment.present?
 
-    graded_peer_reviews_enabled = context.feature_enabled?(:peer_review_allocation_and_grading)
+    if context.feature_enabled?(:peer_review_allocation_and_grading)
+      return unless peer_review_submissions?
 
-    if graded_peer_reviews_enabled && peer_review_submissions?
       errors.add :peer_reviews,
-                 I18n.t("cannot be disabled when students have already submitted reviews")
-    end
-
-    # For backward compatibility, prevent disabling peer reviews for assignments with graded peer reviews in legacy mode
-    if !graded_peer_reviews_enabled && peer_review_sub_assignment.present?
+                 I18n.t("cannot be disabled for assignments with graded peer reviews when students have already submitted reviews")
+    else
+      # For backward compatibility, prevent disabling peer reviews for assignments with graded peer reviews in legacy mode
       errors.add :peer_reviews,
                  I18n.t("cannot be disabled for assignments with graded peer reviews in legacy mode")
     end
   end
+  # rubocop:enable Style/ReturnNilInPredicateMethodDefinition
 
   def governs_submittable?
     true
