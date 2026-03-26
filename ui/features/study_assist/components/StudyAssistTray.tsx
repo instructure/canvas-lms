@@ -16,14 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {AssistProvider, AssistContent} from '@instructure/platform-study-assist'
-import type {AssistRequest, AssistResponse} from '@instructure/platform-study-assist'
+import {
+  AssistProvider,
+  AssistContent,
+  AssistFlashCardsInteraction,
+} from '@instructure/platform-study-assist'
+import type {
+  AssistRequest,
+  AssistResponse,
+  AssistChatFlashCard,
+} from '@instructure/platform-study-assist'
 import {IconAiSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('study_assist')
@@ -37,6 +45,26 @@ type Props = {
 }
 
 export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
+  const renderFlashCards = useCallback(
+    (
+      cards: AssistChatFlashCard[],
+      isFetching: boolean,
+      isError: boolean,
+      getFlashCards: () => void,
+    ) => (
+      <div style={{padding: '2rem'}}>
+        <AssistFlashCardsInteraction
+          cardData={cards}
+          isFetching={isFetching}
+          isError={isError}
+          getFlashCards={getFlashCards}
+          cardHeight="60vh"
+        />
+      </div>
+    ),
+    [],
+  )
+
   return (
     <Tray
       label={I18n.t('Study tools')}
@@ -70,7 +98,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
         <AssistProvider
           fetchAssistResponse={fetchAssistResponse}
           courseId={window.ENV.COURSE_ID}
-          moduleItemId={window.ENV.WIKI_PAGE_ID}
+          pageId={window.ENV.WIKI_PAGE_ID}
         >
           <div style={{padding: '0 1rem'}}>
             <AssistContent
@@ -78,6 +106,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
               showLargePrompts={true}
               onAnalyticsEvent={() => null}
               allowedPrompts={['Summarize', 'Quiz me', 'Flashcards']}
+              renderFlashCards={renderFlashCards}
             />
           </div>
         </AssistProvider>
