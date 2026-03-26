@@ -900,8 +900,6 @@ describe "assignment" do
         wait_for_ajaximations
 
         expect(element_exists?("[data-testid='peer_review_due_at_input']")).to be true
-        expect(element_exists?("[data-testid='peer_review_available_from_input']")).to be true
-        expect(element_exists?("[data-testid='peer_review_available_to_input']")).to be true
 
         click_option("#assignment_grading_type", "Not Graded")
         wait_for_ajaximations

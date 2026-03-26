@@ -18,8 +18,6 @@
 
 import {useEffect, useState, useRef} from 'react'
 import PeerReviewDueDateTimeInput from './PeerReviewDueDateTimeInput'
-import PeerReviewAvailableFromDateTimeInput from './PeerReviewAvailableFromDateTimeInput'
-import PeerReviewAvailableToDateTimeInput from './PeerReviewAvailableToDateTimeInput'
 import type {DateLockTypes, CustomDateTimeInputProps} from '../types'
 import {
   useSettingDependency,
@@ -29,18 +27,9 @@ import {
 type PeerReviewSelectorProps = CustomDateTimeInputProps & {
   peerReviewsEnabled?: boolean
   assignmentDueDate: string | null
-  peerReviewAvailableToDate: string | null
+  assignmentUntilDate: string | null
   setPeerReviewAvailableToDate: (date: string | null) => void
-  handlePeerReviewAvailableToDateChange: (
-    _event: React.SyntheticEvent,
-    value: string | undefined,
-  ) => void
-  peerReviewAvailableFromDate: string | null
   setPeerReviewAvailableFromDate: (date: string | null) => void
-  handlePeerReviewAvailableFromDateChange: (
-    _event: React.SyntheticEvent,
-    value: string | undefined,
-  ) => void
   peerReviewDueDate: string | null
   setPeerReviewDueDate: (date: string | null) => void
   handlePeerReviewDueDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
@@ -50,22 +39,19 @@ type PeerReviewSelectorProps = CustomDateTimeInputProps & {
   dateInputRefs?: Record<string, HTMLInputElement | null>
   timeInputRefs?: Record<string, HTMLInputElement | null>
   handleBlur: (key: string) => (event: React.FocusEvent<HTMLInputElement>) => void
-  clearButtonAltLabels: Record<'dueDateLabel' | 'availableFromLabel' | 'availableToLabel', string>
+  clearButtonAltLabel: string
 }
 
 const PeerReviewSelector = ({
   peerReviewsEnabled: peerReviewsEnabledProp,
   assignmentDueDate,
-  peerReviewAvailableToDate,
+  assignmentUntilDate,
   setPeerReviewAvailableToDate,
-  handlePeerReviewAvailableToDateChange,
-  peerReviewAvailableFromDate,
   setPeerReviewAvailableFromDate,
-  handlePeerReviewAvailableFromDateChange,
   peerReviewDueDate,
   setPeerReviewDueDate,
   handlePeerReviewDueDateChange,
-  clearButtonAltLabels,
+  clearButtonAltLabel,
   ...rest
 }: PeerReviewSelectorProps) => {
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(false)
@@ -126,7 +112,6 @@ const PeerReviewSelector = ({
     if (dueDateWasCleared) {
       setPeerReviewDueDate(null)
       setPeerReviewAvailableFromDate(null)
-      setPeerReviewAvailableToDate(null)
     }
   }, [
     assignmentDueDate,
@@ -161,40 +146,37 @@ const PeerReviewSelector = ({
     setPeerReviewAvailableToDate,
   ])
 
+  // Auto-sync peer review available from date to assignment due date
+  useEffect(() => {
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+      return
+    }
+    setPeerReviewAvailableFromDate(assignmentDueDate)
+  }, [assignmentDueDate, peerReviewEnabled, setPeerReviewAvailableFromDate])
+
+  // Auto-sync peer review available to date to assignment until date
+  useEffect(() => {
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+      return
+    }
+    setPeerReviewAvailableToDate(assignmentUntilDate)
+  }, [assignmentUntilDate, peerReviewEnabled, setPeerReviewAvailableToDate])
+
   if (!ENV?.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
     return null
   }
 
-  const {dueDateLabel, availableFromLabel, availableToLabel} = clearButtonAltLabels
   const isPeerReviewDisabled = assignmentDueDate === null
 
   return (
-    <>
-      <PeerReviewDueDateTimeInput
-        peerReviewDueDate={peerReviewDueDate}
-        setPeerReviewDueDate={setPeerReviewDueDate}
-        handlePeerReviewDueDateChange={handlePeerReviewDueDateChange}
-        clearButtonAltLabel={dueDateLabel}
-        disabled={isPeerReviewDisabled}
-        {...rest}
-      />
-      <PeerReviewAvailableFromDateTimeInput
-        peerReviewAvailableFromDate={peerReviewAvailableFromDate}
-        setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
-        handlePeerReviewAvailableFromDateChange={handlePeerReviewAvailableFromDateChange}
-        clearButtonAltLabel={availableFromLabel}
-        disabled={isPeerReviewDisabled}
-        {...rest}
-      />
-      <PeerReviewAvailableToDateTimeInput
-        peerReviewAvailableToDate={peerReviewAvailableToDate}
-        setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
-        handlePeerReviewAvailableToDateChange={handlePeerReviewAvailableToDateChange}
-        clearButtonAltLabel={availableToLabel}
-        disabled={isPeerReviewDisabled}
-        {...rest}
-      />
-    </>
+    <PeerReviewDueDateTimeInput
+      peerReviewDueDate={peerReviewDueDate}
+      setPeerReviewDueDate={setPeerReviewDueDate}
+      handlePeerReviewDueDateChange={handlePeerReviewDueDateChange}
+      clearButtonAltLabel={clearButtonAltLabel}
+      disabled={isPeerReviewDisabled}
+      {...rest}
+    />
   )
 }
 
