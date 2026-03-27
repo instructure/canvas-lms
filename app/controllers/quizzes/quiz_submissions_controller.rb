@@ -24,6 +24,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   include ::Filters::QuizSubmissions
 
   protect_from_forgery except: %i[create backup record_answer], with: :exception
+  skip_before_action :require_user, only: %i[backup create record_answer]
   before_action :require_context
   before_action :require_quiz, only: %i[index create extensions show update]
   before_action :require_quiz_submission, only: :show
