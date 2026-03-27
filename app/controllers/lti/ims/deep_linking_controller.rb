@@ -148,7 +148,7 @@ module Lti
           # * if a module was created, alert it and then navigate to modules page
           # * reload the page
           context_module = if create_new_module?
-                             @context.context_modules.create!(name: I18n.t("New Content From App"), workflow_state: "unpublished")
+                             @context.context_modules.create!(name: module_name || I18n.t("New Content From App"), workflow_state: "unpublished")
                            else
                              @context.context_modules.not_deleted.find(return_url_parameters[:context_module_id])
                            end
