@@ -368,7 +368,7 @@ module OutcomeCommon
     # submit
     f(".submit_button").click
     wait_for_ajaximations
-    dismiss_flash_messages_if_present
+    dismiss_flash_messages
 
     # create nested group
     f(".add_outcome_group").click

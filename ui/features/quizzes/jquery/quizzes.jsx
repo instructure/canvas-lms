@@ -26,7 +26,9 @@
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
-import regradeTemplate from '../jst/regrade.handlebars'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
+import QuizRegradeModal from '../react/QuizRegradeModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {find, forEach, keys, difference} from 'es-toolkit/compat'
 import $ from 'jquery'
@@ -39,7 +41,6 @@ import Handlebars from '@canvas/handlebars-helpers'
 import DueDateOverrideView from '@canvas/due-dates'
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
-import QuizRegradeView from '../backbone/views/QuizRegradeView'
 import SectionList from '@canvas/sections/backbone/collections/SectionCollection'
 import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialogView'
 import MultipleChoiceToggle from './MultipleChoiceToggle'
@@ -74,6 +75,7 @@ import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
 import {renderError, restoreOriginalMessage} from '@canvas/quizzes/jquery/quiz_form_utils'
 import {isChangeMultiFuncBound} from './utils/changeMultiFunc'
+import {RegradeOption} from '../react/QuizRegradeModal.utils'
 
 // Re-export for backward compatibility
 export {isChangeMultiFuncBound}
@@ -1699,6 +1701,16 @@ function makeFormAnswer(data) {
 
 const REGRADE_DATA = {}
 const REGRADE_OPTIONS = ENV.REGRADE_OPTIONS || {}
+const REGRADE_OPTION_LABELS = {
+  [RegradeOption.CurrentAndPreviousCorrect]: I18n.t(
+    'Award points for both corrected and previously correct answers (no scores will be reduced)',
+  ),
+  [RegradeOption.CurrentCorrectOnly]: I18n.t(
+    "Only award points for the correct answer (some students' scores may be reduced)",
+  ),
+  [RegradeOption.FullCredit]: I18n.t('Give everyone full credit for this question'),
+  [RegradeOption.NoRegrade]: I18n.t('Update question without regrading'),
+}
 
 function quizData($question) {
   const $quiz = $('#questions')
@@ -3000,9 +3012,7 @@ ready(function () {
     var questionID = $question.data('questionID')
 
     if (REGRADE_OPTIONS[questionID]) {
-      const regradeOption = $(QuizRegradeView.prototype.template()).find(
-        'input[value=' + REGRADE_OPTIONS[questionID] + ']',
-      )
+      const regradeOption = REGRADE_OPTIONS[questionID]
       const newAnswer = $form.find('.correct_answer')
       toggleAnswer($question, {regradeOption, newAnswer})
     }
@@ -3143,16 +3153,29 @@ ready(function () {
     } else {
       const isDisabled = holder.find('input[name="regrade_disabled"]').val() === '1'
       const questionType = $question.find('.question_type').val()
-      const regradeOptions = new QuizRegradeView({
-        question: $question,
-        regradeDisabled: isDisabled,
-        regradeOption: REGRADE_OPTIONS[$question.data('questionID')],
-        multipleAnswer: questionType === 'multiple_answers_question',
-      })
-      regradeOptions.on('update', regradeOption => {
-        const newAnswerData = {regradeOption, newAnswer}
-        toggleAnswer($question, newAnswerData)
-      })
+
+      const mountPoint = document.createElement('div')
+      document.body.appendChild(mountPoint)
+      const root = createRoot(mountPoint)
+
+      const cleanup = () => {
+        root.unmount()
+        mountPoint.remove()
+      }
+
+      root.render(
+        <QuizRegradeModal
+          open={true}
+          regradeDisabled={isDisabled}
+          regradeOption={REGRADE_OPTIONS[$question.data('questionID')] || null}
+          multipleAnswer={questionType === 'multiple_answers_question'}
+          onUpdate={selectedValue => {
+            cleanup()
+            toggleAnswer($question, {regradeOption: selectedValue, newAnswer})
+          }}
+          onDismiss={cleanup}
+        />,
+      )
     }
   }
 
@@ -3184,16 +3207,24 @@ ready(function () {
   }
 
   function updateRegradeOption($question, newAnswerData) {
-    const option = newAnswerData.regradeOption
-    const optionText = option.next('span')
-    REGRADE_OPTIONS[$question.data('questionID')] = option.val()
-    $question.find('.' + optionText.attr('class')).remove()
+    const optionValue = newAnswerData.regradeOption
+    const optionLabel = REGRADE_OPTION_LABELS[optionValue] || optionValue
+    REGRADE_OPTIONS[$question.data('questionID')] = optionValue
+    $question.find('.regrade_option_text').remove()
     const $regradeInfoSpan = $('<span id="regrade_info_span">')
-    $regradeInfoSpan.append(htmlEscape(option.next('span').text()))
+    $regradeInfoSpan.append(htmlEscape(optionLabel))
     $(newAnswerData.newAnswer).append($regradeInfoSpan)
-    $(newAnswerData.newAnswer).parents('.answer').append(htmlEscape(optionText))
-    option.hide()
-    $question.append(htmlEscape(option))
+    const $optionTextSpan = $('<span class="regrade_option_text" style="display:none">').text(
+      optionLabel,
+    )
+    $(newAnswerData.newAnswer).parents('.answer').append($optionTextSpan)
+    $question.find('.regrade_option').remove()
+    $question.find('input[name="regrade_option"]').remove()
+    const $hiddenSpan = $('<span class="regrade_option" style="display:none">').text(optionValue)
+    const $hiddenInput = $(
+      '<input type="hidden" name="regrade_option" value="' + htmlEscape(optionValue) + '">',
+    )
+    $question.append($hiddenSpan).append($hiddenInput)
   }
 
   function setAnswerText(answer, text) {
@@ -3226,14 +3257,6 @@ ready(function () {
     holder.find('input[name="regrade_disabled"]').val('1')
   }
 
-  function disableQuestionForm() {
-    $('.question_form')
-      .find('.submit_button')
-      .prop('disabled', true)
-      .addClass('disabled')
-      .removeClass('button_primary btn-primary')
-  }
-
   function enableQuestionForm() {
     $('.question_form')
       .find('.submit_button')
@@ -3248,21 +3271,6 @@ ready(function () {
       if ($(this).hasClass('correct_answer')) answers.push(index)
     })
     return answers
-  }
-
-  function answersAreTheSameAsBefore($el) {
-    setQuestionID($el)
-    const questionID = $el.data('questionID')
-
-    // we don't know 'old answers' if they've updated and returned
-    if (REGRADE_OPTIONS[questionID]) {
-      return false
-    } else {
-      const oldAnswers = REGRADE_DATA[questionID]
-      const newAnswers = correctAnswerIDs($el)
-
-      return oldAnswers.length == newAnswers.length && !difference(oldAnswers, newAnswers).length
-    }
   }
 
   $('.question_form :input').change(function () {
