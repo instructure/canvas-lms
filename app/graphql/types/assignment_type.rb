@@ -523,7 +523,9 @@ module Types
     def assignment_visibility
       return unless object.course.grants_any_right?(current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
-      Loaders::AssignmentVisibilityLoader.load(object.id)
+      Loaders::DatesOverridableLoader.for.load(object).then do |assignment|
+        Loaders::AssignmentVisibilityLoader.load(assignment)
+      end
     end
 
     field :originality_report_visibility, String, null: true
