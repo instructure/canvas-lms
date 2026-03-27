@@ -28,6 +28,24 @@ type Options = {
   sync?: boolean
 }
 
+let _cachedTheme: ReturnType<typeof getTheme> | null = null
+let _cachedKey: string | null = null
+
+function getStableTheme(options: Options) {
+  const key = `${options.highContrast}|${ENV.K5_USER}|${ENV.USE_CLASSIC_FONT}|${ENV.use_dyslexic_font}|${options.brandVariables ? JSON.stringify(options.brandVariables) : ''}`
+  if (key !== _cachedKey) {
+    _cachedKey = key
+    _cachedTheme = getTheme(
+      options.highContrast,
+      options.brandVariables,
+      Boolean(ENV.K5_USER),
+      Boolean(ENV.USE_CLASSIC_FONT),
+      Boolean(ENV.use_dyslexic_font),
+    )
+  }
+  return _cachedTheme!
+}
+
 export function legacyRender(
   element: React.ReactElement,
   container: Element | null,
@@ -39,7 +57,7 @@ export function legacyRender(
     throw new Error('Container must be an HTMLElement')
   }
 
-  const theme = getTheme(options.highContrast, options.brandVariables)
+  const theme = getStableTheme(options)
 
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(
@@ -57,7 +75,7 @@ export function render(
     throw new Error('Container must be an HTMLElement')
   }
 
-  const theme = getTheme(options.highContrast, options.brandVariables)
+  const theme = getStableTheme(options)
   const wrapped = (
     <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>
   )
@@ -73,7 +91,7 @@ export function rerender(
   element: React.ReactElement,
   options: Options = {},
 ) {
-  const theme = getTheme(options.highContrast, options.brandVariables)
+  const theme = getStableTheme(options)
   const wrapped = (
     <DynamicInstUISettingsProvider theme={theme}>{element}</DynamicInstUISettingsProvider>
   )

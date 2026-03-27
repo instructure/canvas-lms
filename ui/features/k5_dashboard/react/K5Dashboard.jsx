@@ -27,7 +27,6 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
 import {
   MOBILE_NAV_BREAKPOINT_PX,
   TAB_IDS,
@@ -40,7 +39,6 @@ import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {responsiviser, store} from '@canvas/planner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {reloadWindow} from '@canvas/util/globalUtils'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -65,8 +63,6 @@ import HomeroomPage from './HomeroomPage'
 import ImportantDates from './ImportantDates'
 import {TodosPage} from './TodosPage'
 import {isUserObservingStudent, getObservedUserId} from './utils'
-
-const componentOverrides = getK5ThemeOverrides()
 
 const I18n = createI18nScope('k5_dashboard')
 
@@ -547,9 +543,7 @@ K5Dashboard.propTypes = {
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
 
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides}}>
-    <Provider store={store}>
-      <WrappedK5Dashboard {...props} />
-    </Provider>
-  </InstUISettingsProvider>
+  <Provider store={store}>
+    <WrappedK5Dashboard {...props} />
+  </Provider>
 )

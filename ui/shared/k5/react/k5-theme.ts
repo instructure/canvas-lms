@@ -28,9 +28,14 @@ import {
 } from '@instructure/ui-themes'
 import {mergeDeep} from '@instructure/ui-utils'
 import {Day, Grouping, PlannerItem} from '@canvas/planner'
+import {getTypography} from '@canvas/instui-bindings'
 
-export function getBaseThemeVars() {
-  const baseTheme = window.ENV.use_high_contrast ? canvasHighContrastTheme : canvasBaseTheme
+export function getBaseThemeVars(
+  highContrast: boolean,
+  useClassicFont: boolean,
+  useDyslexicFont: boolean,
+) {
+  const baseTheme = highContrast ? canvasHighContrastTheme : canvasBaseTheme
   const {borders, colors, typography} = baseTheme
 
   /**
@@ -39,17 +44,8 @@ export function getBaseThemeVars() {
    * used as the `fontFamily` value in the `Text` component as well as the
    * `h1FontFamily` value in the `Heading` component.
    */
-  let userFont = typography.fontFamily
-  if (!ENV.USE_CLASSIC_FONT) {
-    userFont = `"Balsamiq Sans", ${typography.fontFamily}`
-  }
-  if (ENV.use_dyslexic_font) {
-    userFont = `OpenDyslexic, ${userFont}`
-  }
   const baseFont = {
-    typography: {
-      fontFamily: userFont,
-    },
+    typography: getTypography(true, useClassicFont, useDyslexicFont),
   }
   const base = {
     typography: {
@@ -71,8 +67,16 @@ export function getBaseThemeVars() {
  * of the default variables or if you only want to change the theme for a
  * single component, it needs to be defined here.
  */
-export const getK5ThemeOverrides = () => {
-  const {typography, borders, colors} = getK5ThemeVars()
+export const getK5ThemeOverrides = (
+  highContrast: boolean,
+  useClassicFont: boolean,
+  useDyslexicFont: boolean,
+) => {
+  const {typography, borders, colors} = getK5ThemeVars(
+    highContrast,
+    useClassicFont,
+    useDyslexicFont,
+  )
   return {
     Heading: {
       h1FontWeight: typography.fontWeightBold,
@@ -117,8 +121,8 @@ export const getResourcesTheme = () => ({
 })
 
 // A few overrides for the planner
-export const getPlannerTheme = () => {
-  const {colors} = getBaseThemeVars()
+export const getPlannerTheme = (highContrast: boolean) => {
+  const {colors} = getBaseThemeVars(highContrast, false, false)
 
   return {
     ToggleDetails: {
@@ -128,13 +132,11 @@ export const getPlannerTheme = () => {
   }
 }
 
-export const registerK5Theme = (options: {fontOnly?: boolean} = {}) => {
-  const {baseTheme, base, baseFont} = getBaseThemeVars()
-  const fontOnly = options?.fontOnly || false
-  baseTheme.use({overrides: fontOnly ? baseFont : base})
-}
-
-export const getK5ThemeVars = () => {
-  const {base, baseTheme} = getBaseThemeVars()
+export const getK5ThemeVars = (
+  highContrast: boolean,
+  useClassicFont: boolean,
+  useDyslexicFont: boolean,
+) => {
+  const {base, baseTheme} = getBaseThemeVars(highContrast, useClassicFont, useDyslexicFont)
   return mergeDeep(baseTheme, base)
 }

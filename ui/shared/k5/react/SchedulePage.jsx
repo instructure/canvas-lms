@@ -32,7 +32,7 @@ import {InstUISettingsProvider} from '@instructure/emotion'
 import EmptyDashboardState from './EmptyDashboardState'
 import {getPlannerTheme} from './k5-theme'
 
-const plannerTheme = getPlannerTheme()
+const plannerTheme = getPlannerTheme(Boolean(ENV.use_high_contrast))
 
 const SchedulePage = ({
   plannerEnabled,

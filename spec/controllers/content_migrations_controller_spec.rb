@@ -70,7 +70,6 @@ describe ContentMigrationsController do
         toggle_k5_setting(@course.account)
         get :index, params: { course_id: @course.id }
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)
-        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
 
       context "instui_for_import_page flag" do
