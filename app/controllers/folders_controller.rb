@@ -117,7 +117,7 @@ class FoldersController < ApplicationController
   before_action :require_context, except: %i[list_folders_and_files api_index show api_destroy update create create_file copy_folder copy_file]
   before_action :check_limited_access_for_students, only: %i[create_file]
   before_action :check_restricted_file_access_for_students, only: %i[create_file copy_file copy_folder]
-  skip_before_action :require_user, only: %i[api_index index list_folders_and_files resolve_path show]
+  skip_before_action :require_user, only: %i[api_index index list_all_folders_and_files list_folders_and_files resolve_path show]
 
   def index
     if authorized_action(@context, @current_user, :read_files)
