@@ -277,6 +277,7 @@ export default class TrayController {
       this._editor?.selection?.select(this.$videoContainer)
     }
     this._shouldOpen = false
+    this._isOpen = false
     this._renderTray()
     this._editor = null
     this._iframeLoadingListener?.abort()

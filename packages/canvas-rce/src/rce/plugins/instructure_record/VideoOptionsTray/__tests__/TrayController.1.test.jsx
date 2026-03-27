@@ -204,6 +204,13 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(getTray()).toBeNull()
     })
 
+    it('sets isOpen to false immediately without waiting for the exit animation', () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController._isOpen = true
+      trayController.hideTrayForEditor(editors[0])
+      expect(trayController.isOpen).toBe(false)
+    })
+
     describe('with skipFocusOnExit parameter', () => {
       it('does not select video container when skipFocusOnExit is true', async () => {
         const selectSpy = jest.spyOn(editors[0].selection, 'select')
