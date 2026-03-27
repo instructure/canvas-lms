@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, :points)
+require_relative "../../app/services/grade_service"
+
+GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, :points, :response_id)
 
 RSpec.describe GradeService do
   # Test data setup
@@ -63,13 +65,15 @@ RSpec.describe GradeService do
           rubric_category: "Content",
           reasoning: "Well developed ideas",
           criterion: "Meets requirements",
-          guidance: "Add more specific historical examples."
+          guidance: "Add more specific historical examples.",
+          response_id: "response-id-1"
         ),
         GradeResult.new(
           rubric_category: "Grammar",
           reasoning: "Flawless grammar",
           criterion: "Excellent grammar",
-          guidance: "Great job keeping your grammar clear."
+          guidance: "Great job keeping your grammar clear.",
+          response_id: "response-id-2"
         )
       ]
     end
@@ -103,7 +107,8 @@ RSpec.describe GradeService do
               "rating" => 3,
               "reasoning" => "Well developed ideas"
             },
-            "comments" => "Add more specific historical examples."
+            "comments" => "Add more specific historical examples.",
+            "responseId" => "response-id-1"
           },
           {
             "id" => "criteria_2",
@@ -114,7 +119,8 @@ RSpec.describe GradeService do
               "rating" => 4,
               "reasoning" => "Flawless grammar"
             },
-            "comments" => "Great job keeping your grammar clear."
+            "comments" => "Great job keeping your grammar clear.",
+            "responseId" => "response-id-2"
           }
         ]
       )
@@ -254,7 +260,8 @@ RSpec.describe GradeService do
             rubric_category: "Commitment to Success",
             reasoning: "Student clearly articulated areas for improvement",
             criterion: "Thoroughly describes the need for change",
-            guidance: "Well done."
+            guidance: "Well done.",
+            response_id: "response-id-outcome"
           )
         ]
       end
@@ -303,7 +310,8 @@ RSpec.describe GradeService do
                 "rating" => 3,
                 "reasoning" => "Student clearly articulated areas for improvement"
               },
-              "comments" => "Well done."
+              "comments" => "Well done.",
+              "responseId" => "response-id-outcome"
             }
           ]
         )
@@ -343,7 +351,8 @@ RSpec.describe GradeService do
           rubric_category: "Content",
           reasoning: "Good content",
           criterion: "Meets requirements",
-          guidance: "Add more details."
+          guidance: "Add more details.",
+          response_id: "response-id-direct"
         )
       ]
     end
@@ -384,7 +393,8 @@ RSpec.describe GradeService do
               "rating" => 3,
               "reasoning" => "Good content"
             },
-            "comments" => "Add more details."
+            "comments" => "Add more details.",
+            "responseId" => "response-id-direct"
           }
         ]
       )

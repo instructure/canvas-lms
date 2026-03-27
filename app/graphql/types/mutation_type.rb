@@ -149,6 +149,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :auto_grade_submission, mutation: Mutations::AutoGradeSubmission
   field :create_allocation_rule, mutation: Mutations::CreateAllocationRule
   field :reorder_module_items, mutation: Mutations::ReorderModuleItems
+  field :submit_auto_grade_feedback, mutation: Mutations::SubmitAutoGradeFeedback
   field :update_allocation_rule, mutation: Mutations::UpdateAllocationRule
   field :update_rubric_archived_state, mutation: Mutations::UpdateRubricArchivedState
 end

@@ -18,14 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  class AiGradeCriterionResultType < ApplicationObjectType
-    graphql_name "AIGradeCriterionResult"
+class Mutations::SubmitAutoGradeFeedback < Mutations::BaseAiFeedback
+  argument :course_id, ID, required: true
 
-    field :comments, String, null: true, hash_key: "comments"
-    field :description, String, null: false, hash_key: "description"
-    field :id, ID, null: false, hash_key: "id"
-    field :rating, AiGradeRatingType, null: false, hash_key: "rating"
-    field :response_id, String, null: true, hash_key: "responseId"
+  private
+
+  def check_feature_and_permissions!(input)
+    course_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:course_id], "Course")
+    course = Course.find(course_id)
+    verify_authorized_action!(course, :manage_grades)
+
+    unless course.feature_enabled?(:project_lhotse)
+      raise GraphQL::ExecutionError, I18n.t("Grading Assistance is not enabled for this course.")
+    end
+
+    course.root_account.uuid
+  end
+
+  def feature_slug
+    "grading-assistance-feedback"
   end
 end
