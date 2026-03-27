@@ -242,6 +242,43 @@ describe Quizzes::QuizSubmissionsController do
     end
   end
 
+  context "unauthenticated user in public course with practice quiz" do
+    before :once do
+      @course.update!(is_public: true)
+      @quiz = @course.quizzes.create!
+      @quiz.update!(workflow_state: "available",
+                    quiz_type: "practice_quiz",
+                    quiz_data: [{ correct_comments: "",
+                                  assessment_question_id: nil,
+                                  incorrect_comments: "",
+                                  question_name: "Question 1",
+                                  points_possible: 1,
+                                  question_text: "Pick one",
+                                  name: "Question 1",
+                                  id: 128,
+                                  answers: [{ weight: 0, text: "A", comments: "", id: 1490 }],
+                                  question_type: "multiple_choice_question" }])
+    end
+
+    it "allows anonymous quiz submission via create" do
+      temp_code = "tmp_#{SecureRandom.hex}"
+      session[:temporary_user_code] = temp_code
+      @quiz.generate_submission(temp_code)
+
+      post "create", params: { course_id: @course.id, quiz_id: @quiz.id }
+      expect(response).to be_redirect
+    end
+
+    it "allows anonymous record_answer" do
+      temp_code = "tmp_#{SecureRandom.hex}"
+      session[:temporary_user_code] = temp_code
+      qs = @quiz.generate_submission(temp_code)
+
+      post "record_answer", params: { quiz_id: @quiz.id, course_id: @course.id, id: qs.id, a: "test" }
+      expect(response).to be_redirect
+    end
+  end
+
   describe "GET / (#index)" do
     context "with a zip parameter present" do
       it "queues a job to get all attachments for all submissions of a quiz" do
