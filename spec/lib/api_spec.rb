@@ -1353,9 +1353,9 @@ describe Api do
         end
 
         def request
-          @request ||= Struct.new(:user_agent, :host_with_port, :ssl?, :parameters, :filtered_parameters) do
-            def initialize(user_agent, host_with_port = "example.com", ssl: false, parameters: {}, filtered_parameters: {})
-              super(user_agent, host_with_port, ssl, parameters, filtered_parameters)
+          @request ||= Struct.new(:user_agent, :host_with_port, :ssl?) do
+            def initialize(user_agent, host_with_port = "example.com", ssl: false)
+              super(user_agent, host_with_port, ssl)
             end
           end.new(@native_app_user_agent)
         end
