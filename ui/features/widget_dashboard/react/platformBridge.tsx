@@ -134,10 +134,10 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
   failedToLoadProgressOverview: () => I18n.t('Failed to load progress overview. Please try again.'),
   loadingProgressOverview: () => I18n.t('Loading progress overview...'),
   progressOverviewPagination: () => I18n.t('Progress overview pagination'),
-  gradedCourseWork: () => I18n.t('Graded course work'),
-  ungradedCourseWork: () => I18n.t('Ungraded course work'),
-  missingCourseWork: () => I18n.t('Missing course work'),
-  upcomingAvailableWork: () => I18n.t('Upcoming available work'),
+  gradedAssignments: () => I18n.t('Graded assignments'),
+  remaining: () => I18n.t('Remaining'),
+  courseProgressCompletion: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{percent}% complete (%{total} total)', {percent: opts.percent, total: opts.total}),
 
   people: () => I18n.t('People'),
   noPeople: () => I18n.t('No people'),
