@@ -19,11 +19,8 @@
 #
 
 module CC
-  # Exports all Lti::ResourceLinks other than those related
-  # to an assignment.
-  #
-  # Assignment Lti::ResourceLinks are exported in
-  # CC::AssignmentResources.
+  # Exports course-level Lti::ResourceLinks and assignment-level
+  # ones that are selected for export.
   module LtiResourceLinks
     # Export all resource links with a context set to
     # the coures being exported or associated with
@@ -36,9 +33,14 @@ module CC
       Lti::ResourceLink.where(context: @course.assignments.active)
                        .union(@course.lti_resource_links)
                        .active
+                       .preload(:context)
                        .find_each do |resource_link|
         tool = resource_link.current_external_tool(@course)
         next if tool.blank?
+
+        next if resource_link.context_type == "Assignment" &&
+                !export_object?(resource_link.context) &&
+                !export_object?(resource_link)
 
         migration_id = create_key(resource_link)
 
