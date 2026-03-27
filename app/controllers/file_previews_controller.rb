@@ -20,6 +20,7 @@
 class FilePreviewsController < ApplicationController
   include AttachmentHelper
 
+  skip_before_action :require_user, only: [:show]
   before_action :get_context
 
   def token_auth_allowed?
