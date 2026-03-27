@@ -21,11 +21,25 @@ module Importers
   class NavMenuLinkImporter < Importer
     self.item_class = NavMenuLink
 
-    def self.process_migration(data, migration)
-      return unless migration.import_object?("course_settings", "")
-      return unless migration.context.root_account.feature_enabled?(:nav_menu_links)
+    def self.should_process?(data, migration)
+      return false unless migration.import_object?("course_settings", "")
+      # The above check is not sufficient for blueprint courses; use this check which is the same as that used in CourseContentImporter to determine if tab configuration is imported:
+      return false unless data[:course] && data[:course][:tab_configuration].is_a?(Array)
+      return false unless migration.context.root_account.feature_enabled?(:nav_menu_links)
 
-      nav_menu_links = data["nav_menu_links"]&.map(&:with_indifferent_access)
+      true
+    end
+
+    def self.process_migration(data, migration)
+      return unless should_process?(data, migration)
+
+      nav_menu_links = (data["nav_menu_links"] || []).map(&:with_indifferent_access)
+
+      if migration.for_master_course_import?
+        keep_migration_ids = nav_menu_links.pluck(:migration_id).compact
+        delete_orphaned_master_course_links(course: migration.context, keep_migration_ids:)
+      end
+
       return if nav_menu_links.blank?
 
       # Preload existing links to avoid N+1 queries
@@ -107,6 +121,18 @@ module Importers
 
     def self.trunc_str(str, max_length = 150)
       CanvasTextHelper.truncate_text(str, max_length:)
+    end
+
+    def self.delete_orphaned_master_course_links(course:, keep_migration_ids:)
+      to_delete = NavMenuLink.active
+                             .where(course:, course_nav: true)
+                             .where("starts_with(migration_id, ?)", MasterCourses::MIGRATION_ID_PREFIX)
+                             .where.not(migration_id: keep_migration_ids)
+                             .pluck(:id)
+      if to_delete.present?
+        NavMenuLink.where(id: to_delete)
+                   .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+      end
     end
   end
 end

@@ -478,7 +478,11 @@ class ContentExport < ApplicationRecord
   end
 
   def is_external_object?(obj)
-    obj.is_a?(ContextExternalTool) && obj.context_type == "Account"
+    (
+      obj.is_a?(ContextExternalTool) && obj.context_type == "Account"
+    ) || (
+      obj.is_a?(NavMenuLink) && obj.course_id.nil?
+    )
   end
 
   # Method Summary
