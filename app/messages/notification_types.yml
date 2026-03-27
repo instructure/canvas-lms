@@ -250,6 +250,10 @@
       delay_for: 0
     - name: Pseudonym Registration Done
       delay_for: 0
+    - name: Pseudonym Suspended After Failed Login
+      delay_for: 0
+    - name: Pseudonym Suspended By Admin
+      delay_for: 0
     - name: Confirm Registration
       delay_for: 0
     - name: Forgot Password
