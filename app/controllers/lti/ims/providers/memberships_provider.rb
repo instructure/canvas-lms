@@ -100,12 +100,25 @@ module Lti::IMS::Providers
       return @resource_link if defined?(@resource_link)
 
       rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
-      # context here is a decorated context, we want the original
-      if rl.present? && rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
-        raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
-          "Tool does not have access to rlid #{rlid}",
-          api_message: "Tool does not have access to rlid or rlid does not exist"
-        )
+      if rl.present?
+        # context here is a decorated context, we want the original
+        current_tool = rl.current_external_tool(Lti::IMS::Providers::MembershipsProvider.unwrap(context))
+        # Allow access if IDs match exactly, or if both are from the same LTI 1.3
+        # registration (same developer key) within the same root account. The latter
+        # handles cases where the same registration is installed at multiple context
+        # levels (e.g., course and account), and a resource link created by one
+        # installation is accessed by another. The root_account_id guard prevents
+        # a global/inherited developer key from granting cross-root-account access.
+        unless current_tool &&
+               (current_tool.id == tool.id ||
+                (tool.use_1_3? && tool.developer_key_id.present? &&
+                 current_tool.developer_key_id == tool.developer_key_id &&
+                 current_tool.root_account_id == tool.root_account_id))
+          raise Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+            "Tool does not have access to rlid #{rlid}",
+            api_message: "Tool does not have access to rlid or rlid does not exist"
+          )
+        end
       end
 
       @resource_link = rl
