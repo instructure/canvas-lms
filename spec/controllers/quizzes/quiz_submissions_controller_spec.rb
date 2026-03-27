@@ -194,6 +194,19 @@ describe Quizzes::QuizSubmissionsController do
       json = response.parsed_body
       expect(json["backup"]).to be_falsey
     end
+
+    it "allows anonymous backup for ungraded quizzes in public courses" do
+      @course.update!(is_public: true)
+      @quiz.update!(quiz_type: "practice_quiz")
+      temp_code = "tmp_#{SecureRandom.hex}"
+      session[:temporary_user_code] = temp_code
+      qs = @quiz.generate_submission(temp_code)
+      Quizzes::QuizSubmission.where(id: qs).update_all(updated_at: 1.hour.ago)
+
+      put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test" }
+      expect(response).to be_successful
+      expect(qs.reload.submission_data[:a]).to eq "test"
+    end
   end
 
   describe "POST 'record_answer'" do
