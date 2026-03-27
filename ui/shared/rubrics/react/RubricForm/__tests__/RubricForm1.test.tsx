@@ -155,6 +155,21 @@ describe('RubricForm Tests', () => {
       expect(criteriaRowPoints).toHaveLength(0)
     })
 
+    it('renders drag handles with aria-label for each criterion', () => {
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+
+      const {criteria = []} = RUBRICS_QUERY_RESPONSE
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
+
+      const dragHandles = queryAllByTestId('rubric-criteria-row-drag-handle')
+      expect(dragHandles).toHaveLength(criteria.length)
+      expect(dragHandles[0]).toHaveAttribute(
+        'aria-label',
+        `Reorder ${criteria[0]?.description} Criterion`,
+      )
+      expect(dragHandles[0]).toHaveAttribute('role', 'button')
+    })
+
     it('renders the criterion ratings accordion button', () => {
       queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 

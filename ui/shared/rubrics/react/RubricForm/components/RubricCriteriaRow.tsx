@@ -177,8 +177,16 @@ export const RubricCriteriaRow = ({
                   {/* Cell 1: Drag handle */}
                   {!isCompact && (
                     <td className="criterion-cell criterion-cell--drag">
-                      <View as="span" {...provided.dragHandleProps}>
-                        <IconDragHandleLine />
+                      <View
+                        as="span"
+                        role="button"
+                        {...provided.dragHandleProps}
+                        aria-label={I18n.t('Reorder %{criterionName} Criterion', {
+                          criterionName: description,
+                        })}
+                        data-testid="rubric-criteria-row-drag-handle"
+                      >
+                        <IconDragHandleLine aria-hidden="true" />
                       </View>
                     </td>
                   )}
