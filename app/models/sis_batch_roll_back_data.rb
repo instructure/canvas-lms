@@ -31,6 +31,9 @@ class SisBatchRollBackData < ApplicationRecord
                                        group
                                        group_category
                                        group_membership
+                                       institutional_tag
+                                       institutional_tag_association
+                                       institutional_tag_category
                                        pseudonym
                                        user_observer]
 
@@ -50,6 +53,9 @@ class SisBatchRollBackData < ApplicationRecord
                      CommunicationChannel
                      Enrollment
                      GroupMembership
+                     InstitutionalTagCategory
+                     InstitutionalTag
+                     InstitutionalTagAssociation
                      UserObserver
                      AccountUser
                      AssignmentOverrideStudent].freeze

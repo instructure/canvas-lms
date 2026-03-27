@@ -54,6 +54,9 @@ interface SisBatch extends SisImport {
       differentiation_tag_sets: number
       differentiation_tags: number
       differentiation_tag_memberships: number
+      institutional_tag_categories: number
+      institutional_tags: number
+      institutional_tag_associations: number
       user_observers: number
       change_sis_ids: number
     }
@@ -233,6 +236,42 @@ $(document).ready(function (_event) {
           'Differentiation Tag Enrollments: %{group_enrollments_count}',
           {
             group_enrollments_count: batch.data.counts.differentiation_tag_memberships,
+          },
+        ),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t(
+          'import_counts.institutional_tag_categories',
+          'Institutional Tag Categories: %{institutional_tag_categories_count}',
+          {
+            institutional_tag_categories_count: batch.data.counts.institutional_tag_categories,
+          },
+        ),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t(
+          'import_counts.institutional_tags',
+          'Institutional Tags: %{institutional_tags_count}',
+          {
+            institutional_tags_count: batch.data.counts.institutional_tags,
+          },
+        ),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t(
+          'import_counts.institutional_tag_associations',
+          'Institutional Tag Associations: %{institutional_tag_associations_count}',
+          {
+            institutional_tag_associations_count: batch.data.counts.institutional_tag_associations,
           },
         ),
       ) +

@@ -57,6 +57,9 @@ module SIS
                      differentiation_tag
                      group_membership
                      differentiation_tag_membership
+                     institutional_tag_category
+                     institutional_tag
+                     institutional_tag_association
                      grade_publishing_results
                      user_observer].freeze
 
