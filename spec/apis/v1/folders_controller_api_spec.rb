@@ -1742,4 +1742,33 @@ describe "Folders API", type: :request do
       end
     end
   end
+
+  context "unauthenticated user in public course" do
+    before :once do
+      @course.update!(is_public: true)
+      @user = nil
+    end
+
+    it "allows api_index on a folder" do
+      raw_api_call(:get,
+                   "/api/v1/folders/#{@root.id}/folders",
+                   { controller: "folders", action: "api_index", format: "json", id: @root.id.to_param })
+      assert_status(200)
+    end
+
+    it "allows resolve_path" do
+      raw_api_call(:get,
+                   "/api/v1/courses/#{@course.id}/folders/by_path",
+                   { controller: "folders", action: "resolve_path", format: "json", course_id: @course.id.to_param })
+      assert_status(200)
+    end
+
+    it "allows list_all_folders_and_files" do
+      Account.site_admin.enable_feature!(:files_a11y_rewrite)
+      raw_api_call(:get,
+                   "/api/v1/courses/#{@course.id}/folders_and_files",
+                   { controller: "folders", action: "list_all_folders_and_files", format: "json", course_id: @course.id.to_param })
+      assert_status(200)
+    end
+  end
 end

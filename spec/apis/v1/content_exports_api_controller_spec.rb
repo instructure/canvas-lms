@@ -1415,4 +1415,36 @@ describe ContentExportsApiController, type: :request do
       end
     end
   end
+
+  context "unauthenticated user in public course" do
+    before :once do
+      t_course.update!(is_public: true)
+      @user = nil
+    end
+
+    it "allows listing content exports" do
+      raw_api_call(:get,
+                   "/api/v1/courses/#{t_course.id}/content_exports",
+                   { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param })
+      assert_status(200)
+    end
+
+    it "allows creating a zip export" do
+      raw_api_call(:post,
+                   "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+                   { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "zip" })
+      assert_status(200)
+    end
+
+    it "allows showing an export created by an anonymous user" do
+      raw_api_call(:post,
+                   "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+                   { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "zip" })
+      export_id = response.parsed_body["id"]
+      raw_api_call(:get,
+                   "/api/v1/courses/#{t_course.id}/content_exports/#{export_id}",
+                   { controller: "content_exports_api", action: "show", format: "json", course_id: t_course.to_param, id: export_id.to_s })
+      assert_status(200)
+    end
+  end
 end
