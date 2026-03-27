@@ -25,6 +25,10 @@ class GraphQLController < ApplicationController
   # This makes sure that the liveEvents context is set up for graphql requests
   before_action :get_context
 
+  def graphql_operation_name
+    params[:operationName]
+  end
+
   def execute
     result = execute_on(CanvasSchema)
     prep_page_view_for_submit
