@@ -296,17 +296,20 @@ export const DiscussionTopicContainer = ({
 
   const postDiscussionSummaryFeedback = useCallback(
     // @ts-expect-error TS7006 (typescriptify)
-    async action => {
+    async (action, comment) => {
       setIsFeedbackLoading(true)
 
       try {
+        const body: Record<string, string> = {_action: action}
+        if (comment) {
+          body.comment = comment
+        }
+
         const {json} = await doFetchApi({
           method: 'POST',
           // @ts-expect-error TS18047 (typescriptify)
           path: `${apiUrlPrefix}/summaries/${summary.id}/feedback`,
-          body: {
-            _action: action,
-          },
+          body,
         })
         // @ts-expect-error TS18046 (typescriptify)
         setLiked(json.liked)
