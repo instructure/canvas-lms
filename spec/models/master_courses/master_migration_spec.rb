@@ -3127,6 +3127,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "copies tab configurations for account-level external tools" do
+      # ContextExport#is_external_object? ensures account-level links don't get mastercourse_ prepended to migration id
       @tool_from = @copy_from.account.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
       @tool_from.settings[:course_navigation] = { url: "http://www.example.com", text: "Example URL" }
       @tool_from.save!
@@ -3139,6 +3140,33 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
       expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
+    end
+
+    it "copies tab configurations for nav menu links, preserving account-level links" do
+      # ContextExport#is_external_object? ensures account-level links don't get mastercourse_ prepended to migration id
+      acct_link = NavMenuLink.create!(
+        context: @copy_from.account, course_nav: true, label: "Link 1", url: "http://a.com/1"
+      )
+      course_link = NavMenuLink.create!(
+        context: @copy_from, course_nav: true, label: "Link 2", url: "http://a.com/2"
+      )
+
+      @copy_from.update tab_configuration: [
+        { "id" => "nav_menu_link_#{acct_link.id}" },
+        { "id" => "nav_menu_link_#{course_link.id}" },
+      ]
+
+      copy_to = course_factory(account: @copy_from.account)
+      @template.add_child_course!(copy_to)
+
+      run_master_migration
+
+      new_course_link = NavMenuLink.where(course: copy_to, label: "Link 2").last
+
+      expect(copy_to.reload.tab_configuration).to eq [
+        { "id" => "nav_menu_link_#{acct_link.id}" },
+        { "id" => "nav_menu_link_#{new_course_link.id}" },
+      ]
     end
 
     it "does not break trying to match existing attachments on cloned_item_id" do

@@ -97,24 +97,26 @@ describe Importers::NavMenuLinkImporter do
       )
     end
 
+    let(:base_data) { { "course" => { "tab_configuration" => [] } }.with_indifferent_access }
+
     it "imports all nav menu links from data" do
-      data = {
+      data = base_data.merge(
         "nav_menu_links" => [
           { "migration_id" => "pm_link_1", "label" => "Link One", "url" => "https://one.com" },
           { "migration_id" => "pm_link_2", "label" => "Link Two", "url" => "https://two.com" }
         ]
-      }
+      )
 
       expect { Importers::NavMenuLinkImporter.process_migration(data, @import_all_migration) }
         .to change { NavMenuLink.where(course: @course).count }.by(2)
     end
 
     it "does nothing when nav_menu_links key is absent or blank" do
-      expect { Importers::NavMenuLinkImporter.process_migration({}, @import_all_migration) }
+      expect { Importers::NavMenuLinkImporter.process_migration(base_data, @import_all_migration) }
         .not_to change { NavMenuLink.count }
-      expect { Importers::NavMenuLinkImporter.process_migration({ "nav_menu_links" => [] }, @import_all_migration) }
+      expect { Importers::NavMenuLinkImporter.process_migration(base_data.merge("nav_menu_links" => []), @import_all_migration) }
         .not_to change { NavMenuLink.count }
-      expect { Importers::NavMenuLinkImporter.process_migration({ "nav_menu_links" => nil }, @import_all_migration) }
+      expect { Importers::NavMenuLinkImporter.process_migration(base_data.merge("nav_menu_links" => nil), @import_all_migration) }
         .not_to change { NavMenuLink.count }
     end
 
@@ -123,7 +125,7 @@ describe Importers::NavMenuLinkImporter do
       migration = @course.content_migrations.create!(
         migration_settings: { migration_ids_to_import: { copy: { all_assignments: "1" } } }
       )
-      data = { "nav_menu_links" => [{ "migration_id" => "pm_skip_1", "label" => "L", "url" => "https://x.com" }] }
+      data = base_data.merge("nav_menu_links" => [{ "migration_id" => "pm_skip_1", "label" => "L", "url" => "https://x.com" }])
       expect { Importers::NavMenuLinkImporter.process_migration(data, migration) }
         .not_to change { NavMenuLink.count }
     end
@@ -132,12 +134,12 @@ describe Importers::NavMenuLinkImporter do
       migration = @course.content_migrations.create!(
         migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
       )
-      data = {
+      data = base_data.merge(
         "nav_menu_links" => [
           { migration_id: "pm_bad_link", label: "Bad", url: "https://bad.com" },
           { migration_id: "pm_good_link", label: "Good", url: "https://good.com" }
         ]
-      }
+      )
 
       allow(Importers::NavMenuLinkImporter).to receive(:import_from_migration).and_call_original
       allow(Importers::NavMenuLinkImporter).to receive(:import_from_migration)
@@ -154,11 +156,11 @@ describe Importers::NavMenuLinkImporter do
       migration = @course.content_migrations.create!(
         migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
       )
-      data = {
+      data = base_data.merge(
         "nav_menu_links" => [
           { migration_id: "pm_error_link", label: "Error Link", url: "https://error.com" }
         ]
-      }
+      )
 
       error = StandardError.new("unexpected error")
       mock_error_report = 12_345
@@ -168,19 +170,78 @@ describe Importers::NavMenuLinkImporter do
         .with(hash_including(migration_id: "pm_error_link"), anything, anything, anything)
         .and_raise(error)
 
-      # Verify that Canvas::Errors.capture_exception is called with the error
       expect(Canvas::Errors).to receive(:capture_exception)
         .with(:import_nav_menu_links, error)
         .and_return({ error_report: mock_error_report })
 
-      # Verify that the error report ID is included in the warning
       expect(migration).to receive(:add_warning)
         .with(match(/Custom Link could not be imported: Error Link/), { error_report_id: mock_error_report })
 
       Importers::NavMenuLinkImporter.process_migration(data, migration)
 
-      # Verify the link was not created
       expect(NavMenuLink.where(course: @course, migration_id: "pm_error_link")).not_to exist
+    end
+
+    context "with master course import" do
+      let(:master_course_migration) do
+        @course.content_migrations.create!(
+          migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
+        ).tap { |m| allow(m).to receive(:for_master_course_import?).and_return(true) }
+      end
+
+      it "deletes orphaned master course nav links not present in data" do
+        orphaned_link = NavMenuLink.create!(
+          course: @course,
+          course_nav: true,
+          url: "http://example.com",
+          label: "Orphaned",
+          migration_id: "mastercourse_1_1_orphaned"
+        )
+        kept_link = NavMenuLink.create!(
+          course: @course,
+          course_nav: true,
+          url: "http://example.com",
+          label: "Kept",
+          migration_id: "mastercourse_1_1_kept"
+        )
+        kept_nonmastercourse_link = NavMenuLink.create!(
+          course: @course,
+          course_nav: true,
+          url: "http://example.com",
+          label: "Non-master-course",
+          migration_id: "not-from-mastercourse"
+        )
+
+        data = base_data.merge(
+          "nav_menu_links" => [
+            { "migration_id" => "mastercourse_1_1_kept", "label" => "Kept", "url" => "http://example.com" }
+          ]
+        )
+
+        Importers::NavMenuLinkImporter.process_migration(data, master_course_migration)
+
+        expect(orphaned_link.reload.workflow_state).to eq "deleted"
+        expect(kept_link.reload.workflow_state).to eq "active"
+        expect(kept_nonmastercourse_link.reload.workflow_state).to eq "active"
+      end
+
+      it "does not delete links when course settings were not included in the sync" do
+        existing_link = NavMenuLink.create!(
+          course: @course,
+          course_nav: true,
+          url: "http://example.com",
+          label: "Existing",
+          migration_id: "mastercourse_1_1_existing"
+        )
+
+        # No "course" key in data simulates a blueprint sync where course settings
+        # were not checked — should_process? returns false and links are untouched
+        data = { "nav_menu_links" => [] }
+
+        Importers::NavMenuLinkImporter.process_migration(data, master_course_migration)
+
+        expect(existing_link.reload.workflow_state).to eq "active"
+      end
     end
 
     it "skips processing if there is an existing links for the migration id and course" do
@@ -199,12 +260,12 @@ describe Importers::NavMenuLinkImporter do
         url: "https://existing2.com"
       )
 
-      data = {
+      data = base_data.merge(
         "nav_menu_links" => [
           { "migration_id" => "pm_existing_1", "label" => "Updated", "url" => "https://updated.com" },
           { "migration_id" => "pm_other_course_1", "label" => "New", "url" => "https://new.com" }
         ]
-      }
+      )
 
       expect { Importers::NavMenuLinkImporter.process_migration(data, @import_all_migration) }
         .to change { NavMenuLink.where(course: @course).count }.by(1)
@@ -245,7 +306,10 @@ describe Importers::NavMenuLinkImporter do
           url:
         }
       ]
-      Importers::NavMenuLinkImporter.process_migration({ "nav_menu_links" => nav_menu_links_data }, migration)
+      Importers::NavMenuLinkImporter.process_migration(
+        { "nav_menu_links" => nav_menu_links_data, "course" => { "tab_configuration" => [] } }.with_indifferent_access,
+        migration
+      )
     end
 
     it "converts various URL types correctly" do
