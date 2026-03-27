@@ -19,13 +19,10 @@
 #
 
 module Types
-  class AiGradeCriterionResultType < ApplicationObjectType
-    graphql_name "AIGradeCriterionResult"
+  class AiFeedbackTypeEnum < Types::BaseEnum
+    description "Feedback sentiment for AI feature responses"
 
-    field :comments, String, null: true, hash_key: "comments"
-    field :description, String, null: false, hash_key: "description"
-    field :id, ID, null: false, hash_key: "id"
-    field :rating, AiGradeRatingType, null: false, hash_key: "rating"
-    field :response_id, String, null: true, hash_key: "responseId"
+    value "positive"
+    value "negative"
   end
 end
