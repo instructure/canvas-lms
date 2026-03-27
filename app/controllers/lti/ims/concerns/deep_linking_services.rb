@@ -70,6 +70,10 @@ module Lti::IMS::Concerns
       @replace_editor_contents ||= tool_has_scope && (deep_linking_jwt["https://canvas.instructure.com/lti/replace_editor_contents"] || false)
     end
 
+    def module_name
+      deep_linking_jwt["https://canvas.instructure.com/lti/module_name"]&.to_s&.presence
+    end
+
     def lti_resource_links
       content_items.filter { |item| item[:type] == "ltiResourceLink" }
     end
