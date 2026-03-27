@@ -20,6 +20,9 @@
 class InstitutionalTag < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
+  include StickySisFields
+
+  are_sis_sticky :name, :description
 
   belongs_to :category, class_name: "InstitutionalTagCategory", optional: false, inverse_of: :institutional_tags
   belongs_to :sis_batch, optional: true
