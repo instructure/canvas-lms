@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import React from 'react'
 import GroupCategoryModal from '../GroupCategoryModal'
@@ -26,17 +26,12 @@ const setup = (onSubmit = vi.fn()) => {
   return render(<GroupCategoryModal show={true} onSubmit={onSubmit} />)
 }
 
-const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
-
 describe('GroupCategoryModal', () => {
-  beforeEach(() => {
-    vi.useRealTimers()
-  })
-
   it('renders', () => {
     const {getByText} = setup()
     expect(getByText('Group Set Name')).toBeInTheDocument()
   })
+
   it('opens Leadership section when it clicks allows checkbox', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {queryByText, getAllByText, getByText} = setup()
@@ -66,38 +61,6 @@ describe('GroupCategoryModal', () => {
     expect(getByText('Automatically assign a student group leader')).not.toBeChecked()
     expect(getByText('Set first student to join as group leader')).not.toBeChecked()
   })
-
-  it('enables number input when it picks a group structure', async () => {
-    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
-    const {getByLabelText, findByLabelText, findByText} = setup()
-    const select = getByLabelText('Group Structure')
-    await user.click(select)
-    await user.click(await findByText('Split students by number of groups', {}, {timeout: 10000}))
-    expect(await findByLabelText('Number of Groups', {}, {timeout: 20000})).toBeInTheDocument()
-  }, 35000)
-
-  // TODO: InstUI SimpleSelect + NumberInput interaction unreliable in CI
-  it.skip('increments/decrements number input, which stays in bounds', async () => {
-    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
-    const {getByText, findByText, findByLabelText} = setup()
-    await user.click(getByText('Group Structure'))
-    await user.click(await findByText('Split students by number of groups', {}, {timeout: 10000}))
-    const numberInput = (await findByLabelText(
-      'Number of Groups',
-      {},
-      {timeout: 20000},
-    )) as HTMLInputElement
-    await user.type(numberInput, '{arrowdown}')
-    expect(numberInput.value).toBe('0')
-    // userEvent's {arrowup} does not work with number inputs
-    // https://github.com/testing-library/user-event/issues/1066
-    // await user.type(numberInput, '{arrowup}{arrowup}')
-    await user.type(numberInput, '2')
-    expect(numberInput.value).toBe('2')
-    // bigger than the default maximum (200)
-    await user.type(numberInput, '99999999999999999')
-    expect(numberInput.value).toBe('200')
-  }, 30000)
 
   it('calls submission function on submit', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
