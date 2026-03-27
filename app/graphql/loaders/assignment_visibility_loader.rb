@@ -19,24 +19,22 @@
 #
 #
 class Loaders::AssignmentVisibilityLoader < GraphQL::Batch::Loader
-  def perform(assignment_ids)
-    assignments_by_course_id = Assignment.where(id: assignment_ids).group_by(&:context_id)
-
-    courses_by_id = Course.where(id: assignments_by_course_id.keys).index_by(&:id)
+  def perform(assignments)
+    courses_by_id = Course.where(id: assignments.map(&:context_id).uniq).index_by(&:id)
 
     data = {}
-    assignments_by_course_id.each do |course_id, assignments|
+    assignments.group_by(&:context_id).each do |course_id, course_assignments|
       course = courses_by_id[course_id]
 
       course_visibility_data = AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(
         course,
-        assignments
+        course_assignments
       )
       data.merge!(course_visibility_data)
     end
 
-    assignment_ids.each do |id|
-      fulfill(id, data.fetch(id, []))
+    assignments.each do |assignment|
+      fulfill(assignment, data.fetch(assignment.id, []))
     end
   end
 end
