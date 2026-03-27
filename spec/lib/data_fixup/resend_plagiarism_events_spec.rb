@@ -79,6 +79,82 @@ describe DataFixup::ResendPlagiarismEvents do
     end
   end
 
+  describe "#resend_scope" do
+    let(:start_time) { 1.day.ago }
+    let(:end_time) { Time.zone.now }
+    let(:attachment) { attachment_model(context: student) }
+    let(:file_submission) do
+      assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
+    end
+
+    before { assignment.update!(submission_types: "online_upload") }
+
+    context "missing report scope (only_errors: false)" do
+      it "includes a file submission with no originality report" do
+        file_submission
+        expect(described_class.resend_scope(start_time, end_time)).to include(file_submission)
+      end
+
+      it "excludes a file submission whose report matches on attachment_id, even when submission_time differs from submitted_at" do
+        file_submission.originality_reports.create!(
+          attachment:,
+          workflow_state: "scored",
+          originality_score: 10,
+          submission_time: 1.year.ago
+        )
+        expect(described_class.resend_scope(start_time, end_time)).not_to include(file_submission)
+      end
+
+      it "includes a file submission with a pending originality report" do
+        file_submission.originality_reports.create!(attachment:, workflow_state: "pending")
+        expect(described_class.resend_scope(start_time, end_time)).to include(file_submission)
+      end
+
+      it "excludes a text entry resubmission with a scored report, even when an attachment_association exists from the previous file attempt" do
+        assignment.update!(submission_types: ["online_text_entry", "online_upload"])
+        # First attempt: file upload (creates attachment_association)
+        file_submission
+        # Second attempt: text entry — submission_type updates, attachment_association remains
+        submission = assignment.submit_homework(
+          student,
+          submission_type: "online_text_entry",
+          body: "some text"
+        )
+        submission.originality_reports.create!(
+          workflow_state: "scored",
+          originality_score: 5,
+          submission_time: submission.submitted_at
+        )
+        expect(described_class.resend_scope(start_time, end_time)).not_to include(submission)
+      end
+    end
+
+    context "errors report scope (only_errors: true)" do
+      it "includes a file submission with an errored originality report, even when submission_time is nil" do
+        file_submission.originality_reports.create!(
+          attachment:,
+          workflow_state: "error",
+          submission_time: nil
+        )
+        expect(described_class.resend_scope(start_time, end_time, only_errors: true)).to include(file_submission)
+      end
+
+      it "includes a file submission with an errored originality report, even when submission_time differs from submitted_at" do
+        file_submission.originality_reports.create!(
+          attachment:,
+          workflow_state: "error",
+          submission_time: 1.year.ago
+        )
+        expect(described_class.resend_scope(start_time, end_time, only_errors: true)).to include(file_submission)
+      end
+
+      it "excludes a file submission with no errored originality report" do
+        file_submission
+        expect(described_class.resend_scope(start_time, end_time, only_errors: true)).not_to include(file_submission)
+      end
+    end
+  end
+
   describe "#trigger_plagiarism_resubmit_by_id" do
     it "triggers the next job in the batch after it finishes" do
       stub_const("DataFixup::ResendPlagiarismEvents::RESUBMIT_LIMIT", 1)
