@@ -37,9 +37,9 @@ export const DynamicInstUISettingsProvider = ({
 
   useEffect(() => {
     if (isCareerTheme) {
-      loadCareerTheme(themeParam === 'career-dark').then(careerTheme => {
-        if (careerTheme) {
-          setTheme(careerTheme)
+      loadCareerTheme(themeParam === 'career-dark').then(loadedTheme => {
+        if (loadedTheme) {
+          setTheme(loadedTheme)
         }
       })
     }

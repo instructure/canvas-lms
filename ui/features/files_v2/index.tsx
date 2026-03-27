@@ -26,10 +26,18 @@ import {router} from './routes/router'
 import {FilesErrorBoundary} from './react/components/FilesErrorBoundary'
 import {queryClient} from '@canvas/query'
 
+const theme = getTheme(
+  undefined,
+  undefined,
+  Boolean(ENV.K5_USER),
+  Boolean(ENV.USE_CLASSIC_FONT),
+  Boolean(ENV.use_dyslexic_font),
+)
+
 const root = createRoot(document.getElementById('content')!)
 root.render(
   <React.StrictMode>
-    <DynamicInstUISettingsProvider theme={getTheme()}>
+    <DynamicInstUISettingsProvider theme={theme}>
       <FilesErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
