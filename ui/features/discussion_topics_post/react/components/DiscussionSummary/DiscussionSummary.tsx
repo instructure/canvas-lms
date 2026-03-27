@@ -57,7 +57,7 @@ export interface DiscussionSummaryProps {
   onSetLiked: (liked: boolean) => void
   disliked: boolean
   onSetDisliked: (disliked: boolean) => void
-  postDiscussionSummaryFeedback: (action: string) => Promise<void>
+  postDiscussionSummaryFeedback: (action: string, comment?: string) => Promise<void>
 }
 
 interface DiscussionSummaryError {
@@ -187,7 +187,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   } else {
     content = (
       <>
-        <Flex.Item margin={props.isMobile ? '0 0 mediumSmall 0' : '0 0 small 0'}>
+        <Flex.Item margin={props.isMobile ? '0 0 mediumSmall 0' : '0 0 medium 0'}>
           <Text fontStyle="italic" size="medium" weight="normal" data-testid="summary-text">
             {props.summary?.text?.split('\n').map((line, index) => (
               <React.Fragment key={index}>
@@ -206,12 +206,15 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
             </Alert>
           </Flex.Item>
         )}
-        <Flex.Item margin="0 0 medium 0" align="end">
+        <Flex.Item margin="0 0 medium 0">
           <DiscussionSummaryRatings
             liked={props.liked}
             disliked={props.disliked}
             onLikeClick={() => props.postDiscussionSummaryFeedback(likeAction)}
             onDislikeClick={() => props.postDiscussionSummaryFeedback(dislikeAction)}
+            onSubmitFeedbackComment={(comment: string) =>
+              props.postDiscussionSummaryFeedback('add_comment', comment)
+            }
             isEnabled={!props.isFeedbackLoading}
           />
         </Flex.Item>

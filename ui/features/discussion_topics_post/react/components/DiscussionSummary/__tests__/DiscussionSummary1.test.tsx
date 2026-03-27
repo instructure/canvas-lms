@@ -243,6 +243,35 @@ describe('DiscussionSummary', () => {
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('dislike')
     })
 
+    it('should not show feedback form on mount even when already disliked', async () => {
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
+
+      const {queryByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: true,
+      })
+
+      expect(queryByTestId('summary-feedback-comment')).not.toBeInTheDocument()
+    })
+
+    it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
+
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: false,
+      })
+
+      const dislikeButton = await waitFor(() => getByTestId('summary-dislike-button'))
+      fireEvent.click(dislikeButton)
+
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('dislike')
+    })
+
     it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
       const setDisliked = vi.fn()
       const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
@@ -274,6 +303,7 @@ describe('DiscussionSummary', () => {
     const defaultProps = {
       onLikeClick: vi.fn(),
       onDislikeClick: vi.fn(),
+      onSubmitFeedbackComment: vi.fn(),
       liked: false,
       disliked: false,
       isEnabled: true,
@@ -292,6 +322,102 @@ describe('DiscussionSummary', () => {
     it('should display "Thank you for sharing!" when disliked is true', () => {
       const {getByText} = render(<DiscussionSummaryRatings {...defaultProps} disliked={true} />)
       expect(getByText(I18n.t('Thank you for sharing!'))).toBeInTheDocument()
+    })
+
+    it('should not show feedback form when not disliked', () => {
+      const {queryByTestId} = render(<DiscussionSummaryRatings {...defaultProps} />)
+      expect(queryByTestId('summary-feedback-comment')).not.toBeInTheDocument()
+    })
+
+    it('should show feedback form after clicking dislike', () => {
+      const onDislikeClick = vi.fn()
+      const {getByTestId, rerender} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings {...defaultProps} onDislikeClick={onDislikeClick} />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Click dislike
+      fireEvent.click(getByTestId('summary-dislike-button'))
+      expect(onDislikeClick).toHaveBeenCalled()
+
+      // Rerender with disliked=true to simulate parent state update
+      rerender(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            disliked={true}
+            onDislikeClick={onDislikeClick}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      expect(getByTestId('summary-feedback-comment')).toBeInTheDocument()
+      expect(getByTestId('summary-feedback-submit')).toBeInTheDocument()
+    })
+
+    it('should disable Send Feedback button when comment is empty', () => {
+      const onDislikeClick = vi.fn()
+      const {getByTestId, rerender} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings {...defaultProps} onDislikeClick={onDislikeClick} />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Click dislike
+      fireEvent.click(getByTestId('summary-dislike-button'))
+
+      // Rerender with disliked=true
+      rerender(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            disliked={true}
+            onDislikeClick={onDislikeClick}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Send Feedback button should be disabled when no text entered
+      expect(getByTestId('summary-feedback-submit')).toBeDisabled()
+    })
+
+    it('should call onSubmitFeedbackComment with comment text when submitted', () => {
+      const onSubmitFeedbackComment = vi.fn()
+      const onDislikeClick = vi.fn()
+      const {getByTestId, rerender} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            onDislikeClick={onDislikeClick}
+            onSubmitFeedbackComment={onSubmitFeedbackComment}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Click dislike to show form
+      fireEvent.click(getByTestId('summary-dislike-button'))
+
+      // Rerender with disliked=true
+      rerender(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            disliked={true}
+            onDislikeClick={onDislikeClick}
+            onSubmitFeedbackComment={onSubmitFeedbackComment}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Type feedback
+      fireEvent.change(getByTestId('summary-feedback-comment'), {
+        target: {value: 'The summary missed key points'},
+      })
+
+      // Submit
+      fireEvent.click(getByTestId('summary-feedback-submit'))
+      expect(onSubmitFeedbackComment).toHaveBeenCalledWith('The summary missed key points')
     })
   })
 })
