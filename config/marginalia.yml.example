@@ -16,3 +16,4 @@
 #   - hostname
 #   - pid
 #   - context_id
+#   - operation_name
