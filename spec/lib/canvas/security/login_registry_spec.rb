@@ -114,6 +114,7 @@ describe Canvas::Security::LoginRegistry do
       end
 
       it "suspends the user's login after the last failed login attempt" do
+        expect_any_instance_of(Pseudonym).to receive(:suspend_with_notification!).with(from_failed_login: true).and_call_original
         3.times { registry.audit_login(@p, false) }
         expect(@p.reload.workflow_state).to eq "suspended"
       end

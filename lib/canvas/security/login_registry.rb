@@ -104,7 +104,9 @@ module Canvas::Security
           failed_login!(pseudonym)
           return :remaining_attempts_1
         when 1
-          pseudonym.suspend! if pseudonym.active?
+          if pseudonym.active?
+            pseudonym.suspend_with_notification!(from_failed_login: true)
+          end
           return :final_attempt
         end
       end

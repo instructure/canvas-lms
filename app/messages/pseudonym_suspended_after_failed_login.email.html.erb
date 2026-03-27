@@ -1,0 +1,10 @@
+<% p = asset.is_a?(Pseudonym) ? asset : asset.pseudonym %>
+<% define_content :link do %>
+  <%= login_url %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Login Suspended" %>
+<% end %>
+
+<p><%= t :body, "Your login at %{account_name} has been suspended for too many failed login attempts. Please contact your institution's administration.", :account_name => p.account.display_name %></p>
