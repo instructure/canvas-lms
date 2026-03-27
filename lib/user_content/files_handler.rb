@@ -80,8 +80,8 @@ module UserContent
       def options
         { only_path: true }.tap do |h|
           h[:download] = 1 if match.download_frd?
-          unless no_verifiers || location
-            h[:verifier] = attachment.uuid if is_public || match.with_verifier? || (!in_app && !attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api))
+          unless attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
+            h[:verifier] = attachment.uuid unless (in_app && !is_public && !match.with_verifier?) || no_verifiers || location
           end
           h[:location] = location if location
           if !match.preview? && match.rest.include?("wrap=1")
@@ -147,11 +147,18 @@ module UserContent
 
     def attachment
       return nil unless match.obj_id
-      return @attachment if @attachment.present?
 
-      @attachment = preloaded_attachments[match.obj_id] || Attachment.find_by(id: match.obj_id)
-      @attachment = @attachment.context.attachments.find_by(id: match.obj_id) if @attachment&.deleted? && @attachment.context
-      @attachment
+      unless @_attachment
+        @_attachment = preloaded_attachments[match.obj_id] unless preloaded_attachments[match.obj_id]&.replacement_attachment_id
+        if location.present?
+          attachment = Attachment.find_by(id: match.obj_id)
+          @_attachment ||= attachment.context.attachments.find_by(id: attachment)
+        else
+          @_attachment ||= Attachment.find_by(id: match.obj_id) if context.is_a?(User) || context.nil?
+          @_attachment ||= context&.attachments&.find_by(id: match.obj_id)
+        end
+      end
+      @_attachment
     end
 
     def user_can_access_attachment?
