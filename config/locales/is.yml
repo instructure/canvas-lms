@@ -16826,7 +16826,7 @@ is:
         category_settings: Stillingar
         delete_category_option: Eyða
         edit_category_option: Breyta
-        group: Verkefnaflokkur
+        group: Hópur
         group_limit_blurb: "Takmarka hópa við *%{group_limit}* meðlimi"
         import: "Flytja inn"
         message_all_unassigned_option: "Senda skilaboð til allra óúthlutaðra nemenda"
