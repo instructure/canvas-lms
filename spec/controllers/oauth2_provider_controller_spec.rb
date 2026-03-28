@@ -606,8 +606,6 @@ describe OAuth2ProviderController do
       end
 
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
         allow(Canvas).to receive_messages(redis:)
         key.update!(redirect_uri: "https://example.com", client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
       end
@@ -732,8 +730,6 @@ describe OAuth2ProviderController do
         end
 
         before do
-          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
           key.update!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
         end
 
