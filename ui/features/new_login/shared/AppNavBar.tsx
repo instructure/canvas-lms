@@ -37,7 +37,6 @@ const AppNavBar = () => {
       {() => {
         return (
           <TopNavBar.Layout
-            navLabel={I18n.t('Login page navigation')}
             smallViewportConfig={{
               dropdownMenuToggleButtonLabel: I18n.t('Menu'),
             }}
