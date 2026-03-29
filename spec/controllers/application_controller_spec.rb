@@ -856,32 +856,41 @@ RSpec.describe ApplicationController do
           end
         end
 
-        describe "MOBILE_COOKIE_CONSENT" do
+        describe "PRE_COOKIE_CONSENT" do
           before do
             Account.default.enable_feature!(:send_usage_metrics)
             mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!")
           end
 
-          context "when the request comes from a mobile webview" do
-            it "is not included in js_env if cookie consent is not necessary" do
-              mock_session_for_webview(mobile_cookie_consent: true)
-              Account.default.disable_feature!(:cookie_consent_necessary)
-              expect(controller.js_env[:MOBILE_COOKIE_CONSENT]).to be_nil
-            end
-
-            it "is included in js_env if cookie consent is necessary" do
-              mock_session_for_webview(mobile_cookie_consent: true)
-              Account.default.enable_feature!(:cookie_consent_necessary)
-              expect(controller.js_env[:MOBILE_COOKIE_CONSENT]).to be_truthy
-            end
+          it "is implied ''true'' if cookie consent is not necessary" do
+            mock_session_for_webview(mobile_cookie_consent: true)
+            Account.default.disable_feature!(:cookie_consent_necessary)
+            expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
           end
 
-          it "is not included in js_env when it's not a mobile webview request" do
-            Account.default.enable_feature!(:cookie_consent_necessary)
-            allow(controller).to receive(:session).and_return({
-                                                                session_id: "slartibartfast"
-                                                              })
-            expect(controller.js_env[:MOBILE_COOKIE_CONSENT]).to be_nil
+          context "when cookie consent is necessary" do
+            before do
+              Account.default.enable_feature!(:cookie_consent_necessary)
+            end
+
+            it "is ''null'' when it's not a mobile webview request" do
+              allow(controller).to receive(:session).and_return({
+                                                                  session_id: "slartibartfast"
+                                                                })
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("null")
+            end
+
+            context "when the request comes from a mobile webview" do
+              it "is ''true'' when consent was given in the mobile client" do
+                mock_session_for_webview(mobile_cookie_consent: true)
+                expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
+              end
+
+              it "is ''false'' when consent was not given in the mobile client" do
+                mock_session_for_webview(mobile_cookie_consent: false)
+                expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("false")
+              end
+            end
           end
         end
 
