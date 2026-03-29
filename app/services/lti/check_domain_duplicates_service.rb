@@ -43,15 +43,18 @@ module Lti
       normalized_domain = domain.strip.downcase
 
       GuardRail.activate(:secondary) do
-        account_regs = account_registrations
-        forced_on_regs = forced_on_site_admin
-        inherited_regs = inherited_on_registrations
+        account_results = registrations_with_domain(account_registrations, normalized_domain)
 
-        account_results = registrations_with_domain(account_regs, normalized_domain)
-        forced_on_results = registrations_with_domain(forced_on_regs, normalized_domain)
-        inherited_results = registrations_with_domain(inherited_regs, normalized_domain)
-
-        (account_results + forced_on_results + inherited_results)
+        if templates_enabled?
+          # With templates enabled, only check account registrations (includes local copies)
+          # No need to query Site Admin - local copies have the same domain
+          account_results
+        else
+          # Without templates, check Site Admin and inherited registrations via bindings
+          forced_on_results = registrations_with_domain(forced_on_site_admin, normalized_domain)
+          inherited_results = registrations_with_domain(inherited_on_registrations, normalized_domain)
+          account_results + forced_on_results + inherited_results
+        end
       end
     end
 
@@ -59,7 +62,11 @@ module Lti
 
     # Get IDs of all registrations owned by this account
     def account_registrations
-      Lti::Registration.active.where(account:)
+      query = Lti::Registration.active.where(account:)
+      # When templates are disabled, exclude local copies - they shouldn't be visible
+      # When templates are enabled, include them - they'll be shown instead of Site Admin registrations
+      query = query.where(template_registration_id: nil) unless templates_enabled?
+      query
     end
 
     # Get IDs of all registrations forced on in site admin
@@ -115,6 +122,12 @@ module Lti
           admin_nickname:
         }.compact
       end
+    end
+
+    def templates_enabled?
+      return @templates_enabled if defined?(@templates_enabled)
+
+      @templates_enabled = account.root_account.feature_enabled?(:lti_registrations_templates)
     end
   end
 end

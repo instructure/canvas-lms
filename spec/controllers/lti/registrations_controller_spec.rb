@@ -194,6 +194,9 @@ RSpec.describe Lti::RegistrationsController do
 
     context "correctness verifications" do
       before do
+        # Disable templates flag for tests expecting site admin registrations with bindings
+        account.disable_feature!(:lti_registrations_templates)
+
         3.times do |number|
           registration = lti_registration_model(account:, name: "Registration no. #{number}")
           lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
@@ -659,6 +662,9 @@ RSpec.describe Lti::RegistrationsController do
 
       context "with exactly 15 registrations present" do
         before do
+          # Disable templates flag for tests expecting site admin registrations with bindings
+          account.disable_feature!(:lti_registrations_templates)
+
           10.times do |number|
             registration = lti_registration_model(account:, name: "Registration no. #{number}")
             lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
@@ -2417,6 +2423,10 @@ RSpec.describe Lti::RegistrationsController do
         registration
       end
 
+      before do
+        account.disable_feature!(:lti_registrations_templates)
+      end
+
       it "includes the forced-on site admin registration" do
         subject
         expect(duplicates).to contain_exactly(hash_including(id: site_admin_registration.id))
@@ -2447,6 +2457,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       before do
+        account.disable_feature!(:lti_registrations_templates)
         Lti::AccountBindingService.call(account:, user: admin, registration: parent_registration, workflow_state: :on)
       end
 
@@ -2469,6 +2480,7 @@ RSpec.describe Lti::RegistrationsController do
         let_once(:admin) { @shard2.activate { account_admin_user(account:) } }
 
         before do
+          @shard2.activate { account.disable_feature!(:lti_registrations_templates) }
           user_session(admin)
           @shard2.activate { Lti::AccountBindingService.call(account:, registration: site_admin_registration, user: admin, workflow_state: "on") }
         end
@@ -2525,7 +2537,11 @@ RSpec.describe Lti::RegistrationsController do
       let_once(:account) { @shard2.activate { account_model } }
       let_once(:admin) { @shard2.activate { account_admin_user(account:) } }
 
-      before { user_session(admin) }
+      before do
+        user_session(admin)
+        # Disable templates flag to test cross-shard site admin registrations
+        @shard2.activate { account.disable_feature!(:lti_registrations_templates) }
+      end
 
       it "returns the global ID for cross-shard registration" do
         @shard2.activate { subject }

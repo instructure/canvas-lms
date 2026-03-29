@@ -59,11 +59,13 @@ module Api::V1::Lti::Registration
     api_json(registration, user, session, only: JSON_ATTRS).tap do |json|
       json["inherited"] = registration.inherited_for?(context)
       json["lti_version"] = registration.lti_version
-      json["icon_url"] = if includes.include?(:overlay)
-                           Lti::Overlay.apply_to(overlay&.data, registration.internal_lti_configuration(include_overlay: false))
-                                       &.dig(:launch_settings, :icon_url)
+      # Always use preloaded overlay to compute icon_url to avoid n+1 queries
+      # Even if overlay is not included in the response, we need it for icon_url computation
+      # If overlay is nil, don't include overlay to avoid triggering overlay_for query
+      json["icon_url"] = if overlay.present?
+                           registration.internal_lti_configuration(overlay:, include_overlay: true).dig(:launch_settings, :icon_url)
                          else
-                           registration.icon_url(context:)
+                           registration.internal_lti_configuration(include_overlay: false).dig(:launch_settings, :icon_url)
                          end
       json["dynamic_registration"] = true if registration.dynamic_registration?
       json["developer_key_id"] = registration.developer_key&.global_id

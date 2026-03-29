@@ -253,6 +253,39 @@ RSpec.describe Lti::Registration do
           expect(global_nav_config["icon_url"]).to eq("https://example.com/icon.png")
           expect(global_nav_config["text"]).to eq("A Better Title")
         end
+
+        context "when an overlay parameter is provided" do
+          subject { registration.internal_lti_configuration(context: account, overlay: supplied_overlay) }
+
+          let(:other_account) { Account.create! }
+          let(:supplied_overlay) do
+            Lti::Overlay.create!(account: other_account,
+                                 registration: ims_registration.lti_registration,
+                                 updated_by: user,
+                                 data: {
+                                   title: "Supplied Overlay Title",
+                                   privacy_level: "public"
+                                 })
+          end
+
+          it "uses the supplied overlay instead of overlay_for(context)" do
+            overlay # create the context-based overlay
+            supplied_overlay
+
+            config = subject
+
+            expect(config["privacy_level"]).to eq("public")
+            expect(config["title"]).to eq("Supplied Overlay Title")
+            expect(config["scopes"]).to include(TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE)
+          end
+
+          it "does not call overlay_for when overlay is supplied" do
+            supplied_overlay
+
+            expect(registration).not_to receive(:overlay_for)
+            subject
+          end
+        end
       end
     end
 
