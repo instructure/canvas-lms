@@ -347,23 +347,27 @@ class ApplicationController < ActionController::Base
           lti_asset_processor_course: @context.try(:feature_enabled?, :lti_asset_processor_course)
         )
 
+        @js_env[:PRE_COOKIE_CONSENT] = "null"
+
         if load_usage_metrics?
           @js_env[:PENDO_APP_ID] = usage_metrics_api_key
           if cached_features[:cookie_consent_necessary]
             mobile_webview = session&.dig(:is_mobile_webview)
             mobile_consent = session&.dig(:mobile_cookie_consent)
 
-            if !@domain_root_account&.feature_enabled?(:pendo_extended) && !mobile_webview && !native_app?
+            if !mobile_webview && !native_app?
               domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
               onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
               @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
             end
 
-            if mobile_webview
-              @js_env[:MOBILE_COOKIE_CONSENT] = mobile_consent
+            if mobile_webview == true
+              @js_env[:PRE_COOKIE_CONSENT] = mobile_consent.to_s
               # we could fall back to @current_user.custom_data like this:
               # @current_user.custom_data.where(namespace: "MOBILE_CANVAS_COOKIE_CONSENT").first
             end
+          else
+            @js_env[:PRE_COOKIE_CONSENT] = "true"
           end
         end
 

@@ -145,6 +145,8 @@ export interface EnvCommon {
   DOMAIN_ROOT_ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_UUID: string
   ROOT_ACCOUNT_ID: string
+  ONETRUST_CONSENT_DOMAIN_ID?: string
+  PRE_COOKIE_CONSENT?: string
   PENDO_APP_ID: string
   ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
