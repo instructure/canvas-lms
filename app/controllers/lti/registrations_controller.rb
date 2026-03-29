@@ -1189,7 +1189,7 @@ class Lti::RegistrationsController < ApplicationController
       search_terms: params[:query]&.downcase&.split,
       sort_field: params[:sort]&.to_sym || :installed,
       sort_direction: params[:dir]&.to_sym || :desc,
-      preload_overlays: includes.include?(:overlay)
+      preload_overlays: true # Always preload to avoid n+1 when computing icon_url
     }
 
     registrations, preloads = Lti::ListRegistrationService
