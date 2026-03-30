@@ -2514,6 +2514,7 @@ ko:
   after_last_attempt_c9168da2: "마지막 시도 이후"
   after_logging_out_of_canvas_instruct_identity_prov_dc853c9a: "Canvas에서 로그아웃한 후에 ID 공급자에게 다음 로그인 시도에서 사용자를 다시 인증하도록 지시합니다. 예상하지 못한 로그인 루프를 예방할 수 있습니다."
   after_the_assignment_is_graded_53754607: "과제 채점 이후"
+  after_the_due_date_b7ac51f4: "기한 이후"
   after_the_due_date_eee89c9c: "기한 이후"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "첫 시도 이후에 과제를 제출할 때까지 댓글을 남길 수 있습니다."
   after_this_change_the_toolname_tool_deployment_id__245d0a01: "이 변경 이후에 %{toolName} 도구(배포 ID: %{deploymentId})는  %{courseName} 과목에서 삭제될 것입니다."
@@ -5249,6 +5250,7 @@ ko:
   between_parentheses_e_g_d09087_28c4448c: "괄호 사이에. 예, (D09087)"
   between_square_brackets_e_g_principal_64797b64: "대괄호 사이에., [교장]"
   between_two_assessments_the_most_recent_assessment_9f616a5d: "2개 평가 사이에 가장 최근 평가는 %{calculation_int} 가중치를 갖게 되며 첫 번째 평가는 %{remainder} 가중치를 갖게 됩니다. 각 추가적 평가에 대해 이전 점수 계산의 합계는 추가 %{remainder} 감소됩니다. 한 개의 결과만 있는 경우 단일 점수를 반환합니다."
+  bibliographic_material_42d9ed3c: "참고 문헌 자료"
   big_blue_button_conference: 
     create_time: "만들기 시간"
     recording_setting: 녹화
@@ -7225,6 +7227,7 @@ ko:
     releases_beta_test_schedule: "https://community.instructure.com/en/kb/articles/664262-what-are-the-release-schedules-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: "비교 대상"
   compiling_c29a644f: 컴파일
   compiling_progress_968a3ebb: "컴파일(%{progress}%)"
   complete_1_item_f840fb10: "1개 항목 완료"
@@ -11339,6 +11342,7 @@ ko:
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "동일한 슬롯 나누기(값은 분 단위)"
   divide_into_equal_time_slots_in_minutes_234312fa: "동일한 시간 슬롯으로 나누기(분 단위"
   divider_fe08b810: "나누기 기능"
+  do_not_consider_84d7b395: "고려하지 않음"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "이 과제를 최종 학점에 반영하지 않음"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "성적부 또는 학생의 성적 페이지를 표시하지 않음"
   do_not_include_validation_context_and_errors_claim_d9e43fe6: "validation_context 및 오류 클레임을 LTI 시작에 포함하지 않음"
@@ -16584,6 +16588,7 @@ ko:
   internal_settings_initial_query_error_92ba2e00: "내부 설정 초기 쿼리 오류"
   international_sms_9edb9868: "국제 SMS"
   internet2_254c6ca6: 인터넷2
+  internet_database_3d61286a: "인터넷 데이터베이스"
   interval_must_be_0_e7b8eb5: "간격은 0 이상이어야 함"
   introduces_ai_experiences_a_new_canvas_learning_ob_9ac91af7: "AI 경험 소개 - 새로운 Canvas 학습 목표입니다."
   introduction_43f53b7d: 소개
@@ -16863,6 +16868,7 @@ ko:
   joined_group_group_name_e3802c04: "그룹 %{group_name}에 참여"
   joining_81f8b6c9: 참여하기
   joplin_assignment_submission_a4cf7899: "Joplin 과제 제출"
+  journals_periodicals_and_publications_ca24673: "잡지, 정기 간행물, 출판물"
   jpg_903bacff: JPG
   jquery: 
     module_sequence_footer: 
@@ -22085,6 +22091,7 @@ ko:
   other_ddacb37d: 기타
   other_incorrect_match_options_c1418af5: "기타 정확하지 않은 일치 옵션:"
   other_resources_fee3ddda: "기타 리소스"
+  other_student_papers_bf318f4c: "다른 학생 보고서"
   otherwise_please_follow_the_support_link_at_the_bo_ee7856a0: "그렇지 않은 경우 페이지 하단에 지원 링크를 따라가세요."
   our_new_reports_page_adds_dynamic_report_progress__31b2b409: "새로운 보고서 페이지에 동적 보고서 진행률 및 기록이 추가됩니다."
   out_of_78a76f91: "다음 중"
@@ -25653,6 +25660,7 @@ ko:
   quotas_account_settings_22c12b8d: "할당량(계정 설정)"
   quote_ae4462ad: 인용
   quote_reply_e56ad360: "답변 인용"
+  quoted_material_ffaea62b: "인용된 자료"
   radio_button_option_1_a8ec51f9: "라디오 버튼 옵션 1"
   radio_button_option_2_31e50043: "라디오 버튼 옵션 2"
   range_56b2f310: 범위
@@ -28804,6 +28812,7 @@ ko:
   slovak_69f48e1b: 슬로바키아어
   slovenian_30ae5208: 슬로베니아어
   small_b070434a: 작은
+  small_matches_581ab241: "작은 일치"
   small_text_contrast_29d0171f: "작은 텍스트 대비"
   smaller_numbers_mean_higher_priority_c69f4d0a: "작은 수는 더 높은 우선 순위를 의미"
   smart_alerts_44db622e: "스마트 알림"
@@ -29319,6 +29328,7 @@ ko:
   students_can_edit_and_view_page_history_if_allowed_67f9b8da: "학생은 개별 페이지의 옵션에서 허용된 경우 페이지 기록을 편집하고 볼 수 있습니다."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "학생은 이 날짜 사이에만 과목에 참여할 수 있음"
   students_can_see_originality_score_797fe634: "학생이 표절 검사 점수를 볼 수 있음"
+  students_can_see_the_originality_report_f246beb0: "학생이 독창성 보고서를 볼 수 있음"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "학생은 과목 종결 이후에 퀴즈 응답을 볼 수 없음"
   students_enrolled_babf3cb8: "학생 등록됨"
   students_enrolled_in_this_course_859fa7a2: "학생이 이 과목에 등록됨"
