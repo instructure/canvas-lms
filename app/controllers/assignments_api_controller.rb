@@ -1423,7 +1423,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
-  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading peer reviews.
   #  Defaults to "points" if this field is omitted.
   #
@@ -1667,7 +1667,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
-  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading peer reviews.
   #  Defaults to "points" if this field is omitted.
   #

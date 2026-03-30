@@ -49,14 +49,14 @@ class PeerReviewSubAssignment < AbstractAssignment
             uniqueness: { conditions: -> { where.not(workflow_state: "deleted") } },
             comparison: { other_than: :id, message: ->(_object, _data) { I18n.t("cannot reference self") }, allow_blank: true }
   validates :has_sub_assignments, inclusion: { in: [false], message: ->(_object, _data) { I18n.t("cannot have sub assignments") } }
+  validates :grading_type, exclusion: { in: ["not_graded"], message: ->(_object, _data) { I18n.t("cannot be not_graded for peer review sub assignments") } }
   validates :sub_assignment_tag, absence: { message: ->(_object, _data) { I18n.t("cannot have sub assignment tag") } }
   validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
   validate  :parent_assignment_not_discussion_topic_or_external_tool
   validate  :points_possible_changes_ok?
 
-  before_validation :sync_submission_types_with_grading_type
-
   after_initialize :set_default_context
+  before_validation :set_submission_types
   after_save :unlink_assessment_requests, if: :soft_deleted?
 
   set_broadcast_policy do |p|
@@ -201,7 +201,7 @@ class PeerReviewSubAssignment < AbstractAssignment
     end
   end
 
-  def sync_submission_types_with_grading_type
-    self.submission_types = (grading_type == "not_graded") ? "not_graded" : PEER_REVIEW_SUBMISSION_TYPE
+  def set_submission_types
+    self.submission_types = PEER_REVIEW_SUBMISSION_TYPE
   end
 end

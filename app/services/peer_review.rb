@@ -22,6 +22,7 @@ module PeerReview
   class InvalidParentAssignmentError < PeerReviewError; end
   class FeatureDisabledError < PeerReviewError; end
   class InvalidAssignmentSubmissionTypesError < PeerReviewError; end
+  class InvalidGradingTypeError < PeerReviewError; end
   class SubAssignmentExistsError < PeerReviewError; end
   class SubAssignmentNotExistError < PeerReviewError; end
   class InvalidDatesError < PeerReviewError; end

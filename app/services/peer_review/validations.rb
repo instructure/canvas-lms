@@ -36,6 +36,10 @@ module PeerReview::Validations
     end
   end
 
+  def validate_grading_type(grading_type)
+    raise PeerReview::InvalidGradingTypeError, I18n.t("Peer review sub assignments cannot have a not_graded grading type") if grading_type == "not_graded"
+  end
+
   def validate_assignment_submission_types(assignment)
     if assignment.external_tool?
       raise PeerReview::InvalidAssignmentSubmissionTypesError, I18n.t("Peer reviews cannot be used with External Tool assignments")
