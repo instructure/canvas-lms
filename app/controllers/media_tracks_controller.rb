@@ -48,6 +48,7 @@ class MediaTracksController < ApplicationController
   before_action only: %i[create create_asr destroy update] do
     check_media_permissions(access_type: :update)
   end
+  skip_before_action :require_user, only: :show
 
   TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
 
