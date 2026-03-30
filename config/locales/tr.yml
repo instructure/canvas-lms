@@ -2682,6 +2682,7 @@ tr:
   advanced_content_organization_features_in_the_asse_b91a23ab: "Assessment Management Service (AMS) içinde gelişmiş içerik düzenleme özellikleri. Bu, herhangi bir zamanda değişebilir veya bozulabilir ve çoğu hesap için tasarlanmamıştır."
   advanced_peer_review_configurations_83ab5948: "Gelişmiş Akran Değerlendirmesi Yapılandırmaları"
   advanced_turnitin_settings_9ee84a38: "Gelişmiş Turnitin Ayarları"
+  advanced_vericite_settings_4f2afd5b: "Gelişmiş VeriCite Ayarları"
   affected_fields_59549e21: "Etkilenen Alanlar"
   afghanistan_93_ab06805: "Afganistan (+93)"
   afrikaans_da0fe6ee: Afrikaanca
@@ -2694,6 +2695,7 @@ tr:
   after_last_attempt_c9168da2: "Son Teşebbüsten Sonra"
   after_logging_out_of_canvas_instruct_identity_prov_dc853c9a: "Canvas'tan çıkış yaptıktan sonra, kimlik sağlayıcılarına bir sonraki oturum açma denemesinde kullanıcıyı yeniden doğrulamalarını bildirir. Bu, beklenmedik oturum açma döngülerini önleyebilir."
   after_the_assignment_is_graded_53754607: "Ödev notlandırıldıktan sonra"
+  after_the_due_date_b7ac51f4: "Bitiş tarihinden sonra"
   after_the_due_date_eee89c9c: "Bitiş tarihinden sonra"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "İlk denemeden sonra, ödevi göndermeden yorum bırakamazsınız."
   after_this_change_the_toolname_tool_deployment_id__245d0a01: "Bu değişiklikten sonra, %{toolName} aracı (Dağıtım ID: %{deploymentId}) %{courseName} dersinden silinecektir."
@@ -5523,6 +5525,7 @@ tr:
   between_parentheses_e_g_d09087_28c4448c: "Parantez içinde, örn., (D09087)"
   between_square_brackets_e_g_principal_64797b64: "Köşeli parantez içinde, örn., [Principal]"
   between_two_assessments_the_most_recent_assessment_9f616a5d: "İki değerlendirme arasında, en güncel değerlendirme %{calculation_int} ağırlık alır ve ilki %{remainder} alır. Her ek değerlendirme için, önceki puan hesaplamalarının toplamı %{remainder} kadar daha azalır. Yalnızca bir sonuç varsa tek puan döndürülür."
+  bibliographic_material_42d9ed3c: "Biyografik Materyal"
   big_blue_button_conference: 
     create_time: "Oluşturma Zamanı"
     recording_setting: Kaydediliyor
@@ -7485,6 +7488,7 @@ tr:
     releases_beta_test_schedule: "https://community.instructure.com/en/kb/articles/664262-what-are-the-release-schedules-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: Karşılaştırılacak
   compiling_c29a644f: Derleniyor
   compiling_progress_968a3ebb: "Derleniyor (%{progress}%)"
   complete_1_item_f840fb10: "1 öğeyi tamamla"
@@ -11773,6 +11777,7 @@ tr:
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Eşit zaman dilimlerine böl (değer dakika cinsindendir)"
   divide_into_equal_time_slots_in_minutes_234312fa: "Eşit zaman dilimlerine böl (dakika cinsinden"
   divider_fe08b810: Ayırıcı
+  do_not_consider_84d7b395: "Dikkate Almayın"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Bu ödevi final puanı hesaplamasına katma"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Not defterinde veya öğrencinin not sayfasında gösterme"
   do_not_resend_alerts_19ef6249: "Uyarıları yeniden gönderme"
@@ -13392,6 +13397,7 @@ tr:
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Belirtilen tarihten beri güncellenmemiş verileri hariç tut"
   exclude_deleted_and_expired_access_tokens_e9ca9a44: "Silinmiş ve süresi dolmuş erişim anahtarlarını hariç tut"
   exclude_deleted_lti_2_0_similarity_check_tools_on__1bf13f30: "Ödev dışa aktarımında silinmiş LTI 2.0 benzerlik kontrol araçlarını hariç tut"
+  exclude_self_plagiarism_f313288c: "Kendinden İntihali Hariç tut"
   excuse_this_assignment_for_the_selected_student_af04e132: "Seçili Öğrenciyi Bu Ödevden Muaf Tut"
   excused_3aab77: mazeretli
   excused_5877183c: Mazeretli!
@@ -16881,6 +16887,7 @@ tr:
   include_deleted_objects_3cced3b5: "Silinmiş Nesneleri Dahil Et;"
   include_deleted_objects_4b75ef93: "Silinen nesneleri dahil et"
   include_deleted_users_in_search_results_51c1ec4: "Arama sonuçlarına silinen kullanıcıları dahil et"
+  include_in_repository_6102bd95: "Depoya dahil et"
   include_instructure_identity_pseudonyms_from_apis_89ad5584: "API'lerde Instructure Identity takma adlarını dahil et"
   include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Not defteri dışa aktarımlarına Entegrasyon ID'lerini dahil et"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Not defteri dışa aktarımlarında Entegrasyon ID'sini dahil et."
@@ -17237,6 +17244,7 @@ tr:
   international_sms_9edb9868: "Uluslararası SMS"
   international_text_messaging_rates_may_apply_d4b4a97a: "Uluslararası kısa mesaj gönderme ücreti ödeyebilirsiniz."
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: "İnternet Veritabanı"
   interval_must_be_0_e7b8eb5: "INTERVAL 0'dan büyük olmalıdır"
   introduces_ai_experiences_a_new_canvas_learning_ob_9ac91af7: "Yapay zekâ Deneyimlerini tanıtır - yeni bir Canvas öğrenme nesnesi."
   introduction_43f53b7d: Giriş
@@ -17525,6 +17533,7 @@ tr:
   joined_group_group_name_e3802c04: "%{group_name} Grubuna Katıldı"
   joining_81f8b6c9: Katılınıyor
   joplin_assignment_submission_a4cf7899: "Joplin Ödev Gönderimi"
+  journals_periodicals_and_publications_ca24673: "Dergiler, Makaleler ve Yayınlar"
   jpg_903bacff: JPG
   jpg_png_or_gif_files_14e360d2: "jpg, png veya gif dosyaları"
   jquery: 
@@ -22883,6 +22892,7 @@ tr:
   other_ddacb37d: diğer
   other_incorrect_match_options_c1418af5: "Diğer Yanlış Eşleşme Seçenekleri:"
   other_resources_fee3ddda: "DİĞER KAYNAKLAR"
+  other_student_papers_bf318f4c: "Başka Öğrenci Kağıtları"
   other_timezones_42530564: "Diğer Zaman dilimleri"
   otherwise_please_follow_the_support_link_at_the_bo_ee7856a0: "Aksi hâlde lütfen sayfanın altındaki destek bağlantısını izleyin."
   our_new_reports_page_adds_dynamic_report_progress__31b2b409: "Yeni Raporlar sayfamız, rapor ilerlemesini ve geçmişini dinamik olarak gösterir."
@@ -23258,6 +23268,7 @@ tr:
     view_more_link: "Daha Fazla Gör"
   paginated_view: 
     loading_more_results: "Daha fazla sonuç yükleniyor"
+  pagination_40e3280b: Sayfalama
   pair_4d942a74: Eşleştir
   pair_with_observer_b1541895: "Gözlemciyle Eşleştir"
   pair_with_student_6f76e69a: "Öğrenciyle Eşleştir"
@@ -26595,6 +26606,7 @@ tr:
   quotas_account_settings_22c12b8d: "Kotalar (Hesap Ayarları)"
   quote_ae4462ad: Alıntı
   quote_reply_e56ad360: "Alıntı Yanıtı"
+  quoted_material_ffaea62b: "Alıntılı Materyal"
   radio_button_option_1_a8ec51f9: "Radyo düğmesi seçeneği 1"
   radio_button_option_2_31e50043: "Radyo düğmesi seçeneği 2"
   range_56b2f310: Aralık
@@ -29847,6 +29859,7 @@ tr:
       close: Kapat
       forward: İleri
   small_b070434a: Küçük
+  small_matches_581ab241: "Küçük Eşleştirme"
   smaller_numbers_mean_higher_priority_c69f4d0a: "Daha küçük sayılar daha yüksek öncelik anlamına gelir"
   smart_alerts_44db622e: "Akıllı uyarılar"
   smart_assignment_alerts_abc2224: "Akıllı Ödev Uyarıları"
@@ -30390,6 +30403,7 @@ tr:
   students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Öğrenciler, tek bir sayfa için seçeneklerde izin verildiyse sayfa geçmişini düzenleyebilir ve görüntüleyebilir."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Öğrenciler derse yalnızca bu tarihler arasında katılabilirler"
   students_can_see_originality_score_797fe634: "Öğrenciler özgünlük puanlarını görebilir"
+  students_can_see_the_originality_report_f246beb0: "Öğrenciler Orjinallik Raporunu Görebilsin"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Ders sonladırıldıktan sonra öğrenciler kısa sınava verdikleri cevapları göremezler"
   students_enrolled_babf3cb8: "Kayıtlı Öğrenciler"
   students_enrolled_in_this_course_859fa7a2: "Bu derse kayıtlı öğrenciler"
@@ -32981,6 +32995,7 @@ tr:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Yeniden gönder"
+  turnitin_repository_9f865357: "Turnitin Deposu"
   turnitin_settings: 
     originality_report_never: Asla
     originality_report_visible_after_due_date: "Bitiş tarihinden sonra"
