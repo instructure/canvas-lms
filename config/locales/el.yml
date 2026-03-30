@@ -7890,6 +7890,7 @@ el:
   join_group_group_name_871a5e3f: "Συμμετοχή στην ομάδα %{group_name}"
   joined_group_group_name_e3802c04: "Μπήκατε στην Ομάδα %{group_name}"
   joining_81f8b6c9: Συμμετοχή
+  journals_periodicals_and_publications_ca24673: "Επιστημονικά Περιοδικά, Έντυπα και Δημοσιεύσεις"
   jquery: 
     module_sequence_footer: 
       next: Επόμενη
@@ -8205,6 +8206,7 @@ el:
         redirect_from_idp: "Ελήφθη LoginResponse από το IdP"
   login_6f3d6249: Σύνδεση
   login_attribute_731a8181: "Πεδίο Σύνδεσης"
+  login_button_text_c958250f: "Κείμενο Κουμπιού Σύνδεσης"
   login_footer_link_badb3898: "Σύνδεσμος στο Υποσέλιδο για Σύνδεση"
   login_footer_link_hover_1b474e6c: "Σύνδεσμος Hover στο Υποσέλιδο για Σύνδεση"
   login_ids_b394c2a3: "IDs Εισόδου"
@@ -13049,6 +13051,7 @@ el:
     top_level: "-- Ανώτατο επίπεδο --"
     ? "true"
     : Σωστό
+  quoted_material_ffaea62b: "Υλικό που Παρατίθεται"
   radio_button_option_1_a8ec51f9: "Κουμπί επιλογής - επιλογή 1"
   radio_button_option_2_31e50043: "Κουμπί επιλογής - επιλογή 2"
   range_56b2f310: Εύρος
@@ -14671,6 +14674,7 @@ el:
   student_viewed_document_9065adb8: "Σπουδαστής που πρόβαλε το Έγγραφο"
   students_1b8cd07b: Μαθητές
   students_being_observed_4de3e520: "Σπουδαστές υπό Παρατήρηση"
+  students_can_see_the_originality_report_f246beb0: "Οι Φοιτητές/τριες Μπορούν να Δουν την Αναφορά Πρωτοτυπίας"
   students_have_already_submitted_to_this_discussion_f55db744: "Οι σπουδαστές έχουν ήδη πραγματοποιήσει υποβολές σε αυτή τη συζήτηση, επομένως οι ρυθμίσεις της ομάδας δεν μπορούν να αλλάξουν."
   students_must_complete_all_of_these_requirements_15fa97f7: "Οι σπουδαστές θα πρέπει να ολοκληρώσουν όλες αυτές τις απαιτήσεις"
   students_must_move_through_requirements_in_sequent_2c750874: "Οι σπουδαστές θα πρέπει να μετακινηθούν στις απαιτήσεις διαδοχικά από τη μια στην επόμενη"
