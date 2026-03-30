@@ -33,7 +33,7 @@ module Services
       Rails.logger.error(message)
       Rails.logger.error(e.backtrace.join("\n"))
       Sentry.capture_exception(e) do |scope|
-        scope.set_extra(message:)
+        scope.set_extra(:message, message)
       end
 
       30.minutes
