@@ -56,6 +56,10 @@ class LoadAccount
     Account.default
   end
 
+  def self.infer_shard(_hostname)
+    Shard.current
+  end
+
   def clear_caches
     Canvas::Reloader.reload
     ::Account.clear_special_account_cache!(force: ::LoadAccount.force_special_account_reload)

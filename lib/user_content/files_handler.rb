@@ -20,95 +20,8 @@
 
 module UserContent
   class FilesHandler
-    class UriMatch < SimpleDelegator
-      def preview?
-        rest.start_with?("/preview")
-      end
-
-      def download?
-        rest.start_with?("/download")
-      end
-
-      def download_frd?
-        rest.include?("download_frd=1")
-      end
-
-      def with_verifier?
-        rest.include?("verifier=")
-      end
-
-      def media_iframe_url?
-        url.start_with?("/media_attachments_iframe")
-      end
-    end
-
-    class ProcessedUrl
-      include Rails.application.routes.url_helpers
-
-      def initialize(match:, attachment:, is_public: false, in_app: false, no_verifiers: false, location: nil)
-        @match = match
-        @attachment = attachment
-        @is_public = is_public
-        @in_app = in_app
-        @no_verifiers = no_verifiers
-        @location = location
-      end
-
-      def url
-        send(path, *args)
-      end
-
-      private
-
-      attr_reader :match, :attachment, :is_public, :in_app, :no_verifiers, :location
-
-      # Returns either:
-      #
-      # [ attachment.id, url_options ]
-      #
-      # or:
-      #
-      # [ attachment.context_id, attachment.id, url_options ]
-      def args
-        [attachment.id, options].tap do |a|
-          if Attachment.relative_context?(attachment.context_type) && !match.media_iframe_url?
-            a.unshift(attachment.context_id)
-          end
-        end
-      end
-
-      def options
-        { only_path: true }.tap do |h|
-          h[:download] = 1 if match.download_frd?
-          unless attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
-            h[:verifier] = attachment.uuid unless (in_app && !is_public && !match.with_verifier?) || no_verifiers || location
-          end
-          h[:location] = location if location
-          if !match.preview? && match.rest.include?("wrap=1")
-            h[:wrap] = 1
-          end
-        end
-      end
-
-      def path
-        if match.media_iframe_url?
-          "media_attachment_iframe_url"
-        elsif Attachment.relative_context?(attachment.context_type)
-          if match.preview?
-            "#{attachment.context_type.downcase}_file_preview_url"
-          elsif match.download? || match.download_frd?
-            "#{attachment.context_type.downcase}_file_download_url"
-          else
-            "#{attachment.context_type.downcase}_file_url"
-          end
-        else
-          "file_download_url"
-        end
-      end
-    end
-
     def initialize(match:, context:, user:, preloaded_attachments: {}, is_public: false, in_app: false, no_verifiers: false, location: nil)
-      @match = UriMatch.new(match)
+      @match = match
       @context = context
       @user = user
       @preloaded_attachments = preloaded_attachments
@@ -119,46 +32,58 @@ module UserContent
     end
 
     def processed_url
+      uri = Addressable::URI.parse(match.url.gsub("&amp;", "&"))
+      uri = replace_with_current_attachment(uri)
       return unless attachment.present?
 
-      if user_can_access_attachment?
-        ProcessedUrl.new(match:, attachment:, is_public:, in_app:, no_verifiers:, location:).url
-      else
-        # Setting is_public: false and in_app: true to force never adding verifier query param
-        processed_url = ProcessedUrl.new(match:, attachment:, is_public: false, in_app: true, no_verifiers:, location:).url
-        begin
-          uri = URI.parse(processed_url)
-        rescue URI::InvalidURIError
-          uri = URI.parse(Addressable::URI.escape(processed_url))
+      query_values = uri.query_values || {}
+      query_values[:location] = location if location
+      unless user_can_access_attachment?
+        no_verifiers = true
+        if attachment.previewable_media?
+          query_values[:no_preview] = 1
+        elsif /^image/.match?(attachment.content_type)
+          query_values[:hidden] = 1
         end
-        if attachment.previewable_media? && match.url.present?
-          uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
-        elsif attachment.locked_for?(user) && attachment.content_type =~ /^image/
-          # hidden=1 tells the browser to strip the alt attribute for locked files
-          uri.query = (uri.query.to_s.split("&") + ["hidden=1"]).join("&")
-        end
-        uri.to_s
       end
+      unless no_verifiers || location
+        query_values[:verifier] = attachment.uuid if is_public || (!in_app && !attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api))
+      end
+      uri.query_values = query_values unless query_values.blank?
+      uri.to_s
     end
 
     private
 
-    attr_reader :match, :context, :user, :preloaded_attachments, :is_public, :in_app, :no_verifiers, :location
+    attr_reader :match, :context, :user, :preloaded_attachments, :is_public, :in_app, :no_verifiers, :location, :attachment
 
-    def attachment
-      return nil unless match.obj_id
+    def replace_with_current_attachment(uri)
+      return uri unless match.obj_id
 
-      unless @_attachment
-        @_attachment = preloaded_attachments[match.obj_id] unless preloaded_attachments[match.obj_id]&.replacement_attachment_id
-        if location.present?
-          attachment = Attachment.find_by(id: match.obj_id)
-          @_attachment ||= attachment.context.attachments.find_by(id: attachment)
-        else
-          @_attachment ||= Attachment.find_by(id: match.obj_id) if context.is_a?(User) || context.nil?
-          @_attachment ||= context&.attachments&.find_by(id: match.obj_id)
+      uri_shard = uri.host.present? ? LoadAccount.infer_shard(uri.host) : Shard.current
+      if uri_shard == Shard.current
+        @attachment = if preloaded_attachments[match.obj_id]&.replacement_attachment_id
+                        preloaded_attachments[preloaded_attachments[match.obj_id].replacement_attachment_id]
+                      else
+                        preloaded_attachments[match.obj_id]
+                      end
+      end
+      uri_shard.activate do
+        # NOTE: Attachment#find has special logic to find overwritten files; see FindInContextAssociation
+        @attachment ||= if match.context_type && match.context_id && (file_context = match.context_type.classify.constantize.find_by(id: match.context_id)) && file_context.respond_to?(:attachments)
+                          file_context&.attachments&.find_by(id: match.obj_id)
+                        else
+                          att = Attachment.find_by(id: match.obj_id)
+                          att = att.context.attachments.find_by(id: match.obj_id) if att&.context.respond_to?(:attachments)
+                          att
+                        end
+        return uri unless @attachment
+
+        if match.obj_id != @attachment.id
+          uri.path = uri.path.gsub(%r{/(files|media_attachments_iframe)/#{match.obj_id}/}, "/\\1/#{@attachment.id}/")
         end
       end
-      @_attachment
+      uri
     end
 
     def user_can_access_attachment?
@@ -175,7 +100,7 @@ module UserContent
     end
 
     def user_can_view_attachment?
-      (is_public || (user && attachment.context.respond_to?(:is_public_to_auth_users?) && attachment.context.is_public_to_auth_users?)) && !attachment.locked_for?(user)
+      (is_public || (user && attachment.context.try(:is_public_to_auth_users?))) && !attachment.locked_for?(user)
     end
   end
 end
