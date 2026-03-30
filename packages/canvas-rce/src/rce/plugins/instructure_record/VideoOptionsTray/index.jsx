@@ -464,6 +464,14 @@ export default function VideoOptionsTray({
                               variant="toggle"
                               label={formatMessage('Show Rolling Transcript')}
                               value="show_rolling_transcript"
+                              messages={[
+                                {
+                                  text: formatMessage(
+                                    'Transcript panel is available at widths above 720px.',
+                                  ),
+                                  type: 'screenreader-only',
+                                },
+                              ]}
                             />
                           </CheckboxGroup>
                         </Flex.Item>
