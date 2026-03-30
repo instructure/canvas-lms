@@ -141,6 +141,21 @@ RSpec.describe PeerReview::Validations do
     end
   end
 
+  describe "#validate_grading_type" do
+    it "does not raise an error for valid grading types" do
+      %w[points percent letter_grade gpa_scale pass_fail].each do |grading_type|
+        expect { service.validate_grading_type(grading_type) }.not_to raise_error
+      end
+    end
+
+    it "raises an error when grading_type is not_graded" do
+      expect { service.validate_grading_type("not_graded") }.to raise_error(
+        PeerReview::InvalidGradingTypeError,
+        "Peer review sub assignments cannot have a not_graded grading type"
+      )
+    end
+  end
+
   describe "#validate_assignment_submission_types" do
     it "does not raise an error for non-external tool assignments" do
       expect { service.validate_assignment_submission_types(parent_assignment) }.not_to raise_error
@@ -2575,6 +2590,7 @@ RSpec.describe PeerReview::Validations do
       expect(service).to respond_to(:validate_group_parent_override_exists)
       expect(service).to respond_to(:validate_section_parent_override_exists)
       expect(service).to respond_to(:validate_override_dates_against_parent_override)
+      expect(service).to respond_to(:validate_grading_type)
     end
 
     it "properly accesses instance variables set in the including class" do

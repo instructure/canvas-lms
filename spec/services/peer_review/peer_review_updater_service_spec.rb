@@ -312,6 +312,18 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         )
       end
 
+      it "raises error when grading_type is not_graded" do
+        invalid_service = described_class.new(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+
+        expect { invalid_service.call }.to raise_error(
+          PeerReview::InvalidGradingTypeError,
+          "Peer review sub assignments cannot have a not_graded grading type"
+        )
+      end
+
       it "raises error when feature is disabled" do
         course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(

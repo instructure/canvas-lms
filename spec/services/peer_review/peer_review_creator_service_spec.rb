@@ -101,18 +101,9 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect(result.grading_type).to eq(peer_review_grading_type)
       end
 
-      it "sets submission_types to 'peer_review'" do
+      it "always sets submission_types to 'peer_review'" do
         result = service.call
         expect(result.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-      end
-
-      it "sets submission_types to 'not_graded' when grading_type is 'not_graded'" do
-        not_graded_service = described_class.new(
-          parent_assignment:,
-          grading_type: "not_graded"
-        )
-        result = not_graded_service.call
-        expect(result.submission_types).to eq("not_graded")
       end
 
       it "inherits context from parent assignment" do
@@ -277,6 +268,18 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect { invalid_service.call }.to raise_error(
           PeerReview::InvalidAssignmentSubmissionTypesError,
           "Peer reviews cannot be used with Discussion Topic assignments"
+        )
+      end
+
+      it "raises error when grading_type is not_graded" do
+        invalid_service = described_class.new(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+
+        expect { invalid_service.call }.to raise_error(
+          PeerReview::InvalidGradingTypeError,
+          "Peer review sub assignments cannot have a not_graded grading type"
         )
       end
 
