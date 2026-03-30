@@ -73,4 +73,12 @@ describe CommentBankItem do
       end
     end
   end
+
+  describe "associations" do
+    it "accepts a PeerReviewSubAssignment as assignment" do
+      peer_review_sub_assignment = peer_review_model(course:)
+      item = CommentBankItem.create!(course:, user:, comment:, assignment: peer_review_sub_assignment)
+      expect(item.assignment).to eql(peer_review_sub_assignment)
+    end
+  end
 end
