@@ -546,7 +546,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:228px;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -558,7 +558,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:228px;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')

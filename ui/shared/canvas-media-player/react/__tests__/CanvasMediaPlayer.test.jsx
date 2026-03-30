@@ -587,7 +587,7 @@ describe('CanvasMediaPlayer', () => {
       setPlayerSize(player, 'audio/*', {width: 400, height: 200}, container, false)
       expect(player.classList.add).toHaveBeenCalledWith('audio-player')
       expect(player.style.width).toBe('320px')
-      expect(player.style.height).toBe('14.25rem')
+      expect(player.style.height).toBe('228px')
       expect(container.style.width).toBe('500px')
       expect(container.style.height).toBe('300px')
     })
@@ -609,9 +609,9 @@ describe('CanvasMediaPlayer', () => {
       setPlayerSize(player, 'audio/*', {width: 400, height: 200}, container)
       expect(player.classList.add).toHaveBeenCalledWith('audio-player')
       expect(player.style.width).toBe('320px')
-      expect(player.style.height).toBe('14.25rem')
+      expect(player.style.height).toBe('228px')
       expect(container.style.width).toBe('320px')
-      expect(container.style.height).toBe('14.25rem')
+      expect(container.style.height).toBe('228px')
     })
 
     it('when the video is landscape', () => {

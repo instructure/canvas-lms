@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {
   ClosedCaptionPanel,
   ClosedCaptionPanelV2,
   CONSTANTS,
   trackPendoEvent,
+  AUDIO_PLAYER_SIZE,
 } from '@instructure/canvas-media'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
@@ -32,8 +35,9 @@ import {Link} from '@instructure/ui-link'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
-import React, {useEffect, useRef, useState} from 'react'
+import {View} from '@instructure/ui-view'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {Text} from '@instructure/ui-text'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../../rce/RCEGlobals'
@@ -42,8 +46,20 @@ import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {StoreProvider} from '../../shared/StoreContext'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {mapViewerRestrictions, readViewerRestrictions} from '../utils'
+import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
+import {
+  getPlayerLayoutSizes,
+  labelForPlayerLayoutSize,
+  playerLayoutDimensions,
+  scalePlayerLayoutForHeight,
+  scalePlayerLayoutForWidth,
+} from '../playerLayoutOptions'
+import {CUSTOM, MIN_PERCENTAGE} from '../../instructure_image/ImageEmbedOptions'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
+
+const MIN_WIDTH = AUDIO_PLAYER_SIZE.width
+const MIN_HEIGHT = AUDIO_PLAYER_SIZE.height
 
 export default function AudioOptionsTray({
   open,
@@ -56,6 +72,7 @@ export default function AudioOptionsTray({
   requestSubtitlesFromIframe,
   onCaptionsModified,
   isLoading = false,
+  id = 'audio-options-tray',
 }) {
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
   const api = new RceApiSource(trayProps)
@@ -64,6 +81,28 @@ export default function AudioOptionsTray({
 
   const [viewerRestrictions, setViewerRestrictions] = useState(() =>
     readViewerRestrictions(audioOptions.viewerRestrictions),
+  )
+
+  const [sizeKey, setSizeKey] = useState(() => {
+    const match = Object.entries(playerLayoutDimensions).find(
+      ([, dims]) => dims.width === audioOptions.containerDimensions.width,
+    )
+
+    return match?.[0] ?? CUSTOM
+  })
+
+  const dimensionsState = useDimensionsState(
+    {
+      appliedHeight: audioOptions.containerDimensions.height,
+      appliedWidth: audioOptions.containerDimensions.width,
+      usePercentageUnits: false,
+    },
+    {
+      minHeight: MIN_HEIGHT,
+      minWidth: MIN_WIDTH,
+      minPercentage: MIN_PERCENTAGE,
+    },
+    {scaleFns: {width: scalePlayerLayoutForWidth, height: scalePlayerLayoutForHeight}},
   )
 
   useEffect(() => {
@@ -96,12 +135,38 @@ export default function AudioOptionsTray({
       attachment_id: audioOptions.attachmentId,
       updateMediaObject: contentProps.updateMediaObject,
       viewerRestrictions: mapViewerRestrictions(viewerRestrictions),
+      appliedHeight:
+        sizeKey === CUSTOM ? dimensionsState.height : playerLayoutDimensions[sizeKey].height,
+      appliedWidth:
+        sizeKey === CUSTOM ? dimensionsState.width : playerLayoutDimensions[sizeKey].width,
     })
   }
 
   const handleDirtyCheck = isDirty => {
     setHasUnsavedChanges(isDirty)
   }
+
+  const handleSizeChange = (_event, selectedOption) => {
+    setSizeKey(selectedOption.value)
+  }
+
+  const showSizeControls = isAsrCaptioningImprovements
+
+  const applyDescribedBy = useCallback(
+    playerLayoutInput => {
+      if (isAsrCaptioningImprovements && playerLayoutInput) {
+        const helperId = `${id}-size-helper-text`
+        const existing = playerLayoutInput.getAttribute('aria-describedby') || ''
+        const ids = existing.split(' ').filter(Boolean)
+        if (!ids.includes(helperId)) {
+          playerLayoutInput.setAttribute('aria-describedby', [...ids, helperId].join(' '))
+        }
+      }
+    },
+    [isAsrCaptioningImprovements, id],
+  )
+
+  const saveDisabled = sizeKey === CUSTOM && !dimensionsState.isValid
 
   return (
     <StoreProvider {...trayProps}>
@@ -146,6 +211,53 @@ export default function AudioOptionsTray({
                 <Flex justifyItems="space-between" direction="column" height="100%">
                   <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
                     <Flex direction="column">
+                      {showSizeControls && (
+                        <Flex.Item margin="small none xx-small none">
+                          <View as="div" padding="small small xx-small small">
+                            <SimpleSelect
+                              inputRef={applyDescribedBy}
+                              id={`${id}-size`}
+                              mountNode={instuiPopupMountNodeFn}
+                              renderLabel={formatMessage('Player layout')}
+                              assistiveText={formatMessage('Use arrow keys to navigate options.')}
+                              onChange={handleSizeChange}
+                              value={sizeKey}
+                            >
+                              {getPlayerLayoutSizes().map(size => (
+                                <SimpleSelect.Option
+                                  id={`${id}-size-${size}`}
+                                  key={size}
+                                  value={size}
+                                >
+                                  {labelForPlayerLayoutSize(size)}
+                                </SimpleSelect.Option>
+                              ))}
+                            </SimpleSelect>
+                            <View
+                              as="div"
+                              id={`${id}-size-helper-text`}
+                              margin="xx-small none none none"
+                            >
+                              <Text size="small">
+                                {formatMessage(
+                                  'Transcript panel is available at widths above 720px.',
+                                )}
+                              </Text>
+                            </View>
+                          </View>
+                          {sizeKey === CUSTOM && (
+                            <View as="div" padding="xx-small small">
+                              <DimensionsInput
+                                dimensionsState={dimensionsState}
+                                minHeight={MIN_HEIGHT}
+                                minWidth={MIN_WIDTH}
+                                minPercentage={MIN_PERCENTAGE}
+                                hidePercentage
+                              />
+                            </View>
+                          )}
+                        </Flex.Item>
+                      )}
                       {isAsrCaptioningImprovements && (
                         <Flex.Item padding="small">
                           <CheckboxGroup
@@ -252,7 +364,11 @@ export default function AudioOptionsTray({
                       preventTooltip={!hasUnsavedChanges}
                       mountNode={instuiPopupMountNodeFn}
                     >
-                      <Button onClick={e => handleSave(e, contentProps)} color="primary">
+                      <Button
+                        onClick={e => handleSave(e, contentProps)}
+                        color="primary"
+                        interaction={saveDisabled ? 'disabled' : 'enabled'}
+                      >
                         {formatMessage('Done')}
                       </Button>
                     </Tooltip>
@@ -292,6 +408,7 @@ AudioOptionsTray.propTypes = {
   }).isRequired,
   onCaptionsModified: func,
   isLoading: bool,
+  id: string,
 }
 
 AudioOptionsTray.defaultProps = {

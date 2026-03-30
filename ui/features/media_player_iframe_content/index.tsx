@@ -203,6 +203,7 @@ ready(() => {
 
   const viewerRestrictions = media_object?.viewer_restrictions || {}
   const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
+  const showExpandView = isAsrEnabled && showRollingTranscript && is_video
 
   if (ENV.FEATURES?.consolidated_media_player_iframe) {
     render(
@@ -222,7 +223,7 @@ ready(() => {
         onTrackEvent={handleTrackEvent}
         hideUploadCaptions
         kebabMenuElements={
-          isAsrEnabled && showRollingTranscript
+          showExpandView
             ? [
                 {
                   id: 'expand-view',

@@ -117,7 +117,7 @@ export function asVideoElement($element, isStudioVideo = false) {
       $videoElem.getAttribute('data-mce-p-data-media-id'),
     viewerRestrictions: isStudioVideo
       ? {}
-      : $videoElem.contentWindow?.['env'.toUpperCase()]?.media_object?.viewer_restrictions ?? {},
+      : ($videoElem.contentWindow?.['env'.toUpperCase()]?.media_object?.viewer_restrictions ?? {}),
   }
 }
 
@@ -133,11 +133,13 @@ export function asAudioElement($element) {
     $tinymceIframeShim.getAttribute('data-mce-p-title') ||
     ''
   ).replace(formatMessage('Video player for '), '')
+  const containerRect = $element.getBoundingClientRect()
   const audioOptions = {
     titleText: title,
     id:
       $element.parentElement?.getAttribute('data-mce-p-data-media-id') ||
       $element.getAttribute('data-mce-p-data-media-id'),
+    containerDimensions: {width: containerRect.width, height: containerRect.height},
   }
 
   if ($audioIframe.tagName === 'IFRAME') {
