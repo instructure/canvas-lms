@@ -17,9 +17,8 @@
  */
 
 import ReactDOM from 'react-dom'
-import {act} from 'react-dom/test-utils'
 
-import {waitFor, screen} from '@testing-library/dom'
+import {waitFor} from '@testing-library/dom'
 import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
@@ -34,6 +33,7 @@ const MOCK_AUDIO_PLAYERS = [
   {
     id: 'audio_id',
     titleText: 'Audio Title for audio.mp3',
+    containerDimensions: {width: 320, height: 240},
   },
 ]
 
@@ -177,6 +177,20 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
         skipCaptionUpdate: false,
         subtitles: undefined,
       })
+    })
+
+    it('updates audio element sizing in RCE', async () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: 'audio_id',
+        updateMediaObject,
+        appliedHeight: 300,
+        appliedWidth: 400,
+      })
+      const audioContainer = trayController._audioContainer.parentElement
+      expect(audioContainer.style.height).toBe('300px')
+      expect(audioContainer.style.width).toBe('400px')
     })
   })
 

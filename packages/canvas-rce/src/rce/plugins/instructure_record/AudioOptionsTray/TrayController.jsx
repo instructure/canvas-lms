@@ -137,7 +137,26 @@ export default class TrayController {
     return elem.parentNode.removeChild(elem)
   }
 
+  _resizeContainer({height, width}) {
+    const styles = {
+      height: `${height}px`,
+      width: `${width}px`,
+    }
+
+    this._editor.dom.setStyles(this._audioContainer.parentElement, styles)
+    this._editor.dom.setStyles(this._audioContainer, styles)
+
+    // tell tinymce so the context toolbar resets
+    this._editor.fire('ObjectResized', {
+      target: this._audioContainer,
+      width: width,
+      height: height,
+    })
+  }
+
   _applyAudioOptions(audioOptions) {
+    this._resizeContainer({width: audioOptions.appliedWidth, height: audioOptions.appliedHeight})
+
     const hasAttachmentId = audioOptions.attachment_id
 
     if (

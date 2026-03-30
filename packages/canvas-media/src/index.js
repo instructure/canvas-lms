@@ -30,7 +30,7 @@ import saveMediaRecording, {
 } from './saveMediaRecording'
 import * as CONSTANTS from './shared/constants'
 import LoadingIndicator from './shared/LoadingIndicator'
-import {isAudio, isPreviewable, isVideo, sizeMediaPlayer} from './shared/utils'
+import {isAudio, isPreviewable, isVideo, sizeMediaPlayer, AUDIO_PLAYER_SIZE} from './shared/utils'
 import UploadMedia from './UploadMedia'
 import useComputerPanelFocus from './useComputerPanelFocus'
 
@@ -53,5 +53,6 @@ export {
   captionLanguageForLocale,
   getTranslations,
   CONSTANTS,
+  AUDIO_PLAYER_SIZE,
 }
 export {trackPendoEvent} from './utils/trackPendoEvent'
