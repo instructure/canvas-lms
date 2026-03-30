@@ -2341,15 +2341,15 @@ describe AssignmentsController do
               <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@doc1.id)}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
             HTML
 
-            @course.saving_user = @user
+            @course.updating_user = @user
             @course.update!(syllabus_body:)
 
             get "syllabus", params: { course_id: @course.id }
 
             expect(assigns[:syllabus_body]).to eql(<<~HTML)
-              <p><img id="#{@image1.global_id}" src="/users/#{@user.global_id}/files/#{@image1.global_id}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
-              <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video1.global_id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video1.media_entry_id}"></iframe></p>
-              <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{@user.global_id}/files/#{@doc1.global_id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
+              <p><img id="#{@image1.global_id}" src="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@image1.global_id)}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
+              <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{Shard.short_id_for(@video1.global_id)}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video1.media_entry_id}"></iframe></p>
+              <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@doc1.global_id)}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
             HTML
           end
         end

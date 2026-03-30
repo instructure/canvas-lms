@@ -95,7 +95,7 @@ describe "syllabus" do
         @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
         @course.public_syllabus_to_auth = true
         @course.public_syllabus = false
-        @course.saving_user = @teacher
+        @course.updating_user = @teacher
         @course.save!
 
         get "/courses/#{@course.id}/assignments/syllabus"
@@ -108,13 +108,12 @@ describe "syllabus" do
       end
 
       it "does not allow viewing locked files in a public to authenticated syllabus" do
-        @attachment.locked = true
-        @attachment.save!
+        @attachment.update!(locked: true)
 
         @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
         @course.public_syllabus = false
         @course.public_syllabus_to_auth = true
-        @course.saving_user = @teacher
+        @course.updating_user = @teacher
         @course.save!
 
         get "/courses/#{@course.id}/assignments/syllabus"

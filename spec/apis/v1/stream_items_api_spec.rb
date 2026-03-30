@@ -308,10 +308,9 @@ describe UsersController, type: :request do
   end
 
   it "add file attachment location to returned message when file_association_access feature flag is enabled" do
-    @context = @course
-    attachment = attachment_model(context: @course, content_type: "application/pdf")
+    attachment = attachment_model(context: @student, content_type: "application/pdf")
     attachment.root_account.enable_feature!(:file_association_access)
-    discussion_topic_model(message: "<img src='/users/#{@user.id}/files/#{attachment.id}' />", user: @user)
+    discussion_topic_model(context: @course, message: "<img src='/users/#{@student.id}/files/#{attachment.id}' />", user: @student)
 
     json = api_call(:get,
                     "/api/v1/users/activity_stream.json",

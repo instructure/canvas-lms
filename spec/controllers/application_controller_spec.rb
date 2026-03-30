@@ -111,6 +111,29 @@ RSpec.describe ApplicationController do
           expect(controller.send(:user_content, @course.discussion_topics.first.message, location: discussion_topic.asset_string.to_s)).to include("location=#{discussion_topic.asset_string}")
         end
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "does not replace absolute URLs from another host with relative links" do
+          course1 = course_factory(active_all: true)
+          course1.root_account.account_domains.new(host: "host1.example.com").save!(validate: false)
+          att1 = attachment_model(id: 5, context: @course)
+          teacher1 = @teacher
+          @shard1.activate do
+            course_factory(account: Account.create!)
+            @course.root_account.account_domains.new(host: "host2.example.com").save!(validate: false)
+            aq = assessment_question_model(bank: assessment_question_bank_model)
+            attachment_model(id: 5, context: aq)
+            @syllabus_body = "<img src=\"https://host2.example.com/assessment_questions/#{aq.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}\"/>"
+            @expected = "<img src=\"https://host2.example.com/assessment_questions/#{aq.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}\" loading=\"lazy\">"
+          end
+
+          user_content = controller.send(:user_content, @syllabus_body, context: course1, user: teacher1)
+          expect(user_content).to eq @expected
+          expect(user_content).not_to include att1.uuid
+        end
+      end
     end
 
     describe "js_env" do
