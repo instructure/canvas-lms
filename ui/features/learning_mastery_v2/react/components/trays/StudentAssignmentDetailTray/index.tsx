@@ -30,6 +30,7 @@ import {NavigatorProps} from './Navigator'
 import {StudentSection} from './StudentSection'
 import {OutcomeResultSection} from './OutcomeResultSection'
 import {CommentsSection} from './CommentsSection'
+import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -82,6 +83,11 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
   rollups,
   outcomes,
 }) => {
+  const {lmgbStudentReportingFF} = useLMGBContext()
+  const masteryReportUrl = lmgbStudentReportingFF
+    ? `/courses/${courseId}/outcomes?student_id=${student.id}#reporting`
+    : `/courses/${courseId}/grades/${student.id}#tab-outcomes`
+
   return (
     <Tray
       label={I18n.t('Student Assignment Details')}
@@ -109,7 +115,7 @@ export const StudentAssignmentDetailTray: React.FC<StudentAssignmentDetailTrayPr
         <hr />
         <StudentSection
           currentStudent={student}
-          masteryReportUrl={`/courses/${courseId}/grades/${student.id}#tab-outcomes`}
+          masteryReportUrl={masteryReportUrl}
           hasPrevious={studentNavigator.hasPrevious}
           hasNext={studentNavigator.hasNext}
           onPrevious={studentNavigator.onPrevious}

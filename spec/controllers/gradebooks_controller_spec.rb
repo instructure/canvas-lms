@@ -2099,6 +2099,20 @@ describe GradebooksController do
             expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to be false
           end
         end
+
+        describe "GRADEBOOK_OPTIONS.LMGB_STUDENT_REPORTING" do
+          it "is true when lmgb_student_reporting feature flag is enabled" do
+            @course.enable_feature!(:lmgb_student_reporting)
+            get :show, params: { course_id: @course.id }
+            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:LMGB_STUDENT_REPORTING]).to be true
+          end
+
+          it "is false when lmgb_student_reporting feature flag is disabled" do
+            @course.disable_feature!(:lmgb_student_reporting)
+            get :show, params: { course_id: @course.id }
+            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:LMGB_STUDENT_REPORTING]).to be false
+          end
+        end
       end
     end
   end

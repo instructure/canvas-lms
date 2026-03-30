@@ -21,6 +21,7 @@ import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fetchMock from 'fetch-mock'
+import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
 import {StudentAssignmentDetailTray} from '..'
 import {MOCK_OUTCOMES, MOCK_STUDENTS, MOCK_ROLLUPS} from '../../../../__fixtures__/rollups'
 
@@ -276,6 +277,19 @@ describe('StudentAssignmentDetailTray', () => {
       const link = screen.getByRole('link', {name: /View Mastery Report/i})
       expect(link).toBeInTheDocument()
       expect(link).toHaveAttribute('href', '/courses/123/grades/1#tab-outcomes')
+    })
+
+    it('renders mastery report link to outcomes reporting page when flag is on', () => {
+      const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})
+      render(
+        <QueryClientProvider client={queryClient}>
+          <LMGBContext.Provider value={{env: {lmgbStudentReportingFF: true}}}>
+            <StudentAssignmentDetailTray {...defaultProps} />
+          </LMGBContext.Provider>
+        </QueryClientProvider>,
+      )
+      const link = screen.getByRole('link', {name: /View Mastery Report/i})
+      expect(link).toHaveAttribute('href', '/courses/123/outcomes?student_id=1#reporting')
     })
 
     it('calls studentNavigator onPrevious when student previous button is clicked', async () => {
