@@ -37,7 +37,10 @@ class ContextExternalTool < ApplicationRecord
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
+  # Can point to a cross-shard registration, is slowly being phased out for app
   belongs_to :lti_registration, class_name: "Lti::Registration"
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
 
   include MasterCourses::Restrictor
 

@@ -62,6 +62,9 @@ class Lti::Registration < ApplicationRecord
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
   has_many :lti_registration_history_entries, class_name: "Lti::RegistrationHistoryEntry", inverse_of: :lti_registration
   has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
+  has_many :app_deployments, class_name: "ContextExternalTool", foreign_key: :app_id, inverse_of: :app
+  has_many :app_context_controls, class_name: "Lti::ContextControl", foreign_key: :app_id, inverse_of: :app
+  has_many :app_history_entries, class_name: "Lti::RegistrationHistoryEntry", foreign_key: :app_id, inverse_of: :app
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true

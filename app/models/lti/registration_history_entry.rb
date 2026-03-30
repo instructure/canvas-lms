@@ -24,8 +24,10 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
   # Account will always be on the same shard as the entry, but not necessarily
   # the registration (think Site Admin registrations)
   belongs_to :root_account, class_name: "Account", inverse_of: :lti_registration_history_entries
-  # The registration can be cross-shard
+  # The registration can be cross-shard. Is being phased out in favor of app
   belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :lti_registration_history_entries
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
   # It is possible for created_by to be nil, such as when a change is made
   # by Instructure or at the system level (think default tool installs) or if this was
   # backfilled from Lti::OverlayVersion's and we didn't have a created_by then

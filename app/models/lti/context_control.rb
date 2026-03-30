@@ -29,7 +29,10 @@ class Lti::ContextControl < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :deployment, class_name: "ContextExternalTool", inverse_of: :context_controls, optional: false
+  # Points to a cross-shard registration, is slowly being phased out for app
   belongs_to :registration, class_name: "Lti::Registration", inverse_of: :context_controls, optional: false
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
   belongs_to :created_by, class_name: "User"
   belongs_to :updated_by, class_name: "User"
 
