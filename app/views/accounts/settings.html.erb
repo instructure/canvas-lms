@@ -488,7 +488,7 @@
                   </tr>
                 <% end %>
 
-                <% if !@account.site_admin? && @account.primary_settings_root_account? && @account.feature_enabled?(:admin_manage_access_tokens)%>
+                <% if !@account.site_admin? && @account.primary_settings_root_account? %>
                   <tr>
                     <td colspan="2">
                       <%= settings.check_box :limit_personal_access_tokens, checked: @account.limit_personal_access_tokens? %>

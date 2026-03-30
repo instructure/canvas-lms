@@ -15,11 +15,6 @@ verify_ldap_certs:
   display_name: Verify LDAP TLS certificates
   description: Verify TLS certificates presented by LDAP authentication providers.
   applies_to: Account
-admin_manage_access_tokens:
-  state: hidden
-  display_name: Admin Manage Access Tokens
-  description: Limit the ability to manage access tokens to admins only.
-  applies_to: RootAccount
 login_registration_ui_identity:
   state: hidden
   applies_to: RootAccount
