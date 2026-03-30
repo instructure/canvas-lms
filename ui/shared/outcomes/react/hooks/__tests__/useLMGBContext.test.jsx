@@ -31,6 +31,7 @@ describe('useLMGBContext', () => {
             accountLevelMasteryScalesFF: true,
             outcomesFriendlyDescriptionFF: true,
             allowDifferentiationTags: true,
+            lmgbStudentReportingFF: true,
             contextURL: '/courses/1',
             outcomeProficiency: mockProficiency,
           },
@@ -43,6 +44,7 @@ describe('useLMGBContext', () => {
     expect(result.current.accountLevelMasteryScalesFF).toBe(true)
     expect(result.current.outcomesFriendlyDescriptionFF).toBe(true)
     expect(result.current.allowDifferentiationTags).toBe(true)
+    expect(result.current.lmgbStudentReportingFF).toBe(true)
     expect(result.current.contextURL).toBe('/courses/1')
     expect(result.current.outcomeProficiency).toEqual(mockProficiency)
   })
