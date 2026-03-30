@@ -1027,6 +1027,18 @@ module Types
       context.scoped_set!(:context_type, "User")
       object
     end
+
+    field :institutional_tags_connection,
+          Types::InstitutionalTagType.connection_type,
+          null: true do
+      argument :account_id,
+               ID,
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+    end
+    def institutional_tags_connection(account_id:)
+      Loaders::UserLoaders::InstitutionalTagsLoader.for(current_user, session, account_id).load(object.id)
+    end
   end
 end
 

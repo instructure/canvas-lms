@@ -27,6 +27,8 @@ class InstitutionalTag < ApplicationRecord
 
   resolves_root_account through: :category
 
+  scope :search_by_name, ->(term) { where("LOWER(name) LIKE ?", "#{term.downcase}%") }
+
   before_validation :sanitize_name, if: :name_changed?
   before_destroy :cascade_archive_associations
 

@@ -48,6 +48,17 @@ module Types
       GraphQLNodeLoader.load("AccountBySis", sis_id, context) if sis_id
     end
 
+    field :user, Types::UserType, null: true do
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User")
+    end
+    def user(id:)
+      GraphQLNodeLoader.load("User", id, context)
+    end
+
     field :course, Types::CourseType, null: true do
       argument :id,
                ID,
@@ -451,6 +462,28 @@ module Types
     field :my_inbox_settings, Types::InboxSettingsType, null: true
     def my_inbox_settings
       GraphQLNodeLoader.load("MyInboxSettings", context[:current_user].id.to_s, context) if context[:current_user]
+    end
+
+    field :institutional_tag, Types::InstitutionalTagType, null: true do
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InstitutionalTag")
+    end
+    def institutional_tag(id:)
+      GraphQLNodeLoader.load("InstitutionalTag", id, context)
+    end
+
+    field :institutional_tag_category, Types::InstitutionalTagCategoryType, null: true do
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InstitutionalTagCategory")
+    end
+    def institutional_tag_category(id:)
+      GraphQLNodeLoader.load("InstitutionalTagCategory", id, context)
     end
   end
 end
