@@ -114,6 +114,39 @@ describe Mutations::CreateCommentBankItem do
     expect(record.assignment).to eq assignment
   end
 
+  context "peer review sub assignments" do
+    before :once do
+      @peer_review_sub_assignment = peer_review_model(course: @course)
+    end
+
+    it "creates a comment bank item for peer review sub assignment when feature flag is enabled" do
+      query = <<~GQL
+        courseId: #{@course.id}
+        comment: "peer review comment"
+        assignmentId: #{@peer_review_sub_assignment.id}
+      GQL
+      result = execute_with_input(query)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createCommentBankItem", "errors")).to be_nil
+      comment_bank_item_id = result.dig("data", "createCommentBankItem", "commentBankItem", "_id")
+      record = CommentBankItem.find(comment_bank_item_id)
+      expect(record.assignment).to eq @peer_review_sub_assignment
+    end
+
+    it "returns assignment not found for peer review sub assignment when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      query = <<~GQL
+        courseId: #{@course.id}
+        comment: "peer review comment"
+        assignmentId: #{@peer_review_sub_assignment.id}
+      GQL
+      result = execute_with_input(query)
+      errors = result["errors"] || result.dig("data", "createCommentBankItem", "errors")
+      expect(errors).not_to be_nil
+      expect(errors[0]["message"]).to match(/Assignment not found/)
+    end
+  end
+
   context "errors" do
     def expect_error(result, message)
       errors = result["errors"] || result.dig("data", "createCommentBankItem", "errors")
