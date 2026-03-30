@@ -73,7 +73,6 @@ BASE_PERMISSIONS = {
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(a) { a.feature_enabled?(:admin_manage_access_tokens) },
     group: :users_manage_access_tokens,
     account_details: [
       {
@@ -91,9 +90,6 @@ BASE_PERMISSIONS = {
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    # Doesn't make a ton of sense for admins to be able to view access tokens but not delete them, hence the
-    # site admin check.
-    account_allows: ->(a) { Account.site_admin.feature_enabled?(:student_access_token_management) || a.feature_enabled?(:admin_manage_access_tokens) },
     group: :users_manage_access_tokens,
     account_details: [
       {

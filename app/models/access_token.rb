@@ -90,8 +90,6 @@ class AccessToken < ApplicationRecord
 
       # if the session wasn't set up correctly, just ignore the additional restrictions
       next true unless (root_account = session&.dig(:root_account))
-      # additional restrictions gated by feature flags
-      next true unless root_account.feature_enabled?(:admin_manage_access_tokens)
 
       # if personal access tokens are limited, then you can't create tokens for yourself
       # (from this block; if you're an admin, you'll still be able to from the block below)
