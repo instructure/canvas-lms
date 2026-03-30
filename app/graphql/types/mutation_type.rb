@@ -58,10 +58,13 @@ class Types::MutationType < Types::ApplicationObjectType
     existing assignment post policies.
   MD
   field :accept_enrollment_invitation, mutation: Mutations::AcceptEnrollmentInvitation
+  field :apply_institutional_tag, mutation: Mutations::ApplyInstitutionalTag
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
   field :create_discussion_topic, mutation: Mutations::CreateDiscussionTopic
+  field :create_institutional_tag,                         mutation: Mutations::CreateInstitutionalTag
+  field :create_institutional_tag_category,                mutation: Mutations::CreateInstitutionalTagCategory
   field :create_internal_setting, mutation: Mutations::CreateInternalSetting
   field :create_learning_outcome, mutation: Mutations::CreateLearningOutcome
   field :create_learning_outcome_group, mutation: Mutations::CreateLearningOutcomeGroup
@@ -91,6 +94,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
   field :post_draft_submission_comment, mutation: Mutations::PostDraftSubmissionComment
   field :reject_enrollment_invitation, mutation: Mutations::RejectEnrollmentInvitation
+  field :remove_institutional_tag, mutation: Mutations::RemoveInstitutionalTag
   field :restore_deleted_discussion_entry, mutation: Mutations::RestoreDeletedDiscussionEntry
   field :save_rubric_assessment, mutation: Mutations::SaveRubricAssessment
   field :select_provisional_grade, mutation: Mutations::SelectProvisionalGrade
@@ -110,6 +114,10 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
   field :update_discussion_topic_participant, mutation: Mutations::UpdateDiscussionTopicParticipant
   field :update_gradebook_group_filter, mutation: Mutations::UpdateGradebookGroupFilter
+  field :update_institutional_tag, mutation: Mutations::UpdateInstitutionalTag
+  field :update_institutional_tag_archived_state, mutation: Mutations::UpdateInstitutionalTagArchivedState
+  field :update_institutional_tag_category, mutation: Mutations::UpdateInstitutionalTagCategory
+  field :update_institutional_tag_category_archived_state, mutation: Mutations::UpdateInstitutionalTagCategoryArchivedState
   field :update_internal_setting, mutation: Mutations::UpdateInternalSetting
   field :update_learner_dashboard_tab_selection, mutation: Mutations::UpdateLearnerDashboardTabSelection
   field :update_learning_outcome, mutation: Mutations::UpdateLearningOutcome

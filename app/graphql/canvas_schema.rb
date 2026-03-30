@@ -110,6 +110,9 @@ class CanvasSchema < GraphQL::Schema
         Types::ModuleItemType
       end
     when ContextExternalTool then Types::ExternalToolType
+    when InstitutionalTag            then Types::InstitutionalTagType
+    when InstitutionalTagAssociation then Types::InstitutionalTagAssociationType
+    when InstitutionalTagCategory    then Types::InstitutionalTagCategoryType
     when Setting then Types::InternalSettingType
     when AssessmentRequest then Types::AssessmentRequestType
     when UsageRights then Types::UsageRightsType

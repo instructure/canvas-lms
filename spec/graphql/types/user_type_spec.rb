@@ -1518,6 +1518,64 @@ describe Types::UserType do
     end
   end
 
+  context "institutional_tags_connection" do
+    def resolve_institutional_tags(account_id = @root_account.id, tester: nil)
+      tester ||= user_type
+      tester.resolve(%|institutionalTagsConnection(accountId: "#{account_id}") { nodes { _id } }|)
+    end
+
+    before(:once) do
+      @root_account = Account.default
+      @root_account.enable_feature!(:institutional_tags)
+      @admin = account_admin_user(account: @root_account)
+      @category = institutional_tag_category_model(account: @root_account)
+      @tag1 = institutional_tag_model(account: @root_account, category: @category, name: "Alumni")
+      @tag2 = institutional_tag_model(account: @root_account, category: @category, name: "Staff")
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag1, user: @student)
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag2, user: @student)
+    end
+
+    let(:admin_tester) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @admin,
+        domain_root_account: @root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "calls InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "passes correct arguments to InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .with(@admin, anything, @root_account.id.to_s)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "returns institutional tags for the user" do
+      result = resolve_institutional_tags(tester: admin_tester)
+      expect(result).to match_array([@tag1.id.to_s, @tag2.id.to_s])
+    end
+
+    it "returns nil when the current_user lacks permission" do
+      # @teacher is not an account admin so lacks manage_institutional_tags_view
+      expect(resolve_institutional_tags).to be_nil
+    end
+  end
+
   context "conversations" do
     it "returns conversations for the user" do
       c = conversation(@student, @teacher)
