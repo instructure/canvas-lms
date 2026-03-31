@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
-import RegenerateCriteria from '../RegenerateCriteria'
+import RegenerateCriteriaButton from '../RegenerateCriteriaButton'
 
-describe('RegenerateCriteria', () => {
+describe('RegenerateCriteriaButton', () => {
   const defaultProps = {
     buttonColor: 'ai-primary' as const,
     onRegenerate: vi.fn(),
@@ -31,7 +31,7 @@ describe('RegenerateCriteria', () => {
   })
 
   it('renders the regenerate button', () => {
-    const {getByTestId} = render(<RegenerateCriteria {...defaultProps} />)
+    const {getByTestId} = render(<RegenerateCriteriaButton {...defaultProps} />)
 
     const button = getByTestId('regenerate-criteria-button')
 
@@ -40,7 +40,7 @@ describe('RegenerateCriteria', () => {
   })
 
   it('opens modal when regenerate button is clicked', async () => {
-    const {getByTestId, getByText} = render(<RegenerateCriteria {...defaultProps} />)
+    const {getByTestId, getByText} = render(<RegenerateCriteriaButton {...defaultProps} />)
 
     fireEvent.click(getByTestId('regenerate-criteria-button'))
 
@@ -51,7 +51,7 @@ describe('RegenerateCriteria', () => {
 
   it('shows "Regenerate Criterion" title when isCriterion is true', async () => {
     const {getByTestId, getByText} = render(
-      <RegenerateCriteria {...defaultProps} isCriterion={true} />,
+      <RegenerateCriteriaButton {...defaultProps} isCriterion={true} />,
     )
 
     fireEvent.click(getByTestId('regenerate-criteria-button'))
@@ -62,7 +62,7 @@ describe('RegenerateCriteria', () => {
   })
 
   it('validates the additional prompt input - shows error for text over 1000 characters', async () => {
-    const {getByTestId, getByText} = render(<RegenerateCriteria {...defaultProps} />)
+    const {getByTestId, getByText} = render(<RegenerateCriteriaButton {...defaultProps} />)
 
     fireEvent.click(getByTestId('regenerate-criteria-button'))
 
@@ -84,7 +84,9 @@ describe('RegenerateCriteria', () => {
   })
 
   it('allows submission with text under 1000 characters', async () => {
-    const {getByTestId, getByText, queryByText} = render(<RegenerateCriteria {...defaultProps} />)
+    const {getByTestId, getByText, queryByText} = render(
+      <RegenerateCriteriaButton {...defaultProps} />,
+    )
 
     fireEvent.click(getByTestId('regenerate-criteria-button'))
 
@@ -106,7 +108,7 @@ describe('RegenerateCriteria', () => {
   it('calls onRegenerate with the additional prompt when submitted', async () => {
     const onRegenerate = vi.fn()
     const {getByTestId, getByText} = render(
-      <RegenerateCriteria {...defaultProps} onRegenerate={onRegenerate} />,
+      <RegenerateCriteriaButton {...defaultProps} onRegenerate={onRegenerate} />,
     )
 
     fireEvent.click(getByTestId('regenerate-criteria-button'))
@@ -124,7 +126,9 @@ describe('RegenerateCriteria', () => {
   })
 
   it('closes modal and clears input when cancel is clicked', async () => {
-    const {getByTestId, getByText, queryByText} = render(<RegenerateCriteria {...defaultProps} />)
+    const {getByTestId, getByText, queryByText} = render(
+      <RegenerateCriteriaButton {...defaultProps} />,
+    )
 
     fireEvent.click(getByTestId('regenerate-criteria-button'))
 
@@ -150,14 +154,14 @@ describe('RegenerateCriteria', () => {
   }, 30000)
 
   it('disables the button when disabled prop is true', () => {
-    const {getByTestId} = render(<RegenerateCriteria {...defaultProps} disabled={true} />)
+    const {getByTestId} = render(<RegenerateCriteriaButton {...defaultProps} disabled={true} />)
     expect(getByTestId('regenerate-criteria-button')).toBeDisabled()
   })
 
   describe('RegenerateButtonWrapper tooltip behavior', () => {
     it('renders tooltip when toolTipText is provided and button is disabled', () => {
       const {getByTestId, getByText} = render(
-        <RegenerateCriteria
+        <RegenerateCriteriaButton
           {...defaultProps}
           toolTipText="Criteria is regenerating"
           disabled={true}
@@ -173,21 +177,21 @@ describe('RegenerateCriteria', () => {
 
     it('does not render tooltip when toolTipText is empty', () => {
       const {queryByText} = render(
-        <RegenerateCriteria {...defaultProps} toolTipText="" disabled={true} />,
+        <RegenerateCriteriaButton {...defaultProps} toolTipText="" disabled={true} />,
       )
 
       expect(queryByText('Criteria is regenerating')).not.toBeInTheDocument()
     })
 
     it('does not render tooltip when toolTipText is not provided', () => {
-      const {queryByText} = render(<RegenerateCriteria {...defaultProps} disabled={true} />)
+      const {queryByText} = render(<RegenerateCriteriaButton {...defaultProps} disabled={true} />)
 
       expect(queryByText('Criteria is regenerating')).not.toBeInTheDocument()
     })
 
     it('renders button with tooltip and disabled state together', () => {
       const {getByText, getByTestId} = render(
-        <RegenerateCriteria
+        <RegenerateCriteriaButton
           {...defaultProps}
           disabled={true}
           toolTipText="Criteria is regenerating"
@@ -201,7 +205,7 @@ describe('RegenerateCriteria', () => {
 
     it('button can be clicked to open modal when not disabled despite tooltip presence', async () => {
       const {getByTestId, getByText} = render(
-        <RegenerateCriteria {...defaultProps} toolTipText="Some tooltip text" />,
+        <RegenerateCriteriaButton {...defaultProps} toolTipText="Some tooltip text" />,
       )
 
       const button = getByTestId('regenerate-criteria-button')
@@ -220,7 +224,7 @@ describe('RegenerateCriteria', () => {
 
     it('button cannot be clicked when disabled regardless of tooltip', () => {
       const {getByTestId, queryByText, getByText} = render(
-        <RegenerateCriteria
+        <RegenerateCriteriaButton
           {...defaultProps}
           disabled={true}
           toolTipText="Criteria is regenerating"

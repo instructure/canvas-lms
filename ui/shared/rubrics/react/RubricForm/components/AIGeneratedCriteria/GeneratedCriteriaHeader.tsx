@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconAiColoredSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import RegenerateCriteria from './RegenerateCriteria'
+import RegenerateCriteriaButton from './RegenerateCriteriaButton'
 
 const I18n = createI18nScope('rubrics-form-generated-criteria')
 
@@ -47,8 +47,8 @@ export const GeneratedCriteriaHeader = ({
       background="secondary"
       data-testid="generate-criteria-header"
     >
-      <Flex gap="medium">
-        <Flex.Item>
+      <Flex gap="medium" wrap="wrap">
+        <Flex.Item shouldShrink shouldGrow>
           <Heading level="h4">
             <Flex alignItems="center" gap="small">
               <IconAiColoredSolid />
@@ -56,32 +56,27 @@ export const GeneratedCriteriaHeader = ({
             </Flex>
           </Heading>
         </Flex.Item>
-        <Flex.Item shouldGrow={true}></Flex.Item>
+        {aiFeedbackLink && (
+          <Flex.Item>
+            <a
+              data-testid="give-feedback-link"
+              href={aiFeedbackLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {I18n.t('Give Feedback')}
+            </a>
+          </Flex.Item>
+        )}
         <Flex.Item>
-          <Flex gap="small">
-            {aiFeedbackLink && (
-              <Flex.Item>
-                <a
-                  data-testid="give-feedback-link"
-                  href={aiFeedbackLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {I18n.t('Give Feedback')}
-                </a>
-              </Flex.Item>
-            )}
-            <Flex.Item>
-              <RegenerateCriteria
-                buttonColor="ai-primary"
-                disabled={isGenerating || !canRegenerate}
-                toolTipText={
-                  canRegenerate ? '' : I18n.t('There are no criteria available for regeneration')
-                }
-                onRegenerate={onRegenerateAll}
-              />
-            </Flex.Item>
-          </Flex>
+          <RegenerateCriteriaButton
+            buttonColor="ai-primary"
+            disabled={isGenerating || !canRegenerate}
+            toolTipText={
+              canRegenerate ? '' : I18n.t('There are no criteria available for regeneration')
+            }
+            onRegenerate={onRegenerateAll}
+          />
         </Flex.Item>
       </Flex>
     </View>

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {CriterionRowPopover} from '../CriterionRowPopover'
@@ -180,5 +179,104 @@ describe('CriterionRowPopover', () => {
     })
 
     expect(onMoveDown).not.toHaveBeenCalled()
+  })
+
+  describe('onRegenerate', () => {
+    it('does not show regenerate menu item when onRegenerate is not provided', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, queryByTestId} = render(<CriterionRowPopover {...defaultProps} />)
+
+      await user.click(getByTestId('criterion-options-popover'))
+
+      await waitFor(() => {
+        expect(queryByTestId('move-up-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      expect(queryByTestId('regenerate-criterion-menu-item')).not.toBeInTheDocument()
+    })
+
+    it('shows regenerate menu item when onRegenerate is provided', async () => {
+      const user = userEvent.setup()
+      const {getByTestId} = render(<CriterionRowPopover {...defaultProps} onRegenerate={vi.fn()} />)
+
+      await user.click(getByTestId('criterion-options-popover'))
+
+      await waitFor(() => {
+        expect(getByTestId('regenerate-criterion-menu-item')).toBeInTheDocument()
+      })
+    })
+
+    it('opens the regenerate modal when regenerate menu item is clicked', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, queryByTestId} = render(
+        <CriterionRowPopover {...defaultProps} onRegenerate={vi.fn()} />,
+      )
+
+      expect(queryByTestId('regenerate-criteria-modal-description')).not.toBeInTheDocument()
+
+      await user.click(getByTestId('criterion-options-popover'))
+
+      await waitFor(() => {
+        expect(getByTestId('regenerate-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('regenerate-criterion-menu-item'))
+
+      await waitFor(() => {
+        expect(getByTestId('regenerate-criteria-modal-description')).toBeInTheDocument()
+      })
+    })
+
+    it('calls onRegenerate with the additional prompt when modal is submitted', async () => {
+      const user = userEvent.setup()
+      const onRegenerate = vi.fn()
+      const {getByTestId} = render(
+        <CriterionRowPopover {...defaultProps} onRegenerate={onRegenerate} />,
+      )
+
+      await user.click(getByTestId('criterion-options-popover'))
+
+      await waitFor(() => {
+        expect(getByTestId('regenerate-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('regenerate-criterion-menu-item'))
+
+      await waitFor(() => {
+        expect(getByTestId('additional-prompt-textarea')).toBeInTheDocument()
+      })
+
+      await user.clear(getByTestId('additional-prompt-textarea'))
+      await user.type(getByTestId('additional-prompt-textarea'), 'Make it harder')
+
+      await user.click(getByTestId('regenerate-criteria-submit-button'))
+
+      expect(onRegenerate).toHaveBeenCalledWith('Make it harder')
+    })
+
+    it('closes the modal when cancel is clicked', async () => {
+      const user = userEvent.setup()
+      const {getByTestId, queryByTestId} = render(
+        <CriterionRowPopover {...defaultProps} onRegenerate={vi.fn()} />,
+      )
+
+      await user.click(getByTestId('criterion-options-popover'))
+
+      await waitFor(() => {
+        expect(getByTestId('regenerate-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('regenerate-criterion-menu-item'))
+
+      await waitFor(() => {
+        expect(getByTestId('regenerate-criteria-modal-description')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('regenerate-criteria-cancel-button'))
+
+      await waitFor(() => {
+        expect(queryByTestId('regenerate-criteria-modal-description')).not.toBeInTheDocument()
+      })
+    })
   })
 })
