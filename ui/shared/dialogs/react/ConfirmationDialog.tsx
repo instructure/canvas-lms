@@ -26,6 +26,19 @@ const I18n = createI18nScope('ConfirmationDialog')
 
 const dialogHolderId = 'confirmation_dialog_holder'
 
+type ButtonColor = 'primary' | 'primary-inverse' | 'secondary' | 'success' | 'danger'
+
+interface ConfirmationDialogProps {
+  open: boolean
+  label: string
+  children: React.ReactNode
+  confirmColor?: ButtonColor
+  confirmText?: string
+  onConfirm: () => void
+  onReject: () => void
+  size?: 'auto' | 'small' | 'medium' | 'large' | 'fullscreen'
+}
+
 export default function ConfirmationDialog({
   open,
   label,
@@ -35,7 +48,7 @@ export default function ConfirmationDialog({
   onConfirm,
   onReject,
   size = 'medium',
-}) {
+}: ConfirmationDialogProps) {
   return (
     <CanvasModal
       label={label}
@@ -59,9 +72,17 @@ export default function ConfirmationDialog({
         </>
       }
     >
-      {children}
+      {children as React.ReactElement}
     </CanvasModal>
   )
+}
+
+interface ShowConfirmationDialogOptions {
+  label: string
+  body: React.ReactNode
+  confirmText?: string
+  confirmColor?: ButtonColor
+  size?: 'auto' | 'small' | 'medium' | 'large' | 'fullscreen'
 }
 
 export async function showConfirmationDialog({
@@ -70,13 +91,13 @@ export async function showConfirmationDialog({
   confirmText,
   confirmColor,
   size = 'medium',
-}) {
-  let resolver
-  const returnedPromise = new Promise(resolve => {
+}: ShowConfirmationDialogOptions): Promise<boolean> {
+  let resolver!: (value: boolean) => void
+  const returnedPromise = new Promise<boolean>(resolve => {
     resolver = resolve
   })
 
-  function getDialogContainer() {
+  function getDialogContainer(): HTMLElement {
     let dialogContainer = document.getElementById(dialogHolderId)
     if (!dialogContainer) {
       dialogContainer = document.createElement('div')
@@ -96,7 +117,7 @@ export async function showConfirmationDialog({
     resolver(false)
   }
 
-  function renderDialog(parent) {
+  function renderDialog(parent: HTMLElement) {
     legacyRender(
       <ConfirmationDialog
         open={true}

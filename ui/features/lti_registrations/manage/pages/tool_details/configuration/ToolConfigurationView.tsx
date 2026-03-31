@@ -35,7 +35,7 @@ import {isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {
   useResetLtiRegistration,
   fetchLtiRegistrationWithLegacyConfig,
