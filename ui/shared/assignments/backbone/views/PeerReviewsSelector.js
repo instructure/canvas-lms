@@ -86,12 +86,13 @@ PeerReviewsSelector.prototype.afterRender = function () {
 
 PeerReviewsSelector.prototype.toJSON = function () {
   const frozenAttributes = this.parentModel.frozenAttributes()
-  const allocationAndGradingEnabled = ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
   const peerReviewSubAssignment = this.parentModel.get('peer_review_sub_assignment')
   const isGradedPeerReviewInLegacyMode =
-    peerReviewSubAssignment != null && !allocationAndGradingEnabled
+    peerReviewSubAssignment != null && !ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
   const peerReviewsFrozen =
     includes(frozenAttributes, 'peer_reviews') || isGradedPeerReviewInLegacyMode
+  const showGradedPeerReviewSettings =
+    ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && !this.parentModel.isLegacyPeerReview()
 
   return {
     anonymousPeerReviews: this.parentModel.anonymousPeerReviews(),
@@ -106,7 +107,7 @@ PeerReviewsSelector.prototype.toJSON = function () {
     hideAnonymousPeerReview: this.hideAnonymousPeerReview,
     hasGroupCategory: this.parentModel.groupCategoryId(),
     intraGroupPeerReviews: this.parentModel.intraGroupPeerReviews(),
-    allocationAndGradingEnabled: allocationAndGradingEnabled,
+    showGradedPeerReviewSettings,
     lockPeerReviewSettings: isGradedPeerReviewInLegacyMode,
   }
 }

@@ -598,6 +598,7 @@ describe "assignment" do
           intra_group_peer_reviews: true,
           peer_review_submission_required: true
         )
+        peer_review_model(parent_assignment: pr_assignment)
 
         get "/courses/#{@pr_course.id}/assignments/#{pr_assignment.id}/edit"
         wait_for_ajaximations
@@ -622,7 +623,6 @@ describe "assignment" do
       end
 
       it "resets intra_group_peer_reviews when assignment changes from group to non-group", custom_timeout: 30 do
-        # Create assignment as group assignment with within-groups peer reviews
         group_category = @pr_course.group_categories.create!(name: "Test Group Category")
         pr_assignment = @pr_course.assignments.create!(
           name: "Group Assignment with Peer Reviews",
@@ -633,6 +633,7 @@ describe "assignment" do
           group_category_id: group_category.id,
           intra_group_peer_reviews: true
         )
+        peer_review_model(parent_assignment: pr_assignment)
 
         get "/courses/#{@pr_course.id}/assignments/#{pr_assignment.id}/edit"
         wait_for_ajaximations
@@ -1093,6 +1094,7 @@ describe "assignment" do
           submission_types: "online_text_entry",
           peer_reviews: true
         )
+        peer_review_model(parent_assignment: @pr_assignment_sections)
       end
 
       it "loads the initial value of allow across sections when editing an assignment", custom_timeout: 30 do
@@ -1153,6 +1155,63 @@ describe "assignment" do
         wait_for_ajaximations
 
         expect(@pr_assignment_sections.reload.peer_review_across_sections).to be false
+      end
+    end
+
+    context "peer review settings UI" do
+      it "shows legacy peer review settings when feature flag is disabled" do
+        @pr_course.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = assignment_model(
+          course: @pr_course,
+          peer_reviews: true,
+          automatic_peer_reviews: true,
+          peer_review_count: 1
+        )
+
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#assignment_peer_reviews")).to be_displayed
+        expect(f("#peer_reviews_details")).to be_displayed
+        expect(element_exists?("#peer_reviews_allocation_and_grading_details")).to be false
+      end
+
+      context "with peer_review_allocation_and_grading feature enabled" do
+        before do
+          @pr_course.enable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "shows legacy peer review settings UI for assignment with legacy peer reviews" do
+          assignment = assignment_model(
+            course: @pr_course,
+            peer_reviews: true,
+            automatic_peer_reviews: true,
+            peer_review_count: 1
+          )
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("#assignment_peer_reviews")).to be_displayed
+          expect(f("#peer_reviews_details")).to be_displayed
+          expect(element_exists?("#peer_reviews_allocation_and_grading_details")).to be false
+        end
+
+        it "shows graded peer review settings UI for assignment with graded peer reviews" do
+          assignment = assignment_model(
+            course: @pr_course,
+            peer_reviews: true,
+            peer_review_count: 1
+          )
+          peer_review_model(parent_assignment: assignment)
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("#peer_reviews_allocation_and_grading_details")).to be_displayed
+          expect(f("[data-testid='peer-review-checkbox']")).to be_displayed
+          expect(element_exists?("#assignment_peer_reviews")).to be false
+        end
       end
     end
   end

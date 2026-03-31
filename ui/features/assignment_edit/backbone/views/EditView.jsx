@@ -182,6 +182,7 @@ function EditView() {
   this.submit = this.submit.bind(this)
   this.saveFormData = this.saveFormData.bind(this)
   this.getFormData = this.getFormData.bind(this)
+  this.showGradedPeerReviewSettings = this.showGradedPeerReviewSettings.bind(this)
   this._datesDifferIgnoringSeconds = this._datesDifferIgnoringSeconds.bind(this)
   this._attachEditorToDescription = this._attachEditorToDescription.bind(this)
   this.toJSON = this.toJSON.bind(this)
@@ -522,7 +523,7 @@ EditView.prototype.enableCheckbox = function (box) {
 }
 
 EditView.prototype.isPeerReviewChecked = function () {
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (this.showGradedPeerReviewSettings()) {
     const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
     if (peerReviewHidden) {
       return peerReviewHidden.value === 'true'
@@ -557,6 +558,10 @@ EditView.prototype.canEnablePeerReviews = function () {
   if (this.isExternalToolSubmissionType()) return false
 
   return true
+}
+
+EditView.prototype.showGradedPeerReviewSettings = function () {
+  return ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && !this.assignment.isLegacyPeerReview()
 }
 
 EditView.prototype.handlesuppressFromGradebookChange = function () {
@@ -1164,14 +1169,14 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
 
   if (this.isExternalToolSubmissionType()) {
     if (this.isPeerReviewChecked()) {
-      if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+      if (!this.showGradedPeerReviewSettings()) {
         this.$peerReviewsBox.prop('checked', false)
         this.togglePeerReviewsAndGroupCategoryEnabled()
       }
       this.disablePeerReviewsCheckbox()
       $('#peer_reviews_details')?.toggleAccessibly(false)
     }
-  } else if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && this.canEnablePeerReviews()) {
+  } else if (this.showGradedPeerReviewSettings() && this.canEnablePeerReviews()) {
     this.enablePeerReviewsCheckbox()
   }
   this.$externalToolPlacementLaunchContainer.toggleAccessibly(isPlacementTool)
@@ -1652,7 +1657,7 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (this.showGradedPeerReviewSettings()) {
     const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
     data.peer_reviews = peerReviewHidden?.value === 'true'
 
@@ -1867,7 +1872,7 @@ EditView.prototype.showErrors = function (errors) {
   let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
     if (key === 'peer_review_details') {
-      if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && shouldFocus) {
+      if (this.showGradedPeerReviewSettings() && shouldFocus) {
         const peerReviewDetailsEl = document.getElementById(
           'peer_reviews_allocation_and_grading_details',
         )
@@ -2078,7 +2083,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     delete errors.invalid_card
   }
 
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (this.showGradedPeerReviewSettings()) {
     const peerReviewHidden = document.getElementById('assignment_peer_reviews_hidden')
     if (peerReviewHidden && peerReviewHidden.value === 'true') {
       const peerReviewDetailsEl = document.getElementById(
