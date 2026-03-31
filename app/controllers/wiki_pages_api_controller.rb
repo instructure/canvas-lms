@@ -429,6 +429,8 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   rescue Api::Html::UnparsableContentError => e
     rescue_unparsable_content(e)
   end
@@ -447,6 +449,8 @@ class WikiPagesApiController < ApplicationController
       log_asset_access(@page, "wiki", @wiki)
       render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   end
 
   # @API Update/create page
@@ -522,6 +526,8 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   rescue Api::Html::UnparsableContentError => e
     rescue_unparsable_content(e)
   end
@@ -928,6 +934,14 @@ class WikiPagesApiController < ApplicationController
     @page.errors.add(:body, error.message) if @page.present?
 
     render json: @page&.errors || {}, status: :bad_request
+  end
+
+  def rescue_content_service_error(error)
+    error_report = ErrorReport.log_error(
+      "content_service_client_error",
+      { message: error.message, service_errors: error.service_errors }
+    )
+    render json: { error: error.message, error_report_id: error_report.id }, status: :service_unavailable
   end
 
   def create_external_content_ref
