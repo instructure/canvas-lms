@@ -1210,4 +1210,103 @@ describe Rubric do
       end
     end
   end
+
+  describe "#alignments_need_update?" do
+    let_once(:course) { Course.create! }
+    let(:rubric) do
+      Rubric.create!(
+        title: "Test Rubric",
+        context: course,
+        data: [{
+          description: "Criterion 1",
+          points: 10,
+          id: "crit1",
+          ratings: [
+            { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" },
+            { description: "Bad", points: 0, id: "rat2", criterion_id: "crit1" }
+          ]
+        }]
+      )
+    end
+
+    it "returns true when workflow_state changes" do
+      rubric.update!(workflow_state: "deleted")
+      expect(rubric.alignments_need_update?).to be true
+    end
+
+    it "returns true when criteria content changes" do
+      changed_data = [{
+        description: "Changed Criterion",
+        points: 10,
+        id: "crit1",
+        ratings: [
+          { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" },
+          { description: "Bad", points: 0, id: "rat2", criterion_id: "crit1" }
+        ]
+      }]
+      rubric.update!(data: changed_data)
+      expect(rubric.alignments_need_update?).to be true
+    end
+
+    it "returns false when data is saved but criteria are semantically unchanged" do
+      rubric.update!(data: rubric.data)
+      expect(rubric.alignments_need_update?).to be false
+    end
+
+    it "returns false when neither workflow_state nor data changes" do
+      rubric.update!(title: "New Title")
+      expect(rubric.alignments_need_update?).to be false
+    end
+  end
+
+  describe "#criteria_has_changed?" do
+    let_once(:course) { Course.create! }
+    let(:original_data) do
+      [{
+        description: "Criterion 1",
+        points: 10,
+        id: "crit1",
+        ratings: [
+          { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" },
+          { description: "Bad", points: 0, id: "rat2", criterion_id: "crit1" }
+        ]
+      }]
+    end
+    let(:rubric) { Rubric.create!(title: "Test Rubric", context: course, data: original_data) }
+
+    it "returns false when criteria are identical" do
+      expect(rubric.criteria_has_changed?(original_data)).to be false
+    end
+
+    it "returns true when criterion description changes" do
+      changed = original_data.deep_dup
+      changed[0][:description] = "Different Description"
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns true when criterion points change" do
+      changed = original_data.deep_dup
+      changed[0][:points] = 20
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns true when a rating is added" do
+      changed = original_data.deep_dup
+      changed[0][:ratings] << { description: "Okay", points: 5, id: "rat3", criterion_id: "crit1" }
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns true when a rating description changes" do
+      changed = original_data.deep_dup
+      changed[0][:ratings][0][:description] = "Excellent"
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns false when criterion_use_range is false and previous criterion_use_range was not set" do
+      data_with_range = original_data.deep_dup
+      data_with_range[0][:criterion_use_range] = false
+      rubric.update!(data: data_with_range)
+      expect(rubric.criteria_has_changed?(data_with_range)).to be false
+    end
+  end
 end
