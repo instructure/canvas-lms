@@ -2150,7 +2150,6 @@ class Course < ApplicationRecord
       update
       read_outcomes
       view_unpublished_items
-      manage_feature_flags
       view_feature_flags
       read_rubrics
       use_student_view
@@ -2239,7 +2238,6 @@ class Course < ApplicationRecord
       manage
       update
       use_student_view
-      manage_feature_flags
       view_feature_flags
       set_grading_scheme
       manage_grading_schemes
@@ -2276,6 +2274,21 @@ class Course < ApplicationRecord
         (grants_right?(user, :manage) && !root_account.settings[:prevent_course_availability_editing_by_teachers])
     end
     can :edit_course_availability
+
+    given do |user|
+      # manage_feature_flags was extracted from the arrays where the :manage permission was granted.
+      # When the Feature flag is disabled and the user has the :manage permission, this means they also have the :manage_feature_flags permission
+      # Otherwise, also require the new permission
+      grants_right?(user, :manage) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_feature_options))
+    end
+    can :manage_feature_flags
+
+    given do |user|
+      grants_right?(user, :update) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_navigation))
+    end
+    can :update_nav
   end
 
   def allows_gradebook_uploads?

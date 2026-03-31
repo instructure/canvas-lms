@@ -2411,6 +2411,26 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Allows user to delete automation rules on the account.") } }
     ]
   },
+  manage_course_navigation: {
+    label: -> { I18n.t("Manage Course Navigation") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Navigation") },
+        description: -> { I18n.t("Allows the user to reorder, enable, or disable items in the Course Navigation.") } }
+    ]
+  },
+  manage_course_feature_options: {
+    label: -> { I18n.t("Manage Course Feature Options") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Feature Options") },
+        description: -> { I18n.t("Allows the user to toggle the state of feature options in the Course Settings.") } }
+    ]
+  },
   edit_discussion_anonymity: {
     label: -> { I18n.t("Discussions - edit anonymous discussion") },
     available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],

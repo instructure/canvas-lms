@@ -6876,5 +6876,53 @@ describe CoursesController do
         expect(response).to be_redirect
       end
     end
+
+    context "the course_navigation_and_feature_options_permissions feature flag is enabled" do
+      before :once do
+        @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        course_with_teacher(active_all: true)
+      end
+
+      it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
+        user_session(@teacher)
+        @course.root_account.role_overrides.create!(permission: :manage_course_navigation, enabled: true, role: teacher_role)
+
+        tabs_json = [
+          { id: "assignments", label: "Assignments" },
+          { id: "announcements", label: "Announcements", hidden: true }
+        ].to_json
+
+        processed_tabs = [
+          { "id" => "assignments", "label" => "Assignments" },
+          { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+        ]
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(
+            course: @course,
+            tabs: [
+              { "id" => "assignments", "label" => "Assignments" },
+              { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+            ],
+            can_manage_links: false,
+            request_host: "test.host",
+            request_port: 80
+          )
+          .and_return(processed_tabs)
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+        @course.reload
+        expect(@course.tab_configuration).to eq(processed_tabs)
+      end
+
+      it "returns a 401 unauthorized when the permission is disabled" do
+        user_session(@teacher)
+        @course.root_account.role_overrides.create!(permission: :manage_course_navigation, enabled: false, role: teacher_role)
+        put :update_nav, params: { course_id: @course.id, tabs_json: {} }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 end

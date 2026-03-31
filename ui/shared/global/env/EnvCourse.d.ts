@@ -121,6 +121,10 @@ export interface EnvCourseSettings {
 
     manage_course_content_edit: boolean
 
+    manage_course_navigation: boolean
+
+    manage_course_feature_options: boolean
+
     add_tool_manually: boolean
     edit_tool_manually: boolean
     delete_tool_manually: boolean

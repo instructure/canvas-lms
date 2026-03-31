@@ -196,18 +196,3 @@ inbox_sis_id_for_duplicates:
       state: allowed_on
     ci:
       state: allowed_on
-
-default_discussion_options:
-  state: hidden
-  applies_to: RootAccount
-  shadow: true
-  display_name: Default Discussion Options
-  description: |-
-    Allows administrators and teachers (permissions dependent) to set default options that will be applied to newly created discussions.
-    These default options can be set in Course > Discussions > Settings.
-    Also adds a few permissions for modifying discussion options as well as a permission for applying the default options.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed
