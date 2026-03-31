@@ -170,7 +170,7 @@ module HealthChecks
       if PageView.pv4?
         ret[:pv4] = lambda do
           CanvasHttp
-            .get(URI.join(ConfigFile.load("pv4")["uri"], "/health_check").to_s)
+            .get(URI.join(ConfigFile.load("pv4")["uri"], "/readiness").to_s)
             .is_a?(Net::HTTPSuccess)
         end
       end
