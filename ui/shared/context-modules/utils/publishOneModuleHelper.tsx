@@ -18,6 +18,9 @@
 
 import $ from 'jquery'
 import React from 'react'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import type {Root} from 'react-dom/client'
 import {render} from '@canvas/react'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
@@ -32,6 +35,7 @@ import type {
   ModuleItemStateData,
   FetchedModuleItem,
   FetchedModule,
+  PublishWarningItem,
 } from '../react/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -44,6 +48,34 @@ interface PublishingModuleProps {
   setIsPublishing?: (isPublishing: boolean) => void
   moduleIsPublished?: boolean
   skipItems: boolean
+}
+
+function reasonLabel(reason: PublishWarningItem['reason']): string {
+  switch (reason) {
+    case 'file_in_hidden_folder':
+      return I18n.t('file is in a hidden folder')
+    case 'usage_rights_required':
+      return I18n.t('usage rights are required')
+    case 'unpublishable':
+      return I18n.t('cannot be published')
+    default:
+      return I18n.t('could not be published')
+  }
+}
+
+function buildPublishWarningMessage(items: PublishWarningItem[]): React.ReactNode {
+  return (
+    <View>
+      <Text>{I18n.t('Some module items could not be published:')}</Text>
+      <List isUnstyled margin="x-small 0 0 small">
+        {items.map(item => (
+          <List.Item key={item.id}>
+            {item.title} — {reasonLabel(item.reason)}
+          </List.Item>
+        ))}
+      </List>
+    </View>
+  )
 }
 
 export function publishModule({
@@ -133,11 +165,12 @@ export function batchUpdateOneModuleApiCall(
   })
     .then(result => {
       if (result.json!.publish_warning) {
-        showFlashAlert({
-          message: I18n.t('Some module items could not be published'),
-          type: 'warning',
-          err: null,
-        })
+        const warningItems = result.json!.publish_warning_items
+        const message =
+          warningItems && warningItems.length > 0
+            ? buildPublishWarningMessage(warningItems)
+            : I18n.t('Some module items could not be published')
+        showFlashAlert({message, type: 'warning', err: null})
       }
       relockModulesDialog.renderIfNeeded(result.json)
 

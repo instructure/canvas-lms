@@ -45,6 +45,12 @@ export interface ModuleItemStateData {
   bulkPublishInFlight?: boolean
 }
 
+export interface PublishWarningItem {
+  id: string
+  title: string
+  reason: 'file_in_hidden_folder' | 'usage_rights_required' | 'unpublishable' | 'unknown'
+}
+
 export interface FetchedModule {
   id: string
   items_count: number
@@ -54,6 +60,7 @@ export interface FetchedModule {
   prerequisite_module_ids: number[]
   publish_final_grade: boolean
   publish_warning: boolean
+  publish_warning_items?: PublishWarningItem[]
   published: boolean
   require_sequential_progress: true
   unlock_at: string | null
