@@ -75,7 +75,7 @@ const widgetRegistry: WidgetRegistry = {
   },
   [WIDGET_TYPES.EDUCATOR_ANNOUNCEMENT_CREATION]: {
     component: EducatorAnnouncementCreationWidget,
-    displayName: 'Announcement Creation',
+    displayName: 'Announcement creation',
     description: 'Create and post announcements to your courses',
     roles: [EDUCATOR_WIDGET_ROLE],
   },

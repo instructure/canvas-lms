@@ -95,7 +95,7 @@ export const DEFAULT_EDUCATOR_WIDGET_CONFIG = {
       id: 'educator-announcement-creation-widget',
       type: WIDGET_TYPES.EDUCATOR_ANNOUNCEMENT_CREATION,
       position: {col: 1, row: 1, relative: 1},
-      title: I18n.t('Announcement Creation'),
+      title: I18n.t('Announcement creation'),
     },
     {
       id: 'educator-todo-list-widget',
