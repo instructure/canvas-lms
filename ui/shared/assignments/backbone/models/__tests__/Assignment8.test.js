@@ -123,4 +123,35 @@ describe('Assignment', () => {
       })
     })
   })
+
+  describe('#isLegacyPeerReview', () => {
+    it('returns false for a new assignment with no peer reviews', () => {
+      const assignment = new Assignment()
+      expect(assignment.isLegacyPeerReview()).toBe(false)
+    })
+
+    it('returns false for a new assignment with peer reviews enabled', () => {
+      const assignment = new Assignment({peer_reviews: true})
+      expect(assignment.isLegacyPeerReview()).toBe(false)
+    })
+
+    it('returns false for an existing assignment without peer reviews', () => {
+      const assignment = new Assignment({id: '1', peer_reviews: false})
+      expect(assignment.isLegacyPeerReview()).toBe(false)
+    })
+
+    it('returns true for an existing assignment with peer reviews and no peer_review_sub_assignment', () => {
+      const assignment = new Assignment({id: '1', peer_reviews: true})
+      expect(assignment.isLegacyPeerReview()).toBe(true)
+    })
+
+    it('returns false for an existing assignment with peer reviews and a peer_review_sub_assignment', () => {
+      const assignment = new Assignment({
+        id: '1',
+        peer_reviews: true,
+        peer_review_sub_assignment: {id: '42'},
+      })
+      expect(assignment.isLegacyPeerReview()).toBe(false)
+    })
+  })
 })
