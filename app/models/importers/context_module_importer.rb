@@ -131,7 +131,9 @@ module Importers
       end
 
       position = (hash[:position] || hash[:order])&.to_i
-      if (item.new_record? || item.workflow_state_was == "deleted") && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
+      # For regular imports, offset new modules to append after existing ones instead of interweaving positions.
+      # For Blueprint/Master Course imports, preserve absolute positions to maintain module order across syncs.
+      if (item.new_record? || item.workflow_state_was == "deleted") && migration.try(:last_module_position) && !migration.for_master_course_import?
         position = migration.last_module_position + (position || 1)
       end
       item.position = position
