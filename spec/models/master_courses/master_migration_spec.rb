@@ -2861,6 +2861,82 @@ describe MasterCourses::MasterMigration do
       expect(mod_to.reload).to be_deleted
     end
 
+    it "syncs module positions correctly when adding a new module and reordering existing modules" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod0 = @copy_from.context_modules.create!(name: "Module 0", position: 1)
+      mod1 = @copy_from.context_modules.create!(name: "Module 1", position: 2)
+      mod2 = @copy_from.context_modules.create!(name: "Module 2", position: 3)
+      mod3 = @copy_from.context_modules.create!(name: "Module 3", position: 4)
+      mod4 = @copy_from.context_modules.create!(name: "Module 4", position: 5)
+
+      run_master_migration
+
+      mod0_to = @copy_to.context_modules.where(migration_id: mig_id(mod0)).first
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      mod2_to = @copy_to.context_modules.where(migration_id: mig_id(mod2)).first
+      mod3_to = @copy_to.context_modules.where(migration_id: mig_id(mod3)).first
+      mod4_to = @copy_to.context_modules.where(migration_id: mig_id(mod4)).first
+      expect(mod0_to.position).to eq 1
+      expect(mod1_to.position).to eq 2
+      expect(mod2_to.position).to eq 3
+      expect(mod3_to.position).to eq 4
+      expect(mod4_to.position).to eq 5
+
+      Timecop.freeze(2.minutes.from_now) do
+        mod_new = @copy_from.context_modules.create!(name: "Module -1", position: 1)
+        ContextModule.where(id: mod0).update_all(position: 2)
+        ContextModule.where(id: mod1).update_all(position: 3)
+        ContextModule.where(id: mod2).update_all(position: 4)
+        ContextModule.where(id: mod3).update_all(position: 5)
+        ContextModule.where(id: mod4).update_all(position: 6)
+        [mod0, mod1, mod2, mod3, mod4, mod_new].each(&:touch)
+        @mod_new = mod_new
+      end
+
+      run_master_migration
+
+      mod_new_to = @copy_to.context_modules.where(migration_id: mig_id(@mod_new)).first
+      expect(mod_new_to).to be_present
+      expect(mod_new_to.position).to eq 1
+      expect(mod0_to.reload.position).to eq 2
+      expect(mod1_to.reload.position).to eq 3
+      expect(mod2_to.reload.position).to eq 4
+      expect(mod3_to.reload.position).to eq 5
+      expect(mod4_to.reload.position).to eq 6
+    end
+
+    it "syncs module positions correctly when adding a new module in the middle and reordering" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod0 = @copy_from.context_modules.create!(name: "Module 0", position: 1)
+      mod1 = @copy_from.context_modules.create!(name: "Module 1", position: 2)
+      mod2 = @copy_from.context_modules.create!(name: "Module 2", position: 3)
+
+      run_master_migration
+
+      Timecop.freeze(2.minutes.from_now) do
+        mod_new = @copy_from.context_modules.create!(name: "Module 1.5", position: 3)
+        ContextModule.where(id: mod2).update_all(position: 4)
+        [mod0, mod1, mod2, mod_new].each(&:touch)
+        @mod_new = mod_new
+      end
+
+      run_master_migration
+
+      mod0_to = @copy_to.context_modules.where(migration_id: mig_id(mod0)).first
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      mod2_to = @copy_to.context_modules.where(migration_id: mig_id(mod2)).first
+      mod_new_to = @copy_to.context_modules.where(migration_id: mig_id(@mod_new)).first
+
+      expect(mod0_to.reload.position).to eq 1
+      expect(mod1_to.reload.position).to eq 2
+      expect(mod_new_to.position).to eq 3
+      expect(mod2_to.reload.position).to eq 4
+    end
+
     it "copies outcomes in selective copies" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
