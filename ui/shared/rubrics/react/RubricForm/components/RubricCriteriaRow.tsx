@@ -23,7 +23,6 @@ import {possibleString} from '@canvas/rubrics/react/Points'
 import {formatLongDescriptionHTML} from '@canvas/rubrics/react/utils'
 import {OutcomeTag} from '@canvas/rubrics/react/RubricAssessment'
 import classnames from 'classnames'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -34,11 +33,12 @@ import {EditCriterionButton} from './EditCriterionButton'
 import {DeleteCriterionButton} from './DeleteCriterionButton'
 import {DuplicateCriterionButton} from './DuplicateCriterionButton'
 import {Draggable} from 'react-beautiful-dnd'
-import RegenerateCriteria from './AIGeneratedCriteria/RegenerateCriteria'
+import RegenerateCriteriaButton from './AIGeneratedCriteria/RegenerateCriteriaButton'
 import '../drag-and-drop/styles.css'
 import {useGetRubricOutcome} from '../../RubricAssessment/queries/useGetRubricOutcome'
 import {CriterionRowPopover} from './CriterionRowPopover'
 import {RatingScaleAccordion} from './RatingScaleAccordion'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
@@ -128,11 +128,19 @@ export const RubricCriteriaRow = ({
     }
   }, [shouldFocus, onFocused])
 
+  const showRegenerateButtonFreeForm =
+    freeFormCriterionComments &&
+    showCriteriaRegeneration &&
+    onRegenerateCriterion &&
+    !learningOutcomeId
+  const showRegenerateButtonRatings =
+    showCriteriaRegeneration && !learningOutcomeId && onRegenerateCriterion
+
   return (
     <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
       {(provided, snapshot) => {
         return (
-          <div
+          <section
             ref={provided.innerRef}
             className={classnames('draggable', 'criterion-row', {
               dragging: snapshot.isDragging,
@@ -143,271 +151,263 @@ export const RubricCriteriaRow = ({
             {...(isCompact ? provided.dragHandleProps : {})}
             data-testid="rubric-criteria-row"
           >
-            <table
-              className={classnames({'generated-criterion-table': isGenerated})}
-              style={{width: '100%', borderCollapse: 'collapse'}}
-            >
-              <colgroup>
-                {!isCompact && <col style={{width: '2rem'}} />}
-                <col style={{width: '2rem'}} />
-                <col />
-                <col style={{width: '8rem'}} />
-              </colgroup>
-              <thead>
-                <tr>
-                  {!isCompact && (
-                    <th>
-                      <ScreenReaderContent>{I18n.t('Reorder')}</ScreenReaderContent>
-                    </th>
-                  )}
-                  <th>
-                    <ScreenReaderContent>{I18n.t('Number')}</ScreenReaderContent>
-                  </th>
-                  <th>
-                    <ScreenReaderContent>{I18n.t('Criterion')}</ScreenReaderContent>
-                  </th>
-                  <th>
-                    <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Row 1: Criterion details */}
-                <tr>
-                  {/* Cell 1: Drag handle */}
-                  {!isCompact && (
-                    <td className="criterion-cell criterion-cell--drag">
-                      <View
-                        as="span"
-                        role="button"
-                        {...provided.dragHandleProps}
-                        aria-label={I18n.t('Reorder %{criterionName} Criterion', {
-                          criterionName: description,
-                        })}
-                        data-testid="rubric-criteria-row-drag-handle"
-                      >
-                        <IconDragHandleLine aria-hidden="true" />
+            {/* Row 1: Criterion details */}
+            <Flex alignItems="start">
+              {/* Drag handle */}
+              {!isCompact && (
+                <Flex.Item>
+                  <View
+                    className="criterion-cell criterion-cell--drag"
+                    as="div"
+                    role="button"
+                    {...provided.dragHandleProps}
+                    aria-label={I18n.t('Reorder %{criterionName} Criterion', {
+                      criterionName: description,
+                    })}
+                    data-testid="rubric-criteria-row-drag-handle"
+                  >
+                    <IconDragHandleLine aria-hidden="true" />
+                  </View>
+                </Flex.Item>
+              )}
+
+              {/* Row index */}
+              <Flex.Item>
+                <View as="div" minWidth="2rem" className="criterion-cell">
+                  <Text weight="bold" data-testid="rubric-criteria-row-index">
+                    {rowIndex}.
+                  </Text>
+                </View>
+              </Flex.Item>
+
+              {/* Criterion description */}
+              <Flex.Item shouldGrow shouldShrink>
+                <View as="div" className="criterion-cell criterion-cell--description">
+                  {learningOutcomeId ? (
+                    <>
+                      <View as="div">
+                        <OutcomeTag
+                          displayName={criterion.description}
+                          outcome={outcomeTagData}
+                          maxWidth={isCompactOutcome ? '8rem' : undefined}
+                          onClick={() => selectLearningOutcome(criterion.learningOutcomeId)}
+                        />
+                        <Tooltip
+                          renderTip={
+                            isAIRubricsAvailable
+                              ? I18n.t("An outcome can't be edited or regenerated")
+                              : I18n.t("An outcome can't be edited")
+                          }
+                          data-testid={`outcome-tooltip-${criterion.id}`}
+                        >
+                          <IconLockLine
+                            style={{marginLeft: 12}}
+                            data-testid={`outcome-lock-icon-${criterion.id}`}
+                          />
+                        </Tooltip>
                       </View>
-                    </td>
-                  )}
-
-                  {/* Cell 2: Row index */}
-                  <td className="criterion-cell criterion-cell--index">
-                    <Text weight="bold" data-testid="rubric-criteria-row-index">
-                      {rowIndex}.
-                    </Text>
-                  </td>
-
-                  {/* Cell 3: Criterion description */}
-                  <td className="criterion-cell criterion-cell--description">
-                    {learningOutcomeId ? (
-                      <>
-                        <View as="div">
-                          <OutcomeTag
-                            displayName={criterion.description}
-                            outcome={outcomeTagData}
-                            maxWidth={isCompactOutcome ? '8rem' : undefined}
-                            onClick={() => selectLearningOutcome(criterion.learningOutcomeId)}
-                          />
-                          <Tooltip
-                            renderTip={
-                              isAIRubricsAvailable
-                                ? I18n.t("An outcome can't be edited or regenerated")
-                                : I18n.t("An outcome can't be edited")
-                            }
-                            data-testid={`outcome-tooltip-${criterion.id}`}
-                          >
-                            <IconLockLine
-                              style={{marginLeft: 12}}
-                              data-testid={`outcome-lock-icon-${criterion.id}`}
-                            />
-                          </Tooltip>
+                      {outcome?.displayName && (
+                        <View
+                          as="div"
+                          margin="small 0 0 0"
+                          data-testid="rubric-criteria-outcome-subtitle"
+                        >
+                          <Heading level="h4">{outcome?.displayName}</Heading>
                         </View>
-                        {outcome?.displayName && (
-                          <View
-                            as="div"
-                            margin="small 0 0 0"
-                            data-testid="rubric-criteria-outcome-subtitle"
-                          >
-                            <Text weight="bold">{outcome?.displayName}</Text>
-                          </View>
-                        )}
-                        <View as="div" data-testid="rubric-criteria-row-description">
-                          {/* html sanitized by server */}
-                          <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
+                      )}
+                      <View as="div" data-testid="rubric-criteria-row-description">
+                        {/* html sanitized by server */}
+                        <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
+                      </View>
+                      {!hidePoints && (
+                        <View
+                          as="div"
+                          margin="small 0 0 0"
+                          data-testid="rubric-criteria-row-threshold"
+                        >
+                          <Text>
+                            {I18n.t('Threshold: %{threshold}', {
+                              threshold: possibleString(masteryPoints),
+                            })}
+                          </Text>
                         </View>
-                        {!hidePoints && (
-                          <View
-                            as="div"
-                            margin="small 0 0 0"
-                            data-testid="rubric-criteria-row-threshold"
-                          >
-                            <Text>
-                              {I18n.t('Threshold: %{threshold}', {
-                                threshold: possibleString(masteryPoints),
-                              })}
-                            </Text>
-                          </View>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <View as="div" data-testid="rubric-criteria-row-description">
-                          <Flex alignItems="center" gap="x-small">
-                            {isGenerated && (
-                              <span data-testid="rubric-criteria-row-ai-icon">
-                                <IconAiColoredSolid title={I18n.t('Ignite AI Generated')} />
-                              </span>
-                            )}
-                            <Text weight="bold">{description}</Text>
-                          </Flex>
-                        </View>
-                        <View as="div" data-testid="rubric-criteria-row-long-description">
-                          <Text
-                            /**
-                             * because the backend html sanitization adds <br/> whenever there is a newline,
-                             * but the inst-ui textarea only uses newlines (\n),
-                             * we get in this weird state where we can have both <br/> if you
-                             * load a rubric but only \n if you are creating a rubric and have not saved.
-                             * in order to cleanly solve this, we should remove all <br/>, then removing all \n
-                             * and replacing with <br />. this will make sure that we always display the proper
-                             * line breaks regardless of the longDescription having <br/> or \n
-                             */
-                            dangerouslySetInnerHTML={{
-                              __html: formatLongDescriptionHTML(longDescription ?? ''),
-                            }}
-                          />
-                        </View>
-                      </>
-                    )}
-                    {freeFormCriterionComments && (
-                      <View
-                        as="div"
-                        margin="small 0 0 0"
-                        data-testid="rubric-criteria-row-freeform-comment"
-                      >
-                        <Text>
-                          {I18n.t(
-                            'This area will be used by the assessor to leave comments related to this criterion.',
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <View as="div" data-testid="rubric-criteria-row-description">
+                        <Flex alignItems="center" gap="x-small">
+                          {isGenerated && (
+                            <span data-testid="rubric-criteria-row-ai-icon">
+                              <IconAiColoredSolid title={I18n.t('Ignite AI Generated')} />
+                            </span>
                           )}
-                        </Text>
+                          <Heading
+                            margin="xxx-small 0 0 0"
+                            level="h4"
+                            data-testid="rubric-criteria-row-description-heading"
+                          >
+                            {description}
+                          </Heading>
+                        </Flex>
                       </View>
-                    )}
-                  </td>
+                      <View as="div" data-testid="rubric-criteria-row-long-description">
+                        <Text
+                          /**
+                           * because the backend html sanitization adds <br/> whenever there is a newline,
+                           * but the inst-ui textarea only uses newlines (\n),
+                           * we get in this weird state where we can have both <br/> if you
+                           * load a rubric but only \n if you are creating a rubric and have not saved.
+                           * in order to cleanly solve this, we should remove all <br/>, then removing all \n
+                           * and replacing with <br />. this will make sure that we always display the proper
+                           * line breaks regardless of the longDescription having <br/> or \n
+                           */
+                          dangerouslySetInnerHTML={{
+                            __html: formatLongDescriptionHTML(longDescription ?? ''),
+                          }}
+                        />
+                      </View>
+                    </>
+                  )}
+                  {freeFormCriterionComments && (
+                    <View
+                      as="div"
+                      margin="small 0 0 0"
+                      data-testid="rubric-criteria-row-freeform-comment"
+                    >
+                      <Text>
+                        {I18n.t(
+                          'This area will be used by the assessor to leave comments related to this criterion.',
+                        )}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </Flex.Item>
 
-                  {/* Cell 4: Points + actions */}
-                  <td className="criterion-cell criterion-cell--actions">
-                    {!ignoreForScoring && !hidePoints && (
-                      <Pill
-                        color="info"
-                        disabled={true}
-                        themeOverride={{
-                          background: 'rgb(3, 116, 181)',
-                          infoColor: 'white',
-                        }}
-                      >
-                        <Text data-testid="rubric-criteria-row-points" size="x-small">
-                          {possibleString(points)}
-                        </Text>
-                      </Pill>
-                    )}
-                    <View as="span" margin={`0 0 0 ${isCompact ? 'x-small' : 'medium'}`}>
-                      <CriterionRowPopover
-                        ref={popoverRef}
-                        isFirstIndex={isFirstCriterion}
-                        isLastIndex={isLastCriterion}
-                        onMoveUp={handleMoveUp}
-                        onMoveDown={handleMoveDown}
-                        {...(isCompact && {
-                          isLearningOutcome: !!learningOutcomeId,
-                          isRegenerating,
-                          onEditCriterion,
-                          onDeleteCriterion,
-                          onDuplicateCriterion,
-                        })}
+              {/* Points + actions */}
+              <Flex.Item>
+                <View as="div" className="criterion-cell criterion-cell--actions">
+                  {!ignoreForScoring && !hidePoints && (
+                    <Pill
+                      color="info"
+                      disabled={true}
+                      themeOverride={{
+                        background: 'rgb(3, 116, 181)',
+                        infoColor: 'white',
+                      }}
+                    >
+                      <Text data-testid="rubric-criteria-row-points" size="x-small">
+                        {possibleString(points)}
+                      </Text>
+                    </Pill>
+                  )}
+                  <View as="span" margin={`0 0 0 ${isCompact ? 'x-small' : 'medium'}`}>
+                    <CriterionRowPopover
+                      ref={popoverRef}
+                      isFirstIndex={isFirstCriterion}
+                      isLastIndex={isLastCriterion}
+                      onMoveUp={handleMoveUp}
+                      onMoveDown={handleMoveDown}
+                      {...(isCompactRatings && {
+                        onRegenerate:
+                          showRegenerateButtonFreeForm || showRegenerateButtonRatings
+                            ? (additionalPrompt: string) =>
+                                onRegenerateCriterion(criterion, additionalPrompt)
+                            : undefined,
+                      })}
+                      {...(isCompact && {
+                        isLearningOutcome: !!learningOutcomeId,
+                        isRegenerating,
+                        onEditCriterion,
+                        onDeleteCriterion,
+                        onDuplicateCriterion,
+                      })}
+                    />
+                  </View>
+                  {!isCompact && (
+                    <>
+                      <View as="span" margin="0 0 0 medium">
+                        <EditCriterionButton
+                          isLearningOutcome={!!learningOutcomeId}
+                          disabled={isRegenerating}
+                          onClick={onEditCriterion}
+                        />
+                      </View>
+                      <View as="span" margin="0 0 0 medium">
+                        <DeleteCriterionButton
+                          disabled={isRegenerating}
+                          onClick={onDeleteCriterion}
+                        />
+                      </View>
+                      <View as="span" margin="0 0 0 medium">
+                        <DuplicateCriterionButton
+                          disabled={isRegenerating}
+                          onClick={onDuplicateCriterion}
+                        />
+                      </View>
+                    </>
+                  )}
+                  {showRegenerateButtonFreeForm && !isCompactRatings && (
+                    <View as="div" margin="x-small 0 0 0">
+                      <RegenerateCriteriaButton
+                        buttonColor="ai-secondary"
+                        disabled={isRegenerating}
+                        isCriterion={true}
+                        onRegenerate={(additionalPrompt: string) =>
+                          onRegenerateCriterion(criterion, additionalPrompt)
+                        }
                       />
                     </View>
-                    {!isCompact && (
-                      <>
+                  )}
+                </View>
+              </Flex.Item>
+            </Flex>
+
+            {/* Row 2: Rating scale (only when not free-form comments) */}
+            {!freeFormCriterionComments && !isCompactRatings && (
+              <Flex alignItems="start">
+                {!isCompact && (
+                  <Flex.Item>
+                    <View as="div" className="criterion-cell criterion-cell--drag" />
+                  </Flex.Item>
+                )}
+                <Flex.Item>
+                  <View as="div" minWidth="2rem" className="criterion-cell" />
+                </Flex.Item>
+                <Flex.Item shouldGrow shouldShrink>
+                  <View
+                    as="div"
+                    position="relative"
+                    className="criterion-cell criterion-cell--ratings"
+                  >
+                    <RatingScaleAccordion
+                      hidePoints={hidePoints}
+                      ratings={criterion.ratings}
+                      criterionUseRange={criterion.criterionUseRange}
+                      isGenerated={isGenerated}
+                      addExtraBottomSpacing={showCriteriaRegeneration}
+                    />
+                    {showRegenerateButtonRatings && (
+                      <div style={{position: 'absolute', right: 0, top: 0}}>
                         <View as="span" margin="0 0 0 medium">
-                          <EditCriterionButton
-                            isLearningOutcome={!!learningOutcomeId}
-                            disabled={isRegenerating}
-                            onClick={onEditCriterion}
-                          />
-                        </View>
-                        <View as="span" margin="0 0 0 medium">
-                          <DeleteCriterionButton
-                            disabled={isRegenerating}
-                            onClick={onDeleteCriterion}
-                          />
-                        </View>
-                        <View as="span" margin="0 0 0 medium">
-                          <DuplicateCriterionButton
-                            disabled={isRegenerating}
-                            onClick={onDuplicateCriterion}
-                          />
-                        </View>
-                      </>
-                    )}
-                    {freeFormCriterionComments &&
-                      showCriteriaRegeneration &&
-                      onRegenerateCriterion &&
-                      !learningOutcomeId && (
-                        <View as="div" margin="x-small 0 0 0">
-                          <RegenerateCriteria
+                          <RegenerateCriteriaButton
                             buttonColor="ai-secondary"
                             disabled={isRegenerating}
                             isCriterion={true}
+                            toolTipText={isRegenerating ? I18n.t('Criteria is regenerating') : ''}
                             onRegenerate={(additionalPrompt: string) =>
                               onRegenerateCriterion(criterion, additionalPrompt)
                             }
                           />
                         </View>
-                      )}
-                  </td>
-                </tr>
-
-                {/* Row 2: Rating scale (only when not free-form comments) */}
-                {!freeFormCriterionComments && !isCompactRatings && (
-                  <tr>
-                    {!isCompact && <td className="criterion-cell criterion-cell--drag" />}
-                    <td className="criterion-cell criterion-cell--index" />
-                    <td colSpan={2} className="criterion-cell criterion-cell--ratings">
-                      <View as="div" position="relative">
-                        <RatingScaleAccordion
-                          hidePoints={hidePoints}
-                          ratings={criterion.ratings}
-                          criterionUseRange={criterion.criterionUseRange}
-                          isGenerated={isGenerated}
-                          addExtraBottomSpacing={showCriteriaRegeneration}
-                        />
-                        {showCriteriaRegeneration &&
-                          !learningOutcomeId &&
-                          onRegenerateCriterion && (
-                            <div style={{position: 'absolute', right: 0, top: 0}}>
-                              <View as="span" margin="0 0 0 medium">
-                                <RegenerateCriteria
-                                  buttonColor="ai-secondary"
-                                  disabled={isRegenerating}
-                                  isCriterion={true}
-                                  toolTipText={
-                                    isRegenerating ? I18n.t('Criteria is regenerating') : ''
-                                  }
-                                  onRegenerate={(additionalPrompt: string) =>
-                                    onRegenerateCriterion(criterion, additionalPrompt)
-                                  }
-                                />
-                              </View>
-                            </div>
-                          )}
-                      </View>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    )}
+                  </View>
+                </Flex.Item>
+              </Flex>
+            )}
+          </section>
         )
       }}
     </Draggable>
