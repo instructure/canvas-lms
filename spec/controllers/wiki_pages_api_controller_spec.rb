@@ -433,6 +433,107 @@ describe WikiPagesApiController, type: :request do
         end
       end
     end
+
+    describe "Content Service error handling" do
+      let(:error_report_id) { 12_345 }
+
+      let(:service_errors) do
+        [
+          { "message" => "Invalid GraphQL request", "extensions" => { "code" => "GRAPHQL_VALIDATION_FAILED" } }
+        ]
+      end
+
+      let(:client_error) do
+        InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError.new(
+          "An error occurred while communicating with the Content Service.",
+          service_errors:
+        )
+      end
+
+      before do
+        allow(ErrorReport).to receive(:log_error).and_return(double(id: error_report_id))
+      end
+
+      context "POST #create with ContentServiceClient error" do
+        before do
+          allow(ContentServiceClient).to receive(:create_content).and_raise(client_error)
+        end
+
+        it "returns 503 with error details instead of 500" do
+          json = create_wiki_page(@teacher, { title: "New Page", block_editor_data: }, expected_status: 503)
+
+          expect(json["error"]).to eq("An error occurred while communicating with the Content Service.")
+          expect(json["error_report_id"]).to eq(error_report_id)
+        end
+
+        it "logs error report with service_errors" do
+          expect(ErrorReport).to receive(:log_error).with(
+            "content_service_client_error",
+            { message: "An error occurred while communicating with the Content Service.", service_errors: }
+          ).and_return(double(id: error_report_id))
+
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: }, expected_status: 503)
+        end
+      end
+
+      context "PUT #update with ContentServiceClient error" do
+        before :once do
+          wiki_page_model(title: "Update Error Page")
+          @wiki_page = @page
+          @wiki_page.create_external_content_reference!(content_id: "error-test-uuid")
+        end
+
+        before do
+          @wiki_page.reload
+          allow(ContentServiceClient).to receive(:update_content).and_raise(client_error)
+        end
+
+        it "returns 503 with error details instead of 500" do
+          json = update_wiki_page(@teacher, @wiki_page, { block_editor_data: }, expected_status: 503)
+
+          expect(json["error"]).to eq("An error occurred while communicating with the Content Service.")
+          expect(json["error_report_id"]).to eq(error_report_id)
+        end
+
+        it "logs error report with service_errors" do
+          expect(ErrorReport).to receive(:log_error).with(
+            "content_service_client_error",
+            { message: "An error occurred while communicating with the Content Service.", service_errors: }
+          ).and_return(double(id: error_report_id))
+
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: }, expected_status: 503)
+        end
+      end
+
+      context "GET #show with ContentServiceClient error" do
+        before :once do
+          wiki_page_model(title: "Show Error Page")
+          @wiki_page = @page
+          @wiki_page.create_external_content_reference!(content_id: "show-error-uuid")
+        end
+
+        before do
+          @wiki_page.reload
+          allow(ContentServiceClient).to receive(:get_content).and_raise(client_error)
+        end
+
+        it "returns 503 with error details instead of 500" do
+          json = get_wiki_page(@teacher, @wiki_page, expected_status: 503)
+
+          expect(json["error"]).to eq("An error occurred while communicating with the Content Service.")
+          expect(json["error_report_id"]).to eq(error_report_id)
+        end
+
+        it "logs error report with service_errors" do
+          expect(ErrorReport).to receive(:log_error).with(
+            "content_service_client_error",
+            { message: "An error occurred while communicating with the Content Service.", service_errors: }
+          ).and_return(double(id: error_report_id))
+
+          get_wiki_page(@teacher, @wiki_page, expected_status: 503)
+        end
+      end
+    end
   end
 
   describe "POST #ai_generate_alt_text" do
