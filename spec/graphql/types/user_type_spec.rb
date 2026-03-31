@@ -124,6 +124,20 @@ describe Types::UserType do
         expect(user_type_as_admin.resolve("loginId", current_user: @other_student)).to be_nil
       end
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      tester = GraphQLTypeTester.new(
+        @student,
+        current_user: admin,
+        domain_root_account: @course.account.root_account,
+        course: @course,
+        request: ActionDispatch::TestRequest.create
+      )
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: admin)).and_call_original
+      tester.resolve("loginId")
+    end
   end
 
   context "shortName" do

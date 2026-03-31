@@ -270,7 +270,8 @@ module Types
           type: :implicit,
           require_sis: false,
           root_account: context[:domain_root_account],
-          in_region: true
+          in_region: true,
+          current_user:
         )
         pseudonym&.unique_id
       end
