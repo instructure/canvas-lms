@@ -128,20 +128,20 @@ class ApplicationController < ActionController::Base
   end
 
   def flamegraph_requested_and_permitted?
-    return false unless @current_user
+    return false unless logged_in_user
 
     flamegraph_requested = value_to_boolean(params.fetch(:flamegraph, false))
-    flamegraph_requested && Account.site_admin.grants_right?(@current_user, :update)
+    flamegraph_requested && Account.site_admin.grants_right?(logged_in_user, :update)
   end
   private :flamegraph_requested_and_permitted?
 
   def enable_n_plus_one_detection?
-    if flamegraph_requested_and_permitted? || @current_user.blank?
+    if flamegraph_requested_and_permitted? || logged_in_user.blank?
       false
     elsif Rails.env.local?
       !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
     else
-      value_to_boolean(params.fetch(:n_plus_one_detection, false)) && Account.site_admin.grants_right?(@current_user, :update)
+      value_to_boolean(params.fetch(:n_plus_one_detection, false)) && Account.site_admin.grants_right?(logged_in_user, :update)
     end
   end
   private :enable_n_plus_one_detection?
@@ -156,7 +156,7 @@ class ApplicationController < ActionController::Base
       end
     else
       NPlusOneDetection::NPlusOneDetectionService.call(
-        user: @current_user,
+        user: logged_in_user, # if masquerading, save generated files to the masquerader's — not masqueradee's — canvas files
         source_name: "#{controller_name}##{action_name}",
         custom_name: params[:n_plus_one_name],
         &
@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
 
   def generate_flamegraph(&)
     Flamegraphs::FlamegraphService.call(
-      user: @current_user,
+      user: logged_in_user, # if masquerading, save generated files to the masquerader's — not masqueradee's — canvas files
       source_name: "#{controller_name}##{action_name}",
       custom_name: params[:flamename],
       &
