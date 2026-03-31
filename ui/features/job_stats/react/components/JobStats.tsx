@@ -25,7 +25,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import JobStatsTable from './JobStatsTable'
 import StuckModal from './StuckModal'
 
