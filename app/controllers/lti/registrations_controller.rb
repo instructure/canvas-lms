@@ -1144,6 +1144,7 @@ class Lti::RegistrationsController < ApplicationController
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
              LTI_DR_REGISTRATIONS_UPDATE: @account.root_account.feature_enabled?(:lti_dr_registrations_update),
+             LTI_EDIT_JSON: @account.root_account.feature_enabled?(:lti_edit_json),
              ACCOUNT_GLOBAL_ID: @account.global_id
            })
     render :index

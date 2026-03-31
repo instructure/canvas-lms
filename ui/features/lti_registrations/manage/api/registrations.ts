@@ -518,3 +518,48 @@ export const fetchLtiRegistrationHistory = async (
       }
     })
 }
+
+/**
+ * Update LTI registration configuration from JSON
+ * @param accountId The account id to update the registration in
+ * @param registrationId The id of the registration to update
+ * @param jsonConfig The JSON configuration string to parse and apply
+ * @returns A promise that resolves when the update completes
+ */
+export const updateLtiRegistrationJson = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  jsonConfig: string,
+): Promise<unknown> => {
+  const parsedConfig = JSON.parse(jsonConfig) // Validate JSON - will throw if invalid
+
+  return doFetchWithSchema(
+    {
+      method: 'PUT',
+      path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`,
+      body: {
+        configuration: parsedConfig,
+      },
+    },
+    z.unknown(),
+  )
+}
+
+export type UpdateRegistrationJsonParams = {
+  accountId: AccountId
+  registrationId: LtiRegistrationId
+  jsonConfig: string
+}
+
+/**
+ * React Query hook for updating LTI registration configuration from JSON
+ */
+export const useUpdateRegistrationJson = () => {
+  return useMutation({
+    mutationFn: ({accountId, registrationId, jsonConfig}: UpdateRegistrationJsonParams) =>
+      updateLtiRegistrationJson(accountId, registrationId, jsonConfig),
+    onSettled(_, __, {registrationId, accountId}) {
+      refreshRegistrationWithAllInfo(registrationId, accountId)
+    },
+  })
+}

@@ -55,6 +55,7 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
+import {ToolConfigurationJsonEditor} from './manage/pages/tool_details/configuration/ToolConfigurationJsonEditor'
 import {
   deleteContextControl,
   fetchControlsByDeployment,
@@ -140,6 +141,10 @@ const router = createBrowserRouter(
             {
               path: 'configuration/edit',
               element: <ToolConfigurationEdit />,
+            },
+            {
+              path: 'configuration/edit-json',
+              element: <ToolConfigurationJsonEditor />,
             },
             ...(isLtiRegistrationsUsageEnabled()
               ? [

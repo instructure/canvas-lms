@@ -25,6 +25,7 @@ import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
 import {i18nLtiPrivacyLevel} from '../../../../model/i18nLtiPrivacyLevel'
 import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
+import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {ToolConfigurationView} from '../ToolConfigurationView'
 import {mockConfiguration, renderApp} from './helpers'
 import {
@@ -921,5 +922,113 @@ describe('Tool Configuration Edit button, keyboard navigation', () => {
 
     // Button should navigate to the edit configuration page
     expect(mockNavigate).toHaveBeenCalledWith('/manage/1/configuration/edit')
+  })
+})
+
+describe('Tool Configuration Edit as JSON button', () => {
+  const mockNavigate = vi.fn()
+
+  beforeEach(() => {
+    mockNavigate.mockClear()
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
+    // Enable the feature flag for these tests
+    fakeENV.setup({
+      LTI_EDIT_JSON: true,
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  it('shows Edit as JSON button for manual registrations when feature flag is enabled', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        ims_registration_id: null,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editAsJsonButton = getByText('Edit as JSON')
+    expect(editAsJsonButton).toBeInTheDocument()
+  })
+
+  it('does not show Edit as JSON button when feature flag is disabled', () => {
+    fakeENV.setup({
+      LTI_EDIT_JSON: false,
+    })
+
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('Edit as JSON')).not.toBeInTheDocument()
+  })
+
+  it('does not show Edit as JSON button for dynamic registrations', () => {
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('Edit as JSON')).not.toBeInTheDocument()
+  })
+
+  it('does not show Edit as JSON button for inherited registrations', () => {
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        inherited: true,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('Edit as JSON')).not.toBeInTheDocument()
+  })
+
+  it('does not show Edit as JSON button for registrations with template_registration_id', () => {
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        template_registration_id: ZLtiRegistrationId.parse('999'),
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('Edit as JSON')).not.toBeInTheDocument()
+  })
+
+  it('navigates to edit-json page when Edit as JSON button is clicked', async () => {
+    const user = userEvent.setup()
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        ims_registration_id: null,
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    const editAsJsonButton = getByText('Edit as JSON').closest('button')!
+    await user.click(editAsJsonButton)
+
+    expect(mockNavigate).toHaveBeenCalledWith('/manage/1/configuration/edit-json')
   })
 })

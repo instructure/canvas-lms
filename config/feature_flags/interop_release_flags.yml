@@ -226,6 +226,17 @@ lti_dr_registrations_update:
       state: allowed_on
     ci:
       state: allowed_on
+lti_edit_json:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Config Edit as JSON
+  description: Allow administrators to edit LTI tool configuration as JSON
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_find_external_tool_prefer_original_client_id:
   state: hidden
   applies_to: RootAccount
