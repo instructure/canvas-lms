@@ -555,6 +555,10 @@
   path: '/api/v1/career/switch_experience'
 - verb: POST
   path: '/api/v1/career/switch_role'
+- verb: DELETE
+  path: '/api/v1/career/user_experiences'
+- verb: POST
+  path: '/api/v1/career/user_experiences'
 - verb: GET
   path: '/api/v1/collaborations/:id/members'
 - verb: GET
