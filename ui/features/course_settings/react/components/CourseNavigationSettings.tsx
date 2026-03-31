@@ -61,6 +61,7 @@ declare const ENV: EnvCommon & {
   COURSE_SETTINGS_NAVIGATION_TABS?: NavigationTab[]
   PERMISSIONS?: {
     manage_nav_menu_links?: boolean
+    manage_course_navigation?: boolean
   }
 }
 
@@ -89,6 +90,11 @@ export default function CourseNavigationSettings({
   const tabRefs = useRef<{[key: string]: HTMLDivElement | null}>({})
   const [isDragging, setIsDragging] = useState(false)
 
+  // When manage_course_navigation permission is absent, the nav tab is read-only:
+  // no drag-and-drop, no settings menus
+  // The 'Add Link' button is a separate permission
+  const canManageNavigation = ENV.PERMISSIONS?.manage_course_navigation === true
+
   useUpDownKeysChangeFocusHandler({enabledTabs, disabledTabs, isDragging, tabRefs})
 
   const handleSave = () => {
@@ -97,6 +103,7 @@ export default function CourseNavigationSettings({
   }
 
   const renderTab = (tab: NavigationTab, index: number, isEnabled: boolean) => {
+    const isEffectivelyImmovable = tab.immovable || !canManageNavigation
     const tabContent = (provided?: DraggableProvided, snapshot?: DraggableStateSnapshot) => (
       <div
         key={`tabdiv-${tab.internalId}`}
@@ -105,7 +112,7 @@ export default function CourseNavigationSettings({
           tabRefs.current[`tab-${tab.internalId}`] = el
         }}
         {...(provided?.draggableProps || {})}
-        {...(!tab.immovable && provided?.dragHandleProps ? provided.dragHandleProps : {})}
+        {...(!isEffectivelyImmovable && provided?.dragHandleProps ? provided.dragHandleProps : {})}
         tabIndex={0}
         role="button"
         className={classnames({
@@ -117,6 +124,7 @@ export default function CourseNavigationSettings({
         <NavItem
           tab={tab}
           isEnabled={isEnabled}
+          canManageNavigation={canManageNavigation}
           onToggleEnabled={toggleTabEnabled}
           onMove={setMoveTrayItemId}
           onDelete={deleteTab}
@@ -124,7 +132,7 @@ export default function CourseNavigationSettings({
       </div>
     )
 
-    return tab.immovable ? (
+    return isEffectivelyImmovable ? (
       tabContent()
     ) : (
       <Draggable key={`tab-${tab.internalId}`} draggableId={`tab-${tab.internalId}`} index={index}>
@@ -154,19 +162,21 @@ export default function CourseNavigationSettings({
           moveTab(result)
         }}
       >
-        <View as="div" padding="small 0 small 0">
-          <Text>
-            {ENV.K5_SUBJECT_COURSE
-              ? I18n.t(
-                  'help.edit_navigation_k5',
-                  'Drag and drop items to reorder them in the subject navigation.',
-                )
-              : I18n.t(
-                  'help.edit_navigation',
-                  'Drag and drop items to reorder them in the course navigation.',
-                )}
-          </Text>
-        </View>
+        {canManageNavigation && (
+          <View as="div" padding="small 0 small 0">
+            <Text>
+              {ENV.K5_SUBJECT_COURSE
+                ? I18n.t(
+                    'help.edit_navigation_k5',
+                    'Drag and drop items to reorder them in the subject navigation.',
+                  )
+                : I18n.t(
+                    'help.edit_navigation',
+                    'Drag and drop items to reorder them in the course navigation.',
+                  )}
+            </Text>
+          </View>
+        )}
 
         <ScreenReaderContent as="h3">{I18n.t('Enabled Links')}</ScreenReaderContent>
         <div>
@@ -184,19 +194,21 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
-        {ENV.FEATURES?.nav_menu_links && ENV.PERMISSIONS?.manage_nav_menu_links && (
-          <View as="div" padding="medium 0 0 0">
-            <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
-              {I18n.t('Add a Link')}
-            </Button>
-            {isAddLinkModalOpen && (
-              <AddLinkModal
-                onDismiss={() => setIsAddLinkModalOpen(false)}
-                onAdd={appendNewLinkItemTab}
-              />
-            )}
-          </View>
-        )}
+        {canManageNavigation &&
+          ENV.FEATURES?.nav_menu_links &&
+          ENV.PERMISSIONS?.manage_nav_menu_links && (
+            <View as="div" padding="medium 0 0 0">
+              <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
+                {I18n.t('Add a Link')}
+              </Button>
+              {isAddLinkModalOpen && (
+                <AddLinkModal
+                  onDismiss={() => setIsAddLinkModalOpen(false)}
+                  onAdd={appendNewLinkItemTab}
+                />
+              )}
+            </View>
+          )}
 
         <ScreenReaderContent as="h3">{I18n.t('Disabled Links')}</ScreenReaderContent>
         <div>
@@ -208,9 +220,11 @@ export default function CourseNavigationSettings({
                 className="course-nav-tabs-list"
               >
                 <View as="div" padding="medium 0 medium 0">
-                  <Text>
-                    {I18n.t('drag_to_hide', 'Drag items here to hide them from students.')}
-                  </Text>
+                  {canManageNavigation && (
+                    <Text>
+                      {I18n.t('drag_to_hide', 'Drag items here to hide them from students.')}
+                    </Text>
+                  )}
                   <View as="div">
                     <Text size="small">
                       {I18n.t(
@@ -227,24 +241,20 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
-        <View
-          as="div"
-          position="sticky"
-          insetBlockEnd="0"
-          background="secondary"
-          margin="large 0 0 0"
-        >
-          <View as="div" textAlign="end" padding="small">
-            <Button
-              type="button"
-              color="primary"
-              onClick={handleSave}
-              interaction={isSaving ? 'disabled' : 'enabled'}
-            >
-              {isSaving ? I18n.t('Saving...') : I18n.t('buttons.save', 'Save')}
-            </Button>
+        {canManageNavigation && (
+          <View as="div" position="sticky" insetBlockEnd="0" background="secondary">
+            <View as="div" textAlign="end" padding="small">
+              <Button
+                type="button"
+                color="primary"
+                onClick={handleSave}
+                interaction={isSaving ? 'disabled' : 'enabled'}
+              >
+                {isSaving ? I18n.t('Saving...') : I18n.t('buttons.save', 'Save')}
+              </Button>
+            </View>
           </View>
-        </View>
+        )}
       </DragDropContext>
     </>
   )
@@ -257,27 +267,30 @@ const NavItem = React.memo(
   ({
     tab,
     isEnabled,
+    canManageNavigation,
     onToggleEnabled,
     onMove,
     onDelete,
   }: {
     tab: NavigationTab
     isEnabled: boolean
+    canManageNavigation: boolean
     onToggleEnabled: (tabInternalId: string) => void
     onMove: (tabInternalId: string) => void
     onDelete: (tabInternalId: string) => void
   }) => {
     const linkUrl = ENV.FEATURES?.nav_menu_links && getLinkTabUrl(tab)
+    const showControls = !tab.immovable && canManageNavigation
 
     return (
       <View
         id={`nav_edit_tab_id_${tab.internalId}`}
         aria-label={tab.label}
-        cursor={tab.immovable ? 'default' : 'grab'}
+        cursor={showControls ? 'grab' : 'default'}
       >
         <Flex padding="xxx-small">
           <View as="div" padding="small" margin="0 medium 0 0" width="1.5rem" minWidth="1.5rem">
-            {tab.immovable ? <span>&nbsp;</span> : <IconDragHandleLine size="x-small" />}
+            {showControls ? <IconDragHandleLine size="x-small" /> : <span>&nbsp;</span>}
           </View>
           <View as="div" display="inline-block" padding="small 0" margin="0 auto 0 0">
             <Flex alignItems="center" gap="x-small" wrap="wrap" width="100%">
@@ -313,7 +326,7 @@ const NavItem = React.memo(
               </View>
             )}
           </View>
-          {!tab.immovable && (
+          {showControls && (
             <Menu
               trigger={
                 <IconButton

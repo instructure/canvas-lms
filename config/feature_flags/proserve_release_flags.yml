@@ -15,3 +15,31 @@ allow_limited_access_for_students:
   applies_to: RootAccount
   display_name: Allow Limited Access for Students
   description: Makes available an account setting to make certain Canvas features unavailable to students in that account.
+
+default_discussion_options:
+  state: hidden
+  applies_to: RootAccount
+  shadow: true
+  display_name: Default Discussion Options
+  description: |-
+    Allows administrators and teachers (permissions dependent) to set default options that will be applied to newly created discussions.
+    These default options can be set in Course > Discussions > Settings.
+    Also adds a few permissions for modifying discussion options as well as a permission for applying the default options.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed
+
+course_navigation_and_feature_options_permissions:
+  state: hidden
+  applies_to: RootAccount
+  shadow: true
+  display_name: Course Navigation and Feature Options Permissions
+  description: Adds a permission to allow users to manage the Navigation and the Feature Options tabs in the Course Settings page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed
+
