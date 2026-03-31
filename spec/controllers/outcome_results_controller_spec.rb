@@ -2143,6 +2143,53 @@ describe OutcomeResultsController do
           end
         end
 
+        context "with exclude: missing_user_rollups" do
+          it "excludes students with no results from rollups" do
+            get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id, exclude: ["missing_user_rollups"])
+            expect(response).to be_successful
+            json = parse_response(response)
+            expect(json["rollups"].length).to be(2)
+            expect_user_order(json["rollups"], [@student1, @student2])
+          end
+
+          it "pagination count reflects only students with results" do
+            get_rollups(sort_by: "contributing_score", sort_alignment_id: @alignment_id, exclude: ["missing_user_rollups"])
+            expect(response).to be_successful
+            json = parse_response(response)
+            expect(json["meta"]["pagination"]["count"]).to be(2)
+          end
+
+          context "with per_page: 1" do
+            def get_filtered_rollups_page(page)
+              get_rollups(
+                sort_by: "contributing_score",
+                sort_alignment_id: @alignment_id,
+                exclude: ["missing_user_rollups"],
+                per_page: 1,
+                page:
+              )
+            end
+
+            it "returns student with lowest score on page 1" do
+              get_filtered_rollups_page(1)
+              expect(response).to be_successful
+              expect_user_order(parse_response(response)["rollups"], [@student2])
+            end
+
+            it "returns student with higher score on page 2 (not empty)" do
+              get_filtered_rollups_page(2)
+              expect(response).to be_successful
+              expect_user_order(parse_response(response)["rollups"], [@student1])
+            end
+
+            it "returns empty page 3 because student3 is excluded from pagination" do
+              get_filtered_rollups_page(3)
+              expect(response).to be_successful
+              expect(parse_response(response)["rollups"].length).to be(0)
+            end
+          end
+        end
+
         context "with alignment that has no scores" do
           before do
             # Create a new outcome with a new alignment that has no scores
@@ -2156,8 +2203,7 @@ describe OutcomeResultsController do
             @alignment2_id = "A_#{@alignment2.id}"
           end
 
-          it "returns all students when sorting by alignment with no scores (descending)" do
-            # Before the fix, this would return 0 students when exclude[]=missing_user_rollups
+          it "excludes students with no results when sorting descending by an alignment with no scores" do
             get_rollups(
               sort_by: "contributing_score",
               sort_alignment_id: @alignment2_id,
@@ -2167,14 +2213,14 @@ describe OutcomeResultsController do
             )
             expect(response).to be_successful
             json = parse_response(response)
-            # All 3 students should be returned even though they have no scores for this alignment
-            # With no scores, they're sorted by name and reversed (desc)
-            expect(json["rollups"].length).to eq(3)
-            expect_user_order(json["rollups"], [@student3, @student2, @student1])
+            # @student3 has no results for any outcome, so they're excluded.
+            # @student1 and @student2 have results (for @outcome), so they're included.
+            # All scores for this alignment are nil; ties broken by sortable_name desc.
+            expect(json["rollups"].length).to be(2)
+            expect_user_order(json["rollups"], [@student2, @student1])
           end
 
-          it "returns all students when sorting by alignment with no scores (ascending)" do
-            # Before the fix, this would return 0 students when exclude[]=missing_user_rollups
+          it "excludes students with no results when sorting ascending by an alignment with no scores" do
             get_rollups(
               sort_by: "contributing_score",
               sort_alignment_id: @alignment2_id,
@@ -2184,9 +2230,11 @@ describe OutcomeResultsController do
             )
             expect(response).to be_successful
             json = parse_response(response)
-            # All 3 students should be returned even though they have no scores for this alignment
-            expect(json["rollups"].length).to eq(3)
-            expect_user_order(json["rollups"], [@student1, @student2, @student3])
+            # @student3 has no results for any outcome, so they're excluded.
+            # @student1 and @student2 have results (for @outcome), so they're included.
+            # All scores for this alignment are nil; ties broken by sortable_name asc.
+            expect(json["rollups"].length).to be(2)
+            expect_user_order(json["rollups"], [@student1, @student2])
           end
         end
       end
