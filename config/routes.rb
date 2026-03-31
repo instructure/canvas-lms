@@ -3027,6 +3027,11 @@ CanvasRails::Application.routes.draw do
       post "career/switch_experience", action: :switch_experience
       post "career/switch_role", action: :switch_role
     end
+
+    scope(controller: "canvas_career/user_experiences") do
+      post "career/user_experiences", action: :create
+      delete "career/user_experiences", action: :destroy
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
