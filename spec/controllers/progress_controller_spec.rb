@@ -44,6 +44,19 @@ describe ProgressController do
       get "show", params: { id: @progress.id }
       expect(response).to have_http_status(:unauthorized)
     end
+
+    context "when the progress context is a ContentExport with no user" do
+      let_once(:userless_progress) do
+        content_export = ContentExport.create!(context: @course, export_type: ContentExport::COMMON_CARTRIDGE)
+        Progress.create!(context: content_export, tag: "content_export")
+      end
+
+      it "does not redirect to login without a logged-in user" do
+        get "show", params: { id: userless_progress.id }, format: :json
+        # should get 401 from authorized_action, not 302 from require_user
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe "cancel" do
@@ -62,6 +75,19 @@ describe ProgressController do
 
       post "cancel", params: { id: @progress.id }
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    context "when the progress context is a ContentExport with no user" do
+      let_once(:userless_progress) do
+        content_export = ContentExport.create!(context: @course, export_type: ContentExport::COMMON_CARTRIDGE)
+        Progress.create!(context: content_export, tag: "content_export")
+      end
+
+      it "does not redirect to login without a logged-in user" do
+        post "cancel", params: { id: userless_progress.id }, format: :json
+        # should get 401 from authorized_action, not 302 from require_user
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 end
