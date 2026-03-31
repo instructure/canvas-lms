@@ -100,6 +100,8 @@
 class ProgressController < ApplicationController
   include Api::V1::Progress
 
+  skip_before_action :require_user, only: %i[show cancel]
+
   # @API Query progress
   # Return completion and status information about an asynchronous job
   #
