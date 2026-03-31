@@ -208,12 +208,12 @@ describe HorizonMode do
         controller.instance_variable_set(:@context, course)
       end
 
-      it "adds horizon parameters by checking course's horizon_course? method" do
+      it "does not add horizon params" do
         get :test_redirect, params: { url: "/dashboard" }
 
-        expect(response.location).to include("content_only=true")
-        expect(response.location).to include("instui_theme=career")
-        expect(response.location).to include("force_classic=true")
+        expect(response.location).not_to include("content_only=true")
+        expect(response.location).not_to include("instui_theme=career")
+        expect(response.location).not_to include("force_classic=true")
       end
 
       it "does not add horizon parameters to URLs containing /career/" do
@@ -309,7 +309,7 @@ describe HorizonMode do
         controller.instance_variable_set(:@context, course)
       end
 
-      it { is_expected.to be true }
+      it { is_expected.to be false }
     end
 
     context "when @context is a non-horizon course" do

@@ -56,8 +56,6 @@ class CareerController < ApplicationController
 
   def features_env
     %i[
-      horizon_role_dashboards
-      horizon_dashboard_ai_widgets
       horizon_hris_integrations
       horizon_user_profile_page
       horizon_manual_dashboard_builder
@@ -67,9 +65,6 @@ class CareerController < ApplicationController
       horizon_chart_view
       horizon_native_permissions_page
       horizon_block_content_editor
-      horizon_course_academic_switcher
-      horizon_syncable_objects_redesign
-      horizon_help_navigation
       horizon_native_inbox
       horizon_study_tools
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
