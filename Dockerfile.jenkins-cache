@@ -118,7 +118,6 @@ RUN --mount=target=/tmp/src \
         ui-build \
         eslint.config.js \
         eslint.config.vitest.js \
-        jest.config.js \
         vitest.config.ts \
         vitest.workspace.ts \
         package.json \
