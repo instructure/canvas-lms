@@ -1655,7 +1655,6 @@ describe WikiPage do
       course = Course.create!
       course.update!(horizon_course: true)
       course.account.enable_feature!(:horizon_course_setting)
-      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
       course
     end
     let(:regular_course) { Course.create! }
@@ -1710,12 +1709,6 @@ describe WikiPage do
 
       it "no relevant fields changed" do
         wiki_page.save!
-        expect(wiki_page.should_index_in_pine?).to be false
-      end
-
-      it "feature flag is not enabled" do
-        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
-        wiki_page.body = "Updated"
         expect(wiki_page.should_index_in_pine?).to be false
       end
     end
@@ -1832,7 +1825,6 @@ describe WikiPage do
       course = Course.create!
       course.update!(horizon_course: true)
       course.account.enable_feature!(:horizon_course_setting)
-      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
       course
     end
     let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }

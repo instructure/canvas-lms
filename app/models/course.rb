@@ -1715,8 +1715,6 @@ class Course < ApplicationRecord
   end
 
   def handle_horizon_activation
-    return unless root_account.feature_enabled?(:horizon_auto_content_ingestion)
-
     delay(n_strand: ["horizon_content_discovery", global_root_account_id], singleton: "horizon_content_discovery:#{global_id}").ingest_horizon_content
   end
 
@@ -4836,8 +4834,7 @@ class Course < ApplicationRecord
   end
 
   def horizon_back_to_units_enabled?
-    horizon_course? &&
-      root_account.feature_enabled?(:horizon_course_academic_switcher)
+    horizon_course?
   end
 
   def requirement_count_api_enabled?

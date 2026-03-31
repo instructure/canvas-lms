@@ -9666,7 +9666,6 @@ describe Course do
     let(:horizon_account) do
       account = Account.create!
       account.enable_feature!(:horizon_course_setting)
-      account.enable_feature!(:horizon_auto_content_ingestion)
       account.horizon_account = true
       account.save!
       account
@@ -9691,16 +9690,6 @@ describe Course do
           singleton: "horizon_content_discovery:#{course.global_id}"
         ).and_return(course)
         expect(course).to receive(:ingest_horizon_content)
-
-        course.account = horizon_account
-        course.save!
-      end
-
-      it "does not enqueue job when feature flag is disabled" do
-        horizon_account.disable_feature!(:horizon_auto_content_ingestion)
-        course = regular_account.courses.create!
-
-        expect(course).not_to receive(:ingest_horizon_content)
 
         course.account = horizon_account
         course.save!

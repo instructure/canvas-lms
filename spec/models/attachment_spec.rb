@@ -3619,7 +3619,6 @@ describe Attachment do
       course = Course.create!
       course.update!(horizon_course: true)
       course.account.enable_feature!(:horizon_course_setting)
-      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
       course
     end
     let(:regular_course) { Course.create! }
@@ -3680,11 +3679,6 @@ describe Attachment do
           file_state: "available"
         )
         expect(image_attachment.should_index_in_pine?).to be false
-      end
-
-      it "feature flag is not enabled" do
-        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
-        expect(pdf_attachment.should_index_in_pine?).to be false
       end
     end
   end
@@ -3791,7 +3785,6 @@ describe Attachment do
       course = Course.create!
       course.update!(horizon_course: true)
       course.account.enable_feature!(:horizon_course_setting)
-      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
       course
     end
     let(:pdf_attachment) do
