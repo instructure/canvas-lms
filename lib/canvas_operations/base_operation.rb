@@ -217,7 +217,12 @@ module CanvasOperations
     end
 
     def in_test_environment_migration?
-      Rails.env.test? && ActiveRecord::Base.in_migration
+      in_test = Rails.env.test?
+      in_migration = ActiveRecord::Base.in_migration
+      result = in_test && in_migration
+
+      log_message("in_test_environment_migration? => #{result} (Rails.env.test?=#{in_test}, ActiveRecord::Base.in_migration=#{in_migration})")
+      result
     end
 
     def report_message(title:, message:, alert_type: :success)
@@ -235,9 +240,16 @@ module CanvasOperations
     private
 
     def use_progress_tracking?
-      return false if in_test_environment_migration?
+      if in_test_environment_migration?
+        log_message("use_progress_tracking? => false (in test environment migration)", level: :debug)
+        return false
+      end
 
-      progress_tracking? && !context.nil?
+      tracking = progress_tracking?
+      has_context = !context.nil?
+      result = tracking && has_context
+      log_message("use_progress_tracking? => #{result} (progress_tracking?=#{tracking}, context_present=#{has_context})", level: :debug)
+      result
     end
 
     def settings_for(name, default:)

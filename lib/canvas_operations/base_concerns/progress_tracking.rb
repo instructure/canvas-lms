@@ -22,12 +22,13 @@ module CanvasOperations
     module ProgressTracking
       # Get the current progress tracking setting for this operation.
       #
-      # By default, progress tracking is enabled.
+      # By default, progress tracking is disabled.
       #
       # @return [Boolean] true if progress tracking is enabled, false otherwise
       def progress_tracking
-        # By default, progress tracking is enabled.
-        @progress_tracking.nil? || @progress_tracking
+        return @progress_tracking if instance_variable_defined?(:@progress_tracking)
+
+        superclass.respond_to?(:progress_tracking) ? superclass.progress_tracking : false
       end
 
       # Enable or disable progress tracking for this operation.
