@@ -21,6 +21,18 @@ export interface EnvWidgetDashboard {
     dashboard_view: string
     hide_dashcard_color_overlays: boolean
     custom_colors: Record<string, string>
+    widget_dashboard_config?: {
+      filters?: Record<string, Record<string, unknown>>
+      layout?: {
+        columns: number
+        widgets: Array<{
+          id: string
+          type: string
+          position: {col: number; row: number; relative: number}
+          title: string
+        }>
+      }
+    }
   }
   OBSERVED_USERS_LIST: Array<{id: string; name: string; avatar_url?: string | null}>
   CAN_ADD_OBSERVEE: boolean

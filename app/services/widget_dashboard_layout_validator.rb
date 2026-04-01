@@ -95,6 +95,32 @@ class WidgetDashboardLayoutValidator
     educator_content_quality
   ].freeze
 
+  def self.default_educator_layout
+    {
+      "columns" => 2,
+      "widgets" => [
+        {
+          "id" => "educator-announcement-creation-widget",
+          "type" => "educator_announcement_creation",
+          "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+          "title" => I18n.t("Announcement Creation")
+        },
+        {
+          "id" => "educator-todo-list-widget",
+          "type" => "educator_todo_list",
+          "position" => { "col" => 2, "row" => 1, "relative" => 2 },
+          "title" => I18n.t("Todo List")
+        },
+        {
+          "id" => "educator-content-quality-widget",
+          "type" => "educator_content_quality",
+          "position" => { "col" => 1, "row" => 2, "relative" => 3 },
+          "title" => I18n.t("Content Quality")
+        }
+      ]
+    }
+  end
+
   attr_reader :errors
 
   def initialize(layout)

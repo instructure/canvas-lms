@@ -415,6 +415,7 @@ class UsersController < ApplicationController
         css_bundle :educator_dashboard
         add_body_class "educator-dashboard"
         educator_config = @current_user.get_preference(:educator_dashboard_config) || {}
+        educator_config["layout"] ||= WidgetDashboardLayoutValidator.default_educator_layout
 
         js_env({
                  PREFERENCES: {
