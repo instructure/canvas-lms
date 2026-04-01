@@ -125,45 +125,45 @@ describe('AssignmentSubmission', () => {
       {
         _id: '1',
         description: 'Quality',
-        long_description: 'Quality of work',
+        longDescription: 'Quality of work',
         points: 4,
-        criterion_use_range: false,
+        criterionUseRange: false,
         ratings: [
           {
             _id: 'rating-1',
             description: 'Excellent',
-            long_description: '',
+            longDescription: '',
             points: 4,
           },
           {
             _id: 'rating-2',
             description: 'Good',
-            long_description: '',
+            longDescription: '',
             points: 3,
           },
           {
             _id: 'rating-3',
             description: 'Fair',
-            long_description: '',
+            longDescription: '',
             points: 2,
           },
         ],
-        ignore_for_scoring: false,
+        ignoreForScoring: false,
       },
     ],
-    free_form_criterion_comments: false,
-    hide_score_total: false,
-    points_possible: 4,
+    freeFormCriterionComments: false,
+    hideScoreTotal: false,
+    pointsPossible: 4,
     ratingOrder: 'descending',
-    button_display: 'numeric',
+    buttonDisplay: 'numeric',
     ...overrides,
   })
 
   const createRubricAssociation = (overrides = {}) => ({
     _id: '1',
-    hide_points: false,
-    hide_score_total: false,
-    use_for_grading: true,
+    hidePoints: false,
+    hideScoreTotal: false,
+    useForGrading: true,
     ...overrides,
   })
 

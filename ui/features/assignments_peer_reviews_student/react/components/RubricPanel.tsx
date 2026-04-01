@@ -74,19 +74,22 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
     return null
   }
 
+  const hidePoints = assignment.rubricAssociation?.hidePoints ?? false
+  const isFreeFormCriterionComments = assignment.rubric.freeFormCriterionComments ?? false
+
   const mappedCriteria = assignment.rubric.criteria.map((criterion: RubricCriterion) => ({
     id: criterion._id,
     description: criterion.description,
-    longDescription: criterion.long_description ?? '',
+    longDescription: criterion.longDescription ?? '',
     points: criterion.points,
-    criterionUseRange: criterion.criterion_use_range ?? false,
-    learningOutcomeId: criterion.learning_outcome_id ?? undefined,
-    ignoreForScoring: criterion.ignore_for_scoring ?? false,
-    masteryPoints: criterion.mastery_points ?? undefined,
+    criterionUseRange: criterion.criterionUseRange ?? false,
+    learningOutcomeId: criterion.learningOutcomeId ?? undefined,
+    ignoreForScoring: criterion.ignoreForScoring ?? false,
+    masteryPoints: criterion.masteryPoints ?? undefined,
     ratings: criterion.ratings.map((rating: RubricRating) => ({
       id: rating._id,
       description: rating.description,
-      longDescription: rating.long_description ?? '',
+      longDescription: rating.longDescription ?? '',
       points: rating.points,
       criterionId: criterion._id,
     })),
@@ -97,16 +100,16 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
       <RubricAssessmentTray
         isOpen={true}
         currentUserId={ENV.current_user_id?.toString() ?? ''}
-        hidePoints={assignment.rubricAssociation?.hide_points ?? false}
+        hidePoints={hidePoints}
         isPreviewMode={isPeerReviewCompleted || rubricAssessmentCompleted || isReadOnly}
         isPeerReview={true}
         rubric={{
           title: assignment.rubric.title,
           criteria: mappedCriteria,
           ratingOrder: assignment.rubric.ratingOrder ?? 'descending',
-          freeFormCriterionComments: assignment.rubric.free_form_criterion_comments ?? false,
-          pointsPossible: assignment.rubric.points_possible,
-          buttonDisplay: assignment.rubric.button_display ?? 'level',
+          freeFormCriterionComments: isFreeFormCriterionComments,
+          pointsPossible: assignment.rubric.pointsPossible,
+          buttonDisplay: assignment.rubric.buttonDisplay ?? 'level',
         }}
         rubricAssessmentData={rubricAssessmentData}
         viewModeOverride={rubricViewMode}
@@ -126,7 +129,7 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
       overflowY="auto"
       id="rubric-panel"
     >
-      <Flex as="div" direction="column" justifyItems="space-between" height="100%">
+      <Flex as="div" direction="column">
         <Flex.Item>
           <Flex as="div" direction="row" justifyItems="space-between">
             <Flex.Item>
@@ -150,16 +153,16 @@ export const RubricPanel: React.FC<RubricPanelProps> = ({
         <Flex.Item>
           <RubricAssessmentContainerWrapper
             isStandaloneContainer={true}
-            buttonDisplay={assignment.rubric.button_display ?? 'level'}
+            buttonDisplay={assignment.rubric.buttonDisplay ?? 'level'}
             criteria={mappedCriteria}
             currentUserId={ENV.current_user_id?.toString() ?? ''}
-            hidePoints={assignment.rubricAssociation?.hide_points ?? false}
+            hidePoints={hidePoints}
             isPreviewMode={isPeerReviewCompleted || rubricAssessmentCompleted || isReadOnly}
             isPeerReview={true}
-            isFreeFormCriterionComments={assignment.rubric.free_form_criterion_comments ?? false}
+            isFreeFormCriterionComments={isFreeFormCriterionComments}
             ratingOrder={assignment.rubric.ratingOrder ?? 'descending'}
             rubricTitle={assignment.rubric.title}
-            pointsPossible={assignment.rubric.points_possible}
+            pointsPossible={assignment.rubric.pointsPossible}
             rubricAssessmentData={rubricAssessmentData}
             viewModeOverride={rubricViewMode}
             onDismiss={onClose}
