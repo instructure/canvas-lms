@@ -65,6 +65,7 @@ class UserPreferenceValue < ApplicationRecord
   add_user_preference :learning_mastery_gradebook_settings, use_sub_keys: true
   add_user_preference :learner_dashboard_tab_selection
   add_user_preference :widget_dashboard_config
+  add_user_preference :educator_dashboard_config
 
   def self.settings
     @preference_settings ||= {}

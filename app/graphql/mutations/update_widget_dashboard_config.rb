@@ -19,6 +19,7 @@
 #
 
 class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
+  argument :dashboard_type, Types::WidgetDashboardTypeEnum, required: false
   argument :filters, GraphQL::Types::JSON, required: false
   argument :widget_id, String, required: true
 
@@ -31,14 +32,15 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
 
     validate_filters!(widget_id, filters) if filters
 
-    config = current_user.get_preference(:widget_dashboard_config) || {}
+    pref_key = educator_dashboard?(input) ? :educator_dashboard_config : :widget_dashboard_config
+    config = current_user.get_preference(pref_key) || {}
 
     if filters
       config["filters"] ||= {}
       config["filters"][widget_id] = filters.is_a?(ActionController::Parameters) ? filters.to_unsafe_h : filters
     end
 
-    current_user.set_preference(:widget_dashboard_config, config)
+    current_user.set_preference(pref_key, config)
 
     { widget_id:, filters: }
   end
@@ -56,6 +58,15 @@ class Mutations::UpdateWidgetDashboardConfig < Mutations::BaseMutation
   VALID_DATE_FILTERS = %w[not_submitted missing submitted].freeze
 
   private
+
+  # TODO: Remove this entire helper method once platform-ui passes dashboard_type (EGG-2539)
+  # The resolver should directly use input[:dashboard_type] after that.
+  def educator_dashboard?(input)
+    return input[:dashboard_type] == "educator" if input[:dashboard_type].present?
+
+    context[:domain_root_account]&.feature_enabled?(:educator_dashboard) &&
+      current_user.educator_dashboard_user?
+  end
 
   def validate_filters!(widget_id, filters)
     # Accept Hash or ActionController::Parameters (which GraphQL JSON type may produce)

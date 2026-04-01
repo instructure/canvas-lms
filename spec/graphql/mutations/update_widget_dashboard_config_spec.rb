@@ -260,6 +260,70 @@ RSpec.describe Mutations::UpdateWidgetDashboardConfig do
     end
   end
 
+  context "dashboard_type argument routing" do
+    before(:once) do
+      @user = user_factory(active_all: true)
+      student_in_course(course: @course, user: @user, active_all: true)
+      teacher_in_course(course: @course, user: @user, active_all: true)
+    end
+
+    def mutation_str_with_type
+      <<~GQL
+        mutation UpdateWidgetDashboardConfig($widgetId: String!, $filters: JSON!, $dashboardType: WidgetDashboardType) {
+          updateWidgetDashboardConfig(input: {
+            widgetId: $widgetId
+            filters: $filters
+            dashboardType: $dashboardType
+          }) {
+            widgetId
+            filters
+            errors {
+              message
+            }
+          }
+        }
+      GQL
+    end
+
+    def run_mutation_with_type(opts = {})
+      CanvasSchema.execute(
+        mutation_str_with_type,
+        variables: opts,
+        context: {
+          current_user: @user,
+          request: ActionDispatch::TestRequest.create
+        }
+      ).to_h.with_indifferent_access
+    end
+
+    it "writes to :educator_dashboard_config when dashboardType is educator" do
+      filters = { "filter" => "all" }
+      run_mutation_with_type(widgetId: "announcements-widget", filters:, dashboardType: "educator")
+
+      @user.reload
+      expect(@user.get_preference(:educator_dashboard_config).dig("filters", "announcements-widget")).to eq(filters)
+      expect(@user.get_preference(:widget_dashboard_config)).to be_nil
+    end
+
+    it "writes to :widget_dashboard_config when dashboardType is student" do
+      filters = { "filter" => "unread" }
+      run_mutation_with_type(widgetId: "announcements-widget", filters:, dashboardType: "student")
+
+      @user.reload
+      expect(@user.get_preference(:widget_dashboard_config).dig("filters", "announcements-widget")).to eq(filters)
+      expect(@user.get_preference(:educator_dashboard_config)).to be_nil
+    end
+
+    it "writes to :widget_dashboard_config when dashboardType is omitted" do
+      filters = { "filter" => "read" }
+      run_mutation({ widgetId: "announcements-widget", filters: }, @user)
+
+      @user.reload
+      expect(@user.get_preference(:widget_dashboard_config).dig("filters", "announcements-widget")).to eq(filters)
+      expect(@user.get_preference(:educator_dashboard_config)).to be_nil
+    end
+  end
+
   context "unknown widget types" do
     it "accepts generic JSON structures for unknown widgets" do
       filters = {
