@@ -21,7 +21,6 @@
 const esModules = ['text-field-edit', '@instructure\\/ui-icons', 'msw'].join('|')
 
 module.exports = {
-  resolver: '<rootDir>/jest-instui-resolver.js',
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   reporters: [
     'default',
