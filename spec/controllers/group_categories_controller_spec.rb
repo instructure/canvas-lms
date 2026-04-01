@@ -1348,6 +1348,17 @@ describe GroupCategoriesController do
       group_names = csv_data.filter_map { |row| row["group_name"] }
       expect(group_names).to include("Test Group")
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for when building CSV rows" do
+      allow(SisPseudonym).to receive(:for).and_call_original
+      expect(SisPseudonym).to receive(:for)
+        .with(anything, anything, hash_including(current_user: @teacher))
+        .at_least(:once)
+        .and_call_original
+      get :export, params: { course_id: @course.id, group_category_id: @collaborative_category.id }, format: :csv
+    end
   end
 
   describe "GET export_tags" do

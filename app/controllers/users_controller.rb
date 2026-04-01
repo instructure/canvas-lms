@@ -1470,7 +1470,8 @@ class UsersController < ApplicationController
             @domain_root_account,
             type: :implicit,
             require_sis: false,
-            include_all_pseudonyms: true
+            include_all_pseudonyms: true,
+            current_user: @current_user
           )
         @user.last_login = pseudonyms&.filter_map(&:current_login_at)&.max
       end

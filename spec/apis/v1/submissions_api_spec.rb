@@ -2102,6 +2102,28 @@ describe "Submissions API", type: :request do
     expect(json.first["integration_id"]).to eq "xyz"
   end
 
+  # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+  # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+  it "passes current_user to SisPseudonym.for when fetching student submissions" do
+    student = user_with_pseudonym(active_all: true)
+    course_with_teacher(active_all: true)
+    @course.enroll_student(student).accept!
+    allow(SisPseudonym).to receive(:for).and_call_original
+    expect(SisPseudonym).to receive(:for)
+      .with(student, anything, hash_including(current_user: @teacher))
+      .and_call_original
+    api_call_as_user(
+      @teacher,
+      :get,
+      "/api/v1/courses/#{@course.id}/students/submissions.json",
+      { controller: "submissions_api",
+        action: "for_students",
+        format: "json",
+        course_id: @course.to_param },
+      { student_ids: [student.to_param], grouped: "true" }
+    )
+  end
+
   context "with plagiarism data" do
     before :once do
       @student = user_factory(active_all: true)

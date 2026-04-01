@@ -1350,6 +1350,16 @@ describe "Users API", type: :request do
         expect(json.fetch("last_login")).to eq @p.current_login_at.iso8601
       end
 
+      # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+      # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+      it "passes current_user to SisPseudonym.for when including last_login" do
+        allow(SisPseudonym).to receive(:for).and_call_original
+        expect(SisPseudonym).to receive(:for)
+          .with(@u, anything, hash_including(current_user: @user))
+          .and_call_original
+        api_call(:get, "/api/v1/users/#{@u.id}", { controller: "users", action: "api_show", format: "json", id: @u.id }, { include: ["last_login"] })
+      end
+
       it "sorts too" do
         json = api_call(:get,
                         "/api/v1/accounts/#{@account.id}/users",

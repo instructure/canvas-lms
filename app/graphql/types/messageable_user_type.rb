@@ -58,7 +58,8 @@ module Types
                                      type: :implicit,
                                      require_sis: false,
                                      root_account: domain_root_account,
-                                     in_region: true)
+                                     in_region: true,
+                                     current_user: context[:current_user])
         pseudonym&.sis_user_id
       end
     end

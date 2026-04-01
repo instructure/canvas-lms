@@ -137,6 +137,17 @@ describe Types::MessageableUserType do
         expect(result).to include(nil)
       end
 
+      # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+      # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+      it "passes current_user to SisPseudonym.for" do
+        expect(SisPseudonym).to receive(:for)
+          .with(having_attributes(id: @student.id), anything, hash_including(current_user: @teacher))
+          .and_call_original
+        teacher_tester.resolve(
+          "recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { sisId } } }"
+        )
+      end
+
       it "uses course context for permission check" do
         course_tester = GraphQLTypeTester.new(
           @teacher,
