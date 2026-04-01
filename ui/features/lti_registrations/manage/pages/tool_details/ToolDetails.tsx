@@ -395,14 +395,14 @@ export const ToolDetailsInner = ({
               <Pill>v1.3</Pill>
               {window.ENV.FEATURES?.lock_lti_registrations &&
                 (registration.lock_deploying ? (
-                  <Pill color="success">
+                  <Pill color="info">
                     <Flex direction="row" gap="xx-small">
                       <IconLockLine />
                       {I18n.t('App is locked')}
                     </Flex>
                   </Pill>
                 ) : (
-                  <Pill color="danger">
+                  <Pill color="info">
                     <Flex direction="row" gap="xx-small">
                       <IconUnlockLine />
                       {I18n.t('App is unlocked')}
