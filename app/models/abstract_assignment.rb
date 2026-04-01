@@ -4353,6 +4353,7 @@ class AbstractAssignment < ApplicationRecord
         submission.grade_posting_in_progress = true
         submission.broadcast_notifications
         submission.grade_posting_in_progress = false
+        submission.create_alert_on_post if submission.graded?
       end
     end
 
