@@ -838,4 +838,51 @@ class WikiPage < ApplicationRecord
     # TODO: RCX-4463 remove title and workflow_state
     %i[title body workflow_state]
   end
+
+  def create_block_editor_data(user_uuid:, data:)
+    response = Canvas.retriable(tries: content_service_max_retries) do
+      ContentServiceClient.create_content(
+        root_account_uuid: context.root_account.uuid,
+        user_uuid:,
+        context_type: "WikiPage",
+        context_id: id,
+        data:
+      )
+    end
+    create_external_content_reference(content_id: response.external_content_id)
+  end
+
+  def update_block_editor_data(user_uuid:, data:)
+    ref = external_content_reference
+    return unless ref
+
+    Canvas.retriable(tries: content_service_max_retries) do
+      ContentServiceClient.update_content(
+        root_account_uuid: context.root_account.uuid,
+        user_uuid:,
+        external_content_id: ref.content_id,
+        data:
+      )
+    end
+  end
+
+  def get_block_editor_data(user_uuid:)
+    ref = external_content_reference
+    return unless ref
+
+    content = Canvas.retriable(tries: content_service_max_retries) do
+      ContentServiceClient.get_content(
+        root_account_uuid: context.root_account.uuid,
+        user_uuid:,
+        external_content_id: ref.content_id
+      )
+    end
+    content.data
+  end
+
+  private
+
+  def content_service_max_retries
+    Setting.get("content_service_client_max_retries", "3").to_i
+  end
 end
