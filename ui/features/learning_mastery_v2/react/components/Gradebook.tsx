@@ -18,11 +18,8 @@
 import React, {useEffect, useState, useCallback} from 'react'
 import {DragDropContext} from 'react-dnd'
 import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
-import {
-  GradebookSettings,
-  DEFAULT_GRADEBOOK_SETTINGS,
-  NameDisplayFormat,
-} from '@canvas/outcomes/react/utils/constants'
+import {GradebookSettings, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
+import {NameDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {
   Student,
   Outcome,

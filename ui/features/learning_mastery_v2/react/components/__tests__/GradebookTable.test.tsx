@@ -21,15 +21,14 @@ import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
 import {GradebookTable} from '../GradebookTable'
-import {
-  SortOrder,
-  SortBy,
-  ScoreDisplayFormat,
-  NameDisplayFormat,
-  DEFAULT_GRADEBOOK_SETTINGS,
-} from '@canvas/outcomes/react/utils/constants'
+import {SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_STUDENTS, MOCK_OUTCOMES, MOCK_ROLLUPS} from '../../__fixtures__/rollups'
 import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {
+  NameDisplayFormat,
+  SortOrder,
+  ScoreDisplayFormat,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 vi.mock('../grid/StudentCellPopover', () => ({
   StudentCellPopover: ({

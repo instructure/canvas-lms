@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
 import {Outcome, Rating} from '@canvas/outcomes/react/types/rollup'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 describe('StudentOutcomeScore', () => {
   interface TestProps {

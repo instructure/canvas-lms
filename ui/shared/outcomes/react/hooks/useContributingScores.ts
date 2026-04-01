@@ -19,7 +19,8 @@
 import {useState, useCallback, useMemo} from 'react'
 import {useQueries} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {GradebookSettings, DisplayFilter} from '@canvas/outcomes/react/utils/constants'
+import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
+import {DisplayFilter} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 export interface ContributingScoreAlignment {
   alignment_id: string

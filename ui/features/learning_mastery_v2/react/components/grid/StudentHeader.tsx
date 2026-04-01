@@ -21,12 +21,8 @@ import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {
-  SortOrder,
-  SortBy,
-  NameDisplayFormat,
-  STUDENT_COLUMN_WIDTH,
-} from '@canvas/outcomes/react/utils/constants'
+import {SortBy, STUDENT_COLUMN_WIDTH} from '@canvas/outcomes/react/utils/constants'
+import {SortOrder, NameDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {ColumnHeader} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ColumnHeader'
 

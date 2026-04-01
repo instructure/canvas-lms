@@ -32,11 +32,11 @@ import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {SearchWrapper} from './components/filters/SearchWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
+import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
 import {
   DisplayFilter,
-  GradebookSettings,
   NameDisplayFormat,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
