@@ -165,7 +165,6 @@ module SpeedGrader
         { versions: :versionable },
         :quiz_submission,
         :user,
-        :attachment_associations,
         :assignment,
         { originality_reports: :lti_link }
       ]

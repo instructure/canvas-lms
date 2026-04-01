@@ -550,9 +550,14 @@ module Lti
         end
 
         it "verifies the report is in the same context as the assignment" do
-          @submission.attachments = []
-          @submission.save!
-          put @endpoints[:update_alt], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
+          new_assignment = @course.assignments.create!(
+            title: "some new assignment",
+            assignment_group: @group,
+            points_possible: 12,
+            tool_settings_tool: @tool
+          )
+          endpoint = "/api/lti/assignments/#{new_assignment.id}/files/#{@attachment.id}/originality_report"
+          put endpoint, params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
           expect(response).to have_http_status :not_found
         end
 

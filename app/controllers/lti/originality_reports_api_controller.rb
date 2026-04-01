@@ -390,7 +390,7 @@ module Lti
     end
 
     def find_originality_report
-      raise ActiveRecord::RecordNotFound if submission.blank?
+      raise ActiveRecord::RecordNotFound if submission.blank? || submission.assignment != assignment
 
       @report = OriginalityReport.find_by(id: params[:id])
       # NOTE: we could end up looking up by file_id, attachment: nil or attempt
@@ -429,6 +429,9 @@ module Lti
     end
 
     def attachment_in_history?(attachment, submission)
+      # TODO: after GROW-239, change this to:
+      #
+      # submission.attachment_associations.where(attachment:).exists?
       submission.submission_history.any? do |s|
         s.attachment_ids.include?(attachment.id.to_s) ||
           s.attachment_ids.include?(attachment.global_id.to_s)

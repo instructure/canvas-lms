@@ -3639,10 +3639,23 @@ describe Submission do
 
       before { student_in_course(active_all: true) }
 
-      it "includes attachment ids from 'attachment_id'" do
+      it "includes attachment ids from 'attachment_id' by default" do
         submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
         submission.update!(attachment_id: single_attachment)
         expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
+      end
+
+      it "optionally excludes attachment ids from 'attachment_id'" do
+        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
+        submission.update!(attachment_id: single_attachment)
+        ids = submission.attachment_ids_for_version(include_attachment_id: false)
+        expect(ids).to match_array attachments.map(&:id)
+      end
+
+      it "returns unique attachment ids" do
+        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
+        submission.update!(attachment_id: attachments.first.id)
+        expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id)
       end
     end
 
@@ -5984,7 +5997,7 @@ describe Submission do
       expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
     end
 
-    it "keeps attachment associations when new submissions are submitted" do
+    it "keeps attachment associations from previous text entry attempts when new text entry submissions are submitted" do
       @course.enroll_student(@user, enrollment_state: :active)
       attachment_model(filename: "blah.txt", user: @user, context: @user)
       body = "<a href=/users/#{@user.id}/files/#{@attachment.id}>blah.txt</a>"
@@ -6003,6 +6016,43 @@ describe Submission do
 
       @assignment.submit_homework(@user, submission_type: "online_text_entry", body: "meh", updating_user: @user)
       expect(sub.reload.attachment_associations).to eq([aa])
+    end
+
+    it "keeps attachment associations from previous file upload attempts when new file uploads are submitted" do
+      @assignment.update!(submission_types: "online_upload")
+      @course.enroll_student(@user, enrollment_state: :active)
+
+      attachment1 = Attachment.create!(
+        uploaded_data: StringIO.new("attempt 1 file 1"),
+        context: @user,
+        filename: "attempt1_file1.txt"
+      )
+      attachment2 = Attachment.create!(
+        uploaded_data: StringIO.new("attempt 1 file 2"),
+        context: @user,
+        filename: "attempt1_file2.txt"
+      )
+      attachment3 = Attachment.create!(
+        uploaded_data: StringIO.new("attempt 2 file 1"),
+        context: @user,
+        filename: "attempt2_file1.txt"
+      )
+
+      Timecop.freeze(30.minutes.ago) do
+        @assignment.submit_homework(@user, attachments: [attachment1, attachment2]) # first attempt
+      end
+
+      Timecop.freeze(15.minutes.ago) do
+        @assignment.submit_homework(@user, attachments: [attachment3]) # second attempt
+      end
+
+      sub = @assignment.submissions.find_by(user: @user)
+      history_attempt_1 = sub.submission_history.find { it.attempt == 1 }
+      history_attempt_2 = sub.submission_history.find { it.attempt == 2 }
+      expect(sub.attachment_associations.pluck(:attachment_id)).to match_array [attachment1.id, attachment2.id, attachment3.id]
+      expect(sub.attachments).to match_array [attachment3]
+      expect(history_attempt_1.attachments).to match_array [attachment1, attachment2]
+      expect(history_attempt_2.attachments).to match_array [attachment3]
     end
   end
 
@@ -9797,6 +9847,76 @@ describe Submission do
 
       submissions = Submission.for_assignment(@assignment)
       expect(submissions).to match_array(first_assignment.submissions)
+    end
+  end
+
+  describe "referencing attachment scopes" do
+    before do
+      @assignment.update!(submission_types: "online_upload")
+      @course.enroll_student(@user, enrollment_state: :active)
+      Timecop.freeze(30.minutes.ago) do
+        @assignment.submit_homework(@user, attachments: [first_attempt_attachment])
+      end
+    end
+
+    let(:first_attempt_attachment) do
+      Attachment.create!(
+        uploaded_data: StringIO.new("attempt 1"),
+        context: @user,
+        filename: "attempt1.txt"
+      )
+    end
+
+    let(:second_attempt_attachment) do
+      Attachment.create!(
+        uploaded_data: StringIO.new("attempt 2"),
+        context: @user,
+        filename: "attempt2.txt"
+      )
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user: @user) }
+
+    describe "scope: referencing_attachment" do
+      it "finds submissions that include the attachment in their most recent attempt" do
+        expect(Submission.referencing_attachment(first_attempt_attachment.id)).to include(submission)
+      end
+
+      it "does not find submissions that only reference the attachment in past attempts" do
+        @assignment.submit_homework(@user, attachments: [second_attempt_attachment])
+
+        expect(Submission.referencing_attachment(first_attempt_attachment.id)).not_to include(submission)
+      end
+
+      it "returns submissions referencing an attachment even if an AttachmentAssociation record is not in place" do
+        submission.attachment_associations.delete_all
+        expect(Submission.referencing_attachment(first_attempt_attachment.id)).to include(submission)
+      end
+
+      it "can be passed an attachment object instead of an attachment id" do
+        expect(Submission.referencing_attachment(first_attempt_attachment)).to include(submission)
+      end
+    end
+
+    describe "scope: referencing_linked_attachment" do
+      it "finds submissions that include the attachment in their most recent attempt" do
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment.id)).to include(submission)
+      end
+
+      it "does not find submissions that only reference the attachment in past attempts" do
+        @assignment.submit_homework(@user, attachments: [second_attempt_attachment])
+
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment.id)).not_to include(submission)
+      end
+
+      it "does not return submissions that reference an attachment but do not have an AttachmentAssociation record in place" do
+        submission.attachment_associations.delete_all
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment.id)).not_to include(submission)
+      end
+
+      it "can be passed an attachment object instead of an attachment id" do
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment)).to include(submission)
+      end
     end
   end
 
