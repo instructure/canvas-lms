@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 export function submitHtmlForm(path: string, method: string, md5?: string): void {
   // Create and submit an actual HTML form to ensure proper redirect handling

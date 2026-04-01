@@ -18,12 +18,12 @@
 
 import {describe, it, expect, vi, beforeEach} from 'vitest'
 import {executeQuery, getGraphqlDefaults} from '../index'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {request} from 'graphql-request'
 import {gql} from '@apollo/client'
 
 // Mock dependencies
-vi.mock('@instructure/get-cookie')
+vi.mock('@instructure/platform-get-cookie')
 vi.mock('graphql-request', () => ({
   request: vi.fn(),
 }))

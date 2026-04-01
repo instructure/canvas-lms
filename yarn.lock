@@ -2889,6 +2889,11 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-error-boundary/-/platform-error-boundary-0.2.0.tgz#85b5410242dce59bef779b7a26e5daba47f9bea2"
   integrity sha512-Te/TvjWmWzWp+igX0nHpbfHBjighpHmQqsrbtO+3haEFqlXVR9fN5XCwJlN+N7KpfR+0YuSFYyZlCDYk1H1jng==
 
+"@instructure/platform-get-cookie@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-get-cookie/-/platform-get-cookie-0.2.0.tgz#db5c7d9f8381e3e2a058715e2733ecf4da08cfcf"
+  integrity sha512-fxAonhI/Z1xxBLMIJfqc0e56BhEpDE8OaCgXPzZ4EHRXLbMW/KUozE3lRlnWGKL6XgUxpDgfbRgnH7VOT2+KEw==
+
 "@instructure/platform-graphql-types@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@instructure/platform-graphql-types/-/platform-graphql-types-0.1.1.tgz#10901642cb06e6e52c1a03abbabe79c330b22ccb"

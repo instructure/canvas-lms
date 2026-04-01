@@ -26,7 +26,7 @@ import {CaptionMetaData, StudioPlayer, type StudioPlayerProps} from '@instructur
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {type MediaSource} from 'api'
@@ -280,7 +280,7 @@ export default function CanvasStudioPlayer({
       await fetch(caption.src, {
         method: 'DELETE',
         headers: {
-          'X-CSRF-Token': getCookie('_csrf_token'),
+          'X-CSRF-Token': getCookie('_csrf_token') ?? '',
         },
       })
     }

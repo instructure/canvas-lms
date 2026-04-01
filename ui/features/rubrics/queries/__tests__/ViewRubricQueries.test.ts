@@ -21,8 +21,8 @@ import {http, HttpResponse} from 'msw'
 import qs from 'qs'
 import {duplicateRubric} from '../ViewRubricQueries'
 
-vi.mock('@instructure/get-cookie', () => ({
-  default: () => 'test-csrf-token',
+vi.mock('@instructure/platform-get-cookie', () => ({
+  getCookie: () => 'test-csrf-token',
 }))
 
 const server = setupServer()
