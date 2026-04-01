@@ -349,7 +349,17 @@ class SubmissionLifecycleManager
     @enrollment_counts ||= begin
       counts = EnrollmentCounts.new([], [], [])
 
-      GuardRail.activate(:secondary) do
+      # Targeted runs (user_ids present) are triggered by a recent write event
+      # (e.g. enrollment change, section move, group membership, SIS import,
+      # assignment override) and must read from primary to avoid replication lag
+      # race conditions where the write exists on primary but hasn't propagated
+      # to secondary yet. Bulk course-wide recomputes (no user_ids) use secondary
+      # to reduce primary load. The FF acts as a kill switch if primary load
+      # becomes a concern in production.
+      read_from_primary = @user_ids.present? &&
+                          Account.site_admin.feature_enabled?(:slm_read_from_primary_db)
+      db_role = read_from_primary ? :primary : :secondary
+      GuardRail.activate(db_role) do
         # The various workflow states below try to mimic similarly named scopes off of course
         scope = Enrollment.select(
           :user_id,
@@ -362,7 +372,16 @@ class SubmissionLifecycleManager
 
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
 
-        scope.find_each do |record|
+        # Force :copy on primary to avoid the strategy picker falling through
+        # to :temp_table in tests. The scope's GROUP BY triggers
+        # in_batches_needs_temp_table?, but :temp_table raises when called from
+        # after_commit callbacks in the test env because in_transaction_in_test?
+        # returns false there (the committing transaction is gone). In production
+        # the picker also chooses :copy (open_transactions == 0 in the background
+        # job), so this is consistent. On secondary, nil lets the picker run
+        # freely — it also picks :copy for the same reason.
+        strategy = read_from_primary ? :copy : nil
+        scope.find_each(strategy:) do |record|
           if record.accepted_count > 0
             if record.accepted_count == record.prior_count
               counts.prior_student_ids << record.user_id
