@@ -131,29 +131,20 @@ RSpec.describe CanvasOperations::DataFixup do
       expect(described_class.record_changes?).to be(false)
     end
 
-    context "when not in test environment" do
-      before { allow(Rails.env).to receive(:test?).and_return(false) }
+    it "can be set to true" do
+      described_class.record_changes = true
+      expect(described_class.record_changes?).to be(true)
+    end
 
-      it "can be set to true" do
-        described_class.record_changes = true
-        expect(described_class.record_changes?).to be(true)
-      end
-
-      it "can be set to false" do
-        described_class.record_changes = false
-        expect(described_class.record_changes?).to be(false)
-      end
+    it "can be set to false" do
+      described_class.record_changes = false
+      expect(described_class.record_changes?).to be(false)
     end
 
     it "raises an error for invalid values" do
       expect do
         described_class.record_changes = "invalid"
       end.to raise_error(CanvasOperations::Errors::InvalidPropertyValue, "record_changes must be a boolean")
-    end
-
-    it "returns false in test environment even when set to true" do
-      described_class.record_changes = true
-      expect(described_class.record_changes?).to be(false)
     end
   end
 
@@ -352,11 +343,11 @@ RSpec.describe CanvasOperations::DataFixup do
 
       context "with record_changes set to true" do
         include_context "individual record data fixup with recording"
+        include_context "data fixup auditing"
 
         let(:fixup_instance) { IndividualRecordDataFixup.new }
 
         before do
-          allow(described_class).to receive(:auditable_environment?).and_return(true)
           allow(InstFS).to receive(:direct_upload).and_return(SecureRandom.uuid)
         end
 
