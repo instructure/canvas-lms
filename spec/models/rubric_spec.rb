@@ -626,6 +626,26 @@ describe Rubric do
     )
   end
 
+  describe ".normalize long_description line endings" do
+    it "normalizes \\r\\n to \\n in criterion long_description" do
+      criteria = [{ id: "c1", description: "Criterion", long_description: "line1\r\nline2\r\nline3", points: 5, ratings: [] }]
+      result = Rubric.normalize(criteria)
+      expect(result[0]["long_description"]).to eq("line1\nline2\nline3")
+    end
+
+    it "leaves \\n-only long_description unchanged" do
+      criteria = [{ id: "c1", description: "Criterion", long_description: "line1\nline2", points: 5, ratings: [] }]
+      result = Rubric.normalize(criteria)
+      expect(result[0]["long_description"]).to eq("line1\nline2")
+    end
+
+    it "treats criteria with \\r\\n and \\n long_descriptions as equal after normalization" do
+      with_crlf = [{ id: "c1", description: "Criterion", long_description: "line1\r\nline2", points: 5, ratings: [] }]
+      with_lf   = [{ id: "c1", description: "Criterion", long_description: "line1\nline2", points: 5, ratings: [] }]
+      expect(Rubric.normalize(with_crlf)).to eq(Rubric.normalize(with_lf))
+    end
+  end
+
   describe "#update_criteria" do
     context "populates blank titles" do
       before do
@@ -1307,6 +1327,15 @@ describe Rubric do
       data_with_range[0][:criterion_use_range] = false
       rubric.update!(data: data_with_range)
       expect(rubric.criteria_has_changed?(data_with_range)).to be false
+    end
+
+    it "returns false when long_description differs only in \\r\\n vs \\n line endings" do
+      crlf_data = original_data.deep_dup
+      crlf_data[0][:long_description] = "line1\r\nline2"
+      rubric.update!(data: crlf_data)
+      lf_data = original_data.deep_dup
+      lf_data[0][:long_description] = "line1\nline2"
+      expect(rubric.criteria_has_changed?(lf_data)).to be false
     end
   end
 end
