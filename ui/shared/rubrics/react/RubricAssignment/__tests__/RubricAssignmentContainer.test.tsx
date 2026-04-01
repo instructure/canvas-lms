@@ -24,7 +24,7 @@ import {
 } from '../components/RubricAssignmentContainer'
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from './fixtures'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {submitModuleItem, createNewItem} from '../../handlers/addItemHandlers'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {useContextModule} from '../useModuleContext'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../../utils/constants'
 import {showFlashError} from '@instructure/platform-alerts'

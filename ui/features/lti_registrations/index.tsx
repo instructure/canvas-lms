@@ -62,7 +62,7 @@ import {
   updateContextControl,
 } from './manage/api/contextControls'
 import {deleteDeployment} from './manage/api/deployments'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {getAccountId} from './common/lib/getAccountId'
 import {LtiBreadcrumbsLayout} from './layout/LtiBreadcrumbsLayout'
 import {RegistrationUpdateWizardModal} from './manage/registration_update_wizard/RegistrationUpdateWizardModal'

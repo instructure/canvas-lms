@@ -17,7 +17,7 @@
  */
 
 import {type GradebookOptions, GradebookSortOrder} from '../../../types'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 export const DEFAULT_ENV = {
   active_grading_periods: [],

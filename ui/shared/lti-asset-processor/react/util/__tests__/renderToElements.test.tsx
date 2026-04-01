@@ -33,7 +33,7 @@ vi.mock('@canvas/react', () => ({
   render: vi.fn(),
 }))
 
-vi.mock('@canvas/query', () => ({
+vi.mock('@instructure/platform-query', () => ({
   queryClient: {},
 }))
 

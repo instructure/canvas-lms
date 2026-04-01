@@ -18,7 +18,7 @@
 
 import {useMutation} from '@tanstack/react-query'
 import {RubricFormProps} from '../types/RubricForm'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {saveRubric} from '../queries/RubricFormQueries'
 import {SaveRubricResponse} from 'features/rubrics/queries/RubricFormQueries'
 import {showFlashSuccess} from '@instructure/platform-alerts'

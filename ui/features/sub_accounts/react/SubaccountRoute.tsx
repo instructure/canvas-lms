@@ -26,7 +26,7 @@ import {Portal} from '@instructure/ui-portal'
 import {calculateIndent, fetchRootAccount, SubaccountProvider} from './util'
 import {Flex} from '@instructure/ui-flex'
 import {AccountWithCounts} from './types'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('sub_accounts')
@@ -43,7 +43,7 @@ export function Component(): JSX.Element | null {
   >({
     queryKey: ['account', accountId!],
     queryFn: ({queryKey}) => fetchRootAccount(queryKey[1]),
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     enabled: !!accountId,
   })
 

@@ -22,7 +22,7 @@ import {legacyRender} from '@canvas/react'
 import K5Dashboard from './react/K5Dashboard'
 import {K5ThemeProvider} from '@canvas/k5/react/K5ThemeProvider'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import ready from '@instructure/ready'
 
 ready(() => {

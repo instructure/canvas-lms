@@ -33,7 +33,7 @@ import {
   fetchUserWithRelations,
   User,
 } from './common'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {Controller, SubmitHandler, useForm} from 'react-hook-form'

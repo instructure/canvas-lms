@@ -259,7 +259,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {RubricAssessmentImport} from './RubricAssessmentImport'
 import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
 import PostGradesFrameModal from './components/PostGradesFrameModal'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('gradebook')

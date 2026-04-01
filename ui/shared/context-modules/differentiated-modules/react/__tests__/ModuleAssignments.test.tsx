@@ -22,7 +22,7 @@ import ModuleAssignments, {type ModuleAssignmentsProps} from '../ModuleAssignmen
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const server = setupServer()

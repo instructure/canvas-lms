@@ -24,7 +24,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import type {DeveloperKey} from 'features/developer_keys_v2/model/api/DeveloperKey'
 import type {NewKeyFormProps} from '../NewKeyForm'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const developerKey: DeveloperKey = {
   access_token_count: 77,

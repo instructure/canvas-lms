@@ -25,7 +25,7 @@ import * as RubricFormQueries from '../queries/RubricFormQueries'
 import * as ProgressHelpers from '@canvas/progress/ProgressHelpers'
 import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 import fakeEnv from '@canvas/test-utils/fakeENV'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 
 vi.mock('../queries/RubricFormQueries', async () => ({

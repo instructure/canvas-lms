@@ -34,7 +34,7 @@ import {AlertManager} from '@instructure/platform-alerts'
 import PeopleFilter from '@canvas/differentiation-tags/react/PeopleFilter/PeopleFilter'
 import MessageBus from '@canvas/util/MessageBus'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {union} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('RosterView')

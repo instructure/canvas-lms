@@ -17,7 +17,7 @@
  */
 import moment from 'moment-timezone'
 import * as Actions from '../loading-actions'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MOCK_QUERY_CARDS_RESPONSE} from '@canvas/k5/react/__tests__/fixtures'
 
 vi.mock('../../utilities/apiUtils', async () => {

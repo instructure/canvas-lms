@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as testingLibraryRender, screen, act} from '@testing-library/react'
 import NavigationBadges from '../NavigationBadges'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'

@@ -36,7 +36,7 @@ import {TempEnrollNavigation} from './TempEnrollNavigation'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {captureException} from '@sentry/browser'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('temporary_enrollment')

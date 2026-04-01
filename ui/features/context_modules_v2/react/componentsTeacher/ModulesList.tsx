@@ -34,7 +34,7 @@ import {useReorderModuleItemsGQL} from '../hooks/mutations/useReorderModuleItems
 import {useReorderModules} from '../hooks/mutations/useReorderModules'
 import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {useContextModule} from '../hooks/useModuleContext'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleAction, ModuleItem} from '../utils/types'

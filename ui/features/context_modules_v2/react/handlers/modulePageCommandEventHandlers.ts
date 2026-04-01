@@ -45,7 +45,7 @@ interface ModuleItemTitlesGraphQLResult {
   }
   errors?: Array<{message: string}>
 }
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {handleOpeningModuleUpdateTray, handleOpeningEditItemModal} from './modulePageActionHandlers'
 import {handleDelete} from './moduleActionHandlers'
 import {InfiniteData} from '@tanstack/react-query'

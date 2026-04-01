@@ -20,6 +20,8 @@
     "baseUrl": "./ui",
     "paths": {
       "@canvas/*": ["shared/*"],
+      "@instructure/platform-query/broadcast": ["../node_modules/@instructure/platform-query/dist/broadcast.d.ts"],
+      "@instructure/platform-query/queryify": ["../node_modules/@instructure/platform-query/dist/queryify.d.ts"],
       "@instructure/*": ["../packages/*"]
     },
     "plugins": [

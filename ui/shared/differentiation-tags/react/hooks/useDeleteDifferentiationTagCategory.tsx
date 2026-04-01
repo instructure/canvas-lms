@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation} from '@tanstack/react-query'

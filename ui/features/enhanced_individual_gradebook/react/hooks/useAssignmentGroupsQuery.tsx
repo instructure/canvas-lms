@@ -18,7 +18,7 @@
 
 import {useMemo, useState} from 'react'
 import {fetchAssignmentGroups, getNextAssignmentGroupsPage} from '../../queries/Queries'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import type {FetchAssignmentGroupsResponse} from '../../queries/Queries'
 import type {InfiniteData} from '@tanstack/react-query'
 

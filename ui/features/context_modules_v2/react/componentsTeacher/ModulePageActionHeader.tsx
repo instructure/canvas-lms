@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback} from 'react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../utils/constants'

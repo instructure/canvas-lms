@@ -29,7 +29,7 @@ import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 // Mock useBroadcastQuery to avoid BroadcastChannel issues in jsdom
-vi.mock('@canvas/query/broadcast', () => ({
+vi.mock('@instructure/platform-query/broadcast', () => ({
   useBroadcastQuery: vi.fn(),
 }))
 

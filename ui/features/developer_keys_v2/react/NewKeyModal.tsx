@@ -33,7 +33,7 @@ import type {AnyAction, Dispatch} from 'redux'
 import type {DeveloperKey} from '../model/api/DeveloperKey'
 import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('react_developer_keys')
 

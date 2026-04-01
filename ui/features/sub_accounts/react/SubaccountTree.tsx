@@ -33,7 +33,7 @@ import {
   SubaccountContext,
 } from './util'
 import {showFlashAlert} from '@instructure/platform-alerts'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
 import {InfiniteData, useInfiniteQuery} from '@tanstack/react-query'
 

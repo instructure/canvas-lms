@@ -18,7 +18,7 @@
 
 import {act, cleanup} from '@testing-library/react'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   DEFAULT_PROPS,
   renderComponent,

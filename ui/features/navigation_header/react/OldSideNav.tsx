@@ -31,7 +31,7 @@ import groupsQuery from './queries/groupsQuery'
 import NavigationBadges from './NavigationBadges'
 import profileQuery from './queries/profileQuery'
 import getAccounts from '@canvas/api/accounts/getAccounts'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('Navigation')
 

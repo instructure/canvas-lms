@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor, act} from '@testing-library/react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import CurrentUploads from '../CurrentUploads'
 import FileUploader from '@canvas/files/react/modules/FileUploader'

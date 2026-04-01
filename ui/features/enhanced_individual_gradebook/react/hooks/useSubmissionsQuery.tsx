@@ -22,7 +22,7 @@ import {
   FetchSubmissionsResponse,
   getNextSubmissionsPage,
 } from '../../queries/Queries'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import type {InfiniteData} from '@tanstack/react-query'
 
 export const useSubmissionsQuery = (courseId: string) => {

@@ -21,7 +21,7 @@ import {
   LOAD_DASHBOARD_CARDS_QUERY,
   DASHBOARD_ACTIVITY_STREAM_SUMMARY_QUERY,
 } from './graphql/Queries'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {processDashboardCards} from './util/dashboardUtils'
 import {useQuery} from '@tanstack/react-query'
 

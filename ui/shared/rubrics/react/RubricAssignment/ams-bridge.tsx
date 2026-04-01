@@ -19,7 +19,7 @@
 import type {Root} from 'react-dom/client'
 import {render, rerender} from '@canvas/react'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {Alert} from '@instructure/ui-alerts'
 import {RubricAssignmentContainer} from './components/RubricAssignmentContainer'
 import type {RubricAssignmentContainerProps} from './components/RubricAssignmentContainer'

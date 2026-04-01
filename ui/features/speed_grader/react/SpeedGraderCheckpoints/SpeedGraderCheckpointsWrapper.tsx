@@ -20,7 +20,7 @@ import React from 'react'
 import {AlertManager} from '@instructure/platform-alerts'
 import {SpeedGraderCheckpointsContainer} from './SpeedGraderCheckpointsContainer'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 type SpeedGrader = {
   setOrUpdateSubmission: (submission: any) => any

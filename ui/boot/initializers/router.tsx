@@ -31,7 +31,7 @@ import {NewLoginRoutes} from '../../features/new_login/routes/NewLoginRoutes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {getTheme} from '@canvas/instui-bindings'
 import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 

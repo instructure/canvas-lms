@@ -20,7 +20,7 @@ import type {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
 import type {NextPageTerms, Term} from '../types'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {useMemo} from 'react'
 import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 

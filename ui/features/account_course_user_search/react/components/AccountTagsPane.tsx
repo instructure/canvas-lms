@@ -20,7 +20,7 @@ import React from 'react'
 import {AccountTags} from '@instructure/platform-institutional-tagging'
 import {PlatformUiProvider, type Account} from '@instructure/platform-provider'
 import {platformExecuteQuery} from '@canvas/graphql'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const AccountTagsPane = () => {
   const account: Account = {

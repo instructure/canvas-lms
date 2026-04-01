@@ -20,7 +20,7 @@ import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   mockAssignmentAndSubmission,
   mockQuery,

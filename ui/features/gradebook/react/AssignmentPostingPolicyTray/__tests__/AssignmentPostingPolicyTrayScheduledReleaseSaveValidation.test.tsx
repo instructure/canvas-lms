@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import * as Api from '../Api'
 import * as FlashAlert from '@instructure/platform-alerts'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   MockContext,
   createDefaultContext,

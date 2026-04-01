@@ -22,7 +22,7 @@ import NameLink from '../NameLink'
 import {BrowserRouter} from 'react-router-dom'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import userEvent from '@testing-library/user-event'
 import {showFlashError} from '@instructure/platform-alerts'
 
