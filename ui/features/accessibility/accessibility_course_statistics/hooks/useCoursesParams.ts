@@ -18,7 +18,7 @@
 
 import {useCallback} from 'react'
 import {useSearchParams} from 'react-router-dom'
-import type {SortOrder} from '../react/components/SortableTableHeader'
+import type {SortOrder} from '../types/course'
 
 interface UseCoursesParamsOptions {
   defaultSort: string

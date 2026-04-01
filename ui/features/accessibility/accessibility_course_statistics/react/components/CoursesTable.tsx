@@ -19,11 +19,13 @@
 import React from 'react'
 import {Table} from '@instructure/ui-table'
 import {Responsive} from '@instructure/ui-responsive'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {responsiveQuerySizes} from '@canvas/breakpoints'
 import {CoursesTableRow} from './CoursesTableRow'
-import {SortableTableHeader, type SortOrder} from './SortableTableHeader'
-import type {Course} from '../../types/course'
+import type {Course, SortOrder} from '../../types/course'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 
@@ -34,6 +36,34 @@ interface CoursesTableProps {
   onChangeSort: (columnId: string) => void
 }
 
+function sortDirection(
+  columnId: string,
+  currentSort: string,
+  currentOrder: SortOrder,
+): 'ascending' | 'descending' | 'none' {
+  if (currentSort !== columnId) return 'none'
+  return currentOrder === 'asc' ? 'ascending' : 'descending'
+}
+
+function sortTip(
+  columnId: string,
+  label: string,
+  currentSort: string,
+  currentOrder: SortOrder,
+): string {
+  const isActive = currentSort === columnId
+  const nextOrder = isActive && currentOrder === 'asc' ? 'descending' : 'ascending'
+  return I18n.t('Click to sort by %{label} %{order}', {label, order: nextOrder})
+}
+
+const SortLabel: React.FC<{tip: string; label: string}> = ({tip, label}) => (
+  <Tooltip renderTip={tip}>
+    <Link as="span" isWithinText={false} display="inline-flex">
+      <Text weight="bold">{label}</Text>
+    </Link>
+  </Tooltip>
+)
+
 export const CoursesTable: React.FC<CoursesTableProps> = ({
   courses,
   sort = 'course_name',
@@ -41,6 +71,21 @@ export const CoursesTable: React.FC<CoursesTableProps> = ({
   onChangeSort,
 }) => {
   const showSISIds = courses.some(course => course.sis_course_id)
+
+  const colHeader = (id: string, label: string, isMobile: boolean) => (
+    <Table.ColHeader
+      id={id}
+      sortDirection={sortDirection(id, sort, order)}
+      onRequestSort={() => onChangeSort(id)}
+      stackedSortByLabel={label}
+    >
+      {isMobile ? (
+        <Text weight="bold">{label}</Text>
+      ) : (
+        <SortLabel tip={sortTip(id, label, sort, order)} label={label} />
+      )}
+    </Table.ColHeader>
+  )
 
   return (
     <Responsive
@@ -51,121 +96,42 @@ export const CoursesTable: React.FC<CoursesTableProps> = ({
         desktop: {isMobile: false},
       }}
     >
-      {props => (
-        <Table
-          margin="small 0"
-          caption={I18n.t('Course Accessibility Report')}
-          layout={props?.isMobile ? 'stacked' : 'auto'}
-        >
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="header-course-status">
-                <SortableTableHeader
-                  id="course_status"
-                  label={I18n.t('Status')}
-                  tipDesc={I18n.t('Click to sort by status ascending')}
-                  tipAsc={I18n.t('Click to sort by status descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
-                />
-              </Table.ColHeader>
-              <Table.ColHeader id="header-course-name">
-                <SortableTableHeader
-                  id="course_name"
-                  label={I18n.t('Course')}
-                  tipDesc={I18n.t('Click to sort by name ascending')}
-                  tipAsc={I18n.t('Click to sort by name descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
-                />
-              </Table.ColHeader>
-              <Table.ColHeader id="header-active-issue-count">
-                <SortableTableHeader
-                  id="a11y_active_issue_count"
-                  label={I18n.t('Issues')}
-                  tipDesc={I18n.t('Click to sort by issue count ascending')}
-                  tipAsc={I18n.t('Click to sort by issue count descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
-                />
-              </Table.ColHeader>
-              <Table.ColHeader id="header-resolved-issue-count">
-                <SortableTableHeader
-                  id="a11y_resolved_issue_count"
-                  label={I18n.t('Resolved')}
-                  tipDesc={I18n.t('Click to sort by resolved issue count ascending')}
-                  tipAsc={I18n.t('Click to sort by resolved issue count descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
-                />
-              </Table.ColHeader>
-              {showSISIds && (
-                <Table.ColHeader id="header-sis-id">
-                  <SortableTableHeader
-                    id="sis_course_id"
-                    label={I18n.t('SIS ID')}
-                    tipDesc={I18n.t('Click to sort by SIS ID ascending')}
-                    tipAsc={I18n.t('Click to sort by SIS ID descending')}
-                    currentSort={sort}
-                    currentOrder={order}
-                    onChangeSort={onChangeSort}
-                  />
+      {props => {
+        const isMobile = props?.isMobile ?? false
+        return (
+          <Table
+            margin="small 0"
+            caption={I18n.t('Course Accessibility Report')}
+            layout={isMobile ? 'stacked' : 'auto'}
+          >
+            <Table.Head renderSortLabel={I18n.t('Sort by')}>
+              <Table.Row>
+                {colHeader('course_status', I18n.t('Status'), isMobile)}
+                {colHeader('course_name', I18n.t('Course'), isMobile)}
+                {colHeader('a11y_active_issue_count', I18n.t('Issues'), isMobile)}
+                {colHeader('a11y_resolved_issue_count', I18n.t('Resolved'), isMobile)}
+                {showSISIds && colHeader('sis_course_id', I18n.t('SIS ID'), isMobile)}
+                {colHeader('term', I18n.t('Term'), isMobile)}
+                {colHeader('teacher', I18n.t('Teacher'), isMobile)}
+                {colHeader('subaccount', I18n.t('Sub-Account'), isMobile)}
+                <Table.ColHeader id="students" width="1">
+                  <Text weight="bold">{I18n.t('Students')}</Text>
                 </Table.ColHeader>
-              )}
-              <Table.ColHeader id="header-term">
-                <SortableTableHeader
-                  id="term"
-                  label={I18n.t('Term')}
-                  tipDesc={I18n.t('Click to sort by term ascending')}
-                  tipAsc={I18n.t('Click to sort by term descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {courses.map(course => (
+                <CoursesTableRow
+                  key={course.id}
+                  course={course}
+                  showSISIds={showSISIds}
+                  isMobile={isMobile}
                 />
-              </Table.ColHeader>
-              <Table.ColHeader id="header-teacher">
-                <SortableTableHeader
-                  id="teacher"
-                  label={I18n.t('Teacher')}
-                  tipDesc={I18n.t('Click to sort by teacher ascending')}
-                  tipAsc={I18n.t('Click to sort by teacher descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
-                />
-              </Table.ColHeader>
-              <Table.ColHeader id="header-sub-account">
-                <SortableTableHeader
-                  id="subaccount"
-                  label={I18n.t('Sub-Account')}
-                  tipDesc={I18n.t('Click to sort by sub-account ascending')}
-                  tipAsc={I18n.t('Click to sort by sub-account descending')}
-                  currentSort={sort}
-                  currentOrder={order}
-                  onChangeSort={onChangeSort}
-                />
-              </Table.ColHeader>
-              <Table.ColHeader id="header-students" width="1">
-                {I18n.t('Students')}
-              </Table.ColHeader>
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {courses.map(course => (
-              <CoursesTableRow
-                key={course.id}
-                course={course}
-                showSISIds={showSISIds}
-                isMobile={props?.isMobile ?? false}
-              />
-            ))}
-          </Table.Body>
-        </Table>
-      )}
+              ))}
+            </Table.Body>
+          </Table>
+        )
+      }}
     </Responsive>
   )
 }
