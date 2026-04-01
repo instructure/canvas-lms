@@ -1780,7 +1780,7 @@ class AbstractAssignment < ApplicationRecord
                    if score == 0
                      "complete"
                    elsif score < 0
-                     given_grade
+                     grading_standard_or_default.matching_scheme_key(given_grade) || given_grade
                    else
                      # show a perfect grade when positive / 0
                      grading_standard_or_default.score_to_grade(100)
@@ -1789,7 +1789,7 @@ class AbstractAssignment < ApplicationRecord
                    # the score for a zero-point letter_grade assignment could be considered
                    # to be *any* grade, so look at what the current given grade is
                    # instead of trying to calculate it
-                   given_grade
+                   grading_standard_or_default.matching_scheme_key(given_grade) || given_grade
                  end
       else
         # there's not really any reasonable value we can set here -- if the
