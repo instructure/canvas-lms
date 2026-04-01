@@ -235,9 +235,9 @@ describe Api::V1::SisAssignment do
 
       it "adds student assignment override information" do
         assignments = Assignment.where(id: assignment_1.id)
-                                .preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
+                                .preload(active_assignment_overrides: [{ assignment_override_students: [{ user: [:pseudonym] }] }])
 
-        result = generator.sis_assignments_json(assignments, student_overrides: true)
+        result = generator.sis_assignments_json(assignments, includes: { student_overrides: true })
 
         user_overrides = result[0]["user_overrides"]
         expect(user_overrides.size).to eq 1
@@ -253,7 +253,7 @@ describe Api::V1::SisAssignment do
         assignments = Assignment.where(id: assignment_1.id)
 
         expect do
-          generator.sis_assignments_json(assignments, student_overrides: true)
+          generator.sis_assignments_json(assignments, includes: { student_overrides: true })
         end.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
       end
 
@@ -261,7 +261,7 @@ describe Api::V1::SisAssignment do
         assignments = Assignment.where(id: assignment_1.id).preload(:active_assignment_overrides)
 
         expect do
-          generator.sis_assignments_json(assignments, student_overrides: true)
+          generator.sis_assignments_json(assignments, includes: { student_overrides: true })
         end.to raise_error(Api::V1::SisAssignment::UnloadedAssociationError)
       end
 
@@ -269,7 +269,7 @@ describe Api::V1::SisAssignment do
         assignments = Assignment.where(id: assignment_1.id)
                                 .preload(active_assignment_overrides: [:assignment_override_students])
 
-        user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]["user_overrides"]
+        user_overrides = generator.sis_assignments_json(assignments, includes: { student_overrides: true })[0]["user_overrides"]
 
         expect(user_overrides.first["students"].first).not_to have_key("sis_user_id")
       end
@@ -277,11 +277,25 @@ describe Api::V1::SisAssignment do
       it "provides an empty list when there are no overrides" do
         assignment_2 = assignment_model(course:)
         assignments = Assignment.where(id: assignment_2.id)
-                                .preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
+                                .preload(active_assignment_overrides: [{ assignment_override_students: [{ user: [:pseudonym] }] }])
 
-        assignment_hash = generator.sis_assignments_json(assignments, student_overrides: true)[0]
+        assignment_hash = generator.sis_assignments_json(assignments, includes: { student_overrides: true })[0]
 
         expect(assignment_hash["user_overrides"]).to eq []
+      end
+
+      # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+      # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+      it "passes current_user to SisPseudonym.for" do
+        assignments = Assignment.where(id: assignment_1.id)
+                                .preload(active_assignment_overrides: [{ assignment_override_students: [{ user: [:pseudonym] }] }])
+
+        viewer = @student1
+        allow(SisPseudonym).to receive(:for).and_call_original
+        expect(SisPseudonym).to receive(:for)
+          .with(@student1, anything, hash_including(current_user: viewer))
+          .and_call_original
+        generator.sis_assignments_json(assignments, includes: { student_overrides: true }, current_user: viewer)
       end
     end
   end

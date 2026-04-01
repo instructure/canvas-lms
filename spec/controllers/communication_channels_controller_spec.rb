@@ -539,6 +539,22 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq [[@user, [@pseudonym]]]
       end
 
+      # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+      # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+      it "passes current_user to SisPseudonym.for when building merge opportunities" do
+        user_with_pseudonym(username: "jt+1@instructure.com")
+        @not_logged_user = @user
+        user_with_pseudonym(username: "jt@instructure.com", active_all: 1)
+        @logged_user = @user
+        user_session(@logged_user, @pseudonym)
+
+        allow(SisPseudonym).to receive(:for).and_call_original
+        expect(SisPseudonym).to receive(:for)
+          .with(@logged_user, anything, hash_including(current_user: @logged_user))
+          .and_call_original
+        get "confirm", params: { nonce: @not_logged_user.email_channel.confirmation_code }
+      end
+
       it "merges with an already-logged-in user" do
         user_with_pseudonym(username: "jt+1@instructure.com")
         @not_logged_user = @user

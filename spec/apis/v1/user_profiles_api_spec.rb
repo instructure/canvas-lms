@@ -313,4 +313,19 @@ describe "User Profile API", type: :request do
       end
     end
   end
+
+  # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+  # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+  it "passes current_user to SisPseudonym.for" do
+    allow(SisPseudonym).to receive(:for).and_call_original
+    expect(SisPseudonym).to receive(:for)
+      .with(@student, anything, hash_including(current_user: @admin))
+      .and_call_original
+    api_call(:get,
+             "/api/v1/users/#{@student.id}/profile",
+             controller: "profile",
+             action: "settings",
+             user_id: @student.to_param,
+             format: "json")
+  end
 end
