@@ -83,7 +83,7 @@ describe PageViewsController do
     before do
       allow(PageView).to receive(:pv4?).and_return(true)
       ConfigFile.reset_cache
-      ConfigFile.stub("pv4", { "uri" => "https://test.example.com" })
+      ConfigFile.stub("pv5", { "uri" => "https://test.example.com" })
       account_admin_user
       user_session(@user)
     end
@@ -693,7 +693,7 @@ describe PageViewsController do
       user_session(@user)
       allow(PageView).to receive(:pv4?).and_return(true)
       allow(PageViews::Configuration).to receive(:configured?).and_return(true)
-      ConfigFile.stub("pv4", { "uri" => "https://test.example.com" })
+      ConfigFile.stub("pv5", { "uri" => "https://test.example.com" })
       # Mock the PageView fetch to avoid actual API calls
       allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_return([])
     end
