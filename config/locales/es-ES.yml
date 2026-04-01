@@ -2367,7 +2367,7 @@ es-ES:
   admin_analytics_view_admin_analytics_permission_cc7d46db: "Administrar Analíticas: ver el permiso para administrar analíticas"
   admin_analytics_view_and_export_data_7dc4d362: "Administrar analítica - Ver y exportar datos"
   admin_analytics_view_permission_description: "Hacer que el permiso para administrar analíticas sea visible."
-  admin_csv_f8d1b3eb: "Administrar CSV"
+  admin_csv_f8d1b3eb: "CSV de Administrador"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Exportar administradores para varios períodos de evaluación"
   admin_manage_access_tokens_4f6b6eba: "Autentificadores de acceso de administración para administradores"
   admin_navigation_menu_77b801a2: "Menú de navegación de administrador"
@@ -18878,13 +18878,13 @@ es-ES:
         body: "Alerta de Canvas: Nueva asignatura: %{course}, %{account}"
     new_discussion_entry: 
       email: 
-        body: "%{user} respondido a %{discussion_topic}, %{course}:"
+        body: "%{user} ha respondido a %{discussion_topic}, %{course}:"
         html: 
-          body: "%{user} respondido a %{discussion_topic}, %{course}:"
+          body: "%{user} ha respondido a %{discussion_topic}, %{course}:"
           discussion_entry_reply_message: "Únete a la conversación utilizando el enlace que aparece a continuación o realiza un comentario respondiendo a este mensaje. Cuando esté permitido, si debes incluir un archivo adjunto, inicia sesión en Canvas y responde al foro de discusión."
           link: "Haz clic aquí para unirte a la conversación"
-          subject: "%{user} respondido a %{discussion_topic}, %{course}"
-        subject: "%{user} respondido a %{discussion_topic}, %{course}"
+          subject: "%{user} ha respondido a %{discussion_topic}, %{course}"
+        subject: "%{user} ha respondido a %{discussion_topic}, %{course}"
       summary: 
         subject: "Nuevo comentario para %{discussion_topic}: %{course}"
       twitter: 
@@ -32432,7 +32432,7 @@ es-ES:
       page_title: "Diario del profesor"
   user_notes_7fccf1d6: "Notas del usuario"
   user_observees_40cec795: "Observaciones del usuario"
-  user_observer_csv_3592a9cf: "Usuario observador de CSV"
+  user_observer_csv_3592a9cf: "CSV de Usuario observador"
   user_observers_454d4303: "Observadores del usuario"
   user_observers_csv_100a9c26: "Observadores de CSV del usuario"
   user_option_links_66090987: "Enlaces de opción del usuario"
