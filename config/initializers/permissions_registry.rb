@@ -2360,6 +2360,50 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("Bulk actions - People page") },
         description: -> { I18n.t("Allows the user to perform bulk actions (enroll, delete, or suspend) on users listed on the People page.") } }
     ]
+  },
+  manage_rules_view: {
+    label: -> { I18n.t("Automation Rules - view") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to view the account's automation rules.") } }
+    ]
+  },
+  manage_rules_add: {
+    label: -> { I18n.t("Automation Rules - add") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to create automation rules on the account.") } }
+    ]
+  },
+  manage_rules_edit: {
+    label: -> { I18n.t("Automation Rules - edit") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to edit automation rules on the account.") } }
+    ]
+  },
+  manage_rules_delete: {
+    label: -> { I18n.t("Automation Rules - delete") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to delete automation rules on the account.") } }
+    ]
   }
 }.freeze
 

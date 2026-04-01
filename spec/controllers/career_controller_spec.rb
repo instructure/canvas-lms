@@ -76,7 +76,8 @@ describe CareerController do
             horizon_chart_view: false,
             horizon_native_permissions_page: false,
             horizon_block_content_editor: false,
-            horizon_native_inbox: false
+            horizon_native_inbox: false,
+            horizon_autopilot: false
           )
         end
 

@@ -67,6 +67,7 @@ class CareerController < ApplicationController
       horizon_block_content_editor
       horizon_native_inbox
       horizon_study_tools
+      horizon_autopilot
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end

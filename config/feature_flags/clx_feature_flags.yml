@@ -95,3 +95,10 @@ horizon_bulk_api_permission:
   display_name: "Canvas Career: Manage Bulk API & Permission"
   description: |-
     Enables the ability to manage bulk API and permission settings in Canvas Career.
+horizon_autopilot:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Rule-Based Automations"
+  description: |-
+    Enables creating & running rule-based automations in Canvas Career.

@@ -697,6 +697,53 @@ describe RoleOverride do
       end
     end
 
+    describe "manage_rules" do
+      let(:view_perm) { RoleOverride.permissions[:manage_rules_view] }
+      let(:add_perm) { RoleOverride.permissions[:manage_rules_add] }
+      let(:edit_perm) { RoleOverride.permissions[:manage_rules_edit] }
+      let(:delete_perm) { RoleOverride.permissions[:manage_rules_delete] }
+
+      describe "account_allows" do
+        it "allows when account is a horizon account with horizon_autopilot enabled" do
+          allow(@account).to receive(:horizon_account?).and_return(true)
+          @account.root_account.enable_feature!(:horizon_autopilot)
+
+          expect(view_perm[:account_allows].call(@account)).to be true
+          expect(add_perm[:account_allows].call(@account)).to be true
+          expect(edit_perm[:account_allows].call(@account)).to be true
+          expect(delete_perm[:account_allows].call(@account)).to be true
+        end
+
+        it "does not allow when account is not a horizon account" do
+          allow(@account).to receive(:horizon_account?).and_return(false)
+          @account.root_account.enable_feature!(:horizon_autopilot)
+
+          expect(view_perm[:account_allows].call(@account)).to be false
+          expect(add_perm[:account_allows].call(@account)).to be false
+          expect(edit_perm[:account_allows].call(@account)).to be false
+          expect(delete_perm[:account_allows].call(@account)).to be false
+        end
+
+        it "does not allow when horizon_autopilot feature flag is disabled" do
+          allow(@account).to receive(:horizon_account?).and_return(true)
+
+          expect(view_perm[:account_allows].call(@account)).to be false
+          expect(add_perm[:account_allows].call(@account)).to be false
+          expect(edit_perm[:account_allows].call(@account)).to be false
+          expect(delete_perm[:account_allows].call(@account)).to be false
+        end
+
+        it "does not allow when neither condition is met" do
+          allow(@account).to receive(:horizon_account?).and_return(false)
+
+          expect(view_perm[:account_allows].call(@account)).to be false
+          expect(add_perm[:account_allows].call(@account)).to be false
+          expect(edit_perm[:account_allows].call(@account)).to be false
+          expect(delete_perm[:account_allows].call(@account)).to be false
+        end
+      end
+    end
+
     it "view_course_changes" do
       root_account = @account.root_account
       sub_account = root_account.sub_accounts.create!
