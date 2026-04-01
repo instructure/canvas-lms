@@ -1202,6 +1202,7 @@ CanvasRails::Application.routes.draw do
   scope(controller: :translation) do
     post "courses/:course_id/translate", action: :translate, as: :translate
     post "courses/:course_id/translate/paragraph", action: :translate_paragraph, as: :translate_paragraph
+    post "courses/:course_id/translate/feedback", action: :translation_feedback, as: :translation_feedback
   end
 
   scope(controller: "lti/asset_processor_launch") do

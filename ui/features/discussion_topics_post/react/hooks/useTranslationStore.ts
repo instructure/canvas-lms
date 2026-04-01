@@ -36,6 +36,10 @@ interface Translation {
   translatedTitle?: string
   translatedMessage?: string
   error?: Error
+  feedbackLiked?: boolean
+  feedbackDisliked?: boolean
+  feedbackNotes?: string
+  feedbackLoading?: boolean
 }
 
 type State = {
@@ -79,6 +83,10 @@ type Actions = {
     translatedTitle?: string | null,
   ) => void
   setTranslationError: (entryId: string, error: Error, language: string) => void
+
+  setFeedbackState: (entryId: string, liked: boolean, disliked: boolean) => void
+  setFeedbackLoading: (entryId: string, loading: boolean) => void
+  setFeedbackNotes: (entryId: string, notes: string) => void
 }
 
 const useTranslationStore = create<State & Actions>()(
@@ -245,6 +253,52 @@ const useTranslationStore = create<State & Actions>()(
           }),
           false,
           {type: 'translation/setTranslationError', entryId, error, language},
+        ),
+
+      setFeedbackState: (entryId: string, liked: boolean, disliked: boolean) =>
+        set(
+          state => ({
+            entries: {
+              ...state.entries,
+              [entryId]: {
+                ...state.entries[entryId],
+                feedbackLiked: liked,
+                feedbackDisliked: disliked,
+              },
+            },
+          }),
+          false,
+          {type: 'translation/setFeedbackState', entryId, liked, disliked},
+        ),
+
+      setFeedbackLoading: (entryId: string, loading: boolean) =>
+        set(
+          state => ({
+            entries: {
+              ...state.entries,
+              [entryId]: {
+                ...state.entries[entryId],
+                feedbackLoading: loading,
+              },
+            },
+          }),
+          false,
+          {type: 'translation/setFeedbackLoading', entryId, loading},
+        ),
+
+      setFeedbackNotes: (entryId: string, notes: string) =>
+        set(
+          state => ({
+            entries: {
+              ...state.entries,
+              [entryId]: {
+                ...state.entries[entryId],
+                feedbackNotes: notes,
+              },
+            },
+          }),
+          false,
+          {type: 'translation/setFeedbackNotes', entryId, notes},
         ),
     }),
     {

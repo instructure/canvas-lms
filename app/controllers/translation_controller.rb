@@ -17,11 +17,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class TranslationController < ApplicationController
-  before_action :require_context, only: :translate
+  before_action :require_context, only: %i[translate translation_feedback]
+  before_action :require_user, only: %i[translation_feedback]
   before_action :require_inbox_translation, only: %i[translate_paragraph]
 
   # Skip the authenticity token as this is an API endpoint.
-  skip_before_action :verify_authenticity_token, only: [:translate]
+  skip_before_action :verify_authenticity_token, only: %i[translate translation_feedback]
 
   rescue_from Translation::TranslationError, with: :handle_translation_error
 
@@ -58,6 +59,57 @@ class TranslationController < ApplicationController
     duration = Time.zone.now - start_time
     InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
     render json: { translated_text: }
+  end
+
+  def translation_feedback
+    return render_unauthorized_action unless Translation.available? &&
+                                             user_can_read? &&
+                                             @context.feature_enabled?(:translation) &&
+                                             @context.feature_enabled?(:translation_feedback)
+
+    content_type = params[:content_type]
+    unless %w[DiscussionTopic DiscussionEntry].include?(content_type)
+      return render(json: { error: "Invalid content type." }, status: :bad_request)
+    end
+
+    return render(json: { error: "Missing content_id." }, status: :bad_request) if params[:content_id].blank?
+    return render(json: { error: "Missing target_language." }, status: :bad_request) if params[:target_language].blank?
+
+    action = params[:_action]&.to_sym
+    unless %i[like dislike reset_like].include?(action)
+      return render(json: { error: "Invalid action." }, status: :bad_request)
+    end
+
+    find_params = {
+      user: @current_user,
+      context: @context,
+      target_language: params[:target_language]
+    }
+    if content_type == "DiscussionTopic"
+      find_params[:discussion_topic_id] = params[:content_id]
+    else
+      find_params[:discussion_entry_id] = params[:content_id]
+    end
+    feedback = TranslationFeedback.find_or_initialize_by(find_params)
+    feedback.feature_slug = params[:feature_slug] if params[:feature_slug].present?
+
+    begin
+      case action
+      when :like
+        feedback.like
+        InstStatsd::Statsd.distributed_increment("translation.feedback.liked")
+      when :dislike
+        feedback.dislike(notes: params[:notes])
+        InstStatsd::Statsd.distributed_increment("translation.feedback.disliked")
+      when :reset_like
+        feedback.reset_like
+        InstStatsd::Statsd.distributed_increment("translation.feedback.reset_like")
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      return render(json: { error: e.message }, status: :unprocessable_content)
+    end
+
+    render(json: { liked: feedback.liked, disliked: feedback.disliked })
   end
 
   def handle_translation_error(exception)
