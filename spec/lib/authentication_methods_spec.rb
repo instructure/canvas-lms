@@ -516,7 +516,7 @@ describe AuthenticationMethods do
     end
   end
 
-  describe "#load_user with federated_pseudonym_attributes flag" do
+  describe "#load_user with FederatedPseudonymAttributes" do
     let(:user) { user_with_pseudonym }
     let(:test_pseudonym) { @pseudonym }
 
@@ -533,31 +533,13 @@ describe AuthenticationMethods do
       allow(PseudonymSession).to receive(:find_with_validation).and_return(@pseudonym_session)
     end
 
-    context "when feature flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:federated_pseudonym_attributes)
-      end
-
-      it "calls FederatedPseudonymAttributes.load_from with session" do
-        expect(AuthenticationMethods::FederatedPseudonymAttributes).to receive(:load_from).with(@controller.session)
-        @controller.send(:load_user)
-      end
-    end
-
-    context "when feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:federated_pseudonym_attributes)
-      end
-
-      it "does not call FederatedPseudonymAttributes.load_from" do
-        expect(AuthenticationMethods::FederatedPseudonymAttributes).not_to receive(:load_from)
-        @controller.send(:load_user)
-      end
+    it "calls FederatedPseudonymAttributes.load_from with session" do
+      expect(AuthenticationMethods::FederatedPseudonymAttributes).to receive(:load_from).with(@controller.session)
+      @controller.send(:load_user)
     end
 
     context "when current_pseudonym is nil" do
       before do
-        Account.site_admin.enable_feature!(:federated_pseudonym_attributes)
         @controller.instance_variable_set(:@current_pseudonym, nil)
         allow(@controller).to receive(:load_pseudonym_from_access_token).and_return(nil)
         allow(PseudonymSession).to receive(:find_with_validation).and_return(nil)
