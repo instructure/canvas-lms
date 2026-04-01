@@ -16408,7 +16408,7 @@ nl:
   first_reviewer_sortorder_e2184140: "Eerste beoordelaar %{sortOrder}"
   first_student_reply_3b27725f: "eerste antwoord van een cursist"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, en %{others_count} anderen"
-  fix_21c3f51c: Vast
+  fix_21c3f51c: Oplossen
   fix_blueprint_sync_during_folder_sync_f84fea6e: "Blauwdruk-synchronisatie tijdens synchronisatie van mappen repareren"
   fix_heading_hierarchy_f60884c4: "Hiërarchie van koppen corrigeren"
   fix_heading_level_196ab5bd: "Kopniveau herstellen"
