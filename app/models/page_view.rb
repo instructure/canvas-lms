@@ -196,11 +196,17 @@ class PageView < ApplicationRecord
   scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
   scope :for_users, ->(users) { where(user_id: users) }
 
-  def self.pv4_client(**)
-    ConfigFile.cache_object("pv4") do |config|
-      creds = Rails.application.credentials.pv4_creds
+  def self.pv4_client(use_pv5: false, **)
+    ConfigFile.cache_object(use_pv5 ? "pv5" : "pv4") do |config|
+      if use_pv5
+        creds = Rails.application.credentials.pv5_creds
+        uri = "#{config["uri"].chomp("/")}/api/v5/"
+      else
+        creds = Rails.application.credentials.pv4_creds
+        uri = config["uri"]
+      end
 
-      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token), **)
+      Pv4Client.new(uri, creds&.dig(Rails.env.to_sym, :access_token), **)
     end
   end
 
@@ -211,7 +217,7 @@ class PageView < ApplicationRecord
     viewer = options.delete(:viewer)
     viewer = nil if viewer == user
     viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
-    client = options.delete(:client) || pv4_client(requestor_user: viewer || user)
+    client = options.delete(:client) || pv4_client(use_pv5: true, requestor_user: viewer || user)
     user.shard.activate do
       if PageView.pv4?
         result = client.for_user(user, **options)
