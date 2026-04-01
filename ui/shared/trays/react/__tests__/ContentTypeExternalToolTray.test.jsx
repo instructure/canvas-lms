@@ -30,7 +30,12 @@ describe('ContentTypeExternalToolTray', () => {
 
   beforeEach(() => {
     tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['geolocation *', 'microphone *', 'camera *']
     vi.resetAllMocks()
+  })
+
+  afterEach(() => {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = []
   })
 
   function renderTray(props) {
@@ -60,6 +65,12 @@ describe('ContentTypeExternalToolTray', () => {
     const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
     expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('sets iframe allow attribute at render time for microphone and camera permissions', () => {
+    const {getByTestId} = renderTray()
+    const iframe = getByTestId('ltiIframe')
+    expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   })
 
   describe('external content message handling', () => {
