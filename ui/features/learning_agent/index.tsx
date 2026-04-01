@@ -22,7 +22,12 @@ import {LearningAgentButton} from '@canvas/learning-agent'
 
 ready(() => {
   const mount = document.getElementById('learning_agent_mount_point')
-  if (!mount) return
+  if (mount) {
+    render(<LearningAgentButton />, mount)
+  }
 
-  render(<LearningAgentButton />, mount)
+  const mobileMount = document.getElementById('learning_agent_mobile_mount_point')
+  if (mobileMount) {
+    render(<LearningAgentButton />, mobileMount)
+  }
 })
