@@ -204,4 +204,20 @@ describe('AssignmentExternalTools', () => {
       expect(iframe.getAttribute('data-lti-launch')).toEqual('true')
     })
   })
+
+  test('it sets iframe allow attribute at render time for microphone and camera permissions', () => {
+    const ref = React.createRef()
+    wrapper = render(
+      <AssignmentExternalTools.configTools
+        ref={ref}
+        placement="assignment_view"
+        courseId={1}
+        assignmentId={1}
+      />,
+    )
+    ref.current.setState({tools: toolDefinitions})
+    wrapper.container.querySelectorAll('.tool_launch').forEach(iframe => {
+      expect(iframe.getAttribute('allow')).toEqual(ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+    })
+  })
 })

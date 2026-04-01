@@ -22,7 +22,6 @@ import {shape, func, bool} from 'prop-types'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
@@ -94,12 +93,6 @@ export default class ConfigureExternalToolButton extends React.Component {
         />
       </div>
     )
-  }
-
-  onAfterOpen = () => {
-    if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances())
-    }
   }
 
   iframeWidth = () => this.props.tool?.tool_configuration.selection_width || undefined
