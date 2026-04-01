@@ -640,6 +640,72 @@ describe SubmissionLifecycleManager do
           }.from("unsubmitted")
         end
       end
+
+      context "with a cross-shard student" do
+        before do
+          # Create a student on a different shard than the course.
+          # Suspend the SLM callback during enrollment to keep setup focused —
+          # we don't want a spurious enrollment_counts run before the test body.
+          @shard2.activate { @cross_shard_student = user_factory(active_all: true) }
+          @shard1.activate do
+            Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
+              @course.enroll_student(@cross_shard_student, enrollment_state: "active")
+            end
+          end
+        end
+
+        it "uses the primary DB for enrollment_counts when user_ids are specified and FF is enabled" do
+          # Contract test: targeted SLM runs (triggered by enrollment changes) must
+          # read from primary to avoid replication lag race conditions where the
+          # enrollment write exists on primary but hasn't propagated to secondary yet.
+          # We capture the first GuardRail.activate call (which comes from
+          # enrollment_counts itself) and ignore subsequent framework-internal calls
+          # (e.g. unguard calls from the :copy batch strategy).
+          Account.site_admin.enable_feature!(:slm_read_from_primary_db)
+          @shard1.activate do
+            slm = SubmissionLifecycleManager.new(@course, [@assignment.id], [@cross_shard_student.id])
+            db_role_used = nil
+            orig = GuardRail.method(:activate)
+            allow(GuardRail).to receive(:activate) do |role, &blk|
+              db_role_used ||= role
+              orig.call(role, &blk)
+            end
+            slm.send(:enrollment_counts)
+            expect(db_role_used).to eq(:primary)
+          end
+        end
+
+        it "uses the secondary DB for enrollment_counts when user_ids are specified but FF is disabled" do
+          Account.site_admin.disable_feature!(:slm_read_from_primary_db)
+          @shard1.activate do
+            slm = SubmissionLifecycleManager.new(@course, [@assignment.id], [@cross_shard_student.id])
+            db_role_used = nil
+            orig = GuardRail.method(:activate)
+            allow(GuardRail).to receive(:activate) do |role, &blk|
+              db_role_used ||= role
+              orig.call(role, &blk)
+            end
+            slm.send(:enrollment_counts)
+            expect(db_role_used).to eq(:secondary)
+          end
+        end
+
+        it "uses the secondary DB for enrollment_counts when no user_ids are specified" do
+          # Contract test: bulk course-wide recomputes should use secondary to avoid
+          # unnecessary load on the primary DB.
+          @shard1.activate do
+            slm = SubmissionLifecycleManager.new(@course, [@assignment.id])
+            db_role_used = nil
+            orig = GuardRail.method(:activate)
+            allow(GuardRail).to receive(:activate) do |role, &blk|
+              db_role_used ||= role
+              orig.call(role, &blk)
+            end
+            slm.send(:enrollment_counts)
+            expect(db_role_used).to eq(:secondary)
+          end
+        end
+      end
     end
 
     context "unassigning students that have concluded enrollments" do
