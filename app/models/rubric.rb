@@ -280,7 +280,10 @@ class Rubric < ActiveRecord::Base
   end
 
   def alignments_need_update?
-    saved_change_to_data? || saved_change_to_workflow_state?
+    return true if saved_change_to_workflow_state?
+    return true if saved_change_to_data? && criteria_has_changed?(data_before_last_save)
+
+    false
   end
 
   def data_outcome_ids
@@ -450,9 +453,13 @@ class Rubric < ActiveRecord::Base
 
     data = generate_criteria(params)
     return true if data.title != title || data.points_possible != points_possible
-    return true if Rubric.normalize(data.criteria) != Rubric.normalize(criteria)
+    return true if criteria_has_changed?(data.criteria)
 
     false
+  end
+
+  def criteria_has_changed?(other_criteria)
+    Rubric.normalize(other_criteria) != Rubric.normalize(criteria)
   end
 
   def populate_rubric_title
