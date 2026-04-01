@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {AddLinkModal} from '../AddLinkModal'
 
@@ -84,7 +84,7 @@ describe('AddLinkModal', () => {
     await clickAdd()
 
     expect(mockProps.onAdd).not.toHaveBeenCalled()
-    expect(textInput).toHaveFocus()
+    await waitFor(() => expect(textInput).toHaveFocus())
     expect(
       await screen.findByText('Please enter text between 1 and 50 characters long'),
     ).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('AddLinkModal', () => {
     await clickAdd()
 
     expect(mockProps.onAdd).not.toHaveBeenCalled()
-    expect(linkInput).toHaveFocus()
+    await waitFor(() => expect(linkInput).toHaveFocus())
     expect(
       await screen.findByText('Please enter a valid URL beginning with https:// or http://'),
     ).toBeInTheDocument()
