@@ -41,6 +41,8 @@ class InstitutionalTag < ApplicationRecord
   validates :sis_source_id, uniqueness: { scope: :root_account_id, case_sensitive: false }, allow_nil: true
   validates :name, uniqueness: { scope: :root_account_id, conditions: -> { active }, case_sensitive: false }
 
+  validate :validate_tag_limit_per_category
+
   def self.cascade_archive_associations_for(tag_ids)
     return if tag_ids.empty?
 
@@ -67,5 +69,16 @@ class InstitutionalTag < ApplicationRecord
 
   def cascade_archive_associations
     self.class.cascade_archive_associations_for([id])
+  end
+
+  def validate_tag_limit_per_category
+    return unless category_id
+    return unless new_record? || (workflow_state_changed? && workflow_state == "active")
+
+    limit = (DynamicSettings.find(tree: :private)["institutional_tags_per_category_limit", failsafe: nil] || 50).to_i
+
+    if InstitutionalTag.active.where(category_id:).count >= limit
+      errors.add(:category, t("A category cannot have more than %{limit} tags", limit:))
+    end
   end
 end
