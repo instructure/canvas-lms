@@ -330,9 +330,7 @@ module AuthenticationMethods
       end
     end
 
-    if @current_pseudonym && Account.site_admin.feature_enabled?(:federated_pseudonym_attributes)
-      FederatedPseudonymAttributes.load_from(session)
-    end
+    FederatedPseudonymAttributes.load_from(session) if @current_pseudonym
 
     logger.info "[AUTH] final user: #{@current_user&.id}"
     if Sentry.initialized? && !Rails.env.test?
