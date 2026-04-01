@@ -63,6 +63,67 @@ describe InstitutionalTagCategory do
       duplicate = InstitutionalTagCategory.new(valid_params)
       expect(duplicate).to be_valid
     end
+
+    describe "category limit per account" do
+      it "allows up to 50 categories in an account" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        expect(InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).count).to eq(50)
+      end
+
+      it "rejects the 51st category in an account" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        category = InstitutionalTagCategory.new(valid_params.merge(name: "Category 51"))
+        expect(category).not_to be_valid
+        expect(category.errors[:account]).to be_present
+      end
+
+      it "does not count soft-deleted categories toward the limit" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).first.destroy
+        category = InstitutionalTagCategory.new(valid_params.merge(name: "Replacement Category"))
+        expect(category).to be_valid
+      end
+
+      it "allows updating an existing category when the account is at the limit" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        existing_category = InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).last
+        existing_category.name = "Updated Name"
+        expect(existing_category).to be_valid
+      end
+
+      it "prevents restoring a deleted category when the account is at the limit" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        deleted_cat = InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).first
+        deleted_cat.destroy
+        InstitutionalTagCategory.create!(valid_params.merge(name: "Replacement"))
+        deleted_cat.workflow_state = "active"
+        expect(deleted_cat).not_to be_valid
+        expect(deleted_cat.errors[:account]).to be_present
+      end
+
+      it "respects the configurable limit from DynamicSettings" do
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(
+          DynamicSettings::FallbackProxy.new({ "institutional_tag_categories_per_account_limit" => "3" })
+        )
+        3.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        category = InstitutionalTagCategory.new(valid_params.merge(name: "Category 4"))
+        expect(category).not_to be_valid
+        expect(category.errors[:account]).to be_present
+      end
+    end
   end
 
   describe "associations" do
@@ -174,7 +235,7 @@ describe InstitutionalTagCategory do
       root_account = account_model
       sub_account = account_model(parent_account: root_account)
       category = InstitutionalTagCategory.create!(valid_params.merge(account: sub_account))
-      expect(category.root_account_id).to eq(root_account.id)
+      expect(category.root_account_id).to eq(root_account.resolved_root_account_id)
     end
   end
 

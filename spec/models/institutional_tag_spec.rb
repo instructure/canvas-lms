@@ -95,6 +95,67 @@ describe InstitutionalTag do
       record = InstitutionalTag.new(valid_params.merge(sis_source_id: "a" * 256))
       expect(record).not_to be_valid
     end
+
+    describe "tag limit per category" do
+      it "allows up to 50 tags in a category" do
+        50.times do |i|
+          InstitutionalTag.create!(valid_params.merge(name: "Tag #{i}"))
+        end
+        expect(category.institutional_tags.active.count).to eq(50)
+      end
+
+      it "rejects the 51st tag in a category" do
+        50.times do |i|
+          InstitutionalTag.create!(valid_params.merge(name: "Tag #{i}"))
+        end
+        tag = InstitutionalTag.new(valid_params.merge(name: "Tag 51"))
+        expect(tag).not_to be_valid
+        expect(tag.errors[:category]).to be_present
+      end
+
+      it "does not count soft-deleted tags toward the limit" do
+        50.times do |i|
+          InstitutionalTag.create!(valid_params.merge(name: "Tag #{i}"))
+        end
+        category.institutional_tags.active.first.destroy
+        tag = InstitutionalTag.new(valid_params.merge(name: "Replacement Tag"))
+        expect(tag).to be_valid
+      end
+
+      it "allows updating an existing tag when the category is at the limit" do
+        50.times do |i|
+          InstitutionalTag.create!(valid_params.merge(name: "Tag #{i}"))
+        end
+        existing_tag = category.institutional_tags.active.last
+        existing_tag.name = "Updated Name"
+        expect(existing_tag).to be_valid
+      end
+
+      it "prevents restoring a deleted tag when the category is at the limit" do
+        50.times do |i|
+          InstitutionalTag.create!(valid_params.merge(name: "Tag #{i}"))
+        end
+        deleted_tag = category.institutional_tags.active.first
+        deleted_tag.destroy
+        InstitutionalTag.create!(valid_params.merge(name: "Replacement"))
+        deleted_tag.workflow_state = "active"
+        expect(deleted_tag).not_to be_valid
+        expect(deleted_tag.errors[:category]).to be_present
+      end
+
+      it "respects the configurable limit from DynamicSettings" do
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(
+          DynamicSettings::FallbackProxy.new({ "institutional_tags_per_category_limit" => "3" })
+        )
+        3.times do |i|
+          InstitutionalTag.create!(valid_params.merge(name: "Tag #{i}"))
+        end
+        tag = InstitutionalTag.new(valid_params.merge(name: "Tag 4"))
+        expect(tag).not_to be_valid
+        expect(tag.errors[:category]).to be_present
+      end
+    end
   end
 
   describe "associations" do

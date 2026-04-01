@@ -84,7 +84,12 @@ describe "AccountType institutional tag queries" do
       expect(result).to eq ["Animals"]
     end
 
-    it "filters by workflow_state" do
+    it "returns only active categories when workflowState is active" do
+      result = account_type.resolve('institutionalTagCategoriesConnection(workflowState: "active") { nodes { name } }')
+      expect(result).to eq ["Animals", "Colors"]
+    end
+
+    it "returns only deleted categories when workflowState is deleted" do
       result = account_type.resolve('institutionalTagCategoriesConnection(workflowState: "deleted") { nodes { name } }')
       expect(result).to eq ["Archived Category"]
     end
@@ -135,7 +140,12 @@ describe "AccountType institutional tag queries" do
       expect(result).to eq ["Dog"]
     end
 
-    it "filters by workflow_state" do
+    it "returns only active tags when workflowState is active" do
+      result = account_type.resolve('institutionalTagsConnection(workflowState: "active") { nodes { name } }')
+      expect(result).to eq %w[Blue Cat Dog]
+    end
+
+    it "returns only deleted tags when workflowState is deleted" do
       result = account_type.resolve('institutionalTagsConnection(workflowState: "deleted") { nodes { name } }')
       expect(result).to eq ["Archived Tag"]
     end
