@@ -23,4 +23,8 @@
 body.educator-dashboard {
   // No BrandableCSS token equivalent exists for this background color
   background-color: #F2F4F5;
+
+  .unpublished_courses_redesign .ic-DashboardCard__box__header {
+    background: #F2F4F5;
+  }
 }
