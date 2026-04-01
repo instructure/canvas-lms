@@ -288,37 +288,13 @@ describe WikiPagesApiController, type: :request do
 
     describe "POST #create" do
       context "when block_editor_data is present" do
-        it "stores an ExternalContentReference" do
-          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
-
-          expect(ContentServiceClient).to have_received(:create_content)
-          page = WikiPage.last
-          expect(page.external_content_reference).to be_present
-          expect(page.external_content_reference.content_id).to eq external_content_id
-        end
-
-        it "sends the data parameter to ContentServiceClient.create_content" do
-          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
-
-          expect(ContentServiceClient).to have_received(:create_content).with(
-            hash_including(
-              data: block_editor_data,
-              context_type: "WikiPage",
-              context_id: WikiPage.last.id
-            )
+        it "calls create_block_editor_data with the correct parameters" do
+          expect_any_instance_of(WikiPage).to receive(:create_block_editor_data).with(
+            user_uuid: @teacher.uuid,
+            data: block_editor_data
           )
-        end
-      end
 
-      context "when block_editor_data is absent" do
-        it "calls create_content with nil data and creates an ExternalContentReference" do
-          create_wiki_page(@teacher, { title: "New Page" })
-
-          expect(ContentServiceClient).to have_received(:create_content).with(
-            hash_including(data: nil)
-          )
-          page = WikiPage.last
-          expect(page.external_content_reference).to be_present
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
         end
       end
 
@@ -327,8 +303,8 @@ describe WikiPagesApiController, type: :request do
           @course.account.disable_feature!(:horizon_block_content_editor)
         end
 
-        it "does not create an ExternalContentReference" do
-          expect(ContentServiceClient).not_to receive(:create_content)
+        it "does not call create_block_editor_data" do
+          expect_any_instance_of(WikiPage).not_to receive(:create_block_editor_data)
 
           create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
         end
@@ -347,43 +323,36 @@ describe WikiPagesApiController, type: :request do
       end
 
       context "when block_editor_data is present and ExternalContentReference exists" do
-        it "sends the stored external_content_id to the Content Service" do
+        it "calls update_block_editor_data with the correct parameters" do
+          expect_any_instance_of(WikiPage).to receive(:update_block_editor_data).with(
+            user_uuid: @teacher.uuid,
+            data: block_editor_data
+          )
+
           update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
-
-          expect(ContentServiceClient).to have_received(:update_content).with(
-            hash_including(external_content_id: "existing-ext-uuid")
-          )
-        end
-
-        it "sends the data parameter to ContentServiceClient.update_content" do
-          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
-
-          expect(ContentServiceClient).to have_received(:update_content).with(
-            hash_including(
-              data: block_editor_data,
-              external_content_id: "existing-ext-uuid"
-            )
-          )
-        end
-      end
-
-      context "when block_editor_data is absent" do
-        it "calls update_content with nil data" do
-          update_wiki_page(@teacher, @wiki_page, { title: "Updated title" })
-
-          expect(ContentServiceClient).to have_received(:update_content).with(
-            hash_including(data: nil)
-          )
         end
       end
 
       context "when the page has no ExternalContentReference" do
+        let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
+
+        it "does not raise and succeeds" do
+          expect_any_instance_of(WikiPage).to receive(:update_block_editor_data).with(
+            user_uuid: @teacher.uuid,
+            data: block_editor_data
+          ).and_call_original
+
+          update_wiki_page(@teacher, page_without_ref, { block_editor_data: })
+        end
+      end
+
+      context "when the feature flag is disabled" do
         before do
-          @wiki_page.external_content_reference.destroy
+          @course.account.disable_feature!(:horizon_block_content_editor)
         end
 
-        it "does not call the Content Service" do
-          expect(ContentServiceClient).not_to receive(:update_content)
+        it "does not call update_block_editor_data" do
+          expect_any_instance_of(WikiPage).not_to receive(:update_block_editor_data)
 
           update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
         end
@@ -405,7 +374,15 @@ describe WikiPagesApiController, type: :request do
         it "returns block_editor_data from the Content Service" do
           json = get_wiki_page(@teacher, @wiki_page)
 
-          expect(json["block_editor_data"]).to eq block_editor_data
+          expect(json["block_editor_data"]).to eql block_editor_data
+        end
+
+        it "calls get_block_editor_data with correct parameters" do
+          expect_any_instance_of(WikiPage).to receive(:get_block_editor_data).with(
+            user_uuid: @teacher.uuid
+          ).and_return(block_editor_data)
+
+          get_wiki_page(@teacher, @wiki_page)
         end
       end
 
@@ -452,6 +429,7 @@ describe WikiPagesApiController, type: :request do
 
       before do
         allow(ErrorReport).to receive(:log_error).and_return(double(id: error_report_id))
+        allow(Canvas).to receive(:retriable).and_yield
       end
 
       context "POST #create with ContentServiceClient error" do

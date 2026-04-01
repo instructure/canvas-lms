@@ -945,31 +945,15 @@ class WikiPagesApiController < ApplicationController
   end
 
   def create_external_content_ref
-    if @context.account.horizon_block_content_editor?
-      response = ContentServiceClient.create_content(
-        root_account_uuid: @context.root_account.uuid,
-        user_uuid: @current_user.uuid,
-        context_type: "WikiPage",
-        context_id: @page.id,
-        data: @block_editor_data
-      )
+    return unless @context.account.horizon_block_content_editor?
 
-      @page.create_external_content_reference(content_id: response.external_content_id)
-    end
+    @page.create_block_editor_data(user_uuid: @current_user.uuid, data: @block_editor_data)
   end
 
   def update_external_content_ref
-    if @context.account.horizon_block_content_editor?
-      external_ref = @page.external_content_reference
-      if external_ref
-        ContentServiceClient.update_content(
-          root_account_uuid: @context.root_account.uuid,
-          user_uuid: @current_user.uuid,
-          external_content_id: external_ref.content_id,
-          data: @block_editor_data
-        )
-      end
-    end
+    return unless @context.account.horizon_block_content_editor?
+
+    @page.update_block_editor_data(user_uuid: @current_user.uuid, data: @block_editor_data)
   end
 
   def extract_block_editor_data

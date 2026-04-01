@@ -1938,4 +1938,165 @@ describe WikiPage do
       end
     end
   end
+
+  describe "ContentService methods" do
+    let(:wiki_page) { wiki_page_model(title: "Test Page") }
+
+    let(:user_uuid) { "user-uuid-1234" }
+    let(:data) { { "content" => "block data" } }
+    let(:external_content_id) { "ext-uuid-5678" }
+
+    before do
+      stub_const("ContentServiceClient", Class.new do
+        def self.create_content(**) = nil
+        def self.update_content(**) = nil
+        def self.get_content(**) = nil
+      end)
+
+      allow(Canvas).to receive(:retriable).and_yield
+    end
+
+    describe "#create_block_editor_data" do
+      before do
+        allow(ContentServiceClient).to receive(:create_content)
+          .and_return(double(external_content_id:))
+      end
+
+      it "passes correct params to ContentServiceClient" do
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(ContentServiceClient).to have_received(:create_content).with(
+          root_account_uuid: wiki_page.context.root_account.uuid,
+          user_uuid:,
+          context_type: "WikiPage",
+          context_id: wiki_page.id,
+          data:
+        )
+      end
+
+      it "stores the returned external_content_id" do
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(wiki_page.external_content_reference).to be_present
+        expect(wiki_page.external_content_reference.content_id).to eql external_content_id
+      end
+
+      context "when data is nil" do
+        it "passes nil data to ContentServiceClient" do
+          wiki_page.create_block_editor_data(user_uuid:, data: nil)
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            hash_including(data: nil)
+          )
+        end
+      end
+    end
+
+    describe "#update_block_editor_data" do
+      before do
+        wiki_page.create_external_content_reference!(content_id: external_content_id)
+        allow(ContentServiceClient).to receive(:update_content).and_return(nil)
+      end
+
+      it "passes correct params to ContentServiceClient" do
+        wiki_page.update_block_editor_data(user_uuid:, data:)
+
+        expect(ContentServiceClient).to have_received(:update_content).with(
+          root_account_uuid: wiki_page.context.root_account.uuid,
+          user_uuid:,
+          external_content_id:,
+          data:
+        )
+      end
+
+      context "when the page has no ExternalContentReference" do
+        let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
+
+        it "does not call ContentServiceClient" do
+          page_without_ref.update_block_editor_data(user_uuid:, data:)
+
+          expect(ContentServiceClient).not_to have_received(:update_content)
+        end
+
+        it "returns nil" do
+          result = page_without_ref.update_block_editor_data(user_uuid:, data:)
+
+          expect(result).to be_nil
+        end
+      end
+    end
+
+    describe "#get_block_editor_data" do
+      let(:block_editor_data) { { "type" => "doc", "content" => [] } }
+
+      before do
+        wiki_page.create_external_content_reference!(content_id: external_content_id)
+        allow(ContentServiceClient).to receive(:get_content)
+          .and_return(double(data: block_editor_data))
+      end
+
+      it "passes correct params to ContentServiceClient" do
+        wiki_page.get_block_editor_data(user_uuid:)
+
+        expect(ContentServiceClient).to have_received(:get_content).with(
+          root_account_uuid: wiki_page.context.root_account.uuid,
+          user_uuid:,
+          external_content_id:
+        )
+      end
+
+      it "returns the block_editor_data data" do
+        result = wiki_page.get_block_editor_data(user_uuid:)
+
+        expect(result).to eql block_editor_data
+      end
+
+      context "when the page has no ExternalContentReference" do
+        let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
+
+        it "returns nil without calling ContentServiceClient" do
+          result = page_without_ref.get_block_editor_data(user_uuid:)
+
+          expect(result).to be_nil
+          expect(ContentServiceClient).not_to have_received(:get_content)
+        end
+      end
+
+      context "when ContentServiceClient raises" do
+        let(:client_error) do
+          InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError.new("service failure")
+        end
+
+        before do
+          allow(Canvas).to receive(:retriable).and_raise(client_error)
+        end
+
+        it "propagates the error" do
+          expect { wiki_page.get_block_editor_data(user_uuid:) }
+            .to raise_error(InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError)
+        end
+      end
+    end
+
+    describe "retry configuration" do
+      it "defaults to 3" do
+        allow(ContentServiceClient).to receive(:create_content).and_return(double(external_content_id:))
+
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(Canvas).to have_received(:retriable).with(hash_including(tries: 3))
+      end
+
+      it "reads the value from Setting" do
+        Setting.set("content_service_client_max_retries", "5")
+        allow(ContentServiceClient).to receive(:create_content).and_return(double(external_content_id:))
+
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(Canvas).to have_received(:retriable).with(hash_including(tries: 5))
+      ensure
+        Setting.remove("content_service_client_max_retries")
+      end
+    end
+  end
 end
