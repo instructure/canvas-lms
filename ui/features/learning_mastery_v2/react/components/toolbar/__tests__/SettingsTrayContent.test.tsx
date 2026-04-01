@@ -18,12 +18,12 @@
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {SettingsTrayContent, SettingsTrayContentProps} from '../SettingsTrayContent'
+import {DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {
-  DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
   ScoreDisplayFormat,
   SecondaryInfoDisplay,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 const makeProps = (props = {}): SettingsTrayContentProps => ({
   settings: DEFAULT_GRADEBOOK_SETTINGS,

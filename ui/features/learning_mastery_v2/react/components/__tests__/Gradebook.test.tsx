@@ -21,9 +21,10 @@ import {render, screen} from '@testing-library/react'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {Gradebook, GradebookProps} from '../Gradebook'
-import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
+import {SortBy} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 vi.mock('../charts/BarChart', () => ({
   BarChart: () => null,

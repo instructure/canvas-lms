@@ -164,8 +164,9 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
   return (
     <StudentPopover
       studentName={studentName}
-      student={student}
-      userDetails={userDetails}
+      avatarUrl={student.avatar_url}
+      description={userDetails?.course.name}
+      metadata={userDetails?.user.sections.map(s => s.name).join(', ')}
       masteryScoresOverride={masteryScoresOverride}
       actionsOverride={actionsOverride}
       isLoading={isLoading}

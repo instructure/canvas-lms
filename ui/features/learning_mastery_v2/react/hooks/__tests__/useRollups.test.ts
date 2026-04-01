@@ -19,7 +19,8 @@
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '@canvas/outcomes/react/utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE} from '@canvas/outcomes/react/utils/constants'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {Outcome, Rating, Student} from '@canvas/outcomes/react/types/rollup'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 

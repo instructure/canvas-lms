@@ -19,14 +19,14 @@ import {act} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import {useGradebookSettings} from '../useGradebookSettings'
 import * as apiClient from '../../apiClient'
+import {DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {
-  DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
   SecondaryInfoDisplay,
   NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 vi.mock('../../apiClient')
 

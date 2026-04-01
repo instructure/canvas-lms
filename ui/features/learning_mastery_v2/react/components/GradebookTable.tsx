@@ -22,16 +22,18 @@ import {StudentCellPopover} from './grid/StudentCellPopover'
 import {StudentHeader} from './grid/StudentHeader'
 import {OutcomeHeader} from './grid/OutcomeHeader'
 import {
-  COLUMN_WIDTH,
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
   GradebookSettings,
   DEFAULT_GRADEBOOK_SETTINGS,
+} from '@canvas/outcomes/react/utils/constants'
+import {
+  COLUMN_WIDTH,
   DisplayFilter,
   NameDisplayFormat,
   CELL_HEIGHT,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   Student,

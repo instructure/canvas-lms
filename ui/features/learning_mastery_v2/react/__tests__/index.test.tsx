@@ -32,15 +32,11 @@ import {
   StudentRollupData,
   Pagination,
 } from '@canvas/outcomes/react/types/rollup'
-import {
-  DisplayFilter,
-  SortOrder,
-  SortBy,
-  DEFAULT_GRADEBOOK_SETTINGS,
-} from '@canvas/outcomes/react/utils/constants'
+import {SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
 import {useMasteryDistribution} from '../hooks/useMasteryDistribution'
+import {DisplayFilter, SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 vi.mock('../components/charts/BarChart', () => ({
   BarChart: () => null,
