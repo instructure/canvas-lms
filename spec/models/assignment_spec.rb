@@ -9290,6 +9290,96 @@ describe Assignment do
         end
       end
     end
+
+    context "when completing a comment-based peer review" do
+      let_once(:course) { course_model }
+      let_once(:assessor) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+      let_once(:reviewee) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+
+      before :once do
+        peer_review_model(course:, peer_review_count: 1)
+        @parent_assignment.update!(rubric: nil)
+        @reviewee_submission = submission_model(assignment: @parent_assignment, user: reviewee)
+        @assessor_submission = submission_model(assignment: @parent_assignment, user: assessor)
+        @assessment_request = AssessmentRequest.create!(
+          user: reviewee,
+          asset: @reviewee_submission,
+          assessor_asset: @assessor_submission,
+          assessor:,
+          workflow_state: "assigned",
+          peer_review_sub_assignment: @peer_review_sub_assignment
+        )
+      end
+
+      it "calls SubmissionCreatorService when assessment_request has a peer_review_sub_assignment" do
+        service_double = instance_double(PeerReview::SubmissionCreatorService)
+        expect(PeerReview::SubmissionCreatorService).to receive(:new)
+          .with(parent_assignment: @parent_assignment, assessor:)
+          .and_return(service_double)
+        expect(service_double).to receive(:call)
+
+        @parent_assignment.add_submission_comment(
+          reviewee,
+          comment: "Good work!",
+          author: assessor,
+          assessment_request: @assessment_request
+        )
+      end
+
+      it "does not call SubmissionCreatorService when assessment_request has no peer_review_sub_assignment" do
+        @assessment_request.update!(peer_review_sub_assignment: nil)
+
+        expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
+
+        @parent_assignment.add_submission_comment(
+          reviewee,
+          comment: "Good work!",
+          author: assessor,
+          assessment_request: @assessment_request
+        )
+      end
+    end
+
+    # When a rubric association is present, SubmissionCreatorService is triggered
+    # via RubricAssessment#update_assessment_requests, not via add_submission_comment
+    context "when assessment_request has an active rubric association" do
+      let_once(:course) { course_model }
+      let_once(:assessor) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+      let_once(:reviewee) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+
+      before :once do
+        peer_review_model(course:, peer_review_count: 1)
+        rubric = rubric_model(context: course)
+        rubric_association = RubricAssociation.create!(
+          rubric:,
+          association_object: @parent_assignment,
+          context: course,
+          purpose: "grading"
+        )
+        @reviewee_submission = submission_model(assignment: @parent_assignment, user: reviewee)
+        @assessor_submission = submission_model(assignment: @parent_assignment, user: assessor)
+        @assessment_request = AssessmentRequest.create!(
+          user: reviewee,
+          asset: @reviewee_submission,
+          assessor_asset: @assessor_submission,
+          assessor:,
+          workflow_state: "assigned",
+          peer_review_sub_assignment: @peer_review_sub_assignment,
+          rubric_association:
+        )
+      end
+
+      it "does not call SubmissionCreatorService" do
+        expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
+
+        @parent_assignment.add_submission_comment(
+          reviewee,
+          comment: "Good work!",
+          author: assessor,
+          assessment_request: @assessment_request
+        )
+      end
+    end
   end
 
   describe "#in_closed_grading_period?" do
