@@ -6,6 +6,13 @@ translation:
   root_opt_in: true
   description: AI translation controls for courses, currently limited to discussions and announcements.
 
+translation_feedback:
+  state: hidden
+  applies_to: Course
+  root_opt_in: true
+  display_name: AI Translation Feedback
+  description: Allow users to provide thumbs up/down feedback on AI-generated translations in discussions and announcements.
+
 translate_inbox_messages:
   state: hidden
   applies_to: RootAccount

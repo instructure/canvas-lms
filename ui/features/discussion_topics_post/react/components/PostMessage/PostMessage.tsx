@@ -213,6 +213,7 @@ export function PostMessage({...props}) {
                     )}
                   </Translation.Content>
                   <Translation.Actions />
+                  <Translation.Feedback />
                   <Translation.Error />
                 </Translation>
               </div>
