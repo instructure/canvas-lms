@@ -185,6 +185,16 @@ class RubricAssessment < ApplicationRecord
       a.attributes = { rubric_assessment: self, assessor: }
       a.complete
     end
+
+    # Use a separate loop as all ARs must be completed before checking the PRs threshold
+    requests.each do |a| # rubocop:disable Style/CombinableLoops
+      next unless a.peer_review_sub_assignment
+
+      PeerReview::SubmissionCreatorService.new(
+        parent_assignment: a.asset.assignment,
+        assessor: a.assessor
+      ).call
+    end
   end
   protected :update_assessment_requests
 

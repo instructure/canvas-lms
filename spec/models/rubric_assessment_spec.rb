@@ -1147,6 +1147,68 @@ describe RubricAssessment do
     end
   end
 
+  describe "#update_assessment_requests" do
+    let_once(:course) { course_model }
+    let_once(:assessor) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+    let_once(:reviewee) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+
+    before :once do
+      peer_review_model(course:, peer_review_count: 1)
+      rubric_model(context: course)
+      @rubric_association = RubricAssociation.create!(
+        rubric: @rubric,
+        association_object: @parent_assignment,
+        context: course,
+        purpose: "grading"
+      )
+      @reviewee_submission = submission_model(assignment: @parent_assignment, user: reviewee)
+      @assessor_submission = submission_model(assignment: @parent_assignment, user: assessor)
+      @assessment_request = AssessmentRequest.create!(
+        user: reviewee,
+        asset: @reviewee_submission,
+        assessor_asset: @assessor_submission,
+        assessor:,
+        workflow_state: "assigned",
+        peer_review_sub_assignment: @peer_review_sub_assignment,
+        rubric_association: @rubric_association
+      )
+    end
+
+    it "calls SubmissionCreatorService when assessment_request has a peer_review_sub_assignment" do
+      service_double = instance_double(PeerReview::SubmissionCreatorService)
+      expect(PeerReview::SubmissionCreatorService).to receive(:new)
+        .with(parent_assignment: @parent_assignment, assessor:)
+        .and_return(service_double)
+      expect(service_double).to receive(:call)
+
+      @rubric_association.assess(
+        user: reviewee,
+        assessor:,
+        artifact: @reviewee_submission,
+        assessment: {
+          assessment_type: "peer_review",
+          criterion_crit1: { points: 5, comments: "Good work!" }
+        }
+      )
+    end
+
+    it "does not call SubmissionCreatorService when assessment_request has no peer_review_sub_assignment" do
+      @assessment_request.update!(peer_review_sub_assignment: nil)
+
+      expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
+
+      @rubric_association.assess(
+        user: reviewee,
+        assessor:,
+        artifact: @reviewee_submission,
+        assessment: {
+          assessment_type: "peer_review",
+          criterion_crit1: { points: 5, comments: "Good work!" }
+        }
+      )
+    end
+  end
+
   describe "mark_unread_assessments" do
     before do
       @submission = @assignment.find_or_create_submission(@student)

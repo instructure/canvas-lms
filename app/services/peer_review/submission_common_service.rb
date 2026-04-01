@@ -72,11 +72,14 @@ class PeerReview::SubmissionCommonService < ApplicationService
                                      .first(required_count)
                                      .max
                                  else
-                                   # For assignment without rubric, peer assessment is provided via SubmissionComments
+                                   # For assignment without rubric, peer assessment is provided via SubmissionComments.
+                                   # Group by assessment request to collapse multiple comments per review into one
+                                   # timestamp (the earliest comment per AR = when the review was first submitted).
                                    completed_assessment_requests
                                      .joins(:submission_comments)
-                                     .order("submission_comments.created_at ASC")
-                                     .pluck("submission_comments.created_at")
+                                     .group("assessment_requests.id")
+                                     .order(Arel.sql("MIN(submission_comments.created_at) ASC"))
+                                     .pluck(Arel.sql("MIN(submission_comments.created_at)"))
                                      .first(required_count)
                                      .max
                                  end

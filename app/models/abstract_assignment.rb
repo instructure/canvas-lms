@@ -2629,9 +2629,15 @@ class AbstractAssignment < ApplicationRecord
       submissions: []
     }
 
+    # Complete the assessment request before creating the comment because
+    # submission.add_comment calls comment_added which sets workflow_state
+    # in memory — the workflow gem's complete event is only available from
+    # the assigned state
+    should_call_peer_review_submission_service = false
     if opts[:comment] && opts[:assessment_request] && !opts[:assessment_request].active_rubric_association?
       # if there is no rubric the peer review is complete with just a comment
       opts[:assessment_request].complete
+      should_call_peer_review_submission_service = opts[:assessment_request].peer_review_sub_assignment.present?
     end
 
     # commenting on a student submission results in a teacher occupying a
@@ -2649,6 +2655,16 @@ class AbstractAssignment < ApplicationRecord
         res[:submissions] << submission
       end
     end
+
+    # Call after comments are persisted because the service uses comment
+    # timestamps to determine the PR sub assignment submission timestamp
+    if should_call_peer_review_submission_service
+      PeerReview::SubmissionCreatorService.new(
+        parent_assignment: self,
+        assessor: opts[:assessment_request].assessor
+      ).call
+    end
+
     res
   end
   private :update_submission_runner
