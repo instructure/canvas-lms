@@ -250,7 +250,6 @@ class GradeSummaryPresenter
 
   def submissions
     preload_params = [
-      :attachment_associations,
       :content_participations,
       { originality_reports: [:lti_link, :attachment] },
       :user,

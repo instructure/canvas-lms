@@ -943,17 +943,12 @@ module ApplicationHelper
           case attachment.context_type
           when "User"
             # search for an attachment association
-            aas =
-              attachment
-              .attachment_associations
-              .where(context_type: "Submission")
-              .preload(:context)
-              .to_a
+            submissions = Submission.referencing_linked_attachment(attachment).to_a
             ActiveRecord::Associations.preload(
-              aas.map(&:submission),
+              submissions,
               assignment: :context
             )
-            courses = aas.map { |aa| aa&.submission&.assignment&.course }.uniq
+            courses = submissions.map { |submission| submission&.assignment&.course }.uniq
             if courses.length == 1
               @csp_context_is_submission = true
               courses.first

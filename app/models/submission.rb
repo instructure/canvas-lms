@@ -1108,10 +1108,10 @@ class Submission < ApplicationRecord
   end
   private :all_versioned_attachments
 
-  def attachment_ids_for_version
+  def attachment_ids_for_version(include_attachment_id: true)
     ids = (attachment_ids || "").split(",").map(&:to_i)
-    ids << attachment_id if attachment_id
-    ids
+    ids << attachment_id if include_attachment_id && attachment_id
+    ids.uniq
   end
 
   def delete_turnitin_errors
@@ -1611,17 +1611,12 @@ class Submission < ApplicationRecord
       self.updating_user = user
       super
     else
-      association_ids = attachment_associations.pluck(:attachment_id)
-      ids = (attachment_ids || "").split(",").map(&:to_i)
-      ids << attachment_id if attachment_id
-      ids.uniq!
-      associations_to_delete = association_ids - ids
-      attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
-      unassociated_ids = ids - association_ids
+      attachments_with_associations_ids = attachment_associations.pluck(:attachment_id)
+      unassociated_ids = attachment_ids_for_version - attachments_with_associations_ids
       return if unassociated_ids.empty?
 
-      attachments = Attachment.where(id: unassociated_ids)
-      attachments.each do |a|
+      unassociated_attachments = Attachment.where(id: unassociated_ids)
+      unassociated_attachments.each do |a|
         next unless (a.context_type == "User" && a.context_id == user_id) ||
                     (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
                     (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
@@ -2090,9 +2085,7 @@ class Submission < ApplicationRecord
     # look equal to the Hash key and the attachments for the last one
     # will cancel out the former ones.
     submissions_with_index_and_attachment_ids = submissions.each_with_index.map do |s, index|
-      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
-      attachment_ids << s.attachment_id if s.attachment_id
-      [[s, index], attachment_ids]
+      [[s, index], s.attachment_ids_for_version]
     end
     submissions_with_index_and_attachment_ids.to_h
   end
@@ -2184,13 +2177,17 @@ class Submission < ApplicationRecord
   # Otherwise, returns a hash of submission to attachments.
   def self.bulk_load_attachments_for_submissions(submissions, preloads: nil, preload_only: false)
     submissions = Array(submissions)
-    attachment_ids_by_submission =
-      submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
+    attachment_ids_by_submission = submissions.index_with(&:attachment_ids_for_version)
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
     else
-      attachments_by_id = Attachment.where(id: bulk_attachment_ids)
+      # join by attachment_associations here to filter out attachments that don't contain an
+      # AttachmentAssociation linking them to the submissions, even though the attachment is
+      # referenced in a submission's attachment_ids field. See 5e327e3.
+      attachments_by_id = Attachment.joins(:attachment_associations)
+                                    .where(id: bulk_attachment_ids, attachment_associations: { context: submissions })
+                                    .distinct
       attachments_by_id = attachments_by_id.preload(*preloads) unless preloads.nil?
       attachments_by_id = attachments_by_id.group_by(&:id)
     end
@@ -2214,7 +2211,15 @@ class Submission < ApplicationRecord
   end
 
   def includes_attachment?(attachment)
-    versions.map(&:model).any? { |v| (v.attachment_ids || "").split(",").map(&:to_i).include?(attachment.id) }
+    # TODO: after GROW-239, change this to check if the attachment
+    # is referenced in one of the associated AttachmentAssociation records.
+    #
+    # attachment_associations.where(attachment_id: attachment.id).exists?
+    #
+    versions.any? do |v|
+      ids = v.model.attachment_ids_for_version(include_attachment_id: false)
+      ids.include?(attachment.id)
+    end
   end
 
   def <=>(other)
@@ -2303,8 +2308,13 @@ class Submission < ApplicationRecord
     true
   end
 
+  # Note that this only returns attachments for the current version of the submission.
   def attachments
-    Attachment.where(id: attachment_associations.pluck(:attachment_id))
+    if attachment_ids_for_version.blank?
+      Attachment.none
+    else
+      Attachment.where(id: attachment_associations.where(attachment_id: attachment_ids_for_version).pluck(:attachment_id))
+    end
   end
 
   def attachments=(attachments)
@@ -2313,8 +2323,16 @@ class Submission < ApplicationRecord
     # one student from sneakily getting access to files in another user's comments,
     # since they're all being held on the assignment for now.
     attachments ||= []
-    old_ids = Array(attachment_ids || "").join(",").split(",").map(&:to_i)
-    self.attachment_ids = attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == assignment) || a.context != assignment }.map(&:id).join(",")
+
+    old_ids = attachment_ids_for_version(include_attachment_id: false)
+    self.attachment_ids = attachments.filter_map do |a|
+      next nil if a.blank?
+      next a.id if a.id && old_ids.include?(a.id)
+      next a.id if a.recently_created? && a.context == assignment
+      next a.id if a.context != assignment
+
+      nil
+    end.join(",")
   end
 
   # someday code-archaeologists will wonder how this method came to be named
@@ -2414,6 +2432,29 @@ class Submission < ApplicationRecord
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, ->(user) { where(user_id: user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
+
+  # returns submissions that reference the given attachment in their attachment_ids or attachment_id fields.
+  scope :referencing_attachment, lambda { |attachment| # you can also provide an attachment ID
+    where(
+      "submissions.attachment_id = ? " \
+      "OR ? = ANY(regexp_split_to_array(NULLIF(submissions.attachment_ids, ''), ',')::INT8[])",
+      attachment,
+      attachment
+    )
+  }
+
+  # returns submissions that reference the given attachment in their attachment_ids or attachment_id fields,
+  # and have an associated AttachmentAssociation linking that attachment to the submission.
+  # web snapshot attachments do not get AttachmentAssociations generated, therefore they will not be included
+  # in the results of this scope, whereas they could be in the referencing_attachment scope
+  scope :referencing_linked_attachment, lambda { |attachment| # you can also provide an attachment ID
+    referencing_attachment(attachment).where(
+      AttachmentAssociation.where("attachment_associations.context_id = submissions.id")
+                           .where(context_type: "Submission", attachment:)
+                           .arel
+                           .exists
+    )
+  }
 
   def assignment_visible_to_user?(user)
     return visible_to_user unless visible_to_user.nil?

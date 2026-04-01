@@ -1452,12 +1452,9 @@ class Attachment < ApplicationRecord
     # peer reviewer
     if user && assignment.peer_reviews
       # Find submissions associated with this attachment through AttachmentAssociation
-      attachment_assocs = AttachmentAssociation.where(attachment_id: id, context_type: "Submission")
-      attachment_assocs.each do |assoc|
-        submission = assoc.context
-        if submission&.assignment == assignment && submission.peer_reviewer_for?(user)
-          return true
-        end
+      assignment_submissions = assignment.all_submissions.referencing_linked_attachment(id)
+      if assignment_submissions.any? { |sub| sub.peer_reviewer_for?(user) }
+        return true
       end
     end
 
