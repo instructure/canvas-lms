@@ -876,14 +876,16 @@ shared_examples_for "context modules for teachers" do
       get "/courses/#{@course.id}/modules"
 
       hover(f(".reply_to_topic_display a"))
-      rtt_tooltip_els = ff("[class*='vdd_tooltip_']")
-      expect(rtt_tooltip_els.first.text).to include "Multiple Due Dates"
-      expect(rtt_tooltip_els.last.text).to eq "Everyone else\n#{datetime_string(c1due_at)}\n#{sec1.name}\n#{datetime_string(c1o1due_at)}\n#{sec2.name}\n#{datetime_string(c1o2due_at)}"
+      tooltip_element = f("[data-testid='vdd_tooltip_0']")
+      tooltip_contents = f("[data-testid='vdd_contents_0']")
+      expect(tooltip_element.text).to include "Multiple Due Dates"
+      expect(tooltip_contents.text).to eq "Everyone else\n#{datetime_string(c1due_at)}\n#{sec1.name}\n#{datetime_string(c1o1due_at)}\n#{sec2.name}\n#{datetime_string(c1o2due_at)}"
 
       hover(f(".reply_to_entry_display a"))
-      rte_tooltip_els = ff("[class*='vdd_tooltip_']")
-      expect(rte_tooltip_els.first.text).to include "Multiple Due Dates"
-      expect(rte_tooltip_els.last.text).to eq "Everyone else\n#{datetime_string(c2due_at)}\n#{sec1.name}\n#{datetime_string(c2o1due_at)}\n#{sec2.name}\n#{datetime_string(c2o2due_at)}"
+      tooltip_element = f("[data-testid='vdd_tooltip_1']")
+      tooltip_contents = f("[data-testid='vdd_contents_1']")
+      expect(tooltip_element.text).to include "Multiple Due Dates"
+      expect(tooltip_contents.text).to eq "Everyone else\n#{datetime_string(c2due_at)}\n#{sec1.name}\n#{datetime_string(c2o1due_at)}\n#{sec2.name}\n#{datetime_string(c2o2due_at)}"
 
       stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
       get "/courses/#{@course.id}/modules"
