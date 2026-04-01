@@ -598,8 +598,8 @@ export const AccessibilityWizard = () => {
     )
 
     return (
-      <Flex as="div" direction="column" height="100%">
-        <Flex.Item shouldGrow overflowY="auto" padding="0 small">
+      <>
+        <View as="div" padding="0 small">
           <Flex direction="column" gap="large">
             <Flex direction="column" gap="mediumSmall">
               <Flex
@@ -671,7 +671,7 @@ export const AccessibilityWizard = () => {
                 )}
             </Flex>
 
-            <View>
+            <View margin="0 0 medium 0">
               {previewActionButton}
               {formError && selectedIssue.form.type === FormType.Button && (
                 <View as="div" margin="x-small 0">
@@ -679,32 +679,7 @@ export const AccessibilityWizard = () => {
                 </View>
               )}
             </View>
-
-            {/* Spacer for sticky footer */}
-            <View></View>
           </Flex>
-        </Flex.Item>
-
-        <View as="div" position="sticky" insetBlockEnd="0" style={{zIndex: 10}}>
-          <AccessibilityIssuesDrawerFooter
-            nextButtonName={I18n.t('Save & Next')}
-            onSkip={handleSkip}
-            onBack={handlePrevious}
-            onSaveAndNext={handleApplyAndSaveAndNext}
-            onBackToStart={handleBackToStart}
-            showBackToStart={
-              !isCloseIssuesEnabled && selectedIssueIndex === issues.length - 1 && issues.length > 1
-            }
-            isBackToStartDisabled={isFormLocked}
-            isBackDisabled={selectedIssueIndex === 0 || isFormLocked}
-            isSkipDisabled={
-              isFormLocked ||
-              (issues.length === 1 && !isCloseIssuesEnabled && selectedIssueIndex === 0)
-            }
-            isSaveAndNextDisabled={
-              !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
-            }
-          />
         </View>
 
         {assertiveAlertMessage && (
@@ -725,7 +700,7 @@ export const AccessibilityWizard = () => {
             onClose={handleModalClose}
           />
         )}
-      </Flex>
+      </>
     )
   }
 
@@ -740,25 +715,61 @@ export const AccessibilityWizard = () => {
         insetInlineStart="0"
         insetInlineEnd="0"
       >
-        <Flex direction="column" width="100%" height="100%">
-          <View
-            as="div"
-            position="sticky"
-            insetBlockStart="0"
-            padding="medium small mediumSmall small"
+        <Flex as="div" direction="column" height="100%">
+          <Flex.Item shouldShrink={false}>
+            <View
+              as="div"
+              padding="medium small mediumSmall small"
+              elementRef={(el: Element | null) => {
+                if (el instanceof HTMLElement) {
+                  el.style.background = canvas.colors.contrasts.white1010
+                  el.style.borderBottom = `1px solid ${canvas.colors.contrasts.grey1214}`
+                }
+              }}
+            >
+              <WizardHeader title={trayTitle} onDismiss={onDismiss} />
+            </View>
+          </Flex.Item>
+          <Flex.Item
+            shouldGrow
+            shouldShrink
+            overflowY="auto"
             elementRef={(el: Element | null) => {
               if (el instanceof HTMLElement) {
-                el.style.zIndex = '10'
-                el.style.background = canvas.colors.contrasts.white1010
-                el.style.borderBottom = `1px solid ${canvas.colors.contrasts.grey1214}`
+                el.style.minHeight = '0'
               }
             }}
           >
-            <WizardHeader title={trayTitle} onDismiss={onDismiss} />
-          </View>
-          <View as="div" width="100%" height="100%">
             <WizardErrorBoundary>{renderTrayContent()}</WizardErrorBoundary>
-          </View>
+          </Flex.Item>
+          {selectedScan &&
+            selectedIssue &&
+            !isRequestInFlight &&
+            !(allIssuesSkipped && isCloseIssuesEnabled) && (
+              <Flex.Item shouldShrink={false}>
+                <AccessibilityIssuesDrawerFooter
+                  nextButtonName={I18n.t('Save & Next')}
+                  onSkip={handleSkip}
+                  onBack={handlePrevious}
+                  onSaveAndNext={handleApplyAndSaveAndNext}
+                  onBackToStart={handleBackToStart}
+                  showBackToStart={
+                    !isCloseIssuesEnabled &&
+                    selectedIssueIndex === issues.length - 1 &&
+                    issues.length > 1
+                  }
+                  isBackToStartDisabled={isFormLocked}
+                  isBackDisabled={selectedIssueIndex === 0 || isFormLocked}
+                  isSkipDisabled={
+                    isFormLocked ||
+                    (issues.length === 1 && !isCloseIssuesEnabled && selectedIssueIndex === 0)
+                  }
+                  isSaveAndNextDisabled={
+                    !isRemediated || isFormLocked || !!formError || !isSaveButtonEnabled
+                  }
+                />
+              </Flex.Item>
+            )}
         </Flex>
       </View>
     </Tray>
