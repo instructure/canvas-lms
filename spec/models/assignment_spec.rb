@@ -4227,6 +4227,24 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
+    it "normalizes letter grade casing with zero points possible" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 0.0
+      @assignment.save!
+
+      grade = @assignment.score_to_grade(0, "b+")
+      expect(grade).to eql("B+")
+    end
+
+    it "preserves invalid letter grades with zero points possible when not in scheme" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 0.0
+      @assignment.save!
+
+      grade = @assignment.score_to_grade(0, "Z")
+      expect(grade).to eql("Z")
+    end
+
     it "properly calculates letter grades" do
       @assignment.grading_type = "letter_grade"
       @assignment.points_possible = 10
