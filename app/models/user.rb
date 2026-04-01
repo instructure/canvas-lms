@@ -2532,6 +2532,22 @@ class User < ApplicationRecord
     end
   end
 
+  # TODO: Optimize caching strategies (EGG-2540)
+  def educator_dashboard_user?
+    Rails.cache.fetch_with_batched_keys(
+      "should_show_educator_dashboard",
+      batch_object: self,
+      batched_keys: :enrollments,
+      expires_in: 1.hour
+    ) do
+      enrollments
+        .shard(in_region_associated_shards)
+        .of_content_admins
+        .active_or_pending
+        .exists?
+    end
+  end
+
   def active_non_student_enrollment?
     return @_active_non_student_enrollment if defined?(@_active_non_student_enrollment)
 

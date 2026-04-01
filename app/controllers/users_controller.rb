@@ -3622,17 +3622,6 @@ class UsersController < ApplicationController
     return false if k5_user?
     return false unless @domain_root_account&.feature_enabled?(:educator_dashboard)
 
-    Rails.cache.fetch_with_batched_keys(
-      "should_show_educator_dashboard",
-      batch_object: @current_user,
-      batched_keys: :enrollments,
-      expires_in: 1.hour
-    ) do
-      @current_user.enrollments
-                   .shard(@current_user.in_region_associated_shards)
-                   .of_content_admins
-                   .active_or_pending
-                   .exists?
-    end
+    @current_user.educator_dashboard_user?
   end
 end

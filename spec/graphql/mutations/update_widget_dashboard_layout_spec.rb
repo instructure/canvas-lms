@@ -352,4 +352,110 @@ RSpec.describe Mutations::UpdateWidgetDashboardLayout do
       expect(result.dig("data", "updateWidgetDashboardLayout", "layout")).to eq(layout.to_json)
     end
   end
+
+  context "educator widget types" do
+    let(:educator_layout) do
+      {
+        "columns" => 2,
+        "widgets" => [
+          {
+            "id" => "educator-announcement-creation-widget",
+            "type" => "educator_announcement_creation",
+            "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+            "title" => "Announcement Creation"
+          },
+          {
+            "id" => "educator-todo-list-widget",
+            "type" => "educator_todo_list",
+            "position" => { "col" => 2, "row" => 1, "relative" => 2 },
+            "title" => "Todo List"
+          },
+          {
+            "id" => "educator-content-quality-widget",
+            "type" => "educator_content_quality",
+            "position" => { "col" => 1, "row" => 2, "relative" => 3 },
+            "title" => "Content Quality"
+          }
+        ]
+      }
+    end
+
+    it "accepts educator widget types" do
+      result = run_mutation(layout: educator_layout.to_json)
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateWidgetDashboardLayout", "layout")).to eq(educator_layout.to_json)
+    end
+  end
+
+  context "dashboard_type argument routing" do
+    before(:once) do
+      @user = user_factory(active_all: true)
+      student_in_course(course: @course, user: @user, active_all: true)
+      teacher_in_course(course: @course, user: @user, active_all: true)
+    end
+
+    def mutation_str_with_type
+      <<~GQL
+        mutation UpdateWidgetDashboardLayout($layout: String!, $dashboardType: WidgetDashboardType) {
+          updateWidgetDashboardLayout(input: {
+            layout: $layout
+            dashboardType: $dashboardType
+          }) {
+            layout
+            errors {
+              message
+            }
+          }
+        }
+      GQL
+    end
+
+    def run_mutation_with_type(opts = {})
+      CanvasSchema.execute(
+        mutation_str_with_type,
+        variables: opts,
+        context: {
+          current_user: @user,
+          request: ActionDispatch::TestRequest.create
+        }
+      ).to_h.with_indifferent_access
+    end
+
+    it "writes to :educator_dashboard_config when dashboardType is educator" do
+      run_mutation_with_type(layout: valid_layout.to_json, dashboardType: "educator")
+
+      @user.reload
+      expect(@user.get_preference(:educator_dashboard_config)["layout"]).to eq(valid_layout)
+      expect(@user.get_preference(:widget_dashboard_config)).to be_nil
+    end
+
+    it "preserves existing data when updating educator config" do
+      existing_filters = { "filters" => { "some-widget" => { "filter" => "all" } } }
+      @user.set_preference(:educator_dashboard_config, existing_filters)
+
+      run_mutation_with_type(layout: valid_layout.to_json, dashboardType: "educator")
+
+      @user.reload
+      config = @user.get_preference(:educator_dashboard_config)
+      expect(config["layout"]).to eq(valid_layout)
+      expect(config["filters"]).to eq(existing_filters["filters"])
+    end
+
+    it "writes to :widget_dashboard_config when dashboardType is student" do
+      run_mutation_with_type(layout: valid_layout.to_json, dashboardType: "student")
+
+      @user.reload
+      expect(@user.get_preference(:widget_dashboard_config)["layout"]).to eq(valid_layout)
+      expect(@user.get_preference(:educator_dashboard_config)).to be_nil
+    end
+
+    it "writes to :widget_dashboard_config when dashboardType is omitted" do
+      run_mutation({ layout: valid_layout.to_json }, @user)
+
+      @user.reload
+      expect(@user.get_preference(:widget_dashboard_config)["layout"]).to eq(valid_layout)
+      expect(@user.get_preference(:educator_dashboard_config)).to be_nil
+    end
+  end
 end

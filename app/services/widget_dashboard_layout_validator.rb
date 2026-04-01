@@ -90,6 +90,9 @@ class WidgetDashboardLayoutValidator
     progress_overview
     recent_grades
     inbox
+    educator_announcement_creation
+    educator_todo_list
+    educator_content_quality
   ].freeze
 
   attr_reader :errors
