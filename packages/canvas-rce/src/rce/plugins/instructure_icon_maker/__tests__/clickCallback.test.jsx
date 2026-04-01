@@ -29,7 +29,7 @@ describe('clickCallback()', () => {
 
     it('creates the container', async () => {
       await act(async () => {
-        subject('create_icon_maker_icon')
+        await subject('create_icon_maker_icon')
       })
 
       await waitFor(() => {
@@ -39,7 +39,7 @@ describe('clickCallback()', () => {
 
     it('mounts the component', async () => {
       await act(async () => {
-        subject('create_icon_maker_icon')
+        await subject('create_icon_maker_icon')
       })
 
       await waitFor(() => {
@@ -51,7 +51,7 @@ describe('clickCallback()', () => {
   describe('when the container exists', () => {
     beforeEach(async () => {
       await act(async () => {
-        subject('edit_icon_maker_icon')
+        await subject('edit_icon_maker_icon')
       })
 
       await waitFor(() => {
@@ -61,7 +61,7 @@ describe('clickCallback()', () => {
 
     it('re-mounts the component', async () => {
       await act(async () => {
-        subject('create_icon_maker_icon')
+        await subject('create_icon_maker_icon')
       })
 
       await waitFor(() => {
