@@ -117,6 +117,7 @@ export type ItemAssignToCardRef = {
   showValidations: () => void
   focusDeleteButton: () => void
   focusInputs: () => void
+  scrollIntoView: (options?: ScrollIntoViewOptions) => void
   runCustomValidations: (params?: ItemAssignToCardCustomValidationArgs) => {
     [key: string]: string | boolean
   }
@@ -183,6 +184,7 @@ export default forwardRef(function ItemAssignToCard(
   const [unparsedFieldKeys, setUnparsedFieldKeys] = useState<Set<string>>(new Set())
 
   const deleteCardButtonRef = useRef<Element | null>(null)
+  const cardRootRef = useRef<HTMLDivElement | null>(null)
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement>>({})
   const timeInputRefs = useRef<Record<string, HTMLInputElement>>({})
@@ -350,6 +352,9 @@ export default forwardRef(function ItemAssignToCard(
         deleteCardButtonRef.current.focus()
       }
     },
+    scrollIntoView(options?: ScrollIntoViewOptions) {
+      cardRootRef.current?.scrollIntoView(options)
+    },
     focusInputs() {
       if (error.length > 0) {
         assigneeSelectorRef.current?.focus()
@@ -459,6 +464,9 @@ export default forwardRef(function ItemAssignToCard(
         <View
           data-testid="item-assign-to-card"
           as="div"
+          elementRef={(el: Element | null) => {
+            cardRootRef.current = el as HTMLDivElement | null
+          }}
           position="relative"
           padding="medium small small small"
           borderWidth="small"
