@@ -197,6 +197,7 @@ export const LtiAppsLayout = React.memo(() => {
               padding="large x-small"
               active={isTabManage}
               isSelected={isTabManage}
+              themeOverride={{defaultOverflowY: 'unset'}}
             >
               <Outlet />
             </Tabs.Panel>
@@ -211,6 +212,7 @@ export const LtiAppsLayout = React.memo(() => {
               id={LtiRegistrationsTab.monitor}
               active={isTabMonitor}
               isSelected={isTabMonitor}
+              themeOverride={{defaultOverflowY: 'unset'}}
             >
               <Outlet />
             </Tabs.Panel>
