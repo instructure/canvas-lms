@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 import {
   ApolloClient,

@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import QuizEngineModal from '../../react/QuizEngineModal'
 import {ltiState} from '@canvas/lti/jquery/messages'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {getQuizTypes} from '@canvas/util/resourceTypeUtil'
 
 const I18n = createI18nScope('quizzesIndexView')

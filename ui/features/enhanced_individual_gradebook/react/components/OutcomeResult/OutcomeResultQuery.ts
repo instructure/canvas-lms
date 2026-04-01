@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 export type OutcomeRollupScore = {
   score: string
@@ -47,7 +47,7 @@ const fetchOutcomeResult = async (): Promise<OutcomeRollupsResultResponse | null
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
   })

@@ -17,7 +17,7 @@
  */
 
 import {request} from 'graphql-request'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import type {Variables} from 'graphql-request'
 import type {TypedDocumentNode} from '@graphql-typed-document-node/core'
 

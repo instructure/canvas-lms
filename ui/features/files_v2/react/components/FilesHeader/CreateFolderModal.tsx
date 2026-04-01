@@ -30,7 +30,7 @@ import {
   generateFolderPostUrl,
   UnauthorizedError,
 } from '../../../utils/apiUtils'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
