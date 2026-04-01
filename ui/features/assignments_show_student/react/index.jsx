@@ -25,7 +25,7 @@ import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import ObserverOptions from '@canvas/observer-picker'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   getHandleChangeObservedUser,
   autoFocusObserverPicker,

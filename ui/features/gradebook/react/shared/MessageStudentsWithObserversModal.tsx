@@ -22,7 +22,7 @@ import React from 'react'
 import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) => {
   const mountPoint = document.querySelector("[data-component='MessageStudentsWithObserversModal']")

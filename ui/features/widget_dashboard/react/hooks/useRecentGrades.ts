@@ -23,7 +23,7 @@ import {getCurrentUserId, executeGraphQLQuery} from '../utils/graphql'
 import {QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 import type {RecentGradeSubmission} from '../types'
 
 const RECENT_GRADES_KEY = 'recent-grades'

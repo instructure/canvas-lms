@@ -21,7 +21,7 @@ import {fireEvent, render, screen, act, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {
   defaultGetLtiAssetProcessorsAndReportsForStudentResult,

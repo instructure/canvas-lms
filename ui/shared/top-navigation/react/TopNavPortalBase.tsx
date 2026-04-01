@@ -21,7 +21,7 @@ import {Portal} from '@instructure/ui-portal'
 import TopNav, {type ITopNavProps} from './TopNav'
 import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export type Crumb = Exclude<EnvCommon['breadcrumbs'], undefined>[number]

@@ -33,7 +33,7 @@ import {
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
 import {sendMoveRequests} from './MoveModal/utils'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import $ from 'jquery'
 import {render, rerender} from '@canvas/react'
 import type {Root} from 'react-dom/client'

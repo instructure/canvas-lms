@@ -18,7 +18,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {queryClient, useAllPages} from '@canvas/query'
+import {queryClient, useAllPages} from '@instructure/platform-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'

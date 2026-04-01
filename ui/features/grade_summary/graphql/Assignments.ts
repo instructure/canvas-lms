@@ -21,7 +21,7 @@ import {Assignment} from './Assignment'
 import {Submission} from './Submission'
 import {executeQuery} from '@canvas/graphql'
 import {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 
 export const ASSIGNMENTS = gql`
   query GetAssignments($courseID: ID!, $gradingPeriodID: ID, $studentId: ID!, $after: String) {

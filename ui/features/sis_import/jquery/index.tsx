@@ -27,7 +27,7 @@ import 'jqueryui/progressbar'
 import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import SisImportForm from '../react/SisImportForm'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import type {SisImport} from 'api'
 
 const I18n = createI18nScope('sis_import')
@@ -275,7 +275,8 @@ $(document).ready(function (_event) {
     const tick = function (): void {
       if (state === 'nothing') {
         fakeTickCount++
-        const progress = (($('.copy_progress').progressbar('option', 'value') as number) || 0) + 0.25
+        const progress =
+          (($('.copy_progress').progressbar('option', 'value') as number) || 0) + 0.25
         if (fakeTickCount < 10) {
           $('.copy_progress').progressbar('option', 'value', progress)
         }
@@ -354,7 +355,9 @@ $(document).ready(function (_event) {
               )
               message += createMessageHtml(sis_batch)
               message += createCountsHtml(sis_batch)
-              $('.sis_messages').show().html(raw(message) as unknown as string)
+              $('.sis_messages')
+                .show()
+                .html(raw(message) as unknown as string)
             }
           } else {
             if (progress === lastProgress) {

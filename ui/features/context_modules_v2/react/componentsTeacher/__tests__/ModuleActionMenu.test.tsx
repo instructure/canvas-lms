@@ -21,7 +21,7 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleActionMenu from '../ModuleActionMenu'
 import {MODULE_ITEMS, MODULE_ITEM_TITLES, MODULES} from '../../utils/constants'
@@ -78,7 +78,7 @@ import '../../handlers/modulePageCommandEventHandlers'
 
 vi.mock('../../handlers/moduleActionHandlers')
 vi.mock('../../handlers/modulePageActionHandlers', async () => ({
-  ...await vi.importActual('../../handlers/modulePageActionHandlers'),
+  ...(await vi.importActual('../../handlers/modulePageActionHandlers')),
   handleOpeningModuleUpdateTray: vi.fn(),
 }))
 

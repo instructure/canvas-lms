@@ -27,7 +27,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconExportLine} from '@instructure/ui-icons'
 import {AccessTokensSection} from '@canvas/access-tokens/AccessTokensSection'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import TerminateSessions from '@canvas/terminate-sessions/react'
 import type {UserId} from '@canvas/access-tokens/UserId'
 

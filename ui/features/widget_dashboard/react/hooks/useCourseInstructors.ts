@@ -23,7 +23,7 @@ import {COURSE_INSTRUCTORS_PAGINATED_KEY, QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 export interface CourseInstructorForComponent {
   id: string

@@ -19,7 +19,7 @@
 import type {AccountId} from '../../../model/AccountId'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
-import {queryify} from '@canvas/query/queryify'
+import {queryify} from '@instructure/platform-query/queryify'
 import {
   fetchLtiRegistrationOverlayHistory,
   fetchLtiRegistrationHistory,

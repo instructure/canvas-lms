@@ -21,7 +21,7 @@ import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import UserObservees from './react/UserObservees'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 ready(() => {
   const mountPoint = document.getElementById('content')

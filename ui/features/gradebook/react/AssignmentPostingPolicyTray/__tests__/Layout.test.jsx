@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import Layout from '../Layout'
 
 vi.mock('@canvas/apollo-v3', () => ({

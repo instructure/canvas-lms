@@ -24,7 +24,7 @@ import AssignmentPostingPolicyTray from '../index'
 import {CamelizedAssignment} from '@canvas/grading/grading'
 import {MockedProvider} from '@apollo/client/testing'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 export type MockContext = {
   assignment: CamelizedAssignment

@@ -20,7 +20,7 @@ import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
 import {useGetPaginatedFiles} from '../useGetPaginatedFiles'
 import {useSearchTerm} from '../useSearchTerm'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -30,7 +30,7 @@ const server = setupServer()
 vi.mock('../useSearchTerm')
 const mockGenerateTableUrl = vi.fn()
 vi.mock('../../../utils/apiUtils', async () => ({
-  ...await vi.importActual('../../../utils/apiUtils'),
+  ...(await vi.importActual('../../../utils/apiUtils')),
   parseLinkHeader: vi.fn(() => ({next: 'next-link'})),
   parseBookmarkFromUrl: vi.fn(() => 'bookmark'),
   generateTableUrl: (params: any) => {

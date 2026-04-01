@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {queryify} from '@canvas/query/queryify'
+import {queryify} from '@instructure/platform-query/queryify'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {

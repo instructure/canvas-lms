@@ -18,14 +18,14 @@
 
 import {renderHook} from '@testing-library/react-hooks'
 import {getTermsNextPage, termsQuery, useTermsQuery} from '../termsQuery'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import type {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../../api'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-vi.mock('@canvas/query', () => ({
+vi.mock('@instructure/platform-query', () => ({
   useAllPages: vi.fn(),
 }))
 

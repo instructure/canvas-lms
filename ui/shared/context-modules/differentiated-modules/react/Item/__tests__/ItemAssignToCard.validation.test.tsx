@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import fetchMock from 'fetch-mock'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 

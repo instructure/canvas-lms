@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import userSettings from '@canvas/user-settings'
 import {fireEvent, render, within} from '@testing-library/react'
@@ -56,9 +56,10 @@ const mockUserSettings = (mockGet = true) => {
 const mockSearchParams = (defaultSearchParams = {}) => {
   const setSearchParamsMock = vi.fn()
   const searchParamsMock = new URLSearchParams(defaultSearchParams)
-  vi
-    .spyOn(ReactRouterDom, 'useSearchParams')
-    .mockReturnValue([searchParamsMock, setSearchParamsMock])
+  vi.spyOn(ReactRouterDom, 'useSearchParams').mockReturnValue([
+    searchParamsMock,
+    setSearchParamsMock,
+  ])
   return {searchParamsMock, setSearchParamsMock}
 }
 

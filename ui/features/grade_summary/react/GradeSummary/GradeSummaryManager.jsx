@@ -28,7 +28,7 @@ import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GradeSummaryContainer from './GradeSummaryContainer'
 
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('grade_summary')

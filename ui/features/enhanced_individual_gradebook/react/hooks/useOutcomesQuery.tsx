@@ -18,7 +18,7 @@
 
 import {useMemo} from 'react'
 import {fetchOutcomes, getNextOutcomesPage} from '../../queries/Queries'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import type {InfiniteData} from '@tanstack/react-query'
 import type {FetchOutcomesResponse} from '../../queries/Queries'
 

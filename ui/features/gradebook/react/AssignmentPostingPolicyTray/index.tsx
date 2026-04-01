@@ -24,7 +24,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 import Layout from './Layout'

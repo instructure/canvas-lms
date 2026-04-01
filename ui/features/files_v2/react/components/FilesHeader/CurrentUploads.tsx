@@ -18,7 +18,7 @@
 
 import {useCallback, useEffect, useState} from 'react'
 import {usePrevious} from 'react-use'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'

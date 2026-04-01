@@ -23,7 +23,7 @@ import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
@@ -102,14 +102,17 @@ describe('ItemAssignToCard - Available Until Defaults', () => {
     onCardDatesChangeMock.mockClear()
     await userEvent.type(dateInput, 'Nov 9, 2020')
     await userEvent.tab()
-    await waitFor(() => {
-      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
-        expect.any(String),
-        'lock_at',
-        '2020-11-09T23:59:59.000Z',
-      )
-      expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
-    }, {timeout: 30000})
+    await waitFor(
+      () => {
+        expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+          expect.any(String),
+          'lock_at',
+          '2020-11-09T23:59:59.000Z',
+        )
+        expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
+      },
+      {timeout: 30000},
+    )
   })
 
   it('defaults to 11:59 PM for available until dates if it is undefined', async () => {
@@ -122,13 +125,16 @@ describe('ItemAssignToCard - Available Until Defaults', () => {
     onCardDatesChangeMock.mockClear()
     await userEvent.type(dateInput, 'Nov 10, 2020')
     await userEvent.tab()
-    await waitFor(() => {
-      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
-        expect.any(String),
-        'lock_at',
-        '2020-11-10T23:59:59.000Z',
-      )
-      expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
-    }, {timeout: 30000})
+    await waitFor(
+      () => {
+        expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+          expect.any(String),
+          'lock_at',
+          '2020-11-10T23:59:59.000Z',
+        )
+        expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
+      },
+      {timeout: 30000},
+    )
   })
 })

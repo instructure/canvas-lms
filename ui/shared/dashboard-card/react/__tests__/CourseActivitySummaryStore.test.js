@@ -26,7 +26,7 @@ import {http, HttpResponse} from 'msw'
 const server = setupServer()
 
 // Mock GraphQL request
-vi.mock('@canvas/query', () => ({
+vi.mock('@instructure/platform-query', () => ({
   executeQuery: vi.fn(() => Promise.resolve({data: {}})),
 }))
 

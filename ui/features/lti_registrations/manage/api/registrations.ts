@@ -47,7 +47,7 @@ import {useMutation, useQuery} from '@tanstack/react-query'
 import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {getAccountId} from '../../common/lib/getAccountId'
 import {ZPaginatedList} from './PaginatedList'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {diffHistoryEntries, LtiHistoryEntryWithDiff} from '../pages/tool_details/history/differ'
 import {ZLtiRegistrationAccountBinding} from '../model/LtiRegistrationAccountBinding'
 

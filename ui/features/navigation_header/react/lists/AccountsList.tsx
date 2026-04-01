@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {ActiveText} from './utils'
 import getAccounts from '@canvas/api/accounts/getAccounts'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('CoursesTray')
 
@@ -32,7 +32,7 @@ export default function AccountsList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['accounts', {pageIndex: 1}],
     queryFn: getAccounts,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const accounts = data?.json || []

@@ -22,10 +22,10 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import RubricsQuery from '../RubricsQuery'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-vi.mock('@canvas/query', () => ({
+vi.mock('@instructure/platform-query', () => ({
   useAllPages: vi.fn(),
 }))
 

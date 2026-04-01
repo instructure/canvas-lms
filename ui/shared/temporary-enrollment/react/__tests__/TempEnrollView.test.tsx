@@ -26,7 +26,7 @@ import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
 import {type Enrollment, ITEMS_PER_PAGE, PROVIDER, RECIPIENT, type User} from '../types'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const server = setupServer()

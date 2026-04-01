@@ -30,7 +30,7 @@ import {useQuery} from '@apollo/client'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {executeQuery} from '@canvas/graphql'
 import {Assignment, Submission} from './RubricsQuery.types'
 

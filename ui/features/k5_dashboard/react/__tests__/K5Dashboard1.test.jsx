@@ -35,7 +35,7 @@ import K5Dashboard from '../K5Dashboard'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),

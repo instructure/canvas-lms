@@ -18,7 +18,7 @@
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {captureException} from '@sentry/react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   showFlashAlert,
   showFlashError,
