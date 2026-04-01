@@ -792,14 +792,28 @@ class Submission < ApplicationRecord
   def create_alert
     return unless saved_change_to_score? && grader_id && !autograded? &&
                   assignment.points_possible && assignment.points_possible > 0
+    return if hide_grade_from_student?
 
+    prev_score = saved_changes["score"][0]
+    prev_percentage = prev_score.present? ? prev_score.to_f / assignment.points_possible * 100 : nil
+    percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
+    create_assignment_grade_alerts(prev_percentage, percentage)
+  end
+
+  def create_alert_on_post
+    return unless grader_id && !autograded? &&
+                  assignment.points_possible && assignment.points_possible > 0
+    return unless graded?
+
+    percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
+    create_assignment_grade_alerts(nil, percentage)
+  end
+
+  def create_assignment_grade_alerts(prev_percentage, percentage)
     thresholds = ObserverAlertThreshold.active.where(student: user,
                                                      alert_type: ["assignment_grade_high", "assignment_grade_low"])
 
     thresholds.each do |threshold|
-      prev_score = saved_changes["score"][0]
-      prev_percentage = prev_score.present? ? prev_score.to_f / assignment.points_possible * 100 : nil
-      percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
       next unless threshold.did_pass_threshold(prev_percentage, percentage)
 
       observer = threshold.observer
@@ -829,6 +843,7 @@ class Submission < ApplicationRecord
       end
     end
   end
+  private :create_assignment_grade_alerts
 
   def update_quiz_submission
     return true if @saved_by == :quiz_submission || !quiz_submission_id || entered_score == quiz_submission.kept_score
