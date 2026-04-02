@@ -45,6 +45,7 @@ interface NewLoginDataContextType {
   customMessageLogin?: string
   customMessageRegistration?: string
   customMessageRegistrationParent?: string
+  freeForTeacherRegistrationUrl?: string
 }
 
 const NewLoginDataContext = createContext<NewLoginDataContextType | undefined>(undefined)
@@ -80,6 +81,7 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     customMessageLogin,
     customMessageRegistration,
     customMessageRegistrationParent,
+    freeForTeacherRegistrationUrl,
   } = data
 
   const value: NewLoginDataContextType = {
@@ -107,6 +109,7 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     customMessageLogin,
     customMessageRegistration,
     customMessageRegistrationParent,
+    freeForTeacherRegistrationUrl,
   }
 
   return <NewLoginDataContext.Provider value={value}>{children}</NewLoginDataContext.Provider>
