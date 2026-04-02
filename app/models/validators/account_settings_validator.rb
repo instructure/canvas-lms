@@ -20,6 +20,7 @@
 
 module Validators
   class AccountSettingsValidator < ActiveModel::Validator
+    DISCOVERY_PAGE_MAX_ITEMS = 10
     DISCOVERY_PAGE_REQUIRED_KEYS = %i[authentication_provider_id label].freeze
     DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon].freeze
     DISCOVERY_PAGE_LABEL_MAX_LENGTH = 255
@@ -63,8 +64,23 @@ module Validators
           record.errors.add(:settings, "discovery_page.#{section} must be an array")
           next
         end
+      end
 
-        section_data.each_with_index do |entry, index|
+      return if record.errors.any?
+
+      total = (data[:primary] || []).length + (data[:secondary] || []).length
+      if total > DISCOVERY_PAGE_MAX_ITEMS
+        record.errors.add(
+          :settings,
+          "discovery_page total items cannot exceed #{DISCOVERY_PAGE_MAX_ITEMS} (#{total} given)"
+        )
+        return
+      end
+
+      %i[primary secondary].each do |section|
+        next if data[section].nil?
+
+        data[section].each_with_index do |entry, index|
           validate_discovery_page_entry(record, section, entry, index)
         end
       end

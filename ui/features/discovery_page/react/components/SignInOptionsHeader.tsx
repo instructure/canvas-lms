@@ -44,6 +44,7 @@ export function SignInOptionsHeader({
           renderIcon={<IconAddLine />}
           onClick={onAddClick}
           interaction={disabled ? 'disabled' : 'enabled'}
+          data-testid="add-sign-in-option-button"
         >
           {I18n.t('Add')}
         </Button>
