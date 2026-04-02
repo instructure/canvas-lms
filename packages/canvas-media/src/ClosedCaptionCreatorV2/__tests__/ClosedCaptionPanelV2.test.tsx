@@ -374,6 +374,110 @@ describe('<ClosedCaptionPanelV2 />', () => {
       expect(items).toHaveLength(2)
     })
 
+    it('a11y: focuses Add New button after canceling manual caption creation', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Cancel'))
+
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses Add New button after canceling auto-caption request', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Cancel'))
+
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses Add New button after uploading a caption', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+      fireEvent.click(screen.getByText('Upload'))
+
+      await screen.findByText('English')
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses next row delete button after deleting a caption', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+        {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('English')).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByText('Delete Spanish').closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses creation form when deleting a caption while creation form is open', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Open the manual creation form
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
+
+      // Delete the caption while creation form is open
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('English')).not.toBeInTheDocument()
+      })
+
+      // Focus should land on the creation form container (not lost)
+      const creationForm = screen.getByText('Add New Caption').closest('[tabindex="-1"]')
+      expect(creationForm).toHaveFocus()
+    })
+
+    it('a11y: focuses Add New button after deleting the last caption', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('English')).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
     it('a11y: announces when a caption is added', async () => {
       server.use(
         http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),

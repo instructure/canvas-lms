@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import formatMessage from 'format-message'
-import {useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
 import {trackPendoEvent} from '../utils/trackPendoEvent'
 
@@ -32,6 +32,7 @@ interface AutoCaptioningProps {
   languages: {id: string; label: string}[]
   mountNode?: HTMLElement | (() => HTMLElement | null)
   onDirtyStateChanged?: (isDirty: boolean) => void
+  elementRef?: (el: Element | null) => void
 }
 
 const LANGUAGE_ERROR_ID = 'cc-asr-language-error'
@@ -43,10 +44,15 @@ export const AutoCaptioning = ({
   languages,
   mountNode,
   onDirtyStateChanged,
+  elementRef,
 }: AutoCaptioningProps) => {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [showLanguageError, setShowLanguageError] = useState(false)
   const languageInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    languageInputRef.current?.focus()
+  }, [])
 
   const handleLanguageChange = (_event: React.SyntheticEvent, languageId: string) => {
     if (languageId) {
@@ -71,7 +77,7 @@ export const AutoCaptioning = ({
   }
 
   return (
-    <Flex as="div" direction="column" gap="medium">
+    <Flex as="div" direction="column" gap="medium" elementRef={elementRef} tabIndex={-1}>
       <Flex.Item overflowY="hidden" overflowX="hidden">
         <Heading as="h4" variant="titleCardMini">
           {formatMessage('Automatic captioning')}
