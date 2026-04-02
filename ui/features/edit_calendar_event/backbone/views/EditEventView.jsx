@@ -45,7 +45,7 @@ import {
   updateRRuleForNewDate,
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import EditCalendarEventHeader from '../../react/components/EditCalendarEventHeader'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import splitAssetString from '@canvas/util/splitAssetString'

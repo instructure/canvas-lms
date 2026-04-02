@@ -26,7 +26,7 @@ import {map, filter, each, last, includes, omit, has, defaults} from 'es-toolkit
 import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import moment from 'moment'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import decodeFromHex from '@canvas/util/decodeFromHex'
 import withinMomentDates from '../momentDateHelper'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'

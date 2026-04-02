@@ -23,7 +23,7 @@ import {AttachmentDisplay} from '../AttachmentDisplay'
 import {responsiveQuerySizes} from '../../../utils'
 import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/upload-file')
 

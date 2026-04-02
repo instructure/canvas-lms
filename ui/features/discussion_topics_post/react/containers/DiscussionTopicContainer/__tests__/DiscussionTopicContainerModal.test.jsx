@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
@@ -28,31 +28,25 @@ import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
 // Mock to avoid issues with React.lazy in DirectShareUserModal
-vi.mock(
-  '../../../../../../shared/direct-sharing/react/components/DirectShareUserPanel',
-  () => ({
-    default: () => (
-      <div data-testid="mock-user-panel">
-        <label>
-          Send to:
-          <input data-testid="user-search-input" />
-        </label>
-      </div>
-    ),
-  }),
-)
+vi.mock('../../../../../../shared/direct-sharing/react/components/DirectShareUserPanel', () => ({
+  default: () => (
+    <div data-testid="mock-user-panel">
+      <label>
+        Send to:
+        <input data-testid="user-search-input" />
+      </label>
+    </div>
+  ),
+}))
 
 // Mock the lazy-loaded component to avoid dynamic import issues in tests
-vi.mock(
-  '../../../../../../shared/direct-sharing/react/components/DirectShareCoursePanel',
-  () => ({
-    default: () => (
-      <div data-testid="mock-course-panel">
-        <span>Select a Course</span>
-      </div>
-    ),
-  }),
-)
+vi.mock('../../../../../../shared/direct-sharing/react/components/DirectShareCoursePanel', () => ({
+  default: () => (
+    <div data-testid="mock-course-panel">
+      <span>Select a Course</span>
+    </div>
+  ),
+}))
 
 vi.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
 vi.mock('@canvas/rce/RichContentEditor')

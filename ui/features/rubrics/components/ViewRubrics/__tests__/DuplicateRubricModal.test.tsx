@@ -23,7 +23,7 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {DuplicateRubricModal} from '../DuplicateRubricModal'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('react-router', async () => {
   const actual = await vi.importActual<typeof import('react-router')>('react-router')
@@ -154,9 +154,9 @@ describe('RubricForm Tests', () => {
   })
 
   it('duplicates the rubric when the duplicate button is clicked', async () => {
-    vi
-      .spyOn(ViewRubricQueries, 'duplicateRubric')
-      .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
+    vi.spyOn(ViewRubricQueries, 'duplicateRubric').mockImplementation(() =>
+      Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}),
+    )
     const {getByTestId} = renderComponent()
     const duplicateButton = getByTestId('duplicate-rubric-modal-button')
     duplicateButton?.click()

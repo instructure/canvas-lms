@@ -25,13 +25,17 @@ import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../../model/i
 import userEvent from '@testing-library/user-event'
 
 // Mock showFlashAlert to prevent React rendering issues during static initialization
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-  showFlashError: vi.fn(),
-  showFlashSuccess: vi.fn(),
-  showFlashWarning: vi.fn(),
-  destroyContainer: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+    showFlashError: vi.fn(),
+    showFlashSuccess: vi.fn(),
+    showFlashWarning: vi.fn(),
+    destroyContainer: vi.fn(),
+  }
+})
 
 describe('PrivacyConfirmationWrapper', () => {
   it('renders the privacy confirmation window', () => {

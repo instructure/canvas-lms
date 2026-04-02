@@ -19,7 +19,7 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react'
 
 import {useMutation, useQuery} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'

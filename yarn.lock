@@ -2884,6 +2884,11 @@
     sanitize-html "2.7.3"
     shortid "^2.2.8"
 
+"@instructure/platform-alerts@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-alerts/-/platform-alerts-0.2.0.tgz#2836706e1857cd3e026854eccc2013983c9cce7d"
+  integrity sha512-YA3Xps0qS1mGcRr1flzXt6wg7TYK8FmwF1tZfC+xDtoUW/VSAhaWcFWAMJcIuoIKuP5A2I31IhUp7sLYFTZQEg==
+
 "@instructure/platform-error-boundary@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@instructure/platform-error-boundary/-/platform-error-boundary-0.2.0.tgz#85b5410242dce59bef779b7a26e5daba47f9bea2"

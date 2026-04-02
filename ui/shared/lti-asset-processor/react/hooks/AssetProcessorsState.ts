@@ -18,7 +18,7 @@
 
 import {create} from 'zustand'
 
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {
   AssetProcessorContentItem,

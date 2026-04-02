@@ -24,11 +24,15 @@ import {http, HttpResponse} from 'msw'
 import {type MockedFunction} from 'vitest'
 import UncrosslistForm from '../UncrosslistForm'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 const server = setupServer()
 

@@ -21,7 +21,7 @@ import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentSubmission from '../AssignmentSubmission'
 import {Submission} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
 vi.mock('@canvas/util/jquery/apiUserContent', () => ({
   default: {
@@ -39,9 +39,13 @@ vi.mock('@canvas/assignments/react/StudentAnnotationPreview', () => ({
 }))
 
 let mockOnSuccessfulPeerReview: (() => void) | null = null
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('../CommentsTrayContentWithApollo', () => {
   const MockedCommentsTray = (props: any) => {

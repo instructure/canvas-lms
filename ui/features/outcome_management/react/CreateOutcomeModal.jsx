@@ -33,7 +33,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import TargetGroupSelector from './shared/TargetGroupSelector'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {
   CREATE_LEARNING_OUTCOME,
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,

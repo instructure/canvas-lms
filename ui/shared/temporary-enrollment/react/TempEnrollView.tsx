@@ -29,7 +29,7 @@ import type {Bookmark, Enrollment, EnrollmentType, User, ModifyPermissions} from
 import {MODULE_NAME, PROVIDER, RECIPIENT} from './types'
 import {deleteEnrollment, fetchTemporaryEnrollments} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {TempEnrollNavigation} from './TempEnrollNavigation'

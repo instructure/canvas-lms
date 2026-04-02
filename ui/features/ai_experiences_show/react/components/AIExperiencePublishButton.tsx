@@ -30,7 +30,7 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('ai_experiences_show')
 

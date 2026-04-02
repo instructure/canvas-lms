@@ -20,7 +20,7 @@ import axios from '@canvas/axios'
 import {camelizeProperties} from '@canvas/convert-case'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {createClient, gql} from '@canvas/apollo-v3'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {FinalGradeOverrideMap} from './grading.d'
 
 const I18n = createI18nScope('finalGradeOverrideApi')

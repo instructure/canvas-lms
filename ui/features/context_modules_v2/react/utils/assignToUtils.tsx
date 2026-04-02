@@ -18,7 +18,7 @@
 
 import type {Root} from 'react-dom/client'
 import {render} from '@canvas/react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {queryClient} from '@canvas/query'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'

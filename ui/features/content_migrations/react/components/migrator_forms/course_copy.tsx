@@ -18,7 +18,7 @@
 
 import React, {useRef, useState, useCallback, type ChangeEvent, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'

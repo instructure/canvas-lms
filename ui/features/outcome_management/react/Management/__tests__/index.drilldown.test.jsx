@@ -20,7 +20,7 @@ import {act, screen} from '@testing-library/react'
 import OutcomeManagementPanel from '../index'
 import {setupTest, teardownTest, groupDetailMocks, courseMocks} from './testSetup'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+jest.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: jest.fn(),
 }))
 jest.mock('@canvas/rce/RichContentEditor')

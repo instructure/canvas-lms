@@ -23,10 +23,17 @@ import moment from 'moment-timezone'
 // Use dynamic dates relative to current date to avoid year/day failures
 const CURRENT_TIME = '2025-01-01T13:00:40-07:00'
 const TWO_YEARS_FROM_NOW = moment(CURRENT_TIME).add(2, 'years').toISOString()
-import {act, cleanup, render, waitForElementToBeRemoved, waitFor} from '@testing-library/react'
+import {
+  act,
+  cleanup,
+  render,
+  screen,
+  waitForElementToBeRemoved,
+  waitFor,
+} from '@testing-library/react'
 
 import ImportantDates from '../ImportantDates'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import {
   MOCK_ASSIGNMENTS,
   MOCK_EVENTS,
@@ -79,18 +86,18 @@ describe('ImportantDates', () => {
 
   it('shows an error message if assignments request fails', async () => {
     fetchMock.get(ASSIGNMENTS_URL, 500, {overwriteRoutes: true})
-    const {findAllByText} = render(<ImportantDates {...getProps()} />)
+    render(<ImportantDates {...getProps()} />)
+    await vi.advanceTimersByTimeAsync(500)
     expect(
-      (await findAllByText('Failed to load assignments in important dates.'))[0],
+      screen.getAllByText('Failed to load assignments in important dates.')[0],
     ).toBeInTheDocument()
   })
 
   it('shows an error message if events request fails', async () => {
     fetchMock.get(EVENTS_URL, 500, {overwriteRoutes: true})
-    const {findAllByText} = render(<ImportantDates {...getProps()} />)
-    expect(
-      (await findAllByText('Failed to load events in important dates.'))[0],
-    ).toBeInTheDocument()
+    render(<ImportantDates {...getProps()} />)
+    await vi.advanceTimersByTimeAsync(500)
+    expect(screen.getAllByText('Failed to load events in important dates.')[0]).toBeInTheDocument()
   })
 
   it('fires off requests with correct params', async () => {

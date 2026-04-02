@@ -31,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchFormActions from './actions/SearchFormActions'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import environment from './environment'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 

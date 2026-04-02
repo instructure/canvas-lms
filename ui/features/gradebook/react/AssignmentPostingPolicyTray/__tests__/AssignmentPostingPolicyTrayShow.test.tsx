@@ -20,7 +20,7 @@ import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import * as Api from '../Api'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {
   MockContext,
   createDefaultContext,
@@ -31,7 +31,7 @@ import {
   getInput,
 } from './AssignmentPostingPolicyTrayTestUtils'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.mock('../Api')
 
 describe('AssignmentPostingPolicyTray #show()', () => {

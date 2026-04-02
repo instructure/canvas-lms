@@ -32,7 +32,7 @@ import {
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'

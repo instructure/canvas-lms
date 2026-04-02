@@ -31,7 +31,7 @@ import {defaultState, actions, reducer, type SettingsPanelState} from './setting
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {Module, ModuleItem, PointsInputMessages, Requirement} from './types'
 import {shouldShowRelockWarning} from '../../utils/relockValidation'
 import {useScope as createI18nScope} from '@canvas/i18n'

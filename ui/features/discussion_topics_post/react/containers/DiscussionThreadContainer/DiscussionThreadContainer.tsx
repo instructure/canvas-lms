@@ -27,7 +27,7 @@ import {
   addReplyToAllRootEntries,
   addSubentriesCountToParentEntry,
 } from '../../utils'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,

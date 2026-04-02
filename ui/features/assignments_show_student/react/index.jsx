@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {useScope as createI18nScope} from '@canvas/i18n'

@@ -24,7 +24,7 @@ import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {findOutcomesMocks, groupMocks, importGroupMocks} from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {
   createDefaultProps,
   renderWithContext,
@@ -34,9 +34,13 @@ import {
   WITH_FIND_GROUP_REFETCH,
 } from './FindOutcomesModalTestUtils'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/progress/resolve_progress')
 

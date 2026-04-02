@@ -18,10 +18,10 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {CardDashboardLoader, resetCardCache} from '../loadCardDashboard'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 

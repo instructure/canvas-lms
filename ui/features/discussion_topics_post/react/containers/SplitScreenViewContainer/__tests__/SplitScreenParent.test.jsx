@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
@@ -30,7 +30,7 @@ import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 import {ObserverContext} from '../../../utils/ObserverContext'
 
 vi.mock('../../../utils', async () => ({
-  ...await vi.importActual('../../../utils'),
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 

@@ -26,7 +26,7 @@ import {type File, type Folder} from '../../../interfaces/File'
 import {getIcon, getName} from '../../../utils/fileFolderUtils'
 import {generateUrlPath} from '../../../utils/folderUtils'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('files_v2')

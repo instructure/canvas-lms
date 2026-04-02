@@ -21,13 +21,17 @@ import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import CreateAssignmentViewAdapter from '../CreateAssignmentViewAdapter'
 import Backbone from '@canvas/backbone'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const buildAssignment = (options = {}) => ({
   assignment_group_id: 1,
@@ -152,5 +156,4 @@ describe('CreateAssignmentViewAdapter', () => {
       expect(getByTestId('points-input')).not.toBeDisabled()
     })
   })
-
 })

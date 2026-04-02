@@ -31,7 +31,7 @@ import {
   REPLY_TO_TOPIC,
   REPLY_TO_ENTRY,
 } from '../../utils/constants'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
   DELETE_DISCUSSION_ENTRY,

@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('last_attended')
 

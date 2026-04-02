@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {MockedProvider} from '@apollo/client/testing'
 import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'

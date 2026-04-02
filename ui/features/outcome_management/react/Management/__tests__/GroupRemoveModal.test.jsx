@@ -21,13 +21,17 @@ import {render as rawRender, fireEvent, waitFor} from '@testing-library/react'
 import GroupRemoveModal from '../GroupRemoveModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/outcomes/graphql/Management')
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 class CustomError extends Error {
   constructor(message) {

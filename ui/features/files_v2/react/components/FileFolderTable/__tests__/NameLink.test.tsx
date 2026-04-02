@@ -24,9 +24,9 @@ import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashError: vi.fn(() => vi.fn()),
   showFlashAlert: vi.fn(),
 }))
@@ -35,7 +35,7 @@ const mockNavigate = vi.fn()
 const mockUseLocation = vi.fn()
 
 vi.mock('react-router-dom', async () => ({
-  ...await vi.importActual('react-router-dom'),
+  ...(await vi.importActual('react-router-dom')),
   useNavigate: () => mockNavigate,
   useLocation: () => mockUseLocation(),
 }))

@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useRef} from 'react'
 import ConfettiGenerator from '../javascript/ConfettiGenerator'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getBrandingColors, getProps} from '../javascript/confetti.utils'
 

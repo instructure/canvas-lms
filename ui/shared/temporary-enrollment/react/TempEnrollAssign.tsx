@@ -54,7 +54,7 @@ import type {
   User,
 } from './types'
 import {MAX_ALLOWED_COURSES_PER_PAGE, MODULE_NAME, RECIPIENT} from './types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {TempEnrollAvatar} from './TempEnrollAvatar'

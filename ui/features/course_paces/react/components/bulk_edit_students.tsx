@@ -27,7 +27,7 @@ import {BulkEditStudentsTable} from './bulk_edit_students_table'
 import {actions} from '../actions/ui'
 import {connect} from 'react-redux'
 import {PaceContext} from '../types'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('bulk_edit_students')
 

@@ -43,7 +43,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import GroupsPage from '@canvas/k5/react/GroupsPage'

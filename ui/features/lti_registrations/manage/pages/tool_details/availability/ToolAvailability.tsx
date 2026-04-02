@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {LinkInfo} from '@canvas/parse-link-header/parseLinkHeader'

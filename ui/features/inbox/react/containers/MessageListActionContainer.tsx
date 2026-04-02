@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {COURSES_QUERY} from '../../graphql/Queries'
 import CourseSelect, {ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'

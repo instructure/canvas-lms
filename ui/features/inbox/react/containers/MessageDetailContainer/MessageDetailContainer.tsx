@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Conversation} from '../../../graphql/Conversation'
 import {ConversationContext} from '../../../util/constants'
 import {CONVERSATION_MESSAGES_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../../graphql/Queries'

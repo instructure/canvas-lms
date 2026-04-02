@@ -23,7 +23,7 @@ import {
 } from '../../graphql/Mutations'
 import {useMutation, useApolloClient} from '@apollo/client'
 import {useCallback, useContext} from 'react'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('discussion_topics_post')

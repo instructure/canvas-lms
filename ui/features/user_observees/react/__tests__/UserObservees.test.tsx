@@ -42,10 +42,14 @@ vi.mock('@instructure/ui-overlays', () => ({
 }))
 
 // Mock flash alerts to prevent async DOM operations that can leak between tests
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-  showFlashSuccess: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+    showFlashSuccess: vi.fn(() => vi.fn()),
+  }
+})
 
 // Mock globalUtils to prevent actual navigation
 vi.mock('@canvas/util/globalUtils', () => ({

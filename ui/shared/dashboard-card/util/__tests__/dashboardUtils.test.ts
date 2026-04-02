@@ -26,11 +26,15 @@ import {
 import type {ActivityStreamSummary, Card} from '../../types'
 import {CourseDashboardCard as CourseDashboardCardType} from '../../graphql/CourseDashboardCard'
 import {ActivityStreamSummary as ActivityStreamSummaryType} from '../../graphql/ActivityStream'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('sortByPosition', () => {
   it('handles first position smaller', () => {

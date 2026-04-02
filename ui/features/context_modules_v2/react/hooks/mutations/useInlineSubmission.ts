@@ -19,7 +19,7 @@ import {submitModuleItem, createNewItem} from '../../handlers/addItemHandlers'
 import {queryClient} from '@canvas/query'
 import {useContextModule} from '../useModuleContext'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../../utils/constants'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')

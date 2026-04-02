@@ -18,7 +18,7 @@
 
 import actions from '../actions'
 import FlashNotifications from '../flashNotifications'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const createMockStore = state => ({
   subs: [],
@@ -32,10 +32,14 @@ const createMockStore = state => ({
   },
 })
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-  destroyContainer: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+    destroyContainer: vi.fn(),
+  }
+})
 
 describe('Blueprint Course FlashNotifications', () => {
   afterEach(() => {

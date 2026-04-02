@@ -19,7 +19,7 @@
 import React, {useCallback, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import useFetchApi from '@canvas/use-fetch-api-hook'

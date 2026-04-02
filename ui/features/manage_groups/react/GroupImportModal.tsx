@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {FileDrop} from '@instructure/ui-file-drop'

@@ -25,7 +25,7 @@ import {FAKE_FILES} from '../../../../fixtures/fakeData'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 
 const server = setupServer()
 

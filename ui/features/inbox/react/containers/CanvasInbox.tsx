@@ -23,7 +23,7 @@ import {MessageDetailContainer} from './MessageDetailContainer/MessageDetailCont
 import MessageListActionContainer from './MessageListActionContainer'
 import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation, useQuery} from '@apollo/client'
 import {

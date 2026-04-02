@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import StatusPill from '@canvas/grading-status-pill'

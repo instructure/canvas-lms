@@ -17,7 +17,7 @@
  */
 
 import {useRef, useCallback, useEffect} from 'react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 export const useScreenReaderAlert = (timeout = 1500) => {
   const ref = useRef<number | null>(null)

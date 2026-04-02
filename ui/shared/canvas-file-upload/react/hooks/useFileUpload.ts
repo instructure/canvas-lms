@@ -20,7 +20,7 @@ import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {uploadFile} from '@canvas/upload-file'
 import axios from '@canvas/axios'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {ContextFile} from '../types'
 
 const I18n = createI18nScope('canvas_file_upload')

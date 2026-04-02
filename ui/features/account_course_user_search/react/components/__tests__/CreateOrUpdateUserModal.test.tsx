@@ -18,6 +18,15 @@
 import React from 'react'
 import {cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import CreateOrUpdateUserModal from '../CreateOrUpdateUserModal'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn().mockReturnValue(vi.fn()),
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 import userEvent from '@testing-library/user-event'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'

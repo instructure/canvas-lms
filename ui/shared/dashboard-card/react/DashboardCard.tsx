@@ -20,7 +20,7 @@ import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {type MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {assignLocation} from '@canvas/util/globalUtils'
 import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
 import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'

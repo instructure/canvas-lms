@@ -23,7 +23,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 

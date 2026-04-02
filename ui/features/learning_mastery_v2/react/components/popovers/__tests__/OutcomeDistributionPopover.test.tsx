@@ -113,10 +113,14 @@ vi.mock('@canvas/differentiation-tags/react/hooks/useAddTagMembership', () => ({
   }),
 }))
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => vi.fn()),
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn()),
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 describe('OutcomeDistributionPopover', () => {
   beforeEach(() => {

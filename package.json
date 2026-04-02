@@ -25,6 +25,7 @@
     "@instructure/emotion": "11.6.0",
     "@instructure/media-capture": "12.0.0",
     "@instructure/outcomes-ui": "4.1.4",
+    "@instructure/platform-alerts": "0.2.0",
     "@instructure/platform-error-boundary": "0.2.0",
     "@instructure/platform-generic-error-page": "1.0.0",
     "@instructure/platform-get-cookie": "0.2.0",

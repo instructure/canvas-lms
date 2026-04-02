@@ -28,12 +28,16 @@ import type {TagAsModalProps} from '../TagAsModal'
 import {singleTagCategory, multipleTagsCategory} from '../../util/tagCategoryCardMocks'
 import type {DifferentiationTagCategory} from '../../types'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-  showFlashSuccess: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+    showFlashSuccess: vi.fn(() => vi.fn()),
+  }
+})
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const BULK_MANAGE_URL = '*/group_categories/bulk_manage_differentiation_tag'
 

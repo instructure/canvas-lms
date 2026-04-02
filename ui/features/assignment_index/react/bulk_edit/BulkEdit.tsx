@@ -22,7 +22,7 @@ import {func, string} from 'prop-types'
 import moment from 'moment-timezone'
 import produce from 'immer'
 import {DateTime} from '@instructure/ui-i18n'
-import CanvasInlineAlert from '@canvas/alerts/react/InlineAlert'
+import {InlineAlert as CanvasInlineAlert} from '@instructure/platform-alerts'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import BulkEditDateSelect from './BulkEditDateSelect'
@@ -466,7 +466,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     if (loading) {
       return (
         <>
-          <CanvasInlineAlert liveAlert={true} screenReaderOnly={true}>
+          <CanvasInlineAlert liveAlert={true} screenReaderOnly={true} hasShadow={false}>
             {I18n.t('Loading assignments')}
           </CanvasInlineAlert>
           <LoadingIndicator />
@@ -478,7 +478,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
     return (
       <>
-        <CanvasInlineAlert liveAlert={true} screenReaderOnly={true}>
+        <CanvasInlineAlert liveAlert={true} screenReaderOnly={true} hasShadow={false}>
           {I18n.t('Assignments loaded')}
         </CanvasInlineAlert>
         <BulkEditTable

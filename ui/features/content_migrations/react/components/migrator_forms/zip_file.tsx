@@ -25,7 +25,7 @@ import {
   noFileSelectedFormMessage,
   FormLabel,
 } from '@canvas/content-migrations'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'

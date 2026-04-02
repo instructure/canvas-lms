@@ -38,7 +38,7 @@ import {
 import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = i18nScope('page_views')
 

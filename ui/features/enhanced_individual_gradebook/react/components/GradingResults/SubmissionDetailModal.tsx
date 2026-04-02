@@ -45,7 +45,7 @@ import {
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {usePostComment} from '../../hooks/useComments'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import DefaultGradeInput from './DefaultGradeInput'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'

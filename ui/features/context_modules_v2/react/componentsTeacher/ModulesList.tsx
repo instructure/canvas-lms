@@ -42,7 +42,7 @@ import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../u
 import ModuleFilterHeader from './ModuleFilterHeader'
 import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
 import {
   TEACHER,

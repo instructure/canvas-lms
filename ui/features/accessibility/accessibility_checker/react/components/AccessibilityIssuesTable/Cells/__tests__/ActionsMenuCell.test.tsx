@@ -27,8 +27,10 @@ import {
   ResourceWorkflowState,
   ScanWorkflowState,
 } from '../../../../../../shared/react/types'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {useAccessibilityScansStore} from '../../../../../../shared/react/stores/AccessibilityScansStore'
+
+vi.mock('@instructure/platform-alerts')
 
 const mockDoFetchApi = vi.fn()
 vi.mock('@canvas/do-fetch-api-effect', () => ({

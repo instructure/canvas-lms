@@ -20,7 +20,7 @@ import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {HorizonAccount} from '../HorizonAccount'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const server = setupServer()
 
@@ -28,8 +28,8 @@ vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),
 }))
 
-vi.mock('@canvas/alerts/react/FlashAlert', async () => ({
-  ...await vi.importActual('@canvas/alerts/react/FlashAlert'),
+vi.mock('@instructure/platform-alerts', async () => ({
+  ...(await vi.importActual('@instructure/platform-alerts')),
   showFlashError: vi.fn(),
 }))
 

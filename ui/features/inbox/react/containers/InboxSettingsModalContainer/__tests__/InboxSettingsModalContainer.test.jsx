@@ -24,7 +24,7 @@ import InboxSettingsModalContainer, {
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {within} from '@testing-library/dom'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloProvider} from '@apollo/client'
 import {inboxSettingsHandlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '@canvas/msw/mswClient'

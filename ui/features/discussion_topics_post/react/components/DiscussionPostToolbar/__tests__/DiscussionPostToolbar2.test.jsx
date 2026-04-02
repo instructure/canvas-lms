@@ -26,7 +26,7 @@ window.top = {
 
 import {vi} from 'vitest'
 import {MockedProvider} from '@apollo/client/testing'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import {waitFor} from '@testing-library/dom'
 import {fireEvent, render} from '@testing-library/react'

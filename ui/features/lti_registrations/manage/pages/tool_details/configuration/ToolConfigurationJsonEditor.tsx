@@ -28,7 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useUpdateRegistrationJson} from '../../../api/registrations'
 
 const I18n = createI18nScope('lti_registrations')

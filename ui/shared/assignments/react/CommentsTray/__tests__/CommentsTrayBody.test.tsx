@@ -19,7 +19,7 @@
  */
 
 import $ from 'jquery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloClient, gql} from '@apollo/client'
 import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'

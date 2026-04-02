@@ -44,7 +44,7 @@ import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import {Link} from '@instructure/ui-link'
 import TagAsModalManager from '@canvas/differentiation-tags/react/TagAsModal/TagAsModalManager'
 import {useAddTagMembership} from '@canvas/differentiation-tags/react/hooks/useAddTagMembership'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 

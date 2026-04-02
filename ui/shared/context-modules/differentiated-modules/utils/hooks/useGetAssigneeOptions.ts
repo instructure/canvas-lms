@@ -18,7 +18,7 @@
 
 import {useMemo, useEffect} from 'react'
 import {getSections, getStudents, getGroups, getDifferentiationTags} from './queryFn'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AssigneeOption} from '../../react/Item/types'
 import {uniqBy} from 'es-toolkit/compat'

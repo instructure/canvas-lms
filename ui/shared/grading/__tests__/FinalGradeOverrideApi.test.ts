@@ -18,27 +18,23 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
+
+vi.mock('@instructure/platform-alerts')
 import {gql} from '@canvas/apollo-v3'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 import type {FinalGradeOverrideMap} from '../grading.d'
 
 describe('Gradebook FinalGradeOverrideApi', () => {
   const server = setupServer()
-  let showFlashAlertSpy: ReturnType<typeof vi.spyOn>
-
   beforeAll(() => {
     server.listen()
   })
 
-  beforeEach(() => {
-    showFlashAlertSpy = vi.spyOn(FlashAlert, 'showFlashAlert').mockImplementation(() => {})
-  })
-
   afterEach(() => {
     server.resetHandlers()
-    showFlashAlertSpy.mockRestore()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {

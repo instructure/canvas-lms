@@ -34,7 +34,7 @@ import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {
   useResetLtiRegistration,

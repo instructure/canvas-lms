@@ -28,7 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -127,9 +127,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
     // Filter out any undefined/null accounts and ensure they have names before sorting
     const validAccounts = accounts.filter(account => account && account.name)
     setAllAccounts(
-      validAccounts.sort((a, b) =>
-        a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}),
-      ),
+      validAccounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'})),
     )
   }, [])
 

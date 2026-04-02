@@ -38,7 +38,7 @@ import {
   ZGetLtiAssetProcessorsResult,
   ZGetLtiAssetReportsResult,
 } from '@canvas/lti-asset-processor/model/LtiAssetReport'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const STALE_TIME = 5 * 60 * 1000 // 5 minutes
 

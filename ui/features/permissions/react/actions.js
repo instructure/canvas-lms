@@ -22,7 +22,7 @@ import {ALL_ROLES_VALUE} from '@canvas/permissions/react/propTypes'
 
 import * as apiClient from './apiClient'
 
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('permissions')
 

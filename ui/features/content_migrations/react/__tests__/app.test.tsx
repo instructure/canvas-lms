@@ -21,6 +21,15 @@ import {render, screen, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {App} from '../app'
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 const server = setupServer()
 
@@ -64,7 +73,10 @@ const mockMigrations = [
 
 describe('App', () => {
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
+  afterEach(() => {
+    server.resetHandlers()
+    vi.clearAllMocks()
+  })
   afterAll(() => server.close())
 
   beforeEach(() => {
@@ -139,21 +151,15 @@ describe('App', () => {
       render(<App />)
 
       await waitFor(() => {
-        expect(
-          screen.queryAllByText("Couldn't load previous content migrations").length,
-        ).toBeGreaterThan(0)
+        expect(showFlashError).toHaveBeenCalledWith("Couldn't load previous content migrations")
       })
     })
 
     it("doesn't render loading spinner", async () => {
       render(<App />)
 
-      await waitFor(() => {
-        expect(
-          screen.queryAllByText("Couldn't load previous content migrations").length,
-        ).toBeGreaterThan(0)
-        expect(screen.queryByText('Loading')).not.toBeInTheDocument()
-      })
+      await waitFor(() => expect(showFlashError).toHaveBeenCalled())
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument()
     })
   })
 })

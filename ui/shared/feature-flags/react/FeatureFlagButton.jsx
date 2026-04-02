@@ -32,7 +32,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import * as flagUtils from './util'
 

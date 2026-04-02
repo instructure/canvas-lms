@@ -19,7 +19,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasMultiSelect from '@canvas/multi-select'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {debounce} from '@instructure/debounce'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Tag} from '@instructure/ui-tag'

@@ -37,7 +37,7 @@ import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-
 import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 import FileSubmissionPreview from '@canvas/assignments/react/FileSubmissionPreview'
 import StudentAnnotationPreview from '@canvas/assignments/react/StudentAnnotationPreview'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useRubricAssessment} from '../hooks/useRubricAssessment'
 import {RubricPanel} from './RubricPanel'
 import type {RubricPanelHandle} from './RubricPanel'

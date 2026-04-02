@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {RubricAssessmentImportTray} from './RubricAssessmentImportTray'
 import {useMutation} from '@tanstack/react-query'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {
   type RubricAssessmentImportResponse,
   importRubricAssessment,

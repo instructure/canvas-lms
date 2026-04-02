@@ -27,7 +27,7 @@ import {useOutcomesChart} from './hooks/useOutcomesChart'
 import {useMemo, useEffect} from 'react'
 import type {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import OutcomeAlignmentsList from './OutcomeAlignmentsList'
 
 const I18n = createI18nScope('outcome_management')

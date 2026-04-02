@@ -19,15 +19,15 @@
 /* global vi */
 if (typeof vi !== 'undefined') {
   vi.mock('@canvas/hide-assignment-grades-tray/react/Api')
-  vi.mock('@canvas/alerts/react/FlashAlert')
+  vi.mock('@instructure/platform-alerts')
 }
 vi.mock('@canvas/hide-assignment-grades-tray/react/Api')
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 import {render, screen as rtlScreen, waitFor, fireEvent} from '@testing-library/react'
 import React from 'react'
 
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import * as Api from '@canvas/hide-assignment-grades-tray/react/Api'
 import HideAssignmentGradesTray from '..'
 
@@ -242,9 +242,7 @@ describe('HideAssignmentGradesTray', () => {
 
     // fickle; this test passes individually
     it.skip('disables hide button while processing', async () => {
-      const hideAssignmentGradesMock = vi.fn(
-        () => new Promise(resolve => setTimeout(resolve, 100)),
-      )
+      const hideAssignmentGradesMock = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)))
       Api.hideAssignmentGrades.mockImplementation(hideAssignmentGradesMock)
       await showTray()
 

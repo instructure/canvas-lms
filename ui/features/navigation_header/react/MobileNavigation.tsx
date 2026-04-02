@@ -24,7 +24,7 @@ import {useQuery} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {sessionStoragePersister} from '@canvas/query'
 
 declare global {

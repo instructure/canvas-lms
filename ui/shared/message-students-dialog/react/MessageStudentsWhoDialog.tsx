@@ -49,7 +49,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {sortBy} from 'es-toolkit/compat'
 import {type ObserverEnrollmentConnectionUser} from '../graphql/Queries'
 import Pill from './Pill'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {
   FileAttachmentUpload,
   AttachmentUploadSpinner,

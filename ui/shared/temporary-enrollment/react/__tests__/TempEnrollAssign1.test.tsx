@@ -28,6 +28,15 @@ const server = setupServer()
 
 const backCall = vi.fn()
 
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 vi.mock('../api/enrollment', () => ({
   deleteEnrollment: vi.fn(),
   getTemporaryEnrollmentPairing: vi.fn(),
@@ -275,9 +284,12 @@ describe('TempEnrollAssign', () => {
 
       // The DateTimeInput's invalidDateTimeMessage is displayed internally by the component
       // when the date is invalid, and may take time to render.
-      await waitFor(() => {
-        expect(screen.getByText('The chosen date and time is invalid.')).toBeInTheDocument()
-      }, {timeout: 10000})
+      await waitFor(
+        () => {
+          expect(screen.getByText('The chosen date and time is invalid.')).toBeInTheDocument()
+        },
+        {timeout: 10000},
+      )
     }, 30000)
 
     it('sets wrong order error state when start date is after end date', async () => {
@@ -387,11 +399,12 @@ describe('TempEnrollAssign', () => {
     })
 
     it('shows error for failed enrollments fetch', async () => {
-      const {findAllByText} = render(<TempEnrollAssign {...props} />)
-      const errorMessage = await findAllByText(
-        /There was an error while requesting user enrollments, please try again/i,
+      render(<TempEnrollAssign {...props} />)
+      await waitFor(() =>
+        expect(showFlashError).toHaveBeenCalledWith(
+          'There was an error while requesting user enrollments, please try again',
+        ),
       )
-      expect(errorMessage).toBeTruthy()
     })
   })
 

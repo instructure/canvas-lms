@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {IMPORT_OUTCOMES} from '../../graphql/Management'
 import {useMutation} from '@apollo/client'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import useCanvasContext from './useCanvasContext'
 
 const I18n = createI18nScope('FindOutcomesModal')

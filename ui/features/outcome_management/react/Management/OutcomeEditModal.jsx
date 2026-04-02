@@ -30,7 +30,7 @@ import {Mask} from '@instructure/ui-overlays'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {titleValidator, displayNameValidator} from '../../validators/outcomeValidators'
 import {
   UPDATE_LEARNING_OUTCOME,

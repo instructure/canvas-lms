@@ -23,7 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import * as apiClient from './apiClient'
 
 const I18n = createI18nScope('OutcomesImporter')

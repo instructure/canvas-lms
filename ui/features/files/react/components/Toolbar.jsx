@@ -37,7 +37,7 @@ import '@canvas/rails-flash-notifications'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {reloadWindow} from '@canvas/util/globalUtils'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 

@@ -20,7 +20,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {QueryClient, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'

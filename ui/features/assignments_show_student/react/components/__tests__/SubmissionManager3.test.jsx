@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {SET_MODULE_ITEM_COMPLETION} from '@canvas/assignments/graphql/student/Mutations'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import fakeENV from '@canvas/test-utils/fakeENV'

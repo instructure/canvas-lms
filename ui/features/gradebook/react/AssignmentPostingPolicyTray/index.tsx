@@ -29,7 +29,7 @@ import {QueryClientProvider} from '@tanstack/react-query'
 
 import Layout from './Layout'
 import {setAssignmentPostPolicy} from './Api'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 import {ScheduledRelease} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
 

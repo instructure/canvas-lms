@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloProvider} from '@apollo/client'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
 import {cleanup, fireEvent, render, waitFor} from '@testing-library/react'

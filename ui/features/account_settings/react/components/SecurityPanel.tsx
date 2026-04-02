@@ -25,7 +25,7 @@ import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Alert} from '@instructure/ui-alerts'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Whitelist} from './Whitelist'
 

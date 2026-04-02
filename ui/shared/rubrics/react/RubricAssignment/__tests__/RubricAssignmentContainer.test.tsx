@@ -26,7 +26,7 @@ import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/Rub
 import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from './fixtures'
 import {queryClient} from '@canvas/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =
@@ -192,9 +192,7 @@ describe('RubricAssignmentContainer Tests', () => {
       await waitFor(() => expect(getByTestId('add-criterion-button')).toBeInTheDocument())
       fireEvent.click(getByTestId('add-criterion-button'))
 
-      await waitFor(() =>
-        expect(getByTestId('rubric-criterion-name-input')).toBeInTheDocument(),
-      )
+      await waitFor(() => expect(getByTestId('rubric-criterion-name-input')).toBeInTheDocument())
       fireEvent.change(getByTestId('rubric-criterion-name-input'), {
         target: {value: 'New Criterion Test'},
       })

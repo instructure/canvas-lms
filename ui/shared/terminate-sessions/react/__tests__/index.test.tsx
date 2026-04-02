@@ -23,12 +23,16 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import TerminateSessions from '../index'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => vi.fn()),
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn()),
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 
 const server = setupServer()
 

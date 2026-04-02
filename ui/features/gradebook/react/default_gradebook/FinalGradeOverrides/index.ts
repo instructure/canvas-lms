@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import type GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'

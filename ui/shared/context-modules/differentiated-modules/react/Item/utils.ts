@@ -21,7 +21,7 @@ import type React from 'react'
 import {useState, useCallback, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('differentiated_modules')
 

@@ -45,7 +45,7 @@ import {
   downloadRubrics,
 } from '../../queries/ViewRubricQueries'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 import {ImportRubric} from './ImportRubric'
 import {colors} from '@instructure/canvas-theme'

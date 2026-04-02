@@ -26,7 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 import {useGradingSchemeSummaries} from '../hooks/useGradingSchemeSummaries'
 import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'

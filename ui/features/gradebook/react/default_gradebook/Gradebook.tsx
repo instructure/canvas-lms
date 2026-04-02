@@ -175,7 +175,7 @@ import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
 import ScoreToUngradedManager from '../shared/ScoreToUngradedManager'
@@ -5452,7 +5452,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           {this.props.flashAlerts.map(alert => (
             <div key={alert.key} id={alert.key} className="Gradebook__FlashMessage">
               {}
-              <FlashAlert.default
+              <FlashAlert.FlashAlert
                 message={alert.message}
                 onClose={() => document.getElementById(alert.key)?.remove()}
                 timeout={5000}

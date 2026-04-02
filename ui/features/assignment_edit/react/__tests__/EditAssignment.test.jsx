@@ -24,13 +24,17 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {AnnotatedDocumentSelector} from '../EditAssignment'
 
 // Mock FlashAlert
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: () => vi.fn(),
-  showFlashSuccess: () => vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: () => vi.fn(),
+    showFlashSuccess: () => vi.fn(),
+  }
+})
 
 vi.mock('@canvas/i18n', () => ({
-  useScope: (scope) => {
+  useScope: scope => {
     return {
       t: (key, defaultValue) => {
         const translations = {
@@ -38,19 +42,21 @@ vi.mock('@canvas/i18n', () => ({
           'Group files': 'Group files',
           'Remove selected attachment': 'Remove selected attachment',
           'Available folders': 'Available folders',
-          'Loading': 'Loading',
-          'Help us improve by telling us what happened': 'Help us improve by telling us what happened',
+          Loading: 'Loading',
+          'Help us improve by telling us what happened':
+            'Help us improve by telling us what happened',
           'Report Issue': 'Report Issue',
-          'Comment failed to post! Please try again later.': 'Comment failed to post! Please try again later.',
+          'Comment failed to post! Please try again later.':
+            'Comment failed to post! Please try again later.',
           'Comment submitted!': 'Comment submitted!',
           'What happened?': 'What happened?',
           'Your Email Address': 'Your Email Address',
           'email@example.com': 'email@example.com',
-          'Submit': 'Submit',
+          Submit: 'Submit',
           'Sorry, Something Broke': 'Sorry, Something Broke',
         }
         return translations[key] || defaultValue || key
-      }
+      },
     }
   },
 }))

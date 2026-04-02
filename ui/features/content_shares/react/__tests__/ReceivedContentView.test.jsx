@@ -22,7 +22,9 @@ import ReceivedContentView from '../ReceivedContentView'
 import {assignmentShare, unreadDiscussionShare} from './test-utils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse, delay} from 'msw'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 
@@ -49,6 +51,7 @@ describe('view of received content', () => {
   afterEach(async () => {
     if (liveRegion) liveRegion.remove()
     destroyContainer()
+    vi.clearAllMocks()
     // Allow any pending async operations to complete
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0))
@@ -224,9 +227,11 @@ describe('view of received content', () => {
     server.use(
       http.get('/api/v1/users/self/content_shares/received', () => HttpResponse.json(shares)),
     )
-    const {getByText} = render(<ReceivedContentView />)
+    render(<ReceivedContentView />)
     await waitFor(() => {
-      expect(getByText('1 shared item loaded.')).toBeInTheDocument()
+      expect(showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: '1 shared item loaded.'}),
+      )
     })
   })
 
@@ -351,7 +356,9 @@ describe('view of received content', () => {
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })
-      expect(getAllByText(/401/)[0]).toBeInTheDocument()
+      expect(showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'There was an error removing the item'}),
+      )
     })
   })
 })

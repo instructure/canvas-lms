@@ -19,7 +19,7 @@
 /* global vi */
 import * as uploadFileModule from '@canvas/upload-file'
 import $ from 'jquery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 vi.mock('@canvas/upload-file')

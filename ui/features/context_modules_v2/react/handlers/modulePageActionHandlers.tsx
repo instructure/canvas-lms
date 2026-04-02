@@ -30,7 +30,7 @@ import type {
   PaginatedNavigationResponse,
 } from '../utils/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
 import EditItemModal from '../componentsTeacher/EditItemModal'
 

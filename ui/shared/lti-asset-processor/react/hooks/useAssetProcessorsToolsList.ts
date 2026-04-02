@@ -22,7 +22,7 @@ import {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('asset_processors_selection')

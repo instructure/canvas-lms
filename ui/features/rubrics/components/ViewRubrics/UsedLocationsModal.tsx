@@ -31,7 +31,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('UsedLocationsModal')
 

@@ -25,7 +25,7 @@ import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),

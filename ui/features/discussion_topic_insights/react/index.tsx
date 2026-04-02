@@ -20,11 +20,7 @@ import DiscussionInsightsPage from './DiscussionInsightsPage'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import _AlertManager from '@canvas/alerts/react/AlertManager'
-
-// WithBreakpoints HOC incorrectly requires breakpoints in consumer type
-// @ts-expect-error - breakpoints is injected by the HOC, not by consumers
-const AlertManager: React.ComponentType<React.PropsWithChildren<{}>> = _AlertManager
+import {AlertManager} from '@instructure/platform-alerts'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'

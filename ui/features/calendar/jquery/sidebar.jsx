@@ -29,7 +29,7 @@ import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jquery-tinypubsub'
 import AccountCalendarsModal from '../react/AccountCalendarsModal'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {CalendarColorPicker} from '../react/CalendarColorPicker'
 
 const I18n = createI18nScope('calendar_sidebar')

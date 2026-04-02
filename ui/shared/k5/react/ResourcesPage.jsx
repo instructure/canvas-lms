@@ -26,7 +26,7 @@ import StaffContactInfoLayout from './StaffContactInfoLayout'
 import useImmediate from '@canvas/use-immediate-hook'
 import {fetchCourseInstructors, fetchCourseApps, fetchImportantInfos} from './utils'
 import AppsList from './AppsList'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import ImportantInfoLayout from './ImportantInfoLayout'
 import {getResourcesTheme} from './k5-theme'
 

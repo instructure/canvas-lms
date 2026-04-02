@@ -17,6 +17,7 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/react'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {
   mockAssignment,
   findInputForLabel,
@@ -28,6 +29,12 @@ import {
   renderTeacherView,
   renderTeacherQueryAndWaitForResult,
 } from './integration/integration-utils'
+
+vi.mock('@instructure/platform-alerts')
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('TeacherView', () => {
   describe('basic TeacherView stuff', () => {
@@ -197,7 +204,9 @@ describe('TeacherView', () => {
       const saveBtn = closest(getByText('Save'), 'button')
       saveBtn.click()
 
-      expect(getAllByText('You cannot save while there are errors')[0]).toBeInTheDocument()
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'You cannot save while there are errors'}),
+      )
     })
 
     it('bypasses update if new value == old', async () => {

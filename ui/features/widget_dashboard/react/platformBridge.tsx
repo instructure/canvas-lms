@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {platformExecuteQuery} from '@canvas/graphql'
 import {queryClient} from '@canvas/query'
 import {PlatformUiProvider} from '@instructure/platform-provider'
