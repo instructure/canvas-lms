@@ -270,4 +270,21 @@ describe NewLoginHelper do
       expect { new_login_data_attributes }.not_to raise_error
     end
   end
+
+  context "when fft_registration_url is configured" do
+    before do
+      @domain_root_account.settings[:fft_registration_url] = "https://fft.example.com/register"
+      @domain_root_account.save!
+    end
+
+    it "includes free_for_teacher_registration_url in data attributes" do
+      expect(new_login_data_attributes[:free_for_teacher_registration_url]).to eq("https://fft.example.com/register")
+    end
+  end
+
+  context "when fft_registration_url is not configured" do
+    it "omits free_for_teacher_registration_url from data attributes" do
+      expect(new_login_data_attributes).not_to have_key(:free_for_teacher_registration_url)
+    end
+  end
 end

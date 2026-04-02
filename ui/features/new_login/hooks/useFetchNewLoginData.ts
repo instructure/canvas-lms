@@ -43,6 +43,7 @@ interface NewLoginData {
   customMessageLogin?: string
   customMessageRegistration?: string
   customMessageRegistrationParent?: string
+  freeForTeacherRegistrationUrl?: string
 }
 
 interface NewLoginDataResult {
@@ -162,6 +163,10 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         customMessageRegistrationParent: getStringAttribute(
           container,
           'data-custom-message-registration-parent',
+        ),
+        freeForTeacherRegistrationUrl: getStringAttribute(
+          container,
+          'data-free-for-teacher-registration-url',
         ),
       }
     : {}

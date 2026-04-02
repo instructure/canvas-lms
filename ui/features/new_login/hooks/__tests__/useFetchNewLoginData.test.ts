@@ -44,6 +44,7 @@ const createMockContainer = (
   customMessageLogin?: string | null,
   customMessageRegistration?: string | null,
   customMessageRegistrationParent?: string | null,
+  freeForTeacherRegistrationUrl?: string | null,
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -119,6 +120,9 @@ const createMockContainer = (
       customMessageRegistrationParent,
     )
   }
+  if (freeForTeacherRegistrationUrl !== undefined && freeForTeacherRegistrationUrl !== null) {
+    container.setAttribute('data-free-for-teacher-registration-url', freeForTeacherRegistrationUrl)
+  }
   document.body.appendChild(container)
 }
 
@@ -160,6 +164,7 @@ describe('useFetchNewLoginData', () => {
       '', // customMessageLogin
       '', // customMessageRegistration
       '', // customMessageRegistrationParent
+      '', // freeForTeacherRegistrationUrl
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     await waitFor(() => {
@@ -188,6 +193,7 @@ describe('useFetchNewLoginData', () => {
         'customMessageLogin',
         'customMessageRegistration',
         'customMessageRegistrationParent',
+        'freeForTeacherRegistrationUrl',
       ]
       expect(hookAttributes.sort()).toEqual(expectedAttributes.sort())
     })
@@ -219,6 +225,7 @@ describe('useFetchNewLoginData', () => {
       customMessageLogin: undefined,
       customMessageRegistration: undefined,
       customMessageRegistrationParent: undefined,
+      freeForTeacherRegistrationUrl: undefined,
     })
   })
 
@@ -255,6 +262,7 @@ describe('useFetchNewLoginData', () => {
       'Welcome to our platform!', // customMessageLogin
       'Register to get started!', // customMessageRegistration
       'Please fill out the registration form below.', // customMessageRegistrationParent
+      'https://fft.example.com/register', // freeForTeacherRegistrationUrl
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
@@ -289,6 +297,7 @@ describe('useFetchNewLoginData', () => {
       customMessageLogin: 'Welcome to our platform!',
       customMessageRegistration: 'Register to get started!',
       customMessageRegistrationParent: 'Please fill out the registration form below.',
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
     })
   })
 
@@ -387,6 +396,7 @@ describe('useFetchNewLoginData', () => {
       '', // customMessageLogin
       '', // customMessageRegistration
       '', // customMessageRegistrationParent
+      '', // freeForTeacherRegistrationUrl
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
@@ -413,6 +423,7 @@ describe('useFetchNewLoginData', () => {
       customMessageLogin: undefined,
       customMessageRegistration: undefined,
       customMessageRegistrationParent: undefined,
+      freeForTeacherRegistrationUrl: undefined,
     })
   })
 

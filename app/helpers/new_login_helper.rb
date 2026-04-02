@@ -47,11 +47,16 @@ module NewLoginHelper
       discovery_enabled:,
       custom_message_login:,
       custom_message_registration:,
-      custom_message_registration_parent:
+      custom_message_registration_parent:,
+      free_for_teacher_registration_url:
     }.compact
   end
 
   private
+
+  def free_for_teacher_registration_url
+    @domain_root_account.settings[:fft_registration_url].presence
+  end
 
   # course catalog link for display in the top navigation bar
   def enable_course_catalog
