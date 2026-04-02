@@ -3307,6 +3307,65 @@ describe Course do
           expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
         end
 
+        context "for K5 subject courses" do
+          before do
+            toggle_k5_setting(@course.account)
+            @course.tab_configuration = [
+              { "id" => "nav_menu_link_#{link.id}", "hidden" => true }
+            ]
+            @course.save!
+          end
+
+          context "course_subject_tabs sidebar" do
+            it "shows hidden tab to admins" do
+              tabs = @course.tabs_available(@teacher, course_subject_tabs: true, include_external: true)
+              nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+              expect(nav_link_tab).to be_present
+              expect(nav_link_tab[:hidden]).to be true
+            end
+
+            it "hides hidden tab from students" do
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, course_subject_tabs: true, include_external: true)
+              expect(student_tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+            end
+
+            it "shows visible tab to students" do
+              @course.tab_configuration = []
+              @course.save!
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, course_subject_tabs: true, include_external: true)
+              expect(student_tabs.pluck(:id)).to include("nav_menu_link_#{link.id}")
+            end
+          end
+
+          context "regular left-nav settings page" do
+            # include_external: true is required here (unlike non-K5 tests)
+            # because the K5 code path starts from tabs=[] and nav_menu_link
+            # tabs only reach the list via the external_tabs append.
+            it "shows hidden tab to admins" do
+              tabs = @course.tabs_available(@teacher, include_external: true)
+              nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+              expect(nav_link_tab).to be_present
+              expect(nav_link_tab[:hidden]).to be true
+            end
+
+            it "hides hidden tab from students" do
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, include_external: true)
+              expect(student_tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+            end
+
+            it "shows visible tab to students" do
+              @course.tab_configuration = []
+              @course.save!
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, include_external: true)
+              expect(student_tabs.pluck(:id)).to include("nav_menu_link_#{link.id}")
+            end
+          end
+        end
+
         it "includes link_context_type in tab_configuration" do
           l2 = NavMenuLink.create!(context: @course.account, course_nav: true, url: "https://example.com", label: "l2")
           @course.tab_configuration = [

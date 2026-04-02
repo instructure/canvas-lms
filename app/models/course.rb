@@ -3727,7 +3727,9 @@ class Course < ApplicationRecord
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
-      tabs = (elementary_subject_course? && !course_subject_tabs) ? [] : tab_configuration.compact
+
+      start_from_tab_config = !elementary_subject_course? || course_subject_tabs
+      tabs = start_from_tab_config ? tab_configuration.compact : []
       home_tab = default_tabs.find { |t| t[:id] == TAB_HOME }
       settings_tab = default_tabs.find { |t| t[:id] == TAB_SETTINGS }
       external_tool_tabs = if opts[:include_external]
@@ -3892,14 +3894,24 @@ class Course < ApplicationRecord
         admin_only_tabs = tabs.select { |t| t[:visibility] == "admins" }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
+        # For K5 subject courses on the settings page (left-nav), tabs start
+        # as [] so tab_configuration is never consulted during the mapping
+        # loop above. We have to mark hidden nav_menu_link tabs explicitly.
+        unless start_from_tab_config
+          hidden_tab_ids = tab_configuration.filter_map { |t| t[:id] if t[:hidden] }.to_set
+          tabs.each do |tab|
+            if NavMenuLinkTabs.nav_menu_link_tab_id?(tab[:id]) && hidden_tab_ids.include?(tab[:id])
+              tab[:hidden] = true
+            end
+          end
+        end
+
         hidden_external_tabs = tabs.select do |t|
-          next false unless t[:external]
           # Hidden tools do not show for admins. Hidden Nav Menu Links are
           # shown with "crossed-out eye" icon like other tabs.
-          next false if NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id])
-
-          elementary_enabled = elementary_subject_course? && !course_subject_tabs
-          (t[:hidden] && !elementary_enabled) || (elementary_enabled && tab_hidden?(t[:id]))
+          t[:external] &&
+            !NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id]) &&
+            (start_from_tab_config ? t[:hidden] : hidden_tab_ids.include?(t[:id]))
         end
         tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 

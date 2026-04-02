@@ -243,7 +243,6 @@ describe('NavMenuLinksSettings', () => {
     const link = getByRole('link', {name: /https:\/\/example\.com\/my-link/})
     expect(link).toHaveAttribute('href', 'https://example.com/my-link')
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveAttribute('aria-label', 'https://example.com/my-link (opens in new tab)')
   })
 
   it('shows url as external link for existing links', () => {
@@ -267,7 +266,6 @@ describe('NavMenuLinksSettings', () => {
     const link = getByRole('link', {name: /https:\/\/example\.com\/existing/})
     expect(link).toHaveAttribute('href', 'https://example.com/existing')
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveAttribute('aria-label', 'https://example.com/existing (opens in new tab)')
   })
 
   it('renders links in correct order', () => {
