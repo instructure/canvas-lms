@@ -137,7 +137,6 @@ function NavMenuLink({label, url, placements, onDeleteRequest}: NavMenuLinkProps
                   target="_blank"
                   rel="noreferrer"
                   isWithinText={false}
-                  aria-label={I18n.t('%{url} (opens in new tab)', {url})}
                   elementRef={el => {
                     // as of Apr 2026, external_links.js adds icons inconsistently (not to newly rendered links), so we add it manually
                     el?.classList.add('exclude_external_icon')

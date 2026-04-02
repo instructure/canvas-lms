@@ -120,6 +120,7 @@ const translateTabId = id => {
   if (id === '7') return TAB_IDS.GROUPS
   if (id === '5') return TAB_IDS.GRADES
   if (String(id).startsWith('context_external_tool_')) return TAB_IDS.RESOURCES
+  if (String(id).startsWith('nav_menu_link_')) return TAB_IDS.RESOURCES
   return TAB_IDS.HOME
 }
 
@@ -460,6 +461,14 @@ export function K5Course({
     : null
 
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
+  const customLinks = tabs
+    .filter(tab => String(tab.id).startsWith('nav_menu_link_') && !tab.hidden)
+    .map(tab => ({
+      id: tab.id,
+      label: tab.label,
+      url: Array.isArray(tab.args) ? tab.args[0] : null,
+    }))
+    .filter(link => link.url && /^https?:\/\//i.test(link.url))
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
@@ -680,6 +689,7 @@ export function K5Course({
           visible={currentTab === TAB_IDS.RESOURCES}
           showStaff={false}
           isSingleCourse={true}
+          customLinks={customLinks}
         />
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
         {currentTab === TAB_IDS.GROUPS && (
