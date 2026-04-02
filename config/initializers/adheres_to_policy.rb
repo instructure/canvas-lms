@@ -24,4 +24,11 @@ ActiveRecord::Base.singleton_class.include(AdheresToPolicy::ClassMethods)
 AdheresToPolicy.configure do |config|
   config.cache_related_permissions = false
   config.blacklist = ["discussion_entry.reply"]
+  config.override_proc = lambda do |user, sought_right|
+    # != false is intentional here. nil means the permissions check wasn't run against @current_user,
+    # so we don't know that they're not masquerading, and therefore can't allow the action
+    if user.try(:impersonated) != false && Permissions.not_for_masquerading?(sought_right)
+      AdheresToPolicy::JustifiedFailure.new(:not_for_masquerading)
+    end
+  end
 end

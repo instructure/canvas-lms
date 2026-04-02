@@ -236,6 +236,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_user)).to eq @user
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
 
       it "sets current_pseudonym" do
@@ -245,6 +246,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
         expect(controller.instance_variable_get(:@real_current_pseudonym)).to be_nil
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be false
       end
 
       it "sets real current_pseudonym if masquerading user id present" do
@@ -254,6 +256,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
         expect(controller.instance_variable_get(:@real_current_pseudonym)).to eq @real_user.pseudonym
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
     end
 
@@ -293,6 +296,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_user)).to eq @user
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
 
       it "sets current_pseudonym" do
@@ -351,6 +355,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_user)).to eq @user
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
 
       it "rejects as_user_id on a masquerading token if masquerade does not match" do
@@ -435,6 +440,7 @@ describe AuthenticationMethods do
               controller.send(:load_user)
               expect(controller.instance_variable_get(:@current_user)).to eq user
               expect(controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
+              expect(controller.instance_variable_get(:@current_user).impersonated).to be false
             end
 
             it "sends an InstStatsd event for monitoring" do

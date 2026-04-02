@@ -337,6 +337,11 @@ module AuthenticationMethods
     if Sentry.initialized? && !Rails.env.test?
       Sentry.set_user({ id: @current_user&.global_id, ip_address: request.remote_ip }.compact)
     end
+
+    if @current_user
+      @current_user.impersonated = @real_current_user.present? && @current_user != @real_current_user
+    end
+
     @current_user
   end
   private :load_user

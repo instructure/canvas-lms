@@ -91,6 +91,20 @@ module Permissions
     @permissions
   end
 
+  def self.non_masquerading_permissions
+    return [] unless @permissions.frozen?
+
+    @non_masquerading_permissions ||= Set.new(@permissions.keys.select { |perm| @permissions.dig(perm, :not_for_masquerading) })
+  end
+
+  def self.not_for_masquerading?(permission)
+    if permission.is_a?(Array)
+      non_masquerading_permissions.intersect?(permission)
+    else
+      non_masquerading_permissions.include?(permission)
+    end
+  end
+
   def self.permission_groups(context = nil)
     base_groups = PERMISSION_GROUPS
 

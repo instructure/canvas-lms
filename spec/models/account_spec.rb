@@ -519,8 +519,8 @@ describe Account do
   end
 
   def account_with_admin_and_restricted_user(account, restricted_role)
-    admin = User.create
-    user = User.create
+    admin = User.create(impersonated: false)
+    user = User.create(impersonated: false)
     account.account_users.create!(user: admin, role: admin_role)
     account.account_users.create!(user:, role: restricted_role)
     [admin, user]

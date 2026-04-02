@@ -21,6 +21,8 @@
 # `group` values are keys into PERMISSION_GROUPS defined in permissions_groups.rb.
 # help text can be provided in `details` or `considerations` (which will apply in both account and course contexts)
 # and or `account_` / `course_` prefixed versions, which will only apply in those contexts.
+# NOTE: if `not_for_masquerading` is set, the permission will be denied unless checked against @current_user
+# and the user is not being impersonated (so for the time being, such permissions can't be checked in jobs)
 BASE_PERMISSIONS = {
   become_user: {
     label: -> { I18n.t("Users - act as") },
