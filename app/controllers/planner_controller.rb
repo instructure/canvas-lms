@@ -135,6 +135,7 @@ class PlannerController < ApplicationController
   #   }
   #  ]
   def index
+    @user&.clear_checkpoint_data_cache!
     GuardRail.activate(:secondary) do
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
       planner_overrides_meta_key = get_planner_cache_id(@current_user)
@@ -485,19 +486,25 @@ class PlannerController < ApplicationController
       @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
-    allowed_account_calendars = @user&.all_account_calendars&.map(&:id) || []
-    enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
+    # Lazily evaluate account calendars to avoid expensive queries when not needed
+    lazy_allowed = nil
+    lazy_enabled = nil
+    allowed_account_calendars_proc = -> { lazy_allowed ||= @user&.all_account_calendars&.map(&:id) || [] }
+    enabled_account_calendars_proc = -> { lazy_enabled ||= @user&.enabled_account_calendars&.map(&:id) || [] }
     if @include_account_calendars && !context_ids.nil? && context_ids["Account"].nil?
-      @account_ids = enabled_account_calendars
+      @account_ids = enabled_account_calendars_proc.call
     end
 
     # make IDs relative to the user's shard
     @course_ids, @group_ids, @user_ids, @account_ids = transpose_ids(Shard.current, @user.shard) if @user
 
-    # Also transpose allowed/enabled account calendars to match @user.shard format
+    # Transpose allowed/enabled account calendars to match @user.shard format (lazily evaluated)
     if @user
-      allowed_account_calendars = allowed_account_calendars.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) }
-      enabled_account_calendars = enabled_account_calendars.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) }
+      transposed_allowed = -> { allowed_account_calendars_proc.call.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) } }
+      transposed_enabled = -> { enabled_account_calendars_proc.call.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) } }
+    else
+      transposed_allowed = -> { [] }
+      transposed_enabled = -> { [] }
     end
 
     (@user&.shard || Shard.current).activate do
@@ -508,8 +515,8 @@ class PlannerController < ApplicationController
       if @user
         @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded:)
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
-        @account_ids ||= enabled_account_calendars
-        @account_ids &= allowed_account_calendars
+        @account_ids ||= transposed_enabled.call
+        @account_ids &= transposed_allowed.call
         @user_ids ||= [@user.id]
         @user_ids &= [@user.id]
       else

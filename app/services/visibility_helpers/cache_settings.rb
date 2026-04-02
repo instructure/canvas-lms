@@ -20,7 +20,7 @@
 module VisibilityHelpers
   class CacheSettings
     def self.ttl
-      config["ttl"] || 1.minute
+      config["ttl"] || 5.minutes
     end
 
     class << self
