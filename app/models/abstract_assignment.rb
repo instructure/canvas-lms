@@ -187,7 +187,7 @@ class AbstractAssignment < ApplicationRecord
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
   scope :not_excluded_from_accessibility_scan, lambda {
-    where.not(submission_types: ["online_quiz", "external_tool"])
+    where.not(submission_types: "online_quiz")
          .where.not(id: type_quiz_lti)
   }
 

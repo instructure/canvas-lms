@@ -6925,12 +6925,12 @@ describe Assignment do
       expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(classic_quiz_assignment)
     end
 
-    it "excludes external tool assignments" do
+    it "includes external tool assignments" do
       external_tool_assignment = course.assignments.create!(
         title: "External Tool Assignment",
         submission_types: "external_tool"
       )
-      expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(external_tool_assignment)
+      expect(course.assignments.not_excluded_from_accessibility_scan).to include(external_tool_assignment)
     end
 
     it "excludes New Quizzes (quiz_lti) assignments" do
