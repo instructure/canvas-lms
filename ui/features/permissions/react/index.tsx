@@ -17,8 +17,10 @@
  */
 
 import React from 'react'
-import {render as canvasRender, rerender} from '@canvas/react'
+import {render, rerender} from '@canvas/react'
 import {Provider} from 'react-redux'
+
+type Root = ReturnType<typeof render>
 
 // TODO: we probably want this one eventually
 // import { subscribeFlashNotifications } from '../shared/reduxNotifications'
@@ -27,15 +29,15 @@ import {ConnectedPermissionsIndex} from './components/PermissionsIndex'
 import createStore from './store'
 import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
-export default function createPermissionsIndex(root, data = {}) {
+export default function createPermissionsIndex(root: HTMLElement, data = {}) {
   const store = createStore(data)
-  let rootInstance = null
+  let rootInstance: Root | null = null
 
   function unmount() {
     rootInstance?.unmount()
   }
 
-  function render() {
+  function renderPermissionsIndex() {
     const element = (
       <>
         <TopNavPortal />
@@ -44,15 +46,12 @@ export default function createPermissionsIndex(root, data = {}) {
         </Provider>
       </>
     )
-    if (!rootInstance) {
-      rootInstance = canvasRender(element, root)
-    } else {
-      rerender(rootInstance, element)
-    }
+    if (!rootInstance) rootInstance = render(element, root)
+    else rerender(rootInstance, element)
   }
 
   // For some reason this is not working  TODO figure this out
   // subscribeFlashNotifications(store)
 
-  return {unmount, render}
+  return {unmount, render: renderPermissionsIndex}
 }

@@ -19,6 +19,7 @@
 import React from 'react'
 import {noop} from 'es-toolkit/compat'
 import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {EnabledState} from '../types'
 import * as reduxHooks from 'react-redux'
 
@@ -37,9 +38,18 @@ function buildProps({
   locked = false,
   readonly = false,
   explicit = true,
-}) {
+  applies_to_self,
+  applies_to_descendants,
+}: {
+  enabled?: EnabledState
+  locked?: boolean
+  readonly?: boolean
+  explicit?: boolean
+  applies_to_self?: boolean
+  applies_to_descendants?: boolean
+} = {}) {
   return {
-    permission: {enabled, locked, readonly, explicit},
+    permission: {enabled, locked, readonly, explicit, applies_to_self, applies_to_descendants},
     permissionName: PERM_LABEL,
     permissionLabel: PERM_LABEL,
     onFocus: noop,
@@ -80,8 +90,9 @@ describe('permissions::PermissionButton', () => {
 
   it('displays a spinner whilst the API is in flight', () => {
     mockUseSelector
-      .mockReturnValueOnce(true) // for apiBusy
-      .mockReturnValueOnce(false) // for setFocus
+      .mockReturnValueOnce(false) // isSiteAdmin
+      .mockReturnValueOnce(true) // apiBusy
+      .mockReturnValueOnce(false) // setFocus
 
     const {getByText} = render(<PermissionButton {...buildProps({})} />)
 
@@ -191,5 +202,88 @@ describe('permissions::PermissionButton', () => {
     const {container} = render(<PermissionButton {...buildProps({readonly: true, locked: true})} />)
     const button = container.querySelector('button')
     expect(button!.disabled).toBe(true)
+  })
+
+  describe('applies to self/descendants (site admin)', () => {
+    function setupSiteAdmin() {
+      mockUseSelector.mockImplementation((selector: any) =>
+        selector({
+          isSiteAdmin: true,
+          apiBusy: [],
+          nextFocus: {targetArea: '', roleId: '', permissionName: ''},
+        }),
+      )
+    }
+
+    it('shows "Apply to..." group with both items checked by default', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      expect(getByText('Self')).toBeInTheDocument()
+      expect(getByText('Descendants')).toBeInTheDocument()
+    })
+
+    it('shows checkmarks even when explicit is false (Use Default)', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({explicit: false})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      // Both "Self" and "Descendants" should be present even with explicit: false
+      expect(getByText('Self')).toBeInTheDocument()
+      expect(getByText('Descendants')).toBeInTheDocument()
+    })
+
+    it('does not show "Apply to..." group for non-site-admins', async () => {
+      mockUseSelector.mockReturnValue(false) // isSiteAdmin=false, apiBusy=false, setFocus=false
+      const user = userEvent.setup()
+      const props = buildProps({})
+      const {container, queryByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      expect(queryByText('Self')).toBeNull()
+      expect(queryByText('Descendants')).toBeNull()
+    })
+
+    it('disables "Apply to..." selections when the permission is disabled', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({enabled: EnabledState.NONE})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      const selfItem = getByText('Self').closest('[role="menuitemcheckbox"]')
+      const descendantsItem = getByText('Descendants').closest('[role="menuitemcheckbox"]')
+      expect(selfItem).toHaveAttribute('aria-disabled', 'true')
+      expect(descendantsItem).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('dispatches correct action when toggling self off', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({applies_to_self: true, applies_to_descendants: true})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      mockDispatch.mockClear()
+      await user.click(getByText('Self'))
+
+      // modifyPermissions returns a thunk, so dispatch is called with a function
+      expect(mockDispatch).toHaveBeenCalledWith(expect.any(Function))
+    })
   })
 })
