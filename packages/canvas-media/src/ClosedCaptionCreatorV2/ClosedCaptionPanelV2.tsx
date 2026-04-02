@@ -30,6 +30,7 @@ import {CaptionRow} from './CaptionRow'
 import {doAsrRequest} from './hooks/doAsrRequest'
 import {useClosedCaptionState} from './hooks/useClosedCaptionState'
 import {useClosedCaptionUpload} from './hooks/useClosedCaptionUpload'
+import {useFocusManagement} from './hooks/useFocusManagement'
 import {useLanguageFiltering} from './hooks/useLanguageFiltering'
 import {ManualCaptionCreator} from './ManualCaptionCreator'
 import type {CaptionUploadConfig, LanguageOption, Subtitle} from './types'
@@ -93,6 +94,9 @@ export function ClosedCaptionPanelV2({
     subtitles: state.subtitles,
   })
 
+  const {setAddNewButtonRef, setCreationFormRef, setDeleteButtonRef, queueFocus} =
+    useFocusManagement()
+
   // Always use immediate upload hook (this component always uploads immediately)
   const upload = useClosedCaptionUpload({
     uploadConfig,
@@ -111,6 +115,15 @@ export function ClosedCaptionPanelV2({
       state.handleCaptionUploadFailed(locale, 'upload')
     },
     onDeleteSuccess: locale => {
+      const currentSubtitles = state.subtitles
+      const deletedIndex = currentSubtitles.findIndex(s => s.locale === locale)
+      const remaining = currentSubtitles.filter(s => s.locale !== locale)
+      if (remaining.length > 0) {
+        const targetIndex = Math.min(deletedIndex, remaining.length - 1)
+        queueFocus({type: 'afterDelete', targetLocale: remaining[targetIndex].locale})
+      } else {
+        queueFocus({type: 'addNew'})
+      }
       state.handleDeleteRow(locale)
       onCaptionDeleted?.(locale)
     },
@@ -195,7 +208,8 @@ export function ClosedCaptionPanelV2({
                   onRetry={getRetryHandler(subtitle)}
                   isInherited={subtitle.inherited}
                   onDelete={showDelete ? deleteHandler : undefined}
-                />
+                  deleteButtonRef={setDeleteButtonRef(subtitle.locale)}
+              />
               </List.Item>
             )
           })}
@@ -206,15 +220,18 @@ export function ClosedCaptionPanelV2({
         <CaptionCreationModePicker
           onSelect={state.handleCreationModeSelect}
           showAutoOption={!hasAutoCaptionAlready}
+          addNewButtonRef={setAddNewButtonRef}
         />
       )}
 
       {state.creationMode === 'manual' && (
         <ManualCaptionCreator
+          elementRef={setCreationFormRef}
           languages={availableManualLanguages}
           liveRegion={liveRegion}
           mountNode={mountNode}
           onCancel={() => {
+            queueFocus({type: 'addNew'})
             state.handleCancelCreation()
             onDirtyStateChanged?.(false)
           }}
@@ -225,6 +242,7 @@ export function ClosedCaptionPanelV2({
                 flow_type: 'upload_file',
                 language: languageId,
               })
+              queueFocus({type: 'addNew'})
               state.handleCaptionProcessing({locale: languageId, file})
               upload.uploadCaption(languageId, file)
             }
@@ -236,7 +254,9 @@ export function ClosedCaptionPanelV2({
 
       {state.creationMode === 'auto' && (
         <AutoCaptioning
+          elementRef={setCreationFormRef}
           onCancel={() => {
+            queueFocus({type: 'addNew'})
             state.handleCancelCreation()
             onDirtyStateChanged?.(false)
           }}
@@ -250,6 +270,7 @@ export function ClosedCaptionPanelV2({
                 flow_type: 'request_auto',
                 language: languageId,
               })
+              queueFocus({type: 'addNew'})
               state.handleCaptionProcessing({locale: languageId, isAsr: true})
               doAsrRequest(uploadConfig, languageId).catch(() => {
                 trackPendoEvent('canvas_caption_result', {

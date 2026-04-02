@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import formatMessage from 'format-message'
-import {useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
 import {CC_FILE_MAX_BYTES} from '../shared/constants'
 import {trackPendoEvent} from '../utils/trackPendoEvent'
@@ -38,6 +38,7 @@ interface ManualCaptionCreatorProps {
   liveRegion: () => HTMLElement | null
   mountNode?: HTMLElement | (() => HTMLElement | null)
   onDirtyStateChanged?: (isDirty: boolean) => void
+  elementRef?: (el: Element | null) => void
 }
 
 const LANGUAGE_ERROR_ID = 'cc-language-error'
@@ -50,6 +51,7 @@ export function ManualCaptionCreator({
   liveRegion,
   mountNode,
   onDirtyStateChanged,
+  elementRef,
 }: ManualCaptionCreatorProps) {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -58,6 +60,10 @@ export function ManualCaptionCreator({
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const languageInputRef = useRef<HTMLInputElement | null>(null)
   const fileButtonRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    languageInputRef.current?.focus()
+  }, [])
 
   const handleLanguageChange = (_event: React.SyntheticEvent, data: string) => {
     if (data) {
@@ -122,7 +128,7 @@ export function ManualCaptionCreator({
   }
 
   return (
-    <Flex as="div" direction="column" gap="medium">
+    <Flex as="div" direction="column" gap="medium" elementRef={elementRef} tabIndex={-1}>
       <Flex.Item overflowY="hidden" overflowX="hidden">
         <Heading as="h4" variant="titleCardMini">
           {formatMessage('Add New Caption')}
