@@ -31,16 +31,20 @@ import {
   createLearningOutcomeMock,
   createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
 vi.useFakeTimers()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const USER_EVENT_OPTIONS = {delay: null, pointerEventsCheck: PointerEventsCheckLevel.Never}
 

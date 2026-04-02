@@ -30,7 +30,7 @@ import {
   responsiviser,
 } from '@canvas/planner'
 import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import DashboardOptionsMenu from './DashboardOptionsMenu'
 import {CardDashboardLoader} from '@canvas/dashboard-card'

@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'

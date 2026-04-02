@@ -33,7 +33,7 @@ import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TimeZoneSelect from '@canvas/datetime/react/components/TimeZoneSelect'
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('account_course_user_search')
@@ -229,7 +229,10 @@ export default function CreateOrUpdateUserModal(props: Props) {
             {userName, wrapper},
           )
         : I18n.t('*%{userName}* saved successfully!', {userName, wrapper})
-      showFlashSuccess(message)()
+      showFlashAlert({
+        message: <span dangerouslySetInnerHTML={{__html: message.toString()}} />,
+        type: 'success',
+      })
     }
   }
 
@@ -243,7 +246,10 @@ export default function CreateOrUpdateUserModal(props: Props) {
       const userName = json.name || I18n.t('New user')
       const wrapper = `<a href='/users/${json.id}'>$1</a>`
       const message = I18n.t('*%{userName}* saved successfully!', {userName, wrapper})
-      showFlashSuccess(message)()
+      showFlashAlert({
+        message: <span dangerouslySetInnerHTML={{__html: message.toString()}} />,
+        type: 'success',
+      })
     }
   }
 

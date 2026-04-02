@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'

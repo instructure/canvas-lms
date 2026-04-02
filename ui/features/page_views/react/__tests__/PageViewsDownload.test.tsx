@@ -25,9 +25,13 @@ import {PageViewsDownload, type PageViewsDownloadProps} from '../PageViewsDownlo
 import {AsyncPageViewJobStatus} from '../hooks/asyncPageviewExport'
 
 // Mock canvas alerts
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const server = setupServer()
 
@@ -94,7 +98,7 @@ describe('PageViewsDownload', () => {
       const formatter = new Intl.DateTimeFormat('en-US', {
         month: 'long',
         year: 'numeric',
-        timeZone: 'UTC'
+        timeZone: 'UTC',
       })
 
       const currentMonthText = formatter.format(currentMonthDate)
@@ -400,7 +404,7 @@ describe('PageViewsDownload', () => {
 
     it('handles empty download (204 response) and shows flash alert', async () => {
       const user = userEvent.setup()
-      const {showFlashAlert} = await import('@canvas/alerts/react/FlashAlert')
+      const {showFlashAlert} = await import('@instructure/platform-alerts')
 
       const completedJob = createMockJob({
         query_id: 'empty-job',
@@ -431,7 +435,7 @@ describe('PageViewsDownload', () => {
 
     it('handles missing download (404 response) and shows flash alert', async () => {
       const user = userEvent.setup()
-      const {showFlashAlert} = await import('@canvas/alerts/react/FlashAlert')
+      const {showFlashAlert} = await import('@instructure/platform-alerts')
 
       const completedJob = createMockJob({
         query_id: 'missing-job',
@@ -478,7 +482,7 @@ describe('PageViewsDownload', () => {
       expect(document.querySelector('[aria-live="polite"]')).toBeInTheDocument()
 
       // Check for accessible table
-      const exportsTable = screen.getByRole('table', { name: 'Recent exports table' })
+      const exportsTable = screen.getByRole('table', {name: 'Recent exports table'})
       expect(exportsTable).toBeInTheDocument()
       expect(exportsTable).toHaveAccessibleName('Recent exports table')
     })

@@ -28,7 +28,7 @@ import LMGBContext, {
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {SearchWrapper} from './components/filters/SearchWrapper'

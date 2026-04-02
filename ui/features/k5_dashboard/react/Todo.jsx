@@ -30,7 +30,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEndSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {ignoreTodo} from '@canvas/k5/react/utils'
 import * as tz from '@instructure/moment-utils'
 

@@ -40,7 +40,7 @@ import {Controller, SubmitHandler, useForm} from 'react-hook-form'
 import * as z from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('merge_users')

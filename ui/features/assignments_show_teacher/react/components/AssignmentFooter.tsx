@@ -26,7 +26,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 import useModuleSequence from '../hooks/useModuleSequence'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('assignment_footer')
 

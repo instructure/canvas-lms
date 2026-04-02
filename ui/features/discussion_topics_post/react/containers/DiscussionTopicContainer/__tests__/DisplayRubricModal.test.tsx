@@ -23,7 +23,7 @@ import type {RubricAssociation} from '@canvas/rubrics/react/types/rubric'
 import {queryClient} from '@canvas/query'
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =

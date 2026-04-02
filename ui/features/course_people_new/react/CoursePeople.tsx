@@ -19,7 +19,7 @@
 import React, {useEffect, useState, type FC, type SyntheticEvent} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import CoursePeopleHeader from './components/PageHeader/CoursePeopleHeader'
 import PeopleFilter from './components/FilterPeople/PeopleFilter'
 import PeopleSearchBar from './components/SearchPeople/PeopleSearchBar'

@@ -19,15 +19,19 @@
 import React from 'react'
 import {render as rtlRender, fireEvent} from '@testing-library/react'
 import GroupActionDrillDown from '../GroupActionDrillDown'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import OutcomesContext, {
   ACCOUNT_GROUP_ID,
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('GroupActionDrillDown', () => {
   let onCollectionClick, setShowOutcomesView

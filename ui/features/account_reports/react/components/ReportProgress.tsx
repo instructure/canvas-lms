@@ -27,7 +27,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {AccountReport, reportRunning} from '@canvas/account_reports/types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('account_reports')

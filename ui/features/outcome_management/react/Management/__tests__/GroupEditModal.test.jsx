@@ -22,13 +22,13 @@ import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'
 import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {updateOutcomeGroupMock} from '@canvas/outcomes/mocks/Management'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.useFakeTimers()
 
 describe('GroupEditModal', () => {

@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {InfiniteData, QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../utils/constants'
 import {handleOpeningModuleUpdateTray} from './modulePageActionHandlers'
 import {ModulesResponse} from '../utils/types'

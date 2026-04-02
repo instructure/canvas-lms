@@ -27,7 +27,7 @@ import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {SimpleSelect, type SimpleSelectProps} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput, type TextInputProps} from '@instructure/ui-text-input'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('account_notification_settings')
 

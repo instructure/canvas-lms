@@ -28,7 +28,7 @@ import {
   PROVIDER,
 } from './types'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('temporary_enrollment')

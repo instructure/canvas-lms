@@ -30,7 +30,14 @@ import {PERMISSIONS, ROLES} from './examples'
 import '@canvas/rails-flash-notifications'
 
 // Mock FlashAlert to prevent UI transitions/timers from running after test teardown
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+    showFlashSuccess: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 beforeEach(() => {
   fakeENV.setup()

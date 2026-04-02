@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 
 import {useGradingSchemeCreate} from '../hooks/useGradingSchemeCreate'

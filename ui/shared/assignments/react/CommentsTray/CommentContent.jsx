@@ -18,7 +18,7 @@
 
 import React, {useContext, useEffect} from 'react'
 import {Alert} from '@instructure/ui-alerts'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {bool, arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {useScope as createI18nScope} from '@canvas/i18n'

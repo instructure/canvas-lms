@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 interface RatingButtonProps {
   action: 'like' | 'dislike'

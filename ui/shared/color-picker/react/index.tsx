@@ -30,7 +30,7 @@ import {isRTL} from '@canvas/i18n/rtlHelper'
 import '@canvas/rails-flash-notifications'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
-import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashAlert} from '@instructure/platform-alerts'
 import {
   ColorInfo,
   isValidHex,

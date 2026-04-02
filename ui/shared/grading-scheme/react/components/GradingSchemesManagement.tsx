@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconAddLine, IconInfoLine, IconSearchLine} from '@instructure/ui-icons'
 
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {GradingSchemeView} from './view/GradingSchemeView'
 import {GradingSchemeTemplateView} from './view/GradingSchemeTemplateView'
 import {useGradingSchemes} from '../hooks/useGradingSchemes'

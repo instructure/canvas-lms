@@ -20,7 +20,7 @@ import React, {useState, useContext} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
-import AlertManager, {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManager, AlertManagerContext} from '@instructure/platform-alerts'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -187,7 +187,6 @@ const DisallowThreadedFixAlertWithBreakpoints = WithBreakpoints(DisallowThreaded
 
 export default function DisallowThreadedFixAlert() {
   return (
-    // @ts-expect-error TS2741 (typescriptify)
     <AlertManager>
       {/* @ts-expect-error TS2741 (typescriptify) */}
       <DisallowThreadedFixAlertWithBreakpoints />

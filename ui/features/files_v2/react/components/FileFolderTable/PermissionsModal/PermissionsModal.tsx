@@ -24,7 +24,7 @@ import {
   showFlashError,
   showFlashSuccess,
   showFlashWarning,
-} from '@canvas/alerts/react/FlashAlert'
+} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getFilesEnv} from '../../../../utils/filesEnvUtils'
 import {

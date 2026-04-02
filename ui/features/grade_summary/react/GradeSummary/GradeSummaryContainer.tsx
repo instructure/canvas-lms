@@ -19,7 +19,7 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useQuery as useApolloQuery, useMutation} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'

@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {MockedProvider} from '@apollo/client/testing'
 import {DiscussionSummaryRatings} from '../DiscussionSummaryRatings'
 import {useScope as createI18nScope} from '@canvas/i18n'

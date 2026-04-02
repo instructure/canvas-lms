@@ -17,7 +17,7 @@
  */
 
 import {MockedProvider} from '@apollo/client/testing'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {waitFor} from '@testing-library/dom'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
@@ -33,12 +33,12 @@ vi.mock('@canvas/util/globalUtils', () => ({
 }))
 
 vi.mock('../../../utils', async () => ({
-  ...await vi.importActual('../../../utils'),
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 vi.mock('../../../utils/constants', async () => ({
-  ...await vi.importActual('../../../utils/constants'),
+  ...(await vi.importActual('../../../utils/constants')),
   isSpeedGraderInTopUrl: false,
 }))
 

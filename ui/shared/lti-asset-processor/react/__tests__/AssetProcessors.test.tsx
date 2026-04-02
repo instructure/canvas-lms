@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import {render, waitForElementToBeRemoved} from '@testing-library/react'
@@ -45,7 +45,7 @@ const server = setupServer(
 )
 
 vi.mock('@canvas/external-tools/messages')
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 let onProcessorResponseCb: null | AssetProcessorsAddModalOnProcessorResponseFn = null
 

@@ -30,7 +30,7 @@ import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {ColumnHeader} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ColumnHeader'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 

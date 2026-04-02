@@ -21,15 +21,19 @@ import {render, screen, waitFor} from '@testing-library/react'
 
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import FilesUsageBar from '../FilesUsageBar'
 import {FileManagementProvider} from '../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../__tests__/createMockContext'
 import {useGetQuota} from '../../hooks/useGetQuota'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn().mockReturnValue(vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 vi.mock('../../hooks/useGetQuota', () => ({
   useGetQuota: vi.fn(),

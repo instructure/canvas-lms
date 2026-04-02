@@ -23,11 +23,15 @@ import FindOutcomesModal from '../FindOutcomesModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('FindOutcomesModal - Basic Tests', () => {
   let cache

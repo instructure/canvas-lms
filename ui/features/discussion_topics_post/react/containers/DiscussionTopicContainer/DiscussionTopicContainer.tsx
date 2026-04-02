@@ -49,7 +49,7 @@ import {
 import {SearchContext, isSpeedGraderInTopUrl} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'

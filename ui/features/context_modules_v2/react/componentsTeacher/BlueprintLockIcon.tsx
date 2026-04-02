@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ToggleButton} from '@instructure/ui-buttons'
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useContextModule} from '../hooks/useModuleContext'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 

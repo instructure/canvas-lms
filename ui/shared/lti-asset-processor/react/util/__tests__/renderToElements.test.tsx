@@ -21,9 +21,13 @@ import {z} from 'zod'
 import {renderToElements, renderAPComponent, renderAPComponentNoQC} from '../renderToElements'
 
 // Mock only what's actually used
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/react', () => ({
   render: vi.fn(),
@@ -39,7 +43,7 @@ vi.mock('@canvas/i18n', () => ({
   })),
 }))
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {render} from '@canvas/react'
 
 const mockShowFlashError = showFlashError as ReturnType<typeof vi.fn>

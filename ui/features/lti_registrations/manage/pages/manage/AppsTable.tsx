@@ -42,7 +42,7 @@ import {
 import {isForcedOn, type LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
 import {

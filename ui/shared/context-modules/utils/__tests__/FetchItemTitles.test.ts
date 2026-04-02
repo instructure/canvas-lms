@@ -18,11 +18,11 @@
 
 import {vi} from 'vitest'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {fetchItemTitles} from '../fetchItemTitles'
 
 const server = setupServer(

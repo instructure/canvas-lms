@@ -17,7 +17,7 @@
  */
 
 import {useQuery} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'

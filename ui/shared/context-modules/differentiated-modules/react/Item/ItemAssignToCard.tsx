@@ -52,7 +52,7 @@ import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
 import {Text} from '@instructure/ui-text'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import type {ItemType} from '../types'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import PeerReviewSelector from './peer-review/PeerReviewSelector'
 
 const I18n = createI18nScope('differentiated_modules')
@@ -459,7 +459,7 @@ export default forwardRef(function ItemAssignToCard(
     dateValidator.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
 
   return (
-    <AlertManager breakpoints={{}}>
+    <AlertManager>
       <View as="div" {...wrapperProps}>
         <View
           data-testid="item-assign-to-card"

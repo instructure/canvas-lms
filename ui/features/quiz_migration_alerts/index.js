@@ -17,7 +17,7 @@
  */
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('quiz_migration_notifications')

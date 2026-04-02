@@ -18,7 +18,17 @@
 
 import fetchMock from 'fetch-mock'
 import {screen, waitFor} from '@testing-library/react'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashAlert, showFlashSuccess} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashAlert: vi.fn(),
+    showFlashSuccess: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 import {actions as uiActions} from '../ui'
 import {coursePaceActions, PUBLISH_STATUS_POLLING_MS} from '../course_paces'
 import {
@@ -193,9 +203,11 @@ describe('Course paces actions', () => {
         expect(dispatch.mock.calls[4]).toEqual([
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
-        expect(
-          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: `${contextsPublishing[0].pace_context?.name} Pace updated`,
+          }),
+        )
       })
     })
 

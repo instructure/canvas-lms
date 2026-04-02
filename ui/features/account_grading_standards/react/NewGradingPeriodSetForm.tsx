@@ -24,7 +24,7 @@ import setsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import type {GradingPeriodSetCreateParams} from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
 import EnrollmentTermInput from './EnrollmentTermInput'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {EnrollmentTerm, GradingPeriodSet, Permissions} from './types'
 
 const I18n = createI18nScope('NewGradingPeriodSetForm')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'

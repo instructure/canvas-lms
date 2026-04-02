@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError, AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {RubricAssessmentTray, isRubricComplete} from '@canvas/rubrics/react/RubricAssessment'
 import {
@@ -26,7 +26,6 @@ import {
 } from '@canvas/rubrics/react/types/rubric'
 import {useSubmitSelfAssessment} from '../../mutations/useSubmitSelfAssessment'
 import useStore from '../stores/index'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useContext} from 'react'
 
 const I18n = createI18nScope('assignments_2_student_content_rubric_self_assessment')

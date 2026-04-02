@@ -37,7 +37,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import doFetchApi, {type DoFetchApiOpts} from '@canvas/do-fetch-api-effect'
 import type {
   AssigneeOption,

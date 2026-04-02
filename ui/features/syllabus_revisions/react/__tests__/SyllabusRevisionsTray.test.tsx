@@ -22,12 +22,12 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {vi} from 'vitest'
 import SyllabusRevisionsTray from '../SyllabusRevisionsTray'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 const server = setupServer()
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.mock('@canvas/rce/RichContentEditor', () => ({
   default: {
     callOnRCE: vi.fn(),

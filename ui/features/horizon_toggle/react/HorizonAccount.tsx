@@ -26,7 +26,7 @@ import {useState} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Menu} from '@instructure/ui-menu'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('horizon_toggle_page')

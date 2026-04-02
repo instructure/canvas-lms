@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {IconDeactivateUserLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Flex} from '@instructure/ui-flex'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {raw} from '@instructure/html-escape'
 
 const I18n = createI18nScope('terminate_sessions')

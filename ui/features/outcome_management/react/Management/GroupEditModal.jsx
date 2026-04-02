@@ -20,7 +20,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import GroupEditForm from './GroupEditForm'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from '@apollo/client'

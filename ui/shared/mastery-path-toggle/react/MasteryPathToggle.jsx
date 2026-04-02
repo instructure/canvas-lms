@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import uid from '@instructure/uid'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 

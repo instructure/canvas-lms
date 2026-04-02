@@ -17,6 +17,7 @@
  */
 
 import {initFlashContainer, renderServerNotifications} from '@canvas/rails-flash-notifications'
+import {configureAlerts} from '@instructure/platform-alerts'
 import ready from '@instructure/ready'
 
 export function up() {
@@ -24,6 +25,24 @@ export function up() {
     ready(() => {
       try {
         initFlashContainer()
+        // Configure alerts with initial ENV timeout
+        configureAlerts({timeout: window.ENV?.flashAlertTimeout ?? 10000})
+        // Intercept writes to ENV.flashAlertTimeout so that dynamic changes
+        // (e.g. from selenium tests) immediately reconfigure the timeout.
+        // This mirrors the old @canvas/alerts behavior of reading ENV at render time.
+        if (window.ENV) {
+          let _flashAlertTimeout = window.ENV.flashAlertTimeout
+          Object.defineProperty(window.ENV, 'flashAlertTimeout', {
+            get() {
+              return _flashAlertTimeout
+            },
+            set(v) {
+              _flashAlertTimeout = v
+              configureAlerts({timeout: v ?? 10000})
+            },
+            configurable: true,
+          })
+        }
       } catch (e) {
         return reject(e)
       }

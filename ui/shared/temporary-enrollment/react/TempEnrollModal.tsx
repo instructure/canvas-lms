@@ -35,7 +35,7 @@ import type {
   RolePermissions,
 } from './types'
 import {MODULE_NAME, RECIPIENT} from './types'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'

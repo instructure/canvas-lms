@@ -30,7 +30,7 @@ import {
 } from './testSetup'
 import {moveOutcomeMock} from '@canvas/outcomes/mocks/Management'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
 }))
 vi.mock('@canvas/rce/RichContentEditor')

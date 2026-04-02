@@ -28,9 +28,9 @@ import {
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import TargetGroupSelector from '../TargetGroupSelector'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.useFakeTimers()
 
 describe('TargetGroupSelector', () => {

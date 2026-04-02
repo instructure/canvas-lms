@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import React from 'react'
 import {render, rerender} from '@canvas/react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('user_profile')
 

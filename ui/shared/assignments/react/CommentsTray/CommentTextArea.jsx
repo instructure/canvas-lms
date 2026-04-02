@@ -24,7 +24,7 @@ import {bool} from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
 import UploadMedia from '@instructure/canvas-media'
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'

@@ -28,7 +28,7 @@ import {zodResolver} from '@hookform/resolvers/zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useState} from 'react'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {Link} from '@instructure/ui-link'
 import {IS_INTEGER_REGEX} from './common'
 

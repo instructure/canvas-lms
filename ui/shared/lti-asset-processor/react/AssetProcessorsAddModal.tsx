@@ -31,7 +31,7 @@ import type {
   LtiLaunchDefinition,
   LtiLaunchPlacement,
 } from '@canvas/select-content-dialog/jquery/select_content_dialog'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import {
   AssetProcessorsAddModalState,

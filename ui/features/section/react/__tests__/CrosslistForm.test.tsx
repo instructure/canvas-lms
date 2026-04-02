@@ -41,9 +41,13 @@ if (typeof Promise.withResolvers === 'undefined') {
   }
 }
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 vi.mock('@canvas/rails-flash-notifications', () => ({
   addFlashNoticeForNextPage: vi.fn(),
@@ -1431,7 +1435,7 @@ describe('CrosslistForm', () => {
     })
 
     it('shows error flash on submission failure', async () => {
-      const {showFlashError} = await import('@canvas/alerts/react/FlashAlert')
+      const {showFlashError} = await import('@instructure/platform-alerts')
 
       server.use(
         http.get('/api/v1/courses/123/confirm_crosslist', () =>

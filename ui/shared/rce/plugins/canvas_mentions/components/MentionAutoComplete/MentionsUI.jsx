@@ -24,7 +24,7 @@ import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('mentions')

@@ -28,13 +28,17 @@ import {RowsProvider} from '../../../contexts/RowsContext'
 import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 
 const server = setupServer()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => () => {}),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => () => {}),
+  }
+})
 
 const renderComponent = () => {
   return render(

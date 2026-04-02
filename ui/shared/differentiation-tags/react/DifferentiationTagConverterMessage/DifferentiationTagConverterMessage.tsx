@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import axios from 'axios'
 import {useState} from 'react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('differentiation_tags')
 

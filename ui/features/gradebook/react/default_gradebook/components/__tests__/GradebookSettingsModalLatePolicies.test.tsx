@@ -25,7 +25,7 @@ import userEvent, {type UserEvent} from '@testing-library/user-event'
 import {statusColors} from '../../constants/colors'
 import type {GradebookViewOptions, LatePolicy} from '../../gradebook.d'
 import {DEFAULT_LATE_POLICY_DATA} from '../../apis/GradebookSettingsModalApi'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 
 const server = setupServer()
 

@@ -22,7 +22,7 @@ import axios from '@canvas/axios'
 import classnames from 'classnames'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('MasterCourseLock')
 

@@ -27,8 +27,9 @@ import {SortBy} from '@canvas/outcomes/react/utils/constants'
 import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
+vi.mock('@instructure/platform-alerts')
 vi.mock('../../charts/BarChart', () => ({
   BarChart: () => null,
   default: () => null,

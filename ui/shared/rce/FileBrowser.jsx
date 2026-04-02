@@ -36,7 +36,7 @@ import {
 import PropTypes from 'prop-types'
 import {getRootFolder, uploadFile} from '@canvas/files/util/apiFileUtils'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import natcompare from '@canvas/util/natcompare'
 import {captureException} from '@sentry/react'
 

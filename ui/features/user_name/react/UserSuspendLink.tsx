@@ -25,7 +25,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('user_name')
 

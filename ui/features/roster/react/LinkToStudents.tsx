@@ -30,7 +30,7 @@ import {useRef, useState, type MouseEvent} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Avatar} from '@instructure/ui-avatar'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('link_to_students')
 

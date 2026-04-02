@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import {useScope as createI18nScope} from '@canvas/i18n'

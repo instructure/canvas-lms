@@ -40,7 +40,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Link} from '@instructure/ui-link'
 import {
   IconAssignmentLine,

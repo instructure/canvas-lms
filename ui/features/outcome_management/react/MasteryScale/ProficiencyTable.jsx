@@ -28,7 +28,7 @@ import {v1 as uuid} from 'uuid'
 import {memoize, isEqual} from 'es-toolkit/compat'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '@canvas/i18n/numberHelper'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 

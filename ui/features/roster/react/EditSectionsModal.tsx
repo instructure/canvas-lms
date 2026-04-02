@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useState} from 'react'
 
 const I18n = createI18nScope('edit_section_view')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {CardDashboardLoader} from '@canvas/dashboard-card'
 import {useFetchDashboardCards} from '@canvas/dashboard-card/dashboardCardQueries'
 import {handleDashboardCardError} from '@canvas/dashboard-card/util/dashboardUtils'

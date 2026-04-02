@@ -36,6 +36,15 @@ import {
   FETCH_APPS_URL,
 } from './K5CourseTestHelpers'
 
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),
 }))
@@ -149,11 +158,10 @@ describe('K-5 Subject Course', () => {
 
       it('shows an error if syllabus content fails to load', async () => {
         fetchMock.get(FETCH_IMPORTANT_INFO_URL, 400, {overwriteRoutes: true})
-        const {findAllByText} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
+        render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() =>
+          expect(showFlashError).toHaveBeenCalledWith('Failed to load important info.'),
         )
-        const errors = await findAllByText('Failed to load important info.')
-        expect(errors[0]).toBeInTheDocument()
       })
     })
 
@@ -181,8 +189,8 @@ describe('K-5 Subject Course', () => {
 
       it('shows an error if apps fail to load', async () => {
         fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
-        const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-        await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
+        render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() => expect(showFlashError).toHaveBeenCalledWith('Failed to load apps.'))
       })
     })
 

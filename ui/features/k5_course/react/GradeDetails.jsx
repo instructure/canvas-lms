@@ -35,7 +35,7 @@ import {
   getAssignmentGroupTotals,
   getTotalGradeStringFromEnrollments,
 } from '@canvas/k5/react/utils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {GradeRow} from './GradeRow'
 import GradesEmptyPage from './GradesEmptyPage'

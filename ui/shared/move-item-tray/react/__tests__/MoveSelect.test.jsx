@@ -22,6 +22,15 @@ import {screen as testScreen, render, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import MoveSelect from '../MoveSelect'
+import {showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const server = setupServer()
 
@@ -206,9 +215,9 @@ describe('MoveSelect', () => {
       render(<MoveSelect {...props} />)
 
       await waitFor(() => {
-        const alert = testScreen.getByRole('alert')
-        expect(alert).toBeInTheDocument()
-        expect(alert).toHaveTextContent('Failed loading module items')
+        expect(showFlashAlert).toHaveBeenCalledWith(
+          expect.objectContaining({message: 'Failed loading module items'}),
+        )
       })
     })
   })

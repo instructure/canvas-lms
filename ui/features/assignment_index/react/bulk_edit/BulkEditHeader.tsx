@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CanvasInlineAlert from '@canvas/alerts/react/InlineAlert'
+import {InlineAlert as CanvasInlineAlert} from '@instructure/platform-alerts'
 import {originalDateField} from './utils'
 import {AssignmentShape} from './BulkAssignmentShape'
 
@@ -124,7 +124,12 @@ export default function BulkEditHeader({
             valueNow={jobCompletion}
             renderValue={renderProgressValue}
           />
-          <CanvasInlineAlert liveAlert={true} screenReaderOnly={true} variant="info">
+          <CanvasInlineAlert
+            liveAlert={true}
+            screenReaderOnly={true}
+            hasShadow={false}
+            variant="info"
+          >
             {I18n.t('Saving assignment dates progress: %{percent}%', {
               percent: jobCompletion,
             })}
@@ -144,7 +149,12 @@ export default function BulkEditHeader({
                 valueNow={jobCompletion}
                 renderValue={renderProgressValue}
               />
-              <CanvasInlineAlert liveAlert={true} screenReaderOnly={true} variant="info">
+              <CanvasInlineAlert
+                liveAlert={true}
+                screenReaderOnly={true}
+                hasShadow={false}
+                variant="info"
+              >
                 {I18n.t('Saving assignment dates progress: %{percent}%', {
                   percent: jobCompletion,
                 })}

@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {createGradebook} from './GradebookSpecHelper'
 import SubmissionCommentApi from '../apis/SubmissionCommentApi'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 
@@ -135,7 +135,7 @@ describe('SubmissionComments', () => {
               },
             ],
           })
-        })
+        }),
       )
     })
 
@@ -154,7 +154,7 @@ describe('SubmissionComments', () => {
       server.use(
         http.put('/api/v1/courses/*/assignments/*/submissions/*', () => {
           return new HttpResponse(null, {status: 500})
-        })
+        }),
       )
       await gradebook.apiCreateSubmissionComment('a comment')
       expect(FlashAlert.showFlashError).toHaveBeenCalled()
@@ -196,10 +196,7 @@ describe('SubmissionComments', () => {
         const groupAssignment = {...assignment, grade_group_students_individually: false}
         gradebook.setAssignments({2301: groupAssignment})
 
-        const createSubmissionCommentSpy = vi.spyOn(
-          SubmissionCommentApi,
-          'createSubmissionComment',
-        )
+        const createSubmissionCommentSpy = vi.spyOn(SubmissionCommentApi, 'createSubmissionComment')
         await gradebook.apiCreateSubmissionComment('a comment')
 
         expect(createSubmissionCommentSpy).toHaveBeenCalledWith(

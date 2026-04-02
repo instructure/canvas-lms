@@ -30,7 +30,7 @@ import {
   defaultK5DashboardProps as defaultProps,
 } from './mocks'
 
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import K5Dashboard from '../K5Dashboard'
 import fakeENV from '@canvas/test-utils/fakeENV'
 

@@ -27,7 +27,7 @@ import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks, importOutcomeMocks} from '../../../mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {waitFor} from '@testing-library/react'
 
@@ -35,9 +35,13 @@ vi.mock('@canvas/progress/resolve_progress')
 
 vi.useFakeTimers()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('useOutcomesImport', () => {
   let cache

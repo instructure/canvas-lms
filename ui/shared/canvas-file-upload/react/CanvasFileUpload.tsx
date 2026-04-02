@@ -29,7 +29,7 @@ import FileList from './FileList'
 import {useFileUpload} from './hooks/useFileUpload'
 import CanvasFilesBrowser from './components/CanvasFilesBrowser/CanvasFilesBrowser'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('canvas_file_upload')
 

@@ -62,7 +62,7 @@ import {ViewSettings} from '../DiscussionOptions/ViewSettings'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {

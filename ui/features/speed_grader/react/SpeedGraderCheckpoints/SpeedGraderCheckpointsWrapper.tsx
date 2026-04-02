@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {SpeedGraderCheckpointsContainer} from './SpeedGraderCheckpointsContainer'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
@@ -41,7 +41,6 @@ export const SpeedGraderCheckpointsWrapper = ({EG, courseId, assignmentId, stude
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* @ts-expect-error */}
       <AlertManager>
         <SpeedGraderCheckpointsContainer
           EG={EG}

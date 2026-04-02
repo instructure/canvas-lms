@@ -24,11 +24,15 @@ import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Manage
 import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
 import {FIND_GROUP_OUTCOMES} from '../../../graphql/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const flushAllTimersAndPromises = async () => {
   while (vi.getTimerCount() > 0) {

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import FileUpload from '../FileUpload'
 import {fireEvent, render} from '@testing-library/react'

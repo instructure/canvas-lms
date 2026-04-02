@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 // Ideally, in the future, each form is written in such a way that they can
 // be tested separately. However, because they all rely on the submit/cancel button
 // rendered in ConfigurationForm.js and React Testing Library (rightly) only let's
@@ -26,7 +26,7 @@ import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import ConfigurationForm from '../configuration_forms/ConfigurationForm'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const renderForm = (props: object) => {
   return render(<ConfigurationForm {...props} />)
@@ -113,13 +113,25 @@ describe('when configuration type is manual', () => {
     await userPaste(user, getUrlInput(), expected.url)
     await userPaste(user, getDomainInput(), expected.domain)
 
-    await userPaste(user, screen.getByRole('textbox', {name: /consumer key/i}), expected.consumerKey)
-    await userPaste(user, screen.getByRole('textbox', {name: /shared secret/i}), expected.sharedSecret)
+    await userPaste(
+      user,
+      screen.getByRole('textbox', {name: /consumer key/i}),
+      expected.consumerKey,
+    )
+    await userPaste(
+      user,
+      screen.getByRole('textbox', {name: /shared secret/i}),
+      expected.sharedSecret,
+    )
     await user.click(screen.getByRole('combobox', {name: /privacy level/i}))
     await user.click(screen.getByText(/anonymous/i))
 
     await userPaste(user, screen.getByRole('textbox', {name: /description/i}), expected.description)
-    await userPaste(user, screen.getByRole('textbox', {name: /custom fields/i}), expected.customFields)
+    await userPaste(
+      user,
+      screen.getByRole('textbox', {name: /custom fields/i}),
+      expected.customFields,
+    )
     await user.click(getSubmitButton())
     expect(handleSubmitMock).toHaveBeenCalledWith('manual', expected, expect.anything())
   })

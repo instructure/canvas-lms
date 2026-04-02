@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import type {GradeStatus, GradeStatusType} from '@canvas/grading/accountGradingStatus'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'

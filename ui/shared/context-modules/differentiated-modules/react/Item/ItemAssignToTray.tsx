@@ -38,7 +38,7 @@ import {
   IconDiscussionLine,
   IconDocumentLine,
 } from '@instructure/ui-icons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {lockLabels} from '@canvas/blueprint-courses/react/labels'
 import {useScope as createI18nScope} from '@canvas/i18n'
