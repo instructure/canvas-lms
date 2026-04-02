@@ -109,6 +109,7 @@ module NavMenuLinkTabs
             # than full URL) to make it available for translating Course links
             # during Course Copy
             new_link_url = Api::Html::Link.strip_host(link: new_link_url, host: request_host, port: request_port)
+            new_link_url = new_link_url.gsub(%r{^/+}, "/") # Prevent '//' from being treated as protocol-relative URL
             new_link = NavMenuLink.create!(context: course, course_nav: true, url: new_link_url, label: tab[:label])
             { id: numeric_id_to_tab_json_id(new_link.id), hidden: tab[:hidden] }.compact.with_indifferent_access
           else

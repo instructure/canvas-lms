@@ -31,40 +31,37 @@ class NavMenuLink < ApplicationRecord
 
   validates :label, presence: true, length: { maximum: 255 }
   validates :url, presence: true, length: { maximum: 2048 }
-  validate :url_is_valid
+  validate :validate_and_normalize_url
 
   # See also corresponding Postgres check constraints
   validate :at_least_one_nav_type_enabled
   validate :nav_types_match_context
 
-  def url_is_valid
+  def validate_and_normalize_url
     return if url.blank? # presence validation will catch this
 
-    if url.start_with?("/") && !url.start_with?("//")
-      # Allow relative URLs (e.g., /courses/123/assignments/456)
-      # Check for HTML tags before parsing to prevent XSS attacks
-      if url.match?(/[<>]/)
-        errors.add(:url, t("nav_menu_link.errors.url_html_tags", "is not a valid URL (cannot contain HTML tags)"))
+    if url.start_with?("//")
+      # UI rejects these but may be present during old tool migration
+      # CanvasHttp.validate_url with add http://, which is wrong for production
+      self.url = "https:" + url
+    end
+
+    if url.start_with?("/")
+      # Allow relative URLs (needed to support internal link translation during course copy)
+      with_host = "https://canvas.instructure.com" + url
+      normalized, = CanvasHttp.validate_url(with_host, allowed_schemes: %w[http https])
+      unless normalized.start_with?("https://canvas.instructure.com/")
+        errors.add(:url, t("nav_menu_link.errors.url_invalid_relative", "invalid relative URL"))
         return
       end
-
-      begin
-        uri = URI.parse(url)
-        if uri.host.present? || uri.scheme.present? || uri.path.blank?
-          errors.add(:url, t("nav_menu_link.errors.url_relative_invalid", "is not a valid URL (links starting with slash must have path and no host or scheme)"))
-        end
-      rescue URI::Error
-        errors.add(:url, t("nav_menu_link.errors.url_invalid", "is not a valid URL"))
-      end
+      # remove host and replace potential // with just /
+      self.url = normalized.gsub(%r{\Ahttps://canvas.instructure.com/+}, "/")
     else
-      # absolute URLs -- validate and normalize as in validates_as_url
-      begin
-        value, = CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
-        self.url = value # Update with normalized URL (e.g., add http:// if missing)
-      rescue CanvasHttp::Error, URI::Error, ArgumentError
-        errors.add(:url, t("nav_menu_link.errors.url_invalid", "is not a valid URL"))
-      end
+      normalized, = CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+      self.url = normalized
     end
+  rescue CanvasHttp::Error, URI::Error, ArgumentError
+    errors.add(:url, t("nav_menu_link.errors.url_invalid", "is not a valid URL"))
   end
 
   def at_least_one_nav_type_enabled

@@ -299,6 +299,26 @@ describe NavMenuLinkTabs do
         new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
         expect(new_link.url).to eq("/courses/123#section-2")
       end
+
+      it "normalizes '//' returned by strip_host for URLs with a double slash after the host" do
+        # https://canvas.instructure.com//double-slash strips to //double-slash;
+        # the gsub collapses it to /double-slash so it isn't treated as protocol-relative
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com//double-slash"], "label" => "Double Slash Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/double-slash")
+      end
     end
   end
 
