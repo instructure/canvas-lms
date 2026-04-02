@@ -578,7 +578,8 @@ RSpec.describe ApplicationController do
           "encrypted-media *",
           "autoplay *",
           "clipboard-write *",
-          "display-capture *"
+          "display-capture *",
+          "fullscreen *"
         ]
       end
 
