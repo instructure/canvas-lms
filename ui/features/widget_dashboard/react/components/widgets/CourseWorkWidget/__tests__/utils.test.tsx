@@ -17,8 +17,27 @@
  */
 
 import {getSubmissionStatus, formatDueDate} from '../utils'
+import {determineItemType} from '../../../../utils/assignmentUtils'
 
 describe('CourseWorkWidget utils', () => {
+  describe('determineItemType', () => {
+    it('detects quiz via assignment.quiz object before checking submissionTypes', () => {
+      expect(
+        determineItemType({quiz: {_id: '1', title: 'My Quiz'}, submissionTypes: ['online_text_entry']}),
+      ).toBe('quiz')
+    })
+
+    it('falls back to submissionTypes when quiz object is null', () => {
+      expect(determineItemType({quiz: null, submissionTypes: ['online_quiz']})).toBe('quiz')
+    })
+
+    it('returns assignment for non-submission types such as wiki_page and not_graded', () => {
+      expect(determineItemType({submissionTypes: ['wiki_page']})).toBe('assignment')
+      expect(determineItemType({submissionTypes: ['not_graded']})).toBe('assignment')
+      expect(determineItemType({submissionTypes: ['none']})).toBe('assignment')
+    })
+  })
+
   describe('getSubmissionStatus', () => {
     it('returns missing status when missing is true', () => {
       const status = getSubmissionStatus(false, true, 'unsubmitted', null)
@@ -65,6 +84,18 @@ describe('CourseWorkWidget utils', () => {
       const status = getSubmissionStatus(false, false, 'unsubmitted', null)
       expect(status.type).toBe('not_submitted')
       expect(status.label).toBe('Not Submitted')
+    })
+
+    it('returns submitted status for excused submission', () => {
+      // Canvas sets missing=false for excused submissions; state='graded' → submitted pill
+      const status = getSubmissionStatus(false, false, 'graded', null)
+      expect(status.type).toBe('submitted')
+    })
+
+    it('submission status is determined by state alone, not by planner override', () => {
+      // PlannerOverride.marked_complete has no effect on the CW pill
+      const status = getSubmissionStatus(false, false, 'unsubmitted', null)
+      expect(status.type).toBe('not_submitted')
     })
   })
 

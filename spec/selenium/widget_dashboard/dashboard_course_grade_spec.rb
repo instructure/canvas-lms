@@ -111,6 +111,17 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
       expect(updated_last_updated_text).not_to be_empty
     end
 
+    it "persists hidden grade state after page reload" do
+      go_to_dashboard
+      hide_single_grade_button(@course1.id).click
+      expect(show_single_grade_button(@course1.id)).to be_displayed
+
+      refresh_page
+
+      expect(show_single_grade_button(@course1.id)).to be_displayed
+      expect(course_grade_hidden?(@course1.id)).to be_truthy
+    end
+
     it "displays N/A grade badge for courses without a calculable grade" do
       course_with_student(user: @student, active_all: true, course_name: "No Grades Course")
       ungraded_course = @course
