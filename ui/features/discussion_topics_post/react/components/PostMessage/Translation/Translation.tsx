@@ -551,8 +551,8 @@ const FeedbackInner = ({
   }
 
   return (
-    <Flex direction="column" gap="small" margin="small 0 0 0">
-      <Flex alignItems="center">
+    <Flex direction="column" margin="small 0 0 0">
+      <Flex justifyItems="end" alignItems="center">
         <Flex.Item margin="0 small 0 0">
           <Text color="secondary" size="small">
             {liked || disliked
@@ -590,23 +590,31 @@ const FeedbackInner = ({
         </IconButton>
       </Flex>
       {disliked && !storedNotes && (
-        <Flex direction="row" gap="small" alignItems="end">
-          <Flex.Item shouldGrow shouldShrink>
-            <TextInput
-              renderLabel={I18n.t('Feedback')}
-              placeholder={I18n.t('What was wrong with this translation?')}
-              value={feedbackNotes}
-              onChange={(_e, value) => setLocalFeedbackNotes(value)}
-              data-testid="translation-feedback-input"
-            />
-          </Flex.Item>
-          <Button
-            onClick={handleSendNotes}
-            disabled={feedbackLoading || !feedbackNotes.trim()}
-            data-testid="translation-feedback-submit"
-          >
-            {I18n.t('Send Feedback')}
-          </Button>
+        <Flex direction="column" gap="medium" margin="medium 0 0 0">
+          <Text size="small">
+            {I18n.t('Can you please explain why you disapprove of the translation?')}
+          </Text>
+          <Flex gap="small" alignItems="end">
+            <Flex.Item shouldGrow={true}>
+              <TextInput
+                renderLabel={I18n.t('Explanation')}
+                placeholder={I18n.t('Start typing...')}
+                value={feedbackNotes}
+                onChange={(_e, value) => setLocalFeedbackNotes(value)}
+                data-testid="translation-feedback-input"
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                color="secondary"
+                onClick={handleSendNotes}
+                interaction={!feedbackLoading && feedbackNotes.trim() ? 'enabled' : 'disabled'}
+                data-testid="translation-feedback-submit"
+              >
+                {I18n.t('Send Feedback')}
+              </Button>
+            </Flex.Item>
+          </Flex>
         </Flex>
       )}
     </Flex>
