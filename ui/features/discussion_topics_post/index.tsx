@@ -20,10 +20,17 @@ import {DiscussionTopicsPost} from './react/index'
 import ready from '@instructure/ready'
 import $ from 'jquery'
 import React from 'react'
-import {legacyRender} from '@canvas/react'
+import {legacyRender, render} from '@canvas/react'
 import DiscussionTopicKeyboardShortcutModal from './react/KeyboardShortcuts/DiscussionTopicKeyboardShortcutModal'
 import {Portal} from '@instructure/ui-portal'
 import {mountNutritionFacts} from '@canvas/nutrition-facts'
+import {NutritionFacts} from '@canvas/nutrition-facts/react/NutritionFacts'
+import {AiInfo} from '@instructure.ai/aiinfo'
+import type {FeatureInfo} from '@instructure.ai/aiinfo'
+import {captureException} from '@sentry/browser'
+import {createPortal} from 'react-dom'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 
 // @ts-expect-error TS7031 (typescriptify)
 function DiscussionPageLayout({navbarHeight}) {
@@ -86,10 +93,101 @@ export const adjustFooter = () => {
   }
 }
 
+const mergeFeatureData = (features: string[]) => {
+  const validInfos = features
+    .map(feature => {
+      const info = AiInfo[feature]
+      if (!info) {
+        captureException(new Error(`No nutrition facts data found for feature: ${feature}`))
+      }
+      return info
+    })
+    .filter((info): info is FeatureInfo => Boolean(info))
+
+  if (validInfos.length === 0) return null
+  if (validInfos.length === 1) return validInfos[0]
+
+  return {
+    aiInformation: {
+      data: validInfos.flatMap(info => info.aiInformation.data),
+    },
+    dataPermissionLevels: validInfos[0].dataPermissionLevels,
+    nutritionFacts: {
+      featureName: 'IgniteAI Features',
+      data: validInfos.flatMap(info =>
+        info.nutritionFacts.data.map((block: any, index: number) => ({
+          ...block,
+          blockTitle: index === 0 ? info.nutritionFacts.featureName : block.blockTitle,
+        })),
+      ),
+    },
+  }
+}
+
+const mountMergedNutritionFacts = (features: string[]) => {
+  const merged = mergeFeatureData(features)
+  if (!merged) return
+
+  const element = (
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true}) as any}
+      props={{
+        mobile: {
+          domElement: 'nutrition_facts_mobile_container',
+          fullscreenModals: true,
+          color: 'secondary',
+          buttonColor: 'primary',
+          withBackground: false,
+        },
+        desktop: {
+          domElement: 'nutrition_facts_container',
+          fullscreenModals: false,
+          color: 'primary',
+          buttonColor: 'primary-inverse',
+          withBackground: false,
+        },
+      }}
+      render={(responsiveProps: any) => {
+        const node = document.getElementById(responsiveProps.domElement)
+        if (!node) {
+          captureException(
+            new Error(`Could not find element with id ${responsiveProps.domElement}`),
+          )
+          return null
+        }
+        return createPortal(
+          <NutritionFacts
+            responsiveProps={responsiveProps}
+            aiInformation={merged.aiInformation}
+            dataPermissionLevels={merged.dataPermissionLevels}
+            nutritionFacts={merged.nutritionFacts}
+          />,
+          node,
+        )
+      }}
+    />
+  )
+
+  const wrapperDiv = document.createElement('div')
+  document.body.appendChild(wrapperDiv)
+  render(element, wrapperDiv)
+}
+
 ready(() => {
+  const nutritionFeatures: string[] = []
   // @ts-expect-error TS2339 (typescriptify)
   if (ENV?.discussion_translation_available && ENV?.cedar_translation) {
-    mountNutritionFacts('canvascoursetranslation')
+    nutritionFeatures.push('canvascoursetranslation')
+  }
+  // @ts-expect-error TS2339 (typescriptify)
+  if (ENV?.user_can_summarize) {
+    nutritionFeatures.push('canvasdiscussionsummaries')
+  }
+  if (nutritionFeatures.length === 1) {
+    mountNutritionFacts(nutritionFeatures[0])
+  } else if (nutritionFeatures.length > 1) {
+    mountMergedNutritionFacts(nutritionFeatures)
   }
   document.querySelector('body')?.classList.add('full-width')
   document.querySelector('div.ic-Layout-contentMain')?.classList.remove('ic-Layout-contentMain')
