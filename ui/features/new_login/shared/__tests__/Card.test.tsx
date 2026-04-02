@@ -117,4 +117,17 @@ describe('Card', () => {
     const link = screen.getByTestId('card-link')
     expect(link).toHaveAttribute('aria-label', 'Accessible Label')
   })
+
+  it('renders without crashing when onClick is not provided', () => {
+    render(
+      <Card
+        href="https://example.com"
+        icon="/mock.svg"
+        label="External Link"
+        testId="card-link"
+        text="Test Card"
+      />,
+    )
+    expect(screen.getByTestId('card-link')).toHaveAttribute('href', 'https://example.com')
+  })
 })

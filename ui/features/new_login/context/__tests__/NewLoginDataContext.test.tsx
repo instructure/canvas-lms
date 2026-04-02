@@ -101,6 +101,7 @@ describe('NewLoginDataContext', () => {
       'customMessageLogin',
       'customMessageRegistration',
       'customMessageRegistrationParent',
+      'freeForTeacherRegistrationUrl',
     ]
     mockUseFetchNewLoginData.mockReturnValue({
       isDataLoading: false,
