@@ -34,7 +34,8 @@ module Lti
           "encrypted-media *",
           "autoplay *",
           "clipboard-write *",
-          "display-capture *"
+          "display-capture *",
+          "fullscreen *"
         ]
       end
     end
