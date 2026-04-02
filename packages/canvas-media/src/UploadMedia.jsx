@@ -127,6 +127,11 @@ export class UploadMediaModal extends React.Component {
     this.computerPanelRef = React.createRef()
   }
 
+  onRecordingSave = file => {
+    if (this.state.uploading) return
+    this.setState({recordedFile: file}, this.handleSubmit)
+  }
+
   inferSelectedPanel = tabs => {
     let selectedPanel = -1
 
@@ -192,6 +197,7 @@ export class UploadMediaModal extends React.Component {
   saveMediaCallback = async (err, data) => {
     const {onUploadComplete, onDismiss, rcsConfig} = this.props
     const {selectedPanel, subtitles} = this.state
+    this.setState({uploading: false})
     if (err) {
       onUploadComplete?.(err, data)
     } else {
@@ -324,7 +330,7 @@ export class UploadMediaModal extends React.Component {
               <MediaRecorder
                 MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
                 errorMessage={MEDIA_RECORD_NOT_AVAILABLE}
-                onSave={file => this.setState({recordedFile: file}, this.handleSubmit)}
+                onSave={this.onRecordingSave}
               />
             </Suspense>
           </Tabs.Panel>
