@@ -49,6 +49,8 @@ enum MenuId {
   ENABLED = 'enabled',
   DISABLED = 'disabled',
   LOCKED = 'locked',
+  APPLIES_TO_SELF = 'applies_to_self',
+  APPLIES_TO_DESCENDANTS = 'applies_to_descendants',
 }
 
 const ENABLED_STATE_TO_MENU_ID: Record<EnabledState, MenuId> = {
@@ -72,6 +74,7 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
   const [showMenu, setShowMenu] = useStateWithCallback<boolean>(false)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
 
+  const isSiteAdmin: boolean = useSelector((s: ReduxState) => s.isSiteAdmin)
   const apiBusy: boolean = useSelector((s: ReduxState) =>
     s.apiBusy.some(elt => elt.id === roleId && elt.name === permissionName),
   )
@@ -137,6 +140,17 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
     const checked = [ENABLED_STATE_TO_MENU_ID[enabled]]
     if (locked) checked.push(MenuId.LOCKED)
     return checked
+  }
+
+  function appliesToSelection({applies_to_self, applies_to_descendants}: RolePermission): MenuId[] {
+    const result: MenuId[] = []
+    // We want to be careful here to only include items that are explicitly false,
+    // since the absence of these fields in the API response should be treated as
+    // true (i.e. applies to both by default). Effectively, a missing field is treated
+    // as a true value i.e. the item is checked.
+    if (applies_to_self !== false) result.push(MenuId.APPLIES_TO_SELF)
+    if (applies_to_descendants !== false) result.push(MenuId.APPLIES_TO_DESCENDANTS)
+    return result
   }
 
   function renderButton(): JSX.Element {
@@ -205,12 +219,25 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
       enabled,
       locked,
       explicit,
+      applies_to_self,
+      applies_to_descendants,
     }: {
       enabled?: boolean
       locked?: boolean
       explicit: boolean
+      applies_to_self?: boolean
+      applies_to_descendants?: boolean
     }): void {
-      handleClick({name: permissionName, id: roleId, inTray, enabled, locked, explicit})
+      handleClick({
+        name: permissionName,
+        id: roleId,
+        inTray,
+        enabled,
+        locked,
+        explicit,
+        applies_to_self,
+        applies_to_descendants,
+      })
     }
 
     // Since the enum enabled values exist only here on the front end and
@@ -248,6 +275,33 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
       }
     }
 
+    const appliesToSelected = appliesToSelection(permission)
+
+    function appliesToChange(_e: unknown, updated: Array<string | number | undefined>): void {
+      const currentSelf = appliesToSelected.includes(MenuId.APPLIES_TO_SELF)
+      const currentDesc = appliesToSelected.includes(MenuId.APPLIES_TO_DESCENDANTS)
+
+      let newSelf: boolean
+      let newDesc: boolean
+
+      if (updated.length === 0) {
+        // at least one must be chosen... if the user attempts to uncheck both,
+        // just toggle both so it flips to the other
+        newSelf = !currentSelf
+        newDesc = !currentDesc
+      } else {
+        newSelf = updated.includes(MenuId.APPLIES_TO_SELF)
+        newDesc = updated.includes(MenuId.APPLIES_TO_DESCENDANTS)
+      }
+
+      adjustPermissions({
+        enabled: permission.enabled !== EnabledState.NONE,
+        explicit: true,
+        applies_to_self: newSelf,
+        applies_to_descendants: newDesc,
+      })
+    }
+
     return (
       <Menu
         placement="bottom center"
@@ -281,6 +335,28 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
             <Text>{I18n.t('Use Default')}</Text>
           </Menu.Item>
         </Menu.Group>
+        {isSiteAdmin && (
+          <Menu.Group
+            label={I18n.t('Apply to...')}
+            allowMultiple={true}
+            disabled={permission.enabled === EnabledState.NONE}
+            selected={appliesToSelected}
+            onSelect={appliesToChange}
+          >
+            <Menu.Item
+              id="permission_table_applies_to_self_menu_item"
+              value={MenuId.APPLIES_TO_SELF}
+            >
+              <Text>{I18n.t('Self')}</Text>
+            </Menu.Item>
+            <Menu.Item
+              id="permission_table_applies_to_descendants_menu_item"
+              value={MenuId.APPLIES_TO_DESCENDANTS}
+            >
+              <Text>{I18n.t('Descendants')}</Text>
+            </Menu.Item>
+          </Menu.Group>
+        )}
       </Menu>
     )
   }

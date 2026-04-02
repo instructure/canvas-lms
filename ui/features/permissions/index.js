@@ -27,7 +27,7 @@ import {getSortedRoles, groupGranularPermissionsInRole} from '@canvas/permission
 import ready from '@instructure/ready'
 
 ready(() => {
-  const root = document.querySelector('#content')
+  const root = document.getElementById('permissions_root')
   const permissionGroups = ENV.PERMISSION_GROUPS
 
   // The ENV variables containing the permissions are an array of:
@@ -93,8 +93,11 @@ ready(() => {
   const roles = markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES)
   roles.forEach(role => groupGranularPermissionsInRole(role))
 
+  const isSiteAdmin = root.dataset.isSiteAdmin === 'true'
+
   const initialState = {
     contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
+    isSiteAdmin,
     permissions: markAndCombineArrays(
       groupGranularPermissions(permissions),
       groupGranularPermissions(flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),

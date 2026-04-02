@@ -19,6 +19,7 @@
 // This isn't everything in the redux state, just the things we need
 export type ReduxState = {
   apiBusy: Array<{id: string; name: string}>
+  isSiteAdmin: boolean
   nextFocus: {
     targetArea: 'tray' | 'table' | null
     permissionName: string | null
@@ -50,4 +51,6 @@ export interface PermissionModifyAction {
   enabled?: boolean
   locked?: boolean
   explicit: boolean
+  applies_to_self?: boolean
+  applies_to_descendants?: boolean
 }
