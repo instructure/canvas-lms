@@ -57,7 +57,7 @@ class User < ApplicationRecord
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :default_name, :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account
+  attr_accessor :default_name, :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account, :impersonated
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -1608,7 +1608,7 @@ class User < ApplicationRecord
       return false unless includes_subset_of_course_admin_permissions?(masquerader, account)
     end
 
-    has_subset_of_account_permissions?(masquerader, account)
+    has_subset_of_account_permissions?(masquerader, account, exclude_non_masquerading_permissions: true)
   end
 
   def self.all_course_admin_type_permissions_for(user)
@@ -1641,14 +1641,19 @@ class User < ApplicationRecord
     end
   end
 
-  def has_subset_of_account_permissions?(user, account)
+  def has_subset_of_account_permissions?(user, account, exclude_non_masquerading_permissions: false)
     return true if user == self
     return false unless account.root_account?
 
-    Rails.cache.fetch(["has_subset_of_account_permissions", self, user, account].cache_key, expires_in: 60.minutes) do
+    Rails.cache.fetch(["has_subset_of_account_permissions",
+                       self,
+                       user,
+                       account,
+                       !!exclude_non_masquerading_permissions].cache_key,
+                      expires_in: 60.minutes) do
       account_users = account.cached_all_account_users_for(self)
       account_users.all? do |account_user|
-        account_user.is_subset_of?(user)
+        account_user.is_subset_of?(user, exclude_non_masquerading_permissions:)
       end
     end
   end

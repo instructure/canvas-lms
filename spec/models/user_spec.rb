@@ -1570,6 +1570,13 @@ describe User do
       account = instance_double(Account, root_account?: true, cached_all_account_users_for: [instance_double(AccountUser, is_subset_of?: false)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
+
+    it "forwards `exclude_non_masquerading_permissions` to AccountUser.is_subset_of?" do
+      account_user = instance_double(AccountUser)
+      account = instance_double(Account, root_account?: true, cached_all_account_users_for: [account_user])
+      expect(account_user).to receive(:is_subset_of?).with(other_user, exclude_non_masquerading_permissions: true)
+      user.has_subset_of_account_permissions?(other_user, account, exclude_non_masquerading_permissions: true)
+    end
   end
 
   context "check_courses_right?" do

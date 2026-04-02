@@ -193,10 +193,16 @@ class AccountUser < ApplicationRecord
     result
   end
 
-  def self.is_subset_of?(user, account, role)
-    needed_permissions = RoleOverride.manageable_permissions(account).keys.index_with do |permission|
+  def self.is_subset_of?(user, account, role, exclude_non_masquerading_permissions: false)
+    needed_permission_keys = RoleOverride.manageable_permissions(account).keys
+    if exclude_non_masquerading_permissions
+      needed_permission_keys.reject! { |key| Permissions.non_masquerading_permissions.include?(key) }
+    end
+
+    needed_permissions = needed_permission_keys.index_with do |permission|
       RoleOverride.enabled_for?(account, permission, role, account)
     end
+
     target_permissions = AccountUser.all_permissions_for(user, account)
     needed_permissions.all? do |(permission, needed_permission)|
       next true unless needed_permission.present?
@@ -208,8 +214,8 @@ class AccountUser < ApplicationRecord
     end
   end
 
-  def is_subset_of?(user)
-    AccountUser.is_subset_of?(user, account, role)
+  def is_subset_of?(user, exclude_non_masquerading_permissions: false)
+    AccountUser.is_subset_of?(user, account, role, exclude_non_masquerading_permissions:)
   end
 
   def self.readable_type(type)

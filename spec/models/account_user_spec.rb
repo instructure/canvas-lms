@@ -142,6 +142,26 @@ describe AccountUser do
       expect(@au1.is_subset_of?(@user2)).to be_falsey
       expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
+
+    context "exclude_non_masquerading_permissions" do
+      before do
+        allow(Permissions).to receive(:non_masquerading_permissions).and_return(Set[:create_access_tokens])
+      end
+
+      before :once do
+        @ro1 = Account.default.role_overrides.create!(role: @role1, permission: :create_access_tokens, enabled: true)
+      end
+
+      it "ignores permissions that are not for masquerading with option" do
+        expect(@au1.is_subset_of?(@user2, exclude_non_masquerading_permissions: true)).to be true
+        expect(@au2.is_subset_of?(@user1, exclude_non_masquerading_permissions: true)).to be true
+      end
+
+      it "doesn't ignore permissions that are not for masquerading when comparing without option" do
+        expect(@au1.is_subset_of?(@user2)).to be false
+        expect(@au2.is_subset_of?(@user1)).to be true
+      end
+    end
   end
 
   describe "set_policy" do
