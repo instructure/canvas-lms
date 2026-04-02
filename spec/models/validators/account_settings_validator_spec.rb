@@ -141,6 +141,74 @@ describe Validators::AccountSettingsValidator do
       expect(account.errors[:settings]).to include("discovery_page.primary[0].authentication_provider_id is invalid or inactive")
     end
 
+    context "item count validation" do
+      def build_entries(count)
+        Array.new(count) do
+          provider = account.authentication_providers.create!(auth_type: "saml")
+          valid_discovery_page_entry(authentication_provider_id: provider.id)
+        end
+      end
+
+      it "passes with exactly 10 total items across both sections" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(5),
+          secondary: build_entries(5)
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with 10 items all in primary" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(10),
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "fails with 11 total items" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(6),
+          secondary: build_entries(5)
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "fails with 11 items all in primary" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(11),
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "fails with 11 items all in secondary" do
+        account.settings[:discovery_page] = {
+          primary: [],
+          secondary: build_entries(11)
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "fails when one section key is absent and the other exceeds the limit" do
+        account.settings[:discovery_page] = { primary: build_entries(11) }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "does not validate per-entry fields when over the item limit" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(11),
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        # should not also include per-entry errors when the count itself is invalid
+        expect(account.errors[:settings]).not_to include(match(/primary\[0\]/))
+      end
+    end
+
     context "label validation" do
       it "fails when label exceeds max length" do
         account.settings[:discovery_page] = {
