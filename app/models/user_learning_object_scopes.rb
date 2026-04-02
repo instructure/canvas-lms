@@ -187,10 +187,9 @@ module UserLearningObjectScopes
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
     scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz", "PeerReviewSubAssignment"].include?(object_type)
 
-    course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
-    accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
-    course_ids_with_checkpoints_enabled = accounts_with_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
-    course_ids_with_checkpoints_disabled = accounts_without_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+    checkpoint_data = checkpoint_data_for_courses(shard_course_ids)
+    course_ids_with_checkpoints_enabled = checkpoint_data[:enabled]
+    course_ids_with_checkpoints_disabled = checkpoint_data[:disabled]
 
     scope = scope.for_course(course_ids_with_checkpoints_enabled) if object_type == "SubAssignment"
 
@@ -211,6 +210,27 @@ module UserLearningObjectScopes
       end
     end
     [scope, shard_course_ids, shard_group_ids]
+  end
+
+  # Memoize to avoid repeating these queries for each of the 9 planner collections.
+  # Cache lives on the user instance but is keyed by course IDs, so it's safe
+  # across different course sets. Call clear_checkpoint_data_cache! if feature
+  # flags change mid-request (primarily relevant in tests).
+  def checkpoint_data_for_courses(shard_course_ids)
+    @checkpoint_data_cache ||= {}
+    cache_key = shard_course_ids.sort
+    @checkpoint_data_cache[cache_key] ||= begin
+      course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+      accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
+      {
+        enabled: accounts_with_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] },
+        disabled: accounts_without_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+      }
+    end
+  end
+
+  def clear_checkpoint_data_cache!
+    @checkpoint_data_cache = nil
   end
 
   def assignments_for_student(
