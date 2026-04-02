@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom'
 import {AUDIO_PLAYER_SIZE as CANVAS_AUDIO_PLAYER_SIZE} from '@instructure/canvas-media'
 
 import bridge from '../../../../bridge'
+import {showFlashAlert} from '../../../../common/FlashAlert'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../RCEGlobals'
 import {asVideoElement} from '../../shared/ContentSelection'
@@ -35,7 +36,6 @@ import {
 import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
-export const ANNOUNCER_ID = 'instructure-video-options-tray-announcer'
 
 export const STUDIO_PLAYER_VIDEO_SIZE_DEFAULT = {height: '300px', width: '480px'}
 export const AUDIO_PLAYER_SIZE = {
@@ -62,26 +62,9 @@ export default class TrayController {
     this._shouldOpen = false
     this._renderId = 0
     this._skipFocusOnExit = false
-    this._announcer = this.createAnnouncer()
     this._captionsModified = false
     this.requestSubtitlesFromIframe = this.requestSubtitlesFromIframe.bind(this)
     this.isStudioVideo = false
-  }
-
-  createAnnouncer() {
-    let announcer = document.getElementById(ANNOUNCER_ID)
-
-    if (announcer !== null) {
-      return announcer
-    }
-
-    announcer = document.createElement('div')
-    announcer.id = ANNOUNCER_ID
-    announcer.setAttribute('role', 'status')
-    announcer.setAttribute('aria-live', 'polite')
-    announcer.setAttribute('aria-relevant', 'additions text')
-    document.body.appendChild(announcer)
-    return announcer
   }
 
   get $container() {
@@ -124,7 +107,6 @@ export default class TrayController {
 
     this._renderId++
     this._renderTray()
-    this._announcer.textContent = ''
   }
 
   hideTrayForEditor(editor, skipFocusOnExit = false) {
@@ -226,7 +208,9 @@ export default class TrayController {
       }
     }
     this._dismissTray()
-    this._announcer.textContent = formatMessage('Media options saved.')
+    setTimeout(() => {
+      showFlashAlert({message: formatMessage('Media options saved.'), type: 'success'})
+    }, 0)
   }
 
   _listenForPlayerIframeToLoad(currentMediaId) {
