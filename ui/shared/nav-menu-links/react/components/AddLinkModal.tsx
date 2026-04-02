@@ -39,20 +39,44 @@ const PLACEMENT_LABELS: Record<Placement, () => string> = {
   user_nav: () => I18n.t('User Navigation'),
 }
 
-// Returns an error string if invalid
-function validateUrl(str: string): string | undefined {
-  if (str.length > MAX_URL_LENGTH) {
-    return I18n.t('URL is too long (maximum %{max} characters)', {max: MAX_URL_LENGTH})
-  }
+// Characters invalid in URLs, new URL() does not [always] change these, but rejected by ruby
+const INVALID_URL_CHARS = /["[\]^|]/
+
+// % not followed by exactly 2 hex digits = invalid percent-encoding. new URL() leaves these alone, Ruby rejects them.
+const INVALID_PERCENT_ENCODING = /%(?![0-9A-Fa-f]{2})/
+
+export type UrlValidationResult = {error: string} | {normalized: string}
+
+// Returns {error} if invalid, {normalized} with the URL canonical form if valid
+export function validateUrl(str: string): UrlValidationResult {
+  const err = (msg: string): UrlValidationResult => ({error: msg})
+  const invalid = I18n.t('Please enter a valid URL beginning with https:// or http://')
 
   try {
-    const url = new URL(str)
+    const prenormalized = str.trim().replace(/^https:\/\/https?:\/\//, 'https://')
+    const url = new URL(prenormalized)
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      return I18n.t('Please enter a valid URL beginning with https:// or http://')
+      return err(invalid)
     }
-    return undefined
+    const normalized = url.href
+
+    // Cases that even once normalized, ruby rejects:
+    if (INVALID_PERCENT_ENCODING.test(normalized) || INVALID_URL_CHARS.test(normalized)) {
+      return err(invalid)
+    }
+    if (url.hash.slice(1).includes('#')) {
+      return err(I18n.t('URL cannot have two fragments (the # character)'))
+    }
+    if (normalized.length > MAX_URL_LENGTH) {
+      return err(
+        I18n.t('URL is too long (maximum %{max} characters after URL encoding)', {
+          max: MAX_URL_LENGTH,
+        }),
+      )
+    }
+    return {normalized}
   } catch (_) {
-    return I18n.t('Please enter a valid URL beginning with https:// or http://')
+    return err(invalid)
   }
 }
 
@@ -71,10 +95,6 @@ export interface AddLinkModalProps {
     placements: {course_nav: boolean; account_nav: boolean; user_nav: boolean}
   }) => void
   availablePlacements?: Placement[]
-}
-
-function normalize({label, url}: {label: string; url: string}): {label: string; url: string} {
-  return {label: label.trim(), url: url.trim()}
 }
 
 function textLengthHintText(normalizedText: string): string {
@@ -128,9 +148,12 @@ export const AddLinkModal = ({
   const textInputRef = useRef<HTMLInputElement | null>(null)
   const urlInputRef = useRef<HTMLInputElement | null>(null)
 
-  const normalized = normalize({label: text, url})
-  const urlError = validateUrl(normalized.url)
-  const textError = validateText(normalized.label)
+  const normalizedLabel = text.trim()
+  const textError = validateText(normalizedLabel)
+
+  const urlValidation = validateUrl(url)
+  const urlError = 'error' in urlValidation ? urlValidation.error : undefined
+
   const placementsError = !Object.values(selectedPlacements).some(Boolean)
     ? I18n.t('Please select at least one placement.')
     : undefined
@@ -144,7 +167,7 @@ export const AddLinkModal = ({
       return
     }
 
-    if (urlError) {
+    if ('error' in urlValidation) {
       urlInputRef.current?.focus()
       return
     }
@@ -153,7 +176,7 @@ export const AddLinkModal = ({
       return
     }
 
-    onAdd({...normalized, placements: selectedPlacements})
+    onAdd({label: normalizedLabel, url: urlValidation.normalized, placements: selectedPlacements})
     onDismiss()
     setText('')
     setUrl('https://')
@@ -194,9 +217,9 @@ export const AddLinkModal = ({
             <View as="div" margin="x-small none none">
               <Text
                 size="small"
-                color={normalized.label.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
+                color={normalizedLabel.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
               >
-                {textLengthHintText(normalized.label)}
+                {textLengthHintText(normalizedLabel)}
               </Text>
             </View>
           </View>

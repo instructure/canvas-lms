@@ -59,6 +59,13 @@ describe NavMenuLink do
       expect(link.url).to eq "/courses/123/assignments/456"
     end
 
+    it "normalizes URLs starting with // to be https://" do
+      link = make_nav_menu_link(@course, course_nav: true)
+      link.url = "//example.com/123"
+      expect(link.save).to be true
+      expect(link.url).to eq "https://example.com/123"
+    end
+
     it "rejects invalid URLs" do
       link = make_nav_menu_link(@account, account_nav: true)
       link.url = "not a url"
@@ -92,7 +99,7 @@ describe NavMenuLink do
         link = make_nav_menu_link(@course, course_nav: true)
         link.url = "/courses/<img src=x onerror=alert('xss')>"
         expect(link.save).to be false
-        expect(link.errors[:url]).to include("is not a valid URL (cannot contain HTML tags)")
+        expect(link.errors[:url]).to include("is not a valid URL")
       end
 
       it "rejects data URLs" do
