@@ -1706,23 +1706,17 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
-  # @API Bind an LTI Registration to an Account
-  # Enable or disable the specified LTI registration for the specified account.
+  # @API Bind an LTI Registration to a Root Account
+  # Enable or disable the specified LTI registration for the specified root account.
   # To enable an inherited registration (eg from Site Admin), pass the registration's global ID.
   #
   # Only allowed for root accounts.
   #
-  # <b>Specifics for Site Admin:</b>
-  # "on" enables and locks the registration on for all root accounts.
-  # "off" disables and hides the registration for all root accounts.
-  # "allow" makes the registration visible to all root accounts, but accounts must bind it to use it.
-  #
   # <b>Specifics for centrally-managed/federated consortia:</b>
-  # Child root accounts may only bind registrations created in the same account.
+  # Child root accounts may not bind inherited registrations.
   # For parent root account, binding also applies to all child root accounts.
   #
-  # @argument workflow_state [Required, String, "on"|"off"|"allow"]
-  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  # @argument workflow_state [Required, String, "on"|"off"] The desired state for this registration/account binding.
   #
   # @returns Lti::RegistrationAccountBinding
   #
@@ -1734,27 +1728,34 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    workflow_state = params.require(:workflow_state).to_sym
-    to_bind = if @context.feature_enabled?(:lti_registrations_templates)
-                # for backwards compatibility with UI until template flag is fully on.
-                # use the local copy to bind
-                Lti::InstallTemplateRegistrationService.call(
-                  template: registration,
-                  account: @context,
-                  user: @current_user
-                )
-              else
-                registration
-              end
+    if context.site_admin?
+      render_error(:invalid_context, "site admin local bindings are not allowed")
+    end
 
-    Lti::AccountBindingService.call(
-      registration: to_bind,
-      account: @context,
-      workflow_state:,
-      user: @current_user
-    ) => { lti_registration_account_binding: }
+    if workflow_state.nil? || !%w[on off].include?(workflow_state)
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off'")
+    end
 
-    render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
+    begin
+      binding_state = params.require(:workflow_state).to_sym
+      result = Lti::InstallTemplateRegistrationService.call(
+        template: registration,
+        account: @context,
+        user: @current_user,
+        binding_state:
+      )
+    rescue ArgumentError => e
+      return render_error(:invalid_template, e.message)
+    end
+
+    rab = result.dig(:bindings, :lti_registration_account_binding)
+
+    render json: lti_registration_account_binding_json(rab, @current_user, session, @context)
+  rescue ArgumentError => e
+    render_error(:invalid_template, e.message)
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Install an LTI Registration from a Template
@@ -1772,23 +1773,26 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>" \
   #        -H "Content-Type: application/json"
   def install_from_template
-    unless @context.feature_enabled?(:lti_registrations_templates)
-      return render json: { errors: "Not found" }, status: :not_found
+    begin
+      result = Lti::InstallTemplateRegistrationService.call(
+        template: registration,
+        account: @context,
+        user: @current_user
+      )
+    rescue ArgumentError => e
+      return render_error(:invalid_template, e.message)
     end
 
-    local_registration = Lti::InstallTemplateRegistrationService.call(
-      template: registration,
-      account: @context,
-      user: @current_user,
-      create_binding: true
-    )
-
-    account_binding = local_registration.account_binding_for(@context)
+    local_registration = result[:local_copy]
+    account_binding = result.dig(:bindings, :lti_registration_account_binding)
     overlay = local_registration.overlay_for(@context)
     includes = %i[account_binding configuration overlay]
     json = lti_registration_json(local_registration, @current_user, session, @context, includes:, account_binding:, overlay:)
 
     render json:
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Search for Accounts and Courses

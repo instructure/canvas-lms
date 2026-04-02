@@ -18,10 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::InstallTemplateRegistrationService < ApplicationService
-  attr_reader :account, :user, :template, :create_binding
+  attr_reader :account, :user, :template, :binding_state, :local_copy
 
-  def initialize(account:, user:, template:, create_binding: false)
+  def initialize(account:, user:, template:, binding_state: :on)
     raise ArgumentError, "template registration must be provided" if template.nil?
+    raise ArgumentError, "template registration is off" if template.workflow_state != "active"
     raise ArgumentError, "root account must be provided" if account.nil? || !account.root_account?
     raise ArgumentError, "user must be provided" if user.nil?
     raise ArgumentError, "Dynamic Registrations cannot be used as templates" if template.dynamic_registration?
@@ -30,58 +31,78 @@ class Lti::InstallTemplateRegistrationService < ApplicationService
 
     @account = account
     @template = template
-    @create_binding = create_binding
     @user = user
+    @binding_state = binding_state.to_sym
   end
 
   def call
-    existing_copy = Lti::Registration.active.find_by(template_registration: template, account:)
-    return existing_copy if existing_copy.present?
-
     Lti::Registration.transaction do
-      local_copy = Lti::Registration.create!(
-        template_registration: template,
-        account:,
-        created_by: user,
-        updated_by: user,
-        **template.slice(
-          :internal_service,
-          :admin_nickname,
-          :description,
-          :vendor,
-          :name
-        )
-      )
+      @local_copy = Lti::Registration.active.find_by(template_registration: template, account:)
 
-      Lti::ToolConfiguration.create!(
-        lti_registration: local_copy,
-        unified_tool_id: local_copy.developer_key.unified_tool_id,
-        # use the overlaid template configuration as the base for the local copy
-        **template.internal_lti_configuration(include_overlay: true)
-      )
+      create_local_copy unless local_copy.present?
 
-      # blank so that local copy can make its own changes
-      Lti::Overlay.create!(
-        account:,
-        registration: local_copy,
-        updated_by: user,
-        data: {}
-      )
+      bindings = update_state
 
-      # TODO: backwards compatibility for now, remove once
-      # binding responsibility respects the template flag
-      if create_binding
-        Lti::AccountBindingService.call(
-          registration: local_copy,
-          account:,
-          user:,
-          workflow_state: :on
-        )
-      end
-
-      local_copy.new_external_tool(account, current_user: user, available: false)
-
-      local_copy
+      { local_copy:, bindings: }
     end
+  end
+
+  private
+
+  # keep account bindings in sync with the local copy's workflow_state
+  def update_state
+    mapping = {
+      on: :active,
+      off: :inactive
+    }
+    workflow_state = mapping[binding_state]
+    if local_copy.workflow_state.to_sym != workflow_state
+      local_copy.update!(workflow_state:)
+    end
+
+    # keeps backwards compatibility before template
+    # flag is on, and if it is ever turned off
+    Lti::AccountBindingService.call(
+      registration: template,
+      account:,
+      user:,
+      workflow_state: binding_state
+    )
+  end
+
+  def create_local_copy
+    local_copy = Lti::Registration.create!(
+      template_registration: template,
+      account:,
+      created_by: user,
+      updated_by: user,
+      **template.slice(
+        :internal_service,
+        :admin_nickname,
+        :description,
+        :vendor,
+        :name
+      )
+    )
+
+    Lti::ToolConfiguration.create!(
+      lti_registration: local_copy,
+      unified_tool_id: local_copy.developer_key.unified_tool_id,
+      # use the overlaid template configuration as the base for the local copy
+      **template.internal_lti_configuration(include_overlay: true)
+    )
+
+    # blank so that local copy can make its own changes
+    Lti::Overlay.create!(
+      account:,
+      registration: local_copy,
+      updated_by: user,
+      data: {}
+    )
+
+    # deploy tool to root account
+    local_copy.new_external_tool(account, current_user: user, available: false)
+
+    @local_copy = local_copy
   end
 end

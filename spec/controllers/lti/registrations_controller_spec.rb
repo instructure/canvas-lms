@@ -1962,6 +1962,16 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "when the registration is not active" do
+      before { registration.update!(workflow_state: "inactive") }
+
+      it "returns 422 with an error message" do
+        subject
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("template registration is off")
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -1982,34 +1992,21 @@ RSpec.describe Lti::RegistrationsController do
         expect(account_binding.root_account_id).to eq(account.id)
       end
 
-      context "with templates flag off" do
-        before do
-          account.disable_feature!(:lti_registrations_templates)
-        end
-
-        it "binds to the original registration" do
-          subject
-          account_binding = Lti::RegistrationAccountBinding.last
-          expect(account_binding.registration).to eq(registration)
-        end
-      end
-
       it "creates a local copy of the registration" do
         subject
         local_registration = Lti::Registration.last
         account_binding = Lti::RegistrationAccountBinding.last
-        expect(account_binding.registration).to eq(local_registration)
+        expect(account_binding.registration).to eq(registration)
         expect(local_registration.template_registration).to eq(registration)
       end
     end
 
-    context "with existing binding and template flag off" do
+    context "with existing binding" do
       let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
       let(:initial_workflow_state) { "on" }
       let(:initial_updated_by) { user_model }
 
       before do
-        account.disable_feature!(:lti_registrations_templates)
         account_binding.update!(workflow_state: initial_workflow_state, updated_by: initial_updated_by)
       end
 
@@ -2019,6 +2016,18 @@ RSpec.describe Lti::RegistrationsController do
 
       it "updates the existing binding" do
         expect { subject }.to change { account_binding.reload.workflow_state }.from(initial_workflow_state).to(workflow_state).and change { account_binding.updated_by }.from(initial_updated_by).to(admin)
+      end
+
+      context "with workflow_state set to off" do
+        let(:workflow_state) { "off" }
+
+        it "updates the existing binding to off" do
+          expect { subject }.to change { account_binding.reload.workflow_state }.from(initial_workflow_state).to(workflow_state)
+        end
+
+        it "deactivates the local copy" do
+          expect { subject }.to change { Lti::Registration.last.reload.workflow_state }.from("active").to("inactive")
+        end
       end
     end
 
@@ -2038,15 +2047,6 @@ RSpec.describe Lti::RegistrationsController do
 
     let_once(:template) { lti_registration_with_tool(account: Account.site_admin) }
 
-    context "with templates flag disabled" do
-      before { account.disable_feature!(:lti_registrations_templates) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
     it "creates a local copy of the template" do
       expect { subject }.to change { Lti::Registration.count }.by(1)
       local_registration = Lti::Registration.last
@@ -2056,14 +2056,28 @@ RSpec.describe Lti::RegistrationsController do
     it "creates an account binding for backwards compatibility" do
       expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
       account_binding = Lti::RegistrationAccountBinding.last
-      local_registration = Lti::Registration.last
-      expect(account_binding.registration).to eq(local_registration)
+      expect(account_binding.registration).to eq(template)
       expect(account_binding.account).to eq(account)
     end
 
     it "is successful" do
       subject
       expect(response).to be_successful
+    end
+
+    it "returns registration and deployment id" do
+      subject
+      expect(response_json["id"]).to eq(Lti::Registration.last.id)
+    end
+
+    context "when the template is not active" do
+      before { template.update!(workflow_state: "inactive") }
+
+      it "returns 422 with an error message" do
+        subject
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("template registration is off")
+      end
     end
 
     context "with a non-site-admin template" do
