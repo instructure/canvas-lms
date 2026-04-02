@@ -176,6 +176,46 @@ describe UsersController do
       end
     end
 
+    context "grading periods" do
+      def setup_grading_period(course, active: true)
+        group = @account.grading_period_groups.create!(title: "Test Group", weighted: false)
+        group.enrollment_terms << course.enrollment_term
+        group.grading_periods.create!(
+          title: active ? "Current Period" : "Past Period",
+          start_date: active ? 1.month.ago : 3.months.ago,
+          end_date: active ? 1.month.from_now : 1.month.ago,
+          close_date: active ? 2.months.from_now : 2.weeks.ago
+        )
+      end
+
+      it "returns effective_current_score when course has an active grading period" do
+        course = course_factory(active_all: true, account: @account)
+        enrollment = course.enroll_student(@student, enrollment_state: "active")
+        setup_grading_period(course, active: true)
+
+        enrollment.find_score(course_score: true).update!(current_score: 88.0)
+
+        result = controller.send(:fetch_courses_with_grades)
+
+        course_data = result.find { |c| c[:courseId] == course.id.to_s }
+        expect(course_data).not_to be_nil
+        expect(course_data[:currentGrade]).to eq(88.0)
+      end
+
+      it "returns nil grade when grading period has ended and course score is null" do
+        course = course_factory(active_all: true, account: @account)
+        course.enroll_student(@student, enrollment_state: "active")
+        setup_grading_period(course, active: false)
+
+        # No course score → effective_current_score returns nil → displayed as N/A
+        result = controller.send(:fetch_courses_with_grades)
+
+        course_data = result.find { |c| c[:courseId] == course.id.to_s }
+        expect(course_data).not_to be_nil
+        expect(course_data[:currentGrade]).to be_nil
+      end
+    end
+
     context "course types" do
       it "excludes invited enrollments from grade display" do
         course = course_factory(active_all: true, account: @account)
@@ -196,6 +236,30 @@ describe UsersController do
 
         expect(result.length).to eq(1)
         expect(result.first[:courseId]).to eq(course.id.to_s)
+      end
+
+      it "excludes past-dated enrollment when section end date has passed" do
+        course = course_factory(active_all: true, account: @account)
+        enrollment = course.enroll_student(@student, enrollment_state: "active")
+        enrollment.course_section.update!(end_at: 1.day.ago)
+
+        result = controller.send(:fetch_courses_with_grades)
+
+        expect(result.pluck(:courseId)).not_to include(course.id.to_s)
+      end
+
+      it "shows course only once when student has two enrollments in the same course" do
+        course = course_factory(active_all: true, account: @account)
+        section_a = course.course_sections.create!(name: "Section A")
+        section_b = course.course_sections.create!(name: "Section B")
+
+        course.enroll_student(@student, section: section_a, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(@student, section: section_b, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        result = controller.send(:fetch_courses_with_grades)
+
+        course_entries = result.select { |c| c[:courseId] == course.id.to_s }
+        expect(course_entries.length).to eq(1)
       end
     end
 
