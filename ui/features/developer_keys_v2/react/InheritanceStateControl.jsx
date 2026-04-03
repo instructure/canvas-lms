@@ -85,7 +85,8 @@ export default class DeveloperKeyStateControl extends React.Component {
     if (
       ENV.FEATURES?.lti_deactivate_registrations &&
       this.props.developerKey.is_lti_key &&
-      !this.isSiteAdmin()
+      !this.isSiteAdmin() &&
+      !this.props.inheritedTab
     ) {
       return this.props.developerKey.lti_registration_workflow_state === 'active' ? 'on' : 'off'
     }
@@ -244,6 +245,7 @@ DeveloperKeyStateControl.propTypes = {
       contextId: PropTypes.string.isRequired,
     }),
   }).isRequired,
+  inheritedTab: PropTypes.bool,
 }
 
 DeveloperKeyStateControl.defaultProps = {

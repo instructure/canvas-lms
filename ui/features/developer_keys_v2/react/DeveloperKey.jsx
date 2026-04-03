@@ -247,6 +247,7 @@ class DeveloperKey extends React.Component {
         </Table.Cell>
         <Table.Cell>
           <DeveloperKeyStateControl
+            inheritedTab={inherited}
             ref={this.refToggleGroup}
             developerKey={developerKey}
             store={this.props.store}
