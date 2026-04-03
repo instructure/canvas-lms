@@ -17,7 +17,7 @@
  */
 
 import {useCallback, useEffect, useMemo, useState} from 'react'
-import {ScheduledRelease} from '../ScheduledReleasePolicy'
+import type {ScheduledRelease} from '../types'
 import {useGetAssignmentScheduledPost} from '../../queries/useGetAssignmentScheduledPost'
 import {validateRelease, hasScheduledReleaseChanged, type ErrorMessages} from '../utils/utils'
 

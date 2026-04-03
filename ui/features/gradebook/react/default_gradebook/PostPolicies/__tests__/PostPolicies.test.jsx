@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from '../../default_gradebook/__tests__/GradebookSpecHelper'
-import AsyncComponents from '../../default_gradebook/AsyncComponents'
+import {createGradebook} from '../../__tests__/GradebookSpecHelper'
+import AsyncComponents from '../../AsyncComponents'
 import HideAssignmentGradesTray from '@canvas/hide-assignment-grades-tray'
 
 describe('Gradebook PostPolicies', () => {
@@ -190,8 +190,6 @@ describe('Gradebook PostPolicies', () => {
 
       it.skip('updates the submission in the gradebook', async () => {
         // SKIP REASON: The onHidden callback doesn't trigger gradebook.getSubmission as expected.
-        // The mock chain HideAssignmentGradesTray.prototype.show.mock.results[0].value.onHidden
-        // doesn't propagate the callback to the gradebook instance properly.
         await postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
         const {onHidden} = HideAssignmentGradesTray.prototype.show.mock.results[0].value
         onHidden({assignmentId: '2301', postedAt: null, userIds: ['441']})

@@ -18,8 +18,10 @@
 
 import {isEqual} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {FormMessage} from 'features/account_admin_tools/react/CommMessages/types'
-import {ScheduledRelease} from '../ScheduledReleasePolicy'
+import type {TextInputProps} from '@instructure/ui-text-input'
+
+type FormMessage = Required<TextInputProps>['messages'][0]
+import type {ScheduledRelease} from '../types'
 
 const I18n = createI18nScope('assignment_posting_policy_tray')
 
