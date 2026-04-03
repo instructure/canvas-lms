@@ -12189,6 +12189,7 @@ nn:
   getting_started_with_collaborations_794240ba: "Start eit samarbeid"
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Gi alle studentane same vurdering for *%{assignment.name}* ved å oppgi, og sende, ein resultatrverdi nedanfor:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Gi alle fullt utbytte for dette spørsmålet."
   give_this_filter_a_name_36b4b03a: "Gi dette filteret eit namn"
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Mislukka å hente mediaressurser. Problemet vil sannynlegvis omsider løyse seg sjølv."
   global_announcements_a78912c8: "Globale kunngjeringar"
@@ -22650,6 +22651,7 @@ nn:
         name: Namn
     welcome_to_canvas: "Velkomen til Canvas!"
   registration_url_60e0eaaa: Registrerings-URL
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Det er ikkje tillate med ny karaktersetjing på dette spørsmålet, fordi eit svar er fjerna eller spørsmålstypen er endra etter at ein student fullførte ei innlevering."
   regular_lato_font_7f3cf24c: "Skrifttypen Vanlig Lato"
   regular_style_checkbox_ee3d71c1: "Vanleg avmerkingsboks"
   reinforce_student_understanding_304d18a6: "Styrk studentane sin forståing og læring"
@@ -28387,6 +28389,7 @@ nn:
   update_pages_c91d7ba: "Oppdater sider"
   update_password_4bc5cb1f: "Oppdater passord"
   update_public_jwk_9f25f520: "Oppdater offentlig JWK"
+  update_question_without_regrading_47c9904a: "Oppdater spørsmålet utan å setje karakterar på nytt"
   update_quota_81381226: "Oppdater kvote"
   update_rating_6d29c2ef: "Oppdater vurdering"
   update_settings_9b422d0f: "Oppdater innstillingar"
