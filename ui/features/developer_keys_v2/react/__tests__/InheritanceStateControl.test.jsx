@@ -418,6 +418,44 @@ describe('InheritanceStateControl', () => {
       const onRadio = componentNode(key, siteAdminCTX).querySelector('input[value="on"]')
       expect(onRadio.checked).toBe(true)
     })
+
+    it('uses the binding state when inheritedTab is true, ignoring registration state', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const {container} = render(
+        <InheritanceStateControl
+          developerKey={key}
+          ctx={rootAccountCTX}
+          store={{dispatch: () => {}}}
+          actions={{setBindingWorkflowState: () => {}}}
+          inheritedTab={true}
+        />,
+      )
+      const toggle = container.querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(true)
+    })
+
+    it('uses registration state when inheritedTab is false', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const {container} = render(
+        <InheritanceStateControl
+          developerKey={key}
+          ctx={rootAccountCTX}
+          store={{dispatch: () => {}}}
+          actions={{setBindingWorkflowState: () => {}}}
+          inheritedTab={false}
+        />,
+      )
+      const toggle = container.querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(false)
+    })
   })
 
   describe('when devKeysReadOnly is true', () => {
