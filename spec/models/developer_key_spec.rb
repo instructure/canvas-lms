@@ -660,7 +660,8 @@ describe DeveloperKey do
               account: Account.site_admin,
               created_by: admin,
               registration_params: { name: "Template Tool" },
-              configuration_params: internal_lti_configuration
+              configuration_params: internal_lti_configuration,
+              binding_params: { workflow_state: "on" }
             )
           end
         end
@@ -670,7 +671,7 @@ describe DeveloperKey do
             account: subaccount,
             user: admin,
             template:
-          )
+          )[:local_copy]
         end
         let_once(:template_tool) { template.new_external_tool(Account.site_admin) }
         let_once(:local_copy_tool) { local_copy.new_external_tool(subaccount) }
