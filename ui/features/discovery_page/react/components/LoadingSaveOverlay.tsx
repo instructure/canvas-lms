@@ -32,8 +32,8 @@ export function LoadingSaveOverlay({
   const maskRef = useRef<Element | null>(null)
 
   const renderTitle = isLoadingConfig
-    ? I18n.t('Loading configuration')
-    : I18n.t('Saving configuration')
+    ? I18n.t('Loading configuration …')
+    : I18n.t('Saving configuration …')
 
   return (
     <Overlay
