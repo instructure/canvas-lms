@@ -3544,6 +3544,7 @@ hy:
   child_s_username_dde3aa9: "Երեխա օգտատիրոջ անունը"
   choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի հիմնական էջը"
   choose_a_csv_file_to_upload_9644480c: "Ընտրել CSV ֆայլը բեռնման համար"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "Ընտրել վերագնահատման տարբերակը այն ունկնդիրների համար, ովքեր արդեն անցել են թեստը: Canvas համակարգը կվերագնահատի Ձեր բոլոր ուղարկած աշխատանքները թեստը պահպանելուց հետո (դա կարող է ազդել ունկնդիրների միավորների վրա): "
   choose_an_authentication_service_47dc8875: "Ընտրել իսկության ստուգման ծառայությունը"
   choose_one_2c4277df: "Ընտրել մեկը"
   choose_usage_rights_33683854: "Ընտրել օգտագործման իրավունքները..."
@@ -7412,6 +7413,7 @@ hy:
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Խնդրեք ձեր օգտատերերին սխալների մասին  հաշվետվությունները տեղադրել Salesforce Service Cloud-ում:"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Խնդրեք ձեր օգտատերերին սխալների մասին  հաշվետվությունները տեղադրել Salesforce-ում:"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Նշանակել բոլոր ունկնդիրներին միեւնույն գնահատականը *%{assignment.name}* հանձնարարության համար, մուտքագրելով գնահատականի մեծությունը ստորև."
+  give_everyone_full_credit_for_this_question_3ad3266c: "Բոլորին տալ լիարժեք կրեդիտ այս հարցի համար"
   global_announcements_a78912c8: "Ընդհանուր հայտարարություններ"
   global_branding_df1cae12: "Ընդհանուր բրենդինգ"
   global_message_icons: 
@@ -14738,6 +14740,7 @@ hy:
         name: Անվանումը
     welcome_to_canvas: "Ձեզ ողջունում է Canvas-ը"
   registration_url_60e0eaaa: "Գրանցման URL-հասցե"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Այս հարցի համար կրկնակի գնահատում չի թույլատրվում, քանի որ կամ պատասխանն է հանվել կամ հարցի տեսակը փոխվել է ունկնդրի կողմից ուղարկելուց հետո:"
   regular_style_checkbox_ee3d71c1: "Սովորական-ոճի կոճակ"
   remind_me_next_time_6402eb7d: "Հիշեցնել ինձ հաջորդ անգամ "
   remove_as_leader_22d1a7d8: "Հանել առաջնորդությունից"
@@ -17352,6 +17355,7 @@ hy:
   update_login_472cd6db: "Թարմացնել մուտքի տվյալները"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_password_4bc5cb1f: "Թարմացնել գաղտնաբառը"
+  update_question_without_regrading_47c9904a: "Թարմացնել հարցը առանց կրկնակի գնահատման"
   update_quota_81381226: "Թարմացնել քվոտան"
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
   update_tool_7d48ef2a: "Թարմացնել %{tool}"
