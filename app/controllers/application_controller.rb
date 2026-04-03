@@ -68,6 +68,7 @@ class ApplicationController < ActionController::Base
   before_action :clear_idle_connections
   before_action :set_normalized_route
   before_action :set_sentry_trace
+  before_action :set_pre_response_headers
   before_action :annotate_apm
   before_action :annotate_sentry
   before_action :check_pending_otp
@@ -1192,6 +1193,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_pre_response_headers
+    RequestContext::Generator.store_request_meta(request, @sentry_trace)
+
+    true
+  end
+
   def set_response_headers
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
@@ -1201,7 +1208,7 @@ class ApplicationController < ActionController::Base
 
       append_to_header("Content-Security-Policy", directives)
     end
-    RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
+    RequestContext::Generator.store_context_meta(@context)
     true
   end
 
