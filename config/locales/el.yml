@@ -6788,6 +6788,7 @@ el:
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Λάβετε τις αναφορές σφαλμάτων χρηστών που έχουν δημοσιευθεί στο Service Cloud της Salesforce"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Λάβετε τις αναφορές σφαλμάτων χρηστών που έχουν δημοσιευθεί στη Salesforce"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Δώστε σε όλους τους σπουδαστές τον ίδιο βαθμό για το μάθημα *%{assignment.name}* εισαγάγοντας και υποβάλλοντας μια βαθμολογία παρακάτω:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Πείτε μπράβο σε όλους για αυτή την ερώτηση"
   global_announcements_a78912c8: "Καθολικές Ανακοινώσεις"
   global_branding_df1cae12: "Καθολική Σήμανση"
   global_message_icons: 
