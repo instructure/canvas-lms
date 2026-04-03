@@ -31,7 +31,7 @@ import Layout from './Layout'
 import {setAssignmentPostPolicy} from './Api'
 import {showFlashAlert} from '@instructure/platform-alerts'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
-import {ScheduledRelease} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
+import type {ScheduledRelease} from './ScheduledReleasePolicy/types'
 
 const I18n = createI18nScope('post_grades_tray')
 

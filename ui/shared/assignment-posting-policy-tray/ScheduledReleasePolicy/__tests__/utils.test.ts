@@ -17,7 +17,7 @@
  */
 
 import {hasScheduledReleaseChanged, validateRelease, combineDateTime} from '../utils/utils'
-import {ScheduledRelease} from '../ScheduledReleasePolicy'
+import type {ScheduledRelease} from '../types'
 
 describe('utils', () => {
   describe('hasScheduledReleaseChanged', () => {

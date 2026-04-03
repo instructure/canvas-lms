@@ -24,14 +24,9 @@ import {useEffect, useState} from 'react'
 import {SeparateScheduledRelease} from './SeparateScheduledRelease'
 import {SharedScheduledRelease} from './SharedScheduleRelease'
 import {FormMessage} from '@instructure/ui-form-field'
+import type {ScheduledRelease} from './types'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
-
-export type ScheduledRelease = {
-  scheduledPostMode?: string | null
-  postCommentsAt?: string | null
-  postGradesAt?: string | null
-}
 
 type ScheduledReleasePolicyProps = ScheduledRelease & {
   errorMessages: {grades: FormMessage[]; comments: FormMessage[]}

@@ -24,11 +24,9 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {
-  ScheduledRelease,
-  ScheduledReleasePolicy,
-} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
+import {ScheduledReleasePolicy} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
 import {useScheduledRelease} from './ScheduledReleasePolicy/hooks/useScheduledRelease'
+import type {ScheduledRelease} from './ScheduledReleasePolicy/types'
 
 const I18n = createI18nScope('assignment_posting_policy_tray')
 

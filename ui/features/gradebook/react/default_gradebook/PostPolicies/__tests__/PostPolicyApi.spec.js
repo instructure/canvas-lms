@@ -17,7 +17,7 @@
  */
 
 import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
-import * as PostPolicyApi from '../../default_gradebook/PostPolicies/PostPolicyApi'
+import * as PostPolicyApi from '../PostPolicyApi'
 
 describe('PostPolicyApi', () => {
   describe('.setCoursePostPolicy()', () => {
