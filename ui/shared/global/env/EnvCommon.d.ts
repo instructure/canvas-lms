@@ -314,7 +314,6 @@ export type SiteAdminFeatureId =
   | 'instui_for_import_page'
   | 'instui_header'
   | 'instui_nav'
-  | 'lti_registrations_discover_page'
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'

@@ -248,17 +248,6 @@ lti_link_to_apps_from_developer_keys:
       state: allowed_on
     ci:
       state: allowed_on
-lti_registrations_discover_page:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: LTI Apps Discover Page
-  description: When enabled, the LTI Apps Discover page will be available in the Apps page.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_registrations_history:
   state: hidden
   shadow: true

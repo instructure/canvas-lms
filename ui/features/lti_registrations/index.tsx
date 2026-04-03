@@ -22,7 +22,6 @@ import {render} from '@canvas/react'
 import {Navigate, RouterProvider, createBrowserRouter} from 'react-router-dom'
 import {DiscoverRoute} from './discover'
 import {ProductConfigureButton} from './discover/ProductConfigureButton'
-import {isLtiRegistrationsDiscoverEnabled} from './discover/utils'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {ManageRoutes} from './manage'
 import {
@@ -72,9 +71,7 @@ const accountId = getAccountId()
 const getLayoutChildren = (accountId: AccountId) => {
   const layoutRoutes = [...ManageRoutes]
 
-  if (isLtiRegistrationsDiscoverEnabled()) {
-    layoutRoutes.push(DiscoverRoute)
-  }
+  layoutRoutes.push(DiscoverRoute)
 
   if (isLtiRegistrationsUsageEnabled()) {
     layoutRoutes.push(MonitorRoute(accountId))

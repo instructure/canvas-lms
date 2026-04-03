@@ -30,7 +30,6 @@ import {openRegistrationWizard} from '../manage/registration_wizard/Registration
 import {useMedia} from 'react-use'
 import {View} from '@instructure/ui-view'
 import {LtiRegistrationsTab} from './constants'
-import {isLtiRegistrationsDiscoverEnabled} from '../discover/utils'
 import {isLtiRegistrationsUsageEnabled} from '../monitor/utils'
 import {refreshRegistrations} from '../manage/api/registrations'
 const I18n = createI18nScope('lti_registrations')
@@ -148,7 +147,7 @@ export const LtiAppsLayout = React.memo(() => {
         <>
           <View margin="small 0" display="block">
             <SimpleSelect renderLabel="" onChange={onTabClick} value={tabSelected}>
-              {isLtiRegistrationsDiscoverEnabled() && !isSubAccount && (
+              {!isSubAccount && (
                 <SimpleSelect.Option id="discover" value="discover">
                   {I18n.t('Discover')}
                 </SimpleSelect.Option>
@@ -169,7 +168,7 @@ export const LtiAppsLayout = React.memo(() => {
         </>
       ) : (
         <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
-          {isLtiRegistrationsDiscoverEnabled() && !isSubAccount && (
+          {!isSubAccount && (
             <Tabs.Panel
               renderTitle={
                 <Text style={{color: 'initial', textDecoration: 'initial'}}>

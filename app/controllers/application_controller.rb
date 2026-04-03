@@ -575,7 +575,6 @@ class ApplicationController < ActionController::Base
     lti_asset_processor_discussions
     lti_deactivate_registrations
     lti_link_to_apps_from_developer_keys
-    lti_registrations_discover_page
     lti_registrations_next
     lti_registrations_templates
     lti_registrations_usage_data
