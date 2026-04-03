@@ -49,7 +49,7 @@ export const ZLtiRegistration = z.object({
   developer_key_id: ZDeveloperKeyId.nullable(),
   ims_registration_id: ZLtiImsRegistrationId.nullable(),
   manual_configuration_id: ZLtiToolConfigurationId.nullable(),
-  template_registration_id: ZLtiRegistrationId.nullable().optional(),
+  template_registration_id: ZLtiRegistrationId.nullable(),
   account_binding: ZLtiRegistrationAccountBinding.nullable().optional(),
   overlay: ZLtiOverlay.nullable().optional(),
   pending_update: ZLtiRegistrationUpdateRequestId.nullable().optional(),

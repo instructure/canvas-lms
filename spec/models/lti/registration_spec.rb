@@ -639,25 +639,17 @@ RSpec.describe Lti::Registration do
     let(:registration) { lti_registration_model(account: context) }
     let(:context) { account_model }
 
-    context "when flag is disabled" do
-      before do
-        context.disable_feature! :lti_registrations_templates
-      end
+    context "when account matches registration account" do
+      let(:account) { context }
 
-      context "when account matches registration account" do
-        let(:account) { context }
-
-        it { is_expected.to be false }
-      end
-
-      context "when account does not match registration account" do
-        let(:account) { account_model }
-
-        it { is_expected.to be true }
-      end
+      it { is_expected.to be false }
     end
 
-    it { is_expected.to be false }
+    context "when account does not match registration account" do
+      let(:account) { account_model }
+
+      it { is_expected.to be true }
+    end
 
     context "when template registration is present" do
       let(:template_registration) { lti_registration_model(account: Account.site_admin) }
@@ -669,14 +661,6 @@ RSpec.describe Lti::Registration do
       end
 
       it { is_expected.to be true }
-
-      context "and flag is disabled" do
-        before do
-          context.disable_feature! :lti_registrations_templates
-        end
-
-        it { is_expected.to be false }
-      end
     end
   end
 

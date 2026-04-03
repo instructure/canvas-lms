@@ -114,6 +114,44 @@ describe Lti::ListRegistrationService do
           end
         end
       end
+
+      context "when an inherited registration has an account binding turned off" do
+        let(:allow_site_admin_reg) { lti_registration_with_tool(account: site_admin) }
+        let(:sub_account_off_binding) do
+          lti_registration_account_binding_model(
+            registration: allow_site_admin_reg,
+            account:,
+            workflow_state: "off"
+          )
+        end
+
+        context "when flag enabled" do
+          before { account.enable_feature!(:lti_deactivate_registrations) }
+
+          it "includes the registration in the list" do
+            sub_account_off_binding
+            expect(service.call[:registrations]).to include(allow_site_admin_reg)
+          end
+        end
+
+        context "when flag disabled" do
+          before { account.disable_feature!(:lti_deactivate_registrations) }
+
+          it "does not include the registration in the list" do
+            sub_account_off_binding
+            expect(service.call[:registrations]).not_to include(allow_site_admin_reg)
+          end
+        end
+      end
+
+      context "when a site admin registration has never been bound in this account" do
+        let(:allow_site_admin_reg) { lti_registration_with_tool(account: site_admin) }
+
+        it "does not include the registration in the list" do
+          allow_site_admin_reg
+          expect(service.call[:registrations]).not_to include(allow_site_admin_reg)
+        end
+      end
     end
 
     context "when sorting by workflow_state" do
