@@ -3102,6 +3102,38 @@ describe Types::UserType do
         expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
         expect(titles).not_to include("Concluded Course Announcement")
       end
+
+      it "excludes announcements from courses where student has only an invited enrollment" do
+        invited_course = course_factory(active_all: true)
+        invited_course.enroll_student(@student_user, enrollment_state: "invited")
+        invited_announcement = invited_course.announcements.create!(
+          title: "Invited Course Announcement",
+          message: "Should not appear"
+        )
+        @student_user.discussion_topic_participants.find_or_create_by!(discussion_topic: invited_announcement)
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Invited Course Announcement")
+      end
+
+      it "returns each announcement exactly once when student has multiple enrollments in same course" do
+        section_b = @course1.course_sections.create!(name: "Section B")
+        @course1.enroll_student(
+          @student_user,
+          section: section_b,
+          enrollment_state: "active",
+          allow_multiple_enrollments: true
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles.count("Course 1 Announcement")).to eq(1)
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+      end
     end
   end
 
