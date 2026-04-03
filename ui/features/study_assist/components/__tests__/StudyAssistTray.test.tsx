@@ -24,6 +24,12 @@ import StudyAssistTray from '../StudyAssistTray'
 const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-content" />)
 const mockAssistFlashCardsInteraction = vi.fn((_props: object) => <div />)
 
+vi.mock('@canvas/instui-bindings/react/AiInformation', () => ({
+  default: ({triggerButton}: {triggerButton: React.ReactNode}) => (
+    <div data-testid="ai-information">{triggerButton}</div>
+  ),
+}))
+
 vi.mock('@instructure/platform-study-assist', () => ({
   AssistProvider: ({
     children,
@@ -55,6 +61,17 @@ describe('StudyAssistTray', () => {
     onDismiss.mockReset()
     mockAssistContent.mockClear()
     mockAssistFlashCardsInteraction.mockClear()
+  })
+
+  it('renders the AI information button', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-ai-info-button')).toBeInTheDocument()
   })
 
   it('renders the heading when open', () => {

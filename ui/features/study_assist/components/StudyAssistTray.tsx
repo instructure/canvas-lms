@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {
@@ -32,7 +32,8 @@ import type {
   AssistResponse,
   AssistChatFlashCard,
 } from '@instructure/platform-study-assist'
-import {IconAiSolid} from '@instructure/ui-icons'
+import {IconAiSolid, IconInfoLine} from '@instructure/ui-icons'
+import CanvasAiInformation from '@canvas/instui-bindings/react/AiInformation'
 
 const I18n = createI18nScope('study_assist')
 
@@ -45,6 +46,8 @@ type Props = {
 }
 
 export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
+  const closeButtonRef = useRef<Element | null>(null)
+
   const renderFlashCards = useCallback(
     (
       cards: AssistChatFlashCard[],
@@ -72,6 +75,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
       size="regular"
       open={open}
       onDismiss={onDismiss}
+      defaultFocusElement={() => closeButtonRef.current}
     >
       <div style={{background: GRADIENT, color: 'white', minHeight: '100vh'}}>
         <Flex as="div" padding="small" alignItems="center">
@@ -86,13 +90,59 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
             </Flex>
           </Flex.Item>
           <Flex.Item>
-            <CloseButton
-              onClick={onDismiss}
-              size="small"
-              color="primary-inverse"
-              screenReaderLabel={I18n.t('Close')}
-              data-testid="study-assist-close-button"
-            />
+            <Flex gap="small">
+              <Flex.Item>
+                <CanvasAiInformation
+                  title={I18n.t('Nutrition Facts')}
+                  privacyNoticeText={I18n.t('AI Privacy Notice')}
+                  featureName={I18n.t('Study Tools')}
+                  modelName={I18n.t('Claude 3 Haiku')}
+                  isTrainedWithUserData={false}
+                  dataSharedWithModel={I18n.t('Page')}
+                  dataSharedWithModelDescription={I18n.t(
+                    'Page content is sent to the model to generate study materials.',
+                  )}
+                  dataRetention={I18n.t('Data is not stored or reused by the model.')}
+                  dataLogging={I18n.t('Does Not Log Data')}
+                  regionsSupported={I18n.t('US')}
+                  isPIIExposed={false}
+                  isPIIExposedDescription={I18n.t(
+                    'PII in page content may be included, but no PII is intentionally sent to the model.',
+                  )}
+                  isFeatureBehindSetting={true}
+                  isHumanInTheLoop={true}
+                  expectedRisks={I18n.t('Generated study content may be inaccurate or incomplete.')}
+                  intendedOutcomes={I18n.t(
+                    'Students are able to efficiently study course material through AI-generated summaries, quizzes, and flashcards.',
+                  )}
+                  permissionsLevel={2}
+                  triggerButton={
+                    <IconButton
+                      size="small"
+                      color="primary-inverse"
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={I18n.t('AI information')}
+                      data-testid="study-assist-ai-info-button"
+                    >
+                      <IconInfoLine />
+                    </IconButton>
+                  }
+                />
+              </Flex.Item>
+              <Flex.Item>
+                <CloseButton
+                  elementRef={el => {
+                    closeButtonRef.current = el
+                  }}
+                  onClick={onDismiss}
+                  size="small"
+                  color="primary-inverse"
+                  screenReaderLabel={I18n.t('Close')}
+                  data-testid="study-assist-close-button"
+                />
+              </Flex.Item>
+            </Flex>
           </Flex.Item>
         </Flex>
         <AssistProvider
