@@ -161,18 +161,8 @@ describe Api::V1::Lti::Registration do
           registration.save!
         end
 
-        context "and inherited flag is off" do
-          before do
-            registration.account.disable_feature!(:lti_registrations_templates)
-          end
-
-          it "includes inherited as true" do
-            expect(subject[:inherited]).to be(true)
-          end
-        end
-
-        it "includes inherited as false" do
-          expect(subject[:inherited]).to be(false)
+        it "includes inherited as true" do
+          expect(subject[:inherited]).to be(true)
         end
       end
     end
@@ -277,27 +267,17 @@ describe Api::V1::Lti::Registration do
         registration.save!
       end
 
+      it "includes template_registration_id" do
+        expect(subject[:template_registration_id]).to eq(template_registration.id)
+      end
+
       context "when lti_registrations_templates flag is enabled" do
         before do
           context.root_account.enable_feature!(:lti_registrations_templates)
         end
 
-        it "includes template_registration_id" do
-          expect(subject[:template_registration_id]).to eq(template_registration.id)
-        end
-
         it "includes inherited as true" do
           expect(subject[:inherited]).to be(true)
-        end
-      end
-
-      context "when lti_registrations_templates flag is disabled" do
-        before do
-          context.root_account.disable_feature!(:lti_registrations_templates)
-        end
-
-        it "does not include template_registration_id" do
-          expect(subject).not_to have_key(:template_registration_id)
         end
       end
     end

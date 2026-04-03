@@ -112,6 +112,20 @@ RSpec.describe Lti::RegistrationsController do
       expect(assigns[:active_tab]).to eq("apps")
     end
 
+    it "sets ACCOUNT_IS_SITE_ADMIN to false for non-site-admin accounts" do
+      get :index, params: { account_id: account.id }
+      expect(assigns.dig(:js_env, :ACCOUNT_IS_SITE_ADMIN)).to be false
+    end
+
+    context "when account is site admin" do
+      before { user_session(site_admin_user) }
+
+      it "sets ACCOUNT_IS_SITE_ADMIN to true" do
+        get :index, params: { account_id: Account.site_admin.id }
+        expect(assigns.dig(:js_env, :ACCOUNT_IS_SITE_ADMIN)).to be true
+      end
+    end
+
     it "does not set temp_dr_url in ENV" do
       get :index, params: { account_id: account.id }
       expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to be_nil
@@ -241,7 +255,7 @@ RSpec.describe Lti::RegistrationsController do
             .once
             .and_return(account)
           subject
-          expect(response_json[:total]).to eq(4)
+          expect(response_json[:total]).to eq(5)
         end
       end
 
@@ -252,12 +266,21 @@ RSpec.describe Lti::RegistrationsController do
 
       it "returns the total count of registrations" do
         subject
-        expect(response_json[:total]).to eq(4)
+        expect(response_json[:total]).to eq(5)
       end
 
       it "returns a list of registrations" do
         subject
-        expect(response_data.length).to eq(4)
+        expect(response_data.length).to eq(5)
+      end
+
+      context "when lti_deactivate_registrations is disabled" do
+        before { account.disable_feature!(:lti_deactivate_registrations) }
+
+        it "excludes inherited registrations with off bindings" do
+          subject
+          expect(response_json[:total]).to eq(4)
+        end
       end
 
       it "has the expected fields in the results" do

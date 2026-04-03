@@ -26,7 +26,7 @@ module Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationAccountBinding
 
   JSON_ATTRS = %w[
-    id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at description lock_deploying
+    id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at description lock_deploying template_registration_id
   ].freeze
 
   OVERLAY_VERSION_DEFAULT_LIMIT = 5
@@ -73,10 +73,6 @@ module Api::V1::Lti::Registration
       json["dynamic_registration_url"] = registration.ims_registration&.registration_url
       json["reinstall_disabled"] = registration.ims_registration&.reinstall_disabled?
       json["manual_configuration_id"] = registration.manual_configuration&.id
-
-      if context.root_account.feature_enabled?(:lti_registrations_templates)
-        json["template_registration_id"] = registration.template_registration_id
-      end
 
       if registration.site_admin?
         json["created_by"] = "Instructure"

@@ -17,6 +17,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react'
+import * as RegistrationsApi from '../../../api/registrations'
 import {clickOrFail} from '../../__tests__/interactionHelpers'
 import {ToolDetailsInner} from '../ToolDetails'
 import {
@@ -28,9 +29,17 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ZDeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
+import {ZAccountId} from '../../../model/AccountId'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {fireEvent, screen} from '@testing-library/dom'
 import {ZLtiRegistrationId} from '../../../model/LtiRegistrationId'
+import {showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', () => ({
+  showFlashAlert: vi.fn(),
+}))
+
+const mockFlash = showFlashAlert as ReturnType<typeof vi.fn>
 
 const server = setupServer()
 
@@ -38,6 +47,10 @@ describe('ToolDetailsInner', () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   afterEach(() => server.resetHandlers())
+
+  beforeEach(() => {
+    mockFlash.mockClear()
+  })
 
   const renderToolDetailsInner = (
     registration = mockRegistrationWithAllInformation({n: 'test', i: 1}),
@@ -185,6 +198,381 @@ describe('ToolDetailsInner', () => {
     const wrapper = renderToolDetailsInner(registration)
 
     expect(wrapper.queryByText('Reinstall App')).not.toBeInTheDocument()
+  })
+
+  describe('deactivate feature (lti_deactivate_registrations)', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {lti_deactivate_registrations: true},
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('shows "App is On" pill when workflow_state is active', () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {workflow_state: 'active'},
+      })
+      const wrapper = renderToolDetailsInner(registration)
+      expect(wrapper.queryByText('App is On')).toBeInTheDocument()
+      expect(wrapper.queryByText('Turn App Off')).toBeInTheDocument()
+    })
+
+    it('shows "App is Off" pill when workflow_state is not active', () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {workflow_state: 'inactive'},
+      })
+      const wrapper = renderToolDetailsInner(registration)
+      expect(wrapper.queryByText('App is Off')).toBeInTheDocument()
+      expect(wrapper.queryByText('Turn App On')).toBeInTheDocument()
+    })
+
+    it('calls the update API with workflowState: inactive when turning off an active app', async () => {
+      let capturedBody: unknown
+      server.use(
+        http.put(
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId',
+          async ({request}) => {
+            capturedBody = await request.json()
+            return HttpResponse.json({})
+          },
+        ),
+      )
+
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {workflow_state: 'active'},
+      })
+      renderToolDetailsInner(registration)
+
+      fireEvent.click(screen.getByTestId('toggle-app'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Turn Off')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByText('Turn Off'))
+
+      await waitFor(() => {
+        expect(capturedBody).toMatchObject({workflow_state: 'inactive'})
+      })
+    })
+
+    it('calls the update API with workflowState: active when turning on an inactive app', async () => {
+      let capturedBody: unknown
+      server.use(
+        http.put(
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId',
+          async ({request}) => {
+            capturedBody = await request.json()
+            return HttpResponse.json({})
+          },
+        ),
+      )
+
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {workflow_state: 'inactive'},
+      })
+      renderToolDetailsInner(registration)
+
+      fireEvent.click(screen.getByTestId('toggle-app'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Turn On')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByText('Turn On'))
+
+      await waitFor(() => {
+        expect(capturedBody).toMatchObject({workflow_state: 'active'})
+      })
+    })
+
+    it('shows an error flash when the toggle API call fails', async () => {
+      server.use(
+        http.put(
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId',
+          () => new HttpResponse(null, {status: 500}),
+        ),
+      )
+
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {workflow_state: 'active'},
+      })
+      renderToolDetailsInner(registration)
+
+      fireEvent.click(screen.getByTestId('toggle-app'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Turn Off')).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByText('Turn Off'))
+
+      await waitFor(() => {
+        expect(mockFlash).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'error',
+            message: expect.stringContaining('turn off'),
+          }),
+        )
+      })
+    })
+
+    describe('inherited registration (site admin only, no template_registration_id)', () => {
+      it('shows "App is On" when account_binding.workflow_state is "on"', () => {
+        // mockSiteAdminRegistration has account_binding.workflow_state = 'on' by default
+        const registration = mockSiteAdminRegistration('site admin', 1)
+        const wrapper = renderToolDetailsInner(registration)
+        expect(wrapper.queryByText('App is On')).toBeInTheDocument()
+      })
+
+      it('shows "App is Off" when account_binding.workflow_state is not "on"', () => {
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {
+          ...base,
+          account_binding: {...base.account_binding!, workflow_state: 'off'},
+        }
+        const wrapper = renderToolDetailsInner(registration)
+        expect(wrapper.queryByText('App is Off')).toBeInTheDocument()
+      })
+
+      it('calls the bind endpoint (not the update endpoint) when turning off', async () => {
+        const unbindSpy = vi
+          .spyOn(RegistrationsApi, 'unbindGlobalLtiRegistration')
+          .mockResolvedValueOnce({_type: 'Success', data: {} as never, links: {}})
+        const bindSpy = vi.spyOn(RegistrationsApi, 'bindGlobalLtiRegistration')
+
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {...base, account_id: ZAccountId.parse('99')}
+        renderToolDetailsInner(registration)
+
+        fireEvent.click(screen.getByTestId('toggle-app'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Turn Off')).toBeInTheDocument()
+        })
+        fireEvent.click(screen.getByText('Turn Off'))
+
+        await waitFor(() => {
+          expect(unbindSpy).toHaveBeenCalledWith(registration.account_id, registration.id)
+        })
+        expect(bindSpy).not.toHaveBeenCalled()
+      })
+
+      it('calls the bind endpoint (not the update endpoint) when turning on', async () => {
+        const bindSpy = vi
+          .spyOn(RegistrationsApi, 'bindGlobalLtiRegistration')
+          .mockResolvedValueOnce({_type: 'Success', data: {} as never, links: {}})
+        const unbindSpy = vi.spyOn(RegistrationsApi, 'unbindGlobalLtiRegistration')
+
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {
+          ...base,
+          account_binding: {...base.account_binding!, workflow_state: 'off'},
+        }
+        renderToolDetailsInner(registration)
+
+        fireEvent.click(screen.getByTestId('toggle-app'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Turn On')).toBeInTheDocument()
+        })
+        fireEvent.click(screen.getByText('Turn On'))
+
+        await waitFor(() => {
+          expect(bindSpy).toHaveBeenCalledWith(registration.account_id, registration.id)
+        })
+        expect(unbindSpy).not.toHaveBeenCalled()
+      })
+
+      it('shows an error flash when the bind API call fails', async () => {
+        vi.spyOn(RegistrationsApi, 'bindGlobalLtiRegistration').mockResolvedValueOnce({
+          _type: 'ApiError',
+          status: 500,
+          body: {error: 'Bind failed'},
+        })
+
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {
+          ...base,
+          account_binding: {...base.account_binding!, workflow_state: 'off'},
+        }
+        renderToolDetailsInner(registration)
+
+        fireEvent.click(screen.getByTestId('toggle-app'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Turn On')).toBeInTheDocument()
+        })
+        fireEvent.click(screen.getByText('Turn On'))
+
+        await waitFor(() => {
+          expect(mockFlash).toHaveBeenCalledWith(
+            expect.objectContaining({
+              type: 'error',
+              message: expect.stringContaining('turn on'),
+            }),
+          )
+        })
+      })
+    })
+
+    describe('site admin binding pill', () => {
+      beforeEach(() => {
+        window.ENV.ACCOUNT_IS_SITE_ADMIN = true
+      })
+
+      afterEach(() => {
+        delete window.ENV.ACCOUNT_IS_SITE_ADMIN
+      })
+
+      it('shows "App is Allowed" when binding state is "allow"', () => {
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {
+          ...base,
+          account_binding: {...base.account_binding!, workflow_state: 'allow'},
+        }
+        const wrapper = renderToolDetailsInner(registration)
+        expect(wrapper.queryByText('App is Allowed')).toBeInTheDocument()
+      })
+
+      it('shows "App is On" when binding state is "on"', () => {
+        // mockSiteAdminRegistration defaults to account_binding.workflow_state = 'on'
+        const registration = mockSiteAdminRegistration('site admin', 1)
+        const wrapper = renderToolDetailsInner(registration)
+        expect(wrapper.queryByText('App is On')).toBeInTheDocument()
+      })
+
+      it('shows "App is Off" when binding state is neither "allow" nor "on"', () => {
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {
+          ...base,
+          account_binding: {...base.account_binding!, workflow_state: 'off'},
+        }
+        const wrapper = renderToolDetailsInner(registration)
+        expect(wrapper.queryByText('App is Off')).toBeInTheDocument()
+      })
+    })
+
+    describe('forced-on inherited registration with templates flag off', () => {
+      it('disables the toggle button when registration is forced on', () => {
+        const registration = mockSiteAdminRegistration('site admin', 1)
+        renderToolDetailsInner(registration)
+        expect(screen.getByTestId('toggle-app')).toHaveAttribute('disabled')
+      })
+
+      it('enables the toggle button when binding is not forced on', () => {
+        const base = mockSiteAdminRegistration('site admin', 1)
+        const registration = {
+          ...base,
+          account_binding: {...base.account_binding!, workflow_state: 'allow'},
+        }
+        renderToolDetailsInner(registration)
+        expect(screen.getByTestId('toggle-app')).not.toHaveAttribute('disabled')
+      })
+
+      it('shows a tooltip when the button is disabled', async () => {
+        const registration = mockSiteAdminRegistration('site admin', 1)
+        renderToolDetailsInner(registration)
+        fireEvent.mouseOver(screen.getByTestId('toggle-app'))
+        await waitFor(() => {
+          expect(
+            screen.getByText('This app is locked on by Instructure, and cannot be turned off.'),
+          ).toBeInTheDocument()
+        })
+      })
+    })
+
+    describe('local copy registration (inherited with template_registration_id)', () => {
+      const mockLocalCopyRegistration = (workflowState: string) => ({
+        ...mockRegistrationWithAllInformation({n: 'local copy', i: 1}),
+        inherited: true,
+        template_registration_id: ZLtiRegistrationId.parse('99'),
+        workflow_state: workflowState,
+      })
+
+      it('shows "App is On" when workflow_state is active', () => {
+        const wrapper = renderToolDetailsInner(mockLocalCopyRegistration('active'))
+        expect(wrapper.queryByText('App is On')).toBeInTheDocument()
+      })
+
+      it('shows "App is Off" when workflow_state is not active', () => {
+        const wrapper = renderToolDetailsInner(mockLocalCopyRegistration('inactive'))
+        expect(wrapper.queryByText('App is Off')).toBeInTheDocument()
+      })
+
+      it('calls the update endpoint (not the bind endpoint) when turning off', async () => {
+        let capturedUpdateBody: unknown
+        const bindSpy = vi.spyOn(RegistrationsApi, 'bindGlobalLtiRegistration')
+        const unbindSpy = vi.spyOn(RegistrationsApi, 'unbindGlobalLtiRegistration')
+        server.use(
+          http.put(
+            '/api/v1/accounts/:accountId/lti_registrations/:registrationId',
+            async ({request}) => {
+              capturedUpdateBody = await request.json()
+              return HttpResponse.json({})
+            },
+          ),
+        )
+
+        renderToolDetailsInner(mockLocalCopyRegistration('active'))
+
+        fireEvent.click(screen.getByTestId('toggle-app'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Turn Off')).toBeInTheDocument()
+        })
+        fireEvent.click(screen.getByText('Turn Off'))
+
+        await waitFor(() => {
+          expect(capturedUpdateBody).toMatchObject({workflow_state: 'inactive'})
+        })
+        expect(bindSpy).not.toHaveBeenCalled()
+        expect(unbindSpy).not.toHaveBeenCalled()
+      })
+
+      it('calls the update endpoint (not the bind endpoint) when turning on', async () => {
+        let capturedUpdateBody: unknown
+        const bindSpy = vi.spyOn(RegistrationsApi, 'bindGlobalLtiRegistration')
+        const unbindSpy = vi.spyOn(RegistrationsApi, 'unbindGlobalLtiRegistration')
+        server.use(
+          http.put(
+            '/api/v1/accounts/:accountId/lti_registrations/:registrationId',
+            async ({request}) => {
+              capturedUpdateBody = await request.json()
+              return HttpResponse.json({})
+            },
+          ),
+        )
+
+        renderToolDetailsInner(mockLocalCopyRegistration('inactive'))
+
+        fireEvent.click(screen.getByTestId('toggle-app'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Turn On')).toBeInTheDocument()
+        })
+        fireEvent.click(screen.getByText('Turn On'))
+
+        await waitFor(() => {
+          expect(capturedUpdateBody).toMatchObject({workflow_state: 'active'})
+        })
+        expect(bindSpy).not.toHaveBeenCalled()
+        expect(unbindSpy).not.toHaveBeenCalled()
+      })
+    })
   })
 
   describe('lock/unlock feature (lock_lti_registrations)', () => {

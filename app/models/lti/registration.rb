@@ -200,16 +200,12 @@ class Lti::Registration < ApplicationRecord
     end
   end
 
-  # Returns true if this Registration is from a different account than the given account.
+  # Returns true if this Registration is inherited from somewhere else like Site Admin.
   #
   # This will not properly account for a possible future scenario where the account is
   # for a _sub_ account underneath the registration's root account.
   def inherited_for?(account)
-    if self.account.feature_enabled?(:lti_registrations_templates)
-      inherited_from_template?
-    else
-      account != self.account
-    end
+    inherited_from_template? || account != self.account
   end
 
   def inherited_from_template?
