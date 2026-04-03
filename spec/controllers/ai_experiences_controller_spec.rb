@@ -790,7 +790,7 @@ describe AiExperiencesController do
       before { user_session(@teacher) }
 
       let(:expected_tags) do
-        { aws_region: Canvas.region, root_account_uuid: @course.root_account.uuid, course_id: @course.id }
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
       end
 
       it "increments total_created on success" do
@@ -974,7 +974,7 @@ describe AiExperiencesController do
       before { user_session(@teacher) }
 
       let(:expected_tags) do
-        { aws_region: Canvas.region, root_account_uuid: @course.root_account.uuid, course_id: @course.id }
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
       end
 
       it "increments total_published when transitioning to published" do
@@ -1066,7 +1066,7 @@ describe AiExperiencesController do
       before { user_session(@teacher) }
 
       let(:expected_tags) do
-        { aws_region: Canvas.region, root_account_uuid: @course.root_account.uuid, course_id: @course.id }
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
       end
 
       it "decrements total_created on success" do
