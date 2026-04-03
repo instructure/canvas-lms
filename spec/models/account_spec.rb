@@ -2699,6 +2699,12 @@ describe Account do
       link = account.discovery_page_link_for(provider, entry)
       expect(link[:label]).to eq("CAS Login")
     end
+
+    it "HTML-encodes & in the label" do
+      entry = { label: "Arts & Sciences" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("Arts &amp; Sciences")
+    end
   end
 
   describe "#multi_parent_sub_accounts_recursive" do
@@ -3799,6 +3805,51 @@ describe Account do
         account.save!
 
         expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Plain Text Label")
+      end
+
+      it "HTML-encodes & in labels for safe storage" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Arts & Sciences")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Arts &amp; Sciences")
+      end
+
+      it "HTML-encodes angle brackets in non-tag context" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Student <-> Teacher")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Student &lt;-&gt; Teacher")
+      end
+
+      it "strips script elements and their content, failing validation when label becomes blank" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: '<script>alert("foo");</script>')],
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page.primary[0].label is required")
+      end
+
+      it "strips script elements while preserving surrounding text" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: 'Foo <script>alert("foo");</script>')],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Foo ")
+      end
+
+      it "preserves pre-encoded HTML entities as safe text" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "&lt;script&gt;alert(1)&lt;/script&gt;")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("&lt;script&gt;alert(1)&lt;/script&gt;")
       end
     end
 
