@@ -51,11 +51,7 @@ module LearnPlatform
     end
 
     def self.auth_headers
-      if Account.site_admin.feature_enabled?(:use_jwt_auth_for_utid_sync)
-        { Authorization: "Bearer #{jwt}" }
-      else
-        { Authorization: "Basic #{credentials[:learn_platform_basic_token]}" }
-      end
+      { Authorization: "Bearer #{jwt}" }
     end
 
     def self.generate_jwt
