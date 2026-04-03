@@ -3934,6 +3934,7 @@ uk:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Оберіть колір або екранну назву курсу або перемістіть картку курсу для %{course}"
   choose_a_course_home_page_8059c7b: "Виберіть головну сторінку курсу "
   choose_a_csv_file_to_upload_9644480c: "Вибрати .csv файл для завантаження:"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "Виберіть варіант переоцінювання для студентів, котрі вже пройшли опитування. Canvas буде переоцінювати всі ваші матеріали після збереження опитування (оцінки студентів можуть бути затронуті)."
   choose_an_authentication_service_47dc8875: "Виберіть службу аутентифікації"
   choose_and_publish_980812cb: "Обрати та опублікувати"
   choose_assignment_b0132c5e: "-- Виберіть завдання --"
@@ -8036,6 +8037,7 @@ uk:
   getting_started_with_collaborations_794240ba: "Починаємо співробітництво"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Надайте усім студентам однаковий бал  за *%{assignment.name}* увівши та надавши оцінку нижче:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Надайте усім студентам однаковий *percent* бал за **%{assignment.name}** ввівши та подавши бал нижче:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Дайте кожному повну довіру на це питання"
   global_announcements_a78912c8: "Глобальні оголошення"
   global_branding_df1cae12: "Глобальний брендінг"
   global_message_icons: 
@@ -15377,6 +15379,7 @@ uk:
         name: ім'я
     welcome_to_canvas: "Ласкаво просимо до Canvas!"
   registration_url_60e0eaaa: "URL-адреса реєстрації"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Повторне використання не дозволено на це питання, оскільки або відповідь була вилучена, або тип питання був змінений після того, як студент завершив відправлення."
   regular_style_checkbox_ee3d71c1: "Звичайний прапорець"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Реалізовано за шляхом: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Реалізовано за шляхом: %{path}"
@@ -18396,6 +18399,7 @@ uk:
   update_login_472cd6db: "Оновити логін"
   update_module_b984c2e5: "Оновити модуль"
   update_password_4bc5cb1f: "Оновити пароль"
+  update_question_without_regrading_47c9904a: "Оновити питання без переоцінки"
   update_quota_81381226: "Оновити квоту"
   update_rating_6d29c2ef: "Оновити рейтинг"
   update_settings_9b422d0f: "Налаштування оновлення"
