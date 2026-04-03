@@ -492,7 +492,7 @@ class AiExperiencesController < ApplicationController
   def track_experience_metrics(action, experience, initial_publish_state: nil, new_publish_state: nil)
     return unless @context.is_a?(Course)
 
-    tags = { aws_region: Canvas.region, root_account_uuid: @context.root_account.uuid, course_id: @context.id }
+    tags = { aws_region: Canvas.region, root_account_id: @context.root_account.uuid, course_id: @context.id }
 
     case action
     when :create
