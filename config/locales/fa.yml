@@ -5418,6 +5418,7 @@ fa:
   choose_a_file_to_upload_a63bac0f: "فایلی را برای آپلود انتخاب کنید"
   choose_a_file_to_upload_from_your_device_d1b50d4c: "فایلی را برای آپلود از دستگاه خود انتخاب کنید"
   choose_a_quiz_engine_8820d521: "یک موتور مسابقه انتخاب کنید"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "گزینه نمره گذاری دوباره برای دانشجویانی که قبلا آزمون داده اند. کانواس همه موردهای ارسالی را بعد از اینکه آزمون را ذخیره کردید دوباره نمره گذاری خواهد کرد (نمره های دانشجویان ممکن است تحت تأثیر قرار بگیرد)."
   choose_a_submission_type_8f45651a: "نوع ارسال را انتخاب کنید"
   choose_a_timezone_d9c52998: "انتخاب منطقه زمانی"
   choose_an_authentication_service_47dc8875: "انتخاب سرویس اعتبارسنجی"
@@ -11085,6 +11086,7 @@ fa:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "با وارد کردن و ارسال یک مقدار نمره در قسمت زیر، به همه دانشجویان نمره یکسانی برای *%{assignment.name}* بدهید:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "با وارد کردن و ارسال یک مقدار نمره در قسمت زیر، برای  **%{assignment.name}** به همه دانشجویان *درصد* نمره یکسان بدهید:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "دادن امتیاز کامل به همه برای این پرسش"
   give_this_filter_a_name_36b4b03a: "به این فیلتر یک نام بدهید"
   global_announcements_a78912c8: "اطلاعیه های سراسری"
   global_announcements_add_edit_delete_843ca4d2: "اطلاعیه‌های جهانی افزایش / ویرایش / حذف کردن "
@@ -20643,6 +20645,7 @@ fa:
         name: Name
     welcome_to_canvas: "به کانواس خوش آمدید!"
   registration_url_60e0eaaa: "نشانی اینترنتی ثبت نام"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "نمره گذاری دوباره برای این پرسش مجاز نیست، زیرا بعد از اینکه دانشجو مورد ارسالی را ارسال کرده است، پاسخ حذف شده است یا نوع پرسش تغییر یافته است."
   regular_style_checkbox_ee3d71c1: "کادر بررسی با سبک معمولی"
   release_grades_c68fbcc: "انتشار نمرات"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "منتشر شده توسط مسیر تسلط: %{cyoe.releasedLabel}"
@@ -25104,6 +25107,7 @@ fa:
   update_name_6581781d: "به روز رسانی %{name}"
   update_pages_c91d7ba: "به روز رسانی صفحات"
   update_password_4bc5cb1f: "بهنگام سازی رمز عبور"
+  update_question_without_regrading_47c9904a: "بهنگام سازی پرسش بدون نمره گذاری دوباره"
   update_quota_81381226: "بهنگام سازی سهمیه"
   update_rating_6d29c2ef: "به روزرسانی رتبه بندی"
   update_settings_9b422d0f: "بهنگام سازی تنظیمات"
