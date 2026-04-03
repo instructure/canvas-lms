@@ -4285,6 +4285,7 @@ he:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "בחירת צבע או כינוי קורס או העברת כרטיס של הקורס %{course}"
   choose_a_course_home_page_8059c7b: "בחירת דף הבית של הקורס"
   choose_a_csv_file_to_upload_9644480c: "בחירת קובץ CSV להעלאה:"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "בחר/י את האפשרות של הערכה מחודשת, לתלמידים אשר לקחו ענו על הבוחן. קנבס יבצע הערכה מחדש של כל ההגשות שלך לאחר שתשמור/י את הבוחן. (יתכן שציוני תלמידים ישתנו). "
   choose_a_timezone_d9c52998: "בחירת איזור זמן"
   choose_an_authentication_service_47dc8875: "בחירה של שירות אימות ההזדהות"
   choose_and_publish_980812cb: "בחירה ופרסום"
@@ -8841,6 +8842,7 @@ he:
   getting_started_with_collaborations_794240ba: "תחילת פעילות בשיתופי פעולה"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "מתן ציון אחיד לכל תלמידים עבור *%{assignment.name}* באמצעות כניסה ושליחה של ערך הציון הבא:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "מתן ציון *באחוזים* אחיד לכל תלמידים עבור **%{assignment.name}** באמצעות כניסה ושליחה של ערך הציון הבא:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "מתן קרדיט מלא לכולם בשאלה זו"
   global_announcements_a78912c8: "הודעות גלובליות"
   global_branding_df1cae12: "מיתוג גלובלי"
   global_message_icons: 
@@ -17072,6 +17074,7 @@ he:
         name: שם
     welcome_to_canvas: "ברוך בואך לקנבס!"
   registration_url_60e0eaaa: "כתובת הצטרפות"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "הערכה מחודשת אינה אפשרית לשאלה זו כיון שתשובה הוסרה או שסוג השאלה שונה אחרי שהתלמיד השלים הגשה"
   regular_style_checkbox_ee3d71c1: "תיבת סימון רגילה"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "פורסם במסגרת מסלול ההתמחות: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "פורסם במסגרת מסלול התמחות: %{path}"
@@ -20217,6 +20220,7 @@ he:
   update_login_472cd6db: "עדכון לוג-אין "
   update_module_b984c2e5: "עדכון מודול"
   update_password_4bc5cb1f: "עדכון סיסמה"
+  update_question_without_regrading_47c9904a: "עדכון שאלה ללא ביצוע הערכה מחודשת"
   update_quota_81381226: "עדכון מכסות"
   update_settings_9b422d0f: "עדכון הגדרות"
   update_tool_7d48ef2a: "עדכון %{tool}"
