@@ -76,8 +76,11 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const isLoading = isLoadingConfig || isSaving
   const isActionsDisabled = isLoading || isEditingAnyCard
+  // withheld while loading so the iframe can’t fire READY before config is fetched,
+  // and so useIframeMessaging resets its ready state on each open
+  const activePreviewUrl = isLoadingConfig ? undefined : previewUrl
 
-  useIframeMessaging({iframeRef, config, previewUrl})
+  useIframeMessaging({iframeRef, config, previewUrl: activePreviewUrl})
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -263,7 +266,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
               mountNode={() => modalBodyRef.current}
             />
 
-            <PreviewAndSidebar previewUrl={previewUrl} iframeRef={iframeRef}>
+            <PreviewAndSidebar previewUrl={activePreviewUrl} iframeRef={iframeRef}>
               <Heading level="h3" margin="0 0 medium 0">
                 {I18n.t('Configure sign in options')}
               </Heading>
