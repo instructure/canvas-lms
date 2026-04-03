@@ -209,6 +209,7 @@ class AiExperiencesController < ApplicationController
     @experience.account = @context.account
 
     if @experience.save
+      track_experience_metrics(:create, @experience, new_publish_state: @experience.workflow_state)
       respond_to do |format|
         format.json { render json: ai_experience_json(@experience, @current_user, session), status: :created }
       end
@@ -239,7 +240,12 @@ class AiExperiencesController < ApplicationController
   #
   # @returns AiExperience
   def update
+    initial_publish_state = @experience.workflow_state
+
     if @experience.update(experience_params)
+      new_publish_state = @experience.workflow_state
+      track_experience_metrics(:update, @experience, initial_publish_state:, new_publish_state:)
+
       respond_to do |format|
         format.json { render json: ai_experience_json(@experience, @current_user, session), status: :ok }
       end
@@ -256,7 +262,11 @@ class AiExperiencesController < ApplicationController
   #
   # @returns AiExperience
   def destroy
+    initial_publish_state = @experience.workflow_state
+
     if @experience.delete
+      track_experience_metrics(:destroy, @experience, initial_publish_state:)
+
       respond_to do |format|
         format.json { render json: ai_experience_json(@experience, @current_user, session), status: :ok }
       end
@@ -476,6 +486,29 @@ class AiExperiencesController < ApplicationController
 
     experiences_to_sync.each do |experience|
       LLMConversationContextManager.sync_index_status(ai_experience: experience)
+    end
+  end
+
+  def track_experience_metrics(action, experience, initial_publish_state: nil, new_publish_state: nil)
+    return unless @context.is_a?(Course)
+
+    tags = { aws_region: Canvas.region, root_account_uuid: @context.root_account.uuid, course_id: @context.id }
+
+    case action
+    when :create
+      InstStatsd::Statsd.increment("ai_experiences.total_created", tags:)
+      InstStatsd::Statsd.increment("ai_experiences.total_with_source_files", tags:) if experience.ai_experience_context_files.exists?
+      InstStatsd::Statsd.increment("ai_experiences.total_published", tags:) if new_publish_state == "published"
+    when :destroy
+      InstStatsd::Statsd.decrement("ai_experiences.total_created", tags:)
+      InstStatsd::Statsd.decrement("ai_experiences.total_with_source_files", tags:) if experience.ai_experience_context_files.exists?
+      InstStatsd::Statsd.decrement("ai_experiences.total_published", tags:) if initial_publish_state == "published"
+    when :update
+      if initial_publish_state == "unpublished" && new_publish_state == "published" # Experience was just published
+        InstStatsd::Statsd.increment("ai_experiences.total_published", tags:)
+      elsif initial_publish_state == "published" && new_publish_state == "unpublished" # Experience was just unpublished
+        InstStatsd::Statsd.decrement("ai_experiences.total_published", tags:)
+      end
     end
   end
 end
