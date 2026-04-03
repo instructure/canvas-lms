@@ -569,7 +569,6 @@ class ApplicationController < ActionController::Base
     instui_nav
     login_registration_ui_identity
     lock_lti_registrations
-    lti_apps_page_ai_translation
     lti_apps_page_instructors
     lti_asset_processor
     lti_asset_processor_discussions
