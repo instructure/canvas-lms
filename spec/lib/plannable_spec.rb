@@ -237,5 +237,58 @@ describe Plannable do
 
       expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
     end
+
+    it "includes not_graded assignment until explicitly overridden as complete" do
+      assignment = assignment_model(course: @course, submission_types: "not_graded")
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+
+      assignment.planner_overrides.create!(user: @student, marked_complete: true)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).not_to include(assignment)
+    end
+  end
+
+  context "AssessmentRequest planner override on completion" do
+    before :once do
+      course_with_student(active_all: true)
+      @reviewee = course_with_student(course: @course, active_all: true).user
+      @peer_review_assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true,
+        due_at: 1.day.from_now
+      )
+      @reviewee_submission = @peer_review_assignment.submit_homework(
+        @reviewee,
+        submission_type: "online_text_entry",
+        body: "reviewee submission"
+      )
+      @assessor_submission = @peer_review_assignment.submit_homework(
+        @student,
+        submission_type: "online_text_entry",
+        body: "assessor submission"
+      )
+      @assessment_request = AssessmentRequest.create!(
+        assessor: @student,
+        assessor_asset: @assessor_submission,
+        asset: @reviewee_submission,
+        user: @reviewee,
+        workflow_state: "assigned"
+      )
+    end
+
+    it "updates planner override marked_complete to true when assessment request transitions to completed" do
+      override = PlannerOverride.create!(
+        plannable_id: @assessment_request.id,
+        plannable_type: "AssessmentRequest",
+        user: @student,
+        marked_complete: false
+      )
+
+      @assessment_request.workflow_state = "completed"
+      @assessment_request.save!
+
+      expect(override.reload.marked_complete).to be true
+    end
   end
 end
