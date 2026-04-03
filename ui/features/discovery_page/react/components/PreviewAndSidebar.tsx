@@ -83,7 +83,7 @@ export function PreviewAndSidebar({previewUrl, children, iframeRef}: PreviewAndS
                   data-testid="preview-iframe"
                   src={previewUrl}
                   style={{width: '100%', height: '100%', border: 'none', display: 'block'}}
-                  title={I18n.t('Service Preview')}
+                  title={I18n.t('Discovery Page Preview')}
                 />
               </div>
             </Flex.Item>
