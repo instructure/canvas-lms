@@ -1348,6 +1348,12 @@ describe FilesController do
         get "show", params: { course_id: @course.id, id: @file.id }
         expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq []
       end
+
+      it "does not set study_assist for teachers" do
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h.dig(:FEATURES, :study_assist)).to be_nil
+      end
     end
 
     context "when disabled" do
