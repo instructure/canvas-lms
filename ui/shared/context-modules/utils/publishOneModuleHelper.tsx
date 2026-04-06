@@ -172,6 +172,24 @@ export function batchUpdateOneModuleApiCall(
             : I18n.t('Some module items could not be published')
         showFlashAlert({message, type: 'warning', err: null})
       }
+      if (result.json!.unpublish_warning) {
+        showFlashAlert({
+          message: (
+            <>
+              <View as="span" display="block">
+                {I18n.t('Some module items could not be unpublished.')}
+              </View>
+              <View as="span" display="block">
+                {I18n.t(
+                  'Items with student submissions or other restrictions cannot be unpublished.',
+                )}
+              </View>
+            </>
+          ),
+          type: 'warning',
+          err: null,
+        })
+      }
       relockModulesDialog.renderIfNeeded(result.json)
 
       return exportFuncs

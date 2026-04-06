@@ -61,6 +61,7 @@ export interface FetchedModule {
   publish_final_grade: boolean
   publish_warning: boolean
   publish_warning_items?: PublishWarningItem[]
+  unpublish_warning: boolean
   published: boolean
   require_sequential_progress: true
   unlock_at: string | null
