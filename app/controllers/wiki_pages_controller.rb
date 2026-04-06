@@ -127,7 +127,7 @@ class WikiPagesController < ApplicationController
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
-        if @context.feature_enabled?(:study_assist)
+        if @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
           @show_study_assist = true
           js_env[:FEATURES][:study_assist] = true
           js_env({

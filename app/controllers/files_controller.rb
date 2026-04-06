@@ -777,7 +777,7 @@ class FilesController < ApplicationController
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
-          if @context.is_a?(Course) && @context.feature_enabled?(:study_assist)
+          if @context.is_a?(Course) && @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
             @show_study_assist = true
             js_env[:FEATURES][:study_assist] = true
             js_env({
