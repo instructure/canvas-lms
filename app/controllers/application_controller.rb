@@ -3695,4 +3695,12 @@ class ApplicationController < ActionController::Base
       obj.respond_to?(:as_json) ? obj.as_json : obj
     end
   end
+
+  def study_assist_enabled_tools
+    tools = []
+    tools << "Summarize" if @context.feature_enabled?(:study_assist_summarize)
+    tools << "Quiz me" if @context.feature_enabled?(:study_assist_quiz_me)
+    tools << "Flashcards" if @context.feature_enabled?(:study_assist_flashcards)
+    tools
+  end
 end

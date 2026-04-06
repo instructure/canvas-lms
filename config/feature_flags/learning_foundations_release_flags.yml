@@ -321,3 +321,30 @@ study_assist:
     Enables Study Assist for courses. When enabled, students can access
     AI-powered study tools within their course. Root account administrators
     must enable this feature before subaccounts or courses can use it.
+
+study_assist_summarize:
+  state: allowed_on
+  applies_to: Course
+  visible_on: study_assist_visible_on_hook
+  display_name: Study Assist - Summarize
+  description: |-
+    Enables the Summarize tool in Study Assist.
+    When disabled, students will not see the Summarize option.
+
+study_assist_quiz_me:
+  state: allowed_on
+  applies_to: Course
+  visible_on: study_assist_visible_on_hook
+  display_name: Study Assist - Quiz Me
+  description: |-
+    Enables the Quiz Me tool in Study Assist.
+    When disabled, students will not see the Quiz Me option.
+
+study_assist_flashcards:
+  state: allowed_on
+  applies_to: Course
+  visible_on: study_assist_visible_on_hook
+  display_name: Study Assist - Flashcards
+  description: |-
+    Enables the Flashcards tool in Study Assist.
+    When disabled, students will not see the Flashcards option.
