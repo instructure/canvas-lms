@@ -3421,6 +3421,7 @@ el:
   choose_a_color_or_course_nickname_for_course_2585e42c: "Επιλέξτε ένα χρώμα ή υποκοριστικό μαθήματος για %{course}"
   choose_a_course_home_page_8059c7b: "Επιλογή Αρχικής Σελίδας Μαθήματος"
   choose_a_csv_file_to_upload_9644480c: "Επιλέξτε ένα αρχείο CSV για μεταφόρτωση:"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "<mrk mid=\"6262\" mtype=\"seg\">Επιλέξτε μια επιλογή αναβαθμολόγησης για τους σπουδαστές που έχουν ήδη κάνει το κουίζ.</mrk> <mrk mid=\"6263\" mtype=\"seg\">Το Canvas θα αναβαθμολογήσει όλες τις υποβολές σας αφού αποθηκεύσετε το κουίζ (οι βαθμολογίες των σπουδαστών ενδέχεται να επηρεαστούν).</mrk>"
   choose_an_authentication_service_47dc8875: "Επιλέξτε μια υπηρεσία ελέγχου ταυτότητας"
   choose_assignment_b0132c5e: "-- Επιλέξτε εργασία --"
   choose_image_e5ee5d7a: "Επιλέξτε εικόνα"
@@ -13205,6 +13206,7 @@ el:
         name: Όνομα
     welcome_to_canvas: "Καλώς ορίσατε στο Canvas!"
   registration_url_60e0eaaa: "URL Εγγραφής"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Δεν επιτρέπεται η αναβαθμολόγηση αυτής της ερώτησης, επειδή είτε η απάντηση έχει αφαιρεθεί είτε έχει αλλάξει ο τύπος της ερώτησης μετά την ολοκλήρωση της υποβολής από τον σπουδαστή."
   regular_style_checkbox_ee3d71c1: "Κουτάκι επιλογής κανονικής εμφάνισης"
   remove_account_from_this_profile_c3095eb2: "Αφαίρεση λογαριασμού απο αυτό το προφίλ"
   remove_as_leader_22d1a7d8: "Αφαίρεση από Αρχηγό"
@@ -15569,6 +15571,7 @@ el:
   update_login_472cd6db: "Ενημέρωση Σύνδεσης"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
   update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
+  update_question_without_regrading_47c9904a: "Ενημέρωση ερώτησης χωρίς αναβαθμολόγηση"
   update_quota_81381226: "Ενημέρωση Ποσόστωσης"
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
   update_tool_7d48ef2a: "Ενημέρωση %{tool}"
