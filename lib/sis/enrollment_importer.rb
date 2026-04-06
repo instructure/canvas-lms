@@ -274,9 +274,9 @@ module SIS
           role ||= Role.get_built_in_role(type, root_account_id: @root_account.id)
 
           if enrollment_info.associated_user_id && type == "ObserverEnrollment"
-            a_pseudo = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.associated_user_id)
-            if a_pseudo
-              associated_user_id = a_pseudo.user_id
+            pseudonym = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.associated_user_id)
+            if pseudonym
+              associated_user_id = pseudonym.user_id
             else
               message = "An enrollment referenced a non-existent associated user #{enrollment_info.associated_user_id}"
               @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
@@ -285,10 +285,10 @@ module SIS
           end
 
           if enrollment_info.temporary_enrollment_source_user_id &&
-             @course.root_account&.feature_enabled?(:temporary_enrollments) &&
-             (a_pseudo = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.temporary_enrollment_source_user_id))
-            if a_pseudo
-              temporary_enrollment_source_user_id = a_pseudo.user_id
+             @course.root_account&.feature_enabled?(:temporary_enrollments)
+            pseudonym = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.temporary_enrollment_source_user_id)
+            if pseudonym
+              temporary_enrollment_source_user_id = pseudonym.user_id
             else
               message = "An enrollment referenced a non-existent temporary enrollment provider #{enrollment_info.temporary_enrollment_source_user_id}"
               @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
