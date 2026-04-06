@@ -1707,12 +1707,12 @@ class AbstractAssignment < ApplicationRecord
     overridden_users
   end
 
-  def students_with_visibility(scope = nil, user_ids = nil)
+  def students_with_visibility(scope = nil, user_ids = nil, include_concluded: true)
     scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
     return scope unless differentiated_assignments_applies?
 
     context.shard.activate do
-      scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids)
+      scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids, include_concluded:)
     end
   end
 
@@ -2214,7 +2214,7 @@ class AbstractAssignment < ApplicationRecord
   def participants_with_visibility(opts = {})
     users = context.participating_admins
 
-    student_scope = students_with_visibility(context.participating_students_by_date)
+    student_scope = students_with_visibility(context.participating_students_by_date, include_concluded: false)
     student_scope = student_scope.where.not(id: opts[:excluded_user_ids]) if opts[:excluded_user_ids]
     applicable_students = student_scope.to_a
     users += applicable_students

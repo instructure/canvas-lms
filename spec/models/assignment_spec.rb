@@ -7217,6 +7217,14 @@ describe Assignment do
       expect(@assignment.participants.include?(@student1)).to be_falsey
     end
 
+    it "excludes students whose only relevant enrollment is concluded" do
+      student = create_users(1, return_type: :record).first
+      student_in_section(@section2, user: student)
+      student_in_section(@section1, user: student, allow_multiple_enrollments: true)
+      @course.enrollments.find_by(user: student, course_section: @section1).complete!
+      expect(@assignment.participants).not_to include(student)
+    end
+
     it "excludes students with completed enrollments by date" do
       @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
