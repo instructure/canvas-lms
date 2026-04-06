@@ -2922,10 +2922,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-loading-indicator/-/platform-loading-indicator-0.2.0.tgz#6e345adee0316dedc07a266bfa34d6b8d42e8bb0"
   integrity sha512-FMkWqvW6TJHYAdqLKMgLZsBsfAZrmBsMTAkT5TX9Adp7KjuiQVvM29kRkh4jkuaDfzSe5SK0i9oRtHtOQTgc9A==
 
-"@instructure/platform-provider@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.3.0.tgz#5787be34111afffe3fe045d25a29bf8faacab8bb"
-  integrity sha512-Nv/iiUPtIxsHkU3MmF+Gkumnk2JrTh1sWPYk+sg3ua4l4W6mL12QB8TgJBmdP4N/uGXE8gwOS7tXDJMsX6lxyg==
+"@instructure/platform-provider@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.4.1.tgz#5dec8fbe90c00ef6a55820e32836fdff8d8d7e2f"
+  integrity sha512-C+Wt8QlU7/2RQqryAFwNpZb8apqyOqBozN9x5RiMLYQXkAnf57teihZqpPu5ZDTG45JSqLk8qM1SZlR4XhuHXA==
 
 "@instructure/platform-study-assist@0.11.1":
   version "0.11.1"
@@ -2934,10 +2934,10 @@
   dependencies:
     uuid "^9.0.0"
 
-"@instructure/platform-widget-dashboard@3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-widget-dashboard/-/platform-widget-dashboard-3.1.0.tgz#ac3203c80ed36bec1b395a3182cbb52c1e8b8e8c"
-  integrity sha512-K9l4WOkWvOg5JeRxTuD/vMQwF4MlYb5o4w+kc8dgW4JUMHmDVzzaFNwGrC0wHbOBIDLydlZ5VY6q06O9hhxGPQ==
+"@instructure/platform-widget-dashboard@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-widget-dashboard/-/platform-widget-dashboard-3.2.0.tgz#20a848d37f89887ecb6c1a72978d1228b0615cab"
+  integrity sha512-0K4UyevbqTUwd0ayhPiOox2LWPdcojTEaiMAPw1ac0LGjMrknrhlqX+87INAdaMlAhW+UWt9Yacz3+9f2C/bjg==
   dependencies:
     "@instructure/platform-graphql-types" "0.1.2"
     "@tanstack/query-persist-client-core" "^5.0.0"

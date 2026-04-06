@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {platformExecuteQuery} from '@canvas/graphql'
 import {queryClient} from '@canvas/query'
 import {PlatformUiProvider} from '@instructure/platform-provider'
@@ -258,13 +259,13 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
   // Announcement creation notifications
   announcementCreatedOne: (opts: Record<string, unknown> = {}) =>
     I18n.t('Announcement created in %{count} course.', {count: opts.count}),
-  announcementsCreatedMany: (opts: Record<string, unknown> = {}) =>
+  announcementCreatedMany: (opts: Record<string, unknown> = {}) =>
     I18n.t('Announcements created in %{count} courses.', {count: opts.count}),
   announcementFailedOne: (opts: Record<string, unknown> = {}) =>
     I18n.t('%{count} announcement failed to post. Please check your permissions and try again.', {
       count: opts.count,
     }),
-  announcementsFailedMany: (opts: Record<string, unknown> = {}) =>
+  announcementFailedMany: (opts: Record<string, unknown> = {}) =>
     I18n.t('%{count} announcements failed to post. Please check your permissions and try again.', {
       count: opts.count,
     }),
@@ -289,6 +290,7 @@ export function PlatformBridge({children}: {children: React.ReactNode}) {
       locale={ENV.LOCALE}
       timezone={ENV.TIMEZONE}
       queryClient={queryClient}
+      notify={({type, message}) => showFlashAlert({type, message})}
     >
       <TranslationsProvider
         translations={translations}

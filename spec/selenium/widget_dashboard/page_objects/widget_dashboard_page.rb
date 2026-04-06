@@ -327,6 +327,35 @@ module WidgetDashboardPage
     "[data-testid='recent-grades-list']"
   end
 
+  # Announcement creation selectors
+  def create_announcement_button_selector
+    "[data-testid='create-announcement-button']"
+  end
+
+  def announcement_creation_modal_selector
+    "[role='dialog'][aria-label='Create announcement']"
+  end
+
+  def announcement_title_input_selector
+    "[data-testid='announcement-title-input']"
+  end
+
+  def announcement_content_input_selector
+    "[data-testid='announcement-content-input']"
+  end
+
+  def announcement_course_select_selector
+    "[data-testid='announcement-course-select']"
+  end
+
+  def announcement_send_button_selector
+    "[data-testid='announcement-send-button']"
+  end
+
+  def announcement_course_tag_selector(course_id)
+    "[data-testid='course-tag-#{course_id}']"
+  end
+
   # Todo widget selectors
   def todo_filter_select_selector
     "[data-testid='todo-filter-select']"
@@ -741,6 +770,23 @@ module WidgetDashboardPage
     f(create_todo_submit_button_selector)
   end
 
+  # Announcement creation elements
+  def create_announcement_button
+    f(create_announcement_button_selector)
+  end
+
+  def announcement_title_input
+    f(announcement_title_input_selector)
+  end
+
+  def announcement_content_input
+    f(announcement_content_input_selector)
+  end
+
+  def announcement_send_button
+    f(announcement_send_button_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -875,5 +921,36 @@ module WidgetDashboardPage
   def verify_todo_add_modal_closed
     # Retry the block every polling interval for up to 1 second
     keep_trying_until(1) { element_exists?(create_todo_modal_selector) == false }
+  end
+
+  def open_announcement_modal
+    go_to_dashboard
+    expect(widget_container("educator-announcement-creation")).to be_displayed
+    create_announcement_button.click
+    wait_for_ajaximations
+    expect(f(announcement_creation_modal_selector)).to be_displayed
+  end
+
+  def fill_announcement_form(title:, content:)
+    announcement_title_input.send_keys(title)
+    announcement_content_input.send_keys(content)
+  end
+
+  def select_course_in_modal(course_name)
+    click_INSTUI_Select_option(announcement_course_select_selector, course_name)
+    wait_for_ajaximations
+  end
+
+  def click_announcement_send_button
+    announcement_send_button.click
+    wait_for_ajaximations
+  end
+
+  def announcement_modal_open?
+    element_exists?(announcement_creation_modal_selector)
+  end
+
+  def announcement_course_tag_exists?(course_id)
+    element_exists?(announcement_course_tag_selector(course_id))
   end
 end
