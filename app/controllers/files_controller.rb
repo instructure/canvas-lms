@@ -778,6 +778,7 @@ class FilesController < ApplicationController
         end
         format.html do
           if @context.is_a?(Course) && @context.feature_enabled?(:study_assist)
+            @show_study_assist = true
             js_env[:FEATURES][:study_assist] = true
             js_env({
                      COURSE_ID: @context.id.to_s,
@@ -785,6 +786,7 @@ class FilesController < ApplicationController
                      JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
                      STUDY_ASSIST_TOOLS: study_assist_enabled_tools
                    })
+            js_bundle :study_assist
           end
           if attachment.locked_for?(@current_user, check_policies: true)
             render :show, status: :forbidden

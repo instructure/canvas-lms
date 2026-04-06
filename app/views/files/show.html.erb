@@ -32,10 +32,7 @@
   </div>
 <% else %>
   <h2><%= @attachment.display_name %></h2>
-  <% if js_env.dig(:FEATURES, :study_assist) %>
-    <div id="study_assist_mount_point" class="inline-block"></div>
-    <% js_bundle :study_assist %>
-  <% end %>
+
   <div>
     <span style="font-size: 1.2em;">
       <%= link_to "Download #{@attachment.display_name}", download_url, download: "true" %>
