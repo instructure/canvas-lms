@@ -3248,6 +3248,8 @@ class Submission < ApplicationRecord
 
     # When grades are published in moderated grading, only show the selected rubric assessment
     if assignment.moderated_grading? && assignment.grades_published?
+      return unposted_rubric_assessments_for(viewing_user, attempt:) if !posted? && !grants_right?(viewing_user, :read_grade)
+
       selected_assessment = rubric_assessments_for_attempt(attempt:).find do |a|
         a.assessment_type == "grading" &&
           a.rubric_association == assignment.rubric_association
@@ -3255,22 +3257,7 @@ class Submission < ApplicationRecord
       return selected_assessment ? [selected_assessment] : []
     end
 
-    unless posted? || grants_right?(viewing_user, :read_grade)
-      assessments = rubric_assessments_for_attempt(attempt:)
-
-      if posted_comments_at.present?
-        # Comments are posted but grades are not, so show assessments without point information
-        return assessments.map do |assessment|
-          strip_rubric_assessment_points(assessment)
-        end
-      end
-
-      # If this submission is unposted and the viewer can't view the grade,
-      # show only that viewer's assessments
-      return assessments.select do |assessment|
-        assessment.assessor_id == viewing_user.id
-      end
-    end
+    return unposted_rubric_assessments_for(viewing_user, attempt:) if !posted? && !grants_right?(viewing_user, :read_grade)
 
     can_moderate = include_provisional && assignment.permits_moderation?(viewing_user)
     target_rubric_association = assignment.rubric_association
@@ -3323,6 +3310,16 @@ class Submission < ApplicationRecord
     end
   end
   private :rubric_assessments_for_attempt
+
+  def unposted_rubric_assessments_for(viewing_user, attempt:)
+    assessments = rubric_assessments_for_attempt(attempt:)
+    if posted_comments_at.present?
+      return assessments.map { |a| strip_rubric_assessment_points(a) }
+    end
+
+    assessments.select { |a| a.assessor_id == viewing_user.id }
+  end
+  private :unposted_rubric_assessments_for
 
   # Strips point information from a rubric assessment while preserving comments
   # Used when comments are posted but grades are not (posted_comments_at set but not posted_at)
