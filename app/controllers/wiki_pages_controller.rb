@@ -128,12 +128,14 @@ class WikiPagesController < ApplicationController
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
         if @context.feature_enabled?(:study_assist)
+          @show_study_assist = true
           js_env[:FEATURES][:study_assist] = true
           js_env({
                    WIKI_PAGE_ID: @page.url,
                    JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
                    STUDY_ASSIST_TOOLS: study_assist_enabled_tools
                  })
+          js_bundle :study_assist
         end
       end
 
