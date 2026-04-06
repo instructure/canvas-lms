@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useRef} from 'react'
+import React, {useCallback, useMemo, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {
   AssistProvider,
   AssistContent,
@@ -47,6 +49,7 @@ type Props = {
 
 export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
   const closeButtonRef = useRef<Element | null>(null)
+  const allowedPrompts = useMemo(() => window.ENV.STUDY_ASSIST_TOOLS ?? [], [])
 
   const renderFlashCards = useCallback(
     (
@@ -145,22 +148,30 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
             </Flex>
           </Flex.Item>
         </Flex>
-        <AssistProvider
-          fetchAssistResponse={fetchAssistResponse}
-          courseId={window.ENV.COURSE_ID}
-          pageId={window.ENV.WIKI_PAGE_ID}
-          fileId={window.ENV.FILE_ID}
-        >
-          <div style={{padding: '0 1rem'}}>
-            <AssistContent
-              chatEnabled={false}
-              showLargePrompts={true}
-              onAnalyticsEvent={() => null}
-              allowedPrompts={['Summarize', 'Quiz me', 'Flashcards']}
-              renderFlashCards={renderFlashCards}
-            />
-          </div>
-        </AssistProvider>
+        {allowedPrompts.length > 0 ? (
+          <AssistProvider
+            fetchAssistResponse={fetchAssistResponse}
+            courseId={window.ENV.COURSE_ID}
+            pageId={window.ENV.WIKI_PAGE_ID}
+            fileId={window.ENV.FILE_ID}
+          >
+            <div style={{padding: '0 1rem'}}>
+              <AssistContent
+                chatEnabled={false}
+                showLargePrompts={true}
+                onAnalyticsEvent={() => null}
+                allowedPrompts={allowedPrompts}
+                renderFlashCards={renderFlashCards}
+              />
+            </div>
+          </AssistProvider>
+        ) : (
+          <View as="div" padding="large" textAlign="center">
+            <Text color="primary-inverse" data-testid="study-assist-no-tools">
+              {I18n.t('No study tools are currently available.')}
+            </Text>
+          </View>
+        )}
       </div>
     </Tray>
   )

@@ -782,7 +782,8 @@ class FilesController < ApplicationController
             js_env({
                      COURSE_ID: @context.id.to_s,
                      FILE_ID: attachment.id.to_s,
-                     JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey")
+                     JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
+                     STUDY_ASSIST_TOOLS: study_assist_enabled_tools
                    })
           end
           if attachment.locked_for?(@current_user, check_policies: true)

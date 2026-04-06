@@ -240,6 +240,25 @@ describe WikiPagesController do
             get "show", params: { course_id: @course.id, id: @page.url }
             expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
           end
+
+          it "sets STUDY_ASSIST_TOOLS with all tools enabled by default" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Summarize", "Quiz me", "Flashcards"]
+          end
+
+          it "excludes tools when their feature flag is disabled" do
+            @course.disable_feature!(:study_assist_summarize)
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Quiz me", "Flashcards"]
+          end
+
+          it "returns empty array when all tool flags are disabled" do
+            @course.disable_feature!(:study_assist_summarize)
+            @course.disable_feature!(:study_assist_quiz_me)
+            @course.disable_feature!(:study_assist_flashcards)
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq []
+          end
         end
 
         context "when disabled" do
@@ -251,6 +270,11 @@ describe WikiPagesController do
           it "does not set JOURNEY_URL" do
             get "show", params: { course_id: @course.id, id: @page.url }
             expect(assigns[:js_env]).not_to have_key :JOURNEY_URL
+          end
+
+          it "does not set STUDY_ASSIST_TOOLS" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :STUDY_ASSIST_TOOLS
           end
         end
       end

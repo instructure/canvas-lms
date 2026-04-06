@@ -57,6 +57,7 @@ describe('StudyAssistTray', () => {
       ...window.ENV,
       COURSE_ID: '123',
       WIKI_PAGE_ID: 'test-page',
+      STUDY_ASSIST_TOOLS: ['Summarize', 'Quiz me', 'Flashcards'],
     } as any
     onDismiss.mockReset()
     mockAssistContent.mockClear()
@@ -126,6 +127,58 @@ describe('StudyAssistTray', () => {
         allowedPrompts: ['Summarize', 'Quiz me', 'Flashcards'],
       }),
     )
+  })
+
+  it('passes only enabled tools from STUDY_ASSIST_TOOLS', () => {
+    window.ENV = {
+      ...window.ENV,
+      STUDY_ASSIST_TOOLS: ['Summarize', 'Flashcards'],
+    } as any
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(mockAssistContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowedPrompts: ['Summarize', 'Flashcards'],
+      }),
+    )
+  })
+
+  it('shows empty state when no tools are enabled', () => {
+    window.ENV = {
+      ...window.ENV,
+      STUDY_ASSIST_TOOLS: [],
+    } as any
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-no-tools')).toBeInTheDocument()
+    expect(screen.getByText('No study tools are currently available.')).toBeInTheDocument()
+    expect(mockAssistContent).not.toHaveBeenCalled()
+  })
+
+  it('shows empty state when STUDY_ASSIST_TOOLS is undefined', () => {
+    window.ENV = {
+      ...window.ENV,
+      STUDY_ASSIST_TOOLS: undefined,
+    } as any
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-no-tools')).toBeInTheDocument()
+    expect(mockAssistContent).not.toHaveBeenCalled()
   })
 
   it('renderFlashCards renders AssistFlashCardsInteraction with cardHeight', () => {

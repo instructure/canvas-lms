@@ -102,6 +102,7 @@ export interface EnvCommon {
   JOURNEY_URL?: string
   WIKI_PAGE_ID?: string
   FILE_ID?: string
+  STUDY_ASSIST_TOOLS?: string[]
   DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
