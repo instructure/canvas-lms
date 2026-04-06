@@ -209,6 +209,7 @@ class GradeSummaryPresenter
       :context,
       :discussion_topic,
       :grading_standard,
+      :parent_assignment,
       :post_policy,
       :quiz,
       :rubric_association,

@@ -48,6 +48,7 @@ describe('GradebookSettingsModal', () => {
       viewUngradedAsZero: false,
       viewHiddenGradesIndicator: false,
       viewStatusForColorblindness: false,
+      showSuppressedAssignments: false,
     })
 
     props = {

@@ -47,6 +47,7 @@ RSpec.describe GradebookSettingsController do
           "show_inactive_enrollments" => "true", # values must be strings
           "show_concluded_enrollments" => "false",
           "show_unpublished_assignments" => "true",
+          "show_suppressed_assignments" => "false",
           "student_column_display_as" => "last_first",
           "show_separate_first_last_names" => "true",
           "student_column_secondary_info" => "login_id",
@@ -99,6 +100,7 @@ RSpec.describe GradebookSettingsController do
         it { is_expected.to include "show_inactive_enrollments" => "true" }
         it { is_expected.to include "show_concluded_enrollments" => "false" }
         it { is_expected.to include "show_unpublished_assignments" => "true" }
+        it { is_expected.to include "show_suppressed_assignments" => "false" }
         it { is_expected.to include "show_separate_first_last_names" => "true" }
         it { is_expected.to include "student_column_display_as" => "last_first" }
         it { is_expected.to include "student_column_secondary_info" => "login_id" }
@@ -109,7 +111,7 @@ RSpec.describe GradebookSettingsController do
         it { is_expected.to include "view_hidden_grades_indicator" => "true" }
         it { is_expected.to include "view_status_for_colorblindness" => "true" }
         it { is_expected.not_to include "colors" }
-        it { is_expected.to have(18).items } # ensure we add specs for new additions
+        it { is_expected.to have(19).items } # ensure we add specs for new additions
 
         context "colors" do
           subject { json_parse.fetch("gradebook_settings").fetch("colors") }
