@@ -451,6 +451,7 @@ class ContextModulesApiController < ApplicationController
           @module.unpublish
           unless value_to_boolean(params[:module][:skip_content_tags])
             @module.unpublish_items!(user: @current_user)
+            unpublish_warning = @module.content_tags.any?(&:published?)
           end
         end
       end
@@ -461,6 +462,7 @@ class ContextModulesApiController < ApplicationController
         json["relock_warning"] = true if relock_warning || @module.relock_warning?
         json["publish_warning"] = publish_warning.present?
         json["publish_warning_items"] = publish_warning_items if publish_warning_items.present?
+        json["unpublish_warning"] = unpublish_warning.present?
         render json:
       else
         render json: @module.errors, status: :bad_request

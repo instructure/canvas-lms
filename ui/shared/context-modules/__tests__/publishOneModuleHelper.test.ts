@@ -351,6 +351,27 @@ describe('publishOneModuleHelper', () => {
       })
     })
 
+    it('shows an alert if not all items were unpublished', async () => {
+      server.use(
+        http.put('/api/v1/courses/1/modules/2', () => {
+          return HttpResponse.json({published: false, unpublish_warning: true})
+        }),
+      )
+
+      await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(
+          getAllByText(document.body, 'Some module items could not be unpublished.'),
+        ).toHaveLength(2)
+        expect(
+          getAllByText(
+            document.body,
+            'Items with student submissions or other restrictions cannot be unpublished.',
+          ),
+        ).toHaveLength(2)
+      })
+    })
+
     it('shows an alert if the publish failed', async () => {
       server.use(
         http.put('/api/v1/courses/1/modules/1', () => {
