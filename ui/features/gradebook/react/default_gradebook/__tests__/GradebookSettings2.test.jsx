@@ -293,6 +293,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         hideTotal: false,
         showUnpublishedAssignments: false,
         showSeparateFirstLastNames: false,
+        showSuppressedAssignments: false,
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
         viewHiddenGradesIndicator: false,

@@ -68,6 +68,7 @@ export type GradebookSettings = {
   show_inactive_enrollments: 'false' | 'true'
   show_separate_first_last_names: 'false' | 'true'
   show_unpublished_assignments: 'false' | 'true'
+  show_suppressed_assignments: 'false' | 'true'
   sort_rows_by_column_id: string
   sort_rows_by_direction: SortDirection
   sort_rows_by_setting_key: SortRowsSettingKey
@@ -201,6 +202,7 @@ export type GradebookViewOptions = {
   showNotes: boolean
   showSeparateFirstLastNames: boolean
   showUnpublishedAssignments: boolean
+  showSuppressedAssignments: boolean
   hideAssignmentGroupTotals: boolean
   statusColors: StatusColors
   viewUngradedAsZero: boolean

@@ -44,6 +44,7 @@ describe('GradebookSettingsModal Late Policies', () => {
       showNotes: false,
       showSeparateFirstLastNames: false,
       showUnpublishedAssignments: false,
+      showSuppressedAssignments: false,
       hideAssignmentGroupTotals: false,
       statusColors: statusColors(),
       viewUngradedAsZero: false,
