@@ -263,6 +263,11 @@ module AccountReports
       report_attachment(account_report, csv)
       account_report.workflow_state = "complete"
     else
+      if error_report_id.nil?
+        error = exception || RuntimeError.new("Report failed to generate a file: #{account_report.report_type}")
+        context = { tags: { type: :account_report }, extra: { user: account_report.user } }
+        error_report_id = Canvas::Errors.capture(error, context)&.dig(:error_report)
+      end
       failed_report(account_report, exception:, error_report_id:)
       account_report.workflow_state = "error"
     end
