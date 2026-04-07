@@ -155,6 +155,24 @@ A data fixup operation and associated files can be generated with `rails g data_
 
 See [`lib/canvas_operations/base_concerns/settings.rb`](lib/canvas_operations/base_concerns/settings.rb) for more details on using operation settings.
 
+#### DataFixup Additional Properties
+**batch_strategy**
+
+Defaults to `:pluck_ids`, which performs a pluck on the scope (after range filtering), and loads records into memory in batches based on those IDs.
+
+In some cases, it may be appropriate to change this strategy. To do so, set the `batch_strategy` class instance variable:
+
+```ruby
+class UnsetAuthlogicAttributesOnInstPseudonyms < CanvasOperations::DataFixup
+...
+  self.batch_strategy = :id
+...
+end
+```
+
+See `/usr/src/app/config/initializers/active_record.rb` for additional details on available batch strategies.
+
+
 ### RootAccountOperation
 
 The `RootAccountOperation` class is designed for operations that need to run per root account. This is essential when you need to execute the same operation across multiple accounts with proper isolation and context.
