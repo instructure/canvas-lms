@@ -32,7 +32,7 @@
     "@instructure/platform-learning-agent-launcher": "1.1.1",
     "@instructure/platform-loading-indicator": "0.2.0",
     "@instructure/platform-provider": "0.3.0",
-    "@instructure/platform-study-assist": "0.11.0",
+    "@instructure/platform-study-assist": "0.11.1",
     "@instructure/platform-widget-dashboard": "3.1.0",
     "@instructure/platform-with-breakpoints": "^0.2.0",
     "@instructure/react-crop": "^5.0.1",
