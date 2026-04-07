@@ -2327,39 +2327,46 @@ class UsersController < ApplicationController
 
     @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
 
-    user_updated = User.transaction do
-      if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
-         @user != @current_user
-        @user.pseudonyms.active.shard(@user).each_with_index do |pseudo, index|
-          next unless pseudo.grants_right?(@current_user, :delete)
-          next if pseudo.active? && event == "unsuspend"
-          next if pseudo.suspended? && event == "suspend"
+    user_updated = false
+    begin
+      User.transaction do
+        if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
+           @user != @current_user
+          @user.pseudonyms.active.shard(@user).each_with_index do |pseudo, index|
+            next unless pseudo.grants_right?(@current_user, :delete)
+            next if pseudo.active? && event == "unsuspend"
+            next if pseudo.suspended? && event == "suspend"
 
-          pseudo.current_user = @current_user # performing user for audit logging
-          if event == "suspend" && index == 0
-            pseudo.suspend_with_notification!
-          elsif event == "suspend"
-            pseudo.suspend!
-          else
-            pseudo.unsuspend!
+            pseudo.current_user = @current_user # performing user for audit logging
+            if event == "suspend" && index == 0
+              pseudo.suspend_with_notification!
+            elsif event == "suspend"
+              pseudo.suspend!
+            else
+              pseudo.unsuspend!
+            end
           end
         end
-      end
-      @user.update(user_params)
-    end
+        @user.update!(user_params)
 
-    respond_to do |format|
-      if user_updated
         if admin_avatar_update
           avatar_state = (old_avatar_state == :locked) ? old_avatar_state : "approved"
           @user.avatar_state = user_params[:avatar_image][:state] || avatar_state
         end
-        @user.profile.save if @user.profile.changed?
-        @user.save if admin_avatar_update || update_email
+        @user.profile.save! if @user.profile.changed?
+        @user.save! if admin_avatar_update || update_email
         # User.email= causes a reload to the user object. The saves need to
         # happen before the reload happens or we lose all the hard work from
         # above.
         @user.email = new_email if update_email
+        user_updated = true
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      @user.errors.merge!(e.record.errors) unless e.record == @user
+    end
+
+    respond_to do |format|
+      if user_updated
         session.delete(:require_terms)
         flash[:notice] = t("user_updated", "User was successfully updated.")
         unless params[:redirect_to_previous].blank?

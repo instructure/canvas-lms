@@ -2302,6 +2302,16 @@ describe "Users API", type: :request do
         end
       end
 
+      it "does not persist any changes when part of the update is invalid" do
+        original_name = @student.name
+        raw_api_call(:put, @path, @path_options, {
+                       user: { name: "New Name", email: "invalid@" }
+                     })
+        expect(response).to have_http_status :bad_request
+        expect(@student.reload.name).to eq original_name
+        expect(CommunicationChannel.where(path: "invalid@")).not_to exist
+      end
+
       context "pronouns" do
         context "when can_change_pronouns=true" do
           before :once do
