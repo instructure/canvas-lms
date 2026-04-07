@@ -1440,8 +1440,14 @@ class Enrollment < ApplicationRecord
                                        joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                                .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
                                      }
+  scope :invited_or_pending_by_date_ignoring_access, lambda {
+                                                       joins(:enrollment_state)
+                                                         .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
+                                                     }
   scope :completed_by_date,
         -> { joins(:enrollment_state).where(enrollment_states: { restricted_access: false, state: "completed" }) }
+  scope :completed_by_date_ignoring_access,
+        -> { joins(:enrollment_state).where(enrollment_states: { state: "completed" }) }
   scope :not_inactive_by_date, lambda {
                                  joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                          .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
