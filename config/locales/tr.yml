@@ -11728,6 +11728,7 @@ tr:
   dismiss_dacdb625: Yoksay
   dismiss_error_message_44c51c35: "Hata iletisini kapat"
   dismiss_itemtitle_c5020a4c: "%{itemTitle} öğesini kapat"
+  dismiss_name_c9e24598: "%{name} öğesini kapat"
   dismiss_notification_schedule_information_651aef59: "Bildirim zamanlaması bilgilerini kapat"
   dismiss_opportunityname_4fb10e11: "%{opportunityName} öğesini kapat"
   dismiss_this_5c74dddc: "Bunu Yoksay"
