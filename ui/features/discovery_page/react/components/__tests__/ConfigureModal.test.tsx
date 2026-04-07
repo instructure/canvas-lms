@@ -17,8 +17,10 @@
  */
 
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {ConfigureModal} from '../ConfigureModal'
-import {fetchDiscoveryConfig} from '../../api'
+import {fetchDiscoveryConfig, saveDiscoveryConfig} from '../../api'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
 
 vi.mock('../../api', async importOriginal => {
   const original = await importOriginal<typeof import('../../api')>()
@@ -30,11 +32,62 @@ vi.mock('../../api', async importOriginal => {
   }
 })
 
+vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+  confirm: vi.fn(),
+}))
+
 const mockedFetch = vi.mocked(fetchDiscoveryConfig)
+const mockedSave = vi.mocked(saveDiscoveryConfig)
+const mockedConfirm = vi.mocked(confirm)
 
 describe('ConfigureModal', () => {
   afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  describe('discovery page status', () => {
+    beforeEach(() => {
+      window.ENV = {...window.ENV, auth_providers: [], discovery_page_url: undefined}
+    })
+
+    it('shows no status pill while loading', () => {
+      mockedFetch.mockReturnValue(new Promise(() => {})) // never resolves
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      expect(screen.queryByText('Enabled')).not.toBeInTheDocument()
+      expect(screen.queryByText('Disabled')).not.toBeInTheDocument()
+    })
+
+    it('shows “Enabled” pill when config returns active: true', async () => {
+      mockedFetch.mockResolvedValue({discovery_page: {primary: [], secondary: [], active: true}})
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await screen.findByText('Enabled')
+      expect(screen.queryByText('Disabled')).not.toBeInTheDocument()
+    })
+
+    it('shows “Disabled” pill when config returns active: false', async () => {
+      mockedFetch.mockResolvedValue({discovery_page: {primary: [], secondary: [], active: false}})
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await screen.findByText('Disabled')
+      expect(screen.queryByText('Enabled')).not.toBeInTheDocument()
+    })
+
+    it('shows “View Discovery Page” link when discovery_page_url is set', async () => {
+      window.ENV = {
+        ...window.ENV,
+        auth_providers: [],
+        discovery_page_url: 'https://example.com/discovery',
+      }
+      mockedFetch.mockResolvedValue({discovery_page: {primary: [], secondary: [], active: true}})
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await screen.findByText('View Discovery Page')
+    })
+
+    it('does not show “View Discovery Page” link when discovery_page_url is not set', async () => {
+      mockedFetch.mockResolvedValue({discovery_page: {primary: [], secondary: [], active: true}})
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await screen.findByText('Enabled')
+      expect(screen.queryByText('View Discovery Page')).not.toBeInTheDocument()
+    })
   })
 
   describe('item limit counter', () => {
@@ -121,6 +174,114 @@ describe('ConfigureModal', () => {
         'Sign-in options limit exceeded (11/10). Please remove options to save.',
       )
       expect(screen.getByTestId('save-button')).toBeDisabled()
+    })
+  })
+
+  describe('save confirmation', () => {
+    const oneProvider = [{authentication_provider_id: 1, label: 'SSO'}]
+
+    beforeEach(() => {
+      window.ENV = {
+        ...window.ENV,
+        auth_providers: [{id: '1', url: '', auth_type: 'saml'}],
+        discovery_page_url: undefined,
+      }
+    })
+
+    async function makeDirtyAndSave(user: ReturnType<typeof userEvent.setup>) {
+      // wait for loading to finish and card to render
+      const deleteLabel = await screen.findByText('Delete item')
+      await user.click(deleteLabel.closest('button')!)
+      // save should now be enabled
+      await user.click(screen.getByTestId('save-button'))
+    }
+
+    it('shows confirmation when saving with active: true and user confirms', async () => {
+      const user = userEvent.setup()
+      mockedConfirm.mockResolvedValue(true)
+      mockedFetch.mockResolvedValue({
+        discovery_page: {primary: oneProvider, secondary: [], active: true},
+      })
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await makeDirtyAndSave(user)
+      expect(mockedConfirm).toHaveBeenCalledWith(
+        expect.objectContaining({title: 'Save Discovery Page'}),
+      )
+      expect(mockedSave).toHaveBeenCalled()
+    })
+
+    it('does not save when user cancels the confirmation', async () => {
+      const user = userEvent.setup()
+      mockedConfirm.mockResolvedValue(false)
+      mockedFetch.mockResolvedValue({
+        discovery_page: {primary: oneProvider, secondary: [], active: true},
+      })
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await makeDirtyAndSave(user)
+      expect(mockedConfirm).toHaveBeenCalled()
+      expect(mockedSave).not.toHaveBeenCalled()
+    })
+
+    it('saves without confirmation when active is false', async () => {
+      const user = userEvent.setup()
+      mockedFetch.mockResolvedValue({
+        discovery_page: {primary: oneProvider, secondary: [], active: false},
+      })
+      render(<ConfigureModal open={true} onClose={vi.fn()} />)
+      await makeDirtyAndSave(user)
+      expect(mockedConfirm).not.toHaveBeenCalled()
+      expect(mockedSave).toHaveBeenCalled()
+    })
+  })
+
+  describe('exit confirmation', () => {
+    const oneProvider = [{authentication_provider_id: 1, label: 'SSO'}]
+
+    beforeEach(() => {
+      window.ENV = {
+        ...window.ENV,
+        auth_providers: [{id: '1', url: '', auth_type: 'saml'}],
+        discovery_page_url: undefined,
+      }
+    })
+
+    it('closes without confirmation when there are no unsaved changes', async () => {
+      const user = userEvent.setup()
+      mockedFetch.mockResolvedValue({discovery_page: {primary: [], secondary: []}})
+      const onClose = vi.fn()
+      render(<ConfigureModal open={true} onClose={onClose} />)
+      await screen.findByText('0/10 sign-in options added.')
+      await user.click(screen.getByTestId('close-button'))
+      expect(mockedConfirm).not.toHaveBeenCalled()
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('shows confirmation when closing with unsaved changes and user confirms', async () => {
+      const user = userEvent.setup()
+      mockedConfirm.mockResolvedValue(true)
+      mockedFetch.mockResolvedValue({discovery_page: {primary: oneProvider, secondary: []}})
+      const onClose = vi.fn()
+      render(<ConfigureModal open={true} onClose={onClose} />)
+      const deleteLabel = await screen.findByText('Delete item')
+      await user.click(deleteLabel.closest('button')!)
+      await user.click(screen.getByTestId('close-button'))
+      expect(mockedConfirm).toHaveBeenCalledWith(
+        expect.objectContaining({title: 'Unsaved Changes'}),
+      )
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('does not close when user cancels the exit confirmation', async () => {
+      const user = userEvent.setup()
+      mockedConfirm.mockResolvedValue(false)
+      mockedFetch.mockResolvedValue({discovery_page: {primary: oneProvider, secondary: []}})
+      const onClose = vi.fn()
+      render(<ConfigureModal open={true} onClose={onClose} />)
+      const deleteLabel = await screen.findByText('Delete item')
+      await user.click(deleteLabel.closest('button')!)
+      await user.click(screen.getByTestId('close-button'))
+      expect(mockedConfirm).toHaveBeenCalled()
+      expect(onClose).not.toHaveBeenCalled()
     })
   })
 })

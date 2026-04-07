@@ -153,6 +153,11 @@ export interface PreviewAndSidebarProps {
   iframeRef?: React.RefObject<HTMLIFrameElement>
 }
 
+export interface DiscoveryPageStatusProps {
+  active?: boolean
+  viewUrl?: string
+}
+
 export interface SignInOptionsHeaderProps {
   title: string
   description?: string
