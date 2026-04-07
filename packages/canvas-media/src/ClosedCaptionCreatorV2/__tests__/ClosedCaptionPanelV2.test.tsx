@@ -603,7 +603,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       const uploadButton = screen.getByText('Upload')
       fireEvent.click(uploadButton)
 
-      expect(await screen.findByText('Upload Failed')).toBeInTheDocument()
+      expect(await screen.findByText('Upload failed')).toBeInTheDocument()
 
       await screen.findByText('German caption upload failed')
     })
@@ -632,7 +632,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       // Caption should still be visible with error message
       expect(screen.getByText('French')).toBeInTheDocument()
-      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+      expect(screen.getByText('Delete failed')).toBeInTheDocument()
     })
 
     it('a11y: retry upload re-announces and succeeds on retry', async () => {
@@ -662,7 +662,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       // nested promises + axios, so give it extra time under CI load.
       await waitFor(
         () => {
-          expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+          expect(screen.getByText('Upload failed')).toBeInTheDocument()
           expect(screen.getByText('Retry German')).toBeInTheDocument()
         },
         {timeout: 10000},
@@ -682,7 +682,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       await waitFor(
         () => {
           expect(screen.queryByText('Captions have been added for German')).toBeInTheDocument()
-          expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
+          expect(screen.queryByText('Upload failed')).not.toBeInTheDocument()
         },
         {timeout: 10000},
       )
@@ -704,7 +704,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       // Delete French → fails
       fireEvent.click(screen.getByText('Delete French'))
-      await screen.findByText('Delete Failed')
+      await screen.findByText('Delete failed')
 
       // Now upload German → also fails
       server.use(
@@ -721,13 +721,13 @@ describe('<ClosedCaptionPanelV2 />', () => {
       })
       fireEvent.click(screen.getByText('Upload'))
 
-      await screen.findByText('Upload Failed')
+      await screen.findByText('Upload failed')
 
       // Both failures should be visible simultaneously
       expect(screen.getByText('French')).toBeInTheDocument()
-      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+      expect(screen.getByText('Delete failed')).toBeInTheDocument()
       expect(screen.getByText('German')).toBeInTheDocument()
-      expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+      expect(screen.getByText('Upload failed')).toBeInTheDocument()
 
       // Retry German upload (succeeds)
       server.use(
@@ -739,7 +739,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       // French should still show its delete-failed state
       expect(screen.getByText('French')).toBeInTheDocument()
-      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+      expect(screen.getByText('Delete failed')).toBeInTheDocument()
     })
 
     it('server-side failed caption shows delete but not retry', () => {
@@ -786,7 +786,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
 
-      expect(await screen.findByText('Caption generation failed')).toBeInTheDocument()
+      expect(await screen.findByText('Generation failed')).toBeInTheDocument()
       await screen.findByText('Spanish caption generation failed')
       expect(screen.getByText('Retry Spanish (Automatic)')).toBeInTheDocument()
     })
@@ -816,7 +816,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText('Retry Spanish (Automatic)'))
 
       await waitFor(() => {
-        expect(screen.queryByText('Caption generation failed')).not.toBeInTheDocument()
+        expect(screen.queryByText('Generation failed')).not.toBeInTheDocument()
       })
       expect(screen.getByText('Spanish (Automatic)')).toBeInTheDocument()
     })
@@ -838,7 +838,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       // Click delete (fails on first attempt)
       fireEvent.click(screen.getByText('Delete French'))
 
-      await screen.findByText('Delete Failed')
+      await screen.findByText('Delete failed')
       expect(screen.getByText('Retry French')).toBeInTheDocument()
 
       // Phase 2: retry succeeds
@@ -970,7 +970,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
         })
       })
       // Drain the in-flight retry PUT so it doesn't leak into subsequent tests.
-      await screen.findByText('Upload Failed')
+      await screen.findByText('Upload failed')
     })
 
     it('fires canvas_caption_item_action delete when delete button clicked', async () => {
@@ -1003,7 +1003,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       ]
       renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText('Delete French'))
-      await screen.findByText('Delete Failed')
+      await screen.findByText('Delete failed')
       expect(mockTrack).toHaveBeenCalledWith('canvas_caption_validation_error', {
         type: 'track',
         flow_type: 'upload_file',
