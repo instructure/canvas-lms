@@ -23,6 +23,8 @@ import StudyAssistTray from '../StudyAssistTray'
 
 const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-content" />)
 const mockAssistFlashCardsInteraction = vi.fn((_props: object) => <div />)
+const mockResetChat = vi.fn()
+const mockUseAssistContext = vi.fn(() => ({showBackButton: false, resetChat: mockResetChat}))
 
 vi.mock('@canvas/instui-bindings/react/AiInformation', () => ({
   default: ({triggerButton}: {triggerButton: React.ReactNode}) => (
@@ -53,6 +55,7 @@ vi.mock('@instructure/platform-study-assist', () => ({
   ),
   AssistContent: (props: object) => mockAssistContent(props),
   AssistFlashCardsInteraction: (props: object) => mockAssistFlashCardsInteraction(props),
+  useAssistContext: () => mockUseAssistContext(),
 }))
 
 describe('StudyAssistTray', () => {
@@ -69,6 +72,8 @@ describe('StudyAssistTray', () => {
     onDismiss.mockReset()
     mockAssistContent.mockClear()
     mockAssistFlashCardsInteraction.mockClear()
+    mockResetChat.mockReset()
+    mockUseAssistContext.mockReturnValue({showBackButton: false, resetChat: mockResetChat})
   })
 
   it('renders the AI information button', () => {
@@ -229,5 +234,46 @@ describe('StudyAssistTray', () => {
         cardHeight: '60vh',
       }),
     )
+  })
+
+  describe('back button', () => {
+    it('is not visible when showBackButton is false', () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      expect(screen.queryByTestId('study-assist-back-button')).not.toBeInTheDocument()
+    })
+
+    it('is visible when showBackButton is true', () => {
+      mockUseAssistContext.mockReturnValue({showBackButton: true, resetChat: mockResetChat})
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      expect(screen.getByTestId('study-assist-back-button')).toBeInTheDocument()
+    })
+
+    it('calls resetChat when clicked', async () => {
+      const user = userEvent.setup()
+      mockUseAssistContext.mockReturnValue({showBackButton: true, resetChat: mockResetChat})
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const backEl = screen.getByTestId('study-assist-back-button')
+      const button = backEl.tagName === 'BUTTON' ? backEl : backEl.querySelector('button')
+      await user.click(button!)
+      expect(mockResetChat).toHaveBeenCalledTimes(1)
+    })
   })
 })
