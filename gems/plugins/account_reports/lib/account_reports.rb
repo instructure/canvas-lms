@@ -268,6 +268,7 @@ module AccountReports
         context = { tags: { type: :account_report }, extra: { user: account_report.user } }
         error_report_id = Canvas::Errors.capture(error, context)&.dig(:error_report)
       end
+      account_report.message = I18n.t("Generating the report, %{title}, failed.", title: account_report.title)
       failed_report(account_report, exception:, error_report_id:)
       account_report.workflow_state = "error"
     end
