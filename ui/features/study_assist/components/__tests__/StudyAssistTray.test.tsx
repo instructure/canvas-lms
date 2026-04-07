@@ -35,12 +35,19 @@ vi.mock('@instructure/platform-study-assist', () => ({
     children,
     pageId,
     fileId,
+    featureSlug,
   }: {
     children: React.ReactNode
     pageId?: string
     fileId?: string
+    featureSlug?: string
   }) => (
-    <div data-testid="assist-provider" data-page-id={pageId} data-file-id={fileId}>
+    <div
+      data-testid="assist-provider"
+      data-page-id={pageId}
+      data-file-id={fileId}
+      data-feature-slug={featureSlug}
+    >
       {children}
     </div>
   ),
@@ -110,6 +117,20 @@ describe('StudyAssistTray', () => {
       />,
     )
     expect(screen.getByTestId('assist-provider')).toHaveAttribute('data-page-id', 'test-page')
+  })
+
+  it('passes featureSlug="canvas-lms:study-assist" to AssistProvider', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('assist-provider')).toHaveAttribute(
+      'data-feature-slug',
+      'canvas-lms:study-assist',
+    )
   })
 
   it('configures AssistContent for prompts-only mode with filtered prompts', () => {

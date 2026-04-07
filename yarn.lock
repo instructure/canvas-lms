@@ -2927,10 +2927,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.3.0.tgz#5787be34111afffe3fe045d25a29bf8faacab8bb"
   integrity sha512-Nv/iiUPtIxsHkU3MmF+Gkumnk2JrTh1sWPYk+sg3ua4l4W6mL12QB8TgJBmdP4N/uGXE8gwOS7tXDJMsX6lxyg==
 
-"@instructure/platform-study-assist@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-study-assist/-/platform-study-assist-0.10.0.tgz#2011ba8bd98d306ff5fce8bfa13f6064a491de97"
-  integrity sha512-DuNLs1CtiVH3rbetKsEOdyXaB1k4khG5prrnkf8vacu5ScEsMyde1+99131Xjj6j5JYbwOjYRBw0N0G6gwjOxw==
+"@instructure/platform-study-assist@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-study-assist/-/platform-study-assist-0.11.0.tgz#b27a3010e44c0c60004fad8038fa0f0f06e038a5"
+  integrity sha512-VNQNrKNG8rNl6/mGd3tMPv0pNK2lq71xAlUibEdABwWuhfDIjZ0xMaHk1gP/PJJRcCzy3NuCRvZsBk8FAPl5kw==
   dependencies:
     uuid "^9.0.0"
 

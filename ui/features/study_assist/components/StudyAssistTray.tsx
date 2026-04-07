@@ -154,6 +154,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
             courseId={window.ENV.COURSE_ID}
             pageId={window.ENV.WIKI_PAGE_ID}
             fileId={window.ENV.FILE_ID}
+            featureSlug="canvas-lms:study-assist"
           >
             <div style={{padding: '0 1rem'}}>
               <AssistContent
