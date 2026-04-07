@@ -6965,6 +6965,7 @@ uk:
   download_epub_757cf0af: "Завантажити електронну публікацію"
   download_errors_attchment_82ffea3f: "Завантижити errors_attchment"
   download_item_analysis_report_statuslabel_8c9387ec: "Завантажити звіт по аналізу елементів  %{statusLabel}"
+  download_name_de443d96: "Завантажити %{name}"
   download_report_77164f62: "Завантажити звіт"
   download_scores_generated_on_date_ff5b9cd2: "Завантажити результати згенеровані  %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Завантажити аналітичний звіт студента %{statusLabel}"
