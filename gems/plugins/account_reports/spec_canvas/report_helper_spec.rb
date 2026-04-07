@@ -96,6 +96,7 @@ describe "report helper" do
     AccountReports.finalize_report(account_report, "hi", nil)
     error_report = ErrorReport.last
     expect(error_report.category).to eq "account_report"
+    expect(account_report.message).to eq "Generating the report, Test Report, failed."
     expect(account_report.parameters["extra_text"]).to eq(
       "Failed, please report the following error code to your system administrator: ErrorReport:#{error_report.global_id};"
     )
