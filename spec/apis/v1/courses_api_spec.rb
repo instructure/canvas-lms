@@ -4655,6 +4655,24 @@ describe CoursesController, type: :request do
       end
     end
 
+    context "with disable_file_verifiers_in_public_syllabus enabled" do
+      before do
+        @course1.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      end
+
+      it "returns the course syllabus with location tags and without verifiers" do
+        attachment = @course1.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
+        @course1.syllabus_body = "<img src='/courses/#{@course1.id}/files/#{attachment.id}'/>"
+        @course1.updating_user = @me
+        @course1.save!
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_body",
+                        { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_body"] })
+        expect(json["syllabus_body"]).to include("location=course_syllabus_#{@course1.id}")
+        expect(json["syllabus_body"]).not_to include("verifier=")
+      end
+    end
+
     it "does not return syllabus_versions when feature flag is disabled" do
       Account.site_admin.disable_feature!(:syllabus_versioning)
       6.times do |i|

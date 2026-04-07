@@ -656,6 +656,12 @@ module Api
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
       file_handler = proc do |match|
+        is_course_syllabus = location&.include?("course_syllabus_") && domain_root_account&.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+        render_location_tag = if is_course_syllabus || (location && domain_root_account&.feature_enabled?(:file_association_access))
+                                location
+                              else
+                                nil
+                              end
         UserContent::FilesHandler.new(
           match:,
           context:,
@@ -664,7 +670,7 @@ module Api
           is_public:,
           in_app: respond_to?(:in_app?, true) && in_app?,
           no_verifiers:,
-          location: (location if domain_root_account&.feature_enabled?(:file_association_access))
+          location: render_location_tag
         ).processed_url
       end
       rewriter.set_handler("files", &file_handler)
