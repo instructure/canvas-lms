@@ -168,6 +168,115 @@ describe UserMerge do
       end
     end
 
+    context "with institutional tag associations" do
+      let_once(:account1) { account_model }
+      let(:tag) { institutional_tag_model(account: account1) }
+      let(:tag2) { institutional_tag_model(account: account1, name: "Other Tag", description: "Another tag") }
+
+      it "moves source-only tag associations to the target user" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.user_id).to eq user1.id
+        expect(user1.institutional_tag_associations.active.pluck(:institutional_tag_id)).to include(tag.id)
+      end
+
+      it "records moved associations in the merge audit trail" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        merge_data = UserMergeData.where(user_id: user1).first
+        record = merge_data.records.find_by(context_type: "InstitutionalTagAssociation", context_id: assoc.id)
+        expect(record).to be_present
+        expect(record.previous_user_id).to eq user2.id
+        expect(record.previous_workflow_state).to eq "active"
+      end
+
+      it "soft-deletes conflicting associations when both users share the same tag" do
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        from_assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(from_assoc.reload.workflow_state).to eq "deleted"
+        expect(user1.institutional_tag_associations.active.pluck(:institutional_tag_id)).to eq [tag.id]
+      end
+
+      it "records soft-deleted conflict associations in the merge audit trail" do
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        from_assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        merge_data = UserMergeData.where(user_id: user1).first
+        record = merge_data.records.find_by(context_type: "InstitutionalTagAssociation", context_id: from_assoc.id)
+        expect(record).to be_present
+        expect(record.previous_user_id).to eq user2.id
+        expect(record.previous_workflow_state).to eq "active"
+      end
+
+      it "ignores inactive (soft-deleted) tag associations on the source user" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        assoc.destroy
+        UserMerge.from(user2).into(user1)
+        merge_data = UserMergeData.where(user_id: user1).first
+        expect(merge_data.records.where(context_type: "InstitutionalTagAssociation")).to be_empty
+        expect(user1.institutional_tag_associations.active).to be_empty
+      end
+
+      it "moves both when same-named tags belong to different institutions" do
+        account2 = account_model
+        tag_other_institution = institutional_tag_model(account: account2, name: tag.name, description: tag.description)
+        assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag_other_institution, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(assoc1.reload.user_id).to eq user1.id
+        expect(assoc2.reload.user_id).to eq user1.id
+        expect(assoc1.reload.workflow_state).to eq "active"
+        expect(assoc2.reload.workflow_state).to eq "active"
+      end
+
+      it "moves active associations regardless of which institution the tag belongs to" do
+        account2 = account_model
+        sub_acct = account2.sub_accounts.create!
+        tag_other = institutional_tag_model(account: sub_acct)
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag_other, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.user_id).to eq user1.id
+        expect(assoc.reload.workflow_state).to eq "active"
+      end
+
+      it "does not change the tag category's account during merge — only the association's user_id is updated" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        original_tag_name = tag.name
+        original_category_id = tag.category_id
+        original_account_id = tag.category.account_id
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.user_id).to eq user1.id
+        expect(tag.reload.name).to eq original_tag_name
+        expect(tag.reload.category_id).to eq original_category_id
+        expect(tag.category.reload.account_id).to eq original_account_id
+      end
+
+      it "detects conflicts by institutional_tag_id, not by name, so same-named tags from different institutions are independent" do
+        account2 = account_model
+        tag_other = institutional_tag_model(account: account2, name: tag.name, description: tag.description)
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag_other, context: user2)
+        UserMerge.from(user2).into(user1)
+        # Different institutional_tag_id means no conflict even though names match
+        expect(assoc2.reload.workflow_state).to eq "active"
+        # Each tag's root_account_id reflects its own institution, unchanged
+        expect(tag.reload.root_account_id).not_to eq tag_other.reload.root_account_id
+      end
+
+      it "does not modify root_account_id on the association during merge" do
+        root_acct = Account.create!
+        sub_acct = root_acct.sub_accounts.create!
+        sub_tag = institutional_tag_model(account: sub_acct)
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: sub_tag, context: user2)
+        # root_account_id is derived through tag -> category -> account, not set independently
+        expect(assoc.root_account_id).to eq root_acct.id
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.root_account_id).to eq root_acct.id
+        expect(assoc.reload.root_account_id).to eq sub_tag.reload.root_account_id
+      end
+    end
+
     it "uses avatar information from merged user if none exists" do
       user2.avatar_image = { "type" => "external", "url" => "https://example.com/image.png" }
       user2.save!

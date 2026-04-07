@@ -30,5 +30,6 @@ class UserMergeDataRecord < ApplicationRecord
                                      :user_service,
                                      :submission,
                                      { quiz_submission: "Quizzes::QuizSubmission" },
-                                     :assignment_override_student]
+                                     :assignment_override_student,
+                                     :institutional_tag_association]
 end
