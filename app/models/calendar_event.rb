@@ -795,7 +795,7 @@ class CalendarEvent < ApplicationRecord
       event.summary = @event.is_a?(SubAssignment) ? @event.title_with_required_replies : @event.title
 
       if @event.description && include_description
-        html = api_user_content(@event.description, @event.context, nil, preloaded_attachments, location: @event)
+        html = api_user_content(@event.description, @event.context, nil, preloaded_attachments, location: @event.asset_string)
         event.description = html_to_text(html)
         event.x_alt_desc = Icalendar::Values::Text.new(html, { "FMTTYPE" => "text/html" })
       end
