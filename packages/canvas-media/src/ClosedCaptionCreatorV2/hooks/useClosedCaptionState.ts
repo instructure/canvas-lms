@@ -138,37 +138,24 @@ export function useClosedCaptionState({
       const language = closedCaptionLanguages.find(l => l.id === locale)
       const captionName = language?.label || locale
 
-      const failedMessages = {
-        upload: {
-          display: formatMessage('Upload Failed'),
-          announcement: formatMessage('{captionName} caption upload failed', {captionName}),
-        },
-        delete: {
-          display: formatMessage('Delete Failed'),
-          announcement: formatMessage('{captionName} caption delete failed', {captionName}),
-        },
-        asr: {
-          display: formatMessage('Caption generation failed'),
-          announcement: formatMessage('{captionName} caption generation failed', {captionName}),
-        },
+      const announcements = {
+        upload: formatMessage('{captionName} caption upload failed', {captionName}),
+        delete: formatMessage('{captionName} caption delete failed', {captionName}),
+        asr: formatMessage('{captionName} caption generation failed', {captionName}),
       }
-
-      const {display: displayMessage, announcement: announcementMessage} =
-        failedMessages[failedOperation]
 
       const updatedSubtitles = subtitlesRef.current.map(s =>
         s.locale === locale
           ? {
               ...s,
               workflow_state: 'failed' as const,
-              errorMessage: displayMessage,
               failedOperation,
             }
           : s,
       )
       setSubtitles(updatedSubtitles)
       onUpdateSubtitles(updatedSubtitles)
-      setAnnouncement(announcementMessage)
+      setAnnouncement(announcements[failedOperation])
       handleCancelCreation()
     },
     [closedCaptionLanguages, handleCancelCreation, onUpdateSubtitles],
@@ -182,7 +169,6 @@ export function useClosedCaptionState({
           ? {
               ...s,
               workflow_state: 'processing' as const,
-              errorMessage: undefined,
               failedOperation: undefined,
             }
           : s,

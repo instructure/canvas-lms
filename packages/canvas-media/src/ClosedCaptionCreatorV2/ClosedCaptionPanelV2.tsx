@@ -206,7 +206,8 @@ export function ClosedCaptionPanelV2({
                   filename={subtitle.filename}
                   workflow_state={subtitle.workflow_state ?? 'ready'}
                   captionName={getCaptionName(subtitle, language)}
-                  errorMessage={subtitle.errorMessage}
+                  failedOperation={subtitle.failedOperation}
+                  asr={subtitle.asr}
                   onRetry={getRetryHandler(subtitle)}
                   isInherited={subtitle.inherited}
                   onDelete={showDelete ? deleteHandler : undefined}
