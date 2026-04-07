@@ -385,6 +385,23 @@ describe OAuth2ProviderController do
     end
   end
 
+  describe "GET confirm" do
+    render_views
+
+    let_once(:key) { DeveloperKey.create! redirect_uri: "https://example.com" }
+    let_once(:user) { User.create! }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: "https://example.com" } } }
+
+    before { user_session user }
+
+    it "renders the mobile confirm page with the oauth2_accept_form id and data-disable-with" do
+      get :confirm, params: { mobile: true }, session: session_hash
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('id="oauth2_accept_form"')
+      expect(response.body).to include("data-disable-with")
+    end
+  end
+
   describe "POST token" do
     subject { response }
 
