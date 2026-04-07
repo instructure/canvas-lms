@@ -98,6 +98,61 @@ describe InstitutionalTagCategory do
       expect(assoc.reload.workflow_state).to eq "deleted"
     end
 
+    it "cascade-archives via InstitutionalTag.cascade_archive_associations_for" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+
+      expect(InstitutionalTag).to receive(:cascade_archive_associations_for).with([tag.id]).and_call_original
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations via cascade_archive_associations_for on category soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag1 = InstitutionalTag.create!(name: "Tag 1", description: "desc", category:)
+      tag2 = InstitutionalTag.create!(name: "Tag 2", description: "desc", category:)
+      user = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user)
+
+      expect(InstitutionalTag).to receive(:cascade_archive_associations_for)
+        .with(match_array([tag1.id, tag2.id]))
+        .and_call_original
+      category.destroy
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations across multiple tags on category soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag1 = InstitutionalTag.create!(name: "Tag 1", description: "desc", category:)
+      tag2 = InstitutionalTag.create!(name: "Tag 2", description: "desc", category:)
+      user1 = user_model
+      user2 = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user1)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user2)
+      assoc3 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user1)
+
+      category.destroy
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+      expect(assoc3.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives tags when workflow_state is set directly" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      category.update!(workflow_state: "deleted")
+      expect(tag.reload.workflow_state).to eq "deleted"
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
     it "does not touch already-deleted tags on soft-delete" do
       category = InstitutionalTagCategory.create!(valid_params)
       tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)

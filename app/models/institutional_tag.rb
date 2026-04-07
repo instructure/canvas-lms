@@ -30,7 +30,7 @@ class InstitutionalTag < ApplicationRecord
   scope :search_by_name, ->(term) { where("LOWER(name) LIKE ?", "#{term.downcase}%") }
 
   before_validation :sanitize_name, if: :name_changed?
-  before_destroy :cascade_archive_associations
+  after_save :cascade_archive_associations_later, if: -> { saved_change_to_workflow_state?(to: "deleted") }
 
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, presence: true, length: { maximum: 500 }
@@ -41,13 +41,31 @@ class InstitutionalTag < ApplicationRecord
   validates :sis_source_id, uniqueness: { scope: :root_account_id, case_sensitive: false }, allow_nil: true
   validates :name, uniqueness: { scope: :root_account_id, conditions: -> { active }, case_sensitive: false }
 
+  def self.cascade_archive_associations_for(tag_ids)
+    return if tag_ids.empty?
+
+    now = Time.now.utc
+    InstitutionalTagAssociation
+      .active
+      .where(institutional_tag_id: tag_ids)
+      .in_batches(of: 10_000)
+      .update_all(workflow_state: "deleted", updated_at: now)
+  end
+
   private
 
   def sanitize_name
     self.name = Sanitize.clean((name || "").to_s, CanvasSanitize::SANITIZE)
   end
 
+  def cascade_archive_associations_later
+    delay_if_production(
+      singleton: "InstitutionalTag#cascade_archive_associations_#{global_id}",
+      priority: Delayed::LOW_PRIORITY
+    ).cascade_archive_associations
+  end
+
   def cascade_archive_associations
-    institutional_tag_associations.active.update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+    self.class.cascade_archive_associations_for([id])
   end
 end

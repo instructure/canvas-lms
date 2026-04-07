@@ -30,7 +30,7 @@ class InstitutionalTagCategory < ApplicationRecord
   scope :search_by_name, ->(term) { where("LOWER(name) LIKE ?", "#{term.downcase}%") }
 
   before_validation :sanitize_name, if: :name_changed?
-  before_destroy :cascade_archive_tags
+  after_save :cascade_archive_tags_later, if: -> { saved_change_to_workflow_state?(to: "deleted") }
 
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
@@ -46,15 +46,18 @@ class InstitutionalTagCategory < ApplicationRecord
     self.name = Sanitize.clean((name || "").to_s, CanvasSanitize::SANITIZE)
   end
 
+  def cascade_archive_tags_later
+    delay_if_production(
+      singleton: "InstitutionalTagCategory#cascade_archive_tags_#{global_id}",
+      priority: Delayed::LOW_PRIORITY
+    ).cascade_archive_tags
+  end
+
   def cascade_archive_tags
-    InstitutionalTagCategory.transaction do
-      now = Time.now.utc
-      InstitutionalTagAssociation
-        .active
-        .joins(:institutional_tag)
-        .where(institutional_tags: { category_id: id })
-        .update_all(workflow_state: "deleted", updated_at: now)
-      institutional_tags.active.update_all(workflow_state: "deleted", updated_at: now)
-    end
+    tag_ids = institutional_tags.active.pluck(:id)
+    return if tag_ids.empty?
+
+    InstitutionalTag.cascade_archive_associations_for(tag_ids)
+    institutional_tags.active.in_batches(of: 10_000).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
   end
 end
