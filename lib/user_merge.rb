@@ -159,6 +159,8 @@ class UserMerge
       end
       target_user.clear_adminable_accounts_cache! if account_users.any?
 
+      handle_institutional_tag_associations
+
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
 
@@ -233,6 +235,27 @@ class UserMerge
     @merge_data&.items&.create!(user: target_user, item_type: "merge_error", item: e.backtrace.unshift(e.message))
     Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id, from_user_id: from_user&.id, target_user_id: target_user&.id)
     raise
+  end
+
+  def handle_institutional_tag_associations
+    tag_associations = from_user.institutional_tag_associations.active.to_a
+    return unless tag_associations.any?
+
+    merge_data.add_more_data(tag_associations, user: from_user)
+
+    target_tag_ids = target_user.institutional_tag_associations
+                                .active
+                                .pluck(:institutional_tag_id).to_set
+
+    conflict_ids = tag_associations.select { |a| target_tag_ids.include?(a.institutional_tag_id) }.map(&:id)
+    movable_ids  = tag_associations.map(&:id) - conflict_ids
+
+    if movable_ids.any?
+      InstitutionalTagAssociation.where(id: movable_ids)
+                                 .update_all(user_id: target_user.id, updated_at: Time.now.utc)
+    end
+
+    InstitutionalTagAssociation.where(id: conflict_ids).find_each(&:destroy) if conflict_ids.any?
   end
 
   def copy_favorites
