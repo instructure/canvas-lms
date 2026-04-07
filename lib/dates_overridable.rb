@@ -510,7 +510,7 @@ module DatesOverridable
       end
 
       everyone_override = everyone_overrides.first
-      everyone_override[:title] = result.empty? ? "Everyone" : "Everyone else"
+      everyone_override[:title] = result.empty? ? I18n.t("Everyone") : I18n.t("Everyone else")
 
       result << everyone_override.slice(
         :id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id
