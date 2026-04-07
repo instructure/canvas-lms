@@ -214,6 +214,16 @@ class AbstractAssignment < ApplicationRecord
     end
   end
 
+  def self.find_assignment_or_peer_review(assignment_id)
+    assignment = assignment_or_peer_review.find(assignment_id)
+    if assignment.is_a?(PeerReviewSubAssignment) &&
+       !assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      raise ActiveRecord::RecordNotFound
+    end
+
+    assignment
+  end
+
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
   validate :turnitin_changes_ok?

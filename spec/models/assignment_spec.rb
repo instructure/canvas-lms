@@ -14584,4 +14584,30 @@ describe Assignment do
       expect(@assignment.can_manage_rubrics?(student, nil)).to be false
     end
   end
+
+  describe ".find_assignment_or_peer_review" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      assignment_model(course: @course)
+    end
+
+    it "returns the assignment for a regular assignment id" do
+      expect(AbstractAssignment.find_assignment_or_peer_review(@assignment.id)).to eq @assignment
+    end
+
+    it "returns the peer review sub assignment when the feature flag is enabled" do
+      peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      expect(AbstractAssignment.find_assignment_or_peer_review(peer_review_sub_assignment.id)).to eq peer_review_sub_assignment
+    end
+
+    it "raises ActiveRecord::RecordNotFound for a peer review sub assignment when the feature flag is disabled" do
+      peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect { AbstractAssignment.find_assignment_or_peer_review(peer_review_sub_assignment.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "raises ActiveRecord::RecordNotFound for an unknown id" do
+      expect { AbstractAssignment.find_assignment_or_peer_review(0) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
