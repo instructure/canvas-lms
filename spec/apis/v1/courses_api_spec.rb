@@ -3493,6 +3493,62 @@ describe CoursesController, type: :request do
         expect(course_ids).to include(@course1.id, @course2.id, @course3.id, @course4.id)
       end
 
+      it "returns concluded courses where student accepted before course concluded on ?state[]=current_and_concluded" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_user(@me, "StudentEnrollment", enrollment_state: "active")
+        concluded_course.complete!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"] })
+        expect(json.pluck("id")).to include(concluded_course.id)
+      end
+
+      it "returns concluded courses where student accepted before course concluded when enrollment_state=completed" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_user(@me, "StudentEnrollment", enrollment_state: "active")
+        concluded_course.complete!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"], enrollment_state: "completed" })
+        expect(json.pluck("id")).to include(concluded_course.id)
+      end
+
+      it "returns concluded courses when restrict_past_view is enabled" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_user(@me, "StudentEnrollment", enrollment_state: "active")
+        concluded_course.complete!
+        concluded_course.account.settings[:restrict_student_past_view] = { value: true, locked: false }
+        concluded_course.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"], enrollment_state: "completed" })
+        expect(json.pluck("id")).to include(concluded_course.id)
+      end
+
+      it "returns pending enrollments in unpublished courses when restrict_future_view is enabled but restrict_future_listing is disabled" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        @course4.update!(restrict_enrollments_to_course_dates: true, start_at: 1.month.from_now)
+        @course4.enrollments.reload.each do |e|
+          e.enrollment_state.update!(state_is_current: false)
+          e.enrollment_state.ensure_current_state
+        end
+        @course4.account.settings[:restrict_student_future_view] = { value: true, locked: false }
+        @course4.account.settings[:restrict_student_future_listing] = { value: false, locked: false }
+        @course4.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"], enrollment_state: "invited_or_pending" })
+        expect(json.pluck("id")).to include(@course4.id)
+      end
+
       it "returns courses with active StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
         @course3.enrollments.each do |e|
           e.type = "ObserverEnrollment"
