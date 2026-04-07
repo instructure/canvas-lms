@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Fèmen"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Fèmen Modal Rakousi Klavye a"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Fichye soutit la dwe mwens pase { maxKb } kb"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Tanpri, antre yon URL videyo ki valid sou yon platfòm ki konpatib."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Tanpri chwazi yon fichye anvan ou transfere l."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Seleksyone yon fichye nan tip sa ki konpatib yo tanpri"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Afiche opsyon lyen"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Montre transkripsyon k ap woule"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Montre Transkripsyon k ap Woule"

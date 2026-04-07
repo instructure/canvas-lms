@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Close"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Close Keyboard Shortcuts Modal"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Closed caption file must be less than { maxKb } kb"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Please enter a valid video URL from a supported platform."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Please select a file before uploading."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Please select a file of a supported type"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Show link options"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Show rolling transcript"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Show Rolling Transcript"

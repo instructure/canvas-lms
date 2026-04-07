@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Tutup"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Tutup Modal Pintasan Papan Kekunci"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Fail kapsyen tertutup mestilah kurang daripada { maxKb } kb"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Sila masukkan URL video yang sah daripada platform disokong."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Sila pilih Fail sebelum pemuatan."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Sila pilih fail daripada jenis yang disokong"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Tunjuk pilihan pautan"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Tunjuk penggulungan transkrip"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Tunjuk Penggulungan Transkrip"
