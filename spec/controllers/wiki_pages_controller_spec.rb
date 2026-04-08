@@ -306,6 +306,62 @@ describe WikiPagesController do
         end
       end
 
+      context "notebook feature" do
+        before do
+          config = instance_double(CanvasCareer::Config)
+          allow(CanvasCareer::Config).to receive(:new).and_return(config)
+          allow(config).to receive(:public_app_config).and_return({ "hosts" => { "journey" => "http://journey.test" } })
+        end
+
+        context "when enabled" do
+          before { @course.account.enable_feature!(:notebook) }
+
+          context "as a student" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+            end
+
+            it "sets notebook in FEATURES" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:FEATURES][:notebook]).to be true
+            end
+
+            it "sets WIKI_PAGE_ID to the page url" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:WIKI_PAGE_ID]).to eq @page.url
+            end
+
+            it "sets WIKI_PAGE_UPDATED_AT to the page updated_at" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:WIKI_PAGE_UPDATED_AT]).to eq @page.updated_at.iso8601
+            end
+
+            it "sets JOURNEY_URL from CanvasCareer config" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+            end
+          end
+
+          it "does not set notebook for teachers" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:FEATURES]).not_to have_key(:notebook)
+          end
+        end
+
+        context "when disabled" do
+          it "does not set WIKI_PAGE_UPDATED_AT" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :WIKI_PAGE_UPDATED_AT
+          end
+
+          it "does not set notebook in FEATURES" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:FEATURES]).not_to have_key(:notebook)
+          end
+        end
+      end
+
       context "permanent_page_links enabled" do
         before :once do
           Account.site_admin.enable_feature!(:permanent_page_links)

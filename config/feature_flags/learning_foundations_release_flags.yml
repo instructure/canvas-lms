@@ -349,3 +349,11 @@ study_assist_flashcards:
   description: |-
     Enables the Flashcards tool in IgniteAI Study Tools.
     When disabled, students will not see the Flashcards option.
+
+notebook:
+  state: hidden
+  applies_to: Account
+  display_name: Notebook
+  description: |-
+    Enables the Notebook feature. When enabled, students can
+    highlight text on wiki pages and take notes.
