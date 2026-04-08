@@ -3759,6 +3759,17 @@ describe UsersController do
         get "dashboard_stream_items", params: { observed_user_id: @another_student.id }
         expect(response).to be_unauthorized
       end
+
+      it "filters out conversation stream items when observing a student" do
+        conversation_item = instance_double(StreamItem, asset_type: "Conversation", course: nil)
+        announcement_item = instance_double(StreamItem, asset_type: "Announcement", course: nil)
+        allow_any_instance_of(User).to receive(:cached_recent_stream_items).and_return([conversation_item, announcement_item])
+
+        get "dashboard_stream_items", params: { observed_user_id: @student.id }
+
+        expect(assigns[:stream_items]).not_to include(conversation_item)
+        expect(assigns[:stream_items]).to include(announcement_item)
+      end
     end
   end
 

@@ -330,6 +330,28 @@ describe ConversationsController do
       expect(response).to be_successful
       expect(assigns[:conversation]).to eq @conversation
     end
+
+    context "when user does not have access to the conversation" do
+      let_once(:observer) { user_factory(active_all: true) }
+
+      before { user_session(observer) }
+
+      it "redirects to conversations index with a flash error for HTML requests" do
+        get "show", params: { id: @conversation.conversation_id }
+        expect(response).to redirect_to(conversations_url)
+        expect(flash[:error]).to be_present
+      end
+
+      it "returns 404 for XHR requests" do
+        get "show", params: { id: @conversation.conversation_id }, xhr: true
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for JSON requests" do
+        get "show", params: { id: @conversation.conversation_id }, format: "json"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 
   describe "POST 'create'" do
