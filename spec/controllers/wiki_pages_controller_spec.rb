@@ -271,6 +271,21 @@ describe WikiPagesController do
             get "show", params: { course_id: @course.id, id: @page.url }
             expect(assigns[:js_env][:FEATURES]).not_to have_key(:study_assist)
           end
+
+          context "in a group context" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+              @group = group_model(context: @course)
+              @group.add_user(@student)
+              @group_page = @group.wiki_pages.create!(title: "group page", body: "content")
+            end
+
+            it "does not enable study_assist" do
+              get "show", params: { group_id: @group.id, id: @group_page.url }
+              expect(assigns[:js_env][:FEATURES]).not_to have_key(:study_assist)
+            end
+          end
         end
 
         context "when disabled" do
