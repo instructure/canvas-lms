@@ -137,6 +137,7 @@ class FeatureFlagsController < ApplicationController
   include Api::V1::FeatureFlag
 
   before_action :get_context
+  skip_before_action :require_user, only: %i[environment]
 
   # @API List features
   #
@@ -212,6 +213,10 @@ class FeatureFlagsController < ApplicationController
   #   { "telepathic_navigation": true, "fancy_wickets": true, "automatic_essay_grading": false }
   #
   def environment
+    unless mobile_device?
+      return unless require_user
+    end
+
     render json: cached_js_env_account_features
   end
 
