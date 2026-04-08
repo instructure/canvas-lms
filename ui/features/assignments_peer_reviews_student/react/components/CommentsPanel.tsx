@@ -46,6 +46,7 @@ interface CommentsPanelProps {
   isReadOnly?: boolean
   suppressSuccessAlert?: boolean
   autoFocusCloseButton?: boolean
+  focusCommentInputTrigger?: number
 }
 
 export const CommentsPanel = forwardRef<CommentsPanelHandle, CommentsPanelProps>(
@@ -61,6 +62,7 @@ export const CommentsPanel = forwardRef<CommentsPanelHandle, CommentsPanelProps>
       isReadOnly = false,
       suppressSuccessAlert = false,
       autoFocusCloseButton = false,
+      focusCommentInputTrigger = 0,
     },
     ref,
   ) => {
@@ -129,6 +131,7 @@ export const CommentsPanel = forwardRef<CommentsPanelHandle, CommentsPanelProps>
               usePeerReviewModal={false}
               isReadOnly={isReadOnly}
               suppressSuccessAlert={suppressSuccessAlert}
+              focusTrigger={focusCommentInputTrigger}
             />
           </Flex.Item>
         </Flex>

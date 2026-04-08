@@ -29,6 +29,7 @@ import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment
 
 type HorizontalButtonDisplayProps = {
   buttonDisplay: string
+  criterionId: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -42,6 +43,7 @@ type HorizontalButtonDisplayProps = {
 }
 export const HorizontalButtonDisplay = ({
   buttonDisplay,
+  criterionId,
   hidePoints,
   isPreviewMode,
   ratings,
@@ -83,7 +85,11 @@ export const HorizontalButtonDisplay = ({
   const isButtonDisplayPoints = buttonDisplay === 'points' && !hidePoints
 
   return (
-    <View as="div" data-testid="rubric-assessment-horizontal-display">
+    <View
+      as="div"
+      data-criterion-id={criterionId}
+      data-testid="rubric-assessment-horizontal-display"
+    >
       {ratingDescriptionIndex >= 0 && (
         <View
           as="div"

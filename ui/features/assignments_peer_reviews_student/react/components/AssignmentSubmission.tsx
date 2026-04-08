@@ -80,8 +80,10 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   submissionUserId,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
-  const [showComments, setShowComments] = useState(true)
-  const [showRubric, setShowRubric] = useState(false)
+  const [showComments, setShowComments] = useState(!assignment.rubric)
+  const [showRubric, setShowRubric] = useState(!!assignment.rubric)
+  const [rubricFocusTrigger, setRubricFocusTrigger] = useState(0)
+  const [commentFocusTrigger, setCommentFocusTrigger] = useState(0)
   const [peerReviewCommentCompleted, setPeerReviewCommentCompleted] =
     useState(isPeerReviewCompleted)
   const [initialIsPeerReviewCompleted, setInitialIsPeerReviewCompleted] =
@@ -169,6 +171,12 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         message: I18n.t('You must fill out the rubric in order to submit your peer review.'),
         type: 'error',
       })
+      if (!showRubric) {
+        pendingFocusPanel.current = null
+        setShowComments(false)
+        setShowRubric(true)
+      }
+      setRubricFocusTrigger(t => t + 1)
       return
     }
 
@@ -179,6 +187,11 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         ),
         type: 'error',
       })
+      if (!showComments) {
+        pendingFocusPanel.current = null
+        setShowComments(true)
+      }
+      setCommentFocusTrigger(t => t + 1)
       return
     }
 
@@ -328,6 +341,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             onViewModeChange={setRubricViewMode}
             isReadOnly={isReadOnly}
             autoFocusCloseButton={pendingFocusPanel.current === 'rubric'}
+            triggerValidationAndFocus={rubricFocusTrigger}
             isMobile={isMobile}
           />
         )}
@@ -347,6 +361,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             isReadOnly={isReadOnly}
             suppressSuccessAlert={true}
             autoFocusCloseButton={pendingFocusPanel.current === 'comments'}
+            focusCommentInputTrigger={commentFocusTrigger}
           />
         )}
       </Flex>

@@ -388,6 +388,40 @@ describe "peer review student landing page" do
       expect(f("body")).to include_text("Before you can submit this peer review, you must leave a comment for your peer.")
     end
 
+    it "focuses comment textarea when Submit Peer Review is clicked without leaving a comment", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      expect(focused_element).to eq(comment_textarea)
+    end
+
+    it "focuses Send Comment button when Submit Peer Review is clicked and textarea has text", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      comment_textarea = f("textarea[data-testid='comment-text-input']")
+      comment_textarea.send_keys("Some comment text")
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      send_button = f("button[data-testid='send-button']")
+      expect(focused_element).to eq(send_button)
+    end
+
     it "shows peer review modal after completing all peer reviews", custom_timeout: 30 do
       @assignment.update(peer_review_count: 1)
       visit_peer_reviews_page(@course.id, @assignment.id)
@@ -653,25 +687,21 @@ describe "peer review student landing page" do
 
       toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
       expect(toggle_rubric_button).to be_displayed
-      expect(toggle_rubric_button.text).to include("Show Rubric")
-    end
-
-    it "opens rubric panel when rubric button is clicked", custom_timeout: 30 do
-      visit_peer_reviews_page(@course.id, @assignment.id)
-
-      submission_tab = f("div[id='tab-submission']")
-      submission_tab.click
-      wait_for_ajaximations
-
-      toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-      toggle_rubric_button.click
-      wait_for_ajaximations
-
-      expect(f("h2")).to include_text("Peer Review Rubric")
       expect(toggle_rubric_button.text).to include("Hide Rubric")
     end
 
-    it "closes rubric panel when rubric button is clicked again", custom_timeout: 30 do
+    it "shows rubric panel by default when assignment has rubric", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Review Rubric")
+      expect(f("button[data-testid='toggle-rubric-button']").text).to include("Hide Rubric")
+    end
+
+    it "closes rubric panel when rubric button is clicked", custom_timeout: 30 do
       visit_peer_reviews_page(@course.id, @assignment.id)
 
       submission_tab = f("div[id='tab-submission']")
@@ -679,16 +709,35 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-      toggle_rubric_button.click
-      wait_for_ajaximations
-
-      expect(f("h2")).to include_text("Peer Review Rubric")
-
       toggle_rubric_button.click
       wait_for_ajaximations
 
       expect(toggle_rubric_button.text).to include("Show Rubric")
       expect(f("body")).not_to include_text("Peer Review Rubric")
+    end
+
+    it "reopens rubric panel when rubric button is clicked again", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
+
+      # close the panel
+      toggle_rubric_button.click
+      wait_for_ajaximations
+
+      expect(toggle_rubric_button.text).to include("Show Rubric")
+      expect(f("body")).not_to include_text("Peer Review Rubric")
+
+      # reopen the panel
+      toggle_rubric_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Review Rubric")
+      expect(toggle_rubric_button.text).to include("Hide Rubric")
     end
 
     it "closes rubric panel when close button is clicked", custom_timeout: 30 do
@@ -699,8 +748,6 @@ describe "peer review student landing page" do
       wait_for_ajaximations
 
       toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-      toggle_rubric_button.click
-      wait_for_ajaximations
 
       close_button = f("[data-testid='close-rubric-button']")
       close_button.click
@@ -709,32 +756,11 @@ describe "peer review student landing page" do
       expect(toggle_rubric_button.text).to include("Show Rubric")
     end
 
-    it "closes comments when rubric is opened", custom_timeout: 30 do
-      visit_peer_reviews_page(@course.id, @assignment.id)
-
-      submission_tab = f("div[id='tab-submission']")
-      submission_tab.click
-      wait_for_ajaximations
-
-      expect(f("h2")).to include_text("Peer Comments")
-
-      toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-      toggle_rubric_button.click
-      wait_for_ajaximations
-
-      expect(f("h2")).to include_text("Peer Review Rubric")
-      expect(f("body")).not_to include_text("Peer Comments")
-    end
-
     it "closes rubric when comments are opened", custom_timeout: 30 do
       visit_peer_reviews_page(@course.id, @assignment.id)
 
       submission_tab = f("div[id='tab-submission']")
       submission_tab.click
-      wait_for_ajaximations
-
-      toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-      toggle_rubric_button.click
       wait_for_ajaximations
 
       expect(f("h2")).to include_text("Peer Review Rubric")
@@ -747,15 +773,35 @@ describe "peer review student landing page" do
       expect(f("body")).not_to include_text("Peer Review Rubric")
     end
 
-    it "allows student to submit rubric assessment", custom_timeout: 30 do
+    it "closes comments when rubric is reopened", custom_timeout: 30 do
       visit_peer_reviews_page(@course.id, @assignment.id)
 
       submission_tab = f("div[id='tab-submission']")
       submission_tab.click
       wait_for_ajaximations
 
+      # open comments (closes rubric)
+      toggle_comments_button = f("button[data-testid='toggle-comments-button']")
+      toggle_comments_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Comments")
+      expect(f("body")).not_to include_text("Peer Review Rubric")
+
+      # reopen rubric (closes comments)
       toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
       toggle_rubric_button.click
+      wait_for_ajaximations
+
+      expect(f("h2")).to include_text("Peer Review Rubric")
+      expect(f("body")).not_to include_text("Peer Comments")
+    end
+
+    it "allows student to submit rubric assessment", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
       wait_for_ajaximations
 
       expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
@@ -791,6 +837,129 @@ describe "peer review student landing page" do
       expect(f("body")).to include_text("You must fill out the rubric in order to submit your peer review.")
     end
 
+    it "opens rubric panel when Submit Peer Review is clicked without completing rubric", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
+      expect(toggle_rubric_button.text).to include("Hide Rubric")
+      expect(f("body")).to include_text("Peer Review Rubric")
+    end
+
+    it "focuses first incomplete criterion score input when Submit Peer Review is clicked without completing scored rubric", custom_timeout: 30 do
+      visit_peer_reviews_page(@course.id, @assignment.id)
+
+      submission_tab = f("div[id='tab-submission']")
+      submission_tab.click
+      wait_for_ajaximations
+
+      submit_button = f("button[data-testid='submit-peer-review-button']")
+      submit_button.click
+      wait_for_ajaximations
+
+      first_criterion_input = f("[data-testid='criterion-score-criterion_1']")
+      expect(focused_element).to eq(first_criterion_input)
+    end
+
+    context "with scale/unscored rubric" do
+      before(:once) do
+        @scale_assignment = assignment_model({
+                                               course: @course,
+                                               peer_reviews: true,
+                                               automatic_peer_reviews: false,
+                                               peer_review_count: 1,
+                                               points_possible: 10,
+                                               submission_types: "online_text_entry",
+                                               peer_review_submission_required: false
+                                             })
+        @scale_assignment.submit_homework(@student1, body: "student 1 attempt", submission_type: "online_text_entry")
+        @scale_assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
+        @scale_assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 1
+        )
+        assoc = @rubric.associate_with(@scale_assignment, @course, purpose: "grading")
+        assoc.update!(hide_points: true)
+      end
+
+      it "focuses first incomplete criterion rating button when Submit Peer Review is clicked without completing scale/unscored rubric", custom_timeout: 30 do
+        visit_peer_reviews_page(@course.id, @scale_assignment.id)
+
+        submission_tab = f("div[id='tab-submission']")
+        submission_tab.click
+        wait_for_ajaximations
+
+        submit_button = f("button[data-testid='submit-peer-review-button']")
+        submit_button.click
+        wait_for_ajaximations
+
+        first_criterion_button = f("[data-testid='rubric-assessment-vertical-display'] button")
+        expect(focused_element).to eq(first_criterion_button)
+      end
+    end
+
+    context "with written feedback rubric" do
+      before(:once) do
+        @written_assignment = assignment_model({
+                                                 course: @course,
+                                                 peer_reviews: true,
+                                                 automatic_peer_reviews: false,
+                                                 peer_review_count: 1,
+                                                 points_possible: 10,
+                                                 submission_types: "online_text_entry",
+                                                 peer_review_submission_required: false
+                                               })
+        @written_assignment.submit_homework(@student1, body: "student 1 attempt", submission_type: "online_text_entry")
+        @written_assignment.submit_homework(@student2, body: "student 2 attempt", submission_type: "online_text_entry")
+        @written_assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 1
+        )
+        @written_rubric = @course.rubrics.create!(
+          title: "Written Feedback Rubric",
+          user: @teacher,
+          context: @course,
+          free_form_criterion_comments: true,
+          data: [
+            {
+              points: 4,
+              description: "Quality",
+              id: "criterion_1",
+              ratings: [
+                { description: "Excellent", points: 4, id: "rating_1" },
+                { description: "Poor", points: 0, id: "rating_2" }
+              ]
+            }
+          ],
+          points_possible: 4
+        )
+        assoc = @written_rubric.associate_with(@written_assignment, @course, purpose: "grading")
+        assoc.update!(hide_points: true)
+      end
+
+      it "focuses first incomplete criterion comment area when Submit Peer Review is clicked without completing written feedback rubric", custom_timeout: 30 do
+        visit_peer_reviews_page(@course.id, @written_assignment.id)
+
+        submission_tab = f("div[id='tab-submission']")
+        submission_tab.click
+        wait_for_ajaximations
+
+        submit_button = f("button[data-testid='submit-peer-review-button']")
+        submit_button.click
+        wait_for_ajaximations
+
+        first_comment_area = f("[data-testid^='free-form-comment-area-']")
+        expect(focused_element).to eq(first_comment_area)
+      end
+    end
+
     it "allows peer review submission when rubric is completed", custom_timeout: 30 do
       @assignment.assign_peer_review(@student1, @student3)
 
@@ -802,10 +971,6 @@ describe "peer review student landing page" do
 
       selector = f("input[data-testid='peer-review-selector']")
       expect(selector.attribute("value")).to eq("Peer Review (1 of 2)")
-
-      toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-      toggle_rubric_button.click
-      wait_for_ajaximations
 
       expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
 
@@ -1096,10 +1261,6 @@ describe "peer review student landing page" do
         submission_tab.click
         wait_for_ajaximations
 
-        toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-        toggle_rubric_button.click
-        wait_for_ajaximations
-
         expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed
         expect(f("body")).not_to contain_css("[data-testid='save-rubric-assessment-button']")
       end
@@ -1112,10 +1273,6 @@ describe "peer review student landing page" do
 
         submission_tab = f("div[id='tab-submission']")
         submission_tab.click
-        wait_for_ajaximations
-
-        toggle_rubric_button = f("button[data-testid='toggle-rubric-button']")
-        toggle_rubric_button.click
         wait_for_ajaximations
 
         expect(f("[data-testid='enhanced-rubric-assessment-container']")).to be_displayed

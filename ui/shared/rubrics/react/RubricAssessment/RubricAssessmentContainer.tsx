@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -60,6 +60,7 @@ export type RubricAssessmentContainerProps = {
   onViewModeChange?: (viewMode: ViewMode) => void
   onDismiss: () => void
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
+  triggerValidationAndFocus?: number
 }
 export const RubricAssessmentContainer = ({
   buttonDisplay,
@@ -83,6 +84,7 @@ export const RubricAssessmentContainer = ({
   onDismiss,
   onSubmit,
   onViewModeChange,
+  triggerValidationAndFocus = 0,
 }: RubricAssessmentContainerProps) => {
   const [viewModeSelect, setViewModeSelect] = useLocalStorage<ViewMode>(
     CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
@@ -105,6 +107,9 @@ export const RubricAssessmentContainer = ({
   )
 
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const containerRef = useRef<HTMLElement | null>(null)
+  const submitButtonRef = useRef<HTMLButtonElement | null>(null)
+  const lastProcessedTriggerRef = useRef(0)
 
   const selfAssessmentData: RubricAssessmentData[] = useMemo(() => {
     if (!showSelfAssessment) {
@@ -138,7 +143,7 @@ export const RubricAssessmentContainer = ({
     setRubricAssessmentDraftData(updatedRubricAssessmentData)
   }, [rubricAssessmentData, criteria])
 
-  const preSubmitValidation = () => {
+  const preSubmitValidation = (): string[] => {
     const errors = criteria.reduce((acc: string[], criterion: RubricCriterion) => {
       const assessment = rubricAssessmentDraftData.find(data => data.criterionId === criterion.id)
 
@@ -157,18 +162,58 @@ export const RubricAssessmentContainer = ({
     }, [])
 
     setValidationErrors(errors)
-    return errors.length === 0
+    return errors
   }
 
   const validateOnSubmit = (rubricAssessmentDraftData: RubricAssessmentData[]) => {
     if (isPeerReview) {
-      if (preSubmitValidation()) {
+      if (preSubmitValidation().length === 0) {
         onSubmit?.(rubricAssessmentDraftData)
       }
     } else {
       onSubmit?.(rubricAssessmentDraftData)
     }
   }
+
+  useEffect(() => {
+    if (!triggerValidationAndFocus || triggerValidationAndFocus === lastProcessedTriggerRef.current)
+      return
+    lastProcessedTriggerRef.current = triggerValidationAndFocus
+    const errors = preSubmitValidation()
+
+    if (errors.length === 0) {
+      submitButtonRef.current?.focus()
+      return
+    }
+
+    if (!containerRef.current) return
+    const container = containerRef.current
+    const firstErrorId = errors[0]
+    if (!hidePoints) {
+      const input = container.querySelector(
+        `[data-criterion-score-id="${firstErrorId}"]`,
+      ) as HTMLInputElement | null
+      input?.focus()
+    } else if (isFreeFormCriterionComments) {
+      const commentArea = container.querySelector(
+        `[data-criterion-comment-id="${firstErrorId}"]`,
+      ) as HTMLTextAreaElement | null
+      commentArea?.focus()
+    } else {
+      const ratingContainer = container.querySelector(
+        `[data-criterion-id="${firstErrorId}"]`,
+      ) as Element | null
+      const firstButton = ratingContainer?.querySelector('button') as HTMLButtonElement | null
+      firstButton?.focus()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    triggerValidationAndFocus,
+    criteria,
+    rubricAssessmentDraftData,
+    isFreeFormCriterionComments,
+    hidePoints,
+  ])
 
   const renderViewContainer = () => {
     if (isTraditionalView && !isSelfAssessment) {
@@ -274,7 +319,13 @@ export const RubricAssessmentContainer = ({
   const shouldShowFooter = isStandaloneContainer || (!isPreviewMode && onSubmit)
 
   return (
-    <View as="div" data-testid="enhanced-rubric-assessment-container">
+    <View
+      as="div"
+      data-testid="enhanced-rubric-assessment-container"
+      elementRef={(el: Element | null) => {
+        containerRef.current = el as HTMLElement | null
+      }}
+    >
       <Flex as="div" direction="column">
         <Flex.Item as="header">
           <AssessmentHeader
@@ -313,6 +364,9 @@ export const RubricAssessmentContainer = ({
               })}
               onDismiss={onDismiss}
               onSubmit={onSubmit ? () => validateOnSubmit(rubricAssessmentDraftData) : undefined}
+              onSubmitButtonRef={(el: HTMLButtonElement | null) => {
+                submitButtonRef.current = el
+              }}
             />
           </Flex.Item>
         )}
