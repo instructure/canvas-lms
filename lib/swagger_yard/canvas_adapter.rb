@@ -684,8 +684,19 @@ module SwaggerYard
 
           def extract_param_info_from_tag(tag)
             name = tag.name
-            types = (tag.types || ["String"]).map(&:to_s)
+            types = tag.types&.map(&:to_s)
             desc = tag.text.to_s.strip
+
+            # When YARD encounters @argument param[] [Required, Type], it treats
+            # the empty [] as empty type brackets and discards them, leaving
+            # types=nil and pushing "[Required, Type]" into the description text.
+            # Detect this case and parse types/modifiers from the description.
+            if types.nil? && desc =~ /^\[([^\]]+)\](.*)/m
+              types = $1.split(",").map(&:strip).reject(&:empty?)
+              desc = $2.strip
+            end
+
+            types = ["String"] if types.blank?
 
             name, types = normalize_nested_param_name(name, types, desc)
             is_array = name.end_with?("[]")
@@ -723,7 +734,7 @@ module SwaggerYard
           def add_parameter_to_operation(param_info, operation, body_params)
             location = infer_param_location(param_info[:name], operation)
             schema = build_param_schema(param_info)
-            required = required_param?(param_info[:types], param_info[:description])
+            required = required_param?(param_info[:types])
 
             case location
             when :path
@@ -737,7 +748,19 @@ module SwaggerYard
 
           def build_param_schema(param_info)
             base_schema = map_types_to_schema(param_info[:types])
-            param_info[:is_array] ? "array<#{base_schema}>" : base_schema
+            return base_schema unless param_info[:is_array]
+
+            # If base_schema is a Hash (contains enum values), we need to handle it specially
+            if base_schema.is_a?(Hash)
+              # Return a hash representing an array schema with items that have enum constraints
+              {
+                "type" => "array",
+                "items" => base_schema
+              }
+            else
+              # Simple type, use the string format
+              "array<#{base_schema}>"
+            end
           end
 
           def add_path_parameter(operation, param_info, schema)
@@ -1013,14 +1036,15 @@ module SwaggerYard
             # Parameter.new(name, type, description, options={})
             # type must be a SwaggerYard::Type object
 
-            # If schema is a hash (e.g., with enum), we need to handle it specially
+            # If schema is a hash (e.g., with enum or array with items), we need to handle it specially
             type_obj = if schema.is_a?(Hash)
-                         # Create a Type with the base type, then monkey-patch schema_with to add enum
+                         # Create a Type with the base type, then monkey-patch schema_with to return full schema
                          type = SwaggerYard::Type.new(schema["type"])
                          schema_data = schema
                          type.define_singleton_method(:schema_with) do |**_options|
                            result = { "type" => schema_data["type"] }
                            result["enum"] = schema_data["enum"] if schema_data["enum"]
+                           result["items"] = schema_data["items"] if schema_data["items"]
                            result
                          end
                          type
@@ -1036,15 +1060,15 @@ module SwaggerYard
             )
           end
 
-          def required_param?(types, description)
+          def required_param?(types)
             # Check if parameter is marked as required
-            # Canvas uses "Required" or "required" in type list or description
+            # Canvas uses "Required" in type list (e.g., [Required, String])
+            # Do not check description to avoid false positives from
+            # conditionally required params (e.g., "Required for 'Page' type")
             types_str = types.join(" ").downcase
-            desc_str = description.to_s.downcase
 
             return false if types_str.include?("optional")
             return true if types_str.include?("required")
-            return true if desc_str.match?(/\brequired\b/)
 
             false
           end
