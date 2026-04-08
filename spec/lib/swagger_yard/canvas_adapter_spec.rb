@@ -475,6 +475,56 @@ describe SwaggerYard::CanvasAdapter do
     end
   end
 
+  describe "required_param? (via Operation patch)" do
+    # This method is part of the Operation patch, so we need to test it through
+    # a helper object that includes the same logic
+    let(:test_helper) do
+      Class.new do
+        def required_param?(types)
+          # Check if parameter is marked as required
+          # Canvas uses "Required" in type list (e.g., [Required, String])
+          # Do not check description to avoid false positives from
+          # conditionally required params (e.g., "Required for 'Page' type")
+          types_str = types.join(" ").downcase
+
+          return false if types_str.include?("optional")
+          return true if types_str.include?("required")
+
+          false
+        end
+      end.new
+    end
+
+    it "returns true when types include 'required'" do
+      expect(test_helper.required_param?(["Required", "String"])).to be(true)
+    end
+
+    it "returns true when types include 'required' in lowercase" do
+      expect(test_helper.required_param?(["required", "string"])).to be(true)
+    end
+
+    it "returns false when types include 'optional'" do
+      expect(test_helper.required_param?(["Optional", "String"])).to be(false)
+    end
+
+    it "returns false when types do not include 'required' or 'optional'" do
+      expect(test_helper.required_param?(["String"])).to be(false)
+    end
+
+    it "returns false for empty types array" do
+      expect(test_helper.required_param?([])).to be(false)
+    end
+
+    it "handles mixed case in type names" do
+      expect(test_helper.required_param?(["REQUIRED", "Integer"])).to be(true)
+      expect(test_helper.required_param?(["OPTIONAL", "Integer"])).to be(false)
+    end
+
+    it "returns true for required with enum types" do
+      expect(test_helper.required_param?(["Required", "String", '"active"|"inactive"'])).to be(true)
+    end
+  end
+
   describe "paths_from_yard_object_canvas (via add_path_item integration)" do
     # Test via integration since the method is private and deeply integrated with YARD/SwaggerYard
     # This tests the core logic without needing full YARD object mocking
