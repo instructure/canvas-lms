@@ -101,6 +101,7 @@ export interface EnvCommon {
   ASSET_HOST: string
   JOURNEY_URL?: string
   WIKI_PAGE_ID?: string
+  WIKI_PAGE_UPDATED_AT?: string
   FILE_ID?: string
   STUDY_ASSIST_TOOLS?: string[]
   DOMAIN_ROOT_ACCOUNT_SFID: string
@@ -401,6 +402,7 @@ export type OtherFeatureId =
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
   | 'peer_review_allocation_and_grading'
+  | 'notebook'
   | 'study_assist'
 
 /**
