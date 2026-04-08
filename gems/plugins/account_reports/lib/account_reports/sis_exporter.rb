@@ -592,7 +592,11 @@ module AccountReports
 
     def enrollment_query_options(enrol)
       if @include_deleted
-        enrol.where!("enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL")
+        conditions = +"enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL"
+        if @temp_enroll_feature_enabled && !@sis_format
+          conditions << " OR enrollments.temporary_enrollment_source_user_id IS NOT NULL"
+        end
+        enrol.where!(conditions)
       else
         enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'
                         AND es.state<>'completed'")
