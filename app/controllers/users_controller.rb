@@ -573,6 +573,7 @@ class UsersController < ApplicationController
 
     if stale?(etag: @stream_items)
       @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? && !i.course.grants_right?(@user, :read_as_admin) }
+      @stream_items = @stream_items.reject { |i| i.asset_type == "Conversation" } if @is_observing_student
       render partial: "shared/recent_activity", layout: false
     end
   end

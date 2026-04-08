@@ -1197,7 +1197,14 @@ class ConversationsController < ApplicationController
     scope = @current_user.all_conversations
     scope = scope.where("message_count>0") unless allow_deleted
     @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first
-    raise ActiveRecord::RecordNotFound unless @conversation
+    unless @conversation
+      if api_request? || request.xhr? || params[:format] == "json"
+        raise ActiveRecord::RecordNotFound
+      else
+        flash[:error] = t("conversation_not_found", "That conversation does not exist or you do not have access to it.")
+        redirect_to conversations_url
+      end
+    end
   end
 
   def include_private_conversation_enrollments
