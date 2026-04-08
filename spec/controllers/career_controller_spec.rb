@@ -34,9 +34,57 @@ describe CareerController do
   end
 
   describe "GET show" do
-    it "returns unauthorized without a valid session" do
-      get :show
-      assert_unauthorized
+    context "without authentication" do
+      it "returns unauthorized for bare /career route" do
+        get :show
+        assert_unauthorized
+      end
+
+      it "returns unauthorized for non-public course" do
+        get :show, params: { course_id: @course.id }
+        assert_unauthorized
+      end
+
+      it "returns unauthorized for public academic (non-horizon) course" do
+        academic_course = course_factory(active_all: true, is_public: true)
+        get :show, params: { course_id: academic_course.id }
+        assert_unauthorized
+      end
+
+      it "redirects to login for public but unpublished horizon course" do
+        unpublished_course = course_factory(account: @account)
+        unpublished_course.update!(horizon_course: true, is_public: true, workflow_state: "claimed")
+        @account.enable_feature!(:horizon_course_setting)
+        get :show, params: { course_id: unpublished_course.id }
+        assert_unauthorized
+      end
+
+      context "with a public horizon course" do
+        before do
+          @account.enable_feature!(:horizon_course_setting)
+          @course.update!(is_public: true)
+          allow(controller).to receive(:deferred_js_bundle)
+          allow(controller).to receive(:remote_env)
+        end
+
+        it "renders the SPA without requiring login" do
+          get :show, params: { course_id: @course.id }
+          expect(response).to have_http_status(:ok)
+          expect(response).to render_template("layouts/bare")
+        end
+
+        it "loads the learner app for anonymous users" do
+          expect(controller).to receive(:remote_env).with(
+            canvas_career_learner: "https://example.com/learner"
+          )
+          get :show, params: { course_id: @course.id }
+        end
+
+        it "does not invoke ExperienceResolver" do
+          expect(CanvasCareer::ExperienceResolver).not_to receive(:new)
+          get :show, params: { course_id: @course.id }
+        end
+      end
     end
 
     context "with authenticated user" do
@@ -51,9 +99,10 @@ describe CareerController do
           allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::ACADEMIC)
         end
 
-        it "redirects to root path" do
+        it "redirects to root path with career theme params" do
           get :show, params: { course_id: @course.id }
-          expect(response).to redirect_to(root_path)
+          expected_params = CanvasCareer::Constants::QueryParams::ACADEMIC_CONTENT_ONLY_CAREER_THEME
+          expect(response).to redirect_to("/?#{expected_params.to_query}")
         end
       end
 
