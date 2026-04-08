@@ -31,6 +31,7 @@
     "@instructure/platform-images": "0.2.0",
     "@instructure/platform-learning-agent-launcher": "1.1.1",
     "@instructure/platform-loading-indicator": "0.2.0",
+    "@instructure/platform-notebook": "0.4.1",
     "@instructure/platform-provider": "0.4.1",
     "@instructure/platform-study-assist": "0.11.1",
     "@instructure/platform-widget-dashboard": "3.2.0",
@@ -407,6 +408,7 @@
     "clean": "wsrun --serial --exclude-missing -c clean"
   },
   "resolutions": {
+    "zod": "3.22.4",
     "punycode": "npm:punycode2@1.0.1",
     "@tanstack/query-core": "5.95.2",
     "decode-uri-component": "0.2.2",

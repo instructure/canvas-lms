@@ -2922,6 +2922,14 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-loading-indicator/-/platform-loading-indicator-0.2.0.tgz#6e345adee0316dedc07a266bfa34d6b8d42e8bb0"
   integrity sha512-FMkWqvW6TJHYAdqLKMgLZsBsfAZrmBsMTAkT5TX9Adp7KjuiQVvM29kRkh4jkuaDfzSe5SK0i9oRtHtOQTgc9A==
 
+"@instructure/platform-notebook@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-notebook/-/platform-notebook-0.4.1.tgz#7b17e4eada475f7fc95454dd75bb3cd6427dfb8d"
+  integrity sha512-sGlGX3vuCp/Q6Fxrk8TVEp34mfJrWXuBx7cQQwPpnXLYI/yfnjXGJcBfi+J4xajBCvp81MGsogpzd+2FZcZAwQ==
+  dependencies:
+    diff-match-patch "^1.0.5"
+    zod "^3.25.76"
+
 "@instructure/platform-provider@0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@instructure/platform-provider/-/platform-provider-0.4.1.tgz#5dec8fbe90c00ef6a55820e32836fdff8d8d7e2f"
@@ -10844,6 +10852,11 @@ detect-node@^2.0.4:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
+
+diff-match-patch@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.5.tgz#abb584d5f10cd1196dfc55aa03701592ae3f7b37"
+  integrity sha512-IayShXAgj/QMXgB0IWmKx+rOPuGMhqm5w6jvFxmVenXKIzRqTAAsbBPT3kWQeGANj3jGgvcvv4yK6SxqYmikgw==
 
 diff-sequences@^26.6.2:
   version "26.6.2"
@@ -24680,7 +24693,7 @@ zod-validation-error@^3.0.3:
   resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-3.4.0.tgz#3a8a1f55c65579822d7faa190b51336c61bee2a6"
   integrity sha512-ZOPR9SVY6Pb2qqO5XHt+MkkTRxGXb4EVtnjc9JpXUOtUB1T9Ru7mZOT361AN3MsetVe7R0a1KZshJDZdgp9miQ==
 
-zod@^3.22.4:
+zod@3.22.4, zod@^3.22.4, zod@^3.25.76:
   version "3.22.4"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.4.tgz#f31c3a9386f61b1f228af56faa9255e845cf3fff"
   integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==
