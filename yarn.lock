@@ -2990,27 +2990,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/shared-types/-/shared-types-11.6.0.tgz#b1ae3b7986ffe394911aa1487272f7f7a60e4429"
   integrity sha512-uomkewk/Rfhurlm9dGr7O9hmL3Di3BMZDEjwrfWeGOqFN70xWUNFoEa/f9bqGU/83vAHecM4OlHb7Gz1UqIbnQ==
 
-"@instructure/studio-player@1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.7.0.tgz#c64158c6b80b477b53e5b13434d8b207666e08a2"
-  integrity sha512-JpopJNmChhJH4SEQ+h7TW9lfNRX6PZu6MClpcuWff1Sg65bK5WABXxw6v5piQjEfO+oINIL9LcN+Jjbq1pDk2g==
-  dependencies:
-    "@floating-ui/react" "^0.27.3"
-    "@nanostores/react" "^1.0.0"
-    clsx "^2.1.1"
-    dashjs "4.7.4"
-    i18next "^24.2.1"
-    i18next-resources-to-backend "^1.2.1"
-    jwt-decode "^4.0.0"
-    nanostores "^1.0.1"
-    react "^18.3.1"
-    react-dom "^18.3.1"
-    react-i18next "^15.4.0"
-
-"@instructure/studio-player@1.8.1":
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.8.1.tgz#85060a0e13c0741825e704304cf77c4a0742a12f"
-  integrity sha512-gpz6HxcndfwJ58jaTVs18kA89L3rgOyv/2Bkjne4CVc4dX04AvxnjKFRvD+q91yJxkYdoiADK5F0woLzU5Gujw==
+"@instructure/studio-player@1.8.2":
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.8.2.tgz#735bcc0aca8809faae2091bc3d63413dc5a4bb9c"
+  integrity sha512-mIKrUTBSOD/4VUkZ8buWDZApdHCuNrc72MfHf3slAdv901KkfTAliwMFP5xjp+O+pYrY1Gy/E6KzBnxojwv4KA==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@nanostores/react" "^1.0.0"
