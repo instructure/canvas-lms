@@ -27,12 +27,12 @@ class Types::InstitutionalTagType < Types::ApplicationObjectType
 
   connection_type_class Types::TotalCountConnection
   global_id_field :id
-  field :associations_count, Integer, null: true
+  field :associations_count, Integer, null: false
   field :description,        String,  null: false
   field :name,               String,  null: false
   field :workflow_state,     String,  null: false
   def associations_count
-    object.institutional_tag_associations.where(workflow_state: "active").count
+    Loaders::InstitutionalTagAssociationsCountLoader.load(object)
   end
 
   field :category, Types::InstitutionalTagCategoryType, null: true

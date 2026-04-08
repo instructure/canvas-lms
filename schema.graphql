@@ -5815,7 +5815,7 @@ type InstitutionalTag implements LegacyIDInterface & Node & Timestamped {
   legacy canvas id
   """
   _id: ID!
-  associationsCount: Int
+  associationsCount: Int!
   category: InstitutionalTagCategory
   createdAt: DateTime
   description: String!
@@ -5864,6 +5864,7 @@ type InstitutionalTagCategory implements LegacyIDInterface & Node & Timestamped 
   legacy canvas id
   """
   _id: ID!
+  associationsCount: Int!
   createdAt: DateTime
   description: String
   id: ID!

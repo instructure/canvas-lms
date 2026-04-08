@@ -45,13 +45,20 @@ describe Types::InstitutionalTagType do
     expect(tag_type.resolve("category { _id }")).to eq @tag.category.id.to_s
   end
 
-  it "returns active associations count" do
-    expect(tag_type.resolve("associationsCount")).to eq 2
-  end
+  describe "associationsCount" do
+    it "returns the count of active associations" do
+      expect(tag_type.resolve("associationsCount")).to eq 2
+    end
 
-  it "excludes deleted associations from associationsCount" do
-    @tag.institutional_tag_associations.first.update!(workflow_state: "deleted")
-    expect(tag_type.resolve("associationsCount")).to eq 1
+    it "excludes deleted associations" do
+      @tag.institutional_tag_associations.first.update!(workflow_state: "deleted")
+      expect(tag_type.resolve("associationsCount")).to eq 1
+    end
+
+    it "returns 0 when there are no active associations" do
+      @tag.institutional_tag_associations.update_all(workflow_state: "deleted")
+      expect(tag_type.resolve("associationsCount")).to eq 0
+    end
   end
 
   describe "usersConnection" do
