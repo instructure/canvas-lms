@@ -67,10 +67,37 @@ describe Types::SubmissionCommentType do
       ).to eq("html comment")
     end
 
-    it "html_comment includes html tags" do
-      expect(
-        submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}").first
-      ).to eq(@html_comment.comment)
+    describe "html_comment" do
+      it "preserves safe HTML tags" do
+        expect(
+          submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}").first
+        ).to eql("<div>html comment</div>")
+      end
+
+      it "strips script tags" do
+        @submission2.add_comment(
+          author: @student2,
+          comment: "<script>alert('xss')</script>injected text",
+          attempt: nil
+        )
+        result = GraphQLTypeTester.new(@submission2, current_user: @teacher).resolve(
+          "commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}"
+        ).last
+        expect(result).not_to include("<script>")
+        expect(result).not_to include("alert")
+      end
+
+      it "strips event handler attributes" do
+        @submission2.add_comment(
+          author: @student2,
+          comment: '<img src="x" onerror="alert(1)">',
+          attempt: nil
+        )
+        result = GraphQLTypeTester.new(@submission2, current_user: @teacher).resolve(
+          "commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}"
+        ).last
+        expect(result).not_to include("onerror")
+      end
     end
 
     it "does not throw an error for poorly formatted html" do
