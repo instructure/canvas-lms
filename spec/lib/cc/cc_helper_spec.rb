@@ -416,6 +416,58 @@ describe CC::CCHelper do
       expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}"
     end
 
+    context "wiki page URL resolution" do
+      let(:exporter) { CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false) }
+
+      before do
+        Account.site_admin.enable_feature! :permanent_page_links
+        allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
+      end
+
+      def expect_wiki_link(html, expected_page)
+        doc = Nokogiri::HTML5(exporter.html_content(html))
+        urls = doc.css("a").pluck(:href)
+        expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(expected_page)}"
+      end
+
+      it "resolves normal links without encoding" do
+        page = @course.wiki_pages.create!(title: "normal page")
+        html = %(<a href="/courses/#{@course.id}/pages/normal-page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "decodes pipe character" do
+        page = @course.wiki_pages.create!(title: "source | page")
+        html = %(<a href="/courses/#{@course.id}/pages/source-%7C-page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "decodes special characters including plus sign" do
+        page = @course.wiki_pages.create!(title: "test {+<=>} page")
+        html = %(<a href="/courses/#{@course.id}/pages/test-%7B+%3C=%3E%7D-page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "prioritizes exact slug match before decoded match" do
+        page1 = @course.wiki_pages.create!(title: "test+page")
+        @course.wiki_pages.create!(title: "test page")
+        html = %(<a href="/courses/#{@course.id}/pages/test+page">Link</a>)
+        expect_wiki_link(html, page1)
+      end
+
+      it "preserves plus sign in URL (not decoded as space)" do
+        page = @course.wiki_pages.create!(title: "test+page")
+        html = %(<a href="/courses/#{@course.id}/pages/test+page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "falls back to decoded match when exact slug not found" do
+        page = @course.wiki_pages.create!(title: "test page")
+        html = %(<a href="/courses/#{@course.id}/pages/test%20page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+    end
+
     it "creates a page url with a migration id" do
       allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
