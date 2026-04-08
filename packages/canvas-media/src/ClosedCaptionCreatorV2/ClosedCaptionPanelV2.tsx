@@ -18,7 +18,7 @@
 
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
+import {List} from '@instructure/ui-list'
 import formatMessage from 'format-message'
 import {useMemo} from 'react'
 import {sortedAsrLanguageList} from '../asrClosedCaptionLanguages'
@@ -170,7 +170,7 @@ export function ClosedCaptionPanelV2({
 
       {/* Existing captions */}
       {state.subtitles.length > 0 && (
-        <View>
+        <List isUnstyled aria-label={formatMessage('Captions')} margin="0">
           {state.subtitles.map(subtitle => {
             const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
             const deleteHandler = () => {
@@ -185,20 +185,21 @@ export function ClosedCaptionPanelV2({
             // Server-side failures (no failedOperation) get delete only.
             const showDelete = subtitle.workflow_state !== 'failed' || !subtitle.failedOperation
             return (
-              <CaptionRow
-                url={subtitle.url}
-                filename={subtitle.filename}
-                key={subtitle.locale}
-                workflow_state={subtitle.workflow_state ?? 'ready'}
-                captionName={getCaptionName(subtitle, language)}
-                errorMessage={subtitle.errorMessage}
-                onRetry={getRetryHandler(subtitle)}
-                isInherited={subtitle.inherited}
-                onDelete={showDelete ? deleteHandler : undefined}
-              />
+              <List.Item key={subtitle.locale}>
+                <CaptionRow
+                  url={subtitle.url}
+                  filename={subtitle.filename}
+                  workflow_state={subtitle.workflow_state ?? 'ready'}
+                  captionName={getCaptionName(subtitle, language)}
+                  errorMessage={subtitle.errorMessage}
+                  onRetry={getRetryHandler(subtitle)}
+                  isInherited={subtitle.inherited}
+                  onDelete={showDelete ? deleteHandler : undefined}
+                />
+              </List.Item>
             )
           })}
-        </View>
+        </List>
       )}
 
       {state.creationMode === null && (
