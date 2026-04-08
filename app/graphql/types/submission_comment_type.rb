@@ -59,14 +59,12 @@ module Types
       Nokogiri::HTML(object.comment).text
     end
 
-    # rubocop:disable GraphQL/FieldMethod
     # To keep the GraphQL endpoint consistent, we need to keep the comment field as plain text
     # and return the html comment separately
     field :html_comment, String, null: true
     def html_comment
-      object.comment
+      Sanitize.clean((object.comment || "").to_s, CanvasSanitize::SANITIZE)
     end
-    # rubocop:enable GraphQL/FieldMethod
 
     def author
       # We are preloading submission and assignment here for the permission check.
