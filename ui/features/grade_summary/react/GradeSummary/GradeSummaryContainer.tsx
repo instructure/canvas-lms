@@ -21,7 +21,7 @@ import {useQuery as useApolloQuery, useMutation} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import SubmissionCommentsTray from '../SubmissionCommentsTray'
 

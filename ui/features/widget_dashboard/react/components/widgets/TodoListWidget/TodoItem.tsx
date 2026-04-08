@@ -28,15 +28,17 @@ import {Spinner} from '@instructure/ui-spinner'
 import type {PlannerItem, PlannerOverride} from './types'
 import {formatDate, formatAnnouncementDate, getPlannableTypeLabel, isOverdue} from './utils'
 import {usePlannerOverride} from './hooks/usePlannerOverride'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 interface TodoItemProps {
   item: PlannerItem
   onItemUpdate?: (plannableId: string, plannableType: string, override: PlannerOverride) => void
+  readOnly?: boolean
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
+const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate, readOnly = false}) => {
   const isAnnouncement = item.plannable_type === 'announcement'
   const dateText = isAnnouncement
     ? formatAnnouncementDate(item.plannable_date)
@@ -48,6 +50,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
       onItemUpdate?.(toggledItem.plannable_id, toggledItem.plannable_type, override)
     },
   })
+  const {colors, isDark} = useWidgetTheme()
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const previousLoadingRef = useRef<boolean>(false)
 
@@ -87,7 +90,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
       role="group"
       aria-label={item.plannable?.title ?? I18n.t('Unnamed To-Do')}
       themeOverride={{
-        backgroundSecondary: '#F9FAFA',
+        backgroundSecondary: colors.cardSecondary,
       }}
     >
       <Flex gap="small" alignItems="center">
@@ -176,6 +179,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
               elementRef={(el: Element | null) => {
                 buttonRef.current = el as HTMLButtonElement | null
               }}
+              color={isDark ? 'primary-inverse' : 'secondary'}
               screenReaderLabel={
                 isMarkedComplete
                   ? I18n.t('Mark %{title} as incomplete', {title: item.plannable.title})
@@ -183,6 +187,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate}) => {
               }
               onClick={handleCheckboxClick}
               data-testid={`todo-checkbox-${item.plannable_id}`}
+              interaction={readOnly ? 'disabled' : 'enabled'}
             >
               {isMarkedComplete ? <IconCheckLine color="success" /> : <IconCheckPlusLine />}
             </IconButton>

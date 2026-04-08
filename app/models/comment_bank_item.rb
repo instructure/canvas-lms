@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CommentBankItem < ActiveRecord::Base
+class CommentBankItem < ApplicationRecord
   include Canvas::SoftDeletable
   extend RootAccountResolver
 

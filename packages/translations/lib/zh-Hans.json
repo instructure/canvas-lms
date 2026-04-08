@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "卡积"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "生成字幕失败"
+    },
     "caption_manager_aae0906f": {
         "message": "字幕管理器"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "删除 { captionName } 字幕失败"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "生成 { captionName } 字幕失败"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "上传 { captionName } 字幕失败"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "已经添加 { lang } 的字幕"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "度数符号"
     },
+    "delete_failed_6529e336": {
+        "message": "删除失败"
+    },
     "delimiters_4db4840d": {
         "message": "分隔符"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "英语 (英国)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "输入媒体标题"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "输入至少 3 个字符以进行搜索"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "超大"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "超大 ({ width } x { height }px)"
     },
     "extra_small_9ae33252": {
         "message": "特小"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "大文本"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "大 ({ width } x { height }px)"
+    },
     "latvian_2bbb6aab": {
         "message": "拉脱维亚语"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "中等"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "中 ({ width } x { height }px)"
     },
     "merge_links_2478df96": {
         "message": "合并链接"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "播放{ name }的来自{ createdAt }的媒体评论。"
     },
+    "player_layout_14e09a29": {
+        "message": "播放器布局"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "结果 { index }/{ max }。"
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "重试 { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "重试"
     },
@@ -2255,6 +2288,9 @@
     "show_link_options_545338fd": {
         "message": "显示链接选项"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "显示滚动字幕"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "视力好的用户快速浏览网页，查找大号字体或粗体标题。屏幕读取器用户依赖于标题了解上下文。标题应使用正确的结构。"
     },
@@ -2287,6 +2323,9 @@
     },
     "small_b070434a": {
         "message": "小"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "小 ({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "实心圆"
@@ -2567,6 +2606,9 @@
     "timebar_a4d18443": {
         "message": "进度条"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "标题不能为空"
+    },
     "title_ee03d132": {
         "message": "标题"
     },
@@ -2587,6 +2629,9 @@
     },
     "top_66e0adb6": {
         "message": "顶部"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "字幕面板宽度高于 720px。"
     },
     "tray_839df38a": {
         "message": "托盘"
@@ -2627,6 +2672,9 @@
     "unpublished_dfd8801": {
         "message": "取消发布"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "未保存的更改将丢失。"
+    },
     "untitled_16aa4f2b": {
         "message": "无标题"
     },
@@ -2653,6 +2701,9 @@
     },
     "upload_document_253f0478": {
         "message": "上传文档"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "上传失败"
     },
     "upload_file_fd2361b8": {
         "message": "上传文件"
@@ -2815,6 +2866,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "查看字数和字符数"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "查看器限制"
     },
     "waiting_for_response_1efd0c50": {
         "message": "正在等待响应"

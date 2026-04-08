@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -27,13 +27,15 @@ import {useCourses} from '../../hooks/useCourses'
 import {useCoursesParams} from '../../hooks/useCoursesParams'
 import {CoursesTable} from './CoursesTable'
 import {CoursesSearch} from './CoursesSearch'
+import {TermFilter} from './TermFilter'
 import {useAccessibilityIssueSummary} from '../../hooks/useAccessibilityIssueSummary'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import {EmptyDesert} from '@instructure/platform-images'
 import type {CoursesResponse} from '../../types/course'
 import type {SortOrder} from './SortableTableHeader'
 import {Flex} from '@instructure/ui-flex'
 import {IssueStatusBarChart} from '../../../shared/react/components/BarChart'
+import {useA11yTracking} from '../../../shared/react/hooks/useA11yTracking'
 
 const I18n = createI18nScope('accessibility_course_statistics')
 
@@ -107,13 +109,37 @@ const CoursesPagination: React.FC<{
 
 export const AccessibilityCoursesPage: React.FC = () => {
   const accountId = getAccountId()
-  const {sort, order, page, search, handleChangeSort, handlePageChange, handleSearchChange} =
-    useCoursesParams({
-      defaultSort: 'course_name',
-      defaultOrder: 'asc',
-    })
-  const {data, isLoading, isError} = useCourses({accountId, sort, order, page, search})
-  const {data: issueSummary} = useAccessibilityIssueSummary({accountId})
+  const {
+    sort,
+    order,
+    page,
+    search,
+    enrollmentTermId,
+    handleChangeSort,
+    handlePageChange,
+    handleSearchChange,
+    handleTermChange,
+  } = useCoursesParams({
+    defaultSort: 'course_name',
+    defaultOrder: 'asc',
+  })
+  const {data, isLoading, isError} = useCourses({
+    accountId,
+    sort,
+    order,
+    page,
+    search,
+    enrollment_term_id: enrollmentTermId || undefined,
+  })
+  const {data: issueSummary} = useAccessibilityIssueSummary({
+    accountId,
+    enrollmentTermId: enrollmentTermId || undefined,
+  })
+  const {trackA11yEvent} = useA11yTracking()
+
+  useEffect(() => {
+    trackA11yEvent('ReportPageVisited', {accountId})
+  }, [])
 
   return (
     <View as="div">
@@ -121,7 +147,14 @@ export const AccessibilityCoursesPage: React.FC = () => {
         {I18n.t('Accessibility report')}
       </Heading>
 
-      <CoursesSearch value={search} onChange={handleSearchChange} />
+      <Flex gap="small" margin="0 0 medium">
+        <Flex.Item size="30%">
+          <TermFilter accountId={accountId} value={enrollmentTermId} onChange={handleTermChange} />
+        </Flex.Item>
+        <Flex.Item shouldGrow>
+          <CoursesSearch value={search} onChange={handleSearchChange} />
+        </Flex.Item>
+      </Flex>
 
       <Flex>
         <IssueStatusBarChart

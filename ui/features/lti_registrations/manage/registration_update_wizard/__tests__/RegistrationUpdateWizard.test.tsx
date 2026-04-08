@@ -57,7 +57,6 @@ describe('RegistrationUpdateWizard', () => {
   const defaultProps = {
     accountId: ZAccountId.parse('123'),
     registration: mockRegistration(),
-    ltiRegistrationUpdateRequestId: ZLtiRegistrationUpdateRequestId.parse('update-123'),
     onDismiss: vi.fn(),
     onSuccess: vi.fn(),
   }
@@ -99,7 +98,7 @@ describe('RegistrationUpdateWizard', () => {
     it('renders error page when registration update request fails', async () => {
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json({error: 'Failed to fetch update request'}, {status: 500})
           },
@@ -121,7 +120,7 @@ describe('RegistrationUpdateWizard', () => {
     it('renders error page when registration with config fails', async () => {
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json(mockRegistrationUpdateRequest())
           },
@@ -145,7 +144,7 @@ describe('RegistrationUpdateWizard', () => {
     it('renders error page when both requests fail', async () => {
       server.use(
         http.get(
-          `/api/v1/accounts/${defaultProps.accountId}/lti_registrations/${defaultProps.registration.id}/update_requests/${defaultProps.ltiRegistrationUpdateRequestId}`,
+          `/api/v1/accounts/${defaultProps.accountId}/lti_registrations/${defaultProps.registration.id}/latest_update_request`,
           () => {
             return HttpResponse.json({error: 'Server error'}, {status: 500})
           },
@@ -171,7 +170,7 @@ describe('RegistrationUpdateWizard', () => {
     it('renders wizard with review step when both requests succeed', async () => {
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json(mockRegistrationUpdateRequest())
           },
@@ -194,7 +193,7 @@ describe('RegistrationUpdateWizard', () => {
     it('displays progress bar with correct progress', async () => {
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json(mockRegistrationUpdateRequest())
           },
@@ -217,7 +216,7 @@ describe('RegistrationUpdateWizard', () => {
     it('renders header with close button during error', async () => {
       server.use(
         http.get(
-          `/api/v1/accounts/${defaultProps.accountId}/lti_registrations/${defaultProps.registration.id}/update_requests/${defaultProps.ltiRegistrationUpdateRequestId}`,
+          `/api/v1/accounts/${defaultProps.accountId}/lti_registrations/${defaultProps.registration.id}/latest_update_request`,
           () => {
             return HttpResponse.json({error: 'Server error'}, {status: 500})
           },
@@ -238,7 +237,7 @@ describe('RegistrationUpdateWizard', () => {
     it('renders header with close button during success', async () => {
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json(mockRegistrationUpdateRequest())
           },
@@ -262,7 +261,7 @@ describe('RegistrationUpdateWizard', () => {
     beforeEach(() => {
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json(mockRegistrationUpdateRequest())
           },
@@ -340,7 +339,7 @@ describe('RegistrationUpdateWizard', () => {
 
       server.use(
         http.get(
-          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/update_requests/:updateRequestId',
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
           () => {
             return HttpResponse.json(appliedRequest)
           },
@@ -357,6 +356,36 @@ describe('RegistrationUpdateWizard', () => {
       })
 
       expect(screen.getByText(/This update has already been applied/i)).toBeInTheDocument()
+
+      const closeButtons = screen.queryAllByRole('button', {name: /close/i})
+      expect(closeButtons.length).toBeGreaterThan(0)
+    })
+
+    it('displays "Update Already Rejected" message when status is rejected', async () => {
+      const rejectedRequest = {
+        ...mockRegistrationUpdateRequest(),
+        status: 'rejected' as const,
+      }
+
+      server.use(
+        http.get(
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId/latest_update_request',
+          () => {
+            return HttpResponse.json(rejectedRequest)
+          },
+        ),
+        http.get('/api/v1/accounts/:accountId/lti_registrations/:registrationId', () => {
+          return HttpResponse.json(mockRegistrationWithConfig)
+        }),
+      )
+
+      render(<RegistrationUpdateWizard {...defaultProps} />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByText('Update Already Rejected')).toBeInTheDocument()
+      })
+
+      expect(screen.getByText(/This update has already been rejected/i)).toBeInTheDocument()
 
       const closeButtons = screen.queryAllByRole('button', {name: /close/i})
       expect(closeButtons.length).toBeGreaterThan(0)

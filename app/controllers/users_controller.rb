@@ -404,37 +404,61 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    @current_user.reload if @domain_root_account&.feature_enabled?(:widget_dashboard)
+    @current_user.reload if @domain_root_account&.feature_enabled?(:widget_dashboard) ||
+                            @domain_root_account&.feature_enabled?(:educator_dashboard)
     observed_users_list = observed_users(@current_user, session)
     if should_show_widget_dashboard?
       js_bundle :widget_dashboard
       css_bundle :dashboard_card
 
-      observed_user = (@selected_observed_user && @selected_observed_user != @current_user) ? @selected_observed_user : nil
-      course_data_with_grades = fetch_courses_with_grades(observed_user)
+      if should_show_educator_dashboard?
+        css_bundle :educator_dashboard
+        add_body_class "educator-dashboard"
+        educator_config = @current_user.get_preference(:educator_dashboard_config) || {}
 
-      widget_dashboard_config = @current_user.get_preference(:widget_dashboard_config) || {}
+        js_env({
+                 PREFERENCES: {
+                   dashboard_view: @current_user.dashboard_view(@domain_root_account),
+                   hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
+                   custom_colors: @current_user.custom_colors,
+                   learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard",
+                   widget_dashboard_config: educator_config
+                 },
+                 DASHBOARD_FEATURES: {
+                   widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
+                   platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard),
+                   educator_dashboard: true
+                 }
+               })
+      else
+        observed_user = (@selected_observed_user && @selected_observed_user != @current_user) ? @selected_observed_user : nil
+        course_data_with_grades = fetch_courses_with_grades(observed_user)
+        widget_dashboard_config = @current_user.get_preference(:widget_dashboard_config) || {}
 
-      js_env({
-               PREFERENCES: {
-                 dashboard_view: @current_user.dashboard_view(@domain_root_account),
-                 hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
-                 custom_colors: @current_user.custom_colors,
-                 learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard",
-                 widget_dashboard_config:
-               },
-               OBSERVED_USERS_LIST: observed_users_list,
-               OBSERVED_USER_ID: observed_user&.id,
-               CAN_ADD_OBSERVEE: @current_user
+        js_env({
+                 PREFERENCES: {
+                   dashboard_view: @current_user.dashboard_view(@domain_root_account),
+                   hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
+                   custom_colors: @current_user.custom_colors,
+                   learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard",
+                   widget_dashboard_config:
+                 },
+                 OBSERVED_USERS_LIST: observed_users_list,
+                 OBSERVED_USER_ID: observed_user&.id,
+                 CAN_ADD_OBSERVEE: @current_user
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
-               SHARED_COURSE_DATA: course_data_with_grades,
-               DASHBOARD_FEATURES: {
-                 widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
-                 platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard)
-               }
-             })
+                 SHARED_COURSE_DATA: course_data_with_grades,
+                 WIDGET_DASHBOARD_DARK_MODE: !!@current_user&.preferences&.dig(:widget_dashboard_dark_mode),
+                 DASHBOARD_FEATURES: {
+                   widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
+                   widget_dashboard_dark_mode: Account.site_admin.feature_enabled?(:widget_dashboard_dark_mode),
+                   platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard),
+                   educator_dashboard: false
+                 }
+               })
+      end
       return render html: "", layout: true
     end
 
@@ -461,8 +485,9 @@ class UsersController < ApplicationController
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
-    # (skip if already reloaded above for widget_dashboard)
-    @current_user.reload unless @domain_root_account&.feature_enabled?(:widget_dashboard)
+    # (skip if already reloaded above for widget_dashboard or educator_dashboard)
+    @current_user.reload unless @domain_root_account&.feature_enabled?(:widget_dashboard) ||
+                                @domain_root_account&.feature_enabled?(:educator_dashboard)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, overwrite: true)
@@ -484,9 +509,9 @@ class UsersController < ApplicationController
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
-                                 .profile
-                                 .tabs_available(@current_user, root_account: @domain_root_account)
-                                 .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                               .profile
+                               .tabs_available(@current_user, root_account: @domain_root_account)
+                               .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
            })
 
     # prefetch dashboard cards with the right observer url param
@@ -1375,6 +1400,7 @@ class UsersController < ApplicationController
                    ROOT_ACCOUNT_ID: @context_account.root_account.id,
                    TIMEZONES: timezones,
                    DEFAULT_TIMEZONE_NAME: default_timezone_name,
+                   PV5_ENABLED: PageViews::Configuration.configured?,
                  })
           render status:
         end
@@ -1498,10 +1524,8 @@ class UsersController < ApplicationController
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
 
-    @display_override = if @domain_root_account.feature_enabled?("open_tools_in_new_tab") && @tool.extension_setting("user_navigation", "windowTarget") == "_blank"
+    @display_override = if @tool.extension_setting("user_navigation", "windowTarget") == "_blank"
                           "borderless"
-                        else
-                          nil
                         end
 
     render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: @display_override)
@@ -1717,6 +1741,7 @@ class UsersController < ApplicationController
     elementary_dashboard_disabled
     default_to_block_editor
     widget_dashboard_user_preference
+    widget_dashboard_dark_mode
   ].freeze
 
   # @API Update user settings.
@@ -1751,6 +1776,9 @@ class UsersController < ApplicationController
   #   If true, enables the widget dashboard for the user. Only applies
   #   when the widget_dashboard feature is enabled at the account level.
   #   Defaults to true when the feature becomes available.
+  #
+  # @argument widget_dashboard_dark_mode [Boolean]
+  #   If true, enables the dark color theme for the widget dashboard.
   #
   # @example_request
   #
@@ -2658,7 +2686,7 @@ class UsersController < ApplicationController
       into_user = api_find(User, params[:destination_user_id], account: destination_account)
 
       if authorized_action(into_user, @current_user, :merge)
-        UserMerge.from(user).into into_user
+        UserMerge.from(user).into(into_user, merger: @current_user)
         render(json: user_json(into_user,
                                @current_user,
                                session,
@@ -3570,6 +3598,10 @@ class UsersController < ApplicationController
   def should_show_widget_dashboard?
     return false if k5_user?
 
+    # Educators with the educator_dashboard flag bypass the widget_dashboard
+    # flag check — the educator_dashboard flag itself is their opt-in
+    return true if should_show_educator_dashboard?
+
     # Single feature flag lookup to avoid redundant queries
     flag = @domain_root_account&.lookup_feature_flag(:widget_dashboard)
     return false unless flag&.enabled? || flag&.can_override?
@@ -3584,5 +3616,23 @@ class UsersController < ApplicationController
       return true
     end
     false
+  end
+
+  def should_show_educator_dashboard?
+    return false if k5_user?
+    return false unless @domain_root_account&.feature_enabled?(:educator_dashboard)
+
+    Rails.cache.fetch_with_batched_keys(
+      "should_show_educator_dashboard",
+      batch_object: @current_user,
+      batched_keys: :enrollments,
+      expires_in: 1.hour
+    ) do
+      @current_user.enrollments
+                   .shard(@current_user.in_region_associated_shards)
+                   .of_content_admins
+                   .active_or_pending
+                   .exists?
+    end
   end
 end

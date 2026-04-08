@@ -25,6 +25,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {getAllWidgets} from '../WidgetRegistry'
 import {useWidgetLayout} from '../../hooks/useWidgetLayout'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
+import {useWidgetDashboard} from '../../hooks/useWidgetDashboardContext'
+import {WIDGET_TYPES} from '../../constants'
 import WidgetCard from './WidgetCard'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -44,6 +46,12 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
 }) => {
   const {addWidget, config} = useWidgetLayout()
   const {isMobile} = useResponsiveContext()
+  const {currentUserRoles} = useWidgetDashboard()
+  const isObserver = currentUserRoles?.includes('observer') ?? false
+
+  const availableWidgets = Object.entries(getAllWidgets()).filter(
+    ([type]) => !(isObserver && type === WIDGET_TYPES.INBOX),
+  )
 
   const isWidgetOnDashboard = useCallback(
     (widgetType: string): boolean => {
@@ -80,7 +88,7 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
       </Modal.Header>
       <Modal.Body>
         <Flex direction="row" wrap="wrap" gap="small" alignItems="stretch">
-          {Object.entries(getAllWidgets()).map(([type, renderer]) => (
+          {availableWidgets.map(([type, renderer]) => (
             <Flex.Item key={type} width={isMobile ? '100%' : 'calc(50% - 0.5rem)'}>
               <WidgetCard
                 type={type}

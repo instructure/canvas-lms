@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Thumbnail < ActiveRecord::Base
+class Thumbnail < ApplicationRecord
   belongs_to :attachment, foreign_key: "parent_id", inverse_of: :thumbnails
 
   # the ":keep_profile => true" part is in here so that we tell mini_magic to not try to pass the command line option -strip.

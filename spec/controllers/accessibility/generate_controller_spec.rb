@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 RSpec.describe Accessibility::GenerateController do
   describe "#create_table_caption" do
     let!(:course) { Course.create! }
@@ -42,7 +40,7 @@ RSpec.describe Accessibility::GenerateController do
 
       stub_const("CedarClient", Class.new do
         def self.conversation(*)
-          Struct.new(:response, keyword_init: true).new(response: "Generated Caption")
+          Struct.new(:response).new(response: "Generated Caption")
         end
       end)
     end
@@ -141,7 +139,7 @@ RSpec.describe Accessibility::GenerateController do
 
       stub_const("CedarClient", Class.new do
         def self.generate_alt_text(*)
-          Struct.new(:image, keyword_init: true).new(image: { "altText" => "Generated alt text" })
+          Struct.new(:image).new(image: { "altText" => "Generated alt text" })
         end
       end)
     end
@@ -173,18 +171,18 @@ RSpec.describe Accessibility::GenerateController do
         expect(response.parsed_body).to eq({ "value" => "Generated alt text" })
       end
 
-      it "returns bad_request when user cannot read attachment" do
+      it "returns forbidden when user cannot read attachment" do
         allow(Attachment).to receive(:find_by).with(id: attachment.id.to_s).and_return(attachment)
         allow(attachment).to receive(:grants_right?).and_return(false)
 
         post :create_image_alt_text, params:, format: :json
 
-        expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["error"]).to eq("Attachment not found")
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body["error"]).to eq("You do not have permission to access this attachment")
       end
 
-      it "returns bad_request when image is too large" do
-        large_attachment = attachment_model(context: user, size: 11.megabytes, content_type: "image/png")
+      it "returns request_entity_too_large when image is too large" do
+        large_attachment = attachment_model(context: user, size: 4.megabytes, content_type: "image/png")
         wiki_page.update!(body: "<div><p><img src=\"/files/#{large_attachment.id}\" /></p></div>")
 
         allow(Attachment).to receive(:find_by).with(id: large_attachment.id.to_s).and_return(large_attachment)
@@ -192,11 +190,11 @@ RSpec.describe Accessibility::GenerateController do
 
         post :create_image_alt_text, params:, format: :json
 
-        expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["error"]).to eq("Attachment not found")
+        expect(response).to have_http_status(:content_too_large)
+        expect(response.parsed_body["error"]).to eq("Attachment exceeds the maximum allowed size")
       end
 
-      it "returns bad_request when image type is not supported" do
+      it "returns unsupported_media_type when image type is not supported" do
         unsupported_attachment = attachment_model(context: user, size: 1.megabyte, content_type: "application/pdf")
         wiki_page.update!(body: "<div><p><img src=\"/files/#{unsupported_attachment.id}\" /></p></div>")
 
@@ -205,8 +203,8 @@ RSpec.describe Accessibility::GenerateController do
 
         post :create_image_alt_text, params:, format: :json
 
-        expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["error"]).to eq("Attachment not found")
+        expect(response).to have_http_status(:unsupported_media_type)
+        expect(response.parsed_body["error"]).to eq("Attachment type is not supported")
       end
     end
 
@@ -231,7 +229,7 @@ RSpec.describe Accessibility::GenerateController do
         post :create_image_alt_text, params:, format: :json
 
         expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["error"]).to eq("Attachment not found")
+        expect(response.parsed_body["error"]).to eq("Invalid or missing parameters")
       end
     end
 
@@ -252,10 +250,10 @@ RSpec.describe Accessibility::GenerateController do
         }
       end
 
-      it "returns bad_request when attachment does not exist" do
+      it "returns not_found when attachment does not exist" do
         post :create_image_alt_text, params:, format: :json
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:not_found)
         expect(response.parsed_body["error"]).to eq("Attachment not found")
       end
     end
@@ -274,7 +272,7 @@ RSpec.describe Accessibility::GenerateController do
         post :create_image_alt_text, params:, format: :json
 
         expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["error"]).to eq("Attachment not found")
+        expect(response.parsed_body["error"]).to eq("Invalid or missing parameters")
       end
     end
   end

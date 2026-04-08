@@ -123,7 +123,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButton)
 
     // Manual caption creator should be visible
-    expect(screen.getByText('Select Language')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
     expect(screen.getByText(/choose file/i)).toBeInTheDocument()
     expect(screen.getByText('Upload')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButton)
 
     // Select a language
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -193,7 +193,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
     // Open the language dropdown
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // English should not be in the dropdown (filtered out)
@@ -209,7 +209,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
 
     // Open the language dropdown
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // English should not be in the ASR dropdown (filtered out)
@@ -231,7 +231,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButton)
 
     // Select English and upload
-    let selectPlaceholder = screen.getByText('Select Language')
+    let selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -249,7 +249,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(addNewButtonAgain)
 
     // Open the language dropdown
-    selectPlaceholder = screen.getByText('Select Language')
+    selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
 
     // English should not be in the dropdown anymore
@@ -265,10 +265,10 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
 
     // Form should be visible
-    expect(screen.getByText('Language Spoken in This Media*')).toBeInTheDocument()
+    expect(screen.getAllByText('Language Spoken in This Media*').length).toBeGreaterThan(0)
 
     // Select a language
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('German'))
 
@@ -291,7 +291,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
 
     // Select a language from ASR dropdown
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('Spanish'))
 
@@ -372,7 +372,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
       // Select a language and file
-      const selectPlaceholder = screen.getByText('Select Language')
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
       fireEvent.click(selectPlaceholder)
       fireEvent.click(screen.getByText('Spanish'))
 
@@ -420,7 +420,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
       // Select a language and file
-      const selectPlaceholder = screen.getByText('Select Language')
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
       fireEvent.click(selectPlaceholder)
       fireEvent.click(screen.getByText('German'))
 
@@ -465,11 +465,10 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
 
     it('a11y: retry upload re-announces and succeeds on retry', async () => {
-      let callCount = 0
+      let shouldFail = true
       server.use(
         http.put('**/api/media_objects/*/media_tracks', () => {
-          callCount++
-          if (callCount === 1) {
+          if (shouldFail) {
             return HttpResponse.json({error: 'Server error'}, {status: 500})
           }
           return HttpResponse.json({data: 'success'})
@@ -481,7 +480,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       // Open manual caption creator
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
 
-      const selectPlaceholder = screen.getByText('Select Language')
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
       fireEvent.click(selectPlaceholder)
       fireEvent.click(screen.getByText('German'))
 
@@ -500,6 +499,8 @@ describe('<ClosedCaptionPanelV2 />', () => {
         },
         {timeout: 5000},
       )
+
+      shouldFail = false
 
       // Click retry
       fireEvent.click(screen.getByText('Retry German'))
@@ -549,7 +550,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
 
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('German'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -577,6 +578,36 @@ describe('<ClosedCaptionPanelV2 />', () => {
       expect(screen.getByText('Delete Failed')).toBeInTheDocument()
     })
 
+    it('server-side failed caption shows delete but not retry', () => {
+      const initialSubtitles: Subtitle[] = [{locale: 'en', workflow_state: 'failed', asr: true}]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      expect(screen.getByText('English (Automatic)')).toBeInTheDocument()
+      expect(screen.getByText('Delete English (Automatic)')).toBeInTheDocument()
+      expect(screen.queryByText(/retry/i)).not.toBeInTheDocument()
+    })
+
+    it('deleting a server-side failed ASR caption re-enables the Request button', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [{locale: 'en', workflow_state: 'failed', asr: true}]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Request button should be hidden (asr caption exists)
+      expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+
+      // Delete the failed ASR caption
+      fireEvent.click(screen.getByText('Delete English (Automatic)'))
+
+      // Caption should be removed and Request button should reappear
+      expect(await screen.findByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+      expect(screen.queryByText('English (Automatic)')).not.toBeInTheDocument()
+    })
+
     it('a11y: announces when ASR caption generation fails', async () => {
       server.use(
         http.post('/api/v1/media_objects/*/asr', () =>
@@ -587,7 +618,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
 
       fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
 
@@ -611,7 +642,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
 
       fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
 
@@ -675,7 +706,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('English'))
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
       fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
@@ -692,7 +723,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
     it('fires canvas_caption_submitted when ASR request is confirmed', async () => {
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
       await waitFor(() => {
@@ -710,7 +741,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('English'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -734,7 +765,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('German'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -756,7 +787,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       )
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
       fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('German'))
       fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
         target: {files: [createValidFile()]},
@@ -772,6 +803,8 @@ describe('<ClosedCaptionPanelV2 />', () => {
           flow_type: 'upload_file',
         })
       })
+      // Drain the in-flight retry PUT so it doesn't leak into subsequent tests.
+      await screen.findByText('Upload Failed')
     })
 
     it('fires canvas_caption_item_action delete when delete button clicked', async () => {
@@ -810,6 +843,58 @@ describe('<ClosedCaptionPanelV2 />', () => {
         flow_type: 'upload_file',
         error_type: 'delete_failed',
       })
+    })
+  })
+
+  describe('caption download', () => {
+    it('shows download button for each existing caption row', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', url: 'https://example.com/en.srt', file: {name: 'english.vtt'}},
+        {locale: 'es', url: 'https://example.com/es.srt', file: {name: 'spanish.vtt'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      expect(screen.getByText('Download English')).toBeInTheDocument()
+      expect(screen.getByText('Download Spanish')).toBeInTheDocument()
+    })
+
+    it('download button is a link with href when subtitle has url', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', url: 'https://example.com/en.srt', file: {name: 'english.vtt'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const downloadLink = screen.getByText('Download English').closest('a')
+      expect(downloadLink).toBeInTheDocument()
+      expect(downloadLink).toHaveAttribute('href', 'https://example.com/en.srt')
+    })
+
+    it('download button has no href when subtitle has no url', () => {
+      const initialSubtitles: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      expect(screen.getByText('Download English')).toBeInTheDocument()
+      expect(screen.getByText('Download English').closest('a')).toBeNull()
+    })
+
+    it('sets href and filename on the download link', () => {
+      const initialSubtitles: Subtitle[] = [
+        {
+          locale: 'fr',
+          url: 'https://example.com/fr.srt',
+          filename: 'french_fr.srt',
+          file: {name: 'french.vtt'},
+        },
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const downloadLink = screen.getByText('Download French').closest('a')
+      expect(downloadLink).toHaveAttribute('href', 'https://example.com/fr.srt')
+      expect(downloadLink).toHaveAttribute('download', 'french_fr.srt')
     })
   })
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ObserverPairingCode < ActiveRecord::Base
+class ObserverPairingCode < ApplicationRecord
   belongs_to :user, inverse_of: :observer_pairing_codes
   validates :user_id, :expires_at, :code, presence: true
 

@@ -35,6 +35,7 @@ interface UsePlannerItemsOptions {
     | 'all_ungraded_todo_items'
     | 'incomplete_items'
     | 'complete_items'
+  observedUserId?: string | null
 }
 
 interface UsePlannerItemsResult {
@@ -55,7 +56,7 @@ interface UsePlannerItemsResult {
 }
 
 export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlannerItemsResult {
-  const {perPage = 5, startDate, endDate, order = 'asc', filter} = options
+  const {perPage = 5, startDate, endDate, order = 'asc', filter, observedUserId} = options
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
   const [allPages, setAllPages] = useState<PlannerItem[][]>([])
   const [nextUrls, setNextUrls] = useState<(string | null)[]>([])
@@ -71,9 +72,10 @@ export function usePlannerItems(options: UsePlannerItemsOptions = {}): UsePlanne
     if (startDate) params.start_date = startDate
     if (endDate) params.end_date = endDate
     if (filter) params.filter = filter
+    if (observedUserId) params.observed_user_id = observedUserId
 
     return params
-  }, [perPage, startDate, endDate, order, filter])
+  }, [perPage, startDate, endDate, order, filter, observedUserId])
 
   const {
     data,

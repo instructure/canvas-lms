@@ -27,7 +27,7 @@ import {plannerItemsHandlers, plannerNoteHandlers, widgetConfigHandlers} from '.
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const mockWidget: Widget = {
@@ -90,13 +90,15 @@ const renderWithClient = (ui: React.ReactElement) => {
     },
   })
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 
@@ -134,18 +136,20 @@ describe('TodoListWidget - Filter Dropdown', () => {
     }
 
     render(
-      <QueryClientProvider client={queryClient}>
-        <WidgetDashboardProvider
-          sharedCourseData={mockSharedCourseData}
-          preferences={persistedPreferences}
-        >
-          <WidgetDashboardEditProvider>
-            <WidgetLayoutProvider>
-              <TodoListWidget {...buildDefaultProps()} />
-            </WidgetLayoutProvider>
-          </WidgetDashboardEditProvider>
-        </WidgetDashboardProvider>
-      </QueryClientProvider>,
+      <PlatformTestWrapper>
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider
+            sharedCourseData={mockSharedCourseData}
+            preferences={persistedPreferences}
+          >
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>
+                <TodoListWidget {...buildDefaultProps()} />
+              </WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </WidgetDashboardProvider>
+        </QueryClientProvider>
+      </PlatformTestWrapper>,
     )
 
     await waitFor(() => {

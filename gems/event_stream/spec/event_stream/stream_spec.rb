@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EventStream::Stream do
   subject(:stream) do
     # can't access spec methods from the instance_eval block

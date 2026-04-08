@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::MasterMigration < ActiveRecord::Base
+class MasterCourses::MasterMigration < ApplicationRecord
   # represents and handles a blueprint sync event
   # a sync is considered successful when all associated courses have the same data
   # (barring any "exceptions" i.e. modifications on the associated course that we'll leave alone)

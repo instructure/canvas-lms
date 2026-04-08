@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class TermsOfService < ActiveRecord::Base
+class TermsOfService < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :account

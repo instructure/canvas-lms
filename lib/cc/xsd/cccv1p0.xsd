@@ -620,6 +620,22 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="navMenuLinks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="navMenuLink" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="label" type="xs:string" />
+              <xs:element name="url" type="xs:anyURI" />
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:complexType name="ratingsType">
     <xs:sequence>
       <xs:element name="rating" minOccurs="0" maxOccurs="unbounded">

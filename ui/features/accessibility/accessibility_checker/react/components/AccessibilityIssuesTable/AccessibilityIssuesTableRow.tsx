@@ -22,6 +22,7 @@ import {IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Table, TableCellProps} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
+import {canvas} from '@instructure/ui-themes'
 
 import {AccessibilityResourceScan, ResourceWorkflowState} from '../../../../shared/react/types'
 import {ContentTypeCell} from './Cells/ContentTypeCell'
@@ -35,20 +36,39 @@ const baseCellThemeOverride: TableCellProps['themeOverride'] = _componentTheme =
   padding: '1.0625rem 0.75rem', // Make cell height a total of 3.75rem at minimum
 })
 
+type ActiveTableRowProps = {
+  children: React.ReactNode
+  'data-testid'?: string
+}
+
+const ActiveTableRow = ({children, ...rest}: ActiveTableRowProps) => (
+  <tr
+    style={{
+      borderBottom: `0.0625rem solid ${canvas.colors.primitives.grey30}`,
+      outline: `2px solid ${canvas.colors.primitives.blue45}`,
+      outlineOffset: '-1px',
+    }}
+    {...rest}
+  >
+    {children}
+  </tr>
+)
+
 type Props = {
   item: AccessibilityResourceScan
   isMobile: boolean
+  isSelected: boolean
 }
 
-export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => {
+export const AccessibilityIssuesTableRow = ({item, isMobile, isSelected}: Props) => {
   const {mutate: queueRescan} = useQueueScanResource()
 
   const handleRescan = (scanItem: AccessibilityResourceScan) => {
     queueRescan({item: scanItem})
   }
 
-  return (
-    <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
+  const cells = (
+    <>
       <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
         <Link data-pendo="navigate-to-resource-url" href={item.resourceUrl}>
           <Text lineHeight="lineHeight150">{item.resourceName}</Text>
@@ -101,6 +121,12 @@ export const AccessibilityIssuesTableRow = ({item, isMobile}: Props) => {
       <Table.Cell>
         <ActionsMenuCell scan={item} />
       </Table.Cell>
-    </Table.Row>
+    </>
   )
+
+  if (isSelected) {
+    return <ActiveTableRow data-testid={`issue-row-${item.id}`}>{cells}</ActiveTableRow>
+  }
+
+  return <Table.Row data-testid={`issue-row-${item.id}`}>{cells}</Table.Row>
 }

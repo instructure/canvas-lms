@@ -260,7 +260,7 @@
     <% end %>
 
     <% if show_rubric_section? && !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
-      <div class="content-box">
+      <div class="content-box" id="assignment-rubric-section">
         <a
           href="<%= context_url(@context, :context_rubrics_url) %>"
           class="add_rubric_link Button icon-plus"

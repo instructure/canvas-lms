@@ -18,22 +18,14 @@
 
 import {useEffect, useMemo} from 'react'
 import {debounce} from '@instructure/debounce'
-import type {CardConfig} from '../types'
+import type {CardConfig, UseIframeMessagingOptions} from '../types'
 import {fetchPreviewToken, toApiConfig} from '../api'
 
 const DISCOVERY_PAGE_PREVIEW = 'DISCOVERY_PAGE_PREVIEW'
 const DEBOUNCE_MS = 500
 
-interface UseIframeMessagingOptions {
-  iframeRef: React.RefObject<HTMLIFrameElement>
-  config: CardConfig
-  previewUrl?: string
-}
-
-/**
- * Hook to send a signed JWT preview token to an iframe via postMessage.
- * Debounces API calls (~500ms) so rapid edits don’t hammer the token endpoint.
- */
+// hook to send a signed JWT preview token to an iframe via postMessage
+// de-bounces API calls (~500ms) so rapid edits don’t hammer the token endpoint
 export function useIframeMessaging({
   iframeRef,
   config,
@@ -41,6 +33,7 @@ export function useIframeMessaging({
 }: UseIframeMessagingOptions): void {
   const targetOrigin = useMemo(() => {
     if (!previewUrl) return null
+
     try {
       return new URL(previewUrl).origin
     } catch {

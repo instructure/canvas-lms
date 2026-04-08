@@ -22,8 +22,19 @@ import {usePendoTracking} from './usePendoTracking'
 
 const EVENT_PREFIX = 'canvasCourseA11yChecker'
 
-export type A11yIssueEvent = 'IssueSkipped' | 'IssueFixed' | 'PageViewOpened' | 'PageEditorOpened'
-export type A11yEvent = 'CourseScanned' | 'ResourceRemediated' | 'CourseRemediated'
+export type A11yIssueEvent =
+  | 'IssueSkipped'
+  | 'IssueFixed'
+  | 'PageViewOpened'
+  | 'PageEditorOpened'
+  | 'AiTableCaptionButtonPushed'
+  | 'AiAltTextButtonPushed'
+export type A11yEvent =
+  | 'CourseScanned'
+  | 'ResourceRemediated'
+  | 'CourseRemediated'
+  | 'ResourceClosed'
+  | 'ReportPageVisited'
 
 export const useA11yTracking = () => {
   const {trackEvent} = usePendoTracking()

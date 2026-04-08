@@ -70,14 +70,16 @@ import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
 import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
+import {PlatformTestWrapper} from '../../__tests__/testHelpers'
 
 type Props = {
   config: WidgetConfig
   matches?: string[]
+  currentUserRoles?: string[]
 }
 
 const setUp = (props: Props, isEditMode = false) => {
-  const {matches = ['desktop'], ...gridProps} = props
+  const {matches = ['desktop'], currentUserRoles, ...gridProps} = props
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {retry: false},
@@ -86,17 +88,19 @@ const setUp = (props: Props, isEditMode = false) => {
   })
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider>
-        <ResponsiveProvider matches={matches}>
-          <WidgetDashboardEditProvider>
-            <WidgetLayoutProvider>
-              <WidgetGrid {...gridProps} isEditMode={isEditMode} />
-            </WidgetLayoutProvider>
-          </WidgetDashboardEditProvider>
-        </ResponsiveProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider currentUserRoles={currentUserRoles}>
+          <ResponsiveProvider matches={matches}>
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>
+                <WidgetGrid {...gridProps} isEditMode={isEditMode} />
+              </WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </ResponsiveProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 
@@ -341,6 +345,39 @@ describe('WidgetGrid', () => {
 
       expect(column1).toBeInTheDocument()
       expect(column2).toBeInTheDocument()
+    })
+  })
+
+  describe('observer filtering', () => {
+    const configWithInbox: WidgetConfig = {
+      columns: 2,
+      widgets: [
+        {
+          id: 'inbox-widget-1',
+          type: 'inbox',
+          position: {col: 1, row: 1, relative: 1},
+          title: 'Inbox',
+        },
+        {
+          id: 'other-widget-1',
+          type: 'test-widget',
+          position: {col: 2, row: 1, relative: 2},
+          title: 'Other Widget',
+        },
+      ],
+    }
+
+    it('hides pre-existing inbox widget for observers', () => {
+      setUp({config: configWithInbox, currentUserRoles: ['observer', 'user']})
+
+      expect(screen.queryByTestId('widget-container-inbox-widget-1')).not.toBeInTheDocument()
+      expect(screen.getByTestId('widget-container-other-widget-1')).toBeInTheDocument()
+    })
+
+    it('shows inbox widget for non-observers', () => {
+      setUp({config: configWithInbox})
+
+      expect(screen.getByTestId('widget-container-inbox-widget-1')).toBeInTheDocument()
     })
   })
 })

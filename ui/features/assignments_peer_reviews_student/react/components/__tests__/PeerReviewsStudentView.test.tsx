@@ -151,6 +151,47 @@ describe('PeerReviewsStudentView', () => {
     })
   })
 
+  it('renders the assignment title inside an h1 heading', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '1',
+        name: 'Test Peer Review Assignment',
+        description: '<p>This is the assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+          submissionRequired: false,
+        },
+        peerReviewSubAssignment: {
+          dueAt: '2025-12-31T23:59:59Z',
+          unlockAt: null,
+          lockAt: null,
+        },
+        submissionsConnection: {
+          nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    const {getByTestId} = setup()
+
+    await waitFor(() => {
+      expect(getByTestId('title')).toBeInTheDocument()
+    })
+
+    const titleElement = getByTestId('title')
+    const headingElement = titleElement.closest('h1')
+    expect(headingElement).toBeInTheDocument()
+  })
+
   it('renders assignment details successfully', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
@@ -898,29 +939,6 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(getByText('Submission')).toBeInTheDocument()
-    })
-
-    it('renders divider on mobile', async () => {
-      mockExecuteQuery.mockResolvedValueOnce({
-        assignment: {
-          _id: '17',
-          name: 'Mobile Divider Test',
-          dueAt: '2025-12-31T23:59:59Z',
-          description: '<p>Description</p>',
-          peerReviewSubAssignment: null,
-          assessmentRequestsForCurrentUser: [],
-        },
-      })
-
-      const {container} = setup({
-        assignmentId: '17',
-        breakpoints: {mobileOnly: true, tablet: false, desktop: false},
-      })
-
-      await waitFor(() => {
-        const dividers = container.querySelectorAll('hr')
-        expect(dividers.length).toBeGreaterThan(0)
-      })
     })
   })
 

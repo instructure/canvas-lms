@@ -36,7 +36,7 @@ beforeEach(() => {
   server.resetHandlers()
   vi.resetAllMocks()
   ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-    const state = {isAiTableCaptionGenerationEnabled: true}
+    const state = {isAiTableCaptionGenerationEnabled: true, selectedScan: null}
     return selector(state)
   })
 })
@@ -181,10 +181,18 @@ describe('TextInputForm', () => {
       expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
     })
 
+    it('renders data-pendo="AiTableCaptionButtonPushed" on the generate button', () => {
+      render(<TextInputForm {...propsWithGenerateOption} />)
+      expect(screen.getByTestId('generate-button')).toHaveAttribute(
+        'data-pendo',
+        'AiTableCaptionButtonPushed',
+      )
+    })
+
     describe('AI generation feature flag', () => {
       it('shows generate button when feature flag is enabled', () => {
         ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-          const state = {isAiTableCaptionGenerationEnabled: true}
+          const state = {isAiTableCaptionGenerationEnabled: true, selectedScan: null}
           return selector(state)
         })
 
@@ -195,7 +203,7 @@ describe('TextInputForm', () => {
 
       it('hides generate button when feature flag is disabled', () => {
         ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-          const state = {isAiTableCaptionGenerationEnabled: false}
+          const state = {isAiTableCaptionGenerationEnabled: false, selectedScan: null}
           return selector(state)
         })
 

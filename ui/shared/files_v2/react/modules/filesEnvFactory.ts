@@ -24,6 +24,7 @@ declare const ENV: {
   FILES_CONTEXTS?: FileContext[]
   FEATURES?: {
     restrict_student_access?: boolean
+    files_a11y_folder_duplicates?: boolean
   }
   current_user_roles?: string[]
 }
@@ -50,6 +51,8 @@ export const createFilesEnv = (customFilesContexts?: FileContext[]): FilesEnv =>
   const userFileAccessRestricted =
     ENV?.FEATURES?.restrict_student_access && (ENV?.current_user_roles || []).includes('student')
 
+  const isDuplicateFoldersFeatureEnabled = ENV?.FEATURES?.files_a11y_folder_duplicates ?? false
+
   function contextFor(folder: {contextType: string; contextId: string}) {
     const pluralAssetString = `${folder.contextType}s_${folder.contextId}`.toLowerCase()
     return contextsDictionary && contextsDictionary[pluralAssetString]
@@ -74,5 +77,6 @@ export const createFilesEnv = (customFilesContexts?: FileContext[]): FilesEnv =>
     contextFor,
     userHasPermission,
     userFileAccessRestricted,
+    isDuplicateFoldersFeatureEnabled,
   }
 }

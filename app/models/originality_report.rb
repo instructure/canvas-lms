@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class OriginalityReport < ActiveRecord::Base
+class OriginalityReport < ApplicationRecord
   include Rails.application.routes.url_helpers
 
   # Allowed workflow states, for ActiveRecord callbacks. In addition, this list is sorted from least

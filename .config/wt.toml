@@ -11,18 +11,13 @@
 [post-start]
 copy = "wt step copy-ignored"
 
-# For each plugin repo, create a matching worktree and symlink it
-# into the parent worktree's gems/plugins/ directory
+# For each plugin repo, create a matching worktree
 [post-create]
 plugins = """
 for dir in {{ primary_worktree_path }}/gems/plugins/*/; do
   plugin=$(basename "$dir")
   [ ! -d "$dir/.git" ] && continue
-  (
-    wt -C "$dir" switch --create {{ branch }} --yes --no-cd 2>&1
-    ln -s "$dir/../$plugin.{{ branch | sanitize }}" \
-      "{{ worktree_path }}/gems/plugins/$plugin"
-  ) &
+  wt -C "$dir" switch --create {{ branch }} --yes --no-cd 2>&1 &
 done
 wait
 """

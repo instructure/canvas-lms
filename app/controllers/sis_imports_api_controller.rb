@@ -464,7 +464,8 @@ class SisImportsApiController < ApplicationController
   #   1. As a multipart/form-data form field named +attachment+
   #   2. As a raw post with a Content-Type of application/zip or application/octet-stream
   #   3. Using the {file:file.file_uploads.html File Upload} process, which can be more reliable
-  #      for large files. Use the +pre_attachment[name]+ argument to start that flow.
+  #      for large files. Use the +pre_attachment[name]+ argument to start that flow. See that
+  #      parameter below for more information.
   #
   #   +attachment+ is required for multipart/form-data style posts. Assumed to
   #   be SIS data from a file upload form field named +attachment+.
@@ -499,10 +500,18 @@ class SisImportsApiController < ApplicationController
   #   fail. There is a hard cap of 50 GB.
   #
   # @argument pre_attachment[name] [String]
-  #   The name of the file to be uploaded in a separate request via the
-  #   {file:file.file_uploads.html File Upload} workflow. Do not supply +attachment+
-  #   when using this option. This option decouples the file upload from the
-  #   SIS import request, which can improve reliability with larger files.
+  #   The name of the file to be uploaded (in a separate request) via the
+  #   {file:file.file_uploads.html File Upload} workflow. This is the recommended
+  #   way to upload larger batches, since the upload itself no longer has to finish
+  #   within the 1-minute Canvas request timeout period. This argument cannot be combined
+  #   with the +attachment+ argument; use one or the other.
+  #
+  #   To use this flow:
+  #   1. Perform a POST to this endpoint with file information in +pre_attachment+
+  #   2. {file:file.file_uploads.html Upload the file} using the data in the response's +pre_attachment+
+  #   3. Once the file has been uploaded, the SIS import will begin.
+  #   4. {api:SisImportsApiController#show Check the progress} of the import as usual.
+  #
   #   NOTE: this option must be sent as either a query parameter or as a JSON
   #   body parameter; +application/x-www-form-urlencoded+ is not supported due to
   #   conflicts with raw post body data.

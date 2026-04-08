@@ -97,6 +97,16 @@ module Importers
 
       return if item.new_record? && ContextExternalTool.where(identity_hash: item.calculate_identity_hash).exists?
 
+      if persist &&
+         context.root_account.feature_enabled?(:lock_lti_registrations) &&
+         item&.lti_registration&.lock_deploying?
+        migration&.add_warning(
+          t("The app \"%{name}\" was not imported because it has been locked for deployment by an administrator. Please ask your administrator to unlock it before importing.",
+            name: item.name)
+        )
+        return item
+      end
+
       if persist && persist_tool(item, migration, associated_control_from_migration).present?
         migration&.add_imported_item(item)
         item

@@ -237,8 +237,9 @@ def configureBuildStage(buildParameters) {
   }
 
   // Ensure that all build flags are compatible.
-  if (commitMessageFlag('change-merged') as Boolean && configuration.buildRegistryPath() == configuration.buildRegistryPathDefault()) {
-    error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
+  if (commitMessageFlag('change-merged') as Boolean && !(commitMessageFlag('test-tag-suffix') as String)) {
+    env.PUBLISH_PATCHSET_IMAGE = '0' // default to not publishing if the merge flag is set without a test tag suffix
+    error 'Manually triggering the change-merged build path must be combined with test-tag-suffix to avoid overwriting production images'
   }
 
   maybeSlackSendRetrigger()
@@ -290,6 +291,12 @@ def postBuildAlways() {
       dockerUtils.tagRemote(env.DYNAMODB_IMAGE_TAG, env.DYNAMODB_MERGE_IMAGE)
       dockerUtils.tagRemote(env.POSTGRES_IMAGE_TAG, env.POSTGRES_MERGE_IMAGE)
       dockerUtils.tagRemote(env.KARMA_RUNNER_IMAGE, env.KARMA_MERGE_IMAGE)
+    }
+
+    try {
+      buildDockerImageStage.mirrorToStarlord()
+    } catch (e) {
+      echo "Starlord mirror failed (non-fatal): ${e.message}"
     }
 
     if (isStartedByUser()) {

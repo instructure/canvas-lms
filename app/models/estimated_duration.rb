@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EstimatedDuration < ActiveRecord::Base
+class EstimatedDuration < ApplicationRecord
   belongs_to :context,
              polymorphic: [:assignment,
                            :attachment,

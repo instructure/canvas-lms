@@ -99,11 +99,12 @@ class Quizzes::QuizzesController < ApplicationController
         if can_manage
           Quizzes::Quiz.preload_can_unpublish(scoped_quizzes_index)
         end
-        quiz_index.each_with_object({}) do |quiz, quiz_user_permissions|
-          quiz_user_permissions[quiz.id] = {
-            can_update: can_manage,
-            can_unpublish: can_manage && quiz.can_unpublish?
-          }
+        quiz_index.to_h do |quiz|
+          [quiz.id,
+           {
+             can_update: can_manage,
+             can_unpublish: can_manage && quiz.can_unpublish?
+           }]
         end
       end
 

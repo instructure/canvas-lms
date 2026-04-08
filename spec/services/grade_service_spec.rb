@@ -16,10 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require_relative "../../app/services/grade_service"
 
-GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, keyword_init: true)
+GradeResult = Struct.new(:rubric_category, :reasoning, :criterion, :guidance, :points)
 
 RSpec.describe GradeService do
   # Test data setup
@@ -208,6 +207,111 @@ RSpec.describe GradeService do
       end
     end
 
+    [true, false, nil].each do |use_range|
+      it "passes useRange: #{use_range.inspect} to CedarClient when criterion_use_range is #{use_range.inspect}" do
+        single_criterion_rubric = [
+          {
+            id: "criteria_1",
+            description: "Content",
+            criterion_use_range: use_range,
+            ratings: [{ id: "rating_1", long_description: "Meets requirements", points: 3 }],
+            points: 4
+          }
+        ]
+        expect(CedarClient).to receive(:grade_essay).with(
+          hash_including(rubric: [hash_including(useRange: use_range)])
+        ).and_return([])
+
+        described_class.new(
+          assignment:,
+          essay:,
+          rubric: single_criterion_rubric,
+          root_account_uuid: "mock-root",
+          current_user:
+        ).call
+      end
+    end
+
+    context "when rubric contains learning outcome criteria" do
+      let(:outcome_rubric) do
+        [
+          {
+            id: "criteria_1",
+            description: "Commitment to Success",
+            learning_outcome_id: 12_190,
+            mastery_points: 2.0,
+            ratings: [
+              { id: "rating_1", description: "Thoroughly describes the need for change", long_description: "", points: 3 },
+              { id: "rating_2", description: "Vaguely describes the need for change", long_description: "", points: 2 },
+              { id: "rating_3", description: "Does not recognize need for change", long_description: "", points: 0 }
+            ],
+            points: 3
+          }
+        ]
+      end
+
+      let(:outcome_grading_results) do
+        [
+          GradeResult.new(
+            rubric_category: "Commitment to Success",
+            reasoning: "Student clearly articulated areas for improvement",
+            criterion: "Thoroughly describes the need for change",
+            guidance: "Well done."
+          )
+        ]
+      end
+
+      it "sends rating :description to Cedar instead of :long_description" do
+        expect(CedarClient).to receive(:grade_essay) do |args|
+          criteria = args[:rubric].first[:criteria]
+          expect(criteria.map { |c| c[:description] }).to eq(
+            [
+              "Thoroughly describes the need for change",
+              "Vaguely describes the need for change",
+              "Does not recognize need for change"
+            ]
+          )
+          outcome_grading_results
+        end
+
+        described_class.new(
+          assignment:,
+          essay:,
+          rubric: outcome_rubric,
+          root_account_uuid: "mock-root",
+          current_user:
+        ).call
+      end
+
+      it "maps the result back using rating :description for matching" do
+        allow(CedarClient).to receive(:grade_essay).and_return(outcome_grading_results)
+
+        result = described_class.new(
+          assignment:,
+          essay:,
+          rubric: outcome_rubric,
+          root_account_uuid: "mock-root",
+          current_user:
+        ).call
+
+        expect(result).to eq(
+          [
+            {
+              "id" => "criteria_1",
+              "description" => "Commitment to Success",
+              "rating" => {
+                "id" => "rating_1",
+                "description" => "Thoroughly describes the need for change",
+                "rating" => 3,
+                "reasoning" => "Student clearly articulated areas for improvement"
+              },
+              "comments" => "Well done."
+            }
+          ]
+        )
+      end
+    end
+
     context "when rubric matches default template" do
       let(:default_rubric) do
         [
@@ -332,6 +436,35 @@ RSpec.describe GradeService do
 
       expect(result.length).to eq(1)
       expect(result.first["rating"]["description"]).to eq("Meets requirements")
+    end
+
+    # criterion_use_range + result.points combinations
+    [
+      [true, 2.5, 2.5],   # range enabled, points present → use result.points
+      [true, nil, 3],     # range enabled, points nil → fall back to rating points
+      [false, 2.5, 3],    # range disabled → always use rating points
+      [nil, 2.5, 3]       # range absent → always use rating points
+    ].each do |use_range, result_points, expected_rating|
+      it "returns rating=#{expected_rating} when criterion_use_range=#{use_range.inspect} and result.points=#{result_points.inspect}" do
+        rubric_with_range = [
+          {
+            id: "criteria_1",
+            description: "Content",
+            criterion_use_range: use_range,
+            ratings: [{ id: "rating_1", long_description: "Meets requirements", points: 3 }]
+          }
+        ]
+        result_obj = GradeResult.new(
+          rubric_category: "Content",
+          reasoning: "Good content",
+          criterion: "Meets requirements",
+          guidance: "Add more details.",
+          points: result_points
+        )
+
+        result = service.send(:map_grade_essay_results_to_canvas, [result_obj], rubric_with_range)
+        expect(result.first["rating"]["rating"]).to eq(expected_rating)
+      end
     end
 
     # Test handling of completely invalid responses

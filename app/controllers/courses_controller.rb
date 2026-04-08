@@ -558,8 +558,17 @@ class CoursesController < ApplicationController
     end
   end
 
+  def _load_enrollments_for_index
+    if Account.site_admin.feature_enabled?(:optimized_load_enrollments_for_index)
+      @current_user.user_preference_values.load
+      @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :role, :course_section, course: :enrollment_term).to_a
+    else
+      @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
+    end
+  end
+
   def load_enrollments_for_index
-    all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
+    all_enrollments = _load_enrollments_for_index
     if @current_user.roles(@domain_root_account).all? { |role| role == "student" || role == "user" }
       all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? || e.course.horizon_course? }
     end
@@ -569,6 +578,8 @@ class CoursesController < ApplicationController
 
     completed_states = %i[completed rejected]
     active_states = %i[active invited]
+    now = Time.now.utc
+
     all_enrollments.group_by { |e| [e.course_id, e.type] }.each_value do |enrollments|
       first_enrollment = enrollments.min_by(&:state_with_date_sortable)
       if enrollments.count > 1
@@ -585,8 +596,8 @@ class CoursesController < ApplicationController
         if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
            (first_enrollment.admin? &&
                first_enrollment.course.restrict_enrollments_to_course_dates &&
-               first_enrollment.course.start_at&.>(Time.now.utc) &&
-               (first_enrollment.course_section&.start_at&.>(Time.now.utc) || first_enrollment.course_section&.start_at.nil?)
+               first_enrollment.course.start_at&.>(now) &&
+               (first_enrollment.course_section&.start_at&.>(now) || first_enrollment.course_section&.start_at.nil?)
 
            )
           @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?
@@ -616,10 +627,12 @@ class CoursesController < ApplicationController
       sort_column = params[:fc_sort]
       order = params[:fc_order]
     end
+
+    favorite_course_ids = (sort_column == "favorite") ? @current_user.courses_with_primary_enrollment(:favorite_courses).to_set(&:id) : Set.new
     sorted_enrollments = enrollments.sort_by! do |e|
       case sort_column
       when "favorite"
-        @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id).include?(e.course_id) ? 0 : 1
+        favorite_course_ids.include?(e.course_id) ? 0 : 1
       when "course"
         e.course.name
       when "nickname"
@@ -2364,9 +2377,9 @@ class CoursesController < ApplicationController
         js_env({ OBSERVER_OPTIONS: {
                  OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
                  CAN_ADD_OBSERVEE: @current_user
-                                    .profile
-                                    .tabs_available(@current_user, root_account: @domain_root_account)
-                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                                   .profile
+                                   .tabs_available(@current_user, root_account: @domain_root_account)
+                                   .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
                } })
 
         if @context_enrollment
@@ -2376,7 +2389,7 @@ class CoursesController < ApplicationController
           @course_notifications_enabled = NotificationPolicyOverride.enabled_for(@current_user, @context)
         end
 
-        @accessibility_scan_enabled = @context.try(:a11y_checker_enabled?) || false
+        @accessibility_scan_enabled = tab_enabled?(Course::TAB_ACCESSIBILITY, no_render: true)
       end
 
       return if check_for_xlist
@@ -4333,10 +4346,13 @@ class CoursesController < ApplicationController
     include_observed = params.fetch(:include, []).include?("observed_users")
 
     if params[:state]
-      states = Array(params[:state])
-      states += %w[created claimed] if states.include?("unpublished")
+      states = Array.wrap(params[:state])
+      states = states.flat_map { |s| Course::API_STATE_EXPANSIONS[s] || s }.uniq
       conditions = states.filter_map do |state|
-        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
+        # Disable strict checks for unpublished courses so student/observer
+        # invited enrollments are included, matching the web UI behavior.
+        strict = !Course::UNPUBLISHED_STATES.include?(state)
+        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true, strict_checks: strict).conditions
       end.join(" OR ")
       enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
 
@@ -4366,6 +4382,14 @@ class CoursesController < ApplicationController
       end
 
       enrollments = enrollments.to_a
+
+      # Honor restrict_student_future_listing account setting, matching the
+      # web UI's load_enrollments_for_index behavior.
+      if states.intersect?(Course::UNPUBLISHED_STATES)
+        ActiveRecord::Associations.preload(enrollments, :enrollment_state)
+        ActiveRecord::Associations.preload(enrollments.map(&:course).uniq, :account)
+        enrollments.reject!(&:restrict_future_listing?)
+      end
     elsif params[:enrollment_state] == "active"
       enrollments = user.participating_enrollments
       ActiveRecord::Associations.preload(enrollments, :course)

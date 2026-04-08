@@ -2,9 +2,9 @@
 
 # This file is used by Rack-based servers to start the application.
 
-require File.expand_path("config/environment", __dir__)
-if defined?(CanvasRails)
-  run CanvasRails::Application
-else
-  run ActionController::Dispatcher.new
-end
+ENV["RUNNING_IN_RACK"] = "true"
+
+require_relative "config/environment"
+
+run Rails.application
+Rails.application.load_server

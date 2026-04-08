@@ -268,6 +268,129 @@ RSpec.describe Lti::Asset do
     end
   end
 
+  describe "#attempt_number" do
+    context "with a text entry asset (submission_attempt set)" do
+      let(:submission) { submission_model(submission_type: "online_text_entry", body: "hi") }
+      let(:asset) { lti_asset_model(submission:, submission_attempt: submission.attempt) }
+
+      it "returns the submission_attempt" do
+        expect(asset.send(:attempt_number)).to eq(submission.attempt)
+      end
+    end
+
+    context "with an attachment asset" do
+      let(:course) { course_model }
+      let(:assignment) { assignment_model(course:, submission_types: "online_upload") }
+      let(:student) { student_in_course(course:, active_all: true).user }
+
+      it "returns the attempt for the version that contains the attachment" do
+        attachment1 = attachment_model(context: student)
+        attachment2 = attachment_model(context: student)
+
+        sub = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment1])
+        asset1 = Lti::Asset.create!(submission: sub, attachment: attachment1)
+
+        sub = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment2])
+        asset2 = Lti::Asset.create!(submission: sub, attachment: attachment2)
+
+        expect(asset1.send(:attempt_number)).to eq(1)
+        expect(asset2.send(:attempt_number)).to eq(2)
+      end
+
+      it "falls back to the current submission attempt if attachment is not found in history" do
+        sub = submission_model
+        attachment = attachment_model
+        asset = Lti::Asset.create!(submission: sub, attachment:)
+
+        expect(asset.send(:attempt_number)).to eq(sub.attempt)
+      end
+    end
+
+    context "with no submission (deleted)" do
+      it "returns nil" do
+        asset = lti_asset_model
+        asset.submission.destroy
+        asset.reload
+        expect(asset.send(:attempt_number)).to be_nil
+      end
+    end
+  end
+
+  describe "#submission_lti_claim_id" do
+    context "with a text entry asset" do
+      let(:submission) { submission_model(submission_type: "online_text_entry", body: "hi") }
+      let(:asset) { lti_asset_model(submission:, submission_attempt: submission.attempt) }
+
+      it "delegates to submission#lti_attempt_id" do
+        expect(asset.submission_lti_claim_id).to eq(submission.lti_attempt_id(submission.attempt))
+      end
+    end
+
+    context "with a regular attachment asset" do
+      let(:asset) { lti_asset_model }
+
+      it "delegates to submission#lti_attempt_id" do
+        expect(asset.submission_lti_claim_id).to eq(asset.submission.lti_attempt_id(asset.send(:attempt_number)))
+      end
+    end
+
+    context "with a discussion entry asset" do
+      let(:submission) { submission_model }
+      let(:topic) { submission.assignment.context.discussion_topics.create! }
+      let(:entry) { topic.discussion_entries.create!(message: "hello", user: submission.user) }
+      let(:dev) { entry.discussion_entry_versions.first }
+      let(:asset) { lti_asset_model(submission:, discussion_entry_version: dev) }
+
+      it "uses the discussion claim format" do
+        expected = "#{submission.lti_id}:#{dev.id}:#{entry.attachment_id}"
+        expect(asset.submission_lti_claim_id).to eq(expected)
+      end
+    end
+
+    context "with a discussion attachment asset" do
+      let(:course) { course_model }
+      let(:student) { student_in_course(course:, active_all: true).user }
+      let(:attachment) { attachment_model(context: student) }
+      let(:assignment) { assignment_model(course:, submission_types: "discussion_topic") }
+      let(:topic) do
+        t = course.discussion_topics.create!(title: "t", user: course.teachers.first)
+        t.update!(assignment:)
+        t
+      end
+      let(:submission) do
+        sub = assignment.find_or_create_submission(student)
+        sub.update!(submission_type: "discussion_topic")
+        sub
+      end
+
+      it "uses the entry's latest version for the claim id" do
+        entry = topic.discussion_entries.create!(message: "first", user: student, attachment:)
+        asset = Lti::Asset.create!(submission:, attachment:)
+        dev = entry.discussion_entry_versions.order(version: :desc).first
+
+        expect(asset.submission_lti_claim_id).to eq(dev.lti_submission_claim_id(submission))
+      end
+
+      it "picks the latest entry when multiple share the same attachment" do
+        topic.discussion_entries.create!(message: "first", user: student, attachment:)
+        entry2 = topic.discussion_entries.create!(message: "second", user: student, attachment:)
+        asset = Lti::Asset.create!(submission:, attachment:)
+        dev2 = entry2.discussion_entry_versions.order(version: :desc).first
+
+        expect(asset.submission_lti_claim_id).to eq(dev2.lti_submission_claim_id(submission))
+      end
+    end
+
+    context "when submission is nil (deleted)" do
+      it "returns nil" do
+        asset = lti_asset_model
+        asset.submission.destroy
+        asset.reload
+        expect(asset.submission_lti_claim_id).to be_nil
+      end
+    end
+  end
+
   describe "asset_reports association" do
     let(:asset) { lti_asset_model }
     let(:asset_processor) { lti_asset_processor_model(assignment: asset.submission.assignment) }

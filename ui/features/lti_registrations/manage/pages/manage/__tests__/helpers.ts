@@ -114,6 +114,7 @@ export const mockRegistration = (
     vendor: null,
     description: null,
     admin_nickname: n,
+    lock_deploying: false,
     configuration: {
       custom_fields: {},
       placements: [],

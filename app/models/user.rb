@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
   MINIMAL_COLUMNS_TO_SAVE = %i[avatar_image_source
@@ -290,6 +290,8 @@ class User < ActiveRecord::Base
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
   has_many :quiz_migration_alerts, dependent: :destroy
   has_many :custom_data, class_name: "CustomData"
+  has_many :institutional_tag_associations
+  has_many :institutional_tags, through: :institutional_tag_associations
 
   has_many :assessor_allocation_rules,
            class_name: "AllocationRule",
@@ -2287,11 +2289,11 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("course_creating_teacher_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
       Shard.with_each_shard(in_region_associated_shards) do
         Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
-                                .select(:course_id)
-                                .where(type: %w[TeacherEnrollment DesignerEnrollment])
-                                .joins(:root_account)
-                                .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
-               .select(:account_id))
+                                           .select(:course_id)
+                                           .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                                           .joins(:root_account)
+                                           .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
+                          .select(:account_id))
       end
     end
   end
@@ -2300,11 +2302,11 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("course_creating_student_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
       Shard.with_each_shard(in_region_associated_shards) do
         Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
-                                .select(:course_id)
-                                .where(type: %w[StudentEnrollment ObserverEnrollment])
-                                .joins(:root_account)
-                                .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
-               .select(:account_id))
+                                           .select(:course_id)
+                                           .where(type: %w[StudentEnrollment ObserverEnrollment])
+                                           .joins(:root_account)
+                                           .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
+                          .select(:account_id))
       end
     end
   end
@@ -2728,7 +2730,7 @@ class User < ActiveRecord::Base
     ** # forwarded to submissions_for_course_ids
   )
     course_ids ||= if contexts
-                     contexts.select { |c| c.is_a?(Course) }.map(&:id)
+                     contexts.grep(Course).map(&:id)
                    else
                      participating_student_course_ids
                    end
@@ -2898,11 +2900,12 @@ class User < ActiveRecord::Base
       end
     end
 
-    enabled_peer_review_ids = course_ids_with_peer_review_enabled
-    peer_review_context_codes = context_codes.select do |code|
+    course_code_by_id = context_codes.each_with_object({}) do |code, map|
       type, id = ActiveRecord::Base.parse_asset_string(code)
-      type == "Course" && enabled_peer_review_ids.include?(id)
+      map[id] = code if type == "Course"
     end
+    enabled_peer_review_ids = course_ids_with_peer_review_enabled(course_ids: course_code_by_id.keys)
+    peer_review_context_codes = course_code_by_id.values_at(*enabled_peer_review_ids).compact
 
     if peer_review_context_codes.any?
       peer_review_sub_assignments = PeerReviewSubAssignment.published
@@ -2944,8 +2947,9 @@ class User < ActiveRecord::Base
            .flat_map { |a| course_ids_by_account_id[a.id] }
   end
 
-  def course_ids_with_peer_review_enabled
-    courses.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
+  def course_ids_with_peer_review_enabled(course_ids: nil)
+    courses_to_check = course_ids ? courses.where(id: course_ids) : courses
+    courses_to_check.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
@@ -3718,8 +3722,8 @@ class User < ActiveRecord::Base
     adminable_accounts_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     root_accounts = Account.active.where(
       id: Account.active
-               .where(id: adminable_accounts_ids)
-               .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
+          .where(id: adminable_accounts_ids)
+          .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
     )
 
     horizon_account_ids = Set.new

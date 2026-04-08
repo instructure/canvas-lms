@@ -22,7 +22,7 @@
 #
 # Used to configure custom rate limiting parameters for
 # different types of API clients, defined in RequestThrottle.
-class OAuthClientConfig < ActiveRecord::Base
+class OAuthClientConfig < ApplicationRecord
   include Canvas::SoftDeletable
 
   # required to use `type` as a column name

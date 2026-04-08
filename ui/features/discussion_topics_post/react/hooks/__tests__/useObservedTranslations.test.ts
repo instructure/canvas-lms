@@ -71,6 +71,7 @@ describe('useObservedTranslations', () => {
         disconnect: vi.fn(),
         root: null,
         rootMargin: '',
+        scrollMargin: '',
         thresholds: [0.1],
         takeRecords: vi.fn(),
       }

@@ -1195,26 +1195,8 @@ module Lti::IMS
         end
       end
 
-      context "when activityProgress is set to Initialized" do
-        let(:params_overrides) { super().merge(activityProgress: "Initialized") }
-
-        before do
-          Account.root_accounts.first.disable_feature! :ags_score_trigger_needs_grading_after_submitted
-        end
-
-        it "does not update the submission" do
-          send_request
-          rslt = Lti::Result.find(json["resultUrl"].split("/").last)
-          expect(rslt.submission.workflow_state).to eq("unsubmitted")
-        end
-      end
-
       %w[Initialized Started InProgress].each do |activity_progress|
         context "when activityProgress is set to #{activity_progress}" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
-          end
-
           let(:params_overrides) { super().merge(activityProgress: activity_progress) }
 
           it "does not update the submission" do
@@ -1227,10 +1209,6 @@ module Lti::IMS
 
       %w[Submitted Completed].each do |activity_progress|
         context "when activityProgress is set to #{activity_progress}" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
-          end
-
           let(:params_overrides) { super().merge(activityProgress: activity_progress) }
 
           it "does update the submission" do

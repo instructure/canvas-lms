@@ -1159,8 +1159,8 @@ describe "assignments" do
         expect(f("#assignment_annotated_document_info")).to be_displayed
 
         # select attachment from file explorer
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
         # set usage rights
         f("#usageRightSelector").click
@@ -1191,8 +1191,8 @@ describe "assignments" do
         expect(f("#assignment_annotated_document_info")).to be_displayed
 
         # select attachment from file explorer
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
         # set usage rights
         f("#usageRightSelector").click
@@ -1233,8 +1233,8 @@ describe "assignments" do
             expect(f("#online_submission_types\\[student_annotation\\]_errors")).to include_text("This submission type requires a file upload")
 
             # select attachment from file explorer
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
             expect(f("#online_submission_types\\[student_annotation\\]_errors")).not_to include_text("This submission type requires a file upload")
           end
@@ -1268,8 +1268,8 @@ describe "assignments" do
             wait_for_ajaximations
 
             # select attachment from file explorer
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
             submit_assignment_form
             wait_for_ajaximations

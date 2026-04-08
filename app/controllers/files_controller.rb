@@ -650,6 +650,18 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Download file
+  # Downloads the file
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/files/<file_id>/download' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  #   curl 'https://<canvas>/courses/<course_id>/files/<file_id>/download' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
   def show
     # Ensure these links are not indexed by search engines
     response.headers["X-Robots-Tag"] = "noindex, nofollow" unless @allow_robot_indexing
@@ -1532,6 +1544,11 @@ class FilesController < ApplicationController
   private_constant :MetadataSaxDoc
 
   # @API Reset link verifier
+  #
+  # @deprecated_method NOTICE 2026-04-08 EFFECTIVE 2026-07-07
+  #   The UUID-based verification method for file access is being deprecated.
+  #   This endpoint will no longer be available as UUID verification for file
+  #   access is being phased out.
   #
   # Resets the link verifier. Any existing links to the file using
   # the previous hard-coded "verifier" parameter will no longer

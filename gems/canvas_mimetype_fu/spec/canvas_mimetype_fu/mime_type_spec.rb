@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe "A file with a know extension" do
   before do
     @file = File.open(File.dirname(__FILE__) + "/../fixtures/file.jpg")

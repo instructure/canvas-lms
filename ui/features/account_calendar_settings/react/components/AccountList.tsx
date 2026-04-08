@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
+import SpacePandaUrl from '@instructure/platform-images/assets/SpacePanda.svg'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {useScope as createI18nScope} from '@canvas/i18n'

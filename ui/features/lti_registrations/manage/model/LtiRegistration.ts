@@ -54,6 +54,7 @@ export const ZLtiRegistration = z.object({
   pending_update: ZLtiRegistrationUpdateRequestId.nullable().optional(),
   dynamic_registration_url: z.string().nullable().optional(),
   reinstall_disabled: z.boolean().nullable().optional(),
+  lock_deploying: z.boolean().nullable().optional(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>

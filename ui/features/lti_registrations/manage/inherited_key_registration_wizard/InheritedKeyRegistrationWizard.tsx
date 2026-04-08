@@ -46,7 +46,7 @@ import {ReviewScreenWrapper} from '../lti_1p3_registration_form/components/Revie
 import {Header} from '../registration_wizard_forms/Header'
 import {PermissionConfirmationWrapper} from '../lti_1p3_registration_form/components/PermissionConfirmationWrapper'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('lti_registrations')
 

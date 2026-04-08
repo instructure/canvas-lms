@@ -21,14 +21,23 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {FormMessage} from '@instructure/ui-form-field'
+import {FormMessage, FormFieldGroup} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('course_navigation_settings')
 
 const MAX_URL_LENGTH = 2048
 const MAX_TEXT_LENGTH = 50
+
+export type Placement = 'course_nav' | 'account_nav' | 'user_nav'
+
+const PLACEMENT_LABELS: Record<Placement, () => string> = {
+  course_nav: () => I18n.t('Course Navigation'),
+  account_nav: () => I18n.t('Account Navigation'),
+  user_nav: () => I18n.t('User Navigation'),
+}
 
 // Returns an error string if invalid
 function validateUrl(str: string): string | undefined {
@@ -56,7 +65,12 @@ function validateText(normalizedText: string): string | undefined {
 
 export interface AddLinkModalProps {
   onDismiss: () => void
-  onAdd: (link: {label: string; url: string}) => void
+  onAdd: (link: {
+    label: string
+    url: string
+    placements: {course_nav: boolean; account_nav: boolean; user_nav: boolean}
+  }) => void
+  availablePlacements?: Placement[]
 }
 
 function normalize({label, url}: {label: string; url: string}): {label: string; url: string} {
@@ -92,9 +106,22 @@ function makeMessages({
   return result
 }
 
-export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
+export const AddLinkModal = ({
+  onDismiss,
+  onAdd,
+  availablePlacements = ['course_nav'] as Placement[],
+}: AddLinkModalProps) => {
   const [text, setText] = useState('')
   const [url, setUrl] = useState('https://')
+
+  const initialPlacements = () => ({
+    course_nav: availablePlacements[0] === 'course_nav',
+    account_nav: availablePlacements[0] === 'account_nav',
+    user_nav: availablePlacements[0] === 'user_nav',
+  })
+
+  const [selectedPlacements, setSelectedPlacements] = useState(initialPlacements)
+  const [placementsErrorEnabled, setPlacementsErrorEnabled] = useState(false)
 
   // We only show errors after field has been blurred
   const [hasBlurred, setHasBlurred] = useState({text: false, url: false})
@@ -104,12 +131,14 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
   const normalized = normalize({label: text, url})
   const urlError = validateUrl(normalized.url)
   const textError = validateText(normalized.label)
+  const placementsError = !Object.values(selectedPlacements).some(Boolean)
+    ? I18n.t('Please select at least one placement.')
+    : undefined
 
   const handleAdd = () => {
-    // Mark all fields as blurred to show any errors
     setHasBlurred({text: true, url: true})
+    setPlacementsErrorEnabled(true)
 
-    // Focus on first field with error
     if (textError) {
       textInputRef.current?.focus()
       return
@@ -120,12 +149,17 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
       return
     }
 
-    // All valid, proceed
-    onAdd(normalized)
+    if (placementsError) {
+      return
+    }
+
+    onAdd({...normalized, placements: selectedPlacements})
     onDismiss()
     setText('')
     setUrl('https://')
+    setSelectedPlacements(initialPlacements())
     setHasBlurred({text: false, url: false})
+    setPlacementsErrorEnabled(false)
   }
 
   return (
@@ -187,6 +221,27 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
               })}
             />
           </View>
+          {availablePlacements.length > 1 && (
+            <View as="div" margin="none none medium">
+              <FormFieldGroup
+                description={I18n.t('Placements')}
+                messages={
+                  placementsErrorEnabled && placementsError
+                    ? [{type: 'error', text: placementsError}]
+                    : []
+                }
+              >
+                {availablePlacements.map(p => (
+                  <Checkbox
+                    key={p}
+                    label={PLACEMENT_LABELS[p]()}
+                    checked={selectedPlacements[p]}
+                    onChange={() => setSelectedPlacements(prev => ({...prev, [p]: !prev[p]}))}
+                  />
+                ))}
+              </FormFieldGroup>
+            </View>
+          )}
           <View as="div">
             <Text weight="bold">{I18n.t('Opening Behavior')}</Text>
             <View as="div" margin="x-small none none">

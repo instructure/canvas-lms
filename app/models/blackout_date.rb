@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BlackoutDate < ActiveRecord::Base
+class BlackoutDate < ApplicationRecord
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :root_account, class_name: "Account"
 

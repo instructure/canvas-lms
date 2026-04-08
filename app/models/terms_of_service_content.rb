@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class TermsOfServiceContent < ActiveRecord::Base
+class TermsOfServiceContent < ApplicationRecord
   include Canvas::SoftDeletable
 
   sanitize_field :content, CanvasSanitize::SANITIZE

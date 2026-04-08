@@ -17,4 +17,4 @@
  */
 
 declare module 'page'
-declare module '@canvas/images/ErrorShip.svg'
+declare module '@instructure/platform-images/assets/ErrorShip.svg'

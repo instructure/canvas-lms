@@ -323,7 +323,7 @@ module RenderWithHelpers
     # this extends the controller's helper methods to the view
     # however, these methods are delegated to the test controller
     view.singleton_class.class_eval do
-      include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+      include controller_class._helpers unless include?(controller_class._helpers)
     end
 
     # so create a "real_controller"

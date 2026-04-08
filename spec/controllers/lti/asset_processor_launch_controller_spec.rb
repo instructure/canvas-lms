@@ -165,18 +165,6 @@ module Lti
           expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/submission"]["id"]).to eq(asset_report.asset.submission.lti_attempt_id)
         end
 
-        context "with specific submission_attempt" do
-          let(:submission_attempt) { 5 }
-
-          subject { get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report, submission_attempt: } }
-
-          it "contains valid submission lti_attempt_id" do
-            subject
-            expect(response).to have_http_status :ok
-            expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/submission"]["id"]).to eq(asset_report.asset.submission.lti_attempt_id(submission_attempt))
-          end
-        end
-
         context "with invalid asset_processor_id" do
           subject { get :launch_report, params: { asset_processor_id: 0, report_id: asset_report } }
 

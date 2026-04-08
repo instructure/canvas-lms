@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseSection < ActiveRecord::Base
+class CourseSection < ApplicationRecord
   include Workflow
   include MaterialChanges
   include SearchTermHelper

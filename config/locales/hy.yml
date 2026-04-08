@@ -1699,6 +1699,7 @@ hy:
   advanced_turnitin_settings_9ee84a38: "Turnitin-ի լրացուցիչ կարգաբերումներ"
   after_date_981cd41b: "%{date}-ից հետո"
   after_last_attempt_c9168da2: "Վերջին փորձից հետո"
+  after_the_due_date_b7ac51f4: "Վերջնաժամկետից հետո "
   agenda_b010136d: Օրակարգ
   ajax_errors: 
     error_heading: "Ajax սխալ՝ %{status_code}"
@@ -2913,6 +2914,7 @@ hy:
       տեղափոխվում է օգտատիրոջ անձնական ֆայլերի ('/files') էջ, դուք պետք է միացնեք այդ օպցիան այն հաշվի համար, որին նրանք անդամ են:
   between_1_and_99_d421a4c0: "1%-ից  99%-ի սահմաններում"
   between_2_and_5_c34f5152: "2-ց մինչև 5-ի սահմաններում"
+  bibliographic_material_42d9ed3c: "Բիբլիոգրաֆիկ  նյութեր"
   big_blue_button_conference: 
     recording_setting: Ձայնագրում
     recording_setting_enabled_description: "Միացնել այս կոնֆերանսի ձայնագրման ֆունկցիան"
@@ -3542,6 +3544,7 @@ hy:
   child_s_username_dde3aa9: "Երեխա օգտատիրոջ անունը"
   choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի հիմնական էջը"
   choose_a_csv_file_to_upload_9644480c: "Ընտրել CSV ֆայլը բեռնման համար"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "Ընտրել վերագնահատման տարբերակը այն ունկնդիրների համար, ովքեր արդեն անցել են թեստը: Canvas համակարգը կվերագնահատի Ձեր բոլոր ուղարկած աշխատանքները թեստը պահպանելուց հետո (դա կարող է ազդել ունկնդիրների միավորների վրա): "
   choose_an_authentication_service_47dc8875: "Ընտրել իսկության ստուգման ծառայությունը"
   choose_one_2c4277df: "Ընտրել մեկը"
   choose_usage_rights_33683854: "Ընտրել օգտագործման իրավունքները..."
@@ -3760,6 +3763,7 @@ hy:
     profile: 
       notices: 
         contact_registered: "Կոնտակտի եղանակը գրանցված է: "
+  compare_against_d7a750ce: "Համեմատել ըստ"
   complete_all_items_e1779257: "Ավարտել բոլոր տարրերի կատարումը"
   complete_icon_7455be93: "Ավարտել պատկերը"
   complete_incomplete_15b3a89c: "Ավարտված է /Ավարտված չէ "
@@ -6403,6 +6407,7 @@ hy:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Ընթացիկ գնահատականների բաշխումը ըստ դասընթացների՝ դրանցում գրանցված\n\
       \x20բոլոր ունկնդիրների գծով: "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Բաժանել %{num_minutes}  րոպեների հավասար միջակայքերի: *Սկսել*"
+  do_not_consider_84d7b395: "Հաշվի չառնել"
   does_not_meet_expectations_b0736d20: "Չի համապատասխանում սպասումներին"
   does_the_username_require_more_scoping_information_40d51df: "Արդյո՞ք օգտատիրոջ անվան համար պահանջվում է լրացուցիչ տեղեկատվություն (օր.՝ 'cn=Canvas,ou=people,dc=example,dc=com'):"
   domain_3b54c511: Դոմեն
@@ -7408,6 +7413,7 @@ hy:
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Խնդրեք ձեր օգտատերերին սխալների մասին  հաշվետվությունները տեղադրել Salesforce Service Cloud-ում:"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Խնդրեք ձեր օգտատերերին սխալների մասին  հաշվետվությունները տեղադրել Salesforce-ում:"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Նշանակել բոլոր ունկնդիրներին միեւնույն գնահատականը *%{assignment.name}* հանձնարարության համար, մուտքագրելով գնահատականի մեծությունը ստորև."
+  give_everyone_full_credit_for_this_question_3ad3266c: "Բոլորին տալ լիարժեք կրեդիտ այս հարցի համար"
   global_announcements_a78912c8: "Ընդհանուր հայտարարություններ"
   global_branding_df1cae12: "Ընդհանուր բրենդինգ"
   global_message_icons: 
@@ -8658,6 +8664,7 @@ hy:
   include_completed_courses_e650af09: "Ներառել ավարտված դասընթացները"
   include_deleted_enrollments_1c87684a: "ներառել ջնջված գրանցումները"
   include_deleted_objects_3cced3b5: "Ներառել ջնջված օբյեկտները"
+  include_in_repository_6102bd95: "Ներառել պահոցում"
   include_scores_when_alerting_about_grade_changes_623ec201: "Գնահատականների փոփոխության մասին հայտնելու դեպքում ներառել միավորները"
   include_student_replies_in_podcast_feed_b5b2008c: "Ներառել ունկնդիրների պատասխանները ձայնային հոսքում"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Ներառել այս հանձնարարության գնահատականները Ձեր դպրոցի Ունկնդիրների մասին տեղեկությունների համակարգում:"
@@ -8789,6 +8796,7 @@ hy:
   international_sms_9edb9868: "Միջազգային հաղորդագրություն"
   international_sms_send_from_recipient_s_country_43881ea4: "Միջազգային հաղորդագրություն - ուղարկել ստացողի երկրից"
   international_text_messaging_rates_may_apply_d4b4a97a: "Միջազգային հաղորդագրության սակագները կարող են կիրառելի լինել:"
+  internet_database_3d61286a: "Ինտերնետային տվյալների հենք"
   introduction_43f53b7d: Ներածություն
   invalid_authenticity_token_b753558c: "Իսկության ստուգման սխալ token"
   invalid_content_type_utf_8_required_bd458b78: "Բովանդակության սխալ տեսակ, պահանջվում է UTF-8 "
@@ -8884,6 +8892,7 @@ hy:
   join_group_group_name_871a5e3f: "Միանալ %{group_name} խմբին"
   joined_group_group_name_e3802c04: "Միացել է %{group_name} խմբին"
   joining_81f8b6c9: "Միանում է"
+  journals_periodicals_and_publications_ca24673: "Ամսագրեր, պարբերականներ և հրապարակումներ"
   jquery: 
     module_sequence_footer: 
       next: Հաջորդը
@@ -11949,6 +11958,7 @@ hy:
   ordered_by_recent_activity_112d33d5: "Դասավորվել է ըստ վերջին գործողությունների"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Կազմակերպել epub ըստ բովանդակության տեսակի (լռելյայն ընդունված է ըստ մոդուլների)"
   original_job_id_d81afbb3: "Աշխատանքի  նույնականացուցչի բնօրինակ"
+  other_student_papers_bf318f4c: "Այլ ուսանողական աշխատանքներ"
   outcome_groups: 
     invalid_file: "Արդյունքների խմբի սխալ ֆայլ"
   outcome_groups_api: 
@@ -14579,6 +14589,7 @@ hy:
     top_level: "--Վերին մակարդակ--"
     ? "true"
     : Ճիշտ
+  quoted_material_ffaea62b: "Մեջբերված նյութեր"
   radio_button_option_1_a8ec51f9: "Ռադիո կոճակ տարբերակ 1"
   radio_button_option_2_31e50043: "Ռադիո կոճակ տարբերակ 2"
   range_8760934b: Դիապազոն՝
@@ -14729,6 +14740,7 @@ hy:
         name: Անվանումը
     welcome_to_canvas: "Ձեզ ողջունում է Canvas-ը"
   registration_url_60e0eaaa: "Գրանցման URL-հասցե"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Այս հարցի համար կրկնակի գնահատում չի թույլատրվում, քանի որ կամ պատասխանն է հանվել կամ հարցի տեսակը փոխվել է ունկնդրի կողմից ուղարկելուց հետո:"
   regular_style_checkbox_ee3d71c1: "Սովորական-ոճի կոճակ"
   remind_me_next_time_6402eb7d: "Հիշեցնել ինձ հաջորդ անգամ "
   remove_as_leader_22d1a7d8: "Հանել առաջնորդությունից"
@@ -16261,6 +16273,7 @@ hy:
       back: Վերադառնալ
       close: Փակել
       forward: Ուղարկել
+  small_matches_581ab241: "Փոքր համապատասխանություններ"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "Google Play-ում"
@@ -16439,6 +16452,7 @@ hy:
   student_view_ac9b672f: "Դիտում ունկնդրի կողմից"
   students_1b8cd07b: Ունկնդիրներ
   students_being_observed_4de3e520: "Դիտարկվող ունկնդիրներ"
+  students_can_see_the_originality_report_f246beb0: "Ունկնդիրները կարող են տեսնել յուրօրինակության մասին հաշվետվությունը"
   students_have_already_submitted_to_this_discussion_f55db744: "Ունկնդիրներն արդեն այս քննարկման առթիվ ուղարկել են իրենց պատասխանները, ուստի խմբի կարգաբերումները հնարավոր չէ փոխել: "
   students_must_complete_all_of_these_requirements_15fa97f7: "Ունկնդիրը պետք է կատարի բոլոր այս պահանջները"
   students_who_have_taken_the_quiz_count_69dbbda0: 
@@ -17271,6 +17285,7 @@ hy:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Կրկին ուղարկել Turnitin-ին"
+  turnitin_repository_9f865357: "Turnitin պահոց"
   twitter_fcef6b54: Twitter
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Կապ հաստատեք Ձեր friendly Catalog Developer-ի հետ. %{message} հաղորդագրության սխալ"
   unable_to_remove_app_4293cb53: "Հնարավոր չէ հանել հավելվածը"
@@ -17340,6 +17355,7 @@ hy:
   update_login_472cd6db: "Թարմացնել մուտքի տվյալները"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_password_4bc5cb1f: "Թարմացնել գաղտնաբառը"
+  update_question_without_regrading_47c9904a: "Թարմացնել հարցը առանց կրկնակի գնահատման"
   update_quota_81381226: "Թարմացնել քվոտան"
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
   update_tool_7d48ef2a: "Թարմացնել %{tool}"

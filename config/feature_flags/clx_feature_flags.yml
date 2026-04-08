@@ -107,6 +107,13 @@ horizon_help_navigation:
   display_name: "Canvas Career: Help Navigation"
   description: |-
     Enables the help navigation menu in Canvas Career.
+horizon_native_inbox:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Native Inbox"
+  description: |-
+    Enables the native inbox in Canvas Career.
 horizon_study_tools:
   applies_to: RootAccount
   state: hidden

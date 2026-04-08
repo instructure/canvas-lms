@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionDraftAttachment < ActiveRecord::Base
+class SubmissionDraftAttachment < ApplicationRecord
   belongs_to :submission_draft, inverse_of: :submission_draft_attachments
   belongs_to :attachment, inverse_of: :submission_draft_attachments
 

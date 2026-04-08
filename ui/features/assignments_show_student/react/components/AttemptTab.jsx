@@ -35,7 +35,7 @@ import {
   IconTextLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component} from 'react'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'

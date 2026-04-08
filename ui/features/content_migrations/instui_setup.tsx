@@ -22,6 +22,10 @@ import ready from '@instructure/ready'
 import App from './react/app'
 import extensions from '@canvas/bundles/extensions'
 
+type Extensions = {
+  [key: string]: any
+}
+
 ready(() => {
   if (document.getElementById('instui_content_migrations')) {
     const node = document.getElementById('instui_content_migrations')
@@ -31,7 +35,7 @@ ready(() => {
     render(<App />, node)
   }
 
-  const loadExtension = (extensions as Record<string, () => Promise<{default: () => void}>>)[
+  const loadExtension = (extensions as Extensions)[
     'ui/features/content_migrations/instui_setup.tsx'
   ]?.()
   if (loadExtension) {

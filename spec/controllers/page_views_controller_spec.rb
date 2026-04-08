@@ -181,7 +181,7 @@ describe PageViewsController do
     let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.test")) }
 
     before do
-      allow(PageViews::Configuration).to receive(:new).and_return(configuration)
+      allow(PageViews::Configuration).to receive_messages(new: configuration, configured?: true)
       account_admin_user
       user_session(@user)
     end
@@ -235,6 +235,20 @@ describe PageViewsController do
         }
 
         expect(response).to have_http_status(:too_many_requests)
+      end
+
+      it "returns 503 Service Unavailable when query queue is at capacity" do
+        allow_any_instance_of(PageViews::EnqueueQueryService).to receive(:call).and_raise(PageViews::Common::ServiceUnavailable)
+
+        post "query", params: {
+          user_id: @user.id,
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :jsonl
+        }
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.parsed_body["error"]).to eq("Query queue is at capacity. Please wait and try again.")
       end
     end
 
@@ -470,6 +484,20 @@ describe PageViewsController do
 
         expect(response).to have_http_status(:unauthorized)
       end
+
+      it "returns 503 Service Unavailable when query queue is at capacity" do
+        allow_any_instance_of(PageViews::EnqueueBatchQueryService).to receive(:call).and_raise(PageViews::Common::ServiceUnavailable)
+
+        post "batch_query", params: {
+          user_ids: [user1.id],
+          start_date: "2024-01-01",
+          end_date: "2024-02-01",
+          results_format: :csv
+        }
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.parsed_body["error"]).to eq("Query queue is at capacity. Please wait and try again.")
+      end
     end
 
     describe "GET 'poll_batch_query'" do
@@ -621,6 +649,42 @@ describe PageViewsController do
         expect(response.parsed_body["error"]).to eq("An unexpected error occurred.")
       end
     end
+
+    context "when PV5 is not configured" do
+      before do
+        allow(PageViews::Configuration).to receive(:configured?).and_return(false)
+      end
+
+      it "returns 404 for query" do
+        post "query", params: { user_id: @user.id, start_date: "2025-01-01", end_date: "2025-02-01", results_format: :csv }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for poll_query" do
+        get "poll_query", params: { user_id: @user.id, query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for query_results" do
+        get "query_results", params: { user_id: @user.id, query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for batch_query" do
+        post "batch_query", params: { user_ids: [@user.id], start_date: "2025-01-01", end_date: "2025-02-01", results_format: :csv }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for poll_batch_query" do
+        get "poll_batch_query", params: { query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 for batch_query_results" do
+        get "batch_query_results", params: { query_id: SecureRandom.uuid }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 
   describe "Rate Limiting" do
@@ -628,6 +692,7 @@ describe PageViewsController do
       account_admin_user
       user_session(@user)
       allow(PageView).to receive(:pv4?).and_return(true)
+      allow(PageViews::Configuration).to receive(:configured?).and_return(true)
       ConfigFile.stub("pv4", { "uri" => "https://test.example.com" })
       # Mock the PageView fetch to avoid actual API calls
       allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_return([])
@@ -639,7 +704,7 @@ describe PageViewsController do
 
     context "index action" do
       it "increments request cost based on per_page parameter (per_page=10)" do
-        expect(controller).to receive(:increment_request_cost).with(2)
+        expect(controller).to receive(:increment_request_cost).with(5)
 
         get "index", params: { user_id: @user.id, per_page: 10 }, format: :json
 
@@ -647,7 +712,7 @@ describe PageViewsController do
       end
 
       it "increments request cost based on per_page parameter (per_page=100)" do
-        expect(controller).to receive(:increment_request_cost).with(16)
+        expect(controller).to receive(:increment_request_cost).with(40)
 
         get "index", params: { user_id: @user.id, per_page: 100 }, format: :json
 
@@ -655,7 +720,7 @@ describe PageViewsController do
       end
 
       it "increments request cost based on per_page parameter (per_page=200)" do
-        expect(controller).to receive(:increment_request_cost).with(30)
+        expect(controller).to receive(:increment_request_cost).with(75)
 
         get "index", params: { user_id: @user.id, per_page: 200 }, format: :json
 
@@ -663,7 +728,7 @@ describe PageViewsController do
       end
 
       it "uses default per_page=10 when not specified" do
-        expect(controller).to receive(:increment_request_cost).with(2)
+        expect(controller).to receive(:increment_request_cost).with(5)
 
         get "index", params: { user_id: @user.id }, format: :json
 
@@ -671,7 +736,7 @@ describe PageViewsController do
       end
 
       it "clamps per_page to maximum of 200" do
-        expect(controller).to receive(:increment_request_cost).with(30) # Same as per_page=200
+        expect(controller).to receive(:increment_request_cost).with(75) # Same as per_page=200
 
         get "index", params: { user_id: @user.id, per_page: 500 }, format: :json
 
@@ -679,7 +744,7 @@ describe PageViewsController do
       end
 
       it "clamps per_page to minimum of 1" do
-        expect(controller).to receive(:increment_request_cost).with(2) # Minimum cost
+        expect(controller).to receive(:increment_request_cost).with(5) # Minimum cost
 
         get "index", params: { user_id: @user.id, per_page: 0 }, format: :json
 
@@ -687,7 +752,7 @@ describe PageViewsController do
       end
 
       it "calculates cost correctly for per_page=50" do
-        expect(controller).to receive(:increment_request_cost).with(8)
+        expect(controller).to receive(:increment_request_cost).with(20)
 
         get "index", params: { user_id: @user.id, per_page: 50 }, format: :json
 
@@ -696,7 +761,7 @@ describe PageViewsController do
 
       it "does not vary cost with date range (Query with LIMIT behavior)" do
         # Cost should be the same regardless of date range
-        expect(controller).to receive(:increment_request_cost).with(2)
+        expect(controller).to receive(:increment_request_cost).with(5)
 
         get "index",
             params: {
@@ -839,25 +904,25 @@ describe PageViewsController do
     context "RCU calculation accuracy" do
       # These tests verify the mathematical accuracy of the rate limiting formula
       # Based on: eventually consistent reads, 592 bytes per line, 8192 bytes per RCU
-      # Using permissive 2x multiplier
+      # Using standard 5x multiplier
 
-      it "calculates cost for per_page=10 as 2 units (1 RCU * 2 multiplier)" do
-        # 10 lines / 13.838 lines per RCU ≈ 0.72 RCU → ceil = 1 RCU → 1 * 2 = 2 units
-        expect(controller).to receive(:increment_request_cost).with(2)
+      it "calculates cost for per_page=10 as 5 units (1 RCU * 5 multiplier)" do
+        # 10 lines / 13.838 lines per RCU ≈ 0.72 RCU → ceil = 1 RCU → 1 * 5 = 5 units
+        expect(controller).to receive(:increment_request_cost).with(5)
 
         get "index", params: { user_id: @user.id, per_page: 10 }, format: :json
       end
 
-      it "calculates cost for per_page=100 as 16 units (8 RCU * 2 multiplier)" do
-        # 100 lines / 13.838 lines per RCU ≈ 7.23 RCU → ceil = 8 RCU → 8 * 2 = 16 units
-        expect(controller).to receive(:increment_request_cost).with(16)
+      it "calculates cost for per_page=100 as 40 units (8 RCU * 5 multiplier)" do
+        # 100 lines / 13.838 lines per RCU ≈ 7.23 RCU → ceil = 8 RCU → 8 * 5 = 40 units
+        expect(controller).to receive(:increment_request_cost).with(40)
 
         get "index", params: { user_id: @user.id, per_page: 100 }, format: :json
       end
 
-      it "calculates cost for per_page=200 as 30 units (15 RCU * 2 multiplier)" do
-        # 200 lines / 13.838 lines per RCU ≈ 14.46 RCU → ceil = 15 RCU → 15 * 2 = 30 units
-        expect(controller).to receive(:increment_request_cost).with(30)
+      it "calculates cost for per_page=200 as 75 units (15 RCU * 5 multiplier)" do
+        # 200 lines / 13.838 lines per RCU ≈ 14.46 RCU → ceil = 15 RCU → 15 * 5 = 75 units
+        expect(controller).to receive(:increment_request_cost).with(75)
 
         get "index", params: { user_id: @user.id, per_page: 200 }, format: :json
       end
@@ -865,10 +930,10 @@ describe PageViewsController do
       it "scales linearly with per_page values" do
         # Test intermediate values to ensure linear scaling
         test_cases = [
-          { per_page: 25, expected_cost: 4 },   # 2 RCU * 2
-          { per_page: 50, expected_cost: 8 },   # 4 RCU * 2
-          { per_page: 75, expected_cost: 12 },  # 6 RCU * 2
-          { per_page: 150, expected_cost: 22 }  # 11 RCU * 2
+          { per_page: 25, expected_cost: 10 },  # 2 RCU * 5
+          { per_page: 50, expected_cost: 20 },  # 4 RCU * 5
+          { per_page: 75, expected_cost: 30 },  # 6 RCU * 5
+          { per_page: 150, expected_cost: 55 }  # 11 RCU * 5
         ]
 
         test_cases.each do |test_case|

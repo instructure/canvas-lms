@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {createRoot} from 'react-dom/client'
+import {render as canvasRender} from '@canvas/react'
 import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms'
@@ -155,7 +155,7 @@ class Editor extends React.Component {
 const attach = function (element, type, env, readOnly = false) {
   const editor = <Editor env={env} type={type} readOnly={readOnly} />
   const editorRef = React.createRef()
-  flushSync(() => createRoot(element).render(React.cloneElement(editor, {ref: editorRef})))
+  flushSync(() => canvasRender(React.cloneElement(editor, {ref: editorRef}), element))
   return editorRef.current
 }
 

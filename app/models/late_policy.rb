@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LatePolicy < ActiveRecord::Base
+class LatePolicy < ApplicationRecord
   POINT_DEDUCTIBLE_GRADING_TYPES = %w[points percent letter_grade gpa_scale].freeze
 
   belongs_to :course, inverse_of: :late_policy

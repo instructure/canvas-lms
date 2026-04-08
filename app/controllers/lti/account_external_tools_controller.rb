@@ -43,6 +43,12 @@ module Lti
     }.freeze.with_indifferent_access
 
     def create
+      if context.root_account.feature_enabled?(:lock_lti_registrations) &&
+         target_developer_key.lti_registration&.lock_deploying?
+        return render json: { errors: [{ message: "This app has been locked by an administrator and cannot be installed via client ID." }] },
+                      status: :forbidden,
+                      content_type: MIME_TYPE
+      end
       tool = target_developer_key.lti_registration.new_external_tool(context, verify_uniqueness: params[:verify_uniqueness].present?, current_user: @current_user)
 
       ContextExternalTool.invalidate_nav_tabs_cache(tool, @domain_root_account)

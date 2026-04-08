@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupAndMembershipImporter < ActiveRecord::Base
+class GroupAndMembershipImporter < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :group_category, inverse_of: :group_and_membership_importers, optional: true

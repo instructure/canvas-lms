@@ -1,28 +1,4 @@
 ---
-ags_improved_course_concluded_response_codes:
-  state: hidden
-  display_name: Better LTI AGS Response Codes for Concluded Courses
-  description: |-
-    If enabled, the AGS API will return a more helpful response code whenever an LTI
-    tool attempts to access or modify data in a course that has already concluded.
-    Rather than returning a generic 404 Not Found, the API will instead return a 422
-    along with a helpful message indicating that the tool cannot access concluded
-    courses.
-  applies_to: RootAccount
-ags_score_trigger_needs_grading_after_submitted:
-  state: hidden
-  shadow: true
-  display_name: Prevents LTI AGS Score publish service incorrectly trigger Needs Grading icon
-  description: |-
-    If enabled, the AGS Score publish service endpoint will not trigger showing the Needs Grading icon in the gradebook
-    when activityProgress is Initialized or Started or InProgress just when it is Submitted or Completed.
-    If disabled only Initialized activityProgress will not trigger showing the Needs Grading icon in the gradebook.
-  applies_to: RootAccount
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 ags_improved_course_concluded_check:
   state: hidden
   shadow: true
@@ -46,21 +22,6 @@ assignment_edit_placement_not_on_announcements:
   applies_to: SiteAdmin
   display_name: Prevents LTI tools with assignment_edit placement from being launched on Announcements page
   description: When enabled, an LTI tool with the assignment_edit placement will not be launched on the Announcement page.
-csrf_oauth2_fix:
-  state: hidden
-  shadow: true
-  applies_to: SiteAdmin
-  display_name: Use custom CSRF protection on OAuth2 confirmation page
-  description: |-
-    If enabled, the standard CSRF token protection will be turned off on the /login/oauth2/accept endpoint.
-    Custom CSRF protection will be used instead, which does not use cookies, so it will work better in LTI workflows.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 course_settings_navigation_react:
   state: hidden
   shadow: true
@@ -116,18 +77,6 @@ disable_oembed_retrieve:
     This is to ease transitioning any potential users off this endpoint before
     removing it altogether.
   shadow: true
-disallow_null_custom_variables:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Disallow all null values for custom variables
-  description: |-
-    When enabled, any custom variables that have previously been returning NULL
-    will now return the name of the custom variable.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 exclude_deleted_lti2_tools_on_assignment_export:
   state: hidden
   applies_to: SiteAdmin
@@ -162,16 +111,14 @@ feature_flag_ui_sorting:
       state: allowed_on
     ci:
       state: allowed_on
-import_numeric_lti_custom_params_as_string:
+lock_lti_registrations:
   state: hidden
   shadow: true
-  applies_to: SiteAdmin
-  display_name: Copy numeric lti custom params as strings on imports.
-  description: Prevent ResourceLink custom parameters from being converted to numbers during course copy.
+  applies_to: RootAccount
+  display_name: Lock LTI Registrations
+  description: When enabled, admins can lock registrations to prevent deployment via client ID or course copy.
   environments:
     development:
-      state: allowed_on
-    test:
       state: allowed_on
     ci:
       state: allowed_on
@@ -311,18 +258,6 @@ lti_context_copy_notice:
       state: allowed_on
     ci:
       state: allowed_on
-lti_deployment_id_in_login_request:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Send lti_deployment_id in the LTI login request
-  description: |-
-    When enabled the lti_deployment_id will be sent in the LTI 1.3 login request.
-    When disabled both deployment_id and lti_deployment_id will be sent.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_dr_registrations_update:
   state: hidden
   shadow: true
@@ -353,22 +288,6 @@ lti_link_to_apps_from_developer_keys:
     for Canvas API calls via the OAuth flow.
   environments:
     development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_oidc_missing_cookie_retry:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Retry LTI OIDC launches that fail due to missing cookies
-  description: |-
-    If enabled, Canvas will retry LTI OIDC launches that fail due to missing cookies.
-    Safari tracking protection sometimes blocks cookies from being set to authorize the endpoint.
-    To fix this, we resubmit the request with a form.
-  environments:
-    development:
-      state: allowed_on
-    test:
       state: allowed_on
     ci:
       state: allowed_on
@@ -504,21 +423,6 @@ lti_usage_premium:
   description: >-
     This flag controls if an instance has access to premium LTI usage features.
     It should only be enabled in schools which have a contract paying for these features.
-lti_v2_turnitin_usage_log:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: "Send Turnitin LTI V2 usage logs to Pandata"
-  description: >-
-    If enabled, we'll send usage data about Turnitin LTI V2 launches to Pandata the same way
-    as we send usage data about LTI 1.3 launches.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 microsoft_group_enrollments_syncing:
   state: hidden
   display_name: Microsoft Group enrollment syncing
@@ -553,15 +457,18 @@ nav_menu_links:
       state: allowed_on
     ci:
       state: allowed_on
-open_tools_in_new_tab:
+oauth2_deny_post:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: "Open LTI tools in a new tab"
-  description: >-
-    If enabled, the tool launch will open a new tab and will default to the 'borderless' display type showing no Canvas UI elements.
+  display_name: Use POST for OAuth2 deny endpoint
+  description: |-
+    If enabled, the OAuth2 deny endpoint will only accept POST requests instead of GET.
+    This prevents browser prefetch from triggering the deny action and destroying OAuth2 session state.
   environments:
     development:
+      state: allowed_on
+    test:
       state: allowed_on
     ci:
       state: allowed_on

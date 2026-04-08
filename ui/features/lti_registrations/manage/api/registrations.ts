@@ -341,6 +341,7 @@ type UpdateRegistrationParams = {
   overlay?: LtiConfigurationOverlay
   adminNickname?: string
   workflowState?: 'on' | 'off' | 'allow'
+  lock_deploying?: boolean
 }
 
 export type UpdateRegistration = (params: UpdateRegistrationParams) => Promise<ApiResult<unknown>>
@@ -354,6 +355,7 @@ export const useUpdateRegistration = () => {
       overlay,
       adminNickname,
       workflowState,
+      lock_deploying,
     }: UpdateRegistrationParams) =>
       doFetchWithSchema(
         {
@@ -364,6 +366,7 @@ export const useUpdateRegistration = () => {
             overlay,
             admin_nickname: adminNickname,
             workflow_state: workflowState,
+            lock_deploying,
           }),
         },
         z.unknown(),
@@ -390,6 +393,7 @@ export const updateRegistration: UpdateRegistration = ({
   overlay,
   adminNickname,
   workflowState,
+  lock_deploying,
 }) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
@@ -405,6 +409,7 @@ export const updateRegistration: UpdateRegistration = ({
           overlay,
           admin_nickname: adminNickname,
           workflow_state: workflowState,
+          lock_deploying,
         }),
       ),
     }),

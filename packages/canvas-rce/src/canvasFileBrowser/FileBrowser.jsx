@@ -17,7 +17,7 @@
 import React from 'react'
 import formatMessage from '../format-message'
 import {cloneDeep, memoize} from 'es-toolkit/compat'
-import minimatch from 'minimatch'
+import {minimatch} from 'minimatch'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'

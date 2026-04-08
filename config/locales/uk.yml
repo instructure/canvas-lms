@@ -1895,12 +1895,14 @@ uk:
   administrator_f325c186: Адміністратор
   admins_3e1dce15: Адміністратори
   advanced_turnitin_settings_9ee84a38: "Додаткові параметри Turnitin"
+  advanced_vericite_settings_4f2afd5b: "Розширені параметри VeriCite"
   afghanistan_93_ab06805: "Афганістан (+93)"
   after_48b9d69: Після...
   after_4c71e718: Після
   after_date_981cd41b: "Після %{date}"
   after_last_attempt_c9168da2: "Після останньої спроби"
   after_the_assignment_is_graded_53754607: "Після оцінювання завдання"
+  after_the_due_date_b7ac51f4: "Після очікуваної дати"
   after_the_due_date_eee89c9c: "Після призначеної дати"
   agenda_b010136d: "Порядок денний"
   ahead_21f22939: Наперед
@@ -3230,6 +3232,7 @@ uk:
   beta_url_3c7b88ec: "Бета URL:"
   between_1_and_5_f2a74bcf: "Між 1 та 5"
   between_1_and_99_d421a4c0: "Між 1% і 99%"
+  bibliographic_material_42d9ed3c: "Бібліографічний матеріал"
   big_blue_button_conference: 
     recording_setting: Запис
     recording_setting_enabled_description: "Дозволити запис для цієї конференції"
@@ -3931,6 +3934,7 @@ uk:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Оберіть колір або екранну назву курсу або перемістіть картку курсу для %{course}"
   choose_a_course_home_page_8059c7b: "Виберіть головну сторінку курсу "
   choose_a_csv_file_to_upload_9644480c: "Вибрати .csv файл для завантаження:"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "Виберіть варіант переоцінювання для студентів, котрі вже пройшли опитування. Canvas буде переоцінювати всі ваші матеріали після збереження опитування (оцінки студентів можуть бути затронуті)."
   choose_an_authentication_service_47dc8875: "Виберіть службу аутентифікації"
   choose_and_publish_980812cb: "Обрати та опублікувати"
   choose_assignment_b0132c5e: "-- Виберіть завдання --"
@@ -4224,6 +4228,7 @@ uk:
     profile: 
       notices: 
         contact_registered: "Метод контактування зареєстровано!"
+  compare_against_d7a750ce: "Порівняти з"
   complete_4f4efbc: Завершити
   complete_all_items_e1779257: "Завершити всі елементи"
   complete_fd828dea: Завершити
@@ -6933,6 +6938,7 @@ uk:
   district_id_6f408184: "Ідентифікатор району"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Розділити на рівні проміжки по  %{input_value}  хвилин. "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Розділити на рівні проміжки по %{num_minutes} хвилин. *Вперед*"
+  do_not_consider_84d7b395: "Не брати до уваги"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Не враховувати це завдання у кінцевому підсумку."
   do_nothing_9672b478: "Нічого не робити"
   does_not_meet_expectations_b0736d20: "Не відповідає очікуванням"
@@ -6959,6 +6965,7 @@ uk:
   download_epub_757cf0af: "Завантажити електронну публікацію"
   download_errors_attchment_82ffea3f: "Завантижити errors_attchment"
   download_item_analysis_report_statuslabel_8c9387ec: "Завантажити звіт по аналізу елементів  %{statusLabel}"
+  download_name_de443d96: "Завантажити %{name}"
   download_report_77164f62: "Завантажити звіт"
   download_scores_generated_on_date_ff5b9cd2: "Завантажити результати згенеровані  %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Завантажити аналітичний звіт студента %{statusLabel}"
@@ -7655,6 +7662,7 @@ uk:
   example_school_of_rock_41f32c31: "приклад: \"School of Rock\""
   exceeds_expectations_5910fc3a: "Перевищує очікування"
   exceeds_mastery_1f995dce: "Перевищує Майстерність"
+  exclude_self_plagiarism_f313288c: "Виключити самовільний плагіат"
   excuse_this_assignment_for_the_selected_student_af04e132: "Виправдати це завдання для обраного студента"
   excused_3aab77: виправдано
   excused_5877183c: Виправдано!
@@ -8030,6 +8038,7 @@ uk:
   getting_started_with_collaborations_794240ba: "Починаємо співробітництво"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Надайте усім студентам однаковий бал  за *%{assignment.name}* увівши та надавши оцінку нижче:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Надайте усім студентам однаковий *percent* бал за **%{assignment.name}** ввівши та подавши бал нижче:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Дайте кожному повну довіру на це питання"
   global_announcements_a78912c8: "Глобальні оголошення"
   global_branding_df1cae12: "Глобальний брендінг"
   global_message_icons: 
@@ -9089,6 +9098,7 @@ uk:
   include_course_settings_c4c08764: "Містить налаштування курсу"
   include_deleted_enrollments_1c87684a: "Містить видалені реєстрації"
   include_deleted_objects_3cced3b5: "Містить видалені об'єкти;"
+  include_in_repository_6102bd95: "Включити до бібліотеки"
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Містить бали при оголошенні оцінок.
       Якщо ваш email не належить до електронної пошти вашої установи, це означає, що важливий вміст надсилатиметься за її межі.
@@ -9244,6 +9254,7 @@ uk:
   international_sms_9edb9868: "Міжнародне СМС"
   international_text_messaging_rates_may_apply_d4b4a97a: "Можуть бути застосовані міжнародні тарифи для обміну текстовими повідомленнями."
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: "База даних Інтернету"
   introduction_43f53b7d: Вступ
   invalid_address_book_strategy_904a7ada: "Невірна стратегія адресної книги."
   invalid_authenticity_token_b753558c: "Невірний токен аутентифікації"
@@ -9363,6 +9374,7 @@ uk:
   join_the_conversation_using_this_link_link_9017499: "Приєднуйтесь до обговорення за цим посиланням: %{link}."
   joined_group_group_name_e3802c04: "Приєднано до групи %{group_name}"
   joining_81f8b6c9: Приєднання
+  journals_periodicals_and_publications_ca24673: "Журнали, періодика та Публікації"
   jquery: 
     module_sequence_footer: 
       next: Наступний
@@ -12617,6 +12629,7 @@ uk:
   other_1c6d9c79: Інше
   other_carrier_45531207: "Інший носій"
   other_ddacb37d: інше
+  other_student_papers_bf318f4c: "Інші студентські документи"
   out_of_formattedoutof_e08e90d5: "з %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "з %{n_assignment.points_possible}"
   out_of_points_37a749d7: "(з %{points})"
@@ -15193,6 +15206,7 @@ uk:
     ? "true"
     : Правильно
   quizzes_tutorial_tray_6f87cdd3: "Набір вказівок до контрольних робіт"
+  quoted_material_ffaea62b: "Цитований матеріал"
   radio_button_option_1_a8ec51f9: "Перемикач варіанту 1"
   radio_button_option_2_31e50043: "Перемикач варіанту 2"
   range_56b2f310: Діапазон
@@ -15366,6 +15380,7 @@ uk:
         name: ім'я
     welcome_to_canvas: "Ласкаво просимо до Canvas!"
   registration_url_60e0eaaa: "URL-адреса реєстрації"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Повторне використання не дозволено на це питання, оскільки або відповідь була вилучена, або тип питання був змінений після того, як студент завершив відправлення."
   regular_style_checkbox_ee3d71c1: "Звичайний прапорець"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Реалізовано за шляхом: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Реалізовано за шляхом: %{path}"
@@ -16931,6 +16946,7 @@ uk:
   skype_18850ba7: Skype
   skype_name_9eb890df: "Ім'я для Skype"
   skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype пропонує безкоштовні голосові та відеодзвінки. Багато студентів використовують Skype в якості вільного, простого способу спілкування. Якщо ви реєструєте ваше ім'я Skype і включите видимість, то інші студенти можуть легко знайти ваш контакт і подзвонити або додати вас за допомогою Skype."
+  small_matches_581ab241: "Невеликі співпадання"
   sms_f0ddceeb: смс
   snapshots_6e1806b4: Знімки
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Знімки - це резервні копії вашої пробної версії Canvas. Знімок створить унікальну \"версію\", яка зробить точний запис стану вашої пробної версії на момент моментального знімка."
@@ -17165,6 +17181,7 @@ uk:
   students_are_not_allowed_to_access_test_installati_11b9078: "Студенти не мають доступу для установки тестів."
   students_being_observed_4de3e520: "Студенти, за якими спостерігають"
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Студенти можуть брати участь  в курсі тільки між цими датами"
+  students_can_see_the_originality_report_f246beb0: "Студенти можуть бачити оригінальний звіт"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Студенти не можуть переглядати відповіді на Контрольної роботи після завершення курсу"
   students_have_already_submitted_to_this_discussion_f55db744: "Студенти вже долучилися до обговорення, тому групові налаштування не можуть бути змінені."
   students_have_either_already_taken_or_started_taki_a076336: "Студенти або вже склали або почали складати цю контрольну роботу, тому будьте обережні щодо її редагування. Якщо вам потрібно змінити будь-які запитання, можливо, вам слід подумати про переоцінку студентів, які склали попередню версію контрольної роботи."
@@ -18255,6 +18272,7 @@ uk:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Повторити відправку"
+  turnitin_repository_9f865357: "Turnitin Бібліотека"
   turnitin_settings: 
     originality_report_never: Ніколи
     originality_report_visible_after_due_date: "Після очікуваної дати"
@@ -18382,6 +18400,7 @@ uk:
   update_login_472cd6db: "Оновити логін"
   update_module_b984c2e5: "Оновити модуль"
   update_password_4bc5cb1f: "Оновити пароль"
+  update_question_without_regrading_47c9904a: "Оновити питання без переоцінки"
   update_quota_81381226: "Оновити квоту"
   update_rating_6d29c2ef: "Оновити рейтинг"
   update_settings_9b422d0f: "Налаштування оновлення"

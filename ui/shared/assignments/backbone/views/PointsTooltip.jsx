@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {PointsTooltipComponent} from '../../react/PointsTooltipComponent'
 
 extend(PointsTooltip, Backbone.View)
@@ -42,15 +42,15 @@ PointsTooltip.prototype.updateComponent = function (quizType = null) {
   const currentQuizType = quizType || this.parentModel.newQuizzesType() || 'graded_quiz'
   const shouldShow = currentQuizType === 'graded_survey'
 
-  if (!this.root) {
-    this.root = createRoot(this.el)
-  }
+  const element = React.createElement(PointsTooltipComponent, {
+    shouldShow,
+  })
 
-  this.root.render(
-    React.createElement(PointsTooltipComponent, {
-      shouldShow,
-    }),
-  )
+  if (!this.root) {
+    this.root = render(element, this.el)
+  } else {
+    rerender(this.root, element)
+  }
 }
 
 PointsTooltip.prototype.render = function () {

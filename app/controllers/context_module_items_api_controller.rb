@@ -570,7 +570,7 @@ class ContextModuleItemsApiController < ApplicationController
           return render json: { message: "item can't be unpublished" }, status: :forbidden
         end
         @tag.save
-        @tag.update_asset_workflow_state!
+        @tag.update_asset_workflow_state!(user: @current_user)
         @tag.context_module.save
       end
 

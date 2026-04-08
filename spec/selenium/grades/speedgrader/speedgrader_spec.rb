@@ -734,6 +734,12 @@ describe "SpeedGrader" do
         Speedgrader.visit(@course.id, @assignment_for_course.id)
 
         expect(Speedgrader.right_pane).to contain_jqcss("#reassign_assignment[disabled]:visible")
+
+        # The jQuery UI tooltip clears the title attribute on mouseover (to prevent
+        # the native browser tooltip). Move the mouse away to trigger mouseleave,
+        # which causes the tooltip widget to restore the title attribute.
+        driver.action.move_to(f("#combo_box_container")).perform
+
         wrapper = ff("#reassign_assignment_wrapper")
         expect(wrapper[0].attribute("title")).to eq "Student has met maximum allowed attempts."
 

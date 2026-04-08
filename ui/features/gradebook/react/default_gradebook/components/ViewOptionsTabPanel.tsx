@@ -230,7 +230,7 @@ export default function ViewOptionsTabPanel({
             )}
             {renderCheckbox(
               viewStatusForColorblindness,
-              I18n.t('View status for colorblindness'),
+              I18n.t('Enable Gradebook Status Icons'),
               'viewStatusForColorblindness',
             )}
           </FormFieldGroup>

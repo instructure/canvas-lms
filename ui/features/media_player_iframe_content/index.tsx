@@ -29,8 +29,10 @@ import {captionLanguageForLocale} from '@instructure/canvas-media'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {NoTranscript} from './components/NoTranscript'
 import {isAsrGenerating} from './utils/isAsrGenerating'
+import {getPlayerTracks} from './utils/getPlayerTracks'
 
 import {createOnTranscriptEdit, onConfirmEditChanges} from './transcriptEditing'
+import {createPendoTrackEventHandler} from './pendoTrackEventHandler'
 
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
@@ -42,14 +44,30 @@ declare const ENV: GlobalEnv & {
   }
 }
 
+interface AsrContext {
+  isAsrEnabled: boolean
+  isEditMode: boolean
+  rceJwt: string | undefined
+}
+
 const I18n = createI18nScope('CanvasMediaPlayer')
 
 const isStandalone = () => {
   return !window.frameElement && window.location === window?.top?.location
 }
 
-const isRceEditMode = () => {
-  return window.parent.document.body.id === 'tinymce'
+const getAsrContext = (): AsrContext => {
+  const disabled: AsrContext = {isAsrEnabled: false, isEditMode: false, rceJwt: undefined}
+
+  if (!ENV.FEATURES?.rce_asr_captioning_improvements) return disabled
+
+  try {
+    const isEditMode = window.parent.document.body.id === 'tinymce'
+    const rceEnv = window.parent.parent.ENV as {JWT?: string} | undefined
+    return {isAsrEnabled: true, isEditMode, rceJwt: rceEnv?.JWT}
+  } catch {
+    return disabled
+  }
 }
 
 const addVerifier = (url: string, verifier: string | string[] | undefined): string => {
@@ -120,6 +138,8 @@ ready(() => {
           inherited: t.inherited,
           asr: t.asr,
           workflow_state: t.workflow_state,
+          url: t.url,
+          filename: `${media_object?.title}_${t.locale}.srt`,
         }))
         if (tracks) {
           event?.source?.postMessage(
@@ -163,28 +183,23 @@ ready(() => {
     explicitSize = {width: 640, height: 408}
   }
 
-  const isAsrCaptioningImprovements = ENV.FEATURES?.rce_asr_captioning_improvements
-  const isEditMode = isAsrCaptioningImprovements && isRceEditMode()
-  const RCE_ENV = isAsrCaptioningImprovements ? window.parent.parent.ENV : undefined
+  const {isAsrEnabled, isEditMode, rceJwt} = getAsrContext()
 
   const handleTranscriptEdit =
-    isAsrCaptioningImprovements && isEditMode && attachment_id && RCE_ENV?.JWT
-      ? createOnTranscriptEdit(attachment_id, RCE_ENV.JWT)
+    isAsrEnabled && isEditMode && attachment_id && rceJwt
+      ? createOnTranscriptEdit(attachment_id, rceJwt)
       : undefined
 
-  const handleConfirmEditChanges =
-    isAsrCaptioningImprovements && isEditMode ? onConfirmEditChanges : undefined
+  const handleConfirmEditChanges = isAsrEnabled && isEditMode ? onConfirmEditChanges : undefined
+
+  const handleTrackEvent = isAsrEnabled ? createPendoTrackEventHandler() : undefined
 
   const aria_label = !media_object.title ? undefined : media_object.title
   const canManageTranscripts = (ENV.current_user_roles ?? []).some(
     r => r === 'teacher' || r === 'admin',
   )
   const isGenerating = isAsrGenerating(media_object?.media_tracks)
-  // Get rid of processing state ASR tracks, since their content will be empty anyway.
-  // append ASR track's label with "(Automatic)" to differentiate from human-created captions
-  const playerTracks = mediaTracks
-    ?.filter(t => !(t.asr && t.workflow_state === 'processing'))
-    .map(t => (t.asr ? {...t, label: I18n.t('%{language} (Automatic)', {language: t.label})} : t))
+  const playerTracks = getPlayerTracks(mediaTracks)
 
   const viewerRestrictions = media_object?.viewer_restrictions || {}
   const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
@@ -200,12 +215,14 @@ ready(() => {
         is_attachment={is_attachment}
         attachment_id={attachment_id}
         explicitSize={explicitSize}
-        enableSidebar={isAsrCaptioningImprovements && showRollingTranscript}
-        openSidebar={isAsrCaptioningImprovements}
+        enableSidebar={isAsrEnabled && showRollingTranscript}
+        openSidebar={isAsrEnabled}
         onTranscriptEdit={handleTranscriptEdit}
         onConfirmEditChanges={handleConfirmEditChanges}
+        onTrackEvent={handleTrackEvent}
+        hideUploadCaptions
         kebabMenuElements={
-          isAsrCaptioningImprovements && showRollingTranscript
+          isAsrEnabled && showRollingTranscript
             ? [
                 {
                   id: 'expand-view',
@@ -225,7 +242,7 @@ ready(() => {
             : []
         }
         emptyTranscriptsComponent={
-          isAsrCaptioningImprovements && is_video ? (
+          isAsrEnabled && is_video ? (
             <NoTranscript isGenerating={isGenerating} canManageTranscripts={canManageTranscripts} />
           ) : undefined
         }

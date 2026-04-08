@@ -22,7 +22,7 @@ import {AppsSearchBar} from './AppsSearchBar'
 
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'

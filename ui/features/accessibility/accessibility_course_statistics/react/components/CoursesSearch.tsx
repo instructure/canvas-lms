@@ -72,21 +72,13 @@ export const CoursesSearch: React.FC<{
   }
 
   return (
-    <View as="div" margin="0 0 medium">
+    <View as="div">
       <TextInput
         renderLabel={() => <ScreenReaderContent>{I18n.t('Search courses')}</ScreenReaderContent>}
         placeholder={I18n.t('Search by course title, SIS ID...')}
         value={localValue}
         onChange={handleChange}
         type="search"
-        messages={[
-          {
-            type: 'hint',
-            text: I18n.t(
-              'Start typing to search. Results will update automatically after 3 characters.',
-            ),
-          },
-        ]}
         renderBeforeInput={<IconSearchLine inline={false} />}
         renderAfterInput={localValue.length ? clearButton() : null}
       />

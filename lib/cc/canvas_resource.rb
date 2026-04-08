@@ -31,6 +31,7 @@ module CC
     include BlueprintSettings
     include WebResources
     include LtiContextControls
+    include NavMenuLinks
 
     def add_canvas_non_cc_data
       migration_id = create_key(@course)
@@ -57,6 +58,10 @@ module CC
       if export_media_objects?
         File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), "") # just in case an error happens later
         resources << File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MEDIA_TRACKS)
+      end
+
+      if @course.root_account.feature_enabled?(:nav_menu_links) && export_symbol?(:all_course_settings)
+        resources << run_and_set_progress(:create_nav_menu_links, nil, I18n.t("course_exports.errors.nav_menu_links", "Failed to export navigation menu links"))
       end
 
       # Create the syllabus resource
@@ -146,6 +151,39 @@ module CC
       syl_rel_path
     end
 
+    def preloaded_nav_menu_links
+      @preloaded_nav_menu_links ||=
+        NavMenuLink.active
+                   .where(course_nav: true, context: [@course, *@course.account_chain])
+                   .index_by(&:id)
+    end
+
+    def tab_with_id_converted_to_migration_id(tab)
+      raw_tab_id = tab["id"]
+      migration_id =
+        case raw_tab_id
+        when /\Anav_menu_link_(\d+)\z/
+          return nil unless @course.root_account.feature_enabled?(:nav_menu_links)
+
+          nav_menu_link = preloaded_nav_menu_links[$1.to_i]
+          return nil unless nav_menu_link
+
+          "nav_menu_link_#{create_key(nav_menu_link)}"
+        when String
+          # For historical reasons (to avoid any possible breaking changes)
+          # assume any other string is a ContextExternalTool.
+          tool_id = raw_tab_id.sub("context_external_tool_", "")
+          tool = Lti::ToolFinder.from_id(tool_id, @course, placement: :course_navigation)
+          tool && "context_external_tool_#{create_key(tool)}"
+        end
+
+      if migration_id
+        tab.merge("id" => migration_id)
+      else
+        tab
+      end
+    end
+
     def create_course_settings(migration_id, document = nil)
       if document
         course_file = nil
@@ -166,21 +204,8 @@ module CC
         c.start_at ims_datetime(@course.start_at, nil)
         c.conclude_at ims_datetime(@course.conclude_at, nil)
         if @course.tab_configuration.present?
-          tab_config = []
-          @course.tab_configuration.each do |t|
-            # skip nav menu links for now, see INTEROP-9293
-            next if NavMenuLinkTabs.nav_menu_link_tab_id?(t["id"])
-
-            tab = t.dup
-
-            if tab["id"].is_a?(String)
-              # it's an external tool, so translate the id to a migration_id
-              tool_id = tab["id"].sub("context_external_tool_", "")
-              if (tool = Lti::ToolFinder.from_id(tool_id, @course, placement: :course_navigation))
-                tab["id"] = "context_external_tool_#{create_key(tool)}"
-              end
-            end
-            tab_config << tab
+          tab_config = @course.tab_configuration.filter_map do |tab|
+            tab_with_id_converted_to_migration_id(tab)
           end
           c.tab_configuration tab_config.to_json
         end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentGroup < ActiveRecord::Base
+class AssignmentGroup < ApplicationRecord
   include Workflow
 
   # Unlike our other soft-deletable models, assignment groups use 'available' instead of 'active'

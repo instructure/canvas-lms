@@ -30,6 +30,11 @@ import {
 import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
+vi.mock('../../charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
+
 vi.mock('../../charts/MasteryDistributionChart', () => ({
   MasteryDistributionChart: ({
     onBarClick,

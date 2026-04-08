@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Auditors::ActiveRecord
-  class GradeChangeRecord < ActiveRecord::Base
+  class GradeChangeRecord < ApplicationRecord
     include Auditors::ActiveRecord::Attributes
     include CanvasPartman::Concerns::Partitioned
 

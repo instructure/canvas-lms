@@ -31,6 +31,7 @@ import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import '@canvas/jquery/jquery.simulate'
 import {http, HttpResponse} from 'msw'
 import {isAccessible} from '@canvas/test-utils/assertions'
+import {act} from 'react'
 
 // Mock globalUtils
 vi.mock('@canvas/util/globalUtils', () => ({
@@ -203,20 +204,8 @@ afterAll(() => {
 })
 
 describe('AssignmentListItemViewSpec', () => {
-  const server = setupServer()
-
-  beforeAll(() => {
-    server.listen()
-  })
-
   beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'},
-      current_user_is_admin: false,
-    })
-    const {model, submission, view} = genSetup()
-    // Variables can be accessed here if needed
+    genSetup()
   })
 
   afterEach(() => {
@@ -227,10 +216,6 @@ describe('AssignmentListItemViewSpec', () => {
     I18nStubber.clear()
   })
 
-  afterAll(() => {
-    server.close()
-  })
-
   test('should be accessible', async () => {
     const view = createView(assignment1(), {canManage: true})
     await isAccessible(view, {a11yReport: true})
@@ -239,8 +224,6 @@ describe('AssignmentListItemViewSpec', () => {
   test('initializes child views if can manage', () => {
     const view = createView(assignment1(), {canManage: true})
     expect(view.publishIconView).toBeTruthy()
-    expect(view.dateDueColumnView).toBeTruthy()
-    expect(view.dateAvailableColumnView).toBeTruthy()
   })
 
   test("initializes no child views if can't manage", () => {
@@ -336,7 +319,7 @@ describe('AssignmentListItemViewSpec', () => {
     })
     // Mock window.confirm in the JSDOM environment
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    vi.spyOn(view, 'delete')
+    vi.spyOn(view, 'delete').mockImplementation(() => {})
     view.$(`#assignment_${assignment1().id} .delete_assignment`).click()
     expect(confirmSpy).toHaveBeenCalled()
     expect(view.delete).toHaveBeenCalled()
@@ -360,17 +343,14 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('delete destroys model', () => {
-    const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     const view = createView(assignment1())
-    vi.spyOn(view.model, 'destroy')
+    vi.spyOn(view.model, 'destroy').mockImplementation(() => {})
     view.delete()
     expect(view.model.destroy).toHaveBeenCalled()
-    ENV.context_asset_string = old_asset_string
   })
 
   test('delete calls screenreader message', async () => {
-    const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     server.use(
       http.delete('/api/v1/courses/1/assignments/1', () => {
@@ -390,10 +370,11 @@ describe('AssignmentListItemViewSpec', () => {
     )
     const view = createView(assignment1())
     vi.spyOn($, 'screenReaderFlashMessage')
-    view.delete()
-    await new Promise(resolve => setTimeout(resolve, 10))
+    await act(async () => {
+      view.delete()
+      await new Promise(resolve => setTimeout(resolve, 50))
+    })
     expect($.screenReaderFlashMessage).toHaveBeenCalled()
-    ENV.context_asset_string = old_asset_string
   })
 
   test('show score if score is set', () => {
@@ -409,12 +390,10 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('do not show score if viewing as non-student', () => {
-    const old_user_roles = ENV.current_user_roles
     ENV.current_user_roles = ['user']
     const view = createView(assignment1(), {canManage: false})
     const str = view.$('.js-score:eq(0) .non-screenreader').html()
     expect(str.search('2 pts')).not.toBe(-1)
-    ENV.current_user_roles = old_user_roles
   })
 
   test('show no submission if none exists', () => {
@@ -572,7 +551,7 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_duplicate',
     })
     const view = createView(model)
-    vi.spyOn(model, 'duplicate_failed')
+    vi.spyOn(model, 'duplicate_failed').mockImplementation(() => ({always: vi.fn()}))
     view.$(`#assignment_${model.id} .duplicate-failed-retry`).click()
     expect(model.duplicate_failed).toHaveBeenCalled()
   })
@@ -585,7 +564,7 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_migrate',
     })
     const view = createView(model)
-    vi.spyOn(model, 'retry_migration')
+    vi.spyOn(model, 'retry_migration').mockImplementation(() => ({always: vi.fn()}))
     view.$(`#assignment_${model.id} .migrate-failed-retry`).click()
     expect(model.retry_migration).toHaveBeenCalled()
   })
@@ -755,32 +734,6 @@ describe('AssignmentListItemViewSpec', () => {
     const view = createView(model)
     expect(model.pollUntilFinishedImporting).toHaveBeenCalled()
   })
-
-  test('shows availability for checkpoints', () => {
-    const model = buildAssignment({
-      id: 2,
-      title: 'test checkpoint',
-      workflow_state: 'published',
-      due_at: '2024-08-28T23:59:00-06:00',
-      lock_at: '2013-09-28T23:59:00-06:00',
-      unlock_at: '2013-07-28T23:59:00-06:00',
-      can_manage: true,
-      checkpoints: [
-        {
-          id: 2,
-          title: 'reply to topic',
-          tag: 'reply_to_topic',
-        },
-        {
-          id: 3,
-          title: 'reply to entry',
-          tag: 'reply_to_entry',
-        },
-      ],
-    })
-    const view = createView(model)
-    expect(view.dateAvailableColumnView).toBeTruthy()
-  })
 })
 
 // Skipped QUnit Tests Converted to Jest
@@ -826,11 +779,6 @@ describe.skip('AssignmentListItemViewSpec - opens and closes the direct share co
 
 describe('AssignmentListItemViewSpec - editing assignments', () => {
   beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'},
-      current_user_is_admin: false,
-    })
     genSetup()
   })
 
@@ -926,7 +874,6 @@ describe('AssignmentListItemViewSpec - skip to build screen button', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
     genTeardown()
   })
 
@@ -964,7 +911,7 @@ describe('AssignmentListItemViewSpec - mastery paths menu option', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1071,7 +1018,7 @@ describe('AssignmentListItemViewSpec - mastery paths link', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1132,7 +1079,7 @@ describe('AssignmentListItemViewSpec - mastery paths icon', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1179,7 +1126,7 @@ describe('AssignmentListItemViewSpec - assignment icons', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('renders discussion icon for discussion topic', () => {
@@ -1244,14 +1191,8 @@ describe('AssignmentListItemViewSpec - assignment icons', () => {
 })
 
 describe('Assignment#quizzesRespondusEnabled', () => {
-  beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: [],
-    })
-  })
-
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('returns false if the assignment is not RLDB enabled', () => {
@@ -1337,7 +1278,28 @@ describe('AssignmentListItemViewSpec - assessment requests display', () => {
     expect(studentViewItem.text()).toContain('Required Peer Review 1')
   })
 
-  test('does not render StudentViewPeerReviews when flag is enabled', () => {
+  test('does not render StudentViewPeerReviews when flag is enabled and assignment has sub-assignment', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      peer_review_sub_assignment: {id: 10, peer_review_count: 2},
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+
+    // When flag is enabled and assignment has a sub-assignment, peer reviews are handled as sub-assignments
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+
+  test('renders StudentViewPeerReviews for legacy peer reviews when flag is enabled', () => {
     const model = buildAssignment({
       id: 1,
       title: 'Peer Review Assignment',
@@ -1352,9 +1314,9 @@ describe('AssignmentListItemViewSpec - assessment requests display', () => {
     })
     const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
 
-    // When flag is enabled, peer reviews are handled as sub-assignments
+    // Legacy peer reviews (no sub-assignment) should still render even when flag is enabled
     const studentViewItem = view.$el.find('li.student-view')
-    expect(studentViewItem).toHaveLength(0)
+    expect(studentViewItem).toHaveLength(1)
   })
 
   test('does not render StudentViewPeerReviews when no assessment requests', () => {
@@ -1438,7 +1400,7 @@ describe('AssignmentListItemViewSpec - peer review sub-assignment rendering', ()
     expect(view.$('.js-score').text()).toContain('5 pts')
   })
 
-  test('displays peer review due date', () => {
+  test('displays peer review due date', async () => {
     const model = buildAssignment({
       id: 103,
       is_peer_review_assignment: true,
@@ -1447,8 +1409,13 @@ describe('AssignmentListItemViewSpec - peer review sub-assignment rendering', ()
       due_at: '2025-01-15T23:59:00Z',
     })
     const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
-    const dueDateView = view.dateDueColumnView
-    expect(dueDateView).toBeTruthy()
+
+    await act(async () => {
+      view.render()
+    })
+
+    const $mountPoint = view.$('[data-view=date-due]')
+    expect($mountPoint.text()).toContain('Due Jan 15 at 11:59pm')
   })
 })
 

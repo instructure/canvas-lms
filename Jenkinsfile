@@ -100,18 +100,18 @@ pipeline {
 
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
-    IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
+    IMAGE_CACHE_UNIQUE_SCOPE = imageTag.applyTestSuffix("${imageTagVersion()}-$TAG_SUFFIX")
 
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_ASSETS_IMAGE = "$WEBPACK_ASSETS_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
-    DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
+    DYNAMODB_MERGE_IMAGE = imageTag.applyTestSuffix("$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}")
     KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    KARMA_MERGE_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_MERGE_SCOPE"
+    KARMA_MERGE_IMAGE = imageTag.applyTestSuffix("$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_MERGE_SCOPE")
     LINTERS_RUNNER_IMAGE = "$LINTERS_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
+    POSTGRES_MERGE_IMAGE = imageTag.applyTestSuffix("$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}")
 
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
@@ -480,7 +480,6 @@ pipeline {
               steps {
                 script {
                   if (configuration.isChangeMerged() || env.GERRIT_CHANGE_ID != '0') {
-                    lintersStage.provisionDocker()
                     lintersStage.runLintersInline()
                   }
                 }
@@ -620,6 +619,7 @@ pipeline {
           // Only run the post-build cleanup if the build wasn't skipped, since skipped builds may not have set up docker or other resources
           pipelineHelpers.postBuildAlways()
         }
+        pipelineHelpers.cleanupDocker()
       }
     }
 

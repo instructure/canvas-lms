@@ -32,6 +32,7 @@ import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
+import RulesTooltip from '../../react/RulesTooltip'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
 import {createRoot} from 'react-dom/client'
@@ -103,7 +104,6 @@ AssignmentGroupListItemView.prototype.els = {
 AssignmentGroupListItemView.prototype.events = {
   'click .element_toggler': 'toggleArrow',
   'keyclick .element_toggler': 'toggleArrowWithKeyboard',
-  'click .tooltip_link': preventDefault(function () {}),
   'keydown .assignment_group': 'handleKeys',
   'click .move_contents': 'onMoveContents',
   'click .move_group': 'onMoveGroup',
@@ -169,18 +169,18 @@ AssignmentGroupListItemView.prototype.createItemView = function (model) {
 }
 
 AssignmentGroupListItemView.prototype.createRulesToolTip = function () {
-  const link = this.$el.find('.tooltip_link')
-  return link.tooltip({
-    position: {
-      my: 'center top',
-      at: 'center bottom+10',
-      collision: 'fit fit',
-    },
-    tooltipClass: 'center top vertical',
-    content() {
-      return $(link.data('tooltipSelector')).html()
-    },
-  })
+  const mountPoint = this.$el.find(`#ag_${this.model.get('id')}_rules_tooltip_mount_point`)[0]
+
+  if (!mountPoint) return
+
+  if (this._rulesTooltipRoot) {
+    this._rulesTooltipRoot.unmount()
+  }
+
+  this._rulesTooltipRoot = createRoot(mountPoint)
+  this._rulesTooltipRoot.render(
+    <RulesTooltip rulesText={this.toJSON().rulesText} displayableRules={this.displayableRules()} />,
+  )
 }
 
 AssignmentGroupListItemView.prototype.initialize = function () {

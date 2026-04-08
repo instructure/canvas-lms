@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe CanvasCache::Redis::Distributed do
   it "supports failsafe on hmget" do
     redis = Redis::Distributed.new([])

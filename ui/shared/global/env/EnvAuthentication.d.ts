@@ -21,5 +21,5 @@ export interface EnvAuthentication {
     ldap_ips?: string
   }
   auth_providers?: Array<{id: string; url: string; auth_type: string}>
-  discovery_page_base_url?: string
+  discovery_page_url?: string
 }

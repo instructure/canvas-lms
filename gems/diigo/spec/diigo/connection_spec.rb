@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe Diigo::Connection do
   describe ".config_check" do
     it "returns nil if there are no config issues" do

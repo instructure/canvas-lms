@@ -20,7 +20,22 @@ import type {LtiMessageHandler} from '../lti_message_handler'
 
 const enableScrollEvents: LtiMessageHandler = ({responseMessages}) => {
   let timeout: number
-  window.addEventListener(
+
+  // When top_navigation_placement FF is on, the page is wrapped in an
+  // InstUI DrawerLayout, so html/body can no longer scroll. The actual
+  // scroll container becomes #drawer-layout-content in that case.
+  const drawerContent = document.querySelector('#drawer-layout-content')
+  const isTopNavEnabled = ENV.FEATURES?.top_navigation_placement && !!drawerContent
+  const scrollTarget: EventTarget = isTopNavEnabled ? drawerContent! : window
+
+  const getScrollY = (): number => {
+    if (isTopNavEnabled) {
+      return (drawerContent as HTMLElement).scrollTop
+    }
+    return window.scrollY
+  }
+
+  scrollTarget.addEventListener(
     'scroll',
     () => {
       // requesting animation frames effectively debounces the scroll messages being sent
@@ -31,7 +46,7 @@ const enableScrollEvents: LtiMessageHandler = ({responseMessages}) => {
       timeout = window.requestAnimationFrame(() => {
         responseMessages.sendResponse({
           subject: 'lti.scroll',
-          scrollY: window.scrollY,
+          scrollY: getScrollY(),
         })
       })
     },

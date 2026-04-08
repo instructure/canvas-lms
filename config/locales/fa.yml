@@ -2233,6 +2233,7 @@ fa:
   admins_add_remove_26811ce5: "مدیر - افزودن / حذف کردن"
   advanced_36b35b8: پیشرفته
   advanced_turnitin_settings_9ee84a38: "تنظیمات پیشرفته Turnitin"
+  advanced_vericite_settings_4f2afd5b: "تنظیمات پیشرفته VeriCite"
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       مشاهده دکمه های انتشار درس، خاتمه دادن درس و حذف دائمی این درس را تحت تأثیر قرار می دهد.
       دکمه حذف دائمی این درس فقط برای برای درس های ایجاد شده به صورت دستی ظاهر می‌شود.
@@ -2243,6 +2244,7 @@ fa:
   after_date_981cd41b: "بعد از %{date} "
   after_last_attempt_c9168da2: "بعد از آخرین تلاش"
   after_the_assignment_is_graded_53754607: "بعد از اینکه تکلیف نمره گذاری شد"
+  after_the_due_date_b7ac51f4: "بعد از تاریخ مهلت"
   after_the_due_date_eee89c9c: "بعد از تاریخ مهلت"
   agenda_b010136d: Agenda
   ahead_21f22939: "در پیش"
@@ -4466,6 +4468,7 @@ fa:
   between_1_and_5_f2a74bcf: "بین 1 و 5"
   between_1_and_99_d421a4c0: "بین یک و ۹۹ درصد"
   between_2_and_5_c34f5152: "بین ۲ تا ۵"
+  bibliographic_material_42d9ed3c: "مطلب کتابشناختی"
   big_blue_button_conference: 
     create_time: "زمان ایجاد کنید"
     recording_setting: "در حال ضبط"
@@ -5415,6 +5418,7 @@ fa:
   choose_a_file_to_upload_a63bac0f: "فایلی را برای آپلود انتخاب کنید"
   choose_a_file_to_upload_from_your_device_d1b50d4c: "فایلی را برای آپلود از دستگاه خود انتخاب کنید"
   choose_a_quiz_engine_8820d521: "یک موتور مسابقه انتخاب کنید"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "گزینه نمره گذاری دوباره برای دانشجویانی که قبلا آزمون داده اند. کانواس همه موردهای ارسالی را بعد از اینکه آزمون را ذخیره کردید دوباره نمره گذاری خواهد کرد (نمره های دانشجویان ممکن است تحت تأثیر قرار بگیرد)."
   choose_a_submission_type_8f45651a: "نوع ارسال را انتخاب کنید"
   choose_a_timezone_d9c52998: "انتخاب منطقه زمانی"
   choose_an_authentication_service_47dc8875: "انتخاب سرویس اعتبارسنجی"
@@ -5921,6 +5925,7 @@ fa:
     releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: "مقایسه با"
   complete_4f4efbc: کامل
   complete_all_items_e1779257: "تکمیل همه موردها"
   complete_fd828dea: کامل
@@ -9371,6 +9376,7 @@ fa:
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "تقسیم به بازه های زمانی مساوی (مقادیر به دقیقه)"
   divide_into_equal_time_slots_in_minutes_234312fa: "تقسیم به بازه های زمانی مساوی (به دقیقه"
   division_cutoff_cutoff_value_e938bc9d: " قطع تقسیم %{cutoff_value}"
+  do_not_consider_84d7b395: "در نظر گرفته نشود"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "این تکلیف متمایل به نمره نهایی محاسبه نشود"
   do_not_show_again_for_this_assignment_d0abd4ae: "دیگر برای این تکلیف نشان داده نشود"
   do_nothing_9672b478: "اقدامی انجام نشود"
@@ -10368,6 +10374,7 @@ fa:
   exceeds_mastery_1f995dce: "فراتر از تسلط"
   excelsior_student_activity_tracking_7a1ba44d: "ردیابی فعالیت های دانشجو"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "هرگونه داده ای که از تاریخ معین به روز نشده است را حذف کنید"
+  exclude_self_plagiarism_f313288c: "مستثنی کردن سرقت ادبی شخصی"
   excuse_this_assignment_for_the_selected_student_af04e132: "معاف کردن دانشجوی انتخاب شده از این تکلیف"
   excused_3aab77: "معاف شد"
   excused_5877183c: "معاف شد!"
@@ -11079,6 +11086,7 @@ fa:
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "با وارد کردن و ارسال یک مقدار نمره در قسمت زیر، به همه دانشجویان نمره یکسانی برای *%{assignment.name}* بدهید:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "با وارد کردن و ارسال یک مقدار نمره در قسمت زیر، برای  **%{assignment.name}** به همه دانشجویان *درصد* نمره یکسان بدهید:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "دادن امتیاز کامل به همه برای این پرسش"
   give_this_filter_a_name_36b4b03a: "به این فیلتر یک نام بدهید"
   global_announcements_a78912c8: "اطلاعیه های سراسری"
   global_announcements_add_edit_delete_843ca4d2: "اطلاعیه‌های جهانی افزایش / ویرایش / حذف کردن "
@@ -12920,6 +12928,7 @@ fa:
   include_deleted_items_in_report_c94e48b8: "شامل موارد حذف شده در گزارش"
   include_deleted_objects_3cced3b5: "شامل سازی اشیاء حذف شده؛"
   include_deleted_objects_4b75ef93: "شامل اشیاء حذف شده"
+  include_in_repository_6102bd95: "شامل سازی در مخزن"
   include_integration_ids_in_the_gradebook_exports_4b94c795: " شناسه‌های یکپارچگی را  در صدور دفتر نمره درج کنید. "
   include_last_activity_dates_4eb97ed5: "تاریخ های آخرین فعالیت را درج کنید;"
   include_last_activity_dates_ee2d3de0: "تاریخ های آخرین فعالیت را درج کنید"
@@ -13111,6 +13120,7 @@ fa:
   international_sms_9edb9868: "پیامک بین المللی"
   international_text_messaging_rates_may_apply_d4b4a97a: " ممکن است نرخ های پیام رسانی متنی بین المللی به کار رود."
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: "پایگاه داده اینترنتی"
   introduction_43f53b7d: مقدمه
   invalid_address_book_strategy_904a7ada: "راهبرد فهرست نشانی معتبر نیست."
   invalid_authenticity_token_b753558c: "نشانه اعتبار معتبر نیست"
@@ -13276,6 +13286,7 @@ fa:
   join_this_subject_ef4b8845: "به این موضوع بپیوندید"
   joined_group_group_name_e3802c04: "به گروه %{group_name} پیوست"
   joining_81f8b6c9: "درحال پیوستن"
+  journals_periodicals_and_publications_ca24673: "ژورنال ها، نشریات دوره ای و انتشارات"
   jpg_903bacff: JPG
   jpg_png_or_gif_files_14e360d2: "فایل های jpg، png یا gif"
   jquery: 
@@ -17363,6 +17374,7 @@ fa:
   other_ddacb37d: سایر
   other_incorrect_match_options_c1418af5: "سایر گزینه های نادرست تطبیق:"
   other_options_d25f199c: "گزینه‌های دیگر"
+  other_student_papers_bf318f4c: "مقاله های دیگر دانشجو"
   other_timezones_42530564: "منطقه های زمانی دیگر"
   out_of_formattedoutof_e08e90d5: "از %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "از %{n_assignment.points_possible}"
@@ -17657,6 +17669,7 @@ fa:
     view_more_link: "مشاهده بیشتر"
   paginated_view: 
     loading_more_results: "در حال بارگذاری نتایج بیشتر"
+  pagination_40e3280b: "صفحه بندی"
   pair_4d942a74: جفت
   pair_with_observer_b1541895: "با بیننده هم گروه شوید"
   pair_with_student_6f76e69a: "جفت شدن با دانشجو"
@@ -20429,6 +20442,7 @@ fa:
   quizzes_tutorial_tray_6f87cdd3: "سینی خودآموز آزمون‌ها"
   quizzes_view_submission_log_ec105e3e: "آزمون‌ها - مشاهده گزارش موارد ارسالی"
   quotas_account_settings_22c12b8d: "سهمیه ها (تنظیمات حساب)"
+  quoted_material_ffaea62b: "مطلب نقل شده"
   radio_button_option_1_a8ec51f9: "گزینه دکمه رادیویی 1"
   radio_button_option_2_31e50043: "گزینه دکمه رادیویی 2"
   range_56b2f310: بازه
@@ -20631,6 +20645,7 @@ fa:
         name: Name
     welcome_to_canvas: "به کانواس خوش آمدید!"
   registration_url_60e0eaaa: "نشانی اینترنتی ثبت نام"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "نمره گذاری دوباره برای این پرسش مجاز نیست، زیرا بعد از اینکه دانشجو مورد ارسالی را ارسال کرده است، پاسخ حذف شده است یا نوع پرسش تغییر یافته است."
   regular_style_checkbox_ee3d71c1: "کادر بررسی با سبک معمولی"
   release_grades_c68fbcc: "انتشار نمرات"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "منتشر شده توسط مسیر تسلط: %{cyoe.releasedLabel}"
@@ -22788,6 +22803,7 @@ fa:
       forward: "به جلو"
   slovak_69f48e1b: اسلواکی
   slovenian_30ae5208: اسلوونیایی
+  small_matches_581ab241: "تطبیق های جزئی"
   smart_alerts_44db622e: "هشدارهای هوشمند"
   smart_assignment_alerts_abc2224: "هشدارهای تخصیص هوشمند"
   smartbanner: 
@@ -23175,6 +23191,7 @@ fa:
   students_can_edit_and_view_page_history_if_allowed_39a47edc: "در صورت مجاز بودن در گزینه‌های صفحه شخصی، دانشجویان می توانند تاریخچه صفحه را ویرایش و مشاهده کنند."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "دانشجویان فقط می‌توانند در بین این تاریخ‌ها در این درس شرکت نمایند"
   students_can_see_originality_score_797fe634: "دانشجویان می‌توانند نمره اصلی را ببیند."
+  students_can_see_the_originality_report_f246beb0: "دانشجویان می توانند گزارش اصالت را ببینند"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "پس از خاتمه یافتن درس، دانشجویان نمی توانند پاسخ های آزمون را مشاهده کنند"
   students_have_already_submitted_to_this_discussion_f55db744: "دانشجویان از قبل به این بحث ارسال کرده اند، بنابراین تنظیمات گروهی را نمی توان تغییر داد."
   students_have_either_already_taken_or_started_taki_a076336: "دانشجویان از قبل این آزمون را داده اند یا در حال دادن آن هستند. پس برای ویرایش آن مراقب باشید. اگر هر پرسش آزمون را به طور قابل توجه تغییر دهید، ممکن است بخواهید آزمون دانشجویانی که نسخه قدیمی آزمون را داده اند را دوباره نمره گذاری کنید."
@@ -24866,6 +24883,7 @@ fa:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "ارسال دوباره"
+  turnitin_repository_9f865357: "مخزن Turnitin"
   turnitin_settings: 
     originality_report_never: هرگز
     originality_report_visible_after_due_date: "بعد از تاریخ مهلت"
@@ -25089,6 +25107,7 @@ fa:
   update_name_6581781d: "به روز رسانی %{name}"
   update_pages_c91d7ba: "به روز رسانی صفحات"
   update_password_4bc5cb1f: "بهنگام سازی رمز عبور"
+  update_question_without_regrading_47c9904a: "بهنگام سازی پرسش بدون نمره گذاری دوباره"
   update_quota_81381226: "بهنگام سازی سهمیه"
   update_rating_6d29c2ef: "به روزرسانی رتبه بندی"
   update_settings_9b422d0f: "بهنگام سازی تنظیمات"

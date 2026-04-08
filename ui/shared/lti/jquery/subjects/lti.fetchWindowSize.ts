@@ -25,6 +25,13 @@ const fetchWindowSize: LtiMessageHandler = ({responseMessages}) => {
     width: window.innerWidth,
     offset: $('.tool_content_wrapper').offset(),
     footer: $('#fixed_bottom').height() || 0,
+    assignment_footer:
+      ($('#sequence_footer').height() || 0) +
+      ($('#module_sequence_footer').height() || 0) +
+      ($('#enhanced-rubric-assignment-edit-mount-point').height() || 0) +
+      ($('#assignment-rubric-section').height() || 0) +
+      ($('#peer-review-assignment-widget-mount-point').height() || 0) +
+      ($('#enhanced-rubric-self-assessment-edit').height() || 0),
     scrollY: window.scrollY,
   })
   return true

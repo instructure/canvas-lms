@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class TemporaryEnrollmentPairing < ActiveRecord::Base
+class TemporaryEnrollmentPairing < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :root_account, class_name: "Account", inverse_of: :temporary_enrollment_pairings

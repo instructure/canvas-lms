@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "便帽產品"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "産生字幕失敗"
+    },
     "caption_manager_aae0906f": {
         "message": "字幕管理員"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "刪除 { captionName } 字幕失敗"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "産生 { captionName } 字幕失敗"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "上傳 { captionName } 字幕失敗"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "已為 { lang } 添加字幕"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "度數符號"
     },
+    "delete_failed_6529e336": {
+        "message": "刪除失敗"
+    },
     "delimiters_4db4840d": {
         "message": "分隔符號"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "英語（英國）"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "輸入媒體標題"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "請輸入最少 3 個字元以開始搜尋"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "超大"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "超大尺寸（{ width } x { height }像素）"
     },
     "extra_small_9ae33252": {
         "message": "超小"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "大文字"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "大尺寸（{ width } x { height }像素）"
+    },
     "latvian_2bbb6aab": {
         "message": "拉脫維亞語"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "中"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "中尺寸（{ width } x { height }像素）"
     },
     "merge_links_2478df96": {
         "message": "合併連結"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "播放{ name }於{ createdAt }創建的媒體評論。"
     },
+    "player_layout_14e09a29": {
+        "message": "播放器佈局"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "{ max } 的結果 { index }。"
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "重試 { captionName }"
+    },
     "retry_ebd5f8ba": {
         "message": "重試"
     },
@@ -2255,6 +2288,9 @@
     "show_link_options_545338fd": {
         "message": "顯示連結選項"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "顯示滾動成績單"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "有視力的使用者能迅速瀏覽網頁，尋找大型或粗體標題。屏幕閱讀器使用者依靠標題理解內容背景。標題應使用適當的結構。"
     },
@@ -2287,6 +2323,9 @@
     },
     "small_b070434a": {
         "message": "小"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "小尺寸（{ width } x { height }像素）"
     },
     "solid_circle_9f061dfc": {
         "message": "實心圓圈"
@@ -2567,6 +2606,9 @@
     "timebar_a4d18443": {
         "message": "時間欄"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "標題不能為空"
+    },
     "title_ee03d132": {
         "message": "標題"
     },
@@ -2587,6 +2629,9 @@
     },
     "top_66e0adb6": {
         "message": "頂部"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "成績單面板在寬度大於 720 像素時可用。"
     },
     "tray_839df38a": {
         "message": "收集箱"
@@ -2627,6 +2672,9 @@
     "unpublished_dfd8801": {
         "message": "未發佈"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "未儲存的變更都將遺失。"
+    },
     "untitled_16aa4f2b": {
         "message": "無標題"
     },
@@ -2653,6 +2701,9 @@
     },
     "upload_document_253f0478": {
         "message": "上傳文件"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "上傳失敗"
     },
     "upload_file_fd2361b8": {
         "message": "上傳檔案"
@@ -2815,6 +2866,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "檢視文字和字元計數"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "檢視器限制"
     },
     "waiting_for_response_1efd0c50": {
         "message": "等待回應"

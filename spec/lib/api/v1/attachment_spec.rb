@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe Api::V1::Attachment do
   include Api::V1::Attachment
   include Rails.application.routes.url_helpers

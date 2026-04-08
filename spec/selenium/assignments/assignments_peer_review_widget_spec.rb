@@ -293,6 +293,10 @@ describe "assignment peer review widget" do
       )
       @student = student_in_course(course: @course, active_all: true, name: "Student").user
       @assignment.submit_homework(@student, body: "Test submission")
+      @assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
     end
 
     it "redirects teachers from peer_reviews page to assignment page when FF is enabled" do
@@ -373,6 +377,10 @@ describe "assignment peer review widget" do
       )
       @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
       @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+      @assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
     end
 
     context "as a TA with grading permissions but not edit permissions" do

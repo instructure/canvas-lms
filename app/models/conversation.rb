@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Conversation < ActiveRecord::Base
+class Conversation < ApplicationRecord
   include SimpleTags
   include ModelCache
   include SendToStream
@@ -618,7 +618,7 @@ class Conversation < ActiveRecord::Base
     select("conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ",")} FROM #{ConversationParticipant.quoted_table_name} WHERE conversation_id = conversations.id) AS user_ids")
       .where(id: ids)
       .each do |c|
-        c.regenerate_private_hash!(c.user_ids.split(",").map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
+      c.regenerate_private_hash!(c.user_ids.split(",").map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
     end
   end
 

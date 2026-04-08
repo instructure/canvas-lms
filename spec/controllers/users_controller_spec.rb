@@ -104,30 +104,24 @@ describe UsersController do
       end
     end
 
-    context "when 'open_tools_in_new_tab' feature flag is enabled" do
-      before do
-        Account.default.enable_feature! :open_tools_in_new_tab
-      end
+    it "uses borderless display type when windowTarget is _blank" do
+      tool.settings[:user_navigation][:windowTarget] = "_blank"
+      tool.save!
 
-      it "uses borderless display type when windowTarget is _blank" do
-        tool.settings[:user_navigation][:windowTarget] = "_blank"
-        tool.save!
+      get :external_tool, params: { id: tool.id, user_id: user.id }
 
-        get :external_tool, params: { id: tool.id, user_id: user.id }
+      expect(assigns[:lti_launch]).not_to be_nil
+      expect(assigns[:display_override]).to eq "borderless"
+    end
 
-        expect(assigns[:lti_launch]).not_to be_nil
-        expect(assigns[:display_override]).to eq "borderless"
-      end
+    it "renders with default display type when windowTarget is not _blank" do
+      tool.settings[:user_navigation][:windowTarget] = "_self"
+      tool.save!
 
-      it "renders with default display type when windowTarget is not _blank" do
-        tool.settings[:user_navigation][:windowTarget] = "_self"
-        tool.save!
+      get :external_tool, params: { id: tool.id, user_id: user.id }
 
-        get :external_tool, params: { id: tool.id, user_id: user.id }
-
-        expect(assigns[:lti_launch]).not_to be_nil
-        expect(assigns[:display_override]).to be_nil
-      end
+      expect(assigns[:lti_launch]).not_to be_nil
+      expect(assigns[:display_override]).to be_nil
     end
 
     it "removes query string when post_only = true" do
@@ -230,47 +224,6 @@ describe UsersController do
           lti_deployment_id
           lti_storage_target
         ]
-      end
-
-      context "when lti_deployment_id_in_login_request FF is off" do
-        let(:oidc_initiation_url) { "http://lti13testtool.docker/blti_launch" }
-        let(:tool) do
-          reg = lti_registration_with_tool(
-            account:,
-            configuration_params: {
-              oidc_initiation_url:,
-              placements: [
-                {
-                  placement: "user_navigation",
-                  enabled: true,
-                  text: "example",
-                }
-              ]
-            }
-          )
-          reg.deployments.first
-        end
-
-        before do
-          user.account.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-          allow(SecureRandom).to receive(:hex).and_return(verifier)
-          get :external_tool, params: { id: tool.id, user_id: user.id }
-        end
-
-        it "creates a login message" do
-          expect(assigns[:lti_launch].params.keys).to match_array %w[
-            iss
-            login_hint
-            target_link_uri
-            lti_message_hint
-            canvas_region
-            canvas_environment
-            client_id
-            deployment_id
-            lti_deployment_id
-            lti_storage_target
-          ]
-        end
       end
 
       it 'sets the "login_hint" to the current user lti id' do
@@ -592,7 +545,7 @@ describe UsersController do
         expect(courses.pluck("course_code").sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
       end
 
-      it "includes courses with overridden dates as not concluded for teachers if the course period is active" do
+      it "does not include courses as active for teachers when term is concluded, even with active course dates" do
         my_old_course = Course.find_by(course_code: "MyOldCourse")
         my_old_course.restrict_enrollments_to_course_dates = true
         my_old_course.start_at = 2.weeks.ago
@@ -602,7 +555,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @teacher.id }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.pluck("course_code")).to include("MyOldCourse")
+        expect(courses.pluck("course_code")).not_to include("MyOldCourse")
       end
 
       it "includes courses with overridden dates as not concluded for admins if the course period is active" do
@@ -3639,6 +3592,114 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
           expect(assigns[:js_bundles].flatten).to include :dashboard
         end
+      end
+    end
+  end
+
+  describe "#should_show_educator_dashboard?" do
+    let(:account) { Account.default }
+
+    before do
+      account.enable_feature!(:educator_dashboard)
+    end
+
+    it "returns true for teacher" do
+      course_with_teacher_logged_in(active_all: true)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+    end
+
+    it "does not load widget_dashboard bundle for TA" do
+      course_with_ta(active_all: true)
+      user_session(@ta)
+      get "user_dashboard"
+      expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+    end
+
+    it "returns true for multi-role user with teacher and student enrollments" do
+      course_with_teacher_logged_in(active_all: true)
+      @course.enroll_student(@user, enrollment_state: "active")
+      get "user_dashboard"
+      expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+    end
+
+    it "does not load widget_dashboard bundle for teacher with only completed enrollments" do
+      course_with_teacher_logged_in(active_all: true)
+      @enrollment.update!(workflow_state: "completed")
+      get "user_dashboard"
+      expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+    end
+
+    context "routing to widget_dashboard bundle" do
+      it "loads widget_dashboard bundle for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+      end
+
+      it "sets educator_dashboard in DASHBOARD_FEATURES for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+      end
+
+      it "loads educator_dashboard css bundle for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:css_bundles].flatten).to include :educator_dashboard
+      end
+
+      it "does not include student-only data for educator" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:js_env)).not_to have_key(:SHARED_COURSE_DATA)
+        expect(assigns(:js_env)).not_to have_key(:OBSERVED_USERS_LIST)
+      end
+
+      it "does not load widget_dashboard bundle when feature flag is off" do
+        account.disable_feature!(:educator_dashboard)
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "does not load widget_dashboard bundle for K5 teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        allow(controller).to receive(:k5_user?).and_return(true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "does not load widget_dashboard bundle for student-only user" do
+        course_with_student_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "adds educator-dashboard body class for educator" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:body_classes)).to include("educator-dashboard")
+      end
+
+      it "loads educator dashboard for designer" do
+        course = course_factory(active_all: true)
+        designer = user_factory(active_all: true)
+        course.enroll_user(designer, "DesignerEnrollment", enrollment_state: :active)
+        user_session(designer)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+      end
+
+      it "does not load educator dashboard for designer when flag is off" do
+        account.disable_feature!(:educator_dashboard)
+        course = course_factory(active_all: true)
+        designer = user_factory(active_all: true)
+        course.enroll_user(designer, "DesignerEnrollment", enrollment_state: :active)
+        user_session(designer)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
       end
     end
   end

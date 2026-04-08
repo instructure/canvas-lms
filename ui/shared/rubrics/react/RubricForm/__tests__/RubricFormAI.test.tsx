@@ -118,6 +118,32 @@ describe('RubricForm AI Tests', () => {
       expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
     })
 
+    it('sends default totalPoints in generate request when assignmentPointsPossible is not provided', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      expect(getByTestId('criteria-total-points-input')).toHaveValue('20')
+
+      fireEvent.click(getByTestId('generate-criteria-button'))
+
+      await waitFor(() => {
+        expect(generateCriteriaMock).toHaveBeenCalledWith(
+          '1',
+          '1',
+          expect.objectContaining({totalPoints: '20'}),
+        )
+      })
+    })
+
     it('auto-populates assignment points possible in total points input', () => {
       const {getByTestId} = renderComponent({
         aiRubricsEnabled: true,
@@ -126,6 +152,33 @@ describe('RubricForm AI Tests', () => {
         courseId: '1',
       })
       expect(getByTestId('criteria-total-points-input')).toHaveValue('50')
+    })
+
+    it('sends assignmentPointsPossible as totalPoints in generate request', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        assignmentPointsPossible: 50,
+        courseId: '1',
+      })
+
+      expect(getByTestId('criteria-total-points-input')).toHaveValue('50')
+
+      fireEvent.click(getByTestId('generate-criteria-button'))
+
+      await waitFor(() => {
+        expect(generateCriteriaMock).toHaveBeenCalledWith(
+          '1',
+          '1',
+          expect.objectContaining({totalPoints: '50'}),
+        )
+      })
     })
 
     it('does not show the form when aiRubricsEnabled is false', () => {

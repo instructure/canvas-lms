@@ -40,7 +40,7 @@ export const CriteriaBuilderHeader = ({
 }: CriteriaBuilderHeaderProps) => {
   return (
     <View as="div" margin="large 0 small 0">
-      <Flex>
+      <Flex wrap="wrap">
         <Flex.Item shouldGrow={true}>
           <Heading
             level="h2"
@@ -55,7 +55,7 @@ export const CriteriaBuilderHeader = ({
           <Flex.Item>
             <Heading
               level="h2"
-              as="h2"
+              as="span"
               data-testid={`rubric-points-possible-${rubricId}`}
               themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
             >

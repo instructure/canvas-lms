@@ -62,7 +62,7 @@ class GradeService
       acc[key] = {
         "Criteria" => (criterion[:ratings] || []).map do |rating|
           {
-            "Description" => rating[:long_description],
+            "Description" => rating_description_for(criterion, rating),
             "Points" => rating[:points]
           }
         end,
@@ -71,16 +71,21 @@ class GradeService
     end
   end
 
+  def self.rating_description_for(criterion, rating)
+    criterion[:learning_outcome_id].present? ? rating[:description] : rating[:long_description]
+  end
+
   private
 
   def build_cedar_rubric(rubric_data)
     rubric_data.map do |criterion|
       {
         name: criterion[:description],
+        useRange: criterion[:criterion_use_range],
         criteria: (criterion[:ratings] || []).map do |rating|
           {
             points: rating[:points],
-            description: rating[:long_description]
+            description: self.class.rating_description_for(criterion, rating)
           }
         end
       }
@@ -95,7 +100,8 @@ class GradeService
       next unless criterion_data
 
       matched_rating = (criterion_data[:ratings] || []).find do |r|
-        TextNormalizerHelper.normalize(r[:long_description]) ==
+        rating_description = self.class.rating_description_for(criterion_data, r)
+        TextNormalizerHelper.normalize(rating_description) ==
           TextNormalizerHelper.normalize(result.criterion)
       end
       next unless matched_rating
@@ -106,7 +112,7 @@ class GradeService
         "rating" => {
           "id" => matched_rating[:id],
           "description" => result.criterion,
-          "rating" => matched_rating[:points],
+          "rating" => (criterion_data[:criterion_use_range] && result.points) ? result.points : matched_rating[:points],
           "reasoning" => result.reasoning
         },
         # NEW: inline guidance from gradeEssay

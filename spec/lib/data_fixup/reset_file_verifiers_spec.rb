@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe DataFixup::ResetFileVerifiers do
   it "resets uuid for all non-deleted files" do
     attachment = attachment_model

@@ -25,12 +25,15 @@ import {
   SortBy,
   ScoreDisplayFormat,
   NameDisplayFormat,
-  SecondaryInfoDisplay,
   DEFAULT_GRADEBOOK_SETTINGS,
 } from '@canvas/outcomes/react/utils/constants'
 import {MOCK_STUDENTS, MOCK_OUTCOMES, MOCK_ROLLUPS} from '../../__fixtures__/rollups'
 import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
 
+vi.mock('../charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
 vi.mock('@canvas/outcomes/react/hooks/useContributingScores')
 
 vi.mock('@canvas/svg-wrapper', () => ({

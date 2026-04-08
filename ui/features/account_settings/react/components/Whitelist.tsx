@@ -32,7 +32,7 @@ import {Billboard} from '@instructure/ui-billboard'
 import type {FormMessage} from '@instructure/ui-form-field'
 import isValidDomain from 'is-valid-domain'
 
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import {EmptyDesert} from '@instructure/platform-images'
 import type {WhitelistedDomains} from './SecurityPanel'
 
 const I18n = createI18nScope('security_panel')

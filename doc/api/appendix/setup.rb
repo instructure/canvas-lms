@@ -25,9 +25,7 @@ def appendix
   controllers = options[:controllers]
 
   if options[:all_resources]
-    controllers = options[:resources].flatten.select do |o|
-      o.is_a?(YARD::CodeObjects::NamespaceObject)
-    end
+    controllers = options[:resources].flatten.grep(YARD::CodeObjects::NamespaceObject)
   end
 
   return unless controllers.is_a?(Array)

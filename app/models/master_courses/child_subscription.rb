@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::ChildSubscription < ActiveRecord::Base
+class MasterCourses::ChildSubscription < ApplicationRecord
   # links an associated course to the blueprint (via the master_template)
   # keeps track of the last sync status so future syncs know whether they perform faster selective syncs
   # also links the associated course to child_content_tags to keep track of changes

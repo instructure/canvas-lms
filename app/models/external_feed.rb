@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ExternalFeed < ActiveRecord::Base
+class ExternalFeed < ApplicationRecord
   belongs_to :user
   belongs_to :context, polymorphic: [:course, :group]
 

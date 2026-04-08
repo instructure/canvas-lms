@@ -27,6 +27,32 @@ describe Canvadocs::Session do
 
   attr_reader :attachment
 
+  describe ".process_session_token" do
+    let(:token) { JSON::JWT.new({ w: 123 }).to_s }
+
+    before do
+      @attachment = attachment_model
+    end
+
+    it "updates word count on attachment" do
+      expect { process_session_token(token) }.to change { attachment.word_count }.from(nil).to(123)
+    end
+
+    it "can handle missing word count claim" do
+      expect { process_session_token(JSON::JWT.new.to_s) }.not_to change { attachment.word_count }
+    end
+
+    it "it does not change word count if already set" do
+      attachment.update(word_count: 456)
+      expect { process_session_token(token) }.not_to change { attachment.word_count }
+    end
+
+    it "logs exception if something went wrong" do
+      expect(Rails.logger).to receive(:error).with("Failed to process token: fake token Exception: Invalid JWT Format. JWT should include 3 or 5 segments.")
+      process_session_token("fake token")
+    end
+  end
+
   describe ".observing?" do
     it "returns true if the user is acting as an observer" do
       course = course_factory(active_all: true)

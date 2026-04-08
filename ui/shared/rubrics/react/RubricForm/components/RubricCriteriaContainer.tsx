@@ -33,6 +33,9 @@ const I18n = createI18nScope('rubrics-criteria-container')
 type RubricCriteriaRowsProps = {
   rubricForm: RubricFormProps
   isAIRubricsAvailable: boolean
+  isCompact: boolean
+  isCompactRatings: boolean
+  isCompactOutcome: boolean
   isGenerating?: boolean
   showCriteriaRegeneration?: boolean
   handleDragEnd: (result: DropResult) => void
@@ -45,6 +48,9 @@ type RubricCriteriaRowsProps = {
 export const RubricCriteriaContainer = ({
   rubricForm,
   isAIRubricsAvailable,
+  isCompact,
+  isCompactRatings,
+  isCompactOutcome,
   isGenerating = false,
   showCriteriaRegeneration = false,
   handleDragEnd,
@@ -100,7 +106,7 @@ export const RubricCriteriaContainer = ({
           {srAnnouncement}
         </div>
       </ScreenReaderContent>
-      <View as="div" margin="0 0 small 0">
+      <View as="div" margin={`0 0 ${isCompact ? 'medium' : 'small'} 0`}>
         <DragAndDrop onDragEnd={handleDragEnd}>
           <Droppable droppableId="droppable-id">
             {provided => {
@@ -119,6 +125,9 @@ export const RubricCriteriaContainer = ({
                         hidePoints={rubricForm.hidePoints}
                         rowIndex={index + 1}
                         isAIRubricsAvailable={isAIRubricsAvailable}
+                        isCompact={isCompact}
+                        isCompactRatings={isCompactRatings}
+                        isCompactOutcome={isCompactOutcome}
                         isGenerated={criterion.isGenerated}
                         nextIsGenerated={rubricForm.criteria[index + 1]?.isGenerated}
                         onDeleteCriterion={() => deleteCriterion(criterion)}
@@ -145,6 +154,7 @@ export const RubricCriteriaContainer = ({
           </Droppable>
         </DragAndDrop>
         <NewCriteriaRow
+          isCompact={isCompact}
           rowIndex={rubricForm.criteria.length + 1}
           onEditCriterion={() => openCriterionModal()}
           onAddOutcome={() => openOutcomeDialog()}

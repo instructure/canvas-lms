@@ -22,7 +22,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Tabs} from '@instructure/ui-tabs'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {ViewOwnProps} from '@instructure/ui-view'
-import type {Breakpoints} from '@canvas/with-breakpoints'
+import type {Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('discussion_create')
 

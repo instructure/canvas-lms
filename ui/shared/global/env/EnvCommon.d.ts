@@ -99,6 +99,8 @@ export interface BlueprintCoursesData {
 
 export interface EnvCommon {
   ASSET_HOST: string
+  JOURNEY_URL?: string
+  WIKI_PAGE_ID?: string
   DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
@@ -306,6 +308,7 @@ export type SiteAdminFeatureId =
   | 'feature_flag_ui_sorting'
   | 'files_a11y_rewrite'
   | 'files_a11y_rewrite_toggle'
+  | 'files_a11y_folder_duplicates'
   | 'instui_for_import_page'
   | 'instui_header'
   | 'instui_nav'
@@ -351,6 +354,7 @@ export type RootAccountFeatureId =
   | 'lti_asset_processor_discussions'
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_deactivate_registrations'
+  | 'lock_lti_registrations'
   | 'lti_registrations_next'
   | 'lti_registrations_templates'
   | 'lti_dr_registrations_update'
@@ -362,7 +366,6 @@ export type RootAccountFeatureId =
   | 'modules_requirements_allow_percentage'
   | 'nav_menu_links'
   | 'non_scoring_rubrics'
-  | 'open_tools_in_new_tab'
   | 'pendo_extended'
   | 'product_tours'
   | 'rce_asr_captioning_improvements'
@@ -398,6 +401,7 @@ export type OtherFeatureId =
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
   | 'peer_review_allocation_and_grading'
+  | 'study_assist'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

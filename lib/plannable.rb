@@ -145,7 +145,7 @@ module Plannable
   end
 
   def planner_override_for(user)
-    if is_a?(SubAssignment)
+    if is_a?(SubAssignment) || is_a?(PeerReviewSubAssignment)
       return PlannerOverride.for_user(user)
                             .where(plannable_id: id, plannable_type: type)
                             .where.not(workflow_state: "deleted").take

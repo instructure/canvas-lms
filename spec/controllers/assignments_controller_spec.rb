@@ -2925,6 +2925,56 @@ describe AssignmentsController do
       end
     end
 
+    context "peer_review_sub_assignment in js_env" do
+      before do
+        user_session(@teacher)
+        @assignment.update!(peer_reviews: true)
+      end
+
+      it "includes peer_review_sub_assignment when it exists and feature flag is enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review_model(parent_assignment: @assignment, points_possible: 20)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).to have_key("peer_review_sub_assignment")
+        expect(assignment_data["peer_review_sub_assignment"]).to be_a(Hash)
+        expect(assignment_data["peer_review_sub_assignment"]["points_possible"]).to eq(20)
+      end
+
+      it "includes peer_review_sub_assignment as null when it does not exist and feature flag is enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).to have_key("peer_review_sub_assignment")
+        expect(assignment_data["peer_review_sub_assignment"]).to be_nil
+      end
+
+      it "includes peer_review_sub_assignment when it exists even if feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        peer_review_model(parent_assignment: @assignment, points_possible: 15)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).to have_key("peer_review_sub_assignment")
+        expect(assignment_data["peer_review_sub_assignment"]).to be_a(Hash)
+        expect(assignment_data["peer_review_sub_assignment"]["points_possible"]).to eq(15)
+      end
+
+      it "does not include peer_review_sub_assignment when it does not exist and feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        assignment_data = assigns[:js_env][:ASSIGNMENT]
+        expect(assignment_data).not_to have_key("peer_review_sub_assignment")
+      end
+    end
+
     it "bootstrap the assignment originality report visibility settings to js_env" do
       user_session(@teacher)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
@@ -3707,6 +3757,10 @@ describe AssignmentsController do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3753,9 +3807,32 @@ describe AssignmentsController do
       end
     end
 
+    context "when FF is enabled but assignment has legacy peer reviews (no sub-assignment)" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:assignments_2_student)
+      end
+
+      it "does not render A2 peer review student view for students" do
+        user_session(@student)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "renders the legacy peer review page for teachers" do
+        user_session(@teacher)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).not_to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
+      end
+    end
+
     context "when user is a teacher and peer_review_allocation_and_grading FF is enabled" do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3772,6 +3849,10 @@ describe AssignmentsController do
       before :once do
         @course.disable_feature!(:peer_review_allocation_and_grading)
         @course.enable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
@@ -3788,15 +3869,69 @@ describe AssignmentsController do
       before :once do
         @course.enable_feature!(:peer_review_allocation_and_grading)
         @course.disable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
       end
 
       before do
         user_session(@student)
       end
 
-      it "does not render A2 peer review student view" do
+      it "returns unauthorized status" do
         get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "shows a custom error message about required feature flags" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(assigns[:unauthorized_message]).to include("Canvas Administrator")
+        expect(assigns[:unauthorized_details]).to include("Assignment Enhancements - Student")
+        expect(assigns[:unauthorized_details].length).to eq(4)
+      end
+    end
+
+    context "when user has both student and teacher enrollments" do
+      before :once do
+        @dual_user = @student
+        teacher_in_course(course: @course, user: @dual_user, active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:assignments_2_student)
+        @assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+      end
+
+      before do
+        user_session(@dual_user)
+      end
+
+      it "renders the A2 peer review student view when assigned to the assignment" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(layout: "layouts/application")
+      end
+
+      it "does not redirect to the allocation tray when assigned to the assignment" do
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).not_to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
+      end
+
+      it "shows unauthorized view instead of allocation tray when assignments_2_student is disabled" do
+        @course.disable_feature!(:assignments_2_student)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to have_http_status(:unauthorized)
+        expect(assigns[:unauthorized_message]).to include("Canvas Administrator")
+      end
+
+      it "redirects to allocation tray when not assigned to the assignment" do
+        @assignment.update!(only_visible_to_overrides: true)
+        other_section = @course.course_sections.create!(name: "Other Section")
+        @assignment.assignment_overrides.create!(set: other_section)
+        get :peer_reviews, params: { course_id: @course.id, assignment_id: @assignment.id }
+        expect(response).to redirect_to(course_assignment_path(@course, @assignment, open_allocation_tray: true))
       end
     end
   end

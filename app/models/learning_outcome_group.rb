@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LearningOutcomeGroup < ActiveRecord::Base
+class LearningOutcomeGroup < ApplicationRecord
   include Workflow
   include MasterCourses::Restrictor
   extend RootAccountResolver

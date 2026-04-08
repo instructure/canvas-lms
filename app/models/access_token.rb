@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessToken < ActiveRecord::Base
+class AccessToken < ApplicationRecord
   include Workflow
 
   extend RootAccountResolver
@@ -279,7 +279,7 @@ class AccessToken < ActiveRecord::Base
       # not only use optimistic locking, but also don't update if someone else
       # is already in the process of updating it
       updated = AccessToken.where(id: AccessToken.where(id: self, last_used_at: prior_last_used_at)
-                                                 .lock("FOR UPDATE SKIP LOCKED"))
+                                      .lock("FOR UPDATE SKIP LOCKED"))
                            .update_all(last_used_at: at, updated_at: at)
       changes_applied if updated == 1
     end
@@ -363,6 +363,7 @@ class AccessToken < ActiveRecord::Base
       path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
       path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
       path = path.gsub("(", "(?:").gsub(")", "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = path.gsub("/download", "/(?:download|preview)") # files have preview and download endpoints that do pretty much the same job
       path = "#{path}(?:\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end

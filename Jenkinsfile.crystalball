@@ -103,7 +103,6 @@ env.RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
 env.RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
 env.RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
 env.TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
-env.EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
 env.POSTGRES_PASSWORD = 'sekret'
 env.POSTGRES = configuration.postgres()
 env.RUBY = configuration.ruby()

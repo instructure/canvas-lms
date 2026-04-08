@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ErrorReport < ActiveRecord::Base
+class ErrorReport < ApplicationRecord
   belongs_to :user
   belongs_to :account
   serialize :http_env

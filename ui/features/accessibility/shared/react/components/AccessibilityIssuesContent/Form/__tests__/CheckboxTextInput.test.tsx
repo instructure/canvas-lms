@@ -37,7 +37,7 @@ beforeEach(() => {
   server.resetHandlers()
   vi.resetAllMocks()
   ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-    const state = {isAiAltTextGenerationEnabled: true}
+    const state = {isAiAltTextGenerationEnabled: true, selectedScan: null}
     return selector(state)
   })
 })
@@ -213,6 +213,35 @@ describe('CheckboxTextInput', () => {
       expect(message).not.toBeInTheDocument()
     })
 
+    it('button has aria-describedby pointing to helper text when isCanvasImage is false', () => {
+      const props = {
+        ...defaultProps,
+        issue: {
+          ...defaultProps.issue,
+          form: {
+            ...defaultProps.issue.form,
+            canGenerateFix: true,
+            isCanvasImage: false,
+          },
+        },
+      }
+
+      render(<CheckboxTextInput {...props} />)
+
+      const button = screen.getByTestId('generate-button')
+      const helperText = screen.getByTestId('alt-text-generation-not-available-message')
+
+      expect(helperText).toHaveAttribute('id')
+      expect(button).toHaveAttribute('aria-describedby', helperText.id)
+    })
+
+    it('button does not have aria-describedby when isCanvasImage is true', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+
+      const button = screen.getByTestId('generate-button')
+      expect(button).not.toHaveAttribute('aria-describedby')
+    })
+
     describe('during generation loading', () => {
       beforeEach(() => {
         server.use(
@@ -334,40 +363,54 @@ describe('CheckboxTextInput', () => {
       })
     })
 
-    it('handles errors when generate API call fails', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    describe('error messages by status code', () => {
+      const errorCases = [
+        {status: 403, message: 'You do not have permission to access this attachment.'},
+        {status: 404, message: 'Attachment not found.'},
+        {status: 413, message: 'The file exceeds the maximum allowed size for AI processing.'},
+        {status: 415, message: 'This file type is not supported for AI processing.'},
+        {
+          status: 429,
+          message:
+            'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
+        },
+        {
+          status: 500,
+          message:
+            'There was an error generating alt text. Please try again, or enter it manually.',
+        },
+      ]
 
-      server.use(
-        http.post('**/generate/alt_text', () => {
-          return new HttpResponse(null, {status: 500})
-        }),
-      )
+      errorCases.forEach(({status, message}) => {
+        it(`shows correct message for status ${status}`, async () => {
+          const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      render(<CheckboxTextInput {...withGenerateFix()} />)
+          server.use(http.post('**/generate/alt_text', () => new HttpResponse(null, {status})))
 
-      const generateButton = screen.getByTestId('generate-button')
-      fireEvent.click(generateButton)
+          render(<CheckboxTextInput {...withGenerateFix()} />)
+          fireEvent.click(screen.getByTestId('generate-button'))
 
-      expect(screen.getByTestId('loading-label')).toHaveTextContent('Generating alt text...')
+          await waitFor(() => {
+            expect(screen.getByText(message)).toBeInTheDocument()
+          })
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('loading-label')).not.toBeInTheDocument()
+          consoleErrorSpy.mockRestore()
+        })
       })
+    })
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error generating text input:',
-        expect.any(Error),
+    it('renders data-pendo="AiAltTextButtonPushed" on the generate button', () => {
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+      expect(screen.getByTestId('generate-button')).toHaveAttribute(
+        'data-pendo',
+        'AiAltTextButtonPushed',
       )
-
-      expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
-
-      consoleErrorSpy.mockRestore()
     })
 
     describe('AI generation feature flag', () => {
       it('shows generate button when feature flag is enabled', () => {
         ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-          const state = {isAiAltTextGenerationEnabled: true}
+          const state = {isAiAltTextGenerationEnabled: true, selectedScan: null}
           return selector(state)
         })
 
@@ -378,7 +421,7 @@ describe('CheckboxTextInput', () => {
 
       it('hides generate button when feature flag is disabled', () => {
         ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
-          const state = {isAiAltTextGenerationEnabled: false}
+          const state = {isAiAltTextGenerationEnabled: false, selectedScan: null}
           return selector(state)
         })
 

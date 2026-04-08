@@ -17,7 +17,8 @@
  */
 
 import React, {useMemo, useCallback} from 'react'
-import {StudentCell} from './grid/StudentCell'
+import {StudentCell} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/StudentCell'
+import {StudentCellPopover} from './grid/StudentCellPopover'
 import {StudentHeader} from './grid/StudentHeader'
 import {OutcomeHeader} from './grid/OutcomeHeader'
 import {
@@ -48,11 +49,11 @@ import {BarChartRow} from './grid/BarChartRow'
 import {StudentOutcomeScore} from './grid/StudentOutcomeScore'
 import {keyBy} from 'es-toolkit'
 import {View} from '@instructure/ui-view'
-import {Table} from './table/Table'
+import {Table} from '@instructure/outcomes-ui/es/components/Gradebook/table/Table'
+import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
 import {ContributingScoreCellContent} from './table/ContributingScoreCellContent'
-import {Column} from './table/utils'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
-import WithBreakpoints, {Breakpoints} from '@canvas/with-breakpoints/src'
+import {WithBreakpoints, Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -155,31 +156,57 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         sorting={sorting}
         nameDisplayFormat={gradebookSettings.nameDisplayFormat}
         onChangeNameDisplayFormat={onChangeNameDisplayFormat}
-        titleId="ilmgb-student-header"
       />
     ),
     [sorting, gradebookSettings.nameDisplayFormat, onChangeNameDisplayFormat],
   )
 
   const renderStudentCell = useCallback(
-    (cellData: any) => (
-      <StudentCell
-        courseId={courseId}
-        student={cellData}
-        secondaryInfoDisplay={gradebookSettings.secondaryInfoDisplay}
-        showStudentAvatar={gradebookSettings.displayFilters.includes(
-          DisplayFilter.SHOW_STUDENT_AVATARS,
-        )}
-        nameDisplayFormat={gradebookSettings.nameDisplayFormat}
-        outcomes={outcomes}
-        rollups={rollups}
-      />
-    ),
+    (cellData: any) => {
+      const student = cellData
+      const studentName =
+        gradebookSettings.nameDisplayFormat === NameDisplayFormat.LAST_FIRST
+          ? student.sortable_name
+          : student.display_name
+      const studentGradesUrl = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
+
+      return (
+        <StudentCell
+          student={{
+            id: String(student.id),
+            name: student.name,
+            display_name: student.display_name,
+            sortable_name: student.sortable_name,
+            avatar_url: student.avatar_url,
+            sis_id: student.sis_id,
+            integration_id: student.integration_id,
+            login_id: student.login_id,
+            status: student.status,
+          }}
+          studentPopover={
+            <StudentCellPopover
+              key={student.id}
+              student={student}
+              studentName={studentName}
+              studentGradesUrl={studentGradesUrl}
+              courseId={courseId}
+              outcomes={outcomes}
+              rollups={rollups}
+            />
+          }
+          secondaryInfoDisplay={gradebookSettings.secondaryInfoDisplay}
+          showStudentAvatar={gradebookSettings.displayFilters.includes(
+            DisplayFilter.SHOW_STUDENT_AVATARS,
+          )}
+          nameDisplayFormat={gradebookSettings.nameDisplayFormat}
+        />
+      )
+    },
     [courseId, gradebookSettings, outcomes, rollups],
   )
 
   const renderOutcomeHeader = useCallback(
-    (outcome: Outcome, contributingScoreForOutcome: any, titleId?: string) => () => {
+    (outcome: Outcome, contributingScoreForOutcome: any) => () => {
       return (
         <OutcomeHeader
           outcome={outcome}
@@ -188,7 +215,6 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
           courseId={courseId}
           sorting={sorting}
           contributingScoresForOutcome={contributingScoreForOutcome}
-          titleId={titleId}
         />
       )
     },
@@ -200,8 +226,8 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
       return (
         <View as="div" data-testid={`student-outcome-score-${rowData['student'].id}-${outcome.id}`}>
           <StudentOutcomeScore
-            score={cellData.rollup?.score}
             outcome={outcome}
+            score={cellData.rollup?.score}
             scoreDisplayFormat={gradebookSettings.scoreDisplayFormat}
           />
         </View>
@@ -211,13 +237,8 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   )
 
   const renderContributingScoreHeader = useCallback(
-    (alignment: ContributingScoreAlignment, titleId?: string) => () => (
-      <ContributingScoreHeader
-        alignment={alignment}
-        courseId={courseId}
-        sorting={sorting}
-        titleId={titleId}
-      />
+    (alignment: ContributingScoreAlignment) => () => (
+      <ContributingScoreHeader alignment={alignment} courseId={courseId} sorting={sorting} />
     ),
     [courseId, sorting],
   )
@@ -275,8 +296,9 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
       isRowHeader: true,
       colHeaderProps: {
         'data-testid': 'student-header',
+        'aria-label': I18n.t('Students'),
         width: STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING,
-        ariaLabelId: 'ilmgb-student-header',
+
         ...commonColHeaderProps,
       },
       cellProps: {
@@ -287,10 +309,9 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
     {
       outcomes.map(outcome => {
         const contributingScoreForOutcome = contributingScores.forOutcome(outcome.id)
-        const titleId = `ilmgb-outcome-header-${outcome.id}`
         columns.push({
           key: `outcome-${outcome.id}`,
-          header: renderOutcomeHeader(outcome, contributingScoreForOutcome, titleId),
+          header: renderOutcomeHeader(outcome, contributingScoreForOutcome),
           render: renderOutcomeCell(outcome),
           draggable: true,
           dragLabel: outcome.title,
@@ -309,10 +330,9 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         if (contributingScoreForOutcome.isVisible()) {
           ;(contributingScoreForOutcome.alignments || []).forEach(
             (alignment: ContributingScoreAlignment) => {
-              const titleId = `ilmgb-contributing-score-header-${outcome.id}-${alignment.alignment_id}`
               columns.push({
                 key: `contributing-score-${outcome.id}-${alignment.alignment_id}`,
-                header: renderContributingScoreHeader(alignment, titleId),
+                header: renderContributingScoreHeader(alignment),
                 render: renderContributingScoreCell(
                   outcome,
                   alignment,

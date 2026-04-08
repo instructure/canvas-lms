@@ -27,9 +27,24 @@ deprecate_context_groups_old_view:
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
+educator_dashboard:
+  state: hidden
+  display_name: Educator Dashboard
+  description: |-
+    When enabled, teachers with active enrollments see an Educator Dashboard
+    with cross-course task management, content quality insights, and student
+    activity summaries.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed
 peer_review_allocation_and_grading:
   state: hidden
   applies_to: Course
   shadow: true
   display_name: Peer Review Allocation and Grading
-  description: Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
+  description: |-
+    Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
+    Note: the following three other feature options must be enabled for this feature to work correctly: 1) Assignment Enhancements - Student, 2) Enhanced Rubrics, and 3) Performance and Usability Upgrades for SpeedGrader.

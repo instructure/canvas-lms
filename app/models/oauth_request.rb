@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class OAuthRequest < ActiveRecord::Base
+class OAuthRequest < ApplicationRecord
   belongs_to :user
 
   def self.serialization_excludes

@@ -1261,13 +1261,13 @@ describe RubricsController do
   end
 
   describe "ai rubrics" do
-    let(:cedar_response_struct) { Struct.new(:response, keyword_init: true) }
+    let(:cedar_response_struct) { Struct.new(:response) }
     let(:mock_cedar_prompt_response) do
-      Struct.new(:response, keyword_init: true).new(response: "<RUBRIC_DATA>\n</RUBRIC_DATA>")
+      Struct.new(:response).new(response: "<RUBRIC_DATA>\n</RUBRIC_DATA>")
     end
 
     let(:mock_cedar_conversation_response) do
-      Struct.new(:response, keyword_init: true).new(response: '{"criteria": []}')
+      Struct.new(:response).new(response: '{"criteria": []}')
     end
 
     before do

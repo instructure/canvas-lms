@@ -37,6 +37,26 @@ describe LoginController do
       expect(session[:expected_user_id]).to eq @user.id
     end
 
+    it "redirects to discovery_page_url when discovery page is allowed and active" do
+      allow(Account.default).to receive_messages(discovery_page_allowed?: true,
+                                                 discovery_page_active?: true,
+                                                 discovery_page_url: "https://identity.example.com/discover")
+
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment)
+        .with("auth.new.discovery_page_redirect.v2", tags: { auth_type: nil, target_auth_type: nil, domain: "test.host" })
+      get "new"
+      expect(response).to redirect_to("https://identity.example.com/discover")
+    end
+
+    it "does not redirect to discovery_page_url when authentication_provider param is present" do
+      allow(Account.default).to receive_messages(discovery_page_allowed?: true,
+                                                 discovery_page_active?: true,
+                                                 discovery_page_url: "https://identity.example.com/discover")
+      get "new", params: { authentication_provider: "canvas" }
+      expect(response).to redirect_to(canvas_login_url)
+    end
+
     it "respects auth_discovery_url" do
       Account.default.auth_discovery_url = "https://google.com/"
       Account.default.save!

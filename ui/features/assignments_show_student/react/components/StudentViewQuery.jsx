@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
@@ -24,7 +24,7 @@ import {
   STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
 } from '@canvas/assignments/graphql/student/Queries'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {useQuery} from '@apollo/client'
 import React from 'react'
 import {string} from 'prop-types'

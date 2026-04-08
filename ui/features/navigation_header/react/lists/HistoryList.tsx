@@ -29,7 +29,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {useInfiniteQuery} from '@tanstack/react-query'
 import type {QueryFunctionContext} from '@tanstack/react-query'
-import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
+import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
 
 const I18n = createI18nScope('new_nav')
 

@@ -24,7 +24,7 @@ import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidg
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
 import TodoListWidget from './widgets/TodoListWidget/TodoListWidget'
 import RecentGradesWidget from './widgets/RecentGradesWidget/RecentGradesWidget'
-import ProgressOverviewWidget from './widgets/ProgressOverviewWidget/ProgressOverviewWidget'
+import {ProgressOverviewWidget} from '@instructure/platform-widget-dashboard'
 import InboxWidget from './widgets/InboxWidget/InboxWidget'
 
 const widgetRegistry: WidgetRegistry = {

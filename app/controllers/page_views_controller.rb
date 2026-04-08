@@ -278,6 +278,8 @@ class PageViewsController < ApplicationController
   # Maximum number of user IDs allowed in a batch query
   BATCH_QUERY_MAX_USER_IDS = 10
 
+  before_action :require_pv5_configured!, only: %i[query poll_query query_results batch_query poll_batch_query batch_query_results]
+
   # @API List user page views
   # Return a paginated list of the user's page view history in json format,
   # similar to the available CSV download. Page views are returned in
@@ -334,10 +336,10 @@ class PageViewsController < ApplicationController
     # Date range is irrelevant - Query reads sequentially until LIMIT is reached, then stops
     # RCU formula: DynamoDB uses eventually consistent reads (50% cost of strongly consistent)
     # Eventually consistent: 1 RCU per 8192 bytes, avg line = 592 bytes, lines per RCU ≈ 13.838
-    # Rate limit cost = actual RCU * 2 multiplier (permissive: higher throughput for clients)
+    # Rate limit cost = actual RCU * 5 multiplier (standard: balanced throughput protection)
     per_page = (params[:per_page] || 10).to_i.clamp(1, PAGE_VIEWS_MAX_PER_PAGE)
     actual_rcu = (per_page * 0.0723).ceil
-    final_cost = actual_rcu * 2
+    final_cost = actual_rcu * 5
 
     increment_request_cost(final_cost)
 
@@ -459,6 +461,9 @@ class PageViewsController < ApplicationController
   rescue PageViews::Common::TooManyRequestsError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
+  rescue PageViews::Common::ServiceUnavailable => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Query queue is at capacity. Please wait and try again.") }, status: :service_unavailable
   end
 
   # @API BETA - Poll query status
@@ -707,6 +712,9 @@ class PageViewsController < ApplicationController
   rescue PageViews::Common::TooManyRequestsError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
+  rescue PageViews::Common::ServiceUnavailable => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Query queue is at capacity. Please wait and try again.") }, status: :service_unavailable
   rescue PageViews::Common::InvalidRequestError, ArgumentError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: e.message }, status: :bad_request
@@ -886,5 +894,9 @@ class PageViewsController < ApplicationController
 
   def uuid?(string)
     !!(string =~ /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z/)
+  end
+
+  def require_pv5_configured!
+    render json: { error: t("Page views history is not available in this environment.") }, status: :not_found unless PageViews::Configuration.configured?
   end
 end

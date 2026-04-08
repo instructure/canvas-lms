@@ -25,9 +25,9 @@ import {
   STUDENT_COLUMN_RIGHT_PADDING,
   STUDENT_COLUMN_WIDTH,
 } from '@canvas/outcomes/react/utils/constants'
-import {Column} from '../table/utils'
-import {Row} from '../table/Row'
-import {Cell} from '../table/Cell'
+import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
+import {Row} from '@instructure/outcomes-ui/es/components/Gradebook/table/Row'
+import {Cell} from '@instructure/outcomes-ui/es/components/Gradebook/table/Cell'
 import {
   OutcomeDistribution,
   RatingDistribution,

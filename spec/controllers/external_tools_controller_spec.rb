@@ -344,28 +344,6 @@ describe ExternalToolsController do
           ]
         end
 
-        context "with lti_deployment_id_in_login_request FF off" do
-          before do
-            @course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-          end
-
-          it "creates a login message that includes deployment_id" do
-            subject
-            expect(assigns[:lti_launch].params.keys).to match_array %w[
-              iss
-              login_hint
-              target_link_uri
-              lti_message_hint
-              canvas_region
-              canvas_environment
-              client_id
-              deployment_id
-              lti_deployment_id
-              lti_storage_target
-            ]
-          end
-        end
-
         it 'sets the "login_hint" to the current user lti id' do
           subject
           expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(@teacher)
@@ -2544,6 +2522,23 @@ describe ExternalToolsController do
           expect(response).to have_http_status :unprocessable_content
         end
       end
+
+      context "with a locked registration" do
+        before(:once) do
+          developer_key.lti_registration.update!(lock_deploying: true)
+        end
+
+        it "ignores the locked status if the appropriate flag is not enabled" do
+          account.disable_feature!(:lock_lti_registrations)
+          subject
+          expect(response).to have_http_status :ok
+        end
+
+        it "returns an 403 and error when trying to use a locked registration" do
+          subject
+          expect(response).to have_http_status :forbidden
+        end
+      end
     end
 
     context "tool duplication" do
@@ -3930,6 +3925,23 @@ describe ExternalToolsController do
         it "does not redirect and renders the LTI launch" do
           get :sessionless_launch, params: { course_id: @course.id, verifier: }
           expect(response).not_to be_redirect
+        end
+
+        context "with environment overrides" do
+          let(:override_url) { "http://www.example-beta.com/quiz_lti_launch" }
+
+          before do
+            quiz_lti_tool.settings = quiz_lti_tool.settings.merge(
+              "environments" => { "beta_launch_url" => override_url }
+            )
+            quiz_lti_tool.save!
+            allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
+          end
+
+          it "uses the environment override URL for the launch" do
+            get :sessionless_launch, params: { course_id: @course.id, verifier: }
+            expect(assigns(:lti_launch).resource_url).to eq(override_url)
+          end
         end
       end
 

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe Folio do
   it "skips the count for a grouped query that takes a long time" do
     stub_const("Folio::PAGINATION_COUNT_TIMEOUT", "5ms")

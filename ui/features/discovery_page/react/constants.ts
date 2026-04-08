@@ -16,22 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import canvasIcon from './images/canvas.svg'
+import appleIcon from './images/apple.svg'
+import auth0Icon from './images/auth0.svg'
+import classlinkIcon from './images/classlink.svg'
+import cleverIcon from './images/clever.svg'
+import facebookIcon from './images/facebook.svg'
+import githubIcon from './images/github.svg'
+import googleIcon from './images/google.svg'
+import linkedinIcon from './images/linkedin.svg'
+import microsoftIcon from './images/microsoft.svg'
+import oktaIcon from './images/okta.svg'
+import oneloginIcon from './images/onelogin.svg'
+import pingIcon from './images/ping.svg'
 import type {DiscoveryPageIcon} from './types'
 
-// TODO: S3 bucket base URL
-const ICON_BASE_URL = 'http://localhost:9000/icons'
-
-export const getDiscoveryPageIcons = (): DiscoveryPageIcon[] => [
-  {id: 'default', name: 'Default', url: `${ICON_BASE_URL}/default.svg`},
-  {id: 'apple', name: 'Apple', url: `${ICON_BASE_URL}/apple.svg`},
-  {id: 'auth0', name: 'Auth0', url: `${ICON_BASE_URL}/auth0.svg`},
-  {id: 'classlink', name: 'ClassLink', url: `${ICON_BASE_URL}/classlink.svg`},
-  {id: 'facebook', name: 'Facebook', url: `${ICON_BASE_URL}/facebook.svg`},
-  {id: 'github', name: 'GitHub', url: `${ICON_BASE_URL}/github.svg`},
-  {id: 'google', name: 'Google', url: `${ICON_BASE_URL}/google.svg`},
-  {id: 'linkedin', name: 'LinkedIn', url: `${ICON_BASE_URL}/linkedin.svg`},
-  {id: 'microsoft', name: 'Microsoft', url: `${ICON_BASE_URL}/microsoft.svg`},
-  {id: 'okta', name: 'Okta', url: `${ICON_BASE_URL}/okta.svg`},
-  {id: 'onelogin', name: 'OneLogin', url: `${ICON_BASE_URL}/onelogin.svg`},
-  {id: 'ping', name: 'Ping', url: `${ICON_BASE_URL}/ping.svg`},
+export const DISCOVERY_PAGE_ICONS: DiscoveryPageIcon[] = [
+  {id: 'canvas', name: 'Canvas LMS', url: canvasIcon},
+  {id: 'apple', name: 'Apple', url: appleIcon},
+  {id: 'auth0', name: 'Auth0', url: auth0Icon},
+  {id: 'classlink', name: 'ClassLink', url: classlinkIcon},
+  {id: 'clever', name: 'Clever', url: cleverIcon},
+  {id: 'facebook', name: 'Facebook', url: facebookIcon},
+  {id: 'github', name: 'GitHub', url: githubIcon},
+  {id: 'google', name: 'Google', url: googleIcon},
+  {id: 'linkedin', name: 'LinkedIn', url: linkedinIcon},
+  {id: 'microsoft', name: 'Microsoft', url: microsoftIcon},
+  {id: 'okta', name: 'Okta', url: oktaIcon},
+  {id: 'onelogin', name: 'OneLogin', url: oneloginIcon},
+  {id: 'ping', name: 'Ping', url: pingIcon},
 ]

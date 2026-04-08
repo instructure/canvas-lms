@@ -585,7 +585,7 @@ describe DiscussionTopicInsight do
   end
 
   describe "#generate with Cedar" do
-    let(:cedar_response_struct) { Struct.new(:response, keyword_init: true) }
+    let(:cedar_response_struct) { Struct.new(:response) }
     let(:default_cedar_response) do
       cedar_response_struct.new(response: '[{"id":"0","final_label":"relevant","feedback":"Test"}]')
     end

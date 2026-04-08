@@ -338,35 +338,33 @@ module Types
         return Enrollment.none
       end
 
-      enrollments = object.enrollments.joins(:course)
+      enrollments = object.enrollments.shard(object.in_region_associated_shards).joins(:course)
 
       if object != current_user
         domain_root_account = context[:domain_root_account]
         has_manage_students = domain_root_account&.grants_right?(current_user, session, :manage_students)
 
-        unless has_manage_students
-          permitted_course_conditions = []
+        if has_manage_students
+          enrollments = enrollments.where(root_account_id: domain_root_account.id)
+        else
+          permitted_course_ids = current_user.enrollments
+                                             .shard(current_user.in_region_associated_shards)
+                                             .joins(:course)
+                                             .where(courses: { workflow_state: ["available", "completed"] })
+                                             .distinct
+                                             .pluck(:course_id)
 
-          user_enrolled_courses = current_user.enrollments
-                                              .joins(:course)
-                                              .where(courses: { workflow_state: ["available", "completed"] })
-                                              .select(:course_id)
+          observer_course_ids = current_user.observer_enrollments
+                                            .shard(current_user.in_region_associated_shards)
+                                            .active
+                                            .where(associated_user: object)
+                                            .distinct
+                                            .pluck(:course_id)
 
-          if user_enrolled_courses.exists?
-            permitted_course_conditions << "courses.id IN (#{user_enrolled_courses.to_sql})"
-          end
+          all_permitted_course_ids = (permitted_course_ids | observer_course_ids)
 
-          observer_courses = current_user.observer_enrollments
-                                         .active
-                                         .where(associated_user: object)
-                                         .select(:course_id)
-
-          if observer_courses.exists?
-            permitted_course_conditions << "courses.id IN (#{observer_courses.to_sql})"
-          end
-
-          if permitted_course_conditions.any?
-            enrollments = enrollments.where(permitted_course_conditions.join(" OR "))
+          if all_permitted_course_ids.any?
+            enrollments = enrollments.where(course_id: all_permitted_course_ids)
           else
             return Enrollment.none
           end

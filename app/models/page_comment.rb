@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class PageComment < ActiveRecord::Base
+class PageComment < ApplicationRecord
   belongs_to :page, polymorphic: [:eportfolio_entry]
   belongs_to :user
   validates :message, length: { maximum: maximum_text_length, allow_blank: true }

@@ -338,11 +338,11 @@ class UserObserveesController < ApplicationController
     Shard.with_each_shard(shards) do
       user_ids = users.map(&:id)
       scope = Account.where(id: UserAccountAssociation
-        .joins(:account).where(accounts: { parent_account_id: nil })
-        .where(user_id: user_ids)
-        .group(:account_id)
-        .having("count(*) = #{user_ids.length}") # user => account is unique for user_account_associations
-        .select(:account_id))
+                                .joins(:account).where(accounts: { parent_account_id: nil })
+                                .where(user_id: user_ids)
+                                .group(:account_id)
+                                .having("count(*) = #{user_ids.length}") # user => account is unique for user_account_associations
+                                .select(:account_id))
       scope = scope.where(id: root_account) if root_account # scope down to a root_account if specified
       scope
     end

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
-
 describe AuthenticationProvider::OpenIDConnect do
   subject do
     described_class.new(account: Account.default, issuer: "issuer", client_id: "client", client_secret: "secret")

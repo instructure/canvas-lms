@@ -176,7 +176,6 @@ export const InternalSettingsManager = (props: {internalSettings: InternalSettin
           <Dialog
             open={!!pendingDeleteId}
             shouldContainFocus={true}
-            // @ts-expect-error
             defaultFocusElement={() => {}}
             shouldReturnFocus={true}
             onDismiss={cancelDeleteInternalSetting}

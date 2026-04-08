@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Enrollment < ActiveRecord::Base
+class Enrollment < ApplicationRecord
   SIS_TYPES = {
     "TeacherEnrollment" => "teacher",
     "TaEnrollment" => "ta",

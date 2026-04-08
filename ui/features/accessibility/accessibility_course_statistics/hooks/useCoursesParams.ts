@@ -30,9 +30,11 @@ interface UseCoursesParamsReturn {
   order: SortOrder
   page: number
   search: string
+  enrollmentTermId: string
   handleChangeSort: (columnId: string) => void
   handlePageChange: (newPage: number) => void
   handleSearchChange: (newSearch: string) => void
+  handleTermChange: (newTermId: string) => void
 }
 
 export const useCoursesParams = ({
@@ -46,6 +48,7 @@ export const useCoursesParams = ({
   const parsedPage = parseInt(searchParams.get('page') || '1', 10)
   const page = parsedPage > 0 ? parsedPage : 1
   const search = searchParams.get('search') || ''
+  const enrollmentTermId = searchParams.get('enrollment_term_id') || ''
 
   const handleChangeSort = useCallback(
     (columnId: string) => {
@@ -89,13 +92,31 @@ export const useCoursesParams = ({
     [setSearchParams],
   )
 
+  const handleTermChange = useCallback(
+    (newTermId: string) => {
+      setSearchParams(params => {
+        const newParams = new URLSearchParams(params)
+        if (newTermId) {
+          newParams.set('enrollment_term_id', newTermId)
+        } else {
+          newParams.delete('enrollment_term_id')
+        }
+        newParams.set('page', '1')
+        return newParams
+      })
+    },
+    [setSearchParams],
+  )
+
   return {
     sort,
     order,
     page,
     search,
+    enrollmentTermId,
     handleChangeSort,
     handlePageChange,
     handleSearchChange,
+    handleTermChange,
   }
 }

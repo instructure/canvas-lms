@@ -19,7 +19,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -126,7 +126,12 @@ export const RubricForm = ({
   const [savedRubricResponse, setSavedRubricResponse] = useState<SaveRubricResponse>()
   const [showWarningModal, setShowWarningModal] = useState(false)
   const [generateCriteriaFormOptions, setGenerateCriteriaFormOptions] =
-    useState<GenerateCriteriaFormProps>(defaultGenerateCriteriaForm)
+    useState<GenerateCriteriaFormProps>({
+      ...defaultGenerateCriteriaForm,
+      totalPoints: assignmentPointsPossible
+        ? assignmentPointsPossible.toString()
+        : defaultGenerateCriteriaForm.totalPoints,
+    })
   const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
   const [isAssignmentPointsDifferenceModalOpen, setIsAssignmentPointsDifferenceModalOpen] =
     useState(false)
@@ -381,16 +386,21 @@ export const RubricForm = ({
     <Responsive
       match="media"
       query={{
-        compact: {maxWidth: '53.125rem'}, // Will use this to resize criterion rows
+        compact: {maxWidth: '53.125rem'},
         compactTitle: {maxWidth: '37.5rem'},
+        compactRatings: {maxWidth: '34.375rem'},
+        compactOutcome: {maxWidth: '28.125rem'},
+        compactFooter: {maxWidth: '40rem'},
         fullWidthModal: {minWidth: '50rem'},
-        large: {minWidth: '66.5rem'},
       }}
     >
       {(_props, matches) => {
         const isFullWidthModal = matches?.includes('fullWidthModal') ?? false
         const isCompactTitle = matches?.includes('compactTitle') ?? false
         const isCompact = matches?.includes('compact') ?? false
+        const isCompactFooter = matches?.includes('compactFooter') ?? false
+        const isCompactRatings = matches?.includes('compactRatings') ?? false
+        const isCompactOutcome = matches?.includes('compactOutcome') ?? false
 
         return (
           <View
@@ -453,7 +463,7 @@ export const RubricForm = ({
 
                 {showGenerateCriteriaForm && (
                   <GeneratedCriteriaForm
-                    totalPoints={assignmentPointsPossible}
+                    formOptions={generateCriteriaFormOptions}
                     criterionUseRangeEnabled={criterionUseRangeEnabled}
                     criteriaBeingGenerated={!!criteriaBeingGenerated}
                     generateCriteriaMutation={generateCriteriaMutation}
@@ -486,6 +496,9 @@ export const RubricForm = ({
                 openOutcomeDialog={openOutcomeDialog}
                 onRegenerateCriterion={regenerateSingleCriterion}
                 isAIRubricsAvailable={isAIRubricsAvailable}
+                isCompact={isCompact}
+                isCompactRatings={isCompactRatings}
+                isCompactOutcome={isCompactOutcome}
                 isGenerating={criteriaBeingGenerated}
                 showCriteriaRegeneration={isAIRubricsAvailable}
               />
@@ -494,6 +507,7 @@ export const RubricForm = ({
             <RubricFormFooter
               assignmentId={assignmentId}
               hasRubricAssociations={rubricForm.hasRubricAssociations}
+              isCompact={isCompactFooter}
               rubricId={rubricId ?? rubric?.id}
               savePending={savePending}
               handleCancelButton={handleCancelButton}

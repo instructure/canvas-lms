@@ -19,7 +19,7 @@
 import React, {Suspense, lazy} from 'react'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'

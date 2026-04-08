@@ -39,7 +39,6 @@ import {
   type UpdateContextControl,
 } from '../../../api/contextControls'
 import {type AccountId, ZAccountId} from '../../../model/AccountId'
-import {ZCourseId} from '../../../model/CourseId'
 import type {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
 import type {LtiDeployment} from '../../../model/LtiDeployment'
 import type {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
@@ -73,8 +72,15 @@ export type DeploymentAvailabilityProps = {
 }
 
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
-  const {registration, deleteDeployment, deployment, refetchControls, deleteControl, editControl} =
-    props
+  const {
+    registration,
+    deleteDeployment,
+    deployment,
+    refetchControls,
+    deleteControl,
+    editControl,
+    accountId,
+  } = props
 
   const controls_with_ids = React.useMemo(
     () => buildControlsByPath(deployment.context_controls || []),
@@ -421,6 +427,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
       )}
       {openDeleteDeploymentModal && (
         <DeleteDeploymentModal
+          accountId={accountId}
           deployment={deployment}
           registration={registration}
           controlsByPath={controls_with_ids}

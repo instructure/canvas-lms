@@ -22,7 +22,7 @@ import AssignmentDetailsView from '@canvas/assignments/react/AssignmentDescripti
 import AssignmentHeader from '@canvas/assignments/react/AssignmentHeader'
 import AssignmentFooter from './components/AssignmentFooter'
 import AssignmentTabs from './components/AssignmentTabs'
-import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 import {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentTypes'
 import {queryClient} from '@canvas/query'
 import {QueryClientProvider} from '@tanstack/react-query'
@@ -44,7 +44,9 @@ const TeacherSavedView: React.FC<TeacherViewProps> = ({assignment, breakpoints =
         breakpoints={breakpoints}
       />
       {/* The main content of the saved view could go here */}
-      {ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && assignment.peerReviews?.enabled ? (
+      {ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+      ENV.HAS_PEER_REVIEW_SUB_ASSIGNMENT &&
+      assignment.peerReviews?.enabled ? (
         <AssignmentTabs assignment={assignment} />
       ) : (
         <AssignmentDetailsView description={assignment.description} />

@@ -153,6 +153,82 @@ describe CoursesController do
       end
     end
 
+    describe "_load_enrollments_for_index" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        controller.instance_variable_set(:@current_user, @student)
+      end
+
+      context "with optimized_load_enrollments_for_index feature flag enabled" do
+        before { Account.site_admin.enable_feature!(:optimized_load_enrollments_for_index) }
+
+        it "preloads role on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:role).loaded?).to be true
+        end
+
+        it "preloads enrollment_state on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:enrollment_state).loaded?).to be true
+        end
+
+        it "preloads course_section on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:course_section).loaded?).to be true
+        end
+
+        it "preloads course on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:course).loaded?).to be true
+        end
+
+        it "preloads enrollment_term through course" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.course.association(:enrollment_term).loaded?).to be true
+        end
+
+        it "produces the same enrollment classification as the old path" do
+          Account.site_admin.disable_feature!(:optimized_load_enrollments_for_index)
+          controller.load_enrollments_for_index
+          old_current = assigns[:current_enrollments].map(&:id).sort
+
+          Account.site_admin.enable_feature!(:optimized_load_enrollments_for_index)
+          controller.load_enrollments_for_index
+          new_current = assigns[:current_enrollments].map(&:id).sort
+
+          expect(new_current).to eq old_current
+        end
+      end
+
+      context "without optimized_load_enrollments_for_index feature flag" do
+        before { Account.site_admin.disable_feature!(:optimized_load_enrollments_for_index) }
+
+        it "does not preload role" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:role).loaded?).to be false
+        end
+      end
+    end
+
+    describe "sort_enrollments" do
+      it "only calls courses_with_primary_enrollment once when sorting by favorite" do
+        course_with_student_logged_in(active_all: true)
+        course_factory(active_all: true).enroll_student(@student).accept!
+
+        expect(@student).to receive(:courses_with_primary_enrollment).once.and_call_original
+
+        get_index(index_params: { cc_sort: "favorite" })
+      end
+
+      it "does not call courses_with_primary_enrollment when not sorting by favorite" do
+        course_with_student_logged_in(active_all: true)
+
+        expect(@student).not_to receive(:courses_with_primary_enrollment)
+
+        get_index(index_params: { cc_sort: "course" })
+      end
+    end
+
     shared_examples "sorting" do
       before do
         @course1 = (type == "future") ? Account.default.courses.create!(name: "A", start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true) : Account.default.courses.create!(name: "A")
@@ -2558,6 +2634,24 @@ describe CoursesController do
           get "show", params: { id: @course.id }
           expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA]).to be_nil
         end
+      end
+    end
+
+    context "accessibility_scan_enabled" do
+      before do
+        Account.default.enable_feature!(:a11y_checker_ga1)
+      end
+
+      it "is true for teachers" do
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+        expect(assigns(:accessibility_scan_enabled)).to be true
+      end
+
+      it "is false for students" do
+        user_session(@student)
+        get "show", params: { id: @course.id }
+        expect(assigns(:accessibility_scan_enabled)).to be false
       end
     end
   end

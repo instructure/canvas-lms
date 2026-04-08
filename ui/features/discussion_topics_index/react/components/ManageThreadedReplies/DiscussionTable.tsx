@@ -30,7 +30,7 @@ import DiscussionThreadedSelect from './DiscussionThreadedSelect'
 import {useManageThreadedRepliesStore} from '../../hooks/useManageThreadedRepliesStore'
 import {DTRDiscussion} from './ManageThreadedReplies'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 
 const I18n = createI18nScope('discussions_v2')
 

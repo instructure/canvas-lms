@@ -129,7 +129,7 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   # context for our custom logger
   Thread.current[:context] = {
     # these 2 keys aren't terribly well named for this, since they were intended for http requests
-    request_id: job.id,
+    request_id: job.id.to_s,
     session_id: worker.name,
   }
 

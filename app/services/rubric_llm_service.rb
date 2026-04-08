@@ -28,7 +28,9 @@ class RubricLLMService
     rating_count: 4,
     total_points: 100,
     use_range: false,
-    grade_level: "higher-ed"
+    grade_level: "higher-ed",
+    standard: "",
+    additional_prompt_info: ""
   }.freeze
   GENERATE_FEATURE_SLUG = "rubric-generate"
   REGENERATE_CRITERIA_FEATURE_SLUG = "rubric-regenerate-criteria"
@@ -65,6 +67,7 @@ class RubricLLMService
     validate_rubric_and_association_object(association_object)
 
     assignment = association_object
+    generate_options = resolve_generate_options(generate_options)
     llm_config = LLMConfigs.config_for("rubric_create")
     raise "No LLM config found for rubric creation" if llm_config.nil?
 
@@ -101,6 +104,7 @@ class RubricLLMService
     validate_rubric_and_association_object(association_object)
 
     assignment = association_object
+    generate_options = resolve_regenerate_options(generate_options, regenerate_options)
     incoming_criteria, existing_criteria_json, criteria_as_text, regenerable_criteria, learning_outcome_criteria_map, target_criterion =
       normalize_incoming_criteria(regenerate_options)
 
@@ -120,7 +124,7 @@ class RubricLLMService
     # Return the original criteria with recalculated points
     # Preserve all fields: learning_outcome_id, ignore_for_scoring, mastery_points, generated, etc.
     if regenerable_criteria.empty?
-      total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+      total_points = generate_options[:total_points].to_f
       points_per_criterion = calculate_points_per_criterion(total_points, incoming_criteria.size)
 
       return incoming_criteria.each_with_index.map do |criterion, index|
@@ -142,15 +146,14 @@ class RubricLLMService
     raise "No LLM config found for rubric regeneration" if llm_config.nil?
 
     dynamic_content = build_regenerate_dynamic_content(
-      assignment,
-      criteria_as_text,
-      regeneration_target_prompt,
-      regenerate_options,
-      generate_options,
-      criterion_id,
-      structure_directives,
-      current_criteria_count,
-      target_criterion
+      assignment:,
+      existing_criteria_text: resolve_existing_criteria_text(criteria_as_text, criterion_id, target_criterion),
+      regeneration_target: regeneration_target_prompt,
+      additional_user_prompt: generate_options[:additional_user_prompt],
+      grade_level: generate_options[:grade_level],
+      standard: generate_options[:standard],
+      criteria_count: criterion_id.present? ? "original count" : current_criteria_count,
+      structure_directives:
     )
 
     prompt, = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
@@ -169,6 +172,19 @@ class RubricLLMService
   end
 
   private
+
+  def resolve_generate_options(generate_options)
+    DEFAULT_GENERATE_OPTIONS.merge(generate_options.symbolize_keys)
+  end
+
+  def resolve_regenerate_options(generate_options, regenerate_options)
+    resolved = resolve_generate_options(generate_options)
+    resolved.merge(
+      additional_user_prompt: regenerate_options.symbolize_keys[:additional_user_prompt].presence ||
+                              resolved[:additional_prompt_info].presence ||
+                              "No specific expectations, just improve it."
+    )
+  end
 
   def validate_rubric_and_association_object(association_object)
     unless association_object.is_a?(AbstractAssignment)
@@ -229,11 +245,11 @@ class RubricLLMService
         title: assignment.title,
         description: html_to_text(assignment.description),
       }.to_json,
-      CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
-      RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
+      CRITERIA_COUNT: generate_options[:criteria_count],
+      RATING_COUNT: generate_options[:rating_count],
       ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
-      GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
-      STANDARD: generate_options[:standard].presence || "",
+      GRADE_LEVEL: generate_options[:grade_level],
+      STANDARD: generate_options[:standard],
       BLOOM_TAXONOMY_CONTEXT:,
     }
   end
@@ -245,11 +261,11 @@ class RubricLLMService
     ai_rubric = JSON.parse(json_str, symbolize_names: true)
 
     criteria_count = ai_rubric[:criteria].length
-    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    total_points = generate_options[:total_points].to_f
     points_per_criterion = calculate_points_per_criterion(total_points, criteria_count)
 
     ai_rubric[:criteria].each_with_index.map do |criterion_data, index|
-      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range] || DEFAULT_GENERATE_OPTIONS[:use_range])
+      build_criterion_from_llm(criterion_data, points_per_criterion[index], generate_options[:use_range])
     end
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse LLM response as JSON during generation: #{e.message}")
@@ -358,7 +374,7 @@ class RubricLLMService
   # Returns [prompt_config_name, regeneration_target_prompt, structure_directives]
   def determine_regeneration_prompt_setup(incoming_criteria, regenerate_options, generate_options)
     criterion_id = regenerate_options[:criterion_id]
-    orig_rating_count = generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
+    orig_rating_count = generate_options[:rating_count]
 
     if criterion_id.present?
       ["rubric_regenerate_criterion", criterion_id, ""]
@@ -375,24 +391,15 @@ class RubricLLMService
   # Includes STRUCTURE_DIRECTIVES when regenerating the full rubric to enforce
   # exact counts/IDs/order.
   def build_regenerate_dynamic_content(
-    assignment,
-    criteria_as_text,
-    regeneration_target_prompt,
-    regenerate_options,
-    generate_options,
-    criterion_id,
-    structure_directives,
-    current_criteria_count = nil,
-    target_criterion = nil
+    assignment:,
+    existing_criteria_text:,
+    regeneration_target:,
+    additional_user_prompt:,
+    grade_level:,
+    standard:,
+    criteria_count:,
+    structure_directives:
   )
-    # When regenerating a single criterion, only pass that criterion to the LLM
-    # to avoid unwanted modifications to other criteria
-    existing_criteria_text = if criterion_id.present? && target_criterion.present?
-                               rubric_to_text({ criteria: [target_criterion] }.to_json)
-                             else
-                               criteria_as_text
-                             end
-
     {
       CONTENT: {
         id: assignment.id,
@@ -400,14 +407,24 @@ class RubricLLMService
         description: html_to_text(assignment.description),
       }.to_json,
       EXISTING_CRITERIA: existing_criteria_text,
-      REGENERATION_TARGET: regeneration_target_prompt,
-      ADDITIONAL_USER_PROMPT: regenerate_options.fetch(:additional_user_prompt, generate_options.fetch(:additional_prompt_info, "No specific expectations, just improve it.")),
-      GRADE_LEVEL: generate_options.fetch(:grade_level, DEFAULT_GENERATE_OPTIONS[:grade_level]),
-      STANDARD: generate_options.fetch(:standard, " "),
-      CRITERIA_COUNT: criterion_id.present? ? "original count" : (current_criteria_count || generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])),
+      REGENERATION_TARGET: regeneration_target,
+      ADDITIONAL_USER_PROMPT: additional_user_prompt,
+      GRADE_LEVEL: grade_level,
+      STANDARD: standard,
+      CRITERIA_COUNT: criteria_count,
       STRUCTURE_DIRECTIVES: structure_directives,
       BLOOM_TAXONOMY_CONTEXT:,
     }
+  end
+
+  # When regenerating a single criterion, only pass that criterion to the LLM
+  # to avoid unwanted modifications to other criteria.
+  def resolve_existing_criteria_text(criteria_as_text, criterion_id, target_criterion)
+    if criterion_id.present? && target_criterion.present?
+      rubric_to_text({ criteria: [target_criterion] }.to_json)
+    else
+      criteria_as_text
+    end
   end
 
   # Parse the <RUBRIC_DATA>...</RUBRIC_DATA> block, then:
@@ -445,8 +462,8 @@ class RubricLLMService
         ai_rubric_data,
         existing_criteria_json,
         criteria.size,
-        generate_options.fetch(:total_points, DEFAULT_GENERATE_OPTIONS[:total_points]),
-        !!generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+        generate_options[:total_points],
+        !!generate_options[:use_range]
       )
     end
 
@@ -459,7 +476,7 @@ class RubricLLMService
     # Distribute points across ALL criteria (including learning outcome criteria)
     # to maintain proper point distribution
     criteria_array = Array(ai_rubric[:criteria])
-    total_points = (generate_options[:total_points] || DEFAULT_GENERATE_OPTIONS[:total_points]).to_f
+    total_points = generate_options[:total_points].to_f
 
     # For single criterion regeneration, the criteria_array already includes learning outcomes
     # For full regeneration, we need to account for them
@@ -469,7 +486,7 @@ class RubricLLMService
       rebuild_regenerated_criterion(
         criterion_data,
         points_per_criterion[index],
-        generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+        generate_options[:use_range]
       )
     end
 
@@ -506,7 +523,7 @@ class RubricLLMService
   # - Sorting ratings by points desc
   def rebuild_regenerated_criterion(criterion_data, criterion_points, use_range)
     criterion_data = criterion_data.deep_symbolize_keys
-    criterion_id_final = determine_final_criterion_id(criterion_data)
+    criterion_id_final = resolve_item_id(criterion_data[:id])
 
     ratings = rebuild_regenerated_ratings(criterion_data, criterion_id_final, criterion_points)
 
@@ -530,22 +547,6 @@ class RubricLLMService
     result
   end
 
-  # Choose final criterion ID:
-  # - If it's a "_new_c_" placeholder or unused, map to a unique Canvas ID
-  # - Else keep the existing ID (it's from original criteria being preserved)
-  # - If no ID provided, generate a new unique ID
-  def determine_final_criterion_id(criterion_data)
-    if criterion_data[:id].present?
-      if criterion_data[:id].start_with?("_new_c_") || !@used_ids.key?(criterion_data[:id])
-        @rubric.unique_item_id(criterion_data[:id])
-      else
-        criterion_data[:id]
-      end
-    else
-      @rubric.unique_item_id
-    end
-  end
-
   # Rebuild ratings for a criterion while preserving IDs and generating a
   # descending points ladder based on the provided top points value.
   #
@@ -564,16 +565,7 @@ class RubricLLMService
 
     rating_values.each_with_index.map do |rating_data, index|
       rd = rating_data.deep_symbolize_keys
-      rating_id_final =
-        if rd[:id].present?
-          if rd[:id].start_with?("_new_r_") || !@used_ids.key?(rd[:id])
-            @rubric.unique_item_id(rd[:id])
-          else
-            rd[:id]
-          end
-        else
-          @rubric.unique_item_id
-        end
+      rating_id_final = resolve_item_id(rd[:id])
 
       {
         description: (rd[:description].presence || I18n.t("rubric.no_description", default: "No Description")).strip,
@@ -668,15 +660,12 @@ class RubricLLMService
       if type == "criterion"
         next unless raw_id == criterion_id.to_s
 
-        new_criterion ||= {
-          "id" => raw_id,
-          "description" => "",
-          "long_description" => "",
-          "ratings" => [],
-          "points" => criterion_points,
-          "criterion_use_range" => original_criterion["criterion_use_range"] || false,
-          "generated" => true
-        }
+        new_criterion ||= build_blank_criterion(
+          id: raw_id,
+          points: criterion_points,
+          use_range: false,
+          original_criterion:
+        )
         new_criterion[field] = value
         updated = true
       elsif type == "rating"
@@ -685,13 +674,7 @@ class RubricLLMService
 
         rating = new_criterion["ratings"].find { |r| r["id"] == raw_id }
         unless rating
-          rating = {
-            "id" => raw_id,
-            "criterion_id" => new_criterion["id"],
-            "description" => "",
-            "long_description" => "",
-            "points" => 0
-          }
+          rating = build_blank_rating(id: raw_id, criterion_id: new_criterion["id"])
           new_criterion["ratings"] << rating
         end
         rating[field] = value
@@ -760,15 +743,12 @@ class RubricLLMService
           original_criterion = original["criteria"].find { |c| c["id"] == raw_id }
           original_criterion ||= original["criteria"][criterion_index]
 
-          current_crit = {
-            "id" => raw_id,
-            "description" => "",
-            "long_description" => "",
-            "ratings" => [],
-            "points" => criterion_points,
-            "criterion_use_range" => original_criterion&.[]("criterion_use_range") || use_range,
-            "generated" => true
-          }
+          current_crit = build_blank_criterion(
+            id: raw_id,
+            points: criterion_points,
+            use_range:,
+            original_criterion:
+          )
           new_criteria << current_crit
         end
         current_crit[field] = value
@@ -777,13 +757,7 @@ class RubricLLMService
 
         rating = current_crit["ratings"].find { |r| r["id"] == raw_id }
         unless rating
-          rating = {
-            "id" => raw_id,
-            "criterion_id" => current_crit["id"],
-            "description" => "",
-            "long_description" => "",
-            "points" => 0
-          }
+          rating = build_blank_rating(id: raw_id, criterion_id: current_crit["id"])
           current_crit["ratings"] << rating
         end
         rating[field] = value
@@ -944,6 +918,38 @@ class RubricLLMService
     rating[:id] = rating[:id].to_s if rating[:id].present?
     rating[:criterion_id] = rating[:criterion_id].to_s if rating[:criterion_id].present?
     rating
+  end
+
+  # Resolve a raw ID from LLM output to a stable Canvas ID:
+  # - Placeholder (_new_*) or unseen ID → generate a new unique ID
+  # - Known existing ID → preserve it as-is
+  # - Nil/blank → generate a new unique ID
+  def resolve_item_id(raw_id)
+    if raw_id.present?
+      if raw_id.start_with?("_new_") || !@used_ids.key?(raw_id)
+        @rubric.unique_item_id(raw_id)
+      else
+        raw_id
+      end
+    else
+      @rubric.unique_item_id
+    end
+  end
+
+  def build_blank_criterion(id:, points:, use_range:, original_criterion: nil)
+    {
+      "id" => id,
+      "description" => "",
+      "long_description" => "",
+      "ratings" => [],
+      "points" => points,
+      "criterion_use_range" => original_criterion&.[]("criterion_use_range") || use_range,
+      "generated" => true
+    }
+  end
+
+  def build_blank_rating(id:, criterion_id:)
+    { "id" => id, "criterion_id" => criterion_id, "description" => "", "long_description" => "", "points" => 0 }
   end
 
   def normalize_boolean_field!(hash, field)

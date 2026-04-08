@@ -257,8 +257,20 @@
     "cap_product_3a5265a6": {
         "message": "교집합"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "캡션을 생성하지 못함"
+    },
     "caption_manager_aae0906f": {
         "message": "캡션 매니저"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "{ captionName } 캡션을 삭제하지 못함"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "{ captionName } 캡션을 생성하지 못함"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "{ captionName } 캡션을 업로드하지 못함"
     },
     "captions_have_been_added_for_lang_cd126cd": {
         "message": "{ lang }의 캡션을 추가했습니다"
@@ -572,6 +584,9 @@
     "degree_symbol_4a823d5f": {
         "message": "도(각도) 기호"
     },
+    "delete_failed_6529e336": {
+        "message": "삭제 실패"
+    },
     "delimiters_4db4840d": {
         "message": "구분자"
     },
@@ -776,6 +791,9 @@
     "english_united_kingdom_a613f831": {
         "message": "영어(영국)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "미디어 제목 입력"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "최소 3자를 입력하여 검색"
     },
@@ -841,6 +859,9 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "더 크게"
+    },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "더 크게({ width } x { height }px)"
     },
     "extra_small_9ae33252": {
         "message": "더 작게"
@@ -1319,6 +1340,9 @@
     "large_text_e7ba08cd": {
         "message": "큰 텍스트"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "크게({ width } x { height }px)"
+    },
     "latvian_2bbb6aab": {
         "message": "라트비아어"
     },
@@ -1531,6 +1555,9 @@
     },
     "medium_5a8e9ead": {
         "message": "중간"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "중간({ width } x { height }px)"
     },
     "merge_links_2478df96": {
         "message": "링크 병합"
@@ -1883,6 +1910,9 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "{ createdAt }에서 { name } 님의 미디어 댓글을 재생합니다."
     },
+    "player_layout_14e09a29": {
+        "message": "플레이어 레이아웃"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Canvas에서 마이크 및 웹캠에 액세스를 허용하세요."
     },
@@ -2081,6 +2111,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "결과 { index }/{ max }"
     },
+    "retry_captionname_5ed0a12f": {
+        "message": "{ captionName } 다시 시도"
+    },
     "retry_ebd5f8ba": {
         "message": "다시 시도"
     },
@@ -2255,6 +2288,9 @@
     "show_link_options_545338fd": {
         "message": "링크 옵션 표시"
     },
+    "show_rolling_transcript_d353aca4": {
+        "message": "롤링 대화 내용 표시"
+    },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "시력에 문제가 없는 사용자는 큰 머리글 또는 굵은 글자체의 머리글을 찾아서 웹 페이지를 빠르게 탐색합니다. 화면 읽기 프로그램 사용자는 컨텍스트에 기반한 이해를 위해 헤더에 의존합니다. 헤더는 적절한 구조를 사용해야 합니다."
     },
@@ -2287,6 +2323,9 @@
     },
     "small_b070434a": {
         "message": "작은"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "작게({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "채워진 원"
@@ -2567,6 +2606,9 @@
     "timebar_a4d18443": {
         "message": "시간 표시줄"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "제목은 비어 있을 수 없습니다"
+    },
     "title_ee03d132": {
         "message": "제목"
     },
@@ -2587,6 +2629,9 @@
     },
     "top_66e0adb6": {
         "message": "상단"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "대화 기록 패널은 720px 이상의 너비에서 사용할 수 있습니다."
     },
     "tray_839df38a": {
         "message": "트레이"
@@ -2627,6 +2672,9 @@
     "unpublished_dfd8801": {
         "message": "게시되지 않음"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "저장되지 않은 변경 사항은 사라집니다."
+    },
     "untitled_16aa4f2b": {
         "message": "제목 없음"
     },
@@ -2653,6 +2701,9 @@
     },
     "upload_document_253f0478": {
         "message": "문서 업로드"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "업로드 실패"
     },
     "upload_file_fd2361b8": {
         "message": "파일 업로드"
@@ -2815,6 +2866,9 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "단어 및 글자 수 보기"
+    },
+    "viewer_restrictions_e14274c9": {
+        "message": "뷰어 제한"
     },
     "waiting_for_response_1efd0c50": {
         "message": "응답 대기 중"

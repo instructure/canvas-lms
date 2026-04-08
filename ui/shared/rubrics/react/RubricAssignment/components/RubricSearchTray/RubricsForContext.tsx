@@ -19,7 +19,7 @@
 import {RubricAssociation, Rubric} from '../../../types/rubric'
 import {useQuery} from '@tanstack/react-query'
 import {getGradingRubricsForContext} from '../../queries'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {RubricSearchRow} from './RubricSearchRow'
 
 type RubricsForContextProps = {

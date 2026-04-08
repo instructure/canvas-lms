@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import formatMessage from 'format-message'
-import {useState} from 'react'
+import {useRef, useState} from 'react'
 import CanvasSelect from '../shared/CanvasSelect'
 import {trackPendoEvent} from '../utils/trackPendoEvent'
 
@@ -35,6 +34,8 @@ interface AutoCaptioningProps {
   onDirtyStateChanged?: (isDirty: boolean) => void
 }
 
+const LANGUAGE_ERROR_ID = 'cc-asr-language-error'
+
 export const AutoCaptioning = ({
   onCancel,
   onPrimary,
@@ -45,6 +46,7 @@ export const AutoCaptioning = ({
 }: AutoCaptioningProps) => {
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('')
   const [showLanguageError, setShowLanguageError] = useState(false)
+  const languageInputRef = useRef<HTMLInputElement | null>(null)
 
   const handleLanguageChange = (_event: React.SyntheticEvent, languageId: string) => {
     if (languageId) {
@@ -61,6 +63,7 @@ export const AutoCaptioning = ({
         error_type: 'missing_language',
       })
       setShowLanguageError(true)
+      languageInputRef.current?.focus()
       return
     }
 
@@ -70,16 +73,20 @@ export const AutoCaptioning = ({
   return (
     <Flex as="div" direction="column" gap="medium">
       <Flex.Item overflowY="hidden" overflowX="hidden">
-        <Heading variant="titleCardMini">{formatMessage('Automatic captioning')}</Heading>
+        <Heading as="h4" variant="titleCardMini">
+          {formatMessage('Automatic captioning')}
+        </Heading>
         <Text variant="contentSmall">
           {formatMessage('Our technology generates ~85% accurate captions.')}
         </Text>
       </Flex.Item>
 
       <Flex gap="small" direction="column">
-        <Heading variant="titleCardMini">{formatMessage('Language Spoken in This Media*')}</Heading>
         <CanvasSelect
-          label={<ScreenReaderContent>{formatMessage('Select Language')}</ScreenReaderContent>}
+          inputRef={(el: HTMLInputElement | null) => {
+            languageInputRef.current = el
+          }}
+          label={formatMessage('Language Spoken in This Media*')}
           placeholder={formatMessage('Select Language')}
           value={selectedLanguageId}
           mountNode={mountNode}
@@ -90,6 +97,8 @@ export const AutoCaptioning = ({
             OPTION_SELECTED: '{option} selected.',
           }}
           onChange={handleLanguageChange}
+          aria-invalid={showLanguageError ? 'true' : undefined}
+          aria-describedby={showLanguageError ? LANGUAGE_ERROR_ID : undefined}
           messages={
             showLanguageError
               ? [
@@ -110,14 +119,16 @@ export const AutoCaptioning = ({
           ))}
         </CanvasSelect>
         {showLanguageError && (
-          <Alert
-            variant="error"
-            screenReaderOnly={true}
-            isLiveRegionAtomic={true}
-            liveRegion={liveRegion}
-          >
-            {formatMessage('Please select a language')}
-          </Alert>
+          <span id={LANGUAGE_ERROR_ID}>
+            <Alert
+              variant="error"
+              screenReaderOnly={true}
+              isLiveRegionAtomic={true}
+              liveRegion={liveRegion}
+            >
+              {formatMessage('Please select a language')}
+            </Alert>
+          </span>
         )}
       </Flex>
 

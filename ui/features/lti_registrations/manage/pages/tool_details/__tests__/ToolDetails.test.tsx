@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {clickOrFail} from '../../__tests__/interactionHelpers'
 import {ToolDetailsInner} from '../ToolDetails'
 import {
@@ -28,6 +28,8 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ZDeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {fireEvent, screen} from '@testing-library/dom'
 
 const server = setupServer()
 
@@ -170,5 +172,82 @@ describe('ToolDetailsInner', () => {
     const wrapper = renderToolDetailsInner(registration)
 
     expect(wrapper.queryByText('Reinstall App')).not.toBeInTheDocument()
+  })
+
+  describe('lock/unlock feature (lock_lti_registrations)', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {lock_lti_registrations: true},
+      })
+    })
+
+    it("shows a pill showing the registration's lock state", () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {lock_deploying: true},
+      })
+      const wrapper = renderToolDetailsInner(registration)
+      expect(wrapper.queryByText('App is locked')).toBeInTheDocument()
+    })
+
+    it('disables the lock button on an inherited registration', () => {
+      const registration = mockSiteAdminRegistration('site admin', 1)
+      const wrapper = renderToolDetailsInner(registration)
+      const lockButton = wrapper.getByTestId('toggle-lock')
+      expect(lockButton).toHaveAttribute('disabled')
+    })
+
+    it('enables the lock button on a non-inherited registration', () => {
+      const registration = mockRegistrationWithAllInformation({n: 'test', i: 1})
+      const wrapper = renderToolDetailsInner(registration)
+      const lockButton = wrapper.getByTestId('toggle-lock')
+      expect(lockButton).not.toHaveAttribute('disabled')
+    })
+
+    it('shows a tooltip on the lock button for an inherited registration', async () => {
+      const registration = mockSiteAdminRegistration('site admin', 1)
+      renderToolDetailsInner(registration)
+      fireEvent.mouseOver(screen.getByTestId('toggle-lock'))
+      await waitFor(() => {
+        expect(
+          screen.getByText("This account does not own this app and therefore can't lock it."),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it("let's users change registration state", async () => {
+      let capturedBody: unknown
+      server.use(
+        http.put(
+          '/api/v1/accounts/:accountId/lti_registrations/:registrationId',
+          async ({request}) => {
+            capturedBody = await request.json()
+            return HttpResponse.json({})
+          },
+        ),
+      )
+
+      const registration = mockRegistrationWithAllInformation({
+        n: 'test',
+        i: 1,
+        registration: {lock_deploying: false},
+      })
+      renderToolDetailsInner(registration)
+
+      fireEvent.click(screen.getByText('Lock app'))
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/This app will no longer deployable by client ID or course copy/i),
+        ).toBeInTheDocument()
+      })
+
+      fireEvent.click(screen.getByText(/Lock$/i))
+
+      await waitFor(() => {
+        expect(capturedBody).toMatchObject({lock_deploying: true})
+      })
+    })
   })
 })

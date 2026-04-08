@@ -52,8 +52,8 @@ describe('useAccessibilityIssueSummary', () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
-  const renderUseAccessibilityIssueSummary = () => {
-    return renderHook(() => useAccessibilityIssueSummary({accountId}), {wrapper})
+  const renderUseAccessibilityIssueSummary = (enrollmentTermId?: string) => {
+    return renderHook(() => useAccessibilityIssueSummary({accountId, enrollmentTermId}), {wrapper})
   }
 
   it('fetches accessibility issue summary successfully', async () => {
@@ -122,7 +122,11 @@ describe('useAccessibilityIssueSummary', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    const cachedData = queryClient.getQueryData(['accessibility-issue-summary', accountId])
+    const cachedData = queryClient.getQueryData([
+      'accessibility-issue-summary',
+      accountId,
+      undefined,
+    ])
     expect(cachedData).toEqual(mockSummary)
   })
 
@@ -138,6 +142,84 @@ describe('useAccessibilityIssueSummary', () => {
     await waitFor(() => expect(result.current.isError).toBe(true))
 
     expect(result.current.data).toBeUndefined()
+  })
+
+  it('sends enrollment_term_id param when provided', async () => {
+    let params: URLSearchParams | undefined
+
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/accessibility_issue_summary`, ({request}) => {
+        params = new URL(request.url).searchParams
+        return HttpResponse.json({active: 4, resolved: 2})
+      }),
+    )
+
+    const {result} = renderUseAccessibilityIssueSummary('42')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(params?.get('enrollment_term_id')).toBe('42')
+  })
+
+  it('omits enrollment_term_id param when not provided', async () => {
+    let params: URLSearchParams | undefined
+
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/accessibility_issue_summary`, ({request}) => {
+        params = new URL(request.url).searchParams
+        return HttpResponse.json({active: 0, resolved: 0})
+      }),
+    )
+
+    const {result} = renderUseAccessibilityIssueSummary()
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(params?.has('enrollment_term_id')).toBe(false)
+  })
+
+  it('includes enrollmentTermId in query key for per-term caching', async () => {
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/accessibility_issue_summary`, () =>
+        HttpResponse.json({active: 4, resolved: 2}),
+      ),
+    )
+
+    const {result} = renderUseAccessibilityIssueSummary('42')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const cachedData = queryClient.getQueryData(['accessibility-issue-summary', accountId, '42'])
+    expect(cachedData).toEqual({active: 4, resolved: 2})
+  })
+
+  it('refetches when enrollmentTermId changes', async () => {
+    let requestCount = 0
+
+    server.use(
+      http.get(`/api/v1/accounts/${accountId}/accessibility_issue_summary`, () => {
+        requestCount++
+        return HttpResponse.json({active: requestCount, resolved: 0})
+      }),
+    )
+
+    const localWrapper = ({children}: React.PropsWithChildren<{termId?: string}>) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+
+    const {result, rerender} = renderHook(
+      ({termId}: {termId?: string}) =>
+        useAccessibilityIssueSummary({accountId, enrollmentTermId: termId}),
+      {wrapper: localWrapper, initialProps: {termId: undefined} as {termId?: string}},
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(requestCount).toBe(1)
+
+    rerender({termId: '42'})
+
+    await waitFor(() => expect(result.current.data?.active).toBe(2))
+    expect(requestCount).toBe(2)
   })
 
   it('returns zero values when summary has zero counts', async () => {

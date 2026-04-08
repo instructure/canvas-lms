@@ -52,7 +52,8 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationHistoryEntryStateColumns d
             "name" => registration.name,
             "vendor" => registration.vendor,
             "workflow_state" => registration.workflow_state,
-            "description" => registration.description
+            "description" => registration.description,
+            "lock_deploying" => registration.lock_deploying
           }
         )
         expect(entry.new_configuration["registration"]).to eq(
@@ -61,7 +62,8 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationHistoryEntryStateColumns d
             "name" => registration.name,
             "vendor" => registration.vendor,
             "workflow_state" => registration.workflow_state,
-            "description" => registration.description
+            "description" => registration.description,
+            "lock_deploying" => registration.lock_deploying
           }
         )
 

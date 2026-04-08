@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EventStream::Backend::ActiveRecord do
   let(:ar_type) do
     Class.new do

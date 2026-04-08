@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AbstractCourse < ActiveRecord::Base
+class AbstractCourse < ApplicationRecord
   include Workflow
 
   belongs_to :root_account, class_name: "Account"

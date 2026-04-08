@@ -4671,4 +4671,43 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "#needs_normalizing?" do
+    let(:course) { course_model }
+    let(:topic) { discussion_topic_model(context: course) }
+
+    before do
+      Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      course.root_account.enable_feature!(:a11y_checker)
+      course.enable_feature!(:a11y_checker_eap)
+      Progress.create!(
+        tag: Accessibility::CourseScanService::SCAN_TAG,
+        context: course,
+        workflow_state: "completed"
+      )
+    end
+
+    it "returns false when @capture_changed_a11y_attributes is nil (safe navigation guard)" do
+      # Instance variable is never set, so it remains nil.
+      # The safe navigation (&.) returns nil, which is falsy.
+      expect(topic.instance_variable_get(:@capture_changed_a11y_attributes)).to be_nil
+      expect(topic.send(:needs_normalizing?)).to be_falsey
+    end
+
+    it "returns false when @capture_changed_a11y_attributes is set but does not include :assignment_id" do
+      topic.instance_variable_set(:@capture_changed_a11y_attributes, Set[:message])
+      expect(topic.send(:needs_normalizing?)).to be false
+    end
+
+    it "returns true when all conditions are met and :assignment_id is included" do
+      topic.instance_variable_set(:@capture_changed_a11y_attributes, Set[:assignment_id])
+      expect(topic.send(:needs_normalizing?)).to be true
+    end
+
+    it "returns false when topic is an announcement even if other conditions pass" do
+      announcement = course.announcements.create!(title: "Test Announcement", message: "Hello")
+      announcement.instance_variable_set(:@capture_changed_a11y_attributes, Set[:assignment_id])
+      expect(announcement.send(:needs_normalizing?)).to be false
+    end
+  end
 end

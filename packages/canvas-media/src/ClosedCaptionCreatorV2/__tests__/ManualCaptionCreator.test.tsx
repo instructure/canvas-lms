@@ -86,7 +86,7 @@ describe('<ManualCaptionCreator />', () => {
     renderComponent({onPrimary})
 
     // Select a language first - click on placeholder text to open, then click option
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
@@ -117,7 +117,7 @@ describe('<ManualCaptionCreator />', () => {
     renderComponent({onPrimary})
 
     // Select a language - click on placeholder text to open, then click option
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('Spanish'))
 
@@ -157,12 +157,33 @@ describe('<ManualCaptionCreator />', () => {
     expect(screen.getAllByText('Please select a language').length).toBeGreaterThan(0)
 
     // Select a language - click on placeholder text to open, then click option
-    const selectPlaceholder = screen.getByText('Select Language')
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
     fireEvent.click(selectPlaceholder)
     fireEvent.click(screen.getByText('English'))
 
     // Error should be cleared
     expect(screen.queryByText('Please select a language')).not.toBeInTheDocument()
+  })
+
+  it('shows file validation error for invalid file extension', () => {
+    renderComponent()
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const invalidFile = new File(['content'], 'captions.txt', {type: 'text/plain'})
+    fireEvent.change(fileInput, {target: {files: [invalidFile]}})
+
+    expect(screen.getAllByText(/Please select a .vtt or .srt file/i).length).toBeGreaterThan(0)
+  })
+
+  it('shows both language and file errors when neither is provided', () => {
+    const onPrimary = vi.fn()
+    renderComponent({onPrimary})
+
+    fireEvent.click(screen.getByText('Upload'))
+
+    expect(screen.getAllByText('Please select a language').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Please select a file before uploading.').length).toBeGreaterThan(0)
+    expect(onPrimary).not.toHaveBeenCalled()
   })
 
   it('file validation error clears when valid file selected', async () => {
@@ -202,20 +223,110 @@ describe('<ManualCaptionCreator />', () => {
       })
     })
 
-    it('a11y: button aria-label shows "Choose File" when empty, "Selected File: filename" when file selected', async () => {
+    it('a11y: button has aria-describedby linking to format hint and file status', async () => {
       renderComponent()
 
-      // Initially button should have "Choose caption file" label
-      const chooseFileButton = screen.getByLabelText(/choose file/i)
-      expect(chooseFileButton).toBeInTheDocument()
+      const chooseFileButton = screen.getByText(/choose file/i).closest('button')
+
+      // Before file selection: includes both hint and status
+      expect(chooseFileButton).toHaveAttribute('aria-describedby', 'cc-file-hint cc-file-status')
+      expect(document.getElementById('cc-file-hint')).toHaveTextContent(/SRT or WebVTT/i)
+      expect(document.getElementById('cc-file-status')).toHaveTextContent(/no file chosen/i)
 
       // Select a file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
       const validFile = createValidFile('my-captions.vtt')
       fireEvent.change(fileInput, {target: {files: [validFile]}})
 
-      // Button aria-label should now indicate the selected file
-      expect(await screen.findByLabelText(/Selected file: my-captions.vtt/i)).toBeInTheDocument()
+      // After file selection: hint is dropped, only status remains
+      expect(await screen.findByText('my-captions.vtt')).toBeInTheDocument()
+      expect(chooseFileButton).toHaveAttribute('aria-describedby', 'cc-file-status')
+      expect(document.getElementById('cc-file-status')).toHaveTextContent('my-captions.vtt')
+    })
+
+    it('a11y: focuses language select when Upload clicked without language', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText('Upload'))
+
+      const languageInput = screen.getByPlaceholderText('Select Language')
+      expect(document.activeElement).toBe(languageInput)
+    })
+
+    it('a11y: focuses file button when Upload clicked with language but no file', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+
+      fireEvent.click(screen.getByText('Upload'))
+
+      const chooseFileButton = screen.getByText(/choose file/i).closest('button')
+      expect(document.activeElement).toBe(chooseFileButton)
+    })
+
+    it('a11y: sets aria-invalid on language select when error shown', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText('Upload'))
+
+      const languageInput = screen.getByPlaceholderText('Select Language')
+      expect(languageInput).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    it('a11y: sets aria-invalid on file button when file validation error', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      fireEvent.click(screen.getByText('Upload'))
+
+      const chooseFileButton = screen.getByText(/choose file/i).closest('button')
+      expect(chooseFileButton).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    it('a11y: aria-describedby switches to error ID on file validation error', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      fireEvent.click(screen.getByText('Upload'))
+
+      const chooseFileButton = screen.getByText(/choose file/i).closest('button')
+      expect(chooseFileButton).toHaveAttribute('aria-describedby', 'cc-file-error')
+    })
+
+    it('a11y: file button aria-label reflects selection state', () => {
+      renderComponent()
+
+      const chooseFileButton = screen.getByText(/choose file/i).closest('button')
+      expect(chooseFileButton).toHaveAttribute('aria-label', 'Choose File (required)')
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      const validFile = createValidFile('my-captions.vtt')
+      fireEvent.change(fileInput, {target: {files: [validFile]}})
+
+      expect(chooseFileButton).toHaveAttribute('aria-label', 'Selected file: my-captions.vtt')
+    })
+
+    it('a11y: announces language error to screen readers via live region', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText('Upload'))
+
+      const liveRegion = document.getElementById(LIVE_REGION_ID)
+      expect(liveRegion).toHaveTextContent('Please select a language')
+    })
+
+    it('a11y: announces file error to screen readers via live region', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      fireEvent.click(screen.getByText('Upload'))
+
+      const liveRegion = document.getElementById(LIVE_REGION_ID)
+      expect(liveRegion).toHaveTextContent('Please select a file before uploading.')
     })
   })
 
@@ -244,7 +355,7 @@ describe('<ManualCaptionCreator />', () => {
 
     it('fires canvas_caption_validation_error missing_file when no file is selected', async () => {
       renderComponent()
-      fireEvent.click(screen.getByText('Select Language'))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
       fireEvent.click(screen.getByText('English'))
       fireEvent.click(screen.getByText('Upload'))
       await waitFor(() => {
@@ -277,7 +388,7 @@ describe('<ManualCaptionCreator />', () => {
         renderComponent({onDirtyStateChanged})
 
         // Select a language - click on placeholder text to open, then click option
-        const selectPlaceholder = screen.getByText('Select Language')
+        const selectPlaceholder = screen.getByPlaceholderText('Select Language')
         fireEvent.click(selectPlaceholder)
         fireEvent.click(screen.getByText('English'))
 

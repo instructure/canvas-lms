@@ -637,12 +637,17 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   Errors related to the assignment
   """
-  autoGradeAssignmentErrors: [String!]!
+  autoGradeAssignmentErrors: [String!]! @deprecated(reason: "Use autoGradeEligibility instead")
 
   """
   Issues related to the assignment
   """
-  autoGradeAssignmentIssues: EligibilityIssue
+  autoGradeAssignmentIssues: EligibilityIssue @deprecated(reason: "Use autoGradeEligibility instead")
+
+  """
+  Eligibility for auto-grading
+  """
+  autoGradeEligibility: AutoGradeEligibility
   canDuplicate: Boolean
   canManageAssignTo: Boolean
   canUnpublish: Boolean
@@ -1655,6 +1660,14 @@ type AuditLogs {
     last: Int
     startTime: DateTime
   ): MutationLogConnection
+}
+
+type AutoGradeEligibility {
+  issues: [AutoGradeIssue!]!
+}
+
+type AutoGradeIssue {
+  message: String!
 }
 
 """
@@ -7980,12 +7993,17 @@ type PeerReviewSubAssignment implements AssignedDates & LegacyIDInterface & Modu
   """
   Errors related to the assignment
   """
-  autoGradeAssignmentErrors: [String!]!
+  autoGradeAssignmentErrors: [String!]! @deprecated(reason: "Use autoGradeEligibility instead")
 
   """
   Issues related to the assignment
   """
-  autoGradeAssignmentIssues: EligibilityIssue
+  autoGradeAssignmentIssues: EligibilityIssue @deprecated(reason: "Use autoGradeEligibility instead")
+
+  """
+  Eligibility for auto-grading
+  """
+  autoGradeEligibility: AutoGradeEligibility
   canDuplicate: Boolean
   canManageAssignTo: Boolean
   canUnpublish: Boolean
@@ -10042,6 +10060,11 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   ): AuditEventConnection
 
   """
+  Eligibility for auto-grading
+  """
+  autoGradeEligibility: AutoGradeEligibility
+
+  """
   Indicates whether an auto-grading result exists for the submission.
   """
   autoGradeResultPresent: Boolean!
@@ -10049,12 +10072,12 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   """
   Errors related to the submission
   """
-  autoGradeSubmissionErrors: [String!]!
+  autoGradeSubmissionErrors: [String!]! @deprecated(reason: "Use autoGradeEligibility instead")
 
   """
   Issues related to the submission
   """
-  autoGradeSubmissionIssues: EligibilityIssue
+  autoGradeSubmissionIssues: EligibilityIssue @deprecated(reason: "Use autoGradeEligibility instead")
   body: String
   cachedDueDate: DateTime
   commentsConnection(

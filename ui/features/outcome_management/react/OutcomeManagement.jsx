@@ -17,9 +17,9 @@
  */
 
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
 import MasteryCalculation from './MasteryCalculation/index'
@@ -42,7 +42,7 @@ const I18n = createI18nScope('OutcomeManagement')
 
 const unmount = mount => {
   if (mount && mount.nodeType === Node.ELEMENT_NODE) {
-    ReactDOM.unmountComponentAtNode(mount)
+    legacyUnmountComponentAtNode(mount)
   }
 }
 
@@ -286,14 +286,6 @@ const OutcomeManagement = ({breakpoints}) => {
       </QueryClientProvider>
     </ApolloProvider>
   )
-}
-
-OutcomeManagement.propTypes = {
-  breakpoints: breakpointsShape,
-}
-
-OutcomeManagementWithoutGraphql.propTypes = {
-  breakpoints: breakpointsShape,
 }
 
 export default WithBreakpoints(OutcomeManagement)

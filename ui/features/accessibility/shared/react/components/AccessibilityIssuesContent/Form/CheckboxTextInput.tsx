@@ -33,6 +33,7 @@ import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStor
 import {useShallow} from 'zustand/react/shallow'
 import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
 import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
+import {altTextGenerationErrorMessage} from '../../../utils/altTextErrors'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -66,6 +67,8 @@ export const CheckboxTextButtonLabels: ButtonLabelByState = {
   loading: GENERATE_ALT_TEXT_LOADING_LABEL,
   loaded: GENERATE_ALT_TEXT_LOADED_LABEL,
 }
+
+const ALT_TEXT_HELPER_ID = 'alt-text-generation-helper-text'
 
 const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
   forwardRef<FormComponentHandle, FormComponentProps>(
@@ -160,14 +163,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             console.error('Error generating text input:', error)
             const statusCode = error?.response?.status || 0
 
-            const errorMessage =
-              statusCode === 429
-                ? I18n.t(
-                    'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
-                  )
-                : I18n.t(
-                    'There was an error generating alt text. Please try again, or enter it manually.',
-                  )
+            const errorMessage = altTextGenerationErrorMessage(statusCode)
 
             setGenerationError(errorMessage)
           })
@@ -219,9 +215,17 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
                   isLoading={generateLoading}
                   buttonLabels={CheckboxTextButtonLabels}
                   isDisabled={isChecked || !issue.form.isCanvasImage}
+                  pendoId="AiAltTextButtonPushed"
+                  selectedItem={selectedItem}
+                  ruleId={issue.ruleId}
+                  helperTextId={!issue.form.isCanvasImage ? ALT_TEXT_HELPER_ID : undefined}
                 />
                 {!issue.form.isCanvasImage && (
-                  <Text data-testid="alt-text-generation-not-available-message" size="small">
+                  <Text
+                    id={ALT_TEXT_HELPER_ID}
+                    data-testid="alt-text-generation-not-available-message"
+                    size="small"
+                  >
                     {I18n.t(
                       'AI alt text generation is only available for images uploaded to Canvas.',
                     )}

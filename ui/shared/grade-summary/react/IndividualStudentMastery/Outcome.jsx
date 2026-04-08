@@ -32,7 +32,7 @@ import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import TruncateWithTooltip from '../TruncateWithTooltip'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import * as shapes from './shapes'
 
 const I18n = createI18nScope('IndividualStudentMasteryOutcome')
@@ -43,7 +43,6 @@ class Outcome extends React.Component {
     expanded: PropTypes.bool.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {

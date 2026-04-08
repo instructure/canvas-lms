@@ -35,6 +35,7 @@ module Canvadocs
 
       Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
         session = canvadocs_api.session(document_id, StringifyIds.recursively_stringify_ids(opts))
+        process_session_token(session["id"])
         canvadocs_api.view(session["id"])
       end
     end
@@ -43,6 +44,19 @@ module Canvadocs
       @canvadocs_api ||= Canvadoc.canvadocs_api
     end
     private :canvadocs_api
+
+    def process_session_token(token)
+      claims = JSON::JWT.decode(token, :skip_verification)
+
+      return unless claims["w"]
+      return if attachment.word_count
+
+      attachment.update(word_count: claims["w"])
+    rescue => e
+      # We don't want to block the session flow even if we can not process the token
+      Rails.logger.error("Failed to process token: #{token} Exception: #{e}")
+    end
+    private :process_session_token
 
     def canvadoc_permissions_for_user(user, enable_annotations, read_only: false)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)

@@ -92,8 +92,8 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: serialize_json_api(paginated_grading_periods, meta)
-            .merge(index_permissions)
-            .merge(grading_periods_read_only: read_only)
+                       .merge(index_permissions)
+                       .merge(grading_periods_read_only: read_only)
         end
       end
     end

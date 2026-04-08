@@ -32,6 +32,7 @@ import type {Announcement} from '../../../types'
 import {useToggleAnnouncementReadState} from '../../../hooks/useToggleAnnouncementReadState'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {FilterOption} from './utils'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 import {ANNOUNCEMENTS_PAGINATED_KEY} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -55,9 +56,15 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({children, maxLength = 80})
 interface AnnouncementItemProps {
   announcementItem: Announcement
   filter: FilterOption
+  readOnly?: boolean
 }
 
-const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, filter}) => {
+const AnnouncementItem: React.FC<AnnouncementItemProps> = ({
+  announcementItem,
+  filter,
+  readOnly = false,
+}) => {
+  const {isDark} = useWidgetTheme()
   const toggleReadState = useToggleAnnouncementReadState()
   const [announcement, setAnnouncement] = useState(announcementItem)
   const [isLoading, setIsLoading] = useState(false)
@@ -153,8 +160,9 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
         size="small"
         withBackground={false}
         withBorder={false}
-        onClick={isLoading ? undefined : handleToggleReadState}
-        disabled={isLoading}
+        color={isDark ? 'primary-inverse' : 'secondary'}
+        onClick={isLoading || readOnly ? undefined : handleToggleReadState}
+        disabled={isLoading || readOnly}
         screenReaderLabel={label}
         aria-pressed={isLoading ? undefined : isRead}
         data-testid={testId}

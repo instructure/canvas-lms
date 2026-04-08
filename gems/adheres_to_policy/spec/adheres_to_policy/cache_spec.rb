@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 # rubocop:disable Style/RedundantFetchBlock -- it's a cache, not a Hash
 describe AdheresToPolicy::Cache do
   def cached

@@ -47,6 +47,14 @@ vi.mock('../../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', 
 
 vi.mock('../../../../../../shared/react/stores/AccessibilityScansStore')
 
+const mockTrackA11yEvent = vi.fn()
+vi.mock('../../../../../../shared/react/hooks/useA11yTracking', () => ({
+  useA11yTracking: vi.fn(() => ({
+    trackA11yEvent: mockTrackA11yEvent,
+    trackA11yIssueEvent: vi.fn(),
+  })),
+}))
+
 const mockShowFlashAlert = vi.fn()
 vi.spyOn(FlashAlert, 'showFlashAlert').mockImplementation(mockShowFlashAlert)
 
@@ -192,6 +200,21 @@ describe('ActionsMenuCell', () => {
       })
 
       expect(screen.getByText(/you closed remediation/i)).toBeInTheDocument()
+    })
+
+    it('tracks ResourceClosed event with resourceId and courseId on success', async () => {
+      const user = userEvent.setup()
+      render(<ActionsMenuCell scan={activeScan} />, {wrapper})
+
+      await user.click(screen.getByTestId('actions-menu-button'))
+      await user.click(screen.getByText(/close remediation/i))
+
+      await waitFor(() => {
+        expect(mockTrackA11yEvent).toHaveBeenCalledWith('ResourceClosed', {
+          resourceId: activeScan.id,
+          courseId: activeScan.courseId,
+        })
+      })
     })
 
     it('shows error flash alert when close remediation fails', async () => {

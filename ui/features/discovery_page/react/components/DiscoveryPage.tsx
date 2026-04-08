@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import {type ChangeEvent, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -24,45 +24,40 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {DiscoveryProvider, useDiscovery} from '../hooks/useDiscovery'
+import {useHashState} from '../hooks/useHashState'
 import {ConfigureModal} from './ConfigureModal'
 import type {DiscoveryPageProps} from '../types'
 
 const I18n = createI18nScope('discovery_page')
+const MODAL_HASH = '#discovery_config'
 
-function DiscoveryPageInner({initialEnabled, onChange}: DiscoveryPageProps) {
+export function DiscoveryPage({initialEnabled, onChange}: DiscoveryPageProps) {
   const [isEnabled, setIsEnabled] = useState(initialEnabled)
-  const {modalOpen, setModalOpen} = useDiscovery()
+  const [modalOpen, setModalOpen] = useHashState(MODAL_HASH)
 
-  const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.checked
     setIsEnabled(newValue)
     onChange(newValue)
   }
 
-  const handleConfigure = () => setModalOpen(true)
-
   return (
     <View as="div" data-testid="discovery-page">
       <Flex as="div" direction="row" alignItems="center" gap="small">
         <Flex.Item>
-          <Button onClick={handleConfigure} margin="0" data-testid="configure-button">
+          <Button onClick={() => setModalOpen(true)} margin="0" data-testid="configure-button">
             {I18n.t('Configure')}
           </Button>
         </Flex.Item>
 
         <Flex.Item>
           <FormFieldGroup
-            description={
-              <ScreenReaderContent>
-                {I18n.t('Use Identity Service discovery page')}
-              </ScreenReaderContent>
-            }
+            description={<ScreenReaderContent>{I18n.t('Use discovery page')}</ScreenReaderContent>}
           >
             <Checkbox
               checked={isEnabled}
               data-testid="discovery-page-toggle"
-              label={I18n.t('Use Identity Service discovery page')}
+              label={I18n.t('Use discovery page')}
               labelPlacement="end"
               onChange={handleToggle}
               variant="toggle"
@@ -73,13 +68,5 @@ function DiscoveryPageInner({initialEnabled, onChange}: DiscoveryPageProps) {
 
       <ConfigureModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </View>
-  )
-}
-
-export function DiscoveryPage({initialEnabled, onChange}: DiscoveryPageProps) {
-  return (
-    <DiscoveryProvider>
-      <DiscoveryPageInner initialEnabled={initialEnabled} onChange={onChange} />
-    </DiscoveryProvider>
   )
 }

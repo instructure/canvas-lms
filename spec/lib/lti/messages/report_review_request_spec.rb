@@ -61,6 +61,20 @@ describe Lti::Messages::ReportReviewRequest do
     expect(subject["#{IMS_CLAIM_PREFIX}/submission"]["id"]).to eq(asset_report.asset.submission.lti_attempt_id)
   end
 
+  context "when asset is a discussion entry" do
+    let(:submission) { submission_model(assignment:) }
+    let(:topic) { assignment.context.discussion_topics.create! }
+    let(:entry) { topic.discussion_entries.create!(message: "hello", user: submission.user) }
+    let(:dev) { entry.discussion_entry_versions.first }
+    let(:asset) { lti_asset_model(submission:, discussion_entry_version: dev) }
+    let(:asset_report) { lti_asset_report_model(asset_processor:, asset:) }
+
+    it "uses discussion submission claim format matching contribution notice" do
+      expected = "#{submission.lti_id}:#{dev.id}:#{entry.attachment_id}"
+      expect(subject["#{IMS_CLAIM_PREFIX}/submission"]["id"]).to eq(expected)
+    end
+  end
+
   it "includes assetreport type claim" do
     expect(subject["#{IMS_CLAIM_PREFIX}/assetreport_type"]).to eq(asset_report.report_type)
   end

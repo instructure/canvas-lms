@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense} from 'react'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 
 const BulkEdit = React.lazy(() => import('./BulkEdit'))
 

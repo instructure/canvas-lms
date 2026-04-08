@@ -28,7 +28,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('blueprint_coursesLockToggle')
 
@@ -76,7 +76,6 @@ class LockToggle extends Component {
     isLocked: PropTypes.bool.isRequired,
     isToggleable: PropTypes.bool,
     onClick: PropTypes.func,
-    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {

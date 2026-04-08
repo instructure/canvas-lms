@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import createRoot from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {useState, useEffect} from 'react'
 
@@ -27,7 +27,10 @@ const MediaPlayer = ({elementId, mediaId}) => {
       const el = document.getElementById(elementId)
 
       if (el) {
-        const root = createRoot.createRoot(el)
+        const root = render(
+          <CanvasStudioPlayer media_id={mediaId} explicitSize={{width: 550, height: 400}} />,
+          el,
+        )
         setRootRef(root)
       }
     }, 500)
@@ -38,7 +41,8 @@ const MediaPlayer = ({elementId, mediaId}) => {
   }, [elementId])
 
   if (rootRef) {
-    rootRef.render(
+    rerender(
+      rootRef,
       <CanvasStudioPlayer media_id={mediaId} explicitSize={{width: 550, height: 400}} />,
     )
   }

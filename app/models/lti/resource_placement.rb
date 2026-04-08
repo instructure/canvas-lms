@@ -25,7 +25,7 @@ require "lti_advantage"
 module Lti
   class InvalidMessageTypeForPlacementError < StandardError; end
 
-  class ResourcePlacement < ActiveRecord::Base
+  class ResourcePlacement < ApplicationRecord
     # *** Placements and messages constants & helpers: ***
 
     CANVAS_PLACEMENT_EXTENSION_PREFIX = "https://canvas.instructure.com/lti/"

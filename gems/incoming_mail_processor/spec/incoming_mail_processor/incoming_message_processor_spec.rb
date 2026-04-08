@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 MAIL_FIXTURES_PATH = File.dirname(__FILE__) + "/../fixtures/"
 
 RSpec::Matchers.define :imap_account_with_creds do |user, pass|

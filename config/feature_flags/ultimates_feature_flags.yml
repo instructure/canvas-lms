@@ -6,3 +6,10 @@ pendo_extended:
   display_name: Pendo Extended Metadata
   description: When enabled, includes additional metadata information for Pendo
   shadow: true
+institutional_tags:
+  type: setting
+  state: hidden
+  applies_to: RootAccount
+  shadow: true
+  display_name: Institutional Tags
+  description: Create user tags at the root account level.

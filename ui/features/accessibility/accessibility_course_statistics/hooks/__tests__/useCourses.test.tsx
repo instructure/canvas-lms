@@ -57,8 +57,12 @@ describe('useCourses', () => {
     order: 'asc' | 'desc' = 'asc',
     page = 1,
     search = '',
+    enrollment_term_id?: string,
   ) => {
-    return renderHook(() => useCourses({accountId, sort, order, page, search}), {wrapper})
+    return renderHook(
+      () => useCourses({accountId, sort, order, page, search, enrollment_term_id}),
+      {wrapper},
+    )
   }
 
   it('fetches courses successfully', async () => {
@@ -165,6 +169,7 @@ describe('useCourses', () => {
       'asc',
       1,
       '',
+      undefined,
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -188,6 +193,7 @@ describe('useCourses', () => {
       'asc',
       1,
       'biology',
+      undefined,
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -256,6 +262,7 @@ describe('useCourses', () => {
       'asc',
       1,
       '',
+      undefined,
     ])
     expect(cachedData).toBeTruthy()
   })
@@ -293,6 +300,80 @@ describe('useCourses', () => {
 
     const course = result.current.data?.courses[0]
     expect(course?.accessibility_course_statistic).toBeNull()
+  })
+
+  describe('enrollment_term_id', () => {
+    it('includes enrollment_term_id in request when provided', async () => {
+      let requestParams: URLSearchParams | undefined
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, ({request}) => {
+          requestParams = new URL(request.url).searchParams
+          return HttpResponse.json(createMockCourses(1))
+        }),
+      )
+
+      const {result} = renderUseCourses('course_name', 'asc', 1, '', '42')
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      expect(requestParams?.get('enrollment_term_id')).toBe('42')
+    })
+
+    it('omits enrollment_term_id from request when not provided', async () => {
+      let requestParams: URLSearchParams | undefined
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, ({request}) => {
+          requestParams = new URL(request.url).searchParams
+          return HttpResponse.json(createMockCourses(1))
+        }),
+      )
+
+      const {result} = renderUseCourses()
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      expect(requestParams?.has('enrollment_term_id')).toBe(false)
+    })
+
+    it('includes enrollment_term_id in query key for proper caching', async () => {
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, () =>
+          HttpResponse.json(createMockCourses(1)),
+        ),
+      )
+
+      const {result} = renderUseCourses('course_name', 'asc', 1, '', '42')
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      const cachedData = queryClient.getQueryData([
+        'accessibility-courses',
+        accountId,
+        'course_name',
+        'asc',
+        1,
+        '',
+        '42',
+      ])
+      expect(cachedData).toBeTruthy()
+    })
+
+    it('returns empty courses and pageCount 1 when API responds with 404', async () => {
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/courses`, () =>
+          HttpResponse.json({errors: [{message: 'not found'}]}, {status: 404}),
+        ),
+      )
+
+      const {result} = renderUseCourses('course_name', 'asc', 1, '', 'nonexistent-term')
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+      expect(result.current.data?.courses).toEqual([])
+      expect(result.current.data?.pageCount).toBe(1)
+    })
   })
 
   describe('pagination', () => {

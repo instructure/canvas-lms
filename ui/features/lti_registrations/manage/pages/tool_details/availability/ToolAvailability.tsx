@@ -130,43 +130,48 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
               </List>
             ) : (
               <Alert variant="info" margin="0" renderCloseButtonLabel="">
-                <Text>
-                  {I18n.t(
-                    "This tool hasn't been deployed to any sub-accounts or courses. To add availability and exceptions, first create a root account–level deployment. By default, the root account level deployment won’t be available to users, but you can adjust this after creation if needed.",
-                  )}
-                </Text>
-                <Button
-                  color="primary"
-                  size="small"
-                  margin="small 0 0 0"
-                  interaction={creatingDeployment ? 'disabled' : 'enabled'}
-                  onClick={async () => {
-                    setCreatingDeployment(true)
-                    try {
-                      const result = await createDeployment({
-                        registrationId: registration.id,
-                        accountId: props.accountId,
-                        available: false,
-                      })
-                      if (result._type === 'Success') {
-                        controlsQuery.refetch()
-                        showFlashAlert({
-                          type: 'success',
-                          message: I18n.t('Root-level deployment created'),
-                        })
-                      } else {
-                        showFlashAlert({
-                          type: 'error',
-                          message: I18n.t('There was an error when creating the deployment'),
-                        })
-                      }
-                    } finally {
-                      setCreatingDeployment(false)
-                    }
-                  }}
-                >
-                  {I18n.t('Create Deployment')}
-                </Button>
+                <Flex as="div" margin="0 0 0 0" direction="column">
+                  <Text>
+                    {I18n.t(
+                      "This tool hasn't been deployed to any sub-accounts or courses. To add availability and exceptions, first create a root account–level deployment. By default, the root account level deployment won’t be available to users, but you can adjust this after creation if needed.",
+                    )}
+                  </Text>
+                  <Flex.Item>
+                    <Button
+                      color="primary"
+                      size="small"
+                      margin="small 0 0 0"
+                      display="inline-block"
+                      interaction={creatingDeployment ? 'disabled' : 'enabled'}
+                      onClick={async () => {
+                        setCreatingDeployment(true)
+                        try {
+                          const result = await createDeployment({
+                            registrationId: registration.id,
+                            accountId: props.accountId,
+                            available: false,
+                          })
+                          if (result._type === 'Success') {
+                            controlsQuery.refetch()
+                            showFlashAlert({
+                              type: 'success',
+                              message: I18n.t('Root-level deployment created'),
+                            })
+                          } else {
+                            showFlashAlert({
+                              type: 'error',
+                              message: I18n.t('There was an error when creating the deployment'),
+                            })
+                          }
+                        } finally {
+                          setCreatingDeployment(false)
+                        }
+                      }}
+                    >
+                      {I18n.t('Create Deployment')}
+                    </Button>
+                  </Flex.Item>
+                </Flex>
               </Alert>
             )}
             {hasNextPage && (

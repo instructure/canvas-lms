@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Role < ActiveRecord::Base
+class Role < ApplicationRecord
   NULL_ROLE_TYPE = "NoPermissions"
 
   ENROLLMENT_TYPES = %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment ObserverEnrollment].freeze

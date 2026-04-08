@@ -192,7 +192,7 @@ class FeatureFlagsController < ApplicationController
   def enabled_features
     if authorized_action(@context, @current_user, :read)
       features = Feature.applicable_features(@context).filter_map { |fd| @context.lookup_feature_flag(fd.feature) }
-                        .select(&:enabled?).map(&:feature)
+                                                      .select(&:enabled?).map(&:feature)
       render json: features
     end
   end

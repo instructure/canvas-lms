@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class PageView < ActiveRecord::Base
+class PageView < ApplicationRecord
   self.primary_key = "request_id"
 
   belongs_to :developer_key
@@ -141,8 +141,8 @@ class PageView < ActiveRecord::Base
   end
 
   def self.from_attributes(attrs)
-    @blank_template ||= columns.each_with_object({}) do |c, h|
-      h[c.name] = nil
+    @blank_template ||= columns.to_h do |c|
+      [c.name, nil]
     end
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current

@@ -95,17 +95,8 @@
               {{#ifEqual module_count 1}}
                 {{module_name}} {{#t}}Module{{/t}}
               {{else}}
-                <a
-                  title='{{joined_names}}'
-                  class="tooltip_link"
-                  data-tooltip-selector="#module_tooltip_{{labelId}}"
-                >{{#t}}Multiple Modules{{/t}}</a>
+                <span id="module_tooltip_mount_{{labelId}}"></span>
               {{/ifEqual}}
-              <div id="module_tooltip_{{labelId}}" style="display:none;">
-                {{#each modules}}
-                  <span>{{this}}</span>
-                {{/each}}
-              </div>
             </div>
           {{/if}}
         {{/if}}

@@ -24,7 +24,7 @@ import $ from 'jquery'
 import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 const I18n = createI18nScope('assignment_grading_type')
@@ -200,10 +200,12 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
         : undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
+  const element = React.createElement(GradingSchemesSelector, props)
   if (!this.root) {
-    this.root = createRoot(mountPoint)
+    this.root = render(element, mountPoint)
+  } else {
+    rerender(this.root, element)
   }
-  this.root.render(React.createElement(GradingSchemesSelector, props))
 }
 
 export default GradingTypeSelector

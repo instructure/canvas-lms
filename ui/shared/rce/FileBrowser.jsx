@@ -136,7 +136,13 @@ class FileBrowser extends React.Component {
   populateRootFolder(data, opts = {}) {
     this.decreaseLoadingCount()
     this.populateCollectionsList([data], opts)
-    this.getFolderData(data.id)
+    // Read locked status from the API response directly rather than from
+    // this.state, because React 18's automatic batching may not have
+    // committed the populateCollectionsList setState yet.
+    if (!data.locked_for_user) {
+      this.getPaginatedData(this.folderFileApiUrl(data.id, 'folders'), this.populateCollectionsList)
+      this.getPaginatedData(this.folderFileApiUrl(data.id), this.populateItemsList)
+    }
   }
 
   getFolderData(id) {

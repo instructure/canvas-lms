@@ -2056,12 +2056,14 @@ he:
   admins_3e1dce15: "מנהלי מערכת"
   admins_add_remove_26811ce5: "מנהלי מערכת - הוסף / הסר"
   advanced_turnitin_settings_9ee84a38: "הגדרות מתקדמות של Turnitin"
+  advanced_vericite_settings_4f2afd5b: "הגדרות מתקדמות של VeriCite "
   afghanistan_93_ab06805: "אפגניסטן (+93)"
   after_48b9d69: לאחר...
   after_4c71e718: לאחר
   after_date_981cd41b: "אחרי %{date}"
   after_last_attempt_c9168da2: "בתום הנסיון האחרון"
   after_the_assignment_is_graded_53754607: "אחרי שהמטלה מוערכת"
+  after_the_due_date_b7ac51f4: "לאחר תאריך היעד"
   after_the_due_date_eee89c9c: "אחרי תאריך היעד"
   agenda_b010136d: "סדר יים"
   ahead_21f22939: בהמשך
@@ -3532,6 +3534,7 @@ he:
       כל משתמשי הקורס יראו את הממשק החדש. כדי לגרום לכך שגם ייראה כאשר הם מנווטים אל דף הקבצים האישיים של המשתמש ('/files') יש צורך להפעיל גם לחשבון בו הם חברים.
   between_1_and_5_f2a74bcf: "בין 1 ל 5"
   between_1_and_99_d421a4c0: "בין 1% ל 99%"
+  bibliographic_material_42d9ed3c: "חומר ביבליוגרפי"
   big_blue_button_conference: 
     recording_setting: מקליט
     recording_setting_enabled_description: "הפעלת אפשרות הקלטה בשיחת ועידה זו"
@@ -4282,6 +4285,7 @@ he:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "בחירת צבע או כינוי קורס או העברת כרטיס של הקורס %{course}"
   choose_a_course_home_page_8059c7b: "בחירת דף הבית של הקורס"
   choose_a_csv_file_to_upload_9644480c: "בחירת קובץ CSV להעלאה:"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "בחר/י את האפשרות של הערכה מחודשת, לתלמידים אשר לקחו ענו על הבוחן. קנבס יבצע הערכה מחדש של כל ההגשות שלך לאחר שתשמור/י את הבוחן. (יתכן שציוני תלמידים ישתנו). "
   choose_a_timezone_d9c52998: "בחירת איזור זמן"
   choose_an_authentication_service_47dc8875: "בחירה של שירות אימות ההזדהות"
   choose_and_publish_980812cb: "בחירה ופרסום"
@@ -4601,6 +4605,7 @@ he:
     profile: 
       notices: 
         contact_registered: "שיטת ההתקשורת נרשמה! "
+  compare_against_d7a750ce: "השוואה מול"
   complete_4f4efbc: השלמה
   complete_all_items_e1779257: "יש להשלים את כל הפריטים"
   complete_fd828dea: הושלם
@@ -7574,6 +7579,7 @@ he:
   display_totals_for_all_grading_periods_option_4a72586: "אפשרות הצגת סה\"כ לכל תקופת ההערכה."
   district_id_6f408184: "זיהוי מחוז"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "חלוקה לקטעים שווים של %{input_value} דקות. "
+  do_not_consider_84d7b395: "אין צורך להביא בחשבון"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "מטלה זו אינה נספרת בציון הסופי"
   do_nothing_9672b478: "אין צורך לנקוט בפעולה"
   does_not_meet_expectations_b0736d20: "אינו עונה על הציפיות"
@@ -8329,6 +8335,7 @@ he:
   example_school_of_rock_41f32c31: "דוגמה: \"School of Rock\""
   exceeds_expectations_5910fc3a: "מעבר לציפיות"
   exceeds_mastery_1f995dce: "מעבר לרף הנדרש למומחיות"
+  exclude_self_plagiarism_f313288c: "דילוג על העתקה עצמית"
   excuse_this_assignment_for_the_selected_student_af04e132: "התעלם ממשימה זו של התלמיד שנבחר"
   excused_3aab77: נסלח
   excused_5877183c: נסלח!
@@ -8835,6 +8842,7 @@ he:
   getting_started_with_collaborations_794240ba: "תחילת פעילות בשיתופי פעולה"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "מתן ציון אחיד לכל תלמידים עבור *%{assignment.name}* באמצעות כניסה ושליחה של ערך הציון הבא:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "מתן ציון *באחוזים* אחיד לכל תלמידים עבור **%{assignment.name}** באמצעות כניסה ושליחה של ערך הציון הבא:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "מתן קרדיט מלא לכולם בשאלה זו"
   global_announcements_a78912c8: "הודעות גלובליות"
   global_branding_df1cae12: "מיתוג גלובלי"
   global_message_icons: 
@@ -10402,6 +10410,7 @@ he:
   include_course_settings_c4c08764: "הכללת הגדרות הקורס"
   include_deleted_enrollments_1c87684a: "הכללת הרשמות שבוטלו"
   include_deleted_objects_3cced3b5: "הכללת פריטים שבוטלו"
+  include_in_repository_6102bd95: "להכללה במאגר הנתונים"
   include_scores_when_alerting_about_grade_changes_623ec201: "שילוב הציונים בהתראה לגבי שינויי הערכה."
   include_scores_when_alerting_about_grades_89728ae1: "שילוב הציונים בהתראה לגבי מתן הערכה."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
@@ -10569,6 +10578,7 @@ he:
   international_sms_send_from_recipient_s_country_43881ea4: "מסרון בינלאומי - שיגור ממדינת הנמען"
   international_text_messaging_rates_may_apply_d4b4a97a: "יתכן חיוב לפי שיעורי עלות מסרונים בינלאומיים"
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: "מסד נתונים אינטרנטי"
   introduction_43f53b7d: הקדמה
   invalid_address_book_strategy_904a7ada: "איסטרטגיה לא תקינה של פנקס הכתובות"
   invalid_authenticity_token_b753558c: "אסימון הזדהות לא תקין"
@@ -10690,6 +10700,7 @@ he:
   join_the_conversation_using_this_link_link_9017499: "הצטרפות לדיון בעזרת קישור זה: %{link}."
   joined_group_group_name_e3802c04: "הצטרפת לקבוצה %{group_name}"
   joining_81f8b6c9: מצטרפים
+  journals_periodicals_and_publications_ca24673: "ז'ורנלים, כתבי עת ופרסומים"
   jpg_png_or_gif_files_14e360d2: "קבצי jpg, png, או gif "
   jquery: 
     module_sequence_footer: 
@@ -14073,6 +14084,7 @@ he:
   other_1c6d9c79: אחר
   other_carrier_45531207: "קריירה אחרת"
   other_ddacb37d: אחר
+  other_student_papers_bf318f4c: "עבודות אחרות של התלמיד"
   other_timezones_42530564: "איזורי זמן אחרים"
   out_of_formattedoutof_e08e90d5: "מתוך %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "מתוך %{n_assignment.points_possible}"
@@ -16896,6 +16908,7 @@ he:
     ? "true"
     : נכון
   quizzes_tutorial_tray_6f87cdd3: "מגירות הדרכה לבחנים"
+  quoted_material_ffaea62b: "חומר מצוטט"
   radio_button_option_1_a8ec51f9: "אפשרות 1"
   radio_button_option_2_31e50043: "אפשרות 2"
   range_56b2f310: טווח
@@ -17061,6 +17074,7 @@ he:
         name: שם
     welcome_to_canvas: "ברוך בואך לקנבס!"
   registration_url_60e0eaaa: "כתובת הצטרפות"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "הערכה מחודשת אינה אפשרית לשאלה זו כיון שתשובה הוסרה או שסוג השאלה שונה אחרי שהתלמיד השלים הגשה"
   regular_style_checkbox_ee3d71c1: "תיבת סימון רגילה"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "פורסם במסגרת מסלול ההתמחות: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "פורסם במסגרת מסלול התמחות: %{path}"
@@ -18797,6 +18811,7 @@ he:
       back: חזרה
       close: סגירה
       forward: העברה
+  small_matches_581ab241: "התאמות זעירות"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "ב Google Play"
@@ -19036,6 +19051,7 @@ he:
   students_1b8cd07b: תלמידים
   students_are_not_allowed_to_access_test_installati_11b9078: "תלמידים אינם מורשים לגשת להתקנות ניסיוניות"
   students_being_observed_4de3e520: "תלמידים בהשגחה"
+  students_can_see_the_originality_report_f246beb0: "תלמידים יכולים לעיין בדו\"ח המקוריות"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "תלמידים אינם יכולים לעיין בתגובות הבוחן לאחר שקורס מסתיים ונחתם."
   students_have_already_submitted_to_this_discussion_f55db744: "תלמידים כבר תרמו לדיון זה, כך שהגדרות קבוצתיות אינן ניתנות לשינוי"
   students_have_either_already_taken_or_started_taki_a076336: "תלמידים לקחו כבר או לוקחים כעת את הבוחן, כך שיש להיות זהיר לגבי עריכתו. אם משנים שאלת בוחן כלשהי בצורה משמעותית, יש לשקול הערכה מחדש של התלמידים אשר כבר ענו על הגירסה הישנה של הבוחן."
@@ -20092,6 +20108,7 @@ he:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "שיגור מחדש ל Turnitin"
+  turnitin_repository_9f865357: "מאגר Turnitin"
   turnitin_settings: 
     originality_report_never: "לעולם לא"
     originality_report_visible_after_due_date: "לאחר תאריך היעד"
@@ -20203,6 +20220,7 @@ he:
   update_login_472cd6db: "עדכון לוג-אין "
   update_module_b984c2e5: "עדכון מודול"
   update_password_4bc5cb1f: "עדכון סיסמה"
+  update_question_without_regrading_47c9904a: "עדכון שאלה ללא ביצוע הערכה מחודשת"
   update_quota_81381226: "עדכון מכסות"
   update_settings_9b422d0f: "עדכון הגדרות"
   update_tool_7d48ef2a: "עדכון %{tool}"

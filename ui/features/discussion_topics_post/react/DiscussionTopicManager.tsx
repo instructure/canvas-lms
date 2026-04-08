@@ -20,8 +20,8 @@ import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {usePathTransform, whenPendoReady} from '@canvas/pendo'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
@@ -716,7 +716,6 @@ const DiscussionTopicManager = props => {
 
 DiscussionTopicManager.propTypes = {
   discussionTopicId: PropTypes.string.isRequired,
-  breakpoints: breakpointsShape,
   navbarHeight: PropTypes.number,
 }
 

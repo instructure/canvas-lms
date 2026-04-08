@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class MediaObject < ActiveRecord::Base
+class MediaObject < ApplicationRecord
   include Workflow
   include SearchTermHelper
 
@@ -99,12 +99,12 @@ class MediaObject < ActiveRecord::Base
 
   set_policy do
     given do |user|
-      (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_add) || (self.user && self.user == user)))
+      attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_add) || (self.user && self.user == user))
     end
     can :add_captions
 
     given do |user|
-      (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_delete) || (self.user && self.user == user)))
+      attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_delete) || (self.user && self.user == user))
     end
     can :delete_captions
   end

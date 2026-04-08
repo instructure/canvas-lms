@@ -48,6 +48,7 @@ module Factories
       parent_assignment: @parent_assignment,
       **valid_attributes.merge(opts)
     )
+    @parent_assignment.reload
     @peer_review_sub_assignment
   end
 

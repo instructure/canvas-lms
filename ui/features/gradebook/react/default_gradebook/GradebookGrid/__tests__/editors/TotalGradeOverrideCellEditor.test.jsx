@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {act} from 'react'
 import ReactDOM from 'react-dom'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
@@ -100,7 +100,9 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
     }
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Drain React's scheduler before DOM removal to prevent post-teardown errors
+    await act(async () => {})
     if ($container.childNodes.length > 0) {
       editor.destroy()
     }

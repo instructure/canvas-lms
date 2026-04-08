@@ -388,7 +388,7 @@ class RequestThrottle
       @up_front_cost_regex_map ||=
         begin
           hash = RequestThrottle.dynamic_settings["up_front_cost_by_path_regex"] || {}
-          hash.keys.select { |k| k.is_a?(String) }.map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
+          hash.keys.grep(String).map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
           hash.each do |k, v|
             next if k.is_a?(Regexp) && v.is_a?(Numeric)
 

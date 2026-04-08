@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {intersection} from 'es-toolkit/compat'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import decodeFromHex from '@canvas/util/decodeFromHex'
 import userSettings from '@canvas/user-settings'
@@ -214,9 +214,9 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
 }
 
 function setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange) {
-  ReactDOM.unmountComponentAtNode($(`#manage-accounts-btn`)[0])
+  legacyUnmountComponentAtNode($(`#manage-accounts-btn`)[0])
 
-  ReactDOM.render(
+  legacyRender(
     <AccountCalendarsModal
       getSelectedOtherCalendars={getSelectedOtherCalendars}
       onSave={onOtherCalendarsChange}
@@ -351,8 +351,8 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     const assetString = $(this).closest('li').data('context')
 
     // ensures previously picked color clears
-    ReactDOM.unmountComponentAtNode($(`#calendars_color_picker_holder`)[0])
-    ReactDOM.render(
+    legacyUnmountComponentAtNode($(`#calendars_color_picker_holder`)[0])
+    legacyRender(
       <CalendarColorPicker assetString={assetString} />,
       $(`#calendars_color_picker_holder`)[0],
     )

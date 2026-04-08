@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LegacyMultipart::SequencedStream do
   def test_copy(content, content_string)
     source = LegacyMultipart::SequencedStream.new([StringIO.new("prefix|"), content, StringIO.new("|suffix")])

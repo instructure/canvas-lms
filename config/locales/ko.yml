@@ -260,6 +260,7 @@ ko:
   a_placeholder_sticker_with_a_smiley_face_and_a_plu_e8c6ba4: "웃는 얼굴과 더하기 기호가 있는 자리 표시자 스티커입니다."
   a_process_is_already_in_progress_f4495f5e: "프로세스가 이미 진행 중입니다."
   a_recovery_email_has_been_sent_to_email_please_che_6fedd4fe: "복구 이메일을 %{email}(으)로 보냈습니다. 수신함을 확인하고 안내를 따라서 비밀번호를 초기화하세요. 최대 10분이 걸릴 수 있습니다. 이메일을 받지 않는 경우, 스팸 폴더를 확인하세요."
+  a_recovery_email_has_been_sent_to_username_please__1b0a95bb: "복구 이메일을 %{username}(으)로 보냈습니다. 수신함을 확인하고 안내를 따라서 비밀번호를 초기화하세요. 최대 10분이 걸릴 수 있습니다. 이메일을 받지 않는 경우, 스팸 폴더를 확인하세요."
   a_request_is_already_in_progress_7a149a13: "요청이 이미 진행 중입니다"
   a_role_name_is_required_47efd33: "역할 이름은 필수입니다"
   a_rubric_that_has_been_used_for_grading_cannot_be__71b1314f: "성적 평가에 사용된 루브릭을 덮어쓸 수 없습니다."
@@ -499,6 +500,7 @@ ko:
   account_580e7fda: 계정
   account_97b34646: 계정
   account_account_b6b3746b: "계정: %{account}"
+  account_accountname_2e614462: "계정: %{accountName}"
   account_administrators_can_always_create_courses_926dc0cb: "계정 관리자는 항상 과목을 만들 수 있습니다"
   account_administrators_can_create_custom_status_la_e2a601bf: "계정 관리자는 교강사가 성적부에서 사용할 수 있는 사용자 지정 상태 레이블을 만들 수 있습니다. 이런 사용자 지정 레이블은 결석 또는 지각과 같이 레이블에 연결된 기능이 없습니다. 관리자는 또한 기본값 상태 레이블을 사용 중지할 수 있으며 전체 인스턴스에서 사용되는 것을 막을 수 있습니다."
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "계정 및 과목 수준 성과 정복 배율"
@@ -626,6 +628,7 @@ ko:
   account_name_7f63a13: "계정 이름"
   account_name_analytics_62bf60ae: "%{account.name} 분석"
   account_name_bff54ed5: "계정 이름"
+  account_name_does_not_match_please_try_again_d2e1848c: "계정 이름이 일치하지 않습니다. 다시 시도하세요."
   account_name_is_required_e8a7c0f9: "계정 이름은 필수입니다"
   account_navigation_80bbefd4: "계정 탐색"
   account_navigation_menu_10c05bf9: "계정 탐색 메뉴"
@@ -1201,7 +1204,7 @@ ko:
           date_hint: "위에서 '마지막 제출 날짜'를 선택한 날짜를 선택"
           enrollment_term: "등록 학기(선택 사항)"
           excluded_course_codes: "제외된 과목 코드"
-          excluded_course_codes_hint: "쉼표로 구분하여 최대 10개 과목 코드를 입력합니다. 과목 코드는 대소문자를 구분합니다(예, SOR1101 ≠ sor1101). 공백은 자동으로 자릅니다."
+          excluded_course_codes_hint: "쉼표로 구분하여 최대 10개 패턴을 입력합니다. 대소문을 구분하지 않음을 사용 일치를 포함 — 예, 'sor1101' 는 SOR1101, SOR1101_CO, ADVANCED_SOR1101_LAB 등을 제외. 공백은 자동으로 자릅니다."
           last_seven_days: "최근 7일"
           last_seven_days_hint: "최근 7일(오늘 제외)에서 활동을 표시"
           last_submission_date: "마지막 제출 날짜"
@@ -2435,6 +2438,7 @@ ko:
   additional_comments_9aed10bb: "추가 댓글"
   additional_considerations_f3801683: "추가 고려 사항"
   additional_feedback_175ac2c9: "추가 피드백"
+  additional_filters_d4ad7373: "추가 필터링"
   additional_occurrence_s_7b5b0173: "추가 발생"
   additional_options_7cefee79: "추가 옵션"
   additional_prompt_information_15d23406: "추가 프롬프트 정보"
@@ -2514,6 +2518,7 @@ ko:
   after_last_attempt_c9168da2: "마지막 시도 이후"
   after_logging_out_of_canvas_instruct_identity_prov_dc853c9a: "Canvas에서 로그아웃한 후에 ID 공급자에게 다음 로그인 시도에서 사용자를 다시 인증하도록 지시합니다. 예상하지 못한 로그인 루프를 예방할 수 있습니다."
   after_the_assignment_is_graded_53754607: "과제 채점 이후"
+  after_the_due_date_b7ac51f4: "기한 이후"
   after_the_due_date_eee89c9c: "기한 이후"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "첫 시도 이후에 과제를 제출할 때까지 댓글을 남길 수 있습니다."
   after_this_change_the_toolname_tool_deployment_id__245d0a01: "이 변경 이후에 %{toolName} 도구(배포 ID: %{deploymentId})는  %{courseName} 과목에서 삭제될 것입니다."
@@ -2711,6 +2716,7 @@ ko:
   all_submissions_3eedfb97: "모든 제출"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "모든 제출에는 선택한 점수가 있어야 합니다."
   all_terms_cd27b0fb: "모든 학기"
+  all_terms_ce69fff: "모든 학기"
   all_timezones_5e8afa7b: "모든 표준 시간대"
   all_types_allowed_287eb6b0: "모든 유형이 허용됨"
   all_ungraded_artifacts_ec3ba09: "모든 채점하지 않은 산출물"
@@ -2956,6 +2962,7 @@ ko:
   allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: "사용자가 계정 수준 및 과목 수준에서 성과 및 성과 그룹을 만들기, 편집 및 삭제하는 것을 허용합니다."
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: "사용자가 과목 수준에서 성과 및 성과 그룹을 만들기, 편집 및 삭제하는 것을 허용합니다."
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "사용자가 루브릭을 만들기, 편집 및 삭제하는 것을 허용합니다."
+  allows_user_to_create_institutional_tags_8187ad8c: "사용자가 기관 태그를 만드는 것을 허용합니다."
   allows_user_to_create_modify_and_delete_global_sit_bd57ed4e: "사용자가 전역(사이트 관리자) 개발자 키 및 LTI 구성을 만들고 수정하고 삭제하는 것을 허용합니다."
   allows_user_to_create_new_conferences_in_courses_a_80899f64: "사용자가 과목 및 그룹에서 새 컨퍼런스를 만드는 것을 허용합니다."
   allows_user_to_create_new_rate_limit_settings_for__4104f319: "사용자가 외부 도구 및 통합에 대해 새로운 속도 제한을 만드는 것을 허용합니다."
@@ -3009,6 +3016,7 @@ ko:
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "사용자가 SpeedGrader에서 학점을 편집하고 댓글을 추가하는 것을 허용합니다."
   allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: "사용자가 성적부에 학점을 편집하는 것을 허용합니다."
   allows_user_to_edit_grading_schemes_98c35117: "사용자가 성적 평가 기준을 편집하는 것을 허용합니다."
+  allows_user_to_edit_institutional_tags_ff7a9383: "사용자가 기관 태그를 편집하는 것을 허용합니다."
   allows_user_to_edit_lock_settings_on_individual_as_80ed188a: "사용자가 개별 과제, 페이지 또는 토론에서 잠금 설정을 편집하는 것을 허용합니다."
   allows_user_to_edit_lock_settings_on_the_assignmen_4c347262: "사용자가 과제 및 퀴즈 색인 페이지에서 잠금 설정을 편집하는 것을 허용합니다."
   allows_user_to_edit_question_banks_in_a_course_or__f72a39cf: "사용자가 과목 또는 계정에 문제 은행을 편집하는 것을 허용합니다."
@@ -3153,6 +3161,7 @@ ko:
   allows_user_to_view_gradebook_9720b3e2: "사용자가 성적부를 확인하는 것을 허용합니다."
   allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "사용자가 SpeedGrader의 루브릭에서 채점자의 의견을 확인하는 것을 허용합니다."
   allows_user_to_view_groups_in_a_course_8a95805b: "사용자가 과목에서 그룹을 확인하는 것을 허용합니다."
+  allows_user_to_view_institutional_tags_dd657a14: "사용자가 기관 태그를 보는 것을 허용합니다."
   allows_user_to_view_last_activity_and_total_activi_105b5bc3: "사용자가 사용자 페이지에서 최근 활동 및 총 활동 정보를 확인하는 것을 허용합니다."
   allows_user_to_view_last_activity_and_total_activi_1455c521: "사용자가 최근 활동 및 총 활동 보고서를 확인하는 것을 허용합니다."
   allows_user_to_view_last_activity_and_total_activi_786a7286: "사용자가 사용자 페이지에서 최근 활동 및 총 활동 정보를 확인하는 것을 허용합니다."
@@ -3233,6 +3242,7 @@ ko:
   already_belongs_to_an_assignment_override_99fc6f36: "이미 과제 덮어쓰기에 포함"
   already_has_a_rubric_1e05ef65: "(이미 루브릭이 있음)"
   already_have_an_account_866a1a7e: "이미 계정이 있으세요?"
+  already_rejected_1432b585: "이미 거부됨"
   already_translated_into_the_selected_language_35cc3a17: "이미 선택된 언어로 번역되었습니다."
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Microsoft Teams는 %{max_enrollments}개 등록보다 크거나 %{max_owners}명 소유자보다 큰 과목을 지원할 수 없습니다. 과목이 이런 제한을 초과하는 경우 동기화가 중단될 수 있습니다."
   alt_text_611fb322: "대체 텍스트"
@@ -3324,6 +3334,7 @@ ko:
   an_error_occurred_while_deleting_the_allocation_ru_b2179de9: "할당 규칙을 삭제하는 동안 오류가 발생했습니다"
   an_error_occurred_while_deleting_the_appointment_g_aad99e47: "예약 그룹을 삭제하는 동안 오류가 발생했습니다."
   an_error_occurred_while_deleting_the_items_please__7d20b7e1: "항목을 삭제하는 동안 오류가 발생했습니다. 다시 시도하세요."
+  an_error_occurred_while_deleting_the_knowledge_cha_f9ea35be: "지식 채팅을 삭제하는 동안 오류가 발생했습니다"
   an_error_occurred_while_editing_the_rule_aca1a75c: "규칙을 편집하는 동안 오류가 발생했습니다"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "그룹을 편집하는 동안 오류가 발생했습니다. 다시 시도하세요."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "성과를 편집하는 동안 오류가 발생했습니다. 다시 시도하세요."
@@ -3336,6 +3347,7 @@ ko:
   an_error_occurred_while_fetching_sections_253619f4: "분반을 가져오는 동안 오류가 발생했습니다"
   an_error_occurred_while_fetching_students_aac9d7de: "학생을 가져오는 동안 오류가 발생했습니다"
   an_error_occurred_while_fetching_the_folders_dff70881: "폴더를 가져오는 동안 오류가 발생했습니다."
+  an_error_occurred_while_grading_please_try_again_l_a60f0ab: "채점하는 동안 오류가 발생했습니다. 나중에 다시 시도하세요."
   an_error_occurred_while_importing_rubrics_a94c2802: "루브릭을 가져오는 동안 오류가 발생했습니다."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "성과를 가져오는 동안 오류가 발생했습니다."
   an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "성과를 가져오는 동안 오류가 발생했습니다: %{message}."
@@ -3395,6 +3407,7 @@ ko:
   an_error_occurred_while_starting_the_deletion_9227c647: "삭제를 시작하는 동안 오류가 발생했습니다."
   an_error_occurred_while_switching_dashboard_views_6a9ca00f: "대시보드 보기를 전환하는 동안 오류가 발생했습니다"
   an_error_occurred_while_terminating_sessions_pleas_86af4411: "세션을 종료하는 동안 오류가 발생했습니다. 다시 시도하세요."
+  an_error_occurred_while_toggling_dark_mode_ea5aa052: "어두운 모드를 토글하는 동안 오류가 발생했습니다"
   an_error_occurred_while_trying_to_change_the_setti_6fb01994: "설정을 변경하려고 시도하는 동안 오류가 발생했습니다"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "UI를 변경하려고 시도하는 동안 오류가 발생했습니다"
   an_error_occurred_while_unpublishing_course_408a0294: "과목을 게시 취소하는 동안 오류가 발생했습니다"
@@ -3606,6 +3619,7 @@ ko:
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "익명으로 채점된 과제는 그룹 과제가 될 수 없음"
   another_assignment_name_369f8481: "다른 과제 이름"
   another_configuration_is_currently_selected_select_95b394e: "현재 다른 구성이 선택되었습니다.  이 구성을 선택하면 다른 구성이 선택 해제됩니다."
+  another_tool_configuration_uses_this_domain_name_t_71d0c9b9: "다른 도구 구성에서 다음 도메인을 사용: *%{name}*. 충돌을 피하려면 가용성 설정이 중복되지 않도록 확인합니다."
   answer_answerid_97fc4afc: "답변 %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}, (정답)"
   answer_description_6b353cfd: "답변 설명"
@@ -3642,9 +3656,13 @@ ko:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "앱 센터는 과목 또는 계정의 설정 페이지의 \"앱\" 탭에 표시됩니다. 아래에 제공한 URL은 유효한 앱 센터 엔드포인트를 가리켜야 합니다(예를 들어, %{url} -- 끝에 슬래시를 생략하세요"
   app_installed_successfully_462cb60: "앱이 설치되었습니다."
   app_installed_successfully_94ddd6f1: "앱이 설치되었습니다."
+  app_is_locked_a46ca37b: "앱이 잠김"
+  app_is_unlocked_d8ce4417: "앱이 잠김 해제됨"
+  app_locked_successfully_a6dc723c: "앱이 잠겼습니다."
   app_name_3f58de4f: "앱 이름"
   app_placements_6d877225: "앱 배치"
   app_reregistration_87cc8817: "앱 다시 등록"
+  app_unlocked_successfully_88183336: "앱이 잠김 해제되었습니다."
   app_updated_successfully_6c353a8e: "앱이 업데이트되었습니다."
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app}은(는) 관리자가 설치했으며 잠겨 있음"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app}은(는) 마스터 과목에서 설치했으며 잠겨 있음"
@@ -3806,6 +3824,7 @@ ko:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "이 성적 평가 기간 집합을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "이 성적 평가 기간을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "이 성적 평가 기준을 삭제하시겠습니까?"
+  are_you_sure_you_want_to_delete_this_knowledge_cha_e574ed72: "이 지식 채팅을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
   are_you_sure_you_want_to_delete_this_page_2185844: "이 페이지를 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_planner_item_b71e330c: "이 플래너 항목을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_rate_limit_se_19fbc6b: "이 속도 제한 설정을 삭제하시겠습니까?"
@@ -4571,6 +4590,7 @@ ko:
       locked_until: "검토 할당"
       peer_reviews_assign_at_explanation: "기한 이후의 날짜여야 합니다. 공란으로 두면 기한일을 사용합니다."
       peer_reviews_header: "동료 검토"
+      peer_reviews_locked_legacy_mode: "이 과제는 채점된 동료 검토로 만들었기 때문에 동료 검토 설정을 변경할 수 없습니다."
       reviews_per_user: "사용자별 검토"
     points_possible_number: "가능한 점수는 숫자이어야 함"
     positive_number: "양수를 사용해야 함"
@@ -4945,6 +4965,7 @@ ko:
   attachment_deffe5a9: 첨부
   attachment_id_5ed90a5b: "첨부 ID"
   attachment_ids_1a106608: "첨부 ID"
+  attachment_not_found_82269229: "첨부 파일을 찾을 수 없음."
   attachments_694cf227: 첨부
   attempt_3dd42b18: 시도
   attempt_attempt_d3911720: "%{attempt} 시도"
@@ -5009,6 +5030,7 @@ ko:
   authentication_provider/saml: 
     debug: 
       logout_redirect: "LogoutRequest을(를) IdP에 보냄"
+  authentication_provider_is_required_4b25e6b3: "인증 공급자는 필수"
   authentication_providers: 
     account_required: "LDAP으로 인증되어야 함"
     debugging: 
@@ -5249,6 +5271,7 @@ ko:
   between_parentheses_e_g_d09087_28c4448c: "괄호 사이에. 예, (D09087)"
   between_square_brackets_e_g_principal_64797b64: "대괄호 사이에., [교장]"
   between_two_assessments_the_most_recent_assessment_9f616a5d: "2개 평가 사이에 가장 최근 평가는 %{calculation_int} 가중치를 갖게 되며 첫 번째 평가는 %{remainder} 가중치를 갖게 됩니다. 각 추가적 평가에 대해 이전 점수 계산의 합계는 추가 %{remainder} 감소됩니다. 한 개의 결과만 있는 경우 단일 점수를 반환합니다."
+  bibliographic_material_42d9ed3c: "참고 문헌 자료"
   big_blue_button_conference: 
     create_time: "만들기 시간"
     recording_setting: 녹화
@@ -5443,6 +5466,7 @@ ko:
   button_a6fb7727: 버튼
   button_background_should_have_sufficient_contrast__3a1d2165: "버튼 배경은 주변 콘텐츠와 충분한 대비도가 있어야 합니다(최소 3:1 비율)."
   button_color_a14b2d46: "버튼 색"
+  button_icon_b2a1f150: "버튼 아이콘"
   button_layout_c56f1316: "버튼 레이아웃"
   button_style_f4a0ddc5: "버튼 스타일"
   button_text_4c8cd072: "버튼 텍스트"
@@ -5505,6 +5529,7 @@ ko:
   by_reverting_all_canvas_career_features_will_be_di_30059635: "되돌리면 모든 Canvas Career 기능은 사용 중지됩니다. 되돌리면 간소화된 사용자 인터페이스, 프로그램 관리, AI 기반 실행 가능한 인사이트 등을 포함한 기능들을 잃게 됩니다. 계정을 되돌린 후에는 이 기능을 더 이상 사용할 수 없습니다."
   by_reverting_this_course_all_canvas_career_feature_5e246288: "이 과목을 되돌리면 모든 Canvas Career 기능은 사용 중지됩니다. 삭제된 또는 바뀐 콘텐츠는 그대로 남게 되며 복원할 수 없습니다. 과목을 되돌리면 진행률 표시줄, 노트북 작성, AI 어시스트, Skillspace 업적 및 추정 시간 메타데이터를 포함하여 기능을 잃게 됩니다. 과목을 되돌린 후에는 이 기능을 더 이상 사용할 수 없습니다."
   by_selecting_make_all_discussions_threaded_you_wil_cf286418: "'모든 토론을 스레드로 만들기'를 선택하면 과목에 모든 스레드 형식이 아닌 토론을 스레드로 업데이트합니다. 이 동작은 '스레드된 응답 허용하지 않음' 옵션에 확인을 취소하여 모든 토론에 대해 스레드 응답을 사용합니다."
+  by_submitting_this_report_you_agree_to_share_your__1c5f661f: "이 보고서를 제출함으로 현재 대화를 Instructure에서 개선에 사용할 수 있도록 공유하기로 동의합니다."
   by_url_a163275e: URL로
   bzzzzt_try_again_1eee9e8: "다시 시도하세요."
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -6101,6 +6126,7 @@ ko:
   cannot_be_changed_5d1181f7: "변경할 수 없음"
   cannot_be_changed_at_this_time_grading_error_88f5a96b: "지금은 변경할 수 없음: %{grading_error}"
   cannot_be_changed_because_this_assignment_is_due_i_a529873f: "이 과제는 종료된 성적 평가 기간에 기한이므로 변경할 수 없음"
+  cannot_be_disabled_for_assignments_with_graded_pee_6d84494e: "레거시 모드에서 채점된 동료 검토가 있는 과제에 대해 사용 중지할 수 없음"
   cannot_be_disabled_when_students_have_already_subm_cf0c73c6: "학생이 이미 검토를 제출했으면 사용 중지할 수 없음"
   cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: "종료된 성적 평가 기간의 과제는 편집할 수 없음"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "account_id이(가) null이면 null이 될 수 없음"
@@ -6228,6 +6254,7 @@ ko:
   canvas_career_loading_error_7aaf08fa: "Canvas Career 로드 중 오류"
   canvas_career_manage_bulk_api_permission_cea0ae85: "Canvas Career: 일괄 API 및 권한 관리"
   canvas_career_manual_dashboard_builder_14f6ae3e: "Canvas Career: 수동 대시보드 빌더"
+  canvas_career_native_inbox_97eb8bd9: "Canvas Career: 네이티브 수신함"
   canvas_career_offers_a_streamlined_experience_desi_1c87237d: "Canvas Career는 개인 학습을 위해 설계된 간소화된 환경을 제공합니다. 토론, 공동 작업 및 성과는 포함되지 않습니다. 원활한 학습 경험을 보장하기 위해 모든 콘텐츠는 게시하는 모듈 내에 있어야 합니다. 과제는 제출 유형 선택을 지원하도록 개선되어 더욱 개인에 맞춤형 환경을 제공합니다. 그룹 과제는 지원하지 않습니다."
   canvas_career_permissions_page_a88a672b: "Canvas Career: 권한 페이지"
   canvas_career_program_management_14e9b7ff: "Canvas Career: 프로그램 관리"
@@ -6447,10 +6474,12 @@ ko:
   check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "방화벽 설정을 확인하세요. 모든 Canvas IP 주소가 서버에 액세스하는 것이 허용되었습니까?"
   check_your_knowledge_9f655098: "지식 확인"
   check_your_spelling_or_try_fewer_letters_70769a90: "철자를 확인하거나 더 적은 글자 수로 시도하세요."
+  check_your_understanding_of_a_topic_with_an_educat_b673585a: "교육자 구성 지식 채팅으로 주제에 대한 이해를 확인"
   checking_39d88671: 확인
   checking_add_to_calendar_will_invite_all_course_me_6779c8df: "캘린더에 추가를 확인하면 모든 과목 구성원을 초대합니다."
   checking_c5224101: "확인 중..."
   checking_course_accessibility_6d13c0cd: "과목 접근 가능성을 확인 중..."
+  checking_for_duplicate_domains_6d7bec4c: "중복된  도메인을 확인 중..."
   checkpoint_a8a0cbac: 체크포인트
   checkpoint_settings_30796b6b: "체크포인트 설정"
   checkpoints_19505986: 체크포인트
@@ -6615,6 +6644,7 @@ ko:
   click_request_evaluation_to_analyze_this_conversat_abbe1e14: "'평가 요청'을 클릭하여 이 대화를 분석"
   click_the_admin_navigation_button_to_access_accoun_38d881bf: "관리자 탐색 버튼을 클릭하여 계정 설정에 액세스합니다."
   click_the_button_above_to_add_content_4c7024a: "위에 버튼을 클릭하여 콘텐츠를 추가"
+  click_the_create_new_button_to_start_building_your_3fcde727: "새로 만들기 버튼을 클릭하여 첫 지식 채팅을 구축하기 시작합니다."
   click_the_create_new_button_to_start_building_your_7ba9cdb5: "새로 만들기 버튼을 클릭하여 첫 AI 경험을 구축하기 시작합니다."
   click_the_icon_to_add_a_calendar_b9ab4f7f: "\"+\" 아이콘을 클릭하여 캘린더를 추가"
   click_to_add_a_name_6cf551b0: "클릭하여 이름을 추가합니다."
@@ -6710,6 +6740,7 @@ ko:
   close_grade_info_58ef5a20: "점수 정보 닫기"
   close_help_dialog_653a6549: "도움말 대화 상자 닫기"
   close_help_tray_bb1299f6: "도움말 트레이를 닫습니다."
+  close_modal_4d1e5368: "모달 닫기"
   close_move_tray_8609e988: "이동 트레이 닫기"
   close_opportunity_center_popup_9907d981: "기회 센터 팝업 닫기"
   close_peer_comments_94453a35: "동료 의견 닫기"
@@ -6735,6 +6766,7 @@ ko:
   closed_captioning_2a2f4d8a: 자막
   closed_count_67392f08: "종료됨(%{count})"
   closed_for_comments_e395b42f: "의견 닫힘"
+  closed_remediation_count_issues_set_aside_edd407b0: "수정 닫음(%{count}개 문제 구분됨)"
   closes_5c6b4367: "닫기:"
   closing_remediation_please_wait_158542d8: "수정을 닫는 중. 기다려 주세요..."
   closing_this_module_will_also_remove_the_translate_385468f9: "이 모듈을 닫으면 번역된 공지도 제거됩니다"
@@ -7112,7 +7144,7 @@ ko:
     admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
     admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
     admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
-    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_hangouts_meet_lti: "https://support.google.com/edu/assignments/answer/15138059?sjid=14562273210409030064-NC"
     admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
     admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
     admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
@@ -7135,7 +7167,7 @@ ko:
     basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
     basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
     canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
-    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_30_minute_quickstart: "https://community.instructure.com/en/kb/articles/660621-instructor-getting-started-resources"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.instructure.com/en/kb/articles/662747-what-are-conferences"
     course_pacing: "https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing"
@@ -7187,7 +7219,7 @@ ko:
     instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
     instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
     instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
-    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_notification_preferences: "https://community.instructure.com/en/kb/articles/662894-how-do-i-manage-my-canvas-notification-settings"
     instructor_organize_files: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/How-do-I-move-and-organize-files/ta-p/617197"
     instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
     instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
@@ -7225,6 +7257,7 @@ ko:
     releases_beta_test_schedule: "https://community.instructure.com/en/kb/articles/664262-what-are-the-release-schedules-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: "비교 대상"
   compiling_c29a644f: 컴파일
   compiling_progress_968a3ebb: "컴파일(%{progress}%)"
   complete_1_item_f840fb10: "1개 항목 완료"
@@ -7380,8 +7413,10 @@ ko:
   configuration_update_history_9c760033: "구성 업데이트 기록"
   configuration_updates_applied_to_appname_5eaeff99: "구성 업데이트를 *%{appName}*에 적용했습니다"
   configurations_e6f92f1c: 구성
+  configure_a_native_canvas_discovery_page_when_enab_16ea737e: "네이티브 Canvas Discovery 페이지를 구성합니다. 사용으로 설정하면 Discovery URL 또는 첫 목록에 추가된 인증 방법 대신에 이 페이지를 표시합니다. 사용으로 설정하기 전에 이 페이지를 구성할 수 있으며 활성화해도 위에 저장된 Discovery URL을 삭제하지 않습니다. 이 페이지는 자동으로 테마 편집기에서 로그인 페이지 브랜딩을 상속합니다."
   configure_aspen_client_integration_91f8c934: "Aspen 클라이언트 통합 구성"
   configure_cedar_client_integration_7024ba39: "Cedar 클라이언트 통합 구성"
+  configure_discovery_page_be47f8cc: "Discovery 페이지 구성"
   configure_ecb97e30: 구성
   configure_identity_service_discovery_page_4350db61: "ID 서비스 검색 페이지 구성"
   configure_impact_integration_9bd1189f: "가져오기 통합 구성"
@@ -7428,6 +7463,7 @@ ko:
   confirm_restore_5997203d: "복원 확인"
   confirm_restore_962a19a1: "복원 확인"
   confirm_setting_deletion_ccd62cb6: "설정 삭제 확인"
+  confirm_sis_import_66cf5d82: "SIS 가져오기 확인"
   confirm_sis_import_changes_e66e4a76: "SIS 가져오기 변경 확인"
   confirm_submission_e3b43f1: "제출 확인"
   confirm_suspension_18cc1fd2: "일시 중단 확인"
@@ -8351,6 +8387,7 @@ ko:
   converting_course_to_canvas_career_c9ea22ff: "과목을 Canvas Career로 변환하는 중..."
   converting_e721aa0a: 변환
   converting_tag_overrides_105bf8f2: "태그 덮어쓰기 변환"
+  cookie_consent_necessary_880feee9: "쿠키 콘텐츠 필요"
   cookie_notice_fe4f182e: "쿠키 공지"
   copied_from_2094bec4: "복사 출처"
   copied_to_b437eff8: "복사 대상"
@@ -8935,6 +8972,7 @@ ko:
       media_files_too_large: "전체 파일 크기가 너무 크기 때문에 미디어 파일을 내보내지 않았습니다."
       media_tracks: "일부 미디어 캡션 내보내기 실패"
       module_meta: "모듈 메타 데이터 내보내기 실패"
+      nav_menu_links: "탐색 메뉴 링크를 내보내지 못함"
       organization: "조직 구조 생성에 실패했습니다."
       question_bank: "\"%{title}\" 문제 은행을 내보내지 못했습니다"
       quiz: "\"%{title}\" 퀴즈를 내보내지 못했습니다"
@@ -9936,6 +9974,7 @@ ko:
   create_update_delete_ab4ba2f4: 만들기/업데이트/삭제
   create_update_delete_view_245d1ed: 만들기/업데이트/삭제/보기
   create_user_access_tokens_99197175: "사용자 액세스 토큰 만들기"
+  create_user_tags_at_the_root_account_level_6c2635e4: "사용자 태그를 루트 계정 수준에 만듭니다."
   create_users_view: 
     required: "이메일 주소 입력"
   create_your_account_2ab8b932: "계정 만들기"
@@ -10489,6 +10528,8 @@ ko:
   define_general_settings_for_locked_objects_in_this_20da2981: "이 과목의 잠긴 개체에 대한 일반 설정을 정의합니다. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "이 과목의 잠긴 개체에 대한 설정을 유형별로 정의합니다. "
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "드롭다운 이전 및 이후에 삽입되는 텍스트를 정의하고 가능한 응답의 집합을 만듭니다."
+  define_the_completion_rules_pedagogical_guidance_a_daa69dae: "완료 규칙, 교육학적 가이드 및 LLM(대규모 언어 모델)의 출처를 정의합니다."
+  define_the_instructions_for_the_activity_c819c32c: "활동에 대한 자시 사항을 정의합니다."
   define_the_sourcing_completion_rules_and_personali_d180cd82: "이 IgniteAI의 소스 제공, 완료 규칙 및 특성을 정의합니다."
   delayed_until_58b7af4b: "지연 기간:"
   delete_700fdb58: "삭제 "
@@ -10560,6 +10601,7 @@ ko:
   delete_item_f10f02b: "항목 삭제"
   delete_items_a1d2c64: "항목 삭제"
   delete_key_developername_be80e695: "%{developerName} 키 삭제"
+  delete_knowledge_chat_ae9c7cdc: "지식 채팅 삭제"
   delete_lti_1d1cef27: "LTI 삭제"
   delete_lti_developer_key_4d027ad9: "LTI 개발자 키 삭제"
   delete_mastery_level_position_5cf0f8f7: "%{position} 정복 수준 삭제"
@@ -10709,6 +10751,7 @@ ko:
   describe_what_this_image_is_meant_to_convey_f13950d5: "이 이미지가 전달하는 의미를 설명합니다."
   description_436c48d7: 설명
   description_709b38db: "설명:"
+  description_count_students_cc740fa4: "%{description}: %{count}명 학생"
   description_for_mastery_level_position_description_cc17114b: "%{position} 정복 수준의 설명: %{description}"
   description_is_required_32fc9c7: "설명은 필수입니다."
   description_must_not_exceed_2500_characters_f4a80357: "설명은 2500자를 초과할 수 없습니다"
@@ -10883,6 +10926,7 @@ ko:
   discarded_20a4e7e8: 취소됨
   discover_56d42b60: 검색
   discovery_custom_message_fff0e0b0: "Discovery 사용자 지정 메시지"
+  discovery_page_8a9270cb: "Discovery 페이지"
   discovery_pages_90948d00: "탐색 페이지"
   discovery_screen_1515d989: "Discovery 화면"
   discovery_service_url_ca13d3f4: "검색 서비스 URL"
@@ -11283,6 +11327,7 @@ ko:
   dislike_summary_c569326e: "싫어요 요약"
   dislike_summary_deselected_3f686ce9: "싫어요 요약, 선택 해제됨"
   dislike_summary_selected_5527b968: "싫어요 요약, 선택됨"
+  dislike_this_response_b29a28a6: "이 응답 싫어요"
   dismiss_account_level_notification_information_d0d75748: "계정 수준 알림 정보 해제"
   dismiss_course_level_notification_information_504364d: "과목 수준 알림 정보 해제"
   dismiss_dacdb625: 해제
@@ -11339,6 +11384,7 @@ ko:
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "동일한 슬롯 나누기(값은 분 단위)"
   divide_into_equal_time_slots_in_minutes_234312fa: "동일한 시간 슬롯으로 나누기(분 단위"
   divider_fe08b810: "나누기 기능"
+  do_not_consider_84d7b395: "고려하지 않음"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "이 과제를 최종 학점에 반영하지 않음"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "성적부 또는 학생의 성적 페이지를 표시하지 않음"
   do_not_include_validation_context_and_errors_claim_d9e43fe6: "validation_context 및 오류 클레임을 LTI 시작에 포함하지 않음"
@@ -11480,7 +11526,7 @@ ko:
   drag_files_or_click_e2c9d2b2: "파일을 끌거나 클릭"
   drag_to_move_51557ad1: "끌어서 이동"
   drag_to_rearrange_sections_637efee3: "끌어서 섹션을 재정렬"
-  drag_to_reorder_e4257792: "끌어서 재정렬"
+  drag_to_reorder_e4257792: "끌어서 순서 변경"
   drag_to_reorder_or_click_for_options_9492a289: "끌어서 순서를 변경하거나 클릭항 옵션 보기"
   drop_a_block_to_add_it_here_c9450c17: "블록을 내려놓아서 여기에 추가"
   drop_coursename_813d3162: "%{courseName} 내려놓기"
@@ -11565,6 +11611,8 @@ ko:
       \x20               과목의 크기로 인해 SpeedGrader를 시작하기 전에 학생 그룹을 \n\
       선택해야 합니다. \n\
       \x20             "
+  due_today_8b6b2cd7: "오늘 기한"
+  due_tomorrow_9c9555c7: "내일 기한"
   duedate_at_time_fa5a49e5: ", %{dueDate} %{time}"
   duplicate_31cec192: 복제
   duplicate_assignment_name_3ca7d753: "과제 %{name} 복제"
@@ -11573,6 +11621,8 @@ ko:
   duplicate_c4bb7d3a: "복제 "
   duplicate_criterion_601aa3cf: "조건 복제"
   duplicate_discussion_title_6537ef4d: "토론 %{title} 복제"
+  duplicate_folders_919efc13: "중복된 폴더"
+  duplicate_folders_are_detected_40ce30e9: "중복된 폴더가 탐지됨"
   duplicate_grading_scheme_d0e57758: "성적 평가 기준 복제"
   duplicate_ids_23b0a29e: "ID 복제"
   duplicate_item_339f54bb: "항목 복제"
@@ -11685,7 +11735,9 @@ ko:
   edit_in_canvas_apps_3dbeafb1: "Canvas 앱에서 편집합니다."
   edit_item_details_1e2b5ba1: "항목 세부 정보 편집"
   edit_item_details_c9a7b9c5: "항목 세부 정보 편집"
+  edit_item_f6d6ad6a: "항목/문항 편집"
   edit_key_developername_2980f240: "키 %{developerName} 편집"
+  edit_knowledge_chat_96a5e6d8: "지식 채팅 편집"
   edit_label_769ed6c5: "%{label} 편집"
   edit_launch_settings_2b8cd8cc: "시작 설정 편집"
   edit_lti_16f9e6ea: "LTI 편집"
@@ -11836,6 +11888,7 @@ ko:
   editor_id_8035e70a: "편집기 ID"
   editor_id_bb5bc7c2: "편집기 ID"
   editor_toolbar_c0c78b6: "편집기 도구 모음"
+  educator_dashboard_65002027: "교육자 대시보드"
   educators_can_enable_the_detect_multiple_sessions__550b44c5: "교육자는 자신의 퀴즈에 여러 세션 탐지 설정을 사용으로 설정하여 학생 제출에 대해 여러 세션 정보를 수집할 수 있습니다. 이 권한은 활동 로그 및 조정 페이지에서 이 데이터를 볼 수 있는 사용자를 결정합니다."
   effective_context_code_aa1cbfb3: "효과가 있는 컨텍스트 코드"
   either_course_or_student_c42bb055: "'과목' 또는 '학생'"
@@ -11896,12 +11949,17 @@ ko:
   enable_course_as_a_blueprint_course_8515ffd5: "과목을 블루프린트 과목으로 사용"
   enable_course_as_a_course_template_5299afb6: "과목을 과목 템플릿으로 사용"
   enable_custom_labels_for_the_new_canvas_login_regi_7216fb8e: "새 Canvas 로그인/등록 UI에 대해 사용자 지정 레이블을 사용으로 설정합니다."
+  enable_duplicate_folder_detection_and_display_with_81f4afb4: "중복된 폴더 탐지를 사용으로 설정하고 같은 상위 디렉터리에 표시합니다."
   enable_dynamic_peer_review_allocation_and_separate_44f7e8d: "간소화되고 유연한 검토 경험을 위해 동적 동료 검토 할당 및 구별된 기한 및 성적 평가를 사용으로 설정합니다."
+  enable_dynamic_peer_review_allocation_and_separate_9df72e61: |-
+      간소화되고 유연한 검토 경험을 위해 동적 동료 검토 할당 및 구별된 기한 및 성적 평가를 사용으로 설정합니다.
+      참고: "이 기능이 정확하게 작동하려면 다음 3개 기능 옵션을 사용으로 설정해야 합니다: 1) 향상된 과제 - 학생, 2) 향상된 루브릭 및 3) SpeedGrader의 성과 및 사용 업그레이드."
   enable_eula_request_523968fd: "EULA 요청 사용"
   enable_external_apps_side_tray_d49ff9a7: "외부 앱 사이드 트레이 사용"
   enable_extra_filter_options_b52c23e6: "추가 필터링 옵션 사용"
   enable_face_to_face_connection_9df19b76: "대면 연결을 사용"
   enable_file_access_with_api_tokens_ad08912a: "API 토큰으로 파일 액세스를 사용"
+  enable_gradebook_status_icons_ed6a01a2: "성적부 상태 아이콘 사용으로 설정"
   enable_gravatar_8a865b41: "Gravatar 사용"
   enable_identity_service_discovery_page_for_the_new_fac0e431: "새 Canvas 로그인/등록 UI에 대해 ID 서비스 검색 페이지를 사용으로 설정합니다."
   enable_igniteai_question_authoring_for_quizzes_fea_d7a403a6: "퀴즈에 대해 IgniteAI 문제 작성 기능을 사용"
@@ -11946,6 +12004,12 @@ ko:
   enable_to_allow_jit_provisioning_and_federated_att_38655be2: |-
       Instructure Identity를 사용할 때 JIT 프로비저닝 및 페더레이션 특성을 허용하도록 설정합니다.
       Instructure Identity 기능 플래그를 사용으로 설정한 경우에만 적용됩니다.
+  enable_to_allow_jit_provisioning_and_reactivation__59634786: |-
+      사용으로 설정하며 Canvas 인증이 대상이면 JIT 프로비저닝 및 사용자의 다시 활성화를 사용으로 설정합니다.
+      사용으로 설정하면, Instructure Identity가 정보의 출처가 되며 대상 인증 유형이 Canvas 사용자/비밀번호인 경우에도
+      사용자를 프로비저닝 및 다시 활성화할 수 있습니다. 사용 중지하면
+      시스템은 Canvas를 정보 출처로 유지하며 Canvas 인증 대상의
+      프로비저닝/다시 활성화를 차단합니다.
   enable_to_allow_the_daily_periodic_job_to_automati_2c7e4f82: |-
       사용으로 설정하여 매일 정기적 작업이 자동으로 Instructure ID 리디렉션을
       지원하는 인증 공급자의 디리렉션 비율을 높이는 것을 허용합니다.
@@ -12016,6 +12080,10 @@ ko:
   enables_role_based_dashboards_in_canvas_career_e1e5e0f5: "Canvas Career에서 역할 기반 대시보드를 사용으로 설정합니다."
   enables_skill_management_in_canvas_career_f88a6a76: "Canvas Career에서 기술 관리를 사용으로 설정합니다."
   enables_student_reporting_features_in_the_learning_eb826385: "학습 정보 성적부에서 학생 보고 기능을 사용으로 설정합니다."
+  enables_study_assist_for_courses_when_enabled_stud_c4fe55fe: |-
+      과목에 대해 Study Assist를 사용으로 설정합니다. 사용으로 설정되면 학생은 과목 내에서
+      AI 기반 학습 도구에 액세스할 수 있습니다. 루트 계정 관리자는
+      하위 계정 또는 과목에서 이 기능을 사용하기 전에 사용으로 설정해야 합니다.
   enables_support_for_uploading_files_as_part_of_the_712baa12: "최신화된 Speedgrader에서 AI 지원 성적 평가 도구의 일부분으로 파일 업로드 지원을 사용으로 설정합니다."
   enables_that_hidden_attachments_will_be_included_i_932c9552: "숨겨진 첨부 파일이 대체 체인에 포함되도록 설정합니다."
   enables_the_ability_to_manage_bulk_api_and_permiss_b4eb478f: "Canvas Career에서 일괄 API 및 권한 설정을 관리하는 기능을 사용으로 설정합니다."
@@ -12040,6 +12108,7 @@ ko:
   enables_the_learner_app_in_canvas_career_on_all_ro_986e8e82: "모든 경로에서 Canvas Career에 학습자 앱을 사용으로 설정합니다."
   enables_the_learning_library_in_canvas_career_9c5ee3e1: "Canvas Career에서 학습 라이브러리를 사용으로 설정합니다."
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Canvas의 지원되는 영역에서 Microsoft 몰입형 리더 버튼을 사용으로 설정합니다. 계정 관리자가 모든 사용자에 대해 활성화한 경우 이 버튼은 이 설정에 관계 없이 모든 과목에서 사용으로 설정될 수 있습니다."
+  enables_the_native_inbox_in_canvas_career_8e812f4a: "Canvas Career에서 네이티브 수신함을 사용으로 설정합니다."
   enables_the_new_ai_assisted_grading_tool_inside_of_e9480bb2: "이 과목의 과제에 대해 최신화된 SpeedGrader의 내부에 새로운 AI 지원 성적 평가 도구를 사용으로 설정합니다."
   enables_the_new_comment_library_experience_in_spee_c69fd350: "SpeedGrader에서 새 의견/댓글 라이브러리 경험을 사용으로 설정합니다."
   enables_the_new_files_a11y_rewrite_page_75d23b14: "새 파일 a11y 다시 쓰기 페이지를 사용합니다."
@@ -12057,11 +12126,12 @@ ko:
   enabling_the_elementary_theme_will_change_the_font_c944b619: "초등 테마를 사용으로 설정하면 과목의 모든 사용자에게 Canvas 인터페이스에 글꼴이 변경되며 과목 탐색 메뉴가 간소화됩니다."
   enabling_the_youtube_migration_new_quizzes_feature_75a77eab: "YouTube 마이그레이션을 사용 - 새로운 퀴즈 기능은 새로운 퀴즈의 Youtube 포함에 스캐닝 기능 및 변환 옵션을 추가합니다."
   enabling_this_feature_moves_the_new_quizzes_experi_d2f290dd: |-
-      이 기능을 사용으로 설정하면 새로운 퀴즈 경험을 
-      격리 레이어(iframe)에서 이동하여 주요 Canvas 페이지에서 네이티브 방식으로 실행합니다.
+      이 기능을 사용으로 설정하면 새로운 퀴즈 경험을 격리 레이어(iframe)
+      에서 이동하여 주요 Canvas 페이지에서 네이티브 방식으로 실행합니다.
       
-      참고: 네이티브 통합이 모든 프로덕션 환경에 표준 경험이
-      되므로 2026년 7월 1일에 이 기능 옵션은 제거됩니다.
+      참고: 네이티브 통합이 모든 프로덕션 환경에
+      표준 경험이 되므로 2026년 7월 1일에 이
+      기능 옵션은 제거됩니다.
   enabling_this_option_automatically_moves_course_pa_15f755b3: "이 옵션을 사용으로 설정하면 과목 진도 조정 과제 기한 날짜를 종료 날짜 이후로 자동으로 이동합니다. 시간, 위치 및 캘린더에 대한 입력은 사용 중지됩니다."
   encourage_student_discourse_7836b9f7: "학생 담론을 유도"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "기본 성과를 위한 암호화된 Sourcedids"
@@ -12227,6 +12297,7 @@ ko:
   enter_a_workflow_state_to_narrow_results_162903af: "워크플로 상태를 입력하여 결과 범위를 좁히기"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "'{{ACCOUNT_DOMAIN}}'를 입력하여 사용자의 루트 계정 도메인을 대체"
   enter_additional_prompt_information_here_for_examp_fc7eadfb: "여기에 추가적 프롬프트 정보를 입력합니다. 예를 들어, '대학 수준 세미나를 대상' 또는 '논의 요점에 집중' 또는 '관대하게'입니다. "
+  enter_an_external_url_where_users_can_choose_how_t_fc742071: "사용자가 로그인하는 방법을 선택할 수 있는 외부 URL을 입력합니다. 이 페이지는 사용자를 특정 Canvas 인증 공급자(예, /login/saml/3)에게 보냅니다. 비워둔 경우, Canvas는 목록에 첫 번째 인증 방법을 기본값으로 사용합니다."
   enter_an_id_or_an_original_job_id_d81ad1c7: "ID 또는 original_job_id를 입력"
   enter_and_distribute_grades_c1216df: "성적을 입력 및 분포"
   enter_any_comments_about_this_rate_limit_6ef88127: "이 속도 제한에 대한 의견을 입력"
@@ -12656,6 +12727,7 @@ ko:
   error_loading_grades_e0b38f4d: "성적을 로드하는 동안 오류"
   error_loading_grading_statuses_a37954c7: "성적 평가 상태를 로드하는 동안 오류"
   error_loading_items_5218438e: "항목을 로드하는 동안 오류"
+  error_loading_knowledge_chats_error_2943be7: "지식 채팅 로드 중에 오류: %{error}"
   error_loading_module_items_7b3df5aa: "모듈 항목을 로드하는 동안 오류"
   error_loading_modules_a0c4d4a4: "모듈을 로드하는 동안 오류"
   error_loading_more_items_3f109d9f: "더 많은 항목을 로드하는 동안 오류"
@@ -12813,6 +12885,7 @@ ko:
   eula_of_toolname_b7b144d0: "%{toolName}의 최종 사용자 라이선스 계약"
   eula_settings_4540bdeb: "EULA 설정"
   eula_target_link_uri_8b8721ed: "EULA 대상 링크 URI"
+  evaluate_your_students_comprehension_of_a_topic_wi_7b8925e2: "구성 가능한 LLM(대규모 언어 모델) 채팅으로 주제에 대한 학생의 이해도를 평가합니다."
   evaluate_your_work_as_you_believe_your_instructor__78217133: "교강사가 평가할 것이라고 생각되는 것처럼 자신의 작업을 평가합니다."
   evaluating_conversation_573e7192: "대화를 평가 중..."
   evaluation_b4839967: 평가
@@ -13259,6 +13332,9 @@ ko:
   failed_to_delete_faileditems_of_the_selecteditems__2820a418: "선택한 %{selectedItems}개 항목 중 %{failedItems}개를 삭제하지 못했습니다. 다시 시도하세요."
   failed_to_delete_forbidden_words_list_f362dac1: "금지된 단어 목록을 삭제하지 못했습니다."
   failed_to_delete_internal_setting_b85d397c: "내부 설정을 삭제 실패"
+  failed_to_delete_knowledge_chat_error_d619ac0b: "지식 채팅을 삭제하지 못함: %{error}"
+  failed_to_delete_knowledge_chat_f3a3fe87: "지식 채팅을 삭제하지 못함"
+  failed_to_delete_knowledge_chat_please_try_again_91a9a3aa: "지식 채팅을 삭제하지 못했습니다. 다시 시도하세요."
   failed_to_delete_name_4abd2ed5: "%{name} 삭제 실패"
   failed_to_delete_page_b21b9364: "페이지 삭제 실패"
   failed_to_delete_rate_limit_setting_b2a57cfc: "속도 제한 설정을 삭제하지 못했습니다"
@@ -13313,10 +13389,12 @@ ko:
   failed_to_load_assignments_used_locations_2b37a5dd: "과제가 사용된 위치를 로드 실패"
   failed_to_load_available_reports_bd55905b: "사용 가능한 보고서를 로드 실패"
   failed_to_load_configuration_b7248c63: "구성을 로드하지 못함"
+  failed_to_load_configuration_please_close_and_try__80d264e4: "구성을 로드하지 못했습니다. 닫고 다시 시도하세요."
   failed_to_load_content_security_policy_settings_cc668a42: "콘텐츠 보안 정책 설정을 로드하지 못함"
   failed_to_load_contenttype_error_5bb75c75: "%{contentType} 로드 실패: %{error}"
   failed_to_load_contributing_scores_f9401d2b: "기여 점수를 로드하지 못함"
   failed_to_load_conversation_messages_9b4546fc: "대화 메시지를 로드하지 못했습니다."
+  failed_to_load_course_data_67a16f99: "과목 데이터를 로드하지 못함"
   failed_to_load_course_data_please_try_again_419aa1c9: "과목 데이터를 로드하지 못했습니다. 다시 시도하세요."
   failed_to_load_course_grades_please_try_again_ec6b3221: "과목 성적을 로드하지 못했습니다. 다시 시도하세요."
   failed_to_load_course_settings_74168426: "과목 설정을 로드 실패"
@@ -13374,6 +13452,7 @@ ko:
   failed_to_regenerate_criteria_e1f4adca: "조건을 다시 생성하지 못했습니다"
   failed_to_reject_enrollment_invitation_cdb5de40: "등록 초대를 거부하지 못했습니다."
   failed_to_remove_catalog_settings_f5359b2b: "카탈로그 설정 제거 실패"
+  failed_to_remove_feedback_please_try_again_51c6fc81: "피드백을 제거하지 못했습니다. 다시 시도하세요."
   failed_to_remove_from_allowed_domains_2e474628: "허용된 도메인에서 제거하지 못함"
   failed_to_remove_item_ee6d1770: "항목 제거 실패"
   failed_to_remove_module_afebe6aa: "모듈 제거 실패"
@@ -13393,7 +13472,10 @@ ko:
   failed_to_revert_account_please_try_again_6ef1f42c: "계정을 되돌리지 못했습니다. 다시 시도하세요."
   failed_to_save_ai_experience_error_ae7e1de2: "AI 경험을 로드하지 못했습니다: %{error}"
   failed_to_save_configuration_8cf99186: "구성을 저장하지 못함"
+  failed_to_save_configuration_please_try_again_dfef17b2: "구성을 저장하지 못했습니다. 다시 시도하세요."
   failed_to_save_dashboard_selection_32e71c72: "대시보드 선택을 저장 실패"
+  failed_to_save_feedback_please_try_again_9645ea: "피드백을 저장하지 못했습니다. 다시 시도하세요."
+  failed_to_save_knowledge_chat_error_e2b2b87d: "지식 채팅을 저장하지 못함: %{error}"
   failed_to_save_outcome_order_e233ecb0: "성과 순서를 저장하지 못했습니다"
   failed_to_save_please_try_again_later_bb7070fb: "저장하지 못했습니다. 나중에 다시 시도하세요"
   failed_to_save_rubric_assessment_6d4dad70: "루브릭 평가를 저장하지 못했습니다."
@@ -13433,6 +13515,8 @@ ko:
   failed_to_update_internal_setting_ab3d0a4a: "내부 설정을 업데이트 실패"
   failed_to_update_item_indentation_fd7fbf4f: "항목 들여쓰기 업데이트 실패"
   failed_to_update_item_please_try_again_fd2ee896: "항목/문항을 업데이트하지 못했습니다. 다시 시도하세요."
+  failed_to_update_knowledge_chat_eed8de4c: "지식 채팅을 업데이트하지 못함"
+  failed_to_update_knowledge_chat_please_try_again_8f521260: "지식 채팅을 업데이트하지 못했습니다. 다시 시도하세요."
   failed_to_update_missing_submission_policy_setting_95fbc669: "누락된 제출 정책 설정을 업데이트하지 못했습니다."
   failed_to_update_page_23766e21: "페이지를 업데이트 실패"
   failed_to_update_permission_33c493f: "권한을 업데이트 실패"
@@ -13515,6 +13599,7 @@ ko:
   feed_url_8a433438: "피드 URL"
   feedback_6dcc1991: 피드백
   feedback_received_391283b7: "피드백 받음"
+  feedback_submitted_f0d9031f: "피드백을 제출했습니다."
   feeds_9f1c5c76: 패드
   fetching_categories_b5a5bae5: "범주 검색 중..."
   fetching_graph_data_b47b5a80: "그래프 데이터 검색"
@@ -13582,6 +13667,7 @@ ko:
   file_size_exceeds_the_maximum_of_max_mb_edb41d85: "파일 크기가 최대 %{max}MB를 초과"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} 사용자 파일 할당량 적용됨"
   file_size_must_be_less_than_300_mb_3dbf489a: "파일 크기는 300MB 미만이어야 합니다"
+  file_sources_4abe30ac: "파일 소스"
   file_state_9505cece: "파일 상태"
   file_status: 
     hidden_status: "숨겨져 있습니다. 링크로 사용 가능"
@@ -13654,6 +13740,7 @@ ko:
     text_show: 
       page_title: "파일 미리 보기"
   files_2c1c604: 파일
+  files_a11y_folder_duplicates_fed2483: "파일 접근성  폴더 복제본"
   files_a11y_rewrite_6ea6ccfd: "파일 접근성 다시 쓰기"
   files_a11y_rewrite_toggle_49d92185: "파일 접근성 다시 쓰기 토글"
   files_and_folders_sorted_by_sortcolumn_in_sortdire_8b36c8c9: "파일 및 폴더: %{sortColumn}을(를) %{sortDirection} 순서로 정렬됨"
@@ -13871,6 +13958,7 @@ ko:
   for_974cbb84: 대상
   for_all_devices_1f603968: "모든 장치"
   for_an_instant_answer_see_if_your_issue_is_address_297f9d12: "빠른 답변은 문제가 %{guidesLink}에서 해결되었는지 확인하세요."
+  for_example_inappropriate_irrelevant_etc_9fe9fbc2: "예: 부적합, 관련성 낮음, 등"
   for_itemtype_items_details_6353fedf: "%{itemType} 항목/문항의 경우: %{details}"
   for_more_advanced_layouts_e_g_multiple_images_or_l_b0632f40: "더 고급 레이아웃(예, 여러 이미지 또는 긴 양식 콘텐츠)의 경우 필요에 따라 다른 블록을 조합합니다."
   for_more_complex_elements_like_images_tables_or_vi_6a894d6f: "이미지, 표 또는 동영상과 같은 복잡한 요소에 대해 전용 블록을 사용하세요."
@@ -15375,6 +15463,7 @@ ko:
   headings_are_not_in_sequence_46d2a7b0: "머리글이 순차적이지 않습니다."
   hebrew_88fbf778: 히브리어
   height_69b03e15: 높이
+  hello_name_b07db15: "안녕하세요, %{name} 님."
   hello_name_cabdd4ce: "안녕하세요, %{name} 님."
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       안녕하세요 %{name} 님,
@@ -15502,7 +15591,9 @@ ko:
   here_you_can_have_a_chat_with_the_ai_just_like_a_s_b66963a2: "여기에서 학생이 채팅할 수 있는 것처럼 AI와 채팅할 수 있습니다."
   hero_15005a9b: 히어로
   hh_mm_5faafa69: "hh:mm"
+  hi_39ea3146: 안녕하세요.
   hi_contrast_373b614f: 고대비
+  hi_name_878a9344: "%{name} 님 안녕하세요."
   hidden_130c3791: 숨김
   hidden_14a032a7: 숨김
   hidden_attachments_replacement_chain_18baa16a: "숨긴 첨부 파일 대체 체인"
@@ -15907,6 +15998,9 @@ ko:
   if_enabled_the_generate_with_ai_button_will_appear_291b4450: "사용으로 설정한 경우, 'AI로 생성' 버튼이 표시되어 조기 도입 프로그램을 이용 중인 기관에게 AI 기반 퀴즈 만들기를 허용합니다."
   if_enabled_the_modules_page_will_use_the_new_modul_a585c7d8: "사용으로 설정한 경우, 모듈 페이지는 학생 보기에서 새 모듈 페이지 덮어쓰기를 사용합니다."
   if_enabled_the_modules_page_will_use_the_new_modul_c4a1a3de: "사용으로 설정한 경우, 모듈 페이지는 새 모듈 페이지 덮어쓰기를 사용합니다."
+  if_enabled_the_oauth2_deny_endpoint_will_only_acce_2b6be126: |-
+      사용으로 설정한 경우 OAuth2는 거부 엔드포인트는 GET 대신에 POST 요청만 수락합니다.
+      이렇게 하여 브라우저 프리페치가 거부 작업을 작동하고 OAuth2 세션 상태를 파괴하는 것을 방지합니다.
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "사용으로 설정한 경우, 채점하지 않는 루브릭을 포함하는 옵션이 제시됩니다."
   if_enabled_the_public_jwk_url_for_lti_1_3_tools_wi_424e0032: |-
       사용으로 설정한 경우, 딥 링크 흐름 중에 짧은 시간 동안  LTI 1.3 도구의
@@ -16023,6 +16117,7 @@ ko:
   igbo_e4fafbc1: 이그보우어
   ignite_ai_c59923fe: "Ignite AI"
   ignite_ai_generate_insights_a9c9c7cd: "Ignite AI 인사이트 생성"
+  ignite_ai_generated_c8c40e93: "Ignite AI 생성됨"
   ignite_ai_go_to_insights_6d7276c2: "Ignite AI 인사이트로 이동"
   ignite_ai_improvedtext_ed485b41: "Ignite AI %{improvedText}"
   ignite_ai_summarize_53a7af3d: "Ignite AI 요약"
@@ -16290,6 +16385,7 @@ ko:
   indentation_3c6081d5: 들여쓰기
   indexing_in_progress_6ce56f27: "색인 작업 진행 중"
   indicates_if_a_human_is_involved_in_the_ai_s_proce_e0bdd06b: "사람이 AI의 프로세스 또는 결과에 관여하는지 나타냅니다."
+  indicates_if_cookie_consent_is_necessary_753449b5: "쿠키 동의가 필요한지 표시"
   indicates_the_ai_model_has_been_given_customer_dat_dce4609e: "결과를 개선하기 위해 AI 모델에 고객 데이터를 제공했음을 나타냅니다."
   indicates_which_training_or_operational_content_wa_26b2da6a: "어떤 교육 또는 운영 콘텐츠를 모델에게 제공했는지 나타냅니다."
   indication_color_must_be_a_valid_hex_code_a1719f5f: "표시 색은 유효한 16진수 코드여야 함"
@@ -16377,6 +16473,10 @@ ko:
       LaTeX로 타이프세팅합니다.
   institution_14179014: 기관
   institution_members_325dcad8: "기관 구성원"
+  institutional_tags_9b60543e: "기관 태그"
+  institutional_tags_create_24b13c50: "기관 태그 - 만들기"
+  institutional_tags_edit_dbf2faa7: "기관 태그 - 편집"
+  institutional_tags_view_a43a8f33: "기관 태그 - 보기"
   instructions: 
     authorize_google_docs: "문서에 대해 협업하기 전에 Canvas가 Google Docs 계정을 접근할 수 있도록 권한을 부여해야 합니다."
     authorize_google_drive: "문서에 대해 공동 작업하려면 Canvas에서 Google Drive 계정에 액세스 권한을 부여해야 합니다:"
@@ -16471,6 +16571,7 @@ ko:
   instructure_identity_flag_to_perform_periodic_user_4f66d4a6: "Instructure Identity 플래그로 마이그레이션과 정기적 사용자 동기화를 수행"
   instructure_identity_force_saml_proxy_to_on_for_sy_3e73b7c7: "Instructure Identity 동기화에 대해 SAML 프록시 적용"
   instructure_identity_global_30681bc5: "Instructure Identity 글로벌"
+  instructure_identity_is_source_of_truth_a244e73f: "Instructure Identity가 정보의 출처"
   instructure_identity_login_percentage_598c22b4: "Instructure Identity 로그인 백분율"
   instructure_identity_manage_a3696f09: "Instructure Identity - 관리"
   instructure_identity_notify_admins_backfill_comple_88b01: "Instructure Identity 관리자 백필 완료 알리기"
@@ -16584,6 +16685,7 @@ ko:
   internal_settings_initial_query_error_92ba2e00: "내부 설정 초기 쿼리 오류"
   international_sms_9edb9868: "국제 SMS"
   internet2_254c6ca6: 인터넷2
+  internet_database_3d61286a: "인터넷 데이터베이스"
   interval_must_be_0_e7b8eb5: "간격은 0 이상이어야 함"
   introduces_ai_experiences_a_new_canvas_learning_ob_9ac91af7: "AI 경험 소개 - 새로운 Canvas 학습 목표입니다."
   introduction_43f53b7d: 소개
@@ -16863,6 +16965,7 @@ ko:
   joined_group_group_name_e3802c04: "그룹 %{group_name}에 참여"
   joining_81f8b6c9: 참여하기
   joplin_assignment_submission_a4cf7899: "Joplin 과제 제출"
+  journals_periodicals_and_publications_ca24673: "잡지, 정기 간행물, 출판물"
   jpg_903bacff: JPG
   jquery: 
     module_sequence_footer: 
@@ -16943,6 +17046,16 @@ ko:
   kind_7f0a88c4: 유형
   kindergarten_3c95802: 유치원
   know_your_users_5c1323be: "사용자를 이해하기"
+  knowledge_chat_34fd257b: "지식 채팅"
+  knowledge_chat_deleted_successfully_c8a85144: "지식 채팅이 삭제됨"
+  knowledge_chat_description_e0a796ee: "지식 채팅 설명"
+  knowledge_chat_name_4d7ce855: "지식 채팅 이름"
+  knowledge_chat_name_required_3ef7af16: "지식 채팅 이름 필수"
+  knowledge_chat_options_a72ca25: "지식 채팅 옵션"
+  knowledge_chat_published_successfully_2661b781: "지식 채팅이 게시됨"
+  knowledge_chat_settings_81bad769: "지식 채팅 설정"
+  knowledge_chat_unpublished_successfully_b497cd06: "지식 채팅이 게시 취소됨"
+  knowledge_chats_5b4b51d9: "지식 채팅"
   knowledge_check_4aade5c5: "지식 확인"
   korean_da812d9: 한국어
   label_3c9a991: "%{label}:"
@@ -16951,7 +17064,9 @@ ko:
   label_cb92f9b1: 레이블
   label_count_5ebffdc: "%{label}(%{count})"
   label_disabled_not_visible_to_students_da093eec: "%{label}. 사용 중지되었습니다. 학생에게 표시되지 않음"
+  label_is_required_8e766e2a: "레이블은 필수입니다"
   label_menu_a41426cb: "%{label} 메뉴"
+  label_must_not_contain_or_characters_57e7a56f: "레이블은 <, > 또는 \" 문자를 포함하지 않아야 합니다"
   label_name_ee0b0ff8: 성
   label_no_content_not_visible_to_students_84345d2f: "%{label}. 콘텐츠가 없습니다. 학생에게 표시되지 않음"
   label_removed_8793d8b4: "%{label}이(가) 제거되었습니다."
@@ -17312,6 +17427,7 @@ ko:
   like_summary_selected_6753e457: "요약에 좋아요, 선택됨"
   like_the_current_message_41b56198: "현재 메시지에 좋아요"
   like_this_entry_60da41a5: "이 입력 좋아요"
+  like_this_response_fdfc3917: "이 응답에 좋아요"
   likes_8cffe724: 
     one: 좋아요
     other: 좋아요
@@ -17323,6 +17439,7 @@ ko:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "그룹 구성원 제한(제한이 없으면 비워두기)"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "참가자가 %{num_appointments}개 예약에 참석하는 것으로 제한합니다."
   limit_personal_access_token_creation_to_admins_a9b8d7fe: "개인 액세스 토큰 만들기를 관리자로 제한합니다."
+  limit_reached_dd2949a3: "제한에 도달"
   limit_search_to_activity_after_37e727a1: "이후 활동으로 검색을 제한합니다."
   limit_search_to_activity_before_13d8bf3a: "이전 활동으로 검색을 제한합니다."
   limit_students_to_attend_input_value_slot_s_9a5bf576: "학생이 %{input_value} 슬롯에 참석하는 것으로 제한합니다. "
@@ -17526,6 +17643,7 @@ ko:
   loading_items_78771000: "항목 로드"
   loading_job_cluster_info_f3d15dec: "작업 클러스터 정보 로드"
   loading_jobs_12f0609d: "작업 로드 중..."
+  loading_knowledge_chats_a971eb28: "지식 채팅 로드"
   loading_last_attended_date_5a42463: "마지막 출석 날짜 로드"
   loading_latest_announcement_link_f1746190: "최근  공지 링크 로드"
   loading_ldap_test_11093288: "LDAP 테스트 로드"
@@ -17592,6 +17710,7 @@ ko:
   loading_sync_history_3eb11baf: "동기화 기록 로드 중..."
   loading_sync_history_9f342cbf: "동기화 기록 로드"
   loading_terms_11cbc63c: "학기 로드"
+  loading_terms_42dea0e9: "학기 로드..."
   loading_to_do_items_e293dc3e: "할 일 항목 로드 중..."
   loading_to_do_items_fcd93bdc: "할 일 항목 로드"
   loading_todo_course_name_b851e509: "할 일 과목 이름 로드"
@@ -17610,6 +17729,8 @@ ko:
   location_name_ae6dd4b1: "위치 이름"
   location_used_8909c9af: "사용된 위치"
   locations_used_1c050e8e: "사용된 위치"
+  lock_app_d6e23613: "앱 잠금"
+  lock_app_eeaf70f3: "앱 잠금"
   lock_at_time_3c8a044e: "잠금 시간: %{time}"
   lock_c341af13: 잠금
   lock_date_cannot_be_after_assignment_lock_date_df6b6b3a: "잠금 날짜는 과제 잠금 날짜 이후가 될 수 없음"
@@ -17623,9 +17744,11 @@ ko:
   lock_date_cannot_be_before_unlock_date_d6121c6c: "잠금 날짜는 잠금 해제 날짜 이전일 수 없음"
   lock_discussion_title_failed_9d49f2d: "토론 %{title} 잠금 실패"
   lock_discussion_title_succeeded_fb24ebfc: "토론 %{title} 잠김"
+  lock_lti_registrations_71a1a218: "LTI 등록 잠금"
   lock_questions_after_answering_5aecef9d: "답변 후에 문제 잠금"
   lock_selected_announcements_33740f80: "선택된 공지 잠금"
   lock_sort_order_for_students_8462f61c: "학생의 정렬 순서 잠금"
+  lock_status_d5911b86: "잠금 상태"
   lock_this_setting_for_sub_accounts_2ae5af17: "하위 계정에 대해 이 설정 잠금"
   lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "하위 계정 및 과목에 대해 이 설정 잠금"
   lock_thread_state_for_students_7a5b64de: "학생에 대해 스레드 상태 잠금"
@@ -17753,6 +17876,7 @@ ko:
   login_attribute_731a8181: "로그인 특성"
   login_attribute_selector_9a106f9c: "로그인 특성 선택기"
   login_attribute_suffix_input_area_18f7c7f7: "로그인 특성 접미사 입력 영역"
+  login_button_text_c958250f: "로그인 버튼 텍스트"
   login_count_96941b17: "로그인 수"
   login_custom_message_fc48bd93: "로그인 사용자 지정 메시지"
   login_footer_link_badb3898: "로그인 바닥글 링크"
@@ -17954,6 +18078,7 @@ ko:
   manage_home_4fc3480b: "홈 관리"
   manage_home_for_coursename_5e5c7661: "%{courseName}의 홈 관리"
   manage_impact_7ff2d6de: "Impact 관리"
+  manage_institutional_tags_97b15baf: "기관 태그 관리"
   manage_instructure_identity_information_c91b1fad: "Instructure Identity 정보 관리"
   manage_internal_analytics_fcfa306e: "내부 분석 관리"
   manage_item_name_6118d4b0: "%{item_name} 관리"
@@ -18041,6 +18166,7 @@ ko:
   mastery_calculation_parameters_f072c3: "정복 계산 매개 변수"
   mastery_calculation_saved_df378fdd: "정복 계산 저장됨"
   mastery_connect_64598f55: "Mastery Connect"
+  mastery_distribution_chart_for_outcome_337328d6: "%{outcome}의 정복 분포 차트"
   mastery_level_dd10dcc0: "숙달 수준"
   mastery_level_deleted_88838a33: "정복 수준 삭제됨"
   mastery_levels_7d4ee512: "정복 수준"
@@ -18075,6 +18201,7 @@ ko:
   max_attempts_ae7b90bc: "최대 시도"
   max_concurrent_a6f135c: "최대 동시 수"
   max_dd02d615: 최대
+  max_issue_count_reached_on_course_remediate_found__8bcb3f68: "과목에 최대 문제 수에 도달했습니다. 수정에서 문제를 찾았으며 추가 문제를 찾도록 보고서를 업데이트합니다."
   max_run_time_6022a5f1: "최대 런타임"
   max_users_groups_per_appointment_867c505b: "예약당 최대 사용자/그룹"
   max_wait_time_dc158bf1: "최대 대기 시간"
@@ -20102,7 +20229,9 @@ ko:
     other: "메시지 보관 해제됨."
   messsages_167416a: 메시지
   metadata_about_the_subject_ba1a7e3b: "과목에 대한 메타 데이터"
+  metadata_does_not_parse_as_a_valid_saml_entity_5e214c33: "메타데이터가 유효한 SAML 엔터티로 구문 분석되지 않음"
   metadata_f0f169dd: "메타 데이터"
+  metadata_must_be_present_6557b1f9: "메타데이터가 있어야 합니다"
   metadata_refresh_has_been_initiated_please_check_b_41ae5ca: "메타 데이터 새로 고치기가 시작되었습니다. 다시 확인하세요"
   method_c2a4e17a: 방법
   metrics_c80fba05: 메트릭
@@ -20136,6 +20265,7 @@ ko:
     assignment_group_type: "과제 그룹"
     assignment_type: 과제
     calendar_event_type: "캘린더 이벤트"
+    custom_link_type: "사용자 지정 링크"
     discussion_topic_type: "토론 주제"
     ecollege: 
       course_not_found: "ECollege 과목을 찾지 못했습니다."
@@ -20584,6 +20714,7 @@ ko:
   multiple_dropdowns_read_surrounding_text_f61274b3: "복수 드롭다운, 주변 텍스트 읽기"
   multiple_due_dates_283dd861: "여러 기한 날짜"
   multiple_due_dates_47416f7a: "(여러 기한 날짜)"
+  multiple_folders_with_the_same_name_exist_in_this__10bb605a: "이 위치에 같은 이름의 여러 폴더가 있습니다. 탐색 문제를 피하기 위해 고유한 이름을 갖도록 폴더의 이름을 변경하세요."
   multiple_grading_periods_grade_export_512bcd7f: "여러 성적 평가 기간 성적 내보내기"
   multiple_items_a9cb02a4: "여러 항목"
   multiple_microsoft_education_classes_already_exist_317ca726: "과목에 대해 여러 Microsoft 교육 수업이 있습니다."
@@ -20845,6 +20976,7 @@ ko:
   new_conferences_a020a8a9: "새 회의"
   new_content_from_app_9e6e8757: "앱에서 새 콘텐츠"
   new_course_role_6a7bb75f: "새 과목 역할"
+  new_criteria_actions_f020ba87: "새 조건 작업"
   new_criterion_6054bc7f: "새 조건"
   new_criterion_canceled_d8c2a655: "새 조건 취소됨"
   new_discussion_dae4fae3: "새 토론"
@@ -20859,6 +20991,7 @@ ko:
   new_group_8d6ad781: "새 그룹"
   new_group_category_66be9cbd: "새 그룹 범주"
   new_instui_navbar_72a69783: "새 InstUI 탐색 도구 모음"
+  new_knowledge_chat_6eb6c7ef: "새 지식 채팅"
   new_login_registration_ui_for_identity_d405c7c1: "Identity에 새 로그인/등록 UI"
   new_mention_ad04b872: "새 메션"
   new_module_493e82d2: "새 모듈"
@@ -20884,7 +21017,7 @@ ko:
   new_quizzes_canvas_native_integration_945b2754: "새로운 퀴즈 Canvas 네이티브 통합"
   new_quizzes_common_cartridge_support_250780be: "새로운 퀴즈 Common Cartridge 지원"
   new_quizzes_dbda7e0a: "새로운 퀴즈"
-  new_quizzes_description: "이 기능은 퀴즈에 대한 Canvas 경험을 개선합니다. 이  플래그를 사용으로 설정한 경우 새로운 퀴즈 도구를 사용할 수 있습니다. 자세한 정보는 Canvas 커뮤니티에서 *새로운 퀴즈 사용자 그룹*을 참조하세요."
+  new_quizzes_description: "이 기능은 퀴즈에 대한 Canvas 경험을 개선합니다. 이 플래그를 사용으로 설정한 경우 새로운 퀴즈 도구를 사용할 수 있습니다. 자세한 정보는 Canvas 커뮤니티에서 *새로운 퀴즈 FAQ*를 참조하세요."
   new_quizzes_export_support_b0a6a625: "새로운 퀴즈 내보내기 지원"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "성과 정렬 요약 탭에 포함된 새로운 퀴즈"
   new_quizzes_is_not_enabled_for_this_course_b101bcef: "새로운 퀴즈를 이 과목에 사용으로 설정하지 않음"
@@ -20992,6 +21125,7 @@ ko:
   no_accessibility_issues_were_detected_f8d3c875: "탐지된 접근성 문제가 없습니다."
   no_account_default_a4eee3d4: "계정 기본값 없음"
   no_account_found_for_this_email_address_736b271e: "이 이메일 주소에 대한 계정을 찾을 수 없습니다."
+  no_account_found_for_this_loginhandlename_c35962af: "이 %{loginHandleName}에 대한 계정을 찾을 수 없습니다."
   no_active_user_with_that_id_was_found_b8fb5e14: "해당 ID를 가진 활성 사용자를 찾을 수 없습니다."
   no_additional_details_were_added_for_this_assignme_547c0de7: "이 과제에 추가 세부 정보가 추가되지 않았습니다."
   no_ai_experiences_available_yet_2e6a6f25: "아직 사용 가능한 AI 경험이 없습니다."
@@ -21028,10 +21162,12 @@ ko:
   no_conversation_messages_loaded_96b537f: "로드된 대화 메시지 없음"
   no_conversations_selected_ebcd9226: "선택한 대화 없음"
   no_conversations_to_show_9ecbac62: "표시할 대화 없음"
+  no_course_grades_1aca90b0: "과목 성적 없음"
   no_courses_found_12d68a74: "과목을 찾을 수 없음"
   no_courses_to_display_700f94c4: "표시할 과목 없음"
   no_custom_fields_configured_f8617de2: "구성된 사용자 지정 필드가 없습니다."
   no_custom_fields_specified_1b27a3a7: "지정된 사용자 지정 필드가 없음"
+  no_data_18b446d0: "날짜 없음"
   no_data_7914df5d: "데이터 없음."
   no_data_returned_from_the_server_f42e5d8a: "서버에서 반환된 데이터가 없음"
   no_date_bfeb2df7: "날짜 없음"
@@ -21086,6 +21222,7 @@ ko:
   no_group_fd795cf: "그룹 없음"
   no_groups_were_found_in_the_uploaded_file_1d86cd21: "업로드된 파일에 찾은 그룹이 없습니다."
   no_icon_70e13356: "아이콘 없음"
+  no_icon_d0d39c68: "아이콘 없음"
   no_image_currently_set_choose_a_file_to_upload_an__f15cb4f5: "현재 설정된 이미지가 없습니다. 파일을 선택하여 이미지를 업로드합니다."
   no_instructors_found_670e3080: "찾은 교강사 없음"
   no_integrations_available_6729d0ca: "사용 가능한 통합 없음"
@@ -21096,6 +21233,8 @@ ko:
   no_items_in_this_module_917bc681: "이 모듈에 항목 없음"
   no_job_selected_d6c5e6f4: "선택된 작업 없음"
   no_jwks_available_to_validate_signature_b6f7512b: "서명을 유효성 검사할 JWKS 사용할 수 없음"
+  no_knowledge_chats_available_yet_6b72b4b5: "아직 사용할 수 있는 지식 채팅이 없습니다."
+  no_knowledge_chats_created_yet_47d5ba95: "아직 만든 지식 채팅이 없습니다."
   no_label_date_ff3a372f: "%{label} 날짜 없음"
   no_label_provided_2346f401: "**제공된 레이블이 없습니다.**"
   no_label_provided_c5e990bb: "*제공된 레이블이 없습니다.*"
@@ -21104,6 +21243,7 @@ ko:
   no_longer_observing_name_21ee31cc: "더 이상 %{name} 님을 보호하지 않습니다."
   no_marks_5e7d2b59: "표시 없음"
   no_matched_jobs_c1fc8222: "일치되는 작업 없음"
+  no_matches_6ae28640: "일치하는 항목 없음"
   no_matches_found_please_insert_a_valid_recipient_4cef9d47: "일치되는 항목을 찾을 수 없습니다. 유효한 수신자를 삽입하세요."
   no_matches_to_your_search_16d3d3b1: "검색과 일치하는 항목 없음"
   no_matching_external_tool_found_ffc3abc3: "일치하는 외부 도구를 찾을 수 없음"
@@ -21126,6 +21266,7 @@ ko:
   no_password_was_given_472222e5: "제공한 비밀번호가 없음"
   no_peer_reviews_available_6e7e45a5: "사용 가능한 동료 검토가 없습니다"
   no_pending_changes_65d4b8ef: "보류 중인 변경 사항 없음"
+  no_people_e834e1f: "사용자 없음"
   no_people_found_67a8ee2f: "찾은 사용자 없음"
   no_permissions_requested_98cc9658: "필요한 권한 없음"
   no_placements_enabled_bc82878d: "사용으로 설정된 배치가 없습니다."
@@ -21136,6 +21277,7 @@ ko:
   no_preview_available_e8e71199: "사용 가능한 미리 보기 없음"
   no_previous_versions_available_ee281ecc: "사용 가능한 이전 버전이 없습니다"
   no_products_match_these_uris_8f505ee1: "이 URI와 일치하는 제품이 없습니다"
+  no_progress_data_42c93b9b: "진행률 데이터 없음"
   no_question_has_been_selected_a347f75d: "선택된 문제가 없음"
   no_questions_found_ab6f5992: "찾은 문제가 없습니다."
   no_quiz_ip_filters_have_been_set_e47b9b8c: "설정된 퀴즈 IP 필터링이 없음"
@@ -21144,6 +21286,7 @@ ko:
   no_read_announcements_5e270b1b: "읽은 공지가 없습니다"
   no_recent_announcements_abf950d5: "최근 공지 없음"
   no_recent_grades_available_722339d1: "사용 가능한 최근 성적이 없습니다"
+  no_recent_grades_f7c30704: "최근 성적 없음"
   no_recent_submissions_dcf22e0f: "최근 제출 없음"
   no_redirect_uris_specified_7b47f4a4: "지정된 리디렉션 URI 없음"
   no_redirects_will_occur_until_the_instructure_iden_7ff5b3a0: "Instructure Identity 기능 플래그를 사용으로 설정할 때까지 리디렉션되지 않습니다. 그 동안 플래그가 사용으로 설정되면 백분율을 미리 설정할 수 있습니다."
@@ -21162,6 +21305,7 @@ ko:
   no_roles_available_1708d8ce: "사용 가능한 역할 없음"
   no_rubric_ids_provided_ed0d0cb8: "제공된 루브릭 ID 없음"
   no_rubric_is_attached_to_this_assignment_8cbbd841: "이 과제에 첨부된 루브릭이 없습니다."
+  no_rubrics_found_979b8467: "찾은 루브릭 없음"
   no_rubrics_found_e524e096: "찾은 루브릭 없음"
   no_score_yet_c94e919b: "아직 점수 없음"
   no_search_results_found_5f156ff9: "찾은 검색 결과 없음"
@@ -21778,7 +21922,7 @@ ko:
       authorize: "권한 부여"
       cancel: 취소
       details: 
-        allow_application: "%{app_name}에서 계정에 액세스하는 것을 허용합니다."
+        allow_application: "%{app_name}에서 Canvas 계정에 액세스하는 것을 허용합니다."
         email: "이메일 주소가 %{email}입니다."
         login_name: "이 앱에 %{user_name}로 로그인 중입니다."
       login: 로그인
@@ -22008,6 +22152,11 @@ ko:
   opportunities_eb978a67: 기회
   opportunities_popup_f6703842: "기회 팝업"
   optimized_grading_rubrics_b529d7c2: "최적화된 채점 루브릭"
+  optimized_load_enrollments_for_courses_index_b7429773: "과목 색인에 대해 최적화된 등록 로드"
+  optimizes_the_loading_of_enrollments_for_the_cours_fd4b0016: |
+      열의 제한된 설정으로 정확한 개체를 미리 로드하여 과목 색인 페이지의 
+      등록 로드를 최적화합니다. 이것은 특히 많이 등록한 사용자의 메모리 사용을 줄이고
+      성능을 개선합니다.
   option_1_dea39f90: "옵션 1"
   option_2_47aace2a: "옵션 2"
   option_3_30adfebc: "옵션 3"
@@ -22085,6 +22234,9 @@ ko:
   other_ddacb37d: 기타
   other_incorrect_match_options_c1418af5: "기타 정확하지 않은 일치 옵션:"
   other_resources_fee3ddda: "기타 리소스"
+  other_student_papers_bf318f4c: "다른 학생 보고서"
+  other_tool_configurations_use_this_domain_includin_c669be8f: "다른 도구 구성은 *%{first}* 및 **%{second}**을(를) 포함하여 이 도메인을 사용합니다. 충돌을 피하려면 가용성 설정이 중복되지 않도록 확인합니다."
+  other_tool_configurations_use_this_domain_includin_ef4d1741: "다른 도구 구성은 *%{first}*, **%{second}** 및 ***%{third}***을(를) 포함하여 이 도메인을 사용합니다. 충돌을 피하려면 가용성 설정이 중복되지 않도록 확인합니다."
   otherwise_please_follow_the_support_link_at_the_bo_ee7856a0: "그렇지 않은 경우 페이지 하단에 지원 링크를 따라가세요."
   our_new_reports_page_adds_dynamic_report_progress__31b2b409: "새로운 보고서 페이지에 동적 보고서 진행률 및 기록이 추가됩니다."
   out_of_78a76f91: "다음 중"
@@ -22401,6 +22553,7 @@ ko:
   page_views_data_is_not_available_at_this_time_3861ab06: "지금은 페이지 보기 데이터를 사용할 수 없습니다."
   page_views_eb64cf53: "페이지 보기"
   page_views_for_this_user_a0ea578a: "이 사용자의 페이지 보기"
+  page_views_history_is_not_available_in_this_enviro_8aa3fe43: "이 환경에서 페이지 보기 기록을 사용할 수 없습니다."
   page_views_only_312b7577: "페이지 보기만"
   page_views_rate_limit_exceeded_please_wait_and_try_e64c7709: "페이지 보기 속도 제한을 초과했습니다. 기다리고 다시 시도하세요."
   page_views_received_an_invalid_or_malformed_reques_33386508: "페이지 보기에서 잘못된 또는 형식이 틀린 요청을 받았습니다."
@@ -22525,6 +22678,7 @@ ko:
   paste_json_26ad8050: "JSON 붙여넣기"
   paste_xml_cda3a64e: "XML 붙여넣기"
   paste_zoom_into_calendar_events_announcements_disc_d873358e: "Zoom 링크를 캘린더 이벤트, 공지, 토론 및 RCE(서식 있는 콘텐츠 편집기)를 사용하는 모든 곳에 붙여넣습니다"
+  path_418fd67c: "경로:"
   path_4f9abf12: 경로
   path_type_198b46d7: "경로 유형"
   pause_12af3bb4: "일시 중지"
@@ -22535,6 +22689,7 @@ ko:
   pdf_does_not_contain_language_751f7fd1: "PDF가 언어를 포함하지 않습니다."
   pdf_file_d3fac21d: "PDF 파일"
   pdf_language_is_not_specified_in_the_document_prop_3d9f2048: "PDF 언어가 문서 속성에 지정되어 있지 않습니다."
+  pedagogical_activity_guidance_69492abb: "교육학적 활동 가이드"
   pedagogical_guidance_6195f27c: "교육학적 가이드"
   pedagogical_guidance_98e3902a: "교육학적 가이드"
   peer_632472b7: "동료:"
@@ -22550,6 +22705,7 @@ ko:
   peer_review_assignment_7d314c59: "동료 검토 과제"
   peer_review_comments_71cb4605: "동료 검토 댓글"
   peer_review_completed_a74de33: "동료 검토 완료"
+  peer_review_configuration_ae9a31e8: "동료 검토 구성"
   peer_review_due_date_cannot_be_after_assignment_lo_b75eaf3a: "동료 검토 기한 날짜는 과제 잠금 날짜 이후가 될 수 없음"
   peer_review_due_date_cannot_be_before_assignment_d_f623d0f7: "동료 검토 기한 날짜는 과제 기한 날짜 이전이 될 수 없음"
   peer_review_due_date_cannot_be_before_assignment_u_eb4486d0: "동료 검토 기한 날짜는 과제 잠금 날짜 이전이 될 수 없음"
@@ -22736,6 +22892,7 @@ ko:
   permit_usage_of_all_includes_parameters_for_this_d_aaff83d6: "이 개발자 키에 대해 모든 '포함' 매개 변수의 사용을 허용합니다. '포함' 매개 변수는 아래에 선택된 범위에 포함되지 않은 추가 데이터에 액세스를 제공할 수 있습니다."
   permitted_api_endpoints_b092c4cc: "허용된 API 엔드포인트"
   persian_a8cadb95: 이란어
+  persist_saml_signing_certificates_from_authenticat_f7165293: "지문 기반 인증서 일치를 사용하는 경우 인증 응답에서 SAML 서명 인증을 지속합니다."
   persisted_graphql_queries_f80a78f8: "지속 GraphGL 쿼리"
   persists_the_used_authentication_provider_when_log_15113afc: "로그인할 때 사용되는 인증 공급자를 지속하며 새 로그인은 기본적으로 기본 공급자"
   personal_profile_settings_8d31f0dd: "개인 프로필 설정"
@@ -22833,6 +22990,7 @@ ko:
   please_click_above_to_launch_the_tool_and_select_a_641da0df: "위를 클릭하여 도구를 시작하고 자료를 선택하세요."
   please_complete_the_verification_38b3784c: "확인을 완료하세요."
   please_confirm_you_want_to_move_forward_with_these_69a3ed38: "이 변경 사항으로 계속할 것인지 확인하세요."
+  please_contact_your_canvas_administrator_as_one_or_bb8bd4b0: "이 동료 검토 과제를 확인하기 위한 한 개 이상의 다음 기능 옵션이 사용으로 설정되어 있지 않으므로 Canvas 관리자에게 문의하세요."
   please_create_a_group_set_8db6e8fe: "그룹 설정을 만드세요"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "이 이메일에 회신하지 마세요. 이메일은 전달되지 않을 것입니다."
   please_enter_a_custom_from_name_b91f0caa: "사용자 지정 '시작/부터' 이름을 입력하세요."
@@ -22862,6 +23020,7 @@ ko:
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "유효한 URL을 입력하세요. 프로토콜은 필수입니다(예, http://, https://, ftp://, tel:, mailto:)."
   please_enter_an_enrollment_code_fffb05c1: "등록 코드를 입력하세요."
   please_enter_at_least_one_field_c52ecc95: "최소 한 개의 필드를 입력하세요."
+  please_enter_either_course_or_assignment_id_c9940904: "과목 또는 과제 ID를 입력하세요."
   please_enter_text_between_1_and_max_characters_lon_48052ae4: "1자 및 %{max}자 사이의 텍스트를 입력하세요"
   please_enter_the_code_sent_to_your_phone_1242ba72: "전화로 보낸 코드를 입력하세요."
   please_enter_the_details_for_the_new_course_dc705b8c: "새 과목에 대한 세부 정보를 입력하세요."
@@ -22906,6 +23065,7 @@ ko:
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "계속 발생하는 경우 Slack에 #canvas-sre에서 문의하세요."
   please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Slack에 #canvas-sre에서 문의하세요. 이 고객의 Canvas 인스턴스가 위치한 리전은 SFTP를 지원하지 않습니다."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "이 계정에 대해 SFTP를 만들려면 Slack에 #canvas-sre에서 문의하세요."
+  please_remove_the_authentication_provider_from_the_df3e28a5: "삭제하기 전에 Discovery 페이지에서 인증 공급자를 제거하세요."
   please_review_7a9dc15a: 검토하세요
   please_select_a_course_e06d8015: "과목을 선택하세요"
   please_select_a_csv_file_to_upload_d0bfcb29: "업로드할 CSV 파일을 선택하세요"
@@ -22934,6 +23094,7 @@ ko:
   please_select_at_least_one_filter_aafaa1a7: "최소 한 개의 필터를 선택하세요."
   please_select_at_least_one_option_2b83cad: "최소 한 개의 옵션을 선택하세요."
   please_select_at_least_one_option_d98cba70: "최소 한 개의 옵션을 선택하세요"
+  please_select_at_least_one_placement_38ab9305: "최소 한 개의 배치를 선택하세요."
   please_select_at_least_one_recipient_d03398b8: "최소 한 명의 수신자를 선택하세요."
   please_select_one_6be0e7e3: "하나를 선택하세요 ..."
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "지원 액세스에 대해 원하는 개인정보보호의 수준을 선택하세요"
@@ -23244,6 +23405,7 @@ ko:
         client_id: "클라이언트 ID"
         client_secret: "클라이언트 암호"
         default_proxy_auth_types: "기본값 프록시 인증 유형"
+        discovery_page_url: "Discovery 페이지 미리 보기 URL"
         discovery_url: "검색 URL"
         enable_redirects: "리디렉션 사용"
         oauth2_timeout_retries: "OAuth2 토큰 시간 초과 재시도"
@@ -23617,6 +23779,7 @@ ko:
   preview_a3f8f854: "미리 보기"
   preview_ai_experience_51e65049: "AI 경험 미리 보기"
   preview_and_ai_conversations_will_be_available_onc_e0ad1fa7: "처리가 완료되면 미리 보기 및 AI 대화를 사용할 수 있습니다. 나중에 다시 확인하세요."
+  preview_and_conversations_will_be_available_once_p_f1119dd0: "처리가 완료되면 미리 보기 및 대화를 사용할 수 있습니다. 나중에 다시 확인하세요."
   preview_confirm_8b9986a8: "미리 보기 및 확인"
   preview_experience_6fdb7129: "미리 보기 경험"
   preview_filename_f1b58572: "%{filename} 미리 보기"
@@ -24003,6 +24166,7 @@ ko:
   progress_9de4af8f: 진행률
   progress_for_account_name_ef203250: "%{account_name}의 진행률"
   progress_loading_bar_a26b8861: "진행률/로드 표시"
+  progress_overview_739021bc: "진행률 개요"
   progress_overview_pagination_6aea9cf9: "진행률 개요 페이지 매김"
   progress_percent_ae80cd55: "%{progress} 퍼센트"
   project_groups_1fa0320b: "프로젝트 그룹"
@@ -24013,6 +24177,7 @@ ko:
   proprietary_rights_9689a1ef: "독점 권한: "
   proserv_submission_comments_f1e4798c: "Proserv 제출 의견"
   proservices_unsubmitted_assignments_963cc1a8: "Proservices 제출하지 않은 과제"
+  provide_a_prompt_that_tells_the_llm_language_learn_475d1f9d: "LLM(대규모 언어 모델)에게 활동을 제공하는 방식을 설명하는 프롬프트를 제공하세요."
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "IdP의 메타데이터에 URI를 제공하여 기타 필드를 자동으로 생성합니다. 학교가 InCommon 또는 UK Access Management Federation의 일부분인 경우, 메타데이터 URI에 각각 urn:mace:incommon 또는 http://ukfederation.org.uk를 지정하고 학교의 엔터티 ID를 제공합니다."
   provide_igniteai_with_a_closed_loop_of_sources_to__c4a7449: "참조할 피드백 방식의 출처로 IgniteAI를 제공합니다."
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
@@ -24140,6 +24305,7 @@ ko:
     unpublish: "게시 취소"
     unpublish_click: "게시가 취소되었습니다. 게시하려면 클릭하십시오."
     unpublishing: "게시 취소 중..."
+  publish_knowledge_chat_a8c08622: "지식 채팅 게시"
   publish_module_and_all_items_d263682e: "모듈 및 모든 항목 게시"
   publish_module_only_bb43f612: "모듈만 게시"
   publish_modules_only_c638f88: "모듈만 게시"
@@ -24203,6 +24369,7 @@ ko:
   quality_96371bf2: 품질
   quantitative_data_options_4f071510: "정량적 데이터 옵션"
   query_failed_please_try_again_later_f9e816df: "쿼리하지 못했습니다. 나중에 다시 시도하세요."
+  query_queue_is_at_capacity_please_wait_and_try_aga_292fcce8: "쿼리 큐 용량 한도에 도달했습니다. 기다리고 다시 시도하세요."
   question_9121487: 문제
   question_answered: 답변했음
   question_bank: 
@@ -25653,6 +25820,7 @@ ko:
   quotas_account_settings_22c12b8d: "할당량(계정 설정)"
   quote_ae4462ad: 인용
   quote_reply_e56ad360: "답변 인용"
+  quoted_material_ffaea62b: "인용된 자료"
   radio_button_option_1_a8ec51f9: "라디오 버튼 옵션 1"
   radio_button_option_2_31e50043: "라디오 버튼 옵션 2"
   range_56b2f310: 범위
@@ -25682,6 +25850,7 @@ ko:
       배치하는 대신에 이 기능을 사용으로 설정하면 수동으로 과목을 만들 수 있는
       사용자가 과목을 자신이 등록한 하위 계정에
       놓을 수 있습니다.
+  rating_4474fd38: 등급
   rating_button_buttondisplay_selectedtext_658abbea: "등급 버튼 %{buttonDisplay} %{selectedText}"
   rating_button_buttonlabel_selectedtext_8f62e964: "등급 버튼 %{buttonLabel} %{selectedText}"
   rating_description_db6adf39: "등급 설명"
@@ -25691,6 +25860,7 @@ ko:
   rating_name_6f633d52: "등급 이름"
   rating_options_6c51fc9a: "등급 옵션"
   rating_order_e57f63ed: "등급 순서"
+  rating_scale_fc10d5f1: "등급 비율"
   rating_scale_ratingslength_25100b7a: "등급 비율: %{ratingsLength}"
   rating_score_22cfc724: "등급 점수"
   rating_selected_85c31e4c: "선택된 등급"
@@ -25799,6 +25969,7 @@ ko:
     one: "읽기 상태 변경됨!"
     other: "읽기 상태 변경됨!"
   read_tag_import_instructions_cbde268b: "태그 가져오기 방법 읽기"
+  read_the_documentation_8c1e2af1: "설명서 읽기"
   ready_for_sync_16eaf713: "동기화 준비 완료"
   ready_to_enroll_panel_46f45abb: "패널 등록 준비 완료"
   ready_to_review_8b2d96ac: "검토 준비 완료"
@@ -25818,6 +25989,7 @@ ko:
   recent_exports_last_24_hours_c883f46a: "최근 내보내기 (지난 24시간)"
   recent_exports_table_cb98b2dd: "최근 내보내기 표"
   recent_f19e8c64: 최근
+  recent_grades_c80850fc: "최근 성적"
   recent_grades_pagination_aad399c8: "최근 성적 페이지 매김"
   recent_history_bcb0f4c0: "최근 기록"
   recent_history_tray_241a384e: "최근 기록 트레이"
@@ -25857,6 +26029,7 @@ ko:
   record_audio_video_d9993f6c: "오디오/동영상 녹화"
   record_media_6637ff19: "미디어 녹화"
   record_not_found_da7857e9: "녹화를 찾을 수 없음"
+  record_saml_certificates_7591d406: "SAML 인증서 기록"
   record_upload_media_comment_4d01b943: "미디어 댓글 녹화/업로드"
   record_videos_and_screen_capture_with_auto_caption_5c6bc705: "자동 캡션으로 동영상 및 화면 캡처를 녹화합니다."
   record_with_microphone_only_e4ee07aa: "마이크로 녹음만"
@@ -26152,6 +26325,7 @@ ko:
   reopen_bf3372f6: "다시 열기"
   reopen_remediation_d51f520d: "수정 다시 열기"
   reopening_remediation_please_wait_631e0801: "수정을 다시 여는 중입니다. 기다려 주세요..."
+  reorder_672cf4f2: "순서 변경"
   reorder_blocks_4014c1a7: "블록 순서 변경"
   reorder_widgetname_cfe53293: "%{widgetName} 순서 변경"
   reorders_some_menu_options_for_more_consistency_an_90efff07: "일부 메뉴 옵션을 더 높은 일관성을 위해 순서를 변경하고 SpeedGrader에 링크를 추가합니다."
@@ -27001,6 +27175,7 @@ ko:
   search_assignments_as_you_type_in_this_field_the_l_7800de37: "과제를 검색합니다. 이 필드에 입력하면 과제의 목록은 자동으로 필터링되어 이름이 입력과 일치하는 그룹만 포함합니다."
   search_by_99d1ba5f: "검색 기준"
   search_by_app_or_company_name_ad468715: "앱 또는 회사 이름으로 검색"
+  search_by_course_or_assignment_id_78c9553c: "과목 또는 할당 ID로 검색"
   search_by_course_title_sis_id_d557bb77: "과목 제목, SIS, ID 등으로 검색"
   search_by_name_email_or_id_5fd43dc9: "이름, 이메일 또는 ID로 검색"
   search_by_name_or_id_3bdab12e: "이름 또는 ID로 검색"
@@ -27267,6 +27442,7 @@ ko:
   select_a_new_end_date_70006c3d: "새 종료 날짜 선택"
   select_a_outcome_to_view_additional_information_61a282f: "성과를 선택하여 추가 정보 보기"
   select_a_predefined_color_c77ab2f5: "미리 정의된 색을 선택합니다."
+  select_a_provider_74748d4f: "공급자 선택..."
   select_a_provisional_grade_7106e3d5: "임시 성적을 선택"
   select_a_question_a6d8bece: "문제를 선택"
   select_a_question_bank_f346e5a0: "문제 은행을 선택"
@@ -27384,6 +27560,7 @@ ko:
   select_outcome_title_b99b3ca0: "성과 %{title} 선택"
   select_page_e93fc123: "페이지 선택"
   select_peer_to_review_3d3dd335: "검토할 동료 선택"
+  select_peer_to_review_f7f5aedb: "검토할 동료 선택"
   select_placements_type_or_use_arrow_keys_to_naviga_a6bfd561: "배치를 선택합니다. 입력하거나 화살표 키를 사용하여 탐색합니다. 여러 개 선택이 허용됩니다."
   select_position_17125e16: "위치 선택"
   select_prerequisite_3b049b02: "사전 요구 사항 선택"
@@ -27666,6 +27843,7 @@ ko:
   set_to_threaded_ca4719fa: "스레드로 설정"
   set_type_is_required_c875e747: "설정 유형은 필수입니다"
   set_type_set_type_is_not_supported_supported_types_2f3546ec: "설정 유형 '%{set_type}'을(를) 지원하지 않습니다. 지원하는 유형: %{supported_types}"
+  set_up_a_closed_loop_of_sources_to_reference_1b457125: "참조할 피드백 방식의 출처를 설정합니다."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           성취도 등급을 학습 정복 성적부 안에서 표시하는 방법을 설정합니다.\n\
       \x20           등급의 수, 정복 수준, 점수 및 색을 조정합니다.\n\
@@ -27818,6 +27996,7 @@ ko:
       ? "User Research"
       : ""
       by_instructure: "Instructure 제공"
+      cookie_consent_settings: "동의 설정"
       open_source_learning_management_system: "오픈 소스 LMS"
     components: 
       ic_submission-download-dialog: 
@@ -28804,6 +28983,7 @@ ko:
   slovak_69f48e1b: 슬로바키아어
   slovenian_30ae5208: 슬로베니아어
   small_b070434a: 작은
+  small_matches_581ab241: "작은 일치"
   small_text_contrast_29d0171f: "작은 텍스트 대비"
   smaller_numbers_mean_higher_priority_c69f4d0a: "작은 수는 더 높은 우선 순위를 의미"
   smart_alerts_44db622e: "스마트 알림"
@@ -29319,6 +29499,7 @@ ko:
   students_can_edit_and_view_page_history_if_allowed_67f9b8da: "학생은 개별 페이지의 옵션에서 허용된 경우 페이지 기록을 편집하고 볼 수 있습니다."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "학생은 이 날짜 사이에만 과목에 참여할 수 있음"
   students_can_see_originality_score_797fe634: "학생이 표절 검사 점수를 볼 수 있음"
+  students_can_see_the_originality_report_f246beb0: "학생이 독창성 보고서를 볼 수 있음"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "학생은 과목 종결 이후에 퀴즈 응답을 볼 수 없음"
   students_enrolled_babf3cb8: "학생 등록됨"
   students_enrolled_in_this_course_859fa7a2: "학생이 이 과목에 등록됨"
@@ -29368,6 +29549,8 @@ ko:
   students_with_no_results_6bd5424b: "결과가 없는 학생"
   students_with_no_submissions_title: "제출이 없는 학생"
   studio_capture_a88ec4e: "스튜디오 캡처"
+  study_assist_aac2d50b: "학습 어시스트"
+  study_tools_617c3972: "학습 도구"
   style_f6881133: 스타일
   sub_account_c213944c: "하위 계정"
   sub_account_daeadd0: "하위 계정"
@@ -29792,8 +29975,10 @@ ko:
   switch_to_3f310557: "전환 대상"
   switch_to_allow_2f22d00c: "허용으로 전환"
   switch_to_canvas_career_429eaf96: "Canvas Career로 전환"
+  switch_to_dark_mode_1edddff4: "어두운 모드로 전환"
   switch_to_group_group_name_786b913b: "그룹 %{group_name}(으)로 전환"
   switch_to_individual_posts_819d8699: "개별 게시물로 전환"
+  switch_to_light_mode_a81ded71: "밝은 모드로 전환"
   switch_to_new_dashboard_view_6b7f0a12: "새 대시보드 보기로 전환"
   switch_to_new_files_page_e57a0147: "새 파일로 전환 페이지"
   switch_to_off_4957890c: "비활성으로 전환"
@@ -30208,6 +30393,7 @@ ko:
   the_announcement_section_is_where_you_can_add_an_a_da17a150: "공지 섹션에서 페이지에 공지를 추가할 수 있습니다."
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "공지 '%{title}'을(를) 모듈 \"%{mod_title}에 연결할 수 없습니다\""
   the_announcements_tab_is_always_visible_to_admins__58df854d: "공지 탭은 관리자에게 항상 표시되지만 공지를 관리하려면 전역 공지 - 추가/편집/삭제도 사용으로 설정해야 합니다."
+  the_app_name_was_not_imported_because_it_has_been__b96884bc: "관리자가 '%{name}' 앱을 배포하는 것을 잠갔기 때문에 가져올 수 없었습니다. 가져오려면 관리자에게 잠금 해제를 요청하세요."
   the_app_was_activated_a84e055f: "앱이 활성화됨"
   the_app_was_added_58e2836a: "앱이 추가됨"
   the_app_was_added_successfully_3f785a23: "앱이 추가되었습니다"
@@ -30285,6 +30471,7 @@ ko:
   the_conversion_job_failed_9d8eee55: "변환 작업에 실패했습니다."
   the_course_accessibility_checker_is_not_yet_availa_b8425664: "과목 접근성 확인 기능은 1,000개 이상의 리소스(페이지, 과제 및 첨부 파일을 모든 합산)가 있는 과목에 대해 사용할 수 없습니다."
   the_course_accessibility_checker_is_not_yet_availa_dbc51b93: "과목 접근성 확인 기능은 1,000개 이상의 리소스(페이지 및 과제 합산)가 있는 과목에 대해 사용할 수 없습니다."
+  the_course_accessibility_checker_scans_pages_assig_5f2707f0: "과목 접근성 확인 기능은 페이지, 과제, 토론, 공지 및 강의 계획안에서 서식이 있는 텍스트 편집기 또는 기타 텍스트 편집기로 만든 콘텐츠에서 일반적으로 발생하는 일반적 접근성 오류를 스캔합니다."
   the_course_end_date_can_not_occur_before_the_cours_384dd741: "과목 종료 날짜는 과목 시작 날짜 이전이 될 수 없습니다."
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       과목 홈페이지는 학생이 과목을 열 때 처음 표시되는
@@ -30378,6 +30565,7 @@ ko:
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "추천 링크를 목록의 맨 위로 이동했습니다."
   the_field_field_is_required_56512820: "'%{field}' 필드는 필수입니다"
   the_field_field_must_have_no_spaces_d1c2fc37: "'%{field}' 필드에는 공백이 없어야 합니다"
+  the_file_exceeds_the_maximum_allowed_size_for_ai_p_d70d00fa: "이 파일은 AI 프로세스에 대한 최대 허용 크기를 초과합니다."
   the_file_is_empty_or_does_not_contain_valid_assess_4284333e: "파일은 비어 있거나 유효한 평가 데이터를 포함하지 않습니다."
   the_file_is_empty_or_does_not_contain_valid_rubric_4788361a: "파일은 비어 있거나 유효한 루브릭 데이터를 포함하지 않습니다."
   the_file_is_not_a_valid_csv_file_91d7384a: "파일은 유효한 CSV가 아닙니다."
@@ -30741,6 +30929,7 @@ ko:
   there_was_an_error_loading_the_document_d80e57e0: "문서를 로드하는 데 오류가 있었습니다."
   there_was_an_error_loading_the_insights_caafae37: "인사이트를 로드하는 데 오류가 있었습니다"
   there_was_an_error_loading_the_pace_810e3a7e: "진도를 로드하는 데 오류가 있었습니다."
+  there_was_an_error_locking_the_app_please_try_agai_922e4680: "앱을 잠그는 데 오류가 있었습니다. 다시 시도하세요."
   there_was_an_error_publishing_your_course_pace_1aa5fdeb: "과목 진도를 게시 데 오류가 있었습니다．"
   there_was_an_error_removing_the_image_c83acffe: "이미지를 제거하는 데 오류가 있었습니다"
   there_was_an_error_removing_the_item_f8324776: "항목을 제거하는 데 오류가 있었습니다"
@@ -30768,6 +30957,7 @@ ko:
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "유사성 탐지 서비스에 제출하는 데 오류가 있었습니다. 지원 팀에 문의하기 전에 다시 제출해보세요."
   there_was_an_error_submitting_your_attempt_fdbe9259: "시도를 제출하는 데 오류가 있었습니다."
   there_was_an_error_unenrolling_from_the_course_ple_7062a94c: "과목에서 등록을 취소하는 동안 오류가 있었습니다. 다시 시도하세요."
+  there_was_an_error_unlocking_the_app_please_try_ag_b9b34241: "앱을 잠금 해제하는 데 오류가 있었습니다. 다시 시도하세요."
   there_was_an_error_updating_a_filter_2a5ebc87: "필터링을 업데이트하는 데 오류가 있었습니다."
   there_was_an_error_updating_module_and_items_publi_61b23c00: "모듈 및 항목 게시 상태를 업데이트하는 데 오류가 있습니다. 페이지를 새로 고치세요."
   there_was_an_error_updating_the_submission_a8d8591e: "제출을 업데이트하는 데 오류가 있었습니다."
@@ -30832,7 +31022,9 @@ ko:
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "다중 인증 장치를 사용할 수 없는 경우 이 백업 코드를 사용할 수 있습니다. 인쇄하여 지갑과 같이 안전한 곳에 보관하세요."
   these_content_types_will_not_be_available_in_canva_91682606: "이런 콘텐츠 유형은 Canvas Career에서 사용할 수 없습니다. 이런 항목을 지원하는 형식으로 수정하거나 포함하지 않고 계속할 수 있습니다. 토론을 과목에서 제거합니다. 공동 작업 및 성과는 숨겨집니다. 클래식 퀴즈는 새로운 퀴즈로 변환되어야 합니다."
   these_features_and_the_tech_behind_them_belong_to__77f1746e: "이 기능(및 그 이면의 기술)은 Instructure에게 속합니다. 자신의 내부적 사용으로만 액세스할 수 있습니다. 공유 또는 재판매는 금지됩니다."
+  these_options_are_hidden_until_a_user_expands_the__e37e94af: "이 옵션은 사용자가 로그인 페이지에서 '옵션에서 더 많은 기호' 섹션을 확장할 때까지 숨겨집니다."
   these_permissions_control_the_ability_to_create_ed_d4d043b7: "이 권한은 맞춤형 태그를 만들고 편집하고 삭제하는 기능을 제어합니다."
+  these_permissions_control_the_ability_to_view_crea_45a186b6: "이 권한은 기관 태그를 보고 만들고 편집하는 기능을 제어합니다."
   these_permissions_do_not_manage_discussions_discus_79defb66: "이 권한은 토론을 관리하지 않습니다. 토론은 개별 토론 권한을 통해 관리합니다."
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "이 대명사는 계정에 Canvas 사용자가 선택할 수 있도록 사용 가능하게 됩니다."
   they_them_f4d17a04: 이들/이들에게
@@ -30841,6 +31033,7 @@ ko:
   third_20c6a639: 3번째
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "이 계정은 Microsoft Teams sync를 사용하는 것을 허용하지 않습니다. 설정을 편집하기 전에 'Microsoft 그룹 등록 동기화' 기능 플래그를 사용으로 설정하세요."
   this_account_does_not_own_this_app_and_therefore_c_43949bfc: "이 계정은 이 앱을 소유하지 않으므로 구성을 편집할 수 없습니다."
+  this_account_does_not_own_this_app_and_therefore_c_89b0fc0e: "이 계정은 이 앱을 소유하지 않으며 따라서 잠글 수 없습니다."
   this_account_does_not_own_this_app_and_therefore_c_901eb52: "이 계정은 이 앱을 소유하지 않으므로 삭제할 수 없습니다."
   this_account_does_not_own_this_app_and_therefore_c_9ab22b6e: "이 계정은 이 앱을 소유하지 않으므로 구성을 초기화할 수 없습니다."
   this_adds_an_option_to_pick_the_tool_from_the_the__a1252655: "제출 유형 드롭다운 목록에서 도구를 선택하는 옵션을 추가합니다"
@@ -30850,9 +31043,12 @@ ko:
   this_allows_the_tool_to_provide_content_in_an_ifra_7651e8db: "도구가 과제 편집 페이지 내에서 iFrame에 콘텐츠를 제공하는 것을 허용합니다"
   this_and_all_following_events_4b4b283: "이것 및 모든 다음 이벤트"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "이 공지는 %{delayedPostAt}까지 표시되지 않습니다."
+  this_app_has_been_locked_by_an_administrator_and_i_4d239b21: "이 앱은 관리자가 잠갔으며 설치할 수 없습니다."
   this_app_has_no_permissions_configured_f58796f8: "이 앱에는 구성된 권한이 없습니다."
   this_app_is_locked_on_by_instructure_and_cannot_be_7d545f6d: "이 앱은 Instructure에 의해 잠겨있으며 삭제할 수 없습니다."
   this_app_s_configuration_is_managed_by_instructure_73c6c109: "이 앱의 구성은 Instructure에서 관리하므로 변경할 수 없습니다."
+  this_app_will_become_deployable_via_client_id_and__57ed80b1: "이 앱은 클라이언트 ID를 통하여 및 과목 복사본을 통하여 배포 가능하게 됩니다. 언제든지 나중에 잠가서 새 배포를 방지할 수 있습니다."
+  this_app_will_no_longer_deployable_by_client_id_or_cb850139: "이 앱은 더 이상 클라이언트 ID 또는 과목 복사본으로 배포할 수 없습니다. 루트 계정에서 또는 제어 사용 가능성에서 배포하려면 Canvas 앱을 사용하세요. 기존 배포는 영향을 받지 않습니다. 언제든지 이 페이지에서 앱을 잠금 해제할 수 있습니다."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "이 영역은 평가자가 기준과 관련한 의견을 남기는 데 사용합니다."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "이 과제는 최종 성적에 계산되지 않습니다."
   this_assignment_does_not_have_peer_reviews_enabled_6fd402cd: "이 과제에는 동료 검토를 사용으로 설정하지 않았습니다"
@@ -30928,6 +31124,7 @@ ko:
   this_enables_support_for_document_processing_using_80782866: "이것은 채점된 토론 내의 LTI 자산 프로세서 사양을 사용한 문서 처리에 대한 지원을 사용으로 설정합니다."
   this_enables_users_to_generate_and_download_course_4c69c531: "이것은 사용자들에게 과목을 ePub로 생성하고 다운로드하는 것을 허용합니다."
   this_endpoint_only_works_for_differentiation_tags_befab24e: "이 엔드포인트는 맞춤형 태그에 대해서만 작동합니다"
+  this_endpoint_requires_a_post_request_7007a8dd: "이 엔드포인트는 POST 요청이 필요합니다"
   this_environment_is_currently_being_updated_with_a_235f1875: "이 환경은 현재 최신 프로덕션 데이터의 복사본으로 업데이트되는 중입니다. 다중에 다시 확인하세요."
   this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "이 ePortfolio는 스팸 가능으로 플래그가 지정되었습니다. 관리자가 검토할 때까지 나에게만 표시될 수 있습니다. 질문이 있는 경우 관리자에게 문의하세요."
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "이 ePortfolio는 스팸 가능으로 식별되었습니다. 현재는 관리자 및 작성자에게만 표시됩니다. 이 콘텐츠가 스팸이 아니라고 확신하는 경우, 안전하다고 표시할 수 있습니다. 그렇지 않은 경우, 스팸으로 확인할 수 있습니다."
@@ -31006,6 +31203,7 @@ ko:
   this_file_must_be_csv_aca2c67c: "이 파일은 csv여야 합니다."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "이 파일을 게시하려면 usage_rights이(가) 설정되어 있어야 합니다."
   this_file_type_is_not_allowed_accepted_file_types__a1a46f69: "이 파일 유형은 허용되지 않습니다. 수락되는 파일 유형: %{fileTypes}."
+  this_file_type_is_not_supported_for_ai_processing_bc05b186: "이 파일 유형은 AI 프로세스를 지원하지 않습니다."
   this_flag_changes_the_way_rce_content_is_loaded_in_b72905ec: "이 플래그는 요청으로 Canvas를 통하여 프록시하기 위해 RCE 콘텐츠가 iFrame에 로드되는 방식을 변경합니다."
   this_flag_controls_if_an_instance_has_access_to_pr_c6fd6dc8: "이 플래그는 인스턴스가 프리미엄 LTI 사용 기능에 액세스가 있는지 제어합니다. 이 기능에 대해 지불하는 계약이 있는 학교에서만 사용으로 설정해야 합니다."
   this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: "이 플래그는 작동되지 않으면 테스트 전용입니다."
@@ -31093,6 +31291,7 @@ ko:
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "조정할 새 성적이 있으면 여기에 다시 표시됩니다."
   this_key_has_been_customized_in_the_apps_page_edit_fa390cc1: "이 키는 앱 페이지에서 사용자 지정되었습니다. 거기에서 편집하여 변경합니다."
   this_key_includes_settings_that_are_only_supported_db9a412a: "이 키는 Canvas 앱에서만 지원되는 설정을 포함합니다. 변경 사항을 이 페이지에 저장할 수 없습니다."
+  this_knowledge_chat_9581aae1: "이 지식 채팅"
   this_link_will_open_in_a_new_tab_96adc1e8: "이 링크는 새 탭에서 열립니다."
   this_lo_type_was_previously_assigned_via_different_b8cbbcb6: "이 %{lo_type}은(는) 이전에 맞춤형 태그를 통해 할당되었습니다. 이 과제를 편집하려면 맞춤형 태그를 개별 태그로 변환해야 합니다."
   this_login_is_for_provider_6f17462: "이것은 %{provider}에 대한 로그인입니다"
@@ -31252,6 +31451,7 @@ ko:
   this_topic_is_closed_for_comments_3dd10c00: "이 주제는 댓글을 추가할 수 없습니다."
   this_translation_is_generated_by_ai_please_note_th_e84a6f76: "이 번역은 AI가 생성합니다. 결과는 항상 정확하지 않을 수도 있습니다."
   this_update_has_already_been_applied_to_appname_1077d639: "이 업데이트는 이미 *%{appName}*에 적용되었습니다."
+  this_update_has_already_been_rejected_for_appname_9a5fbec7: "이 업데이트는 이미 *%{appName}*에 대해 거부되었습니다."
   this_user_has_been_deleted_8caa45be: "이 사용자는 삭제되었습니다."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "이 사용자는 과목에서 여러 역할이 있습니다. 여기에서 이들의 역할을 변경하면 이들의 모든 현재 등록을 덮어씁니다."
   this_user_has_not_generated_any_access_tokens_f7325ae6: "이 사용자는 액세스 토큰을 생성하지 않았습니다."
@@ -31671,6 +31871,7 @@ ko:
   to_do_5526f10a: "할 일:"
   to_do_6ac7b2dc: "할 일:"
   to_do_6d6bb7ea: "할 일:"
+  to_do_88d16b94: "할 일"
   to_do_date_2cb4bf7b: "할 일 날짜:"
   to_do_date_84b53178: "할 일: %{date}"
   to_do_date_ascending_c3a59abb: "할 일 날짜: 오름차순"
@@ -32167,6 +32368,7 @@ ko:
   type_or_use_arrow_keys_to_navigate_options_multipl_230dbaf7: "입력하거나 화살표 키를 사용하여 옵션을 탐색합니다. 여러 개 선택이 허용됩니다."
   type_something_5fbbeb3b: "입력을 시작"
   type_something_79a0f02c: "입력을 시작..."
+  type_the_account_name_to_confirm_be7f7c75: "계정 이름을 입력하여 확인"
   type_to_add_block_title_269302ae: "입력하여 블록 제목을 추가"
   type_to_add_body_e4b9e290: "입력하여 본문을 추가"
   type_to_navigate_options_26ba9c72: "입력하여 옵션을 탐색합니다."
@@ -32358,6 +32560,8 @@ ko:
   unlimited_ff19e96d: 무제한
   unlink_473a690a: "연결 해제"
   unlink_rubric_b53da02f: "루브릭 연결 해제"
+  unlock_app_cccef43d: "앱 잠금 해제"
+  unlock_app_f483b2dd: "앱 잠금 해제"
   unlock_at_time_a0bbfb9: "잠금 해제: %{time}"
   unlock_date_can_t_be_blank_43efb114: "잠금 해제 날짜는 비어 있을 수 없음"
   unlock_date_cannot_be_after_assignment_lock_date_6aa2a595: "잠금 해제 날짜는 과제 잠금 날짜 이후일 수 없음"
@@ -32406,6 +32610,7 @@ ko:
   unpublish_ai_experience_b021b0f0: "AI 경험 게시 취소"
   unpublish_all_modules_and_items_ba0291f4: "모든 모듈 및 항목을 게시 취소"
   unpublish_and_save_af140caa: "게시 취소 및 저장"
+  unpublish_knowledge_chat_22816057: "지식 채팅 게시 취소"
   unpublish_module_and_all_items_e6dd35e5: "모듈 및 모든 항목을 게시 취소"
   unpublish_module_only_1987d840: "모듈만 게시 취소"
   unpublish_modules_only_934a9ab: "모듈만 게시 취소"
@@ -32485,6 +32690,7 @@ ko:
   upcoming_due_date_assignment_name_course_name_ac1766c1: "예정된 기한 날짜 - %{assignment_name}, %{course_name}"
   update_4d8ee62: 업데이트
   update_already_applied_8f1ef739: "업데이트가 이미 적용됨"
+  update_already_rejected_61119272: "이미 거부됨 업데이트"
   update_app_b2b8c794: "앱 업데이트"
   update_at_least_one_date_to_save_changes_8f09b8b1: "최소 한 개 날짜를 업데이트하여 변경 사항을 저장합니다."
   update_available_34c655c4: "업데이트 사용 가능"
@@ -32503,6 +32709,7 @@ ko:
   update_overview_99c45c71: "개요 업데이트"
   update_pages_c91d7ba: "페이지 업데이트"
   update_password_4bc5cb1f: "비밀번호 업데이트"
+  update_question_without_regrading_47c9904a: "다시 평가하지 않고 문제를 업데이트"
   update_quota_81381226: "할당량 업데이트"
   update_rating_6d29c2ef: "등급 업데이트"
   update_report_7623967f: "보고서 업데이트"
@@ -32611,6 +32818,7 @@ ko:
   url_8c4ff7d2: URL
   url_cc9398ca: "URL:"
   url_does_not_refer_to_a_jwks_f1667fb3: "%{url}이(가) JWKS를 참조하지 않음"
+  url_for_the_discovery_page_iframe_defaults_to_auth_5b1a3782: "Discovery 페이지 iFrame의 URL입니다. 비워둔 경우 기본값은 <authentication_url>/discovery/<global_org_id>입니다. 프로토콜 및 엔드포인트에 전체 경로를 포함해야 합니다. 예: https://auth.example.com/discovery/123456789"
   url_is_required_3893dea9: "URL이 필수입니다"
   url_is_required_4689ed84: "URL이 필수입니다"
   url_is_too_long_maximum_max_characters_a6861e7a: "URL이 너무 깁니다(최대 %{max}자)"
@@ -32654,6 +32862,7 @@ ko:
   use_dashboard_imported_from_platform_ui_b4b1460d: "플랫폼 UI에서 가져온 대시보드를 사용합니다."
   use_default_890939b7: "기본값 사용"
   use_direct_api_call_for_content_migration_complete_7d006ae5: "content_migration_completed 이벤트에 대핸 직접 API 호출을 사용합니다. 새로운 퀴즈 측면 기능 플래그 필요: enable_event_endpoint"
+  use_discovery_page_bf195f47: "Discovery 페이지 사용"
   use_enhanced_comment_library_in_speedgrader_c143b2fc: "SpeedGrader에서 향상된 의견 라이브러리를 사용"
   use_experimental_features_before_they_are_generall_3dfaddd1: "프로덕션에 일반 공급으로 사용 가능하기 전에 실험적 기능을 사용"
   use_file_verifier_authentication_for_new_quiz_file_3f0594ef: "새로운 퀴즈 파일 링크에 대해 파일 확인자 인증을 사용"
@@ -32681,6 +32890,7 @@ ko:
   use_of_this_feature_is_subject_to_the_early_access_76fb95cd: "이 기능의 사용은 조기 액세스 프로그램 약관을 따릅니다"
   use_opendyslexia_font_11928676: "OpenDyslexia 글꼴 사용"
   use_parent_account_setting_f25a721f: "상위 계정 설정 사용"
+  use_post_for_oauth2_deny_endpoint_ec0bc0bf: "OAuth2 거부 엔드포인트에 대해 POST 사용"
   use_queue_for_rate_limiting_gradebook_graphql_requ_c2c03108: "성적부 GraphQL 요청을 제한하는 속도에 큐를 사용"
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
       퀴즈를 사용하여 학생의 이해력에 도전을 주고 과목 자료의 이해도를
@@ -32703,6 +32913,7 @@ ko:
   use_this_grading_scheme_52aa4ecf: "이 성적 평가 기준을 사용"
   use_this_license_9d339145: "이 라이선스를 사용"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "이 목록을 사용하여 할당된 학생을 제거합니다. 목록 이후에 콤보 상자로 새 학생을 추가합니다."
+  use_this_option_if_you_need_more_customization_tha_1f061d1: "네이티브 Discovery 페이지에서 제공하는 것보다 더 많은 사용자 지정이 필요한 경우 이 옵션을 사용하세요."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "이 패널을 사용하여 중복된 결과 또는 검색에서 찾을 수 없는 사용자를 확인합니다."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "이 패널을 사용하여 이 과목에 추가하려는 사용자를 검색합니다."
   use_this_photo_3a594830: "이 사진을 사용"
@@ -33267,6 +33478,7 @@ ko:
   users_view_login_ids_a2e6a85: "사용자 - 로그인 ID 보기"
   users_view_primary_email_address_14f4978f: "사용자 - 주요 이메일 주소 보기"
   users_who_have_logged_in_within_this_many_years_wi_9d82ab61: "이 연도 중에 로그인했던 사용자는 백필됩니다"
+  users_will_be_redirected_to_this_provider_to_compl_6e68b9ed: "사용자는 이 공급자에게 리디렉션되어 로그인을 완료합니다."
   users_with_a_suspended_login_because_of_maximum_lo_60441f2: "로그인이 일시 중단된 사용자는(최대 로그인 시도 정책으로 인해) 교육 기관의 관리자가 일시 중단을 해제해야 합니다."
   users_with_no_enrollments_5dddce33: "등록하지 않은 사용자"
   users_with_this_permission_may_be_able_to_use_the__838a780f: "이 권한이 있는 사용자는 가장 기능을 사용하여 계정 설정을 관리하고 성적을 보고 조정하고 사용자 정보 등에 액세스할 수 있습니다."
@@ -33372,6 +33584,7 @@ ko:
   view_coursename_gradebook_8b3a6240: "%{courseName} 성적부 보기"
   view_coursename_gradebook_9cbe0e3: "%{courseName} 성적부 보기"
   view_coursename_s_assignment_group_totals_bd4b707: "%{courseName}의 과제 그룹 합계 보기"
+  view_create_edit_16a1de55: 보기/만들기/편집
   view_decorative_image_carousel_ba1e4d77: "장식 이미지 캐러셀 보기"
   view_description_b6d8e52b: "설명 보기"
   view_details_for_key_developername_5530eb71: "키 %{developerName}의 세부 정보 보기"
@@ -33528,6 +33741,7 @@ ko:
   we_customize_ai_solutions_tailored_to_the_unique_n_820f54de: "교육 기관의 공유한 필요 및 자료에 맞춰 AI 솔루션을 사용자 지정합니다. 고객 데이터를 사용하여 데이터를 미세 조정하고 귀하의 기관에만 적용되는 AI 모델을 훈련합니다. 기관의 데이터는 교육된 모델을 통해서만 적용됩니다."
   we_d_love_to_hear_your_thoughts_what_s_working_wel_b64ef85c: "어떤 부분이 잘 작동하며 어떤 부분에 개선이 필요한지 귀하의 의견을 듣고 싶습니다. 제공한 피드백을 사용하여 저희 제품 및 서비스를 개선할 수 있습니다."
   we_do_not_anticipate_any_action_required_by_your_a_1295a7f3: "이런 변경 사항의 결과로 관리자 또는 최종 사용자의 작업이 필요할 것으로 예상되지 않습니다. 저희 목표는 이 전환이 완전히 투명한 것입니다. 그렇지만 추가적 확신을 제공하기 위해 리디렉션 날짜 이전에  수동으로 통합을 확인할 것을 제안합니다. 다음 새 로그인 URL로 직접 탐색하고 일반적인 경우와 같이 로그인하여 작업을 수생할 수 있습니다."
+  we_don_t_check_new_quizzes_videos_and_uploaded_fil_972481c8: "새로운 퀴즈, 동영상 및 PDF와 같은 업로드된 파일, 또는 Google Docs와 같은 연결된 외부 콘텐츠를 확인하지 않습니다. RCE 외부에서 만든 상호 작용 및 복잡한 레이아웃에서 오류를 확인하지 않습니다."
   we_emailed_a_confirmation_link_to_email_click_the__10a6c3b2: "확인 링크를 *%{email}*(으)로 보냈습니다. 이메일의 링크를 클릭하여 등록을 완료하세요. 필터링된 경우에 스팸 이메일을 확인하세요."
   we_established_a_consortium_with_educational_insti_359a07ec: "익명화된 데이터, 모범 사례 및 연구 발견 사항을 공유하는 교육 기관들과 컨소시엄을 수립합니다. 이런 방식으로 공동 작업을 촉진하고 교육에서 AI의 책임감 있는 개발을 가속화합니다. 교육에 더 나은 성과, 비용 절감 등을 목적으로 특화된 AI 모델을 만듭니다."
   we_experienced_an_issue_this_reply_was_not_reporte_7622abd1: "문제가 발생했습니다. 이 응답은 보고되지 않았습니다."
@@ -33536,6 +33750,7 @@ ko:
   we_know_getting_your_courses_online_quickly_during_40424e8: "과목을 빠르게 온라인 상태로 만드는 것인 높은 우선 순위라는 것을 이해합니다. 이 짧은 둘러보기에서 다음 방법을 볼 수 있습니다:"
   we_know_it_s_a_priority_to_transition_your_institu_9a5bed0c: "교육 기간을 온라인 학습으로 전환하는 것이 높은 우선 순위라는 것을 이해합니다. 이 짧은 둘러보기에서 다음 방법을 볼 수 있습니다:"
   we_leverage_anonymized_aggregate_data_for_detailed_975b4977: "익명화된 집계 데이터를 활용하여 모델 개발 및 제품 개선에 사용할 수 있는 세부 분석을 만듭니다. 이 수준에서는 AI 모델을 사용합니다."
+  we_look_for_errors_in_image_alt_text_table_and_lis_de60bd24: "이미지 대체 텍스트, 표 및 목록 형식, 머리글, 텍스트 대비(RCE로 만든 콘텐츠) 및 복제 링크에서 오류를 확인합니다."
   we_re_excited_to_invite_you_to_try_our_pre_release_a32514d6: "프리릴리스 기능을 사용해보도록 초대합니다! 일반 공개 이전에 일부 새로운 기능을 미리 액세스할 수 있습니다. 참여는 선택 사항이며 기존 고객 계약 범위 이외입니다. 참여에 따른 비용은 없으며 그저 피드백을 제공하여 개선에 도움을 주시기를 요청합니다."
   we_re_grateful_for_your_willingness_to_test_things_db394f0b: "테스트하려는 의향과 플랫폼의 미래를 형성하는 데 도움을 주셔서 감사합니다. 아이디어, 제안 또는 피드백이 있는 경우 저희에게 큰 도움이 되므로 공유해주세요."
   we_re_sending_your_message_d586da: "메시지는 보내고 있습니다..."
@@ -33655,6 +33870,9 @@ ko:
   what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떤 형식입니까?"
   what_storage_options_do_i_have_in_zoom_b79c738e: "Zoom에 어떤 스토리지 옵션이 있습니까?"
   what_the_student_should_be_able_to_explain_or_demo_6514db57: "이 활동 이후에 학생이 무엇을 설명 또는 증명할 수 있어야 합니까?"
+  what_was_the_issue_1488081d: "어떤 문제였습니까?"
+  what_we_look_for_b08aa8d1: "무엇을 찾습니까?"
+  what_we_look_for_ba083582: "무엇을 찾습니까"
   what_would_make_this_dashboard_better_e5ee3311: "어떤 면에서 이 대시보드가 더 낫습니까?"
   what_would_you_like_to_do_next_2835397e: "다음에 어떤 작업을 하시겠습니까?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "여러 사용자를 추가하는 경우 쉼표 또는 줄바꿈을 사용하여 사용자를 구분합니다."
@@ -33673,6 +33891,7 @@ ko:
       (이전에는 1.3으로 마이그레이션을 지원하기 위해 1.1 도구에 대해서만 허용했습니다.) 이 페이지에서
       변경한 1.3 도구에 대한 배치 상태에 변경은 Instructure의 전역 상속된 키에 변경을 포함하여
       LTI 개발 키에 변경으로 초기화됩니다.
+  when_enabled_admins_can_lock_registrations_to_prev_32d66ddf: "사용으로 설정하면 관리자는 등록을 잠가서 클라이언트 ID 또는 과목 복사본을 통한 배포를 방지할 수 있습니다."
   when_enabled_allows_apps_inherited_from_site_admin_2801fe51: |-
       사용으로 설정한 경우 사이트 관리자에서 상속한 앱을 앱 페이지에서 편집하는 것을 허용하며
       상속한 앱의 로컬 복사본을 만듭니다.
@@ -33727,6 +33946,10 @@ ko:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       사용으로 설정하면 교사는 캘린더에서 예약 그룹을 만들 때 보호자가 예약하는 것을
       허용할 수 있습니다.
+  when_enabled_teachers_with_active_enrollments_see__e608bcbc: |-
+      사용으로 설정하면 활성 등록이 있는 교사는 교차 과목 작업 관리,
+      콘텐츠 품질 인사이트 및 학생 활동 요약을 포함하는 교육자 대시보드를
+      볼 수 있습니다.
   when_enabled_the_assessment_question_bank_id_will__68966c6c: "사용으로 설정하면 assessment_question_bank_id는 /api/v1/courses/:course_id/quizzes/:quiz_id/questions에서 퀴즈 질문 API 응답에 포함됩니다."
   when_enabled_the_default_size_of_the_top_navigatio_888a60af: "사용으로 설정한 경우 상단 탐색 창의 기본값 크기가 더 크며 도구는 선택 사항으로 매개 변수를 설정하여 창을 전체 크기로 확장할 수 있습니다."
   when_enabled_the_history_tab_on_the_tool_details_p_f5cecbb4: |-
@@ -33760,6 +33983,7 @@ ko:
   when_enabled_this_setting_replaces_the_default_fon_ce01d0cd: |-
       사용으로 설정하면 Canvas에 기본 글꼴을 난독증이 있는 사용자의
       가독성을 높이기 위해 만든 글꼴, OpenDyslexic으로 바꿉니다.
+  when_enabled_users_can_toggle_a_dark_color_theme_f_9a11f0da: "사용으로 설정하면 사용자는 위젯 대시보드에 대해 어두운 색 테마를 토글할 수 있습니다."
   when_enabled_uses_the_rewritten_assigntocontent_co_91781a52: "사용으로 설정한 경우 편집 페이지에서 다시 작성한 AssignToContent 구성 요소를 사용합니다."
   when_enalbed_redirects_to_instructure_identity_are_1373cde9: |-
       사용으로 설정하는 경우 Instructure Identity로 리디렉션이 허용됩니다. 리디렉션
@@ -33847,6 +34071,7 @@ ko:
   widget_customize_mode_enabled_89fefbcc: "위젯 사용자 지정 모드 사용"
   widget_dashboard_204dc6bf: "위젯 대시보드"
   widget_dashboard_customization_c41f1e7f: "위젯 대시보드 사용자 지정"
+  widget_dashboard_dark_mode_915c9024: "위젯 대시보드 어두운 모드"
   widget_dashboard_error_page_82de7838: "위젯 대시보드 오류 페이지"
   widgetname_added_55e798c: "%{widgetName} 추가됨"
   widgetname_added_c49f5688: "%{widgetName} 추가됨"
@@ -34100,6 +34325,7 @@ ko:
   you_are_about_to_delete_keyname_5e4ea92e: "'%{keyName}'을(를) 삭제하게 됩니다."
   you_are_about_to_delete_name_226610bb: "%{name}을(를) 삭제하게 됩니다"
   you_are_about_to_exit_the_rubric_editor_any_unsave_aadd69dc: "루브릭 편집기에서 나가게 됩니다. 저장하지 않은 변경 사항을 잃게 됩니다."
+  you_are_about_to_import_sis_data_as_a_site_admin_i_a9baebe4: "사이트 관리자로서 SIS 데이터를 직접 관리하는 않는 계정에 가져오려고 합니다."
   you_are_about_to_lose_any_unsaved_changes_would_yo_dd0be7ed: "저장되지 않은 변경 사항을 잃게 됩니다. 테마 편집기에서 나가시겠습니까?"
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
       저장하지 않은 변경 사항을 잃게 됩니다.
@@ -34235,6 +34461,7 @@ ko:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "요청하는 퀴즈에 액세스 권한이 없습니다."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "요청하는 리소스에 액세스 권한이 없습니다."
   you_do_not_have_blueprint_course_management_permis_51ae6ef5: "블루프린트 과목 관리 권한이 없습니다"
+  you_do_not_have_permission_to_access_this_attachme_e1d511e5: "이 첨부 파일에 액세스하는 권한이 없습니다."
   you_do_not_have_permission_to_add_this_topic_to_th_fc8622a0: "이 주제를 학생 할 일 목록에 추가할 권한이 없습니다."
   you_do_not_have_permission_to_create_or_modify_dev_7324438f: "이 계정에서 개발자 키를 만들거나 수정할 권한이 없습니다"
   you_do_not_have_permission_to_create_or_modify_dev_c66a5073: "이 계정에서 개발자 키를 만들거나 수정할 권한이 없습니다."
@@ -34478,6 +34705,7 @@ ko:
   your_homeroom_is_currently_unpublished_93c14f4f: "시작 페이지를 현재 게시 취소하고 있습니다."
   your_instructor_has_not_posted_the_grade_while_you_c5cd731c: "교강사가 성적을 게시하지 않았습니다. 교강사가 성적을 게시하지 않은 동안에는 성적 및 의견 정보를 사용할 수 없습니다."
   your_instructor_has_not_published_any_ai_experienc_d0ce4722: "교강사가 아직 AI 경험을 게시하지 않았습니다."
+  your_instructor_has_not_published_any_knowledge_ch_c4681fbb: "교강사가 아직 지식 채팅을 게시하지 않았습니다."
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       교사가 %{title}에 대한 평점 변경 사항과 새 의견을 배포했습니다. 이제 변경 사항을 볼 수 있습니다.
       

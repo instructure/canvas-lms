@@ -26,6 +26,22 @@ describe PageViews::Configuration do
     RSpec::Mocks.space.proxy_for(ConfigFile).reset
   end
 
+  describe ".configured?" do
+    it "returns true when pv5 config is present" do
+      expect(PageViews::Configuration.configured?).to be true
+    end
+
+    it "returns false when pv5 config is absent" do
+      allow(ConfigFile).to receive(:load).with("pv5").and_return(nil)
+      expect(PageViews::Configuration.configured?).to be false
+    end
+  end
+
+  it "raises ConfigurationError when pv5 config is absent" do
+    allow(ConfigFile).to receive(:load).with("pv5").and_return(nil)
+    expect { PageViews::Configuration.new }.to raise_error(PageViews::Common::ConfigurationError, /not configured/)
+  end
+
   it "loads configuration properly" do
     config = PageViews::Configuration.new
     expect(config.uri).to be_a(URI::HTTP)

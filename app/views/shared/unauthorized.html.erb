@@ -39,6 +39,13 @@
     <% end %>
     <% if @unauthorized_message %>
       <p><%= @unauthorized_message %></p>
+      <% if @unauthorized_details.present? %>
+        <ul>
+          <% @unauthorized_details.each do |detail| %>
+            <li><%= detail %></li>
+          <% end %>
+        </ul>
+      <% end %>
     <% elsif @needs_cookies %>
       <p><%= t('Please adjust your security preferences before continuing.') %></p>
     <% elsif @files_domain %>

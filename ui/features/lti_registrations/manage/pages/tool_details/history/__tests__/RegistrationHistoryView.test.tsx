@@ -104,6 +104,7 @@ const mockConfigSnapshot = () => ({
     vendor: null,
     workflow_state: 'on' as const,
     description: null,
+    lock_deploying: false,
   },
   overlaid_internal_config: {
     custom_fields: {},

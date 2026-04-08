@@ -21,7 +21,7 @@ import {BarChartRow, BarChartRowProps} from '../BarChartRow'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../__fixtures__/rollups'
 import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
-import {Column} from '../../table/utils'
+import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
 import {
   COLUMN_WIDTH,
   COLUMN_PADDING,

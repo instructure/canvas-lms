@@ -2483,6 +2483,7 @@ nn:
   advanced_analytics_ask_questions_26553cd2: "Avansert analyse - Still spørsmål"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Avansert analyse - Emnetilgjengelegheit og studentar som krev merksemd"
   advanced_turnitin_settings_9ee84a38: "Avanserte Turnitin-innstillingar"
+  advanced_vericite_settings_4f2afd5b: "Avanserte VeriCite-innstillingar"
   affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Påverkar visning av knappane “Slett dette emnet” og “Avslutt emne”."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Har innverknad på vising av knappar for publiser emne, avslutt emne og slett emnet for godt.
@@ -2496,6 +2497,7 @@ nn:
   after_date_981cd41b: "Etter %{date}"
   after_last_attempt_c9168da2: "Etter siste forsøk"
   after_the_assignment_is_graded_53754607: "Etter at oppgåva er vurdert"
+  after_the_due_date_b7ac51f4: "Etter innleveringsfristen"
   after_the_due_date_eee89c9c: "Etter innleveringsfristen"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Etter fyrste forsøk kan du ikkje legge att kommentarar før du har levert oppgåva."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "Den nyoppretta tråden vil bli vald etter struping av valde jobbar"
@@ -5064,6 +5066,7 @@ nn:
   between_1_and_5_f2a74bcf: "Mellom 1 og 5"
   between_1_and_99_d421a4c0: "Mellom 1 % og 99 %"
   between_50_and_99_72540d1c: "Mellom 50 % og 99 %"
+  bibliographic_material_42d9ed3c: "Bibliografisk materiale"
   big_blue_button_conference: 
     create_time: "Lag tid"
     recording_setting: Opptak
@@ -6667,6 +6670,7 @@ nn:
     releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: "Samanlikne med"
   complete_4f4efbc: fullført
   complete_all_7eba5f88: "Fullfør alle"
   complete_all_items_e1779257: "Fullfør alle element"
@@ -10408,6 +10412,7 @@ nn:
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Del inn i like tidsluker (verdi er minutt)"
   divide_into_equal_time_slots_in_minutes_234312fa: "Del inn i like tidsluker (i minutt"
   division_cutoff_cutoff_value_e938bc9d: "Divisjonsavskjering %{cutoff_value}"
+  do_not_consider_84d7b395: "Ikkje vurder"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ikkje tel med denne oppgåva i sluttresultatet"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Vis ikkje i vurderingsoversikta eller på eleven si vurderingsside"
   do_not_show_again_for_this_assignment_d0abd4ae: "Ikkje vis igjen for denne oppgåva"
@@ -11520,6 +11525,7 @@ nn:
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior Sporing av studentaktivitet"
   exciting_discussion_9f67bd0a: "Engasjerande diskusjon"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Ekskluder data som ikkje har blitt oppdatert sidan datoen"
+  exclude_self_plagiarism_f313288c: "Ekskluder sjølvplagiat"
   excuse_this_assignment_for_the_selected_student_af04e132: "La studenten få fritak frå oppgåva"
   excused_3aab77: "Fritak er innvilga"
   excused_5877183c: "Fritak er innvilga."
@@ -12183,6 +12189,7 @@ nn:
   getting_started_with_collaborations_794240ba: "Start eit samarbeid"
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Gi alle studentane same vurdering for *%{assignment.name}* ved å oppgi, og sende, ein resultatrverdi nedanfor:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Gi alle fullt utbytte for dette spørsmålet."
   give_this_filter_a_name_36b4b03a: "Gi dette filteret eit namn"
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Mislukka å hente mediaressurser. Problemet vil sannynlegvis omsider løyse seg sjølv."
   global_announcements_a78912c8: "Globale kunngjeringar"
@@ -14348,6 +14355,7 @@ nn:
   include_deleted_objects_3cced3b5: "Inkluder sletta objekt;"
   include_deleted_objects_4b75ef93: "Inkluder sletta objekt"
   include_fullstory_recording_of_the_user_s_session_656d131e: "Inkluder FullStory opptak av brukar sin arbeidsøkt"
+  include_in_repository_6102bd95: "Inkluder i arkivet"
   include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Inkluder integrasjons-ID'ar i vurderingsoversikt eksportar"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inkluder integrasjons-ID i eksportar av vurderingsoversikta."
   include_last_activity_dates_4eb97ed5: "Inkluder siste aktivitetsdatoar;"
@@ -14602,6 +14610,7 @@ nn:
   international_sms_9edb9868: "Internasjonal SMS"
   international_text_messaging_rates_may_apply_d4b4a97a: "Det kan vere at internasjonale prisar for tekstmeldingar er brukt."
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: Internettdatabase
   introduction_43f53b7d: Introduksjon
   invalid_address_book_strategy_904a7ada: "Ugyldig adressebok-val."
   invalid_authenticity_token_b753558c: "Ugyldig ID"
@@ -14836,6 +14845,7 @@ nn:
   joined_group_group_name_e3802c04: "Vart med i gruppa %{group_name}"
   joining_81f8b6c9: "Blir med"
   joplin_assignment_submission_a4cf7899: "Innlevering av Joplin-oppgåve"
+  journals_periodicals_and_publications_ca24673: "Journalar, tidsskrift og publikasjonar"
   jpg_903bacff: JPG
   jpg_png_or_gif_files_14e360d2: "JPG-, PNG- eller GIF-filer"
   jquery: 
@@ -19281,6 +19291,7 @@ nn:
   other_incorrect_match_options_c1418af5: "Andre feil matchar"
   other_options_d25f199c: "Andre alternativ"
   other_resources_fee3ddda: "ANDRE RESSURSAR"
+  other_student_papers_bf318f4c: "Andre studentoppgåver"
   other_timezones_42530564: "Andre tidssoner"
   out_of_78a76f91: av
   out_of_formattedoutof_e08e90d5: "av %{formattedOutOf}"
@@ -19615,6 +19626,7 @@ nn:
     view_more_link: "Sjå meir"
   paginated_view: 
     loading_more_results: "Lastar fleire resultat"
+  pagination_40e3280b: Sidenummerering
   pair_4d942a74: Par
   pair_with_observer_b1541895: "Par med observatør"
   pair_with_student_6f76e69a: "Par med student"
@@ -22392,6 +22404,7 @@ nn:
   quotas_account_settings_22c12b8d: "Kvoter (kontoinnstillingar)"
   quote_ae4462ad: Sitat
   quote_reply_e56ad360: "Siter svar"
+  quoted_material_ffaea62b: "Sitert materiale"
   radio_button_option_1_a8ec51f9: "Alternativknapp 1"
   radio_button_option_2_31e50043: "Alternativknapp 2"
   range_56b2f310: Område
@@ -22638,6 +22651,7 @@ nn:
         name: Namn
     welcome_to_canvas: "Velkomen til Canvas!"
   registration_url_60e0eaaa: Registrerings-URL
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Det er ikkje tillate med ny karaktersetjing på dette spørsmålet, fordi eit svar er fjerna eller spørsmålstypen er endra etter at ein student fullførte ei innlevering."
   regular_lato_font_7f3cf24c: "Skrifttypen Vanlig Lato"
   regular_style_checkbox_ee3d71c1: "Vanleg avmerkingsboks"
   reinforce_student_understanding_304d18a6: "Styrk studentane sin forståing og læring"
@@ -25153,6 +25167,7 @@ nn:
   slovak_69f48e1b: Slovakisk
   slovenian_30ae5208: Slovensk
   small_b070434a: Liten
+  small_matches_581ab241: "Små treff"
   smaller_numbers_mean_higher_priority_c69f4d0a: "Lavare tall betyr høg prioritet"
   smart_alerts_44db622e: Smart-varsel
   smart_assignment_alerts_abc2224: "Smart oppgåvevarsel"
@@ -25624,6 +25639,7 @@ nn:
   students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Studentar kan endre og sjå sidehistorikk dersom dei er gitt løyve til det på ei individuell side."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Studentar kan berre delta på emnet mellom desse datoane"
   students_can_see_originality_score_797fe634: "Studentar kan sjå det opphavlege resultatet"
+  students_can_see_the_originality_report_f246beb0: "Studentane kan sjå rapporten om originalitet"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Studentane kan ikkje sjå quizrespons etter at emnet er fullført"
   students_enrolled_in_this_course_859fa7a2: "Studentar påmeldt i dette emne"
   students_enrolled_in_this_section_681ba503: "Studentar påmeldt i denne seksjonen"
@@ -28063,6 +28079,7 @@ nn:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Send på nytt"
+  turnitin_repository_9f865357: Turnitin-arkiv
   turnitin_settings: 
     originality_report_never: Aldri
     originality_report_visible_after_due_date: "Etter innleveringsfristen"
@@ -28372,6 +28389,7 @@ nn:
   update_pages_c91d7ba: "Oppdater sider"
   update_password_4bc5cb1f: "Oppdater passord"
   update_public_jwk_9f25f520: "Oppdater offentlig JWK"
+  update_question_without_regrading_47c9904a: "Oppdater spørsmålet utan å setje karakterar på nytt"
   update_quota_81381226: "Oppdater kvote"
   update_rating_6d29c2ef: "Oppdater vurdering"
   update_settings_9b422d0f: "Oppdater innstillingar"

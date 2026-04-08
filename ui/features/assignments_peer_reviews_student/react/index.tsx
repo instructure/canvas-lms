@@ -19,8 +19,8 @@
 import React from 'react'
 import {render} from '@canvas/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import PeerReviewsStudentViewWithBreakpoints from './components/PeerReviewsStudentView'
 

@@ -43,13 +43,13 @@ describe RubricLLMService do
     end
   end
 
-  let(:cedar_response_struct) { Struct.new(:response, keyword_init: true) }
+  let(:cedar_response_struct) { Struct.new(:response) }
   let(:mock_cedar_prompt_response) do
-    Struct.new(:response, keyword_init: true).new(response: "<RUBRIC_DATA>\n</RUBRIC_DATA>")
+    Struct.new(:response).new(response: "<RUBRIC_DATA>\n</RUBRIC_DATA>")
   end
 
   let(:mock_cedar_conversation_response) do
-    Struct.new(:response, keyword_init: true).new(response: '{"criteria": []}')
+    Struct.new(:response).new(response: '{"criteria": []}')
   end
 
   before do
@@ -139,10 +139,6 @@ describe RubricLLMService do
           @used_ids
         end
 
-        def public_determine_final_criterion_id(data)
-          determine_final_criterion_id(data)
-        end
-
         def public_rebuild_regenerated_ratings(criterion_data, criterion_id, points)
           rebuild_regenerated_ratings(criterion_data, criterion_id, points)
         end
@@ -167,26 +163,8 @@ describe RubricLLMService do
           parse_and_transform_generated_criteria(response, generate_options)
         end
 
-        def public_build_regenerate_dynamic_content(
-          assignment,
-          criteria_as_text,
-          regeneration_target_prompt,
-          regenerate_options,
-          generate_options,
-          criterion_id,
-          structure_directives,
-          current_criteria_count = nil
-        )
-          build_regenerate_dynamic_content(
-            assignment,
-            criteria_as_text,
-            regeneration_target_prompt,
-            regenerate_options,
-            generate_options,
-            criterion_id,
-            structure_directives,
-            current_criteria_count
-          )
+        def public_build_regenerate_dynamic_content(**)
+          build_regenerate_dynamic_content(**)
         end
       end.new(rubric)
     end
@@ -1859,43 +1837,6 @@ describe RubricLLMService do
       end
     end
 
-    describe "#determine_final_criterion_id" do
-      it "keeps existing ID when not colliding" do
-        service_with_access.used_ids = { "other_id" => true }
-
-        result = service_with_access.public_determine_final_criterion_id({ id: "c1" })
-        expect(result).to eq("c1")
-      end
-
-      it "generates unique ID for _new_c_ placeholders" do
-        allow(rubric).to receive(:unique_item_id).with("_new_c_1").and_return("unique_c1")
-
-        result = service_with_access.public_determine_final_criterion_id({ id: "_new_c_1" })
-        expect(result).to eq("unique_c1")
-      end
-
-      it "generates unique ID for unused IDs" do
-        allow(rubric).to receive(:unique_item_id).with("unused_id").and_return("unique_new")
-
-        result = service_with_access.public_determine_final_criterion_id({ id: "unused_id" })
-        expect(result).to eq("unique_new")
-      end
-
-      it "keeps colliding ID that's already used" do
-        service_with_access.used_ids = { "existing_id" => true }
-
-        result = service_with_access.public_determine_final_criterion_id({ id: "existing_id" })
-        expect(result).to eq("existing_id")
-      end
-
-      it "generates new ID when none provided" do
-        allow(rubric).to receive(:unique_item_id).and_return("generated_id")
-
-        result = service_with_access.public_determine_final_criterion_id({})
-        expect(result).to eq("generated_id")
-      end
-    end
-
     describe "#rebuild_regenerated_ratings" do
       it "rebuilds ratings with proper points distribution" do
         criterion_data = {
@@ -2515,12 +2456,23 @@ describe RubricLLMService do
     describe "#build_regenerate_dynamic_content" do
       let(:criteria_as_text) { "criterion:c1:description=Clarity" }
 
+      let(:default_kwargs) do
+        {
+          assignment:,
+          existing_criteria_text: criteria_as_text,
+          regeneration_target: "c1",
+          additional_user_prompt: "improve it",
+          grade_level: "higher-ed",
+          standard: "",
+          criteria_count: 1,
+          structure_directives: ""
+        }
+      end
+
       it "strips HTML tags from assignment description" do
         assignment.update!(description: "<p>Write an <em>analytical</em> essay.</p>")
 
-        result = service_with_access.public_build_regenerate_dynamic_content(
-          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
-        )
+        result = service_with_access.public_build_regenerate_dynamic_content(**default_kwargs)
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("Write an analytical essay.")
@@ -2530,9 +2482,7 @@ describe RubricLLMService do
       it "returns empty string for nil description" do
         assignment.update!(description: nil)
 
-        result = service_with_access.public_build_regenerate_dynamic_content(
-          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
-        )
+        result = service_with_access.public_build_regenerate_dynamic_content(**default_kwargs)
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("")
@@ -2541,9 +2491,7 @@ describe RubricLLMService do
       it "preserves plain text descriptions unchanged" do
         assignment.update!(description: "Research and write about climate change.")
 
-        result = service_with_access.public_build_regenerate_dynamic_content(
-          assignment, criteria_as_text, "c1", {}, {}, "c1", "", 1
-        )
+        result = service_with_access.public_build_regenerate_dynamic_content(**default_kwargs)
         content = JSON.parse(result[:CONTENT])
 
         expect(content["description"]).to eq("Research and write about climate change.")
@@ -2759,6 +2707,180 @@ describe RubricLLMService do
           )
         end.to raise_error(/Cannot find criterion with id nonexistent_id/)
       end
+    end
+  end
+
+  describe "#resolve_item_id" do
+    let(:test_rubric) { rubric }
+    let(:test_service) { described_class.new(test_rubric) }
+
+    before { test_service.instance_variable_set(:@used_ids, {}) }
+
+    it "generates a new unique ID when raw_id is nil" do
+      result = test_service.send(:resolve_item_id, nil)
+      expect(result).to be_present
+    end
+
+    it "generates a new unique ID when raw_id is blank" do
+      result = test_service.send(:resolve_item_id, "")
+      expect(result).to be_present
+    end
+
+    it "delegates to unique_item_id for _new_c_ placeholder IDs" do
+      allow(rubric).to receive(:unique_item_id).with("_new_c_1").and_return("canvas_id_1")
+      result = test_service.send(:resolve_item_id, "_new_c_1")
+      expect(result).to eq("canvas_id_1")
+    end
+
+    it "delegates to unique_item_id for _new_r_ placeholder IDs" do
+      allow(rubric).to receive(:unique_item_id).with("_new_r_3").and_return("canvas_id_2")
+      result = test_service.send(:resolve_item_id, "_new_r_3")
+      expect(result).to eq("canvas_id_2")
+    end
+
+    it "generates a new ID for an unseen (not in @used_ids) raw ID" do
+      result = test_service.send(:resolve_item_id, "some_existing_id")
+      expect(result).to be_present
+    end
+
+    it "preserves an ID that is already in @used_ids" do
+      test_service.instance_variable_set(:@used_ids, { "known_id" => true })
+      result = test_service.send(:resolve_item_id, "known_id")
+      expect(result).to eq("known_id")
+    end
+
+    it "delegates to unique_item_id for an ID not in @used_ids, even when other IDs are present" do
+      test_service.instance_variable_set(:@used_ids, { "other_id" => true })
+      allow(rubric).to receive(:unique_item_id).with("c1").and_return("canvas_c1")
+      result = test_service.send(:resolve_item_id, "c1")
+      expect(result).to eq("canvas_c1")
+    end
+
+    it "generates a specific ID when none is provided" do
+      allow(rubric).to receive(:unique_item_id).and_return("generated_id")
+      result = test_service.send(:resolve_item_id, nil)
+      expect(result).to eq("generated_id")
+    end
+  end
+
+  describe "#build_blank_criterion" do
+    let(:test_rubric) { rubric }
+    let(:test_service) { described_class.new(test_rubric) }
+
+    it "returns a hash with the correct structure" do
+      result = test_service.send(:build_blank_criterion, id: "c1", points: 10, use_range: false)
+      expect(result).to include(
+        "id" => "c1",
+        "description" => "",
+        "long_description" => "",
+        "ratings" => [],
+        "points" => 10,
+        "generated" => true
+      )
+    end
+
+    it "uses use_range as fallback when original_criterion is nil" do
+      result = test_service.send(:build_blank_criterion, id: "c1", points: 5, use_range: true)
+      expect(result["criterion_use_range"]).to be(true)
+    end
+
+    it "prefers original_criterion's criterion_use_range over use_range" do
+      original = { "criterion_use_range" => true }
+      result = test_service.send(:build_blank_criterion, id: "c1", points: 5, use_range: false, original_criterion: original)
+      expect(result["criterion_use_range"]).to be(true)
+    end
+
+    it "falls back to use_range when original_criterion has no criterion_use_range" do
+      original = { "description" => "no use_range key here" }
+      result = test_service.send(:build_blank_criterion, id: "c1", points: 5, use_range: true, original_criterion: original)
+      expect(result["criterion_use_range"]).to be(true)
+    end
+  end
+
+  describe "#build_blank_rating" do
+    let(:test_rubric) { rubric }
+    let(:test_service) { described_class.new(test_rubric) }
+
+    it "returns a hash with the correct structure" do
+      result = test_service.send(:build_blank_rating, id: "r1", criterion_id: "c1")
+      expect(result).to eq(
+        "id" => "r1",
+        "criterion_id" => "c1",
+        "description" => "",
+        "long_description" => "",
+        "points" => 0
+      )
+    end
+
+    it "sets description and long_description to empty strings" do
+      result = test_service.send(:build_blank_rating, id: "r2", criterion_id: "c2")
+      expect(result["description"]).to eq("")
+      expect(result["long_description"]).to eq("")
+    end
+
+    it "sets points to 0" do
+      result = test_service.send(:build_blank_rating, id: "r3", criterion_id: "c3")
+      expect(result["points"]).to eq(0)
+    end
+  end
+
+  describe "#resolve_generate_options" do
+    let(:test_service) { described_class.new(rubric) }
+
+    it "fills in all DEFAULT_GENERATE_OPTIONS keys when none are provided" do
+      result = test_service.send(:resolve_generate_options, {})
+      expect(result).to include(
+        criteria_count: 5,
+        rating_count: 4,
+        total_points: 100,
+        use_range: false,
+        grade_level: "higher-ed",
+        standard: "",
+        additional_prompt_info: ""
+      )
+    end
+
+    it "preserves caller-provided values over defaults" do
+      result = test_service.send(:resolve_generate_options, { criteria_count: 3, grade_level: "k-12" })
+      expect(result[:criteria_count]).to eq(3)
+      expect(result[:grade_level]).to eq("k-12")
+    end
+
+    it "keeps default values for keys not provided by the caller" do
+      result = test_service.send(:resolve_generate_options, { criteria_count: 3 })
+      expect(result[:rating_count]).to eq(4)
+      expect(result[:total_points]).to eq(100)
+    end
+  end
+
+  describe "#resolve_regenerate_options" do
+    let(:test_service) { described_class.new(rubric) }
+
+    it "includes all generate defaults" do
+      result = test_service.send(:resolve_regenerate_options, {}, {})
+      expect(result).to include(criteria_count: 5, rating_count: 4, total_points: 100)
+    end
+
+    it "uses additional_user_prompt from regenerate_options when present" do
+      result = test_service.send(:resolve_regenerate_options, {}, { additional_user_prompt: "be concise" })
+      expect(result[:additional_user_prompt]).to eq("be concise")
+    end
+
+    it "falls back to additional_prompt_info from generate_options when additional_user_prompt is absent" do
+      result = test_service.send(:resolve_regenerate_options, { additional_prompt_info: "focus on clarity" }, {})
+      expect(result[:additional_user_prompt]).to eq("focus on clarity")
+    end
+
+    it "falls back to hardcoded default when both prompt fields are blank" do
+      result = test_service.send(:resolve_regenerate_options, {}, {})
+      expect(result[:additional_user_prompt]).to eq("No specific expectations, just improve it.")
+    end
+
+    it "prefers additional_user_prompt over additional_prompt_info" do
+      result = test_service.send(:resolve_regenerate_options,
+                                 { additional_prompt_info: "from generate" },
+                                 { additional_user_prompt: "from regenerate" })
+      expect(result[:additional_user_prompt]).to eq("from regenerate")
     end
   end
 

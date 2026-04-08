@@ -118,17 +118,19 @@ const LabeledInput = ({
   children,
   errorMessage,
   padding = '0',
+  inputId,
 }: {
   label: string
   children: React.ReactNode
   errorMessage?: string
   padding?: string
+  inputId?: string
 }) => (
   <>
     <Flex.Item as="div" padding={padding}>
       <FlexRow>
         <Flex.Item as="div" margin="0 0 small large">
-          <Text size="contentSmall" weight="bold">
+          <Text id={inputId ? `${inputId}-label` : undefined} size="contentSmall" weight="bold">
             {label}
           </Text>
         </Flex.Item>
@@ -150,7 +152,6 @@ const ToggleCheckbox = ({
   checked,
   onChange,
   label,
-  srLabel,
   id,
 }: {
   testId: string
@@ -158,27 +159,31 @@ const ToggleCheckbox = ({
   checked: boolean
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   label: string
-  srLabel: string
-  id?: string
+  id: string
 }) => (
-  <FlexRow>
-    <Flex.Item as="div" margin="0 0 0 medium" shouldGrow={true} shouldShrink={true}>
-      <Text size="contentSmall" weight="bold">
-        {label}
-      </Text>
-    </Flex.Item>
-    <Flex.Item as="div" margin="0" shouldShrink={false}>
+  <Flex as="div" margin="0 0 0 medium" padding="0 large 0 0" width="100%" justifyItems="end">
+    <Flex.Item>
       <Checkbox
         data-testid={testId}
         name={name}
         id={id}
+        inline={true}
         variant="toggle"
         checked={checked}
         onChange={onChange}
-        label={<ScreenReaderContent>{srLabel}</ScreenReaderContent>}
+        label={
+          <Flex as="div" width="100%" justifyItems="start">
+            <Flex.Item>
+              <Text size="contentSmall" weight="bold">
+                {label}
+              </Text>
+            </Flex.Item>
+          </Flex>
+        }
+        labelPlacement="start"
       />
     </Flex.Item>
-  </FlexRow>
+  </Flex>
 )
 const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: string}) => (
   <Flex.Item as="div" padding={padding}>
@@ -390,7 +395,7 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
         </Flex.Item>
       )}
       {peerReviewChecked && (
-        // There is no need to set onBlur handler on the parent div element since those events are handled in the NumberInput components
+        // There is no need to set onBlur handler on the parent div element since those events are handled in the TextInput components
         /* eslint-disable-next-line jsx-a11y/mouse-events-have-key-events */
         <div onMouseOut={handleMouseOut}>
           <SectionHeader title={I18n.t('Review Settings')} padding="none small small small" />
@@ -398,14 +403,17 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
             label={I18n.t('Reviews Required*')}
             padding="x-small 0 0 0"
             errorMessage={errorMessageReviewsRequired}
+            inputId="assignment_peer_reviews_count"
           >
             <NumberInput
               id="assignment_peer_reviews_count"
               name="peer_review_count"
               data-testid="reviews-required-input"
+              renderLabel={<ScreenReaderContent>{I18n.t('Reviews Required')}</ScreenReaderContent>}
               width="4.5rem"
               showArrows={false}
-              size="medium"
+              allowStringValue
+              textAlign="start"
               onChange={handleReviewsRequiredChange}
               onBlur={validateReviewsRequired}
               themeOverride={inputOverride}
@@ -413,23 +421,27 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
               interaction={hasPeerReviewSubmissions ? 'disabled' : 'enabled'}
               inputRef={(el: HTMLInputElement | null) => {
                 reviewsRequiredInputRef.current = el
+                if (el) el.style.marginLeft = '0'
               }}
-              renderLabel={
-                <ScreenReaderContent>{I18n.t('Number of reviews required')}</ScreenReaderContent>
-              }
             />
           </LabeledInput>
           <LabeledInput
             label={I18n.t('Points per Peer Review')}
             padding="x-small 0 0 0"
             errorMessage={errorMessagePointsPerReview}
+            inputId="assignment_peer_reviews_max_input"
           >
             <NumberInput
               id="assignment_peer_reviews_max_input"
               data-testid="points-per-review-input"
+              renderLabel={
+                <ScreenReaderContent>{I18n.t('Points per Peer Review')}</ScreenReaderContent>
+              }
               width="4.5rem"
               showArrows={false}
-              size="medium"
+              allowStringValue
+              textAlign="start"
+              inputMode="decimal"
               onChange={handlePointsPerReviewChange}
               onBlur={validatePointsPerReview}
               themeOverride={inputOverride}
@@ -437,12 +449,8 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
               interaction={hasPeerReviewSubmissions ? 'disabled' : 'enabled'}
               inputRef={(el: HTMLInputElement | null) => {
                 pointsPerReviewInputRef.current = el
+                if (el) el.style.marginLeft = '0'
               }}
-              renderLabel={
-                <ScreenReaderContent>
-                  {I18n.t('Number of Points per Peer Review')}
-                </ScreenReaderContent>
-              }
             />
           </LabeledInput>
           <Flex.Item as="div" padding="x-small 0 small 0">
@@ -490,7 +498,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     checked={allowPeerReviewAcrossMultipleSections}
                     onChange={handleCrossSectionsCheck}
                     label={I18n.t('Allow peer reviews across sections')}
-                    srLabel={I18n.t('Allow peer reviews to be assigned across course sections')}
                   />
                 </Flex.Item>
                 {isGroupAssignment && (
@@ -502,7 +509,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                       checked={allowPeerReviewWithinGroups}
                       onChange={handleInterGroupCheck}
                       label={I18n.t('Allow peer reviews within groups')}
-                      srLabel={I18n.t('Allow peer reviews within student groups')}
                     />
                   </Flex.Item>
                 )}
@@ -515,7 +521,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     checked={usePassFailGrading}
                     onChange={handleUsePassFailCheck}
                     label={I18n.t('Use complete/incomplete instead of points for grading')}
-                    srLabel={I18n.t('Use complete/incomplete instead of points for grading')}
                   />
                 </Flex.Item>
                 <SectionHeader title={I18n.t('Anonymity')} padding="medium 0 0 0" />
@@ -527,7 +532,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     checked={anonymousPeerReviews}
                     onChange={handleAnonymityCheck}
                     label={I18n.t('Reviewers do not see who they review')}
-                    srLabel={I18n.t('Reviewers do not see who they review')}
                   />
                 </Flex.Item>
                 <SectionHeader title={I18n.t('Submission required')} padding="medium 0 0 0" />
@@ -538,7 +542,6 @@ const PeerReviewDetails = ({assignment}: {assignment: AssignmentModel}) => {
                     id="peer_reviews_submission_required_checkbox"
                     checked={submissionRequiredBeforePeerReviews}
                     onChange={handleSubmissionRequiredCheck}
-                    srLabel={I18n.t('Students must submit to see peer reviews')}
                     label={I18n.t(
                       'Reviewers must submit their assignment before they can be allocated reviews',
                     )}

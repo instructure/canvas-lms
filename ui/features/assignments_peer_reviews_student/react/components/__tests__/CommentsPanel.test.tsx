@@ -306,4 +306,18 @@ describe('CommentsPanel', () => {
       expect(props.isReadOnly).toBe(false)
     })
   })
+
+  describe('accessibility and scroll behavior', () => {
+    it('focuses close button when autoFocusCloseButton is true', () => {
+      render(<CommentsPanel {...createDefaultProps({autoFocusCloseButton: true})} />)
+      const closeButton = screen.getByTestId('close-comments-button').querySelector('button')
+      expect(document.activeElement).toBe(closeButton)
+    })
+
+    it('sets scroll-padding-bottom on the comments panel element', () => {
+      render(<CommentsPanel {...createDefaultProps()} />)
+      const panel = document.getElementById('comments-panel') as HTMLElement
+      expect(panel.style.scrollPaddingBottom).toBe('65px')
+    })
+  })
 })

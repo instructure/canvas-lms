@@ -22,7 +22,7 @@
 # RubricAssessments, then, are concrete assessments of the artifacts associated
 # with this idea, such as assignment submissions.
 # The other purpose of this class is just to make rubrics reusable.
-class RubricAssociation < ActiveRecord::Base
+class RubricAssociation < ApplicationRecord
   include Canvas::SoftDeletable
 
   attr_accessor :skip_updating_points_possible, :skip_updating_rubric_association_count

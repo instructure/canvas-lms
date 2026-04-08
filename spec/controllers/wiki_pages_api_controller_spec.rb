@@ -248,6 +248,193 @@ describe WikiPagesApiController, type: :request do
     end
   end
 
+  describe "horizon_block_content_editor" do
+    let(:external_content_id) { "87654321-4321-4321-4321-210987654321" }
+    let(:block_editor_data) { { "content" => "test content", "version" => "1.0" } }
+
+    before :once do
+      account = @course.account
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+      account.enable_feature!(:horizon_block_content_editor)
+    end
+
+    before do
+      stub_const("ContentServiceClient", Class.new do
+        def self.enabled? = true
+        def self.create_content(**) = nil
+        def self.update_content(**) = nil
+        def self.get_content(**) = nil
+      end)
+      allow(ContentServiceClient).to receive_messages(
+        create_content: double(external_content_id:),
+        update_content: nil,
+        get_content: double(data: block_editor_data)
+      )
+    end
+
+    def get_wiki_page(user, wiki_page, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/pages/#{wiki_page.url}"
+      path = {
+        controller: "wiki_pages_api",
+        action: "show",
+        format: "json",
+        course_id: @course.id.to_s,
+        url_or_id: wiki_page.url
+      }
+      api_call_as_user(user, :get, url, path, {}, {}, { expected_status: })
+    end
+
+    describe "POST #create" do
+      context "when block_editor_data is present" do
+        it "stores an ExternalContentReference" do
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
+
+          expect(ContentServiceClient).to have_received(:create_content)
+          page = WikiPage.last
+          expect(page.external_content_reference).to be_present
+          expect(page.external_content_reference.content_id).to eq external_content_id
+        end
+
+        it "sends the data parameter to ContentServiceClient.create_content" do
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            hash_including(
+              data: block_editor_data,
+              context_type: "WikiPage",
+              context_id: WikiPage.last.id
+            )
+          )
+        end
+      end
+
+      context "when block_editor_data is absent" do
+        it "calls create_content with nil data and creates an ExternalContentReference" do
+          create_wiki_page(@teacher, { title: "New Page" })
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            hash_including(data: nil)
+          )
+          page = WikiPage.last
+          expect(page.external_content_reference).to be_present
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "does not create an ExternalContentReference" do
+          expect(ContentServiceClient).not_to receive(:create_content)
+
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
+        end
+      end
+    end
+
+    describe "PUT #update" do
+      before :once do
+        wiki_page_model(title: "Horizon Page")
+        @wiki_page = @page
+        @wiki_page.create_external_content_reference!(content_id: "existing-ext-uuid")
+      end
+
+      before do
+        @wiki_page.reload
+      end
+
+      context "when block_editor_data is present and ExternalContentReference exists" do
+        it "sends the stored external_content_id to the Content Service" do
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
+
+          expect(ContentServiceClient).to have_received(:update_content).with(
+            hash_including(external_content_id: "existing-ext-uuid")
+          )
+        end
+
+        it "sends the data parameter to ContentServiceClient.update_content" do
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
+
+          expect(ContentServiceClient).to have_received(:update_content).with(
+            hash_including(
+              data: block_editor_data,
+              external_content_id: "existing-ext-uuid"
+            )
+          )
+        end
+      end
+
+      context "when block_editor_data is absent" do
+        it "calls update_content with nil data" do
+          update_wiki_page(@teacher, @wiki_page, { title: "Updated title" })
+
+          expect(ContentServiceClient).to have_received(:update_content).with(
+            hash_including(data: nil)
+          )
+        end
+      end
+
+      context "when the page has no ExternalContentReference" do
+        before do
+          @wiki_page.external_content_reference.destroy
+        end
+
+        it "does not call the Content Service" do
+          expect(ContentServiceClient).not_to receive(:update_content)
+
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
+        end
+      end
+    end
+
+    describe "GET #show" do
+      before :once do
+        wiki_page_model(title: "Show Page")
+        @wiki_page = @page
+        @wiki_page.create_external_content_reference!(content_id: external_content_id)
+      end
+
+      before do
+        @wiki_page.reload
+      end
+
+      context "when an ExternalContentReference exists" do
+        it "returns block_editor_data from the Content Service" do
+          json = get_wiki_page(@teacher, @wiki_page)
+
+          expect(json["block_editor_data"]).to eq block_editor_data
+        end
+      end
+
+      context "when the page has no ExternalContentReference" do
+        before do
+          @wiki_page.external_content_reference.destroy
+        end
+
+        it "does not include block_editor_data" do
+          json = get_wiki_page(@teacher, @wiki_page)
+
+          expect(json["block_editor_data"]).to be_nil
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "does not include block_editor_data" do
+          json = get_wiki_page(@teacher, @wiki_page)
+
+          expect(json["block_editor_data"]).to be_nil
+        end
+      end
+    end
+  end
+
   describe "POST #ai_generate_alt_text" do
     def ai_generate_alt_text_request(user, params = {})
       url = "/api/v1/courses/#{@course.id}/pages_ai/alt_text"
@@ -357,7 +544,7 @@ describe WikiPagesApiController, type: :request do
               end
 
               def self.generate_alt_text(*)
-                Struct.new(:image, keyword_init: true).new(image: { "altText" => "AI generated text." })
+                Struct.new(:image).new(image: { "altText" => "AI generated text." })
               end
             end)
             allow(CedarClient).to receive(:enabled?).and_return(true)

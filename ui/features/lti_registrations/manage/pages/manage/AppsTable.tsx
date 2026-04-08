@@ -425,7 +425,7 @@ const CondensedColumnsWithStatus: ReadonlyArray<Column> = [
             renderIcon={() => <IconRefreshLine />}
             data-pendo="lti-registrations-update-available-button"
             onClick={() => {
-              useRegistrationUpdateWizardModalState.getState().open(r, pendingUpdate)
+              useRegistrationUpdateWizardModalState.getState().open(r)
             }}
           >
             {I18n.t('Update Available')}

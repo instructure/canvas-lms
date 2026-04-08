@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LearningOutcomeQuestionResult < ActiveRecord::Base
+class LearningOutcomeQuestionResult < ApplicationRecord
   belongs_to :learning_outcome_result
   belongs_to :learning_outcome
   belongs_to :associated_asset, polymorphic: [:assessment_question]

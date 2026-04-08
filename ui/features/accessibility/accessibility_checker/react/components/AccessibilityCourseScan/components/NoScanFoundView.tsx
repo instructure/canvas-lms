@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import {EmptyDesert} from '@instructure/platform-images'
 import {ScanHandler} from './ScanHandler'
 import type {ScanViewProps} from '../types'
 
