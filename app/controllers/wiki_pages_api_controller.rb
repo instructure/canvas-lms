@@ -172,6 +172,10 @@
 # To explicitly request by ID, you can use the form `/api/v1/courses/:course_id/pages/page_id:7`.
 #
 class WikiPagesApiController < ApplicationController
+  include HorizonMode
+
+  allow_public_horizon_access :index, :show
+
   AI_ALT_TEXT_MAX_LENGTH = 120
   AI_ALT_TEXT_FEATURE_FLAG_SLUG = "alttext"
   AI_ALT_TEXT_TYPE = "Base64"

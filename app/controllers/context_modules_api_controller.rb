@@ -124,6 +124,9 @@
 #     }
 #
 class ContextModulesApiController < ApplicationController
+  include HorizonMode
+
+  allow_public_horizon_access :index, :show
   before_action :require_context
   before_action :find_student, only: [:index, :show]
   include Api::V1::ContextModule

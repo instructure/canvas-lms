@@ -18,6 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module HorizonMode
+  extend ActiveSupport::Concern
+
+  class_methods do
+    def allow_public_horizon_access(*actions)
+      action_names = actions.map(&:to_s)
+      skip_before_action :require_user, if: -> { action_names.include?(action_name) && public_horizon_course? }
+    end
+  end
+
   def load_canvas_career
     return if force_academic? || api_request?
     return if params[:invitation].present?
@@ -87,6 +96,15 @@ module HorizonMode
 
   def in_student_view?
     @current_user&.fake_student?
+  end
+
+  def public_horizon_course?
+    get_context
+    return false unless @context.is_a?(Course)
+
+    @context.horizon_course? &&
+      @context.course_visibility == "public" &&
+      @context.available?
   end
 
   def remove_horizon_params(url)

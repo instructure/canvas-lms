@@ -1978,4 +1978,71 @@ describe "Modules API", type: :request do
                { expected_status: 403 })
     end
   end
+
+  context "as an anonymous user on a public horizon course" do
+    before :once do
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.update!(is_public: true, horizon_course: true)
+    end
+
+    it "allows listing modules without authentication" do
+      @user = nil
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules",
+                      { controller: "context_modules_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s },
+                      {},
+                      {},
+                      { expected_status: 200 })
+      expect(json.pluck("name")).to include(@module1.name, @module2.name)
+      expect(json.pluck("name")).not_to include(@module3.name)
+    end
+
+    it "allows viewing a single module without authentication" do
+      @user = nil
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      { controller: "context_modules_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        id: @module1.id.to_s },
+                      {},
+                      {},
+                      { expected_status: 200 })
+      expect(json["name"]).to eq(@module1.name)
+    end
+
+    it "rejects anonymous access to non-public horizon course modules" do
+      @course.update!(is_public: false)
+      @user = nil
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/modules",
+               { controller: "context_modules_api",
+                 action: "index",
+                 format: "json",
+                 course_id: @course.id.to_s },
+               {},
+               {},
+               { expected_status: 401 })
+    end
+
+    it "rejects anonymous access to public non-horizon course modules" do
+      non_horizon_course = course_factory(active_all: true)
+      non_horizon_course.update!(is_public: true)
+      non_horizon_course.context_modules.create!(name: "visible module")
+      @user = nil
+      api_call(:get,
+               "/api/v1/courses/#{non_horizon_course.id}/modules",
+               { controller: "context_modules_api",
+                 action: "index",
+                 format: "json",
+                 course_id: non_horizon_course.id.to_s },
+               {},
+               {},
+               { expected_status: 401 })
+    end
+  end
 end

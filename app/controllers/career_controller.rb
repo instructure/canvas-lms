@@ -22,10 +22,15 @@ class CareerController < ApplicationController
   include HorizonMode
 
   before_action :get_context
+  allow_public_horizon_access :show
 
   def show
-    app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
-    return redirect_to(root_path) if app == CanvasCareer::Constants::App::ACADEMIC
+    app = CanvasCareer::Constants::App::CAREER_LEARNER
+
+    if @current_user
+      app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
+      return redirect_to(add_horizon_params_to_url(root_path)) if app == CanvasCareer::Constants::App::ACADEMIC
+    end
 
     env = {
       FEATURES: features_env,
