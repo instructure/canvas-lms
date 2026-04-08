@@ -42,6 +42,30 @@ describe Types::InstitutionalTagCategoryType do
     expect(category_type.resolve("workflowState")).to eq "active"
   end
 
+  describe "associationsCount" do
+    before(:once) do
+      @user1 = user_model
+      @user2 = user_model
+      institutional_tag_association_model(account: @account, institutional_tag: @tag1, user: @user1)
+      institutional_tag_association_model(account: @account, institutional_tag: @tag1, user: @user2)
+      institutional_tag_association_model(account: @account, institutional_tag: @tag2, user: @user1)
+    end
+
+    it "returns the total count of active associations across all active tags" do
+      expect(category_type.resolve("associationsCount")).to eq 3
+    end
+
+    it "excludes associations on deleted tags" do
+      institutional_tag_association_model(account: @account, institutional_tag: @archived_tag, user: @user2)
+      expect(category_type.resolve("associationsCount")).to eq 3
+    end
+
+    it "excludes deleted associations" do
+      @tag2.institutional_tag_associations.first.update!(workflow_state: "deleted")
+      expect(category_type.resolve("associationsCount")).to eq 2
+    end
+  end
+
   describe "tagsConnection" do
     it "returns only active tags" do
       ids = category_type.resolve("tagsConnection { nodes { _id } }")

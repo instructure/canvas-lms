@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2026 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class Loaders::InstitutionalTagCategoryAssociationsCountLoader < GraphQL::Batch::Loader
+  def perform(categories)
+    category_ids = categories.map(&:id)
+
+    counts_by_category = InstitutionalTagAssociation
+                         .joins(:institutional_tag)
+                         .where(institutional_tags: { category_id: category_ids, workflow_state: "active" })
+                         .where(institutional_tag_associations: { workflow_state: "active" })
+                         .group("institutional_tags.category_id")
+                         .count
+
+    categories.each { |category| fulfill(category, counts_by_category.fetch(category.id, 0)) }
+  end
+end
