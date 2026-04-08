@@ -24,6 +24,8 @@ module Lti
     TII_TOOL_PRODUCT_CODE = Rails.env.development? ? "similarity detection reference tool" : "turnitin-lti"
     MIGRATED_ASSET_REPORT_TYPE = "originality_report"
     TRUSTED_MIGRATION_DOMAINS = %w[turnitin.com turnitin.dev turnitin.net turnitin.org turnitinuk.com].freeze
+    PROGRESS_UPDATE_BATCH_SIZE = 50
+    PROGRESS_UPDATE_THRESHOLD = 1000
     PROGRESS_TAG = "lti_tii_ap_migration"
     COORDINATOR_TAG = "lti_tii_ap_migration_coordinator"
 
@@ -146,6 +148,9 @@ module Lti
     end
 
     def migrate_actls(csv)
+      batch_size = (actls_for_account_count > PROGRESS_UPDATE_THRESHOLD) ? PROGRESS_UPDATE_BATCH_SIZE : 1
+      pending_completion = 0
+
       actls_for_account.find_each do |actl|
         subaccount_toolproxy = false
         ap_migration_status = :failed
@@ -179,7 +184,11 @@ module Lti
         capture_and_log_exception(e)
         add_actl_error(actl, "Unexpected error migrating ACTL ID=#{actl.id}")
       ensure
-        @progress.increment_completion!(1)
+        pending_completion += 1
+        if pending_completion >= batch_size
+          @progress.increment_completion!(pending_completion)
+          pending_completion = 0
+        end
         unless subaccount_toolproxy
           assignment = actl.assignment
           csv << [
@@ -198,6 +207,7 @@ module Lti
           ]
         end
       end
+      @progress.increment_completion!(pending_completion) if pending_completion > 0
     end
 
     def migrate_orphan_proxies(csv)
@@ -295,7 +305,7 @@ module Lti
     end
 
     def actls_for_account_count
-      actls_for_account.count
+      @actls_for_account_count ||= actls_for_account.count
     end
 
     def tii_orphan_proxies(account_ids = [@account.id])
@@ -835,22 +845,19 @@ module Lti
     def migrate_reports(actl, _tool_proxy, asset_processor)
       raise "Asset Processor is not created" unless asset_processor
 
-      successful_migrated_count = 0
       # Get the most recent originality report for each submission/group/attachment combination
       reports = OriginalityReport.joins(:submission)
                                  .where(submissions: { assignment_id: actl.assignment.id })
                                  .order(created_at: :desc)
+                                 .preload(:lti_link, :submission)
                                  .group_by { |report| [report.submission.group_id || report.submission_id, report.attachment_id] }
                                  .values
                                  .map(&:first)
       reports_count = reports.count
-      reports.each do |report|
-        migrate_report(actl, report, asset_processor)
-        successful_migrated_count += 1
-      rescue => e
-        capture_and_log_exception(e)
-        add_actl_error(actl, "Failed to migrate report ID=#{report.id}: #{e.message}")
-      end
+
+      report_keys = reports.index_with { |r| asset_cache_key(r) }
+      asset_cache = batch_find_or_create_assets(report_keys)
+      successful_migrated_count = batch_migrate_asset_reports(actl, report_keys, asset_processor, asset_cache)
 
       status = if successful_migrated_count == 0 && reports_count.positive?
                  :failed
@@ -867,49 +874,146 @@ module Lti
       [:failed, 0]
     end
 
-    def migrate_report(actl, cpf_report, asset_processor)
-      if cpf_report.attachment_id.present?
-        asset = Lti::Asset.find_or_create_by!(attachment: cpf_report.attachment, submission: cpf_report.submission)
-      else
-        attempt = find_attempt_for_report(cpf_report)
-        unless attempt
-          raise "Cannot find submission attempt for report ID=#{cpf_report.id}"
+    # Loads existing Lti::Assets for the given reports' submissions in one query,
+    # inserts missing ones in bulk, and returns a cache keyed by asset locator.
+    def batch_find_or_create_assets(report_keys)
+      submission_ids = report_keys.keys.map(&:submission_id).uniq
+      existing = Lti::Asset.where(submission_id: submission_ids).to_a
+
+      cache = existing.index_by { |asset| key_for_asset(asset) }.reject { |key, _asset| key.nil? }
+
+      # Determine which reports are missing an asset
+      missing = report_keys.reject { |_cpf_report, key| key.nil? || cache[key] }
+
+      if missing.any?
+        now = Time.zone.now
+        inserts = missing.to_h do |cpf_report, key|
+          attachment_id = cpf_report.attachment_id.presence
+          submission_attempt = attachment_id ? nil : key[2]
+          record = {
+            uuid: SecureRandom.uuid,
+            submission_id: cpf_report.submission_id,
+            root_account_id: cpf_report.submission.root_account_id,
+            workflow_state: "active",
+            created_at: now,
+            updated_at: now,
+            # Both keys must be present in every record so insert_all
+            # sees a uniform column set across attachment and text-entry rows.
+            attachment_id:,
+            submission_attempt:
+          }
+          [key, record]
         end
 
-        asset = Lti::Asset.find_or_create_by!(submission_attempt: attempt, submission: cpf_report.submission)
+        Lti::Asset.insert_all(inserts.values)
+
+        new_assets = Lti::Asset.where(uuid: inserts.values.pluck(:uuid)).index_by(&:uuid)
+        inserts.each do |key, record|
+          asset = new_assets[record[:uuid]]
+          cache[key] = asset if asset
+        end
       end
 
-      raise "Could not create Lti::Asset" unless asset
+      cache
+    end
 
-      timestamp = cpf_report.updated_at
-      indication_color, indication_alt = calc_indications_from_cpf_report(cpf_report)
-      custom_sourcedid = extract_custom_sourcedid(cpf_report)
-      unless custom_sourcedid.present?
-        add_actl_warning(actl, "No custom_sourcedid found on report") # won't include report ID to avoid too big csv cell
+    def asset_cache_key(cpf_report)
+      if cpf_report.attachment_id.present?
+        [:attachment, cpf_report.submission_id, cpf_report.attachment_id]
+      else
+        attempt = find_attempt_for_report(cpf_report)
+        return nil unless attempt
+
+        [:attempt, cpf_report.submission_id, attempt]
       end
-      result = cpf_report.originality_score.present? ? "#{cpf_report.originality_score}%" : nil
-      priority = priority_from_cpf_report(cpf_report)
-      processing_progress = processing_progress_from_cpf_report(cpf_report)
+    end
+
+    def key_for_asset(asset)
+      if asset.attachment_id.present?
+        [:attachment, asset.submission_id, asset.attachment_id]
+      elsif asset.submission_attempt.present?
+        [:attempt, asset.submission_id, asset.submission_attempt]
+      end
+    end
+
+    # Batch-deletes stale AssetReports and inserts new ones for all cpf_reports,
+    # returning the count of successfully migrated reports.
+    def batch_migrate_asset_reports(actl, report_keys, asset_processor, asset_cache)
       visible_to_owner = actl.assignment.turnitin_settings&.dig(:s_view_report) == "1"
+      now = Time.zone.now
 
-      Lti::AssetReport.transaction do
-        report_scope = asset_processor.asset_reports.where(asset:, report_type: MIGRATED_ASSET_REPORT_TYPE)
-        report_scope.where(timestamp: ..timestamp).destroy_all
-        report_scope.create!(
+      asset_ids = asset_cache.values.map(&:id).uniq
+      existing_by_asset_id = asset_processor.asset_reports
+                                            .where(lti_asset_id: asset_ids, report_type: MIGRATED_ASSET_REPORT_TYPE)
+                                            .index_by(&:lti_asset_id)
+
+      to_delete_ids = []
+      to_insert = []
+      successful_count = 0
+
+      report_keys.each do |cpf_report, key|
+        asset = key && asset_cache[key]
+        unless asset
+          add_actl_error(actl, "Cannot find Lti::Asset for CPF report ID=#{cpf_report.id}")
+          next
+        end
+
+        if asset.deleted?
+          add_actl_warning(actl, "Lti::Asset for CPF report ID=#{cpf_report.id} is soft-deleted; skipping")
+          next
+        end
+
+        timestamp = cpf_report.updated_at
+        existing = existing_by_asset_id[asset.id]
+
+        if existing
+          if existing.timestamp > timestamp
+            # Existing report is newer; leave it in place and count as success
+            successful_count += 1
+            next
+          end
+          to_delete_ids << existing.id
+        end
+
+        indication_color, indication_alt = calc_indications_from_cpf_report(cpf_report)
+        custom_sourcedid = extract_custom_sourcedid(cpf_report)
+        unless custom_sourcedid.present?
+          add_actl_warning(actl, "No custom_sourcedid found on report")
+        end
+
+        to_insert << {
+          lti_asset_id: asset.id,
+          lti_asset_processor_id: asset_processor.id,
+          report_type: MIGRATED_ASSET_REPORT_TYPE,
           title: "Turnitin Similarity",
           extensions: {
-            "https://www.instructure.com/legacy_custom_sourcedid": custom_sourcedid,
-            migrated_from: cpf_report.id
+            "https://www.instructure.com/legacy_custom_sourcedid" => custom_sourcedid,
+            "migrated_from" => cpf_report.id
           },
           timestamp:,
-          result:,
-          priority:,
-          processing_progress:,
+          result: cpf_report.originality_score.present? ? "#{cpf_report.originality_score}%" : nil,
+          priority: priority_from_cpf_report(cpf_report),
+          processing_progress: processing_progress_from_cpf_report(cpf_report),
           visible_to_owner:,
           indication_alt:,
-          indication_color:
-        )
+          indication_color:,
+          workflow_state: "active",
+          root_account_id: asset.root_account_id,
+          created_at: now,
+          updated_at: now
+        }
+        successful_count += 1
+      rescue => e
+        capture_and_log_exception(e)
+        add_actl_error(actl, "Failed to migrate report ID=#{cpf_report.id}: #{e.message}")
       end
+
+      Lti::AssetReport.transaction do
+        Lti::AssetReport.where(id: to_delete_ids).update_all(workflow_state: "deleted", updated_at: now) if to_delete_ids.any?
+        Lti::AssetReport.insert_all(to_insert) if to_insert.any?
+      end
+
+      successful_count
     end
 
     def priority_from_cpf_report(cpf_report)
