@@ -63,7 +63,7 @@ export default class CommentTextArea extends Component {
     bottomValue: '0px',
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
       const height =
         this._commentTextBox?.ref?.lastElementChild?.lastChild?.getBoundingClientRect()?.height || 0
@@ -73,6 +73,27 @@ export default class CommentTextArea extends Component {
     } else if (this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
       this.setState({bottomValue: '0px'})
     }
+
+    if (this.props.focusTrigger && this.props.focusTrigger !== prevProps.focusTrigger) {
+      if (this.validateAndShowErrors()) {
+        this._sendButton?.focus()
+      }
+    }
+  }
+
+  validateAndShowErrors = () => {
+    if (this.state.commentText.trim().length > 0 || this.state.currentFiles.length > 0) {
+      return true
+    }
+    const errorMessage = I18n.t('Comment or file required to save')
+    this._commentTextBox?.focus()
+    this.setState({
+      commentTextErrors: [
+        {text: errorMessage, type: 'newError'},
+        {text: errorMessage, type: 'screenreader-only'},
+      ],
+    })
+    return false
   }
   queryVariables() {
     return {
@@ -390,21 +411,12 @@ export default class CommentTextArea extends Component {
                     disableSubmitWhileUploading={true}
                   />
                   <Button
+                    elementRef={el => {
+                      this._sendButton = el
+                    }}
                     onClick={() => {
-                      if (
-                        this.state.commentText.trim().length > 0 ||
-                        this.state.currentFiles.length > 0
-                      ) {
+                      if (this.validateAndShowErrors()) {
                         this.onSendComment(createSubmissionComment)
-                      } else {
-                        const errorMessage = I18n.t('Comment or file required to save')
-                        this._commentTextBox.focus()
-                        this.setState({
-                          commentTextErrors: [
-                            {text: errorMessage, type: 'newError'},
-                            {text: errorMessage, type: 'screenreader-only'},
-                          ],
-                        })
                       }
                     }}
                     data-testid="send-button"

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useEffect, forwardRef, useImperativeHandle} from 'react'
+import React, {useRef, useEffect, useMemo, forwardRef, useImperativeHandle} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -50,6 +50,7 @@ interface RubricPanelProps {
   onViewModeChange: (mode: ViewMode) => void
   isReadOnly?: boolean
   autoFocusCloseButton?: boolean
+  triggerValidationAndFocus?: number
   isMobile?: boolean
 }
 
@@ -66,6 +67,7 @@ export const RubricPanel = forwardRef<RubricPanelHandle, RubricPanelProps>(
       onViewModeChange,
       isReadOnly = false,
       autoFocusCloseButton = false,
+      triggerValidationAndFocus = 0,
       isMobile = false,
     },
     ref,
@@ -80,6 +82,31 @@ export const RubricPanel = forwardRef<RubricPanelHandle, RubricPanelProps>(
       [],
     )
 
+    const mappedCriteria = useMemo(
+      () =>
+        assignment.rubric?.criteria.map((criterion: RubricCriterion) => ({
+          id: criterion._id,
+          description: criterion.description,
+          longDescription: criterion.longDescription ?? '',
+          points: criterion.points,
+          criterionUseRange: criterion.criterionUseRange ?? false,
+          learningOutcomeId: criterion.learningOutcomeId ?? undefined,
+          ignoreForScoring: criterion.ignoreForScoring ?? false,
+          masteryPoints: criterion.masteryPoints ?? undefined,
+          ratings: criterion.ratings.map((rating: RubricRating) => ({
+            id: rating._id,
+            description: rating.description,
+            longDescription: rating.longDescription ?? '',
+            points: rating.points,
+            criterionId: criterion._id,
+          })),
+        })) ?? [],
+      [assignment.rubric?.criteria],
+    )
+
+    const isFreeFormCriterionComments = assignment.rubric?.freeFormCriterionComments ?? false
+    const hidePoints = assignment.rubricAssociation?.hidePoints ?? false
+
     useEffect(() => {
       if (autoFocusCloseButton) {
         closeButtonRef.current?.focus()
@@ -89,27 +116,6 @@ export const RubricPanel = forwardRef<RubricPanelHandle, RubricPanelProps>(
     if (!assignment.rubric) {
       return null
     }
-
-    const hidePoints = assignment.rubricAssociation?.hidePoints ?? false
-    const isFreeFormCriterionComments = assignment.rubric.freeFormCriterionComments ?? false
-
-    const mappedCriteria = assignment.rubric.criteria.map((criterion: RubricCriterion) => ({
-      id: criterion._id,
-      description: criterion.description,
-      longDescription: criterion.longDescription ?? '',
-      points: criterion.points,
-      criterionUseRange: criterion.criterionUseRange ?? false,
-      learningOutcomeId: criterion.learningOutcomeId ?? undefined,
-      ignoreForScoring: criterion.ignoreForScoring ?? false,
-      masteryPoints: criterion.masteryPoints ?? undefined,
-      ratings: criterion.ratings.map((rating: RubricRating) => ({
-        id: rating._id,
-        description: rating.description,
-        longDescription: rating.longDescription ?? '',
-        points: rating.points,
-        criterionId: criterion._id,
-      })),
-    }))
 
     if (isMobile) {
       return (
@@ -184,6 +190,7 @@ export const RubricPanel = forwardRef<RubricPanelHandle, RubricPanelProps>(
               onDismiss={onClose}
               onSubmit={onSubmit}
               onViewModeChange={onViewModeChange}
+              triggerValidationAndFocus={triggerValidationAndFocus}
             />
           </Flex.Item>
         </Flex>

@@ -29,6 +29,7 @@ import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment
 
 type VerticalButtonDisplayProps = {
   buttonDisplay: string
+  criterionId: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -42,6 +43,7 @@ type VerticalButtonDisplayProps = {
 }
 export const VerticalButtonDisplay = ({
   buttonDisplay,
+  criterionId,
   hidePoints,
   isPreviewMode,
   isSelfAssessment,
@@ -68,6 +70,7 @@ export const VerticalButtonDisplay = ({
     <Flex
       as="div"
       direction={ratingOrder === 'ascending' ? 'column-reverse' : 'column'}
+      data-criterion-id={criterionId}
       data-testid="rubric-assessment-vertical-display"
     >
       {ratings.map((rating, index) => {

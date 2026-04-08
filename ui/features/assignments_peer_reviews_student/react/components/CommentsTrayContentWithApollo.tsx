@@ -49,6 +49,7 @@ interface CommentsTrayContentWithApolloProps {
   usePeerReviewModal?: boolean
   isReadOnly: boolean
   suppressSuccessAlert?: boolean
+  focusTrigger?: number
 }
 
 /**

@@ -48,9 +48,25 @@ vi.mock('@instructure/platform-alerts', async () => {
 })
 
 vi.mock('../CommentsTrayContentWithApollo', () => {
+  const {useEffect, useRef} = require('react')
+
   const MockedCommentsTray = (props: any) => {
     // Store the callback so tests can trigger it
     mockOnSuccessfulPeerReview = props.onSuccessfulPeerReview
+    const textareaRef = useRef(null)
+    const sendButtonRef = useRef(null)
+
+    useEffect(() => {
+      if (!props.focusTrigger) return
+      const textarea = textareaRef.current as HTMLTextAreaElement | null
+      const sendButton = sendButtonRef.current as HTMLButtonElement | null
+      if (textarea?.value) {
+        sendButton?.focus()
+      } else {
+        textarea?.focus()
+      }
+    }, [props.focusTrigger])
+
     return (
       <div
         data-testid="mocked-comments-tray"
@@ -60,6 +76,10 @@ vi.mock('../CommentsTrayContentWithApollo', () => {
         })}
       >
         Mocked Comments Tray
+        <textarea ref={textareaRef} data-testid="comment-text-input" defaultValue="" />
+        <button ref={sendButtonRef} data-testid="send-button">
+          Send Comment
+        </button>
       </div>
     )
   }
@@ -70,19 +90,106 @@ vi.mock('../CommentsTrayContentWithApollo', () => {
   }
 })
 
-vi.mock('@canvas/rubrics/react/RubricAssessment', () => ({
-  RubricAssessmentContainerWrapper: (props: any) => (
-    <div data-testid="mocked-rubric-assessment" data-props={JSON.stringify(props)}>
-      Mocked Rubric Assessment
-      <button
-        data-testid="mocked-rubric-submit"
-        onClick={() => props.onSubmit([{id: '1', points: 4, criterionId: '1', comments: ''}])}
+vi.mock('@canvas/rubrics/react/RubricAssessment', () => {
+  const {useEffect, useRef} = require('react')
+
+  const RubricAssessmentContainerWrapper = (props: any) => {
+    const criteria = props.criteria || []
+    const assessmentData = props.rubricAssessmentData || []
+    const hidePoints = props.hidePoints || false
+    const isFreeForm = props.isFreeFormCriterionComments || false
+    const containerRef = useRef(null)
+    const submitButtonRef = useRef(null)
+
+    useEffect(() => {
+      if (!props.triggerValidationAndFocus) return
+      if (!containerRef.current) return
+
+      const container = containerRef.current as HTMLDivElement
+
+      const firstIncomplete = criteria.find((criterion: any) => {
+        const assessment = assessmentData.find((d: any) => d.criterionId === criterion.id)
+        if (!hidePoints) return !assessment?.points && assessment?.points !== 0
+        if (isFreeForm) return !assessment?.comments
+        return !assessment
+      })
+
+      if (!firstIncomplete) {
+        ;(submitButtonRef.current as HTMLButtonElement | null)?.focus()
+        return
+      }
+
+      if (!hidePoints) {
+        const input = container.querySelector(
+          `[data-criterion-score-id="${firstIncomplete.id}"]`,
+        ) as HTMLInputElement | null
+        input?.focus()
+      } else if (isFreeForm) {
+        const commentArea = container.querySelector(
+          `[data-criterion-comment-id="${firstIncomplete.id}"]`,
+        ) as HTMLTextAreaElement | null
+        commentArea?.focus()
+      } else {
+        const ratingContainer = container.querySelector(
+          `[data-criterion-id="${firstIncomplete.id}"]`,
+        ) as Element | null
+        const firstButton = ratingContainer?.querySelector('button') as HTMLButtonElement | null
+        firstButton?.focus()
+      }
+    }, [props.triggerValidationAndFocus])
+
+    const renderCriterionInput = (criterion: any) => {
+      const assessment = assessmentData.find((d: any) => d.criterionId === criterion.id)
+      if (!hidePoints) {
+        return (
+          <input
+            key={criterion.id}
+            data-criterion-score-id={criterion.id}
+            data-testid={`criterion-score-${criterion.id}`}
+            defaultValue={assessment?.points?.toString() ?? ''}
+          />
+        )
+      } else if (isFreeForm) {
+        return (
+          <textarea
+            key={criterion.id}
+            data-criterion-comment-id={criterion.id}
+            data-testid={`free-form-comment-area-${criterion.id}`}
+            defaultValue={assessment?.comments ?? ''}
+          />
+        )
+      } else {
+        const isSelected = !!assessment
+        return (
+          <div key={criterion.id} data-criterion-id={criterion.id}>
+            <button data-testid={`rate-criterion-${criterion.id}`}>Rate</button>
+            {isSelected && <div data-testid="rubric-rating-button-selected" />}
+          </div>
+        )
+      }
+    }
+
+    return (
+      <div
+        ref={containerRef}
+        data-testid="mocked-rubric-assessment"
+        data-props={JSON.stringify(props)}
       >
-        Submit Assessment
-      </button>
-    </div>
-  ),
-}))
+        {criteria.map(renderCriterionInput)}
+        Mocked Rubric Assessment
+        <button
+          ref={submitButtonRef}
+          data-testid="save-rubric-assessment-button"
+          onClick={() => props.onSubmit([{id: '1', points: 4, criterionId: '1', comments: ''}])}
+        >
+          Submit Assessment
+        </button>
+      </div>
+    )
+  }
+
+  return {RubricAssessmentContainerWrapper}
+})
 
 vi.mock('../../hooks/useSavePeerReviewRubricAssessment', () => ({
   useSavePeerReviewRubricAssessment: () => ({
@@ -688,7 +795,7 @@ describe('AssignmentSubmission', () => {
 
   describe('onPeerReviewSubmitted callback', () => {
     it('calls onPeerReviewSubmitted when comment is successfully submitted', () => {
-      const onPeerReviewSubmitted = jest.fn()
+      const onPeerReviewSubmitted = vi.fn()
 
       render(
         <AssignmentSubmission
@@ -804,10 +911,20 @@ describe('AssignmentSubmission', () => {
       )
 
       expect(screen.getByTestId('toggle-rubric-button')).toBeInTheDocument()
-      expect(screen.getByTestId('toggle-rubric-button')).toHaveTextContent('Show Rubric')
+      expect(screen.getByTestId('toggle-rubric-button')).toHaveTextContent('Hide Rubric')
     })
 
-    it('shows rubric panel when rubric button is clicked', async () => {
+    it('shows rubric panel by default when assignment has rubric', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
+
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+    })
+
+    it('hides rubric panel when rubric button is clicked', async () => {
       const user = userEvent.setup()
       render(
         <AssignmentSubmission
@@ -816,32 +933,13 @@ describe('AssignmentSubmission', () => {
       )
 
       const toggleButton = screen.getByTestId('toggle-rubric-button')
-      expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
-
       await user.click(toggleButton)
 
-      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
-      expect(toggleButton).toHaveTextContent('Hide Rubric')
-    })
-
-    it('hides rubric panel when rubric button is clicked again', async () => {
-      const user = userEvent.setup()
-      render(
-        <AssignmentSubmission
-          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
-        />,
-      )
-
-      const toggleButton = screen.getByTestId('toggle-rubric-button')
-      await user.click(toggleButton)
-      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
-
-      await user.click(toggleButton)
       expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
       expect(toggleButton).toHaveTextContent('Show Rubric')
     })
 
-    it('renders Peer Review Rubric heading when rubric is shown', async () => {
+    it('shows rubric panel when rubric button is clicked again after hiding', async () => {
       const user = userEvent.setup()
       render(
         <AssignmentSubmission
@@ -849,22 +947,32 @@ describe('AssignmentSubmission', () => {
         />,
       )
 
-      await user.click(screen.getByTestId('toggle-rubric-button'))
+      const toggleButton = screen.getByTestId('toggle-rubric-button')
+      await user.click(toggleButton)
+      expect(screen.queryByTestId('mocked-rubric-assessment')).not.toBeInTheDocument()
+
+      await user.click(toggleButton)
+      expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
+      expect(toggleButton).toHaveTextContent('Hide Rubric')
+    })
+
+    it('renders Peer Review Rubric heading when rubric is shown', () => {
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createAssignmentWithRubric()})}
+        />,
+      )
 
       expect(screen.getByText('Peer Review Rubric')).toBeInTheDocument()
     })
 
-    it('closes comments when rubric is opened', async () => {
-      const user = userEvent.setup()
+    it('opens with rubric panel and comments panel closed when assignment has rubric', () => {
       render(
         <AssignmentSubmission
           {...createDefaultProps({assignment: createAssignmentWithRubric()})}
         />,
       )
 
-      expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
-
-      await user.click(screen.getByTestId('toggle-rubric-button'))
       expect(screen.queryByTestId('mocked-comments-tray')).not.toBeInTheDocument()
       expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
     })
@@ -877,7 +985,6 @@ describe('AssignmentSubmission', () => {
         />,
       )
 
-      await user.click(screen.getByTestId('toggle-rubric-button'))
       expect(screen.getByTestId('mocked-rubric-assessment')).toBeInTheDocument()
 
       await user.click(screen.getByTestId('toggle-comments-button'))
@@ -885,12 +992,9 @@ describe('AssignmentSubmission', () => {
       expect(screen.getByTestId('mocked-comments-tray')).toBeInTheDocument()
     })
 
-    it('passes correct props to RubricAssessmentContainerWrapper', async () => {
-      const user = userEvent.setup()
+    it('passes correct props to RubricAssessmentContainerWrapper', () => {
       const assignment = createAssignmentWithRubric()
       render(<AssignmentSubmission {...createDefaultProps({assignment})} />)
-
-      await user.click(screen.getByTestId('toggle-rubric-button'))
 
       const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
       const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
@@ -902,14 +1006,11 @@ describe('AssignmentSubmission', () => {
       expect(props.criteria[0].id).toBe('1')
     })
 
-    it('sets rubric to preview mode when peer review is completed', async () => {
-      const user = userEvent.setup()
+    it('sets rubric to preview mode when peer review is completed', () => {
       const assignment = createAssignmentWithRubric()
       render(
         <AssignmentSubmission {...createDefaultProps({assignment, isPeerReviewCompleted: true})} />,
       )
-
-      await user.click(screen.getByTestId('toggle-rubric-button'))
 
       const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
       const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
@@ -986,7 +1087,7 @@ describe('AssignmentSubmission', () => {
         expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
       })
 
-      it('rubric button has aria-expanded false initially', () => {
+      it('rubric button has aria-expanded true initially', () => {
         render(
           <AssignmentSubmission
             {...createDefaultProps({assignment: createAssignmentWithRubric()})}
@@ -994,10 +1095,10 @@ describe('AssignmentSubmission', () => {
         )
 
         const toggleButton = screen.getByTestId('toggle-rubric-button')
-        expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
+        expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
       })
 
-      it('rubric button has aria-expanded true when rubric is shown', async () => {
+      it('rubric button has aria-expanded false when rubric is hidden', async () => {
         const user = userEvent.setup()
         render(
           <AssignmentSubmission
@@ -1008,7 +1109,7 @@ describe('AssignmentSubmission', () => {
         const toggleButton = screen.getByTestId('toggle-rubric-button')
         await user.click(toggleButton)
 
-        expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
+        expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
       })
 
       it('comments button has aria-controls referencing comments panel', () => {
@@ -1055,15 +1156,12 @@ describe('AssignmentSubmission', () => {
         expect(document.getElementById('comments-panel')).toBeInTheDocument()
       })
 
-      it('rubric panel has id matching aria-controls', async () => {
-        const user = userEvent.setup()
+      it('rubric panel has id matching aria-controls', () => {
         render(
           <AssignmentSubmission
             {...createDefaultProps({assignment: createAssignmentWithRubric()})}
           />,
         )
-
-        await user.click(screen.getByTestId('toggle-rubric-button'))
 
         expect(document.getElementById('rubric-panel')).toBeInTheDocument()
       })
@@ -1097,7 +1195,9 @@ describe('AssignmentSubmission', () => {
           />,
         )
 
-        await user.click(screen.getByTestId('toggle-rubric-button'))
+        const toggleButton = screen.getByTestId('toggle-rubric-button')
+        await user.click(toggleButton) // hide
+        await user.click(toggleButton) // show
 
         const closeButton = screen.getByTestId('close-rubric-button').querySelector('button')
         expect(closeButton).toHaveFocus()
@@ -1122,7 +1222,6 @@ describe('AssignmentSubmission', () => {
           />,
         )
 
-        await user.click(screen.getByTestId('toggle-rubric-button'))
         const closeButton = screen.getByTestId('close-rubric-button').querySelector('button')
         await user.click(closeButton!)
 
@@ -1234,8 +1333,8 @@ describe('AssignmentSubmission', () => {
 
         const {rerender} = render(<AssignmentSubmission {...props} />)
 
-        // Close the default-open comments panel so neither panel is open
-        await user.click(screen.getByTestId('toggle-comments-button'))
+        // Close the default-open rubric panel so neither panel is open
+        await user.click(screen.getByTestId('toggle-rubric-button'))
         expect(screen.queryByTestId('close-comments-button')).not.toBeInTheDocument()
         expect(screen.queryByTestId('close-rubric-button')).not.toBeInTheDocument()
 
@@ -1255,10 +1354,22 @@ describe('AssignmentSubmission', () => {
   })
 
   describe('error alerts', () => {
-    const createAssignmentWithRubric = () =>
+    const createScaleUnscoredAssignment = () =>
       createAssignment({
         rubric: createRubric(),
-        rubricAssociation: createRubricAssociation(),
+        rubricAssociation: createRubricAssociation({hidePoints: true}),
+      })
+
+    const createWrittenFeedbackAssignment = () =>
+      createAssignment({
+        rubric: createRubric({freeFormCriterionComments: true}),
+        rubricAssociation: createRubricAssociation({hidePoints: true}),
+      })
+
+    const createScoredAssignment = () =>
+      createAssignment({
+        rubric: createRubric(),
+        rubricAssociation: createRubricAssociation({hidePoints: false}),
       })
 
     it('shows error alert when submitting with rubric but rubric not completed', async () => {
@@ -1268,7 +1379,7 @@ describe('AssignmentSubmission', () => {
       render(
         <AssignmentSubmission
           {...createDefaultProps({
-            assignment: createAssignmentWithRubric(),
+            assignment: createScaleUnscoredAssignment(),
             handleNextPeerReview: mockHandleNext,
           })}
         />,
@@ -1283,6 +1394,63 @@ describe('AssignmentSubmission', () => {
       expect(mockHandleNext).not.toHaveBeenCalled()
     })
 
+    it('reopens rubric panel when Submit is clicked without submitting rubric assessment', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createScaleUnscoredAssignment()})}
+        />,
+      )
+
+      await user.click(screen.getByTestId('toggle-rubric-button'))
+      expect(screen.queryByTestId('close-rubric-button')).not.toBeInTheDocument()
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('close-rubric-button')).toBeInTheDocument()
+    })
+
+    it('focuses first incomplete criterion rating button when Submit is clicked without submitting rubric assessment', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createScaleUnscoredAssignment()})}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('rate-criterion-1')).toHaveFocus()
+    })
+
+    it('focuses written feedback text area when rubric is written feedback type and unscored', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssignmentSubmission
+          {...createDefaultProps({assignment: createWrittenFeedbackAssignment()})}
+        />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('free-form-comment-area-1')).toHaveFocus()
+    })
+
+    it('focuses criterion score input when rubric is scored', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssignmentSubmission {...createDefaultProps({assignment: createScoredAssignment()})} />,
+      )
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('criterion-score-1')).toHaveFocus()
+    })
+
     it('does not show error alert when rubric is completed', async () => {
       const user = userEvent.setup()
       const mockHandleNext = vi.fn()
@@ -1290,7 +1458,7 @@ describe('AssignmentSubmission', () => {
       render(
         <AssignmentSubmission
           {...createDefaultProps({
-            assignment: createAssignmentWithRubric(),
+            assignment: createScaleUnscoredAssignment(),
             rubricAssessment: createRubricAssessment(),
             handleNextPeerReview: mockHandleNext,
           })}
@@ -1323,6 +1491,52 @@ describe('AssignmentSubmission', () => {
         type: 'error',
       })
       expect(mockHandleNext).not.toHaveBeenCalled()
+    })
+
+    it('reopens comments panel when Submit is clicked without leaving a comment', async () => {
+      const user = userEvent.setup()
+
+      render(<AssignmentSubmission {...createDefaultProps({assignment: createAssignment()})} />)
+
+      await user.click(screen.getByTestId('toggle-comments-button'))
+      expect(screen.queryByTestId('close-comments-button')).not.toBeInTheDocument()
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('close-comments-button')).toBeInTheDocument()
+    })
+
+    it('focuses comment textarea when Submit is clicked and textarea is empty', async () => {
+      const user = userEvent.setup()
+
+      render(<AssignmentSubmission {...createDefaultProps({assignment: createAssignment()})} />)
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('comment-text-input')).toHaveFocus()
+    })
+
+    it('focuses comments panel when Submit is clicked and comments panel is already open', async () => {
+      const user = userEvent.setup()
+
+      render(<AssignmentSubmission {...createDefaultProps({assignment: createAssignment()})} />)
+
+      await user.click(screen.getByTestId('toggle-comments-button'))
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('comment-text-input')).toHaveFocus()
+    })
+
+    it('focuses Send Comment button when Submit is clicked and textarea has text', async () => {
+      const user = userEvent.setup()
+
+      render(<AssignmentSubmission {...createDefaultProps({assignment: createAssignment()})} />)
+
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+      await user.type(screen.getByTestId('comment-text-input'), 'some comment')
+      await user.click(screen.getByTestId('submit-peer-review-button'))
+
+      expect(screen.getByTestId('send-button')).toHaveFocus()
     })
 
     it('does not show error alert when peer review is already completed', async () => {
