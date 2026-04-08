@@ -359,6 +359,21 @@ describe('<ClosedCaptionPanelV2 />', () => {
   })
 
   describe('a11y', () => {
+    it('a11y: renders captions as a semantic list', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+        {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const list = screen.getByLabelText('Captions')
+      expect(list.tagName).toBe('UL')
+
+      const items = list.querySelectorAll('li')
+      expect(items).toHaveLength(2)
+    })
+
     it('a11y: announces when a caption is added', async () => {
       server.use(
         http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
