@@ -501,6 +501,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       expect(service).to receive(:validate_assignment_submission_types)
       expect(service).to receive(:validate_feature_enabled)
       expect(service).to receive(:validate_peer_review_sub_assignment_exists)
+      expect(service).to receive(:validate_dates)
 
       service.send(:run_validations)
     end
