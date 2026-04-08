@@ -323,6 +323,7 @@ const renderStepContent = (
         <PrivacyConfirmationWrapper
           overlayStore={state.overlayStore}
           internalConfig={state.registration.configuration}
+          originalConfig={state.registration.configuration}
         />
       )
     case 'PlacementsConfirmation':

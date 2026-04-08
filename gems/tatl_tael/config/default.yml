@@ -227,3 +227,15 @@ Simple/LtiAssetProcessorSharedLinter:
 
     Please coordinate with the interop team to ensure the changes are properly
     replicated.
+
+Simple/SubstitutionVariablesLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+      - "lib/lti/variable_expander.rb"
+  Message: |-
+    You have modified lib/lti/variable_expander.rb which contains LTI
+    variable substitution definitions. If you added, removed, or modified
+    any variable names, please also update the SubstitutionVariables array
+    in ui/features/lti_registrations/manage/lib/extractSubstitutionVariables.ts
+    to keep the frontend list synchronized with the backend definitions.

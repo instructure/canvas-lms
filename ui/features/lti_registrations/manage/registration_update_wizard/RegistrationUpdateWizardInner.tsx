@@ -97,10 +97,9 @@ export const RegistrationUpdateWizardInner = ({
         })
 
         showFlashAlert({
-          message: I18n.t(`Configuration updates applied to *%{appName}*`, {
+          message: I18n.t(`Configuration updates applied to %{appName}`, {
             appName,
-            wrappers: ['<b>$1</b>'],
-          }),
+          }).toString(),
           type: 'success',
         })
         onSuccess()
@@ -180,6 +179,7 @@ export const RegistrationUpdateWizardInner = ({
             internalConfig={registrationUpdateRequest.internal_lti_configuration}
             overlayStore={overlayStore}
             registrationUpdateRequest={registrationUpdateRequest}
+            originalConfig={registration.configuration}
           />
         )
       case 'PlacementsConfirmation':

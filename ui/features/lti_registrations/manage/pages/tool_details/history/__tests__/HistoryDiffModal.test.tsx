@@ -753,7 +753,7 @@ describe('HistoryDiffModal', () => {
 
       render(<HistoryDiffModal entry={entry} isOpen={true} onClose={onClose} />)
 
-      expect(screen.getByText('Privacy Level')).toBeInTheDocument()
+      expect(screen.getByText('Data Sharing')).toBeInTheDocument()
       expect(screen.getByText('[-] All user data')).toBeInTheDocument()
       expect(screen.getByText('[+] None (Anonymized)')).toBeInTheDocument()
     })
@@ -931,7 +931,7 @@ describe('HistoryDiffModal', () => {
 
       expect(screen.getByText('Launch Settings')).toBeInTheDocument()
       expect(screen.getByText('Permissions')).toBeInTheDocument()
-      expect(screen.getByText('Privacy Level')).toBeInTheDocument()
+      expect(screen.getByText('Data Sharing')).toBeInTheDocument()
       expect(screen.getByText('Placements')).toBeInTheDocument()
       expect(screen.getByText('Naming')).toBeInTheDocument()
       expect(screen.getByText('Icon Changes')).toBeInTheDocument()

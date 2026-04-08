@@ -232,6 +232,7 @@ const renderCustomizationBody = (
         <PrivacyConfirmationWrapper
           overlayStore={state.overlayStore}
           internalConfig={state.registration.overlaid_configuration}
+          originalConfig={state.registration.overlaid_configuration}
         />
       )
 
