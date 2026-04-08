@@ -1648,11 +1648,11 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       )
 
       # Make first report migration fail
-      allow(worker).to receive(:migrate_report).and_wrap_original do |method, *args|
-        if args[1] == report1
+      allow(worker).to receive(:calc_indications_from_cpf_report).and_wrap_original do |method, cpf_report|
+        if cpf_report.id == report1.id
           raise StandardError, "Test error"
         else
-          method.call(*args)
+          method.call(cpf_report)
         end
       end
 
@@ -1674,7 +1674,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         workflow_state: "scored"
       )
 
-      allow(worker).to receive(:migrate_report).and_raise(StandardError, "Test error")
+      allow(worker).to receive(:calc_indications_from_cpf_report).and_raise(StandardError, "Test error")
       allow(Canvas::Errors).to receive(:capture_exception)
 
       status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
@@ -1684,7 +1684,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
   end
 
-  describe "#migrate_report" do
+  describe "#migrate_reports (single report behavior)" do
     let(:assignment) { assignment_model(course:) }
     let(:user) { user_model }
     let(:submission) { submission_model(assignment:, user:) }
@@ -1725,14 +1725,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     context "with attachment-based report" do
       it "creates asset report with all required fields" do
         attachment = attachment_model(context: course)
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 75.5,
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         expect(Lti::AssetReport.count).to eq(1)
         asset_report = Lti::AssetReport.last
@@ -1748,14 +1748,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "sets correct indication color based on similarity score" do
         attachment = attachment_model(context: course)
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 85,
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.indication_color).to be_present
@@ -1764,14 +1764,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "sets correct indication color for low similarity score" do
         attachment = attachment_model(context: course)
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 15,
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.indication_color).to eq("#00AC18")
@@ -1780,7 +1780,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "stores custom_sourcedid in extensions when present" do
         attachment = attachment_model(context: course)
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 50,
@@ -1790,7 +1790,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         # Mock extract_custom_sourcedid to return a value
         allow(worker).to receive(:extract_custom_sourcedid).and_return("abc123")
 
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.extensions["https://www.instructure.com/legacy_custom_sourcedid"]).to eq("abc123")
@@ -1798,7 +1798,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       it "adds warning when custom_sourcedid is missing" do
         attachment = attachment_model(context: course)
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 50,
@@ -1806,7 +1806,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         )
 
         worker.send(:initialize_proxy_results, tool_proxy)
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         results = worker.instance_variable_get(:@results)
         warnings = results[:actl_warnings][actl.id]
@@ -1817,14 +1817,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         attachment = attachment_model(context: course)
 
         # First migration
-        first_cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 50,
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_report, actl, first_cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         expect(Lti::AssetReport.active.count).to eq(1)
         first_asset_report_id = Lti::AssetReport.last.id
@@ -1838,7 +1838,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         )
         second_cpf_report.update_column(:updated_at, 1.hour.from_now)
 
-        worker.send(:migrate_report, actl, second_cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         # Should delete older report and create new one (soft delete)
         expect(Lti::AssetReport.active.exists?(first_asset_report_id)).to be false
@@ -1850,21 +1850,23 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     context "with text-entry report (no attachment)" do
-      it "raises error when submission attempt cannot be found" do
-        cpf_report = OriginalityReport.create!(
+      it "records error and returns failed when submission attempt cannot be found" do
+        OriginalityReport.create!(
           submission:,
           originality_score: 75,
           workflow_state: "scored",
           submission_time: 1.day.ago
         )
 
-        expect do
-          worker.send(:migrate_report, actl, cpf_report, asset_processor)
-        end.to raise_error("Cannot find submission attempt for report ID=#{cpf_report.id}")
+        status, count = worker.send(:migrate_reports, actl, nil, asset_processor)
+
+        expect(status).to eq(:failed)
+        expect(count).to eq(0)
+        expect(Lti::AssetReport.count).to eq(0)
       end
 
       it "creates asset report with submission attempt when found" do
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           submission:,
           originality_score: 60,
           workflow_state: "scored",
@@ -1872,9 +1874,9 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         )
 
         # Mock find_attempt_for_report to return a valid attempt
-        allow(worker).to receive(:find_attempt_for_report).with(cpf_report).and_return(1)
+        allow(worker).to receive(:find_attempt_for_report).and_return(1)
 
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         expect(Lti::AssetReport.count).to eq(1)
         asset_report = Lti::AssetReport.last
@@ -1886,18 +1888,42 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       end
     end
 
+    context "when the Lti::Asset is soft-deleted" do
+      it "skips the report with a warning instead of associating it with the deleted asset" do
+        attachment = attachment_model(context: course)
+        OriginalityReport.create!(
+          attachment:,
+          submission:,
+          originality_score: 50,
+          workflow_state: "scored"
+        )
+        Lti::Asset.create!(
+          submission:,
+          attachment:,
+          workflow_state: "deleted",
+          root_account_id: submission.root_account_id
+        )
+
+        status, count = worker.send(:migrate_reports, actl, nil, asset_processor)
+
+        expect(status).to eq(:failed)
+        expect(count).to eq(0)
+        expect(Lti::AssetReport.count).to eq(0)
+      end
+    end
+
     context "visible_to_owner setting" do
       it "sets visible_to_owner based on turnitin_settings" do
         attachment = attachment_model(context: course)
         assignment.update!(turnitin_settings: { s_view_report: "1" })
-        cpf_report = OriginalityReport.create!(
+        OriginalityReport.create!(
           attachment:,
           submission:,
           originality_score: 50,
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_report, actl, cpf_report, asset_processor)
+        worker.send(:migrate_reports, actl, nil, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.visible_to_owner).to be true
