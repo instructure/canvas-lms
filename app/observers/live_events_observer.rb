@@ -53,6 +53,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :user_account_association,
           :user,
           :wiki_page,
+          "Quizzes::QuizQuestion",
           "MasterCourses::MasterTemplate",
           "MasterCourses::MasterMigration",
           "MasterCourses::ChildSubscription",
