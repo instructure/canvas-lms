@@ -756,6 +756,28 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
     end
 
+    context "for announcements" do
+      before do
+        @annc = announcement_model(context: @course)
+      end
+
+      it "returns false when announcement is marked complete via planner override" do
+        # Use PlannerOverride.create! so plannable_type uses Announcement.polymorphic_name
+        # ("DiscussionTopic") consistent with how the API creates overrides
+        PlannerOverride.create!(user: @student, plannable: @annc, marked_complete: true)
+        expect(api.planner_item_json(@annc, @student, session)[:new_activity]).to be false
+      end
+
+      it "returns true when announcement is unread and not marked complete" do
+        expect(api.planner_item_json(@annc, @student, session)[:new_activity]).to be true
+      end
+
+      it "returns false when announcement is read and has no replies" do
+        @annc.change_read_state("read", @student)
+        expect(api.planner_item_json(@annc, @student, session)[:new_activity]).to be false
+      end
+    end
+
     it "returns false for items without new activity" do
       student_in_course active_all: true
       expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be false

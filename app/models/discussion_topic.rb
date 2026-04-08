@@ -659,7 +659,9 @@ class DiscussionTopic < ApplicationRecord
     return true if new_state == read_state(current_user)
 
     StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
-    update_or_create_participant(current_user:, new_state:)
+    opts = { current_user:, new_state: }
+    opts[:new_count] = 0 if is_announcement && new_state == "read"
+    update_or_create_participant(**opts)
   end
 
   def change_all_read_state(new_state, current_user = nil, opts = {})
@@ -2323,7 +2325,7 @@ class DiscussionTopic < ApplicationRecord
         discussion_topic_id: id,
         user_id:,
         workflow_state: "unread",
-        unread_entry_count: 1,
+        unread_entry_count: 0,
         subscribed: false, # Default for bulk creation of announcements
         root_account_id: self.root_account_id,
         created_at: current_time,
