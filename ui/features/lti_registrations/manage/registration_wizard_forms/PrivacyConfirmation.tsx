@@ -30,6 +30,8 @@ import {
 import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../model/i18nLtiPrivacyLevel'
 import {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {Pill} from '@instructure/ui-pill'
+import {CustomVariablesList} from '../components/CustomVariablesList'
+import {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -53,6 +55,7 @@ export type PrivacyConfirmationProps = {
    */
   defaultPrivacyLevel?: LtiPrivacyLevel
   registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  internalConfiguration?: InternalLtiConfiguration
 }
 
 export const PrivacyConfirmation = React.memo(
@@ -62,6 +65,7 @@ export const PrivacyConfirmation = React.memo(
     privacyLevelOnChange,
     registrationUpdateRequest,
     defaultPrivacyLevel,
+    internalConfiguration,
   }: PrivacyConfirmationProps) => {
     const messages = [
       {
@@ -120,6 +124,11 @@ export const PrivacyConfirmation = React.memo(
               </>
             )}
         </View>
+
+        <CustomVariablesList
+          internalConfiguration={internalConfiguration}
+          registrationUpdateRequest={registrationUpdateRequest}
+        />
       </>
     )
   },

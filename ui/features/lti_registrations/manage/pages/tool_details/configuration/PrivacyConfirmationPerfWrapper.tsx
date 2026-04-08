@@ -53,6 +53,7 @@ export const PrivacyConfirmationPerfWrapper = React.memo(
         selectedPrivacyLevel={selectedPrivacyLevel}
         privacyLevelOnChange={privacyLevelOnChange}
         defaultPrivacyLevel={defaultPrivacyLevel}
+        internalConfiguration={registration.overlaid_configuration}
       />
     )
   },

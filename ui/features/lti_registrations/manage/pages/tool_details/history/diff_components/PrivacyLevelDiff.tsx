@@ -36,7 +36,7 @@ export const PrivacyLevelDiff: React.FC<PrivacyLevelDiffProps> = ({diff}) => {
   return (
     <View as="div" margin="large 0">
       <Diff
-        label={I18n.t('Privacy Level')}
+        label={I18n.t('Data Sharing')}
         diff={diff}
         formatter={level => {
           return i18nLtiPrivacyLevel(level)

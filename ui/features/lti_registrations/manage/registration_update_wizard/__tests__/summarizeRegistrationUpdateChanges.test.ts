@@ -221,8 +221,8 @@ describe('summarizeRegistrationUpdateChanges', () => {
     })
   })
 
-  describe('privacy level changes', () => {
-    it('identifies privacy level changes', () => {
+  describe('Data Sharing changes', () => {
+    it('identifies Data Sharing changes', () => {
       const registration = mockRegistration(
         {},
         {
@@ -240,12 +240,12 @@ describe('summarizeRegistrationUpdateChanges', () => {
       const result = summarizeRegistrationUpdateChanges(updateRequest, registration)
 
       expect(result.added).toContainEqual({
-        section: 'Privacy Level',
-        detail: 'Changed to anonymous',
+        section: 'Data Sharing',
+        detail: 'Changed privacy level to anonymous',
       })
     })
 
-    it('shows no change when privacy level is same', () => {
+    it('shows no change when Data Sharing is same', () => {
       const registration = mockRegistration(
         {},
         {
@@ -263,12 +263,12 @@ describe('summarizeRegistrationUpdateChanges', () => {
       const result = summarizeRegistrationUpdateChanges(updateRequest, registration)
 
       expect(result.noChange).toContainEqual({
-        section: 'Privacy Level',
+        section: 'Data Sharing',
         detail: '',
       })
     })
 
-    it('shows no change when overlay has privacy level override', () => {
+    it('shows no change when overlay has Data Sharing override', () => {
       const registration = mockRegistration(
         {
           overlay: mockOverlay({
@@ -290,12 +290,12 @@ describe('summarizeRegistrationUpdateChanges', () => {
       const result = summarizeRegistrationUpdateChanges(updateRequest, registration)
 
       expect(result.noChange).toContainEqual({
-        section: 'Privacy Level',
+        section: 'Data Sharing',
         detail: '',
       })
     })
 
-    it('shows no change when requested privacy level is undefined', () => {
+    it('shows no change when requested Data Sharing is undefined', () => {
       const registration = mockRegistration(
         {},
         {
@@ -313,7 +313,7 @@ describe('summarizeRegistrationUpdateChanges', () => {
       const result = summarizeRegistrationUpdateChanges(updateRequest, registration)
 
       expect(result.noChange).toContainEqual({
-        section: 'Privacy Level',
+        section: 'Data Sharing',
         detail: '',
       })
     })
@@ -761,7 +761,7 @@ describe('summarizeRegistrationUpdateChanges', () => {
       expect(result.added).toEqual(
         expect.arrayContaining([
           {section: 'Permissions', detail: 'Added 1 new scope'},
-          {section: 'Privacy Level', detail: 'Changed to anonymous'},
+          {section: 'Data Sharing', detail: 'Changed privacy level to anonymous'},
           {section: 'Placements', detail: 'Added 1 placement'},
           {section: 'Naming', detail: 'Updated app name'},
           {section: 'Icon', detail: 'Icon settings updated'},
@@ -794,7 +794,7 @@ describe('summarizeRegistrationUpdateChanges', () => {
       )
 
       expect(allSections).toContain('Permissions')
-      expect(allSections).toContain('Privacy Level')
+      expect(allSections).toContain('Data Sharing')
       expect(allSections).toContain('Placements')
       expect(allSections).toContain('Naming')
       expect(allSections).toContain('Icon')

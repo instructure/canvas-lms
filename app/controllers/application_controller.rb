@@ -590,6 +590,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_usage_data_low_usage
     lti_registrations_usage_tab
     lti_toggle_placements
+    substitution_variable_display
     mobile_offline_mode
     modules_requirements_allow_percentage
     nav_menu_links

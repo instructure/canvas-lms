@@ -379,6 +379,7 @@ export type RootAccountFeatureId =
   | 'rubric_criterion_range'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
+  | 'substitution_variable_display'
   | 'top_navigation_placement'
 
 /**

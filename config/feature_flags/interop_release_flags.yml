@@ -445,6 +445,20 @@ refactor_custom_variables:
       state: allowed_on
     ci:
       state: allowed_on
+substitution_variable_display:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Custom Variable Substitutions Display
+  description: |-
+    When enabled, administrators can see which custom variable substitutions
+    (e.g., user IDs, course info) LTI tools are requesting access to in the
+    registration wizard and tool configuration pages.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 top_navigation_placement:
   state: hidden
   applies_to: RootAccount
