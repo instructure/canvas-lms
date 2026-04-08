@@ -457,6 +457,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       expect(service).to receive(:validate_assignment_submission_types).ordered
       expect(service).to receive(:validate_feature_enabled).ordered
       expect(service).to receive(:validate_peer_review_sub_assignment_not_exist).ordered
+      expect(service).to receive(:validate_dates).ordered
 
       service.send(:run_validations)
     end
@@ -563,6 +564,28 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
     it "handles the case when there are no existing assessment requests" do
       expect { service.send(:link_existing_assessment_requests, peer_review_sub_assignment) }.not_to raise_error
+    end
+  end
+
+  describe "validation skip flags" do
+    context "when skip_date_validation is true" do
+      it "creates a peer review sub assignment even when dates would fail validation" do
+        parent_with_dates = assignment_model(
+          course:,
+          title: "Parent with Dates",
+          due_at: 1.week.from_now,
+          lock_at: 2.weeks.from_now,
+          peer_reviews: true
+        )
+        result = described_class.call(
+          parent_assignment: parent_with_dates,
+          points_possible: 10,
+          due_at: parent_with_dates.due_at - 1.day,
+          skip_date_validation: true
+        )
+        expect(result).to be_a(PeerReviewSubAssignment)
+        expect(result).to be_persisted
+      end
     end
   end
 

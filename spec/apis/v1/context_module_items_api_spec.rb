@@ -2698,6 +2698,58 @@ describe "Module Items API", type: :request do
                {},
                { expected_status: 400 })
     end
+
+    context "when the module item is an assignment with a peer review sub assignment" do
+      let(:assignment_with_peer_review) do
+        a = assignment_model(
+          course: @course,
+          title: "PR Module Assignment",
+          points_possible: 10,
+          peer_review_count: 2,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment: a)
+        a.reload
+      end
+      let(:module_tag) { @module1.add_item(id: assignment_with_peer_review.id, type: "assignment") }
+      let(:original_peer_review_sub) { assignment_with_peer_review.peer_review_sub_assignment }
+      let(:new_assignment) { Assignment.find_by!(duplicate_of: assignment_with_peer_review.id) }
+
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        api_call(:post,
+                 "/api/v1/courses/#{@course.id}/modules/items/#{module_tag.id}/duplicate",
+                 { controller: "context_module_items_api",
+                   action: "duplicate",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: module_tag.id.to_s },
+                 {},
+                 {},
+                 { expected_status: 200 })
+      end
+
+      it "duplicates the peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment).to be_present
+      end
+
+      it "links the duplicated sub assignment to the new assignment, not the original" do
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).to eq(new_assignment.id)
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).not_to eq(assignment_with_peer_review.id)
+      end
+
+      it "preserves peer_review_count on the duplicated assignment" do
+        expect(new_assignment.peer_review_count).to eq(assignment_with_peer_review.peer_review_count)
+      end
+
+      it "preserves due_at, unlock_at, and lock_at on the duplicated peer review sub assignment" do
+        new_peer_review_sub = new_assignment.peer_review_sub_assignment
+        expect(new_peer_review_sub.due_at).to eq(original_peer_review_sub.due_at)
+        expect(new_peer_review_sub.unlock_at).to eq(original_peer_review_sub.unlock_at)
+        expect(new_peer_review_sub.lock_at).to eq(original_peer_review_sub.lock_at)
+      end
+    end
   end
 
   context "unauthorized user" do

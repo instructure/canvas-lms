@@ -414,7 +414,9 @@ class AbstractAssignment < ApplicationRecord
        turnitin_id].each do |attr|
       result.send(:"#{attr}=", nil)
     end
-    result.peer_review_count = 0
+    original_peer_review_sub = peer_review_sub_assignment
+    should_duplicate_peer_review_sub = original_peer_review_sub.present? && context.feature_enabled?(:peer_review_allocation_and_grading)
+    result.peer_review_count = should_duplicate_peer_review_sub ? peer_review_count : 0
     result.peer_reviews_assigned = false
 
     # Default to the last position of all active assignments in the group.  Clients can still
@@ -464,6 +466,26 @@ class AbstractAssignment < ApplicationRecord
         )
         new_sub_assignment.duplicate_of = sub_assignment
         new_sub_assignment.save!
+      end
+    end
+
+    if should_duplicate_peer_review_sub
+      ActiveRecord::Base.transaction do
+        # we have to save result here because we have to set it as a parent_assignment
+        result.save!
+        new_peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: result,
+          points_possible: original_peer_review_sub.points_possible,
+          grading_type: original_peer_review_sub.grading_type,
+          due_at: original_peer_review_sub.due_at,
+          unlock_at: original_peer_review_sub.unlock_at,
+          lock_at: original_peer_review_sub.lock_at,
+          # Skipping validation to preserve an exact copy of the original
+          # peer review sub assignment, including all its dates.
+          skip_date_validation: true
+        )
+        new_peer_review_sub.duplicate_of = original_peer_review_sub
+        new_peer_review_sub.save!
       end
     end
 

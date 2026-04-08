@@ -147,6 +147,15 @@ class PeerReviewSubAssignment < AbstractAssignment
     parent_assignment
   end
 
+  def self.generate_title(assignment)
+    count = assignment.peer_review_count
+    if count && count > 0
+      I18n.t("%{title} Peer Review (%{count})", title: assignment.title, count:)
+    else
+      I18n.t("%{title} Peer Review", title: assignment.title)
+    end
+  end
+
   private
 
   def set_default_context

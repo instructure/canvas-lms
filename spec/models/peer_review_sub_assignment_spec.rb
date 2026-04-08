@@ -588,6 +588,28 @@ RSpec.describe PeerReviewSubAssignment do
     end
   end
 
+  describe ".generate_title" do
+    let(:assignment) { instance_double(Assignment, title: "My Assignment") }
+
+    it "includes the peer review count in the title when count is greater than 0" do
+      allow(assignment).to receive(:peer_review_count).and_return(3)
+      expected = I18n.t("%{title} Peer Review (%{count})", title: "My Assignment", count: 3)
+      expect(PeerReviewSubAssignment.generate_title(assignment)).to eq(expected)
+    end
+
+    it "omits the count from the title when peer_review_count is nil" do
+      allow(assignment).to receive(:peer_review_count).and_return(nil)
+      expected = I18n.t("%{title} Peer Review", title: "My Assignment")
+      expect(PeerReviewSubAssignment.generate_title(assignment)).to eq(expected)
+    end
+
+    it "omits the count from the title when peer_review_count is 0" do
+      allow(assignment).to receive(:peer_review_count).and_return(0)
+      expected = I18n.t("%{title} Peer Review", title: "My Assignment")
+      expect(PeerReviewSubAssignment.generate_title(assignment)).to eq(expected)
+    end
+  end
+
   context "broadcast policies" do
     before :once do
       course_with_teacher(active_all: true)
