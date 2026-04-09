@@ -60,8 +60,11 @@ module AccessibilityChecker
 
     FIXTURES = {
       missing_alt_text: { path: "single_issues/missing_alt_text.html", title: "Missing Alt Text", issue_count: 1 },
+      alt_text_too_long: { path: "single_issues/alt_text_too_long.html", title: "Alt Text Too Long", issue_count: 1 },
+      alt_text_is_filename: { path: "single_issues/alt_text_is_filename.html", title: "Alt Text Is Filename", issue_count: 1 },
       table_no_headers: { path: "single_issues/table_no_headers.html", title: "Table No Headers", issue_count: 1 },
       multiple_issues: { path: "multiple_issues/incorrect_heading_hierarchy_and_missing_alt_text.html", title: "Multiple Issues", issue_count: 2 },
+      two_alt_text_issues: { path: "multiple_issues/two_alt_text_issues.html", title: "Two Alt Text Issues", issue_count: 2 },
       valid_alt_text: { path: "valid/accessible_page_complete.html", title: "Accessible Page Complete", issue_count: 0 }
     }.freeze
 
