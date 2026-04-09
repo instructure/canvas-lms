@@ -35,11 +35,6 @@ educator_dashboard:
     with cross-course task management, content quality insights, and student
     activity summaries.
   applies_to: RootAccount
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed
 peer_review_allocation_and_grading:
   state: hidden
   applies_to: Course
