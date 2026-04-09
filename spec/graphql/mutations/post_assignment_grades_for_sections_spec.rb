@@ -291,6 +291,30 @@ describe Mutations::PostAssignmentGradesForSections do
     end
   end
 
+  context "with a peer review sub assignment" do
+    let(:context) { { current_user: teacher } }
+    let(:peer_review_sub_assignment) { peer_review_model(parent_assignment: assignment) }
+
+    it "posts grades by section when the feature flag is enabled" do
+      result = execute_query(mutation_str(assignment_id: peer_review_sub_assignment.id, section_ids: [section1.id]), context)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "postAssignmentGradesForSections", "progress")).to be_present
+    end
+
+    it "returns not found when the feature flag is disabled" do
+      id = peer_review_sub_assignment.id
+      course.disable_feature!(:peer_review_allocation_and_grading)
+      result = execute_query(mutation_str(assignment_id: id, section_ids: [section1.id]), context)
+      expect(result.dig("errors", 0, "message")).to eql "not found"
+    end
+
+    it "does not cause regression for regular assignments" do
+      result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "postAssignmentGradesForSections", "progress")).to be_present
+    end
+  end
+
   context "when user does not have grade permission" do
     let(:context) { { current_user: @section1_student } }
 
