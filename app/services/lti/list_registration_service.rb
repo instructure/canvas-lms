@@ -102,7 +102,7 @@ module Lti
     end
 
     def preloaded_pending_updates(registrations)
-      return {} unless Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+      return {} unless account.root_account.feature_enabled?(:lti_dr_registrations_update)
 
       # Get the most recent update request per registration, regardless of status
       all_latest = Lti::RegistrationUpdateRequest.where(lti_registration: registrations)
