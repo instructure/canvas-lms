@@ -1379,6 +1379,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
   # @argument unified_tool_id [String] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
+  # @argument lock_deploying [Boolean] When true, no new deployments of this registration can be created.
   # @argument workflow_state [String, "on" | "off" | "allow" | "active" | "inactive"]
   #   "on"/"off"/"allow" set the account binding state directly (binding vocabulary).
   #   "active"/"inactive" set the registration state directly (registration vocabulary).
@@ -1416,9 +1417,14 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def create
+    permitted_params = %i[vendor name admin_nickname description workflow_state]
+    if @context.root_account.feature_enabled?(:lock_lti_registrations)
+      permitted_params << :lock_deploying
+    end
+
     registration_params = {
       name: configuration_params[:title],
-    }.with_indifferent_access.merge(params.permit(:vendor, :name, :admin_nickname, :description, :workflow_state))
+    }.with_indifferent_access.merge(params.permit(permitted_params))
 
     create_params = {
       account: @context,
@@ -1627,7 +1633,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    permitted_params = %i[admin_nickname vendor name description lock_deploying workflow_state]
+    permitted_params = %i[admin_nickname vendor name description workflow_state]
 
     if @context.feature_enabled?(:lock_lti_registrations)
       permitted_params << :lock_deploying
