@@ -54,8 +54,14 @@ export type GraphQLModuleItemsNode = {
   moduleItems: Array<{content: GraphQLAssignment}>
 }
 
+export type GraphQLPageInfo = {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
 export type GraphQLModuleItemData = {
   nodes: Array<GraphQLModuleItemsNode>
+  pageInfo: GraphQLPageInfo
 }
 
 export type GraphQLResponse = {
