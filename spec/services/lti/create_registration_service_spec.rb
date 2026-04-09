@@ -79,6 +79,16 @@ describe Lti::CreateRegistrationService do
       .to eql(configuration_params.with_indifferent_access)
   end
 
+  it "defaults lock_deploying to true" do
+    registration_params.delete(:lock_deploying)
+    expect(subject.lock_deploying).to be true
+  end
+
+  it "uses lock_deploying if provided" do
+    registration_params[:lock_deploying] = false
+    expect(subject.lock_deploying).to be false
+  end
+
   it "infers properties on the developer key from the tool configuration" do
     subject
 

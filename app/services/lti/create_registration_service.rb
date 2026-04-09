@@ -98,6 +98,7 @@ module Lti
     def call
       Lti::Registration.transaction do
         registration = Lti::Registration.create!(
+          lock_deploying: true,
           **registration_params,
           account:,
           created_by:,

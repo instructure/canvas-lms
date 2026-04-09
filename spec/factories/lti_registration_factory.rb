@@ -29,7 +29,8 @@ module Factories
     name: "Test Registration",
     admin_nickname: "Test Admin",
     description: "A test LTI registration",
-    vendor: "Test Vendor"
+    vendor: "Test Vendor",
+    lock_deploying: false
   }.with_indifferent_access.freeze
   DEFAULT_OVERLAY_PARAMS = {}.with_indifferent_access.freeze
 

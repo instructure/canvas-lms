@@ -1852,6 +1852,21 @@ RSpec.describe Lti::RegistrationsController do
         expect(response).to be_successful
         expect(registration.reload.lock_deploying).to be(false)
       end
+
+      context "with flag disabled" do
+        before do
+          account.disable_feature!(:lock_lti_registrations)
+        end
+
+        it "ignores the lock_deploying param" do
+          expect do
+            put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}",
+                params: { lock_deploying: true },
+                as: :json
+          end.not_to change { registration.reload.lock_deploying }
+          expect(response).to be_successful
+        end
+      end
     end
   end
 
@@ -2804,6 +2819,26 @@ RSpec.describe Lti::RegistrationsController do
         params[:workflow_state] = "asdfasdfasdfasdf"
         subject
         expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    context "with lock_deploying set to false" do
+      before { params[:lock_deploying] = false }
+
+      it "creates a registration with lock_deploying false" do
+        expect(subject).to be_successful
+        expect(Lti::Registration.last.lock_deploying).to be(false)
+      end
+
+      context "with flag disabled" do
+        before do
+          account.disable_feature!(:lock_lti_registrations)
+        end
+
+        it "ignores the lock_deploying param and defaults to true" do
+          expect(subject).to be_successful
+          expect(Lti::Registration.last.lock_deploying).to be(true)
+        end
       end
     end
 
