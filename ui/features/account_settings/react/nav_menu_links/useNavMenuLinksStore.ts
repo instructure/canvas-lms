@@ -26,6 +26,7 @@ export type ExistingNavMenuLink = {
   type: 'existing'
   label: string
   id: string
+  url: string
   placements: NavMenuPlacements
 }
 export type NewNavMenuLink = {
