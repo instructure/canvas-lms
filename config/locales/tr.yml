@@ -11885,6 +11885,7 @@ tr:
   download_filename_b9d62bf1: "%{fileName} indir"
   download_group_category_roster_csv_6050a420: "Grup Kümesi Katılımcı Listesi CSV indir"
   download_item_analysis_report_statuslabel_8c9387ec: "%{statusLabel} öğe analiz raporunu indirin"
+  download_name_de443d96: "%{name} indir"
   download_report_70ba4a54: "Raporu indir"
   download_report_77164f62: "Raporu İndir"
   download_scores_generated_on_date_ff5b9cd2: "%{date} tarihinde Üretilen Puanları İndir"
@@ -22582,6 +22583,7 @@ tr:
         login_name: "%{user_name} olarak bu uygulamaya izin veriyorsunuz."
       login: "Oturum Aç"
       page_title: "Uygulama İçin Oturum Aç"
+      please_wait: "Lütfen bekleyin..."
       remember_auth: "Yetkilendirmeyi hatırla"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Nesne Türü"
@@ -30870,6 +30872,7 @@ tr:
   support_sharing_settings_4ad422d8: "Paylaşım Ayarlarını Destekle"
   supported_file_types_vtt_srt_8cb75c13: "Desteklenen dosya türleri: .vtt, .srt"
   supported_format_txt_759fea2a: "Desteklenen biçim: TXT"
+  suppress_notifications_from_being_created_and_sent_c2aa1e7f: "Bildirimlerin oluşturulmasını ve gönderilmesini engelle"
   surfaces_the_block_editor_templates_edit_permissio_8db1b33: |-
       İzinler arayüzünde "Blok Düzenleyici Şablonları - düzenle" iznini görünür kılar.
       Bu izne sahip kullanıcılar blok şablonları oluşturabilir ve düzenleyebilir.
