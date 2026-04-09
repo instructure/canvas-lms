@@ -317,6 +317,30 @@ describe Mutations::PostAssignmentGrades do
     end
   end
 
+  context "with a peer review sub assignment" do
+    let(:context) { { current_user: teacher } }
+    let(:peer_review_sub_assignment) { peer_review_model(parent_assignment: assignment) }
+
+    it "posts grades when the feature flag is enabled" do
+      result = execute_query(mutation_str(assignment_id: peer_review_sub_assignment.id), context)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "postAssignmentGrades", "progress")).to be_present
+    end
+
+    it "returns not found when the feature flag is disabled" do
+      id = peer_review_sub_assignment.id
+      course.disable_feature!(:peer_review_allocation_and_grading)
+      result = execute_query(mutation_str(assignment_id: id), context)
+      expect(result.dig("errors", 0, "message")).to eql "not found"
+    end
+
+    it "does not cause regression for regular assignments" do
+      result = execute_query(mutation_str(assignment_id: assignment.id), context)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "postAssignmentGrades", "progress")).to be_present
+    end
+  end
+
   describe "Submissions Posted notification" do
     let_once(:notification) { Notification.find_or_create_by!(category: "Grading", name: "Submissions Posted") }
     let(:context) { { current_user: teacher } }
