@@ -10363,6 +10363,7 @@ nn:
   dislike_summary_c569326e: "Ikkje lik oppsummering"
   dismiss_dacdb625: Forkast
   dismiss_itemtitle_c5020a4c: "Avvis %{itemTitle}"
+  dismiss_name_c9e24598: "Avvis %{name}"
   dismiss_opportunityname_4fb10e11: "Avvis %{opportunityName}"
   dismiss_this_5c74dddc: "Forkast dette"
   dismissed_8b0b1fc9: Forkasta
@@ -10484,6 +10485,7 @@ nn:
   download_filename_781704f5: "Last ned %{filename}"
   download_filename_b9d62bf1: "Last ned %{fileName}"
   download_item_analysis_report_statuslabel_8c9387ec: "Last ned elementanalyserapport %{statusLabel}"
+  download_name_de443d96: "Last ned %{name}"
   download_page_views_csv_974f36e1: "Last ned sidevisningar CSV"
   download_report_77164f62: "Last ned rapport"
   download_scores_generated_on_date_ff5b9cd2: "Last ned resultat generert den %{date}"
@@ -19054,6 +19056,7 @@ nn:
       details: 
         allow_application: "Gi %{app_name} tilgang til kontoen din."
       page_title: "Pålogging applikasjon"
+      please_wait: Vent...
       remember_auth: "Hugs autorisasjonen"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: Objekttype
@@ -26071,6 +26074,7 @@ nn:
   support_sharing_settings_4ad422d8: "Innstilling for støttedeling"
   supported_file_types_srt_or_webvtt_7d827ed: "Støtta filtypar: SRT og WebVTT"
   supported_file_types_vtt_srt_8cb75c13: "Støtta filtypar: .vtt, .srt"
+  suppress_notifications_from_being_created_and_sent_c2aa1e7f: "Unngå at meldinger vert oppretta og sendt ut"
   suspend_db764978: Suspender
   suspend_user_e19fa489: "Suspender brukar"
   suspending_name_from_this_account_will_remove_all__a5aabff3: "Å suspendera %{name} frå denne kontoen vil fjerne all tilgang til systemet frå alle innloggingsmetodar"
