@@ -5956,16 +5956,41 @@ type InstitutionalTagEdge {
   node: InstitutionalTag
 }
 
+type InstructorCourseInfo {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  courseCode: String
+  name: String!
+}
+
 type InstructorEnrollmentInfo {
-  course: Course!
+  course: InstructorCourseInfo!
   enrollmentState: String!
   role: EnrollmentRole!
   type: String!
 }
 
+type InstructorUserInfo {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+
+  """
+  The avatar URL for the user
+  """
+  avatarUrl: URL
+  email: String
+  name: String!
+  shortName: String
+  sortableName: String
+}
+
 type InstructorWithEnrollments {
   enrollments: [InstructorEnrollmentInfo!]!
-  user: User!
+  user: InstructorUserInfo!
 }
 
 """
