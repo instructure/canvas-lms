@@ -81,8 +81,8 @@ class NavMenuLink < ApplicationRecord
 
   # See useNavMenuLinksStore.ts
   def self.as_existing_link_objects
-    pluck(:id, :label, :course_nav, :account_nav, :user_nav).map do |(id, label, course_nav, account_nav, user_nav)|
-      { type: "existing", id:, label:, placements: { course_nav:, account_nav:, user_nav: } }
+    pluck(:id, :label, :url, :course_nav, :account_nav, :user_nav).map do |(id, label, url, course_nav, account_nav, user_nav)|
+      { type: "existing", id:, label:, url:, placements: { course_nav:, account_nav:, user_nav: } }
     end
   end
 

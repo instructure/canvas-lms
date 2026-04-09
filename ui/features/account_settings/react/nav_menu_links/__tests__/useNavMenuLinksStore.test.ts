@@ -60,12 +60,14 @@ describe('useNavMenuLinksStore', () => {
           {
             type: 'existing',
             id: '1',
+            url: 'https://example.com/1',
             label: 'Link 1',
             placements: {course_nav: true, account_nav: false, user_nav: false},
           },
           {
             type: 'existing',
             id: '2',
+            url: 'https://example.com/2',
             label: 'Link 2',
             placements: {course_nav: false, account_nav: true, user_nav: false},
           },
@@ -84,6 +86,7 @@ describe('useNavMenuLinksStore', () => {
     expect(result.current.links[0]).toEqual({
       type: 'existing',
       id: '2',
+      url: 'https://example.com/2',
       label: 'Link 2',
       placements: {course_nav: false, account_nav: true, user_nav: false},
     })

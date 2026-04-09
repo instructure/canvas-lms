@@ -19,8 +19,9 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconLinkLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconLinkLine, IconTrashLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {
   useNavMenuLinksStore,
@@ -59,6 +60,7 @@ export default function NavMenuLinksSettings(): JSX.Element {
           <NavMenuLink
             key={index}
             label={link.label}
+            url={link.url}
             placements={link.placements}
             onDeleteRequest={async () => {
               if (
@@ -113,11 +115,12 @@ const PLACEMENT_LABELS: Record<NavMenuPlacementKey, () => string> = {
 
 type NavMenuLinkProps = {
   label: string
+  url: string
   placements: NavMenuPlacements
   onDeleteRequest: () => void
 }
 
-function NavMenuLink({label, placements, onDeleteRequest}: NavMenuLinkProps): JSX.Element {
+function NavMenuLink({label, url, placements, onDeleteRequest}: NavMenuLinkProps): JSX.Element {
   return (
     <li className="ic-Sortable-item">
       <div className="ic-Sortable-item__Text">
@@ -127,6 +130,25 @@ function NavMenuLink({label, placements, onDeleteRequest}: NavMenuLinkProps): JS
           </Flex.Item>
           <Flex.Item margin="0 xx-small 0 xxx-small" shouldGrow shouldShrink size="0">
             <Text wrap="break-word">{label}</Text>
+            {url && (
+              <Text as="div" size="x-small" color="secondary" wrap="break-word">
+                <Link
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  isWithinText={false}
+                  aria-label={I18n.t('%{url} (opens in new tab)', {url})}
+                  elementRef={el => {
+                    // as of Apr 2026, external_links.js adds icons inconsistently (not to newly rendered links), so we add it manually
+                    el?.classList.add('exclude_external_icon')
+                  }}
+                  renderIcon={IconExternalLinkLine}
+                  iconPlacement="end"
+                >
+                  {url}
+                </Link>
+              </Text>
+            )}
           </Flex.Item>
           {ALL_PLACEMENTS.map(
             p =>
