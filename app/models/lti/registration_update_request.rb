@@ -58,8 +58,6 @@ class Lti::RegistrationUpdateRequest < ApplicationRecord
   # This is used to determine whether or not to apply an update request when it is accepted,
   # as well as whether or not to show an update request as pending in the UI.
   def most_recent?
-    return true unless Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
-
     most_recent = Lti::RegistrationUpdateRequest
                   .where(lti_registration_id:)
                   .order(created_at: :desc)
