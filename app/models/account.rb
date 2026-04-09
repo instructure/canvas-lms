@@ -1929,12 +1929,22 @@ class Account < ApplicationRecord
       sub: user.global_id.to_s,
       org: uuid,
       primary: build_links.call(config[:primary]),
-      secondary: build_links.call(config[:secondary])
+      secondary: build_links.call(config[:secondary]),
+      custom_message: discovery_page_custom_message
     }
   end
 
   def discovery_page_link_for(provider, entry)
     { label: Sanitize.clean(entry[:label].to_s), icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
+  end
+
+  def discovery_page_custom_message
+    return nil unless Account.site_admin.feature_enabled?(:new_login_ui_custom_labels)
+
+    value = brand_config&.get_value("ic-brand-Discovery-custom-message").presence
+    return nil if value.nil?
+
+    value.gsub(/[\r\n]+/, " ").strip
   end
 
   def validate_auth_discovery_url
