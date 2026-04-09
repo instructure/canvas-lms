@@ -244,8 +244,6 @@ class ContextModuleItemsApiController < ApplicationController
   before_action :require_context
   skip_before_action :require_user, only: %i[index item_sequence show]
   before_action :find_student, only: %i[index show select_mastery_path]
-  before_action :disable_escape_html_entities, only: [:index, :show]
-  after_action :enable_escape_html_entities, only: [:index, :show]
   include Api::V1::ContextModule
   include PlannerApiHelper
 
@@ -801,16 +799,6 @@ class ContextModuleItemsApiController < ApplicationController
       end
     end
   end
-
-  def disable_escape_html_entities
-    ActiveSupport.escape_html_entities_in_json = false
-  end
-  private :disable_escape_html_entities
-
-  def enable_escape_html_entities
-    ActiveSupport.escape_html_entities_in_json = true
-  end
-  private :enable_escape_html_entities
 
   def set_position
     return true unless @tag && params[:module_item][:position]
