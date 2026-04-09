@@ -72,7 +72,7 @@ export class CanvasNotebookApi implements NotebookApi {
   private getJwt(): Promise<string> {
     if (!this.jwtPromise) {
       this.jwtPromise = doFetchApi<{token: string}>({
-        path: '/api/v1/jwts?canvas_audience=false&workflows[]=journey',
+        path: '/api/v1/jwts?canvas_audience=false&workflows[]=journey&workflows[]=redwood',
         method: 'POST',
       })
         .then(({json}) => atob(json!.token))
@@ -151,7 +151,14 @@ export class CanvasNotebookApi implements NotebookApi {
   async createNote(input: CreateNoteInputType): Promise<NoteType> {
     const data = await this.executeRedwoodQuery<CreateNoteData>(
       CREATE_NOTE_MUTATION,
-      input as unknown as Record<string, unknown>,
+      {
+        courseId: input.courseId,
+        objectId: input.objectId,
+        objectType: input.objectType,
+        userText: input.userText,
+        reaction: input.reaction,
+        highlightData: input.highlightData,
+      },
       'CreateNote',
     )
     return data.createNote
@@ -160,7 +167,12 @@ export class CanvasNotebookApi implements NotebookApi {
   async updateNote(id: string, input: UpdateNoteInputType): Promise<NoteType> {
     const data = await this.executeRedwoodQuery<UpdateNoteData>(
       UPDATE_NOTE_MUTATION,
-      {...(input as unknown as Record<string, unknown>), id},
+      {
+        id,
+        userText: input.userText,
+        reaction: input.reaction,
+        highlightData: input.highlightData,
+      },
       'UpdateNote',
     )
     return data.updateNote

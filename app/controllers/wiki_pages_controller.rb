@@ -137,13 +137,15 @@ class WikiPagesController < ApplicationController
                  })
           js_bundle :study_assist
         end
-        if @context.account.feature_enabled?(:notebook) && @context.user_is_student?(@current_user)
+        if @context.is_a?(Course) && @context.account.feature_enabled?(:notebook) && @context.user_is_student?(@current_user)
+          @show_notebook = true
           js_env[:FEATURES][:notebook] = true
           js_env({
                    WIKI_PAGE_ID: @page.url,
                    WIKI_PAGE_UPDATED_AT: @page.updated_at.iso8601,
                    JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
                  })
+          js_bundle :notebook
         end
       end
 

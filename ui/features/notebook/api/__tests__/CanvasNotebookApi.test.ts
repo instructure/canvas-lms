@@ -79,7 +79,7 @@ describe('CanvasNotebookApi', () => {
       await api.deleteNote('1')
 
       expect(capturedUrl).toContain('/api/v1/jwts')
-      expect(capturedUrl).toContain('canvas_audience=false&workflows[]=journey')
+      expect(capturedUrl).toContain('canvas_audience=false&workflows[]=journey&workflows[]=redwood')
     })
 
     it('reuses the cached JWT on subsequent calls', async () => {
