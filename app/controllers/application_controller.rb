@@ -542,7 +542,6 @@ class ApplicationController < ActionController::Base
     instui_header
     media_links_use_attachment_id
     multiselect_gradebook_filters
-    nav_menu_links
     new_quizzes_media_type
     new_quizzes_navigation_updates
     permanent_page_links
@@ -594,6 +593,7 @@ class ApplicationController < ActionController::Base
     lti_toggle_placements
     mobile_offline_mode
     modules_requirements_allow_percentage
+    nav_menu_links
     non_scoring_rubrics
     pendo_extended
     product_tours
