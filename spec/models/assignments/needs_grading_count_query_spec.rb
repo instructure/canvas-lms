@@ -160,6 +160,20 @@ module Assignments
           expect(querier.count[@assignment.global_id]).to eq 1 # should not count because it has two marks now
         end
 
+        it "returns a default threshold when no ModeratedGrading::Selection exists for the assignment" do
+          # When the flag is on but no students have been selected for moderation yet,
+          # the count should still succeed and treat every student as threshold 1.
+          @students[0].submissions.find_by(assignment: @assignment)
+                      .find_or_create_provisional_grade!(@ta1, score: 1)
+
+          # Forcibly remove all selections so the code path hits an empty hash
+          ModeratedGrading::Selection.where(assignment: @assignment).delete_all
+          expect(ModeratedGrading::Selection.where(assignment: @assignment).count).to eq(0)
+
+          expect { NeedsGradingCountQuery.new([@assignment], @teacher).count }.not_to raise_error
+          expect(NeedsGradingCountQuery.new([@assignment], @teacher).count[@assignment.global_id]).to eq(2)
+        end
+
         it "only counts submissions in the section-limited TA's visible sections" do
           section2 = @course.course_sections.create!(name: "section 2")
           student1 = student_in_course(course: @course, active_all: true).user

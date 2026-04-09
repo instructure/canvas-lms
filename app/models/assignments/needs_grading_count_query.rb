@@ -381,7 +381,7 @@ module Assignments
         .each do |(a_id, sub_id, user_id), pg_count|
           next if graded_sub_ids_by_assignment[a_id].include?(sub_id)
 
-          threshold = moderation_sets[a_id].include?(user_id) ? 2 : 1
+          threshold = moderation_sets.fetch(a_id, Set.new).include?(user_id) ? 2 : 1
           graded_sub_ids_by_assignment[a_id] << sub_id if pg_count >= threshold
         end
 
