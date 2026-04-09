@@ -177,7 +177,7 @@ export default class UsersPane extends React.Component {
         )}
 
         <SearchMessage
-          collection={{data: users, loading: isLoading, links}}
+          collection={{data: users, loading: isLoading, error: errors.requestFailed, links}}
           setPage={this.handleSetPage}
           knownLastPage={this.state.knownLastPage}
           noneFoundMessage={I18n.t('No users found')}

@@ -81,7 +81,7 @@ describe('Account Course User Search Actions', () => {
     expect(message.type).toBe('LOADING_USERS')
   })
 
-  test('applySearchFilter', async () => {
+  test('applySearchFilter handles short search terms', async () => {
     let count = 3
     const done = () => {
       --count
@@ -132,5 +132,23 @@ describe('Account Course User Search Actions', () => {
 
     await actionThunk(fakeDispatcherSearchLengthOkay, fakeGetStateSearchLengthOkay)
     await actionThunk(fakeDispatcherSearchLengthTooShort, fakeGetStateSearchLengthTooShort)
+  })
+
+  test('applySearchFilter dispatches FAILED_USER_LOAD on fetch error', async () => {
+    const dispatched = []
+    const fakeDispatcher = action => dispatched.push(action)
+    const fakeGetState = () => ({userList: {searchFilter: {search_term: 'abcd'}}})
+
+    const fakeUserStore = {
+      load(_params, _successHandler, errorHandler) {
+        errorHandler()
+        return Promise.resolve()
+      },
+    }
+
+    await actions.applySearchFilter(4, fakeUserStore)(fakeDispatcher, fakeGetState)
+
+    expect(dispatched[0].type).toBe('LOADING_USERS')
+    expect(dispatched[1].type).toBe('FAILED_USER_LOAD')
   })
 })
