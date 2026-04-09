@@ -120,10 +120,9 @@ describe('useRollups', () => {
       await act(async () => vi.runAllTimers())
       const params = {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'student',
           add_defaults: true,
           sort_order: SortOrder.ASC,
@@ -262,10 +261,9 @@ describe('useRollups', () => {
       await act(async () => vi.runAllTimers())
       const params = {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'student',
           add_defaults: true,
           sort_order: SortOrder.ASC,
