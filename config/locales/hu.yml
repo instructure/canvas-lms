@@ -9553,6 +9553,7 @@ hu:
   dislike_summary_c569326e: "Nem tetszik összefoglalás"
   dismiss_dacdb625: Elvetés
   dismiss_itemtitle_c5020a4c: "Elutasítás %{itemTitle}"
+  dismiss_name_c9e24598: "Elutasítás %{name}"
   dismiss_opportunityname_4fb10e11: "Elutasítás %{opportunityName}"
   dismissed_8b0b1fc9: Elvetve
   dismissed_opportunities_f0826640: "Elvetetett lehetőségek"
@@ -9659,6 +9660,7 @@ hu:
   download_filename_781704f5: "%{filename}letöltése"
   download_filename_b9d62bf1: " %{fileName} letöltése"
   download_item_analysis_report_statuslabel_8c9387ec: "Itemelemzési jelentés letöltése %{statusLabel}"
+  download_name_de443d96: " %{name} letöltése"
   download_page_views_csv_974f36e1: "Oldal megtekintés CSV letöltése"
   download_report_77164f62: "Riport letöltése"
   download_scores_generated_on_date_ff5b9cd2: "Pontok letöltése, melyek ekkor lettek generálva: %{date} "
@@ -17728,6 +17730,7 @@ hu:
       details: 
         allow_application: "Engedélyezés, hogy a következő alkalmazás hozzáférjen a fiókjához:%{app_name} "
       page_title: Alkalmazásbejelentkezés
+      please_wait: "Kérjük, várjon..."
       remember_auth: "Emlékezzen az azonosítóadataimra"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Objektum típusa"
@@ -24392,6 +24395,7 @@ hu:
   support_sharing_settings_4ad422d8: "Támogatás Megosztási beállítások"
   supported_file_types_srt_or_webvtt_7d827ed: "Támogatott fájltípusok: SRT vagy WebVTT"
   supported_file_types_vtt_srt_8cb75c13: "Támogatott fájltípusok:"
+  suppress_notifications_from_being_created_and_sent_c2aa1e7f: "Értesítések létrehozásának és kiküldésének elnémítása"
   suspend_db764978: Felfüggesztés
   suspend_user_e19fa489: "Felhasználó felfüggesztése"
   suspending_name_from_this_account_will_remove_all__a5aabff3: "Ha felfüggeszti %{name} fiókját, akkor az összes engedélyezett rendszerhez való hozzáférés megszűnik az összes bejelentkezéséből."
