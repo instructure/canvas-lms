@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, forwardRef, useImperativeHandle} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -31,6 +31,10 @@ import type {
 
 const I18n = createI18nScope('peer_reviews_student')
 
+export interface CommentsPanelHandle {
+  focusCloseButton: () => void
+}
+
 interface CommentsPanelProps {
   submission: Submission
   assignment: Assignment
@@ -44,78 +48,93 @@ interface CommentsPanelProps {
   autoFocusCloseButton?: boolean
 }
 
-export const CommentsPanel: React.FC<CommentsPanelProps> = ({
-  submission,
-  assignment,
-  reviewerSubmission,
-  isMobile,
-  isOpen,
-  onClose,
-  onSuccessfulPeerReview,
-  isReadOnly = false,
-  suppressSuccessAlert = false,
-  autoFocusCloseButton = false,
-}) => {
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+export const CommentsPanel = forwardRef<CommentsPanelHandle, CommentsPanelProps>(
+  (
+    {
+      submission,
+      assignment,
+      reviewerSubmission,
+      isMobile,
+      isOpen,
+      onClose,
+      onSuccessfulPeerReview,
+      isReadOnly = false,
+      suppressSuccessAlert = false,
+      autoFocusCloseButton = false,
+    },
+    ref,
+  ) => {
+    const closeButtonRef = useRef<HTMLButtonElement | null>(null)
 
-  useEffect(() => {
-    if (autoFocusCloseButton) {
-      closeButtonRef.current?.focus()
-    }
-  }, [autoFocusCloseButton])
+    useImperativeHandle(
+      ref,
+      () => ({
+        focusCloseButton: () => closeButtonRef.current?.focus(),
+      }),
+      [],
+    )
 
-  return (
-    <Flex.Item
-      as="div"
-      direction="column"
-      size="327px"
-      height="100%"
-      padding="small"
-      overflowY="auto"
-      id="comments-panel"
-      elementRef={(el: Element | null) => {
-        if (el instanceof HTMLElement) {
-          el.style.scrollPaddingBottom = `${calculateMasqueradeHeight() + 65}px`
-        }
-      }}
-    >
-      <Flex as="div" direction="column">
-        <Flex.Item>
-          <Flex as="div" direction="row" justifyItems="space-between">
-            <Flex.Item>
-              <Heading variant="titleModule" level="h2">
-                {I18n.t('Peer Comments')}
-              </Heading>
-            </Flex.Item>
-            <Flex.Item padding="xx-small">
-              <CloseButton
-                elementRef={(el: Element | null) => {
-                  closeButtonRef.current = el as HTMLButtonElement
-                }}
-                screenReaderLabel={I18n.t('Close Peer Comments')}
-                size="small"
-                onClick={onClose}
-                data-testid="close-comments-button"
-              />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-        <Flex.Item>
-          <CommentsTrayContentWithApollo
-            submission={submission}
-            assignment={assignment}
-            isPeerReviewEnabled={true}
-            reviewerSubmission={reviewerSubmission}
-            renderTray={isMobile}
-            closeTray={onClose}
-            open={isOpen}
-            onSuccessfulPeerReview={onSuccessfulPeerReview}
-            usePeerReviewModal={false}
-            isReadOnly={isReadOnly}
-            suppressSuccessAlert={suppressSuccessAlert}
-          />
-        </Flex.Item>
-      </Flex>
-    </Flex.Item>
-  )
-}
+    useEffect(() => {
+      if (autoFocusCloseButton) {
+        closeButtonRef.current?.focus()
+      }
+    }, [autoFocusCloseButton])
+
+    return (
+      <Flex.Item
+        as="div"
+        direction="column"
+        size="327px"
+        height="100%"
+        padding="small"
+        overflowY="auto"
+        id="comments-panel"
+        elementRef={(el: Element | null) => {
+          if (el instanceof HTMLElement) {
+            el.style.scrollPaddingBottom = `${calculateMasqueradeHeight() + 65}px`
+          }
+        }}
+      >
+        <Flex as="div" direction="column">
+          <Flex.Item>
+            <Flex as="div" direction="row" justifyItems="space-between">
+              <Flex.Item>
+                <Heading variant="titleModule" level="h2">
+                  {I18n.t('Peer Comments')}
+                </Heading>
+              </Flex.Item>
+              <Flex.Item padding="xx-small">
+                <CloseButton
+                  elementRef={(el: Element | null) => {
+                    closeButtonRef.current = el as HTMLButtonElement
+                  }}
+                  screenReaderLabel={I18n.t('Close Peer Comments')}
+                  size="small"
+                  onClick={onClose}
+                  data-testid="close-comments-button"
+                />
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item>
+            <CommentsTrayContentWithApollo
+              submission={submission}
+              assignment={assignment}
+              isPeerReviewEnabled={true}
+              reviewerSubmission={reviewerSubmission}
+              renderTray={isMobile}
+              closeTray={onClose}
+              open={isOpen}
+              onSuccessfulPeerReview={onSuccessfulPeerReview}
+              usePeerReviewModal={false}
+              isReadOnly={isReadOnly}
+              suppressSuccessAlert={suppressSuccessAlert}
+            />
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
+    )
+  },
+)
+
+CommentsPanel.displayName = 'CommentsPanel'

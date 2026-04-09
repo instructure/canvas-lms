@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {cleanup, render, screen} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentSubmission from '../AssignmentSubmission'
 import {Submission} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
@@ -216,8 +216,8 @@ describe('AssignmentSubmission', () => {
     assignment: createAssignment(),
     reviewerSubmission: createReviewerSubmission(),
     isPeerReviewCompleted: false,
-    handleNextPeerReview: jest.fn(),
-    onPeerReviewSubmitted: jest.fn(),
+    handleNextPeerReview: vi.fn(),
+    onPeerReviewSubmitted: vi.fn(),
     hasSeenPeerReviewModal: false,
     isMobile: false,
     isAnonymous: false,
@@ -1124,6 +1124,128 @@ describe('AssignmentSubmission', () => {
 
         const toggleButton = screen.getByTestId('toggle-rubric-button')
         expect(toggleButton).toHaveFocus()
+      })
+
+      it('moves focus to comments close button after navigating to next peer review', async () => {
+        const user = userEvent.setup()
+        const mockHandleNext = vi.fn()
+
+        const props = createDefaultProps({
+          submission: createSubmission({_id: 'submission-1'}),
+          handleNextPeerReview: mockHandleNext,
+          isPeerReviewCompleted: false,
+        })
+
+        const {rerender} = render(<AssignmentSubmission {...props} />)
+
+        expect(mockOnSuccessfulPeerReview).toBeTruthy()
+        mockOnSuccessfulPeerReview!()
+
+        await user.click(screen.getByTestId('submit-peer-review-button'))
+        expect(mockHandleNext).toHaveBeenCalled()
+
+        rerender(
+          <AssignmentSubmission {...props} submission={createSubmission({_id: 'submission-2'})} />,
+        )
+
+        await waitFor(() => {
+          const closeButton = screen.getByTestId('close-comments-button').querySelector('button')
+          expect(closeButton).toHaveFocus()
+        })
+      })
+
+      it('moves focus to rubric close button after navigating to next peer review', async () => {
+        const user = userEvent.setup()
+        const mockHandleNext = vi.fn()
+
+        const props = createDefaultProps({
+          assignment: createAssignmentWithRubric(),
+          rubricAssessment: createRubricAssessment(),
+          submission: createSubmission({_id: 'submission-1'}),
+          handleNextPeerReview: mockHandleNext,
+          isPeerReviewCompleted: false,
+        })
+
+        const {rerender} = render(<AssignmentSubmission {...props} />)
+
+        await user.click(screen.getByTestId('toggle-rubric-button'))
+
+        await user.click(screen.getByTestId('submit-peer-review-button'))
+        expect(mockHandleNext).toHaveBeenCalled()
+
+        rerender(
+          <AssignmentSubmission {...props} submission={createSubmission({_id: 'submission-2'})} />,
+        )
+
+        await waitFor(() => {
+          const closeButton = screen.getByTestId('close-rubric-button').querySelector('button')
+          expect(closeButton).toHaveFocus()
+        })
+      })
+
+      it('opens comments panel and focuses close button when neither panel is open (no rubric)', async () => {
+        const user = userEvent.setup()
+        const mockHandleNext = vi.fn()
+
+        const props = createDefaultProps({
+          submission: createSubmission({_id: 'submission-1'}),
+          handleNextPeerReview: mockHandleNext,
+          isPeerReviewCompleted: false,
+        })
+
+        const {rerender} = render(<AssignmentSubmission {...props} />)
+
+        // Comments panel is open by default — close it so neither panel is open
+        await user.click(screen.getByTestId('toggle-comments-button'))
+        expect(screen.queryByTestId('close-comments-button')).not.toBeInTheDocument()
+
+        // Satisfy the comment requirement so submission is allowed
+        expect(mockOnSuccessfulPeerReview).toBeTruthy()
+        mockOnSuccessfulPeerReview!()
+
+        await user.click(screen.getByTestId('submit-peer-review-button'))
+        expect(mockHandleNext).toHaveBeenCalled()
+
+        rerender(
+          <AssignmentSubmission {...props} submission={createSubmission({_id: 'submission-2'})} />,
+        )
+
+        await waitFor(() => {
+          const closeButton = screen.getByTestId('close-comments-button').querySelector('button')
+          expect(closeButton).toHaveFocus()
+        })
+      })
+
+      it('opens rubric panel and focuses close button when neither panel is open (has rubric)', async () => {
+        const user = userEvent.setup()
+        const mockHandleNext = vi.fn()
+
+        const props = createDefaultProps({
+          assignment: createAssignmentWithRubric(),
+          rubricAssessment: createRubricAssessment(),
+          submission: createSubmission({_id: 'submission-1'}),
+          handleNextPeerReview: mockHandleNext,
+          isPeerReviewCompleted: false,
+        })
+
+        const {rerender} = render(<AssignmentSubmission {...props} />)
+
+        // Close the default-open comments panel so neither panel is open
+        await user.click(screen.getByTestId('toggle-comments-button'))
+        expect(screen.queryByTestId('close-comments-button')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('close-rubric-button')).not.toBeInTheDocument()
+
+        await user.click(screen.getByTestId('submit-peer-review-button'))
+        expect(mockHandleNext).toHaveBeenCalled()
+
+        rerender(
+          <AssignmentSubmission {...props} submission={createSubmission({_id: 'submission-2'})} />,
+        )
+
+        await waitFor(() => {
+          const closeButton = screen.getByTestId('close-rubric-button').querySelector('button')
+          expect(closeButton).toHaveFocus()
+        })
       })
     })
   })
