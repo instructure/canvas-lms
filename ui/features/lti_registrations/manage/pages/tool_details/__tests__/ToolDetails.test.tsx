@@ -95,6 +95,18 @@ describe('ToolDetailsInner', () => {
     expect(deleteButton).toHaveAttribute('disabled')
   })
 
+  it('enables the delete button on a local copy registration', async () => {
+    const registration = {
+      ...mockRegistrationWithAllInformation({n: 'local copy', i: 1}),
+      inherited: true,
+      template_registration_id: ZLtiRegistrationId.parse('99'),
+    }
+
+    const wrapper = renderToolDetailsInner(registration)
+    const deleteButton = wrapper.getByTestId('delete-app')
+    expect(deleteButton).not.toHaveAttribute('disabled')
+  })
+
   it('shows the "Migrate from LTI 2.0" button when turnitinAPClientId matches developer_key_id', async () => {
     const registration = mockRegistrationWithAllInformation({
       n: 'test',
@@ -200,6 +212,17 @@ describe('ToolDetailsInner', () => {
 
     it('enables the lock button on a non-inherited registration', () => {
       const registration = mockRegistrationWithAllInformation({n: 'test', i: 1})
+      const wrapper = renderToolDetailsInner(registration)
+      const lockButton = wrapper.getByTestId('toggle-lock')
+      expect(lockButton).not.toHaveAttribute('disabled')
+    })
+
+    it('enables the lock button on a local copy registration', () => {
+      const registration = {
+        ...mockRegistrationWithAllInformation({n: 'local copy', i: 1}),
+        inherited: true,
+        template_registration_id: ZLtiRegistrationId.parse('99'),
+      }
       const wrapper = renderToolDetailsInner(registration)
       const lockButton = wrapper.getByTestId('toggle-lock')
       expect(lockButton).not.toHaveAttribute('disabled')

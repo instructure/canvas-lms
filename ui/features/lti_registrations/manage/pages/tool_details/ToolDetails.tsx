@@ -231,7 +231,7 @@ export const ToolDetailsInner = ({
   const outletContext: ToolDetailsOutletContext = {registration}
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const [lockTooltipShowing, setLockTooltipShowing] = React.useState(false)
-  const canDelete = !registration.inherited
+  const canDelete = !registration.inherited || !!registration.template_registration_id
   const [tiiMigrationModalShowing, setTiiMigrationModalShowing] = React.useState(false)
 
   const handleCopyClientId = React.useCallback(
