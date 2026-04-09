@@ -75,7 +75,7 @@ const triggerMockDragEnd = (result: any) => {
   }
 }
 
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CourseNavigationSettings from '../CourseNavigationSettings'
 import {NavigationTab, useTabListsStore} from '../../store/useTabListsStore'
@@ -159,6 +159,7 @@ beforeEach(() => {
   fakeENV.setup({
     COURSE_SETTINGS_NAVIGATION_TABS: [...defaultEnabledTabs, ...defaultDisabledTabs],
     K5_SUBJECT_COURSE: false,
+    FEATURES: {nav_menu_links: true},
     PERMISSIONS: {
       manage_nav_menu_links: true,
     },
@@ -315,6 +316,56 @@ describe('CourseNavigationSettings', () => {
       'button[aria-label*="Settings"]',
     )
     expect(discussionsSettingsButton).not.toBeInTheDocument()
+  })
+
+  it('shows url as external link for enabled link tab', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const link = screen.getByRole('link', {name: /https:\/\/example\.com/})
+    expect(link).toHaveAttribute('href', 'https://example.com')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('shows url as external link for disabled link tab', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const link = screen.getByRole('link', {name: /https:\/\/disabled\.com/})
+    expect(link).toHaveAttribute('href', 'https://disabled.com')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('shows url as external link for new link tabs', () => {
+    useTabListsStore.setState({
+      enabledTabs: [
+        ...defaultEnabledTabs,
+        {
+          type: 'newLink',
+          internalId: 'new-1',
+          label: 'My New Link',
+          href: 'nav_menu_link_url',
+          args: ['https://newlink.example.com'],
+        },
+      ],
+      disabledTabs: defaultDisabledTabs,
+    })
+
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const link = screen.getByRole('link', {name: /https:\/\/newlink\.example\.com/})
+    expect(link).toHaveAttribute('href', 'https://newlink.example.com')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('does not show url for non-link tabs', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const assignmentsTab = screen
+      .getByText('Assignments')
+      .closest('[id^="nav_edit_tab_id_"]') as HTMLElement
+    expect(within(assignmentsTab).queryByRole('link')).not.toBeInTheDocument()
   })
 
   it('shows link icon only for items with linkUrl', () => {
