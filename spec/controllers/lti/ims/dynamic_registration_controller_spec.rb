@@ -486,6 +486,78 @@ describe Lti::IMS::DynamicRegistrationController do
             expect(response).to have_http_status(:not_found)
           end
         end
+
+        context "when registration is on a different shard" do
+          specs_require_sharding
+
+          subject do
+            request.headers["Authorization"] = "Bearer #{valid_token_cross_shard}"
+            post :create, params: { **registration_params }
+          end
+
+          let(:shard2_account) { @shard2.activate { account_model } }
+          let(:shard2_user) do
+            @shard2.activate do
+              user = user_with_pseudonym(account: shard2_account)
+              user.save! if user.new_record?
+              user.reload
+              user
+            end
+          end
+          let(:shard2_registration) do
+            @shard2.activate do
+              reg = lti_ims_registration_model(account: shard2_account)
+              reg.lti_registration.new_external_tool(shard2_account)
+              reg
+            end
+          end
+          let(:token_hash_cross_shard) do
+            {
+              user_id: shard2_user.global_id,
+              initiated_at: 1.minute.ago,
+              root_account_global_id: shard2_account.global_id,
+              root_account_domain: shard2_account.domain,
+              uuid: SecureRandom.uuid,
+              unified_tool_id: "cross_shard_test",
+              registration_url: "https://example.com/registration",
+              existing_registration: shard2_registration.lti_registration.global_id
+            }
+          end
+          let(:valid_token_cross_shard) do
+            Canvas::Security.create_jwt(token_hash_cross_shard, 1.hour.from_now)
+          end
+
+          it "creates RegistrationUpdateRequest on the same shard as the registration" do
+            shard2_registration
+            subject
+
+            @shard2.activate do
+              update_request = Lti::RegistrationUpdateRequest.last
+              expect(update_request).not_to be_nil
+              expect(update_request.lti_registration).to eq(shard2_registration.lti_registration)
+              expect(update_request.root_account_id).to eq(shard2_account.id)
+              expect(update_request.root_account).to eq(shard2_account)
+              expect(update_request.shard).to eq(@shard2)
+            end
+          end
+
+          it "finds and uses the registration on its shard" do
+            shard2_registration
+            expect { subject }.to change { @shard2.activate { Lti::RegistrationUpdateRequest.count } }.by(1)
+          end
+
+          it "successfully creates the update request with user reference" do
+            shard2_registration
+            subject
+
+            expect(response).to be_successful
+            @shard2.activate do
+              update_request = Lti::RegistrationUpdateRequest.last
+              expect(update_request).not_to be_nil
+              expect(update_request.created_by_id).to be_present
+            end
+          end
+        end
       end
     end
 
@@ -884,6 +956,77 @@ describe Lti::IMS::DynamicRegistrationController do
         expect do
           put :update, params: { registration_id: other_registration.id, **update_params }
         end.not_to change { Lti::RegistrationUpdateRequest.count }
+      end
+    end
+
+    context "with cross-shard registration" do
+      specs_require_sharding
+
+      subject do
+        request.headers["Authorization"] = "Bearer #{cross_shard_access_token}"
+        put :update, params: { registration_id: shard2_registration.global_id, **update_params }
+      end
+
+      let(:shard2_account) { @shard2.activate { account_model } }
+      let(:shard2_registration) do
+        @shard2.activate do
+          lti_ims_registration_model(account: shard2_account)
+        end
+      end
+      let(:shard2_developer_key) do
+        shard2_registration.developer_key.tap do |dk|
+          dk.update!(scopes: [TokenScopes::LTI_REGISTRATION_SCOPE])
+        end
+      end
+      let(:cross_shard_access_token_jwt_hash) do
+        timestamp = Time.zone.now.to_i
+        {
+          iss: "https://canvas.instructure.com",
+          sub: shard2_developer_key.global_id,
+          aud: access_token_aud,
+          iat: timestamp,
+          exp: access_token_exp,
+          nbf: (Time.zone.now.to_i - 30),
+          jti: SecureRandom.uuid,
+          scopes: access_token_scopes.join(" "),
+        }
+      end
+      let(:cross_shard_access_token) do
+        JSON::JWT.new(cross_shard_access_token_jwt_hash).sign(access_token_signing_key, :HS256).to_s
+      end
+
+      it "creates a RegistrationUpdateRequest on the same shard as the registration" do
+        shard2_registration
+        expect { subject }.to change { @shard2.activate { Lti::RegistrationUpdateRequest.count } }.by(1)
+        expect(response).to be_successful
+      end
+
+      it "does not violate foreign key constraints" do
+        shard2_registration
+        expect { subject }.not_to raise_error
+        expect(response).to be_successful
+      end
+
+      it "creates update request with correct shard association" do
+        shard2_registration
+        subject
+
+        @shard2.activate do
+          update_request = Lti::RegistrationUpdateRequest.last
+          expect(update_request).not_to be_nil
+          expect(update_request.shard).to eq(@shard2)
+          expect(update_request.lti_registration).to eq(shard2_registration.lti_registration)
+          expect(update_request.root_account).to eq(shard2_account)
+          expect(update_request.root_account_id).to eq(shard2_account.id)
+        end
+      end
+
+      it "returns successful response with registration data" do
+        shard2_registration
+        subject
+        expect(response).to be_successful
+        parsed_body = response.parsed_body
+        expect(parsed_body["client_id"]).to eq(shard2_developer_key.global_id.to_s)
       end
     end
   end
