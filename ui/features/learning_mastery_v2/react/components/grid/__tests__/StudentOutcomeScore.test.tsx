@@ -83,6 +83,14 @@ describe('StudentOutcomeScore', () => {
     expect(await screen.findByLabelText('Unassessed')).toBeInTheDocument()
   })
 
+  describe('action button', () => {
+    it('renders an icon in the action button when onAction is provided', () => {
+      render(<StudentOutcomeScore {...defaultProps()} onAction={jest.fn()} focus={true} />)
+      const actionButton = screen.getByTestId('score-cell-action-button')
+      expect(actionButton.querySelector('svg')).toBeInTheDocument()
+    })
+  })
+
   describe('scoreDisplayFormat', () => {
     it('renders visible text with rating description when ICON_AND_LABEL format is used', () => {
       const {getByText} = render(
