@@ -2675,6 +2675,52 @@ describe Account do
       expect(claims[:primary]).to eq([])
       expect(claims[:secondary]).to eq([])
     end
+
+    it "includes custom_message delegated from discovery_page_custom_message" do
+      Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+      bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello world" })
+      account.update!(brand_config: bc)
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:custom_message]).to eq("Hello world")
+    end
+  end
+
+  describe "#discovery_page_custom_message" do
+    let(:account) { Account.default }
+
+    context "when new_login_ui_custom_labels is disabled" do
+      it "returns nil even when a custom message is set" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+    end
+
+    context "when new_login_ui_custom_labels is enabled" do
+      before { Account.site_admin.enable_feature!(:new_login_ui_custom_labels) }
+
+      it "returns nil when there is no brand config" do
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+
+      it "returns nil when the variable is not set" do
+        bc = BrandConfig.create!(variables: { "ic-brand-primary" => "#fff" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+
+      it "returns the value with newlines collapsed" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "line one\nline two" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to eq("line one line two")
+      end
+
+      it "strips leading and trailing whitespace" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "  hello  " })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to eq("hello")
+      end
+    end
   end
 
   describe "#discovery_page_link_for" do
