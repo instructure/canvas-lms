@@ -4124,7 +4124,7 @@ RSpec.describe Lti::RegistrationsController do
 
     context "when lti_dr_registrations_update feature flag is disabled" do
       before do
-        Account.site_admin.disable_feature!(:lti_dr_registrations_update)
+        account.disable_feature!(:lti_dr_registrations_update)
       end
 
       describe "GET list", type: :request do
@@ -4150,7 +4150,7 @@ RSpec.describe Lti::RegistrationsController do
 
     context "when lti_dr_registrations_update feature flag is enabled" do
       before do
-        Account.site_admin.enable_feature!(:lti_dr_registrations_update)
+        account.enable_feature!(:lti_dr_registrations_update)
       end
 
       describe "GET list", type: :request do
