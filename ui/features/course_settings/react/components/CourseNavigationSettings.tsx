@@ -31,6 +31,7 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   IconDragHandleLine,
+  IconExternalLinkLine,
   IconMoreSolid,
   IconXSolid,
   IconPlusSolid,
@@ -38,6 +39,7 @@ import {
   IconLinkLine,
   IconTrashLine,
 } from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'
 import classnames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
@@ -46,12 +48,12 @@ import {EnvCommon} from '@canvas/global/env/EnvCommon'
 import {
   CourseNavigationTabToSave,
   isLinkTab,
+  getLinkTabUrl,
   useTabListsStore,
   type MoveItemTrayResult,
   type NavigationTab,
 } from '../store/useTabListsStore'
 import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
-import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('course_navigation_settings')
 
@@ -225,7 +227,13 @@ export default function CourseNavigationSettings({
           </Droppable>
         </div>
 
-        <View as="div" position="sticky" insetBlockEnd="0" background="secondary">
+        <View
+          as="div"
+          position="sticky"
+          insetBlockEnd="0"
+          background="secondary"
+          margin="large 0 0 0"
+        >
           <View as="div" textAlign="end" padding="small">
             <Button
               type="button"
@@ -259,6 +267,8 @@ const NavItem = React.memo(
     onMove: (tabInternalId: string) => void
     onDelete: (tabInternalId: string) => void
   }) => {
+    const linkUrl = ENV.FEATURES?.nav_menu_links && getLinkTabUrl(tab)
+
     return (
       <View
         id={`nav_edit_tab_id_${tab.internalId}`}
@@ -278,6 +288,21 @@ const NavItem = React.memo(
               )}
               <Flex.Item shouldGrow shouldShrink size="0">
                 <Text wrap="break-word">{tab.label}</Text>
+                {linkUrl && (
+                  <Text as="div" size="x-small" color="secondary" wrap="break-word">
+                    <Link
+                      href={linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      renderIcon={IconExternalLinkLine}
+                      iconPlacement="end"
+                      isWithinText={false}
+                      aria-label={I18n.t('%{url} (opens in new tab)', {url: linkUrl})}
+                    >
+                      {linkUrl}
+                    </Link>
+                  </Text>
+                )}
               </Flex.Item>
             </Flex>
             {!isEnabled && tab.disabled_message && (
