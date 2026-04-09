@@ -44,19 +44,44 @@ class AltTextControlsComponent
     wait_for_ajaximations
   end
 
-  def mark_as_decorative
-    unless decorative_checked?
-      label = decorative_checkbox.find_element(:xpath, "..")
-      label.click
-    end
+  def clear_alt_text
+    alt_text_input.send_keys([:control, "a"], :backspace)
     wait_for_ajaximations
+  end
+
+  def mark_as_decorative
+    decorative_checkbox_label.click unless decorative_checked?
+    wait_for_ajaximations
+  end
+
+  def unmark_as_decorative
+    decorative_checkbox_label.click if decorative_checked?
+    wait_for_ajaximations
+  end
+
+  def alt_text_input_value
+    alt_text_input.attribute("value")
   end
 
   def alt_text_input_disabled?
     alt_text_input.attribute("disabled") == "true"
   end
 
-  private
+  def alt_text_required_message_visible?
+    !!fj("[role='dialog'] span:contains('Alt text is required.')")&.displayed?
+  end
+
+  def alt_text_too_long_message_visible?
+    !!fj("[role='dialog'] span:contains('Keep alt text under 200 characters.')")&.displayed?
+  end
+
+  def alt_text_filename_message_visible?
+    !!fj("[role='dialog'] span:contains('Alt text can not be a filename.')")&.displayed?
+  end
+
+  def decorative_checkbox_label
+    decorative_checkbox.find_element(:xpath, "..")
+  end
 
   def decorative_checked?
     decorative_checkbox.attribute("checked") == "true"

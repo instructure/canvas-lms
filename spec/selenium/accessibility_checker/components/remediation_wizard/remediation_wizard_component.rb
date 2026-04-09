@@ -34,6 +34,10 @@ class RemediationWizardComponent
     "[role='dialog'] header *:contains('You have fixed all accessibility issues on this page.')"
   end
 
+  def unsaved_changes_modal_selector
+    "[data-testid='unsaved-changes-modal']"
+  end
+
   def wizard_tray
     f(wizard_tray_selector)
   end
@@ -52,6 +56,12 @@ class RemediationWizardComponent
     false
   end
 
+  def unsaved_changes_modal_visible?
+    element_exists?(unsaved_changes_modal_selector) && f(unsaved_changes_modal_selector).displayed?
+  rescue
+    false
+  end
+
   def visible?
     wizard_tray_open?
   end
@@ -65,9 +75,12 @@ class RemediationWizardComponent
   end
 
   def apply_fix
-    apply_button = fj("[role='dialog'] button:contains('Apply')")
     apply_button&.click
     wait_for_ajaximations
+  end
+
+  def apply_button_disabled?
+    apply_button.attribute("disabled") == "true"
   end
 
   def save_and_next
@@ -77,6 +90,31 @@ class RemediationWizardComponent
 
   def skip_issue
     footer.click_skip_button
+    wait_for_ajaximations
+  end
+
+  def apply_button
+    f("[data-testid='apply-button']")
+  end
+
+  def undo_button
+    f("[data-testid='undo-button']")
+  end
+
+  def undo_button_enabled?
+    undo_button.attribute("disabled").nil? && undo_button.attribute("aria-disabled") != "true"
+  rescue
+    false
+  end
+
+  def fix_applied_message_visible?(message)
+    !fj("[role='dialog'] *:contains('#{message}')").nil?
+  rescue
+    false
+  end
+
+  def click_undo
+    undo_button.click
     wait_for_ajaximations
   end
 

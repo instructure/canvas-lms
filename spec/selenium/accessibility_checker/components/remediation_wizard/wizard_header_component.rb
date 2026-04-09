@@ -34,6 +34,10 @@ class WizardHeaderComponent
     "[role='dialog'] h3"
   end
 
+  def close_button_selector
+    "[data-testid='wizard-close-button']"
+  end
+
   def header_exists?
     element_exists?(header_selector)
   end
@@ -44,6 +48,15 @@ class WizardHeaderComponent
 
   def issue_counter
     f(issue_counter_selector)
+  end
+
+  def close_button
+    f(close_button_selector)
+  end
+
+  def click_close_button
+    close_button.click
+    wait_for_ajaximations
   end
 
   def visible?
