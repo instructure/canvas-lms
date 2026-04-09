@@ -121,6 +121,7 @@ describe('NavMenuLinksSettings', () => {
         {
           type: 'existing',
           id: '1',
+          url: 'https://example.com',
           label: 'Link to Delete',
           placements: {course_nav: true, account_nav: false, user_nav: false},
         },
@@ -151,6 +152,7 @@ describe('NavMenuLinksSettings', () => {
         {
           type: 'existing',
           id: '1',
+          url: 'https://example.com',
           label: 'Link to Delete',
           placements: {course_nav: true, account_nav: false, user_nav: false},
         },
@@ -174,6 +176,7 @@ describe('NavMenuLinksSettings', () => {
         {
           type: 'existing',
           id: '1',
+          url: 'https://example.com',
           label: 'Link to Delete',
           placements: {course_nav: true, account_nav: false, user_nav: false},
         },
@@ -195,6 +198,7 @@ describe('NavMenuLinksSettings', () => {
       {
         type: 'existing',
         id: '1',
+        url: 'https://example.com/link-1',
         label: 'Link 1',
         placements: {course_nav: true, account_nav: false, user_nav: false},
       },
@@ -219,18 +223,67 @@ describe('NavMenuLinksSettings', () => {
     expect(hiddenInput?.getAttribute('value')).toBe(JSON.stringify(links))
   })
 
+  it('shows url as external link for new links', () => {
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'new',
+          url: 'https://example.com/my-link',
+          label: 'My Link',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: vi.fn(),
+    })
+
+    const {getByText, getByRole} = render(<NavMenuLinksSettings />)
+
+    expect(getByText('My Link')).toBeInTheDocument()
+    const link = getByRole('link', {name: /https:\/\/example\.com\/my-link/})
+    expect(link).toHaveAttribute('href', 'https://example.com/my-link')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('aria-label', 'https://example.com/my-link (opens in new tab)')
+  })
+
+  it('shows url as external link for existing links', () => {
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          url: 'https://example.com/existing',
+          label: 'Existing Link',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: vi.fn(),
+    })
+
+    const {getByText, getByRole} = render(<NavMenuLinksSettings />)
+
+    expect(getByText('Existing Link')).toBeInTheDocument()
+    const link = getByRole('link', {name: /https:\/\/example\.com\/existing/})
+    expect(link).toHaveAttribute('href', 'https://example.com/existing')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('aria-label', 'https://example.com/existing (opens in new tab)')
+  })
+
   it('renders links in correct order', () => {
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
       links: [
         {
           type: 'existing',
           id: '1',
+          url: 'https://example.com/first',
           label: 'First Link',
           placements: {course_nav: true, account_nav: false, user_nav: false},
         },
         {
           type: 'existing',
           id: '2',
+          url: 'https://example.com/second',
           label: 'Second Link',
           placements: {course_nav: false, account_nav: true, user_nav: false},
         },
