@@ -60,39 +60,39 @@ describe('RubricPanel', () => {
       {
         _id: '1',
         description: 'Quality',
-        long_description: 'Quality of work',
+        longDescription: 'Quality of work',
         points: 4,
-        criterion_use_range: false,
+        criterionUseRange: false,
         ratings: [
           {
             _id: 'rating-1',
             description: 'Excellent',
-            long_description: '',
+            longDescription: '',
             points: 4,
           },
           {
             _id: 'rating-2',
             description: 'Good',
-            long_description: '',
+            longDescription: '',
             points: 3,
           },
         ],
-        ignore_for_scoring: false,
+        ignoreForScoring: false,
       },
     ],
-    free_form_criterion_comments: false,
-    hide_score_total: false,
-    points_possible: 4,
+    freeFormCriterionComments: false,
+    hideScoreTotal: false,
+    pointsPossible: 4,
     ratingOrder: 'descending' as const,
-    button_display: 'numeric',
+    buttonDisplay: 'numeric',
     ...overrides,
   })
 
   const createRubricAssociation = (overrides = {}) => ({
     _id: '1',
-    hide_points: false,
-    hide_score_total: false,
-    use_for_grading: true,
+    hidePoints: false,
+    hideScoreTotal: false,
+    useForGrading: true,
     ...overrides,
   })
 
@@ -302,9 +302,9 @@ describe('RubricPanel', () => {
     ])
   })
 
-  it('hides points when rubricAssociation.hide_points is true', () => {
+  it('hides points when rubricAssociation.hidePoints is true', () => {
     const assignment = createAssignment({
-      rubricAssociation: createRubricAssociation({hide_points: true}),
+      rubricAssociation: createRubricAssociation({hidePoints: true}),
     })
     render(<RubricPanel {...createDefaultProps({assignment})} />)
 
@@ -314,9 +314,9 @@ describe('RubricPanel', () => {
     expect(props.hidePoints).toBe(true)
   })
 
-  it('shows points when rubricAssociation.hide_points is false', () => {
+  it('shows points when rubricAssociation.hidePoints is false', () => {
     const assignment = createAssignment({
-      rubricAssociation: createRubricAssociation({hide_points: false}),
+      rubricAssociation: createRubricAssociation({hidePoints: false}),
     })
     render(<RubricPanel {...createDefaultProps({assignment})} />)
 
@@ -327,7 +327,7 @@ describe('RubricPanel', () => {
   })
 
   it('handles rubric with free form criterion comments', () => {
-    const rubric = createRubric({free_form_criterion_comments: true})
+    const rubric = createRubric({freeFormCriterionComments: true})
     const assignment = createAssignment({rubric})
     render(<RubricPanel {...createDefaultProps({assignment})} />)
 
@@ -338,7 +338,7 @@ describe('RubricPanel', () => {
   })
 
   it('handles rubric with level button display', () => {
-    const rubric = createRubric({button_display: 'level'})
+    const rubric = createRubric({buttonDisplay: 'level'})
     const assignment = createAssignment({rubric})
     render(<RubricPanel {...createDefaultProps({assignment})} />)
 
@@ -365,13 +365,13 @@ describe('RubricPanel', () => {
         {
           _id: '1',
           description: 'Quality',
-          long_description: 'Quality of work',
+          longDescription: 'Quality of work',
           points: 4,
-          criterion_use_range: false,
-          learning_outcome_id: 'outcome-1',
-          mastery_points: 3,
+          criterionUseRange: false,
+          learningOutcomeId: 'outcome-1',
+          masteryPoints: 3,
           ratings: [],
-          ignore_for_scoring: false,
+          ignoreForScoring: false,
         },
       ],
     })
@@ -385,17 +385,17 @@ describe('RubricPanel', () => {
     expect(props.criteria[0].masteryPoints).toBe(3)
   })
 
-  it('handles criteria with criterion_use_range', () => {
+  it('handles criteria with criterionUseRange', () => {
     const rubric = createRubric({
       criteria: [
         {
           _id: '1',
           description: 'Quality',
-          long_description: 'Quality of work',
+          longDescription: 'Quality of work',
           points: 4,
-          criterion_use_range: true,
+          criterionUseRange: true,
           ratings: [],
-          ignore_for_scoring: false,
+          ignoreForScoring: false,
         },
       ],
     })
@@ -408,17 +408,17 @@ describe('RubricPanel', () => {
     expect(props.criteria[0].criterionUseRange).toBe(true)
   })
 
-  it('handles criteria with ignore_for_scoring', () => {
+  it('handles criteria with ignoreForScoring', () => {
     const rubric = createRubric({
       criteria: [
         {
           _id: '1',
           description: 'Quality',
-          long_description: 'Quality of work',
+          longDescription: 'Quality of work',
           points: 4,
-          criterion_use_range: false,
+          criterionUseRange: false,
           ratings: [],
-          ignore_for_scoring: true,
+          ignoreForScoring: true,
         },
       ],
     })
@@ -457,6 +457,66 @@ describe('RubricPanel', () => {
     expect(props.currentUserId).toBe('')
 
     ENV.current_user_id = originalUserId
+  })
+
+  describe('Unscored rubric', () => {
+    it('hides points and uses free-form comments when rubric is configured as unscored', () => {
+      const assignment = createAssignment({
+        rubric: createRubric({freeFormCriterionComments: true}),
+        rubricAssociation: createRubricAssociation({hidePoints: true}),
+      })
+      render(
+        <RubricPanel
+          {...createDefaultProps({
+            assignment,
+            isPeerReviewCompleted: false,
+            rubricAssessmentCompleted: false,
+          })}
+        />,
+      )
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.hidePoints).toBe(true)
+      expect(props.isFreeFormCriterionComments).toBe(true)
+    })
+
+    it('hides points and uses free-form comments for unscored rubric in mobile mode', () => {
+      const assignment = createAssignment({
+        rubric: createRubric({freeFormCriterionComments: true}),
+        rubricAssociation: createRubricAssociation({hidePoints: true}),
+      })
+      render(
+        <RubricPanel
+          {...createDefaultProps({
+            assignment,
+            isMobile: true,
+            isPeerReviewCompleted: false,
+            rubricAssessmentCompleted: false,
+          })}
+        />,
+      )
+
+      const tray = screen.getByTestId('mocked-rubric-assessment-tray')
+      const props = JSON.parse(tray.getAttribute('data-props') || '{}')
+
+      expect(props.hidePoints).toBe(true)
+    })
+
+    it('does not hide points for scored rubric', () => {
+      const assignment = createAssignment({
+        rubric: createRubric({freeFormCriterionComments: false}),
+        rubricAssociation: createRubricAssociation({hidePoints: false}),
+      })
+      render(<RubricPanel {...createDefaultProps({assignment})} />)
+
+      const rubricAssessment = screen.getByTestId('mocked-rubric-assessment')
+      const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
+
+      expect(props.hidePoints).toBe(false)
+      expect(props.isFreeFormCriterionComments).toBe(false)
+    })
   })
 
   describe('Read-only mode', () => {

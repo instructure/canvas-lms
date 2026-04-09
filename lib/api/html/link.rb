@@ -28,26 +28,18 @@ module Api
       end
 
       def to_corrected_s
-        local_link = strip_host(link)
+        local_link = self.class.strip_host(link:, host: @host, port: @port)
         return local_link if is_not_actually_a_file_link? || should_skip_correction?
 
         strip_verifier_params(scope_link_to_context(local_link))
       end
 
-      private
-
-      APPLICABLE_CONTEXT_TYPES = %w[Course Group Account].freeze
-      SKIP_CONTEXT_TYPES = ["User"].freeze
-      FILE_LINK_REGEX = %r{/files/(\d+)/?(?:download|preview|\?wrap=1)}
-      VERIFIER_REGEX = /(\?)verifier=[^&]*&?|&verifier=[^&]*/
-      private_constant :APPLICABLE_CONTEXT_TYPES, :SKIP_CONTEXT_TYPES, :FILE_LINK_REGEX, :VERIFIER_REGEX
-
-      def strip_host(link)
-        return link if @host.nil?
+      def self.strip_host(link:, host:, port:)
+        return link if host.nil?
 
         begin
           uri = URI.parse(link)
-          if uri.host == @host && (uri.port.nil? || uri.port == @port)
+          if uri.host == host && (uri.port.nil? || uri.port == port)
             fragment = "##{uri.fragment}" if uri.fragment
             "#{uri.request_uri}#{fragment}"
           else
@@ -57,6 +49,14 @@ module Api
           link
         end
       end
+
+      private
+
+      APPLICABLE_CONTEXT_TYPES = %w[Course Group Account].freeze
+      SKIP_CONTEXT_TYPES = ["User"].freeze
+      FILE_LINK_REGEX = %r{/files/(\d+)/?(?:download|preview|\?wrap=1)}
+      VERIFIER_REGEX = /(\?)verifier=[^&]*&?|&verifier=[^&]*/
+      private_constant :APPLICABLE_CONTEXT_TYPES, :SKIP_CONTEXT_TYPES, :FILE_LINK_REGEX, :VERIFIER_REGEX
 
       def strip_verifier_params(local_link)
         if local_link.include?("verifier=") && !local_link.match(%r{/assessment_questions/\d+/files/\d+})

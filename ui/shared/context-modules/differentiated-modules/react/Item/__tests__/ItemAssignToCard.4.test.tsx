@@ -132,78 +132,45 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
     it('renders peer review inputs when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is true and checkbox is checked', () => {
       renderComponent()
       expect(screen.getByText('Review Due Date')).toBeInTheDocument()
-      expect(screen.getByText('Reviewing Starts')).toBeInTheDocument()
-      // Note: "Until" appears twice - once for lock_at, once for peer review
-      const untilLabels = screen.getAllByText('Until')
-      expect(untilLabels.length).toBeGreaterThanOrEqual(1)
+      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
     })
 
     it('does not render peer review inputs when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
       window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
       renderComponent()
       expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
-      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
     })
 
     it('does not render peer review inputs when checkbox is not checked', () => {
       mockCheckbox.checked = false
       renderComponent()
       expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
-      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
     })
 
     it('does not render peer review inputs when checkbox does not exist in DOM', () => {
       document.body.removeChild(mockCheckbox)
       renderComponent()
       expect(screen.queryByText('Review Due Date')).not.toBeInTheDocument()
-      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
     })
   })
 
   describe('PeerReviewSelector disabled state', () => {
     it('disables peer review inputs when assignment due date is null', () => {
-      renderComponent({due_at: null})
-      const clearButtons = screen.getAllByText('Clear').map(el => el.closest('button'))
-
-      // Find peer review clear buttons (should be the last 3)
-      const peerReviewClearButtons = clearButtons.slice(-3)
-
-      peerReviewClearButtons.forEach(button => {
-        expect(button).toBeDisabled()
-      })
+      const {container} = renderComponent({due_at: null})
+      const clearButton = container.querySelector('[data-testid="peer_review_due_at_clear_button"]')
+      expect(clearButton).toBeInTheDocument()
+      expect(clearButton).toBeDisabled()
     })
 
     it('enables peer review inputs when assignment due date is set', () => {
-      renderComponent({due_at: '2024-11-20T23:59:00Z'})
-      const clearButtons = screen.getAllByText('Clear').map(el => el.closest('button'))
-
-      // Find peer review clear buttons (should be the last 3)
-      const peerReviewClearButtons = clearButtons.slice(-3)
-
-      peerReviewClearButtons.forEach(button => {
-        expect(button).not.toBeDisabled()
-      })
+      const {container} = renderComponent({due_at: '2024-11-20T23:59:00Z'})
+      const clearButton = container.querySelector('[data-testid="peer_review_due_at_clear_button"]')
+      expect(clearButton).toBeInTheDocument()
+      expect(clearButton).not.toBeDisabled()
     })
   })
 
   describe('PeerReviewSelector with dates', () => {
-    it('renders with peer review available from date', () => {
-      renderComponent({
-        peer_review_available_from: '2024-11-10T00:00:00Z',
-      })
-      const input = screen.getByLabelText('Reviewing Starts')
-      expect(input).toBeInTheDocument()
-    })
-
-    it('renders with peer review available to date', () => {
-      renderComponent({
-        peer_review_available_to: '2024-11-25T23:59:00Z',
-      })
-      // "Until" label appears for both lock_at and peer_review_available_to
-      const untilInputs = screen.getAllByLabelText('Until')
-      expect(untilInputs.length).toBeGreaterThan(0)
-    })
-
     it('renders with peer review due date', () => {
       renderComponent({
         peer_review_due_at: '2024-11-18T00:00:00Z',
@@ -220,8 +187,8 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
       })
 
       expect(screen.getByLabelText('Review Due Date')).toBeInTheDocument()
-      expect(screen.getByLabelText('Reviewing Starts')).toBeInTheDocument()
-      expect(screen.getAllByLabelText('Until').length).toBeGreaterThan(0)
+      // Available from and available to are auto-synced, not rendered as inputs
+      expect(screen.queryByLabelText('Reviewing Starts')).not.toBeInTheDocument()
     })
   })
 
@@ -298,35 +265,31 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
   describe('PeerReviewSelector clear button labels', () => {
     it('uses correct clear button labels for no assignees', () => {
       renderComponent({selectedAssigneeIds: []})
-      // These are visually hidden but accessible
+      // Only the peer review due date clear button is rendered
       expect(screen.getByText('Clear peer review due date/time')).toBeInTheDocument()
-      expect(screen.getByText('Clear peer review available from date/time')).toBeInTheDocument()
-      expect(screen.getByText('Clear peer review available to date/time')).toBeInTheDocument()
+      expect(
+        screen.queryByText('Clear peer review available from date/time'),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByText('Clear peer review available to date/time')).not.toBeInTheDocument()
     })
 
     it('uses correct clear button labels for one assignee', () => {
       renderComponent({
         selectedAssigneeIds: ['student-1'],
       })
-      // Since the mock doesn't include the actual student name mapping,
-      // we just verify the component renders without errors
       expect(screen.getByText('Review Due Date')).toBeInTheDocument()
     })
   })
 
   describe('PeerReviewSelector validation integration', () => {
     it('passes validation errors to peer review inputs', () => {
-      // The DateValidator in ItemAssignToCard will validate peer review dates
-      // and pass errors through to the child components
       renderComponent({
         peer_review_due_at: '2024-11-18T00:00:00Z',
         peer_review_available_from: '2024-11-10T00:00:00Z',
         peer_review_available_to: '2024-11-25T23:59:00Z',
       })
 
-      // Component should render and handle validation internally
       expect(screen.getByText('Review Due Date')).toBeInTheDocument()
-      expect(screen.getByText('Reviewing Starts')).toBeInTheDocument()
     })
 
     it('integrates with card validity tracking for peer review dates', () => {
@@ -356,74 +319,40 @@ describe('ItemAssignToCard - PeerReviewSelector Integration', () => {
         '2024-11-18T00:00:00Z',
       )
     })
-
-    it('calls onCardDatesChange when peer review available from date changes', () => {
-      const onCardDatesChange = vi.fn()
-      renderComponent({
-        onCardDatesChange,
-        peer_review_available_from: '2024-11-10T00:00:00Z',
-      })
-
-      expect(onCardDatesChange).toHaveBeenCalledWith(
-        'assign-to-card-001',
-        'peer_review_available_from',
-        '2024-11-10T00:00:00Z',
-      )
-    })
-
-    it('calls onCardDatesChange when peer review available to date changes', () => {
-      const onCardDatesChange = vi.fn()
-      renderComponent({
-        onCardDatesChange,
-        peer_review_available_to: '2024-11-25T23:59:00Z',
-      })
-
-      expect(onCardDatesChange).toHaveBeenCalledWith(
-        'assign-to-card-001',
-        'peer_review_available_to',
-        '2024-11-25T23:59:00Z',
-      )
-    })
   })
 
   describe('PeerReviewSelector refs integration', () => {
     it('manages date and time input refs for peer review fields', () => {
       const {container} = renderComponent({
         peer_review_due_at: '2024-11-18T00:00:00Z',
-        peer_review_available_from: '2024-11-10T00:00:00Z',
-        peer_review_available_to: '2024-11-25T23:59:00Z',
       })
 
-      // Check that the peer review input containers exist
+      // Only the peer review due date input is rendered
       expect(
         container.querySelector('[data-testid="peer_review_due_at_input"]'),
       ).toBeInTheDocument()
       expect(
         container.querySelector('[data-testid="peer_review_available_from_input"]'),
-      ).toBeInTheDocument()
+      ).not.toBeInTheDocument()
       expect(
         container.querySelector('[data-testid="peer_review_available_to_input"]'),
-      ).toBeInTheDocument()
+      ).not.toBeInTheDocument()
     })
   })
 
   describe('PeerReviewSelector rendering order', () => {
-    it('renders peer review inputs after availability dates', () => {
+    it('renders peer review due date after assignment due date and before availability dates', () => {
       const {container} = renderComponent()
 
-      // Get all date inputs in order
       const dateInputs = container.querySelectorAll('[data-testid*="_input"]')
       const testIds = Array.from(dateInputs).map(el => el.getAttribute('data-testid'))
 
-      // Peer review inputs should come after the main assignment date inputs
+      const dueDateIndex = testIds.indexOf('due_at_input')
       const peerReviewDueIndex = testIds.indexOf('peer_review_due_at_input')
-      const peerReviewFromIndex = testIds.indexOf('peer_review_available_from_input')
-      const peerReviewToIndex = testIds.indexOf('peer_review_available_to_input')
+      const unlockAtIndex = testIds.indexOf('unlock_at_input')
 
-      // All peer review inputs should be present
-      expect(peerReviewDueIndex).toBeGreaterThan(-1)
-      expect(peerReviewFromIndex).toBeGreaterThan(-1)
-      expect(peerReviewToIndex).toBeGreaterThan(-1)
+      expect(peerReviewDueIndex).toBeGreaterThan(dueDateIndex)
+      expect(peerReviewDueIndex).toBeLessThan(unlockAtIndex)
     })
   })
 })

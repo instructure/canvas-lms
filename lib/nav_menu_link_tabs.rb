@@ -28,8 +28,15 @@ module NavMenuLinkTabs
   def account_tabs(account)
     tabs_for_context_and_nav_type(
       scope:
-        NavMenuLink.where(context: account.account_chain, account_nav: true)
-        .order(:account_id, :id),
+        NavMenuLink.where(context: account.account_chain, account_nav: true).order(:account_id, :id),
+      link_context_type: "account"
+    )
+  end
+
+  def user_tabs(account)
+    tabs_for_context_and_nav_type(
+      scope:
+        NavMenuLink.where(context: account.account_chain, user_nav: true).order(:account_id, :id),
       link_context_type: "account"
     )
   end
@@ -41,8 +48,7 @@ module NavMenuLinkTabs
     )
     account_context_tabs = tabs_for_context_and_nav_type(
       scope:
-        NavMenuLink.where(context: course.account_chain, course_nav: true)
-        .order(:account_id, :id),
+        NavMenuLink.where(context: course.account_chain, course_nav: true).order(:account_id, :id),
       link_context_type: "account"
     )
 
@@ -74,7 +80,9 @@ module NavMenuLinkTabs
   # * Filtering out any links that are for the wrong context / nav type
   # (Note that course-context course all have only course_nav: true)
   # @param can_manage_links [Boolean] If false, skip creating/deleting links (but allow rearranging)
-  def sync_course_links_with_tabs(course:, tabs:, can_manage_links: false)
+  # @param request_host [String, nil] Optional request host for stripping from URLs
+  # @param request_port [Integer, nil] Optional request port for stripping from URLs
+  def sync_course_links_with_tabs(course:, tabs:, can_manage_links: false, request_host: nil, request_port: nil)
     raise ArgumentError unless course.is_a?(Course)
 
     tabs = tabs.map(&:with_indifferent_access)
@@ -97,6 +105,10 @@ module NavMenuLinkTabs
 
         if id.nil? && tab[:href].to_s == TAB_HREF_VALUE.to_s && new_link_url.present?
           if can_manage_links
+            # Strip host if a Canvas link (e.g. result is "/courses/123" rather
+            # than full URL) to make it available for translating Course links
+            # during Course Copy
+            new_link_url = Api::Html::Link.strip_host(link: new_link_url, host: request_host, port: request_port)
             new_link = NavMenuLink.create!(context: course, course_nav: true, url: new_link_url, label: tab[:label])
             { id: numeric_id_to_tab_json_id(new_link.id), hidden: tab[:hidden] }.compact.with_indifferent_access
           else

@@ -203,7 +203,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
         size="small"
         border={false}
         toggleLabel={I18n.t('Filter resources')}
-        ref={e => (toggleButtonRef.current = e)}
+        ref={(e: CustomToggleGroup | null) => (toggleButtonRef.current = e)}
         summary={
           <Responsive
             match="media"

@@ -35,3 +35,16 @@ ai_experiences_context_file_upload:
       state: allowed_on
     development:
       state: allowed_on
+ai_experiences_v2_auth:
+  state: hidden
+  applies_to: Account
+  shadow: true
+  display_name: AI Experiences V2 Authentication
+  description: Enables stronger authentication practice for communication with LLM Conversation Service
+  touch_context: true
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+

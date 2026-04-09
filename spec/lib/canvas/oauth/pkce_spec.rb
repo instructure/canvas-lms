@@ -18,23 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe Canvas::OAuth::PKCE do # rubocop:disable RSpec/SpecFilePathFormat
-  before do
-    allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
-  end
-
   describe ".use_pkce_in_authorization?" do
     let(:options) { { code_challenge: "challenge", code_challenge_method: "S256" } }
 
     context "when options are blank" do
       it "returns false" do
         expect(described_class.use_pkce_in_authorization?(nil)).to be_falsey
-      end
-    end
-
-    context "when PKCE feature is disabled" do
-      it "returns false" do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(false)
-        expect(described_class.use_pkce_in_authorization?(options)).to be_falsey
       end
     end
 
@@ -63,13 +52,6 @@ RSpec.describe Canvas::OAuth::PKCE do # rubocop:disable RSpec/SpecFilePathFormat
     context "when options are blank" do
       it "returns false" do
         expect(described_class.use_pkce_in_token?(nil)).to be_falsey
-      end
-    end
-
-    context "when PKCE feature is disabled" do
-      it "returns false" do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(false)
-        expect(described_class.use_pkce_in_token?(options)).to be_falsey
       end
     end
 

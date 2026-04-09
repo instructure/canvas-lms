@@ -82,10 +82,6 @@ RSpec.describe Canvas::OAuth::GrantTypes::RefreshToken do # rubocop:disable RSpe
     context "when the client is public" do
       let(:key) { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }
 
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
-      end
-
       it "regenerates access token and sets permanent expiration" do
         expect(access_token).to receive(:regenerate_access_token)
         expect(access_token).to receive(:set_permanent_expiration)
@@ -97,10 +93,6 @@ RSpec.describe Canvas::OAuth::GrantTypes::RefreshToken do # rubocop:disable RSpe
     end
 
     context "when provider.key.public_client? is false" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
-      end
-
       it "regenerates access token without setting permanent expiration" do
         expect(access_token).to receive(:regenerate_access_token)
         expect(access_token).not_to receive(:set_permanent_expiration)

@@ -24,6 +24,7 @@ module Services
     NEW_QUIZZES_CLOUDFRONT_HOST_BETA_KEY = "new_quizzes_cloudfront_host_beta"
     NEW_QUIZZES_CLOUDFRONT_HOST_EDGE_KEY = "new_quizzes_cloudfront_host_edge"
     NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY = "new_quizzes_importing_timeout_in_minutes"
+    NEW_QUIZZES_API_GATEWAY_HOST_KEY = "new_quizzes_api_gateway_host"
 
     def self.importing_timeout_in_minutes
       value = config[NEW_QUIZZES_IMPORTING_TIMEOUT_IN_MINUTES_KEY]
@@ -33,7 +34,7 @@ module Services
       Rails.logger.error(message)
       Rails.logger.error(e.backtrace.join("\n"))
       Sentry.capture_exception(e) do |scope|
-        scope.set_extra(message:)
+        scope.set_extra(:message, message)
       end
 
       30.minutes
@@ -71,6 +72,10 @@ module Services
         Rails.logger.warn("ApplicationController.region is not set, defaulting to 'us-east-1'")
         "us-east-1"
       end
+    end
+
+    def self.api_gateway_host
+      config[NEW_QUIZZES_API_GATEWAY_HOST_KEY]
     end
 
     def self.environment

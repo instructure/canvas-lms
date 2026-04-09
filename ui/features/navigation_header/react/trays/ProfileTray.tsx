@@ -26,6 +26,7 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
 import DyslexicFontToggle from './UseDyslexicFontToggle'
@@ -62,13 +63,15 @@ function CountBadge({counts, id}: {counts: TabCountsObj; id: string}) {
   )
 }
 
-function ProfileTabLink({id, html_url, label, counts}: ProfileTab) {
-  const target = html_url.includes('display=borderless') ? '_blank' : undefined
+function ProfileTabLink({id, html_url, label, counts, type}: ProfileTab) {
+  const isNavMenuLink = type === 'external' && id?.startsWith('nav_menu_link_')
+  const target = isNavMenuLink || html_url.includes('display=borderless') ? '_blank' : undefined
   return (
     <View className={`profile-tab-${id}`} as="div" margin="small 0">
       <Link isWithinText={false} href={html_url} target={target}>
         {label}
         <CountBadge counts={counts} id={id} />
+        {isNavMenuLink && <IconExternalLinkLine size="x-small" style={{paddingLeft: '0.3em'}} />}
       </Link>
     </View>
   )

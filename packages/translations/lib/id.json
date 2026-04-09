@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Tutup"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Tutup Modal Pintasan Keyboard"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "File closed caption harus lebih kecil dari { maxKb } kb"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Harap masukkan URL video yang valid dari platform yang didukung."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Silakan pilih file sebelum mengunggah."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Silakan pilih file dari jenis yang didukung"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Tampilkan opsi tautan"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Tampilkan transkrip bergulir"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Tampilkan Transkrip Bergulir"

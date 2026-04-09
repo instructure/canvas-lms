@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module PeerReview::Validations
-  require_relative "peer_review_error"
-
   def validate_parent_assignment(assignment)
     unless assignment.present? && assignment.is_a?(Assignment) && assignment.persisted?
       raise PeerReview::InvalidParentAssignmentError, I18n.t("Invalid parent assignment")

@@ -197,6 +197,24 @@ shared_examples_for "learning object with due dates" do
       expect(dates_hash[1][:title]).to eq "value for name"
     end
 
+    it "translates the 'Everyone else' title based on locale" do
+      I18n.with_locale(:"fr-CA") do
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
+        dates_hash.sort_by! { |d| d[:title].to_s }
+        expect(dates_hash[0][:title]).to eq "Tous les autres"
+      end
+    end
+
+    it "translates the 'Everyone' title based on locale" do
+      override.destroy!
+      empty_course = Course.create!(name: "empty course")
+      Assignment.create!(course: empty_course, due_at: 1.week.from_now)
+      I18n.with_locale(:"fr-CA") do
+        dates_hash = overridable.dates_hash_visible_to(@admin)
+        expect(dates_hash[0][:title]).to eq "Tous"
+      end
+    end
+
     it "not include original dates if all sections are overriden" do
       override2 = assignment_override_model(overridable_type => overridable)
       override2.set = @section2

@@ -223,6 +223,7 @@ function expectToBeUnselected(cell: HTMLElement) {
 
 describe('MessageStudentsWhoDialog', () => {
   beforeEach(() => {
+    vi.useRealTimers()
     fakeENV.setup()
     queryClient.clear()
   })

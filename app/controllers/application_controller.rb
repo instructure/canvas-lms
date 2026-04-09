@@ -68,6 +68,7 @@ class ApplicationController < ActionController::Base
   before_action :clear_idle_connections
   before_action :set_normalized_route
   before_action :set_sentry_trace
+  before_action :set_pre_response_headers
   before_action :annotate_apm
   before_action :annotate_sentry
   before_action :check_pending_otp
@@ -128,20 +129,20 @@ class ApplicationController < ActionController::Base
   end
 
   def flamegraph_requested_and_permitted?
-    return false unless @current_user
+    return false unless logged_in_user
 
     flamegraph_requested = value_to_boolean(params.fetch(:flamegraph, false))
-    flamegraph_requested && Account.site_admin.grants_right?(@current_user, :update)
+    flamegraph_requested && Account.site_admin.grants_right?(logged_in_user, :update)
   end
   private :flamegraph_requested_and_permitted?
 
   def enable_n_plus_one_detection?
-    if flamegraph_requested_and_permitted? || @current_user.blank?
+    if flamegraph_requested_and_permitted? || logged_in_user.blank?
       false
     elsif Rails.env.local?
       !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
     else
-      value_to_boolean(params.fetch(:n_plus_one_detection, false)) && Account.site_admin.grants_right?(@current_user, :update)
+      value_to_boolean(params.fetch(:n_plus_one_detection, false)) && Account.site_admin.grants_right?(logged_in_user, :update)
     end
   end
   private :enable_n_plus_one_detection?
@@ -156,7 +157,7 @@ class ApplicationController < ActionController::Base
       end
     else
       NPlusOneDetection::NPlusOneDetectionService.call(
-        user: @current_user,
+        user: logged_in_user, # if masquerading, save generated files to the masquerader's — not masqueradee's — canvas files
         source_name: "#{controller_name}##{action_name}",
         custom_name: params[:n_plus_one_name],
         &
@@ -166,7 +167,7 @@ class ApplicationController < ActionController::Base
 
   def generate_flamegraph(&)
     Flamegraphs::FlamegraphService.call(
-      user: @current_user,
+      user: logged_in_user, # if masquerading, save generated files to the masquerader's — not masqueradee's — canvas files
       source_name: "#{controller_name}##{action_name}",
       custom_name: params[:flamename],
       &
@@ -346,12 +347,33 @@ class ApplicationController < ActionController::Base
           lti_asset_processor_course: @context.try(:feature_enabled?, :lti_asset_processor_course)
         )
 
+        @js_env[:PRE_COOKIE_CONSENT] = "null"
+
         if load_usage_metrics?
           @js_env[:PENDO_APP_ID] = usage_metrics_api_key
-          if cached_features[:cookie_consent_necessary] && !@domain_root_account&.feature_enabled?(:pendo_extended)
-            domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
-            onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
-            @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
+          if cached_features[:cookie_consent_necessary]
+            mobile_webview = session&.dig(:is_mobile_webview)
+            mobile_consent = session&.dig(:mobile_cookie_consent)
+
+            if !mobile_webview && !native_app?
+              domain_lookup_key = if request.host.end_with?(".beta.instructure.com")
+                                    :beta_domain_id
+                                  elsif request.host.end_with?(".instructure.com")
+                                    :domain_id
+                                  else
+                                    :vanity_domain_id
+                                  end
+              onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
+              @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
+            end
+
+            if mobile_webview == true
+              @js_env[:PRE_COOKIE_CONSENT] = mobile_consent.to_s
+              # we could fall back to @current_user.custom_data like this:
+              # @current_user.custom_data.where(namespace: "MOBILE_CANVAS_COOKIE_CONSENT").first
+            end
+          else
+            @js_env[:PRE_COOKIE_CONSENT] = "true"
           end
         end
 
@@ -500,7 +522,6 @@ class ApplicationController < ActionController::Base
     a11y_checker_ga2_features
     block_content_editor_toolbar_reorder
     commons_new_quizzes
-    consolidated_media_player
     courses_popout_sisid
     create_external_apps_side_tray_overrides
     dashboard_graphql_integration
@@ -559,13 +580,11 @@ class ApplicationController < ActionController::Base
     instui_nav
     login_registration_ui_identity
     lock_lti_registrations
-    lti_apps_page_ai_translation
     lti_apps_page_instructors
     lti_asset_processor
     lti_asset_processor_discussions
     lti_deactivate_registrations
     lti_link_to_apps_from_developer_keys
-    lti_registrations_discover_page
     lti_registrations_next
     lti_registrations_templates
     lti_registrations_usage_data
@@ -1183,6 +1202,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_pre_response_headers
+    RequestContext::Generator.store_request_meta(request, @sentry_trace)
+
+    true
+  end
+
   def set_response_headers
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
@@ -1192,7 +1217,7 @@ class ApplicationController < ActionController::Base
 
       append_to_header("Content-Security-Policy", directives)
     end
-    RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
+    RequestContext::Generator.store_context_meta(@context)
     true
   end
 
@@ -1858,6 +1883,10 @@ class ApplicationController < ActionController::Base
           if pseudonym && token.current_user_id
             target_user = User.find(token.current_user_id)
             session[:become_user_id] = token.current_user_id if target_user.can_masquerade?(pseudonym.user, @domain_root_account)
+          end
+          unless token.consent_from_mobile.nil?
+            session[:is_mobile_webview] = true
+            session[:mobile_cookie_consent] = token.consent_from_mobile == true
           end
         end
         return redirect_to return_to if return_to
@@ -2913,9 +2942,7 @@ class ApplicationController < ActionController::Base
   end
 
   def in_mobile_webview?
-    # TODO: we need to set up adding :mobile_webview to the session
-    # when /login/session_token is called with mobile_webview=1
-    session&.dig(:mobile_webview) || params[:embedded] || params[:embed]
+    session&.dig(:is_mobile_webview) || params[:embedded] || params[:embed]
   end
 
   def stringify_json_ids?
@@ -3677,5 +3704,13 @@ class ApplicationController < ActionController::Base
     else
       obj.respond_to?(:as_json) ? obj.as_json : obj
     end
+  end
+
+  def study_assist_enabled_tools
+    tools = []
+    tools << "Summarize" if @context.feature_enabled?(:study_assist_summarize)
+    tools << "Quiz me" if @context.feature_enabled?(:study_assist_quiz_me)
+    tools << "Flashcards" if @context.feature_enabled?(:study_assist_flashcards)
+    tools
   end
 end

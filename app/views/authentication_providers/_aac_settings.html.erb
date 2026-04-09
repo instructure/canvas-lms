@@ -52,7 +52,7 @@
           <%= render partial: "debugging", locals: { provider: aac } %>
         <% end %>
 
-        <% if aac.account.mfa_settings != :disabled && (aac.auth_type != 'canvas' || aac.account.mfa_settings != :required) %>
+        <% if aac.show_mfa_configuration_options? %>
           <div class="ic-Form-control ic-Form-control--radio" %>
             <span class="ic-Label"><%= t('MFA Required') %></span>
             <div class="ic-Radio">

@@ -17,8 +17,7 @@
  */
 
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
-import type {Course, CoursesResponse} from '../types/course'
-import type {SortOrder} from '../react/components/SortableTableHeader'
+import type {Course, CoursesResponse, SortOrder} from '../types/course'
 
 const COURSES_PER_PAGE = 14
 const TEACHER_LIMIT = 25

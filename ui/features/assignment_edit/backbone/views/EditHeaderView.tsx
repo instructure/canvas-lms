@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {legacyRender} from '@canvas/react'
+import {render} from '@canvas/react'
 import {Pill} from '@instructure/ui-pill'
 import {IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {extend} from '@canvas/backbone/utils'
@@ -27,7 +27,8 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/EditHeaderView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import 'jqueryui/tabs'
+import ConditionalReleaseTabs from '../../react/ConditionalReleaseTabs'
+import type {ConditionalReleaseTabsHandle} from '../../react/ConditionalReleaseTabs'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
 const I18n = createI18nScope('assignmentsEditHeaderView')
@@ -54,7 +55,6 @@ EditHeaderView.prototype.template = template
 EditHeaderView.prototype.events = {
   'click .delete_assignment_link': 'onDelete',
   'change #grading_type_selector': 'onGradingTypeUpdate',
-  tabsbeforeactivate: 'onTabChange',
 }
 
 // same getter pattern as used in AssignmentListItemView
@@ -67,13 +67,7 @@ EditHeaderView.prototype.messages = shimGetterShorthand(
   },
 )
 
-EditHeaderView.prototype.els = {
-  '#edit-assignment-header-tabs': '$headerTabs',
-  '#edit-assignment-header-cr-tabs': '$headerTabsCr',
-}
-
-// @ts-expect-error
-EditHeaderView.prototype.initialize = function (options) {
+EditHeaderView.prototype.initialize = function (options: any) {
   // @ts-expect-error
   EditHeaderView.__super__.initialize.apply(this, arguments)
   this.editView = options.views.edit_assignment_form
@@ -81,15 +75,24 @@ EditHeaderView.prototype.initialize = function (options) {
 }
 
 EditHeaderView.prototype.afterRender = function () {
-  // doubled for conditional release
-  this.$headerTabs.tabs()
-  this.$headerTabsCr.tabs()
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
-    return this.toggleConditionalReleaseTab(this.model.gradingType())
+    this._crTabsRef = React.createRef<ConditionalReleaseTabsHandle>()
+    const mountPoint = this.$el.find('#conditional-release-tabs-mount')[0]
+    if (mountPoint) {
+      render(
+        <ConditionalReleaseTabs
+          ref={this._crTabsRef}
+          onTabChange={() => this.editView.updateConditionalRelease()}
+        />,
+        mountPoint,
+        {sync: true},
+      )
+    }
+    this.toggleConditionalReleaseTab(this.model.gradingType())
   }
   // EVAL-3711 Remove ICE feature flag
   if (ENV.FEATURES?.instui_nav) {
-    legacyRender(
+    render(
       <Pill
         renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}
         color={this.model.published() ? 'success' : 'primary'}
@@ -97,6 +100,7 @@ EditHeaderView.prototype.afterRender = function () {
         {this.model.published() ? 'Published' : 'Not Published'}
       </Pill>,
       this.$el.find('.published-assignment-container')[0],
+      {sync: true},
     )
   }
 }
@@ -155,30 +159,23 @@ EditHeaderView.prototype.onGradingTypeUpdate = function (e) {
 
 // @ts-expect-error
 EditHeaderView.prototype.toggleConditionalReleaseTab = function (gradingType) {
-  if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
+  if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && this._crTabsRef?.current) {
     if (gradingType === 'not_graded') {
-      this.$headerTabsCr.tabs('option', 'disabled', [1])
-      return this.$headerTabsCr.tabs('option', 'active', 0)
+      this._crTabsRef.current.setDisabledIndices([1])
+      this._crTabsRef.current.setActiveIndex(0)
     } else {
-      return this.$headerTabsCr.tabs('option', 'disabled', false)
+      this._crTabsRef.current.setDisabledIndices([])
     }
   }
 }
 
-EditHeaderView.prototype.onTabChange = function () {
-  if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
-    this.editView.updateConditionalRelease()
-  }
-  return true
-}
-
 // @ts-expect-error
 EditHeaderView.prototype.onShowErrors = function (errors) {
-  if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
+  if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && this._crTabsRef?.current) {
     if (errors.conditional_release) {
-      return this.$headerTabsCr.tabs('option', 'active', 1)
+      this._crTabsRef.current.setActiveIndex(1)
     } else {
-      return this.$headerTabsCr.tabs('option', 'active', 0)
+      this._crTabsRef.current.setActiveIndex(0)
     }
   }
 }

@@ -2861,6 +2861,82 @@ describe MasterCourses::MasterMigration do
       expect(mod_to.reload).to be_deleted
     end
 
+    it "syncs module positions correctly when adding a new module and reordering existing modules" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod0 = @copy_from.context_modules.create!(name: "Module 0", position: 1)
+      mod1 = @copy_from.context_modules.create!(name: "Module 1", position: 2)
+      mod2 = @copy_from.context_modules.create!(name: "Module 2", position: 3)
+      mod3 = @copy_from.context_modules.create!(name: "Module 3", position: 4)
+      mod4 = @copy_from.context_modules.create!(name: "Module 4", position: 5)
+
+      run_master_migration
+
+      mod0_to = @copy_to.context_modules.where(migration_id: mig_id(mod0)).first
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      mod2_to = @copy_to.context_modules.where(migration_id: mig_id(mod2)).first
+      mod3_to = @copy_to.context_modules.where(migration_id: mig_id(mod3)).first
+      mod4_to = @copy_to.context_modules.where(migration_id: mig_id(mod4)).first
+      expect(mod0_to.position).to eq 1
+      expect(mod1_to.position).to eq 2
+      expect(mod2_to.position).to eq 3
+      expect(mod3_to.position).to eq 4
+      expect(mod4_to.position).to eq 5
+
+      Timecop.freeze(2.minutes.from_now) do
+        mod_new = @copy_from.context_modules.create!(name: "Module -1", position: 1)
+        ContextModule.where(id: mod0).update_all(position: 2)
+        ContextModule.where(id: mod1).update_all(position: 3)
+        ContextModule.where(id: mod2).update_all(position: 4)
+        ContextModule.where(id: mod3).update_all(position: 5)
+        ContextModule.where(id: mod4).update_all(position: 6)
+        [mod0, mod1, mod2, mod3, mod4, mod_new].each(&:touch)
+        @mod_new = mod_new
+      end
+
+      run_master_migration
+
+      mod_new_to = @copy_to.context_modules.where(migration_id: mig_id(@mod_new)).first
+      expect(mod_new_to).to be_present
+      expect(mod_new_to.position).to eq 1
+      expect(mod0_to.reload.position).to eq 2
+      expect(mod1_to.reload.position).to eq 3
+      expect(mod2_to.reload.position).to eq 4
+      expect(mod3_to.reload.position).to eq 5
+      expect(mod4_to.reload.position).to eq 6
+    end
+
+    it "syncs module positions correctly when adding a new module in the middle and reordering" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod0 = @copy_from.context_modules.create!(name: "Module 0", position: 1)
+      mod1 = @copy_from.context_modules.create!(name: "Module 1", position: 2)
+      mod2 = @copy_from.context_modules.create!(name: "Module 2", position: 3)
+
+      run_master_migration
+
+      Timecop.freeze(2.minutes.from_now) do
+        mod_new = @copy_from.context_modules.create!(name: "Module 1.5", position: 3)
+        ContextModule.where(id: mod2).update_all(position: 4)
+        [mod0, mod1, mod2, mod_new].each(&:touch)
+        @mod_new = mod_new
+      end
+
+      run_master_migration
+
+      mod0_to = @copy_to.context_modules.where(migration_id: mig_id(mod0)).first
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      mod2_to = @copy_to.context_modules.where(migration_id: mig_id(mod2)).first
+      mod_new_to = @copy_to.context_modules.where(migration_id: mig_id(@mod_new)).first
+
+      expect(mod0_to.reload.position).to eq 1
+      expect(mod1_to.reload.position).to eq 2
+      expect(mod_new_to.position).to eq 3
+      expect(mod2_to.reload.position).to eq 4
+    end
+
     it "copies outcomes in selective copies" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
@@ -3051,6 +3127,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "copies tab configurations for account-level external tools" do
+      # ContextExport#is_external_object? ensures account-level links don't get mastercourse_ prepended to migration id
       @tool_from = @copy_from.account.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
       @tool_from.settings[:course_navigation] = { url: "http://www.example.com", text: "Example URL" }
       @tool_from.save!
@@ -3063,6 +3140,33 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
       expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
+    end
+
+    it "copies tab configurations for nav menu links, preserving account-level links" do
+      # ContextExport#is_external_object? ensures account-level links don't get mastercourse_ prepended to migration id
+      acct_link = NavMenuLink.create!(
+        context: @copy_from.account, course_nav: true, label: "Link 1", url: "http://a.com/1"
+      )
+      course_link = NavMenuLink.create!(
+        context: @copy_from, course_nav: true, label: "Link 2", url: "http://a.com/2"
+      )
+
+      @copy_from.update tab_configuration: [
+        { "id" => "nav_menu_link_#{acct_link.id}" },
+        { "id" => "nav_menu_link_#{course_link.id}" },
+      ]
+
+      copy_to = course_factory(account: @copy_from.account)
+      @template.add_child_course!(copy_to)
+
+      run_master_migration
+
+      new_course_link = NavMenuLink.where(course: copy_to, label: "Link 2").last
+
+      expect(copy_to.reload.tab_configuration).to eq [
+        { "id" => "nav_menu_link_#{acct_link.id}" },
+        { "id" => "nav_menu_link_#{new_course_link.id}" },
+      ]
     end
 
     it "does not break trying to match existing attachments on cloned_item_id" do

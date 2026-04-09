@@ -17,6 +17,7 @@
  */
 
 // Educator dashboard dark navy palette — no InstUI token equivalents exist for these values
+const PAGE_BG = '#F2F4F5'
 const NAVY_DARK = '#061C30'
 const NAVY_HOVER = '#0D2D4A'
 const NAVY_MID = '#1D354F'
@@ -55,6 +56,12 @@ export const EDUCATOR_DASHBOARD_THEME = {
     },
     'Modal.Footer': {
       borderRadius: '12px',
+    },
+    Tabs: {
+      defaultBackground: PAGE_BG,
+    },
+    'Tabs.Panel': {
+      background: PAGE_BG,
     },
     View: {
       borderRadiusLarge: '12px',

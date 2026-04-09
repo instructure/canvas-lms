@@ -41,6 +41,7 @@ vi.mock('@canvas/util/globalUtils', () => ({
 
 let screenreaderText = null
 let nonScreenreaderText = null
+let createdViews = []
 
 class AssignmentCollection extends Backbone.Collection {
   static initClass() {
@@ -154,6 +155,7 @@ const createView = (model, options = {}) => {
   })
   view.$el.appendTo($('#fixtures'))
   view.render()
+  createdViews.push(view)
   return view
 }
 
@@ -181,6 +183,8 @@ const genSetup = (model = assignment1()) => {
 }
 
 const genTeardown = () => {
+  createdViews.forEach(view => view.remove())
+  createdViews = []
   fakeENV.teardown()
   $('#fixtures').empty()
   // cleanup instui dialogs and trays that render in a portal outside of #fixtures

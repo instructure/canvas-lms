@@ -2697,6 +2697,19 @@ describe UsersController do
       expect(response.body).to include "Arizona"
       expect(response).to have_http_status :ok
     end
+
+    it "sends notification when user is suspended" do
+      notification = Notification.create(name: "Pseudonym Suspended By Admin", category: "Registration")
+      admin = account_admin_user(account: Account.default)
+      user_session(admin)
+      user_with_pseudonym(unique_id: "suspended@email.com")
+
+      put "update", params: { id: @user.id, "user[event]": "suspend" }, format: "json"
+      expect(response).to be_successful
+      p = @user.pseudonyms.first
+      expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_present
+      expect(@user.pseudonyms.active_only.length).to eq 0
+    end
   end
 
   describe "POST 'masquerade'" do

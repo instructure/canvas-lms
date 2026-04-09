@@ -21,7 +21,8 @@ import axios from '@canvas/axios'
 import BreadcrumbLinkWithTip from './BreadcrumbLinkWithTip'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
@@ -252,6 +253,8 @@ class CanvasFiles extends React.Component {
       return (
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorSubject={this.state.error.message}
           errorCategory={I18n.t('Assignments 2 Student Error Page')}
         />

@@ -1202,6 +1202,7 @@ CanvasRails::Application.routes.draw do
   scope(controller: :translation) do
     post "courses/:course_id/translate", action: :translate, as: :translate
     post "courses/:course_id/translate/paragraph", action: :translate_paragraph, as: :translate_paragraph
+    post "courses/:course_id/translate/feedback", action: :translation_feedback, as: :translation_feedback
   end
 
   scope(controller: "lti/asset_processor_launch") do
@@ -1499,7 +1500,6 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
       post "courses/:course_id/assignments/:assignment_id/accessibility/scan", action: :accessibility_scan, as: "assignment_accessibility_scan"
       post "courses/:course_id/assignments/:assignment_id/accessibility/queue_scan", action: :accessibility_queue_scan, as: "assignment_accessibility_queue_scan"
-      get "courses/:course_id/assignments/:assignment_id/check_allocation_conversion", action: :check_allocation_conversion
     end
 
     scope(controller: "assignment_extensions") do
@@ -1874,11 +1874,6 @@ CanvasRails::Application.routes.draw do
         get "courses/:course_id/convert_tag_overrides/status", action: :conversion_job_status
       end
 
-      scope(controller: :assignment_peer_review_allocation_conversion) do
-        put "courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations", action: :convert_peer_review_allocations
-        get "courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations/status", action: :conversion_job_status
-      end
-
       scope(controller: :login) do
         get "login/session_token", action: :session_token, as: :login_session_token
       end
@@ -2162,6 +2157,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
       get "accounts/:account_id/lti_registrations/:id/history", action: :history, as: :lti_registration_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
+      get "accounts/:account_id/lti_registrations/by_utid/:utid", action: :show_by_utid
+      get "accounts/:account_id/lti_registrations/install_status/:client_id", action: :install_status
       get "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id", action: :show_registration_update_request, as: "lti_registration_update_request"
       get "accounts/:account_id/lti_registrations/:id/latest_update_request", action: :latest_registration_update_request, as: "latest_lti_registration_update_request"
       put "accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply", action: :apply_registration_update_request, as: "apply_lti_registration_update_request"
@@ -3029,6 +3026,11 @@ CanvasRails::Application.routes.draw do
       get "career/experience_summary", action: :experience_summary
       post "career/switch_experience", action: :switch_experience
       post "career/switch_role", action: :switch_role
+    end
+
+    scope(controller: "canvas_career/user_experiences") do
+      post "career/user_experiences", action: :create
+      delete "career/user_experiences", action: :destroy
     end
   end
 

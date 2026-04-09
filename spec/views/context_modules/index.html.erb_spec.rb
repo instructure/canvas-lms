@@ -262,4 +262,89 @@ describe "context_modules/index" do
       end
     end
   end
+
+  context "discussion checkpoints" do
+    before :once do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @topic = @course.discussion_topics.create!(
+        title: "Checkpointed Discussion",
+        message: "Test discussion"
+      )
+      @assignment = @course.assignments.create!(
+        title: "Checkpointed Discussion",
+        submission_types: "discussion_topic",
+        points_possible: 25
+      )
+      @topic.assignment = @assignment
+      @topic.save!
+      @topic.create_checkpoints(
+        reply_to_topic_points: 10,
+        reply_to_entry_points: 15,
+        reply_to_entry_required_count: 2
+      )
+      @module = @course.context_modules.create!(name: "Test Module")
+      @tag = @module.add_item(type: "discussion_topic", id: @topic.id)
+      @tag.publish! if @tag.unpublished?
+    end
+
+    it "renders successfully when checkpoints are present" do
+      view_context(@course, @student)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+      render "context_modules/index"
+
+      expect(response).not_to be_nil
+      page = Nokogiri("<document>" + response.body + "</document>")
+      expect(page.css("[data-testid='checkpoint']").length).to eq 2
+    end
+
+    it "renders successfully when checkpoints are missing (soft-deleted)" do
+      # Corrupt the data: soft-delete checkpoints without updating parent flag
+      @assignment.sub_assignments.unscoped.update_all(workflow_state: "deleted")
+
+      view_context(@course, @student)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+
+      # Should not raise an error
+      expect { render "context_modules/index" }.not_to raise_error
+
+      expect(response).not_to be_nil
+      page = Nokogiri("<document>" + response.body + "</document>")
+      # Checkpoints should not be rendered since they're deleted
+      expect(page.css("[data-testid='checkpoint']").length).to eq 0
+    end
+
+    it "renders successfully when one checkpoint is missing" do
+      # Delete only the reply_to_topic checkpoint
+      reply_to_topic = @topic.reply_to_topic_checkpoint
+      reply_to_topic.update_column(:workflow_state, "deleted")
+
+      view_context(@course, @student)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+
+      expect { render "context_modules/index" }.not_to raise_error
+
+      expect(response).not_to be_nil
+      page = Nokogiri("<document>" + response.body + "</document>")
+      # Only one checkpoint should be rendered
+      expect(page.css("[data-testid='checkpoint']").length).to eq 1
+    end
+
+    it "renders successfully when parent assignment is deleted" do
+      # Soft-delete the parent assignment (simulates cascade deletion bug)
+      @assignment.destroy
+
+      view_context(@course, @student)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+
+      # Should not raise an error even though parent is deleted
+      expect { render "context_modules/index" }.not_to raise_error
+
+      expect(response).not_to be_nil
+    end
+  end
 end

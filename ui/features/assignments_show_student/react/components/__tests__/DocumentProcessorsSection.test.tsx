@@ -49,7 +49,7 @@ describe('DocumentProcessorsSection', () => {
   const mockSubmission = {
     submissionId: 'test-submission-123',
     submissionType: 'online_upload',
-    ifLastAttemptIsNumber: 1,
+    attempt: 1,
   }
 
   beforeEach(() => {

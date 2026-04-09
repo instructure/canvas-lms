@@ -15,11 +15,6 @@ verify_ldap_certs:
   display_name: Verify LDAP TLS certificates
   description: Verify TLS certificates presented by LDAP authentication providers.
   applies_to: Account
-admin_manage_access_tokens:
-  state: hidden
-  display_name: Admin Manage Access Tokens
-  description: Limit the ability to manage access tokens to admins only.
-  applies_to: RootAccount
 login_registration_ui_identity:
   state: hidden
   applies_to: RootAccount
@@ -89,6 +84,21 @@ new_login_ui_identity_discovery_page:
   applies_to: SiteAdmin
   display_name: "New Canvas Login UI: Identity Service Discovery Page"
   description: Enable Identity Service Discovery Page for the new Canvas Login/Registration UI.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+new_login_ui_identity_discovery_page_root_account:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "New Canvas Login UI: Identity Service Discovery Page"
+  description: >-
+    Enable Identity Service Discovery Page for the new Canvas
+    Login/Registration UI at the root account level.
   environments:
     development:
       state: allowed

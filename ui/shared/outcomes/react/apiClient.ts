@@ -18,8 +18,9 @@
 
 import axios from '@canvas/axios'
 import {AxiosResponse} from 'axios'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder, SortBy} from './utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE, SortBy} from './utils/constants'
 import {MasteryDistributionResponse} from './types/mastery_distribution'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 export function createImport(contextRoot: string, file: File, learningOutcomeGroupId?: string) {
   const data = new FormData()

@@ -287,7 +287,7 @@ describe('publishOneModuleHelper', () => {
       expect(spy).toHaveBeenCalledWith(1, 2)
     })
 
-    it('shows an alert if not all items were published', async () => {
+    it('shows plain warning when publish_warning_items is absent', async () => {
       server.use(
         http.put('/api/v1/courses/1/modules/2', () => {
           return HttpResponse.json({published: true, publish_warning: true})
@@ -298,6 +298,76 @@ describe('publishOneModuleHelper', () => {
       await waitFor(() => {
         expect(
           getAllByText(document.body, 'Some module items could not be published'),
+        ).toHaveLength(2)
+      })
+    })
+
+    it('shows item names and reasons when publish_warning_items is present', async () => {
+      server.use(
+        http.put('/api/v1/courses/1/modules/2', () => {
+          return HttpResponse.json({
+            published: true,
+            publish_warning: true,
+            publish_warning_items: [
+              {id: '42', title: 'Secret File', reason: 'file_in_hidden_folder'},
+              {id: '99', title: 'Unlicensed Image', reason: 'usage_rights_required'},
+              {id: '100', title: 'Locked Item', reason: 'unpublishable'},
+              {id: '101', title: 'Mystery Item', reason: 'unknown'},
+            ],
+          })
+        }),
+      )
+
+      await batchUpdateOneModuleApiCall(1, 2, false, false, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(document.body.textContent).toContain('Some module items could not be published:')
+        expect(document.body.textContent).toContain('Secret File')
+        expect(document.body.textContent).toContain('file is in a hidden folder')
+        expect(document.body.textContent).toContain('Unlicensed Image')
+        expect(document.body.textContent).toContain('usage rights are required')
+        expect(document.body.textContent).toContain('Locked Item')
+        expect(document.body.textContent).toContain('cannot be published')
+        expect(document.body.textContent).toContain('Mystery Item')
+        expect(document.body.textContent).toContain('could not be published')
+      })
+    })
+
+    it('falls back to plain string when publish_warning_items is empty', async () => {
+      server.use(
+        http.put('/api/v1/courses/1/modules/2', () => {
+          return HttpResponse.json({
+            published: true,
+            publish_warning: true,
+            publish_warning_items: [],
+          })
+        }),
+      )
+
+      await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(
+          getAllByText(document.body, 'Some module items could not be published'),
+        ).toHaveLength(2)
+      })
+    })
+
+    it('shows an alert if not all items were unpublished', async () => {
+      server.use(
+        http.put('/api/v1/courses/1/modules/2', () => {
+          return HttpResponse.json({published: false, unpublish_warning: true})
+        }),
+      )
+
+      await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(
+          getAllByText(document.body, 'Some module items could not be unpublished.'),
+        ).toHaveLength(2)
+        expect(
+          getAllByText(
+            document.body,
+            'Items with student submissions or other restrictions cannot be unpublished.',
+          ),
         ).toHaveLength(2)
       })
     })

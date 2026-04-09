@@ -29,6 +29,13 @@ import {createMockCourses, createMockLinkHeaderString} from '../../../__tests__/
 
 vi.mock('../../../../shared/react/hooks/useA11yTracking')
 
+vi.mock('@canvas/breakpoints', async () => ({
+  ...(await vi.importActual('@canvas/breakpoints')),
+  responsiveQuerySizes: () => ({
+    desktop: {minWidth: '0px'},
+  }),
+}))
+
 const mockTrackA11yEvent = vi.fn()
 
 const server = setupServer()
@@ -74,6 +81,23 @@ describe('AccessibilityCoursesPage', () => {
         </QueryClientProvider>
       </MemoryRouter>,
     )
+
+  it('courses table has a descriptive caption for screen readers', async () => {
+    const mockCourses = createMockCourses(2)
+    server.use(http.get('/api/v1/accounts/123/courses', () => HttpResponse.json(mockCourses)))
+    renderPage()
+    await waitFor(() => {
+      expect(screen.getByText('Course Accessibility Report')).toBeInTheDocument()
+    })
+  })
+
+  it('search input accessible name matches visible placeholder text', () => {
+    server.use(http.get('/api/v1/accounts/123/courses', () => HttpResponse.json([])))
+    renderPage()
+    expect(
+      screen.getByRole('searchbox', {name: 'Search by course title, SIS ID...'}),
+    ).toBeInTheDocument()
+  })
 
   it('renders the page heading', () => {
     server.use(

@@ -22,14 +22,20 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconMoreLine, IconDocumentLine, IconClockLine} from '@instructure/ui-icons'
+import {IconAiLine, IconMoreLine, IconClockLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+declare const ENV: GlobalEnv & {
+  FEATURES?: {ai_experiences_context_file_upload?: boolean}
+}
 import {Menu} from '@instructure/ui-menu'
 import {Modal} from '@instructure/ui-modal'
 import {Tooltip} from '@instructure/ui-tooltip'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience} from '../../types'
+import ContextFilePill from '@canvas/canvas-file-upload/react/ContextFilePill'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 import AIExperiencePublishButton from './AIExperiencePublishButton'
 
@@ -318,32 +324,19 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                 </View>
               )}
 
-              {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload &&
+              {ENV?.FEATURES?.ai_experiences_context_file_upload &&
                 (aiExperience.context_files?.length ?? 0) > 0 && (
                   <View as="div" margin="medium 0 0 0">
                     <Heading level="h3" margin="0 0 small 0">
                       {I18n.t('File sources')}
                     </Heading>
-                    <View as="div" borderWidth="small" borderRadius="medium">
-                      {aiExperience.context_files!.map((file, index) => (
-                        <View
-                          key={file.id}
-                          as="div"
-                          padding="small"
-                          borderWidth={index === 0 ? '0' : 'small 0 0 0'}
-                          data-testid={`context-file-row-${file.id}`}
-                        >
-                          <Flex alignItems="center" gap="x-small">
-                            <Flex.Item>
-                              <IconDocumentLine color="secondary" />
-                            </Flex.Item>
-                            <Flex.Item shouldGrow shouldShrink>
-                              <Text>{file.display_name}</Text>
-                            </Flex.Item>
-                          </Flex>
-                        </View>
+                    <Flex wrap="wrap" gap="x-small">
+                      {aiExperience.context_files!.map(file => (
+                        <Flex.Item key={file.id} data-testid={`context-file-row-${file.id}`}>
+                          <ContextFilePill file={file} />
+                        </Flex.Item>
                       ))}
-                    </View>
+                    </Flex>
                   </View>
                 )}
             </View>

@@ -288,6 +288,7 @@ const ItemAssignToTrayContent = ({
         if (cardRef?.current) {
           lastPerformedAction.current = null
           cardRef.current.focusDeleteButton()
+          cardRef.current.scrollIntoView({behavior: 'smooth', block: 'center'})
         }
       }
     }

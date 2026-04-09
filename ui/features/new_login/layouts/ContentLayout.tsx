@@ -60,7 +60,7 @@ const ContentLayout = ({children}: Props) => {
       })}
     >
       <View
-        as="div"
+        as="main"
         className={classNames(styles.contentLayout__content, {
           [styles['contentLayout__content--tablet']]: isTablet,
         })}

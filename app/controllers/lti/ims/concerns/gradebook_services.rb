@@ -62,7 +62,7 @@ module Lti::IMS::Concerns
     end
 
     def verify_course_not_concluded_for_user
-      return verify_course_not_concluded if !Account.site_admin.feature_enabled?(:ags_improved_course_concluded_check) || user.nil?
+      return verify_course_not_concluded if user.nil?
 
       unless grade_passback_allowed?(context, user)
         render_error("This course has concluded for this student. AGS requests will no longer be accepted for this course.",

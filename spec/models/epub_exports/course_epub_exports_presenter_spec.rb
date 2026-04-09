@@ -71,6 +71,13 @@ describe EpubExports::CourseEpubExportsPresenter do
       it "includes courses for which the user is a ta" do
         expect(courses).to include(@course_as_ta)
       end
+
+      it "cancels a stuck export" do
+        @epub_export.update(workflow_state: "generating")
+        @epub_export.job_progress.update(updated_at: 1.day.ago)
+        course = courses.find { |course| course.id == @course_with_epub.id }
+        expect(course.latest_epub_export).to be_failed
+      end
     end
 
     it "only includes courses that have the feature enabled" do

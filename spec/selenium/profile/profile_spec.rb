@@ -469,7 +469,6 @@ describe "profile" do
 
     context "when access token restrictions are enabled" do
       before do
-        @course.root_account.enable_feature!(:admin_manage_access_tokens)
         @course.root_account.settings[:limit_personal_access_tokens] = true
         @course.root_account.save!
       end

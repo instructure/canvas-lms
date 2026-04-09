@@ -110,6 +110,70 @@ module Types
       account.account_chain - [account]
     end
 
+    field :users_connection, Types::UserType.connection_type, null: true do
+      argument :filter, Types::AccountUsersFilterInputType, required: false
+      argument :sort,   Types::AccountUsersSortInputType,   required: false
+    end
+    def users_connection(filter: {}, sort: {})
+      return unless account.grants_any_right?(current_user, session, :read_roster, :manage_students)
+
+      options = {
+        enrollment_type: filter[:enrollment_types],
+        enrollment_role_id: filter[:enrollment_role_ids],
+        include_deleted_users: filter[:include_deleted_users],
+        temporary_enrollment_recipients: filter[:temporary_enrollment_recipients],
+        temporary_enrollment_providers: filter[:temporary_enrollment_providers],
+        sort: sort[:field],
+        order: sort[:direction],
+      }.compact
+
+      search_term = filter[:search_term].presence
+      if search_term
+        UserSearch.for_user_in_context(search_term, account, current_user, session, options)
+      else
+        UserSearch.scope_for(account, current_user, options)
+      end
+    end
+
+    field :institutional_tag_categories_connection,
+          Types::InstitutionalTagCategoryType.connection_type,
+          null: true do
+      argument :search_term, String, required: false
+      argument :workflow_state, String, required: false, default_value: "active"
+    end
+    def institutional_tag_categories_connection(search_term: nil, workflow_state: "active")
+      root_account = account.root_account? ? account : nil
+      return unless root_account
+      raise GraphQL::ExecutionError, "feature flag is disabled" unless root_account.feature_enabled?(:institutional_tags)
+      raise GraphQL::ExecutionError, "not authorized" unless root_account.grants_right?(current_user, session, :manage_institutional_tags_view)
+
+      cats = root_account.institutional_tag_categories.where(workflow_state:)
+      cats = cats.search_by_name(search_term) if search_term.present?
+      cats.order(:name)
+    end
+
+    field :institutional_tags_connection,
+          Types::InstitutionalTagType.connection_type,
+          null: true do
+      argument :category_id,
+               ID,
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InstitutionalTagCategory")
+      argument :search_term, String, required: false
+      argument :workflow_state, String, required: false, default_value: "active"
+    end
+    def institutional_tags_connection(category_id: nil, search_term: nil, workflow_state: "active")
+      root_account = account.root_account? ? account : nil
+      return unless root_account
+      raise GraphQL::ExecutionError, "feature flag is disabled" unless root_account.feature_enabled?(:institutional_tags)
+      raise GraphQL::ExecutionError, "not authorized" unless root_account.grants_right?(current_user, session, :manage_institutional_tags_view)
+
+      tags = InstitutionalTag.where(root_account_id: root_account.id, workflow_state:)
+      tags = tags.where(category_id:) if category_id.present?
+      tags = tags.search_by_name(search_term) if search_term.present?
+      tags.order(:name)
+    end
+
     field :rubrics_connection, RubricType.connection_type, null: true do
       argument :id,
                ID,

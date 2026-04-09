@@ -100,11 +100,11 @@ describe "course index" do
       get "/courses"
 
       star = ".course-list-favoritable"
-      ["Classic Course (Current)", "Classic Course (Past)", "Classic Course (Future)"].each do |name|
+      ["Classic Course (Current)", "Classic Course (Future)"].each do |name|
         expect(row_with_text(name)).to contain_css(star)
       end
 
-      ["K5 Course (Current)", "K5 Course (Past)", "K5 Course (Future)"].each do |name|
+      ["Classic Course (Past)", "K5 Course (Current)", "K5 Course (Past)", "K5 Course (Future)"].each do |name|
         expect(row_with_text(name)).not_to contain_css(star)
       end
     end
@@ -113,7 +113,6 @@ describe "course index" do
       get "/courses"
 
       expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Current) to the courses menu.")')).to be_displayed
-      expect(fj('.course-list-favoritable:contains("Classic Course (Past) cannot be added to the courses menu unless the course is active.")')).to be_displayed
       expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Future) to the courses menu.")')).to be_displayed
     end
 

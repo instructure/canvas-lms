@@ -171,7 +171,7 @@ export default function RubricTab(props) {
 
   return (
     <div data-testid="rubric-tab">
-      <View as="div" margin="none none medium">
+      <View as="div" margin="none none medium" maxWidth="100%" data-testid="rubric-content-wrapper">
         {props.peerReviewModeEnabled && !hasSubmittedAssessment && (
           <Alert variant="info" hasShadow={false} data-testid="peer-review-rubric-alert">
             {I18n.t(
@@ -250,8 +250,9 @@ export default function RubricTab(props) {
                 </CanvasSelect>
               </div>
             )}
-
-            {renderRubricPreview()}
+            <View as="div" maxWidth="100%" overflowX="scroll" data-testid="rubric-preview">
+              {renderRubricPreview()}
+            </View>
           </ToggleDetails>
         )}
       </View>

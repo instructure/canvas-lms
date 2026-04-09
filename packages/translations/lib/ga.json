@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Dún"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Dún Modhach Aicearraí Méarchláir"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Ní mór go mbeadh an comhad fotheideal dúnta níos lú ná { maxKb } kb"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Cuir isteach URL físeáin bailí ó ardán a thacaítear leis."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Roghnaigh comhad le do thoil sula n-uaslódálann tú é."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Roghnaigh comhad den chineál a dtacaítear leis"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Taispeáin roghanna naisc"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Taispeáin tras-scríbhinn rollta"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Taispeáin Tras-scríbhinn Rollta"

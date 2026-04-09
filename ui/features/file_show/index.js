@@ -22,7 +22,6 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import ready from '@instructure/ready'
 
 const previewDefaults = {
-  height: '100%',
   scribdParams: {
     auto_size: true,
   },
@@ -30,6 +29,5 @@ const previewDefaults = {
 
 ready(() => {
   const previewDiv = $('#doc_preview')
-  previewDiv.fillWindowWithMe()
   loadDocPreview(previewDiv[0], $.merge(previewDefaults, previewDiv.data()))
 })

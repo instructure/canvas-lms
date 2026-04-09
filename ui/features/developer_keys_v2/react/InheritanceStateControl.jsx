@@ -82,6 +82,15 @@ export default class DeveloperKeyStateControl extends React.Component {
   }
 
   radioGroupValue() {
+    if (
+      ENV.FEATURES?.lti_deactivate_registrations &&
+      this.props.developerKey.is_lti_key &&
+      !this.isSiteAdmin() &&
+      !this.props.inheritedTab
+    ) {
+      return this.props.developerKey.lti_registration_workflow_state === 'active' ? 'on' : 'off'
+    }
+
     const devKeyBinding = this.props.developerKey.developer_key_account_binding
     if (devKeyBinding) {
       return devKeyBinding.workflow_state || 'allow'
@@ -202,8 +211,8 @@ export default class DeveloperKeyStateControl extends React.Component {
           checked={this.radioGroupValue() === 'on'}
           disabled={this.isDisabled()}
           name={this.props.developerKey.id}
-          onChange={e => {
-            const newValue = e.target.checked ? 'on' : 'off'
+          onChange={() => {
+            const newValue = this.radioGroupValue() === 'on' ? 'off' : 'on'
             this.setBindingState(newValue)
           }}
         />
@@ -222,6 +231,8 @@ DeveloperKeyStateControl.propTypes = {
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     inherited_to: PropTypes.string,
+    is_lti_key: PropTypes.bool,
+    lti_registration_workflow_state: PropTypes.string,
     workflow_state: PropTypes.string,
     name: PropTypes.string,
     developer_key_account_binding: PropTypes.shape({
@@ -234,6 +245,7 @@ DeveloperKeyStateControl.propTypes = {
       contextId: PropTypes.string.isRequired,
     }),
   }).isRequired,
+  inheritedTab: PropTypes.bool,
 }
 
 DeveloperKeyStateControl.defaultProps = {

@@ -216,6 +216,7 @@ class Account < ApplicationRecord
   validates :name, length: { maximum: maximum_string_length, allow_blank: true }
   validate :account_chain_loop, if: :parent_account_id_changed?
   validate :validate_auth_discovery_url
+  validate :validate_login_help_url
   validates :workflow_state, presence: true
   validate :no_active_courses, if: ->(a) { a.workflow_state_changed? && !a.active? }
   validate :no_active_sub_accounts, if: ->(a) { a.workflow_state_changed? && !a.active? }
@@ -322,6 +323,7 @@ class Account < ApplicationRecord
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
   add_setting :unknown_user_url, root_only: true
+  add_setting :login_help_url, root_only: true
   add_setting :fft_registration_url, root_only: true
 
   add_setting :restrict_student_future_view, boolean: true, default: false, inheritable: true
@@ -399,7 +401,8 @@ class Account < ApplicationRecord
   add_setting :usage_rights_required, boolean: true, default: false, inheritable: true
   add_setting :limit_parent_app_web_access, boolean: true, default: false, root_only: true
   add_setting :kill_joy, boolean: true, default: false, root_only: true
-  add_setting :suppress_notifications, boolean: true, default: false, root_only: true
+  # Value is set directly in AccountsController; does not flow through settings= coercion
+  add_setting :suppress_notifications, root_only: true
   add_setting :smart_alerts_threshold, default: 36, root_only: true
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
@@ -463,6 +466,27 @@ class Account < ApplicationRecord
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
   add_setting :onetrust_consent_domain_id, root_only: true
+
+  # suppress_notifications can be:
+  #   true          - suppress all notifications (backward compatible)
+  #   false/nil     - suppress none (backward compatible)
+  #   Array<String> - suppress only notifications whose category_slug matches an entry
+  def suppress_notifications?
+    settings[:suppress_notifications] == true
+  end
+
+  # Returns true if the given notification should be suppressed for this account.
+  # Supports both the legacy blanket suppression (true) and granular per-category suppression.
+  def suppress_notification?(notification)
+    case settings[:suppress_notifications]
+    when true
+      true
+    when Array
+      settings[:suppress_notifications].include?(notification.category_slug)
+    else
+      false
+    end
+  end
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -1859,6 +1883,20 @@ class Account < ApplicationRecord
     settings[:unknown_user_url]
   end
 
+  def login_help_url=(url)
+    settings[:login_help_url] = url
+  end
+
+  def login_help_url
+    settings[:login_help_url]
+  end
+
+  def validate_login_help_url
+    validate_url_setting(:login_help_url, :login_help_url) do
+      t("errors.invalid_login_help_url", "The login help URL is not valid")
+    end
+  end
+
   def discovery_page_active=(active)
     settings[:discovery_page] ||= {}
     settings[:discovery_page][:active] = Canvas::Plugin.value_to_boolean(active)
@@ -1900,13 +1938,8 @@ class Account < ApplicationRecord
   end
 
   def validate_auth_discovery_url
-    return if settings[:auth_discovery_url].blank?
-
-    begin
-      value, _uri = CanvasHttp.validate_url(settings[:auth_discovery_url])
-      self.auth_discovery_url = value
-    rescue URI::Error, ArgumentError
-      errors.add(:discovery_url, t("errors.invalid_discovery_url", "The discovery URL is not valid"))
+    validate_url_setting(:auth_discovery_url, :discovery_url) do
+      t("errors.invalid_discovery_url", "The discovery URL is not valid")
     end
   end
 
@@ -1944,6 +1977,17 @@ class Account < ApplicationRecord
 
     if decimal_sep.present? && thousand_sep.present? && decimal_sep == thousand_sep
       errors.add(:separators_cannot_be_the_same, t("Decimal and thousand separators cannot be the same."))
+    end
+  end
+
+  def validate_url_setting(setting, error_field)
+    return if settings[setting].blank?
+
+    begin
+      value, _uri = CanvasHttp.validate_url(settings[setting])
+      public_send(:"#{setting}=", value)
+    rescue URI::Error, ArgumentError
+      errors.add(error_field, yield)
     end
   end
 
@@ -2302,7 +2346,7 @@ class Account < ApplicationRecord
     end
 
     if root_account? && grants_right?(user, :manage_developer_keys)
-      registrations_path = root_account.feature_enabled?(:lti_registrations_discover_page) ? :account_lti_registrations_path : :account_lti_manage_registrations_path
+      registrations_path = :account_lti_registrations_path
       tabs << { id: TAB_APPS, label: t("#account.tab_apps", "Apps"), css_class: "apps", href: registrations_path, account_id: root_account.id }
     elsif root_account.feature_enabled?(:canvas_apps_sub_account_access) && root_account.feature_enabled?(:lti_registrations_usage_data) && !root_account? && grants_right?(user, :manage_lti_registrations)
       # Sub-account admins can access Canvas Apps when feature flag is enabled

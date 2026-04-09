@@ -170,7 +170,7 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({isMobile}) 
       alignItems="center"
       justifyItems="center"
     >
-      <Heading level="h3" variant="titleCardRegular">
+      <Heading level="h2" variant="titleCardRegular">
         {I18n.t('Issues by type')}
       </Heading>
       <Flex.Item

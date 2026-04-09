@@ -27,7 +27,7 @@ import {
   mapRubricUnderscoredKeysToCamelCase,
   decodeHTML,
 } from '@canvas/rubrics/react/utils'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {
   SharedAccountRubricQueryQuery,
   SharedCourseRubricQueryQuery,
@@ -240,7 +240,7 @@ export const saveRubric = async (
   const response = await fetch(url, {
     method,
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     body: qs.stringify({
@@ -306,7 +306,7 @@ export const generateCriteria = async (
   const response = await fetch(url, {
     method,
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     body: qs.stringify({
@@ -349,7 +349,7 @@ export const regenerateCriteria = async (
   const response = await fetch(url, {
     method,
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     body: qs.stringify({

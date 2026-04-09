@@ -17,14 +17,19 @@
  */
 
 import type {WidgetRegistry, WidgetRenderer} from '../types'
-import {WIDGET_TYPES} from '../constants'
+import {WIDGET_TYPES, EDUCATOR_WIDGET_ROLE} from '../constants'
 import CourseWorkCombinedWidget from './widgets/CourseWorkCombinedWidget/CourseWorkCombinedWidget'
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
 import TodoListWidget from './widgets/TodoListWidget/TodoListWidget'
 import RecentGradesWidget from './widgets/RecentGradesWidget/RecentGradesWidget'
-import {ProgressOverviewWidget} from '@instructure/platform-widget-dashboard'
+import {
+  ProgressOverviewWidget,
+  EducatorAnnouncementCreationWidget,
+  EducatorTodoListWidget,
+  EducatorContentQualityWidget,
+} from '@instructure/platform-widget-dashboard'
 import InboxWidget from './widgets/InboxWidget/InboxWidget'
 
 const widgetRegistry: WidgetRegistry = {
@@ -68,6 +73,24 @@ const widgetRegistry: WidgetRegistry = {
     displayName: 'Inbox',
     description: 'View recent messages from your Canvas conversations',
   },
+  [WIDGET_TYPES.EDUCATOR_ANNOUNCEMENT_CREATION]: {
+    component: EducatorAnnouncementCreationWidget,
+    displayName: 'Announcement creation',
+    description: 'Create and post announcements to your courses',
+    roles: [EDUCATOR_WIDGET_ROLE],
+  },
+  [WIDGET_TYPES.EDUCATOR_TODO_LIST]: {
+    component: EducatorTodoListWidget,
+    displayName: 'Todo List',
+    description: 'Smart todo list educator widget',
+    roles: [EDUCATOR_WIDGET_ROLE],
+  },
+  [WIDGET_TYPES.EDUCATOR_CONTENT_QUALITY]: {
+    component: EducatorContentQualityWidget,
+    displayName: 'Content Quality',
+    description: 'Content quality and accessibility educator widget',
+    roles: [EDUCATOR_WIDGET_ROLE],
+  },
 }
 
 export const registerWidget = (type: string, renderer: WidgetRenderer): void => {
@@ -78,9 +101,21 @@ export const getWidget = (type: string): WidgetRenderer | undefined => {
   return widgetRegistry[type]
 }
 
+// Returns all registered widgets regardless of role, including educator-only widgets.
+// Prefer getWidgetsForRole() when rendering widgets for a specific user.
 export const getAllWidgets = (): WidgetRegistry => {
   return {...widgetRegistry}
 }
+
+// Widgets without a roles field are treated as learner widgets
+const isLearnerWidget = (renderer: WidgetRenderer) => !renderer.roles?.length
+const matchesRole = (renderer: WidgetRenderer, role?: string) =>
+  role ? renderer.roles?.includes(role) : isLearnerWidget(renderer)
+
+export const getWidgetsForRole = (role?: string): WidgetRegistry =>
+  Object.fromEntries(
+    Object.entries(widgetRegistry).filter(([_key, renderer]) => matchesRole(renderer, role)),
+  )
 
 export const isRegisteredWidget = (type: string): boolean => {
   return type in widgetRegistry

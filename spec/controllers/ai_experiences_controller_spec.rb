@@ -17,9 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../lib/llm_conversation"
-require_relative "../../lib/llm_conversation/errors"
-
 describe AiExperiencesController do
   before :once do
     course_with_teacher(active_all: true)
@@ -789,6 +786,72 @@ describe AiExperiencesController do
       end
     end
 
+    context "metrics" do
+      before { user_session(@teacher) }
+
+      let(:expected_tags) do
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
+      end
+
+      it "increments total_created on success" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_created", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+
+      it "increments total_published when created as published" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance", workflow_state: "published" } },
+             format: :json
+      end
+
+      it "does not increment total_published when created as unpublished" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("ai_experiences.total_published", anything)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+
+      it "increments total_with_source_files when created with files" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: @course, size: 1.megabyte)
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_with_source_files", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance", context_file_ids: [attachment.id] } },
+             format: :json
+      end
+
+      it "does not increment total_with_source_files when created without files" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("ai_experiences.total_with_source_files", anything)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+
+      it "does not emit metrics on failure" do
+        expect(InstStatsd::Statsd).not_to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "" } },
+             format: :json
+      end
+
+      it "does not emit metrics when context is not a Course" do
+        expect(InstStatsd::Statsd).not_to receive(:increment)
+        allow(controller).to receive(:require_context)
+        controller.instance_variable_set(:@context, @course.account)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+    end
+
     context "as student" do
       before { user_session(@student) }
 
@@ -907,6 +970,49 @@ describe AiExperiencesController do
       end
     end
 
+    context "metrics" do
+      before { user_session(@teacher) }
+
+      let(:expected_tags) do
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
+      end
+
+      it "increments total_published when transitioning to published" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { workflow_state: "published" } },
+            format: :json
+      end
+
+      it "decrements total_published when transitioning away from published" do
+        @ai_experience.update!(workflow_state: "published")
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { workflow_state: "unpublished" } },
+            format: :json
+      end
+
+      it "does not emit publish metrics when workflow_state is unchanged" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("ai_experiences.total_published", anything)
+        expect(InstStatsd::Statsd).not_to receive(:decrement).with("ai_experiences.total_published", anything)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { title: "New Title" } },
+            format: :json
+      end
+
+      it "does not emit metrics on failure" do
+        expect(InstStatsd::Statsd).not_to receive(:increment)
+        expect(InstStatsd::Statsd).not_to receive(:decrement)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { title: "" } },
+            format: :json
+      end
+    end
+
     context "as student" do
       before { user_session(@student) }
 
@@ -956,6 +1062,48 @@ describe AiExperiencesController do
       end
     end
 
+    context "metrics" do
+      before { user_session(@teacher) }
+
+      let(:expected_tags) do
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
+      end
+
+      it "decrements total_created on success" do
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_created", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "decrements total_published when destroying a published experience" do
+        @ai_experience.update!(workflow_state: "published")
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "does not decrement total_published when destroying an unpublished experience" do
+        expect(InstStatsd::Statsd).not_to receive(:decrement).with("ai_experiences.total_published", anything)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "decrements total_with_source_files when destroying an experience with files" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: @course, size: 1.megabyte)
+        @ai_experience.update!(context_file_ids: [attachment.id])
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_with_source_files", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "does not decrement total_with_source_files when destroying an experience without files" do
+        expect(InstStatsd::Statsd).not_to receive(:decrement).with("ai_experiences.total_with_source_files", anything)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+    end
+
     context "as student" do
       before { user_session(@student) }
 
@@ -995,6 +1143,11 @@ describe AiExperiencesController do
         get :new, params: { course_id: @course.id }
         expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
       end
+
+      it "sets CONTEXT_FILE_MAX_SIZE_MB in js_env" do
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env][:CONTEXT_FILE_MAX_SIZE_MB]).to eq(AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte)
+      end
     end
 
     context "as student" do
@@ -1033,6 +1186,11 @@ describe AiExperiencesController do
         @course.disable_feature!(:ai_experiences_context_file_upload)
         get :edit, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
+      end
+
+      it "sets CONTEXT_FILE_MAX_SIZE_MB in js_env" do
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:CONTEXT_FILE_MAX_SIZE_MB]).to eq(AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte)
       end
     end
 

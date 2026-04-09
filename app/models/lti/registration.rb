@@ -239,9 +239,10 @@ class Lti::Registration < ApplicationRecord
   # overlay for said context, if one exists, will be applied to the configuration.
   # @param [Account | Course | nil] context The context for which to generate the configuration.
   # @param [Boolean] include_overlay Whether or not to apply the overlay to the configuration.
+  # @param [Lti::Overlay | nil] overlay An optional overlay object to apply directly.
   # @return [Hash] A Hash conforming to the InternalLtiConfiguration schema.
   # TODO: this will eventually need to account for 1.1 registrations
-  def internal_lti_configuration(context: nil, include_overlay: true)
+  def internal_lti_configuration(context: nil, include_overlay: true, overlay: nil)
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
@@ -251,12 +252,12 @@ class Lti::Registration < ApplicationRecord
 
     return internal_config unless include_overlay
 
-    overlay = overlay_for(context)&.data
+    overlay_data = overlay&.data || overlay_for(context)&.data
 
     # IMS registrations should not allow adding new placements via overlay
     # Only manual/legacy registrations can have additional placements added
     additive = ims_registration.blank?
-    Lti::Overlay.apply_to(overlay, internal_config, additive:)
+    Lti::Overlay.apply_to(overlay_data, internal_config, additive:)
   end
 
   # Returns a Hash that's usable with the ContextExternalToolImporter to create a new ContextExternalTool.

@@ -777,6 +777,17 @@ class FilesController < ApplicationController
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
+          if @context.is_a?(Course) && @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
+            @show_study_assist = true
+            js_env[:FEATURES][:study_assist] = true
+            js_env({
+                     COURSE_ID: @context.id.to_s,
+                     FILE_ID: attachment.id.to_s,
+                     JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
+                     STUDY_ASSIST_TOOLS: study_assist_enabled_tools
+                   })
+            js_bundle :study_assist
+          end
           if attachment.locked_for?(@current_user, check_policies: true)
             render :show, status: :forbidden
           elsif attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]
@@ -1749,6 +1760,7 @@ class FilesController < ApplicationController
       attachment = thumbnail.attachment
       root_account = attachment&.root_account
       old_auth = params[:uuid].present? && params[:uuid] == thumbnail.uuid && root_account.present? && !root_account.feature_enabled?(:disable_file_verifier_access)
+
       return unless old_auth || access_allowed(attachment:, user: @current_user, access_type: :download)
 
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type

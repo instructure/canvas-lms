@@ -159,7 +159,14 @@ module AttachmentHelper
 
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
-      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, @domain_root_account, session)
+      return true if verifier_checker.valid_verifier_for_permission?(
+        params[:verifier],
+        access_type,
+        @domain_root_account,
+        session,
+        request:,
+        files_domain: @files_domain
+      )
     end
 
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)

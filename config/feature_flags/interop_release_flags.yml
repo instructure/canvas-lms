@@ -1,22 +1,4 @@
 ---
-ags_improved_course_concluded_check:
-  state: hidden
-  shadow: true
-  display_name: Improved LTI AGS Course Concluded Check
-  description: |-
-    If enabled, grading will be allowed if the student is participating in a section which is still active even if the course is concluded (by term or course dates).
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
-    beta:
-      state: allowed_on
-    production:
-      state: allowed_on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
@@ -30,20 +12,6 @@ course_settings_navigation_react:
   description: |-
     If enabled, the Course Settings Navigation tab will use the new React-based
     interface. (This is a prerequisite for the Custom Links feature in courses).
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-custom_variables_booleans_as_strings:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Custom variables returns booleans as strings
-  description: |-
-    If enabled, custom variables that are booleans will be returned as strings.
-    This is to ensure we are conforming to the LTI 1.3 specification.
-    If disabled, boolean results will not be converted to strings.
   environments:
     development:
       state: allowed_on
@@ -148,17 +116,6 @@ lti_target_link_uri_for_assignment_edit_view:
     development:
       state: allowed_on
     test:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_apps_page_ai_translation:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: AI Translation for LTI Apps Discover Page
-  description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
-  environments:
-    development:
       state: allowed_on
     ci:
       state: allowed_on
@@ -269,6 +226,17 @@ lti_dr_registrations_update:
       state: allowed_on
     ci:
       state: allowed_on
+lti_edit_json:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Config Edit as JSON
+  description: Allow administrators to edit LTI tool configuration as JSON
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_find_external_tool_prefer_original_client_id:
   state: hidden
   applies_to: RootAccount
@@ -286,17 +254,6 @@ lti_link_to_apps_from_developer_keys:
     Link directly to the app's configuration page in Canvas Apps from the Developer Keys page.
     Replaces the Show Key button, which does nothing for LTI keys since they cannot be used
     for Canvas API calls via the OAuth flow.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_registrations_discover_page:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: LTI Apps Discover Page
-  description: When enabled, the LTI Apps Discover page will be available in the Apps page.
   environments:
     development:
       state: allowed_on
@@ -523,20 +480,6 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
-use_jwt_auth_for_utid_sync:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: "Use JWTs for UTID Syncing"
-  description: >-
-    If enabled, Canvas will use JWTs signed by a shared secret to authenticate with LearnPlatform
-    when syncing unified tool IDs (UTIDs).
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 canvas_apps_sub_account_access:
   state: hidden
   applies_to: RootAccount

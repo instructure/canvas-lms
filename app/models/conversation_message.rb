@@ -207,7 +207,8 @@ class ConversationMessage < ApplicationRecord
     subscribed = User.where(id: subscribed_ids)
     ActiveRecord::Associations.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
-    subscribed & participants
+    result = subscribed & participants
+    exclude_pending_temporary_enrollment_recipients(result)
   end
 
   def new_recipients
@@ -215,6 +216,32 @@ class ConversationMessage < ApplicationRecord
     return [] unless generated? && event_data[:event_type] == :users_added
 
     recipients.select { |u| event_data[:user_ids].include?(u.id) }
+  end
+
+  # Filters out users whose only enrollments in the conversation's course
+  # contexts are temporary enrollments that haven't started yet.
+  def exclude_pending_temporary_enrollment_recipients(users)
+    return users unless root_account_feature_enabled?(:temporary_enrollments)
+    return users if users.empty?
+
+    parsed_tags = ActiveRecord::Base.parse_asset_string_list(conversation.context_tags)
+    course_ids = parsed_tags["Course"]
+    return users if course_ids.blank?
+
+    user_ids = users.map(&:id)
+
+    # Exclude users who only have pending temporary enrollments in these courses
+    exclude_ids = Enrollment
+                  .where(course_id: course_ids, user_id: user_ids)
+                  .where.not(temporary_enrollment_source_user_id: nil)
+                  .where.not(user_id: Enrollment
+                                      .where(course_id: course_ids, user_id: user_ids)
+                                      .merge(Enrollment.excluding_pending_temporary_enrollments)
+                                      .select(:user_id))
+                  .distinct.pluck(:user_id).to_set
+    return users if exclude_ids.empty?
+
+    users.reject { |u| exclude_ids.include?(u.id) }
   end
 
   # for developer use on console only

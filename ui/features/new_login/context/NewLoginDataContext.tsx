@@ -41,9 +41,11 @@ interface NewLoginDataContextType {
   invalidLoginFaqUrl?: string
   helpLink?: HelpLink
   requireAup?: boolean
+  discoveryEnabled?: boolean
   customMessageLogin?: string
   customMessageRegistration?: string
   customMessageRegistrationParent?: string
+  freeForTeacherRegistrationUrl?: string
 }
 
 const NewLoginDataContext = createContext<NewLoginDataContextType | undefined>(undefined)
@@ -75,9 +77,11 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     invalidLoginFaqUrl,
     helpLink,
     requireAup,
+    discoveryEnabled,
     customMessageLogin,
     customMessageRegistration,
     customMessageRegistrationParent,
+    freeForTeacherRegistrationUrl,
   } = data
 
   const value: NewLoginDataContextType = {
@@ -101,9 +105,11 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     invalidLoginFaqUrl,
     helpLink,
     requireAup,
+    discoveryEnabled,
     customMessageLogin,
     customMessageRegistration,
     customMessageRegistrationParent,
+    freeForTeacherRegistrationUrl,
   }
 
   return <NewLoginDataContext.Provider value={value}>{children}</NewLoginDataContext.Provider>

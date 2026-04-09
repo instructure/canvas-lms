@@ -40,6 +40,7 @@ const Landing = () => {
   const navigate = useNavigate()
   const {isUiActionPending} = useNewLogin()
   const {customMessageRegistration} = useNewLoginData()
+  const {freeForTeacherRegistrationUrl} = useNewLoginData()
 
   const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
@@ -64,10 +65,14 @@ const Landing = () => {
               <Flex.Item shouldGrow={true}>
                 <Card
                   compact={!isTabletOrLarger}
-                  href={ROUTES.REGISTER_TEACHER}
+                  href={freeForTeacherRegistrationUrl ?? ROUTES.REGISTER_TEACHER}
                   icon={iconTeacher}
                   label={I18n.t('Create Teacher Account')}
-                  onClick={handleNavigate(ROUTES.REGISTER_TEACHER)}
+                  onClick={
+                    freeForTeacherRegistrationUrl
+                      ? undefined
+                      : handleNavigate(ROUTES.REGISTER_TEACHER)
+                  }
                   testId="teacher-card-link"
                   text={I18n.t('Teacher')}
                 />

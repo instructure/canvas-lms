@@ -896,7 +896,9 @@ class DiscussionTopicsController < ApplicationController
              rce_mentions_in_discussions: !@topic.anonymous?,
              discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
              discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
-             discussion_translation_available: Translation.available? && @context.feature_enabled?(:translation), # Is translation enabled on the course.
+             discussion_translation_available: Translation.available? && @context.feature_enabled?(:translation),
+             discussion_translation_feedback: @context.feature_enabled?(:translation) &&
+                                              @context.feature_enabled?(:translation_feedback),
              ai_translation_improvements: true, # Temporary kept to avoid front error on release, see  VICE-5844
              cedar_translation: true, # Temporary kept to avoid front error on release, see  VICE-5844
              discussion_translation_languages: Translation.available? ? Translation.languages : [],
@@ -931,7 +933,7 @@ class DiscussionTopicsController < ApplicationController
              restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
              enhanced_rubrics_enabled: @context.is_a?(Course) && @context.feature_enabled?(:enhanced_rubrics),
              PERMISSIONS: {
-               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
+               manage_rubrics: @topic.assignment&.can_manage_rubrics?(@current_user, session) || false,
              },
            })
     unless @locked

@@ -683,6 +683,7 @@ export type ProfileTab = Readonly<{
   label: string
   html_url: string
   counts: TabCountsObj
+  type?: 'internal' | 'external'
 }>
 
 // '/api/v1/users/self/groups?include[]=can_access',

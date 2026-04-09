@@ -37,7 +37,8 @@ import {
 import * as tz from '@instructure/moment-utils'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import type {ActionMenuProps} from './components/ActionMenu'
@@ -5482,7 +5483,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         )}
         <ErrorBoundary
           errorComponent={
-            <GenericErrorPage imageUrl={errorShipUrl} errorCategory="GradebookGrid" />
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
+              errorCategory="GradebookGrid"
+            />
           }
         >
           <Suspense fallback={<></>}>

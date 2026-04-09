@@ -22,6 +22,7 @@ import {clearWidgetDashboardCache} from '../utils/persister'
 import {TranslationsProvider} from '@instructure/platform-widget-dashboard'
 import type {WidgetDashboardTranslations} from '@instructure/platform-widget-dashboard'
 import {PlatformUiProvider} from '@instructure/platform-provider'
+import type {PlatformUiProviderProps} from '@instructure/platform-provider'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 // Export for use in tests - call this in beforeEach to prevent cache pollution
@@ -31,7 +32,10 @@ import enTranslations from '@instructure/platform-widget-dashboard/locales/en.js
 
 const mockTranslations = enTranslations as unknown as WidgetDashboardTranslations
 
-const mockExecuteQuery = async (query: unknown, variables: unknown) => {
+const mockExecuteQuery: NonNullable<PlatformUiProviderProps['executeQuery']> = async (
+  query,
+  variables,
+) => {
   const queryStr = typeof query === 'string' ? query : (query as any)?.loc?.source?.body || ''
   const operationName = queryStr.match(/(?:query|mutation)\s+(\w+)/)?.[1] || undefined
   const response = await fetch('/api/graphql', {
@@ -50,11 +54,11 @@ export function PlatformTestWrapper({children}: {children: React.ReactNode}) {
   return React.createElement(
     PlatformUiProvider,
     {
-      executeQuery: mockExecuteQuery as any,
+      executeQuery: mockExecuteQuery,
       currentUserId: '1',
       locale: 'en',
       timezone: 'America/Denver',
-    },
+    } as PlatformUiProviderProps, // children provided via createElement's 3rd arg
     React.createElement(
       TranslationsProvider,
       {

@@ -111,12 +111,17 @@ export default makeReducer(initialState, {
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
     const developerKeyId = action.payload.developerKeyId
     const accountBinding = action.payload.newAccountBinding
+    const registrationWorkflowState = action.payload.newLtiRegistrationWorkflowState
 
     const newList = state.list.map(developerKey => {
       if (developerKey.id !== developerKeyId.toString()) {
         return developerKey
       }
-      return {...developerKey, developer_key_account_binding: accountBinding}
+      return {
+        ...developerKey,
+        developer_key_account_binding: accountBinding,
+        lti_registration_workflow_state: registrationWorkflowState,
+      }
     })
 
     const newInheritedList = state.inheritedList.map(developerKey => {
@@ -158,6 +163,7 @@ export default makeReducer(initialState, {
     // in a separate commit to keep this one more coherent.
     const developerKeyId = action.payload.developerKeyId
     const previousAccountBinding = action.payload.previousAccountBinding
+    const previousLtiRegistrationWorkflowState = action.payload.previousLtiRegistrationWorkflowState
 
     const newList = state.list.map(developerKey => {
       if (developerKey.id !== developerKeyId.toString()) {
@@ -166,7 +172,11 @@ export default makeReducer(initialState, {
       if (Object.keys(previousAccountBinding).length === 0) {
         return omit(developerKey, 'developer_key_account_binding')
       }
-      return {...developerKey, developer_key_account_binding: previousAccountBinding}
+      return {
+        ...developerKey,
+        developer_key_account_binding: previousAccountBinding,
+        lti_registration_workflow_state: previousLtiRegistrationWorkflowState,
+      }
     })
 
     const newInheritedList = state.inheritedList.map(developerKey => {

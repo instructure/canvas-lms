@@ -21,7 +21,8 @@ import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apoll
 import CanvasInbox from './containers/CanvasInbox'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React, {useEffect, useState} from 'react'
 
@@ -52,7 +53,12 @@ export const CanvasInboxApp = () => {
     <ApolloProvider client={client}>
       <ErrorBoundary
         errorComponent={
-          <GenericErrorPage imageUrl={errorShipUrl} errorCategory="Canvas Inbox Error Page" />
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
+            errorCategory="Canvas Inbox Error Page"
+          />
         }
       >
         <AlertManager>

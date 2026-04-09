@@ -1042,7 +1042,6 @@ describe "Common Cartridge exporting" do
     end
 
     it "exports nav_menu_links.xml when nav_menu_links feature is enabled" do
-      @course.root_account.enable_feature!(:nav_menu_links)
       link = NavMenuLink.create!(context: @course, course_nav: true, label: "My Link", url: "https://example.com/nav")
 
       run_export
@@ -1054,6 +1053,51 @@ describe "Common Cartridge exporting" do
       expect(link_node["identifier"]).to eq(mig_id(link))
       expect(link_node.at_css("label").text).to eq("My Link")
       expect(link_node.at_css("url").text).to eq("https://example.com/nav")
+    end
+
+    it "translates internal nav_menu_link URLs to migration placeholders" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+
+      link = NavMenuLink.create!(
+        context: @course,
+        course_nav: true,
+        label: "My Assignment Link",
+        url: "/courses/#{@course.id}/assignments/#{assignment.id}"
+      )
+
+      run_export
+
+      # Refresh assignment to get the migration_id that was set during export
+      assignment.reload
+
+      # Verify the exported XML has placeholder, not actual URL
+      nav_links_xml = @zip_file.read("course_settings/nav_menu_links.xml")
+      doc = Nokogiri::XML.parse(nav_links_xml)
+      link_node = doc.at_css("navMenuLink[identifier='#{mig_id(link)}']")
+
+      expect(link_node).not_to be_nil
+      url_text = link_node.at_css("url").text
+      expect(url_text).to include("$CANVAS_OBJECT_REFERENCE$")
+      expect(url_text).to include("assignments/#{assignment.migration_id}")
+      expect(url_text).not_to include(@course.id.to_s)
+    end
+
+    it "does not translate external nav_menu_link URLs" do
+      external_url = "https://example.com/external/path"
+      link = NavMenuLink.create!(
+        context: @course,
+        course_nav: true,
+        label: "External Link",
+        url: external_url
+      )
+
+      run_export
+
+      nav_links_xml = @zip_file.read("course_settings/nav_menu_links.xml")
+      doc = Nokogiri::XML.parse(nav_links_xml)
+      link_node = doc.at_css("navMenuLink[identifier='#{mig_id(link)}']")
+
+      expect(link_node.at_css("url").text).to eq(external_url)
     end
 
     it "does not export nav_menu_links.xml when feature is disabled" do

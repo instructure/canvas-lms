@@ -26,6 +26,12 @@ import {Text} from '@instructure/ui-text'
 import {AIExperienceFormData} from '../../../types'
 import CanvasFileUpload from '@canvas/canvas-file-upload/react/CanvasFileUpload'
 import type {ContextFile} from '@canvas/canvas-file-upload/react/types'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+declare const ENV: GlobalEnv & {
+  FEATURES?: {ai_experiences_context_file_upload?: boolean}
+  CONTEXT_FILE_MAX_SIZE_MB?: number
+}
 
 const I18n = createI18nScope('ai_experiences_edit')
 
@@ -159,14 +165,14 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
           </FormFieldGroup>
 
           {/* Only render if feature flag is enabled */}
-          {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload && (
+          {ENV?.FEATURES?.ai_experiences_context_file_upload && (
             <View as="div" margin="medium 0 0 0">
               <CanvasFileUpload
                 files={contextFiles}
                 onFilesChange={onContextFilesChange}
                 courseId={courseId}
                 allowedFileTypes={['.docx', '.xlsx', '.xls', '.pptx', '.pdf', '.txt', '.html']}
-                maxFileSizeMB={300}
+                maxFileSizeMB={ENV?.CONTEXT_FILE_MAX_SIZE_MB ?? 300}
                 maxFiles={10}
               />
             </View>

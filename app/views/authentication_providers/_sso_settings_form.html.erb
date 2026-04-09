@@ -104,6 +104,17 @@
             </div>
           </div>
         <% end %>
+        <div class="ic-Form-control">
+          <%= f.label :login_help_url, t("Login Help URL"),
+                      class: 'ic-Label' %>
+          <%= f.text_field :login_help_url,
+                           :class => 'ic-Input',
+                           'aria-describedby' => 'login_help_url_description' %>
+          <div class="ic-Form-help-text" id="login_help_url_description">
+            <%= t("A URL to help users who are having trouble logging in. " \
+                  "If set, a 'Trouble logging in?' link will appear on the login page.") %>
+          </div>
+        </div>
         <div class="ic-Form-actions">
           <%= f.button t('Save'), class: "Button Button--primary" %>
         </div>

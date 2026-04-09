@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
 import {Outcome, Rating} from '@canvas/outcomes/react/types/rollup'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 describe('StudentOutcomeScore', () => {
   interface TestProps {
@@ -81,6 +81,14 @@ describe('StudentOutcomeScore', () => {
   it('renders the unassessed icon if there is no score', async () => {
     render(<StudentOutcomeScore {...defaultProps({score: undefined})} />)
     expect(await screen.findByLabelText('Unassessed')).toBeInTheDocument()
+  })
+
+  describe('action button', () => {
+    it('renders an icon in the action button when onAction is provided', () => {
+      render(<StudentOutcomeScore {...defaultProps()} onAction={jest.fn()} focus={true} />)
+      const actionButton = screen.getByTestId('score-cell-action-button')
+      expect(actionButton.querySelector('svg')).toBeInTheDocument()
+    })
   })
 
   describe('scoreDisplayFormat', () => {

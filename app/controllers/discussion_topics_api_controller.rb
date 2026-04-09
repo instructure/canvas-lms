@@ -272,10 +272,14 @@ class DiscussionTopicsApiController < ApplicationController
   #   - "seen": Marks the summary as seen. This action saves the feedback if it's not already persisted.
   #   - "like": Marks the summary as liked.
   #   - "dislike": Marks the summary as disliked.
+  #   - "add_comment": Adds a written comment to a disliked summary. Requires the "comment" parameter.
   #   - "reset_like": Resets the like status of the summary.
   #   - "regenerate": Regenerates the summary feedback.
   #   - "disable_summary": Disables the summary feedback.
   #   Any other value will result in an error response.
+  #
+  # @argument comment [String] Optional
+  #   A written explanation for the dislike. Only used with the "add_comment" action. Maximum 1024 characters.
   #
   # @example_request
   #
@@ -310,6 +314,15 @@ class DiscussionTopicsApiController < ApplicationController
     when :dislike
       feedback.dislike
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.disliked")
+    when :add_comment
+      render(json: { error: t("Comment is required.") }, status: :bad_request) and return if params[:comment].blank?
+
+      begin
+        feedback.add_comment(params[:comment])
+      rescue ActiveRecord::RecordInvalid => e
+        render(json: { error: e.message }, status: :bad_request) and return
+      end
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.comment_added")
     when :reset_like
       feedback.reset_like
       InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.reset_like")
@@ -321,7 +334,7 @@ class DiscussionTopicsApiController < ApplicationController
       render(json: { error: "Invalid action." }, status: :bad_request) and return
     end
 
-    render(json: { liked: feedback.liked, disliked: feedback.disliked })
+    render(json: { liked: feedback.liked, disliked: feedback.disliked, comment: feedback.comment })
   end
 
   def insight

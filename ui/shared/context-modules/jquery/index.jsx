@@ -28,7 +28,7 @@ import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import ContextModulesView from '../backbone/views/context_modules' /* handles the publish/unpublish state */
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
-import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
+import vddTooltip from '@canvas/due-dates/react/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'

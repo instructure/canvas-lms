@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../app/services/canvas_career/label_overrides"
-
 module Permissions
   # canvas-lms proper, plugins, etc. call Permissions.register to add
   # permissions to the system. all registrations must happen during app init;

@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {act, render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -26,24 +27,98 @@ import {
   useAccessibilityScansStore,
   initialState,
 } from '../../../../../shared/react/stores/AccessibilityScansStore'
+import {ACCESSIBILITY_SCAN_QUERY_KEY, QUERY_LAST_SCAN} from '../constants'
+const mockAlertScreenReader = vi.fn()
+vi.mock('../../../../../shared/react/hooks/useScreenReaderAlert', () => ({
+  useScreenReaderAlert: () => mockAlertScreenReader,
+}))
 
 const COURSE_ID = '1'
 const COURSE_SCAN_URL = `/courses/${COURSE_ID}/accessibility/course_scan`
 
 const server = setupServer()
 
-const renderComponent = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {queries: {retry: false, gcTime: 0}},
-  })
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <AccessibilityCourseScan courseId={COURSE_ID} scanDisabled={false}>
-        <div />
-      </AccessibilityCourseScan>
-    </QueryClientProvider>,
-  )
+const renderComponent = (queryClient?: QueryClient) => {
+  const client =
+    queryClient ?? new QueryClient({defaultOptions: {queries: {retry: false, gcTime: 0}}})
+  return {
+    ...render(
+      <QueryClientProvider client={client}>
+        <AccessibilityCourseScan courseId={COURSE_ID} scanDisabled={false}>
+          <div />
+        </AccessibilityCourseScan>
+      </QueryClientProvider>,
+    ),
+    queryClient: client,
+  }
 }
+
+describe('AccessibilityCourseScan focus management', () => {
+  beforeAll(() => server.listen())
+
+  beforeEach(() => {
+    useAccessibilityScansStore.setState({isAutomaticScanEnabled: true})
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+    useAccessibilityScansStore.setState(initialState)
+  })
+
+  afterAll(() => server.close())
+
+  it('moves focus to scanning view when scan is initiated', async () => {
+    const user = userEvent.setup()
+
+    server.use(
+      http.get(COURSE_SCAN_URL, () => HttpResponse.json({id: 1, workflow_state: 'completed'})),
+      http.post(COURSE_SCAN_URL, () => HttpResponse.json({id: 2, workflow_state: 'queued'})),
+    )
+
+    renderComponent()
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Scan Course'})).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', {name: 'Scan Course'}))
+
+    await waitFor(() => {
+      expect(screen.getByText('Hang tight!')).toBeInTheDocument()
+    })
+
+    const srAnnouncement = screen.getByText(/Hang tight! Scanning might take/)
+    expect(srAnnouncement).toHaveFocus()
+  })
+
+  it('moves focus to Update Report button and announces completion when scan completes', async () => {
+    server.use(
+      http.get(COURSE_SCAN_URL, () => HttpResponse.json({id: 1, workflow_state: 'queued'})),
+    )
+
+    const {queryClient} = renderComponent()
+
+    // Component starts in scanning view
+    await waitFor(() => {
+      expect(screen.getByText('Hang tight!')).toBeInTheDocument()
+    })
+
+    // Simulate poll returning completed by updating the query cache directly
+    act(() => {
+      queryClient.setQueryData([ACCESSIBILITY_SCAN_QUERY_KEY, QUERY_LAST_SCAN, COURSE_ID], {
+        id: 2,
+        workflow_state: 'completed',
+      })
+    })
+
+    // Scan completed: focus returns to the button
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Scan Course'})).toHaveFocus()
+    })
+
+    expect(mockAlertScreenReader).toHaveBeenCalledWith('Report is ready')
+  })
+})
 
 describe('AccessibilityCourseScan last checked date', () => {
   beforeAll(() => server.listen())

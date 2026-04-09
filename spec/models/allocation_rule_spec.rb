@@ -154,13 +154,13 @@ describe AllocationRule do
       it "prevents conflicting review_permitted values" do
         conflicting_rule = AllocationRule.new(valid_attributes.merge(review_permitted: false))
         expect(conflicting_rule).not_to be_valid
-        expect(conflicting_rule.errors[:assessee_id]).to include("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(conflicting_rule.errors[:assessee_id]).to include("This rule conflicts with rule \"#{@student1.name} will review #{@student2.name}\" (strict)")
       end
 
       it "prevents conflicting must_review values" do
         conflicting_rule = AllocationRule.new(valid_attributes.merge(must_review: false))
         expect(conflicting_rule).not_to be_valid
-        expect(conflicting_rule.errors[:assessee_id]).to include("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(conflicting_rule.errors[:assessee_id]).to include("This rule conflicts with rule \"#{@student1.name} will review #{@student2.name}\" (strict)")
       end
 
       it "allows updating the existing rule" do

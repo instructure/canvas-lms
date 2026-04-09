@@ -219,6 +219,14 @@ class Pseudonym < ApplicationRecord
     p.dispatch :pseudonym_registration_done
     p.to { communication_channel || user.communication_channel }
     p.whenever { @send_registration_done_notification }
+
+    p.dispatch :pseudonym_suspended_after_failed_login
+    p.to { communication_channel || user.communication_channel }
+    p.whenever { @send_failed_login_notification }
+
+    p.dispatch :pseudonym_suspended_by_admin
+    p.to { communication_channel || user.communication_channel }
+    p.whenever { @send_suspension_notification }
   end
 
   def update_account_associations_if_account_changed
@@ -230,6 +238,24 @@ class Pseudonym < ApplicationRecord
       user.update_account_associations(incremental: true, precalculated_associations: { account_id => 0 })
     elsif saved_change_to_account_id?
       user.update_account_associations_later
+    end
+  end
+
+  def suspend_with_notification!(from_failed_login: false)
+    self.workflow_state = "suspended"
+
+    if from_failed_login
+      @send_failed_login_notification = true
+    else
+      @send_suspension_notification = true
+    end
+
+    save!
+  ensure
+    if from_failed_login
+      @send_failed_login_notification = false
+    else
+      @send_suspension_notification = false
     end
   end
 

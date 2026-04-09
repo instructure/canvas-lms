@@ -28,6 +28,7 @@ import {FormComponentProps, FormComponentHandle} from './index'
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {useShallow} from 'zustand/react/shallow'
 import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
+import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -60,6 +61,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       const [generateLoading, setGenerateLoading] = useState(false)
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
+      const screenReaderAlert = useScreenReaderAlert()
       const [isAiTableCaptionGenerationEnabled, selectedItem] = useAccessibilityScansStore(
         useShallow(state => [state.isAiTableCaptionGenerationEnabled, state.selectedScan]),
       )
@@ -101,7 +103,13 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             return result.json
           })
           .then(resultJson => {
-            handleOnChange(resultJson?.value || '')
+            const generatedCaption = resultJson?.value || ''
+            handleOnChange(generatedCaption)
+            if (generatedCaption) {
+              screenReaderAlert(
+                I18n.t('Caption generated: %{caption}', {caption: generatedCaption}),
+              )
+            }
           })
           .catch(error => {
             const statusCode = error?.response?.status || 0

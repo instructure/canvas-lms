@@ -124,17 +124,20 @@ module RequestContext
       add_meta_header("ja4", header_val) if header_val.present?
     end
 
-    def self.store_request_meta(request, context, sentry_trace = nil)
+    def self.store_request_meta(request, sentry_trace = nil)
       add_meta_header("o", request.path_parameters[:controller])
       add_meta_header("n", request.path_parameters[:action])
       if request.request_parameters && request.request_parameters["operationName"]
         add_meta_header("on", request.request_parameters["operationName"])
       end
+      add_meta_header("st", sentry_trace) if sentry_trace.present?
+    end
+
+    def self.store_context_meta(context)
       if context
         add_meta_header("t", context.class)
         add_meta_header("i", context.id)
       end
-      add_meta_header("st", sentry_trace) if sentry_trace.present?
     end
 
     ##

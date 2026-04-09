@@ -2699,6 +2699,12 @@ describe Account do
       link = account.discovery_page_link_for(provider, entry)
       expect(link[:label]).to eq("CAS Login")
     end
+
+    it "HTML-encodes & in the label" do
+      entry = { label: "Arts & Sciences" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("Arts &amp; Sciences")
+    end
   end
 
   describe "#multi_parent_sub_accounts_recursive" do
@@ -3408,6 +3414,42 @@ describe Account do
     end
   end
 
+  context "login_help_url validation" do
+    let(:account) { Account.default }
+
+    it "is valid with a proper https URL" do
+      account.login_help_url = "https://example.com/faq"
+      expect(account).to be_valid
+    end
+
+    it "is valid when the URL is blank" do
+      account.login_help_url = ""
+      expect(account).to be_valid
+    end
+
+    it "is valid when the URL is nil" do
+      account.login_help_url = nil
+      expect(account).to be_valid
+    end
+
+    it "normalizes a URL without a scheme" do
+      account.login_help_url = "example.com/faq"
+      account.validate
+      expect(account.login_help_url).to eq("http://example.com/faq")
+    end
+
+    it "is invalid with a non-URL string" do
+      account.login_help_url = "not a url at all"
+      expect(account).not_to be_valid
+      expect(account.errors[:login_help_url]).to include("The login help URL is not valid")
+    end
+
+    it "is invalid with a javascript: scheme" do
+      account.login_help_url = "javascript:alert(1)"
+      expect(account).not_to be_valid
+    end
+  end
+
   describe "#restricted_file_access_for_user?" do
     let(:root_account) { Account.create!(root_account: nil) }
     let(:sub_account) { Account.create!(root_account:) }
@@ -3764,6 +3806,51 @@ describe Account do
 
         expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Plain Text Label")
       end
+
+      it "HTML-encodes & in labels for safe storage" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Arts & Sciences")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Arts &amp; Sciences")
+      end
+
+      it "HTML-encodes angle brackets in non-tag context" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Student <-> Teacher")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Student &lt;-&gt; Teacher")
+      end
+
+      it "strips script elements and their content, failing validation when label becomes blank" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: '<script>alert("foo");</script>')],
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page.primary[0].label is required")
+      end
+
+      it "strips script elements while preserving surrounding text" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: 'Foo <script>alert("foo");</script>')],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Foo ")
+      end
+
+      it "preserves pre-encoded HTML entities as safe text" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "&lt;script&gt;alert(1)&lt;/script&gt;")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("&lt;script&gt;alert(1)&lt;/script&gt;")
+      end
     end
 
     context "when discovery_page setting has not changed" do
@@ -4039,6 +4126,70 @@ describe Account do
       it "returns false when neither a11y_checker nor a11y_checker_ga2_features are enabled" do
         expect(account.a11y_checker_additional_resources?).to be false
       end
+    end
+  end
+
+  describe "#suppress_notifications?" do
+    let(:account) { Account.default }
+
+    it "returns true when setting is true" do
+      account.settings[:suppress_notifications] = true
+      expect(account.suppress_notifications?).to be true
+    end
+
+    it "returns false when setting is false" do
+      account.settings[:suppress_notifications] = false
+      expect(account.suppress_notifications?).to be false
+    end
+
+    it "returns false when setting is nil" do
+      account.settings.delete(:suppress_notifications)
+      expect(account.suppress_notifications?).to be false
+    end
+
+    it "returns false when setting is an array of categories" do
+      account.settings[:suppress_notifications] = %w[grading announcement]
+      expect(account.suppress_notifications?).to be false
+    end
+  end
+
+  describe "#suppress_notification?" do
+    let(:account) { Account.default }
+
+    let(:grading_notification) do
+      Notification.create!(name: "Test Grading Notification", category: "Grading")
+    end
+
+    let(:announcement_notification) do
+      Notification.create!(name: "Test Announcement Notification", category: "Announcement")
+    end
+
+    it "returns false when setting is nil" do
+      account.settings.delete(:suppress_notifications)
+      expect(account.suppress_notification?(grading_notification)).to be false
+    end
+
+    it "returns false when setting is false" do
+      account.settings[:suppress_notifications] = false
+      expect(account.suppress_notification?(grading_notification)).to be false
+    end
+
+    it "returns true for any notification when setting is true" do
+      account.settings[:suppress_notifications] = true
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be true
+    end
+
+    it "suppresses only notifications whose category_slug is in the array" do
+      account.settings[:suppress_notifications] = %w[grading]
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be false
+    end
+
+    it "suppresses multiple categories when all are in the array" do
+      account.settings[:suppress_notifications] = %w[grading announcement]
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be true
     end
   end
 end

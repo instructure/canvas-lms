@@ -56,8 +56,8 @@ describe NewLoginHelper do
       help_link_data: { "track-category": "Login", "track-label": "Help Link" }
     )
     allow(Setting).to receive(:get).and_call_original
-    allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("https://school.canvas.com/faq")
     allow(Setting).to receive(:get).with("terms_required", "true").and_return("true")
+    @domain_root_account.login_help_url = "https://school.canvas.com/faq"
     allow(@domain_root_account).to receive_messages(
       self_registration_type: "all",
       self_registration?: true,
@@ -96,10 +96,48 @@ describe NewLoginHelper do
     )
     expect(data[:help_link]).to include("Get Help")
     expect(data[:require_aup]).to eq("true")
+    expect(data[:discovery_enabled]).to be_nil
     terms = TermsOfService.ensure_terms_for_account(@domain_root_account)
     expect(terms.passive).to be(false)
     expect(terms.terms_type).to eq("default")
     expect(data).to be_a(Hash)
+  end
+
+  it "returns discovery_enabled when discovery page is active" do
+    @domain_root_account.discovery_page_active = true
+    data = new_login_data_attributes
+    expect(data[:discovery_enabled]).to eq("true")
+  end
+
+  it "returns nil for discovery_enabled when discovery page is not active" do
+    data = new_login_data_attributes
+    expect(data[:discovery_enabled]).to be_nil
+  end
+
+  it "returns discovery_enabled when auth_discovery_url is present" do
+    @domain_root_account.auth_discovery_url = "https://example.com/discovery"
+    data = new_login_data_attributes
+    expect(data[:discovery_enabled]).to eq("true")
+  end
+
+  describe "invalid_login_faq_url" do
+    it "prefers the account setting over the global setting" do
+      @domain_root_account.login_help_url = "https://account-level.com/faq"
+      allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("https://global.com/faq")
+      expect(new_login_data_attributes[:invalid_login_faq_url]).to eq("https://account-level.com/faq")
+    end
+
+    it "falls back to the global setting when the account setting is blank" do
+      @domain_root_account.login_help_url = nil
+      allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("https://global.com/faq")
+      expect(new_login_data_attributes[:invalid_login_faq_url]).to eq("https://global.com/faq")
+    end
+
+    it "returns nil when both the account and global settings are blank" do
+      @domain_root_account.login_help_url = nil
+      allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return(nil)
+      expect(new_login_data_attributes[:invalid_login_faq_url]).to be_nil
+    end
   end
 
   describe "custom message methods" do
@@ -230,6 +268,23 @@ describe NewLoginHelper do
     it "does not raise when there is no active brand config" do
       allow(self).to receive(:active_brand_config).and_return(nil)
       expect { new_login_data_attributes }.not_to raise_error
+    end
+  end
+
+  context "when fft_registration_url is configured" do
+    before do
+      @domain_root_account.settings[:fft_registration_url] = "https://fft.example.com/register"
+      @domain_root_account.save!
+    end
+
+    it "includes free_for_teacher_registration_url in data attributes" do
+      expect(new_login_data_attributes[:free_for_teacher_registration_url]).to eq("https://fft.example.com/register")
+    end
+  end
+
+  context "when fft_registration_url is not configured" do
+    it "omits free_for_teacher_registration_url from data attributes" do
+      expect(new_login_data_attributes).not_to have_key(:free_for_teacher_registration_url)
     end
   end
 end

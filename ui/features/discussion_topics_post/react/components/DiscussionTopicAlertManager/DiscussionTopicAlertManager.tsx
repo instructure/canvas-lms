@@ -27,8 +27,7 @@ import PropTypes from 'prop-types'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
-// @ts-expect-error TS7016 (typescriptify)
-import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
+import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -82,7 +81,6 @@ export const DiscussionTopicAlertManager = props => {
           },
         },
       }}
-      // @ts-expect-error TS7006 (typescriptify)
       render={responsiveProps => {
         const applicableAlerts = []
 

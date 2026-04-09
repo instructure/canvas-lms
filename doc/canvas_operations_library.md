@@ -8,7 +8,7 @@ See [`lib/canvas_operations`](../lib/canvas_operations)
 ## Features
 - **Operation Base Class**: All operations inherit from a common base, ensuring consistent behavior and features.
 - **Shard Binding**: Operations are bound to a single Switchman shard for data consistency.
-- **Progress Tracking**: Integrated with a `Progress` model for tracking and reporting.
+- **Progress Tracking**: Integrated with a `Progress` model for tracking and reporting (opt-in).
 - **Metric Emission**: Emits events to InstStatsd for monitoring operation lifecycle.
 - **Configurable Settings**: Per-operation, per-cluster settings.
 - **Callbacks**: Lifecycle hooks for before/after/around run and failure events.
@@ -30,6 +30,11 @@ class EnableCoolFeatures < CanvasOperations::BaseOperation
   # define settings that can be changed on-the-fly
   setting :feature_list, default: "feature_one"
   setting :stakeholder_notification_channel, default: "#releases"
+
+  # defaults to false. If true, the operation will create a Progress
+  # record when run and update that progress when a completion or
+  # failure state for the operation is reached.
+  self.progress_tracking = true
 
   def execute
     log_message("Enabling features #{feature_list}!")

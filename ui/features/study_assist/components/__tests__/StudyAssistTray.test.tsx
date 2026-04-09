@@ -22,14 +22,40 @@ import userEvent from '@testing-library/user-event'
 import StudyAssistTray from '../StudyAssistTray'
 
 const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-content" />)
+const mockAssistFlashCardsInteraction = vi.fn((_props: object) => <div />)
+const mockResetChat = vi.fn()
+const mockUseAssistContext = vi.fn(() => ({showBackButton: false, resetChat: mockResetChat}))
+
+vi.mock('@canvas/instui-bindings/react/AiInformation', () => ({
+  default: ({triggerButton}: {triggerButton: React.ReactNode}) => (
+    <div data-testid="ai-information">{triggerButton}</div>
+  ),
+}))
 
 vi.mock('@instructure/platform-study-assist', () => ({
-  AssistProvider: ({children, moduleItemId}: {children: React.ReactNode; moduleItemId: string}) => (
-    <div data-testid="assist-provider" data-module-item-id={moduleItemId}>
+  AssistProvider: ({
+    children,
+    pageId,
+    fileId,
+    featureSlug,
+  }: {
+    children: React.ReactNode
+    pageId?: string
+    fileId?: string
+    featureSlug?: string
+  }) => (
+    <div
+      data-testid="assist-provider"
+      data-page-id={pageId}
+      data-file-id={fileId}
+      data-feature-slug={featureSlug}
+    >
       {children}
     </div>
   ),
   AssistContent: (props: object) => mockAssistContent(props),
+  AssistFlashCardsInteraction: (props: object) => mockAssistFlashCardsInteraction(props),
+  useAssistContext: () => mockUseAssistContext(),
 }))
 
 describe('StudyAssistTray', () => {
@@ -41,9 +67,24 @@ describe('StudyAssistTray', () => {
       ...window.ENV,
       COURSE_ID: '123',
       WIKI_PAGE_ID: 'test-page',
+      STUDY_ASSIST_TOOLS: ['Summarize', 'Quiz me', 'Flashcards'],
     } as any
     onDismiss.mockReset()
     mockAssistContent.mockClear()
+    mockAssistFlashCardsInteraction.mockClear()
+    mockResetChat.mockReset()
+    mockUseAssistContext.mockReturnValue({showBackButton: false, resetChat: mockResetChat})
+  })
+
+  it('renders the AI information button', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-ai-info-button')).toBeInTheDocument()
   })
 
   it('renders the heading when open', () => {
@@ -72,7 +113,18 @@ describe('StudyAssistTray', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
-  it('passes WIKI_PAGE_ID as moduleItemId to AssistProvider', () => {
+  it('passes WIKI_PAGE_ID as pageId to AssistProvider', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('assist-provider')).toHaveAttribute('data-page-id', 'test-page')
+  })
+
+  it('passes featureSlug="canvas-lms:study-assist" to AssistProvider', () => {
     render(
       <StudyAssistTray
         open={true}
@@ -81,8 +133,8 @@ describe('StudyAssistTray', () => {
       />,
     )
     expect(screen.getByTestId('assist-provider')).toHaveAttribute(
-      'data-module-item-id',
-      'test-page',
+      'data-feature-slug',
+      'canvas-lms:study-assist',
     )
   })
 
@@ -101,5 +153,127 @@ describe('StudyAssistTray', () => {
         allowedPrompts: ['Summarize', 'Quiz me', 'Flashcards'],
       }),
     )
+  })
+
+  it('passes only enabled tools from STUDY_ASSIST_TOOLS', () => {
+    window.ENV = {
+      ...window.ENV,
+      STUDY_ASSIST_TOOLS: ['Summarize', 'Flashcards'],
+    } as any
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(mockAssistContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowedPrompts: ['Summarize', 'Flashcards'],
+      }),
+    )
+  })
+
+  it('shows empty state when no tools are enabled', () => {
+    window.ENV = {
+      ...window.ENV,
+      STUDY_ASSIST_TOOLS: [],
+    } as any
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-no-tools')).toBeInTheDocument()
+    expect(screen.getByText('No study tools are currently available.')).toBeInTheDocument()
+    expect(mockAssistContent).not.toHaveBeenCalled()
+  })
+
+  it('shows empty state when STUDY_ASSIST_TOOLS is undefined', () => {
+    window.ENV = {
+      ...window.ENV,
+      STUDY_ASSIST_TOOLS: undefined,
+    } as any
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-no-tools')).toBeInTheDocument()
+    expect(mockAssistContent).not.toHaveBeenCalled()
+  })
+
+  it('renderFlashCards renders AssistFlashCardsInteraction with cardHeight', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    const {renderFlashCards} = mockAssistContent.mock.calls[0][0] as {
+      renderFlashCards: (
+        cards: object[],
+        isFetching: boolean,
+        isError: boolean,
+        getFlashCards: () => void,
+      ) => React.ReactNode
+    }
+    const mockCards = [{question: 'Q', answer: 'A'}]
+    render(<>{renderFlashCards(mockCards, false, false, vi.fn())}</>)
+
+    expect(mockAssistFlashCardsInteraction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cardData: mockCards,
+        isFetching: false,
+        isError: false,
+        cardHeight: '60vh',
+      }),
+    )
+  })
+
+  describe('back button', () => {
+    it('is not visible when showBackButton is false', () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      expect(screen.queryByTestId('study-assist-back-button')).not.toBeInTheDocument()
+    })
+
+    it('is visible when showBackButton is true', () => {
+      mockUseAssistContext.mockReturnValue({showBackButton: true, resetChat: mockResetChat})
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      expect(screen.getByTestId('study-assist-back-button')).toBeInTheDocument()
+    })
+
+    it('calls resetChat when clicked', async () => {
+      const user = userEvent.setup()
+      mockUseAssistContext.mockReturnValue({showBackButton: true, resetChat: mockResetChat})
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const backEl = screen.getByTestId('study-assist-back-button')
+      const button = backEl.tagName === 'BUTTON' ? backEl : backEl.querySelector('button')
+      await user.click(button!)
+      expect(mockResetChat).toHaveBeenCalledTimes(1)
+    })
   })
 })

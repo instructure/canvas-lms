@@ -1275,7 +1275,7 @@ class CoursesController < ApplicationController
         if includes.include?("enrollments")
           enrollment_scope = @context.enrollments
                                      .where(user_id: users)
-                                     .preload(:course, :user, :role, :scores, :course_section)
+                                     .preload(:course, :user, :role, :scores, :course_section, :enrollment_state)
                                      .joins(:course_section)
                                      .order("course_sections.name")
 
@@ -1983,7 +1983,9 @@ class CoursesController < ApplicationController
       @context.tab_configuration = NavMenuLinkTabs.sync_course_links_with_tabs(
         course: @context,
         tabs: JSON.parse(params[:tabs_json]).compact,
-        can_manage_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links)
+        can_manage_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links),
+        request_host: request.host,
+        request_port: request.port
       )
       @context.save
       respond_to do |format|
@@ -4349,10 +4351,11 @@ class CoursesController < ApplicationController
       states = Array.wrap(params[:state])
       states = states.flat_map { |s| Course::API_STATE_EXPANSIONS[s] || s }.uniq
       conditions = states.filter_map do |state|
-        # Disable strict checks for unpublished courses so student/observer
-        # invited enrollments are included, matching the web UI behavior.
-        strict = !Course::UNPUBLISHED_STATES.include?(state)
-        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true, strict_checks: strict).conditions
+        # Only available courses need strict checks; unpublished and completed
+        # need broader enrollment matching (student invited / active respectively).
+        strict = !Course::UNPUBLISHED_STATES.include?(state) && state != "completed"
+        enrollment_state = (state == "completed") ? :current_and_concluded : nil
+        Enrollment::QueryBuilder.new(enrollment_state, course_workflow_state: state, enforce_course_workflow_state: true, strict_checks: strict).conditions
       end.join(" OR ")
       enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
 
@@ -4365,13 +4368,15 @@ class CoursesController < ApplicationController
         enrollments = enrollments.where(type: e_type)
       end
 
+      # Use _ignoring_access scopes because restricted_access reflects view
+      # settings, not listing visibility. The post-filter handles listing.
       case params[:enrollment_state]
       when "active"
         enrollments = enrollments.active_by_date
       when "invited_or_pending"
-        enrollments = enrollments.invited_or_pending_by_date
+        enrollments = enrollments.invited_or_pending_by_date_ignoring_access
       when "completed"
-        enrollments = enrollments.completed_by_date
+        enrollments = enrollments.completed_by_date_ignoring_access
       end
 
       if value_to_boolean(params[:current_domain_only])
@@ -4383,9 +4388,9 @@ class CoursesController < ApplicationController
 
       enrollments = enrollments.to_a
 
-      # Honor restrict_student_future_listing account setting, matching the
-      # web UI's load_enrollments_for_index behavior.
-      if states.intersect?(Course::UNPUBLISHED_STATES)
+      # Honor restrict_student_future_listing, matching the web UI.
+      # Only needed when pending enrollments could be in the result set.
+      unless params[:enrollment_state].in?(%w[active completed])
         ActiveRecord::Associations.preload(enrollments, :enrollment_state)
         ActiveRecord::Associations.preload(enrollments.map(&:course).uniq, :account)
         enrollments.reject!(&:restrict_future_listing?)

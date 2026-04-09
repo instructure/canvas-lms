@@ -205,6 +205,8 @@ interface RCEWrapperProps {
   tinymce: typeof tinymce
   trayProps: RCETrayProps
   use_rce_icon_maker?: boolean
+  useHighContrast?: boolean
+  fontFamily?: string
   userCacheKey?: string
 }
 
@@ -285,7 +287,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
 
   constructor(props: RCEWrapperProps) {
     super(props)
-    this.style = buildStyle()
+    this.style = buildStyle(!!props.useHighContrast, props.fontFamily)
 
     // Set up some limited global state that can be referenced
     // as needed in RCE's components and function / plugin definitions
@@ -426,7 +428,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       rce_studio_embed_improvements = false,
       rce_asr_captioning_improvements = false,
       file_verifiers_for_quiz_links = false,
-      consolidated_media_player = false,
     } = this.props.features
 
     return {
@@ -437,7 +438,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       rce_asr_captioning_improvements,
       file_verifiers_for_quiz_links,
       rce_find_replace,
-      consolidated_media_player,
     }
   }
 

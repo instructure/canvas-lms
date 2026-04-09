@@ -1144,6 +1144,7 @@ class Lti::RegistrationsController < ApplicationController
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
              LTI_DR_REGISTRATIONS_UPDATE: @account.root_account.feature_enabled?(:lti_dr_registrations_update),
+             LTI_EDIT_JSON: @account.root_account.feature_enabled?(:lti_edit_json),
              ACCOUNT_GLOBAL_ID: @account.global_id
            })
     render :index
@@ -1188,7 +1189,7 @@ class Lti::RegistrationsController < ApplicationController
       search_terms: params[:query]&.downcase&.split,
       sort_field: params[:sort]&.to_sym || :installed,
       sort_direction: params[:dir]&.to_sym || :desc,
-      preload_overlays: includes.include?(:overlay)
+      preload_overlays: true # Always preload to avoid n+1 when computing icon_url
     }
 
     registrations, preloads = Lti::ListRegistrationService
@@ -1468,6 +1469,105 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Get LTI Registration by Unified Tool ID
+  # Returns an LTI registration by looking up its unified_tool_id.
+  # Searches both manual configurations and IMS registrations.
+  # Only returns registrations that are active and accessible from the
+  # current account (owned by account, Site Admin, or has binding).
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/by_utid/<utid>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_by_utid
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return render json: { errors: "Not found" }, status: :not_found
+    end
+
+    GuardRail.activate(:secondary) do
+      utid = params[:utid]
+
+      manual_config = Lti::ToolConfiguration.find_by(unified_tool_id: utid)
+      ims_registration = manual_config.nil? ? Lti::IMS::Registration.find_by(unified_tool_id: utid) : nil
+
+      registration = manual_config&.lti_registration || ims_registration&.lti_registration
+
+      unless registration.present? && registration.active? && registration.account == @context
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Check LTI Registration Install Status
+  # Returns the local installation status for a Site Admin LTI registration.
+  # If the developer key's registration is in Site Admin, returns the local copy
+  # in the current account (if installed). If the registration is already in the
+  # current account, returns it directly.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/install_status/<client_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def install_status
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return render json: { errors: "Not found" }, status: :not_found
+    end
+
+    GuardRail.activate(:secondary) do
+      developer_key = DeveloperKey.find(params[:client_id])
+      unless developer_key&.lti_registration.present?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      template_registration = developer_key.lti_registration
+
+      # If the template registration is in Site Admin, look for a local copy in the current account
+      if template_registration.account == Account.site_admin
+        local_copy = template_registration.local_copies.active.find_by(account: @context)
+        unless local_copy.present?
+          return render json: { errors: "LTI registration not found" }, status: :not_found
+        end
+
+        registration = local_copy
+      elsif template_registration.account == @context
+        # If the registration is already in the current account, return it
+        registration = template_registration
+      else
+        # Registration is in a different account
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      # Ensure the registration is active
+      unless registration.active?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Update an LTI Registration
   # Update the specified LTI registration with the provided parameters. Note that updating the base tool configuration
   # of a registration that is associated with a Dynamic Registration will return a 422. All other fields can be updated
@@ -1607,23 +1707,17 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
-  # @API Bind an LTI Registration to an Account
-  # Enable or disable the specified LTI registration for the specified account.
+  # @API Bind an LTI Registration to a Root Account
+  # Enable or disable the specified LTI registration for the specified root account.
   # To enable an inherited registration (eg from Site Admin), pass the registration's global ID.
   #
   # Only allowed for root accounts.
   #
-  # <b>Specifics for Site Admin:</b>
-  # "on" enables and locks the registration on for all root accounts.
-  # "off" disables and hides the registration for all root accounts.
-  # "allow" makes the registration visible to all root accounts, but accounts must bind it to use it.
-  #
   # <b>Specifics for centrally-managed/federated consortia:</b>
-  # Child root accounts may only bind registrations created in the same account.
+  # Child root accounts may not bind inherited registrations.
   # For parent root account, binding also applies to all child root accounts.
   #
-  # @argument workflow_state [Required, String, "on"|"off"|"allow"]
-  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  # @argument workflow_state [Required, String, "on"|"off"] The desired state for this registration/account binding.
   #
   # @returns Lti::RegistrationAccountBinding
   #
@@ -1635,27 +1729,34 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    workflow_state = params.require(:workflow_state).to_sym
-    to_bind = if @context.feature_enabled?(:lti_registrations_templates)
-                # for backwards compatibility with UI until template flag is fully on.
-                # use the local copy to bind
-                Lti::InstallTemplateRegistrationService.call(
-                  template: registration,
-                  account: @context,
-                  user: @current_user
-                )
-              else
-                registration
-              end
+    if context.site_admin?
+      render_error(:invalid_context, "site admin local bindings are not allowed")
+    end
 
-    Lti::AccountBindingService.call(
-      registration: to_bind,
-      account: @context,
-      workflow_state:,
-      user: @current_user
-    ) => { lti_registration_account_binding: }
+    if workflow_state.nil? || !%w[on off].include?(workflow_state)
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off'")
+    end
 
-    render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
+    begin
+      binding_state = params.require(:workflow_state).to_sym
+      result = Lti::InstallTemplateRegistrationService.call(
+        template: registration,
+        account: @context,
+        user: @current_user,
+        binding_state:
+      )
+    rescue ArgumentError => e
+      return render_error(:invalid_template, e.message)
+    end
+
+    rab = result.dig(:bindings, :lti_registration_account_binding)
+
+    render json: lti_registration_account_binding_json(rab, @current_user, session, @context)
+  rescue ArgumentError => e
+    render_error(:invalid_template, e.message)
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Install an LTI Registration from a Template
@@ -1673,23 +1774,26 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>" \
   #        -H "Content-Type: application/json"
   def install_from_template
-    unless @context.feature_enabled?(:lti_registrations_templates)
-      return head :not_found
+    begin
+      result = Lti::InstallTemplateRegistrationService.call(
+        template: registration,
+        account: @context,
+        user: @current_user
+      )
+    rescue ArgumentError => e
+      return render_error(:invalid_template, e.message)
     end
 
-    local_registration = Lti::InstallTemplateRegistrationService.call(
-      template: registration,
-      account: @context,
-      user: @current_user,
-      create_binding: true
-    )
-
-    account_binding = local_registration.account_binding_for(@context)
+    local_registration = result[:local_copy]
+    account_binding = result.dig(:bindings, :lti_registration_account_binding)
     overlay = local_registration.overlay_for(@context)
     includes = %i[account_binding configuration overlay]
     json = lti_registration_json(local_registration, @current_user, session, @context, includes:, account_binding:, overlay:)
 
     render json:
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Search for Accounts and Courses

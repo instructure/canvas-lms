@@ -305,7 +305,6 @@ class SisBatch < ApplicationRecord
   end
 
   def process_instructure_csv_zip
-    require "sis"
     download_zip
     diff_result = generate_diff
     case diff_result

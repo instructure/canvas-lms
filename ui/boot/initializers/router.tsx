@@ -179,7 +179,13 @@ export function FallbackSpinner() {
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
   if (mountNode) {
-    const theme = getTheme()
+    const theme = getTheme(
+      undefined,
+      undefined,
+      Boolean(ENV.K5_USER),
+      Boolean(ENV.USE_CLASSIC_FONT),
+      Boolean(ENV.use_dyslexic_font),
+    )
     const root = ReactDOM.createRoot(mountNode)
     root.render(
       <DynamicInstUISettingsProvider theme={theme}>

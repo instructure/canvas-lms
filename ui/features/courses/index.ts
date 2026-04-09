@@ -85,11 +85,10 @@ function renderAccessibilityCells(): void {
   document.querySelectorAll('.course-list-checking-spinner').forEach(element => {
     render(
       React.createElement(
-        // @ts-expect-error - InstUI component type issue with React.createElement
         PresentationContent,
         null,
         React.createElement(
-          // @ts-expect-error - InstUI component type issue with React.createElement
+          // @ts-expect-error - InstUI Spinner type issue with React.createElement
           Spinner,
           {
             as: 'div',

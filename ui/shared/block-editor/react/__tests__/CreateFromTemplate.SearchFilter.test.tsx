@@ -122,9 +122,8 @@ describe('CreateFromTemplate', () => {
       expect(searchInput).not.toHaveAttribute('disabled')
     })
 
-    // Use paste for faster input in CI
     await user.click(searchInput)
-    await user.paste('yellow')
+    await user.type(searchInput, 'yellow')
 
     await waitFor(() => {
       expect(screen.queryByLabelText('Course Home - Blue template')).not.toBeInTheDocument()

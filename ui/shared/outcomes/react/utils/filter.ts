@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DisplayFilter, GradebookSettings} from './constants'
+import {GradebookSettings} from './constants'
+import {DisplayFilter} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 export const mapSettingsToFilters = (settings?: GradebookSettings | null): string[] => {
   const filters: string[] = []

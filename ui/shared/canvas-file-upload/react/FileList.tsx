@@ -22,90 +22,90 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconTrashLine, IconCheckMarkSolid, IconDocumentLine} from '@instructure/ui-icons'
+import {IconWarningSolid, IconXSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {ContextFile} from './types'
-import {formatFileSize} from './fileFormatters'
+import ContextFilePill from './ContextFilePill'
 
 const I18n = createI18nScope('canvas_file_upload')
 
 interface FileListProps {
   files: ContextFile[]
   uploadingFileNames: Set<string>
+  failedFileNames: Set<string>
   onRemoveFile: (fileId: string) => void
+  onClearFailedFile: (name: string) => void
 }
 
-const FileList: React.FC<FileListProps> = ({files, uploadingFileNames, onRemoveFile}) => {
+const FileList: React.FC<FileListProps> = ({
+  files,
+  uploadingFileNames,
+  failedFileNames,
+  onRemoveFile,
+  onClearFailedFile,
+}) => {
   return (
-    <View as="div" margin="medium 0" borderWidth="small" borderRadius="medium">
-      <View as="div" padding="small" background="secondary">
-        <Text weight="bold">{I18n.t('File Name')}</Text>
-      </View>
-      <View as="div">
-        {/* Show uploading files first */}
-        {Array.from(uploadingFileNames).map(fileName => (
-          <View key={`uploading-${fileName}`} as="div" padding="small" borderWidth="small 0 0 0">
-            <Flex justifyItems="space-between" alignItems="center">
-              <Flex.Item shouldGrow={true}>
-                <Flex alignItems="center" gap="small">
-                  <IconDocumentLine />
-                  <View>
-                    <Text weight="bold">{fileName}</Text>
-                    <br />
-                    <Text size="small" color="secondary">
-                      {I18n.t('Uploading...')}
-                    </Text>
-                  </View>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item padding="0 small">
+    <Flex as="div" wrap="wrap" gap="x-small" margin="small 0">
+      {Array.from(uploadingFileNames).map(fileName => (
+        <Flex.Item key={`uploading-${fileName}`}>
+          <View
+            as="div"
+            borderWidth="small"
+            borderRadius="large"
+            padding="x-small small"
+            background="primary"
+          >
+            <Flex alignItems="center" gap="x-small">
+              <Flex.Item>
                 <Spinner renderTitle={I18n.t('Uploading')} size="x-small" />
               </Flex.Item>
               <Flex.Item>
-                {/* Empty space for alignment */}
-                <View as="div" width="2.5rem" />
+                <Text size="small">{I18n.t('%{name} uploading', {name: fileName})}</Text>
               </Flex.Item>
             </Flex>
           </View>
-        ))}
-        {/* Show uploaded files */}
-        {files.map(file => (
-          <View key={file.id} as="div" padding="small" borderWidth="small 0 0 0">
-            <Flex justifyItems="space-between" alignItems="center">
-              <Flex.Item shouldGrow={true}>
-                <Flex alignItems="center" gap="small">
-                  <IconDocumentLine />
-                  <View>
-                    <Text weight="bold">{file.display_name}</Text>
-                    <br />
-                    <Text size="small" color="secondary">
-                      {formatFileSize(file.size)} • {file.content_type}
-                    </Text>
-                  </View>
-                </Flex>
+        </Flex.Item>
+      ))}
+
+      {Array.from(failedFileNames).map(fileName => (
+        <Flex.Item key={`failed-${fileName}`}>
+          <View
+            as="div"
+            borderWidth="small"
+            borderRadius="large"
+            padding="x-small small"
+            background="primary"
+          >
+            <Flex alignItems="center" gap="x-small">
+              <Flex.Item>
+                <IconWarningSolid color="warning" size="x-small" />
               </Flex.Item>
-              <Flex.Item padding="0 small">
-                <IconCheckMarkSolid color="success" />
+              <Flex.Item>
+                <Text size="small">{I18n.t('%{name} failed', {name: fileName})}</Text>
               </Flex.Item>
               <Flex.Item>
                 <IconButton
-                  data-testid={`remove-file-${file.id}`}
-                  screenReaderLabel={I18n.t('Remove %{fileName}', {
-                    fileName: file.display_name,
-                  })}
-                  onClick={() => onRemoveFile(file.id)}
+                  data-testid={`dismiss-failed-${fileName}`}
+                  screenReaderLabel={I18n.t('Dismiss %{name}', {name: fileName})}
+                  onClick={() => onClearFailedFile(fileName)}
                   withBackground={false}
                   withBorder={false}
                   size="small"
                 >
-                  <IconTrashLine />
+                  <IconXSolid />
                 </IconButton>
               </Flex.Item>
             </Flex>
           </View>
-        ))}
-      </View>
-    </View>
+        </Flex.Item>
+      ))}
+
+      {files.map(file => (
+        <Flex.Item key={file.id}>
+          <ContextFilePill file={file} onRemove={onRemoveFile} />
+        </Flex.Item>
+      ))}
+    </Flex>
   )
 }
 

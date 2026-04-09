@@ -25,14 +25,19 @@ import LMGBContext, {
   getLMGBContext,
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {SearchWrapper} from './components/filters/SearchWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
-import {GradebookSettings, NameDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
+import {
+  DisplayFilter,
+  NameDisplayFormat,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
@@ -143,13 +148,22 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
         }
 
         updateSettings(settings)
+
+        // If the "Show students with no results" filter has changed,
+        // reset to the first page to avoid landing on an empty page
+        const showStudentsWithNoResultsChanged =
+          settings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS) !==
+          gradebookSettings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
+        if (showStudentsWithNoResultsChanged) {
+          setCurrentPage(1)
+        }
       } catch (_) {
         error = I18n.t('Failed to save settings')
       }
 
       return {success: error === null}
     },
-    [courseId, updateSettings],
+    [courseId, updateSettings, gradebookSettings.displayFilters, setCurrentPage],
   )
 
   const handleNameDisplayFormatChange = useCallback(
@@ -164,9 +178,12 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     async (studentsPerPage: number) => {
       const newSettings = {...gradebookSettings, studentsPerPage}
 
-      handleGradebookSettingsChange(newSettings)
+      const result = await handleGradebookSettingsChange(newSettings)
+      if (result.success) {
+        setCurrentPage(1)
+      }
     },
-    [gradebookSettings, handleGradebookSettingsChange],
+    [gradebookSettings, handleGradebookSettingsChange, setCurrentPage],
   )
 
   const handleOutcomesReorder = useCallback(
@@ -191,8 +208,10 @@ const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
     if (error !== null || contributingScoresError !== null)
       return (
         <GenericErrorPage
-          errorMessage={error || contributingScoresError}
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorMessage={error ?? contributingScoresError ?? undefined}
           errorSubject={I18n.t('Error loading rollups')}
           errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
         />

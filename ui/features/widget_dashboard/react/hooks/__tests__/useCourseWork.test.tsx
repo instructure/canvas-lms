@@ -531,6 +531,129 @@ describe('useCourseWork', () => {
       'Assignment B', // No due date (null)
     ])
   })
+  describe('enrollment and course filtering', () => {
+    const emptyResponse = {
+      data: {
+        legacyNode: {
+          _id: '1',
+          courseWorkSubmissionsConnection: {
+            nodes: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, endCursor: null, startCursor: null},
+          },
+        },
+      },
+    }
+
+    it('returns no items when student has non-active enrollment', async () => {
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) return HttpResponse.json(emptyResponse)
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
+
+      await waitFor(() => expect(result.current.data?.pages?.[0]?.items).toBeDefined())
+
+      expect(result.current.data?.pages?.[0]?.items).toHaveLength(0)
+    })
+
+    it('returns no items for K5/horizon courses', async () => {
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) return HttpResponse.json(emptyResponse)
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
+
+      await waitFor(() => expect(result.current.data?.pages?.[0]?.items).toBeDefined())
+
+      expect(result.current.data?.pages?.[0]?.items).toHaveLength(0)
+    })
+
+    it('uses cachedDueDate over assignment dueAt when both are present', async () => {
+      const cachedDue = tomorrow.toISOString()
+      const assignmentDue = fiveDaysFromNow.toISOString()
+
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) {
+            return HttpResponse.json({
+              data: {
+                legacyNode: {
+                  _id: '1',
+                  courseWorkSubmissionsConnection: {
+                    nodes: [
+                      {
+                        _id: 'sub1',
+                        cachedDueDate: cachedDue,
+                        submittedAt: null,
+                        late: false,
+                        missing: false,
+                        excused: false,
+                        state: 'unsubmitted',
+                        assignment: {
+                          _id: '1',
+                          name: 'Override Assignment',
+                          dueAt: assignmentDue,
+                          pointsPossible: 10,
+                          htmlUrl: '/courses/1/assignments/1',
+                          submissionTypes: ['online_text_entry'],
+                          state: 'published',
+                          published: true,
+                          quiz: null,
+                          discussion: null,
+                          course: {_id: '1', name: 'Course 1'},
+                        },
+                      },
+                    ],
+                    pageInfo: {hasNextPage: false, hasPreviousPage: false, endCursor: null, startCursor: null},
+                  },
+                },
+              },
+            })
+          }
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
+
+      await waitFor(() => expect(result.current.data?.pages?.[0]?.items).toHaveLength(1))
+
+      expect(result.current.data?.pages?.[0]?.items?.[0].dueAt).toBe(cachedDue)
+    })
+
+    it('passes includeNoDueDate in GraphQL query variables', async () => {
+      let capturedVariables: any = null
+
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) {
+            capturedVariables = body.variables
+            return HttpResponse.json(emptyResponse)
+          }
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const {result} = renderHook(() => useCourseWork({includeNoDueDate: true}), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => expect(result.current.data?.pages?.[0]?.items).toBeDefined())
+
+      expect(capturedVariables?.includeNoDueDate).toBe(true)
+    })
+  })
+
   describe('observer scenarios', () => {
     it('passes observedUserId to GraphQL query when observer views observee data', async () => {
       let receivedVariables: any = null

@@ -115,9 +115,9 @@ export const AddLinkModal = ({
   const [url, setUrl] = useState('https://')
 
   const initialPlacements = () => ({
-    course_nav: availablePlacements[0] === 'course_nav',
-    account_nav: availablePlacements[0] === 'account_nav',
-    user_nav: availablePlacements[0] === 'user_nav',
+    course_nav: availablePlacements.length <= 1 && availablePlacements.includes('course_nav'),
+    account_nav: availablePlacements.length <= 1 && availablePlacements.includes('account_nav'),
+    user_nav: availablePlacements.length <= 1 && availablePlacements.includes('user_nav'),
   })
 
   const [selectedPlacements, setSelectedPlacements] = useState(initialPlacements)

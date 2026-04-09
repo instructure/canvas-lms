@@ -534,7 +534,9 @@ describe Importers::ContextExternalToolImporter do
     it "adds an error when developer key is not usable in context" do
       # Create a developer key that won't be usable in this course
       other_account = account_model
-      other_dev_key = lti_registration_with_tool(account: other_account).developer_key
+      other_registration = lti_registration_with_tool(account: other_account)
+      other_dev_key = other_registration.developer_key
+      other_registration.deactivate
       tool_hash[:settings] = { client_id: other_dev_key.global_id }
 
       expect(migration).to receive(:add_error).with(

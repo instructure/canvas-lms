@@ -34,7 +34,7 @@ import {
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
 import {useMutation} from '@apollo/client'
-import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {captureException} from '@sentry/react'
 
 const I18n = createI18nScope('assignments_2')
@@ -203,14 +203,26 @@ export default function CommentContent(props) {
             {peerReviewCompleteText}
           </Alert>
         )}
-      {[...props.comments]
-        .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
-        .map(comment => (
-          <View as="div" key={comment._id} padding="0 medium 0 x-small">
-            <CommentRow comment={comment} />
-            <hr style={{margin: '1rem 1.5rem'}} />
-          </View>
-        ))}
+      <Flex
+        role="list"
+        direction="column"
+        gap="medium"
+        margin="0 0 medium 0"
+        aria-label={I18n.t('Comments')}
+      >
+        {[...props.comments]
+          .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
+          .map(comment => (
+            <Flex.Item
+              role="listitem"
+              key={comment._id}
+              padding="0 medium 0 x-small"
+              aria-labelledby={`comment-header-${comment._id}`}
+            >
+              <CommentRow comment={comment} />
+            </Flex.Item>
+          ))}
+      </Flex>
     </>
   )
 }

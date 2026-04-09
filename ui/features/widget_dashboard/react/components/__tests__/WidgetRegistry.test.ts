@@ -16,11 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getWidget, getAllWidgets, isRegisteredWidget, registerWidget} from '../WidgetRegistry'
-import {WIDGET_TYPES} from '../../constants'
-import type {WidgetRenderer} from '../../types'
+import widgetRegistry, {
+  getWidget,
+  getAllWidgets,
+  getWidgetsForRole,
+  isRegisteredWidget,
+  registerWidget,
+} from '../WidgetRegistry'
+import {WIDGET_TYPES, EDUCATOR_WIDGET_ROLE} from '../../constants'
+import type {WidgetRegistry as WidgetRegistryType, WidgetRenderer} from '../../types'
 
 describe('WidgetRegistry', () => {
+  let snapshot: WidgetRegistryType
+
+  beforeEach(() => {
+    snapshot = {...widgetRegistry}
+  })
+
+  // registerWidget() mutates the module-level singleton, so restore after each test
+  afterEach(() => {
+    Object.keys(widgetRegistry).forEach(key => delete widgetRegistry[key])
+    Object.assign(widgetRegistry, snapshot)
+  })
+
   it('returns CourseWorkCombinedWidget for course_work_combined type', () => {
     const widget = getWidget(WIDGET_TYPES.COURSE_WORK_COMBINED)
 
@@ -61,6 +79,37 @@ describe('WidgetRegistry', () => {
 
     expect(isRegisteredWidget('test_widget')).toBe(true)
     expect(getWidget('test_widget')).toBe(mockRenderer)
+  })
+
+  describe('getWidgetsForRole', () => {
+    beforeEach(() => {
+      Object.keys(widgetRegistry).forEach(key => delete widgetRegistry[key])
+      registerWidget('educator_widget', {
+        component: () => null,
+        displayName: 'Educator Widget',
+        description: 'An educator-only widget',
+        roles: [EDUCATOR_WIDGET_ROLE],
+      })
+      registerWidget('learner_widget', {
+        component: () => null,
+        displayName: 'Learner Widget',
+        description: 'A learner-only widget',
+      })
+    })
+
+    it('returns only educator widgets for educator role', () => {
+      const educatorWidgets = getWidgetsForRole(EDUCATOR_WIDGET_ROLE)
+
+      expect(educatorWidgets).toHaveProperty('educator_widget')
+      expect(educatorWidgets).not.toHaveProperty('learner_widget')
+    })
+
+    it('returns only learner widgets when no role specified', () => {
+      const result = getWidgetsForRole()
+
+      expect(result).toHaveProperty('learner_widget')
+      expect(result).not.toHaveProperty('educator_widget')
+    })
   })
 
   it('returns a copy of the registry from getAllWidgets', () => {

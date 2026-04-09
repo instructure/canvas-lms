@@ -695,4 +695,24 @@ describe FeatureFlags::Hooks do
       expect(result).to be false
     end
   end
+
+  describe "study_assist_visible_on_hook" do
+    let(:context) { instance_double(Account) }
+
+    it "returns true when study_assist feature is enabled" do
+      allow(context).to receive(:feature_enabled?).with(:study_assist).and_return(true)
+
+      result = FeatureFlags::Hooks.study_assist_visible_on_hook(context)
+
+      expect(result).to be true
+    end
+
+    it "returns false when study_assist feature is disabled" do
+      allow(context).to receive(:feature_enabled?).with(:study_assist).and_return(false)
+
+      result = FeatureFlags::Hooks.study_assist_visible_on_hook(context)
+
+      expect(result).to be false
+    end
+  end
 end

@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {IconSettingsLine} from '@instructure/ui-icons'
+import {Alert} from '@instructure/ui-alerts'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import DashboardNotifications from './components/DashboardNotifications'
-import WidgetGrid from './components/WidgetGrid'
+import DashboardTabs from './components/DashboardTabs'
 import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
 import {useResponsiveContext} from './hooks/useResponsiveContext'
+import {useWidgetDashboardEdit} from './hooks/useWidgetDashboardEdit'
 import {useWidgetLayout} from './hooks/useWidgetLayout'
 import {EDUCATOR_DASHBOARD_THEME} from './educatorDashboardTheme'
 
@@ -36,17 +38,60 @@ const I18n = createI18nScope('widget_dashboard')
 const EducatorDashboardContainer = () => {
   const {currentUser, dashboardFeatures} = useWidgetDashboard()
   const {isMobile} = useResponsiveContext()
-  const {config} = useWidgetLayout()
+  const {isEditMode, isDirty, isSaving, saveError, enterEditMode, exitEditMode, clearError} =
+    useWidgetDashboardEdit()
+  const {resetConfig, saveLayout} = useWidgetLayout()
   const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
+  const customizeButtonRef = useRef<Element | null>(null)
+  const wasEditModeRef = useRef(isEditMode)
 
   const greeting = currentUser?.display_name
     ? I18n.t('Hi, %{name}!', {name: currentUser.display_name})
     : I18n.t('Hi!')
 
+  useEffect(() => {
+    if (wasEditModeRef.current && !isEditMode) {
+      ;(customizeButtonRef.current as HTMLElement)?.focus()
+    }
+    wasEditModeRef.current = isEditMode
+  }, [isEditMode])
+
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
+
+  // Matches WidgetDashboardContainer's handler pattern
+  const handleSave = () => {
+    saveLayout()
+  }
+
+  const handleCancel = () => {
+    resetConfig()
+    exitEditMode()
+  }
+
   return (
     <InstUISettingsProvider theme={EDUCATOR_DASHBOARD_THEME}>
       <View as="div" data-testid="educator-widget-dashboard">
         <DashboardNotifications />
+        {saveError && (
+          <Alert
+            variant="error"
+            margin="0 0 medium"
+            renderCloseButtonLabel={I18n.t('Close')}
+            onDismiss={clearError}
+          >
+            {I18n.t('Failed to save widget layout: %{error}', {error: saveError})}
+          </Alert>
+        )}
         <Flex
           margin="0 0 medium x-small"
           gap="small"
@@ -58,21 +103,42 @@ const EducatorDashboardContainer = () => {
               {greeting}
             </Heading>
           </Flex.Item>
-          {isCustomizationEnabled && (
-            <Flex.Item>
-              <Button
-                renderIcon={<IconSettingsLine />}
-                color="primary"
-                data-testid="customize-dashboard-button"
-              >
-                {I18n.t('Customize')}
-              </Button>
-            </Flex.Item>
-          )}
+          {isCustomizationEnabled &&
+            (isEditMode ? (
+              <>
+                <Flex.Item>
+                  <Button onClick={handleCancel} data-testid="cancel-customize-button">
+                    {I18n.t('Cancel')}
+                  </Button>
+                </Flex.Item>
+                <Flex.Item>
+                  <Button
+                    color="primary"
+                    onClick={handleSave}
+                    interaction={isSaving ? 'disabled' : 'enabled'}
+                    data-testid="save-customize-button"
+                  >
+                    {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
+                  </Button>
+                </Flex.Item>
+              </>
+            ) : (
+              <Flex.Item>
+                <Button
+                  elementRef={el => {
+                    customizeButtonRef.current = el
+                  }}
+                  onClick={enterEditMode}
+                  renderIcon={<IconSettingsLine />}
+                  color="primary"
+                  data-testid="customize-dashboard-button"
+                >
+                  {I18n.t('Customize')}
+                </Button>
+              </Flex.Item>
+            ))}
         </Flex>
-        <View as="div" data-testid="educator-dashboard-content" padding="medium 0 0 0">
-          <WidgetGrid config={config} />
-        </View>
+        <DashboardTabs />
       </View>
     </InstUISettingsProvider>
   )

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, cleanup} from '@testing-library/react'
+import {fireEvent, render, cleanup, waitFor} from '@testing-library/react'
 import {
   RubricAssignmentContainer,
   type RubricAssignmentContainerProps,
@@ -189,17 +189,19 @@ describe('RubricAssignmentContainer Tests', () => {
       getByTestId('create-assignment-rubric-button').click()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+      await waitFor(() => expect(getByTestId('add-criterion-button')).toBeInTheDocument())
       fireEvent.click(getByTestId('add-criterion-button'))
 
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await waitFor(() =>
+        expect(getByTestId('rubric-criterion-name-input')).toBeInTheDocument(),
+      )
       fireEvent.change(getByTestId('rubric-criterion-name-input'), {
         target: {value: 'New Criterion Test'},
       })
       fireEvent.click(getByTestId('rubric-criterion-save'))
       fireEvent.click(getByTestId('save-rubric-button'))
 
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(onRubricChange).toHaveBeenCalledWith(RUBRIC, RUBRIC_ASSOCIATION)
+      await waitFor(() => expect(onRubricChange).toHaveBeenCalledWith(RUBRIC, RUBRIC_ASSOCIATION))
     })
   })
 

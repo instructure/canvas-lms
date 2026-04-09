@@ -275,7 +275,7 @@ describe('DeleteCalendarEventDialog', () => {
       expect(getByText('Delete for everyone?')).toBeInTheDocument()
       expect(getByTestId(`${testIdPrefix}dialog`)).toBeInTheDocument()
       expect(getByTestId(`${testIdPrefix}dialog-content`)).toHaveTextContent(
-        'If you delete this appointment group, all course teachers will lose access, and all student signups will be permanently deleted.',
+        'If you delete this appointment, all course teachers will lose access, and all student signups will be permanently deleted.',
       )
     })
 

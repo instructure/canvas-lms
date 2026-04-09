@@ -20,7 +20,8 @@ import {debounce} from 'es-toolkit/compat'
 import React from 'react'
 import {AppsSearchBar} from './AppsSearchBar'
 
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
@@ -45,6 +46,8 @@ export const ManagePage = () => {
   ) : (
     <GenericErrorPage
       imageUrl={errorShipUrl}
+      onReportError={reportError}
+      translations={canvasErrorPageTranslations}
       errorMessage="Error parsing query"
       stack={`error parsing query:\n${formatSearchParamErrorMessages(searchParams.errors)}`}
       errorCategory="Dynamic Registration"
@@ -116,6 +119,8 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
           return (
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorSubject={I18n.t('LTI Registrations listing error')}
               errorMessage={result.error.message}
             />

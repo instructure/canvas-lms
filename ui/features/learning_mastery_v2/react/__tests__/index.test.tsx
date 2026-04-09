@@ -17,6 +17,7 @@
  */
 
 import {cleanup, render, waitFor, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {type MockedFunction} from 'vitest'
 import LearningMastery from '../index'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
@@ -24,19 +25,27 @@ import {useGradebookSettings} from '../hooks/useGradebookSettings'
 import {useStudents} from '../hooks/useStudents'
 import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {Rating, Student, Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
-import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
+import {
+  Rating,
+  Student,
+  Outcome,
+  StudentRollupData,
+  Pagination,
+} from '@canvas/outcomes/react/types/rollup'
+import {SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 import {saveLearningMasteryGradebookSettings} from '../apiClient'
 import {useMasteryDistribution} from '../hooks/useMasteryDistribution'
+import {DisplayFilter, SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 vi.mock('../components/charts/BarChart', () => ({
   BarChart: () => null,
   default: () => null,
 }))
 
-vi.mock('../apiClient')
+const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
+vi.mock('../apiClient')
 vi.mock('@canvas/outcomes/react/hooks/useRollups')
 vi.mock('../hooks/useGradebookSettings')
 vi.mock('../hooks/useStudents')
@@ -281,6 +290,107 @@ describe('LearningMastery', () => {
 
     expect(screen.getAllByText(outcomes[0].title)[0]).toBeInTheDocument()
     expect(await screen.findByLabelText('rating description!')).toBeInTheDocument()
+  })
+
+  describe('page reset on settings save', () => {
+    it('resets to page 1 when SHOW_STUDENTS_WITH_NO_RESULTS filter is toggled and saved', async () => {
+      const mockSetCurrentPage = vi.fn()
+      const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+      mockUseRollups.mockReturnValue(
+        createMockUseRollupsReturnValue({
+          students,
+          outcomes,
+          rollups,
+          setCurrentPage: mockSetCurrentPage,
+        }),
+      )
+      mockSaveLearningMasteryGradebookSettings.mockResolvedValue({status: 200} as any)
+
+      render(<LearningMastery {...defaultProps()} />)
+
+      await user.click(screen.getByRole('button', {name: 'Settings'}))
+
+      const checkbox = await screen.findByRole('checkbox', {name: 'Students with no results'})
+      await user.click(checkbox)
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+
+      await waitFor(() => {
+        expect(mockSetCurrentPage).toHaveBeenCalledWith(1)
+      })
+    })
+
+    it('does not reset page when only non-row-affecting filters change', async () => {
+      const mockSetCurrentPage = vi.fn()
+      const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+      mockUseRollups.mockReturnValue(
+        createMockUseRollupsReturnValue({
+          students,
+          outcomes,
+          rollups,
+          setCurrentPage: mockSetCurrentPage,
+        }),
+      )
+      const mockUseGradebookSettings = useGradebookSettings as MockedFunction<
+        typeof useGradebookSettings
+      >
+      mockUseGradebookSettings.mockReturnValue({
+        settings: {
+          ...DEFAULT_GRADEBOOK_SETTINGS,
+          displayFilters: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
+        },
+        isLoading: false,
+        error: null,
+        updateSettings: vi.fn(),
+      })
+      mockSaveLearningMasteryGradebookSettings.mockResolvedValue({status: 200} as any)
+
+      render(<LearningMastery {...defaultProps()} />)
+
+      await user.click(screen.getByRole('button', {name: 'Settings'}))
+
+      // Wait for tray to open, then toggle avatars (does not affect row count)
+      const checkbox = await screen.findByRole('checkbox', {name: 'Avatars in student list'})
+      await user.click(checkbox)
+      await user.click(screen.getByRole('button', {name: 'Save'}))
+
+      await waitFor(() => {
+        expect(mockSaveLearningMasteryGradebookSettings).toHaveBeenCalled()
+      })
+
+      expect(mockSetCurrentPage).not.toHaveBeenCalled()
+    })
+  })
+
+  it('resets to page 1 when students per page changes', async () => {
+    const mockSetCurrentPage = vi.fn()
+    const mockPagination: Pagination = {
+      currentPage: 3,
+      totalPages: 5,
+      totalCount: 100,
+      perPage: 20,
+    }
+    const mockUseRollups = useRollups as MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue(
+      createMockUseRollupsReturnValue({
+        students,
+        outcomes,
+        rollups,
+        pagination: mockPagination,
+        setCurrentPage: mockSetCurrentPage,
+      }),
+    )
+    mockSaveLearningMasteryGradebookSettings.mockResolvedValue({status: 200} as any)
+
+    render(<LearningMastery {...defaultProps()} />)
+
+    const selector = screen.getByTestId('per-page-selector')
+    await user.click(selector)
+    const option = await screen.findByText('50')
+    await user.click(option)
+
+    await waitFor(() => {
+      expect(mockSetCurrentPage).toHaveBeenCalledWith(1)
+    })
   })
 
   it('calls useRollups with the provided courseId', () => {

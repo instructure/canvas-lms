@@ -97,21 +97,20 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   createInstUIInput() {
-    this._reactRoot = null
     this.calculationIntInstUIInput = {
       root: (() => {
         const el = this.$('#calculation_int_container')[0]
         if (!el) return null
         return {
-          rootElement: el,
+          rootElement: null,
+          el,
           initialValue: el.dataset.initialValue,
           label: el.dataset.label.replace(/: ?$/g, ''),
           calculationIntDescription: el.dataset.calculationIntDescription,
         }
       })(),
       render: errorMessages => {
-        const rootElement = this.calculationIntInstUIInput.root?.rootElement
-        if (!rootElement) return
+        if (!this.calculationIntInstUIInput.root) return
         const element = createElement(
           View,
           {as: 'div', margin: 'none none small none'},
@@ -139,10 +138,13 @@ export default class CalculationMethodFormView extends Backbone.View {
             ],
           }),
         )
-        if (!this._reactRoot) {
-          this._reactRoot = render(element, rootElement)
+        if (!this.calculationIntInstUIInput.root.rootElement) {
+          this.calculationIntInstUIInput.root.rootElement = render(
+            element,
+            this.calculationIntInstUIInput.root.el,
+          )
         } else {
-          rerender(this._reactRoot, element)
+          rerender(this.calculationIntInstUIInput.root.rootElement, element)
         }
       },
       inputElement: () => this.$('#calculation_int')[0],

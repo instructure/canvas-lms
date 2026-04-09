@@ -21,6 +21,48 @@
 module Api
   module Html
     describe Link do
+      describe ".strip_host" do
+        it "returns the link unchanged when host is nil" do
+          link = "https://example.com/courses/1/files/1"
+          expect(Link.strip_host(link:, host: nil, port: nil)).to eq link
+        end
+
+        it "strips matching host and port" do
+          link = "https://example.com/courses/1/files/1"
+          expect(Link.strip_host(link:, host: "example.com", port: 443)).to eq "/courses/1/files/1"
+        end
+
+        it "preserves query string and fragment when stripping host" do
+          link = "https://example.com/files/1?preview=true#page-5"
+          expect(Link.strip_host(link:, host: "example.com", port: 443)).to eq "/files/1?preview=true#page-5"
+        end
+
+        it "returns link unchanged when host does not match" do
+          link = "https://other-host.com/courses/1"
+          expect(Link.strip_host(link:, host: "example.com", port: 443)).to eq link
+        end
+
+        it "returns link unchanged when port in URL does not match" do
+          link = "https://example.com:8080/files/1"
+          expect(Link.strip_host(link:, host: "example.com", port: 443)).to eq link
+        end
+
+        it "handles invalid URIs gracefully" do
+          link = "not a valid uri:::"
+          expect(Link.strip_host(link:, host: "example.com", port: 443)).to eq link
+        end
+
+        it "strips host when URL port is nil and matches default HTTP port" do
+          link = "http://example.com/courses/1"
+          expect(Link.strip_host(link:, host: "example.com", port: 80)).to eq "/courses/1"
+        end
+
+        it "handles relative URLs" do
+          link = "/courses/1/files/1"
+          expect(Link.strip_host(link:, host: "example.com", port: 443)).to eq link
+        end
+      end
+
       describe "#to_corrected_s" do
         it "returns the raw string if it isnt a link" do
           expect(Link.new("nonsense-data").to_corrected_s).to eq "nonsense-data"

@@ -794,6 +794,42 @@ describe "Accounts API", type: :request do
       expect(@a1.restrict_student_past_view).to eq({ value: true, locked: false })
     end
 
+    describe "suppress_notifications" do
+      def update_suppress_notifications(value)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a1.id}",
+                 { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                 { account: { settings: { suppress_notifications: value } } })
+        @a1.reload
+      end
+
+      it "sets to true" do
+        update_suppress_notifications(true)
+        expect(@a1.settings[:suppress_notifications]).to be true
+      end
+
+      it "sets to an array of category slugs" do
+        Notification.create!(name: "Test Grading", category: "Grading")
+        Notification.create!(name: "Test Announcement", category: "Announcement")
+        update_suppress_notifications(%w[grading announcement])
+        expect(@a1.settings[:suppress_notifications]).to match_array(%w[grading announcement])
+      end
+
+      it "filters out invalid category slugs" do
+        Notification.create!(name: "Test Grading", category: "Grading")
+        update_suppress_notifications(%w[grading not_a_real_category])
+        expect(@a1.settings[:suppress_notifications]).to eq(%w[grading])
+      end
+
+      it "clears when set to false" do
+        @a1.settings[:suppress_notifications] = true
+        @a1.save!
+
+        update_suppress_notifications(false)
+        expect(@a1.settings[:suppress_notifications]).to be false
+      end
+    end
+
     it "updates services" do
       expect(@a1.service_enabled?(:avatars)).to be_falsey
       json = api_call(:put,

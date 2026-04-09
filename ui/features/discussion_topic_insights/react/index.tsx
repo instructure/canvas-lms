@@ -25,7 +25,8 @@ import _AlertManager from '@canvas/alerts/react/AlertManager'
 // WithBreakpoints HOC incorrectly requires breakpoints in consumer type
 // @ts-expect-error - breakpoints is injected by the HOC, not by consumers
 const AlertManager: React.ComponentType<React.PropsWithChildren<{}>> = _AlertManager
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
@@ -55,6 +56,8 @@ const DiscussionInsightsApp = () => {
           errorComponent={
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorCategory={I18n.t('Discussion Insights Error Page')}
             />
           }

@@ -7868,7 +7868,8 @@ describe Submission do
           expect(assessments).to contain_exactly(@final_assessment)
         end
 
-        it "returns only the selected rubric assessment for students when grades are published" do
+        it "returns only the selected rubric assessment for students when grades are published and posted" do
+          @moderated_submission.update!(posted_at: Time.zone.now)
           assessments = @moderated_submission.visible_rubric_assessments_for(@student)
           expect(assessments).to contain_exactly(@final_assessment)
         end
@@ -7877,6 +7878,19 @@ describe Submission do
           assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
           expect(assessments).to contain_exactly(@final_assessment)
           expect(assessments).not_to include(@provisional_assessment, @other_assessment)
+        end
+
+        context "when grades are not yet posted to students" do
+          it "does not return rubric assessments to students" do
+            expect(@moderated_submission.posted_at).to be_nil
+            assessments = @moderated_submission.visible_rubric_assessments_for(@student)
+            expect(assessments).to be_empty
+          end
+
+          it "still returns rubric assessments to teachers" do
+            assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader)
+            expect(assessments).to contain_exactly(@final_assessment)
+          end
         end
       end
     end
@@ -10025,6 +10039,57 @@ describe Submission do
         .with("Couldn't create ObserverAlert for submission #{submission_id} observer #{@threshold.observer_id}")
 
       @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+    end
+
+    it "does not create an alert when the assignment uses a manual posting policy and grade is not posted" do
+      @assignment.post_policy.update!(post_manually: true)
+
+      expect do
+        @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+      end.not_to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }
+    end
+
+    it "creates an alert when a manually-posted assignment's grades are posted" do
+      @assignment.post_policy.update!(post_manually: true)
+      @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+
+      expect do
+        @assignment.post_submissions
+      end.to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }.by(1)
+    end
+
+    it "creates exactly one alert when the score changes multiple times before posting" do
+      @assignment.post_policy.update!(post_manually: true)
+
+      # Grade changed multiple times while hidden — none should fire an alert
+      @assignment.grade_student(@threshold.student, score: 5, grader: @teacher)
+      @assignment.grade_student(@threshold.student, score: 8, grader: @teacher)
+      @assignment.grade_student(@threshold.student, score: 9, grader: @teacher)
+      expect(ObserverAlert.where(context: @assignment).count).to eq(0)
+
+      # Posting should create exactly one alert, not one per grade change
+      expect do
+        @assignment.post_submissions
+      end.to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }.by(1)
+    end
+
+    it "does not create an alert when an autograded submission's grades are posted" do
+      @assignment.post_policy.update!(post_manually: true)
+      submission = @assignment.submissions.find_by(user: @threshold.student)
+      # grader_id < 0 is the convention for autograded submissions (e.g. quizzes)
+      submission.update_columns(score: 10, grade: "10", grader_id: -1, workflow_state: "graded")
+
+      expect do
+        @assignment.post_submissions
+      end.not_to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }
     end
   end
 

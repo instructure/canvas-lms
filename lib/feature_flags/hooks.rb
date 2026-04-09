@@ -201,6 +201,10 @@ module FeatureFlags
       context.feature_enabled?(:oak_for_admins)
     end
 
+    def self.study_assist_visible_on_hook(context)
+      context.feature_enabled?(:study_assist)
+    end
+
     # Private helper methods
 
     def self.shadow_flag_enabled?(context, flag_name)

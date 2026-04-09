@@ -31,6 +31,7 @@ interface LtiUsage {
 export interface EnvLtiRegistrations {
   LTI_USAGE: LtiUsage
   LTI_REGISTRATIONS_HISTORY: boolean
+  LTI_EDIT_JSON: boolean
   LTI_DR_REGISTRATIONS_UPDATE: boolean
   ACCOUNT_GLOBAL_ID: string
 }

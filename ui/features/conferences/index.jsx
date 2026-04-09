@@ -37,7 +37,7 @@ import ready from '@instructure/ready'
 import React from 'react'
 import {legacyRender} from '@canvas/react'
 import {VideoConferenceModal} from './react/components/VideoConferenceModal/VideoConferenceModal'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = createI18nScope('conferences')

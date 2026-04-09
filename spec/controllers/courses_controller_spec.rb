@@ -76,7 +76,6 @@ describe CoursesController do
       toggle_k5_setting(@course.account)
 
       get_index(user: @student)
-      expect(assigns[:js_bundles].flatten).to include :k5_theme
       expect(assigns[:css_bundles].flatten).to include :k5_theme, :k5_font
     end
 
@@ -84,7 +83,6 @@ describe CoursesController do
       course_with_student_logged_in
 
       get_index(user: @student)
-      expect(assigns[:js_bundles].flatten).not_to include :k5_theme
       expect(assigns[:css_bundles].flatten).not_to include :k5_theme, :k5_font
     end
 
@@ -2224,7 +2222,6 @@ describe CoursesController do
 
         get "show", params: { id: @course.id }
         expect(assigns[:js_bundles].flatten).to include :k5_course
-        expect(assigns[:js_bundles].flatten).to include :k5_theme
         expect(assigns[:css_bundles].flatten).to include :k5_common
         expect(assigns[:css_bundles].flatten).to include :k5_course
         expect(assigns[:css_bundles].flatten).to include :k5_theme
@@ -6815,7 +6812,9 @@ describe CoursesController do
             { "id" => "assignments", "label" => "Assignments" },
             { "id" => "announcements", "label" => "Announcements", "hidden" => true }
           ],
-          can_manage_links: false
+          can_manage_links: false,
+          request_host: "test.host",
+          request_port: 80
         )
         .and_return(processed_tabs)
 

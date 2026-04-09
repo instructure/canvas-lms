@@ -189,20 +189,20 @@ class TeacherViewPageV2
       f("input#subject-select-main")
     end
 
-    def review_type_must_review_radio
-      fj("label:contains('Must review')")
+    def review_type_will_review_radio
+      fj("label:contains('Will review')")
     end
 
-    def review_type_must_not_review_radio
-      fj("label:contains('Must not review')")
+    def review_type_will_not_review_radio
+      fj("label:contains('Will not review')")
     end
 
-    def review_type_should_review_radio
-      fj("label:contains('Should review')")
+    def enforcement_type_flexible_radio
+      fj("label:contains('Flexible')")
     end
 
-    def review_type_should_not_review_radio
-      fj("label:contains('Should not review')")
+    def enforcement_type_strict_radio
+      fj("label:contains('Strict')")
     end
 
     def add_subject_button

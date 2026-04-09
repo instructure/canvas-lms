@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {gql} from '@apollo/client'
 import qs from 'qs'
 import type {GradingRubricContext} from '../types/rubricAssignment'
@@ -31,7 +31,7 @@ import {executeQuery} from '@canvas/graphql'
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     method: 'POST',
@@ -55,7 +55,7 @@ export const addRubricToAssignment = async (
 
   const response = await fetch(`/courses/${courseId}/rubric_associations`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     method: 'POST',
@@ -110,7 +110,7 @@ export const getGradingRubricContexts = async ({
 
   const contexts = await fetch(`/courses/${courseId}/grading_rubrics`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
   })
 
@@ -140,7 +140,7 @@ export const getGradingRubricsForContext = async ({
 
   const contexts = await fetch(`/courses/${courseId}/grading_rubrics?context_code=${contextCode}`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
   })
 

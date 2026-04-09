@@ -141,11 +141,6 @@ module Importers
           Importers::GradingStandardImporter.process_migration(data, migration)
           migration.update_import_progress(58)
 
-          if migration.context.root_account.feature_enabled?(:nav_menu_links)
-            Importers::NavMenuLinkImporter.process_migration(data, migration)
-            migration.update_import_progress(59)
-          end
-
           Importers::ContextExternalToolImporter.process_migration(data, migration)
           migration.update_import_progress(60)
           Importers::LtiContextControlImporter.process_migration(data, migration)
@@ -186,6 +181,10 @@ module Importers
 
           if migration.context.try(:horizon_course?)
             Importers::ContentTagImporter.process_migration(data, migration)
+          end
+
+          if migration.context.root_account.feature_enabled?(:nav_menu_links)
+            Importers::NavMenuLinkImporter.process_migration(data, migration)
           end
 
           everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
@@ -25,6 +26,7 @@ import {confirm as confirmDialog} from '@canvas/instui-bindings/react/Confirm'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import $ from 'jquery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 vi.mock('@canvas/instui-bindings/react/Confirm')
 
@@ -50,6 +52,10 @@ beforeEach(() => {
   $.flashError = vi.fn()
   $.flashMessage = vi.fn()
   $.flashWarning = vi.fn()
+})
+
+afterEach(() => {
+  vi.clearAllMocks()
 })
 
 const sampleDeveloperKey = (defaults = {}) => {
@@ -84,15 +90,12 @@ const renderInheritanceStateControl = (developerKey, store = false, contextId = 
   render(<InheritanceStateControl {...defaultProps(developerKey, store, contextId)} />)
 
 describe('InheritanceStateControl', () => {
-  let oldFeatures = {}
-
   beforeEach(() => {
-    window.ENV.FEATURES ||= {}
-    oldFeatures = window.ENV.FEATURES
+    fakeENV.setup({FEATURES: {}})
   })
 
   afterEach(() => {
-    window.ENV.FEATURES = oldFeatures
+    fakeENV.teardown()
   })
 
   it('uses the "off" state from the store for a siteadmin key', () => {
@@ -178,7 +181,7 @@ describe('InheritanceStateControl', () => {
 
     const item = screen.getByText('Off')
 
-    fireEvent.click(item)
+    await userEvent.click(item)
 
     await waitFor(() => {
       const updatedDevKey = store.getState().listDeveloperKeys.list[0]
@@ -212,7 +215,7 @@ describe('InheritanceStateControl', () => {
     const item = screen.getByRole('checkbox')
     expect(item.checked).toBe(true)
 
-    fireEvent.click(item)
+    await userEvent.click(item)
 
     await waitFor(() => {
       const updatedDevKey = store.getState().listDeveloperKeys.list[0]
@@ -230,11 +233,14 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
-    // It's hard to test "wait for nothing to happen", so just
-    // wait a bit and make sure nothing's changed. This seems to be
-    // enough time such that if the confirm() Promise resolves to true,
-    // this test fails.
-    await new Promise(resolve => setTimeout(resolve, 1))
+    // Use fake timers to avoid leaking real async timers between tests.
+    // Advance past any micro-task queue flush to confirm state stays unchanged.
+    vi.useFakeTimers()
+    try {
+      await vi.advanceTimersByTimeAsync(10)
+    } finally {
+      vi.useRealTimers()
+    }
     const updatedDevKey = store.getState().listDeveloperKeys.list[0]
     expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('on')
   })
@@ -366,16 +372,99 @@ describe('InheritanceStateControl', () => {
     expect(allowRadioInput.checked).toBe(true)
   })
 
-  describe('when devKeysReadOnly is true', () => {
-    let originalEnv
-
+  describe('when lti_deactivate_registrations is enabled', () => {
     beforeEach(() => {
-      originalEnv = window.ENV
-      window.ENV = {...originalEnv, devKeysReadOnly: true}
+      window.ENV.FEATURES = {...window.ENV.FEATURES, lti_deactivate_registrations: true}
+    })
+
+    it('shows "on" when lti_registration_workflow_state is active, ignoring the binding', () => {
+      const key = {
+        ...mockDevKey('off'),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'active',
+      }
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(true)
+    })
+
+    it('shows "off" when lti_registration_workflow_state is inactive, ignoring the binding', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(false)
+    })
+
+    it('shows "off" when lti_registration_workflow_state is absent', () => {
+      const key = {...mockDevKey('on', true), is_lti_key: true}
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(false)
+    })
+
+    it('falls back to the binding when the key is not an LTI key', () => {
+      const key = {...mockDevKey('on', true), is_lti_key: false}
+      const toggle = componentNode(key).querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(true)
+    })
+
+    it('uses the binding state for site admin, ignoring registration state', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const onRadio = componentNode(key, siteAdminCTX).querySelector('input[value="on"]')
+      expect(onRadio.checked).toBe(true)
+    })
+
+    it('uses the binding state when inheritedTab is true, ignoring registration state', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const {container} = render(
+        <InheritanceStateControl
+          developerKey={key}
+          ctx={rootAccountCTX}
+          store={{dispatch: () => {}}}
+          actions={{setBindingWorkflowState: () => {}}}
+          inheritedTab={true}
+        />,
+      )
+      const toggle = container.querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(true)
+    })
+
+    it('uses registration state when inheritedTab is false', () => {
+      const key = {
+        ...mockDevKey('on', true),
+        is_lti_key: true,
+        lti_registration_workflow_state: 'inactive',
+      }
+      const {container} = render(
+        <InheritanceStateControl
+          developerKey={key}
+          ctx={rootAccountCTX}
+          store={{dispatch: () => {}}}
+          actions={{setBindingWorkflowState: () => {}}}
+          inheritedTab={false}
+        />,
+      )
+      const toggle = container.querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBe(false)
+    })
+  })
+
+  describe('when devKeysReadOnly is true', () => {
+    beforeEach(() => {
+      fakeENV.setup({FEATURES: {}, devKeysReadOnly: true})
     })
 
     afterEach(() => {
-      window.ENV = originalEnv
+      fakeENV.teardown()
     })
 
     it('disables radio group for site admin context', () => {

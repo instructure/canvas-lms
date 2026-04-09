@@ -206,8 +206,8 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
       scope: 'node',
     })
 
-    ed.on('NodeChange', (e: Events.NodeChangeEvent) => {
-      if (isStudioEmbeddedMedia(e.element) && studioTrayController.isOpen) {
+    ed.on('NodeChange', () => {
+      if (studioTrayController.isOpen) {
         studioTrayController.hideTrayForEditor(ed, true)
       }
     })

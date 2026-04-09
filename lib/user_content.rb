@@ -221,6 +221,11 @@ module UserContent
       html.gsub(@toplevel_regex) { |url| replacement(url) }
     end
 
+    # For places we have URLs outside of HTML content
+    def translate_url(url)
+      url&.gsub(@toplevel_regex) { |matched_url| replacement(matched_url) }
+    end
+
     def add_lazy_loading(parsed_html)
       parsed_html.css("img, iframe").each do |e|
         if e.attributes["src"]&.value&.match?(@toplevel_regex)

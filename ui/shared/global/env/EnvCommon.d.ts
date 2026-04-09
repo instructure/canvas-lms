@@ -101,6 +101,8 @@ export interface EnvCommon {
   ASSET_HOST: string
   JOURNEY_URL?: string
   WIKI_PAGE_ID?: string
+  FILE_ID?: string
+  STUDY_ASSIST_TOOLS?: string[]
   DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
@@ -143,6 +145,8 @@ export interface EnvCommon {
   DOMAIN_ROOT_ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_UUID: string
   ROOT_ACCOUNT_ID: string
+  ONETRUST_CONSENT_DOMAIN_ID?: string
+  PRE_COOKIE_CONSENT?: string
   PENDO_APP_ID: string
   ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
@@ -244,6 +248,7 @@ export interface EnvCommon {
   lolcalize: boolean
   rce_auto_save_max_age_ms: number
   K5_USER: boolean
+  K5_FONT_ONLY?: boolean
   USE_CLASSIC_FONT: string
   K5_HOMEROOM_COURSE: string
   K5_SUBJECT_COURSE: string
@@ -312,7 +317,6 @@ export type SiteAdminFeatureId =
   | 'instui_for_import_page'
   | 'instui_header'
   | 'instui_nav'
-  | 'lti_registrations_discover_page'
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
@@ -349,7 +353,6 @@ export type RootAccountFeatureId =
   | 'extended_submission_state'
   | 'instui_nav'
   | 'login_registration_ui_identity'
-  | 'lti_apps_page_ai_translation'
   | 'lti_asset_processor'
   | 'lti_asset_processor_discussions'
   | 'lti_link_to_apps_from_developer_keys'
@@ -386,10 +389,7 @@ export type RootAccountServiceId = 'account_survey_notifications'
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type BrandAccountFeatureId =
-  | 'embedded_release_notes'
-  | 'consolidated_media_player'
-  | 'discussion_checkpoints'
+export type BrandAccountFeatureId = 'embedded_release_notes' | 'discussion_checkpoints'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in

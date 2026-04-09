@@ -16,8 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, legacyUnmountComponentAtNode, render} from '@canvas/react'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
 import * as tz from '@instructure/moment-utils'
@@ -226,7 +225,7 @@ export default class WikiPageView extends Backbone.View {
       import('@canvas/block-content-editor').then(({BlockContentViewer}) => {
         const container = document.getElementById('block-editor-content')
         const data = this.model.get('block_editor_attributes').blocks
-        createRoot(container).render(<BlockContentViewer data={data} />)
+        render(<BlockContentViewer data={data} />, container)
       })
     } else if (
       this.model.get('editor') === 'block_editor' &&
@@ -307,7 +306,7 @@ export default class WikiPageView extends Backbone.View {
   openSendTo(ev, open = true) {
     if (ev) ev.preventDefault()
 
-    ReactDOM.render(
+    legacyRender(
       <DirectShareUserModal
         open={open}
         sourceCourseId={this.course_id}
@@ -324,7 +323,7 @@ export default class WikiPageView extends Backbone.View {
   openCopyTo(ev, open = true) {
     if (ev) ev.preventDefault()
 
-    ReactDOM.render(
+    legacyRender(
       <DirectShareCourseTray
         open={open}
         sourceCourseId={this.course_id}
@@ -354,9 +353,9 @@ export default class WikiPageView extends Backbone.View {
       this.renderItemAssignToTray(false, returnFocusTo)
       returnFocusTo.focus()
     }
-    const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
+    const onTrayExited = () => legacyUnmountComponentAtNode(mountPoint)
 
-    ReactDOM.render(
+    legacyRender(
       <ItemAssignToManager
         open={open}
         onClose={onTrayClose}
@@ -379,8 +378,7 @@ export default class WikiPageView extends Backbone.View {
     const todo_date = this.model.get('todo_date')
     if (todo_date) {
       const mountPoint = document.getElementById('todo-date-mount-point')
-      const root = createRoot(mountPoint)
-      root.render(
+      render(
         <b>
           <FriendlyDatetime
             data-testid="wiki-page-todo-date"
@@ -389,6 +387,7 @@ export default class WikiPageView extends Backbone.View {
             dateTime={todo_date}
           />
         </b>,
+        mountPoint,
       )
     }
   }

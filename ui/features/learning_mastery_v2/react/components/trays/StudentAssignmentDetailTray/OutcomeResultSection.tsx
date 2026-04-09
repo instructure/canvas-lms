@@ -25,7 +25,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {useOutcomeAlignments} from '../../../hooks/useOutcomeAlignments'
 import {StudentOutcomeScore} from '../../grid/StudentOutcomeScore'
 

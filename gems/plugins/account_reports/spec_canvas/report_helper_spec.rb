@@ -92,7 +92,26 @@ describe "report helper" do
     expect(account_report.account_report_runners.count).to eq 100
   end
 
-  it "fails when no csv" do
+  it "creates an error report and includes its id when failing without csv" do
+    AccountReports.finalize_report(account_report, "hi", nil)
+    error_report = ErrorReport.last
+    expect(error_report.category).to eq "account_report"
+    expect(account_report.message).to eq "Generating the report, Test Report, failed."
+    expect(account_report.parameters["extra_text"]).to eq(
+      "Failed, please report the following error code to your system administrator: ErrorReport:#{error_report.global_id};"
+    )
+  end
+
+  it "captures the original exception in the error report when one is provided" do
+    exception = StandardError.new("boom")
+    AccountReports.finalize_report(account_report, "hi", nil, exception:)
+    error_report = ErrorReport.last
+    expect(error_report.message).to include("boom")
+    expect(account_report.parameters["extra_text"]).to include("ErrorReport:#{error_report.global_id}")
+  end
+
+  it "falls back to generic failure message when error report creation fails" do
+    allow(Canvas::Errors).to receive(:capture).and_return(nil)
     AccountReports.finalize_report(account_report, "hi", nil)
     expect(account_report.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
   end

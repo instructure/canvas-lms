@@ -59,6 +59,40 @@ module Loaders
       end
     end
 
+    class InstitutionalTagsLoader < GraphQL::Batch::Loader
+      def initialize(current_user, session, account_id)
+        super()
+        @current_user = current_user
+        @session = session
+        @account_id = account_id
+      end
+
+      def perform(user_ids)
+        root_account = Account.find_by(id: @account_id)
+
+        unless root_account&.root_account? &&
+               root_account.feature_enabled?(:institutional_tags) &&
+               root_account.grants_right?(@current_user, @session, :manage_institutional_tags_view)
+          user_ids.each { |user_id| fulfill(user_id, nil) }
+          return
+        end
+
+        assocs = InstitutionalTagAssociation
+                 .where(user_id: user_ids, workflow_state: "active")
+                 .eager_load(:institutional_tag)
+                 .where(institutional_tags: { workflow_state: "active" })
+                 .order("institutional_tags.name")
+
+        tags_by_user_id = assocs
+                          .group_by(&:user_id)
+                          .transform_values { |a| a.map(&:institutional_tag) }
+
+        user_ids.each do |user_id|
+          fulfill(user_id, tags_by_user_id[user_id] || [])
+        end
+      end
+    end
+
     class DifferentiationTagsLoader < GraphQL::Batch::Loader
       def initialize(current_user, course_id)
         super()

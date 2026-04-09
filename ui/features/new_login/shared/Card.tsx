@@ -28,7 +28,7 @@ type Props = {
   href: string
   icon: string
   label: string
-  onClick: (event: React.MouseEvent<ViewOwnProps>) => void
+  onClick?: (event: React.MouseEvent<ViewOwnProps>) => void
   testId?: string
   text: string
 }
@@ -39,6 +39,7 @@ const Card = ({compact = false, href, icon, label, onClick, testId, text}: Props
       aria-label={label}
       data-testid={testId}
       display="block"
+      forceButtonRole={false}
       href={href}
       isWithinText={false}
       onClick={onClick}

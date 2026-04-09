@@ -47,7 +47,7 @@ import cellTemplate from './jst/outcome_gradebook_cell.handlebars'
 import studentCellTemplate from './jst/outcome_gradebook_student_cell.handlebars'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 const I18n = createI18nScope('gradebookOutcomeGradebookGrid')
 
@@ -499,7 +499,7 @@ const Grid = {
         null,
       )
 
-      ReactDOM.render(menu, node)
+      legacyRender(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
       const menu = React.createElement(
@@ -512,7 +512,7 @@ const Grid = {
         null,
       )
 
-      ReactDOM.render(menu, node)
+      legacyRender(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {
       if (column.field === 'student') {

@@ -35,6 +35,7 @@ import StudentLtiAssetReportModal from './StudentLtiAssetReportModal'
 export function LtiAssetReportsForStudentSubmission(props: {
   submissionId: string
   submissionType: string
+  attempt?: number
   attachmentId?: string
 }): JSX.Element | null {
   const data = useLtiAssetProcessorsAndReportsForStudent(props)
@@ -45,7 +46,13 @@ export function LtiAssetReportsForStudentSubmission(props: {
   return (
     <>
       <LtiAssetReportStatus reports={data.reports} openModal={() => setShowModal(true)} />
-      {showModal && <StudentLtiAssetReportModal {...data} onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <StudentLtiAssetReportModal
+          {...data}
+          hasNextPage={data.hasNextPage}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

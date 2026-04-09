@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "닫기"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "키보드 바로 가기 키 모달 닫기"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "자막 파일은 { maxKb }kb 미만이어야 합니다"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "지원되는 플랫폼에서 유효한 동영상 URL을 입력하세요."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "업로드하기 전에 파일을 선택하세요."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "지원하는 유형의 파일을 선택하세요"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "링크 옵션 표시"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "롤링 대화 내용 표시"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "롤링 대화 내용 표시"

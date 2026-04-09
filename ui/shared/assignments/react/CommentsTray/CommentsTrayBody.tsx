@@ -21,7 +21,8 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
@@ -118,6 +119,8 @@ export default function CommentsTrayBody(props) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject="Assignments 2 Student submission comments query error"
         errorCategory="Assignments 2 Student Error Page"
       />
@@ -133,6 +136,8 @@ export default function CommentsTrayBody(props) {
       errorComponent={
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorCategory="Assignments 2 Student Comment Error Page"
         />
       }

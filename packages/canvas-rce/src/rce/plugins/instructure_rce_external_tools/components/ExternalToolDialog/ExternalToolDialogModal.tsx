@@ -20,9 +20,8 @@ import React, {useEffect} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {Modal} from '@instructure/ui-modal'
+import {Modal, type ModalProps} from '@instructure/ui-modal'
 import formatMessage from '../../../../../format-message'
-import {ModalProps} from '@instructure/ui-modal/types'
 
 export function ExternalToolDialogModal(
   props: Pick<ModalProps, 'label' | 'open' | 'onOpen' | 'onClose' | 'mountNode'> & {

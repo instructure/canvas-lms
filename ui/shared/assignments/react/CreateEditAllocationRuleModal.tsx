@@ -17,6 +17,7 @@
  */
 
 import React, {useState, useRef, useEffect, useMemo} from 'react'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -50,8 +51,15 @@ const TARGET_TYPES = {
   REVIEWEE: 'reviewee',
   RECIPROCAL: 'reciprocal',
 }
-const REQUIRED_REVIEW_TYPE = ['permit', 'prohibit']
-const SUGGESTED_REVIEW_TYPE = ['should', 'should_not']
+const REVIEW_ACTIONS = {
+  WILL: 'will',
+  WILL_NOT: 'will_not',
+}
+
+const ENFORCEMENT_TYPES = {
+  FLEXIBLE: 'flexible',
+  STRICT: 'strict',
+}
 
 const CreateEditAllocationRuleModal = ({
   assignmentId,
@@ -78,7 +86,7 @@ const CreateEditAllocationRuleModal = ({
       : TARGET_TYPES.REVIEWER,
   )
   const [permitReview, setPermitReview] = useState(rule?.reviewPermitted ?? true)
-  const [mustReview, setMustReview] = useState(rule?.mustReview ?? true)
+  const [mustReview, setMustReview] = useState(rule?.mustReview ?? false)
 
   const [target, setTarget] = useState(rule?.appliesToAssessor ? rule?.assessor : rule?.assessee)
   const [targetErrors, setTargetErrors] = useState<FormMessage[]>([])
@@ -393,38 +401,41 @@ const CreateEditAllocationRuleModal = ({
     clearAllErrors(true)
     if (value === TARGET_TYPES.RECIPROCAL) {
       if (additionalSubjectCount > 0) clearAdditionalSubjects()
+      setPermitReview(true)
     }
     setTargetType(value)
   }
 
-  const getReviewType = () => {
-    if (permitReview && mustReview) return 'permit'
-    if (!permitReview && mustReview) return 'prohibit'
-    if (permitReview && !mustReview) return 'should'
-    return 'should_not'
+  const handleReviewActionChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    clearAllErrors(true)
+    setPermitReview(value === REVIEW_ACTIONS.WILL)
   }
 
-  const handleReviewTypeChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+  const handleEnforcementTypeChange = (
+    _event: React.ChangeEvent<HTMLInputElement>,
+    value: string,
+  ) => {
     clearAllErrors(true)
-    switch (value) {
-      case 'permit':
-        setPermitReview(true)
-        setMustReview(true)
-        break
-      case 'prohibit':
-        setPermitReview(false)
-        setMustReview(true)
-        break
-      case 'should':
-        setMustReview(false)
-        setPermitReview(true)
-        break
-      case 'should_not':
-        setMustReview(false)
-        setPermitReview(false)
-        break
-      default:
-        break
+    setMustReview(value === ENFORCEMENT_TYPES.STRICT)
+  }
+
+  const getEnforcementHelperText = (type: string) => {
+    if (permitReview) {
+      return type === ENFORCEMENT_TYPES.FLEXIBLE
+        ? I18n.t(
+            'If the allocated submission is not available another submission will be substituted',
+          )
+        : I18n.t(
+            'If the allocated submission is not available the student will be blocked from completing the assignment',
+          )
+    } else {
+      return type === ENFORCEMENT_TYPES.FLEXIBLE
+        ? I18n.t(
+            'If only excluded submissions are available another submission will be substituted',
+          )
+        : I18n.t(
+            'If only excluded submissions are available the student will be blocked from completing the assignment',
+          )
     }
   }
 
@@ -553,7 +564,7 @@ const CreateEditAllocationRuleModal = ({
           type: 'hint',
           text: hintText(
             I18n.t(
-              '%{name} already has enough “must review” allocations to meet required peer reviews. Additional allocations will follow available submissions and precedence.',
+              '%{name} already has enough strict allocations to meet required peer reviews. Additional allocations will follow available submissions and precedence.',
               {name: student.name},
             ),
             true,
@@ -620,7 +631,11 @@ const CreateEditAllocationRuleModal = ({
     <StudentSelect
       inputId={index === -1 ? 'subject-select-main' : `subject-select-${subjectKey}`}
       label={
-        targetType === TARGET_TYPES.REVIEWEE ? I18n.t('Reviewer Name') : I18n.t('Recipient Name')
+        targetType === TARGET_TYPES.RECIPROCAL
+          ? I18n.t('Review Partner 2')
+          : targetType === TARGET_TYPES.REVIEWEE
+            ? I18n.t('Reviewer Name')
+            : I18n.t('Recipient Name')
       }
       errors={index === -1 ? subjectErrors : (additionalSubjectsErrors[subjectKey || ''] ?? [])}
       selectedStudent={index === -1 ? subject : additionalSubjects[subjectKey || '']}
@@ -640,8 +655,6 @@ const CreateEditAllocationRuleModal = ({
       clearErrors={() => clearErrors(true, subjectKey)}
     />
   )
-
-  const reviewType = getReviewType()
 
   return (
     <Modal
@@ -684,7 +697,7 @@ const CreateEditAllocationRuleModal = ({
               onChange={handleTargetSelection}
               name="target"
               defaultValue={targetType ?? TARGET_TYPES.REVIEWER}
-              description={I18n.t('Rule Type')}
+              description={<ScreenReaderContent>{I18n.t('Rule Type')}</ScreenReaderContent>}
               data-testid="target-type-radio-group"
             >
               <RadioInput
@@ -711,9 +724,11 @@ const CreateEditAllocationRuleModal = ({
             <StudentSelect
               inputId={`target-select`}
               label={
-                targetType === TARGET_TYPES.REVIEWEE
-                  ? I18n.t('Recipient Name')
-                  : I18n.t('Reviewer Name')
+                targetType === TARGET_TYPES.RECIPROCAL
+                  ? I18n.t('Review Partner 1')
+                  : targetType === TARGET_TYPES.REVIEWEE
+                    ? I18n.t('Recipient Name')
+                    : I18n.t('Reviewer Name')
               }
               handleInputRef={ref => {
                 if (targetSelectRef) targetSelectRef.current = ref
@@ -726,78 +741,36 @@ const CreateEditAllocationRuleModal = ({
               clearErrors={() => clearErrors(false)}
             />
           </Flex.Item>
-          <Flex.Item padding="small">
-            <FormFieldGroup
-              description={I18n.t('Review Requirement')}
-              layout="stacked"
-              rowSpacing="small"
-              role="radiogroup"
-              data-testid="review-type-group"
-            >
-              <Grid colSpacing="medium" rowSpacing="small">
-                <Grid.Row>
-                  <Grid.Col>
-                    <RadioInput
-                      name="reviewType"
-                      value="permit"
-                      checked={reviewType === 'permit'}
-                      onChange={e => handleReviewTypeChange(e, e.target.value)}
-                      label={
-                        targetType !== TARGET_TYPES.REVIEWEE
-                          ? I18n.t('Must review')
-                          : I18n.t('Must be reviewed by')
-                      }
-                      data-testid="review-type-must-review"
-                    />
-                  </Grid.Col>
-                  <Grid.Col>
-                    <RadioInput
-                      name="reviewType"
-                      value="should"
-                      checked={reviewType === 'should'}
-                      onChange={e => handleReviewTypeChange(e, e.target.value)}
-                      label={
-                        targetType !== TARGET_TYPES.REVIEWEE
-                          ? I18n.t('Should review')
-                          : I18n.t('Should be reviewed by')
-                      }
-                      data-testid="review-type-should-review"
-                    />
-                  </Grid.Col>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Col>
-                    <RadioInput
-                      name="reviewType"
-                      value="prohibit"
-                      checked={reviewType === 'prohibit'}
-                      onChange={e => handleReviewTypeChange(e, e.target.value)}
-                      label={
-                        targetType !== TARGET_TYPES.REVIEWEE
-                          ? I18n.t('Must not review')
-                          : I18n.t('Must not be reviewed by')
-                      }
-                      data-testid="review-type-must-not-review"
-                    />
-                  </Grid.Col>
-                  <Grid.Col>
-                    <RadioInput
-                      name="reviewType"
-                      value="should_not"
-                      checked={reviewType === 'should_not'}
-                      onChange={e => handleReviewTypeChange(e, e.target.value)}
-                      label={
-                        targetType !== TARGET_TYPES.REVIEWEE
-                          ? I18n.t('Should not review')
-                          : I18n.t('Should not be reviewed by')
-                      }
-                      data-testid="review-type-should-not-review"
-                    />
-                  </Grid.Col>
-                </Grid.Row>
-              </Grid>
-            </FormFieldGroup>
-          </Flex.Item>
+          {targetType !== TARGET_TYPES.RECIPROCAL && (
+            <Flex.Item padding="small">
+              <RadioInputGroup
+                onChange={handleReviewActionChange}
+                name="reviewAction"
+                defaultValue={permitReview ? REVIEW_ACTIONS.WILL : REVIEW_ACTIONS.WILL_NOT}
+                description={<ScreenReaderContent>{I18n.t('Review Action')}</ScreenReaderContent>}
+                data-testid="review-type-group"
+              >
+                <RadioInput
+                  value={REVIEW_ACTIONS.WILL}
+                  label={
+                    targetType !== TARGET_TYPES.REVIEWEE
+                      ? I18n.t('Will review')
+                      : I18n.t('Will be reviewed by')
+                  }
+                  data-testid="review-type-will-review"
+                />
+                <RadioInput
+                  value={REVIEW_ACTIONS.WILL_NOT}
+                  label={
+                    targetType !== TARGET_TYPES.REVIEWEE
+                      ? I18n.t('Will not review')
+                      : I18n.t('Will not be reviewed by')
+                  }
+                  data-testid="review-type-will-not-review"
+                />
+              </RadioInputGroup>
+            </Flex.Item>
+          )}
           <Flex.Item padding="small">{renderSubjectSelect()}</Flex.Item>
           {Object.keys(additionalSubjects).length > 0 && (
             <Flex.Item padding="small">
@@ -847,6 +820,46 @@ const CreateEditAllocationRuleModal = ({
                 </CondensedButton>
               </Flex.Item>
             )}
+          <Flex.Item padding="small">
+            <RadioInputGroup
+              onChange={handleEnforcementTypeChange}
+              name="enforcementType"
+              defaultValue={mustReview ? ENFORCEMENT_TYPES.STRICT : ENFORCEMENT_TYPES.FLEXIBLE}
+              description={<ScreenReaderContent>{I18n.t('Enforcement')}</ScreenReaderContent>}
+              data-testid="enforcement-type-group"
+            >
+              <RadioInput
+                value={ENFORCEMENT_TYPES.FLEXIBLE}
+                label={I18n.t('Flexible')}
+                data-testid="enforcement-type-flexible"
+              />
+              <View
+                as="div"
+                padding="0 0 0 large"
+                margin="small 0 0 0"
+                themeOverride={{paddingLarge: '1.75rem', marginSmall: '-0.75rem'}}
+              >
+                <Text size="small" color="secondary">
+                  {getEnforcementHelperText(ENFORCEMENT_TYPES.FLEXIBLE)}
+                </Text>
+              </View>
+              <RadioInput
+                value={ENFORCEMENT_TYPES.STRICT}
+                label={I18n.t('Strict')}
+                data-testid="enforcement-type-strict"
+              />
+              <View
+                as="div"
+                padding="0 0 0 large"
+                margin="small 0 0 0"
+                themeOverride={{paddingLarge: '1.75rem', marginSmall: '-0.75rem'}}
+              >
+                <Text size="small" color="secondary">
+                  {getEnforcementHelperText(ENFORCEMENT_TYPES.STRICT)}
+                </Text>
+              </View>
+            </RadioInputGroup>
+          </Flex.Item>
         </Flex>
       </Modal.Body>
       <Modal.Footer>

@@ -285,7 +285,7 @@ describe('EditView - Peer Reviews and Configuration Tools', () => {
 
     it('sends re-enable postMessage from handleSubmissionTypeChange when feature flag is on', () => {
       window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
-      const view = createEditView()
+      const view = createEditView({peer_review_sub_assignment: {id: '1'}})
       view.$el.appendTo($('#fixtures'))
 
       const postMessageSpy = vi.spyOn(window.top, 'postMessage')
@@ -350,6 +350,40 @@ describe('EditView - Peer Reviews and Configuration Tools', () => {
         view.$submissionType.val('online')
         expect(view.canEnablePeerReviews()).toBe(true)
       })
+    })
+  })
+
+  describe('#showGradedPeerReviewSettings', () => {
+    it('returns false when feature flag is disabled', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+      const view = createEditView({peer_reviews: true})
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(false)
+    })
+
+    it('returns true for a new assignment when feature flag is enabled', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView()
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(true)
+    })
+
+    it('returns false for a legacy peer review assignment (peer_reviews with no sub_assignment)', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView({id: '1', peer_reviews: true})
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(false)
+    })
+
+    it('returns true for a graded peer review assignment (peer_reviews with sub_assignment)', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView({
+        id: '1',
+        peer_reviews: true,
+        peer_review_sub_assignment: {id: '1'},
+      })
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(true)
     })
   })
 

@@ -687,6 +687,11 @@ describe Api::V1::User do
           enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
           expect(enrollment_json).to include("temporary_enrollment_source_user_id")
         end
+
+        it "includes temporary_enrollment_display_state attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).to have_key(:temporary_enrollment_display_state)
+        end
       end
 
       context "when feature flag is disabled" do
@@ -697,6 +702,11 @@ describe Api::V1::User do
         it "excludes temporary_enrollment_source_user_id attribute" do
           enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
           expect(enrollment_json).not_to include("temporary_enrollment_source_user_id")
+        end
+
+        it "excludes temporary_enrollment_display_state attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).not_to have_key(:temporary_enrollment_display_state)
         end
       end
     end
@@ -2290,6 +2300,16 @@ describe "Users API", type: :request do
             expect(user.email).to eq new_email
           end
         end
+      end
+
+      it "does not persist any changes when part of the update is invalid" do
+        original_name = @student.name
+        raw_api_call(:put, @path, @path_options, {
+                       user: { name: "New Name", email: "invalid@" }
+                     })
+        expect(response).to have_http_status :bad_request
+        expect(@student.reload.name).to eq original_name
+        expect(CommunicationChannel.where(path: "invalid@")).not_to exist
       end
 
       context "pronouns" do

@@ -87,49 +87,27 @@ function ClearableDateTimeInput({
   timeInputRef,
   clearButtonAltLabel,
 }: ClearableDateTimeInputProps) {
-  const elementRef = useRef<HTMLElement | null>(null)
-  const elementRefCallback = (element: Element | null) => {
-    elementRef.current = element instanceof HTMLElement ? element : null
-    if (elementRef?.current) {
-      setHeight(elementRef.current.offsetHeight)
-    }
-  }
-
   const {setOnSuccess} = useContext(AlertManagerContext)
 
-  const [height, setHeight] = useState(0)
-
-  const [hasErrorBorder, setHasErrorBorder] = useState(false)
   const clearButtonContainer = useRef<HTMLElement | null>()
   const [validationError, setValidationError] = useState<FormMessage | null>(null)
 
   const handleResize = useCallback((element: Element) => {
-    // Selector for the date time input that is affected by the red border and padding
-    const container = element.querySelector('fieldset > span > span:first-child > span > span')
-    if (!container) return
-    // If padding is cero means that the error border does not exist
-    setHasErrorBorder(getComputedStyle(container).padding !== '0px')
+    const dateInput = element.querySelector('input')
+    if (!dateInput || !clearButtonContainer.current) return
+    const containerTop = element.getBoundingClientRect().top
+    const inputTop = dateInput.getBoundingClientRect().top - containerTop
+    const newPadding = `${Math.max(0, inputTop)}px`
+    if (clearButtonContainer.current.style.paddingTop !== newPadding) {
+      clearButtonContainer.current.style.paddingTop = newPadding
+    }
   }, [])
 
-  // We used this instead of checking messages since we can't control internal error messages
   const [listenElement] = useElementResize(handleResize)
 
-  useEffect(() => {
-    if (!clearButtonContainer.current) return
-    if (height > 0) {
-      // labels + labels margins + 0.5rem (padding when the date time input has errors)
-      clearButtonContainer.current.style.paddingTop = hasErrorBorder
-        ? `${1.5 + height / 16}rem`
-        : `${1 + height / 16}rem`
-    }
-  }, [hasErrorBorder, height])
-  const renderDateLabel = <Text elementRef={elementRefCallback}>{dateRenderLabel}</Text>
+  const renderDateLabel = <Text>{dateRenderLabel}</Text>
 
-  const renderTimeLabel = (
-    <Flex as="div" height={height - 2} direction="column" justifyItems="end">
-      {I18n.t('Time')}
-    </Flex>
-  )
+  const renderTimeLabel = <Text>{I18n.t('Time')}</Text>
 
   const handleChange = (event: React.SyntheticEvent, newValue: string | undefined) => {
     // Clear any existing validation error first

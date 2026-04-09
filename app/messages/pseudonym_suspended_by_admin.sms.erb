@@ -1,0 +1,3 @@
+<% p = asset.is_a?(Pseudonym) ? asset : asset.pseudonym %>
+
+<%= t :body, "The user %{user_name} at %{account_name} has been suspended. Please contact your institution's administration.", :user_name => p.user.short_name, :account_name => p.user.account.display_name %>

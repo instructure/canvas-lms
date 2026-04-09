@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -109,5 +109,5 @@ export function ImmersiveReaderButton({content, readerSDK, breakpoints}) {
 const ImmersiveReaderButtonWithBreakpoints = WithBreakpoints(ImmersiveReaderButton)
 
 export function initializeReaderButton(mountPoint, content) {
-  ReactDOM.render(<ImmersiveReaderButtonWithBreakpoints content={content} />, mountPoint)
+  legacyRender(<ImmersiveReaderButtonWithBreakpoints content={content} />, mountPoint)
 }

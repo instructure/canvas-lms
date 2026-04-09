@@ -1821,6 +1821,53 @@ describe Course do
     end
   end
 
+  describe "users_visible_to with temporary enrollments" do
+    before :once do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @provider = user_factory(active_all: true)
+      @course = course_with_teacher(active_all: true, user: @provider).course
+      @pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+    end
+
+    def create_temp_enrollment(user, start_at: nil, end_at: nil)
+      enrollment = @course.enroll_user(
+        user,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      enrollment.update!(start_at:, end_at:) if start_at
+      enrollment
+    end
+
+    it "includes users with future temporary enrollments" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).to include(recipient.id)
+    end
+
+    it "includes users with active temporary enrollments" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.ago, end_at: 1.week.from_now)
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).to include(recipient.id)
+    end
+
+    it "includes users with non-temporary enrollments" do
+      student = user_factory(active_all: true)
+      @course.enroll_student(student, enrollment_state: "active")
+
+      visible_ids = @course.users_visible_to(@provider).pluck(:id)
+      expect(visible_ids).to include(student.id)
+    end
+  end
+
   describe "course_section_visibility" do
     before :once do
       @course = Account.default.courses.create!
@@ -9619,7 +9666,6 @@ describe Course do
     let(:horizon_account) do
       account = Account.create!
       account.enable_feature!(:horizon_course_setting)
-      account.enable_feature!(:horizon_auto_content_ingestion)
       account.horizon_account = true
       account.save!
       account
@@ -9644,16 +9690,6 @@ describe Course do
           singleton: "horizon_content_discovery:#{course.global_id}"
         ).and_return(course)
         expect(course).to receive(:ingest_horizon_content)
-
-        course.account = horizon_account
-        course.save!
-      end
-
-      it "does not enqueue job when feature flag is disabled" do
-        horizon_account.disable_feature!(:horizon_auto_content_ingestion)
-        course = regular_account.courses.create!
-
-        expect(course).not_to receive(:ingest_horizon_content)
 
         course.account = horizon_account
         course.save!

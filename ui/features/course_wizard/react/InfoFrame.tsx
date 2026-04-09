@@ -21,7 +21,7 @@ import {find} from 'es-toolkit/compat'
 import React, {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ListItems, {type ListItem} from './ListItems'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 const I18n = createI18nScope('course_wizard')
 

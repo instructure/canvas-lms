@@ -18,14 +18,23 @@
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconWarningSolid, IconRefreshLine} from '@instructure/ui-icons'
-import {createContext, PropsWithChildren, useContext, useEffect, useRef} from 'react'
+import {
+  IconAiLine,
+  IconWarningSolid,
+  IconRefreshLine,
+  IconLikeLine,
+  IconLikeSolid,
+} from '@instructure/ui-icons'
+import {createContext, PropsWithChildren, useContext, useEffect, useRef, useState} from 'react'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getTranslation} from '../../../utils'
 import {Link} from '@instructure/ui-link'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {IconButton, Button} from '@instructure/ui-buttons'
+import {TextInput} from '@instructure/ui-text-input'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -473,6 +482,165 @@ const Actions = () => {
   )
 }
 
+declare const ENV: {
+  course_id?: string
+  discussion_topic_id?: string
+  discussion_translation_feedback?: boolean
+}
+
+const FeedbackInner = ({
+  id,
+  translateTargetLanguage,
+}: {
+  id: string
+  translateTargetLanguage: string
+}) => {
+  const [feedbackNotes, setLocalFeedbackNotes] = useState('')
+  const liked = useTranslationStore(state => state.entries[id]?.feedbackLiked || false)
+  const disliked = useTranslationStore(state => state.entries[id]?.feedbackDisliked || false)
+  const feedbackLoading = useTranslationStore(state => state.entries[id]?.feedbackLoading || false)
+  const storedNotes = useTranslationStore(state => state.entries[id]?.feedbackNotes)
+  const setFeedbackState = useTranslationStore(state => state.setFeedbackState)
+  const setFeedbackLoadingAction = useTranslationStore(state => state.setFeedbackLoading)
+  const setFeedbackNotesAction = useTranslationStore(state => state.setFeedbackNotes)
+
+  const contentType = id === 'topic' ? 'DiscussionTopic' : 'DiscussionEntry'
+  const contentId = id === 'topic' ? ENV.discussion_topic_id : id
+
+  const postFeedback = async (action: string, notes?: string) => {
+    setFeedbackLoadingAction(id, true)
+
+    try {
+      const {json}: any = await doFetchApi({
+        method: 'POST',
+        path: `/courses/${ENV.course_id}/translate/feedback`,
+        body: {
+          _action: action,
+          content_type: contentType,
+          content_id: contentId,
+          target_language: translateTargetLanguage,
+          feature_slug: 'discussion_topic',
+          notes,
+        },
+      })
+      setFeedbackState(id, json.liked, json.disliked)
+      if (notes) {
+        setFeedbackNotesAction(id, notes)
+      }
+    } catch (_error) {
+      showFlashAlert({
+        type: 'error',
+        message: I18n.t('There was an unexpected error while submitting feedback.'),
+      })
+    } finally {
+      setFeedbackLoadingAction(id, false)
+    }
+  }
+
+  const handleLike = () => {
+    postFeedback(liked ? 'reset_like' : 'like')
+  }
+
+  const handleDislike = () => {
+    postFeedback(disliked ? 'reset_like' : 'dislike')
+  }
+
+  const handleSendNotes = () => {
+    if (!feedbackNotes.trim()) return
+    postFeedback('dislike', feedbackNotes)
+  }
+
+  return (
+    <Flex direction="column" margin="small 0 0 0">
+      <Flex justifyItems="end" alignItems="center">
+        <Flex.Item margin="0 small 0 0">
+          <Text color="secondary" size="small">
+            {liked || disliked
+              ? I18n.t('Thank you for sharing!')
+              : I18n.t('Was this translation helpful?')}
+          </Text>
+        </Flex.Item>
+        <IconButton
+          onClick={handleLike}
+          size="small"
+          withBackground={false}
+          withBorder={false}
+          color={liked ? 'primary' : 'secondary'}
+          screenReaderLabel={
+            liked ? I18n.t('Like translation, selected') : I18n.t('Like translation')
+          }
+          interaction={feedbackLoading ? 'disabled' : 'enabled'}
+          data-testid="translation-like-button"
+        >
+          {liked ? <IconLikeSolid /> : <IconLikeLine />}
+        </IconButton>
+        <IconButton
+          onClick={handleDislike}
+          size="small"
+          withBackground={false}
+          withBorder={false}
+          color={disliked ? 'primary' : 'secondary'}
+          screenReaderLabel={
+            disliked ? I18n.t('Dislike translation, selected') : I18n.t('Dislike translation')
+          }
+          interaction={feedbackLoading ? 'disabled' : 'enabled'}
+          data-testid="translation-dislike-button"
+        >
+          {disliked ? <IconLikeSolid rotate="180" /> : <IconLikeLine rotate="180" />}
+        </IconButton>
+      </Flex>
+      {disliked && !storedNotes && (
+        <Flex direction="column" gap="medium" margin="medium 0 0 0">
+          <Text size="small">
+            {I18n.t('Can you please explain why you disapprove of the translation?')}
+          </Text>
+          <Flex gap="small" alignItems="end">
+            <Flex.Item shouldGrow={true}>
+              <TextInput
+                renderLabel={I18n.t('Explanation')}
+                placeholder={I18n.t('Start typing...')}
+                value={feedbackNotes}
+                onChange={(_e, value) => setLocalFeedbackNotes(value)}
+                data-testid="translation-feedback-input"
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                color="secondary"
+                onClick={handleSendNotes}
+                interaction={!feedbackLoading && feedbackNotes.trim() ? 'enabled' : 'disabled'}
+                data-testid="translation-feedback-submit"
+              >
+                {I18n.t('Send Feedback')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </Flex>
+      )}
+    </Flex>
+  )
+}
+
+const Feedback = () => {
+  const context = useContext(TranslationContext)
+
+  if (context === undefined) {
+    return null
+  }
+
+  const {id, isTranslationReady, translateTargetLanguage, translationError} = context
+
+  if (!isTranslationReady || translationError || !translateTargetLanguage) {
+    return null
+  }
+
+  if (!ENV.discussion_translation_feedback) {
+    return null
+  }
+
+  return <FeedbackInner id={id} translateTargetLanguage={translateTargetLanguage} />
+}
+
 Translation.Content = Content
 
 Translation.Divider = Divider
@@ -480,5 +648,7 @@ Translation.Divider = Divider
 Translation.Error = Error
 
 Translation.Actions = Actions
+
+Translation.Feedback = Feedback
 
 export {Translation}

@@ -660,7 +660,8 @@ describe DeveloperKey do
               account: Account.site_admin,
               created_by: admin,
               registration_params: { name: "Template Tool" },
-              configuration_params: internal_lti_configuration
+              configuration_params: internal_lti_configuration,
+              binding_params: { workflow_state: "on" }
             )
           end
         end
@@ -670,7 +671,7 @@ describe DeveloperKey do
             account: subaccount,
             user: admin,
             template:
-          )
+          )[:local_copy]
         end
         let_once(:template_tool) { template.new_external_tool(Account.site_admin) }
         let_once(:local_copy_tool) { local_copy.new_external_tool(subaccount) }
@@ -753,6 +754,70 @@ describe DeveloperKey do
     context "when the context is a course" do
       it_behaves_like "a boolean indicating the key is usable in context" do
         let(:context) { course_model(account:) }
+      end
+    end
+
+    context "when lti_deactivate_registrations is enabled" do
+      subject { developer_key.usable_in_context?(account) }
+
+      let(:developer_key) do
+        DeveloperKey.create!(
+          account:,
+          is_lti_key: true,
+          public_jwk_url: "https://example.com/jwks"
+        )
+      end
+
+      before { account.enable_feature!(:lti_deactivate_registrations) }
+
+      context "when the key is usable and the registration is active" do
+        it { is_expected.to be true }
+      end
+
+      context "when the key is not usable" do
+        before { developer_key.update!(workflow_state: "deleted") }
+
+        it { is_expected.to be false }
+      end
+
+      context "when the registration is inactive" do
+        before { developer_key.lti_registration.deactivate! }
+
+        it { is_expected.to be false }
+      end
+
+      context "when there is no lti_registration" do
+        before { developer_key.update_column(:lti_registration_id, nil) }
+
+        it { is_expected.to be false }
+      end
+
+      context "when the account binding is off" do
+        before do
+          developer_key.account_binding_for(account).update!(workflow_state: "off")
+        end
+
+        it "ignores the binding and returns true" do
+          expect(subject).to be true
+        end
+      end
+
+      context "when the key is not an LTI key" do
+        let(:developer_key) { DeveloperKey.create!(account:) }
+
+        context "when binding is on" do
+          before { developer_key.account_binding_for(account).update!(workflow_state: "on") }
+
+          it "uses the binding-based check" do
+            expect(subject).to be true
+          end
+        end
+
+        context "when binding is off" do
+          it "uses the binding-based check" do
+            expect(subject).to be false
+          end
+        end
       end
     end
   end

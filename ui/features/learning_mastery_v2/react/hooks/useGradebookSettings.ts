@@ -19,15 +19,14 @@
 import {useState, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {loadLearningMasteryGradebookSettings} from '../apiClient'
+import {GradebookSettings, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {
-  GradebookSettings,
   DisplayFilter,
   SecondaryInfoDisplay,
   NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-  DEFAULT_GRADEBOOK_SETTINGS,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

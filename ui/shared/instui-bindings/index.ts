@@ -17,20 +17,29 @@
  */
 
 import {
-  canvasThemeLocal as canvasBaseTheme,
-  canvasHighContrastThemeLocal as canvasHighContrastTheme,
+  canvas as canvasBaseTheme,
+  canvasHighContrast as canvasHighContrastTheme,
 } from '@instructure/ui-themes'
-import {memoize} from 'es-toolkit/compat'
 
 const EMPTY_OBJ = {}
 
-// Set up the default InstUI theme
 // Override the fontFamily to include "Lato Extended", which we prefer
 // to load over plain Lato (see LS-1559)
 const typographyBase =
   'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif'
-const typography = {
-  fontFamily: ENV.use_dyslexic_font ? `OpenDyslexic, ${typographyBase}` : typographyBase,
+
+export function getTransitionOverride() {
+  return process.env.NODE_ENV === 'test' || window.INST?.environment === 'test'
+    ? {transitions: {duration: '0ms'}}
+    : {}
+}
+
+export function getTypography(k5User: boolean, useClassicFont: boolean, useDyslexicFont: boolean) {
+  const k5FontBase =
+    k5User && !useClassicFont ? `"Balsamiq Sans", ${typographyBase}` : typographyBase
+  return {
+    fontFamily: useDyslexicFont ? `OpenDyslexic, ${k5FontBase}` : k5FontBase,
+  }
 }
 
 type BrandVariables = Record<string, unknown>
@@ -54,27 +63,27 @@ function getIsHighContrastWithFallback(highContrast: unknown) {
   return isHighContrast
 }
 
-function getTheme_(highContrast?: unknown, brandVariables?: BrandVariables) {
+function getTheme_(
+  highContrast?: unknown,
+  brandVariables?: BrandVariables,
+  k5User?: boolean,
+  useClassicFont?: boolean,
+  useDyslexicFont?: boolean,
+) {
   const isHighContrast = getIsHighContrastWithFallback(highContrast)
   const brandVariables_ = brandVariables || window.CANVAS_ACTIVE_BRAND_VARIABLES || EMPTY_OBJ
+  const typography = getTypography(
+    k5User ?? false,
+    useClassicFont ?? false,
+    useDyslexicFont ?? false,
+  )
 
-  // Set CSS transitions to 0ms in Selenium and JS tests
-  let transitionOverride: {
-    transitions?: {
-      duration: string
-    }
-  } = {}
-  if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
-    transitionOverride = {
-      transitions: {
-        duration: '0ms',
-      },
-    }
-  }
+  const transitionOverride = getTransitionOverride()
 
   return isHighContrast
     ? {
         ...canvasHighContrastTheme,
+        ...transitionOverride,
         typography: {
           ...canvasHighContrastTheme.typography,
           ...typography,
@@ -83,6 +92,8 @@ function getTheme_(highContrast?: unknown, brandVariables?: BrandVariables) {
     : {
         ...canvasBaseTheme,
         ...brandVariables_,
+        // transitionOverride MUST be spread after brandVariables_ so that 0ms
+        // transitions aren't overwritten. Moving it earlier causes flaky Selenium tests.
         ...transitionOverride,
         typography: {
           ...canvasBaseTheme.typography,
@@ -90,4 +101,4 @@ function getTheme_(highContrast?: unknown, brandVariables?: BrandVariables) {
         },
       }
 }
-export const getTheme = memoize(getTheme_)
+export const getTheme = getTheme_

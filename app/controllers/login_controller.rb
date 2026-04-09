@@ -117,10 +117,17 @@ class LoginController < ApplicationController
     host = return_to.host
     return render_unauthorized_action unless host.casecmp?(request.host)
 
+    consent_from_mobile = if params[:mobile_consent].present?
+                            params[:mobile_consent] == "true"
+                          else
+                            nil
+                          end
+
     login_pseudonym = @real_current_pseudonym || @current_pseudonym
     token = SessionToken.new(login_pseudonym.global_id,
                              current_user_id: @real_current_user ? @current_user.global_id : nil,
-                             used_remember_me_token: true).to_s
+                             used_remember_me_token: true,
+                             consent_from_mobile:).to_s
     return_to.query&.concat("&")
     return_to.query = "" unless return_to.query
     return_to.query.concat("session_token=#{token}")

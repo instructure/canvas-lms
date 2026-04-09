@@ -188,7 +188,7 @@ const DeleteCalendarEventDialog = ({
 
     if (isAppointmentGroup) {
       message = I18n.t(
-        'If you delete this appointment group, all course teachers will lose access, and all student signups will be permanently deleted.',
+        'If you delete this appointment, all course teachers will lose access, and all student signups will be permanently deleted.',
       )
     } else if (eventType === 'assignment') {
       message = I18n.t(

@@ -19,7 +19,6 @@
 #
 
 require "net-ldap"
-require "net_ldap_extensions"
 NetLdapExtensions.apply
 
 class AuthenticationProvider < ApplicationRecord
@@ -267,6 +266,11 @@ class AuthenticationProvider < ApplicationRecord
 
   def federated_attributes
     settings["federated_attributes"] ||= {}
+  end
+
+  def show_mfa_configuration_options?
+    account.mfa_settings != :disabled &&
+      (auth_type != "canvas" || account.mfa_settings != :required)
   end
 
   def mfa_required?

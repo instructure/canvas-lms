@@ -152,6 +152,21 @@ describe CanvasKaltura::ClientV3::CaptionAssetMethods do
       kaltura_client.create_caption_asset(entry_id, language_code)
     end
 
+    it "calls getRequest with proper parameters when language is unknown" do
+      stub_request(:get, "https://www.kaltura.com/api_v3/")
+        .with(query: hash_excluding(:captionAsset))
+        .to_return(body: response_body)
+
+      expect(kaltura_client).to receive(:getRequest).with(
+        :captionAsset,
+        :add,
+        ks:,
+        entryId: entry_id
+      ).and_call_original
+
+      kaltura_client.create_caption_asset(entry_id, nil)
+    end
+
     it "returns created caption asset hash" do
       expect(kaltura_client.create_caption_asset(entry_id, language_code))
         .to match(

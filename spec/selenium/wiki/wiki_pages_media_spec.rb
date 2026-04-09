@@ -44,7 +44,6 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
 
   context "teacher" do
     before(:once) do
-      Account.site_admin.enable_feature! :consolidated_media_player
       course_with_teacher(active_all: true)
 
       @root_folder = Folder.root_folders(@course).first

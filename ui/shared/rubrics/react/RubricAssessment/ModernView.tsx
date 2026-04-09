@@ -330,7 +330,7 @@ export const CriterionRow = ({
               ) : (
                 <TextInput
                   autoComplete="off"
-                  renderLabel={<ScreenReaderContent>{pointsLabelText}</ScreenReaderContent>}
+                  renderLabel={I18n.t('Points')}
                   placeholder="--"
                   width="3.375rem"
                   height="2.375rem"
@@ -344,7 +344,7 @@ export const CriterionRow = ({
                 />
               )}
             </Flex.Item>
-            <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
+            <Flex.Item margin={isPreviewMode ? '0' : '0 0 x-small x-small'} align="end">
               <Text size="small" weight="bold" aria-hidden={true}>
                 /{criterion.points}
               </Text>

@@ -824,4 +824,83 @@ describe ConversationMessage do
       expect(cp2.workflow_state).to eq "read"
     end
   end
+
+  describe "#exclude_pending_temporary_enrollment_recipients" do
+    before :once do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @provider = user_factory(active_all: true)
+      @course = course_with_teacher(active_all: true, user: @provider).course
+      @pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+
+      @active_student = user_factory(active_all: true)
+      @course.enroll_student(@active_student, enrollment_state: "active")
+
+      @future_recipient = user_factory(active_all: true)
+      temp_enrollment = @course.enroll_user(
+        @future_recipient,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      [@provider, @active_student, @future_recipient].each do |user|
+        communication_channel(user, { username: "test_#{user.id}@test.com", active_cc: true })
+      end
+    end
+
+    it "excludes users with only future temporary enrollments from recipients" do
+      conversation = @provider.initiate_conversation([@active_student, @future_recipient])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      recipient_ids = message.recipients.map(&:id)
+      expect(recipient_ids).to include(@active_student.id)
+      expect(recipient_ids).not_to include(@future_recipient.id)
+    end
+
+    it "does not exclude users whose temporary enrollment has already started" do
+      active_recipient = user_factory(active_all: true)
+      communication_channel(active_recipient, { username: "active_temp_#{active_recipient.id}@test.com", active_cc: true })
+      active_temp = @course.enroll_user(
+        active_recipient,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      active_temp.update!(start_at: 1.day.ago, end_at: 1.week.from_now)
+
+      conversation = @provider.initiate_conversation([@active_student, active_recipient])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.recipients.map(&:id)).to include(active_recipient.id)
+    end
+
+    context "when feature flag is disabled" do
+      before { Account.default.disable_feature!(:temporary_enrollments) }
+      after { Account.default.enable_feature!(:temporary_enrollments) }
+
+      it "does not filter recipients" do
+        conversation = @provider.initiate_conversation([@active_student, @future_recipient])
+        message = conversation.add_message("test", root_account_id: Account.default.id)
+
+        expect(message.recipients.map(&:id)).to include(@future_recipient.id)
+      end
+    end
+
+    it "keeps users who have both a future temp enrollment and an active regular enrollment" do
+      # Give the future_recipient a regular active enrollment too
+      @course.enroll_student(@future_recipient, enrollment_state: "active")
+
+      conversation = @provider.initiate_conversation([@future_recipient])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.recipients.map(&:id)).to include(@future_recipient.id)
+    end
+  end
 end

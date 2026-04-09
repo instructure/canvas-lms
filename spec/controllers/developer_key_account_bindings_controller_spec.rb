@@ -90,6 +90,77 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       post(:create_or_update, params:)
       expect(created_binding.workflow_state).to eq "on"
     end
+
+    it "does not create a local copy for a key in account" do
+      user_session(root_account_admin)
+      params # instantiate registrations
+      expect do
+        post :create_or_update, params:
+      end.not_to change { Lti::Registration.where(account: root_account).count }
+      expect(response).to be_successful
+    end
+
+    context "when the key is inherited" do
+      specs_require_sharding
+
+      let(:root_account) { @shard2.activate { account_model } }
+      let(:parent_admin) { account_admin_user(account: Account.site_admin) }
+      let(:inherited_registration) do
+        Shard.default.activate do
+          lti_registration_with_tool(
+            account: Account.site_admin,
+            created_by: parent_admin,
+            registration_params: { name: "Inherited App" }
+          )
+        end
+      end
+      let(:inherited_dev_key) { inherited_registration.developer_key }
+      let(:params) do
+        {
+          account_id: root_account.id,
+          developer_key_id: inherited_dev_key.global_id,
+          developer_key_account_binding: { workflow_state: "on" }
+        }
+      end
+
+      it "creates a local copy of the inherited registration" do
+        user_session(root_account_admin)
+        @shard2.activate do
+          expect do
+            post(:create_or_update, params:)
+          end.to change { Lti::Registration.where(account: root_account).count }.by(1)
+
+          local_copy = Lti::Registration.find_by(template_registration: inherited_registration, account: root_account)
+          expect(local_copy).to be_present
+          expect(local_copy.name).to eq("Inherited App")
+        end
+      end
+
+      it "creates a binding for the local copy's developer key" do
+        user_session(root_account_admin)
+        @shard2.activate do
+          post(:create_or_update, params:)
+
+          local_copy = Lti::Registration.find_by(template_registration: inherited_registration, account: root_account)
+          binding = DeveloperKeyAccountBinding.find_by(account: root_account, developer_key: local_copy.developer_key)
+          expect(binding).to be_present
+          expect(binding.workflow_state).to eq("on")
+        end
+      end
+
+      context "when the inherited registration is not active" do
+        before { inherited_registration.update!(workflow_state: "deleted") }
+
+        it "returns 422 with an error message" do
+          user_session(root_account_admin)
+          @shard2.activate do
+            post(:create_or_update, params:)
+            expect(response).to have_http_status(:unprocessable_content)
+            expect(json_parse["errors"]).to eq("template registration is off")
+          end
+        end
+      end
+    end
   end
 
   shared_examples "the developer key update endpoint" do

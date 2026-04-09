@@ -22,16 +22,18 @@ import {StudentCellPopover} from './grid/StudentCellPopover'
 import {StudentHeader} from './grid/StudentHeader'
 import {OutcomeHeader} from './grid/OutcomeHeader'
 import {
-  COLUMN_WIDTH,
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
   GradebookSettings,
   DEFAULT_GRADEBOOK_SETTINGS,
+} from '@canvas/outcomes/react/utils/constants'
+import {
+  COLUMN_WIDTH,
   DisplayFilter,
   NameDisplayFormat,
   CELL_HEIGHT,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   Student,
@@ -54,6 +56,7 @@ import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/tab
 import {ContributingScoreCellContent} from './table/ContributingScoreCellContent'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 import {WithBreakpoints, Breakpoints} from '@instructure/platform-with-breakpoints'
+import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -105,6 +108,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
   breakpoints = {},
 }) => {
   const isMobile = breakpoints?.mobileOnly
+  const {lmgbStudentReportingFF} = useLMGBContext()
 
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
@@ -168,7 +172,9 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         gradebookSettings.nameDisplayFormat === NameDisplayFormat.LAST_FIRST
           ? student.sortable_name
           : student.display_name
-      const studentGradesUrl = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
+      const studentGradesUrl = lmgbStudentReportingFF
+        ? `/courses/${courseId}/outcomes?student_id=${student.id}#reporting`
+        : `/courses/${courseId}/grades/${student.id}#tab-outcomes`
 
       return (
         <StudentCell

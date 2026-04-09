@@ -1543,6 +1543,32 @@ describe Types::QueryType do
         expect(instructor_ids.uniq).to eq(instructor_ids) # No duplicates
       end
 
+      it "returns instructor only once when student is dual-enrolled via multiple sections" do
+        # active_by_date.pluck(:course_id).uniq collapses duplicate course_ids from the student's
+        # two section enrollments, so the instructor is fetched only once
+        course = Course.create!(name: "Dual Student Course", account: Account.default, workflow_state: "available")
+        section1 = course.default_section
+        section2 = course.course_sections.create!(name: "Section B")
+
+        instructor = User.create!(name: "Dual Student Instructor")
+        course.enroll_teacher(instructor).accept!
+
+        student = User.create!(name: "Dual Enrolled Student")
+        course.enroll_student(student, section: section1, enrollment_state: "active")
+        e2 = course.enroll_student(student, section: section2, allow_multiple_enrollments: true)
+        e2.accept!
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [course.id.to_s] },
+          context: { current_user: student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(instructors.length).to eq(1)
+        expect(instructors[0].dig("user", "name")).to eq("Dual Student Instructor")
+      end
+
       it "returns empty result for course with no instructors" do
         course = Course.create!(name: "Empty Course", account: Account.default, workflow_state: "available")
         student = User.create!(name: "Student")

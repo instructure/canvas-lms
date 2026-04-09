@@ -57,6 +57,11 @@ describe SessionToken do
     expect(SessionToken.parse(token.to_s).used_remember_me_token).to eq token.used_remember_me_token
   end
 
+  it "preserves non-nil consent_from_mobile" do
+    token = SessionToken.new(1, consent_from_mobile: true)
+    expect(SessionToken.parse(token.to_s).consent_from_mobile).to eq token.consent_from_mobile
+  end
+
   it "is not valid after tampering" do
     token = SessionToken.new(1)
     token.to_s # cache the signature
@@ -109,6 +114,9 @@ describe SessionToken do
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
     data = token.as_json.merge(used_remember_me_token: "invalid")
+    expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
+
+    data = token.as_json.merge(consent_from_mobile: "invalid")
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
     data = token.as_json.merge(signature: 1)
