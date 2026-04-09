@@ -30,6 +30,7 @@ class CanvasSchema < GraphQL::Schema
   connections.add(DynamoQuery, DynamoConnection)
   connections.add(AddressBook::MessageableUser::Collection, CollectionConnection)
   connections.add(BookmarkedCollection::Proxy, CollectionConnection)
+  connections.add(InstructorQuery, InstructorConnection)
 
   def self.execute(...)
     max_depth GraphQLTuning.max_depth
