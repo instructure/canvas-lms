@@ -9441,6 +9441,7 @@ fa:
   download_errors_attchment_82ffea3f: "بارگیری فایل پیوست_خطاها"
   download_filename_781704f5: " دانلود %{filename}"
   download_item_analysis_report_statuslabel_8c9387ec: "بارگیری گزارش تحلیل مورد %{statusLabel}"
+  download_name_de443d96: " دانلود %{name}"
   download_page_views_csv_974f36e1: "CSV بازدیدهای صفحه را دانلود کنید"
   download_report_77164f62: "بارگیری گزارش"
   download_scores_generated_on_date_ff5b9cd2: "بارگیری نمره های ایجاد شده در %{date}"
@@ -17197,6 +17198,7 @@ fa:
         login_name: "شما در حال ورود به این برنامه با عنوان %{user_name} هستید."
       login: ورود
       page_title: "ورود به برنامه"
+      please_wait: "لطفا صبر کنید..."
       remember_auth: "به خاطر سپردن مجوز"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "نوع شیء"

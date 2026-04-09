@@ -11490,6 +11490,7 @@ ko:
   download_filename_b9d62bf1: "%{fileName} 다운로드"
   download_group_category_roster_csv_6050a420: "그룹 범주 명단 CSV 다운로드"
   download_item_analysis_report_statuslabel_8c9387ec: "문항 분석 보고서 다운로드 %{statusLabel}"
+  download_name_de443d96: "%{name} 다운로드"
   download_report_70ba4a54: "보고서 다운로드"
   download_report_77164f62: "보고서 다운로드"
   download_scores_generated_on_date_ff5b9cd2: "%{date}에 생성된 점수 다운로드"
