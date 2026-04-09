@@ -83,6 +83,7 @@ CanvasRails::Application.routes.draw do
 
   get "mr/:id" => "info#message_redirect", :as => :message_redirect
   get "help_links" => "info#help_links"
+  get "ada_chat_popup" => "ada_chat_popup#show"
 
   # This is a debug route that makes working on error pages easier
   get "test_error" => "info#test_error" unless Rails.env.production?

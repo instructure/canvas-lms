@@ -17,138 +17,22 @@
  */
 
 import {useEffect, useRef} from 'react'
-import type {WindowInfo} from './adaTypes'
+import {openWindow} from '@canvas/util/globalUtils'
 
 type AdaChatbotProps = {
   onDialogClose: () => void
 }
 
-const ADA_STATE_KEY = 'persistedAdaState' // localStorage key for Ada state
+// Canvas-hosted popup page — Ada SDK loads here and receives metadata via
+// postMessage. PII never appears in a URL.
+const ADA_POPUP_PATH = '/ada_chat_popup'
 
-type AdaState = 'closed' | 'open' | 'minimized'
-
-let adaReadyPromise: Promise<void> | null = null
-let adaScriptLoadPromise: Promise<void> | null = null
-let isRestoringDrawer = false
-let isOpeningAda = false
-let adaEventsBound = false
+// Keep in sync with the string literals in app/views/ada_chat_popup/show.html.erb
+export const ADA_MSG_POPUP_READY = 'ADA_POPUP_READY' as const
+export const ADA_MSG_META_FIELDS = 'ADA_META_FIELDS' as const
 
 /**
- * Loads the Ada embed script dynamically.
- * Returns a promise that resolves when the script is loaded.
- */
-function loadAdaScript(): Promise<void> {
-  if (adaScriptLoadPromise) return adaScriptLoadPromise
-
-  // If adaEmbed is available, resolve without trying to load the script
-  if (typeof window !== 'undefined' && window.adaEmbed) {
-    adaScriptLoadPromise = Promise.resolve()
-    return adaScriptLoadPromise
-  }
-
-  adaScriptLoadPromise = new Promise((resolve, reject) => {
-    const existingScript = document.getElementById('__ada')
-    if (existingScript) {
-      resolve()
-      return
-    }
-
-    const script = document.createElement('script')
-    script.id = '__ada'
-    script.src = 'https://static.ada.support/embed2.js'
-    script.async = true
-    script.setAttribute('data-lazy', '')
-    script.setAttribute('data-handle', 'instructure-gen')
-
-    const handleError = () => {
-      adaScriptLoadPromise = null
-      reject(new Error('Failed to load Ada embed script'))
-    }
-
-    script.onload = () => resolve()
-    script.onerror = handleError
-
-    document.body.appendChild(script)
-  })
-
-  return adaScriptLoadPromise
-}
-
-function updateChatState({
-  isOpen,
-  hasActiveChatter,
-  hasClosedChat,
-}: {
-  isOpen: boolean
-  hasActiveChatter: boolean
-  hasClosedChat?: boolean
-}) {
-  if (hasClosedChat) {
-    setAdaState('closed')
-  } else if (isOpen) {
-    setAdaState('open')
-  } else {
-    // Drawer minimized but chat still active
-    setAdaState('minimized')
-  }
-
-  if (hasActiveChatter) {
-    window.adaSettings = {
-      ...window.adaSettings,
-      hideMask: true,
-    }
-  }
-}
-
-function getAdaState(): AdaState {
-  try {
-    const state = localStorage.getItem(ADA_STATE_KEY)
-    if (state === 'closed' || state === 'open' || state === 'minimized') {
-      return state
-    }
-  } catch (e) {
-    console.warn('Ada localStorage get failed; defaulting to closed', e)
-  }
-  return 'closed' // Default state
-}
-
-function setAdaState(state: AdaState): void {
-  try {
-    localStorage.setItem(ADA_STATE_KEY, state)
-  } catch (e) {
-    console.warn('Ada localStorage set failed', e)
-  }
-}
-
-/**
- * Gets the Ada settings based on current user and environment.
- */
-function getAdaSettings() {
-  const user = window.ENV?.current_user || {}
-  const roles: string[] = window.ENV?.current_user_roles || []
-  const roleSet = new Set(roles)
-  const domainRootAccountUuid = window.ENV?.DOMAIN_ROOT_ACCOUNT_UUID || ''
-
-  return {
-    crossWindowPersistence: true,
-    metaFields: {
-      institutionUrl: window.location.origin,
-      email: user.email || '',
-      name: user.display_name || '',
-      canvasRoles: roles.join(','),
-      canvasUUID: domainRootAccountUuid,
-      isRootAdmin: roleSet.has('root_admin'),
-      isAdmin: roleSet.has('admin'),
-      isTeacher: roleSet.has('teacher'),
-      isStudent: roleSet.has('student'),
-      isObserver: roleSet.has('observer'),
-    },
-  }
-}
-
-/**
- * Checks if Ada chatbot is enabled via feature flag
- * If not enabled, silently skips initialization.
+ * Checks if Ada chatbot is enabled via feature flag.
  */
 function isAdaEnabled(): boolean {
   if (typeof window === 'undefined' || !window.ENV) {
@@ -158,219 +42,92 @@ function isAdaEnabled(): boolean {
 }
 
 /**
- * Initializes Ada embed and restores drawer/chat state if needed.
- * Returns a promise that resolves when Ada is ready to use.
+ * Metadata split into plain (metaFields) and encrypted (sensitiveMetaFields) buckets.
+ * Ada encrypts sensitiveMetaFields immediately on receipt and does not persist them.
  */
-async function initializeAda(): Promise<void> {
-  if (!isAdaEnabled()) {
-    return
-  }
-
-  if (adaReadyPromise) return adaReadyPromise
-
-  adaReadyPromise = (async () => {
-    try {
-      await loadAdaScript()
-
-      // With data-lazy, call adaEmbed.start() to initialize
-      if (!window.adaEmbed?.start) {
-        throw new Error('adaEmbed.start not available after script load')
-      }
-
-      return await new Promise<void>((resolve, reject) => {
-        window
-          .adaEmbed!.start({
-            ...getAdaSettings(),
-            handle: 'instructure-gen',
-            onAdaEmbedLoaded: () => {
-              const adaEmbed = window.adaEmbed
-              if (!adaEmbed) {
-                reject(new Error('adaEmbed not available in onAdaEmbedLoaded'))
-                return
-              }
-
-              // Subscribe to end_conversation event - only this marks chat as closed
-              const endConversationHandler = () => {
-                updateChatState({
-                  isOpen: false,
-                  hasActiveChatter: false,
-                  hasClosedChat: true,
-                })
-                if (typeof adaEmbed.stop === 'function') {
-                  adaEmbed
-                    .stop()
-                    .catch((err: Error) => {
-                      console.warn('Ada stop failed on end_conversation:', err)
-                    })
-                    .finally(() => {
-                      adaReadyPromise = null // Allow reinitialization after stop
-                      isRestoringDrawer = false
-                      isOpeningAda = false
-                      adaEventsBound = false
-                    })
-                } else {
-                  adaReadyPromise = null
-                  isRestoringDrawer = false
-                  isOpeningAda = false
-                  adaEventsBound = false
-                }
-              }
-
-              adaEmbed
-                .subscribeEvent('ada:end_conversation', endConversationHandler)
-                .catch((err: Error) => console.warn('Ada subscribe end_conversation failed', err))
-
-              // Subscribe to drawer-close events (minimize or close)
-              ;['ada:minimize_chat', 'ada:close_chat']
-                .map(event => {
-                  const handler = () => {
-                    updateChatState({
-                      isOpen: false,
-                      hasActiveChatter: false,
-                      hasClosedChat: false,
-                    })
-                  }
-                  return adaEmbed.subscribeEvent(event, handler)
-                })
-                .forEach(p =>
-                  p.catch((err: Error) => console.warn('Ada subscribe drawer event failed', err)),
-                )
-              adaEventsBound = true
-            },
-            adaReadyCallback: () => {
-              resolve()
-            },
-            toggleCallback: (isOpen: boolean) => {
-              updateChatState({
-                isOpen,
-                hasActiveChatter: false,
-                hasClosedChat: false,
-              })
-            },
-          })
-          .catch(reject)
-      })
-    } catch (err) {
-      console.warn('Ada start failed:', err)
-      // Reset promise so initialization can be retried
-      adaReadyPromise = null
-      adaEventsBound = false
-      throw err
-    }
-  })()
-
-  return adaReadyPromise
+export type AdaMetaFieldsResult = {
+  metaFields: Record<string, string>
+  sensitiveMetaFields: Record<string, string>
 }
 
 /**
- * Opens Ada chatbot and restores drawer state
+ * Builds Ada metadata split into plain and sensitive buckets.
  */
-async function openAda(onDialogClose?: () => void): Promise<void> {
-  if (isOpeningAda || isRestoringDrawer) {
-    console.warn('Ada is already being opened')
-    onDialogClose?.()
-    return
-  }
+export function getAdaMetaFields(): AdaMetaFieldsResult {
+  const user = window.ENV?.current_user || {}
+  const roles: string[] = window.ENV?.current_user_roles || []
+  const roleSet = new Set(roles)
+  const domainRootAccountUuid = window.ENV?.DOMAIN_ROOT_ACCOUNT_UUID || ''
 
-  isOpeningAda = true
-  try {
-    await initializeAda()
-
-    if (!window.adaEmbed) throw new Error('Ada embed not available after initialization')
-    const adaEmbed = window.adaEmbed
-
-    const adaWindowInfo: WindowInfo = await adaEmbed.getInfo()
-    if (!adaWindowInfo.isChatOpen) {
-      await adaEmbed.toggle()
-    }
-    updateChatState({
-      isOpen: true,
-      hasActiveChatter: adaWindowInfo.hasActiveChatter,
-      hasClosedChat: false,
-    })
-  } catch (error) {
-    console.error('Failed to open Ada chatbot:', error)
-  } finally {
-    isOpeningAda = false
-    onDialogClose?.()
+  return {
+    sensitiveMetaFields: {
+      email: user.email || '',
+      name: user.display_name || '',
+    },
+    metaFields: {
+      launchedUrl: window.location.href,
+      institutionUrl: window.location.origin,
+      canvasRoles: roles.join(','),
+      canvasUUID: domainRootAccountUuid,
+      isRootAdmin: String(roleSet.has('root_admin')),
+      isAdmin: String(roleSet.has('admin')),
+      isTeacher: String(roleSet.has('teacher')),
+      isStudent: String(roleSet.has('student')),
+      isObserver: String(roleSet.has('observer')),
+    },
   }
 }
 
+// Tracks the pending ready listener so it can be replaced if the popup is
+// already open and won't re-send ADA_POPUP_READY.
+let pendingReadyListener: ((event: MessageEvent) => void) | null = null
+
 /**
- * Auto-restore Ada if it was open in a previous session.
- * Should be called after main app initialization.
+ * Opens the Ada chatbot popup. The popup page is Canvas-hosted; once it
+ * signals ready, metadata is forwarded via same-origin postMessage so PII
+ * is never exposed in a URL.
  */
-export async function autoRestoreAda(): Promise<void> {
-  const adaState = getAdaState()
-
-  if (adaState === 'closed') {
-    return // User explicitly closed, don't restore
+export function launchAdaPopup(): void {
+  if (pendingReadyListener) {
+    window.removeEventListener('message', pendingReadyListener)
   }
 
-  if (isRestoringDrawer || isOpeningAda) {
-    console.warn('Ada restore/open already in progress')
-    return
+  const {metaFields, sensitiveMetaFields} = getAdaMetaFields()
+  openWindow(ADA_POPUP_PATH, 'AdaChatPopup', 'width=500,height=700,resizable=yes,scrollbars=yes')
+
+  const listener = (event: MessageEvent) => {
+    if (event.origin !== window.location.origin) return
+    if (event.data?.type !== ADA_MSG_POPUP_READY) return
+    window.removeEventListener('message', listener)
+    pendingReadyListener = null
+    const source = event.source as Window | null
+    source?.postMessage(
+      {type: ADA_MSG_META_FIELDS, metaFields, sensitiveMetaFields},
+      window.location.origin,
+    )
   }
 
-  isRestoringDrawer = true
-  try {
-    await initializeAda()
-
-    // After initialization, check if drawer should be restored
-    if (window.adaEmbed && adaState === 'open') {
-      const adaEmbed = window.adaEmbed
-      const adaWindowInfo: WindowInfo = await adaEmbed.getInfo()
-      if (!adaWindowInfo.isChatOpen) {
-        await adaEmbed.toggle()
-        const freshAdaWindowInfo: WindowInfo = await adaEmbed.getInfo()
-        updateChatState({
-          isOpen: freshAdaWindowInfo.isChatOpen,
-          hasActiveChatter: freshAdaWindowInfo.hasActiveChatter,
-          hasClosedChat: freshAdaWindowInfo.hasClosedChat,
-        })
-      }
-    }
-    // If state is 'minimized', Ada initializes but stays minimized (default behavior)
-  } catch (err) {
-    console.warn('Auto-restore Ada failed:', err)
-  } finally {
-    isRestoringDrawer = false
-  }
+  pendingReadyListener = listener
+  window.addEventListener('message', listener)
 }
 
 /**
- * AdaChatbot opens the Ada chatbot when the user selects it from the help menu.
- * Ada will persist across navigation once started, until the user manually closes it.
+ * AdaChatbot opens the Ada chatbot in a popup window when the user selects it
+ * from the help menu, then closes the help dialog.
  */
 function AdaChatbot({onDialogClose}: AdaChatbotProps) {
-  const onDialogCloseRef = useRef(onDialogClose)
-  const mountedRef = useRef(true)
+  const launched = useRef(false)
+
   useEffect(() => {
-    onDialogCloseRef.current = onDialogClose
-  }, [onDialogClose])
-  useEffect(() => {
-    openAda(() => {
-      if (mountedRef.current) onDialogCloseRef.current?.()
-    })
-    return () => {
-      mountedRef.current = false
+    if (launched.current) return
+    launched.current = true
+    if (isAdaEnabled()) {
+      launchAdaPopup()
     }
-  }, []) // Only open once on mount; ref always has latest onDialogClose
+    onDialogClose()
+  }, [onDialogClose])
+
   return null
-}
-
-// Test helper to reset module state between tests
-export function _resetForTesting(): void {
-  adaReadyPromise = null
-  adaScriptLoadPromise = null
-  isRestoringDrawer = false
-  isOpeningAda = false
-  adaEventsBound = false
-}
-
-// Test helper to pre-cache script load promise (prevents real network requests in tests)
-export function _setScriptLoadedForTesting(): void {
-  adaScriptLoadPromise = Promise.resolve()
 }
 
 export default AdaChatbot

@@ -131,17 +131,6 @@ async function afterDocumentReady() {
   if (!ENV.FEATURES.explicit_latex_typesetting) {
     await setupMathML()
   }
-
-  // Only import the module if the persisted state indicates it
-  // should be restored (open or minimized), to avoid unnecessary loading
-  const adaState = localStorage.getItem('persistedAdaState')
-  if (adaState === 'open' || adaState === 'minimized') {
-    import('./shared/help-dialog/react/AdaChatbot')
-      .then(module => {
-        module.autoRestoreAda()
-      })
-      .catch(error => console.error('Failed to load AdaChatbot:', error))
-  }
 }
 
 const RCE_HTML_EDITOR_CLASS = 'RceHtmlEditor'
