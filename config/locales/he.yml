@@ -7606,6 +7606,7 @@ he:
   download_epub_757cf0af: "הורדת ePub"
   download_errors_attchment_82ffea3f: "הורדת errors_attchment"
   download_item_analysis_report_statuslabel_8c9387ec: "הורדת דוח ניתוח פריטים %{statusLabel}"
+  download_name_de443d96: "הורדת %{name}"
   download_report_77164f62: "הורדת דו\"ח"
   download_scores_generated_on_date_ff5b9cd2: "הורדת ציונים שחושבו בתאריך %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "הורדת דוח ניתוח תלמידים %{statusLabel}"
@@ -13972,6 +13973,7 @@ he:
         email: "כתובת הדוא\"ל שלך היא %{email}."
         login_name: "הנך מאשר אפליקציה זו כמשתמש  %{user_name}"
       page_title: "לוג-אין אפליקציה"
+      please_wait: "נא להמתין..."
       remember_auth: "זכירת הרשאה"
   observees: 
     being_observed: "תלמידים בהשגחה"
