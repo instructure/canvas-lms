@@ -69,7 +69,6 @@ module RequestContext
       RequestContext::Generator.store_request_queue_time(env["HTTP_X_REQUEST_START"])
       RequestContext::Generator.store_cloudfront_id(env["HTTP_X_AMZ_CF_ID"])
       RequestContext::Generator.store_alb_trace_id(env["HTTP_X_AMZN_TRACE_ID"])
-      RequestContext::Generator.store_ja4_fingerprint(env["HTTP_CLOUDFRONT_VIEWER_JA4_FINGERPRINT"])
 
       status, headers, body = @app.call(env)
 
@@ -118,10 +117,6 @@ module RequestContext
 
     def self.store_alb_trace_id(header_val)
       add_meta_header("tid", header_val) if header_val.present?
-    end
-
-    def self.store_ja4_fingerprint(header_val)
-      add_meta_header("ja4", header_val) if header_val.present?
     end
 
     def self.store_request_meta(request, context, sentry_trace = nil)
