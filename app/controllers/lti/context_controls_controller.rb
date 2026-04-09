@@ -130,6 +130,8 @@ module Lti
       # Orders deployments by context type: root account (0), subaccount (1), course (2).
       # Uses lti_context_controls.root_account_id to identify the root account without
       # needing to add the account ID in ruby. Requires eager_load(:deployment).
+      # If this query is changed, make sure the deployment_sort function is changed to
+      # match it.
       DEPLOYMENT_CONTEXT_ORDERING_SQL = Arel.sql(<<~SQL.squish)
         CASE
           WHEN #{ContextExternalTool.quoted_table_name}.context_type = 'Account'
@@ -145,6 +147,9 @@ module Lti
       CONTEXT_ORDERING_SQL = Arel.sql("REPLACE(REPLACE(path, 'a', '1'), 'c', '0')")
       ORDER_CLAUSE = [DEPLOYMENT_CONTEXT_ORDERING_SQL, :deployment_id, CONTEXT_ORDERING_SQL, :path].freeze
 
+      # This function needs to match the logic in DEPLOYMENT_CONTEXT_ORDERING_SQL.
+      # That is, DEPLOYMENT_CONTEXT_ORDERING_SQL should be the SQL version of this
+      # ruby function.
       def self.deployment_sort(context_control)
         deployment = context_control.deployment
         if deployment.context_type == "Account" && deployment.context_id == context_control.root_account_id
