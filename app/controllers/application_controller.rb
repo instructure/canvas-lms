@@ -356,7 +356,13 @@ class ApplicationController < ActionController::Base
             mobile_consent = session&.dig(:mobile_cookie_consent)
 
             if !mobile_webview && !native_app?
-              domain_lookup_key = request.host.end_with?(".instructure.com") ? :domain_id : :vanity_domain_id
+              domain_lookup_key = if request.host.end_with?(".beta.instructure.com")
+                                    :beta_domain_id
+                                  elsif request.host.end_with?(".instructure.com")
+                                    :domain_id
+                                  else
+                                    :vanity_domain_id
+                                  end
               onetrust_domain_id = @domain_root_account&.settings&.[](:onetrust_consent_domain_id) || DynamicSettings.find("onetrust-cookie-consent")[domain_lookup_key]
               @js_env[:ONETRUST_CONSENT_DOMAIN_ID] = onetrust_domain_id unless onetrust_domain_id.blank? || onetrust_domain_id == "-"
             end
