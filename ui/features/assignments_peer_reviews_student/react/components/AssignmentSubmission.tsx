@@ -40,7 +40,9 @@ import StudentAnnotationPreview from '@canvas/assignments/react/StudentAnnotatio
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useRubricAssessment} from '../hooks/useRubricAssessment'
 import {RubricPanel} from './RubricPanel'
+import type {RubricPanelHandle} from './RubricPanel'
 import {CommentsPanel} from './CommentsPanel'
+import type {CommentsPanelHandle} from './CommentsPanel'
 import {MediaRecordingSubmissionDisplay} from './MediaRecordingSubmissionDisplay'
 
 const I18n = createI18nScope('peer_reviews_student')
@@ -88,12 +90,29 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   const commentsButtonRef = useRef<HTMLButtonElement | null>(null)
   const rubricButtonRef = useRef<HTMLButtonElement | null>(null)
   const pendingFocusPanel = useRef<'comments' | 'rubric' | null>(null)
+  const pendingFocusAfterSubmit = useRef(false)
+  const commentsPanelRef = useRef<CommentsPanelHandle | null>(null)
+  const rubricPanelRef = useRef<RubricPanelHandle | null>(null)
 
   useEffect(() => {
     if (submission._id !== previousSubmissionIdRef.current) {
       // reset initialIsPeerReviewCompleted value
       setInitialIsPeerReviewCompleted(isPeerReviewCompleted)
       previousSubmissionIdRef.current = submission._id
+      if (pendingFocusAfterSubmit.current) {
+        pendingFocusAfterSubmit.current = false
+        pendingFocusPanel.current = null
+        if (commentsPanelRef.current || rubricPanelRef.current) {
+          commentsPanelRef.current?.focusCloseButton()
+          rubricPanelRef.current?.focusCloseButton()
+        } else if (assignment.rubric) {
+          pendingFocusPanel.current = 'rubric'
+          setShowRubric(true)
+        } else {
+          pendingFocusPanel.current = 'comments'
+          setShowComments(true)
+        }
+      }
     }
   }, [submission._id, isPeerReviewCompleted])
 
@@ -164,6 +183,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
     }
 
     // reset the values
+    pendingFocusAfterSubmit.current = true
     setPeerReviewCommentCompleted(false)
     resetRubricAssessment()
     handleNextPeerReview()
@@ -297,6 +317,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         </Flex.Item>
         {showRubric && assignment.rubric && (
           <RubricPanel
+            ref={rubricPanelRef}
             assignment={assignment}
             rubricAssessmentData={rubricAssessmentData}
             rubricViewMode={rubricViewMode}
@@ -312,6 +333,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         )}
         {showComments && (
           <CommentsPanel
+            ref={commentsPanelRef}
             submission={submission}
             assignment={assignment}
             reviewerSubmission={reviewerSubmission}
