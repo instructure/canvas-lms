@@ -40,7 +40,7 @@
   </script>
   <% end %>
   <% if @js_env && @js_env[:ONETRUST_CONSENT_DOMAIN_ID].present? %>
-  <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_DOMAIN_ID] %>" ></script>
+  <script src="https://cdn.cookielaw.org/consent/<%= @js_env[:ONETRUST_CONSENT_DOMAIN_ID] %>/otSDKStub.js" data-document-language="true" type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_DOMAIN_ID] %>" ></script>
   <script type="text/javascript">
     if (window.ENV && window.ENV['RAILS_ENVIRONMENT'] === 'development') {
       console.warn("OneTrust will initialize.");

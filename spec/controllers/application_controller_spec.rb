@@ -818,10 +818,10 @@ RSpec.describe ApplicationController do
           request.host = "trusty.instructure.com"
         end
 
-        def mock_dynamic_settings_for_pendo_cc(pendo_app_id = nil, domain_id = nil, vanity_domain_id = nil)
+        def mock_dynamic_settings_for_pendo_cc(pendo_app_id = nil, domain_id = nil, vanity_domain_id = nil, beta_domain_id = nil)
           allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
           allow(DynamicSettings).to receive(:find).with("onetrust-cookie-consent").and_return(
-            DynamicSettings::FallbackProxy.new({ domain_id:, vanity_domain_id: })
+            DynamicSettings::FallbackProxy.new({ domain_id:, vanity_domain_id:, beta_domain_id: })
           )
           allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(
             DynamicSettings::FallbackProxy.new({ pendo_app_id: })
@@ -917,6 +917,14 @@ RSpec.describe ApplicationController do
               mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!", "vanity_cookie!")
               request.host = "its.a.vanity.domain.com"
               expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "vanity_cookie!"
+            end
+
+            it "is included with the beta domain ID if used from a beta domain" do
+              Account.default.enable_feature!(:send_usage_metrics)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!", "vanity_cookie!", "beta_cookie!")
+              request.host = "rare.beta.instructure.com"
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "beta_cookie!"
             end
           end
 
