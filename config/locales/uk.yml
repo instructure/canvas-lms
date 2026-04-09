@@ -12527,6 +12527,7 @@ uk:
       details: 
         allow_application: "Дозволити  %{app_name} доступ до Вашого облікового запису. "
       page_title: "Вхід до застосунку"
+      please_wait: "Будь ласка, зачекайте..."
       remember_auth: "Запам'ятати авторизацію"
   object_type_e4f3bbeb: "Тип Об'єкту"
   observees: 
