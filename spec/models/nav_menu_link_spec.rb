@@ -190,11 +190,11 @@ describe NavMenuLink do
       @link3 = NavMenuLink.create!(context: @account, label: "Link Three", url: "https://example.com/3", course_nav: true, workflow_state: :deleted)
     end
 
-    it "returns an array of link objects with type, id, label, and placements" do
+    it "returns an array of link objects with type, id, label, url, and placements" do
       result = NavMenuLink.active.where(context: @account).order(:id).as_existing_link_objects
       expect(result).to eq([
-                             { type: "existing", id: @link1.id, label: "Link One", placements: { course_nav: true, account_nav: false, user_nav: false } },
-                             { type: "existing", id: @link2.id, label: "Link Two", placements: { course_nav: false, account_nav: true, user_nav: false } },
+                             { type: "existing", id: @link1.id, label: "Link One", url: "https://example.com/1", placements: { course_nav: true, account_nav: false, user_nav: false } },
+                             { type: "existing", id: @link2.id, label: "Link Two", url: "https://example.com/2", placements: { course_nav: false, account_nav: true, user_nav: false } },
                            ])
     end
 
