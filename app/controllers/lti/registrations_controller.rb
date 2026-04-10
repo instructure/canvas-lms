@@ -1335,7 +1335,7 @@ class Lti::RegistrationsController < ApplicationController
       # Load pending update information if feature flag is enabled
       # Only show the most recent update request if it's still pending
       pending_update = nil
-      if Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+      if @account.root_account.feature_enabled?(:lti_dr_registrations_update)
         most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
                                                     .order(created_at: :desc)
                                                     .first
