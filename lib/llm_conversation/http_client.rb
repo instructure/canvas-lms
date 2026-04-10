@@ -24,9 +24,14 @@ require "uri"
 
 module LlmConversation
   class HttpClient
-    def initialize
+    def initialize(use_initial_token: false)
       @base_url = resolve_base_url
-      @bearer_token = Rails.application.credentials.llm_conversation_bearer_token
+
+      @bearer_token = if use_initial_token
+                        Rails.application.credentials.dig(:llm_conversation_service, :initial_token)
+                      else
+                        Rails.application.credentials.llm_conversation_bearer_token
+                      end
     end
 
     def get(path)
@@ -114,6 +119,8 @@ module LlmConversation
         rescue JSON::ParserError
           error_detail = response.body
         end
+
+        raise LlmConversation::Errors::ConflictError, error_detail if response.is_a?(Net::HTTPConflict)
 
         raise LlmConversation::Errors::ConversationError, error_detail
       end
