@@ -556,6 +556,7 @@ const CreateEditAllocationRuleModal = ({
       ]
     } else if (
       mustReview &&
+      permitReview &&
       (mustReviewCount >= requiredPeerReviewsCount ||
         completedReviewsCount + mustReviewCount >= requiredPeerReviewsCount)
     ) {
