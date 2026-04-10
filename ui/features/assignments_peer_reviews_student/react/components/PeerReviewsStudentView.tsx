@@ -41,7 +41,6 @@ import {useReviewerSubmissionQuery} from '../hooks/useReviewerSubmissionQuery'
 import {PeerReviewSelector} from './PeerReviewSelector'
 import AssignmentSubmission from './AssignmentSubmission'
 import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
-import theme from '@instructure/canvas-theme'
 import {isPeerReviewLocked, isPeerReviewPastLockDate} from '../utils/peerReviewLockUtils'
 import LockedPeerReview from './LockedPeerReview'
 import UnavailablePeerReview from './UnavailablePeerReview'
@@ -54,12 +53,6 @@ export interface PeerReviewsStudentViewProps {
   assignmentId: string
   breakpoints: Breakpoints
 }
-
-const Divider = () => (
-  <View as="div" margin="small none">
-    <hr style={{border: 'none', borderBottom: `1px solid ${theme.colors.contrasts.grey1214}`}} />
-  </View>
-)
 
 const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
   assignmentId,
