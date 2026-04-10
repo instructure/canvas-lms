@@ -333,6 +333,7 @@ class Lti::Registration < ApplicationRecord
   # Additionally, dependent: :destroy removes the bindings from the association which we do not want.
   # Finally, dependent: :destroy on the tool_configuration will also hard delete it, which we also don't want.
   def destroy_associations
+    manual_configuration&.destroy
     ims_registration&.destroy
     unless inherited_from_template?
       developer_key&.destroy

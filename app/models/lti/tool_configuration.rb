@@ -19,6 +19,8 @@
 
 module Lti
   class ToolConfiguration < ApplicationRecord
+    include Canvas::SoftDeletable
+
     VISIBLE_TO_ADMINS = "admins"
     VISIBLE_TO_MEMBERS = "members"
     PUBLIC = "public"
