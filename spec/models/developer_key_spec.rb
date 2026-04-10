@@ -1326,7 +1326,7 @@ describe DeveloperKey do
       it "deletes all associated objects" do
         subject
         expect(lti_registration.reload).to be_deleted
-        expect(developer_key.reload.tool_configuration).to be_nil
+        expect(developer_key.reload.tool_configuration).to be_deleted
         expect(developer_key.developer_key_account_bindings.all?(&:deleted?)).to be true
       end
 
