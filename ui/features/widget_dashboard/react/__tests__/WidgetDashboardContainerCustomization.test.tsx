@@ -156,24 +156,8 @@ describe('WidgetDashboardContainer - Customization', () => {
     server.close()
   })
 
-  it('should not show customize button when feature flag is disabled', () => {
-    const {queryByTestId, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: false,
-      },
-    })
-
-    expect(queryByTestId('customize-dashboard-button')).not.toBeInTheDocument()
-
-    cleanup()
-  })
-
-  it('should show customize button when feature flag is enabled', () => {
-    const {getByTestId, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+  it('should show customize button', () => {
+    const {getByTestId, cleanup} = setup()
 
     expect(getByTestId('customize-dashboard-button')).toBeInTheDocument()
 
@@ -182,11 +166,7 @@ describe('WidgetDashboardContainer - Customization', () => {
 
   it('should enter edit mode when customize button is clicked', async () => {
     const user = userEvent.setup()
-    const {getByTestId, queryByTestId, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+    const {getByTestId, queryByTestId, cleanup} = setup()
 
     const customizeButton = getByTestId('customize-dashboard-button')
     await user.click(customizeButton)
@@ -202,11 +182,7 @@ describe('WidgetDashboardContainer - Customization', () => {
 
   it('should exit edit mode when cancel button is clicked', async () => {
     const user = userEvent.setup()
-    const {getByTestId, queryByTestId, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+    const {getByTestId, queryByTestId, cleanup} = setup()
 
     const customizeButton = getByTestId('customize-dashboard-button')
     await user.click(customizeButton)
@@ -243,11 +219,7 @@ describe('WidgetDashboardContainer - Customization', () => {
       }),
     )
 
-    const {getByTestId, queryByTestId, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+    const {getByTestId, queryByTestId, cleanup} = setup()
 
     const customizeButton = getByTestId('customize-dashboard-button')
     await user.click(customizeButton)
@@ -288,11 +260,7 @@ describe('WidgetDashboardContainer - Customization', () => {
       }),
     )
 
-    const {getByTestId, findByText, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+    const {getByTestId, findByText, cleanup} = setup()
 
     const customizeButton = getByTestId('customize-dashboard-button')
     await user.click(customizeButton)
@@ -317,11 +285,7 @@ describe('WidgetDashboardContainer - Customization', () => {
       }),
     )
 
-    const {getByTestId, findByText, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+    const {getByTestId, findByText, cleanup} = setup()
 
     const customizeButton = getByTestId('customize-dashboard-button')
     await user.click(customizeButton)
@@ -351,11 +315,7 @@ describe('WidgetDashboardContainer - Customization', () => {
       }),
     )
 
-    const {getByTestId, queryByTestId, cleanup} = setup({
-      dashboardFeatures: {
-        widget_dashboard_customization: true,
-      },
-    })
+    const {getByTestId, queryByTestId, cleanup} = setup()
 
     await user.click(getByTestId('customize-dashboard-button'))
 
