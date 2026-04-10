@@ -32,7 +32,7 @@ class StudentAssignmentPageV2
     end
 
     def assignment_future_locked_image
-      f("img[alt='Assignment locked until future date']")
+      f("img[data-testid='assignment-future-locked-image']")
     end
 
     def assignment_prerequisite_locked_image
