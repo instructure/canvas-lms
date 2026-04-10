@@ -65,7 +65,6 @@ const setup = (contextProps = {}) => {
     <PlatformTestWrapper>
       <QueryClientProvider client={queryClient}>
         <WidgetDashboardProvider
-          dashboardFeatures={{widget_dashboard_customization: true}}
           currentUser={{id: '123', display_name: 'Test Teacher', avatar_image_url: 'test.jpg'}}
           {...contextProps}
         >
@@ -108,18 +107,10 @@ describe('EducatorDashboardContainer', () => {
     expect(getByTestId('educator-dashboard-heading')).toHaveTextContent('Hi, Test Teacher!')
   })
 
-  it('shows Customize button when widget_dashboard_customization is enabled', () => {
+  it('shows Customize button', () => {
     const {getByTestId} = setup()
 
     expect(getByTestId('customize-dashboard-button')).toBeInTheDocument()
-  })
-
-  it('hides Customize button when widget_dashboard_customization is disabled', () => {
-    const {queryByTestId} = setup({
-      dashboardFeatures: {widget_dashboard_customization: false},
-    })
-
-    expect(queryByTestId('customize-dashboard-button')).not.toBeInTheDocument()
   })
 
   it('renders greeting without name when currentUser has no display_name', () => {

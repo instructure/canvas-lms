@@ -426,7 +426,6 @@ class UsersController < ApplicationController
                    widget_dashboard_config: educator_config
                  },
                  DASHBOARD_FEATURES: {
-                   widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
                    platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard),
                    educator_dashboard: true
                  }
@@ -453,7 +452,6 @@ class UsersController < ApplicationController
                  SHARED_COURSE_DATA: course_data_with_grades,
                  WIDGET_DASHBOARD_DARK_MODE: !!@current_user&.preferences&.dig(:widget_dashboard_dark_mode),
                  DASHBOARD_FEATURES: {
-                   widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
                    widget_dashboard_dark_mode: Account.site_admin.feature_enabled?(:widget_dashboard_dark_mode),
                    platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard),
                    educator_dashboard: false
