@@ -5967,6 +5967,7 @@ el:
   download_course_content_7f66edc9: "Λήψη Περιεχομένου Μαθήματος"
   download_current_scores_csv_8ae3f590: "Λήψη Τρεχόντων Βαθμολογιών (.csv)"
   download_epub_757cf0af: "Λήψη ePub"
+  download_name_de443d96: "Λήψη του %{name}"
   download_scores_generated_on_date_ff5b9cd2: "Λήψη Βαθμολογιών που Δημιουργήθηκε στις %{date}"
   download_submissions_7454665f: "Μεταφόρτωση-κατέβασμα των υποβολών"
   download_this_file_669f9174: "Λήψη αυτού του Αρχείου"
@@ -10600,6 +10601,7 @@ el:
       details: 
         allow_application: "Η εφαρμογή %{app_name} ζητά πρόσβαση στον λογαριασμό σας."
       page_title: "Σύνδεση στην Εφαρμογή"
+      please_wait: "Παρακαλώ περιμένετε..."
       remember_auth: "Απομνημόνευση της εξουσιοδότησής μου για αυτή την υπηρεσία"
   oauth_2_eb9d97: "Πρωτόκολλο OAuth2"
   observees: 
