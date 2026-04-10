@@ -329,7 +329,7 @@ export const createRegistration: CreateRegistration = (
         configuration: internalConfig,
         overlay,
         unified_tool_id: unifiedToolId,
-        workflow_state: 'on',
+        workflow_state: 'active',
       }),
     }),
   )
@@ -340,7 +340,7 @@ type UpdateRegistrationParams = {
   internalConfig?: InternalLtiConfiguration
   overlay?: LtiConfigurationOverlay
   adminNickname?: string
-  workflowState?: 'on' | 'off' | 'allow'
+  workflowState?: 'active' | 'inactive'
   lock_deploying?: boolean
 }
 

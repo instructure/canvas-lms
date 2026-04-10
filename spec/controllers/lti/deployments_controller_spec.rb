@@ -36,7 +36,6 @@ RSpec.describe Lti::DeploymentsController do
       created_by: admin,
       registration_params:,
       configuration_params:,
-      binding_params: { workflow_state: "on" },
     }
   end
   let(:registration_params) do

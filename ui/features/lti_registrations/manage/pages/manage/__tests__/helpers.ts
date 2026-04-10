@@ -95,7 +95,7 @@ export const mockRegistration = (
     created_by: user,
     updated_at: date,
     updated_by: user,
-    workflow_state: 'on',
+    workflow_state: 'active',
   }
   return {
     id: id as LtiRegistrationId,

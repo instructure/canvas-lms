@@ -71,10 +71,20 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "lock_deploying": {
+#           "description": "Flag indicating if registration is locked for deployment",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "inherited": {
 #           "description": "Flag indicating if registration is owned by this account, or inherited from Site Admin",
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "template_registration_id": {
+#           "description": "The Canvas ID of the template registration, if this registration is inherited from a template",
+#           "example": 1,
+#           "type": "integer"
 #         },
 #         "lti_version": {
 #           "description": "LTI version of the registration, either 1.1 or 1.3",
@@ -1369,9 +1379,11 @@ class Lti::RegistrationsController < ApplicationController
   # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
   # @argument unified_tool_id [String] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
-  # @argument workflow_state [String, "on" | "off" | "allow"]
-  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
-  #   Defaults to "off".
+  # @argument workflow_state [String, "on" | "off" | "allow" | "active" | "inactive"]
+  #   "on"/"off"/"allow" set the account binding state directly (binding vocabulary).
+  #   "active"/"inactive" set the registration state directly (registration vocabulary).
+  #   All five values update both the binding and the registration to equivalent states.
+  #   "allow" is only valid for Site Admin registrations. Defaults to "off".
   #
   # @example_request
   #
@@ -1406,7 +1418,8 @@ class Lti::RegistrationsController < ApplicationController
   def create
     registration_params = {
       name: configuration_params[:title],
-    }.with_indifferent_access.merge(params.permit(:vendor, :name, :admin_nickname, :description))
+    }.with_indifferent_access.merge(params.permit(:vendor, :name, :admin_nickname, :description, :workflow_state))
+
     create_params = {
       account: @context,
       created_by: @current_user,
@@ -1414,9 +1427,6 @@ class Lti::RegistrationsController < ApplicationController
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params: {
-        workflow_state:,
-      }
     }
 
     registration = Lti::CreateRegistrationService.call(**create_params)
@@ -1578,8 +1588,11 @@ class Lti::RegistrationsController < ApplicationController
   # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
   # @argument configuration [Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool. Note that updating the base tool configuration of a registration associated with a Dynamic Registration is not allowed.
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration. Note that updating the overlay of a registration associated with a Dynamic Registration IS allowed.
-  # @argument workflow_state [String, "on" | "off" | "allow"]
-  #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  # @argument workflow_state [String, "on" | "off" | "allow" | "active" | "inactive"]
+  #   "on"/"off"/"allow" set the account binding state directly (binding vocabulary) and will be deprecated soon.
+  #   "active"/"inactive" set the registration state directly (registration vocabulary).
+  #   All five values update both the binding and the registration to equivalent states.
+  #   "allow" is only valid for Site Admin registrations.
   # @argument comment [String | nil] A comment explaining why this change was made. Cannot exceed 2000 characters.
   # @argument lock_deploying [Boolean] When true, no new deployments of this registration can be created.
   #
@@ -1614,7 +1627,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    permitted_params = %i[admin_nickname vendor name description lock_deploying]
+    permitted_params = %i[admin_nickname vendor name description lock_deploying workflow_state]
 
     if @context.feature_enabled?(:lock_lti_registrations)
       permitted_params << :lock_deploying
@@ -1622,17 +1635,12 @@ class Lti::RegistrationsController < ApplicationController
 
     registration_params = params.permit(*permitted_params).to_h
 
-    binding_params = {
-      workflow_state: params[:workflow_state],
-    }.compact
-
     update_params = {
       id: params[:id],
       account: @context,
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params:,
       updated_by: @current_user,
       comment: params[:comment]&.to_s
     }
@@ -2151,14 +2159,14 @@ class Lti::RegistrationsController < ApplicationController
   # At the model level, setting an invalid workflow_state will silently change it to the
   # initial state ("off") without complaining, so enforce this here as part of the API contract.
   def validate_workflow_state
-    return if workflow_state.nil? || %w[on off].include?(workflow_state)
-
+    return if workflow_state.nil?
+    return if Lti::AccountBindingService.resolve_workflow_state(workflow_state) && workflow_state != "allow"
     return if workflow_state == "allow" && context.site_admin?
 
     if workflow_state == "allow" && !context.site_admin?
       render_error(:invalid_workflow_state, "only site admin registrations can have a state of 'allow'")
     else
-      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', 'allow', 'active', or 'inactive'")
     end
   end
 

@@ -31,7 +31,6 @@ describe Lti::CreateRegistrationService do
       configuration_params:,
       unified_tool_id:,
       overlay_params:,
-      binding_params:,
       developer_key_params:
     )
   end
@@ -47,7 +46,8 @@ describe Lti::CreateRegistrationService do
       admin_nickname: "who named this tool",
       vendor: "acme",
       description: "looney man",
-      lock_deploying: true
+      lock_deploying: true,
+      workflow_state:
     }
   end
   let(:configuration_params) do
@@ -56,7 +56,7 @@ describe Lti::CreateRegistrationService do
   let(:unified_tool_id) { nil }
   let(:developer_key_params) { {} }
   let(:overlay_params) { {} }
-  let(:binding_params) { {} }
+  let(:workflow_state) { "active" }
 
   it "creates the expected objects with the expected values" do
     expect { subject }
@@ -84,6 +84,14 @@ describe Lti::CreateRegistrationService do
 
     expect(DeveloperKey.last.scopes).to eql(configuration_params[:scopes])
     expect(DeveloperKey.last.redirect_uris).to eql([configuration_params[:target_link_uri]])
+  end
+
+  context "with nil workflow_state" do
+    let(:registration_params) { super().merge(workflow_state: nil) }
+
+    it "defaults the workflow_state to active" do
+      expect(subject.workflow_state).to eq("active")
+    end
   end
 
   context "creating a site admin registration" do
@@ -162,21 +170,19 @@ describe Lti::CreateRegistrationService do
     end
   end
 
-  context "with binding_params defined" do
-    let(:binding_params) { { workflow_state: :on } }
-
-    it "sets the registration account binding to the specified state" do
-      expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
-
-      expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("on")
-    end
-
-    context "when workflow_state is off" do
-      let(:binding_params) { { workflow_state: :off } }
+  context "with workflow_state in registration_params" do
+    context "when workflow_state is inactive" do
+      let(:registration_params) { super().merge(workflow_state: "inactive") }
       let(:course) { course_model(account:) }
 
-      before do
-        account.enable_feature!(:lti_registrations_next)
+      it "creates the registration with workflow_state inactive" do
+        expect(subject.workflow_state).to eq("inactive")
+      end
+
+      it "sets the registration account binding to off" do
+        expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+
+        expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("off")
       end
 
       it "tool is not available even with available context control" do
@@ -197,6 +203,21 @@ describe Lti::CreateRegistrationService do
         # Tool should still not be available because binding is off
         expect(Lti::ContextToolFinder.all_tools_for(course))
           .not_to include(deployment)
+      end
+    end
+
+    context "when workflow_state is active" do
+      let(:registration_params) { super().merge(workflow_state: "active") }
+
+      it "creates the registration with workflow_state active" do
+        subject
+        expect(subject.workflow_state).to eq("active")
+      end
+
+      it "sets the registration account binding to on" do
+        expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+
+        expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("on")
       end
     end
   end
