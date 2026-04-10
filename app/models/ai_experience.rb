@@ -163,7 +163,7 @@ class AiExperience < ApplicationRecord
   end
 
   def create_conversation_context
-    LLMConversationContextManager.create_context(ai_experience: self)
+    AiExperiences::ConversationContextService.new.create(ai_experience: self)
   rescue LlmConversation::Errors::ConversationError => e
     Rails.logger.error("Failed to create conversation context for AiExperience #{id}: #{e.message}")
     # Don't fail the AiExperience creation if context creation fails
@@ -210,14 +210,14 @@ class AiExperience < ApplicationRecord
     return unless llm_conversation_context_id.present?
     return unless course.feature_enabled?(:ai_experiences_context_file_upload)
 
-    LLMConversationContextManager.trigger_indexing(ai_experience: self, context_file_ids: added_context_file_ids)
+    AiExperiences::ConversationContextDocumentsService.new.trigger_indexing(ai_experience: self, context_file_ids: added_context_file_ids)
   end
 
   def update_conversation_context
     return if previously_new_record? && !@context_files_changed
     return unless should_update_context?
 
-    LLMConversationContextManager.update_context(ai_experience: self)
+    AiExperiences::ConversationContextService.new.update(ai_experience: self)
   rescue LlmConversation::Errors::ConversationError => e
     Rails.logger.error("Failed to update conversation context for AiExperience #{id}: #{e.message}")
   end
@@ -236,7 +236,7 @@ class AiExperience < ApplicationRecord
   end
 
   def delete_conversation_context
-    LLMConversationContextManager.delete_context(ai_experience: self)
+    AiExperiences::ConversationContextService.new.delete(ai_experience: self)
   rescue LlmConversation::Errors::ConversationError => e
     Rails.logger.error("Failed to delete conversation context for AiExperience #{id}: #{e.message}")
     # Don't fail the AiExperience deletion if context deletion fails
@@ -246,7 +246,7 @@ class AiExperience < ApplicationRecord
     return unless llm_conversation_context_id.present?
     return unless course.feature_enabled?(:ai_experiences_context_file_upload)
 
-    LLMConversationContextManager.remove_documents(ai_experience: self, context_files:)
+    AiExperiences::ConversationContextDocumentsService.new.remove_documents(ai_experience: self, context_files:)
   end
 
   def unpublish_ok?

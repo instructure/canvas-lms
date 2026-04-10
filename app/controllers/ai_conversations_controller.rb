@@ -71,17 +71,10 @@ class AiConversationsController < ApplicationController
       return render_unauthorized_action
     end
 
-    client = LLMConversationClient.new(
-      current_user: @conversation.user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
+    messages_and_progress = AiExperiences::ConversationMessagesService.new.fetch_with_progress(
+      conversation_id: @conversation.llm_conversation_id,
+      requesting_user: @current_user
     )
-
-    messages_and_progress = client.messages_with_conversation_progress
 
     render json: {
       id: @conversation.id,
@@ -109,18 +102,10 @@ class AiConversationsController < ApplicationController
                                        .first
 
     if existing_conversation
-      client = LLMConversationClient.new(
-        current_user: @current_user,
-        root_account_uuid: @context.root_account.uuid,
-        conversation_context_id: @experience.llm_conversation_context_id,
-        # Fallback to inline variables if no context exists (for older records)
-        facts: @experience.facts,
-        learning_objectives: @experience.learning_objective,
-        scenario: @experience.pedagogical_guidance,
-        conversation_id: existing_conversation.llm_conversation_id
+      messages_and_progress = AiExperiences::ConversationMessagesService.new.fetch_with_progress(
+        conversation_id: existing_conversation.llm_conversation_id,
+        requesting_user: @current_user
       )
-
-      messages_and_progress = client.messages_with_conversation_progress
       render json: { id: existing_conversation.id, messages: messages_and_progress[:messages], progress: messages_and_progress[:progress] }
     else
       render json: {}
@@ -144,17 +129,14 @@ class AiConversationsController < ApplicationController
     # If active conversation exists, complete it before creating a new one
     existing_conversation&.complete!
 
-    client = LLMConversationClient.new(
+    result = AiExperiences::ConversationStartService.new.start(
       current_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
       conversation_context_id: @experience.llm_conversation_context_id,
-      # Fallback to inline variables if no context exists (for older records)
       facts: @experience.facts,
       learning_objectives: @experience.learning_objective,
       scenario: @experience.pedagogical_guidance
     )
-
-    result = client.starting_messages
 
     # Save the conversation record
     conversation_record = nil
@@ -188,25 +170,10 @@ class AiConversationsController < ApplicationController
       return render json: { error: "message is required" }, status: :bad_request
     end
 
-    client = LLMConversationClient.new(
-      current_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      # Fallback to inline variables if no context exists (for older records)
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
-    )
-
-    # Get current messages first
-    messages_data = client.messages
-    current_messages = messages_data[:messages]
-
-    # Send the new message
-    result = client.continue_conversation(
-      messages: current_messages,
-      new_user_message: params[:message]
+    result = AiExperiences::ConversationContinueService.new.continue(
+      conversation_id: @conversation.llm_conversation_id,
+      new_user_message: params[:message],
+      requesting_user: @current_user
     )
 
     # Return only the Canvas conversation ID, messages, and progress
@@ -237,17 +204,9 @@ class AiConversationsController < ApplicationController
       return render_unauthorized_action
     end
 
-    client = LLMConversationClient.new(
-      current_user: @conversation.user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
+    evaluation_data = AiExperiences::ConversationEvaluationService.new.evaluate(
       conversation_id: @conversation.llm_conversation_id
     )
-
-    evaluation_data = client.evaluation
 
     render json: {
       id: @conversation.id,
@@ -267,16 +226,8 @@ class AiConversationsController < ApplicationController
   #
   # @returns {Object} Hash with feedback record
   def create_feedback
-    client = LLMConversationClient.new(
-      current_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
-    )
-    feedback = client.create_feedback(
+    feedback = AiExperiences::ConversationMessageFeedbackService.new.create(
+      conversation_id: @conversation.llm_conversation_id,
       message_id: params[:message_id],
       user_id: @current_user.uuid,
       vote: params[:vote],
@@ -293,16 +244,8 @@ class AiConversationsController < ApplicationController
   #
   # @returns {Object} Success response
   def delete_feedback
-    client = LLMConversationClient.new(
-      current_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
-    )
-    client.delete_feedback(
+    AiExperiences::ConversationMessageFeedbackService.new.delete(
+      conversation_id: @conversation.llm_conversation_id,
       message_id: params[:message_id],
       feedback_id: params[:feedback_id]
     )
