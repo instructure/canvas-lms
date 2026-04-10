@@ -4632,6 +4632,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus" do
+      @course1.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
       should_translate_user_content(@course1) do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
@@ -4644,7 +4645,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus without verifiers" do
-      should_translate_user_content(@course1, include_verifiers: false) do |content|
+      should_translate_user_content(@course1, location: "course_syllabus_#{@course1.id}") do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
         @course1.save!
