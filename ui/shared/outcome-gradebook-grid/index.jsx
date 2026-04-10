@@ -456,7 +456,7 @@ const Grid = {
       const filters = Grid.gridRef._getOutcomeFiltersParams()
         ? `${Grid.gridRef._getOutcomeFiltersParams()}`
         : ''
-      return `/api/v1/courses/${course}/outcome_rollups?aggregate=course&aggregate_stat=${stat}${sectionParam}${filters}`
+      return `/api/v1/courses/${course}/outcome_rollups?aggregate=course&aggregate_stat=${stat}&rating_percents=true&include[]=outcomes${sectionParam}${filters}`
     },
     redrawHeader(grid, fn = Grid.averageFn) {
       Grid.averageFn = fn
@@ -465,6 +465,14 @@ const Grid = {
         return $.flashError(I18n.t('There was an error fetching course statistics'))
       })
       return dfd.then((response, _status, _xhr) => {
+        if (response.linked?.outcomes) {
+          response.linked.outcomes.forEach(outcome => {
+            const stored = Grid.outcomes[`outcome_${outcome.id}`]
+            if (stored && outcome.ratings) {
+              stored.ratings = outcome.ratings
+            }
+          })
+        }
         // do for each column
         each(cols, function (col) {
           const header = grid.getHeaderRowColumn(col.id)
