@@ -16,9 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render} from '@canvas/react/index'
+import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react/index'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Portal} from '@instructure/ui-portal'
+
+let _vddRoot: ReturnType<typeof createRoot> | null = null
 
 export default function vddTooltip() {
   const tooltipMount = document.getElementById('vdd_tooltip_mount')
@@ -56,6 +59,10 @@ export default function vddTooltip() {
       }
     })
 
-    render(<>{toolTipElements}</>, tooltipMount)
+    if (_vddRoot) {
+      rerender(_vddRoot, <>{toolTipElements}</>)
+    } else {
+      _vddRoot = render(<>{toolTipElements}</>, tooltipMount)
+    }
   }
 }
