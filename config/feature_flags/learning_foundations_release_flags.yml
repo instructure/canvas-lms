@@ -287,7 +287,7 @@ widget_dashboard_dark_mode:
   display_name: Widget Dashboard Dark Mode
   description: |-
     When enabled, users can toggle a dark color theme for the widget dashboard.
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   environments:
     development:
       state: allowed_on
