@@ -138,6 +138,15 @@ module FeatureFlags
       end
     end
 
+    def self.provision_ai_experience_after_change_hook(_user, context, _old_state, _new_state)
+      AiExperiences::Jobs::AiExperienceProvisionJob.delay(
+        run_at: 10.seconds.from_now,
+        singleton: "ai_experience_provision:#{context.uuid}",
+        on_conflict: :overwrite, # Ensures that job launches 10 seconds after final feature flag flip
+        max_attempts: 3
+      ).provision_account_for_ai_experiences(context)
+    end
+
     def self.assignment_enhancements_prereq_for_stickers_hook(_user, context, _old_state, new_state)
       return if context.feature_allowed?(:assignments_2_student)
 

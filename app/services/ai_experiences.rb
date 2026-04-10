@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2025 - present Instructure, Inc.
+# Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,12 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module LlmConversation
-  module Errors
-    class ConversationError < StandardError; end
-
-    # Raised on HTTP 409 Conflict. Retrying a conflict
-    # (e.g. account already provisioned) would not resolve it.
-    class ConflictError < StandardError; end
-  end
+module AiExperiences
+  class AiExperienceProvisionError < StandardError; end
 end
