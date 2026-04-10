@@ -36,6 +36,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconNoteLine} from '@instructure/ui-icons'
 import {canvas} from '@instructure/ui-themes'
 import {CanvasNotebookApi} from '../api/CanvasNotebookApi'
+import {notebookTranslations, notebookTranslate} from './notebookTranslations'
 
 const I18n = createI18nScope('notebook')
 
@@ -220,6 +221,8 @@ export default function NotebookApp() {
         objectType="Page"
         courseId={String(window.ENV.COURSE_ID ?? '')}
         pageLastModifiedAt={window.ENV.WIKI_PAGE_UPDATED_AT}
+        translations={notebookTranslations}
+        translate={notebookTranslate}
       >
         <NotebookContent />
       </NotebookProvider>
