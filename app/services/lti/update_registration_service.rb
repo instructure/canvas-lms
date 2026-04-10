@@ -26,13 +26,15 @@ module Lti
   #
   # @param updated_by [User] the user making the update
   #
-  # @param registration_params [Hash] Attributes to update on the Lti::Registration.
+  # @param registration_params [Hash] Attributes to update on the Lti::Registration. Valid values for "workflow_state"
+  # temporarily include the binding state values "on"|"off"|"allow" which will resolve to the appropriate workflow state.
   # ```
   # {
   #   name: "string",
   #   admin_nickname: "string",
   #   vendor: "string",
   #   description: "string",
+  #   workflow_state: "active" | "inactive" (| "on" | "off" | "allow"),
   # }
   # ```
   #
@@ -41,11 +43,6 @@ module Lti
   #
   # @param overlay_params [Hash] A Schemas::Lti::Overlay object, stored as `data` in the Lti::Overlay
   # for this Registration and Account.
-  #
-  # @param binding_params [Hash] Attributes to update on the Lti::RegistrationAccountBinding.
-  # ```
-  # { workflow_state: "string" }
-  # ```
   #
   # @param developer_key_params [Hash] Attributes to update on the DeveloperKey.
   # These take precedence over attributes calculated from registration or configuration.
@@ -62,7 +59,6 @@ module Lti
       registration_params: {},
       configuration_params: {},
       overlay_params: {},
-      binding_params: {},
       developer_key_params: {},
       comment: nil
     )
@@ -72,9 +68,15 @@ module Lti
       @registration_params = registration_params
       @configuration_params = configuration_params
       @overlay_params = overlay_params
-      @binding_params = binding_params
       @developer_key_params = developer_key_params
       @comment = comment
+
+      resolved = Lti::AccountBindingService.resolve_workflow_state(@registration_params[:workflow_state])
+      if resolved
+        @binding_workflow_state = resolved[:binding]
+        @binding_workflow_state = "allow" if account.site_admin? && @binding_workflow_state == "on"
+        @registration_params[:workflow_state] = resolved[:registration]
+      end
       super()
     end
 
@@ -185,13 +187,12 @@ module Lti
     end
 
     def bind_to_account!
-      workflow_state = @binding_params[:workflow_state]
-      return unless workflow_state.present?
+      return unless @binding_workflow_state
 
       Lti::AccountBindingService.call(
         account: @account,
         registration:,
-        workflow_state:,
+        workflow_state: @binding_workflow_state,
         user: @updated_by
       )
     end

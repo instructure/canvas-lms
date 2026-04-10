@@ -227,7 +227,7 @@ describe Lti::ContextToolFinder do
 
       context "with an unavailable context control" do
         let(:registration) do
-          lti_registration_with_tool(account: @course.root_account, binding_params: { workflow_state: "on" })
+          lti_registration_with_tool(account: @course.root_account)
         end
 
         let!(:registration_tool1) { registration.deployments.first }
@@ -302,7 +302,7 @@ describe Lti::ContextToolFinder do
         end
 
         let(:registration) do
-          lti_registration_with_tool(account: @root_account, binding_params: { workflow_state: binding_workflow_state })
+          lti_registration_with_tool(account: @root_account, registration_params: { workflow_state: binding_workflow_state })
         end
 
         let(:tool) { registration.deployments.first }

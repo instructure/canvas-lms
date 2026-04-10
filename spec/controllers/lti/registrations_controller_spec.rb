@@ -1704,6 +1704,58 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "with binding-vocabulary workflow states" do
+      %w[on off].each do |state|
+        context "workflow_state: #{state}" do
+          let(:params) { { workflow_state: state } }
+          let(:expected_reg_state) { (state == "on") ? "active" : "inactive" }
+
+          it "sets the binding and registration to the equivalent states" do
+            expect(subject).to be_successful
+            expect(registration.account_binding_for(account).workflow_state).to eq(state)
+            expect(registration.reload.workflow_state).to eq(expected_reg_state)
+          end
+        end
+      end
+    end
+
+    context "with registration-vocabulary workflow states" do
+      context "workflow_state: inactive" do
+        let(:params) { { workflow_state: "inactive" } }
+
+        it "sets registration to inactive and binding to off" do
+          expect(subject).to be_successful
+          expect(registration.reload.workflow_state).to eq("inactive")
+          expect(registration.account_binding_for(account).workflow_state).to eq("off")
+        end
+      end
+
+      context "workflow_state: active" do
+        let(:params) { { workflow_state: "active" } }
+
+        before { registration.update!(workflow_state: "inactive") }
+
+        it "sets registration to active and binding to on" do
+          expect(subject).to be_successful
+          expect(registration.reload.workflow_state).to eq("active")
+          expect(registration.account_binding_for(account).workflow_state).to eq("on")
+        end
+
+        context "with site admin registration" do
+          let(:site_admin) { site_admin_user }
+          let(:registration) { lti_registration_with_tool(account:, created_by: site_admin) }
+          let(:account) { Account.site_admin }
+
+          before { user_session(site_admin) }
+
+          it "sets binding state to Allow, not On" do
+            expect(subject).to be_successful
+            expect(registration.account_binding_for(account).workflow_state).to eq("allow")
+          end
+        end
+      end
+    end
+
     context "when updating only the name" do
       let(:params) { { name: "A Great Partial Update" } }
 
@@ -2531,7 +2583,9 @@ RSpec.describe Lti::RegistrationsController do
 
       let_once(:site_admin_registration) do
         Shard.default.activate do
-          lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+          registration = lti_registration_with_tool(account: Account.site_admin, configuration_params: { domain: "example.com" })
+          Lti::AccountBindingService.call(account: Account.site_admin, user: site_admin_user, registration:, workflow_state: :on)
+          registration
         end
       end
       let_once(:account) { @shard2.activate { account_model } }
@@ -2652,12 +2706,12 @@ RSpec.describe Lti::RegistrationsController do
       expect(response_json[:account_binding]).to be_present
     end
 
-    it 'creates an account binding with a default state of "off"' do
+    it 'creates an account binding with a default state of "on"' do
       expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
 
       expect(Lti::RegistrationAccountBinding.last.registration).to eq(Lti::Registration.last)
       expect(Lti::RegistrationAccountBinding.last.account).to eq(account)
-      expect(Lti::RegistrationAccountBinding.last.workflow_state).to eq("off")
+      expect(Lti::RegistrationAccountBinding.last.workflow_state).to eq("on")
     end
 
     context "without nickname" do
@@ -2726,6 +2780,15 @@ RSpec.describe Lti::RegistrationsController do
         expect(subject).to be_successful
 
         expect(DeveloperKey.last.account).to be_nil
+      end
+
+      context "with workflow_state: on" do
+        before { params[:workflow_state] = "on" }
+
+        it "sets binding state to Allow, not On" do
+          expect(subject).to be_successful
+          expect(Lti::RegistrationAccountBinding.last.workflow_state).to eq("allow")
+        end
       end
     end
 

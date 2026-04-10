@@ -461,7 +461,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
                 registrationId,
                 overlay: convertedOverlay,
                 adminNickname: state.overlayStore.getState().state.naming.nickname || adminNickname,
-                workflowState: 'on',
+                workflowState: 'active',
               })
               .then(result => {
                 if (isSuccessful(result)) {
@@ -494,6 +494,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
                 registrationId,
                 overlay: convertedOverlay,
                 adminNickname: state.overlayStore.getState().state.naming.nickname || adminNickname,
+                workflowState: 'active',
               })
               .then(result => {
                 if (isSuccessful(result)) {
@@ -696,7 +697,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
                   registrationId: state.registration.id,
                   overlay: convertedOverlay,
                   adminNickname,
-                  workflowState: 'on',
+                  workflowState: 'active',
                 })
                 .then(result => {
                   if (isSuccessful(result)) {
