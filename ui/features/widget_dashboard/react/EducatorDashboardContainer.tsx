@@ -135,6 +135,11 @@ const EducatorDashboardContainer = () => {
               </Button>
             </Flex.Item>
           )}
+          {ENV.add_oak_mount_point && (
+            <Flex.Item>
+              <div id="oak-mount-point"></div>
+            </Flex.Item>
+          )}
         </Flex>
         <DashboardTabs />
       </View>
