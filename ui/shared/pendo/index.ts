@@ -112,6 +112,7 @@ export async function initializePendo() {
         thePendo = pendoo
         pendoInitializing = false
         debuglog('Pendo initialized successfully.')
+        return pendoo
       })
       .catch(error => {
         pendoInitializing = false

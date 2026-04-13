@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback, useMemo, useRef} from 'react'
+import {usePendoTracking} from '@canvas/pendo/react/hooks/usePendoTracking'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
@@ -145,6 +146,17 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
 export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
   const closeButtonRef = useRef<Element | null>(null)
   const allowedPrompts = useMemo(() => window.ENV.STUDY_ASSIST_TOOLS ?? [], [])
+  const {trackEvent} = usePendoTracking()
+
+  const handleAnalyticsEvent = useCallback(
+    (event: string) => {
+      trackEvent({
+        eventName: `study_assist_${event}`,
+        props: {type: 'track'},
+      })
+    },
+    [trackEvent],
+  )
 
   const renderFlashCards = useCallback(
     (
@@ -197,7 +209,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
               <AssistContent
                 chatEnabled={false}
                 showLargePrompts={true}
-                onAnalyticsEvent={() => null}
+                onAnalyticsEvent={handleAnalyticsEvent}
                 allowedPrompts={allowedPrompts}
                 renderFlashCards={renderFlashCards}
               />
