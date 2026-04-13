@@ -4602,9 +4602,8 @@ class CoursesController < ApplicationController
   #
   # @returns Course
   def restore_version
-    not_found unless Account.site_admin&.feature_enabled?(:syllabus_versioning)
-
     get_context
+    not_found unless @context.account.feature_enabled?(:syllabus_versioning)
     return unless authorized_action(@context, @current_user, :manage_course_content_edit)
 
     version_id = params[:version_id].to_i

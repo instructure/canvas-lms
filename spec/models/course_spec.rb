@@ -10144,7 +10144,7 @@ describe Course do
     let(:course) { Course.create!(name: "Test Course") }
 
     context "when syllabus_versioning feature flag is enabled" do
-      before { Account.site_admin.enable_feature!(:syllabus_versioning) }
+      before { course.account.enable_feature!(:syllabus_versioning) }
 
       it "creates version when syllabus_body changes and excludes specified fields" do
         expect do
@@ -10162,12 +10162,12 @@ describe Course do
       end
 
       it "saves original version when editing existing syllabus for the first time" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.account.disable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: "Original syllabus content")
         course.reload
         expect(course.versions.count).to eq(0)
 
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.account.enable_feature!(:syllabus_versioning)
         expect do
           course.update!(syllabus_body: "Updated syllabus content")
         end.to change { course.versions.count }.by(2)
@@ -10182,11 +10182,11 @@ describe Course do
       end
 
       it "does not save original version if syllabus was blank" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.account.disable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: nil)
         expect(course.versions.count).to eq(0)
 
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.account.enable_feature!(:syllabus_versioning)
         expect do
           course.update!(syllabus_body: "New syllabus content")
         end.to change { course.versions.count }.by(1)
@@ -10197,12 +10197,12 @@ describe Course do
       end
 
       it "does not save duplicate original version on subsequent edits" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.account.disable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: "Original syllabus content")
         course.reload
         expect(course.versions.count).to eq(0)
 
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.account.enable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: "First edit")
         expect(course.versions.count).to eq(2)
 
@@ -10215,7 +10215,7 @@ describe Course do
     end
 
     context "when syllabus_versioning feature flag is disabled" do
-      before { Account.site_admin.disable_feature!(:syllabus_versioning) }
+      before { course.account.disable_feature!(:syllabus_versioning) }
 
       it "does not create versions when syllabus_body changes" do
         expect do

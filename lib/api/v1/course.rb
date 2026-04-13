@@ -173,7 +173,7 @@ module Api::V1::Course
       if includes.include?("post_manually")
         hash["post_manually"] = course.post_manually?
       end
-      if Account.site_admin.feature_enabled?(:syllabus_versioning) && includes.include?("syllabus_versions") && course.grants_right?(user, :manage_course_content_edit)
+      if course.account.feature_enabled?(:syllabus_versioning) && includes.include?("syllabus_versions") && course.grants_right?(user, :manage_course_content_edit)
         hash["syllabus_versions"] = syllabus_versions_json(course)
       end
       if includes.include?("accessibility_course_statistic") && course.account.can_see_accessibility_tab?(user)

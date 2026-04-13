@@ -398,7 +398,7 @@ class Course < ApplicationRecord
   def check_if_should_save_original_syllabus_version
     @should_save_original_syllabus_version = syllabus_body_changed? &&
                                              syllabus_body_was.present? &&
-                                             Account.site_admin&.feature_enabled?(:syllabus_versioning) &&
+                                             account&.feature_enabled?(:syllabus_versioning) &&
                                              unversioned?
   rescue
     @should_save_original_syllabus_version = false
@@ -419,7 +419,7 @@ class Course < ApplicationRecord
                      return false unless course.syllabus_body_changed?
 
                      begin
-                       !!Account.site_admin&.feature_enabled?(:syllabus_versioning)
+                       !!course.account&.feature_enabled?(:syllabus_versioning)
                      rescue => e
                        Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
                        false
