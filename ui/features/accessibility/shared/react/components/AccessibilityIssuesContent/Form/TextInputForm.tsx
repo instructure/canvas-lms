@@ -20,6 +20,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
@@ -28,7 +29,6 @@ import {FormComponentProps, FormComponentHandle} from './index'
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {useShallow} from 'zustand/react/shallow'
 import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
-import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -61,7 +61,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
       const [generateLoading, setGenerateLoading] = useState(false)
       const inputRef = useRef<HTMLInputElement | null>(null)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const screenReaderAlert = useScreenReaderAlert()
+      const [srAnnouncement, setSrAnnouncement] = useState('')
       const [isAiTableCaptionGenerationEnabled, selectedItem] = useAccessibilityScansStore(
         useShallow(state => [state.isAiTableCaptionGenerationEnabled, state.selectedScan]),
       )
@@ -106,7 +106,7 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             const generatedCaption = resultJson?.value || ''
             handleOnChange(generatedCaption)
             if (generatedCaption) {
-              screenReaderAlert(
+              setSrAnnouncement(
                 I18n.t('Caption generated: %{caption}', {caption: generatedCaption}),
               )
             }
@@ -144,9 +144,15 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
               onChange={(_, value) => handleOnChange(value)}
               inputRef={el => (inputRef.current = el)}
               isRequired
-              messages={error ? [{text: error, type: 'newError'}] : []}
+              messages={error ? [{text: error, type: 'newError' as const}] : []}
               interaction={isDisabled || generateLoading ? 'disabled' : 'enabled'}
             />
+
+            {isAiTableCaptionGenerationEnabled && srAnnouncement && (
+              <Alert liveRegion={getLiveRegion} isLiveRegionAtomic screenReaderOnly>
+                {srAnnouncement}
+              </Alert>
+            )}
 
             {isAiTableCaptionGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
               <GenerateButton

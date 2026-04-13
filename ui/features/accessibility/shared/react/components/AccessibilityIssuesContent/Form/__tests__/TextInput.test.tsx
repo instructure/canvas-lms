@@ -24,17 +24,13 @@ import {http, HttpResponse} from 'msw'
 import {FormType, IssueWorkflowState} from '../../../../types'
 import TextInputForm from '../TextInputForm'
 import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
-import {useScreenReaderAlert} from '../../../../hooks/useScreenReaderAlert'
 
 const server = setupServer()
 
 vi.mock('../../../../stores/AccessibilityScansStore')
-vi.mock('../../../../hooks/useScreenReaderAlert')
 
 beforeAll(() => server.listen())
 afterAll(() => server.close())
-
-const mockScreenReaderAlert = vi.fn()
 
 beforeEach(() => {
   server.resetHandlers()
@@ -43,7 +39,6 @@ beforeEach(() => {
     const state = {isAiTableCaptionGenerationEnabled: true, selectedScan: null}
     return selector(state)
   })
-  ;(useScreenReaderAlert as unknown as any).mockReturnValue(mockScreenReaderAlert)
 })
 
 describe('TextInputForm', () => {
@@ -186,7 +181,7 @@ describe('TextInputForm', () => {
       expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
     })
 
-    it('announces the full generated caption to screen readers', async () => {
+    it('renders a screen reader announcement in the DOM after AI generation', async () => {
       server.use(
         http.post('**/generate/table_caption', () => {
           return HttpResponse.json({value: 'Mushroom Harvesting Log'})
@@ -195,14 +190,17 @@ describe('TextInputForm', () => {
 
       render(<TextInputForm {...propsWithGenerateOption} />)
 
-      const generateButton = screen.getByTestId('generate-button')
-      fireEvent.click(generateButton)
+      fireEvent.click(screen.getByTestId('generate-button'))
 
       await waitFor(() => {
-        expect(mockScreenReaderAlert).toHaveBeenCalledWith(
-          'Caption generated: Mushroom Harvesting Log',
-        )
+        expect(screen.getByText('Caption generated: Mushroom Harvesting Log')).toBeInTheDocument()
       })
+    })
+
+    it('does not render a screen reader announcement before generation', () => {
+      render(<TextInputForm {...propsWithGenerateOption} />)
+
+      expect(screen.queryByText(/Caption generated:/)).not.toBeInTheDocument()
     })
 
     it('renders data-pendo="AiTableCaptionButtonPushed" on the generate button', () => {
