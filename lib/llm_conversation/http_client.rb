@@ -118,7 +118,7 @@ module LlmConversation
         raise LlmConversation::Errors::ConversationError, error_detail
       end
 
-      JSON.parse(response.body)
+      response.body.present? ? JSON.parse(response.body) : nil
     rescue LlmConversation::Errors::ConversationError
       raise
     rescue Timeout::Error,

@@ -39,6 +39,7 @@ module Api::V1::AiExperience
     if opts[:can_manage]
       json[:can_unpublish] = ai_experience.can_unpublish?
       json[:context_ready] = ai_experience.can_publish?
+      json[:failed_context_file_names] = opts[:failed_context_file_names] if opts[:failed_context_file_names].present?
     end
 
     # Hide teacher-facing fields from non-managers

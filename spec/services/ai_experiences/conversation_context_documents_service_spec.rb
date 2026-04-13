@@ -98,8 +98,8 @@ describe AiExperiences::ConversationContextDocumentsService do
         expect(ai_experience.reload.context_index_status).to eq("completed")
       end
 
-      it "returns 'completed'" do
-        expect(service.sync_index_status(ai_experience:)).to eq("completed")
+      it "returns hash with status 'completed' and empty failed_file_names" do
+        expect(service.sync_index_status(ai_experience:)).to eq({ status: "completed", failed_file_names: [] })
       end
     end
 
@@ -121,8 +121,22 @@ describe AiExperiences::ConversationContextDocumentsService do
         expect(ai_experience.reload.context_index_status).to eq("failed")
       end
 
-      it "returns 'failed'" do
-        expect(service.sync_index_status(ai_experience:)).to eq("failed")
+      it "returns hash with status 'failed' and empty failed_file_names when no context files match" do
+        expect(service.sync_index_status(ai_experience:)).to eq({ status: "failed", failed_file_names: [] })
+      end
+
+      context "when context files have matching document ids" do
+        let(:attachment) { attachment_model(context: course, display_name: "lecture.pdf") }
+
+        before do
+          context_file = AiExperienceContextFile.create!(ai_experience:, attachment:)
+          context_file.update_column(:llm_conversation_service_document_id, "doc-2")
+        end
+
+        it "includes the attachment display name in failed_file_names" do
+          result = service.sync_index_status(ai_experience:)
+          expect(result[:failed_file_names]).to include("lecture.pdf")
+        end
       end
     end
 
@@ -142,6 +156,10 @@ describe AiExperiences::ConversationContextDocumentsService do
       it "updates context_index_status to 'in_progress'" do
         service.sync_index_status(ai_experience:)
         expect(ai_experience.reload.context_index_status).to eq("in_progress")
+      end
+
+      it "returns hash with status 'in_progress' and empty failed_file_names" do
+        expect(service.sync_index_status(ai_experience:)).to eq({ status: "in_progress", failed_file_names: [] })
       end
     end
 
@@ -297,6 +315,17 @@ describe AiExperiences::ConversationContextDocumentsService do
 
         service.remove_documents(ai_experience:, context_files: [context_file])
         expect(WebMock).not_to have_requested(:delete, %r{/documents/})
+      end
+
+      context "when the DELETE response body is empty" do
+        before do
+          stub_request(:delete, remove_url)
+            .to_return(status: 200, body: "", headers: { "Content-Type" => "application/json" })
+        end
+
+        it "does not raise even with an empty response body" do
+          expect { service.remove_documents(ai_experience:, context_files: [context_file]) }.not_to raise_error
+        end
       end
     end
 

@@ -40,6 +40,7 @@ interface AIExperiencePublishButtonProps {
   isPublished: boolean
   canUnpublish: boolean
   contextReady: boolean
+  indexFailed?: boolean
   onPublishChange: (newState: 'published' | 'unpublished') => void
 }
 
@@ -49,6 +50,7 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
   isPublished,
   canUnpublish,
   contextReady,
+  indexFailed,
   onPublishChange,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -66,7 +68,9 @@ const AIExperiencePublishButton: React.FC<AIExperiencePublishButtonProps> = ({
       )
     }
     if (!isPublished && !contextReady) {
-      return I18n.t('Cannot publish: source files are still processing')
+      return indexFailed
+        ? I18n.t('Cannot publish: remove the failed source file and save again')
+        : I18n.t('Cannot publish: source files are still processing')
     }
     return ''
   }

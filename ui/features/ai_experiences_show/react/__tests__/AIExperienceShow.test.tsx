@@ -297,7 +297,12 @@ describe('AIExperienceShow', () => {
     it('shows indexing notice instead of preview when context_ready is false and can_manage', () => {
       render(
         <AIExperienceShow
-          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'in_progress',
+            can_manage: true,
+          }}
         />,
       )
       expect(screen.getByTestId('ai-experience-show-indexing-notice')).toBeInTheDocument()
@@ -313,7 +318,12 @@ describe('AIExperienceShow', () => {
     it('disables AI Conversations button when context_ready is false', () => {
       render(
         <AIExperienceShow
-          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'in_progress',
+            can_manage: true,
+          }}
         />,
       )
       const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
@@ -349,12 +359,81 @@ describe('AIExperienceShow', () => {
     it('students always see the preview even when context_ready is false', () => {
       render(
         <AIExperienceShow
-          aiExperience={{...mockAiExperience, context_ready: false, can_manage: false}}
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'in_progress',
+            can_manage: false,
+          }}
         />,
       )
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
       // Students see the conversation view (not the teacher's "Preview" panel)
       expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
+    })
+  })
+
+  describe('index failed notice', () => {
+    it('shows failed notice with edit button when context_index_status is failed and can_manage', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: true,
+          }}
+        />,
+      )
+      expect(screen.getByTestId('ai-experience-show-index-failed-notice')).toBeInTheDocument()
+      const editLink = screen.getByTestId('ai-experience-show-index-failed-edit-button')
+      expect(editLink).toHaveAttribute(
+        'href',
+        `/courses/${mockAiExperience.course_id}/ai_experiences/${mockAiExperience.id}/edit`,
+      )
+    })
+
+    it('does not show processing notice when context_index_status is failed', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: true,
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+    })
+
+    it('disables AI Conversations button with failed tooltip when context_index_status is failed', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: true,
+          }}
+        />,
+      )
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).toHaveAttribute('disabled')
+    })
+
+    it('does not show failed notice for students', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: false,
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-index-failed-notice')).not.toBeInTheDocument()
     })
   })
 
@@ -421,6 +500,48 @@ describe('AIExperienceShow', () => {
       fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: false}})
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
       expect(screen.queryByText('File sources')).not.toBeInTheDocument()
+    })
+
+    it('renders failed file as a warning pill (failed text) in file sources section', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_files: mockFiles,
+            failed_context_file_names: ['lecture-notes.pdf'],
+          }}
+        />,
+      )
+      expect(screen.getByText('lecture-notes.pdf failed')).toBeInTheDocument()
+    })
+
+    it('does not render failed file as a normal pill when it is in failed_context_file_names', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_files: mockFiles,
+            failed_context_file_names: ['lecture-notes.pdf'],
+          }}
+        />,
+      )
+      // The file should appear once as a warning ("lecture-notes.pdf failed") not as a normal download pill
+      expect(screen.queryByTestId('download-file-f1')).not.toBeInTheDocument()
+      // Non-failed file still renders normally
+      expect(screen.getByTestId('download-file-f2')).toBeInTheDocument()
+    })
+
+    it('does not render a dismiss button for failed files on the show page', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_files: mockFiles,
+            failed_context_file_names: ['lecture-notes.pdf'],
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('dismiss-failed-lecture-notes.pdf')).not.toBeInTheDocument()
     })
   })
 })

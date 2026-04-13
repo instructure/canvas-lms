@@ -43,7 +43,18 @@ module AiExperiences
                    end
 
       ai_experience.update_column(:context_index_status, new_status)
-      new_status
+
+      failed_file_names = if new_status == "failed"
+                            failed_doc_ids = documents.select { |d| d["status"] == "failed" }.pluck("id")
+                            ai_experience.ai_experience_context_files
+                                         .where(llm_conversation_service_document_id: failed_doc_ids)
+                                         .preload(:attachment)
+                                         .filter_map { |cf| cf.attachment&.display_name }
+                          else
+                            []
+                          end
+
+      { status: new_status, failed_file_names: }
     rescue LlmConversation::Errors::ConversationError => e
       Rails.logger.warn("Document index status sync failed for ai_experience #{ai_experience.id}: #{e.message}")
     end

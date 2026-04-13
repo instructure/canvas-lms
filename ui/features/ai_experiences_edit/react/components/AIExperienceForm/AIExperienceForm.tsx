@@ -180,6 +180,29 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
   return (
     <View as="div" maxWidth="1000px" margin="0 auto" padding="medium">
+      {aiExperience?.failed_context_file_names?.length && (
+        <Alert
+          variant="error"
+          renderCloseButtonLabel={false}
+          margin="0 0 medium 0"
+          data-testid="ai-experience-edit-index-failed-notice"
+        >
+          {aiExperience.failed_context_file_names.length === 1
+            ? I18n.t(
+                'The source file "%{name}" failed to process. Remove it and save again to continue.',
+                {
+                  name: aiExperience.failed_context_file_names[0],
+                },
+              )
+            : I18n.t(
+                'The following source files failed to process: %{names}. Remove them and save again to continue.',
+                {
+                  names: aiExperience.failed_context_file_names.join(', '),
+                },
+              )}
+        </Alert>
+      )}
+
       {showErrorBanner && showErrors && Object.keys(errors).length > 0 && (
         <Alert
           variant="error"
@@ -226,6 +249,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           contextFiles={contextFiles}
           onContextFilesChange={handleContextFilesChange}
           courseId={((window as any).ENV?.COURSE_ID || '').toString()}
+          initialFailedFileNames={aiExperience?.failed_context_file_names}
         />
 
         <FormActions isLoading={isLoading} onCancel={handleCancel} />
