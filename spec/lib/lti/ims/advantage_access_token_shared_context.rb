@@ -39,7 +39,6 @@ shared_context "advantage access token context" do
       https://canvas.instructure.com/lti/data_services/scope/update
       https://canvas.instructure.com/lti/data_services/scope/list
       https://canvas.instructure.com/lti/data_services/scope/destroy
-      https://canvas.instructure.com/lti/data_services/scope/list_event_types
       https://canvas.instructure.com/lti/account_lookup/scope/show
       https://canvas.instructure.com/lti/feature_flags/scope/show
       https://canvas.instructure.com/lti/account_external_tools/scope/create

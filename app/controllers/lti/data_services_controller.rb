@@ -62,20 +62,6 @@ module Lti
   #       }
   #     }
   #
-  # @model DataServiceEventTypes
-  #     {
-  #        "id": "DataServiceEventTypes",
-  #        "description": "A categorized list of all possible event types",
-  #        "properties": {
-  #           "EventCategory": {
-  #             "description": "An array of strings representing the event types in the category.",
-  #             "example": ["assignment_created"],
-  #             "type": "array",
-  #             "items": {"type": "string"}
-  #           }
-  #         }
-  #     }
-  #
   class DataServicesController < ApplicationController
     include ::Lti::IMS::Concerns::AdvantageServices
 
@@ -87,7 +73,6 @@ module Lti
       update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       index: all_of(TokenScopes::LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       destroy: all_of(TokenScopes::LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE),
-      event_types_index: all_of(TokenScopes::LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE)
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
@@ -216,14 +201,6 @@ module Lti
     # @returns DataServiceSubscription
     def destroy
       response = Services::LiveEventsSubscriptionService.destroy(jwt_body, params.require(:id))
-      forward_service_response(response)
-    end
-
-    # @API List all event types in categories
-    #
-    # @returns DataServiceEventTypes
-    def event_types_index
-      response = Services::LiveEventsSubscriptionService.event_types_index(jwt_body, message_type)
       forward_service_response(response)
     end
 
