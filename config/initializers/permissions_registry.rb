@@ -480,7 +480,6 @@ BASE_PERMISSIONS = {
     account_only: :site_admin,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: [],
-    account_allows: ->(a) { a.feature_enabled?(:api_rate_limits) },
     account_details: [
       { title: -> { I18n.t("Rate Limiting Management") },
         description: -> { I18n.t("Allows user to manage API rate limits for external tools and integrations.") } }
