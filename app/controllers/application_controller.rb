@@ -550,7 +550,6 @@ class ApplicationController < ActionController::Base
     render_both_to_do_lists
     scheduled_feedback_releases
     speedgrader_studio_media_capture
-    student_access_token_management
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp

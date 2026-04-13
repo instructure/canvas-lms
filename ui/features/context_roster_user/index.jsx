@@ -134,10 +134,7 @@ ready(() => {
     )
   }
 
-  if (
-    ENV.FEATURES.student_access_token_management &&
-    ENV.PERMISSIONS?.can_view_user_generated_access_tokens
-  ) {
+  if (ENV.PERMISSIONS?.can_view_user_generated_access_tokens) {
     const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
     if (accessTokensContainer) {
       render(

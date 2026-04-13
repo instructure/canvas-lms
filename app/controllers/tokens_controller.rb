@@ -110,26 +110,24 @@ class TokensController < ApplicationController
 
     return render_error("token[purpose] is missing") unless token_params.key?(:purpose)
 
-    # Force an expiration date for students
-    if Account.site_admin.feature_enabled?(:student_access_token_management) &&
-       user_has_only_student_enrollments?(@current_user)
+    token_params[:developer_key] = DeveloperKey.default
+    @token = @context.access_tokens.build(token_params)
 
-      return render_error("Expiration date is required") unless token_params[:permanent_expires_at]
+    return render_unauthorized_action unless @token.grants_right?(logged_in_user, AccessToken.account_session_for_permissions(@domain_root_account), :create)
+
+    # Force an expiration date for students
+    if user_has_only_student_enrollments?(@current_user)
+      return render_error("Expiration date is required") unless token_params[:permanent_expires_at].present?
 
       begin
         expiration_date = Time.zone.parse(token_params[:permanent_expires_at])
-        if expiration_date > MAXIMUM_EXPIRATION_DURATION.from_now
+        if expiration_date.nil? || expiration_date > MAXIMUM_EXPIRATION_DURATION.from_now
           return render_error("Expiration date cannot be more than 120 days in the future")
         end
       rescue ArgumentError
         return render_error("Invalid expiration date format")
       end
     end
-
-    token_params[:developer_key] = DeveloperKey.default
-    @token = @context.access_tokens.build(token_params)
-
-    return render_unauthorized_action unless @token.grants_right?(logged_in_user, AccessToken.account_session_for_permissions(@domain_root_account), :create)
 
     # unless we're creating it for ourselves (and not masquerading), set it to pending
     @token.workflow_state = "pending" unless @context == logged_in_user
