@@ -23,12 +23,11 @@ import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {AIExperienceShowProps} from '../types'
-import AIExperienceShow from './components/AIExperienceShow'
+import AIExperienceShowManager from './AIExperienceShowManager'
 
 const I18n = createI18nScope('ai_experiences_show')
 
-export const AIExperiencesShow: React.FC<AIExperienceShowProps> = props => {
+export const AIExperiencesShow: React.FC = () => {
   return (
     <ErrorBoundary
       errorComponent={
@@ -41,7 +40,7 @@ export const AIExperiencesShow: React.FC<AIExperienceShowProps> = props => {
       }
     >
       <AlertManager>
-        <AIExperienceShow aiExperience={props.aiExperience} />
+        <AIExperienceShowManager />
       </AlertManager>
     </ErrorBoundary>
   )

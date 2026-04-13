@@ -127,4 +127,36 @@ describe('FileList', () => {
       expect(screen.getByText('document.docx')).toBeInTheDocument()
     })
   })
+
+  describe('read-only mode (callbacks omitted)', () => {
+    it('does not render remove buttons when onRemoveFile is not provided', () => {
+      render(
+        <FileList files={mockFiles} uploadingFileNames={new Set()} failedFileNames={new Set()} />,
+      )
+      expect(screen.queryByTestId('remove-file-1')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('remove-file-2')).not.toBeInTheDocument()
+    })
+
+    it('does not render dismiss buttons when onClearFailedFile is not provided', () => {
+      render(
+        <FileList
+          files={[]}
+          uploadingFileNames={new Set()}
+          failedFileNames={new Set(['broken.pdf'])}
+        />,
+      )
+      expect(screen.queryByTestId('dismiss-failed-broken.pdf')).not.toBeInTheDocument()
+    })
+
+    it('still renders the failed file name when onClearFailedFile is not provided', () => {
+      render(
+        <FileList
+          files={[]}
+          uploadingFileNames={new Set()}
+          failedFileNames={new Set(['broken.pdf'])}
+        />,
+      )
+      expect(screen.getByText('broken.pdf failed')).toBeInTheDocument()
+    })
+  })
 })

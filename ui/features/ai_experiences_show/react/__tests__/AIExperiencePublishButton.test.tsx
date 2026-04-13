@@ -225,6 +225,19 @@ describe('AIExperiencePublishButton', () => {
     expect(button).not.toBeDisabled()
   })
 
+  it('disables button when indexFailed is true and unpublished', () => {
+    render(
+      <AIExperiencePublishButton
+        {...defaultProps}
+        isPublished={false}
+        contextReady={false}
+        indexFailed={true}
+      />,
+    )
+    const button = screen.getByTestId('ai-experience-publish-button')
+    expect(button).toBeDisabled()
+  })
+
   it('allows button to be clicked when canUnpublish is true and published', () => {
     render(<AIExperiencePublishButton {...defaultProps} isPublished={true} canUnpublish={true} />)
     const button = screen.getByTestId('ai-experience-publish-button')

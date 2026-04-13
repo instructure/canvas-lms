@@ -31,9 +31,10 @@ export interface AIExperience {
   can_unpublish?: boolean
   context_files?: ContextFile[]
   context_ready?: boolean
+  context_index_status?: 'not_started' | 'in_progress' | 'completed' | 'failed'
+  failed_context_file_names?: string[]
 }
 
 export interface AIExperienceShowProps {
-  aiExperience: AIExperience
   navbarHeight?: number
 }

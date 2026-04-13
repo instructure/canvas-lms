@@ -30,15 +30,6 @@ ready(() => {
 
   const container = document.getElementById('ai_experiences_show')
   if (container) {
-    // Get AI experience data from ENV
-    const aiExperience = ENV.AI_EXPERIENCE
-    const navbarHeight = ENV.NAVBAR_HEIGHT || 0
-
-    if (aiExperience) {
-      render(
-        <AIExperiencesShow aiExperience={aiExperience} navbarHeight={navbarHeight} />,
-        container,
-      )
-    }
+    render(<AIExperiencesShow />, container)
   }
 })

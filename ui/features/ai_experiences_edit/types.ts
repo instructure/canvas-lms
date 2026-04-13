@@ -36,6 +36,7 @@ export interface AIExperience {
   workflow_state?: string
   context_files?: ContextFile[]
   context_ready?: boolean
+  failed_context_file_names?: string[]
 }
 
 export interface AIExperienceFormData {

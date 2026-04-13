@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconAiLine, IconMoreLine, IconClockLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 declare const ENV: GlobalEnv & {
@@ -35,7 +36,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {AIExperience} from '../../types'
-import ContextFilePill from '@canvas/canvas-file-upload/react/ContextFilePill'
+import {FileList} from '@canvas/canvas-file-upload/react/FileList'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 import AIExperiencePublishButton from './AIExperiencePublishButton'
 
@@ -47,7 +48,9 @@ interface AIExperienceShowProps {
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const canManage = aiExperience.can_manage
-  const isIndexing = !(aiExperience.context_ready ?? true)
+  const indexStatus = aiExperience.context_index_status
+  const isIndexing = indexStatus === 'in_progress' || indexStatus === 'not_started'
+  const isIndexFailed = indexStatus === 'failed'
   const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
     const params = new URLSearchParams(window.location.search)
@@ -100,13 +103,18 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   isPublished={workflowState === 'published'}
                   canUnpublish={aiExperience.can_unpublish ?? true}
                   contextReady={aiExperience.context_ready ?? true}
+                  indexFailed={isIndexFailed}
                   onPublishChange={setWorkflowState}
                 />
               </Flex.Item>
               <Flex.Item>
-                {isIndexing ? (
+                {isIndexing || isIndexFailed ? (
                   <Tooltip
-                    renderTip={I18n.t('Source files are still being processed')}
+                    renderTip={
+                      isIndexFailed
+                        ? I18n.t('A source file failed to process')
+                        : I18n.t('Source files are still being processed')
+                    }
                     on={['hover', 'focus']}
                   >
                     <Button
@@ -202,7 +210,30 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         {I18n.t('Activity')}
       </Heading>
 
-      {canManage && isIndexing ? (
+      {canManage && isIndexFailed ? (
+        <Alert
+          variant="error"
+          renderCloseButtonLabel={false}
+          data-testid="ai-experience-show-index-failed-notice"
+        >
+          {aiExperience.failed_context_file_names?.length
+            ? I18n.t('The following source %{files} failed to process: %{names}. ', {
+                files:
+                  aiExperience.failed_context_file_names.length === 1
+                    ? I18n.t('file')
+                    : I18n.t('files'),
+                names: aiExperience.failed_context_file_names.join(', '),
+              })
+            : I18n.t('A source file failed to process. ')}
+          <a
+            href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`}
+            data-testid="ai-experience-show-index-failed-edit-button"
+          >
+            {I18n.t('Edit this experience')}
+          </a>
+          {I18n.t(' to remove it and save again to continue.')}
+        </Alert>
+      ) : canManage && isIndexing ? (
         <View
           as="div"
           padding="large"
@@ -330,13 +361,13 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                     <Heading level="h3" margin="0 0 small 0">
                       {I18n.t('File sources')}
                     </Heading>
-                    <Flex wrap="wrap" gap="x-small">
-                      {aiExperience.context_files!.map(file => (
-                        <Flex.Item key={file.id} data-testid={`context-file-row-${file.id}`}>
-                          <ContextFilePill file={file} />
-                        </Flex.Item>
-                      ))}
-                    </Flex>
+                    <FileList
+                      files={aiExperience.context_files!.filter(
+                        f => !aiExperience.failed_context_file_names?.includes(f.display_name),
+                      )}
+                      uploadingFileNames={new Set()}
+                      failedFileNames={new Set(aiExperience.failed_context_file_names ?? [])}
+                    />
                   </View>
                 )}
             </View>
