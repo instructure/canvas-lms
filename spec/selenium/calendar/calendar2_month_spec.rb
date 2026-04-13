@@ -301,6 +301,56 @@ describe "calendar2" do
         expect(find("#assignment_name").attribute(:value)).to include(name)
       end
 
+      it "redirects to assignment edit page when clicking edit on a peer review assignment with FF enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          title: "Assignment with Graded Peer Reviews - Calendar Test",
+          due_at: Time.zone.now.beginning_of_month + 15.days,
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          workflow_state: "published"
+        )
+        peer_review_model(parent_assignment: assignment)
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f(".fc-event.assignment").click
+        wait_for_ajaximations
+
+        expect_new_page_load { hover_and_click ".edit_event_link" }
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}/edit")
+      end
+
+      it "redirects to assignment edit page when clicking edit on a peer review assignment override with FF enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          title: "Assignment with Graded Peer Reviews - Override Test",
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          workflow_state: "published"
+        )
+        peer_review_model(parent_assignment: assignment)
+        assignment.assignment_overrides.create! do |override|
+          override.set = @course.course_sections.first
+          override.due_at = Time.zone.now.beginning_of_month + 15.days
+          override.due_at_overridden = true
+        end
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f(".fc-event.assignment_override").click
+        wait_for_ajaximations
+
+        expect_new_page_load { hover_and_click ".edit_event_link" }
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}/edit")
+      end
+
       it "publishes a new assignment when toggle is clicked" do
         create_published_middle_day_assignment
         f(".fc-event.assignment").click

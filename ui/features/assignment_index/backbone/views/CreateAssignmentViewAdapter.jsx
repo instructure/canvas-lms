@@ -124,6 +124,8 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     isPublished: assignment.published(),
     multipleDueDates: assignment.multipleDueDates(),
     differentiatedAssignment: assignment.nonBaseDates(),
+    peerReviewInGradedMode:
+      !!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && !!assignment.peerReviewSubAssignment(),
     frozenFields: getFrozenFields(assignment),
   })
 
