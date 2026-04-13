@@ -478,7 +478,7 @@ module Importers
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
       if migration.for_master_course_import?
-        if Account.site_admin.feature_enabled?(:syllabus_versioning)
+        if course.account.feature_enabled?(:syllabus_versioning)
           course.mark_as_importing!(migration)
         else
           course.master_migration = migration

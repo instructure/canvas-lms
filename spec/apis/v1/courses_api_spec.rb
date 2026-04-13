@@ -4675,7 +4675,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @course1.account.disable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4687,7 +4687,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions when feature flag is enabled and param is present" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4702,7 +4702,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when param is not present" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       json = api_call(:get,
                       "/api/v1/courses/#{@course1.id}.json",
                       { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
@@ -4710,7 +4710,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when user lacks manage_course_content_edit permission" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       student_in_course(active_all: true, course: @course1)
       SimplyVersioned::Version.create!(
         versionable: @course1,
@@ -4727,7 +4727,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions when blank child receives syllabus from master" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4750,7 +4750,7 @@ describe CoursesController, type: :request do
     end
 
     it "protects downstream syllabus changes from being overwritten by blueprint sync" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4777,7 +4777,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not create syllabus versions during blueprint sync when flag is disabled" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @course1.account.disable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4797,7 +4797,7 @@ describe CoursesController, type: :request do
     end
 
     it "creates syllabus versions during blueprint sync when flag is enabled" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4817,7 +4817,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions after blueprint association is removed" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4840,7 +4840,7 @@ describe CoursesController, type: :request do
     end
 
     it "includes edited_by user information in syllabus_versions when saving_user is set" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       @course1.saving_user = @me
       @course1.update(syllabus_body: "Version with user")
 
@@ -4854,7 +4854,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not include edited_by when saving_user is not set" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       @course1.update(syllabus_body: "Version without user")
 
       json = api_call(:get,
@@ -4866,7 +4866,7 @@ describe CoursesController, type: :request do
 
     describe "#restore_version" do
       before do
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        @course1.account.enable_feature!(:syllabus_versioning)
         @course1.update!(syllabus_body: "Previous content")
         @version = @course1.versions.last
         @course1.update!(syllabus_body: "Current content")
@@ -4911,7 +4911,7 @@ describe CoursesController, type: :request do
       end
 
       it "requires feature flag to be enabled" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        @course1.account.disable_feature!(:syllabus_versioning)
         api_call(:post,
                  "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
                  { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" },

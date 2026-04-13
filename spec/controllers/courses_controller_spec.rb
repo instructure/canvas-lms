@@ -6426,8 +6426,8 @@ describe CoursesController do
   describe "#restore_version" do
     before :once do
       course_with_teacher(active_all: true)
-      Account.site_admin.enable_feature!(:syllabus_versioning)
       @account = @course.account
+      @account.enable_feature!(:syllabus_versioning)
       @account.enable_feature!(:allow_attachment_association_creation)
       @account.enable_feature!(:file_association_access)
     end
@@ -6437,7 +6437,7 @@ describe CoursesController do
     end
 
     it "requires syllabus_versioning feature flag" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @account.disable_feature!(:syllabus_versioning)
       post "restore_version", params: { course_id: @course.id, version_id: 1 }
       expect(response).to have_http_status(:not_found)
     end
