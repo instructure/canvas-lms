@@ -84,11 +84,8 @@ module Canvas::Builders
         add_enrollment_dates(@section)
         add_term_dates if @enrollment.admin?
       elsif course_is_restricted?
-        if @enrollment.admin?
-          add_term_dates
-        else
-          add_enrollment_dates(@course)
-        end
+        add_enrollment_dates(@course)
+        add_term_dates if @enrollment.admin?
       elsif @term
         add_term_dates
       else

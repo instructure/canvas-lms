@@ -545,7 +545,7 @@ describe UsersController do
         expect(courses.pluck("course_code").sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
       end
 
-      it "does not include courses as active for teachers when term is concluded, even with active course dates" do
+      it "includes courses with overridden dates as not concluded for teachers if the course period is active" do
         my_old_course = Course.find_by(course_code: "MyOldCourse")
         my_old_course.restrict_enrollments_to_course_dates = true
         my_old_course.start_at = 2.weeks.ago
@@ -555,7 +555,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @teacher.id }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.pluck("course_code")).not_to include("MyOldCourse")
+        expect(courses.pluck("course_code")).to include("MyOldCourse")
       end
 
       it "includes courses with overridden dates as not concluded for admins if the course period is active" do
