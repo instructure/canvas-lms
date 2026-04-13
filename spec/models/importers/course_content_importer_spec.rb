@@ -893,6 +893,27 @@ describe Course do
     context "with allow_student_anonymous_discussion_topics" do
       it_behaves_like "setting set correctly", :allow_student_anonymous_discussion_topics
     end
+
+    context "when course settings are not restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:course_settings_restricted?).and_return(false) }
+
+      it "does not add a warning" do
+        allow(Importers::CourseContentImporter).to receive(:import_settings_from_migration)
+        allow(Importers::LatePolicyImporter).to receive(:process_migration)
+        Importers::CourseContentImporter.import_settings_from_migration(@course, { course: { storage_quota: 4 } }, @cm)
+        expect(@cm.migration_issues.count).to be 0
+      end
+    end
+
+    context "when course settings are restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:course_settings_restricted?).and_return(true) }
+
+      it "adds a warning about the restriction" do
+        Importers::CourseContentImporter.import_settings_from_migration(@course, { course: { storage_quota: 4 } }, @cm)
+        expect(@cm.migration_issues.count).to be 1
+        expect(@cm.migration_issues.first.description).to include("Course Settings were not imported")
+      end
+    end
   end
 
   describe "audit logging" do
@@ -1119,6 +1140,130 @@ describe Course do
 
       it "returns false" do
         expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be false
+      end
+    end
+  end
+
+  describe ".course_settings_restricted?" do
+    let(:course) { course_model }
+    let(:user) { user_model }
+    let(:migration) { instance_double(ContentMigration, user:) }
+
+    context "when the course_navigation_and_feature_options_permissions feature is disabled" do
+      it "returns false" do
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration)).to be false
+      end
+    end
+
+    context "when the course_navigation_and_feature_options_permissions feature is enabled" do
+      before { course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions) }
+
+      let(:perm) { :manage_course_content_edit }
+
+      it "returns false when the user has the permission" do
+        allow(course).to receive(:grants_right?).with(user, perm).and_return(true)
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration)).to be false
+      end
+
+      it "returns true when the user lacks the Course Details related permission" do
+        allow(course).to receive(:grants_right?).with(user, perm).and_return(false)
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration)).to be true
+      end
+
+      it "returns false when migration has no user" do
+        migration_without_user = instance_double(ContentMigration, user: nil)
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration_without_user)).to be false
+      end
+    end
+  end
+
+  describe ".discussion_settings_restricted?" do
+    let(:course) { course_model }
+    let(:user) { user_model }
+    let(:migration) { instance_double(ContentMigration, user:) }
+
+    context "when the default_discussion_options feature is disabled" do
+      it "returns false" do
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration)).to be false
+      end
+    end
+
+    context "when the default_discussion_options feature is enabled" do
+      before { course.root_account.enable_feature!(:default_discussion_options) }
+
+      it "returns false when the user has all of the relevant permissions enabled" do
+        allow(course).to receive(:grants_all_rights?).with(user, *RoleOverride::GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS).and_return(true)
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration)).to be false
+      end
+
+      it "returns true when the user lacks at least one of the relevant permissions" do
+        allow(course).to receive(:grants_all_rights?).with(user, *RoleOverride::GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS).and_return(false)
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration)).to be true
+      end
+
+      it "returns false when migration has no user" do
+        migration_without_user = instance_double(ContentMigration, user: nil)
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration_without_user)).to be false
+      end
+    end
+  end
+
+  describe ".import_discussion_topics_with_permission_check" do
+    let(:course) { course_model }
+    let(:user) { user_model }
+    let(:migration) { course.content_migrations.create!(user:, copy_options: { everything: "1" }) }
+    let(:data) do
+      {
+        "discussion_topics" => [{ "migration_id" => "abc123", "title" => "A Topic" }],
+        "announcements" => [{ "migration_id" => "ann001", "title" => "An Announcement" }]
+      }.with_indifferent_access
+    end
+
+    context "when discussion settings are not restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:discussion_settings_restricted?).and_return(false) }
+
+      it "calls the full process_migration on DiscussionTopicImporter" do
+        expect(Importers::DiscussionTopicImporter).to receive(:process_migration).with(data, migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+      end
+
+      it "does not add any migration warnings" do
+        allow(Importers::DiscussionTopicImporter).to receive(:process_migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+        expect(migration.migration_issues.count).to be 0
+      end
+    end
+
+    context "when discussion settings are restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:discussion_settings_restricted?).and_return(true) }
+
+      it "does not call process_migration for discussion topics" do
+        expect(Importers::DiscussionTopicImporter).not_to receive(:process_migration)
+        allow(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+      end
+
+      it "still imports announcements" do
+        expect(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+          .with(data["announcements"], migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+      end
+
+      it "adds a warning about skipped topics" do
+        allow(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+        expect(migration.migration_issues.count).to be 1
+        expect(migration.migration_issues.first.description).to include("Discussion Topics were not imported")
+      end
+
+      context "when discussion topics are not selected in copy options" do
+        let(:migration) { course.content_migrations.create!(user:, copy_options: { all_course_settings: "1" }) }
+
+        it "does not add a warning" do
+          allow(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+          Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+          expect(migration.migration_issues.count).to be 0
+        end
       end
     end
   end
