@@ -88,10 +88,6 @@
   description: Can destroy subscription to data service data
   undocumented: true
 
-- scope: https://canvas.instructure.com/lti/data_services/scope/list_event_types
-  description: Can list categorized event types
-  undocumented: true
-
 - scope: https://canvas.instructure.com/lti/data_services/scope/list
   description: Can list subscriptions to data service data
   undocumented: true
