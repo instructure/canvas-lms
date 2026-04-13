@@ -62,6 +62,12 @@ class RemediationWizardComponent
     false
   end
 
+  def issue_message_visible?(message)
+    !fj("[role='dialog'] *:contains(\"#{message}\")").nil?
+  rescue
+    false
+  end
+
   def visible?
     wizard_tray_open?
   end
