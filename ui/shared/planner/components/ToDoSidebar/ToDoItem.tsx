@@ -22,6 +22,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {InlineList} from '@instructure/ui-list'
 
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {
   IconAssignmentLine,
   IconQuizLine,
@@ -171,7 +172,7 @@ export default class ToDoItem extends React.Component {
   render() {
     const title = (
       <Text size="small" lineHeight="fit">
-        {this.itemTitle()}
+        <TruncateText>{this.itemTitle()}</TruncateText>
       </Text>
     )
     // @ts-expect-error TS2339 (typescriptify)
