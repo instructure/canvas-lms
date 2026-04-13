@@ -109,7 +109,6 @@ BASE_PERMISSIONS = {
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(_) { Account.site_admin.feature_enabled?(:student_access_token_management) },
     group: :users_manage_access_tokens,
     account_details: [
       {

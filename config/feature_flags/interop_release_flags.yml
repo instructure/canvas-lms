@@ -459,19 +459,6 @@ refactor_custom_variables:
       state: allowed_on
     ci:
       state: allowed_on
-student_access_token_management:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Student Access Token Management
-  description: |-
-    If enabled, Canvas will enforce an expiration of at most 120 days
-    to student access tokens for security purposes, and allow Admins
-    to delete student access tokens.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 top_navigation_placement:
   state: hidden
   applies_to: RootAccount

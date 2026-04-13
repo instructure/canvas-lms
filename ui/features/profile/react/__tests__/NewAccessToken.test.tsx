@@ -171,10 +171,9 @@ describe('NewAccessToken', () => {
     )
   }, 30000) // Add test timeout
 
-  describe('Feature flag behavior', () => {
-    describe('when feature flag is enabled and user is only a student', () => {
+  describe('Student expiration enforcement', () => {
+    describe('when user is only a student', () => {
       beforeEach(() => {
-        window.ENV.FEATURES!.student_access_token_management = true
         window.ENV.user_is_only_student = true
       })
 
@@ -277,9 +276,8 @@ describe('NewAccessToken', () => {
       })
     })
 
-    describe('when feature flag is disabled or user is not only a student', () => {
+    describe('when user is not only a student', () => {
       beforeEach(() => {
-        window.ENV.FEATURES!.student_access_token_management = false
         window.ENV.user_is_only_student = false
       })
 
@@ -327,40 +325,5 @@ describe('NewAccessToken', () => {
       })
     })
 
-    describe('when user is only a student but feature flag is disabled', () => {
-      beforeEach(() => {
-        window.ENV.FEATURES!.student_access_token_management = false
-        window.ENV.user_is_only_student = true
-      })
-
-      it('should not enforce restrictions', () => {
-        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
-        const expirationDateInput = screen.getByLabelText('Expiration date')
-
-        // Should behave like normal user when feature flag is disabled
-        expect(expirationDateInput).not.toBeRequired()
-        expect(
-          screen.getByText('Leave the expiration fields blank for no expiration.'),
-        ).toBeInTheDocument()
-      })
-    })
-
-    describe('when feature flag is enabled but user is not only a student', () => {
-      beforeEach(() => {
-        window.ENV.FEATURES!.student_access_token_management = true
-        window.ENV.user_is_only_student = false
-      })
-
-      it('should not enforce restrictions', () => {
-        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
-        const expirationDateInput = screen.getByLabelText('Expiration date')
-
-        // Should behave like normal user when user is not only a student
-        expect(expirationDateInput).not.toBeRequired()
-        expect(
-          screen.getByText('Leave the expiration fields blank for no expiration.'),
-        ).toBeInTheDocument()
-      })
-    })
   })
 })

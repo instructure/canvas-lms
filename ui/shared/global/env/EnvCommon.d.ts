@@ -325,7 +325,6 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
-  | 'student_access_token_management'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'

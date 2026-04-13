@@ -50,11 +50,7 @@ const getMaxExpirationDate = () => {
   return maxDate
 }
 
-const isFeatureFlagEnabled = () => ENV.FEATURES?.student_access_token_management
-
-const isCurrentUserStudent = () => ENV.user_is_only_student
-
-const shouldEnforceMaxExpiration = () => isFeatureFlagEnabled() && isCurrentUserStudent()
+const shouldEnforceMaxExpiration = () => ENV.user_is_only_student
 
 const defaultValues = {
   purpose: '',
