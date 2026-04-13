@@ -84,7 +84,7 @@ describe('CoursesTableRow', () => {
 
       const link = screen.getByRole('link', {name: course.name})
       expect(link).toBeInTheDocument()
-      expect(link).toHaveAttribute('href', `/courses/${course.id}`)
+      expect(link).toHaveAttribute('href', `/courses/${course.id}/accessibility`)
     })
   })
 

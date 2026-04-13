@@ -92,7 +92,7 @@ const CourseNameCell: React.FC<{courseId: string; courseName: string} & WithHead
   header,
 }) => (
   <Table.Cell data-testid="course-name-cell" header={header}>
-    <Link href={`/courses/${courseId}`} isWithinText={false}>
+    <Link href={`/courses/${courseId}/accessibility`} isWithinText={false}>
       {courseName}
     </Link>
   </Table.Cell>
