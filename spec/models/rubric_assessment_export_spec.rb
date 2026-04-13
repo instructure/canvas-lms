@@ -36,6 +36,13 @@ describe RubricAssessmentExport do
 
         expect(rows.size).to eq(1)
       end
+
+      it "uses sortable_name for the Student Name column" do
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows[0]["Student Name"]).to eq(@student.sortable_name)
+      end
     end
 
     context "when filter all is applied" do
@@ -57,6 +64,18 @@ describe RubricAssessmentExport do
         rows = CSV.parse(csv_content, headers: true)
 
         expect(rows.size).to eq(0)
+      end
+    end
+
+    context "when filter non-completed is applied and a student has no assessment" do
+      let(:options) { { filter: "non-completed" } }
+      let!(:unassessed_student) { student_in_course(active_all: true, course: @course).user }
+
+      it "uses sortable_name for the Student Name column" do
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows[0]["Student Name"]).to eq(unassessed_student.sortable_name)
       end
     end
 
