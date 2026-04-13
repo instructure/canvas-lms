@@ -36,10 +36,12 @@ class Types::InstitutionalTagCategoryType < Types::ApplicationObjectType
     Loaders::InstitutionalTagCategoryAssociationsCountLoader.load(object)
   end
 
-  field :tags_connection, Types::InstitutionalTagType.connection_type, null: true
-  def tags_connection
+  field :tags_connection, Types::InstitutionalTagType.connection_type, null: true do
+    argument :workflow_state, String, required: false, default_value: "active"
+  end
+  def tags_connection(workflow_state: "active")
     load_association(:institutional_tags).then do |tags|
-      tags.where(workflow_state: "active")
+      tags.where(workflow_state:)
     end
   end
 end

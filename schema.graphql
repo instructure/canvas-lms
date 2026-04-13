@@ -5889,6 +5889,7 @@ type InstitutionalTagCategory implements LegacyIDInterface & Node & Timestamped 
     Returns the last _n_ elements from the list.
     """
     last: Int
+    workflowState: String = "active"
   ): InstitutionalTagConnection
   updatedAt: DateTime
   workflowState: String!
