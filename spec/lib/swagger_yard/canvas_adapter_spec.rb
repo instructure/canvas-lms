@@ -407,29 +407,53 @@ describe SwaggerYard::CanvasAdapter do
     end
   end
 
-  describe ".normalize_route_path" do
-    it "removes /api/v1 prefix" do
-      path = "/api/v1/courses/{id}"
-      result = described_class.normalize_route_path(path)
-      expect(result).to eq("/courses/{id}")
+  describe ".process_single_route" do
+    before do
+      # Clear any existing route data
+      described_class.instance_variable_set(:@canvas_routes, {})
     end
 
-    it "removes /api/sis prefix" do
-      path = "/api/sis/courses"
-      result = described_class.normalize_route_path(path)
-      expect(result).to eq("/courses")
+    it "converts Rails param syntax to OpenAPI format" do
+      action_name = "courses#show"
+      route = { path: "/courses/:id", method: "GET" }
+
+      described_class.process_single_route(action_name, route)
+
+      routes = described_class.canvas_routes[action_name]
+      expect(routes).to be_an(Array)
+      expect(routes.first[:path]).to eq("/courses/{id}")
     end
 
-    it "converts Rails params to OpenAPI format" do
-      path = "/api/v1/courses/:id/assignments/:assignment_id"
-      result = described_class.normalize_route_path(path)
-      expect(result).to eq("/courses/{id}/assignments/{assignment_id}")
+    it "converts multiple params in path" do
+      action_name = "courses#show_assignment"
+      route = { path: "/courses/:course_id/assignments/:id", method: "GET" }
+
+      described_class.process_single_route(action_name, route)
+
+      routes = described_class.canvas_routes[action_name]
+      expect(routes.first[:path]).to eq("/courses/{course_id}/assignments/{id}")
     end
 
-    it "handles paths without api prefix" do
-      path = "/courses/{id}"
-      result = described_class.normalize_route_path(path)
-      expect(result).to eq("/courses/{id}")
+    it "handles pipe-separated HTTP methods" do
+      action_name = "courses#update"
+      route = { path: "/courses/:id", method: "PUT|PATCH" }
+
+      described_class.process_single_route(action_name, route)
+
+      routes = described_class.canvas_routes[action_name]
+      expect(routes.size).to eq(2)
+      expect(routes.pluck(:method)).to contain_exactly("PUT", "PATCH")
+      expect(routes.all? { |r| r[:path] == "/courses/{id}" }).to be true
+    end
+
+    it "preserves already converted OpenAPI params" do
+      action_name = "courses#show"
+      route = { path: "/courses/{id}", method: "GET" }
+
+      described_class.process_single_route(action_name, route)
+
+      routes = described_class.canvas_routes[action_name]
+      expect(routes.first[:path]).to eq("/courses/{id}")
     end
   end
 
@@ -552,12 +576,8 @@ describe SwaggerYard::CanvasAdapter do
           method_name = yard_object.name.to_s
           class_name_str = @class_name.to_s
 
-          # Handle nested classes like UsersController::ServiceCredentials
-          # For nested classes, use the parent controller name
-          if class_name_str.include?("::")
-            class_name_str = class_name_str.split("::").first
-          end
-
+          # Convert controller class name to route format
+          # e.g., Quizzes::QuizzesApiController -> quizzes/quizzes_api
           controller_name = underscore(class_name_str).sub(/_controller$/, "")
 
           # Find routes from Canvas routes.rb
@@ -659,12 +679,13 @@ describe SwaggerYard::CanvasAdapter do
       expect(result[1]).to eq({ path: "/groups/{group_id}/users/{id}", http_method: "GET", context: :groups })
     end
 
-    it "handles nested controller classes" do
-      nested_context = Class.new(test_context.class).new("UsersController::ServiceCredentials")
+    it "handles subdirectory controllers" do
+      # Test Quizzes::QuizzesApiController -> quizzes/quizzes_api#index
+      nested_context = Class.new(test_context.class).new("Quizzes::QuizzesApiController")
 
       allow(described_class).to receive(:canvas_routes).and_return({
-                                                                     "users#index" => [
-                                                                       { path: "/users", method: "GET", context: :users }
+                                                                     "quizzes/quizzes_api#index" => [
+                                                                       { path: "/courses/{course_id}/quizzes", method: "GET", context: :courses }
                                                                      ]
                                                                    })
 
@@ -680,7 +701,33 @@ describe SwaggerYard::CanvasAdapter do
 
       expect(result).to be_an(Array)
       expect(result.size).to eq(1)
-      expect(result.first[:path]).to eq("/users")
+      expect(result.first[:path]).to eq("/courses/{course_id}/quizzes")
+      expect(result.first[:http_method]).to eq("GET")
+    end
+
+    it "handles multi-level subdirectory controllers" do
+      # Test deeply nested controller
+      nested_context = Class.new(test_context.class).new("Lti::Ims::NamesAndRolesController")
+
+      allow(described_class).to receive(:canvas_routes).and_return({
+                                                                     "lti/ims/names_and_roles#index" => [
+                                                                       { path: "/api/lti/courses/{course_id}/names_and_roles", method: "GET", context: :courses }
+                                                                     ]
+                                                                   })
+
+      api_tag = instance_double(YARD::Tags::Tag)
+      docstring = instance_double(YARD::Docstring)
+      allow(docstring).to receive(:tags).with(:API).and_return([api_tag])
+
+      yard_object = instance_double(YARD::CodeObjects::MethodObject,
+                                    name: "index",
+                                    docstring:)
+
+      result = nested_context.paths_from_yard_object_canvas(yard_object)
+
+      expect(result).to be_an(Array)
+      expect(result.size).to eq(1)
+      expect(result.first[:path]).to eq("/api/lti/courses/{course_id}/names_and_roles")
     end
   end
 end
