@@ -101,7 +101,10 @@ class Accessibility::ResourceScannerService < ApplicationService
     scan.update(
       workflow_state: "completed",
       issue_count: issues.count,
-      closed_at: nil
+      closed_at: nil,
+      resource_name: @resource.try(:title),
+      resource_workflow_state:,
+      resource_updated_at: @resource.updated_at
     )
     queue_course_statistics(scan.course)
     log_to_datadog(scan)

@@ -280,6 +280,35 @@ describe Accessibility::ResourceScannerService do
         expect(scan.reload.workflow_state).to eq("completed")
       end
 
+      context "when the resource is modified after the scan is queued" do
+        before do
+          scan.update_columns(
+            resource_name: "Old Title",
+            resource_workflow_state: "published",
+            resource_updated_at: 1.day.ago
+          )
+          wiki_page.update!(title: "New Title", workflow_state: "unpublished")
+        end
+
+        it "refreshes resource_name with the current title" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.resource_name).to eql("New Title")
+        end
+
+        it "refreshes resource_workflow_state with the current state" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.resource_workflow_state).to eql("unpublished")
+        end
+
+        it "refreshes resource_updated_at with the current updated_at" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.resource_updated_at).to eql(wiki_page.reload.updated_at)
+        end
+      end
+
       it "logs the correct Datadog metrics for a completed scan" do
         subject.scan_resource(scan:)
 
