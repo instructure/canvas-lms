@@ -60,6 +60,8 @@ module AccessibilityChecker
 
     FIXTURES = {
       missing_alt_text: { path: "single_issues/missing_alt_text.html", title: "Missing Alt Text", issue_count: 1 },
+      misformatted_ordered_list: { path: "single_issues/misformatted_list.html", title: "Misformatted Ordered List", issue_count: 1, list_item_count: 3 },
+      misformatted_unordered_list: { path: "single_issues/misformatted_unordered_list.html", title: "Misformatted Unordered List", issue_count: 1, list_item_count: 3 },
       alt_text_too_long: { path: "single_issues/alt_text_too_long.html", title: "Alt Text Too Long", issue_count: 1 },
       alt_text_is_filename: { path: "single_issues/alt_text_is_filename.html", title: "Alt Text Is Filename", issue_count: 1 },
       table_no_headers: { path: "single_issues/table_no_headers.html", title: "Table No Headers", issue_count: 1 },
@@ -106,6 +108,10 @@ module AccessibilityChecker
       TestDataFactory.expected_issue_counts[assignment.id] = config[:issue_count]
 
       assignment
+    end
+
+    def list_item_count_for(fixture_key)
+      FIXTURES[fixture_key][:list_item_count] || 0
     end
 
     def expected_issue_count_for(resource)
