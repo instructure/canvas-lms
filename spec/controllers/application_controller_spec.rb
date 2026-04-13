@@ -134,6 +134,15 @@ RSpec.describe ApplicationController do
           expect(user_content).not_to include att1.uuid
         end
       end
+
+      context "when disable_file_verifiers_in_public_syllabus is enabled but file_association_access is not" do
+        it "keeps location tags in the HTML" do
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          content_with_location = "<p><a href='/files/123?location=course_syllabus_1'>File</a></p>"
+          result = controller.send(:user_content, content_with_location, context: @course, location: "course_syllabus_#{@course.id}")
+          expect(result).to include("location=course_syllabus_")
+        end
+      end
     end
 
     describe "js_env" do
