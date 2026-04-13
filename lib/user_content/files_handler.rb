@@ -37,16 +37,22 @@ module UserContent
       return unless attachment.present?
 
       query_values = uri.query_values || {}
-      query_values[:location] = location if location
+
+      if location.nil?
+        query_values.delete(:location)
+      else
+        query_values[:location] = location
+      end
+
       unless user_can_access_attachment?
-        no_verifiers = true
+        @no_verifiers = true
         if attachment.previewable_media?
           query_values[:no_preview] = 1
         elsif /^image/.match?(attachment.content_type)
           query_values[:hidden] = 1
         end
       end
-      unless no_verifiers || location
+      unless @no_verifiers || location
         query_values[:verifier] = attachment.uuid if is_public || (!in_app && !attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api))
       end
       uri.query_values = query_values unless query_values.blank?
