@@ -615,6 +615,27 @@ describe('CreateEditAssignmentModal', () => {
         expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
       })
 
+      it('Displays "Peer Review Due Date" message when assignment has peer review sub assignment', () => {
+        const assignment = {...assignmentData, peerReviewInGradedMode: true}
+        const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment})} />)
+
+        expect(getByTestId('multiple-due-dates-message')).toBeInTheDocument()
+        expect(getByTestId('multiple-due-dates-message')).toHaveValue('Peer Review Due Date')
+        expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
+      })
+
+      it('Displays "Peer Review Due Date" over "Multiple Due Dates" when both apply', () => {
+        const assignment = {
+          ...assignmentData,
+          multipleDueDates: true,
+          differentiatedAssignment: true,
+          peerReviewInGradedMode: true,
+        }
+        const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment})} />)
+
+        expect(getByTestId('multiple-due-dates-message')).toHaveValue('Peer Review Due Date')
+      })
+
       it('Disables fields when included in frozenFields', () => {
         const assignment = {...assignmentData, frozenFields: ['name', 'due_at', 'points']}
         const {getByTestId, getByLabelText} = render(

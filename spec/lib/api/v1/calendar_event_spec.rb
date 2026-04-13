@@ -34,7 +34,9 @@ describe Api::V1::CalendarEvent do
     WebConference.create!(context:, user:, conference_type: type)
   end
 
-  def api_user_content(description, context, location: nil)
+  # Splat signature avoids ArgumentError since the real api_user_content
+  # (lib/api.rb) accepts multiple positional and keyword arguments.
+  def api_user_content(description, context, *_args, **_kwargs)
     "api_user_content(#{description}, #{context.id})"
   end
 
@@ -43,7 +45,8 @@ describe Api::V1::CalendarEvent do
   end
 
   def api_v1_calendar_event_url(event)
-    "api_v1_calendar_event_url(#{event.id})"
+    event_id = event.respond_to?(:id) ? event.id : event
+    "api_v1_calendar_event_url(#{event_id})"
   end
 
   def calendar_url_for(event, _)
@@ -77,5 +80,75 @@ describe Api::V1::CalendarEvent do
     event.update(title: "Test (#{section.name})")
     json = event_json(event, @user, @session, {})
     expect(json["title"]).to eq("Test (#{section.name})")
+  end
+
+  describe "assignment_event_json peer review sub assignment" do
+    include Rails.application.routes.url_helpers
+
+    def default_url_options
+      { host: "localhost" }
+    end
+
+    let(:assignment) do
+      course.assignments.create!(
+        title: "Test Assignment",
+        peer_reviews: true,
+        submission_types: "online_text_entry",
+        due_at: 1.week.from_now
+      )
+    end
+
+    let(:base_assignment_hash) { { "html_url" => "http://localhost/test" } }
+
+    before do
+      allow(self).to receive(:assignment_json).and_return(base_assignment_hash.dup)
+    end
+
+    context "when peer_review_allocation_and_grading is enabled" do
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "includes peer_review_sub_assignment_enabled as true when peer review sub assignment exists" do
+        peer_review_model(parent_assignment: assignment)
+        assignment.reload
+
+        json = assignment_event_json(assignment, @user, @session)
+        expect(json["assignment"]["peer_review_sub_assignment_enabled"]).to be true
+      end
+
+      it "includes peer_review_sub_assignment_enabled as false when peer review sub assignment does not exist" do
+        json = assignment_event_json(assignment, @user, @session)
+        expect(json["assignment"]["peer_review_sub_assignment_enabled"]).to be false
+      end
+
+      it "includes peer_review_sub_assignment_enabled on the assignment payload when an override is applied" do
+        peer_review_model(parent_assignment: assignment)
+        override = assignment_override_model(assignment:)
+        overridden = AssignmentOverrideApplicator.assignment_with_overrides(assignment, [override])
+        allow(self).to receive(:assignment_override_json).and_return({ "id" => override.id })
+
+        json = assignment_event_json(overridden, @user, @session)
+
+        expect(json["assignment_overrides"]).to be_present
+        expect(json["assignment"]["peer_review_sub_assignment_enabled"]).to be true
+      end
+    end
+
+    context "when peer_review_allocation_and_grading is disabled" do
+      it "does not include peer_review_sub_assignment_enabled" do
+        json = assignment_event_json(assignment, @user, @session)
+        expect(json["assignment"]).not_to have_key("peer_review_sub_assignment_enabled")
+      end
+
+      it "does not include peer_review_sub_assignment_enabled even when a peer review sub assignment exists" do
+        peer_review_model(parent_assignment: assignment)
+        course.disable_feature!(:peer_review_allocation_and_grading)
+        assignment.reload
+
+        json = assignment_event_json(assignment, @user, @session)
+        expect(json["assignment"]).not_to have_key("peer_review_sub_assignment_enabled")
+      end
+    end
   end
 end

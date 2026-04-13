@@ -101,6 +101,7 @@ describe('CreateAssignmentViewAdapter', () => {
   afterEach(() => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
+    delete window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
   })
 
   it('renders the CreateEditAssignmentModal', () => {
@@ -155,5 +156,36 @@ describe('CreateAssignmentViewAdapter', () => {
       // Not controlled by blueprint course
       expect(getByTestId('points-input')).not.toBeDisabled()
     })
+  })
+
+  it('shows "Peer Review Due Date" when assignment has peer review sub assignment and FF is enabled', () => {
+    window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+    const assignment = new Assignment(
+      buildAssignment({
+        id: 1,
+        peer_reviews: true,
+        peer_review_sub_assignment: {id: 10, peer_review_count: 2},
+      }),
+    )
+    const {getByTestId} = renderComponent({assignment})
+
+    expect(getByTestId('multiple-due-dates-message')).toBeInTheDocument()
+    expect(getByTestId('multiple-due-dates-message')).toHaveValue('Peer Review Due Date')
+    expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
+  })
+
+  it('does not show "Peer Review Due Date" when FF is disabled', () => {
+    window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+    const assignment = new Assignment(
+      buildAssignment({
+        id: 1,
+        peer_reviews: true,
+        peer_review_sub_assignment: {id: 10, peer_review_count: 2},
+      }),
+    )
+    const {queryByTestId, getByLabelText} = renderComponent({assignment})
+
+    expect(queryByTestId('multiple-due-dates-message')).not.toBeInTheDocument()
+    expect(getByLabelText('Date')).toBeInTheDocument()
   })
 })
