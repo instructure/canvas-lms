@@ -363,7 +363,7 @@ class AccessToken < ApplicationRecord
       path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
       path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
       path = path.gsub("(", "(?:").gsub(")", "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
-      path = path.gsub("/download", "/(?:download|preview)") # files have preview and download endpoints that do pretty much the same job
+      path = path.gsub("/download", "/(?:download|preview)(?:\\.:type)?") # files have preview and download endpoints that do pretty much the same job
       path = "#{path}(?:\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end
