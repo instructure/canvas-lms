@@ -39,6 +39,15 @@ module SwaggerYard
 
     class << self
       attr_accessor :canvas_examples, :canvas_schemas, :operation_models
+
+      # Single source of truth for controller patterns to scan
+      # Used by both SwaggerYard config and model schema collection
+      def controller_patterns(root_path)
+        [
+          File.join(root_path, "app/controllers/**/*_controller.rb"),
+          File.join(root_path, "gems/plugins/*/app/controllers/**/*_controller.rb")
+        ]
+      end
     end
 
     TAGS = {
@@ -91,17 +100,13 @@ module SwaggerYard
     end
 
     def self.process_single_route(action_name, route)
-      path = normalize_route_path(route[:path])
+      # Convert Rails param syntax (:id) to OpenAPI syntax ({id})
+      path = route[:path].gsub(/:(\w+)/, '{\1}')
       methods = extract_http_methods(route[:method])
 
       methods.each do |method|
         add_route_entry(action_name, path, method)
       end
-    end
-
-    def self.normalize_route_path(path)
-      path = path.sub(%r{^/api/(v1|sis|quiz/v1|lti/v1|lti)}, "")
-      path.gsub(/:(\w+)/, '{\1}')
     end
 
     def self.extract_http_methods(verb)
@@ -142,9 +147,9 @@ module SwaggerYard
       # rubocop:disable Rails/Output
       puts "📦 Collecting @model schemas from controllers..."
 
-      # Include subdirectories like app/controllers/lti/*
+      # Scan both main controllers and plugin controllers
       root_path = (defined?(Rails) && Rails.respond_to?(:root)) ? Rails.root : Dir.pwd
-      controller_files = Dir.glob(File.join(root_path, "app/controllers/**/*_controller.rb"))
+      controller_files = controller_patterns(root_path).flat_map { |pattern| Dir.glob(pattern) }
 
       controller_files.each do |file_path|
         # Parse the file with YARD
@@ -597,12 +602,8 @@ module SwaggerYard
             method_name = yard_object.name.to_s
             class_name_str = @class_name.to_s
 
-            # Handle nested classes like UsersController::ServiceCredentials
-            # For nested classes, use the parent controller name
-            if class_name_str.include?("::")
-              class_name_str = class_name_str.split("::").first
-            end
-
+            # Convert controller class name to route format
+            # e.g., Quizzes::QuizzesApiController -> quizzes/quizzes_api
             controller_name = underscore(class_name_str).sub(/_controller$/, "")
 
             # Find routes from Canvas routes.rb
