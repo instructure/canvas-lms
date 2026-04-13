@@ -1938,6 +1938,10 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/accessibility_issue_summary", action: :accessibility_issue_summary, as: "account_accessibility_issue_summary"
     end
 
+    scope(controller: :accessibility_course_statistics) do
+      get "users/:user_id/educator_accessibility_course_statistics", action: :index, as: "user_educator_accessibility_course_statistics"
+    end
+
     scope(controller: :sub_accounts) do
       post "accounts/:account_id/sub_accounts", action: :create
       delete "accounts/:account_id/sub_accounts/:id", action: :destroy

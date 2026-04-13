@@ -21,9 +21,11 @@
 module Api::V1::AccessibilityCourseStatistic
   include Api::V1::Json
 
-  def accessibility_course_statistic_json(statistic, user, session)
+  def accessibility_course_statistic_json(statistic, user, session, opts = {})
     return nil unless statistic
 
-    api_json(statistic, user, session, only: %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at])
+    fields = %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at]
+    fields << "closed_issue_count" if opts[:include_closed]
+    api_json(statistic, user, session, only: fields)
   end
 end
