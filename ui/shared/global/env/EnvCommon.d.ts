@@ -352,6 +352,7 @@ export type RootAccountFeatureId =
   | 'create_course_subaccount_picker'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
+  | 'institutional_tags'
   | 'instui_nav'
   | 'login_registration_ui_identity'
   | 'lti_asset_processor'
