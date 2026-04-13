@@ -172,6 +172,7 @@ module AuthenticationMethods
 
       RequestContext::Generator.add_meta_header("at", @access_token.global_id)
       RequestContext::Generator.add_meta_header("dk", @access_token.global_developer_key_id) if @access_token.developer_key_id
+      RequestContext::Generator.add_meta_header("utid", @access_token.developer_key.unified_tool_id) if @access_token.developer_key&.unified_tool_id
     end
   end
 
