@@ -240,9 +240,7 @@ export function filterAssignmentsByStudent(
     // For peer review sub assignments, check if the parent assignment has a submission
     if (assignment.isPeerReviewSubAssignment) {
       if (!assignment.parentAssignmentId) {
-        throw new Error(
-          `Peer review sub assignment ${assignment.id} is missing parentAssignmentId`,
-        )
+        throw new Error(`Peer review sub assignment ${assignment.id} is missing parentAssignmentId`)
       }
       return assignmentIdMap[assignment.parentAssignmentId]
     }
@@ -444,7 +442,7 @@ export function getLetterGrade(
   pointsBased?: boolean,
   gradingStandardScalingFactor?: number,
 ) {
-  if (!gradingStandards || !gradingStandards.length || !possible || !score) {
+  if (!gradingStandards || !gradingStandards.length || !possible || score == null) {
     return '-'
   }
   const rawPercentage = scoreToPercentage(score, possible)
