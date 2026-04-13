@@ -2331,15 +2331,13 @@ class UsersController < ApplicationController
       User.transaction do
         if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
            @user != @current_user
-          @user.pseudonyms.active.shard(@user).each_with_index do |pseudo, index|
+          @user.pseudonyms.active.shard(@user).each do |pseudo|
             next unless pseudo.grants_right?(@current_user, :delete)
             next if pseudo.active? && event == "unsuspend"
             next if pseudo.suspended? && event == "suspend"
 
             pseudo.current_user = @current_user # performing user for audit logging
-            if event == "suspend" && index == 0
-              pseudo.suspend_with_notification!
-            elsif event == "suspend"
+            if event == "suspend"
               pseudo.suspend!
             else
               pseudo.unsuspend!
