@@ -97,41 +97,18 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @student_enrollment.reload
       end
 
-      it "for teacher uses only term dates" do
-        test_builder @teacher_enrollment, [[nil, @term.end_at]]
+      it "for teacher" do
+        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [nil, @term.end_at]]
       end
 
       it "for teacher with no term dates" do
         @term.start_at = nil
         @term.end_at = nil
         @term.save!
-        test_builder @teacher_enrollment, [[nil, nil]]
+        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [nil, nil]]
       end
 
       it "for student" do
-        test_builder @student_enrollment, [[@course.start_at, @course.end_at]]
-      end
-    end
-
-    context "has enrollment dates from course with closed term" do
-      append_before do
-        @course.restrict_enrollments_to_course_dates = true
-        @course.start_at = 2.days.ago
-        @course.conclude_at = 5.days.from_now
-        @course.save!
-
-        @term.start_at = 10.days.ago
-        @term.end_at = 1.day.ago
-        @term.save!
-        @teacher_enrollment.reload
-        @student_enrollment.reload
-      end
-
-      it "for teacher uses only term dates" do
-        test_builder @teacher_enrollment, [[nil, @term.end_at]]
-      end
-
-      it "for student uses course dates" do
         test_builder @student_enrollment, [[@course.start_at, @course.end_at]]
       end
     end
