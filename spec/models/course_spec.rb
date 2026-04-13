@@ -3406,6 +3406,23 @@ describe Course do
           expect(tabs).to include("Item Banks")
         end
 
+        context "and the new_quizzes_native_experience is enabled" do
+          before do
+            @course.enable_feature!(:new_quizzes_native_experience)
+          end
+
+          it "hides item banks tab for students" do
+            student_in_course(active_all: true)
+            tab_ids = @course.tabs_available(@student, include_external: true).pluck(:id)
+            expect(tab_ids).not_to include(Course::TAB_ITEM_BANKS)
+          end
+
+          it "shows item banks tab for teachers" do
+            available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+            expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
+          end
+        end
+
         context "and the ams_root_account_integration is enabled" do
           before do
             @course.root_account.enable_feature!(:ams_root_account_integration)
