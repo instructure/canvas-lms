@@ -67,14 +67,19 @@ describe Types::InstitutionalTagCategoryType do
   end
 
   describe "tagsConnection" do
-    it "returns only active tags" do
+    it "returns only active tags by default" do
       ids = category_type.resolve("tagsConnection { nodes { _id } }")
       expect(ids).to match_array([@tag1.id.to_s, @tag2.id.to_s])
     end
 
-    it "does not include deleted tags" do
+    it "does not include deleted tags by default" do
       ids = category_type.resolve("tagsConnection { nodes { _id } }")
       expect(ids).not_to include(@archived_tag.id.to_s)
+    end
+
+    it "returns deleted tags when workflowState is deleted" do
+      ids = category_type.resolve('tagsConnection(workflowState: "deleted") { nodes { _id } }')
+      expect(ids).to eq([@archived_tag.id.to_s])
     end
   end
 end
