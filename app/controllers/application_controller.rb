@@ -559,7 +559,6 @@ class ApplicationController < ActionController::Base
     account_level_mastery_scales
     ams_root_account_integration
     ams_advanced_content_organization
-    api_rate_limits
     buttons_and_icons_root_account
     canvas_apps_sub_account_access
     cookie_consent_necessary
