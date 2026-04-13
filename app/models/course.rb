@@ -3796,12 +3796,12 @@ class Course < ApplicationRecord
                                 end
 
       if item_bank_href_override
-        NewQuizzesHelper.override_item_banks_tab(
+        item_banks_tab = NewQuizzesHelper.override_item_banks_tab(
           tabs:,
           href: item_bank_href_override,
           context: self,
           css_class: is_ams ? "item_banks" : nil
-        )
+        ) || item_banks_tab
       end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }

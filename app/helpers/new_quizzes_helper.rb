@@ -48,5 +48,6 @@ module NewQuizzesHelper
     overridden_item_banks_tab = tabs[item_banks_index].except(:args).merge(overrides)
     tabs.delete_at(item_banks_index)
     tabs.insert(item_banks_index, overridden_item_banks_tab)
+    overridden_item_banks_tab
   end
 end
