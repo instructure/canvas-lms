@@ -60,6 +60,16 @@ describe Api::V1::AccessibilityCourseStatistic do
         expected_fields = %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at]
         expect(json.keys).to match_array(expected_fields)
       end
+
+      it "excludes closed_issue_count by default" do
+        json = accessibility_course_statistic_json(statistic, user, session)
+        expect(json.key?("closed_issue_count")).to be false
+      end
+
+      it "includes closed_issue_count when include_closed opt is true" do
+        json = accessibility_course_statistic_json(statistic, user, session, include_closed: true)
+        expect(json.key?("closed_issue_count")).to be true
+      end
     end
 
     context "with different workflow states" do
