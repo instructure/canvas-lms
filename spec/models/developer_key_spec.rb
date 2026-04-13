@@ -660,8 +660,7 @@ describe DeveloperKey do
               account: Account.site_admin,
               created_by: admin,
               registration_params: { name: "Template Tool" },
-              configuration_params: internal_lti_configuration,
-              binding_params: { workflow_state: "on" }
+              configuration_params: internal_lti_configuration
             )
           end
         end
