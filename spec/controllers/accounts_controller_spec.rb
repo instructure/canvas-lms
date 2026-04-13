@@ -1364,6 +1364,21 @@ describe AccountsController do
     end
   end
 
+  describe "institutional tags permissions in course_user_search" do
+    before do
+      account_with_admin_logged_in
+      @account.enable_feature!(:institutional_tags)
+    end
+
+    it "includes institutional tags permissions in PERMISSIONS js_env" do
+      get "show", params: { id: @account.id }
+      permissions = assigns[:js_env][:PERMISSIONS]
+      expect(permissions[:can_view_institutional_tags]).to be true
+      expect(permissions[:can_create_institutional_tags]).to be true
+      expect(permissions[:can_edit_institutional_tags]).to be true
+    end
+  end
+
   describe "#acceptable_use_policy" do
     before do
       @account = Account.create!

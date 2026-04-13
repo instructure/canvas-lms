@@ -2144,6 +2144,15 @@ class AccountsController < ApplicationController
       can_add_observer: @account.grants_right?(@current_user, session, :add_observer_to_course)
     }
 
+    if @account.root_account.feature_enabled?(:institutional_tags)
+      js_permissions[:can_view_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_view)
+      js_permissions[:can_create_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_create)
+      js_permissions[:can_edit_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_edit)
+    end
+
     if @account.root_account.feature_enabled?(:temporary_enrollments)
       js_permissions[:can_add_temporary_enrollments] =
         @account.grants_right?(@current_user, session, :temporary_enrollments_add)

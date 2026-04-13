@@ -576,6 +576,7 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
+    institutional_tags
     instui_nav
     login_registration_ui_identity
     lock_lti_registrations
