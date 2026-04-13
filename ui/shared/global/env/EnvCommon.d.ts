@@ -384,6 +384,7 @@ export type RootAccountFeatureId =
   | 'substitution_variable_display'
   | 'send_usage_metrics_after_consent'
   | 'top_navigation_placement'
+  | 'course_navigation_and_feature_options_permissions'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES
