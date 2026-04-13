@@ -9932,7 +9932,12 @@ type RubricAssociation implements LegacyIDInterface {
   associationId: String!
   associationType: String!
   hideOutcomeResults: Boolean!
-  hidePoints: Boolean!
+  hidePoints(
+    """
+    used for additional permissions checks if restrict_quantitative_data is enabled
+    """
+    checkExtraPermissions: Boolean = false
+  ): Boolean!
   hideScoreTotal: Boolean!
   savedComments: String
   useForGrading: Boolean!

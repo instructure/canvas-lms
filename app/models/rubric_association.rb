@@ -410,14 +410,14 @@ class RubricAssociation < ApplicationRecord
     assignment&.auditable?
   end
 
-  def restrict_quantitative_data?(user = nil)
+  def restrict_quantitative_data?(user = nil, check_extra_permissions: false)
     return false if user.nil? || assignment.nil?
 
-    assignment.restrict_quantitative_data?(user)
+    assignment.restrict_quantitative_data?(user, check_extra_permissions:)
   end
 
-  def hide_points(user = nil)
-    return true if restrict_quantitative_data?(user)
+  def hide_points(user = nil, check_extra_permissions: false)
+    return true if restrict_quantitative_data?(user, check_extra_permissions:)
 
     super()
   end
