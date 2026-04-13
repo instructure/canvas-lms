@@ -922,18 +922,6 @@ describe Course do
 
       subject
     end
-
-    context "with lti_context_copy_notice flag disabled" do
-      before do
-        course.root_account.disable_feature!(:lti_context_copy_notice)
-      end
-
-      it "does not send LTI Platform Notice" do
-        expect(Lti::PlatformNotificationService).not_to receive(:notify_tools_in_course)
-
-        subject
-      end
-    end
   end
 
   describe "insert into module" do
