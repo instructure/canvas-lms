@@ -149,8 +149,8 @@ export default function PermissionsIndex(props) {
     return (
       <div className="permissions-v2__header_container">
         <View display="block">
-          <Flex alignItems="end">
-            <Flex.Item size="20%">
+          <Flex alignItems="end" gap="small" wrap="wrap">
+            <Flex.Item size="190px" shouldShrink={false} shouldGrow={true}>
               <TextInput
                 renderLabel={
                   <ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>
@@ -165,7 +165,8 @@ export default function PermissionsIndex(props) {
                 name="permission_search"
               />
             </Flex.Item>
-            <Flex.Item shouldShrink={true} shouldGrow={true} padding="0 small">
+            {/* InstUI Flex components doesn't support setting flexGrow. For better UX we are falling back to using a div with inline styles */}
+            <div style={{flexShrink: 1, flexGrow: 20}}>
               <CanvasMultiSelect
                 id="permissions-role-filter"
                 label={I18n.t('Permission role filter')}
@@ -177,16 +178,15 @@ export default function PermissionsIndex(props) {
               >
                 {optionsToRender()}
               </CanvasMultiSelect>
-            </Flex.Item>
-            <Flex.Item shouldShrink={true} justifyItems="end">
-              <Flex justifyItems="end">
-                <Flex.Item>
-                  <Button id="add_role" color="primary" onClick={props.setAndOpenAddTray}>
-                    {I18n.t('Add Role')}
-                  </Button>
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
+            </div>
+            <Button
+              id="add_role"
+              color="primary"
+              onClick={props.setAndOpenAddTray}
+              margin="0 0 0 auto"
+            >
+              {I18n.t('Add Role')}
+            </Button>
           </Flex>
         </View>
       </div>
