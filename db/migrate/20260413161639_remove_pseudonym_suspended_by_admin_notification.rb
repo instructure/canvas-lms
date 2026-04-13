@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright (C) 2026 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -16,17 +15,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-require_relative "messages_helper"
+class RemovePseudonymSuspendedByAdminNotification < ActiveRecord::Migration[8.0]
+  tag :postdeploy
 
-describe "pseudonym_suspended_by_admin" do
-  before :once do
-    pseudonym_model
+  def change
+    if Shard.current.default?
+      Notification.where(name: "Pseudonym Suspended By Admin").delete_all
+    end
   end
-
-  let(:asset) { @pseudonym }
-  let(:notification_name) { :pseudonym_suspended_by_admin }
-
-  it_behaves_like "a message"
 end

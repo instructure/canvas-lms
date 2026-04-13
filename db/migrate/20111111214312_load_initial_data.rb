@@ -130,7 +130,6 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
                              "Pseudonym Registration",
                              "Pseudonym Registration Done",
                              "Pseudonym Suspended After Failed Login",
-                             "Pseudonym Suspended By Admin",
                              "Self Enrollment Registration"].freeze
 
     Notification.where(name: priority_message_list).update_all(priority: true)
