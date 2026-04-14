@@ -30,6 +30,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ZDeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {fireEvent, screen} from '@testing-library/dom'
+import {ZLtiRegistrationId} from '../../../model/LtiRegistrationId'
 
 const server = setupServer()
 
