@@ -10729,6 +10729,7 @@ nn:
   edit_rubric_title_104d6fd2: "Endre vurderingsskjema: %{title}"
   edit_section_name_558cc89: "Rediger seksjon \"%{name}\""
   edit_sections_7d0e4e34: "Rediger seksjonar"
+  edit_settings_b3ddad69: "Rediger innstillingar"
   edit_status_612572db: "Rediger status"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Rediger innleveringsstatus frå SpeedGrader"
   edit_survey_b0d6890d: "Rediger undersøking"
