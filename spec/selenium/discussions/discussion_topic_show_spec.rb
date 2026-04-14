@@ -830,6 +830,7 @@ describe "Discussion Topic Show" do
 
   context "when Discussion Summary feature flag is ON" do
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       Account.default.enable_feature!(:discussion_summary)
 
       @inst_llm = instance_double(InstLLM::Client)

@@ -1029,6 +1029,7 @@ describe DiscussionTopicsController do
         end
 
         it "teacher can summarize when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_summary
 
           user_session(@teacher)
@@ -1037,6 +1038,7 @@ describe DiscussionTopicsController do
         end
 
         it "student cannot summarize when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_summary
 
           user_session(@student)
