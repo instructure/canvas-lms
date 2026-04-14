@@ -391,6 +391,7 @@ describe "conversations new" do
 
     context "nutrition facts functionality" do
       before do
+        allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
         @course.root_account.enable_feature!(:translate_inbox_messages)
       end
 
