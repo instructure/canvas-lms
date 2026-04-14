@@ -169,8 +169,14 @@ module AttachmentFu # :nodoc:
       end
 
       def self.load_s3_config(path = nil)
-        s3_config_path = path || Rails.root.join("config/amazon_s3.yml")
-        config = YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+        config = if path
+                   YAML.safe_load(ERB.new(File.read(path)).result)[Rails.env].symbolize_keys
+                 elsif defined?(Canvas)
+                   (Canvas.load_config_file_or_consul("amazon_s3") || {}).deep_symbolize_keys
+                 else
+                   s3_config_path = Rails.root.join("config/amazon_s3.yml")
+                   YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+                 end
         config[:credentials] = Canvas::AwsCredentialProvider.new("s3_creds", config.delete(:vault_credential_path)) if config[:vault_credential_path]
         config
       end
