@@ -80,8 +80,8 @@ function NotebookButton() {
 }
 
 function NotebookTrayContent() {
-  const {api, objectId, objectType, courseId} = useNotebook()
-  const [selectedNoteId, setSelectedNoteId] = useState<string | undefined>()
+  const {api, objectId, objectType, courseId, selectedNoteId, selectNote, clearSelectedNote} =
+    useNotebook()
 
   const {data, isLoading, isError} = useGetNotes({
     api,
@@ -144,8 +144,8 @@ function NotebookTrayContent() {
       pageInfo={data?.pageInfo}
       onPreviousPage={() => {}}
       onNextPage={() => {}}
-      selectedNoteId={selectedNoteId}
-      onNoteSelect={id => setSelectedNoteId(id === selectedNoteId ? undefined : id)}
+      selectedNoteId={selectedNoteId ?? undefined}
+      onNoteSelect={id => (id === selectedNoteId ? clearSelectedNote() : selectNote(id))}
       onNoteDelete={handleDelete}
       onNoteSave={handleSave}
       onNoteTypeChange={handleTypeChange}
