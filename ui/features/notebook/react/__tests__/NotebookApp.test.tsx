@@ -23,7 +23,10 @@ import NotebookApp from '../NotebookApp'
 
 const mockOpenTray = vi.fn()
 const mockCloseTray = vi.fn()
+const mockSelectNote = vi.fn()
+const mockClearSelectedNote = vi.fn()
 let mockIsTrayOpen = false
+let mockSelectedNoteId: string | null = null
 
 vi.mock('@instructure/platform-notebook', () => ({
   NotebookProvider: ({children}: {children: React.ReactNode}) => (
@@ -32,16 +35,20 @@ vi.mock('@instructure/platform-notebook', () => ({
   NotebookTray: ({children}: {children: React.ReactNode}) => (
     <div data-testid="notebook-tray">{children}</div>
   ),
-  NotesListView: () => <div data-testid="notes-list-view" />,
+  NotesListView: ({onNoteSelect}: {onNoteSelect?: (id: string) => void}) => (
+    <button data-testid="select-note-btn" onClick={() => onNoteSelect?.('note-1')}>
+      select note
+    </button>
+  ),
   ContentWithNoteWrapper: () => <div data-testid="content-with-note-wrapper" />,
   useNotebook: () => ({
     api: {},
     objectId: 'my-page',
     objectType: 'Page',
     courseId: '42',
-    selectedNoteId: null,
-    selectNote: vi.fn(),
-    clearSelectedNote: vi.fn(),
+    selectedNoteId: mockSelectedNoteId,
+    selectNote: mockSelectNote,
+    clearSelectedNote: mockClearSelectedNote,
     isTrayOpen: mockIsTrayOpen,
     openTray: mockOpenTray,
     closeTray: mockCloseTray,
@@ -60,6 +67,7 @@ describe('NotebookApp', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockIsTrayOpen = false
+    mockSelectedNoteId = null
     window.ENV = {
       ...window.ENV,
       JOURNEY_URL: 'https://journey.test',
@@ -140,5 +148,24 @@ describe('NotebookApp', () => {
     } finally {
       document.body.removeChild(contentEl)
     }
+  })
+
+  it('calls selectNote on the context when a note is selected', async () => {
+    const user = userEvent.setup()
+    render(<NotebookApp />)
+
+    await user.click(screen.getByTestId('select-note-btn'))
+    expect(mockSelectNote).toHaveBeenCalledWith('note-1')
+    expect(mockClearSelectedNote).not.toHaveBeenCalled()
+  })
+
+  it('calls clearSelectedNote when the active note is selected again', async () => {
+    mockSelectedNoteId = 'note-1'
+    const user = userEvent.setup()
+    render(<NotebookApp />)
+
+    await user.click(screen.getByTestId('select-note-btn'))
+    expect(mockClearSelectedNote).toHaveBeenCalled()
+    expect(mockSelectNote).not.toHaveBeenCalled()
   })
 })
