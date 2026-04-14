@@ -121,7 +121,7 @@ describe('Assignment Bulk Edit Dates - Validation', () => {
   it('disables save when local validation fails', async () => {
     const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
     changeAndBlurInput(getAllByLabelText('Due At')[0], '2019-04-01')
-    expect(getByText('Unlock date cannot be after due date')).toBeInTheDocument()
+    expect(getByText('Available from date cannot be after due date')).toBeInTheDocument()
     expect(getByText('Save').closest('button').disabled).toBe(true)
   }, 30000)
 
@@ -129,11 +129,11 @@ describe('Assignment Bulk Edit Dates - Validation', () => {
     const {queryByText, getAllByText, getAllByLabelText} = await renderBulkEditAndWait()
     const theInput = getAllByLabelText('Due At')[0]
     changeAndBlurInput(theInput, '2019-04-01')
-    expect(queryByText('Unlock date cannot be after due date')).toBeInTheDocument()
+    expect(queryByText('Available from date cannot be after due date')).toBeInTheDocument()
     const revertButtons = getAllByText('Revert date changes').filter(elt => elt.closest('button'))
     expect(revertButtons).toHaveLength(1)
     fireEvent.click(revertButtons[0])
-    expect(queryByText('Unlock date cannot be after due date')).not.toBeInTheDocument()
+    expect(queryByText('Available from date cannot be after due date')).not.toBeInTheDocument()
   }, 30000)
 
   it('validates against closed grading periods', async () => {
