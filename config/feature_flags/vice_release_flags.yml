@@ -133,6 +133,7 @@ discussion_insights:
   root_opt_in: true
   description: |-
     Allow access to discussion insights
+  visible_on: tier_2_visible_on_hook
 
 discussion_insights_with_cedar:
   state: hidden

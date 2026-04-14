@@ -1067,6 +1067,7 @@ describe DiscussionTopicsController do
         end
 
         it "teacher can access insights when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_insights
 
           user_session(@teacher)
@@ -1075,6 +1076,7 @@ describe DiscussionTopicsController do
         end
 
         it "student cannot access insights when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_insights
 
           user_session(@student)
@@ -2373,6 +2375,7 @@ describe DiscussionTopicsController do
 
     context "when the feature flag is enabled" do
       before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
         @course.root_account.enable_feature!(:discussion_insights)
       end
 
