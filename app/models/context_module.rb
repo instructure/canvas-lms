@@ -131,7 +131,14 @@ class ContextModule < ApplicationRecord
     current_scope.find_in_batches(batch_size: 100) do |progressions|
       context.cache_item_visibilities_for_user_ids(progressions.map(&:user_id))
 
+      concluded_user_ids = concluded_enrollment_user_ids(progressions.map(&:user_id))
+
       progressions.each do |progression|
+        if concluded_user_ids.include?(progression.user_id)
+          progression.update_column(:current, true) unless progression.current
+          next
+        end
+
         progression.context_module = self
         progression.evaluate!
       end
@@ -1131,6 +1138,18 @@ class ContextModule < ApplicationRecord
   end
 
   private
+
+  def concluded_enrollment_user_ids(user_ids)
+    return Set.new unless context.is_a?(Course)
+
+    context.enrollments
+           .joins(:enrollment_state)
+           .where(user_id: user_ids)
+           .group(:user_id)
+           .having("COUNT(CASE WHEN enrollment_states.state != 'completed' THEN 1 END) = 0")
+           .pluck(:user_id)
+           .to_set
+  end
 
   def batch_load_unpublished_topic_ids(topic_ids)
     unpublished_from_tags = ContentTag.where(content_type: "DiscussionTopic",
