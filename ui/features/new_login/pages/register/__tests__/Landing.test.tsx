@@ -141,4 +141,28 @@ describe('Landing', () => {
     expect(alert).toBeInTheDocument()
     expect(alert).toHaveTextContent(customMsg)
   })
+
+  it('uses freeForTeacherRegistrationUrl as teacher card href when set', () => {
+    const fftData = {
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
+      isDataLoading: false,
+    }
+    mockUseNewLoginData.mockReturnValueOnce(fftData).mockReturnValueOnce(fftData)
+    renderLanding()
+    expect(screen.getByLabelText('Create Teacher Account')).toHaveAttribute(
+      'href',
+      'https://fft.example.com/register',
+    )
+  })
+
+  it('does not call navigate when teacher card is clicked and freeForTeacherRegistrationUrl is set', () => {
+    const fftData = {
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
+      isDataLoading: false,
+    }
+    mockUseNewLoginData.mockReturnValueOnce(fftData).mockReturnValueOnce(fftData)
+    renderLanding()
+    fireEvent.click(screen.getByLabelText('Create Teacher Account'))
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
 })
