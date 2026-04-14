@@ -84,12 +84,7 @@ export default function UsersToolbar(props) {
   const placeholder = I18n.t('Search people...')
 
   return (
-    <form
-      onSubmit={event => {
-        event.preventDefault()
-        props.onApplyFilters()
-      }}
-    >
+    <form>
       <Grid vAlign="top" startAt="medium">
         <Grid.Row>
           <Grid.Col>
@@ -125,6 +120,12 @@ export default function UsersToolbar(props) {
                     renderLabel={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
                     placeholder={placeholder}
                     onChange={e => props.onUpdateFilters({search_term: e.target.value})}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        props.onApplyFilters()
+                      }
+                    }}
                     onKeyUp={e => {
                       if (e.key === 'Enter') {
                         props.toggleSRMessage(true)
