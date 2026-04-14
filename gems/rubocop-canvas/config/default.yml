@@ -113,6 +113,11 @@ Migration/SetReplicaIdentityInSeparateTransaction:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/WorkflowStateEnum:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Rails/SmartTimeZone:
   Enabled: true
 

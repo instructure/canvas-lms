@@ -58,6 +58,7 @@ require "rubocop_canvas/cops/migration/id_column"
 require "rubocop_canvas/cops/migration/function_unqualified_table"
 require "rubocop_canvas/cops/migration/polymorphic_associations"
 require "rubocop_canvas/cops/migration/root_account_id"
+require "rubocop_canvas/cops/migration/workflow_state_enum"
 ## specs
 require "rubocop_canvas/cops/specs/no_before_once_stubs"
 require "rubocop_canvas/cops/specs/no_disable_implicit_wait"
