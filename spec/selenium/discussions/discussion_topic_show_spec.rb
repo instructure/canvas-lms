@@ -991,6 +991,7 @@ describe "Discussion Topic Show" do
 
   context "nutrition facts functionality" do
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       @course.enable_feature!(:translation)
       allow(Translation).to receive(:available?).and_return(true)
     end
