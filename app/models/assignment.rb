@@ -250,6 +250,25 @@ class Assignment < AbstractAssignment
     sub_assignments.each { |sa| sa.ensure_post_policy(post_manually:) }
   end
 
+  def restore(from = nil)
+    transaction do
+      super
+
+      next unless context.feature_enabled?(:peer_review_allocation_and_grading)
+
+      deleted_peer_review_sub = PeerReviewSubAssignment
+                                .unscoped
+                                .where(parent_assignment_id: id, workflow_state: "deleted")
+                                .order(id: :desc)
+                                .first
+      next unless deleted_peer_review_sub
+
+      deleted_peer_review_sub.restore
+      association(:peer_review_sub_assignment).reset
+      PeerReview::PeerReviewUpdaterService.call(parent_assignment: self)
+    end
+  end
+
   private
 
   def before_soft_delete

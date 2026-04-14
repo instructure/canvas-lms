@@ -9273,6 +9273,85 @@ describe Assignment do
       assignment.restore
       expect(comment_bank_item.reload.workflow_state).to eq "active"
     end
+
+    context "with peer review sub assignment" do
+      let(:peer_review_assignment) do
+        @course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 1
+        )
+      end
+      let(:peer_review_sub) do
+        PeerReviewSubAssignment.create!(
+          parent_assignment: peer_review_assignment,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+      end
+
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        [peer_review_assignment, peer_review_sub]
+        peer_review_assignment.destroy
+      end
+
+      it "restores the peer review sub assignment when feature flag is enabled" do
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+
+        peer_review_assignment.reload.restore
+        expect(peer_review_sub.reload.workflow_state).not_to eq "deleted"
+      end
+
+      it "triggers peer review attributes sync after restoring" do
+        expect(PeerReview::PeerReviewUpdaterService).to receive(:call)
+          .with(parent_assignment: peer_review_assignment)
+          .at_least(:once)
+        peer_review_assignment.reload.restore
+      end
+
+      it "restores only the assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        peer_review_assignment.reload.restore
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "does not sync sub assignment when FF is disabled at restore then re-enabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        peer_review_assignment.reload.restore
+
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        expect(PeerReview::PeerReviewUpdaterService).not_to receive(:call)
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "restores only the assignment when no peer review sub assignment exists (legacy)" do
+        legacy_assignment = @course.assignments.create!(
+          title: "Legacy Peer Review",
+          peer_reviews: true
+        )
+        legacy_assignment.destroy
+
+        expect { legacy_assignment.restore }.not_to raise_error
+        expect(legacy_assignment.reload.workflow_state).not_to eq "deleted"
+      end
+
+      it "restores the most recently created sub assignment when multiple deleted ones exist" do
+        # peer_review_sub is the older deleted sub (already deleted by the before block).
+        # Simulate a newer sub created after a second enable/disable cycle,
+        # also deleted. The restore should pick the most recent one (highest id).
+        newer_sub = PeerReviewSubAssignment.create!(
+          parent_assignment: peer_review_assignment,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        newer_sub.update_columns(workflow_state: "deleted")
+
+        peer_review_assignment.reload.restore
+
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+        expect(newer_sub.reload.workflow_state).not_to eq "deleted"
+      end
+    end
   end
 
   describe "#readable_submission_type" do
