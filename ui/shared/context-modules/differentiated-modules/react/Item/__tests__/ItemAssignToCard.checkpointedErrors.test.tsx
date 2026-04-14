@@ -92,7 +92,7 @@ describe('ItemAssignToCard - Checkpointed Errors', () => {
     server.close()
   })
 
-  it('stops displaying "Unlock date cannot be after reply to topic due date" error when isCheckpointed is set to false', async () => {
+  it('stops displaying "Available from date cannot be after reply to topic due date" error when isCheckpointed is set to false', async () => {
     // Provide props that will trigger the error when isCheckpointed is true:
     // In this case, reply_to_topic_due_at is earlier than unlock_at, which triggers the error.
     const errorProps: Partial<ItemAssignToCardProps> = {
@@ -108,7 +108,7 @@ describe('ItemAssignToCard - Checkpointed Errors', () => {
 
     await waitFor(() => {
       expect(
-        getAllByText(/Unlock date cannot be after reply to topic due date/i)[0],
+        getAllByText(/Available from date cannot be after reply to topic due date/i)[0],
       ).toBeInTheDocument()
     })
 
@@ -121,12 +121,12 @@ describe('ItemAssignToCard - Checkpointed Errors', () => {
 
     await waitFor(() => {
       expect(
-        queryByText(/Unlock date cannot be after reply to topic due date/i),
+        queryByText(/Available from date cannot be after reply to topic due date/i),
       ).not.toBeInTheDocument()
     })
   })
 
-  it('stops displaying "Unlock date cannot be after due date" error when isCheckpointed is set to true', async () => {
+  it('stops displaying "Available from date cannot be after due date" error when isCheckpointed is set to true', async () => {
     const errorProps: Partial<ItemAssignToCardProps> = {
       isCheckpointed: true,
       due_at: '2024-05-05T00:00:00-06:00',
@@ -139,7 +139,7 @@ describe('ItemAssignToCard - Checkpointed Errors', () => {
     )
 
     await waitFor(() => {
-      expect(getAllByText(/Unlock date cannot be after due date/i)[0]).toBeInTheDocument()
+      expect(getAllByText(/Available from date cannot be after due date/i)[0]).toBeInTheDocument()
     })
 
     // Rerender the component with isCheckpointed set to false.
@@ -150,7 +150,7 @@ describe('ItemAssignToCard - Checkpointed Errors', () => {
     )
 
     await waitFor(() => {
-      expect(queryByText(/Unlock date cannot be after due date/i)).not.toBeInTheDocument()
+      expect(queryByText(/Available from date cannot be after due date/i)).not.toBeInTheDocument()
     })
   })
 })

@@ -369,7 +369,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review unlock date cannot be before assignment due date/
+            /Peer review available from date cannot be before assignment due date/
           )
         end
 
@@ -381,7 +381,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review due date cannot be before assignment unlock date/
+            /Peer review due date cannot be before assignment available from date/
           )
         end
 
@@ -393,7 +393,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review due date cannot be after assignment lock date/
+            /Peer review due date cannot be after assignment until date/
           )
         end
 
@@ -405,7 +405,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review lock date cannot be after assignment lock date/
+            /Peer review until date cannot be after assignment until date/
           )
         end
 
@@ -418,7 +418,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Due date cannot be before unlock date/
+            /Due date cannot be before available from date/
           )
         end
 
@@ -431,7 +431,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Due date cannot be after lock date/
+            /Due date cannot be after until date/
           )
         end
 
@@ -444,7 +444,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Unlock date cannot be after lock date/
+            /Available from date cannot be after until date/
           )
         end
       end

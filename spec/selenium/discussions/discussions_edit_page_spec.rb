@@ -1353,7 +1353,7 @@ describe "discussions" do
             available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
             update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
-            expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
+            expect(assign_to_date_and_time[2].text).to include("Available from date cannot be after reply to topic due date")
 
             # correct reply to topic
             reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
@@ -1364,7 +1364,7 @@ describe "discussions" do
             required_replies_date_formatted = format_date_for_view(1.day.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_required_replies_date(0, required_replies_date_formatted)
             update_required_replies_time(0, "5:00 PM")
-            expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after required replies due date")
+            expect(assign_to_date_and_time[2].text).to include("Available from date cannot be after required replies due date")
 
             # available until
             until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
@@ -1375,7 +1375,7 @@ describe "discussions" do
             reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_reply_to_topic_date(0, reply_to_topic_date_formatted)
             update_reply_to_topic_time(0, "5:00 PM")
-            expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before reply to topic due date")
+            expect(assign_to_date_and_time[3].text).to include("Until date cannot be before reply to topic due date")
 
             # correct reply to topic
             reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
@@ -1386,7 +1386,7 @@ describe "discussions" do
             required_replies_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_required_replies_date(0, required_replies_date_formatted)
             update_required_replies_time(0, "5:00 PM")
-            expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before required replies due date")
+            expect(assign_to_date_and_time[3].text).to include("Until date cannot be before required replies due date")
           end
         end
 

@@ -6313,7 +6313,7 @@ describe AssignmentsApiController, type: :request do
             points_possible: 50,
             peer_review_overrides: [{ course_section_id: 1, due_at: "invalid" }]
           }
-          error_message = "Unlock date cannot be after lock date"
+          error_message = "Available from date cannot be after until date"
 
           peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)
