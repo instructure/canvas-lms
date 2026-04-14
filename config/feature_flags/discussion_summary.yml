@@ -5,6 +5,7 @@ discussion_summary:
   applies_to: Course
   display_name: IgniteAI Summaries for Discussions
   description: Summarize discussions using AI.
+  visible_on: tier_1_visible_on_hook
 
 discussion_summary_with_cedar:
   state: hidden
