@@ -18,10 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AddWorkflowStateToLtiToolConfigurations < ActiveRecord::Migration[7.1]
+class AddWorkflowStateToLtiToolConfigurations < ActiveRecord::Migration[8.0]
   tag :predeploy
 
   def change
-    add_column :lti_tool_configurations, :workflow_state, :string, default: "active", null: false
+    add_column :lti_tool_configurations, :workflow_state, :string, default: "active", null: false, limit: 32, if_not_exists: true
+    add_check_constraint :lti_tool_configurations,
+                         "workflow_state IN ('active', 'deleted')",
+                         name: "chk_workflow_state_enum",
+                         if_not_exists: true
   end
 end
