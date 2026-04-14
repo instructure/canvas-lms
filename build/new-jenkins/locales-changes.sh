@@ -6,8 +6,8 @@ set -o nounset -o errexit -o errtrace -o pipefail -o xtrace
 changes="$(git show --pretty="" --name-only HEAD^..HEAD | tr '\n' ' ')"
 IFS=', ' read -r -a changesArray <<< "$changes"
 
-# get only config/locales changes, exclude locales.yml that one is ok to change alone
-locales="$(git show --pretty=""  --name-only HEAD^..HEAD | grep "config/locales/" | grep -v "config/locales/locales.yml" | tr '\n' ' ')"
+# get only config/locales changes, exclude locales.yml and community.csv as those are ok to change alone
+locales="$(git show --pretty=""  --name-only HEAD^..HEAD | grep "config/locales/" | grep -v "config/locales/locales.yml" | grep -v "config/locales/community.csv" | tr '\n' ' ')"
 IFS=', ' read -r -a localesArray <<< "$locales"
 
 # diff the two arrays, save any unique to diffArray
