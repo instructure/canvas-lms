@@ -1050,6 +1050,58 @@ describe ContextModule do
     end
   end
 
+  describe "evaluate_all_progressions" do
+    it "does not re-evaluate progressions for date-concluded enrollments" do
+      student_in_course(active_all: true)
+      mod = @course.context_modules.create!(name: "Module")
+      assignment = @course.assignments.create!(
+        title: "Score This",
+        grading_type: "points",
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      tag = mod.add_item(id: assignment.id, type: "assignment")
+      mod.completion_requirements = [{ id: tag.id, type: "min_score", min_score: 5 }]
+      mod.workflow_state = "active"
+      mod.save!
+
+      # Set manual posting so grade stays unposted
+      assignment.ensure_post_policy(post_manually: true)
+
+      # Student submits and gets a passing score, but grade is NOT posted yet
+      assignment.submit_homework(@student, body: "my answer")
+      submission = assignment.grade_student(@student, grade: "10", grader: @teacher).first
+      expect(submission.posted_at).to be_nil
+      # Grade is unposted - module progression should NOT be completed
+      progression = mod.evaluate_for(@student)
+      expect(progression.workflow_state).not_to eq("completed")
+      expect(progression.completed_at).to be_nil
+
+      # Conclude enrollment by date
+      @enrollment.start_at = 2.months.ago
+      @enrollment.end_at = 1.month.ago
+      @enrollment.save!
+      @enrollment.enrollment_state.recalculate_state
+      @enrollment.enrollment_state.save!
+      expect(@enrollment.enrollment_state.state).to eq("completed")
+
+      # Now post the grade (simulating instructor posting after course end)
+      submission.update!(posted_at: Time.zone.now)
+
+      # Mark progression as outdated (what recalculate_module_progressions does)
+      mod.context_module_progressions.where(current: true).update_all(current: false)
+
+      Timecop.freeze(2.days.from_now) do
+        mod.evaluate_all_progressions
+
+        # Progression should NOT have been re-evaluated for concluded enrollment
+        progression.reload
+        expect(progression.completed_at).to be_nil
+        expect(progression.workflow_state).not_to eq("completed")
+      end
+    end
+  end
+
   describe "evaluate_for" do
     it "creates a completed progression for no prerequisites and no requirements" do
       course_module
