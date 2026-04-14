@@ -281,10 +281,6 @@ module Lti
       render_unauthorized_action unless tool_proxy_associated?
     end
 
-    def link_fragment
-      Lti::V1p1::Asset.global_context_id_for(submission)
-    end
-
     def tool_proxy_associated?
       PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)
     end
@@ -326,13 +322,6 @@ module Lti
           attachment = Attachment.find(params.require(:originality_report)[:file_id])
         end
         attachment
-      end
-    end
-
-    def attachment_association
-      @_attachment_association ||= begin
-        file = originality_report&.attachment || attachment
-        file.attachment_associations.find { |a| a.context == submission }
       end
     end
 
