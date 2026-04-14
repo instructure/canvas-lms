@@ -219,3 +219,9 @@ default_to_learning_mastery_gradebook:
       state: allowed
     ci:
       state: allowed
+outcomes_service_api_write:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcomes Service Api Write
+  description:
+    When enabled, Canvas performs CRUD operations via API to the Outcomes Service.
