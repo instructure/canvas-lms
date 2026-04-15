@@ -327,6 +327,22 @@ describe('CheckboxTextInput', () => {
       })
     })
 
+    it('announces generated alt text to screen readers', async () => {
+      const mockGeneratedText = 'This is AI generated alt text'
+      server.use(
+        http.post('**/generate/alt_text', () => {
+          return HttpResponse.json({value: mockGeneratedText})
+        }),
+      )
+
+      render(<CheckboxTextInput {...withGenerateFix()} />)
+      fireEvent.click(screen.getByTestId('generate-button'))
+
+      await waitFor(() => {
+        expect(screen.getByText(`Alt text generated: ${mockGeneratedText}`)).toBeInTheDocument()
+      })
+    })
+
     it('calls onValidationChange when generate button is clicked', async () => {
       const mockGeneratedText = 'Generated alt text'
 
