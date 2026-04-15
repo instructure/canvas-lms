@@ -214,7 +214,7 @@ export const AddLinkModal = ({
                 errorEnabled: hasBlurred.text,
               })}
             />
-            <View as="div" margin="x-small none none">
+            <View as="div" margin="none">
               <Text
                 size="small"
                 color={normalizedLabel.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
@@ -238,7 +238,9 @@ export const AddLinkModal = ({
                 setHasBlurred(prev => ({...prev, url: true}))
               }}
               messages={makeMessages({
-                hint: I18n.t('This can be an external link or a Canvas URL.'),
+                hint: I18n.t(
+                  'This can be an external link or a Canvas URL. This link will open in a new tab.',
+                ),
                 error: urlError,
                 errorEnabled: hasBlurred.url,
               })}
@@ -248,6 +250,7 @@ export const AddLinkModal = ({
             <View as="div" margin="none none medium">
               <FormFieldGroup
                 description={I18n.t('Placements')}
+                rowSpacing="small"
                 messages={
                   placementsErrorEnabled && placementsError
                     ? [{type: 'error', text: placementsError}]
@@ -265,12 +268,6 @@ export const AddLinkModal = ({
               </FormFieldGroup>
             </View>
           )}
-          <View as="div">
-            <Text weight="bold">{I18n.t('Opening Behavior')}</Text>
-            <View as="div" margin="x-small none none">
-              <Text>{I18n.t('This link will open in a new tab.')}</Text>
-            </View>
-          </View>
         </View>
       </Modal.Body>
       <Modal.Footer>

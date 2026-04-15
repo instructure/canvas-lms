@@ -203,7 +203,11 @@ describe('AddLinkModal', () => {
     expect(
       screen.queryByText('Please enter a valid URL beginning with https:// or http://'),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('This can be an external link or a Canvas URL.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'This can be an external link or a Canvas URL. This link will open in a new tab.',
+      ),
+    ).toBeInTheDocument()
 
     await user.clear(linkInput)
     await user.type(linkInput, 'https://example.com')
@@ -211,7 +215,11 @@ describe('AddLinkModal', () => {
     expect(
       screen.queryByText('Please enter a valid URL beginning with https:// or http://'),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('This can be an external link or a Canvas URL.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'This can be an external link or a Canvas URL. This link will open in a new tab.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('shows required indicators on both fields', () => {
