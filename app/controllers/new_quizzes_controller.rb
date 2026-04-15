@@ -25,6 +25,7 @@
 # - Item banks: /courses/:course_id/banks/*
 class NewQuizzesController < ApplicationController
   include NewQuizzesHelper
+  include K5Mode
 
   before_action :require_context
   before_action :require_new_quizzes_native_experience
