@@ -243,8 +243,8 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
       >
         <Flex gap="xSmall" direction="column">
           <Flex.Item>
-            <Flex justifyItems="space-between" wrap="wrap" alignItems="center">
-              <Flex.Item shouldGrow>
+            <Flex justifyItems="space-between" alignItems="start" gap="small">
+              <Flex.Item shouldGrow shouldShrink>
                 <Heading level="h1" aria-labelledby="peer-review-heading">
                   <Text
                     id="peer-review-heading"
