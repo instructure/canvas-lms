@@ -960,7 +960,7 @@ GEM
       prism (>= 1.6.0)
       tsort
     rchardet (1.10.0)
-    rdiscount (2.2.7.3)
+    rdiscount (2.2.7.4)
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
