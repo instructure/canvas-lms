@@ -2181,6 +2181,7 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
+      delete "accounts/:account_id/lti_registrations/:id/bind", action: :unbind
       post "accounts/:account_id/lti_registrations/:id/install_from_template", action: :install_from_template
     end
 

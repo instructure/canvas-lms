@@ -50,6 +50,7 @@ import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
 import {
   useRegistrationWithAllInfo,
   useDeleteRegistration,
+  useUnbindRegistration,
   useUpdateRegistration,
   bindGlobalLtiRegistration,
   unbindGlobalLtiRegistration,
@@ -219,6 +220,7 @@ export const ToolDetailsInner = ({
   const route = useToolDetailsRoute()
 
   const deleteMutation = useDeleteRegistration()
+  const unbindMutation = useUnbindRegistration()
   const updateRegistration = useUpdateRegistration()
 
   useAppendBreadcrumb(registration.name, `/accounts/${accountId}/apps/manage/${registration.id}`)
@@ -238,7 +240,9 @@ export const ToolDetailsInner = ({
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const [lockTooltipShowing, setLockTooltipShowing] = React.useState(false)
   const [toggleTooltipShowing, setToggleTooltipShowing] = React.useState(false)
-  const canDelete = !registration.inherited || !!registration.template_registration_id
+  const isInherited = registration.inherited && !registration.template_registration_id // and not a local copy
+  const canManageOwnership = !isInherited
+  const canDelete = window.ENV.FEATURES.lti_deactivate_registrations ? true : canManageOwnership
   const toggleDisabled = !registration.template_registration_id && !!isForcedOn(registration)
   const isSiteAdmin = window.ENV.ACCOUNT_IS_SITE_ADMIN
   const [tiiMigrationModalShowing, setTiiMigrationModalShowing] = React.useState(false)
@@ -362,6 +366,7 @@ export const ToolDetailsInner = ({
   const handleDelete = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
       e.preventDefault()
+
       const confirmed = await showConfirmationDialog({
         body: [
           <Text key="warning" weight="bold">
@@ -382,10 +387,17 @@ export const ToolDetailsInner = ({
 
       if (confirmed) {
         try {
-          await deleteMutation.mutateAsync({
-            registrationId: registration.id,
-            accountId: registration.account_id,
-          })
+          if (isInherited) {
+            await unbindMutation.mutateAsync({
+              registrationId: registration.id,
+              accountId,
+            })
+          } else {
+            await deleteMutation.mutateAsync({
+              registrationId: registration.id,
+              accountId: registration.account_id,
+            })
+          }
           navigate('/manage')
         } catch {
           showFlashAlert({
@@ -395,7 +407,7 @@ export const ToolDetailsInner = ({
         }
       }
     },
-    [registration, navigate, deleteMutation],
+    [registration, navigate, deleteMutation, unbindMutation, isInherited, accountId],
   )
 
   const handleToggleLock = React.useCallback(async () => {
@@ -549,7 +561,6 @@ export const ToolDetailsInner = ({
                   )}
                   isShowingContent={tooltipShowing}
                   onShowContent={() => {
-                    // The tooltip should only be shown if they *can't* click the delete button
                     setTooltipShowing(!canDelete)
                   }}
                   onHideContent={() => {
@@ -576,7 +587,7 @@ export const ToolDetailsInner = ({
                     )}
                     isShowingContent={lockTooltipShowing}
                     onShowContent={() => {
-                      setLockTooltipShowing(!canDelete)
+                      setLockTooltipShowing(!canManageOwnership)
                     }}
                     onHideContent={() => {
                       setLockTooltipShowing(false)
@@ -590,7 +601,7 @@ export const ToolDetailsInner = ({
                       }
                       color="secondary"
                       margin="0"
-                      interaction={canDelete ? 'enabled' : 'disabled'}
+                      interaction={canManageOwnership ? 'enabled' : 'disabled'}
                       onClick={handleToggleLock}
                     >
                       {registration.lock_deploying ? I18n.t('Unlock app') : I18n.t('Lock app')}

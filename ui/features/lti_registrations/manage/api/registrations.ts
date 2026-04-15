@@ -337,6 +337,28 @@ export const useDeleteRegistration = () => {
   })
 }
 
+export const useUnbindRegistration = () => {
+  return useMutation({
+    mutationFn: ({
+      registrationId,
+      accountId,
+    }: {
+      registrationId: LtiRegistrationId
+      accountId: AccountId
+    }) =>
+      doFetchWithSchema(
+        {
+          method: 'DELETE',
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/bind`,
+        },
+        z.unknown(),
+      ),
+    onSettled: (_, __, {accountId}) => {
+      refreshRegistrations(accountId)
+    },
+  })
+}
+
 export type CreateRegistration = (
   accountId: AccountId,
   internalConfig: InternalLtiConfiguration,

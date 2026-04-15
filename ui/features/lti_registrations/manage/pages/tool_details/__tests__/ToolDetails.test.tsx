@@ -102,12 +102,23 @@ describe('ToolDetailsInner', () => {
     expect(deleteButton).not.toHaveAttribute('disabled')
   })
 
-  it('disables the delete button on a site admin registration', async () => {
+  it('disables the delete button on a site admin registration when flag is off', async () => {
     const registration = mockSiteAdminRegistration('site admin', 1)
 
     const wrapper = renderToolDetailsInner(registration)
     const deleteButton = wrapper.getByTestId('delete-app')
     expect(deleteButton).toHaveAttribute('disabled')
+  })
+
+  it('shows a tooltip on the disabled delete button for an inherited registration', async () => {
+    const registration = mockSiteAdminRegistration('site admin', 1)
+    renderToolDetailsInner(registration)
+    fireEvent.mouseOver(screen.getByTestId('delete-app'))
+    await waitFor(() => {
+      expect(
+        screen.getByText("This account does not own this app and therefore can't delete it."),
+      ).toBeInTheDocument()
+    })
   })
 
   it('enables the delete button on a local copy registration', async () => {
@@ -492,6 +503,39 @@ describe('ToolDetailsInner', () => {
           expect(
             screen.getByText('This app is locked on by Instructure, and cannot be turned off.'),
           ).toBeInTheDocument()
+        })
+      })
+    })
+
+    describe('inherited registration delete', () => {
+      it('enables the delete button for an inherited registration', () => {
+        const registration = mockSiteAdminRegistration('site admin', 1)
+        expect(renderToolDetailsInner(registration).getByTestId('delete-app')).not.toHaveAttribute(
+          'disabled',
+        )
+      })
+
+      it('calls the unbind endpoint when removing an inherited registration', async () => {
+        let capturedUrl = ''
+        server.use(
+          http.delete(
+            '/api/v1/accounts/:accountId/lti_registrations/:registrationId/bind',
+            ({request}) => {
+              capturedUrl = request.url
+              return HttpResponse.json({})
+            },
+          ),
+        )
+
+        const registration = mockSiteAdminRegistration('site admin', 1)
+        renderToolDetailsInner(registration)
+
+        fireEvent.click(screen.getByTestId('delete-app'))
+        await waitFor(() => expect(screen.getByText('Delete')).toBeInTheDocument())
+        fireEvent.click(screen.getByText('Delete').closest('button')!)
+
+        await waitFor(() => {
+          expect(capturedUrl).toContain('/api/v1/accounts/1/lti_registrations/1/bind')
         })
       })
     })

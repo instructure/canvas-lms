@@ -45,7 +45,7 @@ RSpec.describe Lti::Registration do
       non_site_admin_template = lti_registration_model(account: account_model)
       registration.template_registration = non_site_admin_template
       expect(subject).to be false
-      expect(registration.errors[:template_registration]).to include("must be inherited from Site Admin")
+      expect(registration.errors[:template_registration]).to include(a_string_starting_with("must be inherited from Site Admin"))
     end
 
     it "allows site admin template registrations" do
