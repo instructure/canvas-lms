@@ -21,11 +21,21 @@
 module Api::V1::AccessibilityCourseStatistic
   include Api::V1::Json
 
+  # TODO: Replace boolean opts flags (include_closed, include_course_details)
+  # with a standard Canvas include[] param pattern, e.g.:
+  #   @argument include[] [String, "closed_issue_count"|"course_details"]
+  # This is consistent with other Canvas API endpoints and allows callers
+  # to opt into only the fields they need. (ref EGG-2452)
   def accessibility_course_statistic_json(statistic, user, session, opts = {})
     return nil unless statistic
 
     fields = %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at]
     fields << "closed_issue_count" if opts[:include_closed]
-    api_json(statistic, user, session, only: fields)
+    json = api_json(statistic, user, session, only: fields)
+    if opts[:include_course_details]
+      json["course_name"] = statistic.course.name
+      json["course_code"] = statistic.course.course_code
+    end
+    json
   end
 end

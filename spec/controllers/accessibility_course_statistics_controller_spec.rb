@@ -90,6 +90,20 @@ describe AccessibilityCourseStatisticsController do
         expect(response.parsed_body).to eq([])
       end
 
+      it "includes course_name and course_code in the response" do
+        AccessibilityCourseStatistic.create!(
+          course: @course1,
+          workflow_state: "active",
+          active_issue_count: 5
+        )
+
+        get :index, params: { user_id: @teacher.id }, format: :json
+        expect(response).to be_successful
+        row = response.parsed_body.first
+        expect(row["course_name"]).to eq(@course1.name)
+        expect(row["course_code"]).to eq(@course1.course_code)
+      end
+
       it "returns active statistics for the teacher's courses" do
         stat1 = AccessibilityCourseStatistic.create!(
           course: @course1,
