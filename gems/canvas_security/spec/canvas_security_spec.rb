@@ -123,10 +123,6 @@ describe CanvasSecurity do
         JSON::JWT.new({ a: 1 }.merge(claims)).sign(key, :HS256).to_s
       end
 
-      def test_legacy_jwt(claims = {})
-        JSON::JWT.new({ b: 2 }.merge(claims)).sign(CanvasSecurity.encryption_key, :HS256).to_s
-      end
-
       around do |example|
         Timecop.freeze(Time.utc(2013, 3, 13, 9, 12), &example)
       end
@@ -145,11 +141,6 @@ describe CanvasSecurity do
       it "checks using past keys" do
         body = CanvasSecurity.decode_jwt(test_jwt, ["newkey", key])
         expect(body).to eq({ "a" => 1 })
-      end
-
-      it "checks using legacy encryption key" do
-        body = CanvasSecurity.decode_jwt(test_legacy_jwt)
-        expect(body).to eq({ "b" => 2 })
       end
 
       it "raises on an expired token" do

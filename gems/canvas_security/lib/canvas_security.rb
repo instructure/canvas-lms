@@ -282,8 +282,6 @@ module CanvasSecurity
   # Raises CanvasSecurity::TokenExpired if the token has expired, and
   # CanvasSecurity::InvalidToken if the token is otherwise invalid.
   def self.decode_jwt(token, keys = [], ignore_expiration: false)
-    # TODO: remove the first line a deploy cycle or two after the separate JWT key goes out (allow all in flight jwts to be validated successfully)
-    keys += encryption_keys
     keys += jwt_encryption_keys
 
     keys.each do |key|
