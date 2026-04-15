@@ -106,8 +106,12 @@ class Account::HelpLinks
   # take an array of links, and infer default values for links that aren't customized
   # (text is only stored in account settings if it's customized)
   def map_default_links(links)
-    links.map do |link|
+    links.filter_map do |link|
       default_link = link[:type] == "default" && default_links_hash[link[:id]&.to_sym]
+      # Drop default-type links whose definition no longer exists (e.g. FF
+      # turned off) and have no text of their own — they would render blank.
+      next if link[:type] == "default" && !default_link && link[:text].blank?
+
       if default_link
         link = link.dup
         link[:text] ||= default_link[:text]
