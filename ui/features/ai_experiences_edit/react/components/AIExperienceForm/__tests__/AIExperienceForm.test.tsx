@@ -382,7 +382,7 @@ describe('AIExperienceForm', () => {
   })
 
   describe('failed context files alert', () => {
-    it('shows an error alert with singular message when one file has failed', () => {
+    it('shows an error alert naming the failed file', () => {
       render(
         <AIExperienceForm
           aiExperience={{
@@ -394,14 +394,11 @@ describe('AIExperienceForm', () => {
         />,
       )
       expect(screen.getByTestId('ai-experience-edit-index-failed-notice')).toBeInTheDocument()
-      expect(
-        screen.getByText(
-          /The source file "poison.pdf" failed to process\. Remove it and save again to continue\./,
-        ),
-      ).toBeInTheDocument()
+      expect(screen.getByText(/Activity couldn't be loaded/)).toBeInTheDocument()
+      expect(screen.getByText(/poison\.pdf/)).toBeInTheDocument()
     })
 
-    it('shows an error alert listing all failed files when multiple files have failed', () => {
+    it('lists all failed file names in the alert', () => {
       render(
         <AIExperienceForm
           aiExperience={{

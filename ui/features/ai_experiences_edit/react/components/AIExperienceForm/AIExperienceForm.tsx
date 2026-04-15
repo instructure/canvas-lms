@@ -187,19 +187,10 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           margin="0 0 medium 0"
           data-testid="ai-experience-edit-index-failed-notice"
         >
-          {aiExperience.failed_context_file_names.length === 1
-            ? I18n.t(
-                'The source file "%{name}" failed to process. Remove it and save again to continue.',
-                {
-                  name: aiExperience.failed_context_file_names[0],
-                },
-              )
-            : I18n.t(
-                'The following source files failed to process: %{names}. Remove them and save again to continue.',
-                {
-                  names: aiExperience.failed_context_file_names.join(', '),
-                },
-              )}
+          {I18n.t(
+            "Activity couldn't be loaded. A source file has an issue. To try again, remove %{names} from your configurations.",
+            {names: aiExperience.failed_context_file_names.join(', ')},
+          )}
         </Alert>
       )}
 

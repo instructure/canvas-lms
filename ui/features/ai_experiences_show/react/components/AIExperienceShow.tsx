@@ -49,7 +49,7 @@ interface AIExperienceShowProps {
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const canManage = aiExperience.can_manage
   const indexStatus = aiExperience.context_index_status
-  const isIndexing = indexStatus === 'in_progress' || indexStatus === 'not_started'
+  const isIndexing = indexStatus === 'in_progress'
   const isIndexFailed = indexStatus === 'failed'
   const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
@@ -216,22 +216,21 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
           renderCloseButtonLabel={false}
           data-testid="ai-experience-show-index-failed-notice"
         >
-          {aiExperience.failed_context_file_names?.length
-            ? I18n.t('The following source %{files} failed to process: %{names}. ', {
-                files:
-                  aiExperience.failed_context_file_names.length === 1
-                    ? I18n.t('file')
-                    : I18n.t('files'),
-                names: aiExperience.failed_context_file_names.join(', '),
-              })
-            : I18n.t('A source file failed to process. ')}
+          {I18n.t(
+            "Activity couldn't be loaded. A source file has an issue. To try again, remove %{names} from ",
+            {
+              names: aiExperience.failed_context_file_names?.length
+                ? aiExperience.failed_context_file_names.join(', ')
+                : I18n.t('the file'),
+            },
+          )}
           <a
             href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`}
             data-testid="ai-experience-show-index-failed-edit-button"
           >
-            {I18n.t('Edit this experience')}
+            {I18n.t('your configurations')}
           </a>
-          {I18n.t(' to remove it and save again to continue.')}
+          {I18n.t('.')}
         </Alert>
       ) : canManage && isIndexing ? (
         <View
