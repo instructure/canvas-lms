@@ -82,6 +82,31 @@ describe Mutations::SetAssignmentPostPolicy do
       expect(result.dig("errors", 0, "message")).to eql expected_error
     end
 
+    context "when the assignment has a peer review sub-assignment" do
+      let(:peer_review_sub_assignment) do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment.update!(peer_reviews: true)
+        assignment.create_peer_review_sub_assignment!(
+          title: "Peer Review",
+          context: course,
+          peer_reviews: true
+        )
+      end
+
+      it "can set post policy using the peer review sub-assignment id" do
+        result = execute_query(mutation_str(assignment_id: peer_review_sub_assignment.id, post_manually: true), context)
+        expect(result.dig("data", "setAssignmentPostPolicy", "postPolicy", "postManually")).to be true
+      end
+
+      it "returns an error when the feature flag is disabled and a peer review sub-assignment id is used" do
+        sub_assignment = peer_review_sub_assignment
+        course.disable_feature!(:peer_review_allocation_and_grading)
+        result = execute_query(mutation_str(assignment_id: sub_assignment.id, post_manually: true), context)
+        expected_error = "An assignment with that id does not exist"
+        expect(result.dig("errors", 0, "message")).to eql expected_error
+      end
+    end
+
     it "raises an error on setting an anonymous assignment to automatic posting" do
       assignment.update!(anonymous_grading: true)
       result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: false), context)
