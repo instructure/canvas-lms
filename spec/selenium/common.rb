@@ -76,7 +76,17 @@ shared_context "in-process server selenium tests" do
   include Rails.application.routes.url_helpers
 
   prepend_before do
-    resize_screen_to_standard
+    # If the Selenium Grid killed the session due to inactivity while
+    # non-Selenium spec files ran between two Selenium spec files in the
+    # same worker process, reset and start a fresh session before the
+    # test body runs.
+    begin
+      close_modal_if_present { resize_screen_to_standard }
+    rescue Selenium::WebDriver::Error::InvalidSessionIdError,
+           Selenium::WebDriver::Error::NoSuchWindowError
+      SeleniumDriverSetup.reset!
+      resize_screen_to_standard
+    end
     SeleniumDriverSetup.allow_requests!
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
