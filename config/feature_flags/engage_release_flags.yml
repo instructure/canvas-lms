@@ -48,3 +48,8 @@ peer_review_allocation_and_grading:
   description: |-
     Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
     Note: the following three other feature options must be enabled for this feature to work correctly: 1) Assignment Enhancements - Student, 2) Enhanced Rubrics, and 3) Performance and Usability Upgrades for SpeedGrader.
+slm_read_from_primary_db:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Submission Lifecycle Manager - Read from primary db after recent write
+  description: Ensures that Submission Lifecycle Manager reads from the primary database after a recent write to maintain data consistency.
