@@ -878,7 +878,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       click_save_button
 
       # Error: Available from date cannot be after due date
-      check_element_has_focus assign_to_available_from_date(0)
+      check_element_has_focus assign_to_due_date(0)
     end
 
     it "focus date field if is un-parseable after trying to submit", :ignore_js_errors do

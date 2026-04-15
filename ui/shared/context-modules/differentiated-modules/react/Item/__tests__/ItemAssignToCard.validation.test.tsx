@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {createRef} from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
+import ItemAssignToCard, {
+  type ItemAssignToCardProps,
+  type ItemAssignToCardRef,
+} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import fetchMock from 'fetch-mock'
 import {queryClient} from '@instructure/platform-query'
@@ -47,12 +50,16 @@ const props: ItemAssignToCardProps = {
   reply_to_topic_due_at: null,
 }
 
-const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) => {
-  return render(
+const renderComponent = (
+  overrides: Partial<ItemAssignToCardProps> = {},
+  ref = createRef<ItemAssignToCardRef>(),
+) => {
+  const result = render(
     <MockedQueryProvider>
-      <ItemAssignToCard {...props} {...overrides} />
+      <ItemAssignToCard {...props} {...overrides} ref={ref} />
     </MockedQueryProvider>,
   )
+  return {...result, ref}
 }
 
 describe('ItemAssignToCard - Validation', () => {
@@ -210,6 +217,63 @@ describe('ItemAssignToCard - Validation', () => {
       })
 
       expect(getByTestId('item-assign-to-card')).toBeInTheDocument()
+    })
+  })
+
+  describe('focusInputs - date ordering errors', () => {
+    it('focuses the due date input when unlock_at is after due_at', async () => {
+      const onValidityChange = vi.fn()
+      const {ref, getByLabelText} = renderComponent({
+        selectedAssigneeIds: ['course_1'],
+        due_at: '2023-10-05T12:00:00Z',
+        unlock_at: '2023-10-10T12:00:00Z', // unlock after due: invalid
+        lock_at: null,
+        onValidityChange,
+      })
+
+      // Wait for validation errors to be populated
+      await waitFor(() => {
+        expect(onValidityChange).toHaveBeenCalledWith(expect.any(String), false)
+      })
+
+      ref.current?.focusInputs()
+      expect(getByLabelText('Due Date')).toHaveFocus()
+    })
+
+    it('focuses the lock date input when lock_at is before unlock_at (unlock > lock)', async () => {
+      const onValidityChange = vi.fn()
+      const {ref, getByLabelText} = renderComponent({
+        selectedAssigneeIds: ['course_1'],
+        due_at: null,
+        unlock_at: '2023-10-10T12:00:00Z',
+        lock_at: '2023-10-05T12:00:00Z', // lock before unlock: error on unlock_at
+        onValidityChange,
+      })
+
+      await waitFor(() => {
+        expect(onValidityChange).toHaveBeenCalledWith(expect.any(String), false)
+      })
+
+      ref.current?.focusInputs()
+      expect(getByLabelText('Until')).toHaveFocus()
+    })
+
+    it('focuses the lock date input when lock_at is before due_at', async () => {
+      const onValidityChange = vi.fn()
+      const {ref, getByLabelText} = renderComponent({
+        selectedAssigneeIds: ['course_1'],
+        due_at: '2023-10-10T12:00:00Z',
+        unlock_at: null,
+        lock_at: '2023-10-05T12:00:00Z', // lock before due: error on lock_at
+        onValidityChange,
+      })
+
+      await waitFor(() => {
+        expect(onValidityChange).toHaveBeenCalledWith(expect.any(String), false)
+      })
+
+      ref.current?.focusInputs()
+      expect(getByLabelText('Until')).toHaveFocus()
     })
   })
 })
