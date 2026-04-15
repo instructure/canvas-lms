@@ -22,31 +22,27 @@ import {PlatformUiProvider, type Account} from '@instructure/platform-provider'
 import {platformExecuteQuery} from '@canvas/graphql'
 import {queryClient} from '@canvas/query'
 
-interface AccountWithPermissions extends Account {
-  permissions: {
-    canView: boolean | undefined
-    canCreate: boolean | undefined
-    canEdit: boolean | undefined
-  }
-}
-
 const AccountTagsPane = () => {
-  const account: AccountWithPermissions = {
+  const account: Account = {
     id: String(ENV.ROOT_ACCOUNT_ID),
     name: '',
     executeQuery: platformExecuteQuery,
     currentUserId: ENV.current_user_id ?? '',
     locale: ENV.LOCALE ?? 'en',
     timezone: ENV.TIMEZONE ?? 'UTC',
+  }
+
+  // permissions prop pending platform-provider type update
+  const permissionsProps = {
     permissions: {
-      canView: ENV.PERMISSIONS?.can_view_institutional_tags,
-      canCreate: ENV.PERMISSIONS?.can_create_institutional_tags,
-      canEdit: ENV.PERMISSIONS?.can_edit_institutional_tags,
+      canView: ENV.PERMISSIONS?.can_view_institutional_tags ?? false,
+      canCreate: ENV.PERMISSIONS?.can_create_institutional_tags ?? false,
+      canEdit: ENV.PERMISSIONS?.can_edit_institutional_tags ?? false,
     },
   }
 
   return (
-    <PlatformUiProvider accounts={[account as Account]} queryClient={queryClient}>
+    <PlatformUiProvider accounts={[account]} queryClient={queryClient} {...permissionsProps}>
       <AccountTags />
     </PlatformUiProvider>
   )
