@@ -60,6 +60,7 @@ module AccessibilityChecker
 
     FIXTURES = {
       missing_alt_text: { path: "single_issues/missing_alt_text.html", title: "Missing Alt Text", issue_count: 1 },
+      adjacent_links: { path: "single_issues/adjacent_links.html", title: "Adjacent Links", issue_count: 1 },
       misformatted_ordered_list: { path: "single_issues/misformatted_list.html", title: "Misformatted Ordered List", issue_count: 1, list_item_count: 3 },
       misformatted_unordered_list: { path: "single_issues/misformatted_unordered_list.html", title: "Misformatted Unordered List", issue_count: 1, list_item_count: 3 },
       alt_text_too_long: { path: "single_issues/alt_text_too_long.html", title: "Alt Text Too Long", issue_count: 1 },
