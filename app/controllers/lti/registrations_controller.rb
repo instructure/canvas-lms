@@ -1836,7 +1836,9 @@ class Lti::RegistrationsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless registration
 
     # must always be in the root account on current shard
-    deployment = ContextExternalTool.active.find_by(id: params[:deployment_id], lti_registration: registration, root_account_id: @context.id)
+    deployment = ContextExternalTool.active
+                                    .for_lti_registration(registration, @context)
+                                    .find_by(id: params[:deployment_id], root_account_id: @context.id)
     raise ActiveRecord::RecordNotFound unless deployment
 
     if deployment.context_type != "Account"
@@ -1966,7 +1968,8 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def history
     GuardRail.activate(:secondary) do
-      base_scope = Lti::RegistrationHistoryEntry.where(lti_registration: registration, root_account: @account)
+      base_scope = Lti::RegistrationHistoryEntry.for_lti_registration(registration, @account)
+                                                .where(root_account: @account)
                                                 .order(created_at: :desc, id: :desc).preload(:created_by)
       bookmarker = BookmarkedCollection::SimpleBookmarker.new(Lti::RegistrationHistoryEntry, :created_at, :id)
       bookmarked_collection = BookmarkedCollection.wrap(bookmarker, base_scope)

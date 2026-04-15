@@ -177,7 +177,7 @@ module Lti
     def list
       lti_registration = Lti::Registration.find(params[:registration_id])
       bookmark = BookmarkedCollection::SimpleBookmarker.new(ContextExternalTool, :id)
-      tool_collection = BookmarkedCollection.wrap(bookmark, ContextExternalTool.active.where(lti_registration:))
+      tool_collection = BookmarkedCollection.wrap(bookmark, ContextExternalTool.active.for_lti_registration(lti_registration, @context))
       tools = Api.paginate(tool_collection, self, api_v1_list_deployments_path)
 
       render json: tools.map { |tool| lti_deployment_json(tool, @current_user, session, @context) }
@@ -210,7 +210,12 @@ module Lti
     private
 
     def deployment
-      @deployment ||= ContextExternalTool.find_by(id: params[:id], lti_registration_id: params[:registration_id], root_account_id: @context.id)
+      return @deployment if @deployment
+
+      lti_registration = Lti::Registration.find(params[:registration_id])
+      @deployment = ContextExternalTool
+                    .for_lti_registration(lti_registration, @context)
+                    .find_by(id: params[:id], root_account_id: @context.id)
       raise ActiveRecord::RecordNotFound unless @deployment
 
       @deployment

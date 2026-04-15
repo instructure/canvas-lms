@@ -3144,15 +3144,50 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "with cross-shard registration" do
+    context "with site admin template registration" do
       specs_require_sharding
 
-      let(:registration) { @shard2.activate { lti_registration_with_tool(account: xshard_account) } }
-      let(:xshard_account) { @shard2.activate { account_model } }
-      let(:deployment) { registration.new_external_tool(account) }
-      let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
+      subject do
+        @shard2.activate do
+          get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy.id}/deployments/#{deployment.id}/context_search",
+              params: { search_term:, only_children_of: }.compact,
+              as: :json
+        end
+        response
+      end
 
-      before { subaccount }
+      let(:account) { @shard2.activate { account_model } }
+      let(:admin) { @shard2.activate { account_admin_user(account:) } }
+      let(:sa_registration) do
+        Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+      end
+      let(:local_copy) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account:, user: admin, template: sa_registration
+          )[:local_copy]
+        end
+      end
+      let(:deployment) { local_copy.deployments.first }
+      let(:subaccount) do
+        @shard2.activate do
+          account_model(parent_account: account,
+                        root_account: account,
+                        name: "Sub Account",
+                        sis_source_id: "FOO")
+        end
+      end
+
+      before do
+        sa_registration
+        @shard2.activate do
+          account.enable_feature!(:lti_registrations_next)
+          account.enable_feature!(:lti_registrations_templates)
+        end
+        local_copy
+        subaccount
+        user_session(admin)
+      end
 
       it { is_expected.to be_successful }
 
@@ -3162,7 +3197,7 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "with cross-shard deployment" do
-        let(:deployment) { @shard2.activate { registration.new_external_tool(xshard_account) } }
+        let(:deployment) { sa_registration.deployments.first }
 
         it "returns 404" do
           subject
@@ -3568,31 +3603,45 @@ RSpec.describe Lti::RegistrationsController do
     end
 
     context "with a site admin registration and multiple accounts on the same shard" do
-      let(:registration) { lti_registration_with_tool(account: Account.site_admin) }
-      let(:other_account) { account_model }
-      let(:reg_history_entry) do
-        Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: account) do
-          registration.update!(name: "Account Name")
+      let_once(:sa_registration) { lti_registration_with_tool(account: Account.site_admin) }
+      let_once(:other_account) { account_model }
+      let_once(:local_copy) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:, user:, template: sa_registration
+        )[:local_copy]
+      end
+      let_once(:local_copy_other) do
+        other_admin = account_admin_user(account: other_account)
+        Lti::InstallTemplateRegistrationService.call(
+          account: other_account, user: other_admin, template: sa_registration
+        )[:local_copy]
+      end
+      let_once(:reg_history_entry) do
+        Lti::RegistrationHistoryEntry.track_changes(lti_registration: sa_registration, current_user: user, context: account) do
+          sa_registration.update!(name: "Account Name")
         end
         Lti::RegistrationHistoryEntry.where(root_account: account).last
       end
-      let(:other_reg_history_entry) do
-        Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration, current_user: user, context: other_account) do
-          registration.update!(name: "Other Account Name")
+      let_once(:other_reg_history_entry) do
+        Lti::RegistrationHistoryEntry.track_changes(lti_registration: sa_registration, current_user: user, context: other_account) do
+          sa_registration.update!(name: "Other Account Name")
         end
         Lti::RegistrationHistoryEntry.where(root_account: other_account).last
       end
 
       it "only returns history entries for the specified root account" do
+        local_copy
+        local_copy_other
         reg_history_entry
         other_reg_history_entry
         user_session(user)
-        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy.id}/history"
 
         expect(response).to be_successful
 
         ids = response.parsed_body.pluck("id")
-        expect(ids).to eql([reg_history_entry.id])
+        expect(ids).to include(reg_history_entry.id)
+        expect(ids).not_to include(other_reg_history_entry.id)
       end
     end
 
@@ -3699,6 +3748,39 @@ RSpec.describe Lti::RegistrationsController do
         expect(new_deployment2["context_controls"].length).to be(1)
         expect(new_deployment2["context_controls"].first["context_name"]).to eq(course.name)
         expect(new_deployment2["context_controls"].first["available"]).to be(false)
+      end
+    end
+
+    context "with lti_registrations_templates flag (same-shard SA)" do
+      let(:sa_registration) { lti_registration_with_tool(account: Account.site_admin) }
+      let(:local_copy) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user:,
+          template: sa_registration
+        )[:local_copy]
+      end
+
+      before do
+        account.enable_feature!(:lti_registrations_templates)
+        local_copy
+      end
+
+      it "returns history entries linked to the SA registration when flag is ON" do
+        entry = Lti::RegistrationHistoryEntry.create!(
+          lti_registration: sa_registration,
+          root_account: account,
+          diff: [["+", "placements", nil, []]],
+          old_configuration: { "name" => "old" },
+          new_configuration: { "name" => "new" },
+          update_type: "manual_edit",
+          created_by: user
+        )
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy.id}/history"
+
+        expect(response).to be_successful
+        expect(response.parsed_body.pluck("id")).to include(entry.id)
       end
     end
   end

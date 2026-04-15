@@ -39,8 +39,36 @@ class ContextExternalTool < ApplicationRecord
   belongs_to :root_account, class_name: "Account"
   # Can point to a cross-shard registration, is slowly being phased out for app
   belongs_to :lti_registration, class_name: "Lti::Registration"
+  alias_method :old_lti_registration, :lti_registration
+  alias_attribute :old_lti_registration_id, :lti_registration_id
   # Always points to a local registration
   belongs_to :app, class_name: "Lti::Registration", optional: true
+
+  def lti_registration
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app
+    else
+      old_lti_registration
+    end
+  end
+
+  def lti_registration_id
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app_id
+    else
+      old_lti_registration_id
+    end
+  end
+
+  def lti_registration=(value)
+    super
+    sync_app_id
+  end
+
+  def lti_registration_id=(value)
+    super
+    sync_app_id
+  end
 
   include MasterCourses::Restrictor
 
@@ -83,6 +111,7 @@ class ContextExternalTool < ApplicationRecord
   end
   serialize :settings, coder: SettingsSerializer
 
+  before_validation :sync_app_id
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
   before_save :infer_defaults, :add_identity_hash
@@ -91,6 +120,13 @@ class ContextExternalTool < ApplicationRecord
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
 
+  scope :for_lti_registration, lambda { |lti_registration, root_account|
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      where(app: lti_registration)
+    else
+      where(lti_registration:)
+    end
+  }
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
   scope :quiz_lti, -> { where(tool_id: QUIZ_LTI) }
   scope :lti_1_3, -> { where(lti_version: "1.3") }
@@ -1434,6 +1470,43 @@ class ContextExternalTool < ApplicationRecord
   end
 
   private
+
+  def sync_app_id
+    return if old_lti_registration_id.blank?
+    return unless old_lti_registration_id_changed?
+    return if app_id_changed? && !app_id.nil?
+
+    # root_account may not be set yet (infer_defaults runs before_save,
+    # but this callback runs before_validation), so fall back to context.
+    resolved_root_account = root_account || context&.root_account
+    cross_shard = shard != Shard.shard_for(old_lti_registration_id)
+    # Same-shard but inherited: root accounts that share a shard with Site Admin
+    # (OSS installs, local dev, single-shard multi-tenant) still need their own
+    # local copy for any registration they've inherited from Site Admin.
+    same_shard_inherited = !cross_shard &&
+                           resolved_root_account != Account.site_admin &&
+                           shard == Account.site_admin.shard &&
+                           old_lti_registration&.root_account == Account.site_admin
+
+    if cross_shard || same_shard_inherited
+      local = Lti::Registration.active.find_by(
+        template_registration_id: old_lti_registration_id,
+        account: resolved_root_account
+      )
+      if local
+        self.app_id = local.id
+      else
+        msg = "No local App/Lti::Registration found for lti_registration_id=#{old_lti_registration_id}"
+        if resolved_root_account&.feature_enabled?(:lti_registrations_templates)
+          raise Lti::LocalAppNotFound, msg
+        else
+          Canvas::Errors.capture_exception(:lti_registration_sync, msg, :warn)
+        end
+      end
+    else
+      self.app_id = old_lti_registration_id
+    end
+  end
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
   # Returns an array of strings, each listing a partial or full domain suffix that is considered "internal".

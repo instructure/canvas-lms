@@ -192,7 +192,9 @@ module Lti
         end
 
         ims_registration.lti_registration.account.shard.activate do
-          root_deployment = ContextExternalTool.find_by(account: ims_registration.root_account, lti_registration: ims_registration.lti_registration_id)
+          root_deployment = ContextExternalTool
+                            .for_lti_registration(ims_registration.lti_registration, ims_registration.root_account)
+                            .find_by(account: ims_registration.root_account)
           render_registration(ims_registration, ims_registration.developer_key, root_deployment)
         end
       end
@@ -293,7 +295,9 @@ module Lti
                 )
               end
 
-              root_deployment = ContextExternalTool.find_by(account: root_account, lti_registration: registration)
+              root_deployment = ContextExternalTool
+                                .for_lti_registration(registration, root_account)
+                                .find_by(account: root_account)
 
               render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
             end
