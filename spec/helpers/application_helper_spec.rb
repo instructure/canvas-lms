@@ -1203,9 +1203,9 @@ describe ApplicationHelper do
 
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: localhost root_account.test root_account2.test; "
         expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
-        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob: rldb:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
       it "does not include the report URI when active" do
@@ -1213,7 +1213,7 @@ describe ApplicationHelper do
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: localhost root_account.test root_account2.test; "
       end
 
       it "includes canvadocs domain if enabled" do
@@ -1224,7 +1224,7 @@ describe ApplicationHelper do
           config: { "base_url" => "https://canvadocs.instructure.com/1" }
         )
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: canvadocs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: canvadocs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       it "includes inst_fs domain if enabled" do
@@ -1235,7 +1235,7 @@ describe ApplicationHelper do
           app_host: "https://inst_fs.instructure.com"
         )
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       context "with default source CSP directives" do
@@ -1249,7 +1249,7 @@ describe ApplicationHelper do
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
           expect(headers["Content-Security-Policy"])
-            .to eq "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+            .to eq "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
         end
 
         it "sets header for files" do
@@ -1266,16 +1266,23 @@ describe ApplicationHelper do
           expect(headers["Content-Security-Policy"]).to eq helper.default_csp_logging_directives
         end
 
-        it "sets header without default source CSP directives if :default_source_csp_logging feature is disabled" do
-          account.disable_feature!(:default_source_csp_logging)
-          helper.add_csp_for_root
-          expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: #{helper.allow_list_domains}; "
-          headers.clear
-          helper.add_csp_for_file
-          expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
-          headers.clear
-          helper.set_default_source_csp_directive_if_enabled
-          expect(headers["Content-Security-Policy"]).not_to eq helper.default_csp_logging_directives
+        context "when :default_source_csp_logging feature is disabled" do
+          before { account.disable_feature!(:default_source_csp_logging) }
+
+          it "sets frame-src without logging directives for root" do
+            helper.add_csp_for_root
+            expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; "
+          end
+
+          it "sets iframe attribute without logging directives for files" do
+            helper.add_csp_for_file
+            expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
+          end
+
+          it "does not set the default logging CSP directive" do
+            helper.set_default_source_csp_directive_if_enabled
+            expect(headers).not_to have_key("Content-Security-Policy")
+          end
         end
 
         it "doesn't set the header if :javascript_csp feature is enabled but not enforced" do
@@ -1296,7 +1303,7 @@ describe ApplicationHelper do
         it "won't override existing header" do
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           directives =
-            "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+            "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
           helper.add_csp_for_root
           expect(headers["Content-Security-Policy"]).to eq directives
           helper.set_default_source_csp_directive_if_enabled
