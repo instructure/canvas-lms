@@ -42,8 +42,9 @@ class Types::InstitutionalTagType < Types::ApplicationObjectType
 
   field :users_connection, Types::UserType.connection_type, null: true do
     argument :filter, Types::AccountUsersFilterInputType, required: false
+    argument :sort, Types::InstitutionalTagUsersSortInputType, required: false
   end
-  def users_connection(filter: {})
+  def users_connection(filter: {}, sort: {})
     root_account = context[:domain_root_account]
     return unless root_account&.feature_enabled?(:institutional_tags)
     return unless root_account.grants_right?(current_user, session, :manage_institutional_tags_view)
@@ -53,11 +54,14 @@ class Types::InstitutionalTagType < Types::ApplicationObjectType
                 .distinct
 
     search_term = filter[:search_term].presence
+    options = { sort: sort[:field], order: sort[:direction] }.compact
+
     if search_term
-      UserSearch.for_user_in_context(search_term, root_account, current_user, session, {})
+      UserSearch.for_user_in_context(search_term, root_account, current_user, session, options)
                 .where(users: { id: users.select(:id) })
     else
-      users
+      UserSearch.scope_for(root_account, current_user, options)
+                .where(users: { id: users.select(:id) })
     end
   end
 end

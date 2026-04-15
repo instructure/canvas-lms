@@ -27,8 +27,8 @@ describe Types::InstitutionalTagType do
     @admin = account_admin_user(account: @account)
     @category = institutional_tag_category_model(account: @account, name: "Tag Type Spec Category")
     @tag = institutional_tag_model(account: @account, category: @category, name: "Alpha")
-    @user1 = user_model
-    @user2 = user_model
+    @user1 = user_with_pseudonym(account: @account, name: "User 1")
+    @user2 = user_with_pseudonym(account: @account, name: "User 2")
     institutional_tag_association_model(account: @account, institutional_tag: @tag, user: @user1)
     institutional_tag_association_model(account: @account, institutional_tag: @tag, user: @user2)
   end
@@ -76,6 +76,68 @@ describe Types::InstitutionalTagType do
       non_admin = user_model
       type = GraphQLTypeTester.new(@tag, current_user: non_admin, domain_root_account: @account)
       expect(type.resolve("usersConnection { nodes { _id } }")).to be_nil
+    end
+
+    describe "filtering" do
+      it "filters users by search term" do
+        ids = tag_type.resolve('usersConnection(filter: {searchTerm: "User 1"}) { nodes { _id } }')
+        expect(ids).to eq([@user1.id.to_s])
+      end
+
+      it "returns empty when search term matches no users" do
+        ids = tag_type.resolve('usersConnection(filter: {searchTerm: "Nonexistent"}) { nodes { _id } }')
+        expect(ids).to eq([])
+      end
+
+      it "does not return users outside the tag association" do
+        user_with_pseudonym(account: @account, name: "Other Person")
+        ids = tag_type.resolve('usersConnection(filter: {searchTerm: "Other"}) { nodes { _id } }')
+        expect(ids).to eq([])
+      end
+    end
+
+    describe "sorting" do
+      before(:once) do
+        @user1.update!(name: "Zara")
+        @user2.update!(name: "Alice")
+      end
+
+      it "sorts by username ascending" do
+        ids = tag_type.resolve("usersConnection(sort: {field: username, direction: asc}) { nodes { _id } }")
+        expect(ids).to eq([@user2.id.to_s, @user1.id.to_s])
+      end
+
+      it "sorts by username descending" do
+        ids = tag_type.resolve("usersConnection(sort: {field: username, direction: desc}) { nodes { _id } }")
+        expect(ids).to eq([@user1.id.to_s, @user2.id.to_s])
+      end
+
+      it "defaults to sortable name ascending when no sort is provided" do
+        ids = tag_type.resolve("usersConnection { nodes { _id } }")
+        expect(ids).to eq([@user2.id.to_s, @user1.id.to_s])
+      end
+    end
+
+    describe "sorting with filter" do
+      before(:once) do
+        @user1.update!(name: "Zara Smith")
+        @user2.update!(name: "Alice Smith")
+      end
+
+      it "filters and sorts by username ascending" do
+        ids = tag_type.resolve('usersConnection(filter: {searchTerm: "Smith"}, sort: {field: username, direction: asc}) { nodes { _id } }')
+        expect(ids).to eq([@user2.id.to_s, @user1.id.to_s])
+      end
+
+      it "filters and sorts by username descending" do
+        ids = tag_type.resolve('usersConnection(filter: {searchTerm: "Smith"}, sort: {field: username, direction: desc}) { nodes { _id } }')
+        expect(ids).to eq([@user1.id.to_s, @user2.id.to_s])
+      end
+
+      it "returns only matching users when filter narrows results" do
+        ids = tag_type.resolve('usersConnection(filter: {searchTerm: "Zara"}, sort: {field: username, direction: asc}) { nodes { _id } }')
+        expect(ids).to eq([@user1.id.to_s])
+      end
     end
   end
 end
