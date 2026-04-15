@@ -108,7 +108,7 @@ const WidgetDashboardContainer: React.FC = () => {
       )}
       <Flex direction="column" gap="small" margin="0 0 medium">
         <Flex.Item>
-          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center">
+          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center" wrap="wrap">
             <Flex.Item shouldGrow>
               <Heading
                 level="h1"
