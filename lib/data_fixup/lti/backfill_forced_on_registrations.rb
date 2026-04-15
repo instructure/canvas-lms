@@ -50,6 +50,7 @@ module DataFixup
 
     def process_record(account)
       return if account.site_admin?
+      return unless account.primary_settings_root_account?
 
       results = []
 
