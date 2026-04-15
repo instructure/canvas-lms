@@ -179,8 +179,8 @@ export const GradeItem: React.FC<GradeItemProps> = ({submission, isRightColumn =
 
             <Flex.Item shouldGrow shouldShrink>
               <Flex direction="column">
-                <Flex.Item>{assignmentTitle}</Flex.Item>
-                <Flex.Item>{timestamp}</Flex.Item>
+                <Flex.Item overflowY="visible">{assignmentTitle}</Flex.Item>
+                <Flex.Item overflowY="visible">{timestamp}</Flex.Item>
               </Flex>
             </Flex.Item>
 
