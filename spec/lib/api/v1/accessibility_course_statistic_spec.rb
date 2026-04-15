@@ -55,6 +55,18 @@ describe Api::V1::AccessibilityCourseStatistic do
         expect(json["updated_at"]).not_to be_nil
       end
 
+      it "excludes course_name and course_code by default" do
+        json = accessibility_course_statistic_json(statistic, user, session)
+        expect(json.key?("course_name")).to be false
+        expect(json.key?("course_code")).to be false
+      end
+
+      it "includes course_name and course_code when include_course_details opt is true" do
+        json = accessibility_course_statistic_json(statistic, user, session, include_course_details: true)
+        expect(json["course_name"]).to eq course.name
+        expect(json["course_code"]).to eq course.course_code
+      end
+
       it "includes all expected fields" do
         json = accessibility_course_statistic_json(statistic, user, session)
         expected_fields = %w[id course_id active_issue_count resolved_issue_count workflow_state created_at updated_at]
