@@ -63,6 +63,18 @@ module FeatureFlags
       false
     end
 
+    def self.tier_1_visible_on_hook(_context)
+      false
+    end
+
+    def self.tier_2_visible_on_hook(_context)
+      false
+    end
+
+    def self.tier_3_visible_on_hook(_context)
+      false
+    end
+
     def self.quizzes_next_visible_on_hook(context)
       root_account = context.root_account
       # assume all Quizzes.Next provisions so far have been done through uuid_provisioner
