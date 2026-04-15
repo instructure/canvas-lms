@@ -437,6 +437,36 @@ describe('AIExperienceShow', () => {
     })
   })
 
+  describe('not_started index status', () => {
+    it('shows preview instead of processing notice when context_index_status is not_started', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_index_status: 'not_started',
+            can_manage: true,
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+      expect(screen.getByText('Preview')).toBeInTheDocument()
+    })
+
+    it('enables AI Conversations button when context_index_status is not_started', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_index_status: 'not_started',
+            can_manage: true,
+          }}
+        />,
+      )
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).not.toHaveAttribute('disabled')
+    })
+  })
+
   describe('context files table', () => {
     const mockFiles = [
       {
