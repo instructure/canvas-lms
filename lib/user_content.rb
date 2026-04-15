@@ -282,6 +282,9 @@ module UserContent
       url = url.sub(%r{/$}, "") if home_link
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
       return url if context_type == "users" && type == "external_tools"
+      # Don't process external URLs that happen to have /files/ or other Canvas-like paths
+      # but don't belong to a Canvas context (e.g., https://www.example.edu/files/123.pdf)
+      return url if host.present? && !context_type && !@contextless_types.include?(type)
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && !FILES_LOCATIONS_PREFIXES.include?(context_type)
 
       # wiki pages can have slugs instead of ids, but nothing else can.
