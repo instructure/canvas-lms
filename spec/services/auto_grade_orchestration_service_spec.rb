@@ -165,7 +165,7 @@ RSpec.describe AutoGradeOrchestrationService do
             submission:,
             progress:
           )
-        end.to raise_error(Delayed::RetriableError, /Number of graded criteria.*is less than the number of rubric criteria/)
+        end.to raise_error(Delayed::RetriableError, /Grading could not be completed. Please try again./)
       end
 
       it "deduplicates duplicate items from GradeService by description" do

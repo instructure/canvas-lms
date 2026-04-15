@@ -49,10 +49,19 @@ class GradeService
       )
 
       map_grade_essay_results_to_canvas(grading_results, @rubric)
+    # These subclasses have static, user-safe messages and can be shown directly.
+    # If new CedarClientError subclasses are added with user-safe messages, add them here.
+    rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError,
+           InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError,
+           InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError,
+           InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError => e
+      raise CedarAi::Errors::GraderError, friendly_cedar_error_for(e)
     rescue InstructureMiscPlugin::Extensions::CedarClient::CedarClientError => e
-      raise CedarAi::Errors::GraderError, e.message
+      Rails.logger.error("[GradeService] Cedar API error: #{e.message}")
+      raise CedarAi::Errors::GraderError, friendly_cedar_error_for(e)
     rescue => e
-      raise CedarAi::Errors::GraderError, "Invalid response from gradeEssay: #{e.message}"
+      Rails.logger.error("[GradeService] Unexpected error: #{e.class}: #{e.message}")
+      raise CedarAi::Errors::GraderError, I18n.t("An unexpected error occurred while grading.")
     end
   end
 
@@ -147,6 +156,19 @@ class GradeService
 
   def validate_essay_length(text)
     raise "Submission must be at least 5 words long" if text.split.size < 5
+  end
+
+  def friendly_cedar_error_for(error)
+    case error
+    when InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
+      I18n.t("Grading is temporarily unavailable. Please try again later.")
+    when InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError
+      I18n.t("The submission is too long to be graded automatically.")
+    when InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError
+      I18n.t("The submission language is not supported for automatic grading.")
+    else
+      I18n.t("An unexpected error occurred while grading.")
+    end
   end
 
   def rubric_matches_default_template?
