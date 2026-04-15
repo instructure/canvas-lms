@@ -24,6 +24,12 @@
 # NOTE: if `not_for_masquerading` is set, the permission will be denied unless checked against @current_user
 # and the user is not being impersonated (so for the time being, such permissions can't be checked in jobs)
 BASE_PERMISSIONS = {
+  site_admin_self_token_create: {
+    label: -> { I18n.t("Site Admins - create personal access tokens") },
+    account_only: :site_admin,
+    true_for: %w[AccountAdmin AccountMembership],
+    available_to: %w[AccountAdmin AccountMembership]
+  },
   become_user: {
     label: -> { I18n.t("Users - act as") },
     account_only: :root,

@@ -581,6 +581,7 @@ describe Account do
       admin_privileges = full_access + common_siteadmin_privileges
 
       user_privileges = limited_access + common_siteadmin_privileges
+      user_privileges += [:site_admin_self_token_create]
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array user_privileges
     end
@@ -631,7 +632,7 @@ describe Account do
       account = v[:account]
       admin_privileges = full_access.clone
       admin_privileges += [:read_global_outcomes] if k == :site_admin
-      user_array = some_access + [:reset_any_mfa] +
+      user_array = some_access + [:reset_any_mfa, :site_admin_self_token_create] +
                    ((k == :site_admin) ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array

@@ -119,6 +119,13 @@ class OAuth2ProviderController < ApplicationController
   def confirm
     if session[:oauth2]
       @provider = Canvas::OAuth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
+      unless @provider.can_issue_token?(@current_user, logged_in_user)
+        return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                  state: params[:state],
+                                                                  error: "client_not_allowed_for_user",
+                                                                  error_description: "The current user is logged in but does not have permission to authorize this application.")
+      end
+
       @special_confirm_message = special_confirm_message(@provider)
       @custom_csrf_token = SecureRandom.hex(24)
       session[:oauth2][:custom_csrf_token] = @custom_csrf_token

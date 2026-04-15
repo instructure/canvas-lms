@@ -400,6 +400,38 @@ describe OAuth2ProviderController do
       expect(response.body).to include('id="oauth2_accept_form"')
       expect(response.body).to include("data-disable-with")
     end
+
+    context "site admin token restriction" do
+      let_once(:site_admin) { site_admin_user }
+      let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: "https://example.com" } } }
+
+      before { user_session site_admin }
+
+      context "when the site admin has the site_admin_self_token_create permission" do
+        it "renders the confirm page" do
+          get :confirm, session: session_hash
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when the site admin lacks the site_admin_self_token_create permission" do
+        before do
+          account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+        end
+
+        it "redirects with a client_not_allowed_for_user error" do
+          get :confirm, session: session_hash
+          expect(response).to be_redirect
+          expect(response.location).to include("error=client_not_allowed_for_user")
+        end
+
+        it "allows confirm when the developer key is trusted" do
+          key.update!(trusted: true)
+          get :confirm, session: session_hash
+          expect(response).to have_http_status(:ok)
+        end
+      end
+    end
   end
 
   describe "POST token" do
