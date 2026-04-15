@@ -56,15 +56,32 @@ class Lti::Registration < ApplicationRecord
   has_one :manual_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :deployments, class_name: "ContextExternalTool", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+  alias_method :old_deployments, :deployments
+  has_many :app_deployments, class_name: "ContextExternalTool", foreign_key: :app_id, inverse_of: :app
+
+  def deployments
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_deployments : super
+  end
+
   has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
   has_many :lti_registration_history_entries, class_name: "Lti::RegistrationHistoryEntry", inverse_of: :lti_registration
-  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
-  has_many :app_deployments, class_name: "ContextExternalTool", foreign_key: :app_id, inverse_of: :app
-  has_many :app_context_controls, class_name: "Lti::ContextControl", foreign_key: :app_id, inverse_of: :app
+  alias_method :old_lti_registration_history_entries, :lti_registration_history_entries
   has_many :app_history_entries, class_name: "Lti::RegistrationHistoryEntry", foreign_key: :app_id, inverse_of: :app
+
+  def lti_registration_history_entries
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_history_entries : old_lti_registration_history_entries
+  end
+
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
+  alias_method :old_context_controls, :context_controls
+  has_many :app_context_controls, class_name: "Lti::ContextControl", foreign_key: :app_id, inverse_of: :app
+
+  def context_controls
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_context_controls : old_context_controls
+  end
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true
@@ -78,6 +95,25 @@ class Lti::Registration < ApplicationRecord
   resolves_root_account through: :account
 
   before_destroy :destroy_associations
+
+  # Returns the local copy of this Registration for the given account, if one exists.
+  # If this Registration is not a template or is already the local copy, returns self.
+  #
+  # @return [Lti::Registration | nil]
+  def local_copy_for(account)
+    return self if root_account == account
+
+    local_copy = local_copies.shard(account.shard).find_by(template_registration: self, account:)
+
+    if local_copy.blank?
+      if account.feature_enabled?(:lti_registrations_templates)
+        raise Lti::LocalAppNotFound
+      else
+        Canvas::Errors.capture_exception(Lti::LocalAppNotFound, "No local copy found for registration #{global_id} on account #{account.global_id}")
+      end
+    end
+    local_copy
+  end
 
   # Searches for an applicable binding for this Registration and Account in
   # the given root account, its parent root account (for federated consortia), and Site Admin.

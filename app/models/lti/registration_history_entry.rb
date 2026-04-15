@@ -26,14 +26,44 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
   belongs_to :root_account, class_name: "Account", inverse_of: :lti_registration_history_entries
   # The registration can be cross-shard. Is being phased out in favor of app
   belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :lti_registration_history_entries
+  alias_method :old_lti_registration, :lti_registration
+  alias_attribute :old_lti_registration_id, :lti_registration_id
   # Always points to a local registration
   belongs_to :app, class_name: "Lti::Registration", optional: true
+
+  def lti_registration
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app
+    else
+      old_lti_registration
+    end
+  end
+
+  def lti_registration_id
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app_id
+    else
+      old_lti_registration_id
+    end
+  end
+
+  def lti_registration=(value)
+    super
+    sync_app_id
+  end
+
+  def lti_registration_id=(value)
+    super
+    sync_app_id
+  end
+
   # It is possible for created_by to be nil, such as when a change is made
   # by Instructure or at the system level (think default tool installs) or if this was
   # backfilled from Lti::OverlayVersion's and we didn't have a created_by then
   belongs_to :created_by, class_name: "User", inverse_of: :lti_registration_history_entries, optional: true
 
   # @see Lti::RegistrationHistoryEntry.track_changes
+
   validates :lti_registration, :diff, :root_account, presence: true
 
   validates :update_type, presence: true, inclusion: { in: VALID_UPDATE_TYPES }
@@ -41,6 +71,16 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
   validates :comment, if: -> { comment.present? }, length: { maximum: 2000 }
 
   validate :valid_columns_for_update_type
+
+  scope :for_lti_registration, lambda { |lti_registration, root_account|
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      where(app: lti_registration)
+    else
+      where(lti_registration:)
+    end
+  }
+
+  before_validation :sync_app_id
 
   class << self
     # Track all changes made to an Lti::Registration and its associated models to create
@@ -330,6 +370,37 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
   end
 
   private
+
+  def sync_app_id
+    return if old_lti_registration_id.blank?
+    return unless old_lti_registration_id_changed?
+    return if app_id_changed? && !app_id.nil?
+
+    cross_shard = shard != Shard.shard_for(old_lti_registration_id)
+    same_shard_inherited = !cross_shard &&
+                           root_account != Account.site_admin &&
+                           shard == Account.site_admin.shard &&
+                           old_lti_registration&.root_account == Account.site_admin
+
+    if cross_shard || same_shard_inherited
+      local = Lti::Registration.active.find_by(
+        template_registration_id: old_lti_registration_id,
+        account: root_account
+      )
+      if local
+        self.app_id = local.id
+      else
+        msg = "No local App/Lti::Registration found for lti_registration_id=#{old_lti_registration_id}"
+        if root_account&.feature_enabled?(:lti_registrations_templates)
+          raise Lti::LocalAppNotFound, msg
+        else
+          Canvas::Errors.capture_exception(:lti_registration_sync, msg, :warn)
+        end
+      end
+    else
+      self.app_id = old_lti_registration_id
+    end
+  end
 
   def valid_columns_for_update_type
     case update_type

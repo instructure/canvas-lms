@@ -3548,4 +3548,73 @@ describe ContextExternalTool do
       it { expect(tool.eula_custom_fields).to eq({ "field1" => "value1" }) }
     end
   end
+
+  describe "#sync_app_id" do
+    let(:account) { account_model }
+    let(:registration) { lti_registration_with_tool(account:) }
+    let(:tool) { registration.deployments.first }
+
+    context "when lti_registration_id is blank" do
+      let(:tool) { external_tool_model(context: account) }
+
+      it "does not set app_id" do
+        tool.save!
+        expect(tool.app).to be_nil
+      end
+    end
+
+    context "when lti_registration_id is on the current shard" do
+      it "sets app_id to lti_registration_id" do
+        tool.lti_registration = registration
+        tool.save!
+        expect(tool.app).to eql(registration)
+      end
+    end
+
+    context "when lti_registration_id is cross-shard" do
+      specs_require_sharding
+
+      let(:registration) do
+        Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+      end
+      let(:account) { @shard2.activate { account_model } }
+      let(:admin) { @shard2.activate { user_model } }
+      let(:tool) do
+        @shard2.activate do
+          registration.new_external_tool(account, current_user: admin)
+        end
+      end
+
+      context "when a local registration exists" do
+        let(:local_copy) do
+          @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:,
+              user: admin,
+              template: registration
+            )[:local_copy]
+          end
+        end
+
+        it "sets app_id to the local copy's id" do
+          local_copy
+          tool.save!
+          expect(tool.reload.app).to eql(local_copy)
+        end
+      end
+
+      context "when no local registration exists" do
+        it "raises" do
+          # Create then destroy a local copy to simulate bad DB state
+          local_reg = @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:, user: admin, template: registration
+            )[:local_copy]
+          end
+          local_reg.destroy!
+          expect { tool }.to raise_error(Lti::LocalAppNotFound)
+        end
+      end
+    end
+  end
 end

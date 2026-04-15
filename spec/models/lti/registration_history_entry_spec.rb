@@ -76,14 +76,20 @@ describe Lti::RegistrationHistoryEntry do
     it "allows creating history entries for registrations on different shards" do
       # Create registration on shard1
       registration = nil
-      @shard1.activate do
-        shard1_account = account_model
-        registration = lti_registration_with_tool(account: shard1_account)
+      Account.site_admin.shard.activate do
+        registration = lti_registration_with_tool(account: Account.site_admin)
       end
+
+      local_copy = nil
 
       history_entry = @shard2.activate do
         shard2_account = account_model
         created_by = user_model
+        local_copy = Lti::InstallTemplateRegistrationService.call(
+          account: shard2_account,
+          template: registration,
+          user: created_by
+        )[:local_copy]
         Lti::RegistrationHistoryEntry.create!(
           lti_registration: registration,
           root_account: shard2_account,
@@ -97,8 +103,10 @@ describe Lti::RegistrationHistoryEntry do
 
       expect(history_entry).to be_persisted
       expect(history_entry.shard).to eq @shard2
-      expect(history_entry.lti_registration).to eq registration
-      expect(history_entry.lti_registration.shard).to eq @shard1
+      expect(history_entry.old_lti_registration).to eq registration
+      expect(history_entry.old_lti_registration.shard).to eq Account.site_admin.shard
+      expect(history_entry.app).to eq local_copy
+      expect(history_entry.app.shard).to eq @shard2
     end
   end
 
@@ -481,6 +489,80 @@ describe Lti::RegistrationHistoryEntry do
             Lti::Registration.where(id: registration.id).update_all(name: "Changed Name")
           end
         end.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe "#sync_app_id" do
+    def build_entry(reg)
+      Lti::RegistrationHistoryEntry.new(
+        lti_registration: reg,
+        root_account: account,
+        diff: [["+", "foo.bar", "stuff"]],
+        old_configuration: { "name" => "Old" },
+        new_configuration: { "name" => "New" },
+        update_type: "manual_edit",
+        created_by: user
+      )
+    end
+
+    context "when lti_registration_id is on the current shard" do
+      it "sets app_id to lti_registration_id" do
+        entry = build_entry(lti_registration)
+        entry.save!
+        expect(entry.app_id).to be(lti_registration.id)
+      end
+    end
+
+    context "when lti_registration_id is cross-shard" do
+      specs_require_sharding
+
+      let(:account) { @shard2.activate { account_model } }
+      let(:user) { @shard2.activate { user_model } }
+      let(:deployment) { @shard2.activate { registration.new_external_tool(account, current_user: user) } }
+      let(:registration) do
+        Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+      end
+
+      context "when a local registration exists" do
+        let(:local_copy) do
+          @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:,
+              user:,
+              template: registration
+            )[:local_copy]
+          end
+        end
+
+        it "sets app_id to the local copy's id" do
+          # The order of initialization is important here! local_copy must exist
+          # before the deployment to match what prod will be like after
+          # we backfill all local copies and always create them.
+          local_copy
+          deployment
+          @shard2.activate do
+            entry = build_entry(registration)
+            entry.save!
+            expect(entry.app_id).to be(local_copy.id)
+          end
+        end
+      end
+
+      context "when no local registration exists" do
+        it "raises" do
+          # Create then destroy a local copy to simulate bad DB state.
+          local_reg = @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:, user:, template: registration
+            )[:local_copy]
+          end
+          local_reg.destroy!
+          @shard2.activate do
+            entry = build_entry(registration)
+            expect { entry.save! }.to raise_error(Lti::LocalAppNotFound)
+          end
+        end
       end
     end
   end
