@@ -3012,10 +3012,6 @@ CanvasRails::Application.routes.draw do
       get "plugins/:id", action: :show
     end
 
-    scope(controller: :rich_content_api) do
-      post "rich_content/generate", action: :generate
-    end
-
     scope(controller: :block_editor_templates_api) do
       get "courses/:course_id/block_editor_templates", action: :index
       post "courses/:course_id/block_editor_templates", action: :create

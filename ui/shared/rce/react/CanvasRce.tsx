@@ -149,8 +149,6 @@ const CanvasRce = forwardRef(function CanvasRce(
       resourceId={resourceId}
       flashAlertTimeout={flashAlertTimeout ?? ENV?.flashAlertTimeout ?? 10000}
       features={features ?? window.ENV?.FEATURES ?? {}}
-      // @ts-expect-error
-      ai_text_tools={window.ENV?.RICH_CONTENT_AI_TEXT_TOOLS}
       externalToolsConfig={{
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
         // @ts-expect-error

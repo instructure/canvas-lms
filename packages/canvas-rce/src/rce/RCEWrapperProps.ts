@@ -192,7 +192,6 @@ export const rceWrapperPropTypes = {
   timezone: PropTypes.string,
   userCacheKey: PropTypes.string,
   externalToolsConfig: externalToolsConfigPropType,
-  ai_text_tools: PropTypes.bool,
   variant: PropTypes.oneOf(RCEVariantValues),
 }
 
