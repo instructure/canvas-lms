@@ -5843,6 +5843,7 @@ type InstitutionalTag implements LegacyIDInterface & Node & Timestamped {
     Returns the last _n_ elements from the list.
     """
     last: Int
+    sort: InstitutionalTagUsersSortInput
   ): UserConnection
   workflowState: String!
 }
@@ -5955,6 +5956,29 @@ type InstitutionalTagEdge {
   The item at the end of the edge.
   """
   node: InstitutionalTag
+}
+
+"""
+Order direction for results
+"""
+enum InstitutionalTagUsersSortDirection {
+  asc
+  desc
+}
+
+enum InstitutionalTagUsersSortField {
+  email
+  name
+  sis_id
+  username
+}
+
+"""
+Specify sort field and direction for results
+"""
+input InstitutionalTagUsersSortInput {
+  direction: InstitutionalTagUsersSortDirection
+  field: InstitutionalTagUsersSortField!
 }
 
 type InstructorCourseInfo {
