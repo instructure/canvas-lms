@@ -325,7 +325,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">
-        <Flex.Item as="div" height="100%" shouldGrow>
+        <Flex.Item as="div" height="100%" shouldGrow shouldShrink overflowX="hidden">
           {renderSubmissionType()}
         </Flex.Item>
         {showRubric && assignment.rubric && (
