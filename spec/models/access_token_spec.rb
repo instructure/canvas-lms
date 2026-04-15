@@ -911,6 +911,82 @@ describe AccessToken do
     end
   end
 
+  describe ".can_manage_own_access_tokens?" do
+    let_once(:regular_user) { user_model }
+    let_once(:site_admin) { site_admin_user }
+
+    it "returns true for non-site-admin users" do
+      expect(AccessToken.can_manage_own_access_tokens?(regular_user)).to be true
+    end
+
+    it "returns true for site admins with the site_admin_self_token_create permission" do
+      expect(AccessToken.can_manage_own_access_tokens?(site_admin)).to be true
+    end
+
+    it "returns false for site admins without the site_admin_self_token_create permission" do
+      account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+      expect(AccessToken.can_manage_own_access_tokens?(site_admin)).to be false
+    end
+  end
+
+  describe "site admin token creation policy" do
+    let_once(:site_admin) { site_admin_user }
+    let_once(:token) { AccessToken.create!(user: site_admin, developer_key: DeveloperKey.default, purpose: "test") }
+
+    context "when site admin has the site_admin_self_token_create permission" do
+      it "allows the site admin to create their own tokens" do
+        expect(token.grants_right?(site_admin, :create)).to be true
+      end
+
+      it "allows the site admin to read their own tokens" do
+        expect(token.grants_right?(site_admin, :read)).to be true
+      end
+
+      it "allows the site admin to delete their own tokens" do
+        expect(token.grants_right?(site_admin, :delete)).to be true
+      end
+    end
+
+    context "when site admin lacks the site_admin_self_token_create permission" do
+      before do
+        account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+      end
+
+      it "denies the site admin from creating their own tokens" do
+        expect(token.grants_right?(site_admin, :create)).to be false
+      end
+
+      it "still allows the site admin to read their own tokens" do
+        expect(token.grants_right?(site_admin, :read)).to be true
+      end
+
+      it "still allows the site admin to delete their own tokens" do
+        expect(token.grants_right?(site_admin, :delete)).to be true
+      end
+    end
+
+    context "when another admin has :create_access_tokens for the site admin" do
+      let_once(:other_admin) { site_admin_user }
+
+      before do
+        account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+      end
+
+      it "still allows the other admin to create tokens on their behalf" do
+        expect(token.grants_right?(other_admin, :create)).to be true
+      end
+    end
+
+    context "non-site-admin users" do
+      let_once(:regular_user) { user_model }
+      let_once(:regular_token) { AccessToken.create!(user: regular_user, developer_key: DeveloperKey.default, purpose: "test") }
+
+      it "are unaffected by this restriction" do
+        expect(regular_token.grants_right?(regular_user, :create)).to be true
+      end
+    end
+  end
+
   describe "#queue_developer_key_token_count_increment" do
     it "returns early when developer_key is nil" do
       token_without_key = AccessToken.new(user: user_model, purpose: "test")

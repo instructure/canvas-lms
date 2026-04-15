@@ -88,6 +88,8 @@ class AccessToken < ApplicationRecord
       # This block is only for checking if the user can manage their own tokens
       next false unless user.id == user_id
 
+      next false unless self.class.can_manage_own_access_tokens?(user)
+
       # if the session wasn't set up correctly, just ignore the additional restrictions
       next true unless (root_account = session&.dig(:root_account))
 
@@ -109,6 +111,8 @@ class AccessToken < ApplicationRecord
     can :read and can :delete
 
     given do |user|
+      next false if user.id == user_id && !self.class.can_manage_own_access_tokens?(user)
+
       self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
@@ -448,6 +452,17 @@ class AccessToken < ApplicationRecord
       # the developer key's shard, avoiding the background job overhead while
       # still remaining contention-safe at the DB level.
       DeveloperKey.increment_counter(:access_token_count, developer_key.id)
+    end
+  end
+
+  class << self
+    def can_manage_own_access_tokens?(user)
+      if Account.site_admin.grants_right?(user, :read) &&
+         !Account.site_admin.grants_right?(user, :site_admin_self_token_create)
+        return false
+      end
+
+      true
     end
   end
 end
