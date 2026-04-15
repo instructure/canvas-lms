@@ -7,6 +7,7 @@ horizon_course_setting:
   description: |-
     Enables the Canvas Career tab in account settings.
   beta: true
+  after_state_change_proc: sync_with_salesforce
 
 # Feature flags read by Horizon app
 horizon_hris_integrations:
