@@ -72,6 +72,18 @@ describe Account::HelpLinks do
       translated = subject.map_default_links(links)
       expect(translated.first).to eq({ type: "default", text: "bob", available_to: ["user"] })
     end
+
+    it "drops default-type links with no text whose definition no longer exists" do
+      links = [{ type: "default", id: :obsolete_link, available_to: ["user"] }]
+      translated = subject.map_default_links(links)
+      expect(translated).to be_empty
+    end
+
+    it "keeps default-type links with custom text even if their definition no longer exists" do
+      links = [{ type: "default", id: :obsolete_link, text: "Our Bot", available_to: ["user"] }]
+      translated = subject.map_default_links(links)
+      expect(translated.first[:text]).to eq "Our Bot"
+    end
   end
 
   describe ".process_links_before_save" do
