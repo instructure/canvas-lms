@@ -375,6 +375,23 @@ export default forwardRef(function ItemAssignToCard(
       } else if (unparsedFieldKeys.size > 0) {
         key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
       }
+      // When the unlock_at field has an error because it is after another date,
+      // focus the date that needs to move later instead of the unlock_at field.
+      if (key === 'unlock_at' && validationErrors['unlock_at']) {
+        const unlockAt = availableFromDate ? new Date(availableFromDate).getTime() : null
+        const datesToCheck: Array<[string, string | null]> = [
+          ['required_replies_due_at', requiredRepliesDueDate],
+          ['reply_to_topic_due_at', replyToTopicDueDate],
+          ['due_at', dueDate],
+          ['lock_at', availableToDate],
+        ]
+        for (const [dateKey, dateValue] of datesToCheck) {
+          if (dateValue && unlockAt !== null && unlockAt > new Date(dateValue).getTime()) {
+            key = dateKey
+            break
+          }
+        }
+      }
       if (key) {
         dateInputRefs.current[key]?.focus()
         return dateInputRefs.current[key]
