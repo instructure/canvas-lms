@@ -6048,6 +6048,7 @@ el:
       find_existing_rubric: "Βρείτε Υπάρχουσα Ρουμπρίκα"
   edit_rubric_7d4d139d: "Επεξεργασία Ρουμπρίκας"
   edit_sections_7d0e4e34: "Επεξεργασία Τομέων"
+  edit_settings_b3ddad69: "Τροποποίηση Ρυθμίσεων"
   edit_survey_b0d6890d: "Τροποποίησης Δημοσκόπισης"
   edit_this_key_1ee53473: "Επεξεργασία αυτού του κλειδιού"
   edit_toolname_app_23cfbb8: "Τροποποίηση %{toolName} Εφαρμογής"
