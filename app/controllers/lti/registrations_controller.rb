@@ -1113,6 +1113,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_root_account_instrumented_or_sub_account_and_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
+  before_action :require_lti_deactivate_registrations_flag, only: :unbind
   before_action :require_manage_lti_registrations
   before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
   before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history check_domain_duplicates]
@@ -1121,7 +1122,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :validate_registration_params, only: %i[create update]
   before_action :restrict_dynamic_registration_updates, only: %i[update]
   before_action :require_registration_params, only: :create
-  before_action :require_in_account_or_site_admin, only: %i[show bind update reset overlay_history history]
+  before_action :require_in_account_or_site_admin, only: %i[show bind unbind update reset overlay_history history]
 
   include Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationHistoryEntry
@@ -1774,6 +1775,36 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Remove an Inherited LTI Registration
+  #
+  # Deletes the account binding for this registration, effectively removing it from the account.
+  #
+  # Only available when the lti_deactivate_registrations feature flag is enabled.
+  # Only valid for inherited (Site Admin) registrations — use destroy for registrations owned by this account.
+  #
+  # @returns Lti::RegistrationAccountBinding
+  def unbind
+    return render_error(:invalid_context, "site admin local bindings are not allowed") if context.site_admin?
+    return render_error(:invalid_registration, "use destroy to delete local registrations") if registration.account == @context
+
+    rab = Lti::RegistrationAccountBinding.active.find_by(account: @context, registration:)
+    return render_error(:not_found, "No binding found for this registration in this account.", status: :not_found) unless rab
+
+    dkab = rab.developer_key_account_binding
+    local_copy = registration.local_copy_for(@context)
+
+    Lti::Registration.transaction do
+      rab.destroy
+      dkab&.destroy
+      local_copy&.destroy
+    end
+
+    render json: lti_registration_account_binding_json(rab, @current_user, session, @context)
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Install an LTI Registration from a Template
   # This endpoint installs a local copy of a "template" LTI registration from Site Admin into the specified account.
   # The local copy can then be customized for the account without affecting the template registration.
@@ -2256,6 +2287,12 @@ class Lti::RegistrationsController < ApplicationController
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
       end
+    end
+  end
+
+  def require_lti_deactivate_registrations_flag
+    unless @context.root_account.feature_enabled?(:lti_deactivate_registrations)
+      render_error(:not_found, "The specified resource does not exist.", status: :not_found)
     end
   end
 

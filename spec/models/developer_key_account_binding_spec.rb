@@ -151,6 +151,15 @@ RSpec.describe DeveloperKeyAccountBinding do
             subject
           end
         end
+
+        context 'when the new workflow state is "deleted"' do
+          let(:workflow_state) { "deleted" }
+
+          it "disables associated external tools" do
+            expect(site_admin_key).to receive(:disable_external_tools!)
+            subject
+          end
+        end
       end
 
       context "when the starting workflow_state is off" do
@@ -170,6 +179,15 @@ RSpec.describe DeveloperKeyAccountBinding do
 
           it "restores associated external tools" do
             expect(site_admin_key).to receive(:restore_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "deleted"' do
+          let(:workflow_state) { "deleted" }
+
+          it "disables associated external tools" do
+            expect(site_admin_key).to receive(:disable_external_tools!)
             subject
           end
         end
