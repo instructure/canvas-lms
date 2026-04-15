@@ -1,4 +1,13 @@
 ---
+peer_reviewer_locked_file_access:
+  state: allowed_on
+  applies_to: SiteAdmin
+  display_name: Peer Reviewer Access to Locked Submission Files
+  description: |-
+    Allows peer reviewers with :read permission on a submission to
+    download its attachments even when the file is otherwise locked.
+    When disabled, locked files fall back to the standard
+    locked_for? check.
 assignment_enhancements_teacher_view:
   state: hidden
   applies_to: Course

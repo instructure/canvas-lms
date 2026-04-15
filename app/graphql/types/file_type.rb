@@ -83,7 +83,7 @@ module Types
 
     field :url, Types::UrlType, null: true, extras: [:parent]
     def url(parent:)
-      return if object.locked_for?(current_user, check_policies: true)
+      return if attachment_access_blocked?(parent)
 
       # Check if this file belongs to a peer review submission
       if parent.is_a?(Submission)
@@ -135,7 +135,7 @@ module Types
         return unless submission_id ||= parent&.id
       end
 
-      return if object.locked_for?(current_user, check_policies: true)
+      return if attachment_access_blocked?(parent)
 
       Loaders::IDLoader.for(Submission).load(submission_id).then do |submission|
         next unless submission.grants_right?(current_user, session, :read)
@@ -158,6 +158,19 @@ module Types
     end
 
     private
+
+    # locked_for? checks only attachment-level locks. Mirror
+    # AttachmentHelper#access_allowed: a Submission :read grant overrides
+    # the lock. (AttachmentHelper#access_allowed can't be called here —
+    # it needs controller state.)
+    def attachment_access_blocked?(parent)
+      if Account.site_admin.feature_enabled?(:peer_reviewer_locked_file_access) &&
+         parent.is_a?(Submission) && parent.grants_right?(current_user, session, :read)
+        return false
+      end
+
+      object.locked_for?(current_user, check_policies: true)
+    end
 
     def build_standard_file_url
       opts = {
