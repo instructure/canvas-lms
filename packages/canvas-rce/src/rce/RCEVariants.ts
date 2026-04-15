@@ -33,7 +33,6 @@ interface ToolbarGroupSetting {
 }
 
 type StatusBarFeature =
-  | 'ai_tools'
   | 'keyboard_shortcuts'
   | 'a11y_checker'
   | 'word_count'
@@ -53,7 +52,6 @@ export const RCEVariantValues = [
 export type RCEVariant = (typeof RCEVariantValues)[number]
 
 export type StatusBarOptions = {
-  aiTextTools?: boolean
   isDesktop?: boolean
   a11yResizers?: boolean
 }
@@ -256,7 +254,6 @@ const A11Y_RESIZERS: StatusBarFeature[] = ['a11y_resize_handlers']
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
   options: StatusBarOptions = {
-    aiTextTools: false,
     isDesktop: true,
     a11yResizers: false,
   },
@@ -279,6 +276,5 @@ export function getStatusBarFeaturesForVariant(
     ...platformFeatures,
     ...EXTENDED_FEATURES,
     ...(options.a11yResizers ? A11Y_RESIZERS : []),
-    ...(options.aiTextTools ? ['ai_tools'] : []),
   ] as StatusBarFeature[]
 }

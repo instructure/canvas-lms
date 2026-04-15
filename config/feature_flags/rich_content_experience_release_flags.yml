@@ -1,12 +1,4 @@
 ---
-ai_text_tools:
-  applies_to: Account
-  state: hidden
-  display_name: AI Text Tools
-  description: |-
-    Enable AI text tools in the Rich Content Editor
-  beta: true
-
 authenticated_iframe_content:
   state: hidden
   display_name: 'Authenticated IFrame Content'
