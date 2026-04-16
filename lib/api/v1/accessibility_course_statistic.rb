@@ -35,6 +35,7 @@ module Api::V1::AccessibilityCourseStatistic
     if opts[:include_course_details]
       json["course_name"] = statistic.course.name
       json["course_code"] = statistic.course.course_code
+      json["published"] = statistic.course.published?
     end
     json
   end
