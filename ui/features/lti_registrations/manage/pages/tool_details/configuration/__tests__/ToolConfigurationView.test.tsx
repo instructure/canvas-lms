@@ -564,6 +564,7 @@ describe('Tool Configuration Restore Default Button', () => {
       n: 'Test App',
       i: 1,
       registration: {
+        ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           redirect_uris: ['http://example.com/redirect_uri_1'],
           target_link_uri: 'https://example.com/target_link_uri',
@@ -627,6 +628,7 @@ describe('Tool Configuration Copy JSON Code button', () => {
       n: 'Test App',
       i: 1,
       registration: {
+        ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           redirect_uris: ['http://example.com/redirect_uri_1'],
           target_link_uri: 'https://example.com/target_link_uri',
@@ -779,6 +781,97 @@ describe('Tool Configuration View EULA Settings', () => {
   })
 })
 
+describe('Tool Configuration View Local Template Registrations', () => {
+  it('should render the Launch Settings for local template registrations', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          redirect_uris: ['http://example.com/redirect_uri_1'],
+          target_link_uri: 'https://example.com/target_link_uri',
+        }),
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        template_registration_id: ZLtiRegistrationId.parse('999'),
+      },
+    })(<ToolConfigurationView />)
+
+    // Launch Settings should still be rendered in view mode
+    expect(getByText('Launch Settings')).toBeInTheDocument()
+    expect(getByText('https://example.com/target_link_uri')).toBeInTheDocument()
+  })
+
+  it('should enable the Edit button for local template registrations', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        template_registration_id: ZLtiRegistrationId.parse('999'),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+    expect(editButton).not.toHaveAttribute('disabled')
+  })
+
+  it('should enable the Restore Default button for local template registrations', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        template_registration_id: ZLtiRegistrationId.parse('999'),
+      },
+    })(<ToolConfigurationView />)
+
+    const restoreButton = getByText('Restore Default').closest('button')!
+    expect(restoreButton).not.toHaveAttribute('disabled')
+  })
+
+  it('should not show Edit as JSON button for local template registrations', () => {
+    fakeENV.setup({
+      LTI_EDIT_JSON: true,
+    })
+
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        template_registration_id: ZLtiRegistrationId.parse('999'),
+        overlaid_configuration: mockConfiguration({}),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('Edit as JSON')).not.toBeInTheDocument()
+
+    fakeENV.teardown()
+  })
+
+  it('should not show the tooltip on the Edit button for local template registrations', async () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({}),
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        template_registration_id: ZLtiRegistrationId.parse('999'),
+      },
+    })(<ToolConfigurationView />)
+
+    const editButton = getByText('Edit').closest('button')!
+    fireEvent.focus(editButton)
+
+    const tooltip = editButton
+      .closest('[data-position-target]')
+      ?.parentElement?.querySelector('[role="tooltip"]')
+    expect(tooltip).toBeNull()
+  })
+})
+
 describe('Tool Configuration Edit button, inherited registration', () => {
   it('should disable the Edit button when registration is inherited', () => {
     const {getByText} = renderApp({
@@ -851,6 +944,7 @@ describe('Tool Configuration Edit button, inherited registration', () => {
       i: 1,
       registration: {
         inherited: true,
+        manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
         overlaid_configuration: mockConfiguration({}),
       },
     })(<ToolConfigurationView />)
@@ -947,7 +1041,6 @@ describe('Tool Configuration Edit as JSON button', () => {
       i: 1,
       registration: {
         manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-        ims_registration_id: null,
         overlaid_configuration: mockConfiguration({}),
       },
     })(<ToolConfigurationView />)
@@ -1021,7 +1114,6 @@ describe('Tool Configuration Edit as JSON button', () => {
       i: 1,
       registration: {
         manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
-        ims_registration_id: null,
         overlaid_configuration: mockConfiguration({}),
       },
     })(<ToolConfigurationView />)

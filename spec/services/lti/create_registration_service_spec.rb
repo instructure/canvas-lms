@@ -115,7 +115,6 @@ describe Lti::CreateRegistrationService do
     end
   end
 
-  # TEMPORARY: This test verifies temporary behavior. Remove this when we revert the temporary changes.
   context "with overlay params specified" do
     let(:overlay_params) do
       {

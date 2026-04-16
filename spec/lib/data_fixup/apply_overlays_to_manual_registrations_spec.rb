@@ -206,7 +206,7 @@ describe DataFixup::ApplyOverlaysToManualRegistrations do
       end
     end
 
-    context "with additive placements" do
+    context "with placement modifications and new placements" do
       let(:registration) do
         lti_registration_with_tool(
           account:,
@@ -245,7 +245,7 @@ describe DataFixup::ApplyOverlaysToManualRegistrations do
         )
       end
 
-      it "adds new placements from overlay" do
+      it "applies modifications to existing placements but does not add new placements" do
         # Should start with just course_navigation
         expect(registration.manual_configuration.placements.count).to eq(1)
 
@@ -253,15 +253,15 @@ describe DataFixup::ApplyOverlaysToManualRegistrations do
 
         tool_config = registration.manual_configuration.reload
 
-        # Should have both placements now (additive: true for manual configs)
-        expect(tool_config.placements.count).to be >= 2
+        # Should still have only the original placement
+        expect(tool_config.placements.count).to eq(1)
 
         course_nav = tool_config.placements.find { |p| p["placement"] == "course_navigation" }
         expect(course_nav["text"]).to eq("Updated Course Nav")
 
+        # The new account_navigation placement should not be added
         account_nav = tool_config.placements.find { |p| p["placement"] == "account_navigation" }
-        expect(account_nav).not_to be_nil
-        expect(account_nav["text"]).to eq("New Account Nav")
+        expect(account_nav).to be_nil
       end
     end
 
