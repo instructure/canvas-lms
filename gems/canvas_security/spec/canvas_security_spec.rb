@@ -174,6 +174,34 @@ describe CanvasSecurity do
         not_a_jwt = CanvasSecurity.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
         expect { CanvasSecurity.decode_jwt(not_a_jwt, [key]) }.to raise_error(CanvasSecurity::InvalidToken)
       end
+
+      describe "failure instrumentation" do
+        it "reports a metric tagged with JSON::JWS::VerificationFailed when no key verifies the signature" do
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", tags: { exception: "JSON::JWS::VerificationFailed" })
+          expect { CanvasSecurity.decode_jwt(test_jwt, ["wrongkey"]) }.to raise_error(CanvasSecurity::InvalidToken)
+        end
+
+        it "reports a metric tagged with CanvasSecurity::TokenExpired when the token is expired" do
+          expired_jwt = test_jwt(exp: 1.hour.ago)
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", tags: { exception: "CanvasSecurity::TokenExpired" })
+          expect { CanvasSecurity.decode_jwt(expired_jwt, [key]) }.to raise_error(CanvasSecurity::TokenExpired)
+        end
+
+        it "reports a metric tagged with the underlying exception class for other decode failures" do
+          not_a_jwt = CanvasSecurity.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", tags: { exception: "JSON::JWT::InvalidFormat" })
+          expect { CanvasSecurity.decode_jwt(not_a_jwt, [key]) }.to raise_error(CanvasSecurity::InvalidToken)
+        end
+
+        it "does not report a metric on successful decode" do
+          expect(InstStatsd::Statsd).not_to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", anything)
+          CanvasSecurity.decode_jwt(test_jwt, [key])
+        end
+      end
     end
   end
 
