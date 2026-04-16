@@ -117,7 +117,12 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
 
     const WidgetComponent = widgetRenderer.component
     return (
-      <WidgetComponent widget={widget} isEditMode={isEditMode} dragHandleProps={dragHandleProps} />
+      <WidgetComponent
+        {...widgetRenderer.props}
+        widget={widget}
+        isEditMode={isEditMode}
+        dragHandleProps={dragHandleProps}
+      />
     )
   }
 

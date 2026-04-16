@@ -65,7 +65,8 @@ vi.mock('../WidgetRegistry', () => ({
 import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import WidgetGrid from '../WidgetGrid'
-import type {WidgetConfig} from '../../types'
+import {getWidget} from '../WidgetRegistry'
+import type {BaseWidgetProps, WidgetConfig} from '../../types'
 import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
 import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
@@ -345,6 +346,27 @@ describe('WidgetGrid', () => {
 
       expect(column1).toBeInTheDocument()
       expect(column2).toBeInTheDocument()
+    })
+  })
+
+  describe('widgetRenderer.props passthrough', () => {
+    it('spreads registry-declared props onto the rendered widget component', () => {
+      const WidgetWithInjectedProp = ({
+        widget,
+        injectedProp,
+      }: BaseWidgetProps & {injectedProp?: string}) => (
+        <div data-testid={`widget-${widget.id}`} data-injected-prop={injectedProp} />
+      )
+      vi.mocked(getWidget).mockReturnValueOnce({
+        component: WidgetWithInjectedProp,
+        displayName: 'Mock Widget With Props',
+        description: 'Mock widget that receives extra props from the registry',
+        props: {injectedProp: 'yes'},
+      })
+
+      setUp(buildDefaultProps())
+
+      expect(screen.getByTestId('widget-widget-1')).toHaveAttribute('data-injected-prop', 'yes')
     })
   })
 
