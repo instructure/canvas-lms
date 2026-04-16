@@ -48,8 +48,8 @@ import {launchTypeSpecificSettingsLabels} from '../../../registration_wizard_for
 import {Section, SubSection} from '../../../components/Section'
 import {LaunchSettingsReadOnlyView} from '../../../components/LaunchSettingsReadOnlyView'
 import {IconUrlsReadOnlyView} from '../../../components/IconUrlsReadOnlyView'
-import {extractSubstitutionVariables} from '../../../lib/extractSubstitutionVariables'
 import {CustomVariablesList} from '../../../components/CustomVariablesList'
+import {canEdit, canEditAsJson, canRestoreDefault} from '../../../model/LtiRegistration'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -111,21 +111,10 @@ export const ToolConfigurationView = () => {
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const [editTooltipShowing, setEditTooltipShowing] = React.useState(false)
 
-  // TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
-  // Manual registrations no longer use overlays (they edit the base config directly),
-  // so "Restore Default" doesn't make sense for them. Only show it for dynamic registrations.
-  const isManualRegistration = registration.manual_configuration_id !== null
-  const isInherited = registration.inherited ?? false
-  const canRestoreDefault = !isInherited && !isManualRegistration
-
-  // Edit as JSON should only be available for manual LTI Registrations,
-  // not Lti::IMS::Registration, and not Lti::Registrations that have a template_registration_id
-  const canEditAsJson =
-    window.ENV.LTI_EDIT_JSON &&
-    isManualRegistration &&
-    registration.ims_registration_id === null &&
-    !registration.template_registration_id &&
-    !isInherited
+  // Local Manual registrations no longer use overlays (they edit the base config directly),
+  // so "Restore Default" doesn't make sense for them. Only show it for dynamic registrations and inherited keys.
+  const isLocalManualRegistration =
+    registration.manual_configuration_id !== null && registration.template_registration_id === null
 
   const handleRestoreDefault = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
@@ -305,8 +294,7 @@ export const ToolConfigurationView = () => {
         <Flex direction="row" justifyItems="space-between" padding="0 small">
           <Flex.Item>
             <Flex gap="small">
-              {/* TEMPORARY: Hide Restore Default button for manual registrations */}
-              {!isManualRegistration ? (
+              {!isLocalManualRegistration || registration.inherited ? (
                 <Flex.Item>
                   <Tooltip
                     renderTip={I18n.t(
@@ -315,7 +303,7 @@ export const ToolConfigurationView = () => {
                     isShowingContent={tooltipShowing}
                     onShowContent={() => {
                       // The tooltip should only be shown if they *can't* click the restore default button
-                      setTooltipShowing(!canRestoreDefault)
+                      setTooltipShowing(!canRestoreDefault(registration))
                     }}
                     onHideContent={() => {
                       setTooltipShowing(false)
@@ -324,7 +312,7 @@ export const ToolConfigurationView = () => {
                     <Button
                       data-pendo="lti-registrations-restore-default"
                       color="primary-inverse"
-                      interaction={canRestoreDefault ? 'enabled' : 'disabled'}
+                      interaction={canRestoreDefault(registration) ? 'enabled' : 'disabled'}
                       renderIcon={<IconRefreshLine />}
                       margin="0"
                       onClick={handleRestoreDefault}
@@ -352,7 +340,7 @@ export const ToolConfigurationView = () => {
           <Flex.Item>
             <Flex gap="small">
               <Flex.Item>
-                {canEditAsJson && (
+                {window.ENV.LTI_EDIT_JSON && canEditAsJson(registration) && (
                   <Flex.Item>
                     <Button
                       data-pendo="lti-registrations-edit-json"
@@ -374,7 +362,7 @@ export const ToolConfigurationView = () => {
                   isShowingContent={editTooltipShowing}
                   onShowContent={() => {
                     // The tooltip should only be shown if they *can't* click the edit button
-                    setEditTooltipShowing(isInherited)
+                    setEditTooltipShowing(!canEdit(registration))
                   }}
                   onHideContent={() => {
                     setEditTooltipShowing(false)
@@ -383,7 +371,7 @@ export const ToolConfigurationView = () => {
                   <Button
                     data-pendo="lti-registrations-edit-config"
                     color="primary"
-                    interaction={isInherited ? 'disabled' : 'enabled'}
+                    interaction={canEdit(registration) ? 'enabled' : 'disabled'}
                     onClick={_ => {
                       navigate(`/manage/${registration.id}/configuration/edit`)
                     }}

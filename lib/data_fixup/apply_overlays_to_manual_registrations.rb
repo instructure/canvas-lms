@@ -18,9 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DataFixup
-  # TEMPORARY: This data fixup applies existing overlays to manual registrations.
-  # After we disable the old developer keys page, we can remove this code along with
-  # the temporary changes that make manual registrations edit directly instead of using overlays.
   class ApplyOverlaysToManualRegistrations < CanvasOperations::DataFixup
     self.mode = :individual_record
     self.progress_tracking = false
@@ -43,8 +40,8 @@ module DataFixup
       tool_config = registration.manual_configuration
       current_config = tool_config.internal_lti_configuration
 
-      # Apply the overlay to the configuration (additive: true for manual configs)
-      merged_config = ::Lti::Overlay.apply_to(overlay.data, current_config, additive: true)
+      # Apply the overlay to the configuration
+      merged_config = ::Lti::Overlay.apply_to(overlay.data, current_config)
 
       # Update the tool configuration with the merged config
       # No need to propagate to external tools - they already have the overlaid config

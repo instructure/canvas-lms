@@ -89,7 +89,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
-    # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
     # Instead of creating an overlay with disabled_placements, we directly modify the placements
     # to set enabled: false for disabled placements.
     configuration_params = {
@@ -155,7 +154,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def update
-    # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
     # Instead of creating an overlay with disabled_placements, we directly modify the placements
     # to set enabled: false for disabled placements.
     settings = tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields)
