@@ -232,10 +232,12 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
     I18n.t('%{count} more — type to filter', {count: opts.count}),
 
   // Educator Announcement Creation Modal
+  required: () => I18n.t('Required'),
   announcementTitle: () => I18n.t('Title'),
   announcementTitleRequired: () => I18n.t('Title must not be empty.'),
   announcementTitleMaxLength: () => I18n.t('Title must be less than 255 characters.'),
   announcementContent: () => I18n.t('Content'),
+  announcementContentRequired: () => I18n.t('Content must not be empty.'),
   announcementContentTooLarge: () => I18n.t('Content exceeds the 16 MB size limit'),
   announcementCoursesRequired: () => I18n.t('At least one course is required'),
   announcementStartDate: () => I18n.t('Start date'),
