@@ -197,11 +197,11 @@ describe LiveEventsObserver do
       entry.save
     end
 
-    it "posts update events when soft deleted" do
+    it "posts delete events when soft deleted" do
       course_model
       discussion_topic_model(context: @course)
       entry = @topic.discussion_entries.create!(message: "entry")
-      expect(Canvas::LiveEvents).to receive(:discussion_entry_updated).once
+      expect(Canvas::LiveEvents).to receive(:discussion_entry_deleted).once
       entry.destroy
     end
   end

@@ -116,7 +116,11 @@ module Canvas::LiveEventsCallbacks
       end
       Canvas::LiveEvents.course_updated(obj)
     when DiscussionEntry
-      Canvas::LiveEvents.discussion_entry_updated(obj)
+      if changes["deleted_at"] && obj.deleted?
+        Canvas::LiveEvents.discussion_entry_deleted(obj)
+      else
+        Canvas::LiveEvents.discussion_entry_updated(obj)
+      end
     when DiscussionTopic
       Canvas::LiveEvents.discussion_topic_updated(obj)
     when Enrollment
