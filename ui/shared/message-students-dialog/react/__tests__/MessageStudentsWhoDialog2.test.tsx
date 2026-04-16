@@ -235,14 +235,15 @@ describe('MessageStudentsWhoDialog', () => {
   it('includes the total number of observers selected in the checkbox label', async () => {
     makeMocks()
 
-    students.forEach(student => {
-      student.submittedAt = null
-      student.workflowState = 'unsubmitted'
-    })
+    const unsubmittedStudents = students.map(s => ({
+      ...s,
+      submittedAt: null,
+      workflowState: 'unsubmitted',
+    }))
 
     const {findByRole} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <MessageStudentsWhoDialog {...makeProps()} />
+        <MessageStudentsWhoDialog {...makeProps({students: unsubmittedStudents})} />
       </MockedQueryClientProvider>,
     )
     const checkbox = await findByRole('checkbox', {name: /Observers/})
