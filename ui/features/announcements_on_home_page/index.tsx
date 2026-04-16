@@ -63,12 +63,13 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
           if (_homeRoot)
             rerender(
               _homeRoot,
-              <View display="block" margin="0 0 medium">
-                <Heading
-                  // @ts-expect-error TS18048,TS2345 (typescriptify)
-                  level={['wiki', 'syllabus'].includes(ENV.COURSE.default_view) ? 'h1' : 'h2'}
-                  margin="0 0 small"
-                >
+              <View
+                as="section"
+                display="block"
+                margin="0 0 medium"
+                aria-label={I18n.t('Recent Announcements')}
+              >
+                <Heading level="h2" margin="0 0 small">
                   {I18n.t('Recent Announcements')}
                 </Heading>
                 {/* @ts-expect-error TS7006 (typescriptify) */}

@@ -44,11 +44,7 @@ To add some comments, click the "Edit" link at the top.
 <% header_content = course_home ? @context.nickname_for(@current_user) : title_text %>
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">
-  <% if @context.show_announcements_on_home_page? && !@context.elementary_subject_course? %>
-    <h2 class="ic-Action-header__Heading"><%= header_content %></h2>
-  <% else %>
     <h1 class="ic-Action-header__Heading"><%= header_content %></h1>
-  <% end %>
   </div>
   <div class="ic-Action-header__Secondary">
   <% if show_summary %>
