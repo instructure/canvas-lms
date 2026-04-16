@@ -1158,7 +1158,7 @@ describe Course do
     context "when the course_navigation_and_feature_options_permissions feature is enabled" do
       before { course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions) }
 
-      let(:perm) { :manage_course_content_edit }
+      let(:perm) { :manage_course_details }
 
       it "returns false when the user has the permission" do
         allow(course).to receive(:grants_right?).with(user, perm).and_return(true)

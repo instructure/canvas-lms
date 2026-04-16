@@ -5592,6 +5592,33 @@ describe CoursesController, type: :request do
           expect(@course.reload.allow_student_discussion_topics).to be true
         end
       end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before :once do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "allows teacher with manage_course_details even when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/settings",
+                   { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
+                   { lock_all_announcements: true })
+          expect(response).to be_successful
+          expect(@course.reload.lock_all_announcements).to be true
+        end
+
+        it "denies update when manage_course_details is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/settings",
+                   { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
+                   { lock_all_announcements: true },
+                   {},
+                   expected_status: 403)
+          expect(@course.reload.lock_all_announcements).to be false
+        end
+      end
     end
 
     describe "/recent_students" do

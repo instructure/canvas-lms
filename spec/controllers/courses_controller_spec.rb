@@ -1247,6 +1247,43 @@ describe CoursesController do
       expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be false
     end
 
+    describe "PERMISSIONS[:manage_course_details] in js_env" do
+      context "when course_navigation_and_feature_options_permissions is disabled" do
+        it "is true when teacher has manage_course_content_edit" do
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(true)
+        end
+
+        it "is false when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(false)
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "is true when teacher has manage_course_details even when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(true)
+        end
+
+        it "is false when manage_course_details is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(false)
+        end
+      end
+    end
+
     it "requires authorization" do
       get "settings", params: { course_id: @course.id }
       assert_unauthorized
@@ -3055,6 +3092,26 @@ describe CoursesController do
       put "update", params: { id: @course.id, course: { name: "new course name" } }
       expect(assigns[:course]).not_to be_nil
       expect(assigns[:course]).to eql(@course)
+    end
+
+    context "when course_navigation_and_feature_options_permissions is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+      end
+
+      it "allows update via manage_course_details even when manage_course_content_edit is revoked" do
+        @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "new name" } }
+        expect(response).to be_redirect
+      end
+
+      it "denies update when manage_course_details is revoked" do
+        @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "new name" } }
+        assert_unauthorized
+      end
     end
 
     it "returns a 400 if the start_at date is a unix timestamp" do
