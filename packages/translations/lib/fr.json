@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "Réponse générée par l’IA"
-    },
-    "ai_tools_fda01177": {
-        "message": "Outils basés sur l’IA"
-    },
     "albanian_21ed929e": {
         "message": "Albanais"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Une erreur est survenue lors de la réalisation d''une requête réseau"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Une erreur s’est produite lors du traitement de votre demande"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Une erreur est survenue lors de l’envoi de votre média."
@@ -428,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "Nombres complexes"
     },
-    "compose_44c904f4": {
-        "message": "Rédiger"
-    },
     "computer_1d7dfa6f": {
         "message": "Ordinateur"
     },
@@ -460,9 +448,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproduit"
-    },
-    "copy_9748f9f": {
-        "message": "Copier"
     },
     "copyright_holder_66ee111": {
         "message": "Détenteur des droits d’auteur :"
@@ -647,9 +632,6 @@
     "disjoint_union_e74351a8": {
         "message": "Union disjointe"
     },
-    "dislike_14befc48": {
-        "message": "Désapprouver"
-    },
     "display_options_315aba85": {
         "message": "Afficher les options"
     },
@@ -806,9 +788,6 @@
     "enter_search_text_26cb4459": {
         "message": "Saisir le texte à rechercher"
     },
-    "enter_text_8b35c65b": {
-        "message": "Saisissez du texte"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -880,9 +859,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Échec de la récupération des contenus de fichiers"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Impossible de copier la réponse"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Impossible de récupérer le contenu de l’outil externe"
@@ -1103,12 +1079,6 @@
     "height_69b03e15": {
         "message": "Hauteur"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Bonjour. Veuillez décrire les modifications que vous souhaitez apporter à votre rédaction."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Bonjour. Veuillez décrire les modifications que vous souhaitez apporter à votre sélection."
-    },
     "hexagon_d8468e0d": {
         "message": "Hexagone"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Je détiens les droits d’auteur"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Désolé, je ne trouve pas la réponse générée par l’IA"
     },
     "icelandic_9d6d35de": {
         "message": "Islandais"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Divers"
     },
-    "modify_6b0b13e3": {
-        "message": "Modifier"
-    },
     "module_90d9fd32": {
         "message": "Module"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Veuillez choisir un fichier."
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Veuillez décrire ce que vous souhaitez rédiger."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Veuillez saisir un nom de fichier."
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Redimensionner"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Réponse copiée sur le presse-papiers"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Restaurer l’enregistrement auto ?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Réessayer { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Réessayer"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Taquet gauche (ne fournit pas)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Raccourci"
-    },
-    "show_all_967a90f0": {
-        "message": "Tout afficher"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Afficher les options d''images"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Restrictions des téléspectateurs"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Réponse en attente"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Nous n''avons pas pu détecter un microphone fonctionnel connecté à votre appareil."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Gallois"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Que souhaitez-vous faire ?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Lorsqu''on utilise des balises qui formatent visuellement les éléments sous forme de liste, mais qui n''indiquent pas la relation entre les listes, les utilisateurs peuvent avoir de la difficulté à naviguer dans l''information."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Produit couronne"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Assistant de rédaction"
     },
     "xi_149681d0": {
         "message": "Xi"
