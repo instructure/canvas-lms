@@ -30,6 +30,7 @@ import {
   EducatorTodoListWidget,
   EducatorContentQualityWidget,
 } from '@instructure/platform-widget-dashboard'
+import {renderAnnouncementMessageEditor} from './widgets/EducatorAnnouncementCreationWidget/AnnouncementMessageEditor'
 import InboxWidget from './widgets/InboxWidget/InboxWidget'
 
 const widgetRegistry: WidgetRegistry = {
@@ -78,6 +79,9 @@ const widgetRegistry: WidgetRegistry = {
     displayName: 'Announcement creation',
     description: 'Create and post announcements to your courses',
     roles: [EDUCATOR_WIDGET_ROLE],
+    props: {
+      renderMessageEditor: renderAnnouncementMessageEditor,
+    },
   },
   [WIDGET_TYPES.EDUCATOR_TODO_LIST]: {
     component: EducatorTodoListWidget,
