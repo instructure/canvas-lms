@@ -97,6 +97,36 @@ module ConditionalRelease
         expect(rollup[:ranges][2][:size]).to eq 2
       end
 
+      it "counts a 100% student only in the top range when ranges overlap at 100%" do
+        @rule.scoring_ranges.destroy_all
+        top = create(:scoring_range_with_assignments, rule: @rule, lower_bound: 1.0, upper_bound: 1.0, assignment_set_count: 1, assignment_count: 1)
+        bottom = create(:scoring_range_with_assignments, rule: @rule, lower_bound: 0.0, upper_bound: 1.0, assignment_set_count: 1, assignment_count: 1)
+        @rule.reload
+
+        set_user_submissions(1, "foo", [[@trigger, 100, 100]])
+        rollup = Stats.students_per_range(@rule, include_trend_data: false).with_indifferent_access
+
+        top_bucket = rollup[:ranges].find { |r| r.dig(:scoring_range, :id) == top.id }
+        bottom_bucket = rollup[:ranges].find { |r| r.dig(:scoring_range, :id) == bottom.id }
+        expect(top_bucket[:size]).to eq 1
+        expect(bottom_bucket[:size]).to eq 0
+      end
+
+      it "counts a student in every matching range when ranges overlap below 100%" do
+        @rule.scoring_ranges.destroy_all
+        high = create(:scoring_range_with_assignments, rule: @rule, lower_bound: 0.7, upper_bound: 1.0, assignment_set_count: 1, assignment_count: 1)
+        wide = create(:scoring_range_with_assignments, rule: @rule, lower_bound: 0.5, upper_bound: 0.9, assignment_set_count: 1, assignment_count: 1)
+        @rule.reload
+
+        set_user_submissions(1, "foo", [[@trigger, 80, 100]])
+        rollup = Stats.students_per_range(@rule, include_trend_data: false).with_indifferent_access
+
+        high_bucket = rollup[:ranges].find { |r| r.dig(:scoring_range, :id) == high.id }
+        wide_bucket = rollup[:ranges].find { |r| r.dig(:scoring_range, :id) == wide.id }
+        expect(high_bucket[:size]).to eq 1
+        expect(wide_bucket[:size]).to eq 1
+      end
+
       context "with trend data" do
         let(:trends) { @rollup.dig(:ranges, 0, :students).pluck(:trend) }
 

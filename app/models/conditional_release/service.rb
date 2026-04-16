@@ -154,7 +154,7 @@ module ConditionalRelease
               trigger_sub = trigger_submissions[trigger_assignment.id]
               if trigger_sub&.score
                 relative_score = ConditionalRelease::Stats.percent_from_points(trigger_sub.score, trigger_assignment.points_possible)
-                assignment_sets = rule.scoring_ranges.select { |sr| sr.contains_score(relative_score) }.flat_map(&:assignment_sets)
+                assignment_sets = rule.matching_scoring_ranges(relative_score, preloaded: true).flat_map(&:assignment_sets)
                 selected_set_id =
                   if assignment_sets.length == 1
                     assignment_sets.first.id
