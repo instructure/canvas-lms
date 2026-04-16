@@ -132,6 +132,9 @@ class TokensController < ApplicationController
     # unless we're creating it for ourselves (and not masquerading), set it to pending
     @token.workflow_state = "pending" unless @context == logged_in_user
 
+    # apply any additional expiration restrictions
+    @token.set_permanent_expiration
+
     if @token.save
       render json: token_json(@token, @current_user, session)
     else
