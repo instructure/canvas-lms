@@ -3683,6 +3683,76 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
       end
+
+      describe "RCE js_env" do
+        context "for a teacher" do
+          before do
+            course_with_teacher_logged_in(active_all: true)
+            get "user_dashboard"
+          end
+
+          it "sets RICH_CONTENT_APP_HOST" do
+            expect(assigns(:js_env)).to have_key(:RICH_CONTENT_APP_HOST)
+          end
+
+          it "disables file uploads" do
+            expect(assigns(:js_env)[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be false
+          end
+
+          it "sets context_asset_string to user" do
+            expect(assigns(:js_env)[:context_asset_string]).to eq(@user.asset_string)
+          end
+
+          it "pins file, media, and AI toggles off" do
+            env = assigns(:js_env)
+            expect(env[:RICH_CONTENT_CAN_EDIT_FILES]).to be false
+            expect(env[:RICH_CONTENT_FILES_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_INST_RECORD_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_AI_TEXT_TOOLS]).to be false
+          end
+        end
+
+        context "for a designer" do
+          before do
+            course = course_factory(active_all: true)
+            @user = user_factory(active_all: true)
+            course.enroll_user(@user, "DesignerEnrollment", enrollment_state: :active)
+            user_session(@user)
+            get "user_dashboard"
+          end
+
+          it "sets RICH_CONTENT_APP_HOST" do
+            expect(assigns(:js_env)).to have_key(:RICH_CONTENT_APP_HOST)
+          end
+
+          it "disables file uploads" do
+            expect(assigns(:js_env)[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be false
+          end
+
+          it "sets context_asset_string to user" do
+            expect(assigns(:js_env)[:context_asset_string]).to eq(@user.asset_string)
+          end
+
+          it "pins file, media, and AI toggles off" do
+            env = assigns(:js_env)
+            expect(env[:RICH_CONTENT_CAN_EDIT_FILES]).to be false
+            expect(env[:RICH_CONTENT_FILES_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_INST_RECORD_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_AI_TEXT_TOOLS]).to be false
+          end
+        end
+
+        context "when educator dashboard is inactive" do
+          before do
+            course_with_student_logged_in(active_all: true)
+            get "user_dashboard"
+          end
+
+          it "does not set RICH_CONTENT_APP_HOST" do
+            expect(assigns(:js_env)).not_to have_key(:RICH_CONTENT_APP_HOST)
+          end
+        end
+      end
     end
   end
 

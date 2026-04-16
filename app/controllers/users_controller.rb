@@ -417,6 +417,20 @@ class UsersController < ApplicationController
         educator_config = @current_user.get_preference(:educator_dashboard_config) || {}
         educator_config["layout"] ||= WidgetDashboardLayoutValidator.default_educator_layout
 
+        # Widget composes announcement text across multiple courses. Scope the
+        # RCE JWT to the user (no single course/account @context is available)
+        # and pin heavy features off so the RCE runs in a lite, text-only mode.
+        js_env(rce_js_env_base(user: @current_user, context: @current_user))
+        js_env({
+                 RICH_CONTENT_CAN_UPLOAD_FILES: false,
+                 RICH_CONTENT_CAN_EDIT_FILES: false,
+                 RICH_CONTENT_FILES_TAB_DISABLED: true,
+                 RICH_CONTENT_INST_RECORD_TAB_DISABLED: true,
+                 RICH_CONTENT_AI_TEXT_TOOLS: false
+               },
+               overwrite: true)
+        js_env({ context_asset_string: @current_user.asset_string })
+
         js_env({
                  PREFERENCES: {
                    dashboard_view: @current_user.dashboard_view(@domain_root_account),
