@@ -118,6 +118,28 @@ describe Types::InstitutionalTagType do
       end
     end
 
+    describe "pageInfo" do
+      it "returns totalCount without sort" do
+        count = tag_type.resolve("usersConnection { pageInfo { totalCount } }")
+        expect(count).to be 2
+      end
+
+      it "returns totalCount with sort" do
+        count = tag_type.resolve("usersConnection(sort: {field: username, direction: asc}) { pageInfo { totalCount } }")
+        expect(count).to be 2
+      end
+
+      it "returns totalNrOfPages based on page size" do
+        pages = tag_type.resolve("usersConnection(first: 1) { pageInfo { totalNrOfPages } }")
+        expect(pages).to be 2
+      end
+
+      it "returns accurate totalCount regardless of pagination" do
+        count = tag_type.resolve("usersConnection(first: 1) { pageInfo { totalCount } }")
+        expect(count).to be 2
+      end
+    end
+
     describe "sorting with filter" do
       before(:once) do
         @user1.update!(name: "Zara Smith")
