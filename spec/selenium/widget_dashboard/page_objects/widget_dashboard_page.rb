@@ -356,6 +356,14 @@ module WidgetDashboardPage
     "[data-testid='course-tag-#{course_id}']"
   end
 
+  def rce_announcement_textarea_selector
+    "#{announcement_creation_modal_selector} textarea[id^='announcement-editor-']"
+  end
+
+  def rce_announcement_iframe_selector
+    "#{announcement_creation_modal_selector} .tox-edit-area__iframe"
+  end
+
   # Todo widget selectors
   def todo_filter_select_selector
     "[data-testid='todo-filter-select']"
@@ -787,6 +795,10 @@ module WidgetDashboardPage
     f(announcement_send_button_selector)
   end
 
+  def rce_announcement_iframe
+    f(rce_announcement_iframe_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def filter_announcements_list_by(status)
@@ -933,7 +945,7 @@ module WidgetDashboardPage
 
   def fill_announcement_form(title:, content:)
     announcement_title_input.send_keys(title)
-    announcement_content_input.send_keys(content)
+    type_in_tiny(rce_announcement_textarea_selector, content)
   end
 
   def select_course_in_modal(course_name)

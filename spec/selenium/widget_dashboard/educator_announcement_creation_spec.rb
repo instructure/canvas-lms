@@ -88,4 +88,34 @@ describe "educator announcement creation", :ignore_js_errors, custom_timeout: 30
       expect(announcement_course_tag_exists?(@course3.id)).to be true
     end
   end
+
+  context "RCE editor" do
+    it "creates an announcement via RCE content" do
+      open_announcement_modal
+      select_course_in_modal("Biology 101")
+      announcement_title_input.send_keys("RCE Announcement")
+      type_in_tiny(rce_announcement_textarea_selector, "Hello via RCE")
+      click_announcement_send_button
+
+      keep_trying_until { DiscussionTopic.where(context: @course1, title: "RCE Announcement").exists? }
+      expect(announcement_modal_open?).to be false
+    end
+
+    it "marks the RCE backing textarea as aria-required" do
+      open_announcement_modal
+      textarea = f(rce_announcement_textarea_selector)
+      expect(textarea.attribute("aria-required")).to eq("true")
+    end
+
+    it "moves focus into the RCE iframe on empty-content validation error" do
+      open_announcement_modal
+      select_course_in_modal("Biology 101")
+      announcement_title_input.send_keys("Focus Test")
+      click_announcement_send_button
+
+      in_frame(rce_announcement_iframe["id"]) do
+        expect(driver.switch_to.active_element).to eq(f("body"))
+      end
+    end
+  end
 end
