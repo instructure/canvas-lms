@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaanca"
     },
-    "ai_response_9624e8e8": {
-        "message": "Yapay zekâ yanıtı"
-    },
-    "ai_tools_fda01177": {
-        "message": "Yapay zekâ araçları"
-    },
     "albanian_21ed929e": {
         "message": "Arnavutça"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ağ isteğinde bulunurken bir hata oluştu"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "İsteğiniz işlenirken bir hata oluştu"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Medya dosyası yüklenirken hata oluştu."
@@ -419,9 +410,6 @@
     "complex_numbers_a543d004": {
         "message": "Karmaşık Sayılar"
     },
-    "compose_44c904f4": {
-        "message": "Ödevleri taşımak için bir Ödev Grubu gereklidir."
-    },
     "computer_1d7dfa6f": {
         "message": "Bilgisayar"
     },
@@ -451,9 +439,6 @@
     },
     "coproduct_e7838082": {
         "message": "Yan ürün"
-    },
-    "copy_9748f9f": {
-        "message": "Kopyala"
     },
     "copyright_holder_66ee111": {
         "message": "Telif Sahibi:"
@@ -638,9 +623,6 @@
     "disjoint_union_e74351a8": {
         "message": "Ayrık Birleşim"
     },
-    "dislike_14befc48": {
-        "message": "Beğenmedim"
-    },
     "display_options_315aba85": {
         "message": "Gösterim Seçenekleri"
     },
@@ -794,9 +776,6 @@
     "enter_search_text_26cb4459": {
         "message": "arama metni girin"
     },
-    "enter_text_8b35c65b": {
-        "message": "Dışa aktarılacak dosya adını veya ön ekini girin"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -865,9 +844,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Dosya içeriği alınamadı"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Yanıt kopyalanamadı"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Harici araçtan içerik alınamadı"
@@ -1088,12 +1064,6 @@
     "height_69b03e15": {
         "message": "Yükseklik"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Merhaba. Oluşturduğunuz içerikte yapmak istediğiniz değişiklikleri lütfen açıklayın."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Merhaba. Seçiminizde yapmak istediğiniz değişiklikleri lütfen açıklayın."
-    },
     "hexagon_d8468e0d": {
         "message": "Altıgen"
     },
@@ -1126,9 +1096,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Telif hakkı bendedir"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Üzgünüm, yapay zekânın yanıtını bulamıyorum"
     },
     "icelandic_9d6d35de": {
         "message": "Canvas LMS''i kullanmayı planlamıyorum"
@@ -1577,9 +1544,6 @@
     "miscellaneous_e9818229": {
         "message": "Çeşitli"
     },
-    "modify_6b0b13e3": {
-        "message": "Değiştir"
-    },
     "module_90d9fd32": {
         "message": "Modül"
     },
@@ -1907,9 +1871,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Lütfen bir dosya seçin"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Lütfen ne oluşturmak istediğinizi açıklayın."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Lütfen bir dosya adı girin"
     },
@@ -2090,9 +2051,6 @@
     "resize_ec83d538": {
         "message": "Yeniden boyutlandır"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Yanıt panoya kopyalandı"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Otomatik kaydı geri yüklemek ister misiniz?"
     },
@@ -2101,9 +2059,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "{ captionName } yeniden dene"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Tekrar"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Ters Turnike (Sonuç Vermez)"
@@ -2266,9 +2221,6 @@
     },
     "shortcut_911d6255": {
         "message": "Kısayol"
-    },
-    "show_all_967a90f0": {
-        "message": "Tümünü göster"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Görsel seçeneklerini göster"
@@ -2852,9 +2804,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "İzleyici Kısıtlamaları"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Yanıt bekleniyor"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Cihazınıza bağlı çalışan bir mikrofon algılayamadık."
     },
@@ -2875,9 +2824,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Galce"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Ne yapmak istersiniz?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Liste gibi görünen ancak liste ilişkisini belirtmeyen biçimlendirme kullanıldığında, kullanıcılar bilgide gezinmekte zorlanabilir."
@@ -2908,9 +2854,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Çelenk Çarpımı"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Yazma Asistanı"
     },
     "xi_149681d0": {
         "message": "Xi"

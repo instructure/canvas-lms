@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikáans"
     },
-    "ai_response_9624e8e8": {
-        "message": "Respuesta de IA"
-    },
-    "ai_tools_fda01177": {
-        "message": "Herramientas de IA"
-    },
     "albanian_21ed929e": {
         "message": "Albanés"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Se produjo un error al realizar una solicitud de red"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Se produjo un error al procesar su solicitud"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Se produjo un error al cargar sus elementos multimedia."
@@ -428,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "Números complejos"
     },
-    "compose_44c904f4": {
-        "message": "Componer"
-    },
     "computer_1d7dfa6f": {
         "message": "Computadora"
     },
@@ -460,9 +448,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproducto"
-    },
-    "copy_9748f9f": {
-        "message": "Copiar"
     },
     "copyright_holder_66ee111": {
         "message": "Titular de los derechos de autor:"
@@ -647,9 +632,6 @@
     "disjoint_union_e74351a8": {
         "message": "Unión disjunta"
     },
-    "dislike_14befc48": {
-        "message": "Quitar Me gusta"
-    },
     "display_options_315aba85": {
         "message": "Mostrar opciones"
     },
@@ -806,9 +788,6 @@
     "enter_search_text_26cb4459": {
         "message": "ingresar texto de búsqueda"
     },
-    "enter_text_8b35c65b": {
-        "message": "Ingresar texto"
-    },
     "epsilon_54bb8afa": {
         "message": "Épsilon"
     },
@@ -880,9 +859,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Error al obtener el contenido del archivo"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Error al copiar la respuesta"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "No se pudo recuperar el contenido de la herramienta externa"
@@ -1103,12 +1079,6 @@
     "height_69b03e15": {
         "message": "Altura"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hola. Describa las modificaciones que le gustaría realizar en su composición."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hola. Describa las modificaciones que le gustaría realizar en su selección."
-    },
     "hexagon_d8468e0d": {
         "message": "Hexágono"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Soy el titular de los derechos de autor"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Lo siento, no encuentro la respuesta de la IA."
     },
     "icelandic_9d6d35de": {
         "message": "Islandés"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Misceláneo"
     },
-    "modify_6b0b13e3": {
-        "message": "Modificar"
-    },
     "module_90d9fd32": {
         "message": "Módulo"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Elija un archivo"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Describa lo que le gustaría componer."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Ingrese el nombre del archivo"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Redimensionar"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Respuesta copiada al portapapeles"
-    },
     "restore_auto_save_deccd84b": {
         "message": "¿Desea restablecer el guardado automático?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Volver a intentar { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Reintentar"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Trinquete invertido (no da resultados)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Atajo"
-    },
-    "show_all_967a90f0": {
-        "message": "Mostrar todos"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Mostrar opciones de imágenes"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Limitaciones del visor"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Esperando respuesta"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "No pudimos detectar un micrófono operativo conectado a su dispositivo."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Galés"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "¿Qué desea hacer?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Cuando se usa el marcado que formatea visualmente los ítems como una lista, pero no indica la relación de la lista, los usuarios pueden tener dificultades para navegar por la información."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Producto en corona"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Asistente de redacción"
     },
     "xi_149681d0": {
         "message": "Xi"
