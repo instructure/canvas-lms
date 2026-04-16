@@ -52,10 +52,6 @@ module Validators
     def validate_discovery_page(record)
       data = record.settings[:discovery_page]
 
-      # Load authentication providers into memory and validate there
-      # to avoid N+1 queries during #validate_discovery_page_entry
-      record.authentication_providers.load unless record.authentication_providers.loaded?
-
       %i[primary secondary].each do |section|
         section_data = data[section]
         next if section_data.nil?
@@ -88,7 +84,7 @@ module Validators
 
     def validate_discovery_page_entry(record, section, entry, index)
       provider_id = entry[:authentication_provider_id].to_i
-      unless record.authentication_providers.find { it.id == provider_id }&.active?
+      unless record.authentication_providers.valid_for_discovery_page.find_by(id: provider_id)
         record.errors.add(:settings, "discovery_page.#{section}[#{index}].authentication_provider_id is invalid or inactive")
         return
       end
