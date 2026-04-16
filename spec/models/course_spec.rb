@@ -6906,6 +6906,39 @@ describe Course do
         expect(@course.grants_right?(@teacher, :direct_share)).to be(true)
       end
     end
+
+    describe "update_course_details" do
+      context "when course_navigation_and_feature_options_permissions is disabled" do
+        it "grants :update_course_details when teacher has :manage_course_content_edit" do
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(true)
+        end
+
+        it "does not grant :update_course_details when :manage_course_content_edit is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(false)
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "grants :update_course_details via :manage_course_details even when :manage_course_content_edit is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(true)
+        end
+
+        it "does not grant :update_course_details when :manage_course_details is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_details", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(false)
+        end
+      end
+    end
   end
 
   context "sharding" do

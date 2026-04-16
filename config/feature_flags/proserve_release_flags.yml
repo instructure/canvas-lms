@@ -35,8 +35,13 @@ course_navigation_and_feature_options_permissions:
   state: hidden
   applies_to: RootAccount
   shadow: true
-  display_name: Course Navigation and Feature Options Permissions
-  description: Adds a permission to allow users to manage the Navigation and the Feature Options tabs in the Course Settings page.
+  display_name: Course Details, Navigation and Feature Options Permissions
+  description: |-
+    Adds three different permissions for more granular control of the Course Settings page.
+    Each permission controls one tab of the Settings page. The permissions are:
+      - Manage Course Details
+      - Manage Course Navigation
+      - Manage Course Feature Options
   environments:
     development:
       state: allowed_on

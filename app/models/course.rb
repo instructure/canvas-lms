@@ -2282,13 +2282,22 @@ class Course < ApplicationRecord
       grants_right?(user, :manage) &&
         (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_feature_options))
     end
-    can :manage_feature_flags
+    can :manage_feature_flags # match the permission name in the Account model (both models use the same controller)
 
     given do |user|
       grants_right?(user, :update) &&
         (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_navigation))
     end
     can :update_nav
+
+    given do |user|
+      if account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions)
+        grants_right?(user, :manage_course_details)
+      else
+        grants_right?(user, :manage_course_content_edit)
+      end
+    end
+    can :update_course_details
   end
 
   def allows_gradebook_uploads?

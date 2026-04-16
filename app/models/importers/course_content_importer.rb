@@ -764,7 +764,7 @@ module Importers
       return false unless migration.user
       return false unless course.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions)
 
-      !course.grants_right?(migration.user, :manage_course_content_edit)
+      !course.grants_right?(migration.user, :manage_course_details)
     end
 
     # Checks if the migrating user's role is restricted from modifying

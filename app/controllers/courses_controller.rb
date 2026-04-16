@@ -1666,6 +1666,7 @@ class CoursesController < ApplicationController
         delete_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_delete),
         manage_course_content_edit: @context.grants_right?(@current_user, session, :manage_course_content_edit),
         manage_nav_menu_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links),
+        manage_course_details: @context.grants_right?(@current_user, session, :update_course_details),
         manage_course_navigation: @context.grants_right?(@current_user, session, :update_nav),
         manage_course_feature_options: @context.grants_right?(@current_user, session, :manage_feature_flags)
       }
@@ -1872,7 +1873,7 @@ class CoursesController < ApplicationController
     return unless api_request?
 
     @course = api_find(Course, params[:course_id])
-    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+    return unless authorized_action(@course, @current_user, :update_course_details)
 
     old_settings = @course.settings
 
@@ -3352,11 +3353,10 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, :manage_course_content_edit)
+    if authorized_action(@course, @current_user, :update_course_details)
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
-        # let users with :manage_couse_content_edit only update the body
         params_for_update = params_for_update.slice(:syllabus_body)
       end
       if params_for_update.key?(:syllabus_body)
