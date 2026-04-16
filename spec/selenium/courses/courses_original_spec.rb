@@ -372,15 +372,7 @@ describe "courses" do
       expect(f("#announcements_on_home_page")).not_to include_text(@html)
     end
 
-    ["wiki", "syllabus"].each do |view|
-      it "displays an h1 header when home page is #{view}" do
-        @course.update_column(:default_view, view)
-        get "/courses/#{@course.id}"
-        expect(f("#announcements_on_home_page h1")).to include_text("Recent Announcements")
-      end
-    end
-
-    %w[feed assignments modules].each do |view|
+    %w[wiki syllabus feed assignments modules].each do |view|
       it "displays with an h2 header when course home is #{view}" do
         @course.update_column(:default_view, view)
         get "/courses/#{@course.id}"

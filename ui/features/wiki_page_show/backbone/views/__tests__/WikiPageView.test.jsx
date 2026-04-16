@@ -203,6 +203,40 @@ describe('WikiPageView', () => {
     })
   })
 
+  describe('course home heading hierarchy', () => {
+    test('renders course title as h1 even when announcements are enabled', () => {
+      ENV.SHOW_ANNOUNCEMENTS = true
+      const model = new WikiPage()
+      const view = new WikiPageView({
+        model,
+        course_home: true,
+        course_title: 'My Course',
+        WIKI_RIGHTS: {read: true, manage: true},
+        PAGE_RIGHTS: {update: true},
+      })
+      view.render()
+      const courseTitle = view.$('.course-title')
+      expect(courseTitle).toHaveLength(1)
+      expect(courseTitle[0].tagName).toBe('H1')
+    })
+
+    test('renders course title as h1 when announcements are disabled', () => {
+      ENV.SHOW_ANNOUNCEMENTS = false
+      const model = new WikiPage()
+      const view = new WikiPageView({
+        model,
+        course_home: true,
+        course_title: 'My Course',
+        WIKI_RIGHTS: {read: true, manage: true},
+        PAGE_RIGHTS: {update: true},
+      })
+      view.render()
+      const courseTitle = view.$('.course-title')
+      expect(courseTitle).toHaveLength(1)
+      expect(courseTitle[0].tagName).toBe('H1')
+    })
+  })
+
   describe('with the block editor', () => {
     const simplePage = `{
         "ROOT": {
