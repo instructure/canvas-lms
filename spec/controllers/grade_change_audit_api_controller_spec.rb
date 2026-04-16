@@ -453,4 +453,47 @@ describe GradeChangeAuditApiController do
       end
     end
   end
+
+  describe "GET for_course_and_other_parameters" do
+    context "with a checkpoint parent assignment" do
+      let_once(:checkpoints) do
+        course.account.enable_feature!(:discussion_checkpoints)
+        graded_discussion_topic_with_checkpoints(context: course)
+      end
+      let_once(:reply_to_topic_checkpoint) { checkpoints[0] }
+      let_once(:reply_to_entry_checkpoint) { checkpoints[1] }
+      let_once(:parent_assignment) { checkpoints[2].assignment }
+
+      before do
+        reply_to_topic_checkpoint.grade_student(student, grader: teacher, score: 4)
+        reply_to_entry_checkpoint.grade_student(student, grader: teacher, score: 5)
+      end
+
+      it "returns grade change events for all checkpoint sub-assignments" do
+        get :for_course_and_other_parameters, params: { course_id: course.id, assignment_id: parent_assignment.id }
+        event_assignment_ids = returned_events.map { |e| e.dig("links", "assignment") }
+        expect(event_assignment_ids).to contain_exactly(reply_to_topic_checkpoint.id, reply_to_entry_checkpoint.id)
+      end
+
+      it "filters by grader_id" do
+        get :for_course_and_other_parameters, params: {
+          course_id: course.id,
+          assignment_id: parent_assignment.id,
+          grader_id: teacher.id
+        }
+        event_grader_ids = returned_events.map { |e| e.dig("links", "grader") }
+        expect(event_grader_ids).to all(eql(teacher.id.to_s))
+      end
+
+      it "filters by student_id" do
+        get :for_course_and_other_parameters, params: {
+          course_id: course.id,
+          assignment_id: parent_assignment.id,
+          student_id: student.id
+        }
+        event_student_ids = returned_events.map { |e| e.dig("links", "student") }
+        expect(event_student_ids).to all(eql(student.id.to_s))
+      end
+    end
+  end
 end
