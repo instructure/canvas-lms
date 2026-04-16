@@ -1537,14 +1537,14 @@ describe Lti::AssetProcessorTiiMigrationWorker do
     end
 
     it "returns failed status when no asset processor is provided" do
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, nil)
+      status, count = worker.send(:migrate_reports, actl, nil)
 
       expect(status).to eq(:failed)
       expect(count).to eq(0)
     end
 
     it "returns success status when no reports exist" do
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+      status, count = worker.send(:migrate_reports, actl, asset_processor)
 
       expect(status).to eq(:success)
       expect(count).to eq(0)
@@ -1559,7 +1559,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         workflow_state: "scored"
       )
 
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+      status, count = worker.send(:migrate_reports, actl, asset_processor)
 
       expect(status).to eq(:success)
       expect(count).to eq(1)
@@ -1591,7 +1591,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         workflow_state: "scored"
       )
 
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+      status, count = worker.send(:migrate_reports, actl, asset_processor)
 
       expect(status).to eq(:success)
       expect(count).to eq(2)
@@ -1619,7 +1619,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         created_at: 1.day.ago
       )
 
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+      status, count = worker.send(:migrate_reports, actl, asset_processor)
 
       expect(status).to eq(:success)
       expect(count).to eq(1)
@@ -1658,7 +1658,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
 
       allow(Canvas::Errors).to receive(:capture_exception)
 
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+      status, count = worker.send(:migrate_reports, actl, asset_processor)
 
       expect(status).to eq(:partially_failed)
       expect(count).to eq(1)
@@ -1677,7 +1677,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
       allow(worker).to receive(:calc_indications_from_cpf_report).and_raise(StandardError, "Test error")
       allow(Canvas::Errors).to receive(:capture_exception)
 
-      status, count = worker.send(:migrate_reports, actl, tool_proxy, asset_processor)
+      status, count = worker.send(:migrate_reports, actl, asset_processor)
 
       expect(status).to eq(:failed)
       expect(count).to eq(0)
@@ -1732,7 +1732,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         expect(Lti::AssetReport.count).to eq(1)
         asset_report = Lti::AssetReport.last
@@ -1755,7 +1755,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.indication_color).to be_present
@@ -1771,7 +1771,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.indication_color).to eq("#00AC18")
@@ -1790,7 +1790,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         # Mock extract_custom_sourcedid to return a value
         allow(worker).to receive(:extract_custom_sourcedid).and_return("abc123")
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.extensions["https://www.instructure.com/legacy_custom_sourcedid"]).to eq("abc123")
@@ -1806,7 +1806,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         )
 
         worker.send(:initialize_proxy_results, tool_proxy)
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         results = worker.instance_variable_get(:@results)
         warnings = results[:actl_warnings][actl.id]
@@ -1824,7 +1824,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         expect(Lti::AssetReport.active.count).to eq(1)
         first_asset_report_id = Lti::AssetReport.last.id
@@ -1838,7 +1838,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         )
         second_cpf_report.update_column(:updated_at, 1.hour.from_now)
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         # Should delete older report and create new one (soft delete)
         expect(Lti::AssetReport.active.exists?(first_asset_report_id)).to be false
@@ -1858,7 +1858,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           submission_time: 1.day.ago
         )
 
-        status, count = worker.send(:migrate_reports, actl, nil, asset_processor)
+        status, count = worker.send(:migrate_reports, actl, asset_processor)
 
         expect(status).to eq(:failed)
         expect(count).to eq(0)
@@ -1876,7 +1876,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
         # Mock find_attempt_for_report to return a valid attempt
         allow(worker).to receive(:find_attempt_for_report).and_return(1)
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         expect(Lti::AssetReport.count).to eq(1)
         asset_report = Lti::AssetReport.last
@@ -1904,7 +1904,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           root_account_id: submission.root_account_id
         )
 
-        status, count = worker.send(:migrate_reports, actl, nil, asset_processor)
+        status, count = worker.send(:migrate_reports, actl, asset_processor)
 
         expect(status).to eq(:failed)
         expect(count).to eq(0)
@@ -1923,7 +1923,7 @@ describe Lti::AssetProcessorTiiMigrationWorker do
           workflow_state: "scored"
         )
 
-        worker.send(:migrate_reports, actl, nil, asset_processor)
+        worker.send(:migrate_reports, actl, asset_processor)
 
         asset_report = Lti::AssetReport.last
         expect(asset_report.visible_to_owner).to be true

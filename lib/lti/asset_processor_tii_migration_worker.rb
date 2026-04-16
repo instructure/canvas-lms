@@ -150,61 +150,66 @@ module Lti
     def migrate_actls(csv)
       batch_size = (actls_for_account_count > PROGRESS_UPDATE_THRESHOLD) ? PROGRESS_UPDATE_BATCH_SIZE : 1
       pending_completion = 0
+      tool_proxy_cache = {}
 
-      actls_for_account.find_each do |actl|
-        subaccount_toolproxy = false
-        ap_migration_status = :failed
-        report_migration_status = :failed
-        tool_proxy = actl.associated_tool_proxy
-        # only migrate if tool proxy is installed on this account/course (not for sub-accounts)
-        unless tool_proxy.present? && proxy_in_account?(tool_proxy, @account)
-          subaccount_toolproxy = true
-          next
-        end
-        initialize_proxy_results(tool_proxy)
-
-        next if get_proxy_result(tool_proxy, :cet_creation_failed) # We could not create the CET for this TP earlier
-
-        unless tool_proxy.migrated_to_context_external_tool.present?
-          migrate_tool_proxy(tool_proxy)
-          unless proxy_errors(tool_proxy).empty? && tool_proxy.reload.migrated_to_context_external_tool.present?
-            set_proxy_result(tool_proxy, :cet_creation_failed, true)
-            add_proxy_error(tool_proxy, "Tool creation failed for Tool Proxy ID=#{tool_proxy.global_id}")
+      actls_for_account.find_in_batches do |batch|
+        ActiveRecord::Associations::Preloader.new(records: batch, associations: { assignment: { context: :account } }).call
+        batch.each do |actl|
+          subaccount_toolproxy = false
+          ap_migration_status = :failed
+          report_migration_status = :failed
+          cache_key = tool_proxy_cache_key(actl)
+          tool_proxy = tool_proxy_cache.fetch(cache_key) { tool_proxy_cache[cache_key] = actl.associated_tool_proxy }
+          # only migrate if tool proxy is installed on this account/course (not for sub-accounts)
+          unless tool_proxy.present? && proxy_in_account?(tool_proxy, @account)
+            subaccount_toolproxy = true
             next
           end
-          @migrated_tool_proxies << tool_proxy
-        end
+          initialize_proxy_results(tool_proxy)
 
-        ap_migration_status, ap = create_asset_processor_from_actl(actl, tool_proxy)
+          next if get_proxy_result(tool_proxy, :cet_creation_failed) # We could not create the CET for this TP earlier
 
-        unless ap_migration_status == :failed
-          report_migration_status, reports_count = migrate_reports(actl, tool_proxy, ap)
-        end
-      rescue => e
-        capture_and_log_exception(e)
-        add_actl_error(actl, "Unexpected error migrating ACTL ID=#{actl.id}")
-      ensure
-        pending_completion += 1
-        if pending_completion >= batch_size
-          @progress.increment_completion!(pending_completion)
-          pending_completion = 0
-        end
-        unless subaccount_toolproxy
-          assignment = actl.assignment
-          csv << [
-            assignment.course.account.id,
-            assignment.course.account.name,
-            assignment.id,
-            assignment.name,
-            assignment.course.id,
-            tool_proxy&.id,
-            ap&.context_external_tool_id || "",
-            ap_migration_status.to_s,
-            report_migration_status.to_s,
-            reports_count || 0,
-            report_error_message(tool_proxy, actl).join(", "),
-            report_warning_message(tool_proxy, actl).join(", ")
-          ]
+          unless tool_proxy.migrated_to_context_external_tool.present?
+            migrate_tool_proxy(tool_proxy)
+            unless proxy_errors(tool_proxy).empty? && tool_proxy.reload.migrated_to_context_external_tool.present?
+              set_proxy_result(tool_proxy, :cet_creation_failed, true)
+              add_proxy_error(tool_proxy, "Tool creation failed for Tool Proxy ID=#{tool_proxy.global_id}")
+              next
+            end
+            @migrated_tool_proxies << tool_proxy
+          end
+
+          ap_migration_status, ap = create_asset_processor_from_actl(actl, tool_proxy)
+
+          unless ap_migration_status == :failed
+            report_migration_status, reports_count = migrate_reports(actl, ap)
+          end
+        rescue => e
+          capture_and_log_exception(e)
+          add_actl_error(actl, "Unexpected error migrating ACTL ID=#{actl.id}")
+        ensure
+          pending_completion += 1
+          if pending_completion >= batch_size
+            @progress.increment_completion!(pending_completion)
+            pending_completion = 0
+          end
+          unless subaccount_toolproxy
+            assignment = actl.assignment
+            csv << [
+              assignment.context.account.id,
+              assignment.context.account.name,
+              assignment.id,
+              assignment.name,
+              assignment.context.id,
+              tool_proxy&.id,
+              ap&.context_external_tool_id || "",
+              ap_migration_status.to_s,
+              report_migration_status.to_s,
+              reports_count || 0,
+              report_error_message(tool_proxy, actl).join(", "),
+              report_warning_message(tool_proxy, actl).join(", ")
+            ]
+          end
         end
       end
       @progress.increment_completion!(pending_completion) if pending_completion > 0
@@ -276,6 +281,19 @@ module Lti
         messages += @results[:actl_warnings][actl.id]
       end
       messages
+    end
+
+    def course_level_tii_proxies?
+      return @course_level_tii_proxies if defined?(@course_level_tii_proxies)
+
+      @course_level_tii_proxies = tii_tool_proxies_base_query([@account.id])
+                                  .where(lti_tool_proxies: { context_type: "Course" })
+                                  .exists?
+    end
+
+    def tool_proxy_cache_key(actl)
+      context_id = course_level_tii_proxies? ? actl.assignment.context_id : actl.assignment.context.account_id
+      [context_id, actl.tool_resource_type_code]
     end
 
     def proxy_in_account?(tool_proxy, account)
@@ -842,18 +860,24 @@ module Lti
       true
     end
 
-    def migrate_reports(actl, _tool_proxy, asset_processor)
+    def migrate_reports(actl, asset_processor)
       raise "Asset Processor is not created" unless asset_processor
 
       # Get the most recent originality report for each submission/group/attachment combination
-      reports = OriginalityReport.joins(:submission)
-                                 .where(submissions: { assignment_id: actl.assignment.id })
+      reports = OriginalityReport.eager_load(:submission, :lti_link)
+                                 .where(submissions: { assignment_id: actl.assignment_id })
                                  .order(created_at: :desc)
-                                 .preload(:lti_link, :submission)
                                  .group_by { |report| [report.submission.group_id || report.submission_id, report.attachment_id] }
                                  .values
                                  .map(&:first)
       reports_count = reports.count
+
+      # Preload older versions of submissions whis have reports for previous attempts
+      stale_submission_ids = reports
+                             .reject { |r| r.attachment_id.present? || r.submission.submitted_at == r.submission_time }
+                             .map(&:submission_id)
+                             .uniq
+      @version_attempt_cache = build_version_attempt_cache(stale_submission_ids)
 
       report_keys = reports.index_with { |r| asset_cache_key(r) }
       asset_cache = batch_find_or_create_assets(report_keys)
@@ -1058,14 +1082,28 @@ module Lti
       nil
     end
 
+    def build_version_attempt_cache(submission_ids)
+      return {} if submission_ids.empty?
+
+      SimplyVersioned::Version
+        .where(versionable_type: "Submission", versionable_id: submission_ids)
+        .each_with_object({}) do |v, cache|
+          model = v.model
+          cache[[v.versionable_id, model.submitted_at]] ||= model.attempt
+        end
+    end
+
     def find_attempt_for_report(cpf_report)
       return nil if cpf_report.attachment_id.present?
 
       submission = cpf_report.submission
-      version = submission.versions.find do |v|
-        v.model.submitted_at == cpf_report.submission_time
+      return submission.attempt if submission.submitted_at == cpf_report.submission_time
+
+      if @version_attempt_cache
+        @version_attempt_cache[[submission.id, cpf_report.submission_time]]
+      else
+        submission.versions.find { |v| v.model.submitted_at == cpf_report.submission_time }&.model&.attempt
       end
-      version&.model&.attempt
     end
 
     def calc_indications_from_cpf_report(cpf_report)
