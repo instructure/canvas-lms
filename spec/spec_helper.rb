@@ -474,8 +474,21 @@ RSpec.configure do |config|
     end
   end
 
+  if ENV["PRE_EXAMPLE_CHECKS"] == "1"
+    config.after(:suite) do
+      next if PreExampleChecks.log_entries.empty?
+
+      RSpec.configuration.reporter.message("\nPreExampleChecks findings:\n#{PreExampleChecks.log_entries.join("\n")}")
+    end
+  end
+
   config.around do |example|
     Rails.logger.info "STARTING SPEC #{example.full_description}"
+    if ENV["PRE_EXAMPLE_CHECKS"] == "1"
+      PreExampleChecks::Base.descendants.select { |c| c.run_types.include?(:pre_before_each) }.each(&:check_and_log)
+      PreExampleChecks.append_before_example_hooks(example)
+      PreExampleChecks.append_after_example_hooks(example)
+    end
     SpecTimeLimit.enforce(example, &example)
   end
 
