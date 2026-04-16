@@ -43,6 +43,11 @@
 #         "example": "BIO101",
 #         "type": "string"
 #       },
+#       "published": {
+#         "description": "Whether the course is published",
+#         "example": true,
+#         "type": "boolean"
+#       },
 #       "active_issue_count": {
 #         "description": "The number of active accessibility issues in the course",
 #         "example": 5,
