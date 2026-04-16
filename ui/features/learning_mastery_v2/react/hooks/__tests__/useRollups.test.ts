@@ -218,6 +218,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 4,
+              count: undefined,
               rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
             },
           ],
@@ -228,6 +229,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 4,
+              count: undefined,
               rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
             },
           ],
@@ -238,6 +240,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 0,
+              count: undefined,
               rating: {...mockedRatings[2], color: `#${mockedRatings[2].color}`},
             },
           ],

@@ -78,6 +78,7 @@ const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRo
     return {
       outcomeId: outcome.id,
       score: score.score,
+      count: score.count,
       rating: {
         ...rating,
         color: `#` + rating.color,
