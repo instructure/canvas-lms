@@ -19,6 +19,7 @@
 #
 
 require "active_support/core_ext/module"
+require "inst_statsd"
 require "json/jwt"
 require "dynamic_settings"
 require "canvas_errors"
@@ -291,12 +292,15 @@ module CanvasSecurity
     rescue JSON::JWS::VerificationFailed
       # Keep looping, to try all the keys. If none succeed,
       # we raise below.
-    rescue CanvasSecurity::TokenExpired
+    rescue CanvasSecurity::TokenExpired => e
+      InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: e.class.name })
       raise
     rescue => e
+      InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: e.class.name })
       raise CanvasSecurity::InvalidToken, e
     end
 
+    InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: JSON::JWS::VerificationFailed.name })
     raise CanvasSecurity::InvalidToken
   end
 

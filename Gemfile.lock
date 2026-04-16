@@ -183,6 +183,7 @@ PATH
       canvas_cache
       canvas_errors
       dynamic_settings
+      inst_statsd
       json-jwt
     canvas_slug (0.0.1)
       swearjar (~> 1.4)
