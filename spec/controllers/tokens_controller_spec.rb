@@ -253,6 +253,43 @@ describe TokensController do
         expect(response.body).to match(/purpose/)
       end
 
+      context "when the user is a site admin" do
+        before :once do
+          @sa_user = site_admin_user(user: @user)
+        end
+
+        let(:private_settings) { instance_double(DynamicSettings::FallbackProxy) }
+
+        around { |example| Timecop.freeze(Time.zone.now.change(usec: 0)) { example.run } }
+
+        before do
+          allow(private_settings).to receive(:[]).and_return(nil)
+          allow(private_settings).to receive(:[])
+            .with("site_admin_access_token_expires_in", failsafe: 604_800)
+            .and_return(3600)
+          allow(DynamicSettings).to receive(:find).and_call_original
+          allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(private_settings)
+        end
+
+        it "applies the site admin expiration restriction" do
+          post "create", params: { user_id: "self", token: { purpose: "test" } }
+          expect(response).to be_successful
+          expect(assigns[:token].permanent_expires_at).to eql(1.hour.from_now)
+        end
+
+        it "respects a user-provided expiration when it is shorter" do
+          post "create", params: { user_id: "self", token: { purpose: "test", expires_at: 30.minutes.from_now.iso8601 } }
+          expect(response).to be_successful
+          expect(assigns[:token].permanent_expires_at).to eql(30.minutes.from_now)
+        end
+
+        it "restricts a user-provided expiration that exceeds the site admin limit" do
+          post "create", params: { user_id: "self", token: { purpose: "test", expires_at: 2.hours.from_now.iso8601 } }
+          expect(response).to be_successful
+          expect(assigns[:token].permanent_expires_at).to eql(1.hour.from_now)
+        end
+      end
+
       it "allows deleting an access token" do
         token = @user.access_tokens.create!(purpose: "test")
         expect(token.user_id).to eq @user.id

@@ -144,6 +144,39 @@ module Canvas::OAuth
         allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(instance_double(Canvas::Plugin, settings: { mobile_timeout: 30 }))
         expect(token.access_token.permanent_expires_at).not_to be_nil
       end
+
+      context "when the user is a site admin" do
+        let(:user) { site_admin_user }
+        let(:private_settings) { instance_double(DynamicSettings::FallbackProxy) }
+
+        around { |example| Timecop.freeze { example.run } }
+
+        before do
+          stub_out_cache key.id
+          allow(private_settings).to receive(:[]).and_return(nil)
+          allow(private_settings).to receive(:[])
+            .with("site_admin_access_token_expires_in", failsafe: 604_800)
+            .and_return(3600)
+          allow(DynamicSettings).to receive(:find).and_call_original
+          allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(private_settings)
+        end
+
+        it "applies the site admin expiration to the OAuth token" do
+          expect(token.access_token.permanent_expires_at).to eql(1.hour.from_now)
+        end
+
+        context "when the setting is not configured and returns nil" do
+          before do
+            allow(private_settings).to receive(:[])
+              .with("site_admin_access_token_expires_in", failsafe: 604_800)
+              .and_return(nil)
+          end
+
+          it "falls back to the 1-week default" do
+            expect(token.access_token.permanent_expires_at).to eql(1.week.from_now)
+          end
+        end
+      end
     end
 
     describe "#create_access_token_if_needed" do

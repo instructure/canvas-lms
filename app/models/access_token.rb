@@ -218,7 +218,17 @@ class AccessToken < ApplicationRecord
 
   def set_permanent_expiration
     expires_in = developer_key.tokens_expire_in
-    self.permanent_expires_at = Time.now.utc + expires_in if expires_in
+    # failsafe 1 week
+    if Account.site_admin.feature_enabled?(:site_admin_access_token_expiration) &&
+       Account.site_admin.grants_right?(user, :read) &&
+       (site_admin_expires_in = DynamicSettings.find(tree: :private)["site_admin_access_token_expires_in", failsafe: 604_800]&.seconds || 1.week)
+      expires_in = [expires_in, site_admin_expires_in].compact.min
+    end
+    if expires_in
+      expires_at = Time.now.utc + expires_in
+      expires_at = [permanent_expires_at, expires_at].compact.min if new_record?
+      self.permanent_expires_at = expires_at
+    end
   end
 
   def usable?(token_key = :crypted_token)

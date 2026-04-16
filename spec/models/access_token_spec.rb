@@ -205,6 +205,125 @@ describe AccessToken do
         expect(access_token.permanent_expires_at).to be_nil
       end
     end
+
+    context "when the user is a site admin" do
+      let_once(:sa_user) { site_admin_user }
+      let(:access_token) { AccessToken.create!(user: sa_user, developer_key:) }
+      let(:private_settings) { instance_double(DynamicSettings::FallbackProxy) }
+
+      around { |example| Timecop.freeze { example.run } }
+
+      before do
+        allow(private_settings).to receive(:[]).and_return(nil)
+        allow(DynamicSettings).to receive(:find).and_call_original
+        allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(private_settings)
+      end
+
+      context "when site_admin_access_token_expires_in is configured" do
+        before do
+          allow(private_settings).to receive(:[])
+            .with("site_admin_access_token_expires_in", failsafe: 604_800)
+            .and_return(3600)
+        end
+
+        it "uses the site admin expiration when it is shorter than the developer key expiration" do
+          access_token.set_permanent_expiration
+          expect(access_token.permanent_expires_at).to eql(1.hour.from_now)
+        end
+
+        context "when the developer key expiration is shorter" do
+          before do
+            allow(private_settings).to receive(:[])
+              .with("site_admin_access_token_expires_in", failsafe: 604_800)
+              .and_return(3.hours.to_i)
+          end
+
+          it "uses the developer key expiration" do
+            access_token.set_permanent_expiration
+            expect(access_token.permanent_expires_at).to eql(2.hours.from_now)
+          end
+        end
+
+        context "when the developer key does not have a token expiration" do
+          let(:developer_key) { DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}") }
+
+          it "uses the site admin expiration" do
+            access_token.set_permanent_expiration
+            expect(access_token.permanent_expires_at).to eql(1.hour.from_now)
+          end
+        end
+      end
+
+      context "when site_admin_access_token_expires_in uses the failsafe" do
+        before do
+          allow(private_settings).to receive(:[])
+            .with("site_admin_access_token_expires_in", failsafe: 604_800)
+            .and_return(604_800)
+        end
+
+        let(:developer_key) { DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}") }
+
+        it "sets the expiration to the 1-week failsafe" do
+          access_token.set_permanent_expiration
+          expect(access_token.permanent_expires_at).to eql(1.week.from_now)
+        end
+      end
+
+      context "when site_admin_access_token_expires_in is not configured and returns nil" do
+        before do
+          allow(private_settings).to receive(:[])
+            .with("site_admin_access_token_expires_in", failsafe: 604_800)
+            .and_return(nil)
+        end
+
+        it "falls back to the developer key expiration" do
+          access_token.set_permanent_expiration
+          expect(access_token.permanent_expires_at).to eql(2.hours.from_now)
+        end
+
+        context "when the developer key does not have a token expiration" do
+          let(:developer_key) { DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}") }
+
+          it "falls back to the 1-week default" do
+            access_token.set_permanent_expiration
+            expect(access_token.permanent_expires_at).to eql(1.week.from_now)
+          end
+        end
+      end
+
+      context "for a new record" do
+        before do
+          allow(private_settings).to receive(:[])
+            .with("site_admin_access_token_expires_in", failsafe: 604_800)
+            .and_return(3600)
+        end
+
+        it "respects a user-provided expiration that is shorter" do
+          token = sa_user.access_tokens.build(developer_key:, permanent_expires_at: 30.minutes.from_now)
+          token.set_permanent_expiration
+          expect(token.permanent_expires_at).to eql(30.minutes.from_now)
+        end
+
+        it "uses the site admin expiration when the user-provided expiration is longer" do
+          token = sa_user.access_tokens.build(developer_key:, permanent_expires_at: 2.hours.from_now)
+          token.set_permanent_expiration
+          expect(token.permanent_expires_at).to eql(1.hour.from_now)
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:site_admin_access_token_expiration)
+        end
+
+        let(:developer_key) { DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}") }
+
+        it "does not apply the site admin expiration" do
+          access_token.set_permanent_expiration
+          expect(access_token.permanent_expires_at).to be_nil
+        end
+      end
+    end
   end
 
   describe "usable?" do
