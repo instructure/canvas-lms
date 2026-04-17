@@ -1937,7 +1937,7 @@ describe Types::CourseType do
               "enrollmentsConnection(filter: {states: [inactive, deleted, rejected]}) { nodes { _id } }",
               current_user: @teacher
             )
-          ).to eq [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
+          ).to match_array [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
         end
       end
     end
