@@ -48,6 +48,7 @@ export type EditExceptionModalProps = {
   availableInParentContext: boolean | null
   onClose: () => void
   onSave: UpdateContextControl
+  onSettled?: () => void
 }
 
 export const EditExceptionModal = ({
@@ -55,6 +56,7 @@ export const EditExceptionModal = ({
   onSave,
   control,
   availableInParentContext,
+  onSettled,
 }: EditExceptionModalProps) => {
   const [available, setAvailable] = useState(!control.available)
 
@@ -62,6 +64,7 @@ export const EditExceptionModal = ({
     mutationKey: ['lti_registrations', 'update_exception_availability'],
     mutationFn: async (control: LtiContextControl) =>
       onSave(control.registration_id, control.id, available),
+    onSettled,
     // We don't need an onError handler here because ApiResult is meant to be a discriminated union
     // that indicates success or failure within the result object itself.
     onSuccess: result => {

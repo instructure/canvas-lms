@@ -30,6 +30,7 @@ import React, {useCallback} from 'react'
 import {useQueryClient, useMutation} from '@tanstack/react-query'
 import {isSuccessful} from '../../common/lib/apiResult/ApiResult'
 import {applyLtiRegistrationUpdateRequest} from '../api/ltiImsRegistration'
+import {refreshRegistrationHistory} from '../api/registrations'
 import {IconConfirmationWrapper} from '../lti_1p3_registration_form/components/IconConfirmationWrapper'
 import {NamingConfirmationWrapper} from '../lti_1p3_registration_form/components/NamingConfirmationWrapper'
 import {PermissionConfirmationWrapper} from '../lti_1p3_registration_form/components/PermissionConfirmationWrapper'
@@ -95,6 +96,7 @@ export const RegistrationUpdateWizardInner = ({
         queryClient.invalidateQueries({
           queryKey: [accountId, 'lti_registrations'],
         })
+        refreshRegistrationHistory(accountId, registrationUpdateRequest.lti_registration_id)
 
         showFlashAlert({
           message: I18n.t(`Configuration updates applied to %{appName}`, {
