@@ -17,7 +17,8 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -159,6 +160,8 @@ const EditItemModal = (props: EditItemModalProps) => {
         handleSubmit()
       }}
       data-testid="edit-item-modal"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" padding="small small small medium">
         <Grid>

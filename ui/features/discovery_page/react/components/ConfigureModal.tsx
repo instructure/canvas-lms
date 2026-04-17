@@ -26,10 +26,11 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '@instructure/platform-alerts'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import {fetchDiscoveryConfig, saveDiscoveryConfig, toApiConfig, toCardConfig} from '../api'
 import type {CardConfig, ConfigureModalProps, DiscoverySection, ModalError} from '../types'
 import {LoadingSaveOverlay} from './LoadingSaveOverlay'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 import {useIframeMessaging} from '../hooks/useIframeMessaging'
 import {useCardEditing} from '../hooks/useCardEditing'
 import {Flex} from '@instructure/ui-flex'
@@ -141,6 +142,8 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
         message: I18n.t('You have unsaved changes. Are you sure you want to close?'),
         confirmButtonLabel: I18n.t('Close'),
         cancelButtonLabel: I18n.t('Cancel'),
+        closeButtonLabel: I18n.t('Close'),
+        theme: getActiveCanvasTheme(),
       })
       if (!confirmed) return
     }
@@ -191,6 +194,8 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
         ),
         confirmButtonLabel: I18n.t('Save'),
         cancelButtonLabel: I18n.t('Cancel'),
+        closeButtonLabel: I18n.t('Close'),
+        theme: getActiveCanvasTheme(),
       })
       if (!confirmed) return
     }

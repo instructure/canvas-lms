@@ -29,8 +29,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 
 import {showFlashError} from '@instructure/platform-alerts'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {CanvasAsyncSelect, InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {createNewCourse, getAccountsFromEnrollments} from './utils'
 

@@ -20,7 +20,7 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ConfigureModal} from '../ConfigureModal'
 import {fetchDiscoveryConfig, saveDiscoveryConfig} from '../../api'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 
 vi.mock('../../api', async importOriginal => {
   const original = await importOriginal<typeof import('../../api')>()
@@ -32,7 +32,8 @@ vi.mock('../../api', async importOriginal => {
   }
 })
 
-vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+vi.mock('@instructure/platform-instui-bindings', async () => ({
+  ...(await vi.importActual<typeof import('@instructure/platform-instui-bindings')>('@instructure/platform-instui-bindings')),
   confirm: vi.fn(),
 }))
 

@@ -17,7 +17,8 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -304,6 +305,8 @@ const ModulesPageLegend: React.FC<ModulesPagePageLegendProps> = ({
           onDismiss={onClose}
           footer={renderFooter()}
           shouldReturnFocus={returnFocusTo === null}
+          closeButtonLabel={I18n.t('Close')}
+          errorComponent={canvasErrorComponent()}
         >
           <View as="div" minHeight="22rem" margin="modalElements">
             {renderModalBody()}

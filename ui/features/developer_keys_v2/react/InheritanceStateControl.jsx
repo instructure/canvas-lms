@@ -17,12 +17,13 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -52,6 +53,9 @@ export default class DeveloperKeyStateControl extends React.Component {
             keyName,
           })
         : I18n.t('Are you sure you want to change the state of this developer key?'),
+      cancelButtonLabel: I18n.t('Cancel'),
+      closeButtonLabel: I18n.t('Close'),
+      theme: getActiveCanvasTheme(),
     })
   }
 

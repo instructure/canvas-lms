@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import type {Account, CourseFilterFilters, Term} from '../types'
 

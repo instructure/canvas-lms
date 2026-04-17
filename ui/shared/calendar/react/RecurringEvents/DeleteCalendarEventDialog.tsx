@@ -20,7 +20,8 @@ import React, {useCallback, useState} from 'react'
 import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import authenticity_token from '@canvas/authenticity-token'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {showFlashAlert} from '@instructure/platform-alerts'
 import {checkStatus, defaultFetchOptions} from '@canvas/util/xhr'
 import {Button} from '@instructure/ui-buttons'
@@ -214,6 +215,8 @@ const DeleteCalendarEventDialog = ({
       label={isAppointmentGroup ? I18n.t('Delete for everyone?') : I18n.t('Confirm Deletion')}
       footer={renderFooter}
       data-testid={`${testIdPrefix || ''}dialog`}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" margin="0 small" data-testid={`${testIdPrefix || ''}dialog-content`}>
         {isRepeating ? renderRepeating() : renderOne()}

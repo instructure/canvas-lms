@@ -32,8 +32,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@instructure/platform-query'
-import {getTheme} from '@canvas/instui-bindings'
-import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
+import {CanvasThemeProvider, getActiveCanvasTheme} from '@canvas/react'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -179,20 +178,13 @@ export function FallbackSpinner() {
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
   if (mountNode) {
-    const theme = getTheme(
-      undefined,
-      undefined,
-      Boolean(ENV.K5_USER),
-      Boolean(ENV.USE_CLASSIC_FONT),
-      Boolean(ENV.use_dyslexic_font),
-    )
     const root = ReactDOM.createRoot(mountNode)
     root.render(
-      <DynamicInstUISettingsProvider theme={theme}>
+      <CanvasThemeProvider theme={getActiveCanvasTheme()}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
         </QueryClientProvider>
-      </DynamicInstUISettingsProvider>,
+      </CanvasThemeProvider>,
     )
   }
 }

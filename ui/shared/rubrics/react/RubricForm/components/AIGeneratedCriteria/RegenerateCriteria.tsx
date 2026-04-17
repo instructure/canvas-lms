@@ -20,7 +20,8 @@ import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconAiColoredSolid, IconAiSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {Flex} from '@instructure/ui-flex'
@@ -66,6 +67,8 @@ const RegenerateCriteria = ({
         size="medium"
         label={isCriterion ? I18n.t('Regenerate Criterion') : I18n.t('Regenerate Criteria')}
         shouldCloseOnDocumentClick={false}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
         footer={
           <Flex direction="row" gap="small" padding="small">
             <Button onClick={onClose} data-testid="regenerate-criteria-cancel-button">

@@ -26,7 +26,7 @@ import {deleteRubric} from '../../queries/ViewRubricQueries'
 import {showFlashSuccess} from '@instructure/platform-alerts'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {Text} from '@instructure/ui-text'
 import {useMutation} from '@tanstack/react-query'
 

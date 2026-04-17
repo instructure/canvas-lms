@@ -29,7 +29,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {showFlashSuccess} from '@instructure/platform-alerts'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 import StudentMultiSelect from './components/StudentMultiSelect'
@@ -155,6 +156,8 @@ export default function NewStudentGroupModal({onSave, ...modalProps}) {
         size="medium"
         shouldCloseOnDocumentClick={false}
         footer={<Footer />}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
         {...modalProps}
       >
         <FormFieldGroup

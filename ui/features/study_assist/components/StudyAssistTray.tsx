@@ -37,7 +37,7 @@ import type {
   AssistChatFlashCard,
 } from '@instructure/platform-study-assist'
 import {IconAiSolid, IconArrowStartLine, IconInfoLine} from '@instructure/ui-icons'
-import CanvasAiInformation from '@canvas/instui-bindings/react/AiInformation'
+import CanvasAiInformation from '@canvas/ai-information'
 
 const I18n = createI18nScope('study_assist')
 

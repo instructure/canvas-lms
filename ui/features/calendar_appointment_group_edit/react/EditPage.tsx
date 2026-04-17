@@ -30,7 +30,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_forms'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
@@ -520,6 +521,8 @@ class EditPage extends React.Component {
           onDismiss={this.closeDeleteModal}
           size="small"
           label={I18n.t('Delete for everyone?')}
+          closeButtonLabel={I18n.t('Close')}
+          errorComponent={canvasErrorComponent()}
           data-testid="delete-appointment-group-modal"
           footer={
             <>

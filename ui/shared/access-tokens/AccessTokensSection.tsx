@@ -18,6 +18,7 @@
 
 import {format} from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -31,8 +32,8 @@ import {useManuallyGeneratedTokens, useDeleteToken} from './api'
 import {showFlashAlert} from '@instructure/platform-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {memo} from 'react'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
-import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
+import {TruncateWithTooltip} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('access_tokens')
 
@@ -165,6 +166,10 @@ const handleDeleteToken = async (token: Token, deleteToken: ReturnType<typeof us
           },
         ),
       },
+      confirmButtonLabel: I18n.t('Delete'),
+      cancelButtonLabel: I18n.t('Cancel'),
+      closeButtonLabel: I18n.t('Close'),
+      theme: getActiveCanvasTheme(),
     }))
   ) {
     return

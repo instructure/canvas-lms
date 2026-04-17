@@ -28,7 +28,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tag} from '@instructure/ui-tag'
 import {TextArea} from '@instructure/ui-text-area'
 import {showFlashSuccess} from '@instructure/platform-alerts'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 
@@ -161,6 +162,8 @@ export default function GroupCategoryMessageAllUnassignedModal({
       size="medium"
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       {...modalProps}
     >
       <>

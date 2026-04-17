@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
@@ -31,7 +32,7 @@ import {
 import {useState} from 'react'
 import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
 import {Tag} from '@instructure/ui-tag'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('account_settings')
 
@@ -76,6 +77,9 @@ export default function NavMenuLinksSettings(): JSX.Element {
                     </>
                   ),
                   confirmButtonLabel: I18n.t('Delete'),
+                  cancelButtonLabel: I18n.t('Cancel'),
+                  closeButtonLabel: I18n.t('Close'),
+                  theme: getActiveCanvasTheme(),
                 })
               ) {
                 deleteLink(index)

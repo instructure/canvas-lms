@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import $ from 'jquery'
 
 import {CloseButton, Button} from '@instructure/ui-buttons'
@@ -31,7 +32,7 @@ import type {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer
 import type actions from './actions/developerKeysActions'
 import type {AnyAction, Dispatch} from 'redux'
 import type {DeveloperKey} from '../model/api/DeveloperKey'
-import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
+import {confirmWithPrompt} from '@instructure/platform-instui-bindings'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@instructure/platform-query'
 
@@ -386,6 +387,11 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       }),
       valueMatchesExpected: (value: string) =>
         value?.toLowerCase() === ENV.RAILS_ENVIRONMENT?.toLowerCase(),
+      confirmButtonLabel: I18n.t('Confirm'),
+      cancelButtonLabel: I18n.t('Cancel'),
+      closeButtonLabel: I18n.t('Close'),
+      mismatchErrorText: I18n.t('The provided value is incorrect. Please try again.'),
+      theme: getActiveCanvasTheme(),
     })
   }
 

@@ -20,7 +20,8 @@ import React from 'react'
 import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 
 const I18n = createI18nScope('ConfirmationDialog')
 
@@ -55,6 +56,8 @@ export default function ConfirmationDialog({
       onDismiss={onReject}
       open={open}
       size={size}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       footer={
         <>
           <Button key="cancel" data-testid="cancel-button" onClick={onReject}>
