@@ -4068,6 +4068,51 @@ describe Enrollment do
     end
   end
 
+  describe "#add_to_favorites" do
+    let(:user) { user_model }
+    let(:old_course) { course_factory(active_all: true) }
+    let(:new_course) { course_factory(active_all: true) }
+    let(:new_enrollment) { new_course.enroll_student(user, enrollment_state: "active") }
+    let(:old_enrollment) do
+      enrollment = old_course.enroll_student(user, enrollment_state: "active")
+      user.favorites.create!(context: old_course)
+      enrollment
+    end
+
+    it "does not auto-favorite the new course when the user's favorited course enrollment is deleted" do
+      old_enrollment.destroy
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+
+    it "does not auto-favorite the new course when the user's favorited course enrollment is concluded" do
+      old_enrollment.conclude
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+
+    it "does not auto-favorite the new course when the user's favorited course enrollment is inactive" do
+      old_enrollment.deactivate
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+
+    it "auto-favorites the new course when the user has a current enrollment in a favorited course" do
+      old_enrollment
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).to exist
+    end
+
+    it "does not auto-favorite the new course when the user has never favorited a course" do
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+  end
+
   describe "web conference syncing" do
     include ExternalToolsSpecHelper
 
