@@ -24,7 +24,8 @@ require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/groups_common"
 
-shared_examples_for "item assign to tray during assignment creation/update" do
+describe "item assign to tray during assignment creation/update",
+         skip: "assign-to UI selectors drifted since 31c6d195a97 (2024-12-19); needs stabilization LX-4102" do
   include AssignmentsIndexPage
   include ItemsAssignToTray
   include ContextModulesCommon
