@@ -17,7 +17,7 @@
  */
 
 import {render} from '@testing-library/react'
-import CanvasAiInformation from '../AiInformation'
+import CanvasAiInformation from '..'
 import userEvent from '@testing-library/user-event'
 
 const props = {

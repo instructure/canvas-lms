@@ -21,7 +21,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@instructure/platform-alerts'
 
@@ -55,6 +56,8 @@ export default function EarlyAccessModal({isOpen, onAccept, onCancel}: EarlyAcce
       size="fullscreen"
       footer={null}
       data-testid="scrollable-content"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" height="100%" overflowY="auto" padding="x-small medium">
         <Text as="p">

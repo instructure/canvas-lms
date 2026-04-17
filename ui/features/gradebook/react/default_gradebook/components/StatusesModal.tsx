@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import update from 'immutability-helper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Text} from '@instructure/ui-text'
 import {getStatuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
@@ -149,7 +149,7 @@ class StatusesModal extends React.Component<Props, State> {
         open={true}
         label={I18n.t('Statuses')}
         onDismiss={this.props.onClose}
-        contentRef={this.bindContentRef}
+        contentRef={this.bindContentRef as (dialog: unknown) => void}
         shouldCloseOnDocumentClick={false}
       >
         <ModalBody>

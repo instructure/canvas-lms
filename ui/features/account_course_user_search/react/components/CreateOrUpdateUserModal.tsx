@@ -30,7 +30,7 @@ import {
 } from '@canvas/user-sortable-name/jquery/user_utils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import registrationErrors from '@canvas/normalize-registration-errors'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import TimeZoneSelect from '@canvas/datetime/react/components/TimeZoneSelect'
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'

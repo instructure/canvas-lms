@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useCallback, useReducer, useEffect, useMemo, useRef} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {Paginator} from '@instructure/platform-instui-bindings'
 import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
 import GroupsTable from './components/GroupsTable'

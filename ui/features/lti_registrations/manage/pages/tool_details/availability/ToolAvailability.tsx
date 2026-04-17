@@ -18,7 +18,7 @@
 
 import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 import {LinkInfo} from '@canvas/parse-link-header/parseLinkHeader'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'

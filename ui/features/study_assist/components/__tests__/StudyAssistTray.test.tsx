@@ -28,7 +28,7 @@ const mockResetChat = vi.fn()
 const mockUseAssistContext = vi.fn(() => ({showBackButton: false, resetChat: mockResetChat}))
 const mockTrack = vi.fn()
 
-vi.mock('@canvas/instui-bindings/react/AiInformation', () => ({
+vi.mock('@canvas/ai-information', () => ({
   default: ({triggerButton}: {triggerButton: React.ReactNode}) => (
     <div data-testid="ai-information">{triggerButton}</div>
   ),

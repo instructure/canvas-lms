@@ -32,7 +32,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {fromNow} from '@canvas/fuzzy-relative-time'
 import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('QRMobileLogin')
 

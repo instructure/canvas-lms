@@ -18,7 +18,7 @@
 
 import React, {useMemo} from 'react'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {getTransitionOverride} from '@canvas/instui-bindings'
+import {getTransitionOverride} from '@instructure/platform-instui-bindings'
 import {getK5ThemeVars, getK5ThemeOverrides} from './k5-theme'
 
 type K5ThemeProviderProps = {

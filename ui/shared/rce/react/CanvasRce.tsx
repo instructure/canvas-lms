@@ -25,7 +25,7 @@ import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 import getRCSProps from '../getRCSProps'
 import EditorConfig from '../tinymce.config'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
-import {getTypography} from '@canvas/instui-bindings'
+import {getTypography} from '@instructure/platform-instui-bindings'
 import tinymce, {Editor} from 'tinymce'
 import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
 

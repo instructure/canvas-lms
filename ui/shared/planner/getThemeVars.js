@@ -18,7 +18,7 @@
 
 import {canvas, canvasHighContrast} from '@instructure/ui-themes'
 import {cloneDeep} from 'es-toolkit/compat'
-import {getTypography} from '@canvas/instui-bindings'
+import {getTypography} from '@instructure/platform-instui-bindings'
 
 // In case we are running a test and there is absolutely no theme data available
 // (happens often)

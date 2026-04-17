@@ -52,7 +52,7 @@ import {
 } from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {type CanvasProgress} from '@canvas/progress/ProgressHelpers'
-import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {Paginator} from '@instructure/platform-instui-bindings'
 import {Pill} from '@instructure/ui-pill'
 
 export interface AppProps {

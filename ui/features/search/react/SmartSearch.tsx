@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import IndexingProgress from './IndexingProgress'
 import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 
 const RELEVANCE_THRESHOLD = 50
 const MAX_NUMBER_OF_RESULTS = 25

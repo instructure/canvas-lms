@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGraderButton} from '../../buttons/SpeedGraderButton'
 import {Navigator} from './Navigator'
-import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+import {TruncateWithTooltip} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

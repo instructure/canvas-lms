@@ -28,7 +28,7 @@ import {
 } from '@instructure/ui-themes'
 import {mergeDeep} from '@instructure/ui-utils'
 import {Day, Grouping, PlannerItem} from '@canvas/planner'
-import {getTypography} from '@canvas/instui-bindings'
+import {getTypography} from '@instructure/platform-instui-bindings'
 
 export function getBaseThemeVars(
   highContrast: boolean,
