@@ -431,7 +431,7 @@ module Lti
                  }
           return
         end
-        if jwt["user_id"] != @current_user.id
+        if jwt["user_id"] != @current_user.global_id
           render status: :unauthorized,
                  json: {
                    errorMessage: "registration_token was created for a different user"
