@@ -29,6 +29,7 @@ describe PageViews::EnqueueQueryService do
     allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
     allow(user).to receive(:is_a?).with(User).and_return(true)
     allow(admin).to receive(:uuid).and_return("admin-uuid-123")
+    allow(HostUrl).to receive(:default_host).and_return("canvas.instructure.com")
   end
 
   it "returns query's job ID" do
@@ -129,5 +130,16 @@ describe PageViews::EnqueueQueryService do
     service.call("2025-03-01", "2025-06-01", user, "csv")
 
     expect(CanvasHttp).to have_received(:post).with(anything, hash_including("Authorization" => /^Bearer /), anything)
+  end
+
+  it "uses the Canvas instance domain for JWT generation" do
+    canvas_domain = "canvas.example.com"
+    allow(HostUrl).to receive(:default_host).and_return(canvas_domain)
+    allow(CanvasSecurity::ServicesJwt).to receive(:for_user).and_call_original
+    allow(CanvasHttp).to receive(:post).and_yield(instance_double(Net::HTTPResponse, code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
+
+    service.call("2025-03-01", "2025-06-01", user, "csv")
+
+    expect(CanvasSecurity::ServicesJwt).to have_received(:for_user).with(canvas_domain, admin, encrypt: false, base64: false)
   end
 end
