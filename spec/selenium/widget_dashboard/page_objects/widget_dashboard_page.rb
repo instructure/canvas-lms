@@ -421,6 +421,34 @@ module WidgetDashboardPage
     "[data-testid='create-todo-submit-button']"
   end
 
+  def progress_overview_course_selector(course_id)
+    "[data-testid='course-progress-item-#{course_id}']"
+  end
+
+  def progress_overview_course_link_selector(course_id)
+    "[data-testid='course-link-#{course_id}']"
+  end
+
+  def progress_overview_course_progress_text_selector(course_id)
+    "[data-testid='course-progress-counts-#{course_id}']"
+  end
+
+  def progress_overview_progress_bar_graded_selector(course_id)
+    "[data-testid='progress-segment-graded-#{course_id}']"
+  end
+
+  def progress_overview_progress_bar_submitted_selector(course_id)
+    "[data-testid='progress-segment-submitted-#{course_id}']"
+  end
+
+  def progress_overview_progress_bar_remaining_selector(course_id)
+    "[data-testid='progress-segment-remaining-#{course_id}']"
+  end
+
+  def progress_overview_progression_text_selector(course_id)
+    "[data-testid='course-progress-completion-#{course_id}']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -797,6 +825,38 @@ module WidgetDashboardPage
 
   def rce_announcement_iframe
     f(rce_announcement_iframe_selector)
+  end
+
+  def progress_overview_course(course_id)
+    f(progress_overview_course_selector(course_id))
+  end
+
+  def all_progress_overview_courses
+    ff("[data-testid^='course-progress-item-']")
+  end
+
+  def progress_overview_course_link(course_id)
+    f(progress_overview_course_link_selector(course_id))
+  end
+
+  def progress_overview_course_progress_text(course_id)
+    f(progress_overview_course_progress_text_selector(course_id))
+  end
+
+  def progress_overview_progress_bar_graded(course_id)
+    f(progress_overview_progress_bar_graded_selector(course_id))
+  end
+
+  def progress_overview_progress_bar_submitted(course_id)
+    f(progress_overview_progress_bar_submitted_selector(course_id))
+  end
+
+  def progress_overview_progress_bar_remaining(course_id)
+    f(progress_overview_progress_bar_remaining_selector(course_id))
+  end
+
+  def progress_overview_progression_text(course_id)
+    f(progress_overview_progression_text_selector(course_id))
   end
 
   #------------------------------ Actions -------------------------------

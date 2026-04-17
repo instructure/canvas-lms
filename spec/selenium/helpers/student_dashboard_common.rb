@@ -388,6 +388,10 @@ module StudentDashboardCommon
       widget_id = "todo-list-widget"
       widget_type = "todo_list"
       title = "To-do list"
+    when :progress_overview
+      widget_id = "progress_overview-widget"
+      widget_type = "progress_overview"
+      title = "Progress overview"
     end
 
     config = user.get_preference(:widget_dashboard_config) || {}
