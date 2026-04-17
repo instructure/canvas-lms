@@ -195,5 +195,14 @@ describe "student dashboard", :ignore_js_errors do
       filter_todos_by("All")
       expect(no_todo_items_message.text).to eq("No upcoming items")
     end
+
+    it "shows empty state for progress widget when no items exist" do
+      add_widget_to_dashboard(@student, :progress_overview, 1)
+      go_to_dashboard
+
+      expect(progress_overview_course_progress_text(@course1.id).text).to match("0 Graded0 Submitted0 Remaining")
+      expect(progress_overview_progression_text(@course1.id).text).to match("0% complete (0 total)")
+      expect(element_exists?(progress_overview_course_selector(@course3.id))).to be_falsey
+    end
   end
 end
