@@ -53,6 +53,7 @@ export type DeleteDeploymentModalProps = {
   controlsByPath: Map<string, LtiContextControl>
   onClose: () => void
   onDelete: DeleteDeployment
+  onSettled?: () => void
 }
 
 export const DeleteDeploymentModal = ({
@@ -62,6 +63,7 @@ export const DeleteDeploymentModal = ({
   registration,
   controlsByPath,
   accountId,
+  onSettled,
 }: DeleteDeploymentModalProps) => {
   const cancelRef = useRef<Element | null>(null)
 
@@ -73,6 +75,7 @@ export const DeleteDeploymentModal = ({
         accountId: accountId,
         deploymentId: deployment.id,
       }),
+    onSettled,
     // We don't need an onError handler here because ApiResult is meant to be a discriminated union
     // that indicates success or failure within the result object itself.
     onSuccess: result => {

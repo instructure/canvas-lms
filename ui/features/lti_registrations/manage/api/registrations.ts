@@ -43,7 +43,7 @@ import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {compact} from '../../common/lib/compact'
 import {type LtiOverlayVersion, ZLtiOverlayVersion} from '../model/LtiOverlayVersion'
 import {ZLtiRegistrationHistoryEntry} from '../model/LtiRegistrationHistoryEntry'
-import {useMutation, useQuery} from '@tanstack/react-query'
+import {useMutation, useQuery, type UseMutationOptions} from '@tanstack/react-query'
 import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {getAccountId} from '../../common/lib/getAccountId'
 import {ZPaginatedList} from './PaginatedList'
@@ -150,6 +150,51 @@ export const refreshRegistrationWithAllInfo = (
   })
 }
 
+export const refreshRegistrationHistory = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+) => {
+  queryClient.invalidateQueries({
+    queryKey: ['ltiRegistrationHistoryNew', accountId, registrationId],
+  })
+}
+
+/**
+ * A wrapper around useMutation that automatically invalidates the
+ * registration's allInfo and history queries on settled, so callers
+ * don't have to remember to do it manually.
+ *
+ * @param getRegistrationKey - Extracts { registrationId, accountId }
+ *   from the mutation variables. Use a closure when the IDs are in
+ *   component scope rather than the variables themselves.
+ */
+export const useRegistrationMutation = <
+  TData = unknown,
+  TError = Error,
+  TVariables = void,
+  TContext = unknown,
+>(
+  getRegistrationKey: (variables: TVariables) => {
+    registrationId: LtiRegistrationId
+    accountId: AccountId
+  },
+  options: UseMutationOptions<TData, TError, TVariables, TContext>,
+) => {
+  type SettledArgs = Parameters<
+    NonNullable<UseMutationOptions<TData, TError, TVariables, TContext>['onSettled']>
+  >
+  return useMutation({
+    ...options,
+    onSettled: (...args: SettledArgs) => {
+      const [, , variables] = args
+      const {registrationId, accountId} = getRegistrationKey(variables)
+      refreshRegistrationWithAllInfo(registrationId, accountId)
+      refreshRegistrationHistory(accountId, registrationId)
+      options.onSettled?.(...args)
+    },
+  })
+}
+
 const createRegistrationWithConfigQueryKey = (
   ltiRegistrationId: LtiRegistrationId,
   accountId: AccountId,
@@ -198,21 +243,20 @@ export type ResetLtiRegistrationOptions = {
   accountId: AccountId
 }
 
-export const useResetLtiRegistration = () => {
-  return useMutation({
-    mutationFn: ({ltiRegistrationId, accountId}: ResetLtiRegistrationOptions) =>
-      doFetchWithSchema(
-        {
-          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
-          method: 'PUT',
-        },
-        z.unknown(),
-      ),
-    onSettled: (_, __, {ltiRegistrationId, accountId}) => {
-      refreshRegistrationWithAllInfo(ltiRegistrationId, accountId)
+export const useResetLtiRegistration = () =>
+  useRegistrationMutation(
+    ({ltiRegistrationId, accountId}) => ({registrationId: ltiRegistrationId, accountId}),
+    {
+      mutationFn: ({ltiRegistrationId, accountId}: ResetLtiRegistrationOptions) =>
+        doFetchWithSchema(
+          {
+            path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
+            method: 'PUT',
+          },
+          z.unknown(),
+        ),
     },
-  })
-}
+  )
 
 export type FetchThirdPartyToolConfiguration = (
   config:
@@ -346,8 +390,8 @@ type UpdateRegistrationParams = {
 
 export type UpdateRegistration = (params: UpdateRegistrationParams) => Promise<ApiResult<unknown>>
 
-export const useUpdateRegistration = () => {
-  return useMutation({
+export const useUpdateRegistration = () =>
+  useRegistrationMutation(({registrationId, accountId}) => ({registrationId, accountId}), {
     mutationFn: ({
       accountId,
       registrationId,
@@ -371,11 +415,7 @@ export const useUpdateRegistration = () => {
         },
         z.unknown(),
       ),
-    onSettled(_, __, {registrationId, accountId}) {
-      refreshRegistrationWithAllInfo(registrationId, accountId)
-    },
   })
-}
 
 /**
  * Updates an LTI registration
@@ -554,12 +594,8 @@ export type UpdateRegistrationJsonParams = {
 /**
  * React Query hook for updating LTI registration configuration from JSON
  */
-export const useUpdateRegistrationJson = () => {
-  return useMutation({
+export const useUpdateRegistrationJson = () =>
+  useRegistrationMutation(({registrationId, accountId}) => ({registrationId, accountId}), {
     mutationFn: ({accountId, registrationId, jsonConfig}: UpdateRegistrationJsonParams) =>
       updateLtiRegistrationJson(accountId, registrationId, jsonConfig),
-    onSettled(_, __, {registrationId, accountId}) {
-      refreshRegistrationWithAllInfo(registrationId, accountId)
-    },
   })
-}
