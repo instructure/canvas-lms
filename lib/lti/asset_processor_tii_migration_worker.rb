@@ -68,6 +68,7 @@ module Lti
       if any_error_occurred?
         Rails.logger.info("TII Asset Processor migration completed with errors")
         @progress.fail!
+        on_migration_failed
       else
         Rails.logger.info("TII Asset Processor migration completed successfully")
         @progress.complete!
@@ -1133,6 +1134,10 @@ module Lti
 
     def generate_migration_id(tool_proxy, actl)
       "cpf_#{tool_proxy.guid}_#{actl.assignment.global_id}"
+    end
+
+    def on_migration_failed
+      # overridden in MRA
     end
   end
 end
