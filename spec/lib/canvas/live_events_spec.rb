@@ -1870,6 +1870,28 @@ describe Canvas::LiveEvents do
 
       Canvas::LiveEvents.course_completed(context_module_progression)
     end
+
+    it "also emits the event to Kafka with the progression's completed_at" do
+      course = course_model(sis_source_id: "abc123")
+      user = user_model
+      context_module = course.context_modules.create!
+      completed_at = Time.zone.parse("2026-04-17T12:00:00Z")
+      context_module_progression = context_module.context_module_progressions.create!(
+        user_id: user.id,
+        workflow_state: "completed",
+        completed_at:
+      )
+
+      expect(Canvas::KafkaEvents).to receive(:post_event).with(
+        Canvas::KafkaEvents::Events::COURSE_COMPLETED,
+        root_account: course.root_account,
+        user:,
+        payload: { course_id: course.global_id.to_s },
+        occurred_at: completed_at
+      )
+
+      Canvas::LiveEvents.course_completed(context_module_progression)
+    end
   end
 
   describe ".course_progress" do
@@ -1890,6 +1912,17 @@ describe Canvas::LiveEvents do
       }
 
       expect_event("course_progress", expected_event_body).once
+
+      Canvas::LiveEvents.course_progress(context_module_progression)
+    end
+
+    it "does not emit a Kafka event (only course_completed is dual-emitted)" do
+      course = course_model(sis_source_id: "abc123")
+      user = user_model
+      context_module = course.context_modules.create!
+      context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: "started")
+
+      expect(Canvas::KafkaEvents).not_to receive(:post_event)
 
       Canvas::LiveEvents.course_progress(context_module_progression)
     end
