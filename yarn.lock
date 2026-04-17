@@ -2900,10 +2900,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-images/-/platform-images-0.2.0.tgz#79d1ca8c212eff72f6819cd78692f76548c0fe7f"
   integrity sha512-V46mmESkQHObnJ9yEC7IkI5iC1yagPj5bSzE+0DcMEWIdWXl7wzE/i7sbo33CgJXVToYWlxvlPmx9tFWzBfMXw==
 
-"@instructure/platform-institutional-tagging@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-institutional-tagging/-/platform-institutional-tagging-5.0.1.tgz#c757fea158b2783c3ddef6a5b063090082b67e64"
-  integrity sha512-rJS8C/q3u12F6vCDxb4SfGuwxvmrYeoMZNxGT0r/TtcPIvtX7TeUaTkFzXtCemLDB5YMqckSglIN+R1TjHnAcg==
+"@instructure/platform-institutional-tagging@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-institutional-tagging/-/platform-institutional-tagging-6.0.1.tgz#66695af9c71fa8dd38ee22426fdf211b0eaa6f3a"
+  integrity sha512-leihnGyAjTb2WMasAetS/qSjEzL/rhHvmncJ7w4RH8/bLhOrXEHaRenZKxxXz0W0Ab989PEJlLOHhJCk4hGhoA==
   dependencies:
     lodash "^4.17.23"
     luxon "^3.7.2"
