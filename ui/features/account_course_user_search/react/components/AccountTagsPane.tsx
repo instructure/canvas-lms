@@ -22,7 +22,12 @@ import {PlatformUiProvider, type Account} from '@instructure/platform-provider'
 import {platformExecuteQuery} from '@canvas/graphql'
 import {queryClient} from '@instructure/platform-query'
 
-const AccountTagsPane = () => {
+interface AccountTagsPaneProps {
+  initialTagId?: string
+  onTagSelect: (tagId: string | null) => void
+}
+
+const AccountTagsPane = ({initialTagId, onTagSelect}: AccountTagsPaneProps) => {
   const account: Account = {
     id: String(ENV.ROOT_ACCOUNT_ID),
     name: '',
@@ -43,7 +48,7 @@ const AccountTagsPane = () => {
 
   return (
     <PlatformUiProvider accounts={[account]} queryClient={queryClient} {...permissionsProps}>
-      <AccountTags />
+      <AccountTags initialTagId={initialTagId} onTagSelect={onTagSelect} />
     </PlatformUiProvider>
   )
 }

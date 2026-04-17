@@ -31,7 +31,7 @@
     "@instructure/platform-get-cookie": "0.2.0",
     "@instructure/platform-images": "0.2.0",
     "@instructure/platform-learning-agent-launcher": "1.1.1",
-    "@instructure/platform-institutional-tagging": "^5.0.1",
+    "@instructure/platform-institutional-tagging": "^6.0.1",
     "@instructure/platform-loading-indicator": "0.2.0",
     "@instructure/platform-notebook": "0.4.1",
     "@instructure/platform-provider": "0.5.0",
