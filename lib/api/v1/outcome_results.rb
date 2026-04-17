@@ -66,9 +66,10 @@ module Api::V1::OutcomeResults
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations.preload(outcomes_slice, [:context])
-      ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: outcomes_slice)
-                .pluck(:learning_outcome_id, :content_type, :content_id).each do |lo_id, content_type, content_id|
-        (alignment_asset_string_map[lo_id] ||= []) << "#{content_type.underscore}_#{content_id}"
+      outcomes_slice.each do |outcome|
+        alignments = filter_assignment_alignments(find_all_outcome_alignments(outcome, context))
+                     .reject { |a| a.content.unpublished? }
+        alignment_asset_string_map[outcome.id] = alignments.map { |a| a.content.asset_string }
       end
     end
 
