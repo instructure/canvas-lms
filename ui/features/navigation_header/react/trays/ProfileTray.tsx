@@ -30,7 +30,6 @@ import {IconExternalLinkLine} from '@instructure/ui-icons'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
 import DyslexicFontToggle from './UseDyslexicFontToggle'
-import WidgetDashboardToggle from './WidgetDashboardToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import profileQuery from '../queries/profileQuery'
 import {getUnreadCount} from '../queries/unreadCountQuery'
@@ -114,11 +113,6 @@ export default function ProfileTray() {
   const hasAccessibilitySettings = true // High contrast is always available
   const hasDyslexicFont = 'use_dyslexic_font' in window.ENV
 
-  // Check if we have any early access settings to show
-  // Toggle shows when feature is "allowed" (overridable), not when it's locked "on"
-  const hasWidgetDashboard = window.ENV.widget_dashboard_overridable !== undefined
-  const hasEarlyAccessSettings = hasWidgetDashboard
-
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -168,16 +162,6 @@ export default function ProfileTray() {
           </Heading>
           <HighContrastModeToggle />
           {hasDyslexicFont && <DyslexicFontToggle />}
-        </>
-      )}
-
-      {hasEarlyAccessSettings && (
-        <>
-          <hr role="presentation" />
-          <Heading level="h3" as="h3" margin="small 0">
-            {I18n.t('Early Adopter Program Settings')}
-          </Heading>
-          {hasWidgetDashboard && <WidgetDashboardToggle />}
         </>
       )}
     </View>
