@@ -22,6 +22,7 @@
 #      calculator alongside ActiveIssueCalculator.
 #   2. Cross-shard via Shard.with_each_shard
 #   3. ETag caching on last scan time -- only after step 1.
+#   EGG-2605
 
 # Caller is responsible for authorization; no access check here.
 class Accessibility::CategoryBreakdownService
