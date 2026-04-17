@@ -22,6 +22,7 @@ require_relative "wizard_header_component"
 require_relative "wizard_footer_component"
 require_relative "problem_area_component"
 require_relative "alt_text_controls_component"
+require_relative "radio_input_controls_component"
 
 class RemediationWizardComponent
   include SeleniumDependencies
@@ -138,5 +139,9 @@ class RemediationWizardComponent
 
   def alt_text_controls
     @alt_text_controls ||= AltTextControlsComponent.new
+  end
+
+  def radio_input_controls
+    @radio_input_controls ||= RadioInputControlsComponent.new
   end
 end

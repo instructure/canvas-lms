@@ -19,12 +19,14 @@
 
 require_relative "../../common"
 require_relative "../pages/accessibility_checker_page"
+require_relative "../pages/wiki_page"
 require_relative "../support/batch_data_factory"
 
 describe "Accessibility Checker - Alt Text Related Rules", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include AccessibilityCheckerPage
   include AccessibilityChecker::BatchDataFactory
+  include AccessibilityChecker::WikiPage
 
   let(:fix_applied_message) { "Alt text updated" }
   let(:valid_alt_text_value) { "A descriptive alt text" }
@@ -159,7 +161,7 @@ describe "Accessibility Checker - Alt Text Related Rules", :ignore_js_errors do
 
       issues_table.find_row_by_resource_name(@image_page.title).click_resource_name_link
 
-      saved_alt_text = f(".show-content img").attribute("alt")
+      saved_alt_text = content_image_alt_text
       expect(saved_alt_text).to eq(valid_alt_text_value)
     end
   end
