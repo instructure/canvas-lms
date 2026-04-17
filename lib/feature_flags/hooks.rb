@@ -64,15 +64,15 @@ module FeatureFlags
     end
 
     def self.tier_1_visible_on_hook(_context)
-      false
+      true
     end
 
     def self.tier_2_visible_on_hook(_context)
-      false
+      true
     end
 
     def self.tier_3_visible_on_hook(_context)
-      false
+      true
     end
 
     def self.quizzes_next_visible_on_hook(context)
