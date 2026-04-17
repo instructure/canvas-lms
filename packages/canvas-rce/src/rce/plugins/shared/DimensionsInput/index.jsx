@@ -73,25 +73,13 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
 }
 
 export default function DimensionsInput(props) {
-  const {
-    dimensionsState,
-    minHeight,
-    minWidth,
-    minPercentage,
-    hidePercentage,
-    dimensionsRef,
-  } = props
+  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage, dimensionsRef} = props
 
   const handleDimensionTypeChange = e => {
     dimensionsState.setUsePercentageUnits(e.target.value === 'percentage')
   }
 
-  const message = getMessage(
-    dimensionsState,
-    minWidth,
-    minHeight,
-    minPercentage,
-  )
+  const message = getMessage(dimensionsState, minWidth, minHeight, minPercentage)
   const secondaryMessage = {...message, text: ''}
 
   const displayMessage = message => {
@@ -112,10 +100,8 @@ export default function DimensionsInput(props) {
 
   return (
     <Flex direction="column">
-      <Flex.Item padding="small">
-        {hidePercentage ? (
-          <Text weight="bold">{formatMessage('Custom width and height (Pixels)')}</Text>
-        ) : (
+      {!hidePercentage && (
+        <Flex.Item padding="small">
           <RadioInputGroup
             data-testid="dimension-type"
             name="dimension-type"
@@ -126,13 +112,15 @@ export default function DimensionsInput(props) {
             <RadioInput label={formatMessage('Percentage')} value="percentage" />
             <RadioInput label={formatMessage('Pixels')} value="pixels" />
           </RadioInputGroup>
-        )}
-      </Flex.Item>
-      <Flex.Item padding="small">
+        </Flex.Item>
+      )}
+      <Flex.Item overflowX="hidden">
         <FormFieldGroup
-          description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
+          description={
+            <ScreenReaderContent>{formatMessage('Custom Dimensions')}</ScreenReaderContent>
+          }
         >
-          <Flex alignItems="start" direction="row" data-testid="input-number-container">
+          <Flex alignItems="end" direction="row" data-testid="input-number-container">
             {dimensionsState.usePercentageUnits ? (
               <>
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
@@ -158,7 +146,7 @@ export default function DimensionsInput(props) {
                   />
                 </Flex.Item>
 
-                <Flex.Item padding="x-small small">
+                <Flex.Item padding="0 x-small small">
                   <IconLockLine />
                 </Flex.Item>
 
