@@ -38,9 +38,8 @@ module PageViews
     def generate_jwt_token
       raise ArgumentError, "requestor_user is required for JWT generation" unless @requestor_user
 
-      domain = @configuration.uri.host
       CanvasSecurity::ServicesJwt.for_user(
-        domain,
+        HostUrl.default_host,
         @requestor_user,
         encrypt: false,
         base64: false

@@ -132,9 +132,8 @@ class PageView
       raise ArgumentError, "Either requestor_user or access_token must be provided" unless @requestor_user || @access_token
       return @access_token unless @requestor_user
 
-      domain = @uri.host
       CanvasSecurity::ServicesJwt.for_user(
-        domain,
+        HostUrl.default_host,
         @requestor_user,
         encrypt: false,
         base64: false

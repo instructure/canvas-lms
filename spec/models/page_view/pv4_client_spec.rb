@@ -243,9 +243,20 @@ describe PageView::Pv4Client do
 
     before do
       allow(CanvasSecurity::ServicesJwt).to receive(:for_user).and_return(jwt_token)
+      allow(HostUrl).to receive(:default_host).and_return("canvas.instructure.com")
     end
 
     it_behaves_like "pv4 client"
+
+    it "uses the Canvas instance domain for JWT generation" do
+      canvas_domain = "canvas.example.com"
+      allow(HostUrl).to receive(:default_host).and_return(canvas_domain)
+      stub_http_request("page_views" => [pv4_object])
+
+      client.fetch(user)
+
+      expect(CanvasSecurity::ServicesJwt).to have_received(:for_user).with(canvas_domain, user, encrypt: false, base64: false)
+    end
   end
 
   context "with access_token auth" do

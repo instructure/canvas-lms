@@ -27,6 +27,7 @@ describe PageViews::PollQueryService do
     allow(Account).to receive(:find_cached).and_return(account)
     allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
     allow(admin).to receive(:uuid).and_return("user-uuid-123")
+    allow(HostUrl).to receive(:default_host).and_return("canvas.instructure.com")
   end
 
   it "returns query is running" do

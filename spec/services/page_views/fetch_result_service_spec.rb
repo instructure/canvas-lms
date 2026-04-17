@@ -85,6 +85,7 @@ describe PageViews::FetchResultService do
     allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
     allow(admin).to receive(:uuid).and_return("user-uuid-123")
     allow(Net::HTTP).to receive(:new).and_return(http_double)
+    allow(HostUrl).to receive(:default_host).and_return("canvas.instructure.com")
   end
 
   it "returns compressed jsonl result" do
