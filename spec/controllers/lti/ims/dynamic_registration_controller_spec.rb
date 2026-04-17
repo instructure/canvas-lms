@@ -101,7 +101,7 @@ describe Lti::IMS::DynamicRegistrationController do
     context "with a valid token" do
       let(:token_hash) do
         {
-          user_id: User.create!.id,
+          user_id: User.create!.global_id,
           initiated_at: 1.minute.ago,
           root_account_global_id: Account.default.global_id,
           root_account_domain: Account.default.domain,
@@ -261,7 +261,7 @@ describe Lti::IMS::DynamicRegistrationController do
             # Mimic the token being created on the user's shard, like would happen typically.
             @shard2.activate do
               {
-                user_id: user.id,
+                user_id: user.global_id,
                 initiated_at: 1.minute.ago,
                 root_account_global_id: account.global_id,
                 root_account_domain: account.domain,
@@ -414,7 +414,7 @@ describe Lti::IMS::DynamicRegistrationController do
         end
         let(:token_hash_with_existing) do
           {
-            user_id: User.create!.id,
+            user_id: User.create!.global_id,
             initiated_at: 1.minute.ago,
             root_account_global_id: account.global_id,
             root_account_domain: account.domain,
@@ -465,7 +465,7 @@ describe Lti::IMS::DynamicRegistrationController do
         context "when existing registration is not found" do
           let(:token_hash_with_existing) do
             {
-              user_id: User.create!.id,
+              user_id: User.create!.global_id,
               initiated_at: 1.minute.ago,
               root_account_global_id: account.global_id,
               root_account_domain: account.domain,
@@ -571,7 +571,7 @@ describe Lti::IMS::DynamicRegistrationController do
         let(:invalid_token) do
           initiation_time = 1.minute.ago
           token_hash = {
-            user_id: User.create!.id,
+            user_id: User.create!.global_id,
             initiated_at: initiation_time,
             root_account_global_id: Account.first.root_account_id,
           }
@@ -588,7 +588,7 @@ describe Lti::IMS::DynamicRegistrationController do
         let(:invalid_token) do
           initiation_time = 62.minutes.ago # this should be too long ago to be accepted
           token_hash = {
-            user_id: User.create!.id,
+            user_id: User.create!.global_id,
             initiated_at: initiation_time,
             root_account_global_id: Account.first.root_account_id,
             uuid: SecureRandom.uuid,
@@ -1105,7 +1105,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
     it "includes expected fields in token" do
       subject
-      expect(token[:user_id]).to eq(@admin.id)
+      expect(token[:user_id]).to eq(@admin.global_id)
       expect(token[:root_account_global_id]).to eq(Account.default.global_id)
       expect(token[:root_account_domain]).to eq(Account.default.domain)
       expect(token[:uuid]).not_to be_nil
@@ -1221,8 +1221,8 @@ describe Lti::IMS::DynamicRegistrationController do
 
     it "returns unauthorized if jwt is expired" do
       expired_jwt = Canvas::Security.create_jwt({
-                                                  user_id: @admin.id,
-                                                  root_account_global_id: Account.default.id
+                                                  user_id: @admin.global_id,
+                                                  root_account_global_id: Account.default.global_id
                                                 },
                                                 5.minutes.ago)
       get :dr_iframe, params: { account_id: Account.default.id, url: "http://testexample.com?registration_token=#{expired_jwt}" }
@@ -1231,7 +1231,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
     it "returns unauthorized if jwt is issued for other account" do
       expired_jwt = Canvas::Security.create_jwt({
-                                                  user_id: @admin.id,
+                                                  user_id: @admin.global_id,
                                                   root_account_global_id: 123
                                                 },
                                                 5.minutes.from_now)
@@ -1242,8 +1242,8 @@ describe Lti::IMS::DynamicRegistrationController do
 
     it "returns unauthorized if jwt is issued for other user" do
       expired_jwt = Canvas::Security.create_jwt({
-                                                  user_id: @admin.id + 1,
-                                                  root_account_global_id: Account.default.id
+                                                  user_id: @admin.global_id + 1,
+                                                  root_account_global_id: Account.default.global_id
                                                 },
                                                 5.minutes.from_now)
       get :dr_iframe, params: { account_id: Account.default.id, url: "http://testexample.com?registration_token=#{expired_jwt}" }
@@ -1253,7 +1253,7 @@ describe Lti::IMS::DynamicRegistrationController do
 
     it "adds url to CSP whitelist if registration_token is valid" do
       valid_jwt = Canvas::Security.create_jwt({
-                                                user_id: @admin.id,
+                                                user_id: @admin.global_id,
                                                 root_account_global_id: Account.default.global_id
                                               },
                                               5.minutes.from_now)
