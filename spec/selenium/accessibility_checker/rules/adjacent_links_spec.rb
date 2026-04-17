@@ -19,12 +19,14 @@
 
 require_relative "../../common"
 require_relative "../pages/accessibility_checker_page"
+require_relative "../pages/wiki_page"
 require_relative "../support/batch_data_factory"
 
 describe "Accessibility Checker - Adjacent Links Rule", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include AccessibilityCheckerPage
   include AccessibilityChecker::BatchDataFactory
+  include AccessibilityChecker::WikiPage
 
   let(:issue_description) { "These are two links that go to the same place. Turn them into one link to avoid repetition." }
   let(:fix_applied_message) { "Links merged" }
@@ -42,8 +44,8 @@ describe "Accessibility Checker - Adjacent Links Rule", :ignore_js_errors do
   end
 
   context "Fixing adjacent links issues" do
-    let(:link_count) { ff(".show-content a").length }
-    let(:merged_link_text) { f(".show-content a").text }
+    let(:link_count) { content_links.length }
+    let(:merged_link_text) { content_link.text }
 
     before(:once) do
       @course.wiki_pages.destroy_all

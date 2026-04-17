@@ -60,6 +60,9 @@ module AccessibilityChecker
 
     FIXTURES = {
       missing_alt_text: { path: "single_issues/missing_alt_text.html", title: "Missing Alt Text", issue_count: 1 },
+      heading_too_long: { path: "single_issues/heading_too_long.html", title: "Heading Too Long", issue_count: 1, heading_text: "This is a very long heading that is intentionally written to exceed the one hundred and twenty character limit for headings", issue_heading_level: 2 },
+      heading_starts_at_h2: { path: "single_issues/heading_starts_at_h2.html", title: "Heading Starts at H2", issue_count: 1, issue_heading_level: 1, corrected_heading_level: 2, heading_text: "Main Page Heading" },
+      heading_sequence: { path: "single_issues/heading_sequence.html", title: "Heading Sequence", issue_count: 1, issue_heading_level: 4, corrected_heading_level: 3 },
       adjacent_links: { path: "single_issues/adjacent_links.html", title: "Adjacent Links", issue_count: 1 },
       misformatted_ordered_list: { path: "single_issues/misformatted_list.html", title: "Misformatted Ordered List", issue_count: 1, list_item_count: 3 },
       misformatted_unordered_list: { path: "single_issues/misformatted_unordered_list.html", title: "Misformatted Unordered List", issue_count: 1, list_item_count: 3 },
@@ -113,6 +116,18 @@ module AccessibilityChecker
 
     def list_item_count_for(fixture_key)
       FIXTURES[fixture_key][:list_item_count] || 0
+    end
+
+    def heading_text_for(fixture_key)
+      FIXTURES[fixture_key][:heading_text]
+    end
+
+    def issue_heading_level_for(fixture_key)
+      FIXTURES[fixture_key][:issue_heading_level]
+    end
+
+    def corrected_heading_level_for(fixture_key)
+      FIXTURES[fixture_key][:corrected_heading_level]
     end
 
     def expected_issue_count_for(resource)

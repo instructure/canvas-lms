@@ -19,12 +19,14 @@
 
 require_relative "../../common"
 require_relative "../pages/accessibility_checker_page"
+require_relative "../pages/wiki_page"
 require_relative "../support/batch_data_factory"
 
 describe "Accessibility Checker - Misformatted List Rule", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include AccessibilityCheckerPage
   include AccessibilityChecker::BatchDataFactory
+  include AccessibilityChecker::WikiPage
 
   let(:issue_description) { "This looks like a list but isn't formatted as one." }
   let(:fix_applied_message) { "List is now formatted correctly." }
@@ -40,7 +42,7 @@ describe "Accessibility Checker - Misformatted List Rule", :ignore_js_errors do
   end
 
   shared_examples "persists reformatted list" do |list_type, expected_list_tag|
-    let(:reformatted_list_items) { ff(".show-content #{expected_list_tag} li") }
+    let(:reformatted_list_items) { content_list_items(expected_list_tag) }
 
     it "persists the reformatted #{list_type} list to the actual page content after save" do
       issues_table.find_row_by_resource_name(list_page.title).click_fix_button
