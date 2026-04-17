@@ -77,6 +77,7 @@ module Importers
         item.public = hash[:public] unless hash[:public].nil?
         item.hide_score_total = hash[:hide_score_total] unless hash[:hide_score_total].nil?
         item.free_form_criterion_comments = hash[:free_form_criterion_comments] unless hash[:free_form_criterion_comments].nil?
+        item.rating_order = hash[:rating_order] if hash[:rating_order].present?
 
         item.data = hash[:data]
         item.data.each do |crit|
