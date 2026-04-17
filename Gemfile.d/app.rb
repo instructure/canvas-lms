@@ -91,6 +91,7 @@ gem "prawn-rails", "~> 1.4"
 gem "prosopite", "~> 2.1"
 gem "puma", "~> 7.0", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
+gem "waterdrop", "~> 2.9", require: false
 gem "rails-observers", "0.1.5"
 gem "feedjira", "~> 4.0", require: false
 gem "redcarpet", "~> 3.6", require: false

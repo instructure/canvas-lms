@@ -411,3 +411,8 @@ classic_quizzes_client_ip:
     We need to use the quiz_client_ip method to get the real IP of the user.
   applies_to: RootAccount
   shadow: true
+enable_kafka_events:
+  state: hidden
+  display_name: Emit Events to Kafka
+  description: Allow emitting events to Kafka
+  applies_to: SiteAdmin

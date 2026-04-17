@@ -734,6 +734,33 @@ GEM
       simpleidn (~> 0.2)
     jwt (3.1.2)
       base64
+    karafka-core (2.5.13)
+      karafka-rdkafka (>= 0.20.0)
+      logger (>= 1.6.0)
+    karafka-rdkafka (0.26.1)
+      ffi (~> 1.17.1)
+      json (> 2.0)
+      logger
+      mini_portile2 (~> 2.6)
+      rake (> 12)
+    karafka-rdkafka (0.26.1-aarch64-linux-gnu)
+      ffi (~> 1.17.1)
+      json (> 2.0)
+      logger
+      mini_portile2 (~> 2.6)
+      rake (> 12)
+    karafka-rdkafka (0.26.1-arm64-darwin)
+      ffi (~> 1.17.1)
+      json (> 2.0)
+      logger
+      mini_portile2 (~> 2.6)
+      rake (> 12)
+    karafka-rdkafka (0.26.1-x86_64-linux-gnu)
+      ffi (~> 1.17.1)
+      json (> 2.0)
+      logger
+      mini_portile2 (~> 2.6)
+      rake (> 12)
     language_server-protocol (3.17.0.5)
     launchy (3.1.1)
       addressable (~> 2.8)
@@ -1220,6 +1247,10 @@ GEM
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
+    waterdrop (2.9.0)
+      karafka-core (>= 2.5.12, < 3.0.0)
+      karafka-rdkafka (>= 0.24.0)
+      zeitwerk (~> 2.3)
     wcag_color_contrast (0.1.0)
     webmock (3.26.2)
       addressable (>= 2.8.0)
@@ -1439,6 +1470,7 @@ DEPENDENCIES
   utf8_cleaner!
   vault (~> 0.17)
   vericite_api (= 1.5.3)
+  waterdrop (~> 2.9)
   wcag_color_contrast (= 0.1.0)
   webmock (~> 3.18)
   workflow!

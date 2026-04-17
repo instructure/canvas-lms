@@ -97,6 +97,9 @@ development:
         aws_access_key_id: key
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
+      kafka_events.yml: |-
+        topics:
+          course_events: course.events
       # bedrock configuration for smart search and discussion summaries
       bedrock.yml: |-
         bedrock_region: us-west-2
