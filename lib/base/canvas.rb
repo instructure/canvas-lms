@@ -77,7 +77,7 @@ module Canvas
       yaml_string = DynamicSettings.find(tree: :private, cluster:, default_ttl:)["#{config_name}.yml", failsafe_cache: failsafe_param]
       YAML.safe_load(yaml_string || "{}") || {}
     rescue => e
-      Rails.logger.warn("Failed to load #{config_name} from Consul: #{e.message}")
+      Rails.logger&.warn("Failed to load #{config_name} from Consul: #{e.message}")
       {}
     end
 
