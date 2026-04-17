@@ -56,6 +56,27 @@ axios.interceptors.response.use(
 const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
 const pendingIntervals = new Set<ReturnType<typeof setInterval>>()
 
+// Track all MutationObservers so we can disconnect them in afterEach.
+// InstUI v11 ScreenReaderFocusRegion uses a MutationObserver that fires
+// asynchronously. If it fires after jsdom tears down the environment, it
+// throws "ReferenceError: Element is not defined" because the observer
+// callback checks `elem instanceof Element`. Disconnecting all observers
+// before the environment tears down prevents this.
+const activeMutationObservers = new Set<MutationObserver>()
+const OriginalMutationObserver = globalThis.MutationObserver
+class TrackedMutationObserver extends OriginalMutationObserver {
+  constructor(callback: MutationCallback) {
+    super(callback)
+    activeMutationObservers.add(this)
+  }
+
+  disconnect() {
+    activeMutationObservers.delete(this)
+    super.disconnect()
+  }
+}
+globalThis.MutationObserver = TrackedMutationObserver as unknown as typeof MutationObserver
+
 const originalSetTimeout = globalThis.setTimeout
 const originalSetInterval = globalThis.setInterval
 const originalClearTimeout = globalThis.clearTimeout
@@ -126,6 +147,13 @@ afterEach(() => {
     originalClearInterval(id)
   }
   pendingIntervals.clear()
+
+  // Disconnect all MutationObservers to prevent InstUI ScreenReaderFocusRegion
+  // callbacks from firing after jsdom tears down the environment globals.
+  for (const observer of activeMutationObservers) {
+    observer.disconnect()
+  }
+  activeMutationObservers.clear()
 })
 
 // jQuery plugins (toJSON, dialog, droppable, etc.) are added via the jquery-with-plugins.ts wrapper
