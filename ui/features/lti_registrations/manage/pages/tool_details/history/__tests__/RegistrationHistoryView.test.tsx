@@ -102,7 +102,7 @@ const mockConfigSnapshot = () => ({
     admin_nickname: 'Test Tool',
     name: 'Test Tool',
     vendor: null,
-    workflow_state: 'on' as const,
+    workflow_state: 'active' as const,
     description: null,
     lock_deploying: false,
   },
@@ -170,10 +170,9 @@ describe('RegistrationHistoryView', () => {
       )
 
       expect(await screen.findByText('Configuration Update History')).toBeInTheDocument()
-      expect(screen.getByText('Status')).toBeInTheDocument()
       expect(screen.getByText('Updated On')).toBeInTheDocument()
       expect(screen.getByText('Updated By')).toBeInTheDocument()
-      expect(screen.getByText('Affected Fields')).toBeInTheDocument()
+      expect(screen.getByText('Summary')).toBeInTheDocument()
       expect(screen.getByText('John Doe')).toBeInTheDocument()
     })
 
@@ -457,6 +456,93 @@ describe('RegistrationHistoryView', () => {
       expect(await screen.findByText('Availability & Exceptions')).toBeInTheDocument()
     })
 
+    it('shows "Turned Off" when workflow_state changes from active to inactive', async () => {
+      const mockSnapshot = mockConfigSnapshot()
+      const entries: ConfigChangeHistoryEntry[] = [
+        mockConfigChangeEntry({
+          old_configuration: {
+            ...mockSnapshot,
+            registration: {...mockSnapshot.registration, workflow_state: 'active' as const},
+          },
+          new_configuration: {
+            ...mockSnapshot,
+            registration: {...mockSnapshot.registration, workflow_state: 'inactive' as const},
+          },
+        }),
+      ]
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/history`, () =>
+          HttpResponse.json(entries),
+        ),
+      )
+
+      renderWithQueryClient(
+        <RegistrationHistoryView accountId={accountId} registrationId={registrationId} />,
+      )
+
+      expect(await screen.findByText('Turned Off')).toBeInTheDocument()
+      expect(screen.queryByRole('button', {name: 'Turned Off'})).toBeNull()
+    })
+
+    it('shows "Turned On" when workflow_state changes from inactive to active', async () => {
+      const mockSnapshot = mockConfigSnapshot()
+      const entries: ConfigChangeHistoryEntry[] = [
+        mockConfigChangeEntry({
+          old_configuration: {
+            ...mockSnapshot,
+            registration: {...mockSnapshot.registration, workflow_state: 'inactive' as const},
+          },
+          new_configuration: {
+            ...mockSnapshot,
+            registration: {...mockSnapshot.registration, workflow_state: 'active' as const},
+          },
+        }),
+      ]
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/history`, () =>
+          HttpResponse.json(entries),
+        ),
+      )
+
+      renderWithQueryClient(
+        <RegistrationHistoryView accountId={accountId} registrationId={registrationId} />,
+      )
+
+      expect(await screen.findByText('Turned On')).toBeInTheDocument()
+      expect(screen.queryByRole('button', {name: 'Turned On'})).toBeNull()
+    })
+
+    it('shows "Deleted" when workflow_state changes from active to deleted', async () => {
+      const mockSnapshot = mockConfigSnapshot()
+      const entries: ConfigChangeHistoryEntry[] = [
+        mockConfigChangeEntry({
+          old_configuration: {
+            ...mockSnapshot,
+            registration: {...mockSnapshot.registration, workflow_state: 'active' as const},
+          },
+          new_configuration: {
+            ...mockSnapshot,
+            registration: {...mockSnapshot.registration, workflow_state: 'deleted' as const},
+          },
+        }),
+      ]
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/history`, () =>
+          HttpResponse.json(entries),
+        ),
+      )
+
+      renderWithQueryClient(
+        <RegistrationHistoryView accountId={accountId} registrationId={registrationId} />,
+      )
+
+      expect(await screen.findByText('Deleted')).toBeInTheDocument()
+      expect(screen.queryByRole('button', {name: 'Deleted'})).toBeNull()
+    })
+
     it('shows multiple affected fields when multiple categories change', async () => {
       const mockSnapshot = mockConfigSnapshot()
       const entries: ConfigChangeHistoryEntry[] = [
@@ -505,6 +591,45 @@ describe('RegistrationHistoryView', () => {
       expect(await screen.findByText(/Naming/)).toBeInTheDocument()
       expect(await screen.findByText(/Privacy Level/)).toBeInTheDocument()
       expect(await screen.findByText(/Placements/)).toBeInTheDocument()
+    })
+  })
+
+  describe('workflow state summary rendering', () => {
+    it('renders workflow-state change combined with other field changes as a link', async () => {
+      const mockSnapshot = mockConfigSnapshot()
+      const entries: ConfigChangeHistoryEntry[] = [
+        mockConfigChangeEntry({
+          old_configuration: {
+            ...mockSnapshot,
+            registration: {
+              ...mockSnapshot.registration,
+              workflow_state: 'active' as const,
+              admin_nickname: 'Old Name',
+            },
+          },
+          new_configuration: {
+            ...mockSnapshot,
+            registration: {
+              ...mockSnapshot.registration,
+              workflow_state: 'inactive' as const,
+              admin_nickname: 'New Name',
+            },
+          },
+        }),
+      ]
+
+      server.use(
+        http.get(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/history`, () =>
+          HttpResponse.json(entries),
+        ),
+      )
+
+      renderWithQueryClient(
+        <RegistrationHistoryView accountId={accountId} registrationId={registrationId} />,
+      )
+
+      const summaryLink = await screen.findByRole('button', {name: /Turned Off/})
+      expect(summaryLink).toBeInTheDocument()
     })
   })
 

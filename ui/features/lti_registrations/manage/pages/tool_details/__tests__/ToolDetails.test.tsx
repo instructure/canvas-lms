@@ -34,6 +34,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {fireEvent, screen} from '@testing-library/dom'
 import {ZLtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {showFlashAlert} from '@instructure/platform-alerts'
+import {LtiRegistration} from '../../../model/LtiRegistration'
 
 vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
@@ -496,7 +497,7 @@ describe('ToolDetailsInner', () => {
     })
 
     describe('local copy registration (inherited with template_registration_id)', () => {
-      const mockLocalCopyRegistration = (workflowState: string) => ({
+      const mockLocalCopyRegistration = (workflowState: LtiRegistration['workflow_state']) => ({
         ...mockRegistrationWithAllInformation({n: 'local copy', i: 1}),
         inherited: true,
         template_registration_id: ZLtiRegistrationId.parse('99'),

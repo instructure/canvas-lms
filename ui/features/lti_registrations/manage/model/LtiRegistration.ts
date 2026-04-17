@@ -38,7 +38,7 @@ export const ZLtiRegistration = z.object({
   inherited: z.boolean().optional(),
   name: z.string(),
   admin_nickname: z.string().nullable(),
-  workflow_state: z.string(),
+  workflow_state: z.enum(['active', 'inactive', 'deleted']),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
   created_by: z.union([ZUser, z.literal('Instructure')]).optional(),
