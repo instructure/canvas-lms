@@ -1147,6 +1147,49 @@ describe('diffConfigChangeEntry', () => {
       })
     })
 
+    describe('Workflow State', () => {
+      it('detects when a registration is deactivated', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'active'
+        entry.new_configuration.registration.workflow_state = 'inactive'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig!.workflowState).toEqual(createDiffValue('active', 'inactive'))
+      })
+
+      it('detects when a registration is activated', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'inactive'
+        entry.new_configuration.registration.workflow_state = 'active'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig!.workflowState).toEqual(createDiffValue('inactive', 'active'))
+      })
+
+      it('returns null internalConfig when workflow_state is unchanged', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'active'
+        entry.new_configuration.registration.workflow_state = 'active'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig).toBeNull()
+      })
+
+      it('counts a state change as 1 addition and 1 removal', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'active'
+        entry.new_configuration.registration.workflow_state = 'inactive'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.totalAdditions).toBe(1)
+        expect(result.totalRemovals).toBe(1)
+      })
+    })
+
     describe('Icons', () => {
       it('detects top-level icon_url changes', () => {
         const entry = createMockConfigEntry(
