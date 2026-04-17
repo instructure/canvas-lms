@@ -428,4 +428,68 @@ describe Canvas do
       Canvas.load_config_file_or_consul("test_config", cluster: "cluster21")
     end
   end
+
+  describe ".load_consul_subtree" do
+    let(:proxy) { instance_double(DynamicSettings::PrefixProxy) }
+
+    before do
+      allow(DynamicSettings).to receive(:find)
+        .with("outgoing_mail", tree: :private, default_ttl: 5.minutes)
+        .and_return(proxy)
+      allow(FileUtils).to receive(:mkdir_p)
+    end
+
+    it "fetches each key and parses values as YAML" do
+      allow(proxy).to receive(:[]).with("smtp.yml", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("domain: example.com\nport: 25\n")
+      allow(proxy).to receive(:[]).with("reply_to", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("reply@example.com")
+      allow(proxy).to receive(:[]).with("delivery_method", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("test")
+      allow(proxy).to receive(:[]).with("reply_to_disabled", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("true")
+
+      result = Canvas.load_consul_subtree("outgoing_mail",
+                                          keys: %w[smtp.yml reply_to delivery_method reply_to_disabled])
+
+      expect(result).to eq(
+        smtp: { "domain" => "example.com", "port" => 25 },
+        reply_to: "reply@example.com",
+        delivery_method: "test",
+        reply_to_disabled: true
+      )
+    end
+
+    it "returns nil for absent keys" do
+      allow(proxy).to receive(:[]).and_return(nil)
+
+      result = Canvas.load_consul_subtree("outgoing_mail",
+                                          keys: %w[smtp.yml reply_to])
+
+      expect(result).to eq(smtp: nil, reply_to: nil)
+    end
+
+    it "creates the per-prefix cache subdirectory when failsafe_cache is enabled" do
+      allow(proxy).to receive(:[]).and_return(nil)
+
+      expect(FileUtils).to receive(:mkdir_p).with(Rails.root.join("config/outgoing_mail"))
+
+      Canvas.load_consul_subtree("outgoing_mail", keys: ["reply_to"])
+    end
+
+    it "passes failsafe_cache: false to the proxy when disabled" do
+      expect(proxy).to receive(:[]).with("reply_to", failsafe_cache: false).and_return(nil)
+      expect(FileUtils).not_to receive(:mkdir_p)
+
+      Canvas.load_consul_subtree("outgoing_mail", keys: ["reply_to"], failsafe_cache: false)
+    end
+
+    it "lets Consul errors propagate" do
+      allow(proxy).to receive(:[]).and_raise(StandardError, "boom")
+
+      expect do
+        Canvas.load_consul_subtree("outgoing_mail", keys: %w[smtp.yml reply_to])
+      end.to raise_error(StandardError, "boom")
+    end
+  end
 end
