@@ -171,7 +171,7 @@ describe('TagAsModal', () => {
 
     it('renders multi-variant categories as grouped options', async () => {
       renderComponent({categories: [multipleTagsCategoryTyped]})
-      await user.click(screen.getByTestId('existing-tag-selector'))
+      await user.click(screen.getByRole('combobox'))
       // SimpleSelect renders options asynchronously after click
       expect(await screen.findByText('Reading Groups', {}, {timeout: 3000})).toBeInTheDocument()
       expect(
@@ -192,7 +192,7 @@ describe('TagAsModal', () => {
       )
 
       renderComponent({categories: [singleTagCategoryTyped]})
-      await user.click(screen.getByTestId('existing-tag-selector'))
+      await user.click(screen.getByRole('combobox'))
       await user.click(await screen.findByRole('option', {name: 'Honors'}, {timeout: 3000}))
       await user.click(screen.getByTestId('submit-button'))
 
@@ -215,7 +215,7 @@ describe('TagAsModal', () => {
       )
 
       renderComponent({categories: [multipleTagsCategoryTyped]})
-      await user.click(screen.getByTestId('existing-tag-selector'))
+      await user.click(screen.getByRole('combobox'))
       await user.click(await screen.findByRole('option', {name: 'Variant A'}, {timeout: 3000}))
       await user.click(screen.getByTestId('submit-button'))
 
@@ -344,7 +344,7 @@ describe('TagAsModal', () => {
     it('lists only multi-variant categories in the tag set selector', async () => {
       renderComponent({categories: [singleTagCategoryTyped, multipleTagsCategoryTyped]})
       await user.click(screen.getByLabelText('New variant of existing tag'))
-      await user.click(screen.getByTestId('existing-tag-set-selector'))
+      await user.click(screen.getByRole('combobox'))
       // Multi-variant category should appear
       expect(screen.getByTitle('Reading Groups')).toBeInTheDocument()
       // Single tag category should NOT appear
