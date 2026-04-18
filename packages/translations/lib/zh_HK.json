@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "選擇檔案"
     },
+    "choose_file_required_61f0d716": {
+        "message": "選擇檔案（必填）"
+    },
     "choose_usage_rights_33683854": {
         "message": "選擇使用權限…"
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "首頁"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "如何申請和編輯標題？"
     },
     "html_code_editor_fd967a44": {
         "message": "Html 代碼編輯器"

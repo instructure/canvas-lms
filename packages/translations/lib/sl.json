@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Izberi datoteko"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Izberite datoteko (zahtevano)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Izberi pravice uporabe ..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Glavna stran"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Kako zahtevati in urejati napise?"
     },
     "html_code_editor_fd967a44": {
         "message": "urejevalnik kode html"

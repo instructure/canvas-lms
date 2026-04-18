@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "파일 선택"
     },
+    "choose_file_required_61f0d716": {
+        "message": "파일 선택(필수)"
+    },
     "choose_usage_rights_33683854": {
         "message": "사용 권리를 선택..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "홈"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "어떻게 캡션을 요청 및 편집합니까?"
     },
     "html_code_editor_fd967a44": {
         "message": "html 코드 편집기"

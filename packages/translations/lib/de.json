@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Datei auswählen"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Datei auswählen (erforderlich)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Nutzungsrechte auswählen ...."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Start"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Wie kann ich Untertitel anfordern und bearbeiten?"
     },
     "html_code_editor_fd967a44": {
         "message": "HTML-Code-Editor"

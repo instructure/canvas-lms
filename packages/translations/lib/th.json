@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "เลือกไฟล์"
     },
+    "choose_file_required_61f0d716": {
+        "message": "เลือกไฟล์ (บังคับ)"
+    },
     "choose_usage_rights_33683854": {
         "message": "เลือกสิทธิ์การใช้งาน..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "หน้าหลัก"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "จะแจ้งขอและแก้ไขคำบรรยายได้อย่างไร"
     },
     "html_code_editor_fd967a44": {
         "message": "โปรแกรมแก้ไขรหัส HTML"
