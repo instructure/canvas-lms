@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Elegir archivo"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Seleccionar archivo (obligatorio)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Elegir derechos de uso..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Página de inicio"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "¿Cómo solicitar y editar subtítulos?"
     },
     "html_code_editor_fd967a44": {
         "message": "editor de código html"

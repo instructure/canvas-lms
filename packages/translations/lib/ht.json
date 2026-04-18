@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Chwazi Fichye"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Chwazi Fichye (obligatwa)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Itilizasyon dwa itilizasyon..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Akèy"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Kijan pou mande ak modifye soutit yo?"
     },
     "html_code_editor_fd967a44": {
         "message": "editè kòd html"

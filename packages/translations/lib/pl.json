@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Wybierz plik"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Wybierz plik (wymagane)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Wybierz prawa użytkowania..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Strona główna"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Jak poprosić o napisy i je edytować?"
     },
     "html_code_editor_fd967a44": {
         "message": "edytor kodu html"

@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Kōwhiri kōnae"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Kōwhiria te Kōnae (e hiahiatia ana)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Kōwhiria ngā mōtika whakamahi ..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Kāinga"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Me pēhea te tono me te whakatika i ngā taitara?"
     },
     "html_code_editor_fd967a44": {
         "message": "html waehere editor"
