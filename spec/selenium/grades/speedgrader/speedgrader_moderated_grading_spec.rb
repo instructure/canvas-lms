@@ -81,6 +81,8 @@ describe "SpeedGrader" do
       time2 = 10.minutes.from_now
       Timecop.freeze(time2) do
         submit_comment "srsly"
+        # wait for comment to save and submission to update
+        expect { SubmissionComment.where(submission: @submission, comment: "srsly").any? }.to become(true)
       end
       @submission.reload
       expect(@submission.updated_at.to_i).to eq time2.to_i
