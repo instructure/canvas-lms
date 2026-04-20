@@ -4,3 +4,11 @@ services:
     environment:
       REMOTE_DEBUGGING_ENABLED: 1
       USER: docker
+  jobs:
+    environment:
+      RUBY_DEBUG_PORT: 12355
+    # 12355 is bound by the delayed_job master (which never runs jobs).
+    # The worker falls back to 12356 — that's the one we attach to.
+    ports:
+      - 12355:12355
+      - 12356:12356
