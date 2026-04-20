@@ -351,6 +351,12 @@ class ApplicationController < ActionController::Base
 
         if load_usage_metrics?
           @js_env[:PENDO_APP_ID] = usage_metrics_api_key
+          @js_env[:PENDO_APP_ENV] = "io"
+          @js_env[:PRE_COOKIE_CONSENT] = "true"
+        elsif load_consented_usage_metrics?
+          @js_env[:PENDO_APP_ID] = usage_metrics_regional_api_key
+          @js_env[:PENDO_APP_ENV] = usage_metrics_regional_api_env
+
           if cached_features[:cookie_consent_necessary]
             mobile_webview = session&.dig(:is_mobile_webview)
             mobile_consent = session&.dig(:mobile_cookie_consent)
@@ -605,6 +611,7 @@ class ApplicationController < ActionController::Base
     rubric_criterion_range
     scheduled_page_publication
     send_usage_metrics
+    send_usage_metrics_after_consent
     top_navigation_placement
     youtube_migration
     educator_dashboard

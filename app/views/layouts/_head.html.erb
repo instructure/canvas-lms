@@ -83,5 +83,5 @@
     <%= prefetch_xhr(*args, **kwargs) %>
   <% end -%>
   <% if @include_recaptcha %><script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async></script><% end %>
-  <% deferred_js_bundle :usage_metrics if load_usage_metrics? %>
+  <% deferred_js_bundle :usage_metrics if (load_usage_metrics? || load_consented_usage_metrics?) %>
 </head>

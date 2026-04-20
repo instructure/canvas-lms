@@ -29,6 +29,7 @@ declare global {
 declare const ENV: GlobalEnv
 
 const oneTrustPerformanceCookieClass: string = 'C0002'
+const isDevEnv: boolean = ENV && ENV.RAILS_ENVIRONMENT === 'development'
 
 let libraryInitialized: boolean = false
 let whenPendoReady: Promise<any> | null = null
@@ -41,7 +42,7 @@ function initializeLib(): void {
   if (!libraryInitialized) {
     libraryInitialized = true
 
-    if (ENV && ENV.RAILS_ENVIRONMENT === 'development') {
+    if (isDevEnv) {
       debuglog = (message: string) => {
         console.log(message)
       }
@@ -110,6 +111,9 @@ export async function initializePendo() {
     whenPendoReady = result
       .then((pendoo: any) => {
         thePendo = pendoo
+        if (isDevEnv) {
+          window.CANVAS_DEBUGTAP.pendoInstance = pendoo
+        }
         pendoInitializing = false
         debuglog('Pendo initialized successfully.')
         return pendoo
@@ -190,7 +194,7 @@ function init(): Promise<any> | null {
 
     pendoInitParams = {
       apiKey: ENV.PENDO_APP_ID,
-      env: 'io',
+      env: ENV.PENDO_APP_ENV,
       visitor: visitorData,
       account: accountData,
       globalKey: 'canvasUsageMetrics',

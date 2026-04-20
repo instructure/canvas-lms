@@ -375,12 +375,17 @@ send_usage_metrics:
   applies_to: RootAccount
   visible_on: usage_metrics_allowed_hook
   shadow: true
+send_usage_metrics_after_consent:
+  state: hidden
+  display_name: Send usage metrics after consent
+  description: Send usage metrics only after user has given consent to data processing
+  applies_to: RootAccount
+  shadow: true
 cookie_consent_necessary:
   state: hidden
   display_name: Cookie Consent Necessary
   description: Indicates if cookie consent is necessary
   applies_to: RootAccount
-  visible_on: usage_metrics_allowed_hook
   shadow: true
 new_quiz_public_api:
   applies_to: SiteAdmin
