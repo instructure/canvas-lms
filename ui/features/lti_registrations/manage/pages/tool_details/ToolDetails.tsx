@@ -533,7 +533,7 @@ export const ToolDetailsInner = ({
               ) : null}
             </Flex>
             <Flex direction="column">
-              <Flex gap="small" margin="0">
+              <Flex gap="small" margin="0" wrap="wrap">
                 <Button
                   data-pendo="lti-registrations-copy-client-id"
                   color="secondary"
