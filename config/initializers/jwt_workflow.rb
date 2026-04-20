@@ -63,3 +63,11 @@ CanvasSecurity::JWTWorkflow.register(:scone, requires_context: true) do |context
     ) || false
   }
 end
+
+CanvasSecurity::JWTWorkflow.register(:autopilot, requires_context: true) do |context, user|
+  next {} unless context.is_a?(Account) && user.present?
+
+  %i[manage_rules_view manage_rules_add manage_rules_edit manage_rules_delete].index_with do |permission|
+    context.grants_right?(user, permission)
+  end
+end
