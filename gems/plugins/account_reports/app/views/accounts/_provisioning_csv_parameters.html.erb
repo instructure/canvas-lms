@@ -96,6 +96,32 @@
       </label>
     </td>
   </tr>
+  <% if @account.root_account.feature_enabled?(:institutional_tags) %>
+    <tr>
+      <td>
+        <label class="checkbox">
+          <%= check_box_tag "parameters[institutional_tag_categories]" %>
+          <%= t('Institutional Tag Categories CSV') %>
+        </label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label class="checkbox">
+          <%= check_box_tag "parameters[institutional_tags]" %>
+          <%= t('Institutional Tags CSV') %>
+        </label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label class="checkbox">
+          <%= check_box_tag "parameters[institutional_tag_associations]" %>
+          <%= t('Institutional Tag Associations CSV') %>
+        </label>
+      </td>
+    </tr>
+  <% end %>
   <tr>
     <tr>
         <td>
