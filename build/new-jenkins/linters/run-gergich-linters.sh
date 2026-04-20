@@ -73,5 +73,24 @@ ruby script/lint_commit_message
 
 bin/rails css:styleguide doc:api
 
+# Regression check for GROW-236: ensure file download routes don't leak into
+# other controllers' API docs (e.g., accounts#index should have exactly 1 scope).
+accounts_html="public/doc/api/accounts.html"
+if [ -f "$accounts_html" ]; then
+  accounts_index_scopes=$(ruby -e "
+    require 'nokogiri'
+    doc = Nokogiri::HTML(File.read('$accounts_html'))
+    h2 = doc.at_css('h2[name=\"method.accounts.index\"]')
+    puts h2 ? h2.parent.css('h3').length : 'missing'
+  " 2>/dev/null || echo "missing")
+  if [ "$accounts_index_scopes" = "missing" ]; then
+    echo "ERROR: accounts#index section not found in API docs" >&2
+    exit 1
+  elif [ "$accounts_index_scopes" != "1" ]; then
+    echo "ERROR: accounts#index has $accounts_index_scopes scopes in API docs, expected 1. File download routes may be leaking into other controllers." >&2
+    exit 1
+  fi
+fi
+
 gergich status
 echo "LINTER OK!"
