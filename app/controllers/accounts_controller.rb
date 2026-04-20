@@ -765,8 +765,9 @@ class AccountsController < ApplicationController
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
-  # @argument enrollment_term_id [Integer]
-  #   If set, only includes courses from the specified term.
+  # @argument enrollment_term_id[] [Integer]
+  #   If set, only includes courses from the specified terms. Can be either a single ID or
+  #   an array of enrollment term IDs.
   #
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
@@ -983,8 +984,12 @@ class AccountsController < ApplicationController
     end
 
     if params[:enrollment_term_id]
-      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
-      @courses = @courses.for_term(term)
+      terms = if params[:enrollment_term_id].is_a?(Array)
+                api_find_all(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              else
+                api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              end
+      @courses = @courses.for_term(terms)
     end
 
     if params[:search_term]
