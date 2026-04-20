@@ -366,6 +366,7 @@ ga:
   a_template_name_is_required_8568babf: "Tá ainm teimpléid ag teastáil"
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "chun dul i dteagmháil le seirbhís fíordheimhnithe sheachtrach"
   a_title_is_required_71222850: "Tá teideal ag teastáil"
+  a_url_to_help_users_who_are_having_trouble_logging_e7490244: "URL chun cabhrú le húsáideoirí a bhfuil deacracht acu logáil isteach. Má shocraítear é, feicfear nasc 'An bhfuil badhbanna agat ag logáil isteach?' ar an leathanach logála isteach."
   a_user_could_not_be_found_65d13b84: "Níorbh fhéidir úsáideoir a aimsiú."
   a_user_who_can_delete_differentiation_tags_has_the_194875b9: "Tá sé de chumas ag úsáideoir atá in ann clibeanna difreála a scriosadh úsáideoirí a bhaint de thasc trí na clibeanna a shanntar don tasc a scriosadh."
   a_user_with_this_permission_has_the_ability_to_rem_82d8b0a6: "Tá an cumas ag úsáideoir a bhfuil an cead seo aige úsáideoirí a bhaint de thasc trí leaganacha clibeanna a shanntar do thasc a bhaint"
@@ -486,6 +487,7 @@ ga:
     default_term_name: "Seimeastar Réamhshocraithe"
     errors: 
       invalid_discovery_url: "Níl an URL fionnachtana bailí"
+      invalid_login_help_url: "Níl an URL cabhrach logála isteach bailí"
     feedback_coach: "Tabhair cuairt ar an bPobal"
     feedback_coach_sub: "Féach thart ar threoracha, nuashonruithe, blaganna, fóraim agus acmhainní chun cabhrú leat freagraí a fháil."
     feedback_feature_request_sub: "An bhfuil smaoineamh agat Canvas a fheabhsú?"
@@ -718,6 +720,7 @@ ga:
         consortium_autocreate_web_of_trust: "Cruthaigh gréasán muiníne go huathoibríoch agus cuntais nua á gcruthú"
         consortium_can_create_own_accounts: "Is féidir le riarthóirí cuibhreannais cuntais fhréimhe a chruthú"
         consortium_parent_account: "Máthair-chuntas cuibhreannais"
+        enforce_access_consent: "Éiligh ar riarthóir scoile rochtain fostaithe Instructure a cheadú"
         shard_per_account: "Cruthaigh shard nua do gach cuntas fréimhe nua"
       new_account_domain_title: "Fearann Cuntais Nua"
     additional_settings_right_side: 
@@ -1951,6 +1954,7 @@ ga:
   act_as_user_name_5581cdbb: "Gníomhú mar %{user_name}"
   act_as_users_de7ee378: "Gníomhú mar úsáideoirí"
   action_db315788: Gníomh
+  action_enforcement_62c15f41: "%{action} (%{enforcement})"
   action_level_f064ffe6: "Leibhéal Gníomhaíochta"
   action_required_we_strongly_encourage_you_to_enabl_526b6847: "*Gníomh ag Teastáil:* Molaimid go láidir duit Comhéadan Logála Isteach Canvas Nua a chumasú agus a thástáil *anois*. Déan tástáil ar na hathruithe i do *Timpeallacht béite ar dtús* chun coigeartuithe téama riachtanacha a chur i bhfeidhm roimh an spriocdháta."
   action_required_we_strongly_encourage_you_to_enabl_db338af4: "Gníomh ag Teastáil: Molaimid go láidir duit Comhéadan Logála Isteach Canvas Nua a chumasú agus a thástáil anois. Déan tástáil ar na hathruithe i do thimpeallacht Béite ar dtús le go mbeidh na coigeartuithe téama riachtanacha i bhfeidhm roimh an spriocdháta."
@@ -2308,6 +2312,7 @@ ga:
   advanced_content_organization_features_in_the_asse_b91a23ab: "Gnéithe eagrúcháin ábhair chun cinn sa tSeirbhís Bainistíochta Measúnaithe (AMS). Féadfaidh sé seo athrú nó briseadh ag am ar bith agus níl sé beartaithe do fhormhór na gcuntas."
   advanced_peer_review_configurations_83ab5948: "Cumraíochtaí Piarmheasúnuithe Ardleibhéil"
   advanced_turnitin_settings_9ee84a38: "Ardsocruithe Turnitin"
+  advanced_vericite_settings_4f2afd5b: "Ardsocruithe VeriCite"
   affected_fields_59549e21: "Réimsí atá buailte"
   afghanistan_93_ab06805: "An Afganastáin (+93)"
   afrikaans_da0fe6ee: Afracáinis
@@ -2320,6 +2325,7 @@ ga:
   after_last_attempt_c9168da2: "Tar éis na hiarrachta Deiridh"
   after_logging_out_of_canvas_instruct_identity_prov_dc853c9a: "Tar éis logáil amach as Canvas, treoraigh soláthraithe aitheantais chun an t-úsáideoir a ath-údarú ar a gcéad iarracht logála isteach eile. Is féidir leis seo lúbanna logála isteach gan choinne a chosc."
   after_the_assignment_is_graded_53754607: "Tar éis don tasc a bheith marcáilte"
+  after_the_due_date_b7ac51f4: "Tar éis an Dáta Dlite"
   after_the_due_date_eee89c9c: "Tar éis an dáta dlite"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Tar éis na chéad iarrachta, ní féidir leat ráitis a fhágáil go dtí go gcuirfidh tú an tasc isteach."
   after_this_change_the_toolname_tool_deployment_id__245d0a01: "Tar éis an athraithe seo, an uirlis %{toolName} (Aitheantas Imscartha: Scriosfar %{deploymentId}) ón gcúrsa %{courseName}."
@@ -2353,16 +2359,20 @@ ga:
   ai_experiences_68bc22ad: "Eispéiris AI"
   ai_experiences_evaluation_e2a240ab: "Meastóireacht ar Thaithí AI"
   ai_experiences_student_view_13bab5d9: "Taithí AI Radharc na Mac Léinn"
+  ai_experiences_v2_authentication_2941a4b9: "Fíordheimhniú Eispéiris AI V2"
   ai_feedback_summary_bdbd1121: "Achoimre ar Aiseolas AI"
   ai_generated_rubrics_42964825: "Rubricí arna Ghiniúint ag IS"
   ai_genreated_rubrics_889d7e0b: "Ruibricí arna Ghiniúint ag IS"
+  ai_information_455bbb89: "Faisnéis faoi IS"
   ai_nutrition_facts_c55a0fe0: "Fíricí Cothaithe IS"
   ai_powered_features_without_data_retention_3c26e814: "Gnéithe Faoi Thiomáint ag AI Gan Coinneáil Sonraí"
   ai_powered_features_without_data_training_44cb5559: "Gnéithe Cumhachtaithe ag Intleacht Shaorga Gan Oiliúint Sonraí"
+  ai_privacy_notice_a8f5983e: "Fógra Príobháideachta IS"
   ai_quiz_generation_b4088599: "Giniúint Quiz AI"
   ai_settings_control_b113d39a: "RIALÚ Socruithe AI"
   ai_text_tools_77911fa4: "Uirlisí Téacs IS"
   ai_translation_controls_for_courses_currently_limi_deebebb6: "Rialuithe aistriúcháin IS do chúrsaí, teoranta faoi láthair d’fhóraim agus d'fhógraí."
+  ai_translation_feedback_e75479fd: "Aiseolas Aistriúcháin IS"
   ai_translation_for_lti_apps_discover_page_4c74f324: "Aistriúchán AI do Leathanach ‘Faigh Amach’ Aipeanna LTI"
   ai_translation_improvements_c33e1cc3: "Feabhsúcháin Aistriúcháin IS"
   ajax_errors: 
@@ -2499,6 +2509,7 @@ ga:
   all_modules_20c9a1c8: "Gach Mhodúil"
   all_my_files_a0213441: "Mo chomhaid ar fad"
   all_new_and_existing_users_in_the_sub_account_will_7ec9ca8d: "Déanfar suibscríobh uathoibríoch ar gach úsáideoir nua agus úsáideoir reatha san fhochuntas le féilirí roghnaithe."
+  all_notifications_6f482e61: "Gach fógra"
   all_outcomes_9f338636: "Gach Toradh"
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Cuireadh na torthaí go léir ó %{groupTitle} leis an gcúrsa seo go rathúil."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Cuireadh na torthaí go léir ó %{groupTitle} le %{targetGroupTitle} go rathúil."
@@ -2548,6 +2559,7 @@ ga:
   allow_access_to_discussion_insights_ad50085d: "Ceadaigh rochtain ar léargais fóraim"
   allow_account_administrators_to_manage_api_rate_li_1ded6de: "Ceadaigh do riarthóirí cuntais teorainneacha ráta API a bhainistiú le haghaidh uirlisí agus comhtháthú seachtrach ag baint úsáide as UTIDanna"
   allow_administrative_actions_in_courses_20c33fed: "Gníomhartha riaracháin a cheadú i gcúrsaí"
+  allow_administrators_to_edit_lti_tool_configuratio_2c973645: "Ceadaigh do riarthóirí cumraíocht uirlis LTI a chur in eagar mar JSON"
   allow_administrators_to_set_a_default_grading_sche_9b928f00: "Lig do riarthóirí scéim marcála réamhshocraithe a shocrú do chuntais. Is í an scéim marcála seo an réamhshocrú do gach cúrsa sa chuntas, ach is féidir le cúrsaí aonair é a fhorscríobh lena réamhshocrú féin."
   allow_attachment_association_creation_5ed99e74: "Ceadaigh Cruthú Comhlachais Ceangaltán"
   allow_attachment_associations_creation_for_any_att_28bc623f: "Ceadaigh cruthú comhlachais cheangaltán d'aon cheangaltán ar shócmhainní Canvas"
@@ -2593,6 +2605,7 @@ ga:
   allow_opt_out_of_inbox: "Lig d'úsáideoirí díliostáil as Bosca Isteach an Chomhrá. Déanfaidh sé seo gach teachtaireacht agus fógra comhrá a sheoladh mar fhógraí CLIF chuig príomh-ríomhphost an úsáideora, cuir suaitheantas teachtaireachtaí neamhléite an Chomhrá ar an mBosca Isteach i folaigh roghanna fógraí an Chomhrá."
   allow_outcome_extra_credit_57c1e84e: "Ceadaigh Creidmheas Breise do Thoradh"
   allow_participants_to_comment_2380a686: "Lig do Rannpháirtithe Ráiteas a Dhéanamh"
+  allow_participants_to_comment_eed89382: "Lig do rannpháirtithe ráitis a scríobh"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Ceadaigh glacadh éighníomhach le Téarmaí Seirbhíse"
   allow_peer_reviews_across_sections_fb72345b: "Ceadaigh piarmheasúnuithe thar grúpaí"
   allow_peer_reviews_to_be_assigned_across_course_se_ac101b02: "Ceadaigh piarmheasúnuithe a shannadh thar grúpaí cúrsa"
@@ -2619,6 +2632,7 @@ ga:
   allow_users_to_access_files_associated_with_a_conv_c069804e: "Lig d’úsáideoirí rochtain a fháil ar chomhaid a bhaineann le comhrá agus iad ag féachaint ar theachtaireachtaí an chomhrá (is é seo an rud a dhéanann file_association_access, is é an difríocht ná nach mbaineann sé ach leis na teachtaireachtaí comhrá)"
   allow_users_to_access_files_associated_with_a_cour_43f01878: "Lig d'úsáideoirí rochtain a fháil ar chomhaid a bhaineann le cúrsa"
   allow_users_to_comment_45b8f753: "Lig d'úsáideoirí ráiteas a dhéanamh"
+  allow_users_to_provide_thumbs_up_down_feedback_on__96a96e30: "Lig d’úsáideoirí aiseolas ordóg suas/síos a thabhairt ar aistriúcháin a ghintear le hintleacht shaorga i bhfóraim agus i bhfógraí."
   allow_users_to_remediate_certain_accessibility_iss_d0fb935b: "Lig d’úsáideoirí fadhbanna inrochtaineachta áirithe a leigheas le hintleacht shaorga tríd an Seiceálaí Inrochtaineachta Cúrsa."
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Lig d’úsáideoirí ríomhphost breise a chur isteach agus iad ag clárú."
   allowed_19727e83: Ceadaithe
@@ -2780,6 +2794,7 @@ ga:
   allows_user_to_create_and_manage_groups_allows_use_562e0013: "Ligeann sé don úsáideoir Grúpaí a chruthú agus a bhainistiú. Ligeann sé don úsáideoir acmhainní comhroinnte sa chuntas a bhainistiú."
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "Ligeann sé don úsáideoir scéimeanna marcála a chruthú agus a mhodhnú."
   allows_user_to_create_and_update_other_user_s_acce_fe779eec: "Ceadaíonn sé don úsáideoir comharthaí rochtana úsáideoirí eile a chruthú agus a nuashonrú."
+  allows_user_to_create_automation_rules_on_the_acco_737d4e5a: "Ceadaíonn sé don úsáideoir rialacha uathoibrithe a chruthú ar an gcuntas."
   allows_user_to_create_blackout_dates_f6970f37: "Ligeann sé don úsáideoir dátaí sceite a chruthú."
   allows_user_to_create_collaborations_b4f214bf: "Ligeann sé don úsáideoir comhoibrithe a chruthú."
   allows_user_to_create_content_migrations_67527a6b: "Ligeann sé don úsáideoir ascnaimh ábhair a chruthú."
@@ -2811,6 +2826,7 @@ ga:
   allows_user_to_delete_account_or_course_groups_3078d0c5: "Ligeann sé don úsáideoir grúpaí cuntais nó cúrsa a scriosadh."
   allows_user_to_delete_assignment_groups_in_a_cours_88c89c76: "Ligeann sé don úsáideoir grúpaí taisc i gcúrsa a scriosadh."
   allows_user_to_delete_assignments_in_a_course_b0f220c4: "Ligeann sé don úsáideoir tascanna i gcúrsa a scriosadh."
+  allows_user_to_delete_automation_rules_on_the_acco_865f96f3: "Ceadaíonn sé don úsáideoir rialacha uathoibrithe a scriosadh ar an gcuntas."
   allows_user_to_delete_course_files_and_folders_34a7793c: "Ligeann sé don úsáideoir comhaid chúrsa agus fillteáin a scriosadh."
   allows_user_to_delete_course_groups_5ce7382e: "Ligeann sé don úsáideoir grúpaí cúrsa a scriosadh."
   allows_user_to_delete_course_pages_dfaf4fb7: "Ligeann sé don úsáideoir leathanaigh an chúrsa a scriosadh."
@@ -2831,6 +2847,7 @@ ga:
   allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Ligeann sé don úsáideoir luas an chúrsa a chur in eagar agus a fhoilsiú trí Luaschur an Chúrsa."
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: "Ligeann sé don úsáideoir tascanna a chur in eagar agus a fhoilsiú/a dhífhoilsiú."
   allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Ligeann sé don úsáideoir quizeanna a chur in eagar agus a fhoilsiú/a dhífhoilsiú."
+  allows_user_to_edit_automation_rules_on_the_accoun_b36372d0: "Ceadaíonn sé don úsáideoir rialacha uathoibrithe a chur in eagar ar an gcuntas."
   allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Ligeann sé don úsáideoir socruithe glais ábhair a chur in eagar ar shocruithe aonair má tá an t-úsáideoir rollaithe i máistirchúrsa Treoirphlean."
   allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Ligeann sé don úsáideoir socruithe glais Treoirphlean ábhair a chur in eagar ar fhóraim aonair."
   allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Ligeann sé don úsáideoir socruithe glais Treoirphlean Cúrsa a chur in eagar ar an leathanach innéacs Leathanaigh agus do leathanach aonair i máistirchúrsa Treoirphlean."
@@ -3027,6 +3044,7 @@ ga:
   allows_user_to_view_student_quiz_logs_e1c4491: "Ligeann sé don úsáideoir logaí quiz na mac léinn a fheiceáil."
   allows_user_to_view_student_results_view_quiz_stat_7d77640a: "Ligeann sé don úsáideoir féachaint ar thorthaí na mac léinn, féachaint ar staitisticí quiz, agus teacht ar quiz i SpeedGrader."
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Ligeann sé don úsáideoir sonraí mac léinn ar leith a fheiceáil in Anailísíocht."
+  allows_user_to_view_the_account_s_automation_rules_b72dcc1d: "Ceadaíonn sé don úsáideoir rialacha uathoibrithe an chuntais a fheiceáil."
   allows_user_to_view_the_announcements_link_in_cour_b3522273: "Ligeann sé don úsáideoir féachaint ar an nasc Fógraí i Nascleanúint Cúrsa."
   allows_user_to_view_the_clone_group_set_button_for_d68aab98: "Ligeann sé seo don úsáideoir féachaint ar an gcnaipe Clónáil Sraith Grúpaí le haghaidh cuntas nó grúpa cúrsa."
   allows_user_to_view_the_clone_group_set_button_for_f975352: "Ligeann sé seo don úsáideoir féachaint ar an gcnaipe Sraith Grúpaí Clónáil le haghaidh grúpa cúrsa."
@@ -3306,6 +3324,7 @@ ga:
   an_unexpected_error_occurred_please_try_again_late_19f6d055: "Tharla earráid gan choinne. Bain triail eile as ar ball."
   an_unexpected_error_occurred_please_try_again_late_c58da3e4: "Tharla earráid gan choinne, bain triail eile as ar ball"
   an_unexpected_error_occurred_while_grading_570e2035: "Tharla earráid gan choinne agus an grádú ar siúl."
+  an_unexpected_error_occurred_while_submitting_feed_8c0b31ed: "Tharla earráid gan choinne agus aiseolas á chur isteach."
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Tharla earráid anaithnid. Fíoraigh an comhad CSV nó bain triail eile as ar ball."
   an_unknown_error_occurred_1ddc9525: "Tharla earráid anaithnid."
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
@@ -3368,6 +3387,8 @@ ga:
   annotation_teacher_notification_c5e4db1f: "Fógra Nóta Mínithe an Múinteora"
   announcement: 
     no_title: "Gan Teideal"
+  announcement_created_in_count_course_f90d55bb: "Fógra cruthaithe i %{count} (g)c(h)úrsa."
+  announcement_creation_f9db51ec: "Cruthú Fógraí"
   announcement_creation_failed_f7d227f5: "Theip ar chruthú an fhógra"
   announcement_e37d6dbd: fógra
   announcement_ends_at_4ccc2a7e: "Téann an Fógra in éag ag"
@@ -3397,6 +3418,7 @@ ga:
   announcements_a4b8ed4a: Fógraí
   announcements_account_4e9df626: "Fógraí (Cuntas)"
   announcements_cannot_be_duplicated_2de8824c: "ní féidir fógraí a mhacasamhlú"
+  announcements_created_in_count_courses_42919b8e: "Fógraí cruthaithe i %{count} (g)c(h)úrsa."
   announcements_deleted_successfully_7d77e9e1: "D'éirigh le fógraí a scriosadh"
   announcements_from_the_past_four_months_cefbc99c: "Fógraí ó na ceithre mhí anuas"
   announcements_list_c75fc413: "Liosta Fógraí"
@@ -3671,6 +3693,7 @@ ga:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "An bhfuil tú cinnte gur mhaith leat an tréimhse mharcála seo a scriosadh?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "An bhfuil tú cinnte gur mhaith leat an scéim mharcála seo a scriosadh?"
   are_you_sure_you_want_to_delete_this_knowledge_cha_e574ed72: "An bhfuil tú cinnte gur mian leat an Comhrá Eolais seo a scriosadh? Ní féidir an gníomh seo a chealú."
+  are_you_sure_you_want_to_delete_this_link_f3ee1c29: "An bhfuil tú cinnte gur mian leat an nasc seo a scriosadh?"
   are_you_sure_you_want_to_delete_this_page_2185844: "An bhfuil tú cinnte gur mhaith leat an leathanach seo a scriosadh?"
   are_you_sure_you_want_to_delete_this_planner_item_b71e330c: "An bhfuil tú cinnte gur mhaith leat an mhír pleanála seo a scriosadh?"
   are_you_sure_you_want_to_delete_this_rate_limit_se_19fbc6b: "An bhfuil tú cinnte gur mhaith leat an socrú teorann ráta seo a scriosadh?"
@@ -3758,8 +3781,12 @@ ga:
   assessee_name_must_not_be_reviewed_by_assessor_nam_503d86f9: "Níor cheart %{assessor_name} athbhreithniú a dhéanamh ar %{assessee_name}"
   assessee_name_should_be_reviewed_by_assessor_name_7cf7aff8: "Is ceart do %{assessee_name} athbhreithniú a dhéanamh ar %{assessor_name}"
   assessee_name_should_not_be_reviewed_by_assessor_n_58559fcf: "Níor cheart do %{assessor_name} athbhreithniú a dhéanamh ar %{assessee_name}"
+  assessee_name_will_be_reviewed_by_assessor_name_31eb4a9b: "Déanfar athbhreithniú ar %{assessee_name} ag %{assessor_name}"
+  assessee_name_will_not_be_reviewed_by_assessor_nam_3a78f35b: "Ní dhéanfar athbhreithniú ar %{assessee_name} ag %{assessor_name}"
   assessee_should_be_reviewed_by_assessor_e77029d5: "Is ceart do %{assessee} athbhreithniú a dhéanamh ar %{assessor}"
   assessee_should_not_be_reviewed_by_assessor_9568e3c4: "Níor cheart do %{assessor} athbhreithniú a dhéanamh ar %{assessee}"
+  assessee_will_be_reviewed_by_assessor_b8a02a5d: "Déanfar athbhreithniú ar %{assessee} ag %{assessor}"
+  assessee_will_not_be_reviewed_by_assessor_ec87bdaf: "Ní dhéanfar athbhreithniú ar %{assessee} ag %{assessor}"
   assessment_audit_d4a76709: "Iniúchadh taisc"
   assessment_audit_events_for_creatorname_56e84e8: "Imeachtaí iniúchta taisc do %{creatorName}"
   assessment_audit_tray_5dd11721: "Tráidire iniúchta taisc"
@@ -3790,8 +3817,12 @@ ga:
   assessor_name_must_review_assessee_name_df2c3c74: "Ní mór do %{assessor_name} athbhreithniú a dhéanamh ar %{assessee_name}"
   assessor_name_should_not_review_assessee_name_2aea0c46: "Níor cheart do %{assessor_name} athbhreithniú a dhéanamh ar %{assessee_name}"
   assessor_name_should_review_assessee_name_eb90b62b: "Ba chóir do %{assessor_name} athbhreithniú a dhéanamh ar %{assessee_name}"
+  assessor_name_will_not_review_assessee_name_28442b6f: "Ní dhéanfaidh %{assessor_name} athbhreithniú ar %{assessee_name}"
+  assessor_name_will_review_assessee_name_64a450d7: "Déanfaidh %{assessor_name} athbhreithniú ar %{assessee_name}"
   assessor_should_not_review_assessee_a5643872: "Níor cheart do %{assessor} athbhreithniú a dhéanamh ar %{assessee}"
   assessor_should_review_assessee_942eeec7: "Ba chóir do %{assessor} athbhreithniú a dhéanamh ar %{assessee}"
+  assessor_will_not_review_assessee_cf484ebd: "Ní dhéanfaidh %{assessor} athbhreithniú ar %{assessee}"
+  assessor_will_review_assessee_fe1a3b01: "Déanfaidh %{assessor} athbhreithniú ar %{assessee}"
   asset_category_b7ae28d6: "Catagóir Sócmhainní"
   asset_code_ef611162: "Cód Sócmhainní"
   asset_group_code_d476ed05: "Cód Grúpa Sócmhainní"
@@ -4555,6 +4586,7 @@ ga:
   at_791460b3: ag
   at_least_one_assessee_is_required_69e26fce: "Tá measúnóir amháin ar a laghad ag teastáil"
   at_least_one_assessor_is_required_72a115d7: "Tá measúnóir amháin ar a laghad ag teastáil"
+  at_least_one_course_is_required_c2d2538d: "Tá cúrsa amháin ar a laghad ag teastáil"
   at_least_one_person_should_be_selected_9083f62e: "Ba cheart duine amháin ar a laghad a roghnú"
   at_least_one_required_cd667070: "Tá ceann amháin ar a laghad ag teastáil"
   at_least_one_scope_must_be_selected_97d6fce9: "Ní mór raon feidhme amháin ar a laghad a roghnú."
@@ -4774,6 +4806,11 @@ ga:
   automatically_show_closed_captions_in_the_user_s_c_f290a22f: |-
       Taispeáin fotheidil dhúnta go huathoibríoch i dteanga
       reatha an úsáideora (má tá sé ar fáil) agus meáin Canvas á sheinm.
+  automation_rules_52b4ef9c: "Rialacha Uathoibrithe"
+  automation_rules_add_4cb5c7c2: "Rialacha Uathoibrithe - cuir leis"
+  automation_rules_delete_10816b7e: "Rialacha Uathoibrithe - scrios"
+  automation_rules_edit_6f0b35e7: "Rialacha Uathoibrithe - cur in eagar"
+  automation_rules_view_10c34073: "Rialacha Uathoibrithe - amharc"
   availability_8942cde6: Infhaighteacht
   availability_and_exceptions_98b8cb30: "Infhaighteacht agus Eisceachtaí"
   availability_dates_438d71e0: "Dátaí Infhaighteachta"
@@ -4828,6 +4865,7 @@ ga:
   avg_alignments_per_outcome_4daf75cd: "Avg. Ailínithe in aghaidh an Toraidh"
   avi_2d8cc99f: AVI
   avoid_using_common_passwords_like_password123_c9f945fb: "Seachain pasfhocail choitianta ar nós \"password123.\" a úsáid"
+  award_points_for_both_corrected_and_previously_cor_319c28da: "Bronn pointí as freagraí ceartaithe agus as freagraí a bhí ceart roimhe seo (ní laghdófar aon scóir)"
   azerbaijani_54820a18: Asarbaiseáinis
   back_2900f52a: Siar
   back_to_accessibility_checker_55123ea4: "Ar ais chuig an seiceálaí inrochtaineachta"
@@ -4919,6 +4957,7 @@ ga:
   between_parentheses_e_g_d09087_28c4448c: "Idir lúibíní, m.sh., (D09087)"
   between_square_brackets_e_g_principal_64797b64: "Idir lúibíní cearnacha, m.sh., [Príomhoide]"
   between_two_assessments_the_most_recent_assessment_9f616a5d: "Idir dhá mheasúnú, faigheann an tasc is déanaí %{calculation_int} meáchan, agus faigheann an chéad cheann %{remainder}. I gcás gach tasc breise, tagann meath %{remainder} breise ar shuim na ríomhanna scóir roimhe seo. Mura bhfuil ach toradh amháin ann, tabharfar an scór aonair ar ais."
+  bibliographic_material_42d9ed3c: "Ábhar Leabharliosta"
   big_blue_button_conference: 
     create_time: "Cruthaigh Am"
     recording_setting: Taifeadadh
@@ -5645,6 +5684,8 @@ ga:
   can_view_the_content_of_a_page_the_tool_is_launche_61ba993b: "Is féidir breathnú ar ábhar an leathanaigh óna seoltar an uirlis."
   can_view_the_content_of_a_page_the_tool_is_launche_94cb9745: "Is féidir breathnú ar ábhar an leathanaigh óna seoltar an uirlis"
   can_you_please_explain_why_you_disagree_with_the_e_5c22b101: "An féidir leat a mhíniú le do thoil cén fáth nach n-aontaíonn tú leis an meastóireacht?"
+  can_you_please_explain_why_you_disapprove_of_the_s_3c5a971f: "An féidir leat a mhíniú, le do thoil, cén fáth nach n-aontaíonn tú leis an achoimre?"
+  can_you_please_explain_why_you_disapprove_of_the_t_33dbb022: "An féidir leat a mhíniú, le do thoil, cén fáth nach n-aontaíonn tú leis an aistriúchán?"
   canada_1_921df67a: "Ceanada (+1)"
   cancel_attempt_attempt_aab8c2a9: "Cealaigh Iarracht %{attempt}"
   cancel_caeb1e68: Cealaigh
@@ -5677,12 +5718,14 @@ ga:
   cannot_be_changed_at_this_time_grading_error_88f5a96b: "ní féidir é a athrú ag an am seo: %{grading_error}"
   cannot_be_changed_because_this_assignment_is_due_i_a529873f: "ní féidir é a athrú toisc go bhfuil an tasc seo dlite i dtréimhse mharcála dúnta"
   cannot_be_disabled_for_assignments_with_graded_pee_6d84494e: "ní féidir é a dhíchumasú le haghaidh tascanna a bhfuil piarmheasúnuithe marcáilte acu sa mhodh oidhreachta"
+  cannot_be_disabled_for_assignments_with_graded_pee_beec836: "ní féidir é a dhíchumasú le haghaidh tascanna a bhfuil piarmheasúnuithe marcáilte acu nuair a bhíonn measúnuithe curtha isteach ag mic léinn cheana féin"
   cannot_be_disabled_when_students_have_already_subm_cf0c73c6: "ní féidir é a dhíchumasú nuair a bhíonn léirmheasanna curtha isteach ag mic léinn cheana féin"
   cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: "Ní féidir é a chur in eagar le haghaidh tascanna i dtréimhsí mharcála dúnta"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "ní féidir a bheith nialas nuair is nialas é account_id"
   cannot_be_nil_when_course_id_is_nil_f539388: "ní féidir a bheith nialas nuair is nialas é course_id"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "ní féidir leis a bheith i láthair nuair a bhíonn account_id i láthair"
   cannot_be_present_when_course_id_is_present_785e6a59: "ní féidir leis a bheith i láthair nuair a bhíonn course_id i láthair"
+  cannot_be_published_cc8a13af: "ní féidir é a fhoilsiú"
   cannot_be_the_same_as_the_assessor_c426c7ac: "ní féidir leis a bheith mar an gcéanna leis an measúnóir"
   cannot_be_true_for_sub_assignments_66a9ba5f: "ní féidir a bheith fíor i gcás fo-thascanna"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Ní féidir dáta dlite sáraithe a athrú go dáta laistigh de thréimhse dhúnta mharcála"
@@ -5837,6 +5880,7 @@ ga:
   canvas_career_role_dashboards_18a4c7d: "Canvas Career: Painéil Ról"
   canvas_career_roles_permissions_f8acf32a: "Canvas Career: Róil & Ceadanna"
   canvas_career_root_account_experience_485e496f: "Gairme Chanbhás: Taithí Cuntas Fréimhe"
+  canvas_career_rule_based_automations_6310ad9c: "Canvas Career: Uathoibrithe Bunaithe ar Rialacha"
   canvas_career_skill_management_a0bc3dd6: "Canvas Career: Bainistíocht Scileanna"
   canvas_career_study_tools_b4805897: "Canvas Career: Uirlisí Staidéir"
   canvas_career_sub_account_b1da8954: "Fo-Chuntas Canvas Career"
@@ -5917,6 +5961,7 @@ ga:
   caption_1cf95987: Fotheideal
   caption_added_8d73b023: "Cuireadh fotheideal leis"
   caption_cannot_be_empty_67f12e96: "Ní féidir an fotheideal a fhágáil folamh."
+  caption_generated_caption_66670d3: "Fotheideal ginte: %{caption}"
   caption_sorted_by_sortby_in_direction_order_7e98ca69: "%{caption}: sortáilte de réir %{sortBy} in ordú %{direction}"
   captions_99c57b5c: Fotheidil
   captions_are_being_generated_for_this_media_5b177dc7: "Tá fotheidil á nginiúint don mheán seo."
@@ -6121,6 +6166,7 @@ ga:
   choose_a_peer_review_available_to_date_and_time_ef9ab31b: "Roghnaigh piarmheasúnú atá ar fáil go dtí an dáta agus an t-am"
   choose_a_peer_review_due_date_and_time_b913e700: "Roghnaigh dáta agus am dlite piarmheasúnaithe"
   choose_a_quiz_engine_8820d521: "Roghnaigh Inneall Quiz"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "Roghnaigh rogha athghrádaithe do mhic léinn a rinne an quiz cheana féin. Déanfaidh Canvas do chuid uaslódálacha go léir a athmharcáil tar éis duit an Quiz a shábháil (SEANS go mbeidh tionchar aige seo ar scóir na mac léinn)."
   choose_a_reply_to_topic_due_date_and_time_b908fd6: "Roghnaigh dáta agus am dlite chun freagra a thabhairt don topaic"
   choose_a_self_sign_up_deadline_date_and_time_19b311e1: "Roghnaigh dáta agus am féinchláraithe"
   choose_a_sticker_aa45291e: "Roghnaigh greamán"
@@ -6140,11 +6186,13 @@ ga:
   choose_assignment_set_415f1b3: "Roghnaigh Tacar Taisc"
   choose_attribute_to_add_866e128d: "Roghnaigh tréith le cur leis"
   choose_canvas_account_ec2f0279: "Roghnaigh Cuntas Canvas…"
+  choose_categories_fc1b361d: "Roghnaigh catagóirí…"
   choose_complimentary_font_pairings_for_your_h1_h2__2a6189c6: |-
       Roghnaigh péirí cló comhoiriúnach do do théacs h1, h2, agus alt, nó roghnaigh do cheann féin
                 níos déanaí.
   choose_course_home_page_d8642f9e: "Roghnaigh Leathanach Baile an Chúrsa"
   choose_file_8d89ccab: "Roghnaigh Comhad"
+  choose_from_canvas_files_5002f495: "Roghnaigh ó chomhaid Canvas"
   choose_home_page_80cef4ee: "Roghnaigh Leathanach Baile"
   choose_image_242f727e: "Roghnaigh íomhá"
   choose_image_e5ee5d7a: "Roghnaigh Íomhá"
@@ -6180,6 +6228,7 @@ ga:
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Rogha Quizeanna Clasaiceacha le haghaidh Quizeanna gan Uaslódáil"
   classic_quizzes_use_quiz_client_ip_d554d652: "Úsáid Quizzes Clasaiceacha quiz_client_ip"
   classic_view_33f29576: "Amharc Clasaiceach"
+  claude_3_haiku_cff9d753: "Haiku Claude 3"
   clear_1_filter_4991e472: "Glan 1 scagaire amháin"
   clear_2084585f: Glan
   clear_all_da755751: "Soiléir ar fad"
@@ -6292,6 +6341,7 @@ ga:
   click_to_sort_by_email_descending_72801b54: "Cliceáil chun sórtáil trí ríomhphost anuas"
   click_to_sort_by_issue_count_ascending_34196a78: "Cliceáil chun sórtáil de réir líon na saincheisteanna ardaitheach"
   click_to_sort_by_issue_count_descending_9721026e: "Cliceáil chun sórtáil de réir líon na saincheisteanna a íslitheach"
+  click_to_sort_by_label_order_49f357cb: "Cliceáil chun sórtáil de réir %{label} %{order}"
   click_to_sort_by_last_login_ascending_eafcbee4: "Cliceáil chun sórtáil de réir an logáil isteach dheireanach ag dul suas"
   click_to_sort_by_last_login_descending_61fdadc: "Cliceáil chun sórtáil de réir logáil isteach deiridh anuas"
   click_to_sort_by_name_ascending_739c011e: "Cliceáil chun sórtáil de réir ainm ag dul suas"
@@ -6605,6 +6655,7 @@ ga:
     one: "Féach an comhad ceangailte"
     other: "Féach comhaid cheangailte"
   comment_input_box_b8c7e58b: "Bosca ionchur ráitis"
+  comment_is_required_c7c546b7: "Tá trácht ag teastáil."
   comment_library_84735835: "Leabharlann Ráitis"
   comment_library_suggestions_disabled_ae04eb77: "Leabharlann Ráitis (Moltaí Díchumasaithe)"
   comment_or_file_required_to_save_921da797: "Tá trácht nó comhad ag teastáil chun le sábháil"
@@ -6704,7 +6755,7 @@ ga:
     admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
     admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
     admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
-    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq: "https://community.instructure.com/en/discussion/261826/using-zoom-with-canvas-faq/p1"
     admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
     admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
     admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
@@ -6721,7 +6772,7 @@ ga:
     basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
     basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
     basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
-    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    canvas_for_elementary: "https://community.instructure.com/en/kb/articles/663780-what-is-canvas-for-elementary"
     contingency_30_minute_quickstart: "https://community.instructure.com/en/kb/articles/660621-instructor-getting-started-resources"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.instructure.com/en/kb/articles/662747-what-are-conferences"
@@ -6812,6 +6863,7 @@ ga:
     releases_beta_test_schedule: "https://community.instructure.com/en/kb/articles/664262-what-are-the-release-schedules-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: "Déan comparáid in aghaidh"
   compiling_c29a644f: "Ag tiomsú"
   compiling_progress_968a3ebb: "Ag tiomsú (%{progress}%)"
   complete_1_item_f840fb10: "Críochnaigh 1 mhír amháin"
@@ -6958,6 +7010,7 @@ ga:
   configuration_changes_17b1fa7a: "Athruithe Cumraíochta"
   configuration_e186200: Cumraíocht
   configuration_error_906691a5: "Earráid chumraíochta"
+  configuration_has_been_saved_successfully_a839ffd8: "Tá an chumraíocht sábháilte go rathúil."
   configuration_json_cannot_be_empty_f3664d30: "Ní féidir le cumraíocht JSON a bheith folamh."
   configuration_location_ee0f6592: "Suíomh Cumraíochta"
   configuration_type_25a084a4: "Cineál Cumraíochta"
@@ -7054,6 +7107,7 @@ ga:
   content_changed_exceptions_e8bff81e: "Eisceachtaí athraithe ábhair:"
   content_choice_51f4ca0f: "Rogha Ábhar"
   content_dbfd19d7: ábhar
+  content_exceeds_the_16_mb_size_limit_43734c91: "Tá an t-ábhar níos mó ná an teorainn méide 16 MB"
   content_export_files_cannot_be_downloaded_after_da_2872b0e4: "Ní féidir comhaid easpórtála ábhar a íoslódáil tar éis %{days} lá."
   content_exports: 
     buttons: 
@@ -7294,6 +7348,7 @@ ga:
   content_name_fe0424ba: "Ainm an Ábhair"
   content_not_available_7b2e004: "Níl an t-ábhar ar fáil"
   content_on_this_page_violates_the_security_policy__25685d8a: "Sáraíonn ábhar ar an leathanach seo an polasaí slándála, déan teagmháil le do riarthóir le haghaidh cúnaimh."
+  content_quality_753a703a: "Cáilíocht Ábhair"
   content_security_policy_3bb8d922: "Beartas Slándála Ábhar"
   content_security_policy_settings_3e87fcb2: "Socruithe Beartais Slándála Ábhar"
   content_selection_4aad6732: "Roghnú Ábhair"
@@ -7839,6 +7894,7 @@ ga:
   correct_answers_will_be_available_on_date_48137: "Beidh freagraí cearta ar fáil ar %{date}."
   correct_check_icon_617da6c3: "deilbhín ceart seiceála"
   costa_rica_506_d63d2ea1: "Cósta Ríce (+506)"
+  could_not_be_published_b5bcf4dd: "níorbh fhéidir a fhoilsiú"
   could_not_convert_course_to_canvas_career_please_t_cbca96dd: "Níorbh fhéidir an cúrsa a thiontú go Canvas Career. Bain triail as arís, le do thoil."
   could_not_duplicate_discussion_953ed67f: "Níorbh fhéidir an fóram a dhúbailt"
   could_not_find_a_resource_with_that_id_96d6d7ac: "Níorbh fhéidir %{resource} a fháil leis an ID sin."
@@ -7900,6 +7956,8 @@ ga:
     one: "%{count} ailíniú"
     other: "%{count} ailínithe"
     zero: "Gan ailíniú"
+  count_announcement_failed_to_post_please_check_you_f6e1dba1: "Theip ar %{count} f(h)ógra a phostáil. Seiceáil do cheadanna agus déan iarracht arís."
+  count_announcements_failed_to_post_please_check_yo_f44faf3c: "Theip ar %{count} f()hógraí a phostáil. Seiceáil do cheadanna agus déan iarracht arís."
   count_announcements_found_b7b055b3: "Fuarthas %{count} fógraí."
   count_apps_found_f4d86860: "%{count} aipeanna aimsithe"
   count_assessable_artifacts_ed4369fa: 
@@ -8041,6 +8099,7 @@ ga:
     one: "1 Sannadh ar Iarraidh"
     other: "%{count} Tascanna ar Iarraidh"
   count_more_beba6428: "%{count} eile"
+  count_more_type_to_filter_fbbeddd7: "%{count} eile — clóscríobh le scagadh"
   count_must_be_0_4abb84b3: "Caithfidh > 0 a bheith sa COMHAIREAMH"
   count_must_be_limit_8536ff23: "Caithfidh COUNT a bheith <= %{limit}"
   count_not_decided_b5f21e29: "%{count} Gan cinneadh"
@@ -8137,6 +8196,7 @@ ga:
     one: "Toradh 1"
     other: "%{count} toradh"
     zero: "Níl aon thorthaí"
+  count_results_available_601bdfc2: "%{count} (d)t(h)oradh ar fáil"
   count_results_for_searchterm_a70b872d: 
     one: "1 toradh amháin le haghaidh \"%{searchTerm}\""
     other: "%{count} (d)t(h)oradh le haghaidh \"%{searchTerm}\""
@@ -8278,6 +8338,7 @@ ga:
   course_8dcfb195: cúrsa
   course_access_report_52da1e9f: "Tuairisc Rochtana Cúrsa"
   course_accessibility_checker_f00c451: "Seiceálaí Inrochtaineachta Cúrsa"
+  course_accessibility_report_fc9a1bae: "Tuarascáil Inrochtaineachta Cúrsa"
   course_activities_21c83bd3: "Gníomhaíochtaí Cúrsa"
   course_activity_bfe11267: "Gníomhaíocht Chúrsa"
   course_activity_form_f30ea720: "Foirm Gníomhaíochta Cúrsa"
@@ -9114,6 +9175,7 @@ ga:
   create_an_eportfolio_1841e34a: "Cruthaigh rPhunann"
   create_and_edit_line_items_cacad0fa: "Cruthaigh agus Cuir Míreanna Líne in Eagar"
   create_and_edit_scores_4177662c: "Cruthaigh agus Cuir Scóir in Eagar"
+  create_announcement_668ed3bd: "Cruthaigh fógra"
   create_announcement_7ebf0845: "Cruthaigh Fógra"
   create_announcements_above_1c36202b: "Cruthaigh fógraí thuas"
   create_anonymous_discussion_topics_d573e88e: "Cruthaigh topaicí fóraim d’úsáid anaithnid"
@@ -9807,6 +9869,7 @@ ga:
   delete_current_message_5da0221a: "Scrios an Teachtaireacht Reatha"
   delete_current_module_item_21fefc54: "Scrios Modúl/Mír Reatha"
   delete_current_module_or_module_item_e854eab1: "Scrios an modúl nó an mhír mhodúil reatha"
+  delete_custom_link_d2b8ae8: "Scrios Nasc Saincheaptha"
   delete_custom_status_b20e5195: "Scrios Stádas Saincheaptha?"
   delete_deployment_e7161f3b: "Scrios Imscaradh"
   delete_deployment_for_context_name_497b6642: "Scrios Imscaradh le haghaidh *%{context_name}*"
@@ -9841,6 +9904,7 @@ ga:
   delete_items_a1d2c64: "Scrios Míreanna"
   delete_key_developername_be80e695: "Scrios eochair %{developerName}"
   delete_knowledge_chat_ae9c7cdc: "Scrios Comhrá Eolais"
+  delete_linklabel_ae8b52e8: "Scrios %{linkLabel}"
   delete_live_events_subscriptions_b15bc9a6: "Scrios Síntiúis Imeachtaí Beo"
   delete_lti_1d1cef27: "Scrios LTI"
   delete_lti_developer_key_4d027ad9: "Scrios Eochair Fhorbróra LTI"
@@ -10124,6 +10188,7 @@ ga:
   discover_what_you_can_create_using_the_block_conte_65cfdebe: "Faigh amach cad is féidir leat a chruthú ag baint úsáide as an Eagarthóir Ábhar Bloc."
   discovery_custom_message_fff0e0b0: "Teachtaireacht Saincheaptha Fionnachtana"
   discovery_page_8a9270cb: "Leathanach Fionnachtana"
+  discovery_page_preview_928c04df: "Réamhamharc ar an Leathanach ‘Féach Thart’"
   discovery_pages_90948d00: "Leathanaigh Fionnachtana"
   discovery_screen_1515d989: "Scáileán Fionnachtana"
   discovery_service_url_ca13d3f4: "URL na Seirbhíse Fionnachtana"
@@ -10434,11 +10499,14 @@ ga:
   dislike_summary_deselected_3f686ce9: "Tabhair ‘ní maith liom’ d’achoimre, díroghnaithe"
   dislike_summary_selected_5527b968: "Tabhair ‘ní maith liom’ d’achoimre, roghnaithe"
   dislike_this_response_b29a28a6: "Ní maith liom an freagra seo"
+  dislike_translation_640db1df: "Ní maith liom an t-aistriúchán"
+  dislike_translation_selected_15771ce6: "Ní maith liom an t-aistriúchán, roghnaithe"
   dismiss_account_level_notification_information_d0d75748: "Diúltaigh d’Fhaisnéis fógraí ar leibhéal an chuntais"
   dismiss_course_level_notification_information_504364d: "Diúltaigh d’fhaisnéis fógraí ar leibhéal an chúrsa"
   dismiss_dacdb625: Diúltaigh
   dismiss_error_message_44c51c35: "Ruaig an teachtaireacht earráide"
   dismiss_itemtitle_c5020a4c: "Diúltaigh %{itemTitle}"
+  dismiss_name_c9e24598: "Diúltaigh %{name}"
   dismiss_notification_schedule_information_651aef59: "Diúltaigh d’Fhaisnéis sceideal fógraí"
   dismiss_opportunityname_4fb10e11: "Diúltaigh %{opportunityName}"
   dismissed_8b0b1fc9: Diúltaithe
@@ -10492,6 +10560,7 @@ ga:
   divide_into_equal_time_slots_in_minutes_234312fa: "Roinn ina shliotán ama comhionann (i nóiméid"
   divider_fe08b810: Roinnteoir
   division_cutoff_cutoff_value_e938bc9d: "Gearradh grúpa %{cutoff_value}"
+  do_not_consider_84d7b395: "Ná Smaoinigh"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ná cuir an tasc seo san áireamh sa mharc deiridh"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Ná taispeáin i leabhar na marcanna ar leathanach na marcanna an mhic léinn"
   do_not_include_validation_context_and_errors_claim_d9e43fe6: "Ná cuir validation_context agus éilimh earráide san áireamh i Seoltaí LTI"
@@ -10601,6 +10670,7 @@ ga:
   download_filename_b9d62bf1: "Íoslódáil %{fileName}"
   download_group_category_roster_csv_6050a420: "Íoslódáil CSV Liosta Catagóirí Grúpa"
   download_item_analysis_report_statuslabel_8c9387ec: "Íoslódáil tuairisc ar anailís mír %{statusLabel}"
+  download_name_de443d96: "Íoslódáil %{name}"
   download_page_views_csv_974f36e1: "Íoslódáil Amharcanna Leathanach CSV"
   download_report_70ba4a54: "Íoslódáil an tuairisc"
   download_report_77164f62: "Íoslódáil Tuairisc"
@@ -10807,6 +10877,7 @@ ga:
   edit_and_delete_their_own_replies_e5b9d793: "Cuir a gcuid freagraí féin in eagar agus scrios iad"
   edit_announcement_title_cce0b4e: "Cuir fógra in eagar %{title}"
   edit_app_b0cc1c17: "Cuir Aip in Eagar"
+  edit_as_json_f9778876: "Cuir in eagar mar JSON"
   edit_assignment_dates_6f8c72b: "Cuir Dátaí an Taisc in Eagar"
   edit_assignment_ebf22a72: "Cuir Tasc in Eagar"
   edit_assignment_group_c04c4af0: "Cuir Grúpa Taisc in Eagar"
@@ -10820,6 +10891,7 @@ ga:
   edit_block_content_28c62e36: "Cuir ábhar bloc in eagar"
   edit_block_e77d6159: "Cuir bloc in eagar"
   edit_c5fbea07: "Cuir in eagar"
+  edit_categories_count_selected_cf24b55b: "Cuir catagóirí in eagar (%{count} roghnaithe)"
   edit_collaboration_b014c18b: "Cuir Comhoibriú in Eagar"
   edit_comment_comment_a584d187: "Cuir ráiteas in eagar: {{comment}}"
   edit_comment_comment_c1ce8c10: "Cuir ráiteas in eagar: %{comment}"
@@ -11044,6 +11116,7 @@ ga:
   enable_file_access_with_api_tokens_ad08912a: "Cumasaigh Rochtain Comhad le Comharthaí API"
   enable_gradebook_status_icons_ed6a01a2: "Cumasaigh Deilbhíní Stádas Leabhar na Marcanna"
   enable_gravatar_8a865b41: "Cumasaigh Gravatar"
+  enable_identity_service_discovery_page_for_the_new_cdbeb0b7: "Cumasaigh Leathanach Aimsithe Seirbhíse Céannachta don Chomhéadan Úsáideora Logála Isteach/Clárúcháin Canvas nua ag leibhéal an chuntais fréimhe."
   enable_identity_service_discovery_page_for_the_new_fac0e431: "Cumasaigh Leathanach Aimsithe Seirbhíse Céannachta don Chomhéadan Úsáideora Logála Isteach/Clárú Canvas nua."
   enable_igniteai_question_authoring_for_quizzes_fea_d7a403a6: "Cumasaigh gné Údarú Ceisteanna IgniteAI do Quizeanna"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Cumasaigh cosáin foghlama aonair do mhic léinn bunaithe ar mheasúnú"
@@ -11161,6 +11234,7 @@ ga:
       a chur le chéile chun Marc fóraim deiridh a dhéanamh.
   enables_context_file_upload_for_ai_experiences_req_e3b9f28f: "Cumasaíonn sé uaslódáil comhaid chomhthéacs le haghaidh Eispéiris AI. Éilíonn sé bratach ghné Taithí AI a bheith cumasaithe."
   enables_courses_to_leverage_canvas_career_features_22bf68c7: "Cumasaigh cúrsaí chun leas a bhaint as gnéithe Canvas Career go dúchasach."
+  enables_creating_running_rule_based_automations_in_9b20fd3d: "Cumasaíonn sé cruthú & ag rith uathoibrithe bunaithe ar rialacha i Canvas Career."
   enables_dark_theme_in_learning_provider_ebe48699: "Cumasaíonn sé téama dorcha i Soláthraí Foghlama."
   enables_dashboards_for_admins_in_canvas_career_f34966b: "Cumasaíonn sé deais rialaithe do riarthóirí in Canvas Career."
   enables_dashboards_for_leaders_in_canvas_career_4ce72c91: "Cumasaíonn sé deais rialaithe do cheannairí in Canvas Career."
@@ -11172,6 +11246,11 @@ ga:
       Áirítear leis comhéadan úsáideora chun stair leaganacha a fheiceáil agus filleadh ar leaganacha roimhe seo.
   enables_hris_integrations_in_canvas_career_8f3b771d: "Cumasaíonn sé comhtháthú HRIS I Canvas Career."
   enables_igniteai_agent_feature_for_teachers_ignite_57c67fec: "Cumasaíonn sé gné Gníomhaire IgniteAI do Mhúinteoirí. Is compánach AI é Gníomhaire IgniteAI do riarthóirí agus do mhúinteoirí chun cabhrú leo lena gcuid tascanna laethúla i Canvas LMS."
+  enables_igniteai_study_tools_for_courses_when_enab_f0ef6a2f: |-
+      Cumasaíonn sé Uirlisí Staidéir IgniteAI do chúrsaí. Nuair a bhíonn sé cumasaithe, is féidir le daltaí
+      rochtain a fháil ar uirlisí staidéir faoi thiomáint ag IS laistigh dá gcúrsa. Ní mór do riarthóirí cuntas fréimhe
+      an ghné seo a chumasú roimh fhochuntais nó cúrsaísular bhféidir
+      é a úsáid.
   enables_importing_metadata_in_bulk_in_canvas_caree_2db97d50: "Cumasaíonn sé meiteashonraí a iompórtáil ar an mórchóir I Canvas Career."
   enables_integration_with_the_assessment_management_7ebf2fdc: "Cumasaíonn sé comhtháthú leis an tSeirbhís Bainistíochta Tascanna (AMS) do chuntais agus do chúrsaí."
   enables_learning_library_microlearning_features_in_d5294aa2: "Cumasaíonn sé gnéithe micrefhoghlama na Leabharlainne Foghlama i Canvas Career."
@@ -11192,6 +11271,7 @@ ga:
   enables_sending_metrics_when_the_comment_bank_item_310e4575: "Cumasaigh méadracht a sheoladh nuair a úsáidtear an `comment_bank_items_count` réiteoir ar user_type.comment_bank_items_connection."
   enables_sending_metrics_when_the_limit_argument_is_a4c63beb: "Cumasaíonn sé seo méadracht a sheoladh nuair a bhíonn an `limit` argóint úsáidte ar user_type.comment_bank_items_connection."
   enables_skill_management_in_canvas_career_f88a6a76: "Cumasaíonn sé Bainistíocht Scileanna i gCanvas Career."
+  enables_stronger_authentication_practice_for_commu_4b5c8f06: "Cumasaíonn sé cleachtas fíordheimhnithe níos láidre le haghaidh cumarsáide le Seirbhís Comhrá LLM"
   enables_student_reporting_features_in_the_learning_eb826385: "Cumasaíonn sé gnéithe tuairiscithe mac léinn i Leabhar na Marcanna Forlámhas Foghlama"
   enables_study_assist_for_courses_when_enabled_stud_c4fe55fe: |-
       Cumasaíonn sé Cúnamh Staidéir do chúrsaí. Nuair a bheidh sé cumasaithe, is féidir le daltaí rochtain a fháil
@@ -11217,6 +11297,9 @@ ga:
       Is ionadú é seo ar fheidhmiúlacht an Uirlis Athsheolta.
   enables_the_crm_integration_settings_in_canvas_car_9ff4faeb: "Cumasaíonn sé socruithe comhtháthaithe CRM i Canvas Career."
   enables_the_evaluation_feature_for_ai_experiences__c63b4eb7: "Cumasaíonn sé seo an ghné mheasúnaithe do chomhráite Eispéiris AI."
+  enables_the_flashcards_tool_in_igniteai_study_tool_58e87614: |-
+      Cumasaíonn sé an uirlis Cártaí Flash in Uirlisí Staidéir IgniteAI.
+      Nuair a bhíonn sé díchumasaithe, ní fheicfidh mic léinn an rogha luaschártaí.
   enables_the_help_navigation_menu_in_canvas_career_5d8a6466: "Cumasaíonn sé an roghchlár nascleanúna cabhrach in Canvas Career."
   enables_the_horizon_setting_in_the_course_settings_c4d3e03d: "Cumasaíonn sé an socrú Horizon ar leathanach socruithe an chúrsa."
   enables_the_ignite_agent_feature_for_a_single_user_1dce6ba4: "Cumasaíonn sé seo an ghné Ignite Agent d'úsáideoir aonair."
@@ -11238,9 +11321,15 @@ ga:
       Cumasaíonn sé seo an fheidhmiúlacht nua athordaithe bloc i mbarra uirlisí Eagarthóir Ábhar Bloc.
       Nuair a bhíonn sé cumasaithe, is féidir le húsáideoirí rochtain a fháil ar fhuinneog aníos nua chun bloic a tharraingt agus a athordú laistigh den eagarthóir.
   enables_the_optimized_root_account_experience_in_c_974cfdcc: "Cumasaíonn sé an taithí cuntas fréimhe optamaithe I Canvas Career."
+  enables_the_quiz_me_tool_in_igniteai_study_tools_w_1c2edcae: |-
+      Cumasaíonn sé an uirlis Quiz Me in Uirlisí Staidéir IgniteAI.
+      Nuair a bhíonn sé díchumasaithe, ní fheicfidh mic léinn an rogha Cuir Ceisteanna Orm.
   enables_the_redesigned_syncable_objects_interface__a50346e4: "Cumasaíonn sé an comhéadan athdheartha réada sioncrónaithe in Canvas Career."
   enables_the_refreshed_user_profile_page_in_canvas__42c5e6f6: "Cumasaíonn sé an leathanach próifíl úsáideora athnuaite I Canvas Career."
   enables_the_student_view_for_ai_experiences_5198d079: "Cumasaíonn sé radharc na mac léinn le haghaidh Eispéiris AI."
+  enables_the_summarize_tool_in_igniteai_study_tools_ee7ae23: |-
+      Cumasaíonn sé an uirlis Achoimre in Uirlisí Staidéir IgniteAI.
+      Nuair a bhíonn sé díchumasaithe, ní fheicfidh mic léinn an rogha Achoimre.
   enables_top_navigation_lti_placement_lti_1_3_only_f46e894: "Cumasaíonn sé  Socrúchán LTI top_navigation. (LTI 1.3 amháin)"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Cumasaíonn sé gnéithe Chomhéadain chun Uaslódálacha “sínte” a bhainistiú."
   enables_updated_roles_permissions_ui_in_canvas_car_c2c95830: "Cumasaíonn sé Róil nuashonraithe & Comhéadan Úsáideora Ceadanna i Canvas Career."
@@ -11263,6 +11352,7 @@ ga:
   end_at_f483e40b: "Críochnaigh ag"
   end_course_set_up_tutorial_f358b85d: "Teagaisc ar Shocrú an Chúrsa Deiridh"
   end_date_403b91e9: "Dáta deiridh"
+  end_date_and_time_66d858de: "Dáta agus am deiridh"
   end_date_cannot_be_before_start_date_eb62ed6d: "Ní féidir an dáta deiridh a bheith roimh an dáta tosaithe"
   end_date_e0093ed7: "Dáta deiridh"
   end_date_for_conference_eaff0807: "Dáta Deiridh don Chomhdháil"
@@ -11271,6 +11361,7 @@ ga:
     other: "Dáta Deiridh d’úsáideoirí %{count}"
   end_date_for_enroll_2a879a36: "Dáta Deiridh le haghaidh %{enroll}"
   end_date_from_cdd9d90: "Dáta Deiridh Ó:"
+  end_date_must_be_after_start_date_26faf9e2: "Ní mór don dáta deiridh a bheith i ndiaidh an dáta tosaithe."
   end_date_must_be_after_start_date_2fea5383: "Caithfidh an dáta deiridh a bheith tar éis an dáta tosaithe"
   end_date_must_be_after_the_start_date_cebb0582: "Ní mór don dáta deiridh a bheith i ndiaidh an dáta tosaigh."
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "Caithfidh an Dáta/Am Deiridh a bheith níos déanaí ná an Dáta/Am Tosaigh"
@@ -11301,6 +11392,7 @@ ga:
       Úsáideoirí Riarthóra Suímh gan chead chun Forbróir domhanda a mhodhnú
       Eochracha.
   enforce_the_onetimeuse_condition_in_saml_assertion_c73e16d: "Cuir an coinníoll OneTimeUse i bhfeidhm i ndearbhuithe SAML chun ionsaithe athsheinm a chosc. Is féidir leat a sheiceáil an bhfacthas aon sáruithe ar leathanach na soláthraithe fíordheimhnithe."
+  enforcement_2136c4f: Forfheidhmiú
   engagement_report_986e9621: "Tuairisc Rannpháirtíochta"
   english_australia_dc405d82: "Béarla (An Astráil)"
   english_c60612e2: Béarla
@@ -12131,6 +12223,8 @@ ga:
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Fág amach aon sonraí nár nuashonraíodh ón dáta tugtha"
   exclude_deleted_and_expired_access_tokens_e9ca9a44: "Fág comharthaí rochtana scriosta agus imithe in éag amach"
   exclude_deleted_lti_2_0_similarity_check_tools_on__1bf13f30: "Eisiamh uirlisí seiceála cosúlachta LTI 2.0 scriosta ar easpórtáil tasc"
+  exclude_quoted_material_165d68c3: "Fág Amach Ábhar Luaite"
+  exclude_self_plagiarism_f313288c: "Fág Amach Féin-Bhradaíl"
   excuse_this_assignment_for_the_selected_student_af04e132: "Ná bac leis an Tasc Seo don Mac Léinn Roghnaithe"
   excused_3aab77: "Leithscéal faighte"
   excused_5877183c: "Ní bhacfar leis/léi!"
@@ -12450,8 +12544,10 @@ ga:
   failed_to_load_course_settings_74168426: "Theip ar shocruithe an chúrsa a lódáil"
   failed_to_load_course_work_data_please_try_again_61ebc206: "Theip ar lódáil sonraí na hoibre cúrsa. Bain triail as arís, le do thoil."
   failed_to_load_course_work_please_try_again_5c97c7c0: "Theip ar an obair chúrsa a lódáil. Bain triail as arís, le do thoil."
+  failed_to_load_courses_d28a656a: "Theip ar chúrsaí a lódáil"
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Theip ar chúrsaí a lódáil. Athnuaigh an leathanach chun triail eile a bhaint as."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Theip ar lódáil an t-eolas CSP, bain triail as an leathanach a athnuachan."
+  failed_to_load_discovery_page_configuration_please_fea58cbd: "Theip ar chumraíocht an leathanaigh fionnachtana a lódáil. Dún agus déan iarracht arís."
   failed_to_load_document_processing_apps_errormsg_6014a1f6: "Theip ar lódáil aipeanna próiseála doiciméad: %{errorMsg}"
   failed_to_load_eportfolio_pages_fd6eb835: "Theip ar lódáil na leathanaigh r-Phunann"
   failed_to_load_eportfolio_sections_45b98e4: "Theip ar lódáil grúpa na r-Phunanna"
@@ -12531,6 +12627,7 @@ ga:
   failed_to_save_configuration_8cf99186: "Theip ar an gcumraíocht a shábháil"
   failed_to_save_configuration_please_try_again_dfef17b2: "Theip ar shábháil na cumraíochta. Bain triail as arís, le do thoil."
   failed_to_save_dashboard_selection_32e71c72: "Theip ar an rogha painéal a shábháil"
+  failed_to_save_discovery_page_configuration_please_e67607c2: "Theip ar chumraíocht an leathanaigh fionnachtana a shábháil. Bain triail as arís, le do thoil."
   failed_to_save_feedback_please_try_again_9645ea: "Theip ar shábháil an aiseolais. Bain triail as arís, le do thoil."
   failed_to_save_knowledge_chat_error_e2b2b87d: "Theip ar shábháil an Chomhrá Eolais: %{error}"
   failed_to_save_outcome_order_e233ecb0: "Theip ar ordú na dtorthaí a shábháil"
@@ -12647,10 +12744,12 @@ ga:
   feedback_noted_c8396ffb: "Tugadh Aiseolas Faoi Deara"
   feedback_received_391283b7: "Fuarthas Aiseolas"
   feedback_submitted_f0d9031f: "Cuireadh aiseolas isteach."
+  feedback_submitted_thank_you_7b25fa6d: "Cuireadh aiseolas isteach. Go raibh maith agat!"
   feeds_9f1c5c76: fothaeanna
   fetch_unified_tool_id_from_lp_and_update_it_3db0d1bb: "Faigh Aitheantas Uirlis Aontaithe ó LP agus nuashonraigh é"
   fetching_categories_b5a5bae5: "Catagóirí á bhFáil..."
   fetching_graph_data_b47b5a80: "Ag fáil sonraí graif"
+  fewer_than_2622757: "Níos lú ná"
   field_9ec0ec01: Réimse
   field_cannot_be_blank_afb5b332: "Ní féidir an réimse a bheith bán."
   field_must_be_either_active_or_deleted_329a42a: "\"Caithfidh %{field}\" a bheith \"%{active}\" nó \"%{deleted}\""
@@ -12675,6 +12774,7 @@ ga:
   file_has_not_finished_uploading_cfba3b2f: "Níor chríochnaigh an comhad ag úaslódáil"
   file_info_ba4cc190: "Eolas an Chomhaid"
   file_information_6e6f6fc1: "Eolas an Chomhaid"
+  file_is_in_a_hidden_folder_c2dfa872: "tá an comhad i bhfillteán i bhfolach"
   file_list_350d08df: "Liosta Comhad"
   file_list_updated_38e2a5ad: "Nuashonraíodh an liosta comhad"
   file_menu_cc0ca54: "Roghchlár Comhad"
@@ -12946,6 +13046,8 @@ ga:
   flash_ab3ad95e: splanc
   flash_file_cbcadc71: "Comhad Splaince"
   flask_323388e4: fleascán
+  flexible_11554c07: solúbtha
+  flexible_e8232e51: Solúbtha
   fluid_c84f4b06: Corrach
   flv_15e62834: FLV
   focus_mode_a1f65110: "Mód Fócais"
@@ -13064,6 +13166,7 @@ ga:
   from_the_discussions_page_the_tool_can_be_launched_b0f80135: "Ón leathanach fóram is féidir an uirlis a sheoladh ón gclár anuas ag barr an leathanaigh. Tá sé le feiceáil ag mic léinn"
   from_the_edit_page_of_an_assignment_this_placement_53195eaf: "Ó leathanach eagarthóireachta an tasc, tá an socrúchán seo ar fáil nuair a shocraítear an Sórt Uaslódála go hUirlis Sheachtrach trí chliceáil ar an gcnaipe ‘Aimsigh’"
   from_the_gradebook_when_you_click_on_a_student_s_n_76867ddc: "Ó leabhar na marcanna, nuair a chliceálann tú ar ainm mac léinn, is féidir an uirlis a sheoladh ón gcárta"
+  from_the_gradebook_when_you_click_the_actions_butt_17359765: "Ó leabhar na marcanna nuair a chliceálann tú an cnaipe gníomhartha cuireann sé seo rogha ar fáil chun marcanna a shioncronú leis an uirlis. Gan a bheith sa phictiúr: nuair a bhíonn sé cumasaithe ar uirlis atá ar fáil ag an gcuntas fréimhe, bíonn na socruithe easpórtála marcanna SIS ar an leathanach Socruithe Cuntais faoin táb Socruithe cumasaithe."
   from_the_gradebook_when_you_click_the_actions_butt_91da16e6: "Ó leabhar na marcanna, nuair a chliceálann tú an cnaipe gníomhartha, cuireann sé seo rogha ar fáil chun marcanna a shioncronú leis an uirlis"
   from_the_modules_page_when_the_plus_icon_is_select_a512ecf: "Ón leathanach Modúil, nuair a roghnaítear an deilbhín móide ó cheanntásc modúil agus Uirlis Sheachtrach roghnaithe, is féidir uirlis a sheoladh."
   from_the_provider_of_the_enrollments_834d5ae4: "ó sholáthraí na gclárúchán"
@@ -13114,6 +13217,7 @@ ga:
   generated_e71c6622: Ginte
   generated_f26ee56b: "Ginte:"
   generated_icon_d004f211: "Deilbhín Ginte"
+  generated_study_content_may_be_inaccurate_or_incom_ed3d0dff: "D’fhéadfadh ábhar staidéir a gineadh a bheith míchruinn nó neamhiomlán."
   generated_summary_63857c79: "Achoimre Ginte"
   generating_5b5e20f8: "Ag giniúint:"
   generating_alt_text_a8819f13: "Ag giniúint téacs malartach..."
@@ -13124,6 +13228,7 @@ ga:
   generating_pairing_code_251b7fc8: "Cód péireála á ghiniúint..."
   generating_pairing_code_d480ccf4: "Cód péireála á ghiniúint"
   generating_preview_45b53be0: "Réamhamharc á giniúint..."
+  generating_the_report_title_failed_421d7e27: "Theip ar ghiniúint na tuairise, %{title}."
   generating_token_42c29663: "Comhartha á Ghiniúint..."
   generating_token_failed_a25c3627: "Theip ar ghiniúint an chomhartha."
   georgian_94cc6fcc: Seoirsis
@@ -13148,6 +13253,7 @@ ga:
   give_all_students_the_same_grade_for_596ae9d0: "Tabhair an Marc céanna do gach mac léinn le haghaidh"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Tabhair an Marc céanna do gach mac léinn le haghaidh *%{assignment.name}* trí luach Marcanna a chur isteach agus a chur isteach thíos:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Tabhair an Marc an *faoin gcéad* céanna do gach mac léinn le haghaidh **%{assignment.name}** trí luach Marcanna a chur isteach thíos:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Tabhair buíochas iomlán don cheist seo do gach duine"
   give_feedback_8f20278a: "Tabhair Aiseolas"
   give_rubric_creators_the_option_to_generate_rubric_a59be8bf: "Tabhair an rogha do chruthaitheoirí rúibricí critéir rúibrice a ghiniúint go huathoibríoch bunaithe ar chur síos ar thasc trí mhúnla teanga mór (LLM)."
   give_rubric_creators_the_options_to_generate_rubri_8ee10700: "Tabhair na roghanna do chruthaitheoirí rúibric chun critéir rúibrice a ghiniúint go huathoibríoch bunaithe ar chur síos ar thasc trí shamhail teanga mhór (LLM)."
@@ -13515,6 +13621,7 @@ ga:
       renamed_file: "athainmnithe ó %{filename}"
       submissions_upload: "%{assignment} Uaslódáil Uaslódálacha"
   graded_25cd3fcd: Marcáilte
+  graded_assignments_1c8879b4: "Tascanna marcáilte"
   graded_count_days_ago_f7a42c9e: 
     one: "Marcáilte 1 lá ó shin"
     other: "Marcáilte %{count} laethanta ó shin"
@@ -13595,6 +13702,7 @@ ga:
   grading_assistance_is_disabled_for_file_uploads_37648c97: "Tá cúnamh marcála díchumasaithe le haghaidh uaslódálacha comhad."
   grading_assistance_is_not_available_right_now_311ff55a: "Níl cúnamh marcála ar fáil faoi láthair."
   grading_assistance_is_not_available_right_now_810b15c1: "Níl Cúnamh Marcálaithe ar fáil faoi láthair."
+  grading_assistance_is_not_enabled_for_this_course_23fdb8d7: "Níl Cúnamh Marcáilte cumasaithe don chúrsa seo."
   grading_category_aligned_with_sis_f8f64792: "Catagóir marcála ailínithe le SIS"
   grading_cell: 
     grade_complete: Críochnaigh
@@ -14029,6 +14137,7 @@ ga:
   handler_7912052f: Láimhseálaí
   handles_switching_between_canvas_academic_and_care_92d79681: "Láimhseálann sé aistriú idir Canvas Academic agus Career i gCúrsaí"
   hang_tight_f391c843: "Fan go daingean!"
+  hang_tight_scanning_might_take_a_few_seconds_or_up_2044766f: "Fan go fóill! D’fhéadfadh sé go dtógfadh an scanadh cúpla soicind nó suas le roinnt nóiméad, ag brath ar an méid ábhair atá i do chúrsa."
   has_assessment_d67224c3: "Tá Measúnú Ann"
   has_attachments_922bf3ba: "Tá Ceangaltáin ann"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "roghnaithe go huathoibríoch bunaithe ar an áit a bhfuil cónaí ar ásc Canvas an chuntais seo. I gcásanna áirithe is féidir é a bheith ina réigiún difriúil."
@@ -14722,6 +14831,8 @@ ga:
   if_not_selected_this_item_will_be_imported_as_one__f6313092: "Mura bhfuil sé roghnaithe, iompórtálfar an mhír seo mar mhír mhodúil amháin."
   if_one_is_configured_c010e411: ", má tá ceann cumraithe."
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Má tá ceann amháin nó gach cead díchumasaithe, is féidir leis an úsáideoir comhaid a fheiceáil agus a íoslódáil i gcomhad zip fós."
+  if_only_excluded_submissions_are_available_another_e649deda: "Mura bhfuil ach uaslódálacha eisiata ar fáil, cuirfear uaslódáil eile ina hionad"
+  if_only_excluded_submissions_are_available_the_stu_70ce2e9: "Mura bhfuil ach uaslódálacha eisiata ar fáil, cuirfear bac ar an mac léinn an tasc a chríochnú"
   if_provided_this_name_will_be_used_in_preference_t_4079100a: "Má chuirtear ar fáil é, úsáidfear an t-ainm seo in áit ainm iarbhír an chúrsa ar an ndeais agus i bhfógraí."
   if_restrict_quantitative_data_is_enabled_checkpoin_cd95933d: "Má tá Srian ar Shonraí Cainníochtúla cumasaithe, ní féidir seiceálphointí a chruthú."
   if_restrict_view_of_quantitative_data_is_enabled_t_29613e6f: "Má tá “Srian amharc ar shonraí cainníochtúla” cumasaithe, caithfidh scéim marcála réamhshocraithe a bheith cumasaithe don chúrsa."
@@ -14741,6 +14852,8 @@ ga:
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Má tá Staitisticí - amharc nó Úsáideoirí - bainistigh sonraí logáil isteach cumasaithe, beidh an t-úsáideoir in ann gníomhaíocht logáil isteach/logáil amach a ghiniúint in Uirlisí Riaracháin. Chun an rogha gníomhaíochta logáil isteach/logála amach a cheilt in Uirlisí Riaracháin, ní mór an dá chead seo a dhíchumasú."
   if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Má tá rogha na gné Scálaí Forlámhais ar Leibhéal an Chuntais agus an Chúrsa cumasaithe, taispeánann an táb Bainistigh comhéadan nuashonraithe. Ina theannta sin, léireoidh an leathanach Torthaí dhá táb breise a scarann scálaí forlámhais agus ríomhaireachtaí inniúlachta ó bhainistiú torthaí."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Má tá na ceadanna breise cumasaithe, ach nach bhfuil an cead seo cumasaithe, is féidir socruithe glais a chur in eagar ar fhóram aonair."
+  if_the_allocated_submission_is_not_available_anoth_3da44807: "Mura bhfuil an uaslódáil a leithroinntear ar fáil, cuirfear uaslódáil eile ina háit"
+  if_the_allocated_submission_is_not_available_the_s_f52c4cd: "Mura bhfuil an uaslódáil a leithdháiltear ar fáil, cuirfear bac ar an mac léinn an tasc a chríochnú."
   if_the_canvas_was_copied_from_a_template_instance__917bb965: "Má rinneadh an Canvas a chóipeáil ó shampla teimpléad, tá sé seo normálta!"
   if_the_course_content_permission_enabled_and_web_c_85f91e32: "Má tá cead Ábhar an Chúrsa cumasaithe agus Comhdhálacha Gréasáin - cruthaigh díchumasaithe, is féidir leis an úsáideoir comhdhálacha a bhainistiú fós."
   if_the_email_attribute_is_not_set_to_autoconfirm_u_f0322e42: "Mura bhfuil an tréith ríomhphoist socraithe chun uathdhearbhú a dhéanamh, seolfar ríomhphost chuig úsáideoirí chun úinéireacht a seoladh ríomhphoist a dhearbhú. Níor cheart é seo a chumasú ach amháin má tá tú muiníneach go bhfuil do sholáthraí fíordheimhnithe ag soláthar seoltaí ríomhphoist atá bailí agus nach bhfuil curtha ar fáil ag an úsáideoir (nó a bhfuil a n-úinéireacht deimhnithe cheana féin)."
@@ -14783,6 +14896,7 @@ ga:
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Má athraíonn tú pointí féideartha an taisc, ní mór duit an tasc a athmharcáil."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Má athraíonn tú pointí féideartha an taisc, ní mór duit aon uaslódálacha a athmharcáil."
   if_you_changed_anything_since_the_last_scan_you_ne_b3941e3d: "Má d’athraigh tú aon rud ó rinneadh an scanadh deireanach, ní mór duit scanadh arís chun an liosta nuashonraithe a fháil."
+  if_you_delete_this_appointment_all_course_teachers_ae859482: "Má scriosann tú an coinne seo, caillfidh gach múinteoir cúrsa rochtain air, agus scriosfar gach clárú mac léinn go buan."
   if_you_delete_this_appointment_group_all_course_te_9f7dd252: "Má scriosann tú an grúpa ceapacháin seo, caillfidh gach múinteoir cúrsa rochtain, agus scriosfar gach clárú mac léinn go buan."
   if_you_did_not_try_to_log_into_canvas_please_disre_d2bbfb: "Mura ndearna tú iarracht logáil isteach i Canvas, déan neamhaird den teachtaireacht seo."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Mura roghnaíonn tú cearta úsáide anois, beidh an comhad seo neamhfhoilsithe tar éis é a uaslódáil."
@@ -14842,6 +14956,10 @@ ga:
   igniteai_search_is_in_feature_preview_feedback_can_bdc40afe: "Tá IgniteAI Search i réamhamharc gné. Is féidir aiseolas a sholáthar trí rátálacha torthaí agus spás Pobail Canvas do IgniteAI Search Beta. Is féidir teacht ar an spás Pobail Canvas anseo: "
   igniteai_search_is_in_progress_fa0d36ed: "Tá cuardach IgniteAI ar siúl"
   igniteai_search_results_loaded_c6a14af5: "Torthaí cuardaigh IgniteAI luchtaithe."
+  igniteai_study_tools_47cfbd2d: "Uirlisí Staidéir IgniteAI"
+  igniteai_study_tools_flashcards_3cfa48c7: "Uirlisí Staidéir IgniteAI - Splanchártaí"
+  igniteai_study_tools_quiz_me_3fe084fb: "Uirlisí Staidéir IgniteAI - Cuir Ceisteanna Orm"
+  igniteai_study_tools_summarize_fde3aa4b: "Uirlisí Staidéir IgniteAI - Déan Achoimre"
   igniteai_summaries_for_discussions_63b8c8eb: "Achoimrí IgniteAI do Fhóraim"
   igniteai_translations_for_discussions_announcement_c3be6962: "Aistriúcháin IgniteAI le haghaidh Fóram & Fógraí"
   igniteai_translations_for_inbox_5c3ee598: "Aistriúcháin IgniteAI don Bhosca Isteach"
@@ -15045,6 +15163,7 @@ ga:
   include_deleted_objects_4b75ef93: "Cuimsigh míreanna scriosta"
   include_deleted_users_in_search_results_51c1ec4: "Cuimsigh úsáideoirí scriosta san áireamh i dtorthaí cuardaigh"
   include_group_categories_when_copying_group_assign_d9290dbc: "Cuir catagóirí grúpa san áireamh agus tascanna grúpa á gcóipeáil i gcóipeanna cúrsa nó i sioncronú Treoirphlean"
+  include_in_repository_6102bd95: "Cuimsigh sa Stór"
   include_instructure_identity_pseudonyms_from_apis_89ad5584: "Cuimsigh Ainmneacha Bréige Aitheantais Instructure ó APIanna"
   include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Cuimsigh IDanna Comhtháthaithe in easpórtálacha leabhar na marcanna"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Cuimsigh IDanna Chomhtháthaithe in easpórtálacha leabhar na marcanna."
@@ -15353,6 +15472,7 @@ ga:
   international_sms_9edb9868: "SMS idirnáisiúnta"
   international_text_messaging_rates_may_apply_d4b4a97a: "Féadfaidh rátaí idirnáisiúnta teachtaireachtaí téacs a bheith i bhfeidhm."
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: "Bunachar Sonraí Idirlín"
   interop_8899_this_is_a_low_risk_change_because_too_43e25e8f: "INTEROP-8899. Is athrú riosca íseal é seo, mar níor cheart go mbeadh uirlisí ag brath ar theachtaireachtaí earráide a thagann ó bhailitheoir scéimre json."
   interval_must_be_0_e7b8eb5: "Ní mór BRISEADH a bheith > 0"
   introduces_ai_experiences_a_new_canvas_learning_ob_9ac91af7: "Tugann sé isteach Eispéiris ID - Réad Foghlama Canvas nua."
@@ -15419,6 +15539,7 @@ ga:
   invalid_input_d7957821: "Ionchur neamhbhailí"
   invalid_json_7d2eebce: "JSON neamhbhailí"
   invalid_json_format_for_widget_dashboard_layout_6b9f3f94: "Formáid JSON neamhbhailí do leagan amach deais na ngiuirléidí"
+  invalid_json_syntax_d8759541: "Comhréir JSON neamhbhailí"
   invalid_jwk_f8d46234: "JWK neamhbhailí"
   invalid_jwt_audience_audience_961899c6: "Lucht féachana JWT neamhbhailí: %{audience}"
   invalid_jwt_issuer_issuer_3a20d9b9: "Eisitheoir JWT neamhbhailí: %{issuer}"
@@ -15550,6 +15671,7 @@ ga:
   items_items_selected_5b55e566: "%{items} míreanna roghnaithe"
   items_last_accessed_before_date_may_not_be_shown_be840349: "Ní féidir míreanna a osclaíodh go deireanach roimh %{date} a thaispeáint."
   items_selected_have_different_usage_rights_52b325cc: "Tá cearta úsáide difriúla ag na míreanna a roghnaíodh."
+  items_with_student_submissions_or_other_restrictio_e49fb99b: "Ní féidir míreanna a bhfuil uaslódálacha mic léinn nó srianta eile orthu a dhífhoilsiú."
   itemtitle_reply_to_topic_df6a63a0: "%{itemTitle} Tabhair Freagra ar Thopaic"
   itemtitle_required_replies_num_66397950: "%{itemTitle} Freagraí Riachtanacha (%{num})"
   j_5226008a: j
@@ -15648,6 +15770,7 @@ ga:
   joined_group_group_name_e3802c04: "Chuaigh tú isteach sa ghrúpa %{group_name}"
   joining_81f8b6c9: "Ag dul isteach"
   joplin_assignment_submission_a4cf7899: "uaslódáil Tasc Joplin"
+  journals_periodicals_and_publications_ca24673: "Irisí, Tréimhseacháin, agus Foilseacháin"
   jpg_903bacff: JPG
   jquery: 
     module_sequence_footer: 
@@ -15660,6 +15783,7 @@ ga:
       play_comment: "Seinn Ráiteas Meáin"
   json_b96e53d2: JSON
   json_code_67d7aa0a: "Cód JSON"
+  json_configuration_cfd53a85: "Cumraíocht JSON"
   json_configuration_copied_7c260f5f: "Cóipeáladh cumraíocht JSON"
   json_data_bd3169f1: "Sonraí JSON"
   json_is_not_valid_please_submit_properly_formatted_e3b2f88f: "Níl Json bailí. Cuir isteach json formáidithe i gceart."
@@ -16003,6 +16127,7 @@ ga:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} fógra aimsithe"
   length_results_found_3afd01e5: "%{length} toradh aimsithe"
+  less_than_25ea97f: "Níos lú ná"
   less_than_a_minute_ago_9f45e2a5: "níos lú ná nóiméad ó shin"
   less_than_a_minute_f938af3a: "níos lú ná nóiméad"
   let_instructors_tag_enrolled_users_and_assign_cour_90131b01: "Lig do theagascóirí clibeanna a chur ar úsáideoirí cláraithe agus ábhar cúrsa a shannadh bunaithe ar na clibeanna sin, rud a thacaíonn le heispéiris foghlama níos pearsantaithe."
@@ -16127,6 +16252,8 @@ ga:
   like_the_current_message_41b56198: "Cosúil leis an Teachtaireacht Reatha"
   like_this_entry_60da41a5: "Tabhair ‘Is Maith’ don Iontráil seo"
   like_this_response_fdfc3917: "Is maith liom an freagra seo"
+  like_translation_e49dad16: "Is maith liom an t-aistriúchán"
+  like_translation_selected_10a8b538: "Is maith liom an t-aistriúchán, roghnaithe"
   likes_8cffe724: 
     one: "Is maith liom"
     other: "Is maith liom"
@@ -16302,6 +16429,7 @@ ga:
   loading_comments_32366acf: "Ráitis á lódáil"
   loading_completion_b62ca82f: "Críochnú lódála"
   loading_compose_modal_f6da0e8b: "Modhach Cumadóireachta á Lódáil"
+  loading_configuration_78278eab: "Cumraíocht á lódáil…"
   loading_configuration_a0f96cd3: "Cumraíocht á luchtú"
   loading_content_for_import_4ed89a17: "Ábhar á lódáil le hiompórtáil."
   loading_contributing_scores_5f68330f: "Ag lódáil scóir rannchuidithe"
@@ -16595,6 +16723,7 @@ ga:
   login_handle_is_required_90ab7fe0: "Tá %{login_handle} ag teastáil"
   login_has_been_denied_for_security_reasons_please__66869692: "Diúltaíodh logáil isteach ar chúiseanna slándála. Bain triail eile as ar ball le do thoil nó déan teagmháil le riarthóir do chórais."
   login_help_for_canvas_5571f9b1: "Cabhair chun Logáil Isteach le haghaidh %{canvas}"
+  login_help_url_19c952cb: "URL Cabhrach Logála Isteach"
   login_id_12109693: "ID logála isteach"
   login_id_bc943b97: "ID Logála Isteach:"
   login_ids_b394c2a3: "ID logáil isteach"
@@ -16677,6 +16806,7 @@ ga:
   lti_apps_page_improved_history_c22dd69b: "Stair Fheabhsaithe Leathanach Aipeanna LTI"
   lti_apps_usage_data_147aa4af: "Feidhmchláir LTI - Sonraí Úsáide"
   lti_asset_processor_turnitin_migration_bc484419: "Imirce Turnitin Próiseálaí Sócmhainní LTI"
+  lti_config_edit_as_json_43c3adf8: "Cumraíocht LTI a chur in Eagar mar JSON"
   lti_context_id_d6a24cfc: "ID an chomhthéacs Lti"
   lti_context_id_should_be_unique_7437a74d: "Ba cheart lti_context_id a bheith uathúil"
   lti_contextcontrols_91b76c7a: "Rialuithe Comhthéacs LTI"
@@ -18348,6 +18478,30 @@ ga:
         subject: "Clárúchán Canvas Críochnaithe"
       twitter: 
         body: "Foláireamh Canvas - Cláraíodh thú le haghaidh cuntas Canvas ag %{account}!  "
+    pseudonym_suspended_after_failed_login: 
+      email: 
+        body: "Cuireadh do logáil isteach ag %{account_name} curtha ar fionraí mar gheall ar an iomarca iarrachtaí logála isteach nár éirigh leo. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+        html: 
+          body: "Do logáil isteach ag %{account_name} curtha ar fionraí mar gheall ar an iomarca iarrachtaí logála isteach nár éirigh leo. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+          subject: "Logáil Isteach Ar Fionraí"
+        subject: "Logáil Isteach Ar Fionraí"
+      sms: 
+        body: "Cuireadh do logáil isteach ag %{account_name} ar fionraí mar gheall ar an iomarca iarrachtaí logála isteach nár éirigh leo. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+      summary: 
+        body: "Cuireadh do logáil isteach ag %{account_name} ar fionraí mar gheall ar an iomarca iarrachtaí logála isteach nár éirigh leo. Téigh i dteagmháil le riarthóir d’institiúide le do thoil."
+        subject: "Logáil Isteach Ar Fionraí"
+    pseudonym_suspended_by_admin: 
+      email: 
+        body: "Cuireadh an t-úsáideoir %{user_name} ag %{account_name} ar fionraí. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+        html: 
+          body: "Cuireadh an t-úsáideoir %{user_name} ag %{account_name} ar fionraí. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+          subject: "Úsáideoir ar Fionraí"
+        subject: "Úsáideoir ar Fionraí"
+      sms: 
+        body: "Cuireadh an t-úsáideoir %{user_name} ag %{account_name} ar fionraí. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+      summary: 
+        body: "Cuireadh an t-úsáideoir %{user_name} ag %{account_name} ar fionraí. Téigh i dteagmháil le riarachán d’institiúide le do thoil."
+        subject: "Úsáideoir ar Fionraí"
     quiz_locked: "Tá an Quiz seo faoi ghlas faoi láthair."
     quiz_locked_at: "Bhí an Quiz seo faoi ghlas %{at}."
     quiz_locked_module: "Tá an Quiz seo mar chuid den mhodúl *%{module}* agus níl sé díghlasáilte go fóill."
@@ -18725,7 +18879,10 @@ ga:
     assignment_group_type: "Grúpa Taisc"
     assignment_type: Tasc
     calendar_event_type: "Imeacht Féilire"
+    custom_link_import_failed: "Níorbh fhéidir an Nasc Saincheaptha a iompórtáil: %{link_label}"
+    custom_link_invalid_url: "Níor cóipeáladh an nasc lipéadaithe %{link_label} mar nach bhfuarthas an acmhainn a bhfuil nasc léi sa chúrsa nua. Chun nasc a dhéanamh leis an acmhainn seo, cuir leis de láimh í ón táb nascleanúna i Socruithe an Chúrsa."
     custom_link_type: "Nasc Saincheaptha"
+    custom_link_validation_error: "Níorbh fhéidir an Nasc Saincheaptha a iompórtáil: %{link_label} (URL: %{url}) - %{validation_errors}"
     discussion_topic_type: "Topaic Fóraim"
     ecollege: 
       course_not_found: "Níor aimsíodh an cúrsa RCholáiste."
@@ -19243,6 +19400,7 @@ ga:
   name_3806192d: "Ainm:"
   name_added_6257decb: "Cuireadh %{name} leis"
   name_already_has_enough_must_review_allocations_to_319b3007: "Tá dóthain leithdháiltí “riachtanach athbhreithnithe” ag %{name} cheana féin chun freastal ar na piarmheasúnaithe riachtanacha. Leanfaidh leithdháiltí breise na haighneachtaí agus an tosaíocht atá ar fáil."
+  name_already_has_enough_strict_allocations_to_meet_f307c06f: "Tá dóthain leithdháiltí dochta ag %{name} cheana féin chun freastal ar na piarmheasúnuithe is gá. Leanfaidh leithdháiltí breise na huaslódalacha agus an tosaíocht atá ar fáil."
   name_app_has_been_deleted_fb2d9426: "Scriosadh an aip %{name}"
   name_badfe525: ainm
   name_cannot_exceed_num_characters_2250bf22: "Ní féidir an t-ainm %{num} (g)c(h)arachtar a shárú."
@@ -19254,6 +19412,7 @@ ga:
   name_e790ff1f: Ainm...
   name_ea82c4df: "\"%{name}\""
   name_error_fee4236: "Earráid Ainm"
+  name_failed_58b59384: "Theip ar %{name}"
   name_has_already_completed_the_required_peer_revie_cdd4ab5c: "Tá na hathbhreithnithe piaraí riachtanacha críochnaithe ag %{name} cheana féin."
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "Tá *ainm* suiteáilte go rathúil ach níl sé cumasaithe go fóill."
   name_is_currently_locked_and_unavailable_to_view_6e579cea: "Tá %{name} faoi ghlas faoi láthair agus ní féidir é a fheiceáil."
@@ -19292,6 +19451,7 @@ ga:
   name_successfully_moved_to_foldername_90eec95f: "D'éirigh le %{name} a bhogadh go %{folderName}."
   name_template_8bfc30ec: "%{name} (d)t(h)eimpléad"
   name_toggle_module_visibility_f948faf8: "%{name} scoránaigh infheictheacht modúl"
+  name_uploading_309284d0: "Ag uaslódáil %{name}"
   name_user_e44eebed: "%{name} Úsáideoir"
   name_was_successfully_duplicated_6e48347b: "D'éirigh le macasamhail a dhéanamh de %{name}."
   name_was_successfully_removed_31398997: "Baineadh %{name} go rathúil."
@@ -19309,6 +19469,14 @@ ga:
   nav_icon_ca3fef59: "Deilbhín Nascleanúna"
   nav_logo_4b255c91: "Lógó Nascleanúna"
   nav_logo_background_ba33fb7f: "Cúlra Lógó Nascleanúna"
+  nav_menu_link: 
+    nav_menu_link: 
+      errors: 
+        course_context_nav_only: "ní féidir ach nascleanúint cúrsa a chumasú i nasc comhthéacs cúrsa"
+        nav_type_required: "ní mór cineál nascleanúna amháin ar a laghad a bheith cumasaithe"
+        url_html_tags: "ní URL bailí é (ní féidir clibeanna HTML a bheith ann)"
+        url_invalid: "ní URL bailí é"
+        url_relative_invalid: "ní URL bailí é (ní mór cosán a bheith ag naisc a thosaíonn le slais agus gan óstach ná scéim)"
   nav_menu_links_3ada377a: "Naisc Roghchláir Loingseoireachta"
   nav_text_94206145: "Téacs Nascleanúna"
   nav_text_active_a924ae88: "Téacs Nascleanúna Gníomhach"
@@ -19442,6 +19610,7 @@ ga:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Cumasaíodh ascnamh Quizeanna Nua de réir réamhshocraithe"
   new_quizzes_migration_required_7854aa1a: "Ascnamh Quizeanna Nua ag teastáil"
   new_quizzes_native_experience_6d4e340a: "Quizeanna Nua Eispéireas Dúchasach"
+  new_quizzes_native_experience_api_gateway_f6791c2f: "Quizeanna Nua Eispéireas Dúchasach Geata API"
   new_quizzes_native_experience_respondus_b96bbd98: "Quizeanna Nua Eispéireas Dúchasach Respondus"
   new_quizzes_native_experience_sessionless_launch_d40baa23: "Quiz Nua Eispéireas Dúchasach Seoladh Gan Seisiún"
   new_quizzes_navigation_updates_42713009: "Nuashonruithe Nascleanúna Quizeanna Nua"
@@ -19679,6 +19848,7 @@ ga:
   no_matches_6ae28640: "Gan aon mheaitseálacha"
   no_matches_found_please_insert_a_valid_recipient_4cef9d47: "Níor aimsíodh aon mheaitseálacha. Cuir isteach faighteoir bailí."
   no_matches_to_your_search_16d3d3b1: "Níl aon mheaitseálacha le do chuardach"
+  no_matching_courses_7401988: "Gan aon chúrsaí comhoiriúnacha"
   no_matching_external_tool_found_ffc3abc3: "níor aimsíodh aon uirlis sheachtrach meaitseála"
   no_matching_options_found_b26c0aa9: "Níor aimsíodh aon rogha meaitseála."
   no_matching_results_where_found_for_searchterm_1efa586e: "Níor aimsíodh aon torthaí comhoiriúnacha le haghaidh \"%{searchTerm}\""
@@ -19733,6 +19903,7 @@ ga:
   no_result_35ffe52a: "Gan toradh"
   no_result_found_3d3fc3e3: "Níor aimsíodh toradh ar bith"
   no_results_3cda4e72: "Níl aon Thorthaí"
+  no_results_available_abe5f888: "Níl aon torthaí ar fáil"
   no_results_f36777ee: "Níl aon thorthaí"
   no_results_found_2ace1494: "Níor aimsíodh aon thorthaí"
   no_results_found_58717065: "Níor aimsíodh aon torthaí"
@@ -19759,6 +19930,7 @@ ga:
   no_students_have_taken_the_quiz_yet_e667644b: "Níor ghlac aon mhic léinn an quiz go fóill"
   no_students_have_taken_the_survey_yet_d378cd35: "Níor ghlac aon mhic léinn an suirbhé go fóill"
   no_students_with_that_name_found_f6004da2: "Níor aimsíodh aon mhac léinn leis an t-ainm sin"
+  no_study_tools_are_currently_available_dd837cbe: "Níl aon uirlisí staidéir ar fáil faoi láthair."
   no_subject_58b7941c: "Níl aon ábhar"
   no_subject_970aad80: "Níl aon ábhar"
   no_subject_a8b6ceeb: "(Níl aon ábhar)"
@@ -20187,6 +20359,8 @@ ga:
       new_user: "Úsáideoir Nua"
       pseudonym_registration: "Clárú Ainm Bréige"
       pseudonym_registration_done: "Clárú Ainm Bréige Críochnaithe"
+      pseudonym_suspended_after_failed_login: "Cuireadh Ainm Bréige Ar Fionraí Tar Éis Logáil Isteach a Theip Air"
+      pseudonym_suspended_by_admin: "Cuireadh Ainm Bréige Ar Fionraí ag an Riarthóir"
       report_generated: "Gineadh an Tuairisc"
       report_generation_failed: "Theip ar Ghiniúint Tuairisce"
       rubric_assessment_invitation: "Cuireadh Taisc Rúibric"
@@ -20237,6 +20411,7 @@ ga:
     submission_comment_display: "Nóta Tráchta Uaslódála"
     web_conference_recording_ready: "Tá taifeadadh comhdhála réidh"
     web_conference_recording_ready_legend: "Tá taifeadadh comhdhála réidh"
+  notification_categories_1460dd20: "Catagóirí fógra"
   notification_not_found_54f78db0: "Fógra gan aimsiú"
   notification_policies_requires_the_communication_c_2e7ded08: "Teastaíonn ID an chainéil chumarsáide, an chatagóir fógra, agus an mhinicíocht atá le nuashonrú ó pholasaithe fógra"
   notification_preferences_cf47083d: "Sainroghanna Fógraí"
@@ -20345,6 +20520,7 @@ ga:
   number_of_students_per_group_8abe7189: "Líon na mac léinní in aghaidh an ghrúpa"
   number_of_times_5a52c6c0: "Líon na nUaireanta"
   number_of_times_calc_int_6d1f8687: "Líon Amanna (%{calc_int})"
+  number_of_words_f73919c4: "Líon na bhfocal"
   numerical_answer_ec7120bf: "Freagra uimhriúil"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} de %{numGroup} Máistrithe"
   numpoints_points_b1f0666a: "Líon na bPointí: %{numPoints}"
@@ -20371,6 +20547,7 @@ ga:
       details: 
         allow_application: "Ceadaigh %{app_name} chun rochtain a fháil ar do chuntas Canvas."
       page_title: "Logáil isteach Aip"
+      please_wait: "Fán le do thoil..."
       remember_auth: "Cuimhnigh Údarú"
   oauth_2_eb9d97: "Údarú Oscailte 2"
   object_type_e4f3bbeb: "Cineál Míre"
@@ -20405,6 +20582,7 @@ ga:
   october_6b2bf82: "Deireadh Fómhair"
   of_grade_984aa550: "% de Mharc"
   of_students_5d1af0d2: "# de mhic léinn"
+  of_the_document_57dac576: "% den doiciméad"
   of_times_1018baab: "# de hamanna"
   of_total_c02b5afe: "de %{total}"
   off_5385ef3f: Múchta
@@ -20502,6 +20680,7 @@ ga:
   only_allowedcount_of_totalcount_files_were_uploade_3d965ed: "Níor uaslódáladh %{allowedCount} de %{totalCount} (g)c(h)omhad chun fanacht laistigh den teorainn %{maxFiles} (g)c(h)omhad."
   only_available_to_students_with_link_107e2468: "Ar fáil do mhic léinn amháin a bhfuil nasc acu"
   only_available_with_link_5ffb9492: "Ar fáil le nasc amháin"
+  only_award_points_for_the_correct_answer_some_stud_ca9a7a20: "Ná bronn pointí ach amháin as an bhfreagra ceart (d’fhéadfadh scóir roinnt mac léinn a bheith laghdaithe)"
   only_collect_grades_that_have_been_graded_since_th_96baed94: "Ná bhailigh Marcanna a Mharcáladh ón t-am start_at."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Ní féidir ach le fógraí cúrsa agus fóraim a bheith sainiúil do roinn"
   only_csv_files_are_supported_e1ad5270: "Ní thacaítear ach le comhaid CSV."
@@ -20600,6 +20779,7 @@ ga:
   opportunities_popup_f6703842: "mír-aníos do dheiseanna"
   optimized_grading_rubrics_b529d7c2: "Rubricí Grádúcháin Optamaithe"
   optimized_load_enrollments_for_courses_index_b7429773: "Ualach Clárúcháin Optamaithe le haghaidh Innéacs Cúrsaí"
+  optimized_needs_grading_count_5b82bca9: "Líon Marala Riachtanach Optamaithe"
   optimized_the_visibility_services_used_by_selectiv_d8abb7be: "Optamaíodh na seirbhísí infheictheachta úsáidte ag Eisiúint Roghnach."
   optimizes_the_loading_of_enrollments_for_the_cours_fd4b0016: |
       Uasmhéadaíonn sé luchtú na gclárúchán do leathanach innéacs na gcúrsaí trí réamhluchtú ceart a dhéanamh 
@@ -20679,8 +20859,10 @@ ga:
   other_ddacb37d: eile
   other_incorrect_match_options_c1418af5: "Roghanna Meaitseála Míchearta Eile:"
   other_resources_fee3ddda: "ACMHAINNÍ EILE"
+  other_student_papers_bf318f4c: "Páipéir Eile na Mac Léinn"
   other_tool_configurations_use_this_domain_includin_c669be8f: "Úsáideann cumraíochtaí uirlisí eile an fearann seo lena n-áirítear *%{first}* agus **%{second}**. Chun coimhlintí a sheachaint, cinntigh nach bhfuil forluí idir na socruithe infhaighteachta."
   other_tool_configurations_use_this_domain_includin_ef4d1741: "Úsáideann cumraíochtaí uirlisí eile an fearann seo lena n-áirítear *%{first}*, **%{second}**, agus ***%{third}***. Chun coimhlintí a sheachaint, cinntigh nach bhfuil forluí idir na socruithe infhaighteachta."
+  other_ways_to_log_in_9d9d2600: "Bealaí eile chun logáil isteach"
   otherwise_please_follow_the_support_link_at_the_bo_ee7856a0: "Seachas sin, lean an nasc tacaíochta ag bun an leathanaigh."
   our_new_reports_page_adds_dynamic_report_progress__31b2b409: "Cuireann ár leathanach Tuarascálacha nua dul chun cinn agus stair dinimiciúil tuarascála leis."
   our_smart_search_feature_relies_on_an_ai_adjacent__e48733be: "Braitheann ár ngné Cuardach Cliste ar theicneolaíocht IS-in aice leis ar a dtugtar “leabaithe.” “Léann” an teicneolaíocht seo ábhar an chúrsa agus cruthaíonn sí léiriú casta matamaitice ar gach píosa ábhair. Nuair a dhéanann tú cuardach, “léann” an teicneolaíocht do cheist agus déanann sé léiriú casta matamaitice air. Déanann an uirlis comparáid ansin idir léirithe matamaitice do chuardaigh agus ábhar an chúrsa chun torthaí ábhartha a thabhairt ar ais."
@@ -20909,6 +21091,7 @@ ga:
   page_comments: 
     errors: 
       create_failed: "Theip ar chruthú Ráiteasa"
+  page_content_is_sent_to_the_model_to_generate_stud_354ea807: "Seoltar ábhar an leathanaigh chuig an tsamhail chun ábhair staidéir a ghiniúint."
   page_duration_7b562e65: "Fad Leathanaigh"
   page_editor_9023aaa1: "Eagarthóir Leathanaigh"
   page_highlight_10d1fc2b: "Aibhsiú leathanaigh"
@@ -21008,6 +21191,7 @@ ga:
     view_more_link: "Féach ar Tuilleadh"
   paginated_view: 
     loading_more_results: "Tuilleadh torthaí á lódáil"
+  pagination_40e3280b: Leathanaigh
   pair_4d942a74: Péireáil
   pair_with_observer_b1541895: "Péireáil le Breathnóir"
   pair_with_student_6f76e69a: "Péireáil le mac léinn"
@@ -21203,6 +21387,7 @@ ga:
   percent_complete_3a7edc20: "%{percent} críochnaithe"
   percent_complete_a7f6d403: "Céatadán críochnaithe"
   percent_complete_e46b6148: "%{percent}% críochnaithe"
+  percent_complete_total_total_19c15249: "%{percent}% críochnaithe (%{total} iomlán)"
   percent_of_points_possible_93cd8127: "%{percent} de phointí féideartha"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Céatadán na bhfreagróirí a roghnaigh an freagra seo"
   percent_of_students_scored_score_53d2c4d5: "%{percent} de mhic léinn a scóráil %{score}"
@@ -21210,6 +21395,7 @@ ga:
   percent_relevance_b375fbdc: "%{percent}% Ábharthacht"
   percent_size_9bcff8be: "Méid céatadáin"
   percentage_34ab7c2c: Céatadán
+  percentage_of_document_643b900b: "Céatadán den doiciméad"
   percentages_and_points_can_t_be_edited_because_it__3639dd1b: "Ní féidir céatadáin agus pointí a chur in eagar toisc gur scéim marcála ar leibhéal cuntais é."
   percentages_and_points_can_t_be_edited_because_it__806d51e8: "Ní féidir céatadáin agus pointí a chur in eagar toisc go bhfuil siad in úsáid faoi láthair."
   percentages_and_points_can_t_be_edited_because_it__fa156ee5: "Ní féidir céatadáin agus pointí a chur in eagar toisc go bhfuil siad á n-úsáid mar an scéim marcála réamhshocraithe."
@@ -21347,6 +21533,7 @@ ga:
   pii_fd320e46: PII
   pii_in_course_content_may_be_indexed_but_no_pii_is_eada8fc7: "Féadfar PII in ábhar cúrsa a innéacsú, ach ní sheoltar aon PII chuig an tsamhail d'aon ghnó"
   pii_in_discussion_replies_may_be_sent_to_the_model_4462b79c: "Féadfar PII i bhfreagraí plé a sheoladh chuig an tsamhail, ach ní sheoltar aon PII chuig an tsamhail d'aon ghnó."
+  pii_in_page_content_may_be_included_but_no_pii_is__475896ef: "Féadfar PII a áireamh in ábhar leathanaigh, ach ní sheoltar aon PII chuig an tsamhail d'aon ghnó."
   pin_cdbc9f8f: Greamaigh
   pin_discussion_title_67c84658: "Pionnáil Fóram %{title}"
   pin_of_discussion_title_failed_6c2c32a5: "Theip ar fhóram %{title} a phionnáil"
@@ -21425,6 +21612,7 @@ ga:
   please_check_your_system_s_microphone_settings_bd2bc7f2: "Seiceáil socruithe micreafón do chórais."
   please_choose_a_file_c2449cc: "Roghnaigh comhad le do thoil"
   please_choose_a_language_for_the_caption_b14115d5: "Roghnaigh teanga don fhotheideal."
+  please_choose_an_authentication_provider_674fdbd6: "Roghnaigh soláthraí fíordheimhnithe le do thoil."
   please_choose_an_editor_569f139e: "Roghnaigh eagarthóir le do thoil"
   please_click_above_to_launch_the_tool_and_select_a_641da0df: "Cliceáil thuas chun an uirlis a sheoladh agus roghnaigh acmhainn."
   please_click_below_to_launch_the_tool_and_select_a_f66e14d: "Cliceáil thíos chun an uirlis a sheoladh agus roghnaigh acmhainn."
@@ -21438,6 +21626,7 @@ ga:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Cuir isteach dáta dlite ar nó tar éis %{earliestDate}"
   please_enter_a_file_name_f159edc1: "Cuir isteach ainm comhaid le do thoil"
   please_enter_a_grading_scheme_name_b2233cfc: "Cuir isteach ainm na scéime marcála"
+  please_enter_a_label_7f5fa751: "Cuir lipéad isteach le do thoil."
   please_enter_a_larger_number_7d18cabd: "Cuir isteach uimhir níos mó"
   please_enter_a_name_c4a6ca65: "Cuir isteach ainm le do thoil."
   please_enter_a_name_for_this_link_318f01a4: "Cuir isteach ainm don nasc seo."
@@ -22379,6 +22568,7 @@ ga:
         save_skype_name: "Sábháil ainm Skype"
         select_image: "Roghnaigh Íomhá"
         update_settings: "Nuashonraigh Socruithe"
+      cookie_consent_settings: "Socruithe Toilithe"
       diigo_description: "Is uirlis leabharmharcála sóisialta é Diigo atá oiriúnaithe go sonrach don taighde agus don oideachas. Ligfidh eagarthóír mórán inneachar Canvas duit do chuid clibeanna Diigo a chuardach chun nasc a dhéanamh go héasca ó laistigh de Canvas le hacmhainní eile atá úsáideach duit."
       error_loading_token_details: "Earráid agus Sonraí Comhartha á lódáil"
       full_token_warning: |-
@@ -23923,6 +24113,7 @@ ga:
   quotas_account_settings_22c12b8d: "Cuótaí (Socruithe Cuntais)"
   quote_ae4462ad: Sliocht
   quote_reply_e56ad360: "Freagra Sleachta"
+  quoted_material_ffaea62b: "Ábhar Luaite"
   radio_button_option_1_a8ec51f9: "Rogha cnaipe raidió 1"
   radio_button_option_2_31e50043: "Rogha cnaipe raidió 2"
   range_56b2f310: Raon
@@ -24244,6 +24435,10 @@ ga:
   registration_screens_724e0d82: "Scáileáin Chlárúcháin"
   registration_update_wizard_error_da5adb50: "Earráid Draoi Nuashonraithe Clárúcháin"
   registration_url_60e0eaaa: "URL clárúcháin"
+  regrade_options_4d463c7c: "Roghanna athmharcála"
+  regrade_options_82fb05e0: "Roghanna Athmharcála"
+  regrade_options_modal_45fb6da1: "Roghanna modhach athmharcála"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Ní cheadaítear athmharcáil ar an gceist seo toisc gur baineadh freagra nó gur athraíodh cineál na ceiste tar éis do mhac léinn uaslódáil a chríochnú."
   regular_and_substantive_interaction_e49d7016: "Idirghníomhaíocht Rialta agus Substaintiúil"
   regular_and_substantive_interaction_insights_is_pa_8f874ac6: "Is cuid den uasghrádú Léargais Chliste i Canvas é Léargais Idirghníomhaíochta Rialta agus Substaintiúla."
   regular_lato_font_7f3cf24c: "Cló Lato Rialta"
@@ -24270,6 +24465,7 @@ ga:
   relinking_paces_fb1a0047: "Luasanna á n-athcheangail..."
   reload_results_6e4870a: "Athlódáil torthaí"
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Athlódáil an leathanach nó déan nascleanúint a dhéanamh chuig leathanach nua chun an t-athrú seo a chur i bhfeidhm."
+  remaining_8a623700: Fágtha
   remediation_closed_1257cd0e: "Dúnadh an obair leighis."
   remediation_closed_successfully_5e4d1550: "Dúnadh an leigheas go rathúil"
   remediation_feccc1fd: Feabhsúchán
@@ -24277,6 +24473,7 @@ ga:
   remember_me_bd780b4: "Cuimhnigh orm"
   remember_my_choice_d74e8f60: "Cuimhnigh mo rogha"
   remember_my_choice_for_this_course_5a3b7206: "Cuimhnigh ar mo rogha don chúrsa seo"
+  remember_to_save_your_settings_for_this_change_to__75ddda3b: "Cuimhnigh do shocruithe a shábháil le go dtiocfaidh an t-athrú seo i bhfeidhm."
   reminder_date_f701f92f: "Meabhrúchán: %{date}"
   reminder_time_for_due_dates_bea56d24: "Am Meabhrúcháin Do Dhátaí Dlite"
   reminder_time_for_grading_ea0dd44d: "Am Meabhrúcháin Le Marcáil"
@@ -24458,6 +24655,8 @@ ga:
   reopening_remediation_please_wait_631e0801: "Athoscailt an athchóirithe, fan le do thoil..."
   reorder_672cf4f2: "Cuireadh athordú leis"
   reorder_blocks_4014c1a7: "Athordaigh bloic"
+  reorder_criterionname_criterion_c7255556: "Athordaigh %{criterionName} Critéar"
+  reorder_ratingname_rating_2ee31ccf: "Athordaigh %{ratingName} Rátáil"
   reorder_widgetname_cfe53293: "Athordú %{widgetName}"
   reorders_some_menu_options_for_more_consistency_an_90efff07: "Athordaíonn sé roinnt roghanna roghchláir le haghaidh comhsheasmhachta níos fearr agus cuireann sé nasc go SpeedGrader leis."
   repeat_every_e653d6d0: "Tarlóidh sé gach:"
@@ -24530,6 +24729,7 @@ ga:
   report_history_d7b6cbb2: "Stair na tuairiscí"
   report_inappropriate_picture_af4eefeb: "Tuairiscigh pictiúr míchuí"
   report_is_already_being_generated_873dd2aa: "Tá tuairisc á giniúint cheana féin."
+  report_is_ready_dd2a548b: "Tá an tuairisc réidh"
   report_issue_b5f1db0e: "Tuairisc Earráid"
   report_profile_picture_8f1d7535: "Tuairiscigh Pictiúr Próifíle"
   report_progress_61367f06: "Dul chun cinn na tuairiscí"
@@ -24758,6 +24958,7 @@ ga:
   revert_sub_account_fa7ae3f2: "Fill ar an bhFo-Chuntas"
   revert_to_actual_score_f665eea9: "Fill ar an Scór Iarbhír"
   review_7197fba3: "Athbhreithniú "
+  review_action_7bcca971: "Athbhreithnigh Gníomh"
   review_and_fix_e31364ca: "Athbhreithniú agus deisigh"
   review_due_date_a4a08771: "Dáta Dlite Athbhreithnithe"
   review_e5be5adc: Athbhreithniú
@@ -24765,6 +24966,8 @@ ga:
   review_feedback_4b4abb38: "Déan Athbhreithniú ar an Aiseolas"
   review_issues_for_name_e89a1246: "Athbhreithnigh saincheisteanna le haghaidh %{name}"
   review_now_318a6a3e: "Déan Athbhreithniú Air Anois"
+  review_partner_1_ffd770f5: "Athbhreithnigh Comhpháirtí 1"
+  review_partner_2_66de214f: "Athbhreithnigh Comhpháirtí 2"
   review_requirement_622655d4: "Riachtanas Athbhreithnithe"
   review_settings_7c265fa5: "Socruithe Athbhreithnithe"
   review_updates_818e58a2: "Nuashonruithe Athbhreithnithe"
@@ -25131,6 +25334,7 @@ ga:
   saving_associations_started_8ac85360: "Thosaigh naisc bhainteacha a shábháil"
   saving_blackout_dates_be03e6ee: "Dátaí le cosc orthu á sábháil..."
   saving_configuration_1463971f: "Cumraíocht á sábháil"
+  saving_configuration_7c5a63b5: "Cumraíocht á sábháil …"
   saving_custom_status_name_e1b66f6e: "Stádas saincheaptha a shábháil %{name}"
   saving_d55dd90e: "Ag sábháil..."
   saving_discussion_topic_a3cb589e: "Topaic Phléite a Shábháil"
@@ -25350,6 +25554,7 @@ ga:
   search_by_99d1ba5f: "Cuardaigh de réir"
   search_by_app_name_company_name_8ea86de: "Cuardaigh de réir ainm an aip & Ainm na Cuideachta"
   search_by_app_or_company_name_ad468715: "Cuardaigh de réir aip nó ainm cuideachta"
+  search_by_course_name_or_id_49a95c96: "Cuardaigh de réir ainm nó aitheantas cúrsa"
   search_by_course_or_assignment_id_78c9553c: "Cuardaigh de réir Aitheantas Cúrsa nó Tascanna"
   search_by_course_title_sis_id_d557bb77: "Cuardaigh de réir teideal cúrsa, ID SIS..."
   search_by_extension_name_company_name_345e690c: "Cuardaigh de réir ainm breiseáin & Ainm na Cuideachta"
@@ -25709,6 +25914,7 @@ ga:
   select_course_color_cad8e62b: "Roghnaigh Dath an Chúrsa"
   select_course_colour_e3627dc2: "Roghnaigh dath an chúrsa"
   select_d70f31da: Roghnaigh
+  select_date_57ab4079: "Roghnaigh dáta"
   select_date_f799ef47: "Roghnaigh Dáta"
   select_dates_to_remove_be55b14c: "Roghnaigh dátaí le baint"
   select_discussion_threaded_option_6f1f7c1f: "Roghnaigh rogha snáithithe plé"
@@ -25793,6 +25999,7 @@ ga:
   select_the_quiz_engine_use_the_arrow_keys_to_navig_a259dda0: "Roghnaigh an t-inneall quiz. Úsáid na heochracha saigheada chun nascleanúint a dhéanamh trí na roghanna, ansin brúigh ‘Téigh Isteach’ chun a dheimhniú."
   select_the_score_that_you_would_like_to_apply_to_u_5a281baa: "Roghnaigh an scór ar mhaith leat a chur i bhfeidhm ar dhéantáin neamhmharcáilte i %{groupName}. Nuair a chuirtear i bhfeidhm é, ní féidir an gníomh seo a chealú."
   select_the_score_that_you_would_like_to_apply_to_u_a445c726: "Roghnaigh an scór ar mhaith leat a chur i bhfeidhm ar dhéantáin neamhmharcáilte. Nuair a chuirtear i bhfeidhm é, ní féidir an gníomh seo a chealú."
+  select_time_92a1ef46: "Roghnaigh am"
   select_title_741f7ef0: "roghnaigh %{title}"
   select_title_for_deletion_45b08247: "Roghnaigh %{title} le scriosadh"
   select_translation_language_58cb57d4: "Roghnaigh Teanga Aistriúcháin"
@@ -25975,6 +26182,7 @@ ga:
   send_usage_metrics_cecc7a7d: "Seol méadracht úsáide"
   send_user_avatar_to_bigbluebutton_17cda2f6: "Seol abhatár úsáideora chuig BigBlueButton"
   sending_bf324366: "Ag seoladh..."
+  sending_feedback_e6d728f9: "Aiseolas á sheoladh"
   sending_file_858ca8e9: "Ag seoladh %{file}"
   sending_message_75923692: "Ag Seoladh Teachtaireacht"
   sending_message_8ac5bc90: "Ag Seoladh Teachtaireacht…"
@@ -26185,6 +26393,7 @@ ga:
         download_submissions: "Íoslódáil uaslódálacha ar fad a chuireadh isteach"
     current_enrollment: 
       checking: "Ag seiceáil..."
+      favorited_past_tooltip: "Tá %{course_name} sa roghchlár cúrsaí."
       favorited_tooltip: "Cliceáil chun %{course_name} a bhaint ó roghchlár na gcúrsaí."
       issue_count: 
         one: "%{count} fadhb"
@@ -26937,6 +27146,7 @@ ga:
   slovak_69f48e1b: Slóvaicise
   slovenian_30ae5208: Slóivéinise
   small_b070434a: Beag
+  small_matches_581ab241: "Cluichí Beaga"
   small_text_contrast_29d0171f: "Codarsnacht bheag téacs"
   small_text_should_have_sufficient_contrast_60bc23dd: "Ba chóir go mbeadh codarsnacht leordhóthanach i dtéacs beag."
   smaller_numbers_mean_higher_priority_c69f4d0a: "Ciallaíonn uimhreacha níos lú tosaíocht níos airde"
@@ -26973,7 +27183,9 @@ ga:
   some_items_are_hidden_from_gradebook_view_ce9cb5e2: "* Tá roinnt míreanna i bhfolach ó radharc an leabhair ghráid."
   some_items_are_hidden_from_grades_view_for_more_in_588020f4: "* Tá roinnt míreanna i bhfolach ó radharc na ngrád. Chun tuilleadh eolais a fháil, déan teagmháil le do mhúinteoir."
   some_items_could_not_be_added_errors_a549215b: "Níorbh fhéidir roinnt míreanna a chur leis: %{errors}"
+  some_module_items_could_not_be_published_c8774997: "Níorbh fhéidir roinnt míreanna modúil a fhoilsiú:"
   some_module_items_could_not_be_published_e4be3c0: "Níorbh fhéidir roinnt míreanna modúil a fhoilsiú"
+  some_module_items_could_not_be_unpublished_c2b9cc77: "Níorbh fhéidir roinnt míreanna modúil a dhífhoilsiú."
   some_of_the_custom_variables_used_a_controller_ins_944376df: |-
       Bhain cuid de na hathróga saincheaptha úsáid as sampla rialaitheora chun ionadaíocht a dhéanamh.
       Níl sé sin ar fáil i bpostálacha cúlra, mar sin i bhfógraí PNS agus imirce ábhar.
@@ -27105,6 +27317,7 @@ ga:
   spanish_de9de5d6: Spáinnise
   spanish_mexico_ec27e8d4: "Spáinnis (Meicsiceo)"
   spanish_spain_8e3620ae: "Spáinnis (An Spáinn)"
+  specific_categories_only_f5f81f68: "Catagóirí sonracha amháin"
   specific_sections_a38d8b0d: "Grúpa ar Leith"
   specify_a_set_of_ip_address_filters_that_teachers__a37cdb2f: |-
       Sonraigh sraith de scagairí seoltaí IP is féidir le múinteoirí a úsáid chun rochtain ar na quizeanna a chosaint.
@@ -27250,6 +27463,7 @@ ga:
   start_auto_refresh_e2feafb2: "Tosaigh uath-athnuachan"
   start_creating_1b8a6134: "Tosaigh ag Cruthú"
   start_date_490511b4: "Dáta tosaithe"
+  start_date_and_time_da9a7a4e: "Dáta agus am tosaithe"
   start_date_e937be8a: "Dáta tosaithe"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_for_conference_1936e809: "Dáta Tosaithe na Comhdhálacha"
@@ -27287,6 +27501,7 @@ ga:
   start_tls_26e4b0dc: "Tosaigh TLS"
   start_tour_29787099: "Tosaigh Turas"
   start_typing_fdfc5600: "Tosaigh ag clóscríobh..."
+  start_typing_to_search_6c8bbc26: "Tosaigh ag clóscríobh le cuardach a dhéanamh"
   start_typing_to_search_c64c71bf: "Tosaigh ag clóscríobh chun cuardach a dhéanamh..."
   start_typing_to_search_results_will_update_automat_2f91bfeb: "Tosaigh ag clóscríobh le cuardach a dhéanamh. Nuashonrófar na torthaí go huathoibríoch tar éis 3 charachtar."
   startdate_to_enddate_8811cf2b: "%{startDate} go %{endDate}"
@@ -27352,6 +27567,7 @@ ga:
   storage_quotas_manage_6ca14bbb: "Cuótaí Stórais - bainistigh"
   storage_used_in_mb_c75fbd9c: "úsáidtear stórais i MB"
   store_and_share_course_assets_82a9967c: "Sócmhainní cúrsa a stóráil agus a roinnt"
+  store_submissions_in_institutional_index_7868dbcc: "Stóráil uaslódalacha san Innéacs Institiúideach"
   strand_955969b1: Snáithe
   strand_name_has_no_next_in_strand_db0992db: "Níl next_in_strand ag snáithe \"%{name}\"."
   strand_or_singleton_is_blocked_by_the_shard_migrat_58f8d7b1: "Cuireann an ascnamh shard bac ar shnáithe nó ar aonarán"
@@ -27359,6 +27575,8 @@ ga:
   strands_b086013b: Snáitheanna
   stream_items_api: 
     assessment_request_title: "Piarmheasúnú le haghaidh %{title}"
+  strict_33535620: Dian
+  strict_34ff5316: dian
   stride_context_module_progress_cab7c1cd: "Céimeanna an Mhodúil Comhthéacs Stride"
   strikethrough_6e45cdfe: "Stailc tríd"
   strip_domain_from_login_attribute_value_bb6daa88: "Bain Fearann Ó Luach Tréithe Logála Isteach"
@@ -27490,6 +27708,7 @@ ga:
   students_1b8cd07b: "Mic léinn"
   students_access_report_5637cbfb: "Tuairisc Rochtana na Mac Léinn"
   students_add_4e988446: "Mic léinn - cuir le"
+  students_are_able_to_efficiently_study_course_mate_9f98eb04: "Is féidir le mic léinn ábhar cúrsa a staidéar go héifeachtúil trí achoimrí, quizeanna agus luaschártaí a ghintear ag hintleacht shaorga."
   students_are_able_to_quickly_find_answers_to_quest_9e025ab1: "Is féidir le mic léinn freagraí a fháil go tapa ar cheisteanna, agus is féidir le teagascóirí nascleanúint a dhéanamh trína gcúrsaí go tapa."
   students_are_attempting_to_access_unpublished_cont_be329862: "Tá mic léinn ag iarraidh rochtain a fháil ar ábhar neamhfhoilsithe, %{bad_link}, i %{asset_link}."
   students_are_clicking_on_bad_link_to_content_that__d9c51d0d: "Tá mic léinn ag cliceáil ar %{bad_link} chuig ábhar atá bainte i %{asset_link}."
@@ -27499,6 +27718,7 @@ ga:
   students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Is féidir le mic léinn stair leathanaigh a chur in eagar agus féachaint air má cheadaítear é sna roghanna do leathanach aonair."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Ní féidir le mic léinn páirt a ghlacadh sa chúrsa ach idir na dátaí seo"
   students_can_see_originality_score_797fe634: "Is féidir le mic léinn scór úrnuachta a fheiceáil"
+  students_can_see_the_originality_report_f246beb0: "Is Féidir le mic léinní an Tuairisc Úrnuachta a Fheiceáil"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Ní féidir le mic léinn féachaint ar fhreagraí quiz tar éis críochnú an chúrsa"
   students_enrolled_babf3cb8: "Mic Léinn Rollaithe"
   students_enrolled_in_this_course_859fa7a2: "Mic léinn atá rollaithe sa chúrsa seo"
@@ -27556,6 +27776,7 @@ ga:
   studio_capture_a88ec4e: "Gabháil Studio"
   study_assist_aac2d50b: "Cúnamh Staidéir"
   study_tools_617c3972: "Uirlisí staidéir"
+  study_tools_a0bd1676: "Uirlisí Staidéir"
   style_f6881133: Stíl
   sub_account_c213944c: Fochuntas
   sub_account_daeadd0: Fo-Chuntas
@@ -27940,10 +28161,15 @@ ga:
   support_all_lti_postmessages_from_within_active_rc_8954bc83: "Tacaigh le gach postMessages LTI ón dtaobh istigh de RCE gníomhach"
   support_exporting_new_quizzes_in_qti_format_ba09b465: "Tacaigh le heaspórtáil Quizeanna Nua i bhformáid QTI"
   support_inherited_apps_in_lti_apps_page_e2efee20: "Tacaigh le hAipeanna Oidhreachta ar Leathanach Aipeanna LTI"
+  support_privacy_access_84820425: "Tacaíocht Rochtain Príobháideachta"
   support_sharing_settings_4ad422d8: "Tacaigh le Socruithe a Roinnt"
   supported_file_types_srt_or_webvtt_7d827ed: "Cineálacha comhaid tacaithe: SRT nó WebVTT"
   supported_file_types_vtt_srt_8cb75c13: "Cineálacha comhaid tacaithe: .vtt, .srt"
   supported_format_txt_759fea2a: "Formáid tacaithe: TXT"
+  suppress_notifications_d49be310: "Coisc Fógraí"
+  suppress_notifications_from_being_created_and_sent_c2aa1e7f: "Coisc fógraí ó bheith cruthaithe agus seolta amach"
+  suppress_specific_notification_categories_23f1130f: "Coisc catagóirí fógra sonracha"
+  suppression_scope_2dd5d1ea: "Raon feidhme an choiscthe"
   surfaces_the_block_editor_templates_edit_permissio_8db1b33: |-
       Cuireann sé dromchla ar an gcead "Teimpléid Bhloc Eagarthóirí - cuir in eagar" sa Chomhéadain ceadanna.
       Is féidir le húsáideoirí leis an gcead seo teimpléid bhloic a chruthú agus a chur in eagar.
@@ -28179,9 +28405,12 @@ ga:
   templates_4ca13d07: Teimpléid
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Rollaigh úsáideoir go sealadach ar chúrsa. Cuirtear an rollú sealadach seo le chéile le rollú eile laistigh den chúrsa."
   temporary_9c54e959: "Sealadach:"
+  temporary_active_94fbe167: "sealadach - gníomhach"
+  temporary_completed_983c2f4b: "sealadach - críochnaithe"
   temporary_enrollment_enrollmenttype_for_username_a5410ed7: "Rollú Sealadach %{enrollmentType} le haghaidh %{userName}"
   temporary_enrollment_option_links_eb9b8b2e: "Naisc rogha rollaithe sealadach"
   temporary_enrollment_pairings_56f35f5c: "Péirí Rollaithe Sealadacha"
+  temporary_enrollment_status_5df96f90: "Stádas clárúcháin sealadach"
   temporary_enrollment_was_successfully_created_78b48a7a: "Cruthaíodh rollú sealadach go rathúil."
   temporary_enrollment_was_successfully_updated_9ea3705a: "D'éirigh le rollú sealadach a nuashonrú."
   temporary_enrollments_add_373181b7: "Rolluithe Sealadacha - cuir le"
@@ -28189,6 +28418,8 @@ ga:
   temporary_enrollments_edit_67c01325: "Rolluithe Sealadacha - cuir in eagar"
   temporary_enrollments_f0937c5a: "Rolluithe Sealadacha"
   temporary_enrollments_were_successfully_created_7e0f3178: "Cruthaíodh rolluithe sealadacha go rathúil."
+  temporary_future_170e2ced: "sealadach - todhchaí"
+  temporary_inactive_3ff93d03: "sealadach - neamhghníomhach"
   temporary_rolename_c67d0df4: "Sealadach: %{roleName}"
   tenant_d2a41f78: Tionónta
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tionónta in easnamh nó sioncronaithe díchumasaithe. Seiceáil socruithe comhtháthú sioncronaithe Microsoft don chúrsa agus don chuntas."
@@ -28987,6 +29218,7 @@ ga:
   there_was_an_unexpected_error_while_deleting_the_r_7df6ebe0: "Tharla earráid gan choinne agus an freagra á scriosadh."
   there_was_an_unexpected_error_while_disabling_the__6ce0fd46: "Tharla earráid gan choinne agus an achoimre ar an bhfóraim á dhíchumasú."
   there_was_an_unexpected_error_while_marking_replie_f1372937: "Tharla earráid gan choinne agus freagraí á marcáil mar léite"
+  there_was_an_unexpected_error_while_submitting_fee_a37e770c: "Tharla earráid gan choinne agus aiseolas á chur isteach."
   there_was_an_unexpected_error_while_submitting_the_87e56bf1: "Tharla earráid gan choinne agus aiseolas achoimre ar an bhfóraim á chur isteach."
   there_was_an_unexpected_error_while_updating_the_r_412e6e54: "Tharla earráid gan choinne agus an freagra á nuashonrú."
   there_was_an_unexpected_error_while_updating_the_r_a7ab5183: "Tharla earráid gan choinne agus na freagraí á nuashonrú"
@@ -29005,6 +29237,7 @@ ga:
   these_features_and_the_tech_behind_them_belong_to__77f1746e: "Is le Instructure na gnéithe seo (agus an teicneolaíocht atá taobh thiar díobh). Ní bheidh rochtain agat ach le haghaidh d’úsáide inmheánaí féin. Gan roinnt ná athdhíol."
   these_options_are_hidden_until_a_user_expands_the__e37e94af: "Bíonn na roghanna seo i bhfolach go dtí go leathnaíonn úsáideoir an chuid “Tuilleadh roghanna sínithe isteach” ar an leathanach logála isteach."
   these_permissions_control_the_ability_to_create_ed_d4d043b7: "Rialaíonn na ceadanna seo an cumas clibeanna difreála a chruthú, a chur in eagar agus a scriosadh."
+  these_permissions_control_the_ability_to_manage_au_ca7062: "Rialaíonn na ceadanna seo an cumas rialacha uathoibrithe a bhainistiú ar an gcuntas."
   these_permissions_control_the_ability_to_view_crea_45a186b6: "Rialaíonn na ceadanna seo an cumas clibeanna institiúideacha a fheiceáil, a chruthú agus a chur in eagar."
   these_permissions_do_not_manage_discussions_discus_79defb66: "Ní bhainistíonn na ceadanna seo Fóraim. Déantar fóraim a bhainistiú trí cheadanna fóraim aonair."
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "Beidh na forainmneacha seo ar fáil d’úsáideoirí Canvas i do chuntas le roghnú astu."
@@ -29025,6 +29258,7 @@ ga:
   this_allows_the_tool_to_provide_content_in_an_ifra_7651e8db: "Ligeann sé seo don uirlis ábhar a sholáthar i iframe laistigh den leathanach eagarthóireachta tascanna"
   this_and_all_following_events_4b4b283: "Seo agus gach imeacht ina dhiaidh"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Ní bheidh an fógra seo le feiceáil go dtí %{delayedPostAt}."
+  this_app_can_only_be_installed_once_and_is_already_bcae3a7f: "Ní féidir an aip seo a shuiteáil ach uair amháin agus tá sí gníomhach i do chuntas cheana féin."
   this_app_has_been_locked_by_an_administrator_and_i_4d239b21: "Tá an aip seo faoi ghlas ag riarthóir agus níl sí ar fáil le suiteáil."
   this_app_has_no_permissions_configured_f58796f8: "Níl aon cheadanna cumraithe ag an aip seo."
   this_app_is_locked_on_and_cannot_be_deleted_dc508f75: "Tá an aip seo faoi ghlas, agus ní féidir í a scriosadh."
@@ -29429,6 +29663,7 @@ ga:
   this_rubric_removes_criterions_that_have_learning__46a402bc: "Baineann an rúibric seo na critéir a bhfuil torthaí na dtorthaí foghlama acu"
   this_rule_conflicts_with_completed_peer_review_ass_e40e8c9a: "Tá an riail seo ag teacht salach ar piarmheasúnú atá críochnaithe. Tá athbhreithniú déanta ag %{assessor_name} cheana féin ar %{assessee_name}"
   this_rule_conflicts_with_rule_rule_text_32c948b4: "Tá an riail seo i gcoimhlint le riail \"%{rule_text}\""
+  this_rule_conflicts_with_rule_rule_text_enforcemen_22db46ad: "Tá an riail seo i gcoimhlint le riail \"%{rule_text}\" (%{enforcement})"
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Cuimsíonn an leathanach samplach seo eilimintí CU coitianta i gCanvas chun cabhrú leat do bhrandáil shaincheaptha a thógáil. Nuair a thosaíonn tú ag déanamh athruithe ar luachanna datha agus íomhánna, feicfidh tú cnaipe *Réamhamharc ar Do Athruithe*. Cliceáil é chun an leathanach seo a athnuachan agus chun breathnú ar na hathruithe atá agat."
   this_setting_allows_the_admin_to_brand_or_label_al_978c6710: "Ligeann an socrú seo don Riarthóir an téacs \"Ó\" go léir a bhrandáil nó a lipéadú ar gach fógra a sheoltar ó Canvas don Chuntas seo."
   this_setting_defines_the_initial_sort_order_studen_1d20b5b0: "Sainmhíníonn an socrú seo an t-ord sórtála tosaigh. Is féidir le mic léinn a rogha féin a shocrú. Tar éis dóibh é a athrú, ní athróidh nuashonruithe réamhshocraithe amach anseo a socruithe mura bhfuil siad glasáilte."
@@ -29507,6 +29742,7 @@ ga:
   this_will_remove_the_uuid_from_the_response_of_the_e1f2fa45: "Bainfidh sé seo an UUID as freagra API na gcomhad. Is réimse inmheánach amháin é seo, agus mura seoltar thar an sreang é, beidh sé ina uasmhéadú gréasáin."
   this_will_replace_all_other_branding_sent_in_canva_3aed2632: "Tiocfaidh sé seo in ionad gach brandáil eile a sheoltar i bhfógraí Canvas."
   this_will_set_next_in_strand_on_the_appropriate_nu_42be1d07: "Socróidh sé seo next_in_strand ar an líon cuí poist chun an snáithe nó an singleton a bhaint de."
+  this_will_suppress_all_notifications_from_being_cr_86ebb38f: "Cuirfidh sé seo cosc ar chruthú agus ar sheoladh fógraí don chuntas seo. An bhfuil tú cinnte?"
   this_will_terminate_all_user_sessions_for_username_5595ae6c: "Cuirfidh sé seo deireadh le gach seisiún úsáideora le haghaidh *%{userName}*. Áirítear leis seo gach seisiún brabhsálaí-bhunaithe agus gach comhartha rochtana, lena n-áirítear cinn a ghintear de láimh agus aipeanna soghluaiste Canvas."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Nuashonróidh sé seo gach rúibric ar leibhéal cuntais agus cúrsa atá ceangailte le scála forlámhas leibhéal an chuntais agus nach bhfuil measúnú déanta orthu go fóill."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Nuashonróidh sé seo gach rúibric atá ailínithe le torthaí laistigh den chúrsa seo nach bhfuil measúnú déanta orthu fós."
@@ -30087,6 +30323,7 @@ ga:
   today_b7202098: inniu
   today_s_course_work_2871965c: "Obair chúrsa an lae inniu"
   todo_date_d76c9cc: "Dáta LeDéanamh"
+  todo_list_e32006ae: "Liosta Le Déanamh"
   toggle_alignment_details_for_title_944f605: "Scoránaigh sonraí ailínithe le haghaidh %{title}"
   toggle_captions_off_27256008: "Scoránaigh Fotheidil As"
   toggle_captions_on_43f76145: "Scoránaigh Fotheidil ar siúl"
@@ -30403,6 +30640,7 @@ ga:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Cuir isteach arís"
+  turnitin_repository_9f865357: "Stór Turnitin"
   turnitin_settings: 
     originality_report_never: Riamh
     originality_report_visible_after_due_date: "Tar éis an Dáta Dlite"
@@ -30412,6 +30650,7 @@ ga:
   type_72aae036: "Cineál: "
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Clóscríobh dáta nó úsáid saigheadeochracha chun an roghnóir dáta a nascleanúint."
   type_a_few_letters_to_start_searching_3334657b: "Clóscríobh cúpla litir chun tús a chur leis an gcuardach"
+  type_at_least_2_characters_to_start_searching_4041e397: "Clóscríobh 2 charachtar ar a laghad chun tús a chur leis an gcuardach"
   type_at_least_number_characters_to_search_5ff908c9: "Clóscríobh ar a laghad %{number} carachtair le cuardach"
   type_c8106334: Cineál
   type_enter_to_edit_rich_text_cbaa1df: "clóscríobh <Enter> chun téacs saibhir a chur in eagar"
@@ -30438,6 +30677,7 @@ ga:
   type_to_search_for_allocation_rules_66aca034: "Clóscríobh chun rialacha leithdháilte a chuardach"
   type_to_search_for_tools_or_use_arrow_keys_to_navi_e62666d3: "Clóscríobh chun uirlisí a chuardach nó bain úsáid as na heochracha saigheada chun nascleanúint a dhéanamh ar roghanna"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Clóscríobh chun cuardach a dhéanamh, bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
+  type_to_start_searching_6878df10: "Clóscríobh chun tús a chur leis an gcuardach"
   type_your_message_here_3551e252: "Clóscríobh do theachtaireacht anseo…"
   uagc_all_discussion_entries_report_12bc50be: "UAGC Gach Iontráil Fhóraim Tuarascáil"
   uagc_all_submission_attachments_report_71ef378b: "UAGC Gach Ceangaltán Aighneachta Tuarascáil"
@@ -30760,6 +31000,7 @@ ga:
   up_c553575d: Suas
   up_to_36c838b8: "suas go dtí"
   up_to_date_f60135ee: "Suas chun dáta"
+  up_to_maxfiles_file_sources_maximum_of_maxsize_mb_366e4fc3: "Suas le %{maxFiles} foinsí comhaid (Uasmhéid de %{maxSize}MB)"
   upcoming_available_work_ecf478a2: "Obair atá ar fáil atá le teacht"
   upcoming_due_date_assignment_name_course_name_ac1766c1: "Dáta Dlite le Teacht - %{assignment_name}, %{course_name}"
   update_4d8ee62: Nuashonraigh
@@ -30790,6 +31031,7 @@ ga:
   update_pages_c91d7ba: "Nuashonraigh leathanaigh"
   update_password_4bc5cb1f: "Nuashonraigh Pasfhocal"
   update_public_jwk_9f25f520: "Nuashonraigh JWK Poiblí"
+  update_question_without_regrading_47c9904a: "Nuashonraigh an cheist gan athmharcáil"
   update_quota_81381226: "Nuashonraigh Cuóta"
   update_rating_6d29c2ef: "Nuashonraigh Rátáil"
   update_report_7623967f: "Tuairisc nuashonraithe"
@@ -30860,6 +31102,7 @@ ga:
   upload_files_a228f20f: "Uaslódáil Comhaid"
   upload_files_to_provide_context_for_this_ai_experi_5daba794: "Uaslódáil comhaid chun comhthéacs a sholáthar don Eispéireas AI seo. Formáidí tacaithe: DOCX, XLSX, XLS, PPTX, PDF, TXT, HTML."
   upload_forbidden_words_terms_list_a4a2d14e: "Uaslódáil Focail Toirmiscthe/Liosta Téarmaí"
+  upload_from_computer_3eea7cab: "Uaslódáil ón ríomhaire"
   upload_from_computer_c79c1efd: "Uaslódáil ó Ríomhaire"
   upload_gradebook_386a46c8: "Íoslódáil Leabhar na Marcanna"
   upload_image_6120b609: "Uaslódáil Íomhá"
@@ -30915,9 +31158,11 @@ ga:
   url_submission_f76327e3: "Uaslódáil URL"
   url_type_3ece27d2: "Cineál URL"
   uruguay_598_866a5ef3: "Uragua (+598)"
+  us_6734262f: SAM
   us_canada_emea_apac_latam_ce0402ba: "SAM, Ceanada, EMEA, APAC, LATAM"
   usage_15def729: Úsáid
   usage_right_ff96f3e2: "Ceart Úsáide:"
+  usage_rights_are_required_1d481ae8: "tá cearta úsáide ag teastáil"
   usage_rights_f0960ad6: "Cearta Úsáide"
   usage_rights_f73a0fe0: "Cearta úsáide"
   usage_rights_have_been_set_d1b433c7: "Tá cearta úsáide socraithe."
@@ -31002,6 +31247,7 @@ ga:
   use_sms_6ca0b993: "Bain úsáid as SMS"
   use_the_following_keyboard_shortcuts_to_navigate_m_203b00d6: "Bain úsáid as na haicearraí méarchláir seo a leanas chun nascleanúint a dhéanamh ar mhodúil agus ar mhíreanna:"
   use_the_import_content_tool_to_migrate_course_mate_41716290: "Úsáid an uirlis Iompórtáil Ábhar chun ábhair chúrsa a aistriú ó fhoinsí eile sa chúrsa seo."
+  use_the_json_editor_for_advanced_configurations_mo_462f5c79: "Bain úsáid as an eagarthóir JSON le haghaidh cumraíochtaí ardleibhéil. Ba cheart formhór na n-aipeanna a bhainistiú ar an leathanach socruithe caighdeánacha. Ná déan athruithe anseo ach amháin má tá tú eolach ar fhormáidiú JSON."
   use_the_new_assignments_teacher_page_8add7e46: "Úsáid leathanach an mhúinteora tascanna nua"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Bain úsáid as an uirlis sheachtrach nua Comhoibriú a chumasaíonn tuilleadh roghanna uirlisí a úsáid chun comhoibriú"
   use_the_rce_873ca281: "Bain úsáid as an RCE"
@@ -31514,6 +31760,10 @@ ga:
   users_with_this_permission_may_be_able_to_use_the__838a780f: "Seans go mbeidh úsáideoirí a bhfuil an cead seo acu in ann an tAcht a úsáid mar ghné chun socruithe cuntais a bhainistiú, chun marcanna a fheiceáil agus a choigeartú, rochtain a fháil ar fhaisnéis úsáideora, srl."
   users_with_this_permission_may_be_able_to_use_the__84394072: "Seans go mbeidh úsáideoirí a bhfuil an cead seo acu in ann an tAcht a úsáid mar ghné chun socruithe cuntais a bhainistiú, chun marcanna a fheiceáil agus a choigeartú, rochtain a fháil ar eolas úsáideora, srl. Ligeann an cead seo do riarthóirí atá ainmnithe i bhfochuntas rochtain a fháil ar shocruithe agus ar eolas lasmuigh dá bhfochuntas."
   uses_batch_processing_orchestrator_when_account_le_580b00a4: "Úsáideann sé orchestrator próiseála baisce nuair a dhéantar torthaí ar leibhéal an chuntais a nuashonrú chun rolladh suas a athríomh do chúrsaí lena mbaineann."
+  uses_bulk_sql_group_by_instead_of_per_assignment_r_a1bcff53: |
+      Úsáideann sé SQL mórchóir (GROUP BY) in ionad glaonna Redis in aghaidh an sannta le haghaidh
+      needs_grading_count. Cuireann sé deireadh le turais bhabhta N+1 Redis le linn an chúrsa
+      sraithuimhir liosta.
   uses_cedar_for_translations_7bfb6b44: "Úsáidtear Cedar le haghaidh aistriúcháin"
   uses_optimized_implementation_for_grading_rubrics__f9a18a27: |
       Úsáideann sé cur i bhfeidhm optamaithe le haghaidh críochphointe rubricí grádaithe le N+1 ceartúcháin fiosrúcháin
@@ -31592,6 +31842,7 @@ ga:
   video_player_for_label_6a5fdb03: "Fís-Seinnteoir le haghaidh %{label}"
   vietnam_84_e50a2a44: "Vítneam (+84)"
   vietnamese_e7a76583: Vítneaimis
+  view_add_edit_delete_41d4b23c: "féach / cuir leis / cuir in eagar / scrios"
   view_all_course_grades_a5df657b: "Féach ar gach marc an chúrsa"
   view_all_courses_1b4ea3e4: "Féach ar na cúrsaí uile"
   view_all_e13bf0a6: "Féach ar Gach"
@@ -31651,15 +31902,18 @@ ga:
   view_important_dates_173c7e1b: "Amharc ar Dhátaí Tábhachtacha"
   view_in_canvas_apps_156f9f2e: "Féach in Aipeanna Canvas"
   view_inline_ffb3928b: "Amharc ar Inlíne"
+  view_installation_b532aaf1: "Féach ar an Suiteáil"
   view_instructure_identity_information_fea4c5c2: "Féach ar Fhaisnéis Aitheantais Instructure"
   view_issues_6da5b0ff: "Amharc ar Cheisteanna"
   view_key_details_38208652: "Féach ar shonraí tábhachtacha"
   view_locate_the_outcome_and_click_the_dd0ae03c: "amharc, aimsigh an toradh, agus cliceáil ar an"
   view_login_ids_for_users_142bbe7a: "Amharc ar ids logáil isteach d'úsáideoirí"
   view_longer_description_6b762087: "Amharc ar chur síos níos faide"
+  view_lti_configuration_documentation_248e5f64: "Féach ar Dhoiciméadacht Chumraíochta LTI"
   view_lti_key_name_in_canvas_apps_9ef69151: "Féach ar eochair LTI %{name} in Aipeanna Canvas"
   view_mastery_report_7b7c9bc7: "Féach ar an Tuairisc Forlámhas"
   view_missing_missing_items_for_course_coursename_e7509012: "Amharc ar %{missing} mír atá in easnamh don chúrsa %{courseName}"
+  view_mode_9149135e: "Mód Amhairc"
   view_module_name_assign_to_e2a705eb: "Amharc ar %{module_name} Sann Do"
   view_name_app_62a2ad8e: "Amharc ar aip %{name}"
   view_name_user_tags_6e8306e3: "Amharc %{name} clibeanna úsáideora"
@@ -31766,6 +32020,7 @@ ga:
       periodic_message: "Níl an suiteáil Canvas seo ach le haghaidh tástála amháin agus *athshocróidh sé go tréimhsiúil.*"
       title: "Suiteáil Tástála Canvas"
   was_not_selected_30d63a10: "níor roghnaíodh é"
+  was_this_translation_helpful_61874489: "An raibh an t-aistriúchán seo cabhrach?"
   watermark_c93fae0d: "Comhartha uisce"
   watermark_opacity_ce3d3097: "Teimhneacht Comhartha Uisce"
   watermarks_other_images_e970fc6a: "Comhartha uisce & Íomhánna Eile"
@@ -32034,6 +32289,7 @@ ga:
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Nuair a bheidh sé cumasaithe, úsáidfidh forálacha Quizeanna Nua an Riarachán Suímh tiomnaithe
       Úsáideoir seirbhíse agus DeveloperKey chun comhartha rochtana agus athnuachana a ghiniúint
+  when_enabled_new_quizzes_requests_are_routed_throu_605bdb0b: "Nuair a bhíonn sé cumasaithe, déantar iarratais ar Quizeanna Nua a threorú tríd an nGeata API"
   when_enabled_prevents_marking_downstream_changes_o_fcebe666: "Nuair a bhíonn sé cumasaithe, cuireann sé cosc ar athruithe iartheachtacha a mharcáil ar mhodúil agus scriosadh treoirphlean cúrsa á shioncrónú."
   when_enabled_provides_a_specific_error_message_whe_27da5d92: |-
       Nuair a bhíonn sé cumasaithe, soláthraítear teachtaireacht earráide shonrach nuair a dhéanann úsáideoirí iarracht rud a chruthú nó a chóipeáil.
@@ -32191,6 +32447,7 @@ ga:
   who_can_create_new_courses_7a6c1338: "Cé atá In ann Cúrsaí Nua a Chruthú"
   whoops_looks_like_nothing_is_here_f5c7dd44: "Úps... Is cosúil nach bhfuil aon rud anseo!"
   why_can_t_i_create_an_access_token_11291d42: "Cén fáth nach féidir liom comhartha rochtana a chruthú?"
+  why_is_self_assessment_disabled_6b84f827: "Cén fáth a bhfuil féinmheasúnú díchumasaithe?"
   why_it_matters_f2677514: "Cén fáth go bhfuil sé tábhachtach"
   why_was_this_result_received_cfcd7cbd: "Cén fáth a bhfuarthas an toradh seo?"
   widget: 
@@ -32343,12 +32600,18 @@ ga:
   will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
       Ligfidh sé sin dréachtaí a shábháil de réir mar a chlóscríobhann mic léinn a bhfreagraí ar ábhar fóraim
       san athdhearadh fóraim
+  will_be_reviewed_by_7906a4c3: "Déanfar athbhreithniú air ag"
+  will_be_reviewed_by_subject_d928bb29: "déanfar athbhreithniú air ag %{subject}"
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "An gcuirfear faisnéis aitheantais a eisíonn an eochair seo i láthair go Canvas nó do sheirbhís piaraí (m.sh. Sonraí Canvas)?"
   will_display_the_version_history_for_edited_discus_bbb7dfa: "Taispeánfar stair na leaganacha le haghaidh iontrálacha fóram a chuireadh in eagar laistigh den CU Athdhearadh"
   will_grant_them_different_permissions_ee74b308: "tabharfaidh sé ceadanna éagsúla dóibh"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Coinneoidh sé an meán de do scóir ar fad"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Coinneoidh sé na cinn is airde de do scóir ar fad"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Coinneoidh sé na cinn is déanaí de do scóir ar fad"
+  will_not_be_reviewed_by_c7e17966: "Ní dhéanfar athbhreithniú air ag"
+  will_not_be_reviewed_by_subject_6719ee41: "ní dhéanfar athbhreithniú air ag %{subject}"
+  will_not_review_58178fdf: "Ní dhéanfar athbhreithniú"
+  will_not_review_subject_f2ee951e: "ní dhéanfaidh athbhreithniú ar %{subject}"
   will_paginate: 
     container_aria_label: Leathanaigh
     next_aria_label: "An chéad leathanach eile"
@@ -32369,6 +32632,8 @@ ga:
     previous_aria_label: "An leathanach roimhe seo"
     previous_label: "&#8592; Roimhe Seo"
   will_publish_on_publish_date_8b42e1ec: "Foilseoidh ar %{publish_date}"
+  will_review_85cb0f6a: "Déanfaidh athbhreithniú"
+  will_review_subject_9873ce7c: "déanfaidh %{subject} athbhreithniú"
   will_translate_inbound_messages_and_allow_users_to_e1d4704c: "Aistreoidh siad teachtaireachtaí isteach, agus ligfidh siad d’úsáideoirí leaganacha aistrithe dá dteachtaireachtaí amach a chur san áireamh"
   will_unlock_966c3e43: "Díghlasfar é"
   wimba_conference: 
@@ -32392,6 +32657,7 @@ ga:
   wmv_1119d032: WMV
   wolof_2cd9048f: Volaifis
   word_count_c77fe3a6: "Líon Focal"
+  words_758998d1: focail
   work_and_create_together_c65f358b: "Oibrigh agus cruthaigh le chéile"
   workflow_state_3a5c99d2: workflow_state
   workflow_state_allow_is_only_valid_for_site_admin__71dd26e2: "workflow_state níl ‘ceadaigh’ bailí ach le haghaidh clárúcháin Riarthóra an tSuímh"
@@ -32454,6 +32720,7 @@ ga:
     one: "Tá tú ar tí 1 fhóram amháin a scriosadh. An bhfuil tú cinnte?"
     other: "Tá tú ar tí %{count} fóram a scriosadh. An bhfuil tú cinnte?"
   you_are_about_to_delete_keyname_5e4ea92e: "Tá tú ar tí “%{keyName}” a scriosadh."
+  you_are_about_to_delete_label_a8cf8e7e: "Tá tú ar tí \"%{label}\" a scriosadh."
   you_are_about_to_delete_name_226610bb: "Tá tú ar tí \"%{name}\" a scriosadh\""
   you_are_about_to_exit_the_rubric_editor_any_unsave_aadd69dc: "Tá tú ar tí imeacht ón eagarthóir rúibric. Caillfear aon athruithe nach bhfuil sábháilte."
   you_are_about_to_import_sis_data_as_a_site_admin_i_a9baebe4: "Tá tú ar tí sonraí SIS a allmhairiú mar riarthóir suímh isteach i gcuntas nach ndéanann tú a riaradh go díreach."
