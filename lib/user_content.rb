@@ -274,6 +274,7 @@ module UserContent
       type, obj_id, rest = matched.values_at(6, 7, 8)
       home_link = url.match(%r{(/courses/#{Api::SHARDID_REGEX}/?(?=\b|[^/\w]|$))}o)
       url = url.sub(%r{/$}, "") if home_link
+      host = matched[1]
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
       return url if context_type == "users" && type == "external_tools"
       # Don't process external URLs that happen to have /files/ or other Canvas-like paths
