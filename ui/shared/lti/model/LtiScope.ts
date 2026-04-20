@@ -43,6 +43,8 @@ export const LtiScopes = {
   DataServicesList: 'https://canvas.instructure.com/lti/data_services/scope/list',
   DataServicesDestroy: 'https://canvas.instructure.com/lti/data_services/scope/destroy',
   DataServicesShow: 'https://canvas.instructure.com/lti/data_services/scope/show',
+  DataServicesListEventTypes:
+    'https://canvas.instructure.com/lti/data_services/scope/list_event_types',
   AccountLookupShow: 'https://canvas.instructure.com/lti/account_lookup/scope/show',
   AccountExternalToolsCreate:
     'https://canvas.instructure.com/lti/account_external_tools/scope/create',
@@ -77,6 +79,7 @@ export const AllLtiScopes = [
   LtiScopes.DataServicesList,
   LtiScopes.DataServicesDestroy,
   LtiScopes.DataServicesShow,
+  LtiScopes.DataServicesListEventTypes,
   LtiScopes.AccountLookupShow,
   LtiScopes.AccountExternalToolsCreate,
   LtiScopes.AccountExternalToolsUpdate,
