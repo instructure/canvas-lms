@@ -25,8 +25,12 @@ type TrackEvent =
   | {type: 'transcript_auto_follow_toggle'; enabled: boolean}
   | {type: 'fullscreen_toggled'; isFullScreen: boolean}
   | {type: 'sidebar_visibility_changed'; isVisible: boolean}
+  | {
+      type: 'studio_transcript_editing'
+      action: 'enter_edit_mode' | 'segment_edited' | 'autosave_succeeded' | 'autosave_failed'
+    }
 
-export function createPendoTrackEventHandler(): (event: TrackEvent) => void {
+export function createPendoTrackEventHandler(roles: string[] = []): (event: TrackEvent) => void {
   return (event: TrackEvent) => {
     switch (event.type) {
       case 'fullscreen_toggled':
@@ -55,6 +59,12 @@ export function createPendoTrackEventHandler(): (event: TrackEvent) => void {
       case 'sidebar_visibility_changed':
         trackPendoEvent('studio_sidebox_visibility_changed', {
           visibility_state: event.isVisible ? 'shown' : 'hidden',
+        })
+        break
+      case 'studio_transcript_editing':
+        trackPendoEvent('canvas_transcript_editing', {
+          action: event.action,
+          ...(roles.length > 0 && {roles}),
         })
         break
     }

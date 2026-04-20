@@ -188,7 +188,9 @@ ready(() => {
 
   const handleConfirmEditChanges = isAsrEnabled && isEditMode ? onConfirmEditChanges : undefined
 
-  const handleTrackEvent = isAsrEnabled ? createPendoTrackEventHandler() : undefined
+  const handleTrackEvent = isAsrEnabled
+    ? createPendoTrackEventHandler(ENV.current_user_roles ?? [])
+    : undefined
 
   const aria_label = !media_object.title ? undefined : media_object.title
   const canManageTranscripts = (ENV.current_user_roles ?? []).some(
