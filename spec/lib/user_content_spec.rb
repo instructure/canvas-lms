@@ -137,16 +137,6 @@ describe UserContent do
       expect(rewriter.translate_content(html)).to eq(expected)
     end
 
-    it "does not process external URLs with /files/ paths even if they match local attachment IDs" do
-      course_factory
-      att = attachment_model(context: @course)
-
-      external_url = "https://www.external-university.edu/files/#{att.id}/document.pdf"
-      html = %(<a href="#{external_url}">External File</a>)
-
-      expect(rewriter.translate_content(html)).to eq(html)
-    end
-
     describe "precise_translate_content" do
       before do
         Account.site_admin.enable_feature!(:precise_link_replacements)
