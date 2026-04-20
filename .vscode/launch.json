@@ -55,6 +55,14 @@
       "rdbgPath": "bin/rdbg-spring",
       "command": "rspec",
       "script": "${file}:${lineNumber}"
+    },
+    {
+      "type": "rdbg",
+      "request": "attach",
+      "name": "Debug Current Spec (Docker)",
+      "debugPort": "localhost:12354",
+      "localfsMap": "/usr/src/app:${workspaceFolder}",
+      "preLaunchTask": "rspec-rdbg"
     }
   ]
 }
