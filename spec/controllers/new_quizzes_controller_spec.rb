@@ -17,7 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "../helpers/k5_common"
+
 describe NewQuizzesController do
+  include K5Common
+
   let(:course) { course_model }
   let(:teacher) { teacher_in_course(course:, active_all: true).user }
   let(:student) { student_in_course(course:, active_all: true).user }
@@ -265,6 +269,43 @@ describe NewQuizzesController do
         assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
         get :launch, params: { course_id: course.id, assignment_id: assignment.id }
         expect(response).to render_template("assignments/native_new_quizzes")
+      end
+    end
+
+    context "in a K5 (Canvas for Elementary) course" do
+      before do
+        toggle_k5_setting(course.account)
+        course.offer!
+      end
+
+      context "when user is a student" do
+        before { user_session(student) }
+
+        it "hides the course sidebar (@show_left_side is false)" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be false
+        end
+      end
+
+      context "when user is a teacher" do
+        before { user_session(teacher) }
+
+        it "keeps the course sidebar visible (@show_left_side is true)" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be true
+        end
+      end
+
+      context "when account is not K5" do
+        before do
+          toggle_k5_setting(course.account, enable: false)
+          user_session(student)
+        end
+
+        it "does not set @show_left_side" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be_nil
+        end
       end
     end
   end
