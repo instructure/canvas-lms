@@ -149,6 +149,7 @@ export interface EnvCommon {
   ONETRUST_CONSENT_DOMAIN_ID?: string
   PRE_COOKIE_CONSENT?: string
   PENDO_APP_ID: string
+  PENDO_APP_ENV: string
   ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
   help_link_name: string
@@ -380,6 +381,7 @@ export type RootAccountFeatureId =
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
   | 'substitution_variable_display'
+  | 'send_usage_metrics_after_consent'
   | 'top_navigation_placement'
 
 /**
