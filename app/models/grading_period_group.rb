@@ -24,6 +24,7 @@ class GradingPeriodGroup < ApplicationRecord
   belongs_to :root_account, inverse_of: :grading_period_groups, foreign_key: :account_id, class_name: "Account"
   belongs_to :course
   has_many :grading_periods, inverse_of: :grading_period_group
+  has_many :active_grading_periods, -> { active }, class_name: "GradingPeriod", inverse_of: :grading_period_group
   has_many :enrollment_terms, inverse_of: :grading_period_group
 
   validate :associated_with_course_or_root_account, if: :active?
