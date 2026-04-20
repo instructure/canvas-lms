@@ -538,7 +538,8 @@ class CoursesController < ApplicationController
           js_env({
                    CREATE_COURSES_PERMISSIONS: {
                      PERMISSION: course_permissions[:can_create],
-                     RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc]
+                     RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc],
+                     VIEWABLE_ACCOUNT_IDS: course_permissions[:viewable_account_ids]
                    }
                  })
 
