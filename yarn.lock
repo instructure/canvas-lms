@@ -3002,10 +3002,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/shared-types/-/shared-types-11.6.0.tgz#b1ae3b7986ffe394911aa1487272f7f7a60e4429"
   integrity sha512-uomkewk/Rfhurlm9dGr7O9hmL3Di3BMZDEjwrfWeGOqFN70xWUNFoEa/f9bqGU/83vAHecM4OlHb7Gz1UqIbnQ==
 
-"@instructure/studio-player@1.8.2":
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.8.2.tgz#735bcc0aca8809faae2091bc3d63413dc5a4bb9c"
-  integrity sha512-mIKrUTBSOD/4VUkZ8buWDZApdHCuNrc72MfHf3slAdv901KkfTAliwMFP5xjp+O+pYrY1Gy/E6KzBnxojwv4KA==
+"@instructure/studio-player@1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.10.0.tgz#4fcd89b9c59f4ab551b5bf84310e41b0d551ead0"
+  integrity sha512-UlZ7yZjISDJm/xEQ9ul9nRxFAHAME98YuNHlZJxukJvoM7m2PiJZXVsXzBt4hSTlKWNz/IxIw2KH0TgelRUzIg==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@nanostores/react" "^1.0.0"

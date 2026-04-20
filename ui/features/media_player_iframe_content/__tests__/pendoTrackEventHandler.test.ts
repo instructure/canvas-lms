@@ -95,4 +95,25 @@ describe('createPendoTrackEventHandler', () => {
       })
     })
   })
+
+  describe('studio_transcript_editing', () => {
+    it.each([
+      'enter_edit_mode',
+      'segment_edited',
+      'autosave_succeeded',
+      'autosave_failed',
+    ] as const)('tracks %s action without role when none provided', action => {
+      handler({type: 'studio_transcript_editing', action})
+      expect(mockTrackPendoEvent).toHaveBeenCalledWith('canvas_transcript_editing', {action})
+    })
+
+    it('includes all roles when provided', () => {
+      const handlerWithRoles = createPendoTrackEventHandler(['user', 'student', 'teacher'])
+      handlerWithRoles({type: 'studio_transcript_editing', action: 'enter_edit_mode'})
+      expect(mockTrackPendoEvent).toHaveBeenCalledWith('canvas_transcript_editing', {
+        action: 'enter_edit_mode',
+        roles: ['user', 'student', 'teacher'],
+      })
+    })
+  })
 })
