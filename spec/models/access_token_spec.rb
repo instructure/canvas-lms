@@ -987,6 +987,98 @@ describe AccessToken do
     end
   end
 
+  describe ".send_expiration_reminders" do
+    let_once(:notification) { Notification.create!(name: "Access Token Expiring Soon", category: "Registration") }
+    let_once(:user) { user_model }
+    let_once(:channel) { communication_channel(user, active_cc: true) }
+
+    before(:once) do
+      notification
+      channel
+      BroadcastPolicy.notification_finder.refresh_cache
+    end
+
+    before do
+      Account.site_admin.enable_feature!(:access_key_expiration_email)
+    end
+
+    it "does nothing when the feature flag is disabled" do
+      Account.site_admin.disable_feature!(:access_key_expiration_email)
+      token = AccessToken.create!(user:, purpose: "test")
+      token.update!(permanent_expires_at: 7.days.from_now.noon)
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+
+    it "sends a notification for user-generated tokens expiring in 7 days" do
+      token = AccessToken.create!(user:, purpose: "test")
+      token.update!(permanent_expires_at: 7.days.from_now.noon)
+
+      expect { AccessToken.send_expiration_reminders }
+        .to change { Message.where(context: token, notification_name: "Access Token Expiring Soon").count }.by(1)
+    end
+
+    it "sends one notification per expiring token when a user has multiple" do
+      token1 = AccessToken.create!(user:, purpose: "test1")
+      token1.update!(permanent_expires_at: 7.days.from_now.noon)
+      token2 = AccessToken.create!(user:, purpose: "test2")
+      token2.update!(permanent_expires_at: 7.days.from_now.noon)
+
+      expect { AccessToken.send_expiration_reminders }
+        .to change { Message.where(notification_name: "Access Token Expiring Soon").count }.by(2)
+    end
+
+    it "does not send a notification for tokens expiring in 6 days" do
+      token = AccessToken.create!(user:, purpose: "test")
+      token.update!(permanent_expires_at: 6.days.from_now.noon)
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+
+    it "does not send a notification for tokens expiring in 8 days" do
+      token = AccessToken.create!(user:, purpose: "test")
+      token.update!(permanent_expires_at: 8.days.from_now.noon)
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+
+    it "does not send a notification for tokens with no expiration" do
+      token = AccessToken.create!(user:, purpose: "test")
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+
+    it "does not send a notification for already-expired tokens" do
+      token = AccessToken.create!(user:, purpose: "test")
+      token.update!(permanent_expires_at: 1.day.ago)
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+
+    it "does not send a notification for non-user-generated tokens" do
+      other_key = DeveloperKey.create!(name: "third_party_app_#{SecureRandom.hex(4)}")
+      token = AccessToken.create!(user:, developer_key: other_key)
+      token.update!(permanent_expires_at: 7.days.from_now.noon)
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+
+    it "does not send a notification for deleted tokens" do
+      token = AccessToken.create!(user:, purpose: "test")
+      token.update!(permanent_expires_at: 7.days.from_now.noon)
+      token.destroy
+
+      AccessToken.send_expiration_reminders
+      expect(Message.where(context: token, notification_name: "Access Token Expiring Soon")).to be_empty
+    end
+  end
+
   describe "#queue_developer_key_token_count_increment" do
     it "returns early when developer_key is nil" do
       token_without_key = AccessToken.new(user: user_model, purpose: "test")

@@ -416,6 +416,21 @@ class AccessToken < ApplicationRecord
     developer_key_id == DeveloperKey.default.id || developer_key&.name == DeveloperKey::DEFAULT_KEY_NAME
   end
 
+  def self.send_expiration_reminders
+    return unless Account.site_admin.feature_enabled?(:access_key_expiration_email)
+
+    notification = BroadcastPolicy.notification_finder.by_name("Access Token Expiring Soon")
+    return unless notification
+
+    window_start = 7.days.from_now.beginning_of_day
+    window_end   = 7.days.from_now.end_of_day
+
+    active.user_generated
+          .where(permanent_expires_at: window_start..window_end)
+          .preload(:developer_key, user: { pseudonym: :account })
+          .find_each { |token| notification.create_message(token, [token.user]) }
+  end
+
   # if user is not provided, all user tokens in the account will be invalidated
   # if skip_admins is true, tokens for users with active admin roles in the account will not be invalidated
   def self.invalidate_mobile_tokens!(account, user: nil, skip_admins: true)

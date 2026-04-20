@@ -123,6 +123,7 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
                              "Enrollment Invitation",
                              "Enrollment Notification",
                              "Forgot Password",
+                             "Access Token Expiring Soon",
                              "Manually Created Access Token Created",
                              "Access Token Created On Behalf Of User",
                              "Access Token Deleted",

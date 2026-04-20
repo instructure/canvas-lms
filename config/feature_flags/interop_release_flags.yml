@@ -1,4 +1,10 @@
 ---
+access_key_expiration_email:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: User Generated Access Key Expiration Email
+  description: When this flag is enabled, users will receive an email 7 days prior to their user-generated access tokens expiring so that if they still require access they can switch over to a new key before their integration stops working.
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
