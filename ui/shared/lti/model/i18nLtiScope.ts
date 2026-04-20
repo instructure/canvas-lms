@@ -33,6 +33,7 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   [LtiScopes.DataServicesUpdate]: I18n.t('Can update subscription to data service data'),
   [LtiScopes.DataServicesList]: I18n.t('Can list subscriptions to data service data'),
   [LtiScopes.DataServicesDestroy]: I18n.t('Can destroy subscription to data service data'),
+  [LtiScopes.DataServicesListEventTypes]: I18n.t('Can list categorized event types'),
   [LtiScopes.FeatureFlagsShow]: I18n.t('Can view feature flags'),
   [LtiScopes.AgsLineItem]: I18n.t(
     'Can create and view assignment data in the gradebook associated with the tool',

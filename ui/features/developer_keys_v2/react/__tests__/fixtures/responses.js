@@ -40,6 +40,7 @@ const successfulLtiKeySaveResponse = {
           'https://canvas.instructure.com/lti/data_services/scope/list',
           'https://canvas.instructure.com/lti/data_services/scope/destroy',
           'https://canvas.instructure.com/lti/data_services/scope/show',
+          'https://canvas.instructure.com/lti/data_services/scope/list_event_types',
         ],
         extensions: [
           {
@@ -435,6 +436,7 @@ const successfulLtiKeySaveResponse = {
         'https://canvas.instructure.com/lti/data_services/scope/list',
         'https://canvas.instructure.com/lti/data_services/scope/destroy',
         'https://canvas.instructure.com/lti/data_services/scope/show',
+        'https://canvas.instructure.com/lti/data_services/scope/list_event_types',
       ],
       workflow_state: 'active',
       icon_url: null,
