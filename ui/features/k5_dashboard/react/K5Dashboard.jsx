@@ -157,6 +157,7 @@ const K5Dashboard = ({
   assignmentsCompletedForToday,
   createPermission,
   restrictCourseCreation,
+  viewableAccountIds,
   currentUser,
   currentUserRoles,
   timeZone,
@@ -448,6 +449,7 @@ const K5Dashboard = ({
               cards={cards}
               createPermission={createPermission}
               restrictCourseCreation={restrictCourseCreation}
+              viewableAccountIds={viewableAccountIds}
               homeroomAnnouncements={homeroomAnnouncements}
               loadingAnnouncements={loadingAnnouncements}
               visible={currentTab === TAB_IDS.HOMEROOM}
@@ -516,6 +518,7 @@ K5Dashboard.propTypes = {
   loadingOpportunities: PropTypes.bool.isRequired,
   createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   restrictCourseCreation: PropTypes.bool.isRequired,
+  viewableAccountIds: PropTypes.arrayOf(PropTypes.string),
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,

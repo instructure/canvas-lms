@@ -518,6 +518,7 @@ class UsersController < ApplicationController
              CREATE_COURSES_PERMISSIONS: {
                PERMISSION: course_permissions[:can_create],
                RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc],
+               VIEWABLE_ACCOUNT_IDS: course_permissions[:viewable_account_ids],
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user

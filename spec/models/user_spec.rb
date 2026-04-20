@@ -5911,6 +5911,61 @@ describe User do
       expect(permissions[:can_create]).to be(:student)
       expect(permissions[:restrict_to_mcc]).to be_falsey
     end
+
+    describe "viewable_account_ids" do
+      it "includes the account ID when admin has read_course_list" do
+        @user = user_factory(active_all: true)
+        account_admin_user(account: @account, user: @user)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to include(@account.id.to_s)
+      end
+
+      it "is nil when user has only course enrollments (no account role)" do
+        @user = user_factory(active_all: true)
+        course_with_teacher(user: @user, active_all: true, account: @account)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to be_nil
+      end
+
+      it "is empty when admin role has read_course_list disabled" do
+        @user = user_factory(active_all: true)
+        role = custom_account_role("no_course_list", account: @account)
+        @account.role_overrides.create!(
+          permission: :read_course_list,
+          role:,
+          enabled: false
+        )
+        @account.account_users.create!(user: @user, role:)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to be_empty
+      end
+
+      it "includes only accounts where admin has read_course_list" do
+        @user = user_factory(active_all: true)
+        account_admin_user(account: @account, user: @user)
+
+        # A separate root account where the user lacks read_course_list.
+        other_account = Account.create!(name: "Other Root Account")
+        restricted_role = custom_account_role("no_course_list", account: other_account)
+        other_account.role_overrides.create!(
+          permission: :read_course_list,
+          role: restricted_role,
+          enabled: false
+        )
+        other_account.account_users.create!(user: @user, role: restricted_role)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to include(@account.id.to_s)
+        expect(permissions[:viewable_account_ids]).not_to include(other_account.id.to_s)
+      end
+    end
   end
 
   it "destroys associated gradebook filters when the user is soft-deleted" do

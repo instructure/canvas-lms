@@ -56,6 +56,8 @@ interface CreateCourseModalProps {
   permissions: 'admin' | 'teacher' | 'student' | 'no_enrollments'
   restrictToMCCAccount: boolean
   isK5User: boolean
+  // null = non-admin (no restriction); string[] = account IDs where homerooms can be fetched
+  viewableAccountIds?: string[] | null
 }
 
 export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
@@ -64,6 +66,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   permissions,
   restrictToMCCAccount,
   isK5User,
+  viewableAccountIds,
 }) => {
   const {t} = useTranslation('create_course_modal')
   const [loading, setLoading] = useState(true)
@@ -252,7 +255,17 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
     error: homeroomsError,
     fetchAllPages: true,
     // don't let students/users with no enrollments sync homeroom data
-    forceResult: ['no_enrollments', 'student'].includes(permissions) ? [] : undefined,
+    // for admins, skip homerooms fetch if selected account lacks read_course_list:
+    //   viewableAccountIds=null → non-admin, no restriction
+    //   viewableAccountIds=[]   → admin with no viewable accounts
+    //   viewableAccountIds=[ids] → check if selectedAccount is included
+    forceResult: (() => {
+      if (['no_enrollments', 'student'].includes(permissions)) return []
+      if (viewableAccountIds !== null && viewableAccountIds !== undefined) {
+        if (!selectedAccount || !viewableAccountIds.includes(selectedAccount.id)) return []
+      }
+      return undefined
+    })(),
     path: homeOptionPath,
   })
 
