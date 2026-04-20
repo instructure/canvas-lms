@@ -1892,6 +1892,22 @@ describe AccountsController do
       expect(response.body).to match(/#{@c2.id}/)
     end
 
+    it "accepts array of enrollment terms and correctly filters courses" do
+      admin_logged_in(@account)
+      term1 = @account.root_account.enrollment_terms.create!(name: "Term A")
+      term2 = @account.root_account.enrollment_terms.create!(name: "Term B")
+      term3 = @account.root_account.enrollment_terms.create!(name: "Term C")
+
+      course1 = course_model(account: @account, enrollment_term: term1)
+      course_model(account: @account, enrollment_term: term2)
+      course3 = course_model(account: @account, enrollment_term: term3)
+
+      get "courses_api", params: { account_id: @account.id, enrollment_term_id: [term1.id, term3.id] }, format: :json
+      expect(response).to be_successful
+      data = response.parsed_body
+      expect(data.pluck("id")).to contain_exactly(course1.id, course3.id)
+    end
+
     context "post_manually" do
       it "gets of a list of courses with post_manually populated if included in the includes param" do
         admin_logged_in(@account)
