@@ -82,7 +82,10 @@ const originalSetInterval = globalThis.setInterval
 const originalClearTimeout = globalThis.clearTimeout
 const originalClearInterval = globalThis.clearInterval
 
-// Wrap setTimeout to track pending timers
+// Wrap setTimeout to track pending timers.
+// The document guard prevents InstUI BaseTransition callbacks from throwing
+// "ReferenceError: document is not defined" when a timer fires after the
+// jsdom environment has been torn down at the end of the test run.
 globalThis.setTimeout = ((
   callback: (...args: unknown[]) => void,
   ms?: number,
@@ -90,6 +93,8 @@ globalThis.setTimeout = ((
 ) => {
   const id = originalSetTimeout(() => {
     pendingTimeouts.delete(id)
+
+    if (typeof (globalThis as any).document === 'undefined') return
     callback(...args)
   }, ms)
   pendingTimeouts.add(id)
