@@ -94,7 +94,7 @@ describe PageViews::FetchResultService do
 
     expect(result).to be_a(PageViews::Common::DownloadableResult)
     expect(result.format).to eq(:jsonl)
-    expect(result.filename).to eq("page_views_123456.jsonl.gz")
+    expect(result.filename).to eql("page_views_123456.jsonl")
     expect(result.content).to eq(example_jsonl_gz_response.body)
     expect(result.compressed?).to be true
   end
@@ -106,7 +106,7 @@ describe PageViews::FetchResultService do
 
     expect(result).to be_a(PageViews::Common::DownloadableResult)
     expect(result.format).to eq(:csv)
-    expect(result.filename).to eq("page_views_123456.csv.gz")
+    expect(result.filename).to eql("page_views_123456.csv")
     expect(result.content).to eq(example_csv_gz_response.body)
     expect(result.compressed?).to be true
   end
