@@ -32,6 +32,7 @@ import CanvasSelect from '../shared/CanvasSelect'
 import {CC_FILE_MAX_BYTES} from '../shared/constants'
 
 export default class ClosedCaptionCreatorRow extends Component {
+  static _instanceCounter = 0
   static propTypes = {
     languages: arrayOf(
       shape({
@@ -69,6 +70,7 @@ export default class ClosedCaptionCreatorRow extends Component {
   constructor(props) {
     super(props)
 
+    this._instanceId = ++ClosedCaptionCreatorRow._instanceCounter
     this.state = {
       isValidCC: true,
       messageErrorCC: '',
@@ -146,7 +148,7 @@ export default class ClosedCaptionCreatorRow extends Component {
         <CanvasSelect
           ref={this._langSelectRef}
           value={this.props.selectedLanguage?.id}
-          label={<ScreenReaderContent>{CLOSED_CAPTIONS_SELECT_LANGUAGE}</ScreenReaderContent>}
+          label={CLOSED_CAPTIONS_SELECT_LANGUAGE}
           liveRegion={this.props.liveRegion}
           onChange={this.handleLanguageChange}
           placeholder={CLOSED_CAPTIONS_SELECT_LANGUAGE}
@@ -181,9 +183,12 @@ export default class ClosedCaptionCreatorRow extends Component {
           type="file"
         />
         <View as="div">
-          <Text as="div">{SUPPORTED_FILE_TYPES}</Text>
+          <Text as="div" id={`cc-supported-types-${this._instanceId}`}>
+            {SUPPORTED_FILE_TYPES}
+          </Text>
           <Button
             id="attachmentFileButton"
+            aria-describedby={`cc-supported-types-${this._instanceId}${!this.props.selectedFile ? ` cc-file-status-${this._instanceId}` : ''}`}
             onClick={() => {
               this.fileInput.click()
             }}
@@ -195,7 +200,11 @@ export default class ClosedCaptionCreatorRow extends Component {
             <ScreenReaderContent>{this.state.messageErrorCC}</ScreenReaderContent>
           </Button>
           {!this.props.selectedFile && (
-            <View display="inline-block" margin="0 0 0 small">
+            <View
+              display="inline-block"
+              margin="0 0 0 small"
+              id={`cc-file-status-${this._instanceId}`}
+            >
               <Text color="secondary">{NO_FILE_CHOSEN}</Text>
             </View>
           )}
