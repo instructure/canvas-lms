@@ -242,18 +242,15 @@ export function ManualCaptionCreator({
               {formatMessage('Choose File')}
             </Button>
           </Flex.Item>
-          {!selectedFile && (
-            <Text id="cc-file-status" variant="contentSmall">
-              {formatMessage('No file chosen')}
-            </Text>
-          )}
-          {selectedFile && (
-            <View id="cc-file-status" minWidth={0}>
+          <View id="cc-file-status" minWidth={0} role="status">
+            {selectedFile ? (
               <Text variant="contentSmall">
                 <TruncateText>{selectedFile.name}</TruncateText>
               </Text>
-            </View>
-          )}
+            ) : (
+              <Text variant="contentSmall">{formatMessage('No file chosen')}</Text>
+            )}
+          </View>
         </Flex>
         {fileValidationError && (
           <span id={FILE_ERROR_ID}>

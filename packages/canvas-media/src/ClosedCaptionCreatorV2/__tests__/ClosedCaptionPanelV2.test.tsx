@@ -478,6 +478,58 @@ describe('<ClosedCaptionPanelV2 />', () => {
       expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
     })
 
+    it('a11y: announces file selection in the manual caption creator', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      const fileStatus = document.getElementById('cc-file-status')
+      expect(fileStatus).toHaveAttribute('role', 'status')
+      expect(fileStatus).toHaveTextContent('No file chosen')
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile('my-captions.vtt')]}})
+
+      expect(fileStatus).toHaveTextContent('my-captions.vtt')
+    })
+
+    it('a11y: announces when upload starts', () => {
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+      fireEvent.click(screen.getByText('Upload'))
+
+      expect(screen.getByText('Uploading English caption')).toBeInTheDocument()
+    })
+
+    it('a11y: announces when ASR request starts', () => {
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+
+      expect(screen.getByText('Requesting Spanish caption')).toBeInTheDocument()
+    })
+
+    it('a11y: announces when delete starts', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText('Delete English'))
+
+      expect(screen.getByText('Deleting English')).toBeInTheDocument()
+    })
+
     it('a11y: announces when a caption is added', async () => {
       server.use(
         http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
@@ -754,7 +806,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       fireEvent.click(screen.getByText('Spanish'))
       fireEvent.click(screen.getByText('Request'))
 
-      await screen.findByText('Caption generation failed')
+      await screen.findByText(/Spanish Caption generation failed/i)
 
       // Phase 2: retry succeeds
       server.use(
@@ -885,7 +937,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
         target: {files: [createValidFile()]},
       })
       fireEvent.click(screen.getByText('Upload'))
-      await screen.findByText('Upload Failed')
+      await screen.findByText(/German Caption Upload Failed/i)
       expect(mockTrack).toHaveBeenCalledWith('canvas_caption_result', {
         type: 'track',
         flow_type: 'upload_file',
