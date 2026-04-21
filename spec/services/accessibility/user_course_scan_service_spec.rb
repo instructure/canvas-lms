@@ -231,8 +231,11 @@ describe Accessibility::UserCourseScanService do
       end
 
       it "captures to Sentry" do
-        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
-        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+        expect(Canvas::Errors).to receive(:capture).with(
+          instance_of(StandardError),
+          hash_including(tags: { type: described_class::ERROR_TAG }),
+          :error
+        )
         expect { described_class.perform_scan(progress, teacher.id, account.id) }
           .to raise_error(StandardError)
       end
@@ -334,10 +337,9 @@ describe Accessibility::UserCourseScanService do
     end
 
     context "when a course scan raises an unexpected error" do
-      let!(:second_course) do
+      before do
         c = course_model(account:)
         c.enroll_teacher(teacher, enrollment_state: :active)
-        c
       end
 
       before do

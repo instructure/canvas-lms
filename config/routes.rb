@@ -1940,6 +1940,11 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :accessibility_course_statistics) do
+      # This endpoint was created during experimentation phase for Educator Dashboard
+      # At this time the endpoint only pulls courses that the user is enrolled as an educator
+      # i.e. TeacherEnrollment or DesignerEnrollment
+      # This this feature goes to GA, it will be idea to update the endpoint to remove educator
+      # as the indicator.
       get "users/:user_id/educator_accessibility_course_statistics", action: :index, as: "user_educator_accessibility_course_statistics"
     end
 

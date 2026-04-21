@@ -55,18 +55,11 @@ class Accessibility::UserCourseScanService < ApplicationService
     progress.complete!
   rescue => e
     progress.fail!
-    ErrorReport.log_exception(
-      ERROR_TAG,
+    Canvas::Errors.capture(
       e,
-      { progress_id: progress.id, user_id:, root_account_id: }
+      { tags: { type: ERROR_TAG }, extra: { progress_id: progress.id, user_id:, root_account_id: } },
+      :error
     )
-    Sentry.with_scope do |scope|
-      scope.set_context(
-        ERROR_TAG,
-        { progress_id: progress.global_id, user_id:, root_account_id: }
-      )
-      Sentry.capture_exception(e, level: :error)
-    end
     raise
   end
 
@@ -88,19 +81,15 @@ class Accessibility::UserCourseScanService < ApplicationService
   def scan_user_courses
     educator_courses_with_a11y_enabled.each do |course|
       Accessibility::CourseScanService.queue_course_scan(course)
-    rescue Accessibility::CourseScanService::ScanLimitExceededError => e
-      ErrorReport.log_exception(
-        ERROR_TAG,
-        e,
-        { user_id: @user.id, course_id: course.id, course_name: course.name }
-      )
     rescue => e
       ErrorReport.log_exception(
         ERROR_TAG,
         e,
         { user_id: @user.id, course_id: course.id, course_name: course.name }
       )
-      Sentry.capture_exception(e, level: :warning)
+      unless e.is_a?(Accessibility::CourseScanService::ScanLimitExceededError)
+        Sentry.capture_exception(e, level: :warning)
+      end
     end
   end
 
@@ -113,7 +102,7 @@ class Accessibility::UserCourseScanService < ApplicationService
     #
     # NOTE: This query runs on the user's home shard only. Users with
     # cross-shard enrollments will silently miss courses on other shards.
-    # This will be corrected during scaling (ref )
+    # This will be corrected during scaling (ref EGG-2606)
     educator_course_ids = @user
                           .enrollments
                           .active

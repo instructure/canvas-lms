@@ -55,16 +55,12 @@ describe AccessibilityCourseScansController do
         @account.disable_feature!(:educator_dashboard)
         post :create, params: { user_id: @teacher.id }, format: :json
         expect(response).to be_forbidden
-      ensure
-        @account.enable_feature!(:educator_dashboard)
       end
 
       it "returns 403 when a11y_checker_account_statistics is disabled" do
         Account.site_admin.disable_feature!(:a11y_checker_account_statistics)
         post :create, params: { user_id: @teacher.id }, format: :json
         expect(response).to be_forbidden
-      ensure
-        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
       end
     end
 
@@ -102,20 +98,6 @@ describe AccessibilityCourseScansController do
         user_session(@teacher)
         post :create, params: { user_id: "self" }, format: :json
         expect(response).to be_successful
-      end
-    end
-
-    context "when the service returns nil" do
-      before do
-        allow(Accessibility::UserCourseScanService)
-          .to receive(:queue_user_courses_scan)
-          .and_return(nil)
-        user_session(@teacher)
-      end
-
-      it "returns 403" do
-        post :create, params: { user_id: @teacher.id }, format: :json
-        expect(response).to be_forbidden
       end
     end
 
