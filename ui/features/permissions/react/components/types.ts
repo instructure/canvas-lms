@@ -54,3 +54,5 @@ export interface PermissionModifyAction {
   applies_to_self?: boolean
   applies_to_descendants?: boolean
 }
+
+export type PermissionUpdate = Omit<PermissionModifyAction, 'name' | 'id' | 'inTray'>
