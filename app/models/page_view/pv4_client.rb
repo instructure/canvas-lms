@@ -112,7 +112,7 @@ class PageView
                             end_time: newest,
                             last_page_view_id:,
                             limit: pager.per_page))
-        pager.has_more! unless pager.empty?
+        pager.has_more! if pager.size >= pager.per_page
         pager
       end
     end
