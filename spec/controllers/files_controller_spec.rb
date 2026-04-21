@@ -1302,9 +1302,6 @@ describe FilesController do
 
     before do
       user_session(@student)
-      config = instance_double(CanvasCareer::Config)
-      allow(CanvasCareer::Config).to receive(:new).and_return(config)
-      allow(config).to receive(:public_app_config).and_return({ "hosts" => { "journey" => "http://journey.test" } })
     end
 
     context "when enabled" do
@@ -1323,11 +1320,6 @@ describe FilesController do
       it "sets COURSE_ID to the course id" do
         get "show", params: { course_id: @course.id, id: @file.id }
         expect(assigns[:js_env][:COURSE_ID]).to eq @course.id.to_s
-      end
-
-      it "sets JOURNEY_URL from CanvasCareer config" do
-        get "show", params: { course_id: @course.id, id: @file.id }
-        expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
       end
 
       it "sets STUDY_ASSIST_TOOLS with all tools enabled by default" do
@@ -1360,11 +1352,6 @@ describe FilesController do
       it "does not set FILE_ID" do
         get "show", params: { course_id: @course.id, id: @file.id }
         expect(assigns[:js_env].to_h).not_to have_key :FILE_ID
-      end
-
-      it "does not set JOURNEY_URL" do
-        get "show", params: { course_id: @course.id, id: @file.id }
-        expect(assigns[:js_env].to_h).not_to have_key :JOURNEY_URL
       end
 
       it "does not set STUDY_ASSIST_TOOLS" do

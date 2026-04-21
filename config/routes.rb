@@ -1302,6 +1302,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/ai_experiences/:id/ai_conversations/:conversation_id", action: :ai_conversation_show, as: "course_ai_experience_ai_conversation"
     end
 
+    scope(controller: :study_assist) do
+      post "courses/:course_id/study_assist", action: :create, as: "course_study_assist"
+    end
+
     scope(controller: :ai_conversations) do
       get "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :active_conversation, as: "course_ai_experience_conversations"
       get "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id", action: :show, as: "course_ai_experience_conversation"
