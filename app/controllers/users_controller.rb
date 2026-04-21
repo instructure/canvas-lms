@@ -1808,7 +1808,16 @@ class UsersController < ApplicationController
     when request.get?
       return unless authorized_action(user, @current_user, :read)
 
-      render json: BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
+      results = BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
+
+      if params.key?(:include) && params[:include].include?("mobile_settings")
+        results[:pendo_mobile_teacher_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_teacher, failsafe: nil]
+        results[:pendo_mobile_parent_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_parent, failsafe: nil]
+        results[:pendo_mobile_student_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_student, failsafe: nil]
+        results[:usage_metrics] = should_track_usage
+      end
+
+      render json: results
     when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
 

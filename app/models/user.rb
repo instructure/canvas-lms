@@ -3525,6 +3525,10 @@ class User < ApplicationRecord
     !!preferences[:fake_student] && enrollments.where(type: "StudentViewEnrollment").exists?
   end
 
+  def underage?
+    !!preferences[:underage]
+  end
+
   def private?
     !public?
   end
