@@ -72,7 +72,7 @@ module Lti
         redirect_uris:,
         launch_settings:,
         placements:,
-      }
+      }.with_indifferent_access
     end
 
     def effective_developer_key

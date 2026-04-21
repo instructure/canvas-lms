@@ -217,6 +217,16 @@ describe Api::V1::Lti::Registration do
       end
     end
 
+    context "of manual registration type" do
+      let!(:tool_configuration) do
+        lti_tool_configuration_model(lti_registration: registration)
+      end
+
+      it "includes icon_url from launch_settings when no overlay is present" do
+        expect(subject[:icon_url]).to eql(tool_configuration.launch_settings["icon_url"])
+      end
+    end
+
     # TEMPORARY: Manual registrations now merge overlays into configuration.
     # Use a dynamic registration to test overlay functionality.
     context "with an overlay" do
