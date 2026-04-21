@@ -62,6 +62,18 @@ describe SessionToken do
     expect(SessionToken.parse(token.to_s).consent_from_mobile).to eq token.consent_from_mobile
   end
 
+  it "validates tokens generated before consent_from_mobile was added to the signature" do
+    token = SessionToken.new(1)
+    legacy_signature_string = [
+      token.created_at.to_i.to_s,
+      token.pseudonym_id.to_s,
+      token.current_user_id.to_s,
+      token.used_remember_me_token.to_s
+    ].join("::")
+    token.signature = Canvas::Security.hmac_sha1(legacy_signature_string)
+    expect(SessionToken.parse(token.to_s)).to be_valid
+  end
+
   it "is not valid after tampering" do
     token = SessionToken.new(1)
     token.to_s # cache the signature
