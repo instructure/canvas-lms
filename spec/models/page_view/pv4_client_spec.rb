@@ -220,11 +220,26 @@ describe PageView::Pv4Client do
         expect(result.length).to eq 1
       end
 
+      it "does not set next_page when results are fewer than per_page" do
+        stub_http_request("page_views" => [pv4_object])
+
+        result = client.for_user(user).paginate(per_page: 100)
+        expect(result.next_page).to be_nil
+      end
+
+      it "sets next_page when results fill the full page" do
+        page_views = Array.new(10) { pv4_object.dup }
+        stub_http_request("page_views" => page_views)
+
+        result = client.for_user(user).paginate(per_page: 10)
+        expect(result.next_page).not_to be_nil
+      end
+
       it "sends last_page_view_id when paginating" do
         stub_http_request("page_views" => [pv4_object])
 
         now = Time.now.utc
-        result = client.for_user(user).paginate(per_page: 10)
+        result = client.for_user(user).paginate(per_page: 1)
 
         http_response = instance_double(Net::HTTPResponse, body: '{ "page_views": [] }', code: 200)
         expect(CanvasHttp).to receive(:get).with(
