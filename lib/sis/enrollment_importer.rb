@@ -284,8 +284,10 @@ module SIS
             end
           end
 
+          temporary_enrollments_feature_enabled = @course.root_account&.feature_enabled?(:temporary_enrollments)
+
           if enrollment_info.temporary_enrollment_source_user_id &&
-             @course.root_account&.feature_enabled?(:temporary_enrollments)
+             temporary_enrollments_feature_enabled
             pseudonym = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.temporary_enrollment_source_user_id)
             if pseudonym
               temporary_enrollment_source_user_id = pseudonym.user_id
@@ -300,11 +302,9 @@ module SIS
             next
           end
 
-          enrollment = @section.all_enrollments.find_by(user_id: user,
-                                                        type:,
-                                                        associated_user_id:,
-                                                        temporary_enrollment_source_user_id:,
-                                                        role_id: role)
+          conditions = { user_id: user, type:, associated_user_id:, role_id: role }
+          conditions[:temporary_enrollment_source_user_id] = temporary_enrollment_source_user_id if temporary_enrollments_feature_enabled && temporary_enrollment_source_user_id.present?
+          enrollment = @section.all_enrollments.find_by(conditions)
 
           enrollment ||= Enrollment.typed_enrollment(type).new
           enrollment.root_account = @root_account
@@ -318,7 +318,7 @@ module SIS
             enrollment.limit_privileges_to_course_section = Canvas::Plugin.value_to_boolean(enrollment_info.limit_section_privileges)
           end
 
-          if @course.root_account&.feature_enabled?(:temporary_enrollments) && temporary_enrollment_source_user_id
+          if temporary_enrollments_feature_enabled && temporary_enrollment_source_user_id
             pairing = create_temp_enrollment_pairing(enrollment_info, temporary_enrollment_source_user_id, @section.course.id, enrollment.user_id)
             next unless pairing
 
@@ -329,16 +329,16 @@ module SIS
             rescue ActiveRecord::RecordInvalid
               msg = "A temporary enrollment did not pass validation "
               msg += "(" + "course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
-              msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
-                     msg += enrollment.errors.full_messages.join(",") + ")"
+              msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: "
+              msg += enrollment.errors.full_messages.join(",") + ")"
               @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
               next
             rescue ActiveRecord::RecordNotUnique
               if @retry == true
                 msg = "A temporary enrollment failed to save "
                 msg += "(course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
-                msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
-                       msg += enrollment.errors.full_messages.join(",") + ")"
+                msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: "
+                msg += enrollment.errors.full_messages.join(",") + ")"
                 @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
                 @retry = false
               else
@@ -351,6 +351,11 @@ module SIS
             msg = "Temporary enrollments are not enabled"
             @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
+          else
+            # Clear temp fields so a matched deleted/concluded temporary enrollment can be
+            # restored as a regular one (mirrors Course#enroll_user).
+            enrollment.temporary_enrollment_source_user_id = nil
+            enrollment.temporary_enrollment_pairing_id = nil
           end
 
           next if enrollment_status(associated_user_id,
@@ -398,16 +403,16 @@ module SIS
             rescue ActiveRecord::RecordInvalid
               msg = "An enrollment did not pass validation "
               msg += "(" + "course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
-              msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
-                     msg += enrollment.errors.full_messages.join(",") + ")"
+              msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: "
+              msg += enrollment.errors.full_messages.join(",") + ")"
               @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
               next
-            rescue ActiveRecord::RecordNotUnique
+            rescue ActiveRecord::RecordNotUnique => e
               if @retry == true
                 msg = "An enrollment failed to save "
                 msg += "(course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
-                msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
-                       msg += enrollment.errors.full_messages.join(",") + ")"
+                msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: "
+                msg += e.message + ")"
                 @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
                 @retry = false
               else
