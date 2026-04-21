@@ -21,7 +21,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
-    timecop (0.9.10)
+    timecop (0.9.11)
 
 PLATFORMS
   aarch64-linux
