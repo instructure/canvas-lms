@@ -21,9 +21,10 @@
 require "webmock/rspec"
 
 describe AiExperiences::ConversationContextDocumentsService do
-  subject(:service) { described_class.new }
+  subject(:service) { described_class.new(account: course.account) }
 
   let(:course) { course_model }
+
   let(:ai_experience) do
     AiExperience.create!(
       course:,

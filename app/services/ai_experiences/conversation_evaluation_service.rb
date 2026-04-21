@@ -20,8 +20,8 @@
 
 module AiExperiences
   class ConversationEvaluationService
-    def initialize
-      @client = LlmConversation::HttpClient.new
+    def initialize(account:)
+      @client = LlmConversation::HttpClient.new(account:)
     end
 
     def evaluate(conversation_id:)

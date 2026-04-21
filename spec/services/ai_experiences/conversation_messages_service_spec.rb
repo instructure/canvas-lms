@@ -19,10 +19,11 @@
 #
 
 describe AiExperiences::ConversationMessagesService do
+  let(:account) { account_model }
   let(:user) { user_model }
   let(:conversation_id) { "test-conversation-id" }
   let(:http_client) { instance_double(LlmConversation::HttpClient) }
-  let(:service) { described_class.new }
+  let(:service) { described_class.new(account:) }
 
   before do
     allow(LlmConversation::HttpClient).to receive(:new).and_return(http_client)

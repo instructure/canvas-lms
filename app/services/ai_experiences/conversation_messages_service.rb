@@ -20,8 +20,8 @@
 
 module AiExperiences
   class ConversationMessagesService
-    def initialize
-      @client = LlmConversation::HttpClient.new
+    def initialize(account:)
+      @client = LlmConversation::HttpClient.new(account:)
     end
 
     def fetch_with_progress(conversation_id:, requesting_user: nil)

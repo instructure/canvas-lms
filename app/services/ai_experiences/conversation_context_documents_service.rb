@@ -20,8 +20,8 @@
 
 module AiExperiences
   class ConversationContextDocumentsService
-    def initialize
-      @client = LlmConversation::HttpClient.new
+    def initialize(account:)
+      @client = LlmConversation::HttpClient.new(account:)
     end
 
     def sync_index_status(ai_experience:)
