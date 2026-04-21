@@ -17,12 +17,13 @@
  */
 
 import React, {useState, useRef} from 'react'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconMoreLine, IconClockLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconClockLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
@@ -39,6 +40,7 @@ import {AIExperience} from '../../types'
 import {FileList} from '@canvas/canvas-file-upload/react/FileList'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 import AIExperiencePublishButton from './AIExperiencePublishButton'
+import {roundedTheme} from '../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_show')
 
@@ -206,10 +208,6 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         </View>
       )}
 
-      <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Activity')}
-      </Heading>
-
       {canManage && isIndexFailed ? (
         <Alert
           variant="error"
@@ -277,48 +275,26 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
 
       {canManage && (
         <>
-          <Heading level="h2" margin="large 0 0 0">
-            {I18n.t('Configurations')}
-          </Heading>
-
-          <div
-            style={{
-              margin: '0.75rem 0 0 0',
-              borderRadius: '0.5rem',
-              overflow: 'hidden',
-              border: '3px solid transparent',
-              backgroundImage:
-                'linear-gradient(white, white), linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-              backgroundOrigin: 'border-box',
-              backgroundClip: 'padding-box, border-box',
-            }}
-          >
-            <div
-              style={{
-                padding: '1rem',
-                background: 'linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-              }}
+          <InstUISettingsProvider theme={roundedTheme}>
+            <View
+              as="div"
+              margin="large 0 0 0"
+              borderWidth="small"
+              borderRadius="medium"
+              background="primary"
+              padding="medium"
             >
-              <Flex gap="small" alignItems="start">
-                <Flex.Item>
-                  <IconAiLine color="primary-inverse" size="small" />
-                </Flex.Item>
-                <Flex.Item shouldGrow shouldShrink>
-                  <View>
-                    <Text color="primary-inverse" weight="bold" size="large">
-                      {I18n.t('Learning Design')}
-                    </Text>
-                    <View as="div" margin="xx-small 0 0 0">
-                      <Text color="primary-inverse" size="small">
-                        {I18n.t('What should students know and how should the AI behave?')}
-                      </Text>
-                    </View>
-                  </View>
-                </Flex.Item>
-              </Flex>
-            </div>
+              <View as="div" margin="0 0 medium 0">
+                <Heading level="h2" margin="0 0 xx-small 0">
+                  {I18n.t('Configurations')}
+                </Heading>
+                <Text size="small" color="secondary">
+                  {I18n.t(
+                    'The completion rules, pedagogical guidance, and sources of the large language model (LLM).',
+                  )}
+                </Text>
+              </View>
 
-            <View as="div" padding="medium" background="primary">
               {aiExperience.learning_objective && (
                 <View as="div" margin="0 0 medium 0">
                   <Heading level="h3" margin="0 0 small 0">
@@ -370,7 +346,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   </View>
                 )}
             </View>
-          </div>
+          </InstUISettingsProvider>
         </>
       )}
 

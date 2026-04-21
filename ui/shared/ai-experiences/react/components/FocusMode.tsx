@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {CloseButton, Button} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('ai_experiences')
 
@@ -115,15 +115,6 @@ const FocusMode: React.FC<FocusModeProps> = ({
           </Flex>
         </div>
       </Modal.Body>
-      <Modal.Footer>
-        <Flex justifyItems="end">
-          <Flex.Item>
-            <Button onClick={onClose} color="secondary" data-testid="focus-mode-exit-button-footer">
-              {I18n.t('Exit Focus Mode')}
-            </Button>
-          </Flex.Item>
-        </Flex>
-      </Modal.Footer>
     </Modal>
   )
 }

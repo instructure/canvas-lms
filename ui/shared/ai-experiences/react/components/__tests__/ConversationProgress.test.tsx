@@ -36,7 +36,7 @@ describe('ConversationProgress', () => {
 
   it('renders progress bar with correct percentage', () => {
     render(<ConversationProgress progress={mockProgress} />)
-    expect(screen.getByText('50%')).toBeInTheDocument()
+    expect(screen.getByText('2/4 Learning targets')).toBeInTheDocument()
   })
 
   it('renders null when progress is null', () => {
@@ -53,7 +53,7 @@ describe('ConversationProgress', () => {
     expect(button).not.toBeNull()
     await user.click(button!)
 
-    expect(screen.getByText(/Learning objectives covered:/i)).toBeInTheDocument()
+    expect(screen.getByText(/Learning targets met/i)).toBeInTheDocument()
     expect(screen.getByText(/Learn React basics/)).toBeInTheDocument()
     expect(screen.getByText(/Understand hooks/)).toBeInTheDocument()
     expect(screen.getByText(/Master state management/)).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('ConversationProgress', () => {
     }
 
     render(<ConversationProgress progress={zeroProgress} />)
-    expect(screen.getByText('0%')).toBeInTheDocument()
+    expect(screen.getByText('0/3 Learning targets')).toBeInTheDocument()
   })
 
   it('displays 100% for complete progress', () => {
@@ -102,7 +102,7 @@ describe('ConversationProgress', () => {
     }
 
     render(<ConversationProgress progress={completeProgress} />)
-    expect(screen.getByText('100%')).toBeInTheDocument()
+    expect(screen.getByText('3/3 Learning targets')).toBeInTheDocument()
   })
 
   it('uses blue color for progress less than 100%', () => {
