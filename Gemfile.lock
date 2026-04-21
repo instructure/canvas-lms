@@ -896,7 +896,7 @@ GEM
     process_executer (4.0.2)
       track_open_instances (~> 0.1)
     promise.rb (0.7.4)
-    prosopite (2.1.2)
+    prosopite (2.2.0)
     pstore (0.2.1)
     psych (5.3.1)
       date
