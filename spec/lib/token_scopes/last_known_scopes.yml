@@ -1537,6 +1537,8 @@
   path: '/api/v1/courses/:course_id/students'
 - verb: GET
   path: '/api/v1/courses/:course_id/students/submissions'
+- verb: POST
+  path: '/api/v1/courses/:course_id/study_assist'
 - verb: PUT
   path: '/api/v1/courses/:course_id/submissions/:user_id/clear_unread'
 - verb: PUT

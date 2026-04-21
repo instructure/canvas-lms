@@ -29,52 +29,15 @@ import {IconAiSolid} from '@instructure/ui-icons'
 import {registerPageContentWrapper} from '@canvas/page-content-wrapper'
 import StudyAssistTray from './components/StudyAssistTray'
 
-let jwtPromise: Promise<string> | null = null
-
-function getJwt(): Promise<string> {
-  if (!jwtPromise) {
-    jwtPromise = doFetchApi<{token: string}>({
-      path: '/api/v1/jwts?canvas_audience=false&workflows[]=journey',
-      method: 'POST',
-    }).then(({json}) => atob(json!.token))
-  }
-  return jwtPromise
-}
-
-const CHIP_LABEL_MAP: Array<[RegExp, string]> = [
-  [/^Summarize/i, 'Summarize'],
-  [/^Quiz me/i, 'Quiz me'],
-  [/^Flash Cards$/i, 'Flashcards'],
-]
-
-function normalizeChipLabel(chip: string): string {
-  for (const [pattern, label] of CHIP_LABEL_MAP) {
-    if (pattern.test(chip)) return label
-  }
-  return chip
-}
-
 async function fetchAssistResponse(request: AssistRequest): Promise<AssistResponse> {
-  const token = await getJwt()
-  const journeyUrl = window.ENV.JOURNEY_URL
-  if (!journeyUrl) throw new Error('JOURNEY_URL is not configured')
-  const response = await fetch(`${journeyUrl}/api/v1/assist`, {
+  const courseId = window.ENV.COURSE_ID ?? request.state?.courseID
+  if (!courseId) throw new Error('COURSE_ID is not configured')
+  const {json} = await doFetchApi<AssistResponse>({
+    path: `/api/v1/courses/${courseId}/study_assist`,
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(request),
+    body: request,
   })
-  if (!response.ok) throw new Error(`Assist request failed: ${response.status}`)
-  const data = (await response.json()) as AssistResponse
-  if (data.chips) {
-    data.chips = data.chips.map(c => {
-      const label = normalizeChipLabel(c.chip)
-      return {...c, chip: label, prompt: label}
-    })
-  }
-  return data
+  return json ?? {}
 }
 
 const ICON_MOUNT_IDS = ['study_assist_mount_point', 'study_assist_mobile_mount_point']
