@@ -78,7 +78,7 @@ describe('LLMConversationView', () => {
 
   it('renders collapsed state when not expanded (teacher preview)', () => {
     render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={true} />)
-    expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
     expect(
       screen.getByText('Here, you can have a chat with the AI just like a student would.'),
     ).toBeInTheDocument()
@@ -86,30 +86,28 @@ describe('LLMConversationView', () => {
 
   it('renders collapsed state when not expanded (student view)', () => {
     render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={false} />)
-    expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
-    expect(
-      screen.getByText('Start the experience by having a conversation with the AI. Good luck!'),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText(/Show what you know\./)).toBeInTheDocument()
   })
 
   it('renders expanded state when expanded (teacher preview)', () => {
     render(<LLMConversationView {...defaultProps} isTeacherPreview={true} />)
-    expect(screen.getByText('Preview')).toBeInTheDocument()
-    expect(screen.getByText('Restart')).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText('Reset')).toBeInTheDocument()
   })
 
   it('renders expanded state when expanded (student view)', () => {
     render(<LLMConversationView {...defaultProps} isTeacherPreview={false} />)
-    expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
-    expect(screen.getByText('Restart')).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText('Reset')).toBeInTheDocument()
   })
 
   it('renders restart button', () => {
     render(<LLMConversationView {...defaultProps} />)
-    expect(screen.getByText('Restart')).toBeInTheDocument()
+    expect(screen.getByText('Reset')).toBeInTheDocument()
   })
 
-  it('calls onToggleExpanded when collapsed card is clicked', () => {
+  it('calls onToggleExpanded when start button is clicked', () => {
     const onToggleExpanded = vi.fn()
     render(
       <LLMConversationView
@@ -120,18 +118,8 @@ describe('LLMConversationView', () => {
       />,
     )
 
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    fireEvent.click(previewCard!)
-
-    expect(onToggleExpanded).toHaveBeenCalled()
-  })
-
-  it('calls onToggleExpanded when close button is clicked', () => {
-    const onToggleExpanded = vi.fn()
-    render(<LLMConversationView {...defaultProps} onToggleExpanded={onToggleExpanded} />)
-
-    const closeButton = screen.getAllByText('Close preview')[0].closest('button')
-    fireEvent.click(closeButton!)
+    const startButton = screen.getByTestId('llm-conversation-start-button')
+    fireEvent.click(startButton)
 
     expect(onToggleExpanded).toHaveBeenCalled()
   })
@@ -325,7 +313,7 @@ describe('LLMConversationView', () => {
       expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
-    const restartButton = screen.getByText('Restart')
+    const restartButton = screen.getByText('Reset')
     fireEvent.click(restartButton)
 
     // Should re-initialize conversation
@@ -651,7 +639,7 @@ describe('LLMConversationView', () => {
 
       shouldSucceed = true
 
-      const restartButton = screen.getByText('Restart')
+      const restartButton = screen.getByText('Reset')
       fireEvent.click(restartButton)
 
       await waitFor(() => {

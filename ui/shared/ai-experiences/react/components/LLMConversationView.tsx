@@ -17,15 +17,16 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
-import {IconPlayLine, IconXLine, IconRefreshLine, IconFullScreenLine} from '@instructure/ui-icons'
+import {IconRefreshLine, IconFullScreenLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
@@ -33,11 +34,30 @@ import type {
   LLMConversationViewProps,
   ConversationProgress,
 } from '../../types'
+import ConversationHeader from './ConversationHeader'
 import ConversationProgressComponent from './ConversationProgress'
 import FocusMode from './FocusMode'
+import GradientBorder from './GradientBorder'
 import MessageThread from './MessageThread'
+import {BRAND_GRADIENT, RADIUS_SM, RADIUS_PILL, navyButtonTheme, roundedTheme} from '../brand'
 
 const I18n = createI18nScope('ai_experiences')
+
+const expandButtonTheme = {borderRadius: RADIUS_PILL, smallHeight: '1.75rem'}
+const sendButtonTheme = navyButtonTheme
+
+const gradientTextStyle = {
+  background: BRAND_GRADIENT,
+  WebkitBackgroundClip: 'text' as const,
+  WebkitTextFillColor: 'transparent' as const,
+  backgroundClip: 'text' as const,
+}
+
+const gradientButtonWrapperStyle = {
+  display: 'inline-block',
+  background: BRAND_GRADIENT,
+  borderRadius: RADIUS_SM,
+}
 
 interface ConversationResponse {
   id: string
@@ -53,7 +73,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   aiExperienceId,
   aiExperienceTitle,
   facts: _facts,
-  learningObjectives: _learningObjectives,
+  learningObjectives,
   scenario: _scenario,
   isExpanded = false,
   onToggleExpanded,
@@ -69,6 +89,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   const [screenReaderAnnouncement, setScreenReaderAnnouncement] = useState('')
   const [isFocusModeOpen, setIsFocusModeOpen] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const expandButtonRef = useRef<HTMLButtonElement | null>(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const normalModeMessagesContainerRef = useRef<HTMLDivElement | null>(null)
   const focusModeMessagesContainerRef = useRef<HTMLDivElement | null>(null)
@@ -255,7 +276,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   }
 
   const renderConversationContent = (inFocusMode = false) => (
-    <View as="div" padding="medium" background="secondary">
+    <View as="div" padding="medium" background="primary">
       {error && (
         <Alert
           variant="error"
@@ -288,321 +309,295 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         />
       </View>
 
-      <View as="div" padding="small" background="primary" borderWidth="small" borderRadius="medium">
-        <div style={{marginBottom: '0.75rem'}}>
-          <Text weight="bold" size="small">
-            {I18n.t('Message')}
-          </Text>
+      <GradientBorder>
+        <div style={{padding: '0.75rem'}}>
+          <div style={{marginBottom: '0.75rem'}}>
+            <Text weight="bold" size="small">
+              {I18n.t('Message')}
+            </Text>
+          </div>
+          <Flex gap="small" alignItems="center">
+            <Flex.Item shouldGrow shouldShrink>
+              <TextArea
+                data-testid="llm-conversation-message-input"
+                label={<span style={{display: 'none'}}>{I18n.t('Your answer...')}</span>}
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder={I18n.t('Your answer...')}
+                height="60px"
+                disabled={isLoading || isInitializing}
+                textareaRef={(el: HTMLTextAreaElement | null) => {
+                  ;(textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el
+                }}
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                data-testid="llm-conversation-send-message-button"
+                onClick={handleSendMessage}
+                color="primary"
+                interaction={
+                  isLoading || isInitializing || !inputValue.trim() ? 'disabled' : 'enabled'
+                }
+                themeOverride={sendButtonTheme}
+              >
+                {I18n.t('Send')}
+              </Button>
+            </Flex.Item>
+          </Flex>
         </div>
-        <Flex gap="small" alignItems="center">
-          <Flex.Item shouldGrow shouldShrink>
-            <TextArea
-              data-testid="llm-conversation-message-input"
-              label={<span style={{display: 'none'}}>{I18n.t('Your answer...')}</span>}
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder={I18n.t('Your answer...')}
-              height="60px"
-              disabled={isLoading || isInitializing}
-              textareaRef={(el: HTMLTextAreaElement | null) => {
-                ;(textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el
-              }}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <Button
-              data-testid="llm-conversation-send-message-button"
-              onClick={handleSendMessage}
-              color="primary"
-              interaction={
-                isLoading || isInitializing || !inputValue.trim() ? 'disabled' : 'enabled'
-              }
-            >
-              {I18n.t('Send')}
-            </Button>
-          </Flex.Item>
-        </Flex>
-      </View>
+      </GradientBorder>
     </View>
   )
 
   if (!isOpen) return null
 
-  // Collapsed state - clickable preview card
+  // Collapsed state - preview card with gradient header and start chatting CTA
   if (!isExpanded) {
+    const objectivesCount = learningObjectives?.split('\n').filter(Boolean).length ?? 0
     return (
-      <View
-        as="div"
-        padding="medium"
-        background="primary"
-        borderWidth="small"
-        borderRadius="medium"
-        cursor="pointer"
-        onClick={onToggleExpanded}
-        role="button"
-        tabIndex={0}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            onToggleExpanded?.()
-          }
-        }}
-        elementRef={(el: Element | null) => {
-          if (el && returnFocusRef) {
-            // @ts-expect-error - returnFocusRef expects HTMLElement but View gives Element
-            returnFocusRef.current = el
-          }
-        }}
-      >
-        <Flex gap="small" alignItems="center" justifyItems="space-between">
-          <Flex gap="small" alignItems="center">
-            <IconPlayLine size="small" />
-            <View>
-              <Heading level="h3" margin="0 0 xx-small 0">
-                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
-              </Heading>
-              <Text size="small">
-                {isTeacherPreview
-                  ? I18n.t('Here, you can have a chat with the AI just like a student would.')
-                  : I18n.t('Start the experience by having a conversation with the AI. Good luck!')}
-              </Text>
+      <InstUISettingsProvider theme={roundedTheme}>
+        <div
+          ref={(el: HTMLDivElement | null) => {
+            if (el && returnFocusRef) returnFocusRef.current = el
+          }}
+        >
+          <GradientBorder>
+            <ConversationHeader />
+            <View as="div" padding="x-large" background="primary" textAlign="center">
+              <View as="div" margin="0 0 small 0">
+                <Heading level="h3">
+                  <span style={gradientTextStyle}>{I18n.t('Start chatting')}</span>
+                </Heading>
+              </View>
+              <View as="div" margin="0 0 medium 0">
+                <Text>
+                  {isTeacherPreview
+                    ? I18n.t('Here, you can have a chat with the AI just like a student would.')
+                    : I18n.t(
+                        'Show what you know. %{count} learning targets to complete this activity.',
+                        {count: objectivesCount},
+                      )}
+                </Text>
+              </View>
+              <div style={gradientButtonWrapperStyle}>
+                <Button
+                  data-testid="llm-conversation-start-button"
+                  onClick={onToggleExpanded}
+                  color="primary-inverse"
+                  withBackground={false}
+                  themeOverride={{borderRadius: '0.5rem'}}
+                >
+                  ✦ {I18n.t('Test as learner')}
+                </Button>
+              </div>
             </View>
-          </Flex>
-          {progress && (
-            <View as="div" minWidth="200px">
-              <ConversationProgressComponent progress={progress} />
-            </View>
-          )}
-        </Flex>
-      </View>
+          </GradientBorder>
+        </div>
+      </InstUISettingsProvider>
     )
   }
 
   // Expanded state - full conversation interface
   return (
-    <View as="div" borderWidth="small" borderRadius="medium" overflowX="hidden">
-      <div aria-live="polite" aria-atomic="true">
-        <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
-      </div>
-      {/* Preview header section */}
-      <View as="div" padding="medium" background="primary" borderWidth="0 0 small 0">
-        <Flex gap="small" alignItems="center" justifyItems="space-between">
-          <Flex gap="small" alignItems="center">
-            <IconButton
-              onClick={() => {
-                onToggleExpanded?.()
-                setMessages([])
-                setInputValue('')
-                // Return focus to the element that opened the chat
-                returnFocusRef?.current?.focus()
-              }}
-              size="small"
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('Close preview')}
-              elementRef={el => {
-                if (el) {
-                  // @ts-expect-error - elementRef accepts Element but we need HTMLButtonElement for focus()
-                  closeButtonRef.current = el
-                }
-              }}
-              data-testid="llm-conversation-close-preview-button"
-            >
-              <IconXLine />
-            </IconButton>
-            <View>
-              <Heading level="h3" margin="0 0 xx-small 0">
-                {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
-              </Heading>
-              <Text size="small">
-                {isTeacherPreview
-                  ? I18n.t('Here, you can have a chat with the AI just like a student would.')
-                  : I18n.t('Start the experience by having a conversation with the AI. Good luck!')}
-              </Text>
-            </View>
-          </Flex>
-          <Flex gap="small">
+    <InstUISettingsProvider theme={roundedTheme}>
+      <GradientBorder>
+        <div aria-live="polite" aria-atomic="true">
+          <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
+        </div>
+        <ConversationHeader
+          action={
             <Button
               data-testid="llm-conversation-focus-mode-button"
               onClick={() => setIsFocusModeOpen(true)}
-              size="medium"
+              size="small"
+              color="primary-inverse"
+              withBackground={false}
               renderIcon={<IconFullScreenLine />}
+              themeOverride={expandButtonTheme}
+              elementRef={(el: Element | null) => {
+                expandButtonRef.current = el as HTMLButtonElement | null
+              }}
             >
-              {I18n.t('Focus Mode')}
+              {I18n.t('Expand')}
             </Button>
-            <Button
-              data-testid="llm-conversation-restart-button"
-              onClick={handleRestart}
-              size="medium"
-              renderIcon={<IconRefreshLine />}
-            >
-              {I18n.t('Restart')}
-            </Button>
-          </Flex>
-        </Flex>
-        {progress && (
-          <View as="div" margin="small 0 0 0">
-            <ConversationProgressComponent progress={progress} />
-          </View>
-        )}
-      </View>
-
-      {/* Chat conversation section */}
-      {renderConversationContent()}
-
-      {/* Focus Mode */}
-      <FocusMode
-        isOpen={isFocusModeOpen}
-        onClose={() => setIsFocusModeOpen(false)}
-        title={aiExperienceTitle}
-      >
-        <View
-          as="div"
-          borderWidth="small"
-          borderRadius="medium"
-          overflowX="hidden"
-          overflowY="hidden"
-          height="100%"
-          elementRef={(el: Element | null) => {
-            if (el) {
-              ;(el as HTMLElement).style.outline = 'none'
-            }
-          }}
-        >
-          <div aria-live="polite" aria-atomic="true">
-            <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
-          </div>
-          <Flex direction="column" height="100%">
-            {/* Preview header section in focus mode */}
+          }
+        />
+        {/* Progress bar row — white background */}
+        <View as="div" padding="small medium" background="primary" borderWidth="0 0 small 0">
+          <Flex gap="small" alignItems="center">
+            {progress && (
+              <Flex.Item shouldGrow shouldShrink>
+                <ConversationProgressComponent progress={progress} />
+              </Flex.Item>
+            )}
             <Flex.Item>
-              <View as="div" padding="medium" background="primary" borderWidth="0 0 small 0">
-                <Flex gap="small" alignItems="center" justifyItems="space-between">
-                  <Flex gap="small" alignItems="center">
-                    <View>
-                      <Heading level="h3" margin="0 0 xx-small 0">
-                        {isTeacherPreview ? I18n.t('Preview') : I18n.t('Knowledge Chat')}
-                      </Heading>
-                      <Text size="small">
-                        {isTeacherPreview
-                          ? I18n.t(
-                              'Here, you can have a chat with the AI just like a student would.',
-                            )
-                          : I18n.t(
-                              'Start the experience by having a conversation with the AI. Good luck!',
-                            )}
-                      </Text>
-                    </View>
-                  </Flex>
-                  <Button
-                    data-testid="llm-conversation-restart-button-focus"
-                    onClick={handleRestart}
-                    size="medium"
-                    renderIcon={<IconRefreshLine />}
-                  >
-                    {I18n.t('Restart')}
-                  </Button>
-                </Flex>
-                {progress && (
-                  <View as="div" margin="small 0 0 0">
-                    <ConversationProgressComponent progress={progress} />
-                  </View>
-                )}
-              </View>
-            </Flex.Item>
-            {/* Conversation content in focus mode */}
-            <Flex.Item shouldGrow shouldShrink style={{display: 'flex', flexDirection: 'column'}}>
-              <View
-                as="div"
-                padding="medium"
-                background="secondary"
-                height="100%"
-                style={{boxSizing: 'border-box'}}
-              >
-                {error && (
-                  <Alert
-                    variant="error"
-                    margin="0 0 small 0"
-                    renderCloseButtonLabel={I18n.t('Close')}
-                    onDismiss={() => setError(null)}
-                  >
-                    {error}
-                  </Alert>
-                )}
-                <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-                  <div
-                    style={{flex: 1, overflowY: 'auto', marginBottom: '1rem', padding: '0.5rem'}}
-                    role="log"
-                    aria-label={I18n.t('Conversation messages')}
-                    ref={el => {
-                      focusModeMessagesContainerRef.current = el as HTMLDivElement | null
-                    }}
-                  >
-                    <MessageThread
-                      messages={messages}
-                      conversationId={conversationId}
-                      courseId={courseId ?? ''}
-                      aiExperienceId={aiExperienceId ?? ''}
-                      isLoading={isLoading}
-                      isInitializing={isInitializing}
-                      lastAssistantMessageRef={lastAssistantMessageRef}
-                      bottomRef={focusModeBottomRef}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      padding: '0.75rem',
-                      backgroundColor: 'white',
-                      border: '1px solid #C7CDD1',
-                      borderRadius: '0.5rem',
-                    }}
-                  >
-                    <div style={{marginBottom: '0.75rem'}}>
-                      <Text weight="bold" size="small">
-                        {I18n.t('Message')}
-                      </Text>
-                    </div>
-                    <Flex gap="small" alignItems="center">
-                      <Flex.Item shouldGrow shouldShrink>
-                        <TextArea
-                          data-testid="llm-conversation-message-input"
-                          label={<span style={{display: 'none'}}>{I18n.t('Your answer...')}</span>}
-                          value={inputValue}
-                          onChange={e => setInputValue(e.target.value)}
-                          onKeyDown={handleKeyPress}
-                          placeholder={I18n.t('Your answer...')}
-                          height="60px"
-                          disabled={isLoading || isInitializing}
-                          textareaRef={(el: HTMLTextAreaElement | null) => {
-                            ;(
-                              textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>
-                            ).current = el
-                          }}
-                        />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Button
-                          data-testid="llm-conversation-send-message-button"
-                          onClick={handleSendMessage}
-                          color="primary"
-                          interaction={
-                            isLoading || isInitializing || !inputValue.trim()
-                              ? 'disabled'
-                              : 'enabled'
-                          }
-                        >
-                          {I18n.t('Send')}
-                        </Button>
-                      </Flex.Item>
-                    </Flex>
-                  </div>
-                </div>
-              </View>
+              <Button data-testid="llm-conversation-restart-button" onClick={handleRestart}>
+                {I18n.t('Reset')}
+              </Button>
             </Flex.Item>
           </Flex>
         </View>
-      </FocusMode>
-    </View>
+
+        {/* Chat conversation section */}
+        {renderConversationContent()}
+
+        {/* Focus Mode */}
+        <FocusMode
+          isOpen={isFocusModeOpen}
+          onClose={() => {
+            setIsFocusModeOpen(false)
+            setTimeout(() => expandButtonRef.current?.focus(), 0)
+          }}
+          title={aiExperienceTitle}
+        >
+          <GradientBorder style={{height: '100%'}} fillHeight>
+            <View
+              as="div"
+              overflowX="hidden"
+              overflowY="hidden"
+              height="100%"
+              elementRef={(el: Element | null) => {
+                if (el) {
+                  ;(el as HTMLElement).style.outline = 'none'
+                }
+              }}
+            >
+              <div aria-live="polite" aria-atomic="true">
+                <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
+              </div>
+              <Flex direction="column" height="100%">
+                {/* Preview header section in focus mode */}
+                <Flex.Item>
+                  <ConversationHeader
+                    action={
+                      <Button
+                        data-testid="llm-conversation-restart-button-focus"
+                        onClick={handleRestart}
+                        size="small"
+                        color="primary-inverse"
+                        withBackground={false}
+                        renderIcon={<IconRefreshLine />}
+                        themeOverride={expandButtonTheme}
+                      >
+                        {I18n.t('Reset')}
+                      </Button>
+                    }
+                  />
+                  {progress && (
+                    <View
+                      as="div"
+                      padding="small medium"
+                      background="primary"
+                      borderWidth="0 0 small 0"
+                    >
+                      <ConversationProgressComponent progress={progress} />
+                    </View>
+                  )}
+                </Flex.Item>
+                {/* Conversation content in focus mode */}
+                <Flex.Item
+                  shouldGrow
+                  shouldShrink
+                  style={{display: 'flex', flexDirection: 'column'}}
+                >
+                  <View
+                    as="div"
+                    padding="medium"
+                    background="primary"
+                    height="100%"
+                    style={{boxSizing: 'border-box'}}
+                  >
+                    {error && (
+                      <Alert
+                        variant="error"
+                        margin="0 0 small 0"
+                        renderCloseButtonLabel={I18n.t('Close')}
+                        onDismiss={() => setError(null)}
+                      >
+                        {error}
+                      </Alert>
+                    )}
+                    <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+                      <div
+                        style={{
+                          flex: 1,
+                          overflowY: 'auto',
+                          marginBottom: '1rem',
+                          padding: '0.5rem',
+                        }}
+                        role="log"
+                        aria-label={I18n.t('Conversation messages')}
+                        ref={el => {
+                          focusModeMessagesContainerRef.current = el as HTMLDivElement | null
+                        }}
+                      >
+                        <MessageThread
+                          messages={messages}
+                          conversationId={conversationId}
+                          courseId={courseId ?? ''}
+                          aiExperienceId={aiExperienceId ?? ''}
+                          isLoading={isLoading}
+                          isInitializing={isInitializing}
+                          lastAssistantMessageRef={lastAssistantMessageRef}
+                          bottomRef={focusModeBottomRef}
+                        />
+                      </div>
+                      <GradientBorder>
+                        <div style={{padding: '0.75rem'}}>
+                          <div style={{marginBottom: '0.75rem'}}>
+                            <Text weight="bold" size="small">
+                              {I18n.t('Message')}
+                            </Text>
+                          </div>
+                          <Flex gap="small" alignItems="center">
+                            <Flex.Item shouldGrow shouldShrink>
+                              <TextArea
+                                data-testid="llm-conversation-message-input"
+                                label={
+                                  <span style={{display: 'none'}}>{I18n.t('Your answer...')}</span>
+                                }
+                                value={inputValue}
+                                onChange={e => setInputValue(e.target.value)}
+                                onKeyDown={handleKeyPress}
+                                placeholder={I18n.t('Your answer...')}
+                                height="60px"
+                                disabled={isLoading || isInitializing}
+                                textareaRef={(el: HTMLTextAreaElement | null) => {
+                                  ;(
+                                    textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>
+                                  ).current = el
+                                }}
+                              />
+                            </Flex.Item>
+                            <Flex.Item>
+                              <Button
+                                data-testid="llm-conversation-send-message-button"
+                                onClick={handleSendMessage}
+                                color="primary"
+                                interaction={
+                                  isLoading || isInitializing || !inputValue.trim()
+                                    ? 'disabled'
+                                    : 'enabled'
+                                }
+                                themeOverride={sendButtonTheme}
+                              >
+                                {I18n.t('Send')}
+                              </Button>
+                            </Flex.Item>
+                          </Flex>
+                        </div>
+                      </GradientBorder>
+                    </div>
+                  </View>
+                </Flex.Item>
+              </Flex>
+            </View>
+          </GradientBorder>
+        </FocusMode>
+      </GradientBorder>
+    </InstUISettingsProvider>
   )
 }
 

@@ -64,16 +64,6 @@ describe('FocusMode', () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onClose when exit button in footer is clicked', async () => {
-    const user = userEvent.setup()
-    render(<FocusMode {...defaultProps} />)
-
-    const exitButton = screen.getByTestId('focus-mode-exit-button-footer')
-    await user.click(exitButton)
-
-    expect(mockOnClose).toHaveBeenCalledTimes(1)
-  })
-
   it('calls onClose when ESC key is pressed', async () => {
     const user = userEvent.setup()
     render(<FocusMode {...defaultProps} />)
@@ -116,11 +106,6 @@ describe('FocusMode', () => {
   it('has correct screen reader text for close button', () => {
     render(<FocusMode {...defaultProps} />)
     expect(screen.getByText('Exit focus mode')).toBeInTheDocument()
-  })
-
-  it('displays Exit Focus Mode button text in footer', () => {
-    render(<FocusMode {...defaultProps} />)
-    expect(screen.getByText('Exit Focus Mode')).toBeInTheDocument()
   })
 
   it('modal has fullscreen size', () => {

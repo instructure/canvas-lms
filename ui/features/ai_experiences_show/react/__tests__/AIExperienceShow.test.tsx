@@ -104,48 +104,23 @@ describe('AIExperienceShow', () => {
     expect(screen.getByText('A customer calls about incorrect billing')).toBeInTheDocument()
   })
 
-  it('renders Activity section heading', () => {
-    render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    expect(screen.getByText('Activity')).toBeInTheDocument()
-  })
-
   it('renders preview in collapsed state by default', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
     expect(
       screen.getByText('Here, you can have a chat with the AI just like a student would.'),
     ).toBeInTheDocument()
-    expect(screen.queryByText('Restart')).not.toBeInTheDocument()
+    expect(screen.queryByText('Reset')).not.toBeInTheDocument()
   })
 
   it('expands preview when clicked', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    fireEvent.click(previewCard!)
+    const startButton = screen.getByTestId('llm-conversation-start-button')
+    fireEvent.click(startButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Restart')).toBeInTheDocument()
-    })
-  })
-
-  it('collapses preview when close button is clicked', async () => {
-    render(<AIExperienceShow aiExperience={mockAiExperience} />)
-
-    // Expand first
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    fireEvent.click(previewCard!)
-
-    await waitFor(() => {
-      expect(screen.getByText('Restart')).toBeInTheDocument()
-    })
-
-    // Then collapse - find the close button by its screen reader label text
-    const closeButton = screen.getAllByText('Close preview')[0].closest('button')
-    fireEvent.click(closeButton!)
-
-    await waitFor(() => {
-      expect(screen.queryByText('Restart')).not.toBeInTheDocument()
+      expect(screen.getByText('Reset')).toBeInTheDocument()
     })
   })
 
@@ -275,10 +250,9 @@ describe('AIExperienceShow', () => {
 
   it('passes returnFocusRef to LLMConversationView', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    // The preview card should be rendered and accessible
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    expect(previewCard).toBeInTheDocument()
-    expect(previewCard).toHaveAttribute('tabindex', '0')
+    // The start button should be rendered and focusable
+    const startButton = screen.getByTestId('llm-conversation-start-button')
+    expect(startButton).toBeInTheDocument()
   })
 
   it('renders kebab menu when can_manage is true', () => {
@@ -346,7 +320,7 @@ describe('AIExperienceShow', () => {
         />,
       )
       // LLMConversationView is shown
-      expect(screen.getByText('Preview')).toBeInTheDocument()
+      expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
       // AI Conversations button is enabled (has href, not disabled)
       const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
       expect(aiConversationsButton).not.toHaveAttribute('disabled')
@@ -369,7 +343,7 @@ describe('AIExperienceShow', () => {
       )
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
       // Students see the conversation view (not the teacher's "Preview" panel)
-      expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
+      expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
     })
   })
 
@@ -449,7 +423,7 @@ describe('AIExperienceShow', () => {
         />,
       )
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
-      expect(screen.getByText('Preview')).toBeInTheDocument()
+      expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
     })
 
     it('enables AI Conversations button when context_index_status is not_started', () => {

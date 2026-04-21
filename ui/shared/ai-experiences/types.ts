@@ -46,7 +46,7 @@ export interface ConversationProgress {
 export interface LLMConversationViewProps {
   isOpen: boolean
   onClose: () => void
-  returnFocusRef?: React.RefObject<HTMLElement>
+  returnFocusRef?: React.MutableRefObject<HTMLElement | null>
   courseId?: string | number
   aiExperienceId?: string
   aiExperienceTitle?: string

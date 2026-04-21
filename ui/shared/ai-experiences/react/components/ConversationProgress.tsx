@@ -23,11 +23,16 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Popover} from '@instructure/ui-popover'
-import {IconMiniArrowDownLine, IconMiniArrowUpLine, IconCheckLine} from '@instructure/ui-icons'
+import {IconMiniArrowDownLine, IconMiniArrowUpLine, IconCompleteLine} from '@instructure/ui-icons'
 import {List} from '@instructure/ui-list'
 import {Button} from '@instructure/ui-buttons'
+import {navyButtonTheme, RADIUS_PILL} from '../brand'
 
 const I18n = createI18nScope('ai_experiences')
+
+const progressBorderTheme = {borderColorPrimary: '#000000'}
+const progressBarTheme = {borderRadius: RADIUS_PILL, trackBottomBorderWidth: '0'}
+const targetButtonTheme = navyButtonTheme
 
 export interface ConversationProgressData {
   current: number
@@ -50,31 +55,42 @@ const ConversationProgress: React.FC<ConversationProgressProps> = ({progress}) =
     return null
   }
 
-  const {percentage, objectives} = progress
+  const {current, total, percentage, objectives} = progress
   const isComplete = percentage >= 100
 
   return (
     <Flex gap="small" alignItems="center" justifyItems="space-between">
       <Flex.Item shouldGrow shouldShrink>
-        <ProgressBar
-          screenReaderLabel={I18n.t('Learning objective progress: %{percentage}%', {percentage})}
-          valueNow={percentage}
-          valueMax={100}
-          size="small"
-          meterColor={isComplete ? 'success' : 'info'}
-        />
+        <View
+          as="div"
+          borderWidth="small"
+          borderRadius="pill"
+          overflowX="hidden"
+          overflowY="hidden"
+          themeOverride={progressBorderTheme}
+        >
+          <ProgressBar
+            screenReaderLabel={I18n.t('Learning objective progress: %{percentage}%', {percentage})}
+            valueNow={percentage}
+            valueMax={100}
+            size="small"
+            meterColor={isComplete ? 'success' : 'success'}
+            themeOverride={progressBarTheme}
+          />
+        </View>
       </Flex.Item>
       <Flex.Item>
         <Popover
           renderTrigger={
             <Button
               display="inline-block"
-              withBackground={false}
+              color="primary"
               onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+              themeOverride={targetButtonTheme}
             >
               <Flex gap="xx-small" alignItems="center">
-                <Text weight="bold" size="large">
-                  {percentage}%
+                <Text weight="bold" size="small">
+                  {I18n.t('%{current}/%{total} Learning targets', {current, total})}
                 </Text>
                 {isPopoverOpen ? (
                   <IconMiniArrowUpLine size="x-small" />
@@ -95,7 +111,7 @@ const ConversationProgress: React.FC<ConversationProgressProps> = ({progress}) =
           <View as="div" padding="medium" width="400px" maxWidth="90vw">
             <View as="div" margin="0 0 small 0">
               <Text weight="bold" size="large">
-                {I18n.t('Learning objectives covered:')}
+                {I18n.t('%{current}/%{total} Learning targets met', {current, total})}
               </Text>
             </View>
             <List isUnstyled margin="0">
@@ -104,7 +120,7 @@ const ConversationProgress: React.FC<ConversationProgressProps> = ({progress}) =
                   <Flex gap="small" alignItems="start">
                     <Flex.Item>
                       {objective.status === 'covered' ? (
-                        <IconCheckLine color="success" />
+                        <IconCompleteLine color="success" />
                       ) : (
                         <View
                           as="div"
