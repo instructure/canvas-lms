@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Pilih Fail"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Pilih Fail (wajib)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Pilih hak penggunaan..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Laman Utama"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Bagaimanakah cara untuk meminta dan mengedit kapsyen?"
     },
     "html_code_editor_fd967a44": {
         "message": "editor kod html"

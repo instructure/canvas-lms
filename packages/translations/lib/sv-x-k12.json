@@ -332,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Välj fil"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Välj fil (krävs)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Välj användningsrättigheter ..."
     },
@@ -1096,6 +1099,9 @@
     },
     "home_351838cd": {
         "message": "Startsida"
+    },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Hur begär och redigerar du undertexter?"
     },
     "html_code_editor_fd967a44": {
         "message": "Redigerare för HTML-kod"
