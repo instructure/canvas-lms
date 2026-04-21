@@ -91,7 +91,7 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
     securerandom (0.4.1)
-    simple_oauth (0.4.0)
+    simple_oauth (0.4.1)
       base64
       cgi
     statsd-ruby (1.5.0)
