@@ -349,15 +349,31 @@ class ApplicationController < ActionController::Base
 
         @js_env[:PRE_COOKIE_CONSENT] = "null"
 
-        if load_usage_metrics?
+        classic_usage_metrics = load_usage_metrics?
+        consented_usage_metrics = load_consented_usage_metrics?
+        cookie_consent_necessary = cached_features[:cookie_consent_necessary]
+        potentially_underage = potentially_underage_user?
+
+        @js_env[:EXPECTED_USAGE_METRICS_BEHAVIOR] = should_track_usage(
+          classic_usage_metrics:,
+          consented_usage_metrics:,
+          cookie_consent_necessary:,
+          potentially_underage:
+        )
+
+        if potentially_underage
+          @js_env[:PRE_COOKIE_CONSENT] = "false"
+        end
+
+        if classic_usage_metrics
           @js_env[:PENDO_APP_ID] = usage_metrics_api_key
           @js_env[:PENDO_APP_ENV] = "io"
-          @js_env[:PRE_COOKIE_CONSENT] = "true"
-        elsif load_consented_usage_metrics?
+          @js_env[:PRE_COOKIE_CONSENT] = (!potentially_underage).to_s
+        elsif consented_usage_metrics
           @js_env[:PENDO_APP_ID] = usage_metrics_regional_api_key
           @js_env[:PENDO_APP_ENV] = usage_metrics_regional_api_env
 
-          if cached_features[:cookie_consent_necessary]
+          if cookie_consent_necessary && !potentially_underage
             mobile_webview = session&.dig(:is_mobile_webview)
             mobile_consent = session&.dig(:mobile_cookie_consent)
 
@@ -379,7 +395,7 @@ class ApplicationController < ActionController::Base
               # @current_user.custom_data.where(namespace: "MOBILE_CANVAS_COOKIE_CONSENT").first
             end
           else
-            @js_env[:PRE_COOKIE_CONSENT] = "true"
+            @js_env[:PRE_COOKIE_CONSENT] = (!potentially_underage).to_s
           end
         end
 
@@ -3656,6 +3672,25 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_user?(check_disabled:)
   end
   helper_method :k5_user?
+
+  def potentially_underage_user?
+    @current_user&.underage? || k12? || @domain_root_account&.settings&.dig(:has_underage_users) || k5_user?
+  end
+
+  def should_track_usage(classic_usage_metrics: nil, consented_usage_metrics: nil, cookie_consent_necessary: nil, potentially_underage: nil)
+    classic_usage_metrics ||= @domain_root_account&.feature_enabled?(:send_usage_metrics) && usage_metrics_api_key.present?
+    consented_usage_metrics ||= @domain_root_account&.feature_enabled?(:send_usage_metrics_after_consent) && usage_metrics_regional_api_key.present? && usage_metrics_regional_api_env.present?
+    cookie_consent_necessary ||= @domain_root_account&.feature_enabled?(:cookie_consent_necessary)
+    potentially_underage ||= potentially_underage_user?
+
+    if !@current_user || potentially_underage || (!consented_usage_metrics && !classic_usage_metrics)
+      "no_track_usage"
+    elsif classic_usage_metrics || (consented_usage_metrics && !cookie_consent_necessary)
+      "track_usage"
+    elsif consented_usage_metrics && cookie_consent_necessary
+      "ask_for_consent"
+    end
+  end
 
   def widget_dashboard_eligible?
     return false unless @current_user

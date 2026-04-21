@@ -466,6 +466,7 @@ class Account < ApplicationRecord
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
   add_setting :onetrust_consent_domain_id, root_only: true
+  add_setting :has_underage_users, boolean: true, root_only: true, default: false
 
   # suppress_notifications can be:
   #   true          - suppress all notifications (backward compatible)

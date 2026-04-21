@@ -2433,6 +2433,7 @@ class AccountsController < ApplicationController
                                    :external_notification_warning,
                                    :global_includes,
                                    :google_docs_domain,
+                                   :has_underage_users,
                                    :help_link_icon,
                                    :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
