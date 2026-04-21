@@ -31,8 +31,10 @@ import {
   IconTroubleLine,
   IconLockSolid,
   IconOvalHalfSolid,
+  IconRemoveLinkSolid,
+  IconDeactivateUserSolid,
 } from '@instructure/ui-icons'
-import type {ReduxState, RolePermission, PermissionModifyAction} from './types'
+import type {ReduxState, RolePermission, PermissionModifyAction, PermissionUpdate} from './types'
 import {EnabledState} from './types'
 
 const I18n = createI18nScope('permission_button')
@@ -105,22 +107,28 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
   }, [setFocus, cleanFocus])
 
   function renderAllyScreenReaderTag(): string {
-    const {enabled, locked} = permission
+    const {enabled, locked, applies_to_self, applies_to_descendants} = permission
     let status: string = ''
-    if (enabled === EnabledState.ALL && !locked) {
-      status = I18n.t('Enabled')
-    } else if (enabled === EnabledState.ALL && locked) {
-      status = I18n.t('Enabled and Locked')
-    } else if (enabled === EnabledState.PARTIAL && !locked) {
-      status = I18n.t('Partially enabled')
-    } else if (enabled === EnabledState.PARTIAL && locked) {
+    if (enabled === EnabledState.ALL && !locked) status = I18n.t('Enabled')
+    else if (enabled === EnabledState.ALL && locked) status = I18n.t('Enabled and Locked')
+    else if (enabled === EnabledState.PARTIAL && !locked) status = I18n.t('Partially enabled')
+    else if (enabled === EnabledState.PARTIAL && locked)
       status = I18n.t('Partially enabled and Locked')
-    } else if (enabled === EnabledState.NONE && !locked) {
-      status = I18n.t('Disabled')
-    } else {
-      status = I18n.t('Disabled and Locked')
+    else if (enabled === EnabledState.NONE && !locked) status = I18n.t('Disabled')
+    else status = I18n.t('Disabled and Locked')
+
+    if (isSiteAdmin) {
+      if (applies_to_self && !applies_to_descendants)
+        status += `, ${I18n.t('applies only to self')}`
+      else if (!applies_to_self && applies_to_descendants)
+        status += `, ${I18n.t('applies only to descendants')}`
     }
-    return `${status} ${permissionLabel} ${roleLabel}`
+
+    return I18n.t('Status of permission %{permission}, for role %{role}: %{status}', {
+      permission: permissionLabel,
+      role: roleLabel,
+      status,
+    })
   }
 
   function closeMenu(): void {
@@ -154,7 +162,7 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
   }
 
   function renderButton(): JSX.Element {
-    const {enabled} = permission
+    const {enabled, readonly} = permission
 
     function stateIcon() {
       if (enabled === EnabledState.NONE) return IconTroubleLine
@@ -173,11 +181,12 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
         }}
         onClick={toggleMenu}
         onFocus={props.onFocus}
-        interaction={permission.readonly ? 'disabled' : 'enabled'}
+        interaction={readonly ? 'disabled' : 'enabled'}
         size="large"
         withBackground={false}
         withBorder={false}
         color={stateColor}
+        data-color={stateColor}
         margin={inTray ? '0' : 'small 0 0 0'}
         screenReaderLabel={renderAllyScreenReaderTag()}
       >
@@ -186,9 +195,28 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
     )
   }
 
-  function renderLockOrSpinner(): JSX.Element {
-    const {locked, explicit} = permission
+  function renderSideIcons(): JSX.Element {
+    const {locked, explicit, applies_to_descendants, applies_to_self} = permission
     const flexWidth = inTray ? '22px' : '18px'
+
+    let lowerIcon: JSX.Element | null = null
+    if (apiBusy)
+      lowerIcon = (
+        <Spinner delay={0} size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
+      )
+    else if (isSiteAdmin && applies_to_descendants === false)
+      lowerIcon = (
+        <Text color="primary">
+          <IconRemoveLinkSolid data-testid="permission-button-no-descendants" />
+        </Text>
+      )
+    else if (isSiteAdmin && applies_to_self === false)
+      lowerIcon = (
+        <Text color="primary">
+          <IconDeactivateUserSolid data-testid="permission-button-no-self" />
+        </Text>
+      )
+
     return (
       <Flex direction="column" margin="none none none xx-small" width={flexWidth}>
         <Flex.Item size="24px">
@@ -198,15 +226,7 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
             </Text>
           )}
         </Flex.Item>
-        <Flex.Item size="24px">
-          {apiBusy && (
-            <Spinner
-              delay={0}
-              size="x-small"
-              renderTitle={I18n.t('Waiting for request to complete')}
-            />
-          )}
-        </Flex.Item>
+        <Flex.Item size="24px">{lowerIcon}</Flex.Item>
       </Flex>
     )
   }
@@ -215,29 +235,8 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
     const closeMenuIfInTray = inTray ? () => {} : closeMenu
     const selected = checkedSelection(permission)
 
-    function adjustPermissions({
-      enabled,
-      locked,
-      explicit,
-      applies_to_self,
-      applies_to_descendants,
-    }: {
-      enabled?: boolean
-      locked?: boolean
-      explicit: boolean
-      applies_to_self?: boolean
-      applies_to_descendants?: boolean
-    }): void {
-      handleClick({
-        name: permissionName,
-        id: roleId,
-        inTray,
-        enabled,
-        locked,
-        explicit,
-        applies_to_self,
-        applies_to_descendants,
-      })
+    function adjustPermissions(update: PermissionUpdate): void {
+      handleClick({name: permissionName, id: roleId, inTray, ...update})
     }
 
     // Since the enum enabled values exist only here on the front end and
@@ -374,8 +373,8 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
       id={`${props.permissionName}_${props.roleId}`}
       className="ic-permissions__permission-button-container"
     >
-      <div>{inTray || showMenu ? renderMenu(button) : button}</div>
-      {renderLockOrSpinner()}
+      {inTray || showMenu ? renderMenu(button) : button}
+      {renderSideIcons()}
     </div>
   )
 }
