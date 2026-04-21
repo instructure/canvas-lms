@@ -220,6 +220,32 @@ describe NewQuizzesHelper do
       end
     end
 
+    context "when the tab label has been translated to a non-English locale" do
+      %w[es fr de ja].each do |locale|
+        it "still finds and overrides the tab in #{locale}" do
+          I18n.with_locale(locale) do
+            translated_label = I18n.t("#tabs.item_banks", "Item Banks")
+            translated_tabs = [
+              { id: "home", label: "Home", css_class: "home", href: :course_path },
+              { id: "item_banks", label: translated_label, css_class: "context_external_tool_7", href: :some_original_path, args: [1, 7], external: true },
+              { id: "assignments", label: "Assignments", css_class: "assignments", href: :course_assignments_path }
+            ]
+
+            result = NewQuizzesHelper.override_item_banks_tab(
+              tabs: translated_tabs,
+              href: :course_new_quizzes_banks_path,
+              context: course
+            )
+
+            expect(result).to be_present
+            expect(result[:id]).to eq(Course::TAB_ITEM_BANKS)
+            expect(result[:href]).to eq(:course_new_quizzes_banks_path)
+            expect(result[:label]).to eq(translated_label)
+          end
+        end
+      end
+    end
+
     context "when Item Banks tab does not exist" do
       let(:tabs_without_item_banks) do
         [
