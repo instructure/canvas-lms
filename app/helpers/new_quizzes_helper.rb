@@ -34,12 +34,13 @@ module NewQuizzesHelper
   end
 
   def self.override_item_banks_tab(tabs:, href:, context:, css_class: nil)
-    item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
+    label = I18n.t("#tabs.item_banks", "Item Banks")
+    item_banks_index = tabs.find_index { |t| t[:label] == label }
     return unless item_banks_index
 
     overrides = {
       id: Course::TAB_ITEM_BANKS,
-      label: I18n.t("#tabs.item_banks", "Item Banks"),
+      label:,
       href:,
       external: false
     }
