@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -64,8 +64,6 @@ import {useAccountDefaultGradingScheme} from '../hooks/useAccountDefaultGradingS
 import {useAccountDefaultGradingSchemeUpdate} from '../hooks/useAccountDefaultGradingSchemeUpdate'
 import {AccountDefaultSelector} from './form/AccountDefaultSelector'
 
-const I18n = createI18nScope('GradingSchemeManagement')
-
 interface GradingSchemeTemplateCardData {
   creating: boolean
   gradingSchemeTemplate: GradingSchemeTemplate
@@ -88,6 +86,7 @@ export const GradingSchemesManagement = ({
   defaultAccountGradingSchemeEnabled = false, // default to false since course grading scheme management doesn't need this
   showCourseSchemesOnly = false,
 }: GradingSchemesManagementProps) => {
+  const {t} = useTranslation('GradingSchemeManagement')
   const {createGradingScheme /* createGradingSchemeStatus */} = useGradingSchemeCreate()
   const {deleteGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeDelete()
   const {updateGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeUpdate()
@@ -143,22 +142,20 @@ export const GradingSchemesManagement = ({
         )
       })
       .catch(error => {
-        showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
+        showFlashError(t('There was an error while loading grading schemes'))(error)
       })
     loadDefaultGradingScheme(contextType, contextId)
       .then(loadedDefaultGradingScheme => {
         setDefaultGradingScheme(loadedDefaultGradingScheme)
       })
       .catch(error => {
-        showFlashError(I18n.t('There was an error while loading the default grading scheme'))(error)
+        showFlashError(t('There was an error while loading the default grading scheme'))(error)
       })
     if (defaultAccountGradingSchemeEnabled) {
       loadAccountDefaultGradingScheme(contextId)
         .then(accountDefault => setAccountDefaultGradingScheme(accountDefault))
         .catch(error => {
-          showFlashError(I18n.t('There was an error while loading the default grading scheme'))(
-            error,
-          )
+          showFlashError(t('There was an error while loading the default grading scheme'))(error)
         })
     }
   }, [
@@ -180,9 +177,7 @@ export const GradingSchemesManagement = ({
     setDeletingGradingScheme(true)
     if (
       !archivedGradingSchemesEnabled &&
-      !window.confirm(
-        I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?'),
-      )
+      !window.confirm(t('Are you sure you want to delete this grading scheme?'))
     ) {
       return
     }
@@ -197,7 +192,7 @@ export const GradingSchemesManagement = ({
         gradingSchemeToDelete.context_id,
         gradingSchemeId,
       )
-      showFlashSuccess(I18n.t('Grading scheme was successfully removed.'))()
+      showFlashSuccess(t('Grading scheme was successfully removed.'))()
       if (onGradingSchemesChanged) {
         // if parent supplied a callback method, inform parent that grading standards changed (one was removed)
         onGradingSchemesChanged()
@@ -211,7 +206,7 @@ export const GradingSchemesManagement = ({
       setDeleteModalOpen(false)
       setEditing(false)
     } catch (error) {
-      showFlashError(I18n.t('There was an error while removing the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while removing the grading scheme'))(error as Error)
     }
     setDeletingGradingScheme(false)
   }
@@ -219,7 +214,7 @@ export const GradingSchemesManagement = ({
     setCreatingGradingScheme(true)
     await handleCreateScheme(
       {
-        title: `${gradingScheme.title} ${I18n.t('Copy')}`,
+        title: `${gradingScheme.title} ${t('Copy')}`,
         data: gradingScheme.data,
         scalingFactor: gradingScheme.scaling_factor,
         pointsBased: gradingScheme.points_based,
@@ -249,13 +244,13 @@ export const GradingSchemesManagement = ({
       setGradingSchemeCreating(undefined)
       const updatedGradingSchemeCards = [{gradingScheme, editing: false}, ...gradingSchemeCards]
       setGradingSchemeCards(updatedGradingSchemeCards)
-      showFlashSuccess(I18n.t('Grading scheme was successfully saved.'))()
+      showFlashSuccess(t('Grading scheme was successfully saved.'))()
       if (onGradingSchemesChanged) {
         // if parent supplied a callback method, inform parent that grading standards changed (one was added)
         onGradingSchemesChanged()
       }
     } catch (error) {
-      showFlashError(I18n.t('There was an error while creating the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while creating the grading scheme'))(error as Error)
     }
   }
 
@@ -287,13 +282,13 @@ export const GradingSchemesManagement = ({
       setGradingSchemeCards(updatedGradingSchemeCards)
       setSelectedGradingScheme(undefined)
       setEditing(false)
-      showFlashSuccess(I18n.t('Grading scheme was successfully saved.'))()
+      showFlashSuccess(t('Grading scheme was successfully saved.'))()
       if (onGradingSchemesChanged) {
         // if parent supplied a callback method, inform parent that grading standards changed (one was updated)
         onGradingSchemesChanged()
       }
     } catch (error) {
-      showFlashError(I18n.t('There was an error while saving the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while saving the grading scheme'))(error as Error)
     }
   }
 
@@ -308,7 +303,7 @@ export const GradingSchemesManagement = ({
         gradingScheme.context_id,
         gradingScheme.id,
       )
-      showFlashSuccess(I18n.t('Grading scheme was successfully archived.'))()
+      showFlashSuccess(t('Grading scheme was successfully archived.'))()
       if (onGradingSchemesChanged) {
         // if parent supplied a callback method, inform parent that grading standards changed (one was archived)
         onGradingSchemesChanged()
@@ -321,9 +316,7 @@ export const GradingSchemesManagement = ({
       })
       setGradingSchemeCards(updatedGradingSchemeCards)
     } catch (error) {
-      showFlashError(I18n.t('There was an error while archiving the grading scheme'))(
-        error as Error,
-      )
+      showFlashError(t('There was an error while archiving the grading scheme'))(error as Error)
     }
   }
 
@@ -338,7 +331,7 @@ export const GradingSchemesManagement = ({
         gradingScheme.context_id,
         gradingScheme.id,
       )
-      showFlashSuccess(I18n.t('Grading scheme was successfully unarchived.'))()
+      showFlashSuccess(t('Grading scheme was successfully unarchived.'))()
       if (onGradingSchemesChanged) {
         // if parent supplied a callback method, inform parent that grading standards changed (one was unarchived)
         onGradingSchemesChanged()
@@ -351,9 +344,7 @@ export const GradingSchemesManagement = ({
       })
       setGradingSchemeCards(updatedGradingSchemeCards)
     } catch (error) {
-      showFlashError(I18n.t('There was an error while unarchiving the grading scheme'))(
-        error as Error,
-      )
+      showFlashError(t('There was an error while unarchiving the grading scheme'))(error as Error)
     }
   }
 
@@ -377,7 +368,7 @@ export const GradingSchemesManagement = ({
       )
     } catch (e) {
       if (e instanceof Error) {
-        showFlashError(I18n.t('There was an error while loading grading schemes'))(e)
+        showFlashError(t('There was an error while loading grading schemes'))(e)
       }
     }
   }
@@ -386,12 +377,12 @@ export const GradingSchemesManagement = ({
     const id = gradingSchemeId === '0' ? null : gradingSchemeId
     try {
       const res = await updateAccountDefaultGradingScheme(contextId, id)
-      showFlashSuccess(I18n.t('Account default grading scheme was successfully saved.'))()
+      showFlashSuccess(t('Account default grading scheme was successfully saved.'))()
       setAccountDefaultGradingScheme(res)
       handleLoadingGradingSchemes()
     } catch (e) {
       if (e instanceof Error) {
-        showFlashError(I18n.t('There was an error while updating the default grading scheme'))(e)
+        showFlashError(t('There was an error while updating the default grading scheme'))(e)
       }
     }
   }
@@ -516,12 +507,12 @@ export const GradingSchemesManagement = ({
             <Flex.Item margin="medium small 0 0" shouldShrink={true}>
               <TextInput
                 type="search"
-                placeholder={I18n.t('Search...')}
+                placeholder={t('Search...')}
                 value={gradingSchemeSearch}
                 onChange={e => setGradingSchemeSearch(e.target.value)}
                 renderBeforeInput={() => <IconSearchLine inline={false} />}
                 width="22.5rem"
-                renderLabel={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
+                renderLabel={<ScreenReaderContent>{t('Search')}</ScreenReaderContent>}
                 data-testid="grading-scheme-search"
               />
             </Flex.Item>
@@ -533,7 +524,7 @@ export const GradingSchemesManagement = ({
               disabled={!!(gradingSchemeCreating || editing)}
               renderIcon={() => <IconAddLine />}
             >
-              {I18n.t('New Grading Scheme')}
+              {t('New Grading Scheme')}
             </Button>
           </Flex.Item>
         </Flex>
@@ -578,13 +569,13 @@ export const GradingSchemesManagement = ({
                   <Flex justifyItems="end">
                     <Flex.Item>
                       <Button onClick={handleCancelCreate} margin="0 x-small 0 0">
-                        {I18n.t('Cancel')}
+                        {t('Cancel')}
                       </Button>
                       <Button
                         onClick={() => gradingSchemeCreateRef.current?.savePressed()}
                         color="primary"
                       >
-                        {I18n.t('Save')}
+                        {t('Save')}
                       </Button>
                     </Flex.Item>
                   </Flex>
@@ -601,11 +592,11 @@ export const GradingSchemesManagement = ({
                 margin="medium 0"
                 themeOverride={{h2FontWeight: 700, lineHeight: 1.05}}
               >
-                {I18n.t('Canvas Default')}
+                {t('Canvas Default')}
               </Heading>
               <GradingSchemeTable
                 gradingSchemeCards={[{editing: false, gradingScheme: defaultGradingScheme}]}
-                caption={I18n.t('Canvas Default Grading Scheme')}
+                caption={t('Canvas Default Grading Scheme')}
                 editGradingScheme={editGradingScheme}
                 openGradingScheme={openGradingScheme}
                 viewUsedLocations={viewUsedLocations}
@@ -621,7 +612,7 @@ export const GradingSchemesManagement = ({
                 margin="large 0 medium"
                 themeOverride={{h2FontWeight: 700, lineHeight: 1.05}}
               >
-                {I18n.t('Your Grading Schemes')}
+                {t('Your Grading Schemes')}
               </Heading>
               <GradingSchemeTable
                 gradingSchemeCards={gradingSchemeCards?.filter(
@@ -631,7 +622,7 @@ export const GradingSchemesManagement = ({
                       ?.toLowerCase()
                       .includes(gradingSchemeSearch.toLowerCase()),
                 )}
-                caption={I18n.t('Active Grading Schemes')}
+                caption={t('Active Grading Schemes')}
                 editGradingScheme={editGradingScheme}
                 viewUsedLocations={viewUsedLocations}
                 openGradingScheme={openGradingScheme}
@@ -647,9 +638,9 @@ export const GradingSchemesManagement = ({
                 margin="large 0 medium"
                 themeOverride={{h2FontWeight: 700, lineHeight: 1.05}}
               >
-                {I18n.t('Archived')}
+                {t('Archived')}
                 <Tooltip
-                  renderTip={I18n.t(
+                  renderTip={t(
                     'Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.',
                   )}
                 >
@@ -669,7 +660,7 @@ export const GradingSchemesManagement = ({
                       .toLowerCase()
                       .includes(gradingSchemeSearch.toLowerCase()),
                 )}
-                caption={I18n.t('Archived Grading Schemes')}
+                caption={t('Archived Grading Schemes')}
                 editGradingScheme={editGradingScheme}
                 viewUsedLocations={viewUsedLocations}
                 openGradingScheme={openGradingScheme}
@@ -790,13 +781,13 @@ export const GradingSchemesManagement = ({
                             onClick={() => handleCancelEdit(gradingSchemeCard.gradingScheme.id)}
                             margin="0 x-small 0 0"
                           >
-                            {I18n.t('Cancel')}
+                            {t('Cancel')}
                           </Button>
                           <Button
                             onClick={() => gradingSchemeUpdateRef.current?.savePressed()}
                             color="primary"
                           >
-                            {I18n.t('Save')}
+                            {t('Save')}
                           </Button>
                         </Flex.Item>
                       </Flex>

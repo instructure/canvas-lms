@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Responsive} from '@instructure/ui-responsive'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {
   IconDuplicateLine,
   IconEditLine,
@@ -33,8 +33,6 @@ import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
-
-const I18n = createI18nScope('GradingSchemeManagement')
 
 export type GradingSchemeTableProps = {
   caption: string
@@ -64,6 +62,7 @@ export const GradingSchemeTable = ({
   archivedSchemes = false,
   defaultAccountGradingSchemeEnabled,
 }: GradingSchemeTableProps) => {
+  const {t} = useTranslation('GradingSchemeManagement')
   const [ascending, setAscending] = useState(true)
   const [currentPage, setCurrentPage] = useState<number>(0)
   const direction = ascending ? 'ascending' : 'descending'
@@ -104,7 +103,7 @@ export const GradingSchemeTable = ({
         onRequestSort={handleSort}
         sortDirection={direction}
       >
-        {I18n.t('Grading Scheme Name')}
+        {t('Grading Scheme Name')}
       </Table.ColHeader>
       {showUsedLocations ? (
         <Table.ColHeader
@@ -113,7 +112,7 @@ export const GradingSchemeTable = ({
           width="45%"
           stackedSortByLabel="Locations Used"
         >
-          {I18n.t('Locations Used')}
+          {t('Locations Used')}
         </Table.ColHeader>
       ) : (
         <></>
@@ -127,7 +126,7 @@ export const GradingSchemeTable = ({
       withBorder={false}
       withBackground={false}
       screenReaderLabel={
-        archivedSchemes ? I18n.t('Unarchive Grading Scheme') : I18n.t('Archive Grading Scheme')
+        archivedSchemes ? t('Unarchive Grading Scheme') : t('Archive Grading Scheme')
       }
       onClick={() => archiveOrUnarchiveScheme(gradingScheme)}
       data-testid={`grading-scheme-${gradingScheme.id}-archive-button`}
@@ -139,8 +138,8 @@ export const GradingSchemeTable = ({
     return (
       <>
         {archivedSchemes
-          ? I18n.t('You have no archived grading schemes.')
-          : I18n.t('You have no active grading schemes.')}
+          ? t('You have no archived grading schemes.')
+          : t('You have no active grading schemes.')}
       </>
     )
   }
@@ -163,7 +162,7 @@ export const GradingSchemeTable = ({
               }`}
               {...props}
             >
-              <Table.Head renderSortLabel={I18n.t('Sort by')}>{header}</Table.Head>
+              <Table.Head renderSortLabel={t('Sort by')}>{header}</Table.Head>
               <Table.Body>
                 {currentPageSchemes.map(gradingSchemeCard => (
                   <Table.Row
@@ -190,8 +189,8 @@ export const GradingSchemeTable = ({
                             data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-view-locations-button`}
                           >
                             {defaultAccountGradingSchemeEnabled
-                              ? I18n.t('Show locations used')
-                              : I18n.t('Show courses and assignments')}
+                              ? t('Show locations used')
+                              : t('Show courses and assignments')}
                           </Link>
                         ) : (
                           ''
@@ -204,7 +203,7 @@ export const GradingSchemeTable = ({
                       <IconButton
                         withBorder={false}
                         withBackground={false}
-                        screenReaderLabel={I18n.t('Duplicate Grading Scheme')}
+                        screenReaderLabel={t('Duplicate Grading Scheme')}
                         onClick={() => openDuplicateModal(gradingSchemeCard.gradingScheme)}
                         data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-duplicate-button`}
                       >
@@ -216,14 +215,14 @@ export const GradingSchemeTable = ({
                             withBorder={false}
                             withBackground={false}
                             onClick={() => editGradingScheme(gradingSchemeCard.gradingScheme.id)}
-                            screenReaderLabel={I18n.t('Edit Grading Scheme')}
+                            screenReaderLabel={t('Edit Grading Scheme')}
                             data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-edit-button`}
                           >
                             <IconEditLine />
                           </IconButton>
                           {!canArchive(gradingSchemeCard.gradingScheme) ? (
                             <Tooltip
-                              renderTip={I18n.t(
+                              renderTip={t(
                                 "You can't archive this grading scheme because it is set as a default for a course or account.",
                               )}
                             >
@@ -236,14 +235,14 @@ export const GradingSchemeTable = ({
                           <IconButton
                             withBorder={false}
                             withBackground={false}
-                            screenReaderLabel={I18n.t('Delete Grading Scheme')}
+                            screenReaderLabel={t('Delete Grading Scheme')}
                             onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
                             data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-delete-button`}
                             disabled={!canDelete(gradingSchemeCard.gradingScheme)}
                           >
                             {!canDelete(gradingSchemeCard.gradingScheme) ? (
                               <Tooltip
-                                renderTip={I18n.t(
+                                renderTip={t(
                                   "You can't delete this grading scheme because it is in use.",
                                 )}
                               >
@@ -270,8 +269,8 @@ export const GradingSchemeTable = ({
           as="nav"
           margin="small"
           variant="compact"
-          labelNext={I18n.t('Next Page')}
-          labelPrev={I18n.t('Previous Page')}
+          labelNext={t('Next Page')}
+          labelPrev={t('Previous Page')}
           data-testid="grading-scheme-table-pagination"
         >
           {pages}

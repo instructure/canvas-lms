@@ -18,20 +18,19 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {View} from '@instructure/ui-view'
 import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
 
-const I18n = createI18nScope('media_immersive_view')
-
 export function NoTranscript() {
+  const {t} = useTranslation('media_immersive_view')
   return (
     <Flex gap="space16" alignItems="center" justifyItems="center" direction="column" height="100%">
       <View maxWidth="102px">
         <img src={ConfusedPanda} alt="" />
       </View>
       <Text size="descriptionPage" weight="weightImportant" lineHeight="lineHeight100">
-        {I18n.t('There is no transcript yet.')}
+        {t('There is no transcript yet.')}
       </Text>
     </Flex>
   )

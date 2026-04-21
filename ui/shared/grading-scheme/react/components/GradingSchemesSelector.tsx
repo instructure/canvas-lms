@@ -17,7 +17,7 @@
  */
 import React, {useEffect, useState} from 'react'
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import shortid from '@canvas/shortid'
 import {Button, CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
@@ -52,8 +52,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useGradingScheme} from '../hooks/useGradingScheme'
 
-const I18n = createI18nScope('assignments.grading_type_selector')
-
 export type GradingSchemesSelectorProps = {
   canManage: boolean
   canSet: boolean
@@ -81,6 +79,7 @@ export const GradingSchemesSelector = ({
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
   }
+  const {t} = useTranslation('assignments.grading_type_selector')
   const {loadGradingScheme /* deleteGradingSchemeStatus */} = useGradingScheme()
   const [showViewEditGradingSchemeModal, setShowViewEditGradingSchemeModal] = useState(false)
   const [showManageGradingSchemesModal, setShowManageGradingSchemesModal] = useState(false)
@@ -119,7 +118,7 @@ export const GradingSchemesSelector = ({
         const defaultScheme = await loadDefaultGradingScheme(contextType, contextId)
         setDefaultCanvasGradingScheme(defaultScheme)
       } catch (error: any) {
-        showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
+        showFlashError(t('There was an error while loading grading schemes'))(error)
       }
     }
     loadSchemes()
@@ -242,7 +241,7 @@ export const GradingSchemesSelector = ({
       setSelectedGradingScheme(scheme)
       setShowViewGradingSchemeModal(true)
     } catch (error: any) {
-      showFlashError(I18n.t('There was an error while loading the grading scheme'))(error)
+      showFlashError(t('There was an error while loading the grading scheme'))(error)
     }
   }
   async function openGradingSchemeDuplicateModal() {
@@ -254,7 +253,7 @@ export const GradingSchemesSelector = ({
       setSelectedGradingScheme(scheme)
       setShowDuplicateGradingSchemeModal(true)
     } catch (error: any) {
-      showFlashError(I18n.t('There was an error while loading the grading scheme'))(error)
+      showFlashError(t('There was an error while loading the grading scheme'))(error)
     }
   }
   function openGradingSchemeCreateModal() {
@@ -282,7 +281,7 @@ export const GradingSchemesSelector = ({
         setGradingSchemeSummaries(loadedGradingSchemes)
       })
       .catch(error => {
-        showFlashError(I18n.t('There was an error while refreshing grading schemes'))(error)
+        showFlashError(t('There was an error while refreshing grading schemes'))(error)
       })
   }
 
@@ -301,14 +300,14 @@ export const GradingSchemesSelector = ({
 
       handleUpdatedGradingScheme(updatedGradingScheme, updatedGradingScheme)
       setShowEditGradingSchemeModal(false)
-      showFlashSuccess(I18n.t('Grading scheme was successfully updated.'))()
+      showFlashSuccess(t('Grading scheme was successfully updated.'))()
     } catch (error) {
-      showFlashError(I18n.t('There was an error while saving the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while saving the grading scheme'))(error as Error)
     }
   }
   async function handleDuplicateScheme(gradingScheme: GradingScheme) {
     await handleCreateGradingScheme({
-      title: `${gradingScheme.title} ${I18n.t('Copy')}`,
+      title: `${gradingScheme.title} ${t('Copy')}`,
       data: gradingScheme.data,
       scalingFactor: gradingScheme.scaling_factor,
       pointsBased: gradingScheme.points_based,
@@ -330,7 +329,7 @@ export const GradingSchemesSelector = ({
 
   async function handleDeleteScheme(gradingSchemeId: string) {
     if (selectedGradingScheme?.id !== gradingSchemeId) {
-      showFlashError(I18n.t('There was an error while removing the grading scheme'))()
+      showFlashError(t('There was an error while removing the grading scheme'))()
     }
     try {
       const schemeToDelete = selectedGradingScheme
@@ -342,10 +341,10 @@ export const GradingSchemesSelector = ({
         schemeToDelete.context_id,
         gradingSchemeId,
       )
-      showFlashSuccess(I18n.t('Grading scheme was successfully removed.'))()
+      showFlashSuccess(t('Grading scheme was successfully removed.'))()
       handleDeletedGradingScheme(gradingSchemeId)
     } catch (error) {
-      showFlashError(I18n.t('There was an error while removing the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while removing the grading scheme'))(error as Error)
     }
   }
   if (!gradingSchemeSummaries || !defaultCanvasGradingScheme) {
@@ -362,14 +361,14 @@ export const GradingSchemesSelector = ({
         gradingSchemeSummary => gradingSchemeSummary.id === courseDefaultSchemeId,
       )
       if (courseDefaultSchemeId === '0') {
-        defaultSchemeLabel = I18n.t('Canvas Grading Scheme (course default)')
+        defaultSchemeLabel = t('Canvas Grading Scheme (course default)')
       } else if (matchingSummaries.length > 0) {
-        defaultSchemeLabel = `${matchingSummaries[0].title} ${I18n.t('(course default)')}`
+        defaultSchemeLabel = `${matchingSummaries[0].title} ${t('(course default)')}`
       } else {
-        defaultSchemeLabel = I18n.t('Course Default Grading Scheme')
+        defaultSchemeLabel = t('Course Default Grading Scheme')
       }
     } else {
-      defaultSchemeLabel = I18n.t('Default Canvas Grading Scheme')
+      defaultSchemeLabel = t('Default Canvas Grading Scheme')
     }
     return (
       <>
@@ -395,7 +394,7 @@ export const GradingSchemesSelector = ({
                     value={selectedGradingSchemeId ?? ''}
                     onChange={onChangeInput}
                     renderLabel={
-                      <ScreenReaderContent>{I18n.t('Select a grading scheme')}</ScreenReaderContent>
+                      <ScreenReaderContent>{t('Select a grading scheme')}</ScreenReaderContent>
                     }
                     data-testid="grading-schemes-selector-dropdown"
                     id="grading-schemes-selector-dropdown"
@@ -419,7 +418,7 @@ export const GradingSchemesSelector = ({
                       {defaultSchemeLabel}
                     </SimpleSelect.Option>
 
-                    <SimpleSelect.Group renderLabel={I18n.t('Course Level')}>
+                    <SimpleSelect.Group renderLabel={t('Course Level')}>
                       {gradingSchemeSummaries
                         .filter(gradingScheme => gradingScheme.context_type === 'Course')
                         .map(gradingScheme => (
@@ -438,7 +437,7 @@ export const GradingSchemesSelector = ({
                           </SimpleSelect.Option>
                         ))}
                     </SimpleSelect.Group>
-                    <SimpleSelect.Group renderLabel={I18n.t('Account Level')}>
+                    <SimpleSelect.Group renderLabel={t('Account Level')}>
                       {gradingSchemeSummaries
                         ?.filter(gradingScheme => gradingScheme.context_type === 'Account')
                         .map(gradingScheme => (
@@ -455,7 +454,7 @@ export const GradingSchemesSelector = ({
                           >
                             {`${gradingScheme.title} ${
                               courseDefaultSchemeId === gradingScheme.id
-                                ? I18n.t('(course default)')
+                                ? t('(course default)')
                                 : ''
                             }`}
                           </SimpleSelect.Option>
@@ -491,7 +490,7 @@ export const GradingSchemesSelector = ({
                   onClick={openGradingSchemeViewEditModal}
                   data-testid="grading-schemes-selector-view-button"
                 >
-                  {canManage ? I18n.t('View/Edit') : I18n.t('View')}
+                  {canManage ? t('View/Edit') : t('View')}
                 </Button>
               </View>
             </Flex.Item>
@@ -511,7 +510,7 @@ export const GradingSchemesSelector = ({
                     onClick={openGradingSchemeViewModal}
                     data-testid="grading-schemes-selector-view-button"
                   >
-                    {I18n.t('View')}
+                    {t('View')}
                   </Button>
                 </View>
               </Flex.Item>
@@ -522,7 +521,7 @@ export const GradingSchemesSelector = ({
                       onClick={openGradingSchemeDuplicateModal}
                       data-testid="grading-schemes-selector-copy-button"
                     >
-                      {I18n.t('Copy')}
+                      {t('Copy')}
                     </Button>
                   </View>
                 </Flex.Item>
@@ -535,7 +534,7 @@ export const GradingSchemesSelector = ({
                       renderIcon={() => <IconAddLine />}
                       data-testid="grading-schemes-selector-new-grading-scheme-button"
                     >
-                      {I18n.t('New Grading Scheme')}
+                      {t('New Grading Scheme')}
                     </Button>
                   </View>
                 </Flex.Item>
@@ -550,7 +549,7 @@ export const GradingSchemesSelector = ({
               onClick={openManageGradingSchemesModal}
               data-testid="manage-all-grading-schemes-button"
             >
-              {I18n.t('Manage All Grading Schemes')}
+              {t('Manage All Grading Schemes')}
             </CondensedButton>
           </View>
         )}
@@ -639,7 +638,7 @@ export const GradingSchemesSelector = ({
           <Modal
             open={showManageGradingSchemesModal}
             size="fullscreen"
-            label={I18n.t('Manage All Grading Schemes')}
+            label={t('Manage All Grading Schemes')}
             shouldCloseOnDocumentClick={true}
           >
             <Modal.Header>
@@ -647,10 +646,10 @@ export const GradingSchemesSelector = ({
                 placement="end"
                 offset="small"
                 onClick={closeManageGradingSchemesModal}
-                screenReaderLabel={I18n.t('Close')}
+                screenReaderLabel={t('Close')}
                 data-testid="manage-all-grading-schemes-close-button"
               />
-              <Heading>{I18n.t('Manage All Grading Schemes')}</Heading>
+              <Heading>{t('Manage All Grading Schemes')}</Heading>
             </Modal.Header>
             <Modal.Body>
               <>
@@ -665,7 +664,7 @@ export const GradingSchemesSelector = ({
             </Modal.Body>
             <Modal.Footer>
               <Button onClick={closeManageGradingSchemesModal} margin="0 x-small 0 0">
-                {I18n.t('Close')}
+                {t('Close')}
               </Button>
             </Modal.Footer>
           </Modal>

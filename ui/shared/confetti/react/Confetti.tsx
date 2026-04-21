@@ -19,12 +19,11 @@
 import React, {useState, useEffect, useRef} from 'react'
 import ConfettiGenerator from '../javascript/ConfettiGenerator'
 import {showFlashAlert} from '@instructure/platform-alerts'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {getBrandingColors, getProps} from '../javascript/confetti.utils'
 
-const I18n = createI18nScope('confetti')
-
 export default function Confetti({triggerCount}: {triggerCount?: number | null}) {
+  const {t} = useTranslation('confetti')
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [visible, setVisible] = useState(true)
   useEffect(() => {
@@ -65,7 +64,7 @@ export default function Confetti({triggerCount}: {triggerCount?: number | null})
     document.body.addEventListener('keydown', clearConfettiOnSpaceOrEscape)
     confetti.render()
     showFlashAlert({
-      message: I18n.t('Great work! From the Canvas developers'),
+      message: t('Great work! From the Canvas developers'),
       srOnly: true,
     })
 

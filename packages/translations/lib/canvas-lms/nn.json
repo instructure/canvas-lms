@@ -1,0 +1,258 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "Avbryt",
+    "Confirm": "Stadfest"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "Merk som viktig dato og vis på heimesida si sidemeny"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "Standard vurderingsskjema for konto",
+    "Account default grading scheme was successfully saved.": "Standard vurderingsskjema for kontoen vart lagra.",
+    "Active Grading Schemes": "Aktive vurderingsskjema",
+    "Applied": "Brukt",
+    "Apply": "Bruk",
+    "Archive Grading Scheme": "Arkiv Vurderingsskjema",
+    "Archived": "Arkivert",
+    "Are you sure you want to delete this grading scheme?": "Er du sikker på at du vil slette karaktersetjingsskjemaet?",
+    "Cancel": "Avbryt",
+    "Canvas Default": "Canvas standard",
+    "Close": "Lukk",
+    "Confirm": "Stadfest",
+    "Delete Grading Scheme": "Slett oppsett for karaktersetjing",
+    "Duplicate Grading Scheme": "Dupliser vurderingsskjema",
+    "Edit Grading Scheme": "Rediger karakterskjema",
+    "Grading Scheme Name": "Namn til oppsett for karaktersetjing",
+    "Locations Used": "Plasseringar brukt",
+    "Lower limit of range": "Nedre grense i området",
+    "New Grading Scheme": "Ny karaktersetjingsskala",
+    "Next Page": "Neste side",
+    "Previous Page": "Førre side",
+    "Save": "Lagre",
+    "Search": "Søk",
+    "Search...": "Søk...",
+    "Show courses and assignments": "Vis emner og oppgåver",
+    "Sort by": "Sorter etter",
+    "There was an error while archiving the grading scheme": "Det oppstod ein feil under arkivering av vurderingsskjemaet.",
+    "There was an error while creating the grading scheme": "Det oppstod ein feil under oppretting av vurderingsskjemaet.",
+    "There was an error while loading grading schemes": "Det oppstod ein feil under lasting av vurderingsskjemaene.",
+    "There was an error while loading the default canvas grading scheme": "Det oppstod ein feil under lasting av standard vurderingssett.",
+    "There was an error while loading the default grading scheme": "Det oppstod ein feil under lasting av standard vurderingssett.",
+    "There was an error while removing the grading scheme": "Det oppstod ein feil under fjerning av vurderingsskjemaet.",
+    "There was an error while updating the grading scheme": "Det oppstod ein feil under oppdatering av vurderingsskjemaet.",
+    "Unarchive Grading Scheme": "Fjern arkivering for vurderingsskjema",
+    "Upper limit of range": "Øvre grense i området",
+    "View Grading Scheme": "Vis karakterskjema",
+    "View/Copy Grading Scheme": "Sjå/Kopier vurderingsskjema",
+    "View/Edit Grading Scheme": "Vis/rediger karakterskjema",
+    "You can't delete this grading scheme because it is in use.": "Du kan ikkje slette dette vurderingsskjemaet fordi det er i bruk.",
+    "You have no active grading schemes.": "Du har ingen aktive vurderingsskjema.",
+    "You have no archived grading schemes.": "Du har ingen arkiverte vurderingsskjema.",
+    "to": "til"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "Er du sikker på at du vil slette karaktersetjingsskjemaet?",
+    "Cancel": "Avbryt",
+    "Close": "Lukk",
+    "Delete": "Slett",
+    "Delete ": "Slett",
+    "Duplicate": "Dupliser",
+    "Duplicate ": "Dupliser",
+    "Edit Grading Scheme": "Rediger karakterskjema",
+    "New Grading Scheme": "Ny karaktersetjingsskala",
+    "Save": "Lagre"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Ein tabell som inneheld standarddata for vurderingsskjema for Canvas. Kvar rad inneheld eit namn, ein maksimal prosentandel og ein minimal prosentandel.",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Ein tabell som inneheld data frå vurderingsskjemaet. Kvar rad inneheld eit namn, ein maksimal prosentdel og ein minimal prosentdel.",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Kan ikkje ha navnekopiar eller tomme kolonnenavn. Endre på navna og prøv å trykk lagre på nytt",
+    "Delete grading scheme": "Slett vurderingsskjema",
+    "Edit Grading Scheme": "Rediger karakterskjema",
+    "Edit grading scheme": "Endre vurderingsskjema",
+    "Grading scheme title": "Tittel til oppsett for karaktersetjing",
+    "Invalid grading scheme": "Ugyldig vurderingsskjema",
+    "Letter Grade": "Bokstavkarakter",
+    "Looks great!": "Flott!",
+    "Percentage": "Prosenttal",
+    "Points": "Poeng",
+    "Range": "Område",
+    "edit a copy": "Endre ein kopi"
+  },
+  "OutcomeManagement": {
+    "Course": "Emne",
+    "Institution": "Institusjon"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Kontoar",
+    "Close": "Lukk",
+    "Concluded": "Fullført",
+    "Courses": "Emne",
+    "Loading": "Lastar",
+    "Locations Used": "Plasseringar brukt",
+    "Search": "Søk",
+    "Search...": "Søk..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "Akseptable bruksvilkår",
+    "Close": "Lukk",
+    "Loading page": "Lastar side"
+  },
+  "account_reports": {
+    "Close": "Lukk",
+    "Next month": "Neste månad",
+    "Previous month": "Førre månad",
+    "Time": "Tidspunkt"
+  },
+  "admin_split": {
+    "Cancel": "Avbryt",
+    "Failed to split users.": "Mislukka å separere brukarene.",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "MERK: vi prøver å gjere om samanslåinga så langt som mogleg, men det kan hende at samanslåtte brukarar ikkje gjenoppstår fullt og heilt som tidlegare. ",
+    "OK": "OK",
+    "Split": "Separer",
+    "The following users will be split into separate user accounts:": "Følgjande brukarar vil bli delt i separate brukarkontoer:",
+    "There are no user accounts to split from this user.": "Det finnast ingen brukerkontoar å separere for denne brukaren.",
+    "User split complete. Links to split user accounts follow:": "Brukerseparering fullført. Lenker til separerte kontoar:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Skildring"
+  },
+  "assignment_footer": {
+    "Next": "Neste",
+    "Previous": "Førre"
+  },
+  "assignment_tabs": {
+    "Assignment": "Oppgåve",
+    "Peer Review": "Fagfellevurdering"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(emnestandard)",
+    "Account Level": "Kontonivå",
+    "Canvas Grading Scheme (course default)": "Canvas vurderingsskjema (emnestandard)",
+    "Close": "Lukk",
+    "Course Level": "Emnenivå",
+    "Default Canvas Grading Scheme": "Standard vurderingsskjema for Canvas",
+    "Manage All Grading Schemes": "Administrer alle vurderingsskjema",
+    "New Grading Scheme": "Ny karaktersetjingsskala",
+    "Select a grading scheme": "Vel vurderingsskjema",
+    "There was an error while loading grading schemes": "Det oppstod ein feil under lasting av vurderingsskjemaene.",
+    "There was an error while loading the grading scheme": "Det oppstod ein feil under lasting av vurderingsskjemaet",
+    "There was an error while refreshing grading schemes": "Det oppstod ein feil under oppdatering av vurderingsskjemaene.",
+    "There was an error while removing the grading scheme": "Det oppstod ein feil under fjerning av vurderingsskjemaet.",
+    "View": "Vis"
+  },
+  "assignments_2": {
+    "Loading": "Lastar"
+  },
+  "catalog": {
+    "Course Catalog": "Emnekatalog"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "Godt jobba! Frå Canvasutviklarane"
+  },
+  "content_copy_redesign": {
+    "Cancel": "Avbryt",
+    "Create course": "Opprett emne",
+    "Creating...": "Opprettar ...\\\"",
+    "Name": "Namn",
+    "No results": "Utan resultat",
+    "Please enter the details for the new course.": "Sett inn detaljane for det nye emnet.",
+    "Start date must be before end date": "Startdato må være før sluttdato",
+    "Term": "Semester",
+    "Use arrow keys to navigate options.": "Bruk piltastane for å navigere mellom alternativa."
+  },
+  "content_share_preview_overlay": {
+    "Close": "Lukk",
+    "Content Share Preview": "Førehandsvising av innhaldsdeling",
+    "Preview": "Førehandsvising"
+  },
+  "copy_warnings_modal": {
+    "Attention": "Merksemd"
+  },
+  "course_logging_content": {
+    "No results": "Utan resultat",
+    "Type to search": "Skriv for å søke"
+  },
+  "create_course_modal": {
+    "Cancel": "Avbryt",
+    "Course Details": "Emnedetaljar",
+    "Course Name": "Emnenamn",
+    "Create": "Opprett",
+    "Create Course": "Opprett emne",
+    "Create Subject": "Opprett emne",
+    "Creating new course...": "Opprettar nytt emne...",
+    "Creating new subject...": "Opprettar nytt emne...",
+    "Error creating new course": "Feil under oppretting av nytt emne",
+    "Error creating new subject": "Feil under oppretting av nytt emne",
+    "Loading accounts...": "Lastar kontoar...",
+    "Name...": "Namn...",
+    "No Results": "Ingen resultat",
+    "Select a homeroom": "Vel ei heimeside",
+    "Subject Name": "Emnet sitt namn",
+    "Unable to get accounts": "Kunne ikkje finne kontoar",
+    "Unable to get homerooms": "Kunne ikkje hente heimerom",
+    "Use arrow keys to navigate options.": "Bruk piltastane for å navigere mellom alternativa.",
+    "Which account will this course be associated with?": "Hvilken underkonto skal dette emnet være knytta til?",
+    "Which account will this subject be associated with?": "Hvilken underkonto skal dette emnet være knytta til?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "Overstyring av sluttvurdering"
+  },
+  "feature_flags": {
+    "Accept": "Godta",
+    "Cancel": "Avbryt"
+  },
+  "filter_bar": {
+    "All": "Alle",
+    "Clear": "Fjern",
+    "Filter by": "Filtrer etter",
+    "Search": "Søk",
+    "Use arrow keys to navigate options.": "Bruk piltastane for å navigere mellom alternativa."
+  },
+  "groupNavigationSelector": {
+    "Select Group": "Vel ei gruppe",
+    "Use arrow keys to navigate options.": "Bruk piltastane for å navigere mellom alternativa."
+  },
+  "jobs": {
+    "Close": "Lukk"
+  },
+  "modules_home_page": {
+    "Create a new Module": "Opprett ein ny modul"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "Ein lærd panda",
+    "Moves:": "Flyttar:"
+  },
+  "overview_page": {
+    "Edit home page": "Rediger nettside",
+    "Subject Home Page": "Emnet si heimeside"
+  },
+  "pages_edit_title": {
+    "Page Title": "Sidetittel"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "Avbryt",
+    "Close": "Lukk"
+  },
+  "study_assist": {
+    "Back": "Tilbake",
+    "Close": "Lukk",
+    "Page": "Side"
+  },
+  "submit_online_url_assignment": {
+    "Website URL": "URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "Akseptable bruksvilkår",
+    "Loading...": "Lastar...",
+    "Preview": "Førehandsvising"
+  },
+  "todos_page": {
+    "Failed to load todos": "Innlasting av gjeremål mislukkast",
+    "Loading Additional Todo Details": "Lastar fleire gjeremålsdetaljar",
+    "Loading Todo Course Name": "Lastar emnenamn for gjeremål",
+    "Loading Todo Title": "Lastar tittel på gjeremål"
+  },
+  "tray": {
+    "Close": "Lukk"
+  }
+}

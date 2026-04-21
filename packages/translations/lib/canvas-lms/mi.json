@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "Whakakore",
+    "Confirm": "Whakaū"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "Tohua he rā nui me te whakātu i runga i te kainga rūma paerewa taha"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "Kaupapa māka taunoa pūkete",
+    "Account default grading scheme was successfully saved.": "I momoho te tiaki i te kaupapa māka taunoa.",
+    "Active Grading Schemes": "Kaupapa Maaka Hohe",
+    "Applied": "Ka whakamahia",
+    "Apply": "Tono",
+    "Archive Grading Scheme": "Aronui Māka Pūranga",
+    "Archived": "Kua pūrangatia",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Ka taea tonu te whakamahi i nga kaupapa māka kua whakarangatirahia, engari kaore e taea te taapiri atu ki nga akoranga hou, ki nga taumahi ranei.",
+    "Are you sure you want to delete this grading scheme?": "E tino hiahia ana koe ki te muku i tēnei kaupapa kōeke?",
+    "Cancel": "Whakakore",
+    "Canvas Default": "Canvas Taunoa",
+    "Close": "Katia",
+    "Confirm": "Whakaū",
+    "Confirm Default Grading Scheme Change": "Whakapumautia te Huringa Kaupapa Tohu Taunoa",
+    "Delete Grading Scheme": "Mukua Kōeke Aronui",
+    "Duplicate Grading Scheme": "Kaupapa Tohu Whakataurua",
+    "Edit Grading Scheme": "Whakatikahia te Aronui Kōeketanga",
+    "Grading Scheme Name": "Ingoa Kaupapa Tohu",
+    "Grading scheme was successfully archived.": "I momoho te whakapuranga kaupapa māka.",
+    "Grading scheme was successfully created.": "I momoho te waihanga kaupapa māka.",
+    "Grading scheme was successfully removed.": "I momoho te tango i te kaupapa māka.",
+    "Grading scheme was successfully saved.": "I momoho te tiaki kaupapa māka.",
+    "Grading scheme was successfully unarchived.": "I momoho te whakakore i te kaupapa māka.",
+    "Locations Used": "Ngā Tauwāhi i Whakamahia",
+    "Lower limit of range": "Rohe Kura o awhe",
+    "New Grading Scheme": "Kaupapa Tohu Hou",
+    "Next Page": "Whārangi haere ake nei",
+    "No account default": "Karekau he pūkete taunoa",
+    "Previous Page": "Te whārangi o muri nei",
+    "Save": "Tiaki",
+    "Search": "Rapu",
+    "Search...": "Rapu...",
+    "Show courses and assignments": "Whakaatuhia nga akoranga me nga taumahi",
+    "Show locations used": "Whakaatuhia nga waahi kua whakamahia",
+    "Sort by": "Kōmaka i te",
+    "There was an error while archiving the grading scheme": "He hapa i te wa e pupuri ana i te kaupapa māka",
+    "There was an error while creating the grading scheme": "He hapa i te wa e hanga ana i te kaupapa māka",
+    "There was an error while loading grading schemes": "He hapa i te wa e uta ana i nga kaupapa māka",
+    "There was an error while loading the default canvas grading scheme": "I puta he hapa i te wa e utaina ana te kaupapa whakakao kanawehi taunoa",
+    "There was an error while loading the default grading scheme": "He hapa i te wa e utaina ana te kaupapa māka taunoa",
+    "There was an error while removing the grading scheme": "I hapa i te tango i te kaupapa māka",
+    "There was an error while unarchiving the grading scheme": "He hapa i te wa e wetewete ana i te kaupapa māka",
+    "There was an error while updating the default grading scheme": "He hapa i te wa e whakahōu ana i te kaupapa māka taunoa",
+    "There was an error while updating the grading scheme": "He hapa i te wa e whakahōu ana i te kaupapa māka",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Ka pa tenei huringa ki nga akoranga hohe katoa me nga taumahi e tuku iho ana i te kaute taunoa. Ka roa tenei huringa ka mutu hei akoranga katoa ka tatauhia ano nga tohu taumahi e pa ana ki te kaupapa tohu tohu taunoa hou.",
+    "Unarchive Grading Scheme": "Whakakorea te Kaupapa Whakaakoranga",
+    "Upper limit of range": "Rohe tepe o te whānui",
+    "View Grading Scheme": "Tirohia Aronui Kōeke",
+    "View/Copy Grading Scheme": "Tiro/Tārua i te Kaupapa Tohu",
+    "View/Edit Grading Scheme": "Tirohia / Whakatika Kaupapa Kōeke",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "Kāore e taea te pūranga tēnei kaupapa māka nā te mea kua whakaritea hei taunoa mō tētahi akoranga, pūkete rānei.",
+    "You can't delete this grading scheme because it is in use.": "Kāore e taea te muku tēnei kaupapa māka nā te mea kei te whakamahia.",
+    "You have no active grading schemes.": "Karekau he kaupapa māka kaha.",
+    "You have no archived grading schemes.": "Karekau he kaupapa māka kua whakapūrangatia.",
+    "to": "kī"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "E tino hiahia ana koe ki te muku i tēnei kaupapa kōeke?",
+    "Are you sure you want to duplicate this grading scheme?": "E tino hiahia ana koe ki te tārua i tenei kaupapa māka?",
+    "Cancel": "Whakakore",
+    "Close": "Katia",
+    "Delete": "Muku",
+    "Delete ": "Muku ",
+    "Duplicate": "Tārua",
+    "Duplicate ": "Tārua ",
+    "Edit Grading Scheme": "Whakatikahia te Aronui Kōeketanga",
+    "New Grading Scheme": "Kaupapa Tohu Hou",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "Ko nga ōrau me nga tohu kaore e taea te whakatika na te mea he kaupapa māka taumata kaute.",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Ko nga ōrau me nga tohu kaore e taea te whakatika na te mea kei te whakamahia hei kaupapa māka taunoa.",
+    "Percentages and points can't be edited because it is currently being used.": "Ko nga ōrau me nga tohu kaore e taea te whakatika na te mea kei te whakamahia inaianei.",
+    "Save": "Tiaki"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "He ripanga kei roto te raraunga kaupapa māka kānawehi taunoa.  Ia rārangi e mau ana i te ingoa, te nuinga paihēneti, me te iti paihēneti.",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "He tepū e mau ana i te kōeke kaupapa raraunga.  Ia rārangi e mau ana i te ingoa, te nuinga paihēneti, me te iti paihēneti.",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Kāore e taea te tārite, te ingoa haupae putu rānei. Whakatikahia nga ingoa ka ngana ki te paato ano i te 'Tiaki'.",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Kare e taea te inaki, te awhe putu ranei. Whakatikahia nga awhe ka ngana ki te paato ano i te 'Tiaki'.",
+    "Delete grading scheme": "Mukua te kaupapa māka",
+    "Edit Grading Scheme": "Whakatikahia te Aronui Kōeketanga",
+    "Edit a copy of this grading scheme": "Whakatikaina he kape o tenei kaupapa māka",
+    "Edit grading scheme": "Whakatika kaupapa māka",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "E hiahiatia ana te Ingoa Kaupapa Tohu. Tāpiri ingoa ka ngana ki te paato ano i te 'Tiaki'.",
+    "Grading scheme title": "Te taitara kaupapa māka",
+    "Invalid grading scheme": "Kaupapa māka muhu",
+    "Letter Grade": "Kōeke Reta",
+    "Looks great!": "Titiro nui!",
+    "Percentage": "ōrau",
+    "Points": "Ngā koinga",
+    "Range": "whānui",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Me tika te awhe. Kaore e taea te whai tau kino, tau nui ake ranei i te 100. Whakatikahia nga awhe ka ngana ki te paato ano i te 'Tiaki'.",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Me tika te awhe. Kaore e taea te whai tau kino, tau nui ake ranei i nga awhe tohu o runga. Whakatikahia nga awhe ka ngana ki te paato ano i te 'Tiaki'.",
+    "edit a copy": "whakatika i te kape"
+  },
+  "OutcomeManagement": {
+    "Course": "akoranga",
+    "Institution": "Whakanōhanga"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Pūkete",
+    "Close": "Katia",
+    "Concluded": "Kua mutua",
+    "Courses": "Ngā Akoranga",
+    "Failed to load account used locations": "I rahua te uta i nga waahi kaute kua whakamahia",
+    "Failed to load assignments used locations": "I rahua te uta i nga taumahi i nga waahi kua whakamahia",
+    "Failed to load used locations": "I rahua te uta i nga waahi kua whakamahia",
+    "Load Assignments ...": "Utaina Taumahi...",
+    "Load More Assignments ...": "Utaina etahi atu taumahi...",
+    "Loading": "E tukuake ana",
+    "Locations Used": "Ngā Tauwāhi i Whakamahia",
+    "Search": "Rapu",
+    "Search...": "Rapu..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "Kaupapa Whakamahi e Whakāetia ana",
+    "Close": "Katia",
+    "Loading page": "Te uta i te wharangi",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Ko te Kaupapa Whakamahi Whakaaetanga kaore i te waatea i tenei wa. Tena koa tirohia mai i muri mai, whakapā atu ranei ki te tautoko mena ka hiahia awhina koe.",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Kaore e taea te uta i te Kaupapa Whakamahi Whakaae. Tena koa ngana ano i muri mai, whakapā atu ranei ki te tautoko mena ka mau tonu te take."
+  },
+  "account_reports": {
+    "Close": "Katia",
+    "Invalid date and time.": "Te ra me te wa muhu.",
+    "Next month": "marama i muri mai",
+    "Previous month": "marama o muri nei",
+    "Time": "Wā"
+  },
+  "admin_split": {
+    "Cancel": "Whakakore",
+    "Failed to split users.": "I rahua te wāwāhi kaiwhakamahi.",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "TUHIPOKA: Ka ngana tēnei ki te whakakore i te hono i te nuinga o te mahi, engari ngā kaiwhakamahi kua kua honoa kaore pea e whakahou pai tia ki te āhua o mua.",
+    "OK": "Ae",
+    "Split": "Wāwāhi",
+    "The following users will be split into separate user accounts:": "Ko ngā kaiwhakamahi e whai ake nei ka wāwāhia ki roto kaiwhakamahi pūkete wehe:",
+    "There are no user accounts to split from this user.": "Kaore he kaiwhakamahi pūkete hei wāwāhi mai i te kaiwhakamahi.",
+    "User split complete. Links to split user accounts follow:": "I oti kaiwhakamahi wāwāhi. Hono ki te kaiwhakamahi wāwāhi pūkete whai ake nei:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Whakāhuatanga"
+  },
+  "assignment_footer": {
+    "Next": "E haere ake nei",
+    "Previous": "ō muri"
+  },
+  "assignment_tabs": {
+    "Assignment": "Whakataunga",
+    "Peer Review": "Hoa arotake"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(akoranga taunoa)",
+    "Account Level": "Taumata Kaute",
+    "Canvas Grading Scheme (course default)": "Kaupapa Maaka Kanawa (akoranga taunoa)",
+    "Close": "Katia",
+    "Course Level": "Taumata Akoranga",
+    "Default Canvas Grading Scheme": "Kaupapa Whakapakari Kanaweti Taunoa",
+    "Grading scheme was successfully removed.": "I momoho te tango i te kaupapa māka.",
+    "Grading scheme was successfully updated.": "I pai te whakahou i te kaupapa māka.",
+    "Manage All Grading Schemes": "Whakahaerehia nga Kaupapa Tohu Katoa",
+    "New Grading Scheme": "Kaupapa Tohu Hou",
+    "Select a grading scheme": "Tīpakohia he kaupapa māka",
+    "There was an error while loading grading schemes": "He hapa i te wa e uta ana i nga kaupapa māka",
+    "There was an error while loading the grading scheme": "He hapa i te wa e utaina ana te kaupapa māka",
+    "There was an error while refreshing grading schemes": "He hapa i te wa e whakahou ana i nga kaupapa māka",
+    "There was an error while removing the grading scheme": "I hapa i te tango i te kaupapa māka",
+    "View": "Tirohia"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "Taumahi 2 Whārangi Hapa Kaiako",
+    "Assignments 2 Teacher initial query error": "Taumahi 2 Kaiako hapa patai tuatahi",
+    "Loading": "E tukuake ana"
+  },
+  "catalog": {
+    "Course Catalog": "Putumōhio akoranga"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "Tino pai te mahi! Mai i ngā kaiwhakawhanake o Canvas"
+  },
+  "content_copy_redesign": {
+    "Cancel": "Whakakore",
+    "Copy course": "Tārua akoranga",
+    "Course code": "Waehere akoranga",
+    "Course code must be 255 characters or less": "Ko te waehere akoranga me 255 nga tohu, iti iho ranei",
+    "Course name must be 255 characters or less": "Me 255 te ingoa o te akoranga, iti iho ranei",
+    "Create course": "Waihanga akoranga",
+    "Creating...": "Waihanga...",
+    "End date": "Rā Whakamutunga",
+    "End date must be after start date": "Me whakatau te rā mutunga ki muri o te rā timata",
+    "Name": "Ingoa",
+    "No results": "Kāore he hua",
+    "Please enter the details for the new course.": "Tēnā koa whakauru ngā kōrero mo te akoranga hou.",
+    "Select a new beginning date": "Tīpakohia he rā tīmata hou",
+    "Select a new end date": "Tīpakohia he rā mutunga hōu",
+    "Select end date": "Tīpakohia te rā mutunga",
+    "Select start date": "Tīpakohia te rā tīmata",
+    "Start date": "Rā tīmata",
+    "Start date must be before end date": "Me whakatau te rā timata i mua i te rā mutunga",
+    "Start typing to search...": "Tīmatahia te pātō ki te rapu mō",
+    "Term": "wā",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Kaore e taea te whakarereke i nga ra tiimata me te mutunga o te wahanga i konei, kei te wharangi Taipitopito Ture kei raro i te Kaiwhakahaere.",
+    "Use arrow keys to navigate options.": "Whakamahia ngā kī pere pere hei whakawhiti i nga wāhanga."
+  },
+  "content_share_preview_overlay": {
+    "Close": "Katia",
+    "Content Share Preview": "Arokite Tuari Ihirangi",
+    "Preview": "Arokite"
+  },
+  "copy_warnings_modal": {
+    "Attention": "Te aro"
+  },
+  "course_logging_content": {
+    "No results": "Kāore he hua",
+    "Type to search": "Pātō ki te rapu"
+  },
+  "create_course_modal": {
+    "Cancel": "Whakakore",
+    "Course Details": "Taipitopito akoranga",
+    "Course Name": "Akoranga Ingoa",
+    "Create": "Waihanga",
+    "Create Course": "Waihanga akoranga",
+    "Create Subject": "Hanga Marau",
+    "Creating new course...": "E hanga ana akoranga hou...",
+    "Creating new subject...": "E hanga ana marau hou...",
+    "Error creating new course": "He hapa i te wā e hanga ana he akoranga hou",
+    "Error creating new subject": "He hapa i te wā e hanga ana he marau hou",
+    "Loading accounts...": "E uta ana ngā pūkete...",
+    "Name...": "Ingoa: ",
+    "No Results": "Kāore Ngā Hua",
+    "Select a homeroom": "Tīpako he rūma kainga",
+    "Subject Name": "Marau Ingoa",
+    "Unable to get accounts": "Kaore e taea te tiki i ngā pūkete",
+    "Unable to get homerooms": "Kaore e taea te tiki i ngā kainga rūma",
+    "Use arrow keys to navigate options.": "Whakamahia ngā kī pere pere hei whakawhiti i nga wāhanga.",
+    "Which account will this course be associated with?": "Ko tēhea te pūkete e hoahoa atu ai tēnei pūkete?",
+    "Which account will this subject be associated with?": "Ko tēhea te pūkete e hoahoa atu ai tēnei marau?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "Kōeke Tuhinga Whakamutunga"
+  },
+  "feature_flags": {
+    "Accept": "Manakohia",
+    "Cancel": "Whakakore"
+  },
+  "filter_bar": {
+    "All": "Katoa",
+    "Clear": "Ūkui",
+    "Filter by": "Tātari mā",
+    "Search": "Rapu",
+    "Use arrow keys to navigate options.": "Whakamahia ngā kī pere pere hei whakawhiti i nga wāhanga."
+  },
+  "groupNavigationSelector": {
+    "Select Group": "Tīpakohia te Rōpū",
+    "Use arrow keys to navigate options.": "Whakamahia ngā kī pere pere hei whakawhiti i nga wāhanga."
+  },
+  "jobs": {
+    "Close": "Katia"
+  },
+  "modules_home_page": {
+    "Create a new Module": "Hanga he Kōwae hou"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "He panda ako",
+    "Moves:": "Nuku:"
+  },
+  "overview_page": {
+    "Edit home page": "Whakatika kainga whārangi",
+    "Subject Home Page": "Kaupapa Whārangi Kāinga"
+  },
+  "pages_edit_title": {
+    "Page Title": "Taitara whārangi"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "Whakakore",
+    "Close": "Katia"
+  },
+  "study_assist": {
+    "Back": "Hoki ki muri",
+    "Close": "Katia",
+    "Page": "Whārangi"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "Me whai URL whaimana",
+    "Website URL": "Paetukutuku URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "Kaupapa Whakamahi e Whakāetia ana",
+    "Loading...": "E uta ana ....",
+    "Preview": "Arokite"
+  },
+  "todos_page": {
+    "Failed to load todos": "I rahua te uta i todos",
+    "Loading Additional Todo Details": "E uta ana Tāpiri Todo Taipitopito",
+    "Loading Todo Course Name": "Uta ana Todo Akoranga Ingoa",
+    "Loading Todo Title": "Uta ana Todo Taitara"
+  },
+  "tray": {
+    "Close": "Katia"
+  }
+}

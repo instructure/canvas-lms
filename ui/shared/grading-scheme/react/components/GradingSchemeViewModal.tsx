@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {GradingSchemeView} from './view/GradingSchemeView'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-
-const I18n = createI18nScope('GradingSchemeViewModal')
 
 export type GradingSchemeViewModalProps = {
   open: boolean
@@ -46,6 +44,7 @@ const GradingSchemeViewModal = ({
   editGradingScheme,
   canManageScheme,
 }: GradingSchemeViewModalProps) => {
+  const {t} = useTranslation('GradingSchemeViewModal')
   if (!gradingScheme) {
     return <></>
   }
@@ -64,7 +63,7 @@ const GradingSchemeViewModal = ({
     >
       <Modal.Header>
         <CloseButton
-          screenReaderLabel={I18n.t('Close')}
+          screenReaderLabel={t('Close')}
           placement="end"
           offset="small"
           onClick={handleClose}
@@ -86,7 +85,7 @@ const GradingSchemeViewModal = ({
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={handleClose}>{I18n.t('Cancel')}</Button>
+            <Button onClick={handleClose}>{t('Cancel')}</Button>
           </Flex.Item>
         </Flex>
       </Modal.Footer>

@@ -17,13 +17,11 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import type {GradingSchemeDataRow} from '@instructure/grading-utils'
 import {roundToTwoDecimalPlaces} from '../../helpers/roundDecimalPlaces'
-
-const I18n = createI18nScope('GradingSchemeManagement')
 
 interface ComponentProps {
   schemeScaleFactor: number
@@ -40,6 +38,7 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
   schemeScaleFactor,
   viewAsPercentage,
 }) => {
+  const {t} = useTranslation('GradingSchemeManagement')
   const [entryScale /* setEntryScale */] = useState<number>(
     schemeScaleFactor * (viewAsPercentage ? 100 : 1),
   )
@@ -58,15 +57,15 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
         <Table.Cell themeOverride={{padding: '0.5rem 0'}}>
           <Flex display="inline-flex">
             <Flex.Item>
-              <span aria-label={I18n.t('Upper limit of range')}>
+              <span aria-label={t('Upper limit of range')}>
                 {isFirstRow ? '' : '< '}
                 {renderHighRange()}
                 {viewAsPercentage ? <>%</> : <></>}
               </span>
             </Flex.Item>
-            <Flex.Item padding="none small">{I18n.t('to')}</Flex.Item>
+            <Flex.Item padding="none small">{t('to')}</Flex.Item>
             <Flex.Item>
-              <span aria-label={I18n.t('Lower limit of range')}>
+              <span aria-label={t('Lower limit of range')}>
                 {renderLowRange()}
                 {viewAsPercentage ? <>%</> : <></>}
               </span>

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useRef} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
@@ -27,8 +27,6 @@ import {
   GradingSchemeInput,
   type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
-
-const I18n = createI18nScope('GradingSchemeViewModal')
 
 export type GradingSchemeCreateModalProps = {
   open: boolean
@@ -46,6 +44,7 @@ const GradingSchemeCreateModal = ({
   defaultPointsGradingScheme,
   handleCancelCreate,
 }: GradingSchemeCreateModalProps) => {
+  const {t} = useTranslation('GradingSchemeViewModal')
   const gradingSchemeCreateRef = useRef<GradingSchemeInputHandle>(null)
   if (!defaultGradingSchemeTemplate) {
     return <></>
@@ -56,19 +55,19 @@ const GradingSchemeCreateModal = ({
       as="form"
       open={open}
       onDismiss={handleCancelCreate}
-      label={I18n.t('New Grading Scheme')}
+      label={t('New Grading Scheme')}
       size="small"
       data-testid="grading-scheme-create-modal"
     >
       <Modal.Header>
         <CloseButton
-          screenReaderLabel={I18n.t('Close')}
+          screenReaderLabel={t('Close')}
           placement="end"
           offset="small"
           onClick={handleCancelCreate}
           data-testid="grading-scheme-create-modal-close-button"
         />
-        <Heading>{I18n.t('New Grading Scheme')}</Heading>
+        <Heading>{t('New Grading Scheme')}</Heading>
       </Modal.Header>
       <Modal.Body>
         <GradingSchemeInput
@@ -99,14 +98,14 @@ const GradingSchemeCreateModal = ({
               margin="0 x-small"
               data-testid="grading-scheme-create-modal-cancel-button"
             >
-              {I18n.t('Cancel')}
+              {t('Cancel')}
             </Button>
             <Button
               onClick={() => gradingSchemeCreateRef.current?.savePressed()}
               color="primary"
               data-testid="grading-scheme-create-modal-save-button"
             >
-              {I18n.t('Save')}
+              {t('Save')}
             </Button>
           </Flex.Item>
         </Flex>

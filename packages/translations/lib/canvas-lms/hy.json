@@ -1,0 +1,133 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "Չեղյալ համարել",
+    "Confirm": "Հաստատել"
+  },
+  "GradingSchemeManagement": {
+    "Apply": "Կիրառել",
+    "Archived": "Արխիվացվել է",
+    "Are you sure you want to delete this grading scheme?": "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս սխեման:",
+    "Cancel": "Չեղյալ համարել",
+    "Canvas Default": "Canvas-ի ըստ լռության ընդունված կարգավորումներ",
+    "Close": "Փակել",
+    "Confirm": "Հաստատել",
+    "Delete Grading Scheme": "Ջնջել գնահատման սխեման",
+    "Edit Grading Scheme": "Խմբագրել գնահատման սխեման",
+    "Lower limit of range": "Տիրույթի ամենացածր սահմանը",
+    "Save": "Պահպանել",
+    "Search": "Որոնել",
+    "Upper limit of range": "Տիրույթի վերին սահմանը",
+    "View Grading Scheme": "Դիտել գնահատման սխեման",
+    "View/Edit Grading Scheme": "Դիտել/խմբագրել Գնահատման համակարգը",
+    "to": "Ում"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս սխեման:",
+    "Cancel": "Չեղյալ համարել",
+    "Close": "Փակել",
+    "Delete": "Ջնջել",
+    "Edit Grading Scheme": "Խմբագրել գնահատման սխեման",
+    "Save": "Պահպանել"
+  },
+  "GradingSchemes": {
+    "Edit Grading Scheme": "Խմբագրել գնահատման սխեման",
+    "Letter Grade": "Գնահատական՝ տառերի տեսքով",
+    "Looks great!": "Գերազանց է:",
+    "Percentage": "Տոկոս",
+    "Points": "Միավորներ"
+  },
+  "OutcomeManagement": {
+    "Course": "Դասընթաց"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Հաշիվների գրառումներ",
+    "Close": "Փակել",
+    "Concluded": "Ավարտվել է",
+    "Courses": "Դասընթացներ",
+    "Loading": "Բեռնում է",
+    "Search": "Որոնել"
+  },
+  "acceptable_use_policy": {
+    "Close": "Փակել"
+  },
+  "account_reports": {
+    "Close": "Փակել",
+    "Time": "Ժամ"
+  },
+  "admin_split": {
+    "Cancel": "Չեղյալ համարել",
+    "OK": "Ok"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Նկարագրություն"
+  },
+  "assignment_footer": {
+    "Next": "Հաջորդը"
+  },
+  "assignment_tabs": {
+    "Assignment": "Հանձնարարություն",
+    "Peer Review": "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ ներկայացված կարծիք"
+  },
+  "assignments.grading_type_selector": {
+    "Close": "Փակել",
+    "View": "Դիտել"
+  },
+  "assignments_2": {
+    "Loading": "Բեռնում է"
+  },
+  "catalog": {
+    "Course Catalog": "Դասընթացի կատալոգ"
+  },
+  "content_copy_redesign": {
+    "Cancel": "Չեղյալ համարել",
+    "Create course": "Ստեղծել դասընթաց",
+    "Creating...": "Ստեղծվում է...",
+    "Name": "Անուն",
+    "Please enter the details for the new course.": "Մուտքագրեք նոր դասընթացի մանրամասները:"
+  },
+  "content_share_preview_overlay": {
+    "Close": "Փակել",
+    "Preview": "Նախնական դիտում"
+  },
+  "create_course_modal": {
+    "Cancel": "Չեղյալ համարել",
+    "Course Details": "Դասընթացի մասին տեղեկություններ",
+    "Course Name": "Դասընթացի անվանում",
+    "Create": "Ստեղծել",
+    "Create Course": "Ստեղծել դասընթաց",
+    "No Results": "Արդյունքներ չկան"
+  },
+  "feature_flags": {
+    "Accept": "Ընդունել",
+    "Cancel": "Չեղյալ համարել"
+  },
+  "filter_bar": {
+    "All": "Բոլորը",
+    "Clear": "Մաքրել",
+    "Search": "Որոնել"
+  },
+  "jobs": {
+    "Close": "Փակել"
+  },
+  "pages_edit_title": {
+    "Page Title": "Էջի անվանում"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "Չեղյալ համարել",
+    "Close": "Փակել"
+  },
+  "study_assist": {
+    "Back": "Վերադառնալ",
+    "Close": "Փակել"
+  },
+  "submit_online_url_assignment": {
+    "Website URL": "Վեբ-կայքի url հասցեն"
+  },
+  "terms_of_service_modal": {
+    "Loading...": "Բեռնում է...",
+    "Preview": "Նախնական դիտում"
+  },
+  "tray": {
+    "Close": "Փակել"
+  }
+}

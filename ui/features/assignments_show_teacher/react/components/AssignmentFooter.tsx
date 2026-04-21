@@ -25,23 +25,22 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 import useModuleSequence from '../hooks/useModuleSequence'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {AlertManagerContext} from '@instructure/platform-alerts'
-
-const I18n = createI18nScope('assignment_footer')
 
 interface AssignmentFooterProps {
   moduleItemId: string | number
 }
 
 export default function AssignmentFooter({moduleItemId}: AssignmentFooterProps) {
+  const {t} = useTranslation('assignment_footer')
   const {isLoading, error, sequence} = useModuleSequence(moduleItemId)
   const {setOnFailure} = useContext(AlertManagerContext)
   const displayFooter = !isLoading && !error
 
   useEffect(() => {
     if (error) {
-      setOnFailure(I18n.t('An error occurred while loading sequential module items.'))
+      setOnFailure(t('An error occurred while loading sequential module items.'))
     }
   }, [error])
 
@@ -61,7 +60,7 @@ export default function AssignmentFooter({moduleItemId}: AssignmentFooterProps) 
                 <Button href={sequence.previous.url} data-testid="previous-assignment-button">
                   <Flex alignItems="center" gap="x-small">
                     <IconArrowOpenStartLine size="x-small" themeOverride={{sizeXSmall: '.75rem'}} />
-                    <Text>{I18n.t('Previous')}</Text>
+                    <Text>{t('Previous')}</Text>
                   </Flex>
                 </Button>
               </Tooltip>
@@ -70,7 +69,7 @@ export default function AssignmentFooter({moduleItemId}: AssignmentFooterProps) 
               <Tooltip renderTip={sequence.next.title}>
                 <Button href={sequence.next.url} data-testid="next-assignment-button">
                   <Flex alignItems="center" gap="x-small">
-                    <Text>{I18n.t('Next')}</Text>
+                    <Text>{t('Next')}</Text>
                     <IconArrowOpenEndLine size="x-small" themeOverride={{sizeXSmall: '.75rem'}} />
                   </Flex>
                 </Button>

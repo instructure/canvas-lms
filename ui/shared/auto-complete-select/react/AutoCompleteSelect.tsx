@@ -19,11 +19,9 @@
 import React, {useRef, useState, type ComponentProps} from 'react'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {QueryParameterRecord} from '@instructure/query-string-encoding'
-
-const I18n = createI18nScope('course_logging_content')
 
 interface SelectState<T> {
   value: string
@@ -51,6 +49,7 @@ const AutoCompleteSelect = <T extends {id: string}>({
   overrideSelectOptionProps,
   ...selectProps
 }: AutoCompleteSelectProps<T>) => {
+  const {t} = useTranslation('course_logging_content')
   const [selectState, setSelectState] = useState<SelectState<T>>({
     value: '',
     isShowingOption: false,
@@ -81,9 +80,9 @@ const AutoCompleteSelect = <T extends {id: string}>({
       {selectState.isLoading ? (
         <Spinner renderTitle="Loading" size="x-small" />
       ) : shouldSendRequest(selectState.value) ? (
-        I18n.t('No results')
+        t('No results')
       ) : (
-        I18n.t('Type to search')
+        t('Type to search')
       )}
     </Select.Option>
   )
