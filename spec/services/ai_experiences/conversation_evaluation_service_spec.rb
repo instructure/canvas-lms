@@ -19,9 +19,10 @@
 #
 
 describe AiExperiences::ConversationEvaluationService do
+  let(:account) { account_model }
   let(:conversation_id) { "test-conversation-id" }
   let(:http_client) { instance_double(LlmConversation::HttpClient) }
-  let(:service) { described_class.new }
+  let(:service) { described_class.new(account:) }
   let(:evaluation_response) do
     {
       "success" => true,

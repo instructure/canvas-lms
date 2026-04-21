@@ -33,7 +33,7 @@ describe AiExperiences::ProvisionService do
 
   before do
     allow(LlmConversation::HttpClient).to receive(:new)
-      .with(use_initial_token: true)
+      .with(account:, use_initial_token: true)
       .and_return(http_client)
   end
 
@@ -67,7 +67,15 @@ describe AiExperiences::ProvisionService do
     it "uses the initial token http client" do
       service.provision(account)
 
-      expect(LlmConversation::HttpClient).to have_received(:new).with(use_initial_token: true)
+      expect(LlmConversation::HttpClient).to have_received(:new).with(account:, use_initial_token: true)
+    end
+
+    it "writes the new api token to the cache" do
+      allow(LlmConversation::TokenCache).to receive(:set_api_token)
+
+      service.provision(account)
+
+      expect(LlmConversation::TokenCache).to have_received(:set_api_token).with(account, "test-api-token")
     end
 
     it "raises ConversationError on API failure" do
