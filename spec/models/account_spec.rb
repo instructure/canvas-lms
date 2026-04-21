@@ -2676,12 +2676,13 @@ describe Account do
       expect(claims[:secondary]).to eq([])
     end
 
-    it "includes custom_message delegated from discovery_page_custom_message" do
+    it "includes customMessageDiscovery delegated from discovery_page_custom_message" do
       Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+      allow(account).to receive(:discovery_page_allowed?).and_return(true)
       bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello world" })
       account.update!(brand_config: bc)
       claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
-      expect(claims[:custom_message]).to eq("Hello world")
+      expect(claims[:customMessageDiscovery]).to eq("Hello world")
     end
   end
 
@@ -2697,7 +2698,10 @@ describe Account do
     end
 
     context "when new_login_ui_custom_labels is enabled" do
-      before { Account.site_admin.enable_feature!(:new_login_ui_custom_labels) }
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+        allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      end
 
       it "returns nil when there is no brand config" do
         expect(account.discovery_page_custom_message).to be_nil
@@ -2719,6 +2723,19 @@ describe Account do
         bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "  hello  " })
         account.update!(brand_config: bc)
         expect(account.discovery_page_custom_message).to eq("hello")
+      end
+    end
+
+    context "when discovery_page_allowed? is false" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello" })
+        account.update!(brand_config: bc)
+      end
+
+      it "returns nil" do
+        allow(account).to receive(:discovery_page_allowed?).and_return(false)
+        expect(account.discovery_page_custom_message).to be_nil
       end
     end
   end

@@ -1930,7 +1930,7 @@ class Account < ApplicationRecord
       org: uuid,
       primary: build_links.call(config[:primary]),
       secondary: build_links.call(config[:secondary]),
-      custom_message: discovery_page_custom_message
+      customMessageDiscovery: discovery_page_custom_message
     }
   end
 
@@ -1940,6 +1940,7 @@ class Account < ApplicationRecord
 
   def discovery_page_custom_message
     return nil unless Account.site_admin.feature_enabled?(:new_login_ui_custom_labels)
+    return nil unless discovery_page_allowed?
 
     value = brand_config&.get_value("ic-brand-Discovery-custom-message").presence
     return nil if value.nil?
