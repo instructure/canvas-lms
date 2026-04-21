@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "取消",
+    "Confirm": "确认"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "标记为重要日期并在教室边栏显示"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "帐户默认评级方案",
+    "Account default grading scheme was successfully saved.": "帐户默认评级方案已成功保存。",
+    "Active Grading Schemes": "有效的评分方案",
+    "Applied": "已申请",
+    "Apply": "应用",
+    "Archive Grading Scheme": "将评分方案存档",
+    "Archived": "已归档",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "使用中的存档评分方案继续使用，但不能添加到新课程或作业。",
+    "Are you sure you want to delete this grading scheme?": "是否确定要删除此评分方案?",
+    "Cancel": "取消",
+    "Canvas Default": "Canvas 默认值",
+    "Close": "关闭",
+    "Confirm": "确认",
+    "Confirm Default Grading Scheme Change": "确认默认的评分方案变更",
+    "Delete Grading Scheme": "删除评分方案",
+    "Duplicate Grading Scheme": "重复的评分方案",
+    "Edit Grading Scheme": "编辑评分方案",
+    "Grading Scheme Name": "评分方案名称",
+    "Grading scheme was successfully archived.": "评分方案已成功存档。",
+    "Grading scheme was successfully created.": "已成功创建评分方案。",
+    "Grading scheme was successfully removed.": "已成功移除评分方案。",
+    "Grading scheme was successfully saved.": "已成功保存评分方案。",
+    "Grading scheme was successfully unarchived.": "评分方案已成功取消存档。",
+    "Locations Used": "使用的位置",
+    "Lower limit of range": "范围的下限",
+    "New Grading Scheme": "新建评分方案",
+    "Next Page": "下一页",
+    "No account default": "无默认帐户",
+    "Previous Page": "上一页",
+    "Save": "保存",
+    "Search": "搜索",
+    "Search...": "搜索...",
+    "Show courses and assignments": "显示课程和任务",
+    "Show locations used": "显示所使用的位置",
+    "Sort by": "排序",
+    "There was an error while archiving the grading scheme": "将评分方案存档时出错",
+    "There was an error while creating the grading scheme": "创建评分方案时出错",
+    "There was an error while loading grading schemes": "加载评分方案时出错",
+    "There was an error while loading the default canvas grading scheme": "加载默认的 canvas 评分方案时出错",
+    "There was an error while loading the default grading scheme": "创建默认的评分方案时出错",
+    "There was an error while removing the grading scheme": "移除评分方案时出错",
+    "There was an error while unarchiving the grading scheme": "将评分方案取消存档时出错",
+    "There was an error while updating the default grading scheme": "更新默认评分方案时出错",
+    "There was an error while updating the grading scheme": "更新评分方案时出错",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "此更改将影响目前继承帐户默认设置的所有活跃的课程和作业。完成此更改需要一些时间，因为要根据新的帐户默认评分方案重新计算所有课程和作业分数。",
+    "Unarchive Grading Scheme": "将评分方案取消存档",
+    "Upper limit of range": "范围的上限",
+    "View Grading Scheme": "查看评分方案",
+    "View/Copy Grading Scheme": "查看/编辑评分方案",
+    "View/Edit Grading Scheme": "查看/编辑评分方案",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "此评分方案已设置为某个课程或帐户的默认方案，因此您无法将它存档。",
+    "You can't delete this grading scheme because it is in use.": "无法删除此评分方案，原因是它正在使用。",
+    "You have no active grading schemes.": "您没有有效的评分方案。",
+    "You have no archived grading schemes.": "您没有存档的评分方案。",
+    "to": "到"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "是否确定要删除此评分方案?",
+    "Are you sure you want to duplicate this grading scheme?": "是否确实要复制此评分方案？",
+    "Cancel": "取消",
+    "Close": "关闭",
+    "Delete": "删除",
+    "Delete ": "删除 ",
+    "Duplicate": "复制、重复",
+    "Duplicate ": "复制 ",
+    "Edit Grading Scheme": "编辑评分方案",
+    "New Grading Scheme": "新建评分方案",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "无法编辑百分数和分数，因为这是帐户级别的评分方案。",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "无法编辑百分数和分数，因为目前是默认的评分方案。",
+    "Percentages and points can't be edited because it is currently being used.": "无法编辑百分数和分数，因为目前正在使用。",
+    "Save": "保存"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "含有默认的 canvas 评分方案数据的表格。每一行含有一个名称、一个最大百分比值以及一个最小百分比值。",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "含有评分方案数据的表格。每一行含有一个名称、一个最大百分比值以及一个最小百分比值。",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "行名称不能重复或为空。修改名称，并尝试再次点击“保存”。",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "范围不能重叠或为空。修改范围，并尝试再次点击“保存”。",
+    "Delete grading scheme": "删除评分方案",
+    "Edit Grading Scheme": "编辑评分方案",
+    "Edit a copy of this grading scheme": "编辑该评分方案的副本",
+    "Edit grading scheme": "编辑评分方案",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "评分方案名称必填。添加名称，并尝试再次点击“保存”。",
+    "Grading scheme title": "评分方案标题",
+    "Invalid grading scheme": "无效的评分方案",
+    "Letter Grade": "字母评分",
+    "Looks great!": "好极！",
+    "Percentage": "百分比、百分率",
+    "Points": "得分",
+    "Range": "范围",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "范围必须是有效的数字。不能使用负数或大于 100 的数字。修改范围，并尝试再次点击“保存”。",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "范围必须是有效的数字。不能使用负数或大于上限范围的数字。修改范围，并尝试再次点击“保存”。",
+    "edit a copy": "编辑副本"
+  },
+  "OutcomeManagement": {
+    "Course": "课程",
+    "Institution": "机构"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "账户",
+    "Close": "关闭",
+    "Concluded": "已结束",
+    "Courses": "课程",
+    "Failed to load account used locations": "未能加载帐户使用的位置",
+    "Failed to load assignments used locations": "未能加载作业使用的位置",
+    "Failed to load used locations": "未能加载使用的位置",
+    "Load Assignments ...": "加载作业...",
+    "Load More Assignments ...": "加载更多作业...",
+    "Loading": "加载",
+    "Locations Used": "使用的位置",
+    "Search": "搜索",
+    "Search...": "搜索..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "允许使用政策",
+    "Close": "关闭",
+    "Loading page": "正在加载页面",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "“规范使用政策”目前不可用。请稍后回来查看或联系支持人员获取更多帮助。",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "无法加载“规范使用政策”。请稍后重试，如果问题仍然存在，请联系支持人员。"
+  },
+  "account_reports": {
+    "Close": "关闭",
+    "Invalid date and time.": "无效的日期和时间。",
+    "Next month": "下个月",
+    "Previous month": "上个月",
+    "Time": "时间"
+  },
+  "admin_split": {
+    "Cancel": "取消",
+    "Failed to split users.": "无法拆分用户。",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "注意：这将尝试尽可能撤销合并；但是，合并的用户可能无法完全恢复至先前的状态。",
+    "OK": "确定",
+    "Split": "拆分",
+    "The following users will be split into separate user accounts:": "以下用户将拆分为单独的用户帐户：",
+    "There are no user accounts to split from this user.": "没有可从该用户拆分的用户帐户。",
+    "User split complete. Links to split user accounts follow:": "用户拆分完成。下面提供了用于拆分用户帐户的链接："
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "描述"
+  },
+  "assignment_footer": {
+    "Next": "下一步",
+    "Previous": "上一页"
+  },
+  "assignment_tabs": {
+    "Assignment": "作业",
+    "Peer Review": "同伴互评"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "（课程默认）",
+    "Account Level": "帐户级别",
+    "Canvas Grading Scheme (course default)": "Canvas 评分方案（课程默认）",
+    "Close": "关闭",
+    "Course Level": "课程级别",
+    "Default Canvas Grading Scheme": "默认的 Canvas 评分方案",
+    "Grading scheme was successfully removed.": "已成功移除评分方案。",
+    "Grading scheme was successfully updated.": "评分方案已成功更新。",
+    "Manage All Grading Schemes": "管理所有评分方案",
+    "New Grading Scheme": "新建评分方案",
+    "Select a grading scheme": "选择评分方案",
+    "There was an error while loading grading schemes": "加载评分方案时出错",
+    "There was an error while loading the grading scheme": "加载评分方案时出错",
+    "There was an error while refreshing grading schemes": "刷新评分方案时出错",
+    "There was an error while removing the grading scheme": "移除评分方案时出错",
+    "View": "查看"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "作业 2 教师错误页面",
+    "Assignments 2 Teacher initial query error": "作业 2 教师初始查询错误",
+    "Loading": "加载"
+  },
+  "catalog": {
+    "Course Catalog": "课程目录"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "做得好！来自 Canvas 开发人员"
+  },
+  "content_copy_redesign": {
+    "Cancel": "取消",
+    "Copy course": "复制课程",
+    "Course code": "课程代码",
+    "Course code must be 255 characters or less": "课程代码不能超过 255 个字符",
+    "Course name must be 255 characters or less": "课程名称不能超过 255 个字符",
+    "Create course": "创建课程",
+    "Creating...": "正在创建...",
+    "End date": "结束日期",
+    "End date must be after start date": "结束日期必须在开始日期后",
+    "Name": "名称",
+    "No results": "无结果",
+    "Please enter the details for the new course.": "输入以下详细信息开始创建此课程的副本。",
+    "Select a new beginning date": "选择新的开始日期",
+    "Select a new end date": "选择新的结束日期",
+    "Select end date": "选择结束日期",
+    "Select start date": "选择开始日期",
+    "Start date": "开始日期",
+    "Start date must be before end date": "开始日期必须在结束日期前",
+    "Start typing to search...": "开始键入并搜索...",
+    "Term": "学期",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "无法在此处修改学期开始和结束日期，只能在“管理员”下的“学期详情”页面进行修改。",
+    "Use arrow keys to navigate options.": "使用方向键来导航各选项。"
+  },
+  "content_share_preview_overlay": {
+    "Close": "关闭",
+    "Content Share Preview": "内容共享预览",
+    "Preview": "预览"
+  },
+  "copy_warnings_modal": {
+    "Attention": "注意"
+  },
+  "course_logging_content": {
+    "No results": "无结果",
+    "Type to search": "键入以搜索"
+  },
+  "create_course_modal": {
+    "Cancel": "取消",
+    "Course Details": "课程详细信息",
+    "Course Name": "课程名称",
+    "Create": "创建",
+    "Create Course": "创建课程",
+    "Create Subject": "创建主题",
+    "Creating new course...": "正在创建新课程...",
+    "Creating new subject...": "正在创建新主题...",
+    "Error creating new course": "创建新课程时出错",
+    "Error creating new subject": "创建新主题时出错",
+    "Loading accounts...": "正在加载帐户...",
+    "Name...": "名称...",
+    "No Results": "无结果",
+    "Select a homeroom": "选择年级教室",
+    "Subject Name": "主题名称",
+    "Unable to get accounts": "无法获取帐户",
+    "Unable to get homerooms": "无法进入年级教室",
+    "Use arrow keys to navigate options.": "使用方向键来导航各选项。",
+    "Which account will this course be associated with?": "此课程将关联哪个帐户？",
+    "Which account will this subject be associated with?": "该主题与哪个帐户关联？"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "最终评分覆盖"
+  },
+  "feature_flags": {
+    "Accept": "接受",
+    "Cancel": "取消"
+  },
+  "filter_bar": {
+    "All": "全部",
+    "Clear": "清除",
+    "Filter by": "筛选条件",
+    "Search": "搜索",
+    "Use arrow keys to navigate options.": "使用方向键来导航各选项。"
+  },
+  "groupNavigationSelector": {
+    "Select Group": "选择小组",
+    "Use arrow keys to navigate options.": "使用方向键来导航各选项。"
+  },
+  "jobs": {
+    "Close": "关闭"
+  },
+  "modules_home_page": {
+    "Create a new Module": "创建新单元"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "一只勤奋的熊猫",
+    "Moves:": "移动："
+  },
+  "overview_page": {
+    "Edit home page": "编辑首页",
+    "Subject Home Page": "主题首页"
+  },
+  "pages_edit_title": {
+    "Page Title": "页面标题"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "取消",
+    "Close": "关闭"
+  },
+  "study_assist": {
+    "Back": "后退",
+    "Close": "关闭",
+    "Page": "页面"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "必须填写有效的 URL",
+    "Website URL": "网站 URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "允许使用政策",
+    "Loading...": "加载中……",
+    "Preview": "预览"
+  },
+  "todos_page": {
+    "Failed to load todos": "无法加载待办事项",
+    "Loading Additional Todo Details": "正在加载其他待办详情",
+    "Loading Todo Course Name": "正在加载待办课程名称",
+    "Loading Todo Title": "正在加载待办课程名称"
+  },
+  "tray": {
+    "Close": "关闭"
+  }
+}

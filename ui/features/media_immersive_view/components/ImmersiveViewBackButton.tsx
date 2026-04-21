@@ -18,7 +18,7 @@
 
 import {useCallback} from 'react'
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 
@@ -26,9 +26,8 @@ import {useMedia} from 'react-use'
 
 import styles from './ImmersiveViewBackButton.module.css'
 
-const I18n = createI18nScope('media_immersive_view')
-
 export function ImmersiveViewBackButton() {
+  const {t} = useTranslation('media_immersive_view')
   const isTablet = !useMedia('(min-width: 769px)')
 
   const handleClick = useCallback(() => {
@@ -36,15 +35,11 @@ export function ImmersiveViewBackButton() {
   }, [])
 
   return isTablet ? (
-    <CloseButton
-      size="medium"
-      screenReaderLabel={I18n.t('Go Back to Course')}
-      onClick={handleClick}
-    />
+    <CloseButton size="medium" screenReaderLabel={t('Go Back to Course')} onClick={handleClick} />
   ) : (
     <div className={styles.noShrink}>
       <Button color="primary" onClick={handleClick}>
-        {I18n.t('Go Back to Course')}
+        {t('Go Back to Course')}
       </Button>
     </div>
   )

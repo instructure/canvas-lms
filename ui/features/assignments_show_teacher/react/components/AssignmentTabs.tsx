@@ -22,11 +22,10 @@ import PeerReviewDetailsView from './PeerReviewDetailsView'
 import {Tabs} from '@instructure/ui-tabs'
 import {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import {type ViewOwnProps} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('assignment_tabs')
+import {useTranslation} from '@canvas/i18next'
 
 export default function AssignmentTabs({assignment}: {assignment: TeacherAssignmentType}) {
+  const {t} = useTranslation('assignment_tabs')
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const handleTabChange = (
@@ -40,14 +39,14 @@ export default function AssignmentTabs({assignment}: {assignment: TeacherAssignm
     <Tabs margin="large auto" padding="medium" onRequestTabChange={handleTabChange}>
       <Tabs.Panel
         data-testid="assignment-tab"
-        renderTitle={I18n.t('Assignment')}
+        renderTitle={t('Assignment')}
         isSelected={selectedIndex === 0}
       >
         <AssignmentDetailsView description={assignment.description} />
       </Tabs.Panel>
       <Tabs.Panel
         data-testid="peer-review-tab"
-        renderTitle={I18n.t('Peer Review')}
+        renderTitle={t('Peer Review')}
         isSelected={selectedIndex === 1}
       >
         <PeerReviewDetailsView

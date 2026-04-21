@@ -19,10 +19,8 @@ import React, {useState, useCallback, useEffect, useMemo, type SyntheticEvent} f
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Select} from '@instructure/ui-select'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import type {FormMessage} from '@instructure/ui-form-field'
-
-const I18n = createI18nScope('content_copy_redesign')
 
 type Option = {
   id: string
@@ -51,6 +49,7 @@ export const ConfiguredSelectInput = ({
   messages?: Array<FormMessage>
   searchable?: boolean
 }) => {
+  const {t} = useTranslation('content_copy_redesign')
   const [inputValue, setInputValue] = useState<string>(defaultInputValue)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
@@ -163,7 +162,7 @@ export const ConfiguredSelectInput = ({
     return (
       <SimpleSelect
         renderLabel={label}
-        assistiveText={I18n.t('Use arrow keys to navigate options.')}
+        assistiveText={t('Use arrow keys to navigate options.')}
         value={inputValue}
         defaultValue={inputValue}
         onChange={(_: SyntheticEvent, {id, value}) => {
@@ -187,8 +186,8 @@ export const ConfiguredSelectInput = ({
     <div>
       <Select
         renderLabel={label}
-        assistiveText={I18n.t('Type to navigate options.')}
-        placeholder={I18n.t('Start typing to search...')}
+        assistiveText={t('Type to navigate options.')}
+        placeholder={t('Start typing to search...')}
         inputValue={inputValue}
         isShowingOptions={isShowingOptions}
         onBlur={() => setHighlightedOptionId(null)}
@@ -221,7 +220,7 @@ export const ConfiguredSelectInput = ({
             ))
         ) : (
           <Select.Option id="empty-option" key="empty-option">
-            {I18n.t('No results')}
+            {t('No results')}
           </Select.Option>
         )}
       </Select>

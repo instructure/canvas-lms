@@ -18,12 +18,10 @@
 
 import React from 'react'
 import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Button} from '@instructure/ui-buttons'
 import {CanvasModal} from '@instructure/platform-instui-bindings'
 import {canvasErrorComponent} from '@canvas/error-page-utils'
-
-const I18n = createI18nScope('ConfirmationDialog')
 
 const dialogHolderId = 'confirmation_dialog_holder'
 
@@ -50,18 +48,19 @@ export default function ConfirmationDialog({
   onReject,
   size = 'medium',
 }: ConfirmationDialogProps) {
+  const {t} = useTranslation('ConfirmationDialog')
   return (
     <CanvasModal
       label={label}
       onDismiss={onReject}
       open={open}
       size={size}
-      closeButtonLabel={I18n.t('Close')}
+      closeButtonLabel={t('Close')}
       errorComponent={canvasErrorComponent()}
       footer={
         <>
           <Button key="cancel" data-testid="cancel-button" onClick={onReject}>
-            {I18n.t('Cancel')}
+            {t('Cancel')}
           </Button>
           <Button
             key="confirm"
@@ -70,7 +69,7 @@ export default function ConfirmationDialog({
             color={confirmColor || 'primary'}
             onClick={onConfirm}
           >
-            {confirmText || I18n.t('Confirm')}
+            {confirmText || t('Confirm')}
           </Button>
         </>
       }

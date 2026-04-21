@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "Отменить",
+    "Confirm": "Подтвердить"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "Отметить, как важную дату, и показать на боковой панели «домашней комнаты»"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "Схема выставления оценок учетной записи по умолчанию",
+    "Account default grading scheme was successfully saved.": "Схема выставления оценок учетной записи по умолчанию была успешно сохранена.",
+    "Active Grading Schemes": "Активные схемы выставления оценок",
+    "Applied": "Применено",
+    "Apply": "Применить",
+    "Archive Grading Scheme": "Архивировать схему оценивания",
+    "Archived": "Помещено в архив",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Используемые архивированные схемы выставления оценок можно продолжать использовать, но нельзя добавлять их в новые курсы или задания.",
+    "Are you sure you want to delete this grading scheme?": "Вы уверены, что хотите удалить эту схему оценок?",
+    "Cancel": "Отменить",
+    "Canvas Default": "Canvas по умолчанию",
+    "Close": "Закрыть",
+    "Confirm": "Подтвердить",
+    "Confirm Default Grading Scheme Change": "Подтвердить изменение схемы оценивания по умолчанию",
+    "Delete Grading Scheme": "Удалить схему оценок",
+    "Duplicate Grading Scheme": "Дублировать схему оценивания",
+    "Edit Grading Scheme": "Редактировать схему оценок",
+    "Grading Scheme Name": "Название схемы выставления оценок",
+    "Grading scheme was successfully archived.": "Схема выставления оценок успешно архивирована.",
+    "Grading scheme was successfully created.": "Схема выставления оценок успешно создана.",
+    "Grading scheme was successfully removed.": "Схема выставления оценок успешно удалена.",
+    "Grading scheme was successfully saved.": "Схема выставления оценок успешно сохранена.",
+    "Grading scheme was successfully unarchived.": "Схема выставления оценок успешно разархивирована.",
+    "Locations Used": "Используемые местоположения",
+    "Lower limit of range": "Нижняя граница диапазона",
+    "New Grading Scheme": "Новая схема выставления оценок",
+    "Next Page": "Следующая страница",
+    "No account default": "Нет учетной записи по умолчанию",
+    "Previous Page": "Предыдущая страница",
+    "Save": "Сохранить",
+    "Search": "Поиск",
+    "Search...": "Поиск…",
+    "Show courses and assignments": "Показать курсы и назначения",
+    "Show locations used": "Показать используемые места",
+    "Sort by": "Сортировать по",
+    "There was an error while archiving the grading scheme": "Произошла ошибка при архивировании схемы выставления оценок",
+    "There was an error while creating the grading scheme": "Произошла ошибка при создании схемы выставления оценок",
+    "There was an error while loading grading schemes": "Произошла ошибка при загрузке схем выставления оценок",
+    "There was an error while loading the default canvas grading scheme": "Произошла ошибка при загрузке схемы выставления оценок Сanvas по умолчанию",
+    "There was an error while loading the default grading scheme": "Произошла ошибка при загрузке схемы выставления оценок по умолчанию",
+    "There was an error while removing the grading scheme": "Произошла ошибка при удалении схемы выставления оценок",
+    "There was an error while unarchiving the grading scheme": "Произошла ошибка при разархивировании схемы выставления оценок",
+    "There was an error while updating the default grading scheme": "Произошла ошибка при обновлении схемы выставления оценок по умолчанию",
+    "There was an error while updating the grading scheme": "Произошла ошибка при обновлении схемы выставления оценок",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Это изменение затронет все активные курсы и задания, которые в настоящее время наследуют учетную запись по умолчанию. Это изменение займет некоторое время, так как все оценки за курсы и задания будут пересчитаны в соответствии с новой схемой оценивания по умолчанию.",
+    "Unarchive Grading Scheme": "Разархивировать схему выставления оценок",
+    "Upper limit of range": "Верхняя граница диапазона",
+    "View Grading Scheme": "Просмотр схемы оценок",
+    "View/Copy Grading Scheme": "Просмотр/копирование схемы выставления оценок",
+    "View/Edit Grading Scheme": "Просмотр/редактирование схемы оценок",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "Вы не можете архивировать эту схему выставления оценок, потому что она установлена по умолчанию для курса или учетной записи.",
+    "You can't delete this grading scheme because it is in use.": "Вы не можете удалить эту схему выставления оценок, поскольку она используется.",
+    "You have no active grading schemes.": "У вас нет активных схем выставления оценок.",
+    "You have no archived grading schemes.": "У вас нет архивированных схем выставления оценок.",
+    "to": "к"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "Вы уверены, что хотите удалить эту схему оценок?",
+    "Are you sure you want to duplicate this grading scheme?": "Вы действительно хотите дублировать эту схему выставления оценок?",
+    "Cancel": "Отменить",
+    "Close": "Закрыть",
+    "Delete": "Удалить",
+    "Delete ": "Удалить ",
+    "Duplicate": "Дубликат",
+    "Duplicate ": "Дубликат ",
+    "Edit Grading Scheme": "Редактировать схему оценок",
+    "New Grading Scheme": "Новая схема выставления оценок",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "Процентные значения и баллы нельзя редактировать, поскольку это схема оценок на уровне учетной записи.",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Процентные значения и баллы нельзя редактировать, поскольку эта схема оценок используется по умолчанию.",
+    "Percentages and points can't be edited because it is currently being used.": "Процентные значения и баллы нельзя редактировать, поскольку схема сейчас используется.",
+    "Save": "Сохранить"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Таблица, которая содержит данные схем выставления оценок Canvas по умолчанию.  Каждый ряд содержит имя, максимальное и минимальное процентное значение.",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Таблица, которая содержит данные схем выставления оценок.  Каждый ряд содержит имя, максимальное и минимальное процентное значение.",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Дублирующиеся или пустые имена строк не допускаются. Исправьте имена и снова нажмите «Сохранить».",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Перекрывающиеся или пустые диапазоны не допускаются. Исправьте диапазоны и снова нажмите «Сохранить».",
+    "Delete grading scheme": "Удалить схему выставления оценок",
+    "Edit Grading Scheme": "Редактировать схему оценок",
+    "Edit a copy of this grading scheme": "Отредактируйте копию этой схемы выставления оценок",
+    "Edit grading scheme": "Изменить схему выставления оценок",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Требуется указать название схемы выставления оценок. Добавьте название и снова нажмите «Сохранить».",
+    "Grading scheme title": "Заголовок схемы выставления оценок",
+    "Invalid grading scheme": "Неверная схема выставления оценок",
+    "Letter Grade": "Буквенная оценка",
+    "Looks great!": "Выглядит отлично!",
+    "Percentage": "Процент",
+    "Points": "Баллы",
+    "Range": "Диапазон",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Диапазон должен содержать действительные числа. Отрицательные числа или числа больше 100 не допускаются. Исправьте диапазоны и снова нажмите «Сохранить».",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Диапазон должен содержать действительные числа. Отрицательные числа или числа за пределами верхней границы диапазона не допускаются. Исправьте диапазоны и снова нажмите «Сохранить».",
+    "edit a copy": "редактировать копию"
+  },
+  "OutcomeManagement": {
+    "Course": "Курс",
+    "Institution": "Учреждение"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Учетные записи",
+    "Close": "Закрыть",
+    "Concluded": "Завершено",
+    "Courses": "Курсы",
+    "Failed to load account used locations": "Не удалось загрузить использованные расположения учетной записи",
+    "Failed to load assignments used locations": "Не удалось загрузить использованные расположения заданий",
+    "Failed to load used locations": "Не удалось загрузить использованные расположения",
+    "Load Assignments ...": "Загрузить задания ...",
+    "Load More Assignments ...": "Загрузить больше заданий ...",
+    "Loading": "Загрузка",
+    "Locations Used": "Используемые местоположения",
+    "Search": "Поиск",
+    "Search...": "Поиск…"
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "Приемлемая политика использования",
+    "Close": "Закрыть",
+    "Loading page": "Загрузка страницы",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Политика приемлемого использования в настоящее время недоступна. Проверьте позже или свяжитесь со службой поддержки, если вам нужна дополнительная помощь.",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Невозможно загрузить Политику допустимого использования. Повторите попытку позднее или свяжитесь со службой поддержки, если проблему не удается устранить."
+  },
+  "account_reports": {
+    "Close": "Закрыть",
+    "Invalid date and time.": "Неверное время и дата.",
+    "Next month": "Следующий месяц",
+    "Previous month": "Предыдущий месяц",
+    "Time": "Время"
+  },
+  "admin_split": {
+    "Cancel": "Отменить",
+    "Failed to split users.": "Не удалось разделить пользователей.",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "ПРИМЕЧАНИЕ: Будет предпринята попытка отменить слияние в максимально возможном объеме; тем не менее, объединенные пользователи могут быть не полностью восстановлены до предыдущего состояния.",
+    "OK": "ОК",
+    "Split": "Разделение",
+    "The following users will be split into separate user accounts:": "Следующие пользователи будут разделены на отдельные пользовательские учетные записи:",
+    "There are no user accounts to split from this user.": "Нет учетных записей пользователей для разделения с этим пользователем.",
+    "User split complete. Links to split user accounts follow:": "Разделение пользователей завершено. Ссылки на разделение учетных записей:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Описание"
+  },
+  "assignment_footer": {
+    "Next": "Далее",
+    "Previous": "Предыдущий"
+  },
+  "assignment_tabs": {
+    "Assignment": "Задание",
+    "Peer Review": "Рассмотрение коллегами"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(курс по умолчанию)",
+    "Account Level": "Уровень учетной записи",
+    "Canvas Grading Scheme (course default)": "Схема выставления оценок Canvas (курс по умолчанию)",
+    "Close": "Закрыть",
+    "Course Level": "Уровень курса",
+    "Default Canvas Grading Scheme": "Схема выставления оценок Canvas по умолчанию",
+    "Grading scheme was successfully removed.": "Схема выставления оценок успешно удалена.",
+    "Grading scheme was successfully updated.": "Схема выставления оценок успешно обновлена.",
+    "Manage All Grading Schemes": "Управление всеми схемами выставления оценок",
+    "New Grading Scheme": "Новая схема выставления оценок",
+    "Select a grading scheme": "Выбрать схему выставления оценок",
+    "There was an error while loading grading schemes": "Произошла ошибка при загрузке схем выставления оценок",
+    "There was an error while loading the grading scheme": "Произошла ошибка при загрузке схемы выставления оценок",
+    "There was an error while refreshing grading schemes": "Произошла ошибка при обновлении схем выставления оценок",
+    "There was an error while removing the grading scheme": "Произошла ошибка при удалении схемы выставления оценок",
+    "View": "Просмотреть"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "Задания 2 Страница ошибок преподавателя",
+    "Assignments 2 Teacher initial query error": "Задания 2 Ошибка первоначального запроса преподавателя",
+    "Loading": "Загрузка"
+  },
+  "catalog": {
+    "Course Catalog": "Каталог курсов"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "Отличная работа! От разработчиков Canvas"
+  },
+  "content_copy_redesign": {
+    "Cancel": "Отменить",
+    "Copy course": "Копировать курс",
+    "Course code": "Код курса",
+    "Course code must be 255 characters or less": "Длина кода курса не должна превышать 255 символов",
+    "Course name must be 255 characters or less": "Название курса не должна превышать 255 символов",
+    "Create course": "Создать курс",
+    "Creating...": "Выполняется создание...",
+    "End date": "Дата окончания",
+    "End date must be after start date": "Дата окончания должна быть после даты начала",
+    "Name": "Имя",
+    "No results": "Без результатов",
+    "Please enter the details for the new course.": "Введите следующие сведения, чтобы приступить к созданию курса.",
+    "Select a new beginning date": "Выберите новую дату начала",
+    "Select a new end date": "Выберите новую дату окончания",
+    "Select end date": "Выберите дату окончания",
+    "Select start date": "Выберите дату начала",
+    "Start date": "Дата начала",
+    "Start date must be before end date": "Дата начала должна быть раньше даты окончания",
+    "Start typing to search...": "Начните ввод поискового запроса...",
+    "Term": "Период",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Даты начала и окончания периода нельзя изменить здесь — только на странице Сведения о периоде в разделе Администратор.",
+    "Use arrow keys to navigate options.": "Используйте клавиши со стрелками для навигации по параметрам."
+  },
+  "content_share_preview_overlay": {
+    "Close": "Закрыть",
+    "Content Share Preview": "Предпросмотр общедоступного контента",
+    "Preview": "Предварительный просмотр"
+  },
+  "copy_warnings_modal": {
+    "Attention": "Внимание"
+  },
+  "course_logging_content": {
+    "No results": "Без результатов",
+    "Type to search": "Набрать для поиска"
+  },
+  "create_course_modal": {
+    "Cancel": "Отменить",
+    "Course Details": "Сведения о курсе",
+    "Course Name": "Название курса",
+    "Create": "Создать",
+    "Create Course": "Создать курс",
+    "Create Subject": "Создать тему",
+    "Creating new course...": "Создать новый курс...",
+    "Creating new subject...": "Создание новой темы...",
+    "Error creating new course": "Ошибка при создании нового курса",
+    "Error creating new subject": "Ошибка при создании новой темы",
+    "Loading accounts...": "Загрузка учетных записей...",
+    "Name...": "Имя...",
+    "No Results": "Нет результатов",
+    "Select a homeroom": "Выбрать домашнюю комнату",
+    "Subject Name": "Наименование темы",
+    "Unable to get accounts": "Невозможно получить учетные записи",
+    "Unable to get homerooms": "Невозможно получить «домашние комнаты»,",
+    "Use arrow keys to navigate options.": "Используйте клавиши со стрелками для навигации по параметрам.",
+    "Which account will this course be associated with?": "С какой учетной записью будет ассоциирован этот курс?",
+    "Which account will this subject be associated with?": "С какой учетной записью будет связана данная тема?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "Отклонение итоговой оценки"
+  },
+  "feature_flags": {
+    "Accept": "Принять",
+    "Cancel": "Отменить"
+  },
+  "filter_bar": {
+    "All": "Всё",
+    "Clear": "Очистить",
+    "Filter by": "Фильтровать по",
+    "Search": "Поиск",
+    "Use arrow keys to navigate options.": "Используйте клавиши со стрелками для навигации по параметрам."
+  },
+  "groupNavigationSelector": {
+    "Select Group": "Выберите группу",
+    "Use arrow keys to navigate options.": "Используйте клавиши со стрелками для навигации по параметрам."
+  },
+  "jobs": {
+    "Close": "Закрыть"
+  },
+  "modules_home_page": {
+    "Create a new Module": "Создать новый Модуль"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "Панда-ученик",
+    "Moves:": "Переместить:"
+  },
+  "overview_page": {
+    "Edit home page": "Редактировать начальную страницу",
+    "Subject Home Page": "Начальная страница темы"
+  },
+  "pages_edit_title": {
+    "Page Title": "Заголовок страницы"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "Отменить",
+    "Close": "Закрыть"
+  },
+  "study_assist": {
+    "Back": "Назад",
+    "Close": "Закрыть",
+    "Page": "Страница"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "Необходим действительный URL-адрес",
+    "Website URL": "Адрес веб-сайта"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "Приемлемая политика использования",
+    "Loading...": "Выполняется загрузка...",
+    "Preview": "Предварительный просмотр"
+  },
+  "todos_page": {
+    "Failed to load todos": "Не удалось загрузить список заданий со сроками выполнения",
+    "Loading Additional Todo Details": "Загрузка детальной информации о дополнительном списке заданий со сроками выполнения",
+    "Loading Todo Course Name": "Загрузка названия курса для списка заданий со сроками выполнения",
+    "Loading Todo Title": "Загрузка заголовка списка заданий со сроками выполнения"
+  },
+  "tray": {
+    "Close": "Закрыть"
+  }
+}

@@ -18,7 +18,7 @@
 
 import React, {useCallback, useMemo, useRef} from 'react'
 import {usePendoTracking} from '@canvas/pendo/react/hooks/usePendoTracking'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -39,8 +39,6 @@ import type {
 import {IconAiSolid, IconArrowStartLine, IconInfoLine} from '@instructure/ui-icons'
 import CanvasAiInformation from '@canvas/ai-information'
 
-const I18n = createI18nScope('study_assist')
-
 const GRADIENT = 'linear-gradient(135deg, #7b5ea7 0%, #5b7fa6 60%, #4a919e 100%)'
 
 type Props = {
@@ -55,6 +53,7 @@ type TrayHeaderProps = {
 }
 
 function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
+  const {t} = useTranslation('study_assist')
   const {showBackButton, resetChat} = useAssistContext()
 
   return (
@@ -68,7 +67,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
                 color="primary-inverse"
                 withBackground={false}
                 withBorder={true}
-                screenReaderLabel={I18n.t('Back')}
+                screenReaderLabel={t('Back')}
                 onClick={resetChat}
                 data-testid="study-assist-back-button"
               >
@@ -80,7 +79,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
             <IconAiSolid />
           </Flex.Item>
           <Flex.Item>
-            <Heading themeOverride={{primaryColor: 'white'}}>{I18n.t('Study tools')}</Heading>
+            <Heading themeOverride={{primaryColor: 'white'}}>{t('Study tools')}</Heading>
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -88,26 +87,26 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
         <Flex gap="small">
           <Flex.Item>
             <CanvasAiInformation
-              title={I18n.t('Nutrition Facts')}
-              privacyNoticeText={I18n.t('AI Privacy Notice')}
-              featureName={I18n.t('Study Tools')}
-              modelName={I18n.t('Claude 3 Haiku')}
+              title={t('Nutrition Facts')}
+              privacyNoticeText={t('AI Privacy Notice')}
+              featureName={t('Study Tools')}
+              modelName={t('Claude 3 Haiku')}
               isTrainedWithUserData={false}
-              dataSharedWithModel={I18n.t('Page')}
-              dataSharedWithModelDescription={I18n.t(
+              dataSharedWithModel={t('Page')}
+              dataSharedWithModelDescription={t(
                 'Page content is sent to the model to generate study materials.',
               )}
-              dataRetention={I18n.t('Data is not stored or reused by the model.')}
-              dataLogging={I18n.t('Does Not Log Data')}
-              regionsSupported={I18n.t('US')}
+              dataRetention={t('Data is not stored or reused by the model.')}
+              dataLogging={t('Does Not Log Data')}
+              regionsSupported={t('US')}
               isPIIExposed={false}
-              isPIIExposedDescription={I18n.t(
+              isPIIExposedDescription={t(
                 'PII in page content may be included, but no PII is intentionally sent to the model.',
               )}
               isFeatureBehindSetting={true}
               isHumanInTheLoop={true}
-              expectedRisks={I18n.t('Generated study content may be inaccurate or incomplete.')}
-              intendedOutcomes={I18n.t(
+              expectedRisks={t('Generated study content may be inaccurate or incomplete.')}
+              intendedOutcomes={t(
                 'Students are able to efficiently study course material through AI-generated summaries, quizzes, and flashcards.',
               )}
               permissionsLevel={2}
@@ -117,7 +116,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
                   color="primary-inverse"
                   withBackground={false}
                   withBorder={false}
-                  screenReaderLabel={I18n.t('AI information')}
+                  screenReaderLabel={t('AI information')}
                   data-testid="study-assist-ai-info-button"
                 >
                   <IconInfoLine />
@@ -133,7 +132,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
               onClick={onDismiss}
               size="small"
               color="primary-inverse"
-              screenReaderLabel={I18n.t('Close')}
+              screenReaderLabel={t('Close')}
               data-testid="study-assist-close-button"
             />
           </Flex.Item>
@@ -144,6 +143,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
 }
 
 export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
+  const {t} = useTranslation('study_assist')
   const closeButtonRef = useRef<Element | null>(null)
   const allowedPrompts = useMemo(() => window.ENV.STUDY_ASSIST_TOOLS ?? [], [])
   const {trackEvent} = usePendoTracking()
@@ -180,7 +180,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
 
   return (
     <Tray
-      label={I18n.t('Study tools')}
+      label={t('Study tools')}
       placement="end"
       size="regular"
       open={open}
@@ -217,7 +217,7 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
           ) : (
             <View as="div" padding="large" textAlign="center">
               <Text color="primary-inverse" data-testid="study-assist-no-tools">
-                {I18n.t('No study tools are currently available.')}
+                {t('No study tools are currently available.')}
               </Text>
             </View>
           )}

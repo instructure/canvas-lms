@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "Avbryt",
+    "Confirm": "Bekräfta"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "Markera som viktigt datum och visa i sidofält i fjärrundervisningsrum"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "Standardomdömesschema för konton",
+    "Account default grading scheme was successfully saved.": "Standardomdömesschemat för konton sparades.",
+    "Active Grading Schemes": "Aktiva omdömesscheman",
+    "Applied": "Tillämpad",
+    "Apply": "Tillämpa",
+    "Archive Grading Scheme": "Arkivera omdömesscheman",
+    "Archived": "Arkiverade",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Arkiverade omdömesscheman som används kan fortfarande användas, men kan inte läggas till i nya kurser eller uppgifter.",
+    "Are you sure you want to delete this grading scheme?": "Vill du radera det här bedömningsschemat?",
+    "Cancel": "Avbryt",
+    "Canvas Default": "Canvas-standard",
+    "Close": "Stäng",
+    "Confirm": "Bekräfta",
+    "Confirm Default Grading Scheme Change": "Bekräfta ändring i standardomdömesschema",
+    "Delete Grading Scheme": "Radera omdömesschema",
+    "Duplicate Grading Scheme": "Duplicera omdömesschema",
+    "Edit Grading Scheme": "Redigera omdömesschema",
+    "Grading Scheme Name": "Namn på bedömningsschema",
+    "Grading scheme was successfully archived.": "Omdömesschemat arkiverades.",
+    "Grading scheme was successfully created.": "Bedömningsschemat skapades.",
+    "Grading scheme was successfully removed.": "Bedömningsschemat togs bort.",
+    "Grading scheme was successfully saved.": "Bedömningsschemat sparades.",
+    "Grading scheme was successfully unarchived.": "Omdömesschemat hämtades från arkivet.",
+    "Locations Used": "Platserna har använts",
+    "Lower limit of range": "Intervallets nedre gräns",
+    "New Grading Scheme": "Nytt bedömningsschema",
+    "Next Page": "Nästa sida",
+    "No account default": "Ingen kontostandard",
+    "Previous Page": "Föregående sida",
+    "Save": "Spara",
+    "Search": "Sök",
+    "Search...": "Sök ...",
+    "Show courses and assignments": "Visa kurser och uppgifter",
+    "Show locations used": "Visa använda platser",
+    "Sort by": "Sortera efter",
+    "There was an error while archiving the grading scheme": "Ett fel inträffade när omdömesschemat arkiverades.",
+    "There was an error while creating the grading scheme": "Ett fel inträffade när bedömningsschemat skapades.",
+    "There was an error while loading grading schemes": "Ett fel inträffade när bedömningsscheman lästes in.",
+    "There was an error while loading the default canvas grading scheme": "Ett fel inträffade när Canvas standardbedömningsschema lästes in.",
+    "There was an error while loading the default grading scheme": "Ett fel inträffade när standardbedömningsschemat lästes in.",
+    "There was an error while removing the grading scheme": "Ett fel inträffade när bedömningsschemat togs bort.",
+    "There was an error while unarchiving the grading scheme": "Ett fel inträffade när omdömesschemat hämtades från arkivet.",
+    "There was an error while updating the default grading scheme": "Ett fel inträffade när standardomdömesschemat uppdaterades.",
+    "There was an error while updating the grading scheme": "Ett fel inträffade när bedömningsschemat uppdaterades.",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Ändringen kommer att påverka alla aktiva kurser och uppgifter som för närvarande ärver standarden för kontot, Det kommer att ta ett tag innan den här ändringen har slutförts eftersom alla omdömen för kurser och uppgifter omberäknas med hänsyn till det nya standardomdömesschemat för kontot.",
+    "Unarchive Grading Scheme": "Hämta omdömesschema från arkivet",
+    "Upper limit of range": "Intervallets övre gräns",
+    "View Grading Scheme": "Visa bedömningsschema",
+    "View/Copy Grading Scheme": "Visa/kopiera bedömningsschema",
+    "View/Edit Grading Scheme": "Visa/redigera bedömningsschema",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "Du kan inte arkivera det här omdömesschemat eftersom det är inställt som standard för en kurs eller ett konto.",
+    "You can't delete this grading scheme because it is in use.": "Det går inte att radera det här omdömesschemat eftersom det används.",
+    "You have no active grading schemes.": "Du har inga aktiva omdömesscheman.",
+    "You have no archived grading schemes.": "Du har inga arkiverade omdömesscheman.",
+    "to": "till"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "Vill du radera det här bedömningsschemat?",
+    "Are you sure you want to duplicate this grading scheme?": "Vill du duplicera det här bedömningsschemat?",
+    "Cancel": "Avbryt",
+    "Close": "Stäng",
+    "Delete": "Ta bort",
+    "Delete ": "Radera ",
+    "Duplicate": "Kopiera",
+    "Duplicate ": "Duplicera ",
+    "Edit Grading Scheme": "Redigera omdömesschema",
+    "New Grading Scheme": "Nytt bedömningsschema",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "Det går inte att redigera procentandelar och poäng eftersom det är ett omdömesschema på kontonivå.",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Det går inte att redigera procentandelar och poäng eftersom det används som standardomdömesschema.",
+    "Percentages and points can't be edited because it is currently being used.": "Det går inte att redigera procentandelar och poäng eftersom det för närvarande används.",
+    "Save": "Spara"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "En tabell som innehåller data för Canvas standardbedömningsschema.  Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal.",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "En tabell som innehåller data för bedömningsschema.  Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal.",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Det får inte finnas radnamn som är dubbletter eller tomma. Åtgärda namnen och försök klicka på ”Spara” igen.",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Det får inte finnas överlappande eller tomma intervall. Åtgärda intervallen och försök klicka på ”Spara” igen.",
+    "Delete grading scheme": "Radera bedömningsschema",
+    "Edit Grading Scheme": "Redigera omdömesschema",
+    "Edit a copy of this grading scheme": "Redigera en kopia av det här bedömningsschemat",
+    "Edit grading scheme": "Redigera bedömningsschema",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Namn på bedömningsschema krävs Lägg till ett namn och försök klicka på ”Spara” igen.",
+    "Grading scheme title": "Titel på bedömningsschema",
+    "Invalid grading scheme": "Ogiltigt bedömningsschema",
+    "Letter Grade": "Bokstavsomdöme",
+    "Looks great!": "Ser väldigt bra ut!",
+    "Percentage": "Procent",
+    "Points": "Poäng",
+    "Range": "Intervall",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Intervallen måste vara ett giltigt nummer. Det får inte finnas negativa nummer eller nummer som är större än 100. Åtgärda intervallen och försök klicka på ”Spara” igen.",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Intervallen måste vara ett giltigt nummer. Det får inte finnas negativa nummer eller nummer som är större än den övre poängintervallen. Åtgärda intervallen och försök klicka på ”Spara” igen.",
+    "edit a copy": "redigera en kopia"
+  },
+  "OutcomeManagement": {
+    "Course": "Kurs",
+    "Institution": "Lärosäte"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Konton",
+    "Close": "Stäng",
+    "Concluded": "Avslutade",
+    "Courses": "Kurser",
+    "Failed to load account used locations": "Det gick inte att läsa in använda platser för kontot",
+    "Failed to load assignments used locations": "Det gick inte att läsa in använda platser för uppgifter",
+    "Failed to load used locations": "Det gick inte att läsa platser",
+    "Load Assignments ...": "Läs in uppgifter ...",
+    "Load More Assignments ...": "Läs in fler uppgifter ...",
+    "Loading": "Laddar",
+    "Locations Used": "Platserna har använts",
+    "Search": "Sök",
+    "Search...": "Sök ..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "Acceptable Use Policy (Policy för godkänd användning)",
+    "Close": "Stäng",
+    "Loading page": "Läser in sidan",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Policyn för godkänd användning är för närvarande inte tillgänglig. Kom tillbaka senare eller kontakta supporten om du behöver ytterligare hjälp.",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Det gick inte att läsa in policyn för godkänd användning. Försök igen eller kontakta supporten om problemet kvarstår."
+  },
+  "account_reports": {
+    "Close": "Stäng",
+    "Invalid date and time.": "Ogiltigt startdatum och -tid.",
+    "Next month": "Nästa månad",
+    "Previous month": "Föregående månad",
+    "Time": "Tid"
+  },
+  "admin_split": {
+    "Cancel": "Avbryt",
+    "Failed to split users.": "Det gick inte att dela användare.",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "OBS! Detta kommer att återställa sammanfogningen så långt det är möjligt. Sammanfogade användare kanske inte blir fullständigt återställda till sitt tidigare tillstånd.",
+    "OK": "OK",
+    "Split": "Dela",
+    "The following users will be split into separate user accounts:": "Följande användare delas upp i separata användarkonton:",
+    "There are no user accounts to split from this user.": "Det finns inga användarkonton som kan delas från den här användaren.",
+    "User split complete. Links to split user accounts follow:": "Delning av användare slutförd. Länkar för att dela användarkonton följer:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Beskrivning"
+  },
+  "assignment_footer": {
+    "Next": "Nästa",
+    "Previous": "Föregående"
+  },
+  "assignment_tabs": {
+    "Assignment": "Uppgift",
+    "Peer Review": "Kamratrespons"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(kurstandard)",
+    "Account Level": "Kontonivå",
+    "Canvas Grading Scheme (course default)": "Canvas-bedömningsschema (kursstandard)",
+    "Close": "Stäng",
+    "Course Level": "Kursnivå",
+    "Default Canvas Grading Scheme": "Canvas standardbedömningsschema",
+    "Grading scheme was successfully removed.": "Bedömningsschemat togs bort.",
+    "Grading scheme was successfully updated.": "Omdömesschemat uppdaterades.",
+    "Manage All Grading Schemes": "Hantera alla bedömningsscheman",
+    "New Grading Scheme": "Nytt bedömningsschema",
+    "Select a grading scheme": "Välj ett omdömesschema",
+    "There was an error while loading grading schemes": "Ett fel inträffade när bedömningsscheman lästes in.",
+    "There was an error while loading the grading scheme": "Ett fel inträffade när omdömesschemat lästes in",
+    "There was an error while refreshing grading schemes": "Ett fel inträffade när bedömningsscheman uppdaterades.",
+    "There was an error while removing the grading scheme": "Ett fel inträffade när bedömningsschemat togs bort.",
+    "View": "Visa"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "Uppgifter 2 Felsida för lärare",
+    "Assignments 2 Teacher initial query error": "Uppgifter 2 Fel i initial fråga för lärare",
+    "Loading": "Laddar"
+  },
+  "catalog": {
+    "Course Catalog": "Kurskatalog"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "Bra jobbat! Från Canvas-utvecklarna"
+  },
+  "content_copy_redesign": {
+    "Cancel": "Avbryt",
+    "Copy course": "Kopiera kurs",
+    "Course code": "Kurskod",
+    "Course code must be 255 characters or less": "Kurskoden får innehålla högst 255 tecken",
+    "Course name must be 255 characters or less": "Kursnamnet får innehålla högst 255 tecken",
+    "Create course": "Skapa kurs",
+    "Creating...": "Skapar …",
+    "End date": "Slutdatum",
+    "End date must be after start date": "Slutdatumet måste infalla efter startdatumet",
+    "Name": "Namn",
+    "No results": "Inga resultat",
+    "Please enter the details for the new course.": "Ange den nya kursens uppgifter",
+    "Select a new beginning date": "Välj ett nytt startdatum",
+    "Select a new end date": "Välj ett nytt slutdatum",
+    "Select end date": "Välj slutdatum",
+    "Select start date": "Välj startdatum",
+    "Start date": "Startdatum",
+    "Start date must be before end date": "Startdatumet måste infalla före slutdatumet",
+    "Start typing to search...": "Börja skriva för att söka...",
+    "Term": "Termin",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Du kan inte ändra start- och slutdatumen för terminen här, utan endast på sidan Termininformation under Admin.",
+    "Use arrow keys to navigate options.": "Använd piltangenterna för att navigera bland alternativen."
+  },
+  "content_share_preview_overlay": {
+    "Close": "Stäng",
+    "Content Share Preview": "Förhandsgranskning av innehållsdelning",
+    "Preview": "Förhandsgranska"
+  },
+  "copy_warnings_modal": {
+    "Attention": "Uppmärksamhet"
+  },
+  "course_logging_content": {
+    "No results": "Inga resultat",
+    "Type to search": "Skriv för att söka"
+  },
+  "create_course_modal": {
+    "Cancel": "Avbryt",
+    "Course Details": "Kursinformation",
+    "Course Name": "Kursnamn",
+    "Create": "Skapa",
+    "Create Course": "Skapa kurs",
+    "Create Subject": "Skapa ämne",
+    "Creating new course...": "Skapar ny kurs ...",
+    "Creating new subject...": "Skapar nytt ämne ...",
+    "Error creating new course": "Ett fel inträffade när den nya kursen skapades",
+    "Error creating new subject": "Ett fel inträffade när ett nytt ämne skapades",
+    "Loading accounts...": "Läser in konton ...",
+    "Name...": "Namn ...",
+    "No Results": "Inga resultat",
+    "Select a homeroom": "Välj ett fjärrundervisningsrum",
+    "Subject Name": "Ämnesnamn",
+    "Unable to get accounts": "Det gick inte att hämta konton",
+    "Unable to get homerooms": "Det gick inte att hämta fjärrundervisningsrum",
+    "Use arrow keys to navigate options.": "Använd piltangenterna för att navigera bland alternativen.",
+    "Which account will this course be associated with?": "Vilket konto kommer den här kursen att kopplas till?",
+    "Which account will this subject be associated with?": "Vilket konto kommer det här ämnet att kopplas till?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "Åsidosättning av slutbedömning"
+  },
+  "feature_flags": {
+    "Accept": "Acceptera",
+    "Cancel": "Avbryt"
+  },
+  "filter_bar": {
+    "All": "Alla",
+    "Clear": "Rensa",
+    "Filter by": "Filtrera efter",
+    "Search": "Sök",
+    "Use arrow keys to navigate options.": "Använd piltangenterna för att navigera bland alternativen."
+  },
+  "groupNavigationSelector": {
+    "Select Group": "Välj grupp",
+    "Use arrow keys to navigate options.": "Använd piltangenterna för att navigera bland alternativen."
+  },
+  "jobs": {
+    "Close": "Stäng"
+  },
+  "modules_home_page": {
+    "Create a new Module": "Skapa en ny modul"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "En panda som studerar",
+    "Moves:": "Flyttar:"
+  },
+  "overview_page": {
+    "Edit home page": "Redigera kurshemsida",
+    "Subject Home Page": "Ämneshemsida"
+  },
+  "pages_edit_title": {
+    "Page Title": "Sidans titel"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "Avbryt",
+    "Close": "Stäng"
+  },
+  "study_assist": {
+    "Back": "Tillbaka",
+    "Close": "Stäng",
+    "Page": "Sida"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "En giltig URL krävs",
+    "Website URL": "Webbplatslänk"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "Acceptable Use Policy (Policy för godkänd användning)",
+    "Loading...": "Läser in ...",
+    "Preview": "Förhandsgranska"
+  },
+  "todos_page": {
+    "Failed to load todos": "Det gick inte att läsa in att göra-aktiviteter",
+    "Loading Additional Todo Details": "Läser in ytterligare att göra-information",
+    "Loading Todo Course Name": "Läser in kursnamn för att göra-aktivitet",
+    "Loading Todo Title": "Läser in titel för att göra-aktivitet"
+  },
+  "tray": {
+    "Close": "Stäng"
+  }
+}

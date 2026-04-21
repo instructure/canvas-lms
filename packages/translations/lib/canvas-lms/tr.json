@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "İptal",
+    "Confirm": "Onayla"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "Önemli tarih olarak işaretle ve sınıf yan çubuğunda göster"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "Hesap varsayılan notlandırma şeması",
+    "Account default grading scheme was successfully saved.": "Hesap varsayılan notlandırma şeması başarıyla kaydedildi.",
+    "Active Grading Schemes": "Etkin Notlandırma Şemaları",
+    "Applied": "Uygulandı",
+    "Apply": "Uygula",
+    "Archive Grading Scheme": "Notlandırma Şemasını Arşivle",
+    "Archived": "Arşivlenmiş",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Kullanımda olan arşivlenmiş notlandırma şemaları hâlâ kullanılabilir; ancak yeni derslere veya ödevlere eklenemez.",
+    "Are you sure you want to delete this grading scheme?": "Bu notlandırma şemasını silmek istediğinize emin misiniz?",
+    "Cancel": "İptal",
+    "Canvas Default": "Canvas Varsayılan",
+    "Close": "Kapat",
+    "Confirm": "Onayla",
+    "Confirm Default Grading Scheme Change": "Varsayılan Notlandırma Şeması Değişikliğini Onayla",
+    "Delete Grading Scheme": "Notlandırma Şemasını Sil",
+    "Duplicate Grading Scheme": "Notlandırma Şemasını Çoğalt",
+    "Edit Grading Scheme": "Notlandırma Şemasını Düzenle",
+    "Grading Scheme Name": "Notlandırma Şeması Adı",
+    "Grading scheme was successfully archived.": "Notlandırma şeması başarıyla arşivlendi.",
+    "Grading scheme was successfully created.": "Notlandırma şeması başarıyla oluşturuldu.",
+    "Grading scheme was successfully removed.": "Notlandırma şeması başarıyla kaldırıldı.",
+    "Grading scheme was successfully saved.": "Notlandırma şeması başarıyla kaydedildi.",
+    "Grading scheme was successfully unarchived.": "Notlandırma şemasının arşivi başarıyla kaldırıldı.",
+    "Locations Used": "Kullanılan Konumlar",
+    "Lower limit of range": "Aralık alt sınırı",
+    "New Grading Scheme": "Yeni Notlandırma Şeması",
+    "Next Page": "Sonraki Sayfa",
+    "No account default": "Varsayılan hesap yok",
+    "Previous Page": "Önceki Sayfa",
+    "Save": "Kaydet",
+    "Search": "Ara",
+    "Search...": "Ara...",
+    "Show courses and assignments": "Dersleri ve ödevleri göster",
+    "Show locations used": "Kullanılan konumları göster",
+    "Sort by": "Şuna göre sırala",
+    "There was an error while archiving the grading scheme": "Notlandırma şemasını arşivlerken hata oluştu",
+    "There was an error while creating the grading scheme": "Notlandırma şemasını oluştururken hata oluştu",
+    "There was an error while loading grading schemes": "Notlandırma şemaları yüklenirken hata oluştu",
+    "There was an error while loading the default canvas grading scheme": "Varsayılan Canvas notlandırma şeması yüklenirken hata oluştu",
+    "There was an error while loading the default grading scheme": "Varsayılan notlandırma şeması yüklenirken hata oluştu",
+    "There was an error while removing the grading scheme": "Notlandırma şemasını kaldırırken hata oluştu",
+    "There was an error while unarchiving the grading scheme": "Notlandırma şemasını arşivden çıkarırken hata oluştu",
+    "There was an error while updating the default grading scheme": "Varsayılan notlandırma şeması güncellenirken hata oluştu",
+    "There was an error while updating the grading scheme": "Notlandırma şeması güncellenirken hata oluştu",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Bu değişiklik, hesap varsayılanını devralan şu anda etkin olan tüm dersleri ve ödevleri etkileyecektir. Hesap ve ödev notları yeni hesap varsayılanına göre yeniden hesaplanacağı için işlemin tamamlanması biraz zaman alacaktır.",
+    "Unarchive Grading Scheme": "Notlandırma Şemasını Arşivden Çıkar",
+    "Upper limit of range": "Aralık üst sınırı",
+    "View Grading Scheme": "Notlandırma Şemasını Göster",
+    "View/Copy Grading Scheme": "Notlandırma Şemasını Görüntüle/Kopyala",
+    "View/Edit Grading Scheme": "Notlandırma Şemasını Göster/Düzenle",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "Bu notlandırma şemasını arşivleyemezsiniz; çünkü bir ders veya hesap için varsayılan olarak ayarlı.",
+    "You can't delete this grading scheme because it is in use.": "Bu notlandırma şemasını silemezsiniz; çünkü kullanımda.",
+    "You have no active grading schemes.": "Etkin notlandırma şemanız yok.",
+    "You have no archived grading schemes.": "Arşivlenmiş notlandırma şemanız yok.",
+    "to": "ile"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "Bu notlandırma şemasını silmek istediğinize emin misiniz?",
+    "Are you sure you want to duplicate this grading scheme?": "Bu notlandırma şemasını kopyalamak istediğinizden emin misiniz?",
+    "Cancel": "İptal",
+    "Close": "Kapat",
+    "Delete": "Sil",
+    "Delete ": "Sil",
+    "Duplicate": "Çoğalt",
+    "Duplicate ": "Çoğalt",
+    "Edit Grading Scheme": "Notlandırma Şemasını Düzenle",
+    "New Grading Scheme": "Yeni Notlandırma Şeması",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "Yüzdeler ve puanlar düzenlenemez; çünkü bu, hesap düzeyinde bir notlandırma şemasıdır.",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Yüzdeler ve puanlar düzenlenemez; çünkü varsayılan notlandırma şeması olarak kullanılıyor.",
+    "Percentages and points can't be edited because it is currently being used.": "Yüzdeler ve puanlar düzenlenemez; çünkü şu anda kullanılıyor.",
+    "Save": "Kaydet"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Varsayılan Canvas notlandırma şeması verilerini içeren bir tablo. Her satır bir ad, maksimum yüzde ve minimum yüzde içerir.",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Notlandırma şeması verilerini içeren bir tablo. Her satır bir ad, maksimum yüzde ve minimum yüzde içerir.",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Yinelenen veya boş satır adları olamaz. Adları düzeltin ve 'Kaydet' düğmesine yeniden tıklayın.",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Çakışan veya boş aralıklar olamaz. Aralıkları düzeltin ve 'Kaydet' düğmesine yeniden tıklayın.",
+    "Delete grading scheme": "Notlandırma şemasını sil",
+    "Edit Grading Scheme": "Notlandırma Şemasını Düzenle",
+    "Edit a copy of this grading scheme": "Bu notlandırma şemasının bir kopyasını düzenle",
+    "Edit grading scheme": "Notlandırma şemasını düzenle",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Notlandırma Şeması Adı zorunludur. Bir ad ekleyip 'Kaydet'i yeniden tıklayın.",
+    "Grading scheme title": "notlandırma şeması başlığı",
+    "Invalid grading scheme": "Notlandırma şeması geçersiz",
+    "Letter Grade": "Harf Notu",
+    "Looks great!": "Harika görünüyor!",
+    "Percentage": "Yüzde",
+    "Points": "Puanlar",
+    "Range": "Aralık",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Aralık geçerli bir sayı olmalıdır. Negatif sayı veya 100'den büyük sayı içeremez. Aralıkları düzeltin ve 'Kaydet' düğmesine yeniden tıklayın.",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Aralık geçerli bir sayı olmalıdır. Negatif sayı veya üst puan aralığından büyük sayı içeremez. Aralıkları düzeltin ve 'Kaydet' düğmesine yeniden tıklayın.",
+    "edit a copy": "Kopyayı düzenle"
+  },
+  "OutcomeManagement": {
+    "Course": "Ders",
+    "Institution": "Kurum"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Hesaplar",
+    "Close": "Kapat",
+    "Concluded": "Sonlandırıldı",
+    "Courses": "Dersler",
+    "Failed to load account used locations": "Hesabın kullanılan konumları yüklenemedi",
+    "Failed to load assignments used locations": "Ödevlerde kullanılan konumlar yüklenemedi",
+    "Failed to load used locations": "Kullanılan konumlar yüklenemedi",
+    "Load Assignments ...": "Ödevler yükleniyor...",
+    "Load More Assignments ...": "Daha Fazla Ödev Yükle ...",
+    "Loading": "Yükleniyor",
+    "Locations Used": "Kullanılan Konumlar",
+    "Search": "Ara",
+    "Search...": "Ara..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "Uygun Kullanım Koşulları",
+    "Close": "Kapat",
+    "Loading page": "Sayfa yükleniyor",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Kabul Edilebilir Kullanım Politikası şu anda kullanılamıyor. Lütfen daha sonra tekrar kontrol edin veya ek yardıma ihtiyacınız varsa destekle iletişime geçin.",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Kabul Edilebilir Kullanım Politikası yüklenemedi. Lütfen daha sonra yeniden deneyin veya sorun devam ederse destekle iletişime geçin."
+  },
+  "account_reports": {
+    "Close": "Kapat",
+    "Invalid date and time.": "Geçersiz tarih ve saat.",
+    "Next month": "Sonraki ay",
+    "Previous month": "Önceki ay",
+    "Time": "Süre"
+  },
+  "admin_split": {
+    "Cancel": "İptal",
+    "Failed to split users.": "Kullanıcılar bölünemedi.",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NOT: Bu işlem, birleştirmeyi mümkün olduğunca tamamen geri almayı dener; ancak birleştirilen kullanıcılar önceki durumlarına kusursuz biçimde geri döndürülemeyebilir.",
+    "OK": "Tamam",
+    "Split": "Ayır",
+    "The following users will be split into separate user accounts:": "Aşağıdaki kullanıcılar ayrı kullanıcı hesaplarına bölünecek:",
+    "There are no user accounts to split from this user.": "Bu kullanıcıdan ayrılacak kullanıcı hesabı yok.",
+    "User split complete. Links to split user accounts follow:": "Kullanıcı ayırma tamamlandı. Ayrılan kullanıcı hesaplarına bağlantılar:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Açıklama"
+  },
+  "assignment_footer": {
+    "Next": "Sonraki",
+    "Previous": "Önceki"
+  },
+  "assignment_tabs": {
+    "Assignment": "Ödev",
+    "Peer Review": "Akran Değerlendirme"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(ders varsayılanı)",
+    "Account Level": "Hesap Düzeyi",
+    "Canvas Grading Scheme (course default)": "Canvas Notlandırma Şeması (ders varsayılanı)",
+    "Close": "Kapat",
+    "Course Level": "Ders Düzeyi",
+    "Default Canvas Grading Scheme": "Varsayılan Canvas Notlandırma Şeması",
+    "Grading scheme was successfully removed.": "Notlandırma şeması başarıyla kaldırıldı.",
+    "Grading scheme was successfully updated.": "Notlandırma şeması başarıyla güncellendi.",
+    "Manage All Grading Schemes": "Tüm Notlandırma Şemalarını Yönet",
+    "New Grading Scheme": "Yeni Notlandırma Şeması",
+    "Select a grading scheme": "Bir notlandırma şeması seçin",
+    "There was an error while loading grading schemes": "Notlandırma şemaları yüklenirken hata oluştu",
+    "There was an error while loading the grading scheme": "Notlandırma şeması yüklenirken hata oluştu",
+    "There was an error while refreshing grading schemes": "Notlandırma şemaları yenilenirken hata oluştu",
+    "There was an error while removing the grading scheme": "Notlandırma şemasını kaldırırken hata oluştu",
+    "View": "Göster"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "Ödevler 2 Öğretmen Hata Sayfası",
+    "Assignments 2 Teacher initial query error": "Ödevler 2 Öğretmen ilk sorgu hatası",
+    "Loading": "Yükleniyor"
+  },
+  "catalog": {
+    "Course Catalog": "Ders Kataloğu"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "Harika iş! Canvas geliştiricilerinden"
+  },
+  "content_copy_redesign": {
+    "Cancel": "İptal",
+    "Copy course": "Dersi kopyala",
+    "Course code": "Ders kodu",
+    "Course code must be 255 characters or less": "Ders kodu 255 karakter veya daha az olmalıdır",
+    "Course name must be 255 characters or less": "Ders adı 255 karakter veya daha az olmalıdır",
+    "Create course": "Dersi Oluştur",
+    "Creating...": "Oluşturuluyor...",
+    "End date": "Bitiş tarihi",
+    "End date must be after start date": "Bitiş tarihi başlangıç tarihinden sonra olmalıdır",
+    "Name": "İsim",
+    "No results": "Sonuç yok",
+    "Please enter the details for the new course.": "Lütfen yeni dersin detaylarını girin.",
+    "Select a new beginning date": "Yeni bir başlangıç tarihi seçin",
+    "Select a new end date": "Yeni bir bitiş tarihi seçin",
+    "Select end date": "Bitiş tarihini seçin",
+    "Select start date": "Başlangıç tarihini seçin",
+    "Start date": "Başlangıç tarihi",
+    "Start date must be before end date": "Başlangıç tarihi bitiş tarihinden önce olmalıdır",
+    "Start typing to search...": "Aramak için yazmaya başlayın...",
+    "Term": "Dönem",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Dönemin başlangıç ve bitiş tarihleri burada değiştirilemez; yalnızca Yönetici altındaki Dönem Ayrıntıları sayfasında değiştirilebilir.",
+    "Use arrow keys to navigate options.": "Seçeneklerde gezinmek için ok tuşlarını kullanın."
+  },
+  "content_share_preview_overlay": {
+    "Close": "Kapat",
+    "Content Share Preview": "İçerik Paylaşımı Önizlemesi",
+    "Preview": "Önizleme"
+  },
+  "copy_warnings_modal": {
+    "Attention": "Dikkat"
+  },
+  "course_logging_content": {
+    "No results": "Sonuç yok",
+    "Type to search": "Aramak için yazın"
+  },
+  "create_course_modal": {
+    "Cancel": "İptal",
+    "Course Details": "Ders Detayları",
+    "Course Name": "Ders Adı",
+    "Create": "Oluştur",
+    "Create Course": "Dersi Oluştur",
+    "Create Subject": "Konu Oluştur",
+    "Creating new course...": "Yeni ders oluşturuluyor...",
+    "Creating new subject...": "Yeni konu oluşturuluyor...",
+    "Error creating new course": "Yeni ders oluşturulurken hata oluştu",
+    "Error creating new subject": "Yeni konu oluşturulurken hata oluştu",
+    "Loading accounts...": "Hesaplar yükleniyor...",
+    "Name...": "Ad...",
+    "No Results": "Sonuç Yok",
+    "Select a homeroom": "Bir sınıf seçin",
+    "Subject Name": "Konu Adı",
+    "Unable to get accounts": "Hesaplar alınamadı",
+    "Unable to get homerooms": "Sınıflar alınamadı",
+    "Use arrow keys to navigate options.": "Seçeneklerde gezinmek için ok tuşlarını kullanın.",
+    "Which account will this course be associated with?": "Bu ders hangi hesapla ilişkilendirilecek?",
+    "Which account will this subject be associated with?": "Bu konu hangi hesapla ilişkilendirilecek?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "Final Puanının Üzerine Yaz"
+  },
+  "feature_flags": {
+    "Accept": "Onayla",
+    "Cancel": "İptal"
+  },
+  "filter_bar": {
+    "All": "Tümü",
+    "Clear": "Temizle",
+    "Filter by": "Şuna göre filtrele",
+    "Search": "Ara",
+    "Use arrow keys to navigate options.": "Seçeneklerde gezinmek için ok tuşlarını kullanın."
+  },
+  "groupNavigationSelector": {
+    "Select Group": "Grup Seçin",
+    "Use arrow keys to navigate options.": "Seçeneklerde gezinmek için ok tuşlarını kullanın."
+  },
+  "jobs": {
+    "Close": "Kapat"
+  },
+  "modules_home_page": {
+    "Create a new Module": "Yeni bir Modül Oluştur"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "Çalışkan bir panda",
+    "Moves:": "Taşınacaklar:"
+  },
+  "overview_page": {
+    "Edit home page": "Ana sayfayı düzenle",
+    "Subject Home Page": "Konu Ana Sayfası"
+  },
+  "pages_edit_title": {
+    "Page Title": "Sayfa Başlığı"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "İptal",
+    "Close": "Kapat"
+  },
+  "study_assist": {
+    "Back": "Geri",
+    "Close": "Kapat",
+    "Page": "Sayfa"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "Geçerli bir URL gereklidir",
+    "Website URL": "Web Sayfası URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "Uygun Kullanım Koşulları",
+    "Loading...": "Yükleniyor...",
+    "Preview": "Önizleme"
+  },
+  "todos_page": {
+    "Failed to load todos": "Yapılacaklar yüklenemedi",
+    "Loading Additional Todo Details": "Ek Yapılacaklar Ayrıntıları Yükleniyor",
+    "Loading Todo Course Name": "Yapılacaklar Ders Adı yükleniyor",
+    "Loading Todo Title": "Yapılacaklar Başlığı yükleniyor"
+  },
+  "tray": {
+    "Close": "Kapat"
+  }
+}

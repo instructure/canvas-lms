@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Heading} from '@instructure/ui-heading'
 import {MainLayout} from './react/layouts/MainLayout'
 import {BlockContentEditorWrapper} from './react/components/BlockContentEditorWrapper'
 import {PageTitle} from './react/components/PageTitle'
 import {BodyLayout} from './react/layouts/BodyLayout'
 
-const I18n = createI18nScope('pages')
-
 export const App = () => {
+  const {t} = useTranslation('pages')
   return (
     <MainLayout
-      header={<Heading variant="titlePageDesktop">{I18n.t('Block Content Editor')}</Heading>}
+      header={<Heading variant="titlePageDesktop">{t('Block Content Editor')}</Heading>}
       body={<BodyLayout title={<PageTitle />} editor={<BlockContentEditorWrapper />} />}
     />
   )

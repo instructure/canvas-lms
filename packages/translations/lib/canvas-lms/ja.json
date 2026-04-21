@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "キャンセル",
+    "Confirm": "確認"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "重要な日としてマークし、ホームルームのサイドバーに表示する"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "アカウントでデフォルトの評定スキーム",
+    "Account default grading scheme was successfully saved.": "アカウントでデフォルトの評定スキームが正常に保存されました。",
+    "Active Grading Schemes": "アクティブな成績評定スキーム",
+    "Applied": "適用されました",
+    "Apply": "適用",
+    "Archive Grading Scheme": "評定スキームをアーカイブ",
+    "Archived": "アーカイブ済み",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "使用中のアーカイブされた評定スキームは引き続き使用することができますが、新しいコースや課題に追加することはできません。",
+    "Are you sure you want to delete this grading scheme?": "この採点スキームを削除してもよろしいですか?",
+    "Cancel": "キャンセル",
+    "Canvas Default": "Canvas のデフォルト",
+    "Close": "閉じる",
+    "Confirm": "確認",
+    "Confirm Default Grading Scheme Change": "デフォルトの評定スキームの変更確認",
+    "Delete Grading Scheme": "採点スキームの削除",
+    "Duplicate Grading Scheme": "評定スキームを複製",
+    "Edit Grading Scheme": "採点スキームの編集",
+    "Grading Scheme Name": "採点スキーム名",
+    "Grading scheme was successfully archived.": "評定スキームは正常にアーカイブされました。",
+    "Grading scheme was successfully created.": "採点スキームが正常に作成されました。",
+    "Grading scheme was successfully removed.": "採点スキームが正常に削除されました。",
+    "Grading scheme was successfully saved.": "採点スキームが正常に保存されました。",
+    "Grading scheme was successfully unarchived.": "評定スキームは正常にアーカイブ解除されました。",
+    "Locations Used": "使用ロケーション",
+    "Lower limit of range": "範囲の下限",
+    "New Grading Scheme": "新しい採点スキーム",
+    "Next Page": "次のページ",
+    "No account default": "アカウントのデフォルトなし",
+    "Previous Page": "前のページ",
+    "Save": "保存",
+    "Search": "検索",
+    "Search...": "検索...",
+    "Show courses and assignments": "コースと課題の表示",
+    "Show locations used": "使用された場所を表示します",
+    "Sort by": "並べ替え基準",
+    "There was an error while archiving the grading scheme": "評定スキームのアーカイブ中にエラーが発生しました。",
+    "There was an error while creating the grading scheme": "採点スキームの作成中にエラーがありました",
+    "There was an error while loading grading schemes": "採点スキームの読み込み中にエラーが発生しました",
+    "There was an error while loading the default canvas grading scheme": "デフォルトのCanvas採点スキームの読み込み中にエラーが発生しました",
+    "There was an error while loading the default grading scheme": "採点スキームの更新中にエラーが発生しました",
+    "There was an error while removing the grading scheme": "採点スキームの保存中にエラーが発生しました",
+    "There was an error while unarchiving the grading scheme": "評定スキームのアーカイブ解除中にエラーが発生しました。",
+    "There was an error while updating the default grading scheme": "デフォルトの評定スキームの更新中にエラーが発生しました",
+    "There was an error while updating the grading scheme": "採点スキームの更新中にエラーがありました",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "この変更は、現在アカウントのデフォルトを継承しているすべてのアクティブなコースと課題に影響します。すべてのコースと課題の評定が新しいアカウントのデフォルトの評定スキームに基づいて再計算されるため、この変更には少し時間がかかります。",
+    "Unarchive Grading Scheme": "評定スキームをアーカイブ解除する",
+    "Upper limit of range": "範囲の上限",
+    "View Grading Scheme": "採点スキームを表示",
+    "View/Copy Grading Scheme": "採点スキームを表示/コピー",
+    "View/Edit Grading Scheme": "採点スキームを表示/編集",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "この評定スキームはコースまたはアカウントのデフォルトとして設定されているため、アーカイブすることはできません。",
+    "You can't delete this grading scheme because it is in use.": "この評定スキームは使用中であるため、削除することはできません。",
+    "You have no active grading schemes.": "アクティブな評定スキームがありません。",
+    "You have no archived grading schemes.": "アーカイブされた評定スキームがありません。",
+    "to": "から"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "この採点スキームを削除してもよろしいですか?",
+    "Are you sure you want to duplicate this grading scheme?": "この評定スキームをほんとうに複製しますか？",
+    "Cancel": "キャンセル",
+    "Close": "閉じる",
+    "Delete": "削除",
+    "Delete ": "削除 ",
+    "Duplicate": "複製",
+    "Duplicate ": "複製する ",
+    "Edit Grading Scheme": "採点スキームの編集",
+    "New Grading Scheme": "新しい採点スキーム",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "アカウントレベルの評定スキームであるため、パーセンテージとポイントを編集することはできません。",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "デフォルトの評定スキームであるため、パーセンテージとポイントを編集することはできません。",
+    "Percentages and points can't be edited because it is currently being used.": "現在使用中のため、パーセンテージとポイントは編集できません。",
+    "Save": "保存"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "デフォルトのCanvas採点スキームデータを含む表。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "採点スキームデータを含む表。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "行の名前が重複することや空であることは認められません。行名を修正し、再度「保存」をクリックしてみてください。",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "範囲が重複する、または空であることは認められません。範囲を修正し、再度「保存」をクリックしてみてください。",
+    "Delete grading scheme": "採点スキームを削除する",
+    "Edit Grading Scheme": "採点スキームの編集",
+    "Edit a copy of this grading scheme": "この採点スキームのコピーを編集する",
+    "Edit grading scheme": "採点スキームを編集する",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "採点スキーム名は必須項目です。名前を追加して、もう一度「保存」をクリックしてみてください。",
+    "Grading scheme title": "採点スキームのタイトル",
+    "Invalid grading scheme": "無効な採点スキーム",
+    "Letter Grade": "レター グレード",
+    "Looks great!": "素晴らしいです！",
+    "Percentage": "割合",
+    "Points": "点数",
+    "Range": "範囲",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "範囲は有効な番号でなければなりません。負の数や100より大きい数にすることはできません。範囲を修正し、再度「保存」をクリックしてみてください。",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "範囲は有効な数値でなければなりません。負の数や100を超える数は入力できません。範囲を修正し、再度「保存」をクリックしてみてください。",
+    "edit a copy": "コピーを編集する"
+  },
+  "OutcomeManagement": {
+    "Course": "コース",
+    "Institution": "機関"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "アカウント",
+    "Close": "閉じる",
+    "Concluded": "完了",
+    "Courses": "コース",
+    "Failed to load account used locations": "アカウント使用場所の読み込みに失敗しました",
+    "Failed to load assignments used locations": "課題使用場所の読み込みに失敗しました",
+    "Failed to load used locations": "使用されている場所の読み込みに失敗しました",
+    "Load Assignments ...": "課題を読込む ...",
+    "Load More Assignments ...": "さらに課題を読み込む ...",
+    "Loading": "読み込み中",
+    "Locations Used": "使用ロケーション",
+    "Search": "検索",
+    "Search...": "検索..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "利用規約",
+    "Close": "閉じる",
+    "Loading page": "ページの読み込み",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "現在、利用規約は利用できません。後ほどもう一度確認するか、サポートに連絡してください。",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "利用規定を読み込めません。しばらくしてからもう一度試すか、問題が解決しない場合後でもう一度お試しください。"
+  },
+  "account_reports": {
+    "Close": "閉じる",
+    "Invalid date and time.": "無効な日時です。",
+    "Next month": "翌月",
+    "Previous month": "前月",
+    "Time": "時間"
+  },
+  "admin_split": {
+    "Cancel": "キャンセル",
+    "Failed to split users.": "ユーザーの分割に失敗しました。",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "注意：これにより、マージを可能な限り完全に元に戻そうとしますが、マージされたユーザーは、以前の状態に完全に復元されない場合があります。",
+    "OK": "OK",
+    "Split": "分割",
+    "The following users will be split into separate user accounts:": "次のユーザーは、個別のユーザーアカウントに分割されます：",
+    "There are no user accounts to split from this user.": "このユーザーから分割するユーザーアカウントはありません。",
+    "User split complete. Links to split user accounts follow:": "ユーザー分割が完了しました。分割ユーザーアカウントへのリンクはこちら："
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "説明"
+  },
+  "assignment_footer": {
+    "Next": "次へ",
+    "Previous": "前へ"
+  },
+  "assignment_tabs": {
+    "Assignment": "課題",
+    "Peer Review": "ピア レビュー"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(コースデフォルト)",
+    "Account Level": "アカウントレベル",
+    "Canvas Grading Scheme (course default)": "Canvasの評定スキーム (コースデフォルト)",
+    "Close": "閉じる",
+    "Course Level": "コースレベル",
+    "Default Canvas Grading Scheme": "Canvas のデフォルトの採点スキーム",
+    "Grading scheme was successfully removed.": "採点スキームが正常に削除されました。",
+    "Grading scheme was successfully updated.": "評定スキームは正常に更新されました。",
+    "Manage All Grading Schemes": "すべての採点スキームを管理する",
+    "New Grading Scheme": "新しい採点スキーム",
+    "Select a grading scheme": "評定スキームを選択する",
+    "There was an error while loading grading schemes": "採点スキームの読み込み中にエラーが発生しました",
+    "There was an error while loading the grading scheme": "評定スキームの読み込み中にエラーが発生しました",
+    "There was an error while refreshing grading schemes": "採点スキームの削除中にエラーが発生しました",
+    "There was an error while removing the grading scheme": "採点スキームの保存中にエラーが発生しました",
+    "View": "表示"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "課題2 教員のエラーページ",
+    "Assignments 2 Teacher initial query error": "課題2 教員の初期クエリエラー",
+    "Loading": "読み込み中"
+  },
+  "catalog": {
+    "Course Catalog": "コース カタログ"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "すばらしい！Canvas 開発者より"
+  },
+  "content_copy_redesign": {
+    "Cancel": "キャンセル",
+    "Copy course": "コースをコピー",
+    "Course code": "コースコード",
+    "Course code must be 255 characters or less": "コースコードは255文字以下でなければなりません",
+    "Course name must be 255 characters or less": "コース名は255文字以下でなければなりません",
+    "Create course": "コースの作成",
+    "Creating...": "作成中...",
+    "End date": "終了日",
+    "End date must be after start date": "終了日は開始日以降でなければなりません",
+    "Name": "名前",
+    "No results": "結果なし",
+    "Please enter the details for the new course.": "このコースのコピーの作成を開始するには、次の詳細情報を入力してください。",
+    "Select a new beginning date": "新しい開始日を選択",
+    "Select a new end date": "新しい終了日を選択",
+    "Select end date": "終了日を選択する",
+    "Select start date": "開始日を選択する",
+    "Start date": "開始日",
+    "Start date must be before end date": "「開始日」日付は、「終了日」の日付の前でなければなりません",
+    "Start typing to search...": "入力して検索開始...",
+    "Term": "期間",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "期間の開始日と終了日は、管理下の「期間の詳細」ページでのみ変更でき、ここでは変更できません。",
+    "Use arrow keys to navigate options.": "矢印キーを使用してオプションを移動します。"
+  },
+  "content_share_preview_overlay": {
+    "Close": "閉じる",
+    "Content Share Preview": "コンテンツ共有プレビュー",
+    "Preview": "プレビュー"
+  },
+  "copy_warnings_modal": {
+    "Attention": "注意事項"
+  },
+  "course_logging_content": {
+    "No results": "結果なし",
+    "Type to search": "タイプして検索する"
+  },
+  "create_course_modal": {
+    "Cancel": "キャンセル",
+    "Course Details": "コースの詳細情報",
+    "Course Name": "コース名",
+    "Create": "作成",
+    "Create Course": "コースを作成",
+    "Create Subject": "件名を作成",
+    "Creating new course...": "新しいコースを作成中...",
+    "Creating new subject...": "新しい件名を作成中...",
+    "Error creating new course": "新しいコースの作成中にエラーが発生しました",
+    "Error creating new subject": "新しい課題の作成中にエラーが発生しました",
+    "Loading accounts...": "アカウントを読み込み中...",
+    "Name...": "名前...",
+    "No Results": "結果なし",
+    "Select a homeroom": "ホームルームを選ぶ",
+    "Subject Name": "件名",
+    "Unable to get accounts": "アカウントを取得できません",
+    "Unable to get homerooms": "ホームルームを取得できません",
+    "Use arrow keys to navigate options.": "矢印キーを使用してオプションを移動します。",
+    "Which account will this course be associated with?": "このコースはどのアカウントに関連付けられますか？",
+    "Which account will this subject be associated with?": "この件名はどのアカウントに関連付けられますか？"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "最終的な評定オーバーライド"
+  },
+  "feature_flags": {
+    "Accept": "受諾",
+    "Cancel": "キャンセル"
+  },
+  "filter_bar": {
+    "All": "すべて",
+    "Clear": "クリア",
+    "Filter by": "フィルタ条件",
+    "Search": "検索",
+    "Use arrow keys to navigate options.": "矢印キーを使用してオプションを移動します。"
+  },
+  "groupNavigationSelector": {
+    "Select Group": "グループの選択",
+    "Use arrow keys to navigate options.": "矢印キーを使用してオプションを移動します。"
+  },
+  "jobs": {
+    "Close": "閉じる"
+  },
+  "modules_home_page": {
+    "Create a new Module": "新しいモジュールを作成する"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "勉強熱心なパンダ",
+    "Moves:": "移動："
+  },
+  "overview_page": {
+    "Edit home page": "ホームページを編集",
+    "Subject Home Page": "対象ホームページ"
+  },
+  "pages_edit_title": {
+    "Page Title": "ページのタイトル"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "キャンセル",
+    "Close": "閉じる"
+  },
+  "study_assist": {
+    "Back": "戻る",
+    "Close": "閉じる",
+    "Page": "ページ"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "有効なURLが必要です",
+    "Website URL": "ウェブサイト URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "利用規約",
+    "Loading...": "読み込み中・・・",
+    "Preview": "プレビュー"
+  },
+  "todos_page": {
+    "Failed to load todos": "「TO DO」の読み込みに失敗しました",
+    "Loading Additional Todo Details": "Todoの追加情報を読み込み中",
+    "Loading Todo Course Name": "Todoのコース名を読み込み中",
+    "Loading Todo Title": "Todoのタイトルを読み込み中"
+  },
+  "tray": {
+    "Close": "閉じる"
+  }
+}

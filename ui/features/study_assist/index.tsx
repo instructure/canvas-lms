@@ -23,12 +23,10 @@ import {PlatformUiProvider} from '@instructure/platform-provider'
 import {platformExecuteQuery} from '@canvas/graphql'
 import type {AssistRequest, AssistResponse} from '@instructure/platform-study-assist'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconAiSolid} from '@instructure/ui-icons'
 import StudyAssistTray from './components/StudyAssistTray'
-
-const I18n = createI18nScope('study_assist')
 
 let jwtPromise: Promise<string> | null = null
 
@@ -79,12 +77,13 @@ async function fetchAssistResponse(request: AssistRequest): Promise<AssistRespon
 }
 
 function StudyAssistApp() {
+  const {t} = useTranslation('study_assist')
   const [open, setOpen] = useState(false)
 
   return (
     <>
       <IconButton
-        screenReaderLabel={I18n.t('Study tools')}
+        screenReaderLabel={t('Study tools')}
         shape="circle"
         color="ai-primary"
         onClick={() => setOpen(true)}

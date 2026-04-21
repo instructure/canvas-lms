@@ -17,12 +17,11 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Link} from '@instructure/ui-link'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
-const I18n = createI18nScope('jobs')
 
 function testIdIfy(str: string, suffix: string): string {
   return str.toLowerCase().replace(/\s+/g, '-') + '-' + suffix
@@ -34,6 +33,7 @@ interface Props {
 }
 
 function JobDialog({label, retrieveValue}: Props): React.JSX.Element {
+  const {t} = useTranslation('jobs')
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState('')
 
@@ -50,7 +50,7 @@ function JobDialog({label, retrieveValue}: Props): React.JSX.Element {
         href="#"
         onClick={openModal}
       >
-        {I18n.t('show')}
+        {t('show')}
       </Link>
       <Modal open={isOpen} onDismiss={() => setIsOpen(false)} label={label}>
         <Modal.Header>
@@ -58,7 +58,7 @@ function JobDialog({label, retrieveValue}: Props): React.JSX.Element {
           <CloseButton
             data-testid={testIdIfy(label, 'close')}
             onClick={() => setIsOpen(false)}
-            screenReaderLabel={I18n.t('Close')}
+            screenReaderLabel={t('Close')}
             placement="end"
           />
         </Modal.Header>

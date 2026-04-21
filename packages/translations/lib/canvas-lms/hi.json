@@ -1,0 +1,306 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "रद्द करें",
+    "Confirm": "पुष्टि करें"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "महत्वपूर्ण तिथि के रूप में चिह्नित करें और होमरूम साइडबार पर दिखाएं"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "खाता डिफ़ॉल्ट ग्रेडिंग योजना",
+    "Account default grading scheme was successfully saved.": "खाता डिफ़ॉल्ट ग्रेडिंग योजना सफलतापूर्वक सहेजी गई।",
+    "Active Grading Schemes": "सक्रिय ग्रेडिंग योजनाएं",
+    "Applied": "आवेदन किया गया",
+    "Apply": "लागू करें",
+    "Archive Grading Scheme": "ग्रेडिंग योजना संग्रहीत करें",
+    "Archived": "संग्रहीत किया गया",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "उपयोग में संग्रहीत ग्रेडिंग योजनाओं का अभी भी उपयोग किया जा सकता है, लेकिन उन्हें नए पाठ्यक्रमों या असाइनमेंट में नहीं जोड़ा जा सकता।",
+    "Are you sure you want to delete this grading scheme?": "क्या आप सच में इस ग्रेडिंग योजना को मिटाना चाहते हैं?",
+    "Cancel": "रद्द करें",
+    "Canvas Default": "Canvas डिफ़ॉल्ट",
+    "Close": "बंद करें",
+    "Confirm": "पुष्टि करें",
+    "Confirm Default Grading Scheme Change": "डिफ़ॉल्ट ग्रेडिंग योजना परिवर्तन की पुष्टि करें",
+    "Delete Grading Scheme": "ग्रेडिंग योजना मिटाएं",
+    "Duplicate Grading Scheme": "ग्रेडिंग योजना डुप्लिकेट करें",
+    "Edit Grading Scheme": "ग्रेडिंग योजना संपादित करें",
+    "Grading Scheme Name": "ग्रेडिंग योजना नाम",
+    "Grading scheme was successfully archived.": "ग्रेडिंग योजना सफलतापूर्वक संग्रहीत की गई थी।",
+    "Grading scheme was successfully created.": "ग्रेडिंग योजना सफलतापूर्वक बनाई गई थी।",
+    "Grading scheme was successfully removed.": "ग्रेडिंग योजना सफलतापूर्वक निकाली गई थी।",
+    "Grading scheme was successfully saved.": "ग्रेडिंग योजना सफलतापूर्वक सहेजी गई थी।",
+    "Grading scheme was successfully unarchived.": "ग्रेडिंग योजना सफलतापूर्वक असंग्रहीत की गई थी।",
+    "Locations Used": "प्रयुक्त लोकेशन",
+    "Lower limit of range": "रेंज की निचली सीमा",
+    "New Grading Scheme": "नई ग्रेडिंग योजना",
+    "Next Page": "अगला पेज",
+    "No account default": "कोई खाता डिफ़ॉल्ट नहीं",
+    "Previous Page": "पिछला पेज",
+    "Save": "सहेजें",
+    "Search": "खोजें",
+    "Search...": "खोजें...",
+    "Show courses and assignments": "पाठ्यक्रम और असाइनमेंट दिखाएं",
+    "Show locations used": "प्रयुक्त लोकेशन दिखाएं",
+    "Sort by": "इस के आधार पर क्रमबद्ध करें",
+    "There was an error while archiving the grading scheme": "ग्रेडिंग योजना संग्रहीत करते समय त्रुटि हुई",
+    "There was an error while creating the grading scheme": "ग्रेडिंग योजना बनाने में त्रुटि हुई",
+    "There was an error while loading grading schemes": "ग्रेडिंग योजना लोड करने में त्रुटि हुई",
+    "There was an error while loading the default canvas grading scheme": "डिफ़ॉल्ट canvas ग्रेडिंग योजना लोड करने में त्रुटि हुई",
+    "There was an error while loading the default grading scheme": "डिफ़ॉल्ट ग्रेडिंग योजना लोड करने में त्रुटि हुई",
+    "There was an error while removing the grading scheme": "ग्रेडिंग योजना को हटाने में त्रुटि हुई",
+    "There was an error while unarchiving the grading scheme": "ग्रेडिंग योजना असंग्रहीत करते समय त्रुटि हुई",
+    "There was an error while updating the default grading scheme": "डिफ़ॉल्ट ग्रेडिंग योजना को अपडेट करते समय त्रुटि हुई",
+    "There was an error while updating the grading scheme": "ग्रेडिंग योजना को अपडेट करने में त्रुटि हुई",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "यह परिवर्तन उन सभी सक्रिय पाठ्यक्रमों और असाइनमेंटों को प्रभावित करेगा, जो वर्तमान में खाता डिफ़ॉल्ट को प्राप्त कर रहे हैं। इस परिवर्तन को पूरा होने में कुछ समय लगेगा, क्योंकि सभी पाठ्यक्रम और असाइनमेंट ग्रेड की गणना नए खाते की डिफ़ॉल्ट ग्रेडिंग योजना के संबंध में की जाती है।",
+    "Unarchive Grading Scheme": "ग्रेडिंग योजना असंग्रहीत करें",
+    "Upper limit of range": "उच्च सीमा",
+    "View Grading Scheme": "ग्रेडिंग योजना देखें",
+    "View/Copy Grading Scheme": "ग्रेडिंग योजना देखें/कॉपी करें",
+    "View/Edit Grading Scheme": "ग्रेडिंग योजना देखें/संपादित करें",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "आप इस ग्रेडिंग योजना को संग्रहीत नहीं कर सकते, क्योंकि यह किसी पाठ्यक्रम या खाते के लिए डिफ़ॉल्ट के रूप में सेट है।",
+    "You can't delete this grading scheme because it is in use.": "आप इस ग्रेडिंग योजना को मिटा नहीं सकते, क्योंकि यह उपयोग में है।",
+    "You have no active grading schemes.": "आपके पास कोई सक्रिय ग्रेडिंग योजना नहीं है।",
+    "You have no archived grading schemes.": "आपके पास कोई संग्रहीत ग्रेडिंग योजना नहीं है।",
+    "to": "को"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "क्या आप सच में इस ग्रेडिंग योजना को मिटाना चाहते हैं?",
+    "Are you sure you want to duplicate this grading scheme?": "क्या आप वाकई इस ग्रेडिंग योजना को डुप्लिकेट करना चाहते हैं?",
+    "Cancel": "रद्द करें",
+    "Close": "बंद करें",
+    "Delete": "मिटाएं",
+    "Delete ": "मिटाएं ",
+    "Duplicate": "डुप्लिकेट करें",
+    "Duplicate ": "डुप्लिकेट करें ",
+    "Edit Grading Scheme": "ग्रेडिंग योजना संपादित करें",
+    "New Grading Scheme": "नई ग्रेडिंग योजना",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "प्रतिशत और अंक संपादित नहीं किए जा सकते, क्योंकि यह खाता स्तरीय ग्रेडिंग योजना है।",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "प्रतिशत और अंक संपादित नहीं किए जा सकते, क्योंकि इसका उपयोग डिफ़ॉल्ट ग्रेडिंग योजना के रूप में किया जा रहा है।",
+    "Percentages and points can't be edited because it is currently being used.": "प्रतिशत और अंक संपादित नहीं किए जा सकते, क्योंकि इसका उपयोग वर्तमान में किया जा रहा है।",
+    "Save": "सहेजें"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "एक तालिका जिसमें डिफ़ॉल्ट Canvas ग्रेडिंग योजना डेटा शामिल है।  प्रत्येक पंक्ति में एक नाम, अधिकतम प्रतिशत और न्यूनतम प्रतिशत होता है।",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "एक तालिका जिसमें ग्रेडिंग योजना डेटा शामिल है।  प्रत्येक पंक्ति में एक नाम, अधिकतम प्रतिशत और न्यूनतम प्रतिशत होता है।",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "डुप्लिकेट या खाली पंक्ति नाम नहीं हो सकते। नाम ठीक करें और 'सहेजें' पर दोबारा क्लिक करने का प्रयास करें।",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "ओवरलैप करती या खाली रेंज नहीं हो सकतीं। रेंज ठीक करें और 'सहेजें' पर दोबारा क्लिक करने का प्रयास करें।",
+    "Delete grading scheme": "ग्रेडिंग योजना मिटाएं",
+    "Edit Grading Scheme": "ग्रेडिंग योजना संपादित करें",
+    "Edit a copy of this grading scheme": "इस ग्रेडिंग योजना की एक प्रति संपादित करें",
+    "Edit grading scheme": "ग्रेडिंग योजना संपादित करें",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "ग्रेडिंग योजना नाम आवश्यक है। कोई नाम जोड़ें और 'सहेजें' पर दोबारा क्लिक करने की कोशिश करें।",
+    "Grading scheme title": "ग्रेडिंग योजना शीर्षक",
+    "Invalid grading scheme": "अमान्य ग्रेडिंग योजना",
+    "Letter Grade": "अक्षर ग्रेड",
+    "Looks great!": "बढ़िया लग रहा है!",
+    "Percentage": "प्रतिशत",
+    "Points": "पॉइंट्स",
+    "Range": "सीमा",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "सीमा एक मान्य संख्या होनी चाहिए। संख्या ऋणात्मक या 100 से बड़ी संख्या नहीं होनी चाहिए। सीमा तय करें और 'सहेजें' पर क्लिक करने का पुनः प्रयास करें",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "सीमा एक मान्य संख्या होनी चाहिए। संख्या ऋणात्मक या ऊपरी पॉइंट सीमा से बड़ी संख्या नहीं होनी चाहिए। सीमा तय करें और 'सहेजें' पर क्लिक करने का पुनः प्रयास करें",
+    "edit a copy": "प्रति संपादित करें"
+  },
+  "OutcomeManagement": {
+    "Course": "पाठ्यक्रम",
+    "Institution": "संस्थान"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "खाते",
+    "Close": "बंद करें",
+    "Concluded": "समाप्त हुआ",
+    "Courses": "पाठ्यक्रम",
+    "Failed to load account used locations": "खाते में उपयोग किए गए लोकेशन लोड करने में विफल",
+    "Failed to load assignments used locations": "खाते में उपयोग की गई असाइनमेंट लोड करने में विफल",
+    "Failed to load used locations": "प्रयुक्त लोकेशन लोड करने में विफल",
+    "Load Assignments ...": "असाइनमेंट लोड करें ...",
+    "Load More Assignments ...": "और अधिक असाइनमेंट लोड करें ...",
+    "Loading": "लोड किया जा रहा है",
+    "Locations Used": "प्रयुक्त लोकेशन",
+    "Search": "खोजें",
+    "Search...": "खोजें..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "स्वीकार्य उपयोग नीति",
+    "Close": "बंद करें",
+    "Loading page": "पेज लोड किया जा रहा है",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "स्वीकार्य उपयोग नीति फ़िलहाल उपलब्ध नहीं है। यदि आपको और सहायता की आवश्यकता हो, तो कृपया बाद में दोबारा जांच करें या सपोर्ट से संपर्क करें।",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "स्वीकार्य उपयोग नीति लोड करने में असमर्थ। यदि समस्या बनी रहती है, तो कृपया बाद में दोबारा कोशिश करें या सपोर्ट से संपर्क करें।"
+  },
+  "account_reports": {
+    "Close": "बंद करें",
+    "Invalid date and time.": "अमान्य तिथि और समय।",
+    "Next month": "अगला महीना",
+    "Previous month": "पिछला महीना",
+    "Time": "समय"
+  },
+  "admin_split": {
+    "Cancel": "रद्द करें",
+    "Failed to split users.": "उपयोगकर्ता विभाजित करने में विफल।",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "ध्यान दें: इस तरह से मर्ज को यथासंभव पूर्णतः पूर्ववत करने का प्रयास किया जाएगा; हालांकि, मर्ज किए गए उपयोगकर्ताओं को उनकी पूर्व स्थिति में पूरी तरह से बहाल नहीं किया जा सकता है।",
+    "OK": "ठीक है",
+    "Split": "विभाजित करें",
+    "The following users will be split into separate user accounts:": "निम्नलिखित उपयोगकर्ताओं को अलग-अलग उपयोगकर्ता खातों में विभाजित किया जाएगा:",
+    "There are no user accounts to split from this user.": "इस उपयोगकर्ता से विभाजित करने के लिए कोई उपयोगकर्ता खाता नहीं है।",
+    "User split complete. Links to split user accounts follow:": "उपयोगकर्ता को विभाजित करना पूरा हुआ। उपयोगकर्ता खातों को विभाजित करने के लिंक इस प्रकार हैं:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "विवरण"
+  },
+  "assignment_footer": {
+    "Next": "अगला",
+    "Previous": "पिछला"
+  },
+  "assignment_tabs": {
+    "Assignment": "असाइनमेंट",
+    "Peer Review": "सहकर्मी समीक्षा"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(पाठ्यक्रम डिफ़ॉल्ट)",
+    "Account Level": "खाता स्तर",
+    "Canvas Grading Scheme (course default)": "Canvas ग्रेडिंग योजना (पाठ्यक्रम डिफ़ॉल्ट)",
+    "Close": "बंद करें",
+    "Course Level": "पाठ्यक्रम स्तर",
+    "Default Canvas Grading Scheme": "डिफ़ॉल्ट Canvas ग्रेडिंग योजना",
+    "Grading scheme was successfully removed.": "ग्रेडिंग योजना सफलतापूर्वक निकाली गई थी।",
+    "Grading scheme was successfully updated.": "ग्रेडिंग योजना सफलतापूर्वक अपडेट की गई थी।",
+    "Manage All Grading Schemes": "सभी ग्रेडिंग योजनाएं प्रबंधित करें",
+    "New Grading Scheme": "नई ग्रेडिंग योजना",
+    "Select a grading scheme": "कोई ग्रेडिंग योजना चुनें",
+    "There was an error while loading grading schemes": "ग्रेडिंग योजना लोड करने में त्रुटि हुई",
+    "There was an error while loading the grading scheme": "ग्रेडिंग योजना लोड करते समय त्रुटि हुई",
+    "There was an error while refreshing grading schemes": "ग्रेडिंग योजना को रीफ़्रेश करने में त्रुटि हुई",
+    "There was an error while removing the grading scheme": "ग्रेडिंग योजना को हटाने में त्रुटि हुई",
+    "View": "देखें"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "असाइनमेंट 2 शिक्षक त्रुटि पेज",
+    "Assignments 2 Teacher initial query error": "असाइनमेंट 2 शिक्षक आरंभिक प्रश्न त्रुटि",
+    "Loading": "लोड किया जा रहा है"
+  },
+  "catalog": {
+    "Course Catalog": "पाठ्यक्रम कैटलॉग"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "बहुत बढ़िया! Canvas डेवलपर्स की ओर से"
+  },
+  "content_copy_redesign": {
+    "Cancel": "रद्द करें",
+    "Copy course": "पाठ्यक्रम कॉपी करें",
+    "Course code": "पाठ्यक्रम कोड",
+    "Course code must be 255 characters or less": "पाठ्यक्रम कोड 255 कैरेक्टर या उससे कम का होना चाहिए",
+    "Course name must be 255 characters or less": "पाठ्यक्रम का नाम 255 कैरेक्टर या उससे कम का होना चाहिए",
+    "Create course": "पाठ्यक्रम बनाएं",
+    "Creating...": "बनाया जा रहा है...",
+    "End date": "समाप्ति तिथि",
+    "End date must be after start date": "समाप्ति तिथि आरंभ तिथि के बाद की होनी चाहिए",
+    "Name": "नाम",
+    "No results": "कोई नतीजा नहीं",
+    "Please enter the details for the new course.": "कृपया नए पाठ्यक्रम के लिए विवरण दर्ज करें।",
+    "Select a new beginning date": "नई आरंभ तिथि चुनें",
+    "Select a new end date": "नई समाप्ति तिथि चुनें",
+    "Select end date": "समाप्ति तिथि चुनें",
+    "Select start date": "आरंभ तिथि चुनें",
+    "Start date": "आरंभ तिथि",
+    "Start date must be before end date": "प्रारंभ तिथि समाप्ति तिथि के पहले की होनी चाहिए",
+    "Start typing to search...": "खोज करने के लिए टाइप करना शुरू करें...",
+    "Term": "अवधि",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "अवधि की आरंभिक और समापन तिथियाँ यहाँ संशोधित नहीं की जा सकतीं, इन्हें केवल व्यवस्थापक के तहत अवधि विवरण पेज पर संशोधित किया जा सकता है।",
+    "Use arrow keys to navigate options.": "विकल्पों को नेविगेट करने के लिए तीर कुंजियों का उपयोग करें।"
+  },
+  "content_share_preview_overlay": {
+    "Close": "बंद करें",
+    "Content Share Preview": "सामग्री साझाकरण पूर्वावलोकन",
+    "Preview": "पूर्वावलोकन"
+  },
+  "copy_warnings_modal": {
+    "Attention": "ध्यान दें"
+  },
+  "course_logging_content": {
+    "No results": "कोई नतीजा नहीं",
+    "Type to search": "खोजने के लिए टाइप करें"
+  },
+  "create_course_modal": {
+    "Cancel": "रद्द करें",
+    "Course Details": "पाठ्यक्रम विवरण",
+    "Course Name": "पाठ्यक्रम का नाम",
+    "Create": "बनाएं",
+    "Create Course": "पाठ्यक्रम बनाएं",
+    "Create Subject": "विषय बनाएं",
+    "Creating new course...": "नया पाठ्यक्रम बनाया जा रहा है...",
+    "Creating new subject...": "नया विषय बनाया जा रहा है...",
+    "Error creating new course": "नया पाठ्यक्रम बनाने में त्रुटि हुई",
+    "Error creating new subject": "नया विषय बनाने में त्रुटि हुई",
+    "Loading accounts...": "खाते लोड किए जा रहे हैं...",
+    "Name...": "नाम...",
+    "No Results": "कोई नतीजा नहीं",
+    "Select a homeroom": "एक होमरूम चुनें",
+    "Subject Name": "विषय का नाम",
+    "Unable to get accounts": "खाता प्राप्त करने में असमर्थ",
+    "Unable to get homerooms": "होमरूम प्राप्त करने में असमर्थ",
+    "Use arrow keys to navigate options.": "विकल्पों को नेविगेट करने के लिए तीर कुंजियों का उपयोग करें।",
+    "Which account will this course be associated with?": "यह पाठ्यक्रम किस खाते से संबद्ध होगा?",
+    "Which account will this subject be associated with?": "यह विषय किस खाते से संबद्ध होगा?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "अंतिम ग्रेड की अवहेलना"
+  },
+  "feature_flags": {
+    "Accept": "स्वीकार करें",
+    "Cancel": "रद्द करें"
+  },
+  "filter_bar": {
+    "All": "सभी",
+    "Clear": "साफ़ करें",
+    "Filter by": "इसके अनुसार फ़िल्टर करें",
+    "Search": "खोजें",
+    "Use arrow keys to navigate options.": "विकल्पों को नेविगेट करने के लिए तीर कुंजियों का उपयोग करें।"
+  },
+  "groupNavigationSelector": {
+    "Select Group": "ग्रुप चुनें",
+    "Use arrow keys to navigate options.": "विकल्पों को नेविगेट करने के लिए तीर कुंजियों का उपयोग करें।"
+  },
+  "jobs": {
+    "Close": "बंद करें"
+  },
+  "modules_home_page": {
+    "Create a new Module": "नया मॉड्यूल बनाएं"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "पढ़ाकू पांडा",
+    "Moves:": "स्थानांतरित होता है:"
+  },
+  "overview_page": {
+    "Edit home page": "मुख्य पेज संपादित करें",
+    "Subject Home Page": "विषय मुख्य पेज"
+  },
+  "pages_edit_title": {
+    "Page Title": "पेज शीर्षक"
+  },
+  "quizzes_regrade_modal": {
+    "Cancel": "रद्द करें",
+    "Close": "बंद करें"
+  },
+  "study_assist": {
+    "Back": "वापस जाएं",
+    "Close": "बंद करें",
+    "Page": "पेज"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "एक मान्य URL आवश्यक है",
+    "Website URL": "वेबसाइट URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "स्वीकार्य उपयोग नीति",
+    "Loading...": "लोड किया जा रहा है...",
+    "Preview": "पूर्वावलोकन"
+  },
+  "todos_page": {
+    "Failed to load todos": "करने के लिए लोड करने में विफल",
+    "Loading Additional Todo Details": "अतिरिक्त करने के लिए विवरण लोड किया जा रहा है",
+    "Loading Todo Course Name": "करने के लिए पाठ्यक्रम नाम लोड किया जा रहा है",
+    "Loading Todo Title": "करने के लिए शीर्षक लोड किया जा रहा है"
+  },
+  "tray": {
+    "Close": "बंद करें"
+  }
+}

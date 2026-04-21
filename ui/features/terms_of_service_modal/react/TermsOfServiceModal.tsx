@@ -17,16 +17,13 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {Link} from '@instructure/ui-link'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {ViewOwnProps} from '@instructure/ui-view'
 import {openWindow} from '@canvas/util/globalUtils'
-
-const I18n = createI18nScope('terms_of_service_modal')
-const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
 // Type for the raw API response - either has content or redirectUrl
 type AcceptableUsePolicyResponse = {content: string} | {redirectUrl: string}
@@ -68,6 +65,8 @@ function TermsOfServiceCustomContents({
   setContent,
   setUrl,
 }: TermsOfServiceCustomContentsProps): JSX.Element | null {
+  const {t} = useTranslation('terms_of_service_modal')
+
   useEffect(
     function () {
       async function fetchTermsOfService() {
@@ -89,7 +88,7 @@ function TermsOfServiceCustomContents({
 
   if (content) return <div dangerouslySetInnerHTML={{__html: content}} />
   if (url) return null
-  return <span>{I18n.t('Loading...')}</span>
+  return <span>{t('Loading...')}</span>
 }
 
 export interface TermsOfServiceModalProps {
@@ -98,6 +97,8 @@ export interface TermsOfServiceModalProps {
 }
 
 export default function TermsOfServiceModal(props: TermsOfServiceModalProps): React.JSX.Element {
+  const {t} = useTranslation('terms_of_service_modal')
+  const termsOfServiceText = t('Acceptable Use Policy')
   const preview = Boolean(props.preview)
   const footerLink = Boolean(props.footerLink)
   const [open, setOpen] = useState(false)
@@ -206,7 +207,7 @@ export default function TermsOfServiceModal(props: TermsOfServiceModalProps): Re
         isWithinText={!footerLink}
         themeOverride={linkThemeOverrides}
       >
-        {preview ? I18n.t('Preview') : termsOfServiceText}
+        {preview ? t('Preview') : termsOfServiceText}
       </Link>
       <TOSContents />
     </span>
