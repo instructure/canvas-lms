@@ -85,23 +85,23 @@ GEM
     bigdecimal (3.3.1)
     bindata (2.5.1)
     builder (3.3.0)
-    code_ownership (2.1.1)
+    code_ownership (2.1.2)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.6.12763)
-    code_ownership (2.1.1-aarch64-linux)
+    code_ownership (2.1.2-aarch64-linux)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.6.12763)
-    code_ownership (2.1.1-arm64-darwin)
+    code_ownership (2.1.2-arm64-darwin)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.6.12763)
-    code_ownership (2.1.1-x86_64-darwin)
+    code_ownership (2.1.2-x86_64-darwin)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.6.12763)
-    code_ownership (2.1.1-x86_64-linux)
+    code_ownership (2.1.2-x86_64-linux)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.6.12763)
