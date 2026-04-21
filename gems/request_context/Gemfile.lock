@@ -128,7 +128,7 @@ GEM
       ostruct
     dogstatsd-ruby (5.7.1)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo

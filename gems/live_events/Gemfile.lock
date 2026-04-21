@@ -58,7 +58,7 @@ GEM
     diff-lcs (1.6.2)
     dogstatsd-ruby (5.7.1)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     inst_statsd (3.4.0)
