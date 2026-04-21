@@ -793,7 +793,7 @@ GEM
       rubyzip (>= 2.4.1)
       thor
     msgpack (1.8.0)
-    multi_json (1.19.1)
+    multi_json (1.20.1)
     multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
     multipart-post (2.4.1)
