@@ -856,7 +856,7 @@ GEM
     packs-specification (0.0.11)
       sorbet-runtime
     parallel (1.27.0)
-    parser (3.3.10.2)
+    parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
     parslet (2.0.0)
