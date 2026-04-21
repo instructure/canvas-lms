@@ -85,7 +85,7 @@ class SessionToken
      pseudonym_id.to_s,
      current_user_id.to_s,
      used_remember_me_token.to_s,
-     consent_from_mobile.to_s]
+     consent_from_mobile].compact
   end
 
   def signature_string
