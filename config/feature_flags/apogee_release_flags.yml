@@ -402,6 +402,7 @@ ai_rubrics:
   root_opt_in: true
   display_name: IgniteAI Generator for Rubrics
   description: Give rubric creators the option to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
+  visible_on: tier_2_visible_on_hook
 use_body_word_count:
   state: allowed_on # this is intentional. we want to enable this upon deploy so we start populating word count.
   applies_to: SiteAdmin
