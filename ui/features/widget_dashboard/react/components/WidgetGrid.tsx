@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useCallback, useState, useRef} from 'react'
+import React, {useMemo, useCallback, useState, useRef, useEffect} from 'react'
 import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
@@ -106,6 +106,36 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     [moveWidgetToPosition, visibleWidgets],
   )
 
+  // Prevent keyboard access to widget content (links, filters, pagination) during edit mode.
+  // Edit controls (drag handle + remove button) are excluded and remain keyboard-accessible.
+  useEffect(() => {
+    const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    const EDIT_CONTROLS = '[data-testid$="-drag-handle"], [data-testid$="-remove-button"]'
+    const STORAGE_ATTR = 'data-original-tabindex'
+
+    if (isEditMode) {
+      const widgetColumns = document.querySelector('[data-testid="widget-columns"]')
+      if (!widgetColumns) return
+
+      widgetColumns.querySelectorAll<HTMLElement>(FOCUSABLE).forEach(el => {
+        if (!el.matches(EDIT_CONTROLS) && !el.hasAttribute(STORAGE_ATTR)) {
+          el.setAttribute(STORAGE_ATTR, el.getAttribute('tabindex') ?? '')
+          el.setAttribute('tabindex', '-1')
+        }
+      })
+    } else {
+      document.querySelectorAll<HTMLElement>(`[${STORAGE_ATTR}]`).forEach(el => {
+        const original = el.getAttribute(STORAGE_ATTR)!
+        if (original === '') {
+          el.removeAttribute('tabindex')
+        } else {
+          el.setAttribute('tabindex', original)
+        }
+        el.removeAttribute(STORAGE_ATTR)
+      })
+    }
+  }, [isEditMode, visibleWidgets.length])
+
   const renderWidget = (widget: Widget, dragHandleProps?: any) => {
     const widgetRenderer = getWidget(widget.type)
 
@@ -116,13 +146,31 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     }
 
     const WidgetComponent = widgetRenderer.component
-    return (
+
+    // In edit mode, elevate the drag handle above the interaction-blocking overlay
+    const enhancedDragHandleProps =
+      isEditMode && dragHandleProps
+        ? {...dragHandleProps, style: {position: 'relative' as const, zIndex: 2}}
+        : dragHandleProps
+
+    const widgetElement = (
       <WidgetComponent
         {...widgetRenderer.props}
         widget={widget}
         isEditMode={isEditMode}
-        dragHandleProps={dragHandleProps}
+        dragHandleProps={enhancedDragHandleProps}
       />
+    )
+
+    if (!isEditMode) return widgetElement
+
+    // Overlay blocks all widget interactions (links, filters, pagination, etc.)
+    // during customization mode. The drag handle sits above the overlay via z-index.
+    return (
+      <div style={{position: 'relative'}}>
+        {widgetElement}
+        <div aria-hidden="true" style={{position: 'absolute', inset: 0, zIndex: 1}} />
+      </div>
     )
   }
 
@@ -378,6 +426,14 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
 
   return (
     <>
+      {isEditMode && (
+        <style>{`
+          [data-testid="widget-columns"] [data-testid$="-remove-button"] {
+            position: relative !important;
+            z-index: 2 !important;
+          }
+        `}</style>
+      )}
       {gridContent}
       {addPosition && (
         <AddWidgetModal

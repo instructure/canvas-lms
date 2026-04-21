@@ -370,6 +370,207 @@ describe('WidgetGrid', () => {
     })
   })
 
+  describe('Edit Mode — interaction blocking', () => {
+    // Widget that renders focusable content AND the two edit controls,
+    // using the exact data-testid patterns WidgetGrid filters on.
+    const InteractiveWidget = ({widget, dragHandleProps}: BaseWidgetProps) =>
+      React.createElement(
+        'div',
+        {'data-testid': `widget-${widget.id}`},
+        React.createElement(
+          'a',
+          {href: '/test', 'data-testid': `${widget.id}-content-link`},
+          'content link',
+        ),
+        React.createElement(
+          'button',
+          {'data-testid': `${widget.id}-drag-handle`, ...dragHandleProps},
+          'drag',
+        ),
+        React.createElement('button', {'data-testid': `${widget.id}-remove-button`}, 'remove'),
+      )
+
+    const defaultInteractiveImpl = () => ({
+      component: InteractiveWidget,
+      displayName: 'Interactive Mock',
+      description: 'Interactive mock widget for blocking tests',
+    })
+
+    const defaultInertImpl = () => ({
+      component: ({widget}: any) =>
+        React.createElement('div', {'data-testid': `widget-${widget.id}`}, widget.title),
+      displayName: 'Mock Widget',
+      description: 'Mock widget for testing',
+    })
+
+    beforeEach(() => {
+      vi.mocked(getWidget).mockImplementation(defaultInteractiveImpl)
+    })
+
+    afterEach(() => {
+      // vi.clearAllMocks() in the outer afterEach clears call history but not the
+      // base implementation, so we must restore it explicitly here.
+      vi.mocked(getWidget).mockImplementation(defaultInertImpl)
+    })
+
+    it('renders an aria-hidden overlay over each widget in edit mode', () => {
+      const {container} = setUp(buildDefaultProps(), true)
+
+      // Filter to only the overlays we inject (position:absolute, zIndex:1) since
+      // PlatformUiProvider also renders other aria-hidden elements in the tree.
+      const overlays = Array.from(container.querySelectorAll('[aria-hidden="true"]')).filter(
+        el =>
+          (el as HTMLElement).style.position === 'absolute' &&
+          (el as HTMLElement).style.zIndex === '1',
+      )
+      expect(overlays).toHaveLength(3)
+    })
+
+    it('does not render an aria-hidden overlay in view mode', () => {
+      const {container} = setUp(buildDefaultProps(), false)
+
+      expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0)
+    })
+
+    it('overlay does not set a cursor style', () => {
+      const {container} = setUp(buildDefaultProps(), true)
+
+      const overlay = container.querySelector('[aria-hidden="true"]') as HTMLElement
+      expect(overlay.style.cursor).toBe('')
+    })
+
+    it('injects a <style> tag with remove-button elevation rules in edit mode', () => {
+      const {container} = setUp(buildDefaultProps(), true)
+
+      const styleTag = container.querySelector('style')
+      expect(styleTag).toBeInTheDocument()
+      expect(styleTag!.textContent).toContain('[data-testid$="-remove-button"]')
+      expect(styleTag!.textContent).toContain('z-index: 2')
+    })
+
+    it('does not inject a <style> tag in view mode', () => {
+      const {container} = setUp(buildDefaultProps(), false)
+
+      expect(container.querySelector('style')).not.toBeInTheDocument()
+    })
+
+    it('sets tabindex="-1" on focusable content elements in edit mode', () => {
+      setUp(buildDefaultProps(), true)
+
+      const contentLink = document.querySelector(
+        '[data-testid="widget-1-content-link"]',
+      ) as HTMLElement
+      expect(contentLink).toBeInTheDocument()
+      expect(contentLink).toHaveAttribute('tabindex', '-1')
+      expect(contentLink).toHaveAttribute('data-original-tabindex')
+    })
+
+    it('does not block focusable content elements in view mode', () => {
+      setUp(buildDefaultProps(), false)
+
+      const contentLink = document.querySelector(
+        '[data-testid="widget-1-content-link"]',
+      ) as HTMLElement
+      expect(contentLink).toBeInTheDocument()
+      expect(contentLink).not.toHaveAttribute('tabindex', '-1')
+      expect(contentLink).not.toHaveAttribute('data-original-tabindex')
+    })
+
+    it('does not disable the drag handle in edit mode', () => {
+      setUp(buildDefaultProps(), true)
+
+      const dragHandle = document.querySelector(
+        '[data-testid="widget-1-drag-handle"]',
+      ) as HTMLElement
+      expect(dragHandle).toBeInTheDocument()
+      expect(dragHandle).not.toHaveAttribute('tabindex', '-1')
+      expect(dragHandle).not.toHaveAttribute('data-original-tabindex')
+    })
+
+    it('does not disable the remove button in edit mode', () => {
+      setUp(buildDefaultProps(), true)
+
+      const removeBtn = document.querySelector(
+        '[data-testid="widget-1-remove-button"]',
+      ) as HTMLElement
+      expect(removeBtn).toBeInTheDocument()
+      expect(removeBtn).not.toHaveAttribute('tabindex', '-1')
+      expect(removeBtn).not.toHaveAttribute('data-original-tabindex')
+    })
+
+    it('restores tabindex when exiting edit mode', () => {
+      const props = buildDefaultProps()
+      const queryClient = new QueryClient({
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+      })
+
+      const Wrapper = ({isEditMode}: {isEditMode: boolean}) => (
+        <PlatformTestWrapper>
+          <QueryClientProvider client={queryClient}>
+            <WidgetDashboardProvider>
+              <ResponsiveProvider matches={['desktop']}>
+                <WidgetDashboardEditProvider>
+                  <WidgetLayoutProvider>
+                    <WidgetGrid {...props} isEditMode={isEditMode} />
+                  </WidgetLayoutProvider>
+                </WidgetDashboardEditProvider>
+              </ResponsiveProvider>
+            </WidgetDashboardProvider>
+          </QueryClientProvider>
+        </PlatformTestWrapper>
+      )
+
+      const {rerender} = render(<Wrapper isEditMode={true} />)
+
+      expect(document.querySelector('[data-testid="widget-1-content-link"]')).toHaveAttribute(
+        'tabindex',
+        '-1',
+      )
+
+      rerender(<Wrapper isEditMode={false} />)
+
+      // Re-query after rerender: switching edit mode remounts the widget tree
+      // (Draggable → Flex.Item), so the pre-rerender reference is stale.
+      const restoredLink = document.querySelector('[data-testid="widget-1-content-link"]')
+      expect(restoredLink).not.toHaveAttribute('tabindex', '-1')
+      expect(restoredLink).not.toHaveAttribute('data-original-tabindex')
+    })
+
+    it('enhances dragHandleProps with position:relative and zIndex:2 in edit mode', () => {
+      let capturedProps: any = null
+      vi.mocked(getWidget).mockImplementation(() => ({
+        component: ({widget, dragHandleProps}: BaseWidgetProps) => {
+          capturedProps = dragHandleProps ?? null
+          return React.createElement('div', {'data-testid': `widget-${widget.id}`})
+        },
+        displayName: 'Capturing Mock',
+        description: 'Captures dragHandleProps for assertion',
+      }))
+
+      setUp(buildDefaultProps(), true)
+
+      expect(capturedProps).not.toBeNull()
+      expect(capturedProps.style).toEqual({position: 'relative', zIndex: 2})
+    })
+
+    it('does not enhance dragHandleProps in view mode', () => {
+      let capturedProps: any = undefined
+      vi.mocked(getWidget).mockImplementation(() => ({
+        component: ({widget, dragHandleProps}: BaseWidgetProps) => {
+          capturedProps = dragHandleProps
+          return React.createElement('div', {'data-testid': `widget-${widget.id}`})
+        },
+        displayName: 'Capturing Mock',
+        description: 'Captures dragHandleProps for assertion',
+      }))
+
+      setUp(buildDefaultProps(), false)
+
+      // In view mode there is no Draggable, so dragHandleProps is undefined
+      expect(capturedProps).toBeUndefined()
+    })
+  })
+
   describe('observer filtering', () => {
     const configWithInbox: WidgetConfig = {
       columns: 2,
