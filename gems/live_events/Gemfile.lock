@@ -73,7 +73,7 @@ GEM
       reline (>= 0.4.2)
     jmespath (1.6.2)
     logger (1.7.0)
-    minitest (6.0.2)
+    minitest (6.0.5)
       drb (~> 2.0)
       prism (~> 1.5)
     nokogiri (1.19.2-aarch64-linux-gnu)

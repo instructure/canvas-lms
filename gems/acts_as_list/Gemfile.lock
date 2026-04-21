@@ -36,7 +36,7 @@ GEM
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     logger (1.7.0)
-    minitest (6.0.2)
+    minitest (6.0.5)
       drb (~> 2.0)
       prism (~> 1.5)
     prism (1.9.0)
