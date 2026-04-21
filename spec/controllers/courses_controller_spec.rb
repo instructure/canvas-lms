@@ -2435,6 +2435,20 @@ describe CoursesController do
         end
       end
 
+      it "includes args in ENV.TABS for nav_menu_link tabs" do
+        # Important because args is used in K5Course.jsx for nav_menu_link_* tabs
+        link = NavMenuLink.create!(context: @course, course_nav: true, url: "https://example.com", label: "My Link")
+        user_session(@teacher)
+
+        get "show", params: { id: @course.id }
+
+        tabs = assigns[:js_env][:TABS]
+        nav_tab = tabs.find { |t| t[:id] == NavMenuLinkTabs.numeric_id_to_tab_json_id(link.id) }
+        expect(nav_tab).not_to be_nil
+        expect(nav_tab[:args]).to eql(["https://example.com"])
+        expect(nav_tab[:href]).to be(NavMenuLinkTabs::TAB_HREF_VALUE)
+      end
+
       describe "update" do
         before :once do
           @subject = @course

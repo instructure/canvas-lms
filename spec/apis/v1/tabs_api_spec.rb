@@ -216,6 +216,21 @@ describe TabsController, type: :request do
       expect(tab).not_to have_key("url") # Should not have sessionless_launch url
     end
 
+    it "returns an absolute full_url for nav menu links with relative URLs" do
+      course_with_teacher(active_all: true)
+
+      link = NavMenuLink.create!(context: @course, course_nav: true, label: "Internal Link", url: "/courses/#{@course.id}/assignments")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/tabs",
+                      { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
+                      { include: ["external"] })
+
+      tab = json.find { |t| t["id"] == "nav_menu_link_#{link.id}" }
+      expect(tab["html_url"]).to eql "/courses/#{@course.id}/assignments"
+      expect(tab["full_url"]).to eql "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments"
+    end
+
     it "includes external tools" do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.new({
