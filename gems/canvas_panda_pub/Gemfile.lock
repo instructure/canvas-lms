@@ -139,7 +139,7 @@ GEM
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
     mime-types-data (3.2026.0414)
-    minitest (6.0.2)
+    minitest (6.0.5)
       drb (~> 2.0)
       prism (~> 1.5)
     net-http (0.9.1)
