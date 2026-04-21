@@ -1124,7 +1124,7 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
-    simple_oauth (0.4.0)
+    simple_oauth (0.4.1)
       base64
       cgi
     simplecov (0.22.0)
