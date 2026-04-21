@@ -800,6 +800,8 @@ GEM
     mustache (1.1.2)
     net-http (0.9.1)
       uri (>= 0.11.1)
+    net-http-persistent (4.0.8)
+      connection_pool (>= 2.2.4, < 4)
     net-imap (0.6.3)
       date
       net-protocol
@@ -1207,8 +1209,10 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
-    vault (0.18.2)
+    vault (0.20.1)
       aws-sigv4
+      base64
+      net-http-persistent (~> 4.0, >= 4.0.2)
     vericite_api (1.5.3)
       json (>= 1.4.6)
     version_gem (1.1.9)
