@@ -646,7 +646,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
 
-    supported_includes = %w[course_count sub_account_count]
+    supported_includes = %w[course_count sub_account_count horizon_account]
     includes = Array(params[:include])
     includes &= supported_includes
 
