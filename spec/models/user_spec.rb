@@ -5342,6 +5342,65 @@ describe User do
     end
   end
 
+  describe "#educator_dashboard_config" do
+    let(:user) { user_model }
+
+    it "returns the default layout when no preference is set" do
+      widget_types = user.educator_dashboard_config["layout"]["widgets"].pluck("type")
+      expect(widget_types).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list",
+        "educator_content_quality"
+      )
+    end
+
+    it "drops non-educator widget types from a saved layout" do
+      user.set_preference(:educator_dashboard_config, {
+                            "layout" => {
+                              "columns" => 2,
+                              "widgets" => [
+                                { "type" => "educator_announcement_creation" },
+                                { "type" => "course_work_combined" },
+                                { "type" => "course_grades" },
+                                { "type" => "educator_todo_list" }
+                              ]
+                            }
+                          })
+
+      widget_types = user.educator_dashboard_config["layout"]["widgets"].pluck("type")
+      expect(widget_types).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list"
+      )
+    end
+
+    it "does not mutate the stored preference" do
+      stored = {
+        "layout" => {
+          "columns" => 2,
+          "widgets" => [{ "type" => "course_grades" }]
+        }
+      }
+      user.set_preference(:educator_dashboard_config, stored)
+
+      user.educator_dashboard_config
+
+      expect(user.get_preference(:educator_dashboard_config)["layout"]["widgets"])
+        .to eq([{ "type" => "course_grades" }])
+    end
+
+    it "returns the default layout when the stored layout is not a hash" do
+      user.set_preference(:educator_dashboard_config, { "layout" => "garbage" })
+
+      widget_types = user.educator_dashboard_config["layout"]["widgets"].pluck("type")
+      expect(widget_types).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list",
+        "educator_content_quality"
+      )
+    end
+  end
+
   describe "#prefers_no_celebrations?" do
     let(:user) { user_model }
 

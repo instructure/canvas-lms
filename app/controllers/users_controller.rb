@@ -414,8 +414,7 @@ class UsersController < ApplicationController
       if should_show_educator_dashboard?
         css_bundle :educator_dashboard
         add_body_class "educator-dashboard"
-        educator_config = @current_user.get_preference(:educator_dashboard_config) || {}
-        educator_config["layout"] ||= WidgetDashboardLayoutValidator.default_educator_layout
+        educator_config = @current_user.educator_dashboard_config
 
         # Widget composes announcement text across multiple courses. Scope the
         # RCE JWT to the user (no single course/account @context is available)

@@ -2018,6 +2018,14 @@ class User < ApplicationRecord
     set_preference(:dashboard_positions, new_positions)
   end
 
+  def educator_dashboard_config
+    config = get_preference(:educator_dashboard_config) || {}
+    unless config["layout"].is_a?(Hash)
+      config = config.merge("layout" => WidgetDashboardLayoutValidator.default_educator_layout)
+    end
+    WidgetDashboardLayoutValidator.sanitize_educator_layout(config)
+  end
+
   # Use the user's preferences for the default view
   # Otherwise, use the account's default (if set)
   # Fallback to using cards (default option on the Account settings page)
