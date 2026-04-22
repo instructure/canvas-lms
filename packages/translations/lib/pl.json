@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Niestandardowe"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Niestandardowa szerokość i wysokość (piksele)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cyjan"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Typ wymiaru"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Wymiary"
     },
     "directionality_26ae9e08": {
         "message": "Kierunkowość"

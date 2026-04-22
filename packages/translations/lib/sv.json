@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Anpassa"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Anpassad bredd och höjd (pixlar)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Dimensionstyp"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensioner"
     },
     "directionality_26ae9e08": {
         "message": "Textens riktning"

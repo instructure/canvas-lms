@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "自定义"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "自定义宽度和高度（像素）"
-    },
     "cyan_c1d5f68a": {
         "message": "青色"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "维度类型"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "尺寸"
     },
     "directionality_26ae9e08": {
         "message": "方向"

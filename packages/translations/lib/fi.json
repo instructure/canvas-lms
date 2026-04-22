@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Mukauta"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Mukautettu leveys ja korkeus (pikseliä)"
-    },
     "cyan_c1d5f68a": {
         "message": "Syaani"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Ulottuvuuden tyyppi"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Mitat"
     },
     "directionality_26ae9e08": {
         "message": "Suuntaisuus"

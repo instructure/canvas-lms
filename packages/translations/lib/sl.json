@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Po meri"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Širina in višina po meri (slikovne pike)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cijan"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Vrsta mere"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Mere"
     },
     "directionality_26ae9e08": {
         "message": "Usmerjenost"

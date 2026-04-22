@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "사용자 지정"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "사용자 지정 너비 및 높이(픽셀)"
-    },
     "cyan_c1d5f68a": {
         "message": "녹청"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "차원 유형"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "차원"
     },
     "directionality_26ae9e08": {
         "message": "방향형"

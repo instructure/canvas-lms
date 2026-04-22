@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Personalizar"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Largura e altura personalizadas (Pixels)"
-    },
     "cyan_c1d5f68a": {
         "message": "Ciano"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Tipo de dimensão"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensões"
     },
     "directionality_26ae9e08": {
         "message": "Direcionalidade"
