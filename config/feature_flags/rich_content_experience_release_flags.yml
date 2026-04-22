@@ -449,6 +449,7 @@ a11y_checker_ignite_ai:
   applies_to: RootAccount
   display_name: IgniteAI Accessibility Remediation for Courses
   description: Allow users to remediate certain accessibility issues with AI through the Course Accessibility Checker.
+  visible_on: tier_1_visible_on_hook
 
 a11y_checker_ga2_features:
   applies_to: SiteAdmin
