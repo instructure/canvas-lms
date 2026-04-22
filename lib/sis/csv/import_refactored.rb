@@ -415,6 +415,9 @@ module SIS
             ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS, headers: false) do |row|
               row.each { |header| header&.downcase! }
               importer = IMPORTERS.index do |type|
+                next false if %i[institutional_tag_category institutional_tag institutional_tag_association].include?(type) &&
+                              !@root_account.feature_enabled?(:institutional_tags)
+
                 if SIS::CSV.const_get(type.to_s.camelcase + "Importer").send(type.to_s + "_csv?", row)
                   unless @previous_diff_import
                     downloadable_att = (type == :user && row.intersect?(HEADERS_TO_EXCLUDE_FOR_DOWNLOAD)) ? create_filtered_csv(csv, row) : att

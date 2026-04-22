@@ -240,42 +240,45 @@ $(document).ready(function (_event) {
         ),
       ) +
       '</li>'
-    output +=
-      '<li>' +
-      htmlEscape(
-        I18n.t(
-          'import_counts.institutional_tag_categories',
-          'Institutional Tag Categories: %{institutional_tag_categories_count}',
-          {
-            institutional_tag_categories_count: batch.data.counts.institutional_tag_categories,
-          },
-        ),
-      ) +
-      '</li>'
-    output +=
-      '<li>' +
-      htmlEscape(
-        I18n.t(
-          'import_counts.institutional_tags',
-          'Institutional Tags: %{institutional_tags_count}',
-          {
-            institutional_tags_count: batch.data.counts.institutional_tags,
-          },
-        ),
-      ) +
-      '</li>'
-    output +=
-      '<li>' +
-      htmlEscape(
-        I18n.t(
-          'import_counts.institutional_tag_associations',
-          'Institutional Tag Associations: %{institutional_tag_associations_count}',
-          {
-            institutional_tag_associations_count: batch.data.counts.institutional_tag_associations,
-          },
-        ),
-      ) +
-      '</li>'
+    if (ENV.INSTITUTIONAL_TAGS_ENABLED) {
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tag_categories',
+            'Institutional Tag Categories: %{institutional_tag_categories_count}',
+            {
+              institutional_tag_categories_count: batch.data.counts.institutional_tag_categories,
+            },
+          ),
+        ) +
+        '</li>'
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tags',
+            'Institutional Tags: %{institutional_tags_count}',
+            {
+              institutional_tags_count: batch.data.counts.institutional_tags,
+            },
+          ),
+        ) +
+        '</li>'
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tag_associations',
+            'Institutional Tag Associations: %{institutional_tag_associations_count}',
+            {
+              institutional_tag_associations_count:
+                batch.data.counts.institutional_tag_associations,
+            },
+          ),
+        ) +
+        '</li>'
+    }
     output +=
       '<li>' +
       htmlEscape(

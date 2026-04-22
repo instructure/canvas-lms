@@ -47,8 +47,6 @@ module SIS
       end
 
       def add_institutional_tag_association(tag_id, user_id, status, csv: nil, lineno: nil, row_info: nil)
-        raise ImportError, "Institutional tags are not enabled for this account" unless @root_account.feature_enabled?(:institutional_tags)
-
         raise ImportError, "No institutional_tag_id given for an institutional tag association" if tag_id.blank?
         raise ImportError, "No user_id given for institutional tag association with tag #{tag_id}" if user_id.blank?
         raise ImportError, "No status given for institutional tag association (tag: #{tag_id}, user: #{user_id})" if status.blank?

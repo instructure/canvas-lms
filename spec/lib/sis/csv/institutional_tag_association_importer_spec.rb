@@ -161,4 +161,19 @@ describe SIS::CSV::InstitutionalTagAssociationImporter do
     assoc = InstitutionalTagAssociation.find_by(institutional_tag: @tag, context: @user)
     expect(assoc.workflow_state).to eq "deleted"
   end
+
+  context "when the institutional_tags feature flag is disabled" do
+    before { @account.disable_feature!(:institutional_tags) }
+
+    it "does not process the CSV and records one dispatcher-level error" do
+      importer = process_csv_data(
+        "institutional_tag_id,user_id,status",
+        "TAG001,U001,active"
+      )
+      expect(importer.errors.map(&:last)).to contain_exactly(
+        "Couldn't find Canvas CSV import headers"
+      )
+      expect(InstitutionalTagAssociation.where(institutional_tag: @tag)).to be_empty
+    end
+  end
 end
