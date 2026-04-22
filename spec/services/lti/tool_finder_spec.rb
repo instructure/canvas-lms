@@ -1168,24 +1168,8 @@ describe Lti::ToolFinder do
         closest_tool
       end
 
-      context "and the flag is disabled" do
-        before do
-          @course.root_account.disable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "returns the closest matching tool" do
-          expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq closest_tool
-        end
-      end
-
-      context "and the flag is enabled" do
-        before do
-          @course.root_account.enable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "prefers tool from the same developer key" do
-          expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq matching_tool
-        end
+      it "prefers tool from the same developer key" do
+        expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq matching_tool
       end
     end
   end
@@ -1339,24 +1323,8 @@ describe Lti::ToolFinder do
         tool2.save!
       end
 
-      context "and flag is enabled" do
-        before do
-          @course.root_account.enable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "prefers tool from the same developer key" do
-          expect(subject.first).to eq tool1
-        end
-      end
-
-      context "and flag is disabled" do
-        before do
-          @course.root_account.disable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "prefers tool from closer context" do
-          expect(subject.first).to eq tool2
-        end
+      it "prefers tool from the same developer key" do
+        expect(subject.first).to eq tool1
       end
     end
 
