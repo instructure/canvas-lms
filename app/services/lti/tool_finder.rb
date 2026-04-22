@@ -325,10 +325,7 @@ module Lti
             order_clauses << sort_by_sql_string("#{ContextExternalTool.quoted_table_name}.id = #{preferred_tool_id}")
           end
 
-          # prefer tools from the original developer key when requested,
-          # and over other order clauses like context
-          prefer_original_client_id = context.root_account.feature_enabled?(:lti_find_external_tool_prefer_original_client_id)
-          if prefer_original_client_id && (original_client_id = Shard.integral_id_for(original_client_id))
+          if (original_client_id = Shard.integral_id_for(original_client_id))
             order_clauses.prepend(sort_by_sql_string("developer_key_id = #{original_client_id}"))
           end
 

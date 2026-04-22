@@ -223,14 +223,6 @@ lti_edit_json:
       state: allowed_on
     ci:
       state: allowed_on
-lti_find_external_tool_prefer_original_client_id:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Prefer LTI tools with a matching client ID when finding an external tool
-  description: |-
-    When possible, the LTI tool finding logic will prefer tools installed from the same
-    developer key as the original tool. This prevents the edge case where multiple developer
-    keys share the same domain, and a tool from the wrong developer key would be matched first.
 lti_link_to_apps_from_developer_keys:
   state: hidden
   shadow: true
