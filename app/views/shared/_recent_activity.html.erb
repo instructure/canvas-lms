@@ -87,6 +87,7 @@
             <% unread_count = items.select { |i| i.unread }.size %>
             <% if unread_count > 0 %>
               <strong class="unread-count">
+                <span aria-hidden="true"><%= unread_count %></span>
                 <span class="screenreader-only"><%= t(:unread_count_badge, { :one => "1 *unread item*", :other => "%{count} *unread items*" },
                       :count => unread_count,
                       :wrapper => '<span>\1</span>') %>
