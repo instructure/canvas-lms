@@ -851,4 +851,138 @@ describe UsersController, type: :request do
       expect(checkpoint_todos).to be_empty
     end
   end
+
+  describe "filtering" do
+    before :once do
+      me = @user
+      @other_teacher_course = course_factory(active_course: true, course_name: "Other Teacher Course")
+      @other_teacher_course.enroll_teacher(me).accept!
+      @a3 = Assignment.create!(context: @other_teacher_course, due_at: 2.days.from_now, title: "other grading", submission_types: "online_text_entry", points_possible: 10)
+      other_student = user_factory(active_all: true)
+      @other_teacher_course.enroll_student(other_student).accept!
+      @a3.reload.submit_homework(other_student, submission_type: "online_text_entry", body: "done")
+      @user = me
+    end
+
+    def todo_call(extra_params = {})
+      api_call(:get,
+               "/api/v1/users/self/todo",
+               { controller: "users", action: "todo_items", format: "json" },
+               extra_params)
+    end
+
+    def grading_assignment_ids(json)
+      json.select { |item| item["type"] == "grading" }.map { |item| item["assignment"]["id"] }
+    end
+
+    describe "course_ids[]" do
+      it "filters grading items by course" do
+        json = todo_call(course_ids: [@teacher_course.id])
+        assignment_ids = grading_assignment_ids(json)
+        expect(assignment_ids).to include(@a2.id)
+        expect(assignment_ids).not_to include(@a3.id)
+      end
+
+      it "silently drops courses the user is not enrolled in" do
+        unauthorized_course = course_factory(active_all: true)
+        json = todo_call(course_ids: [@teacher_course.id, unauthorized_course.id])
+        expect(response).to be_successful
+        assignment_ids = json.map { |item| item["assignment"]["id"] }
+        expect(assignment_ids).to include(@a2.id)
+      end
+
+      it "returns the unfiltered list when the param is absent" do
+        assignment_ids = todo_call.map { |item| item["assignment"]["id"] }
+        expect(assignment_ids).to include(@a2.id, @a3.id)
+      end
+
+      it "excludes courses where user lacks manage_grades from grading items" do
+        json = todo_call(course_ids: [@student_course.id])
+        expect(grading_assignment_ids(json)).to be_empty
+      end
+
+      it "filters submitting items by course" do
+        student_only = todo_call(course_ids: [@student_course.id]).map { |item| item["assignment"]["id"] }
+        expect(student_only).to include(@a1.id)
+
+        teacher_only = todo_call(course_ids: [@teacher_course.id]).map { |item| item["assignment"]["id"] }
+        expect(teacher_only).not_to include(@a1.id)
+      end
+
+      it "returns no results when all course_ids[] values resolve to nothing" do
+        garbage = todo_call(course_ids: ["abc"])
+        expect(garbage).to eq([])
+      end
+
+      it "accepts SIS course IDs via api_find_all" do
+        @teacher_course.update!(sis_source_id: "TEACHER-COURSE-SIS")
+        json = todo_call(course_ids: ["sis_course_id:TEACHER-COURSE-SIS"])
+        assignment_ids = json.map { |item| item["assignment"]["id"] }
+        expect(assignment_ids).to include(@a2.id)
+        expect(assignment_ids).not_to include(@a3.id)
+      end
+    end
+
+    context "with checkpoints" do
+      before :once do
+        me = @user
+        @teacher_course.account.enable_feature!(:discussion_checkpoints)
+        @rtt, @rte = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+        ckpt_student = @teacher_course.students.first
+        @rtt.submit_homework(ckpt_student, body: "topic submission")
+        @rte.submit_homework(ckpt_student, body: "entry submission")
+        @student_rtt, @student_rte = graded_discussion_topic_with_checkpoints(context: @student_course)
+        @user = me
+      end
+
+      def checkpoint_grading_ids(json)
+        json.select { |item| item["checkpoint_label"].present? && item["type"] == "grading" }
+            .map { |item| item["assignment"]["id"] }
+      end
+
+      def checkpoint_submitting_ids(json)
+        json.select { |item| item["checkpoint_label"].present? && item["type"] == "submitting" }
+            .map { |item| item["assignment"]["id"] }
+      end
+
+      it "filters checkpoint grading items by course" do
+        in_scope = todo_call(course_ids: [@teacher_course.id])
+        expect(checkpoint_grading_ids(in_scope)).to match_array([@rtt.id, @rte.id])
+
+        out_of_scope = todo_call(course_ids: [@other_teacher_course.id])
+        expect(checkpoint_grading_ids(out_of_scope)).to be_empty
+      end
+
+      it "filters checkpoint submitting items by course" do
+        in_scope = todo_call(course_ids: [@student_course.id])
+        expect(checkpoint_submitting_ids(in_scope)).to match_array([@student_rtt.id, @student_rte.id])
+
+        out_of_scope = todo_call(course_ids: [@teacher_course.id])
+        expect(checkpoint_submitting_ids(out_of_scope)).to be_empty
+      end
+    end
+
+    context "with ungraded_quizzes" do
+      before :once do
+        @student_quiz = @student_course.quizzes.create!(
+          title: "ungraded student quiz",
+          quiz_type: "practice_quiz",
+          due_at: 1.day.from_now
+        )
+        @student_quiz.publish!
+      end
+
+      def quiz_ids(json)
+        json.select { |item| item["quiz"] }.map { |item| item["quiz"]["id"] }
+      end
+
+      it "filters ungraded quizzes by course" do
+        in_scope = todo_call(include: ["ungraded_quizzes"], course_ids: [@student_course.id])
+        expect(quiz_ids(in_scope)).to include(@student_quiz.id)
+
+        out_of_scope = todo_call(include: ["ungraded_quizzes"], course_ids: [@teacher_course.id])
+        expect(quiz_ids(out_of_scope)).not_to include(@student_quiz.id)
+      end
+    end
+  end
 end

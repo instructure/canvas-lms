@@ -903,6 +903,14 @@ class UsersController < ApplicationController
   #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
   #                        These will be returned under a +quiz+ key instead of an +assignment+ key in response elements.
   #
+  # @argument course_ids[] [String]
+  #   Restrict results to todo items in the given courses. Accepts numeric IDs
+  #   and SIS IDs of the form +sis_course_id:foo+. Applies to grading, submitting,
+  #   checkpoint, and ungraded quiz items alike. Courses the user is not enrolled
+  #   in (or that cannot be resolved) are silently dropped. When the parameter is
+  #   present but no valid courses resolve, an empty list is returned rather than
+  #   the unfiltered list.
+  #
   # There is a limit to the number of items returned.
   #
   # The `ignore` and `ignore_permanently` URLs can be used to update the user's
@@ -947,13 +955,20 @@ class UsersController < ApplicationController
   def todo_items
     GuardRail.activate(:secondary) do
       bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
-      grading_scope = @current_user.assignments_needing_grading(scope_only: true)
-                                   .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
+      # Assumes Shard.current == @current_user.shard (true for /self/todo).
+      # Cross-shard callers would need Shard.relative_id_for translation here.
+      course_ids_filter = api_find_all(Course, Array(params[:course_ids])).pluck(:id) if params.key?(:course_ids)
+      submitting_course_ids = course_ids_filter || @current_user.courses.pluck(:id)
+
+      grading_scope = @current_user.assignments_needing_grading(
+        scope_only: true,
+        course_ids: course_ids_filter
+      ).reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
       submitting_scope = @current_user
                          .assignments_needing_submitting(
                            include_ungraded: true,
                            scope_only: true,
-                           course_ids: @current_user.courses.pluck(:id),
+                           course_ids: submitting_course_ids,
                            include_concluded: false
                          )
                          .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
@@ -976,12 +991,16 @@ class UsersController < ApplicationController
 
       # Add discussion checkpoint assignments for courses with checkpoints enabled
       course_ids_with_checkpoints = @current_user.course_ids_with_checkpoints_enabled
+      course_ids_with_checkpoints &= course_ids_filter if course_ids_filter
       unless course_ids_with_checkpoints.empty?
         sub_assignment_bookmark = Plannable::Bookmarker.new(SubAssignment, false, [:due_at, :created_at], :id)
 
         # Add checkpoint assignments needing grading
-        checkpoint_grading_scope = @current_user.assignments_needing_grading(scope_only: true, is_sub_assignment: true)
-                                                .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :duplicate_of)
+        checkpoint_grading_scope = @current_user.assignments_needing_grading(
+          scope_only: true,
+          is_sub_assignment: true,
+          course_ids: course_ids_filter
+        ).reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :duplicate_of)
         checkpoint_grading_collection = BookmarkedCollection.wrap(sub_assignment_bookmark, checkpoint_grading_scope)
         checkpoint_grading_collection = BookmarkedCollection.filter(checkpoint_grading_collection) do |assignment|
           assignment.context.grants_right?(@current_user, session, :manage_grades)
@@ -1011,7 +1030,8 @@ class UsersController < ApplicationController
         quizzes_scope = @current_user
                         .ungraded_quizzes(
                           needing_submitting: true,
-                          scope_only: true
+                          scope_only: true,
+                          course_ids: course_ids_filter
                         )
                         .reorder(:due_at, :id)
         quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
