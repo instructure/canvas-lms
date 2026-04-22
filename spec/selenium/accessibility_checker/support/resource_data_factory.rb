@@ -20,7 +20,7 @@
 require_relative "fixture_loader"
 
 module AccessibilityChecker
-  module TestDataFactory
+  module ResourceDataFactory
     include FixtureLoader
 
     @resource_counter = 0
@@ -87,13 +87,13 @@ module AccessibilityChecker
       raise ArgumentError, "Unknown fixture: #{fixture_key}" unless config
 
       if title.nil?
-        TestDataFactory.resource_counter += 1
-        title = "Resource #{TestDataFactory.resource_counter}"
+        ResourceDataFactory.resource_counter += 1
+        title = "Resource #{ResourceDataFactory.resource_counter}"
       end
 
       page = create_page_from_fixture(course, config[:path], title:, **)
 
-      TestDataFactory.expected_issue_counts[page.id] = config[:issue_count]
+      ResourceDataFactory.expected_issue_counts[page.id] = config[:issue_count]
 
       page
     end
@@ -103,13 +103,13 @@ module AccessibilityChecker
       raise ArgumentError, "Unknown fixture: #{fixture_key}" unless config
 
       if title.nil?
-        TestDataFactory.resource_counter += 1
-        title = "Resource #{TestDataFactory.resource_counter}"
+        ResourceDataFactory.resource_counter += 1
+        title = "Resource #{ResourceDataFactory.resource_counter}"
       end
 
       assignment = create_assignment_from_fixture(course, config[:path], title:, **)
 
-      TestDataFactory.expected_issue_counts[assignment.id] = config[:issue_count]
+      ResourceDataFactory.expected_issue_counts[assignment.id] = config[:issue_count]
 
       assignment
     end
@@ -131,7 +131,7 @@ module AccessibilityChecker
     end
 
     def expected_issue_count_for(resource)
-      TestDataFactory.expected_issue_counts[resource.id] || 0
+      ResourceDataFactory.expected_issue_counts[resource.id] || 0
     end
   end
 end
