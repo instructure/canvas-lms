@@ -26,11 +26,31 @@ export const NAVY = 'rgb(39, 53, 64)'
 export const NAVY_HOVER = 'rgb(30, 42, 52)'
 export const NAVY_ACTIVE = 'rgb(25, 35, 43)'
 
+// Success green — used for the published state button
+export const GREEN = '#03893D'
+export const GREEN_HOVER = '#026f30'
+export const GREEN_ACTIVE = '#025c28'
+
+// Pure black — used for progress bar border
+export const BLACK = '#000000'
+
 // Border radii
 export const RADIUS_SM = '0.5rem' // buttons, inputs
 export const RADIUS_MD = '0.75rem' // cards
 export const RADIUS_LG = '1.5rem' // large cards
 export const RADIUS_PILL = '999px' // pill / fully-rounded
+
+// Reusable InstUI themeOverride: any button that only needs rounded corners (secondary/outline)
+export const buttonTheme = {borderRadius: RADIUS_SM}
+
+// Reusable InstUI themeOverride: published (green) button
+export const publishedButtonTheme = {
+  borderRadius: RADIUS_SM,
+  primaryBackground: GREEN,
+  primaryHoverBackground: GREEN_HOVER,
+  primaryActiveBackground: GREEN_ACTIVE,
+  primaryBorderColor: GREEN,
+}
 
 // Reusable InstUI themeOverride: navy filled button
 export const navyButtonTheme = {

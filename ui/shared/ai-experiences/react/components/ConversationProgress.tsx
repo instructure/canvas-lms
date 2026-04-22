@@ -26,11 +26,11 @@ import {Popover} from '@instructure/ui-popover'
 import {IconMiniArrowDownLine, IconMiniArrowUpLine, IconCompleteLine} from '@instructure/ui-icons'
 import {List} from '@instructure/ui-list'
 import {Button} from '@instructure/ui-buttons'
-import {navyButtonTheme, RADIUS_PILL} from '../brand'
+import {navyButtonTheme, RADIUS_PILL, BLACK} from '../brand'
 
 const I18n = createI18nScope('ai_experiences')
 
-const progressBorderTheme = {borderColorPrimary: '#000000'}
+const progressBorderTheme = {borderColorPrimary: BLACK}
 const progressBarTheme = {borderRadius: RADIUS_PILL, trackBottomBorderWidth: '0'}
 const targetButtonTheme = navyButtonTheme
 
