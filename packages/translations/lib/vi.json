@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Tùy Chỉnh"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Chiều rộng và chiều cao tùy chỉnh (Pixel)"
-    },
     "cyan_c1d5f68a": {
         "message": "Xanh Lá Mạ"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Loại Kích Thước"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Kích Thước"
     },
     "directionality_26ae9e08": {
         "message": "Định Hướng"

@@ -524,9 +524,6 @@
     "custom_6979cd81": {
         "message": "Пользовательская"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Пользовательская ширина и высота (пикселы)"
-    },
     "cyan_c1d5f68a": {
         "message": "Голубой"
     },
@@ -610,9 +607,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Тип измерения"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Размеры"
     },
     "directionality_26ae9e08": {
         "message": "Направленность"

@@ -443,9 +443,6 @@
     "custom_6979cd81": {
         "message": "Eigendefinert"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Eigendefinert bredde og høgde (pikslar)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
@@ -523,9 +520,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Dimensjonstype"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensjonar"
     },
     "directionality_26ae9e08": {
         "message": "Retningsgivande"
