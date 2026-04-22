@@ -94,6 +94,25 @@ describe "AccountType institutional tag queries" do
       expect(result).to eq ["Archived Category"]
     end
 
+    it "returns categories in any state when workflowState is any" do
+      result = account_type.resolve('institutionalTagCategoriesConnection(workflowState: "any") { nodes { name } }')
+      expect(result).to eq ["Animals", "Archived Category", "Colors"]
+    end
+
+    it "with workflowState any and hasTagsInState deleted, keeps deleted categories and active categories with at least one deleted tag" do
+      result = account_type.resolve(
+        'institutionalTagCategoriesConnection(workflowState: "any", hasTagsInState: "deleted") { nodes { name } }'
+      )
+      expect(result).to eq ["Animals", "Archived Category"]
+    end
+
+    it "with a concrete workflowState and hasTagsInState, filters strictly by matching tags" do
+      result = account_type.resolve(
+        'institutionalTagCategoriesConnection(workflowState: "active", hasTagsInState: "deleted") { nodes { name } }'
+      )
+      expect(result).to eq ["Animals"]
+    end
+
     it "returns nil for non-admins" do
       result = non_admin_account_type.resolve("institutionalTagCategoriesConnection { nodes { _id } }")
       expect(result).to be_nil
