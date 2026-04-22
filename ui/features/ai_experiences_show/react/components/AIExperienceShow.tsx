@@ -40,7 +40,11 @@ import {AIExperience} from '../../types'
 import {FileList} from '@canvas/canvas-file-upload/react/FileList'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 import AIExperiencePublishButton from './AIExperiencePublishButton'
-import {roundedTheme} from '../../../../shared/ai-experiences/react/brand'
+import {
+  navyButtonTheme,
+  roundedTheme,
+  buttonTheme,
+} from '../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_show')
 
@@ -120,22 +124,32 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                     on={['hover', 'focus']}
                   >
                     <Button
-                      color="primary"
                       interaction="disabled"
+                      themeOverride={buttonTheme}
                       data-testid="ai-experience-show-ai-conversations-button"
                     >
-                      {I18n.t('Conversations')}
+                      {I18n.t('View conversations')}
                     </Button>
                   </Tooltip>
                 ) : (
                   <Button
-                    color="primary"
                     href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
+                    themeOverride={buttonTheme}
                     data-testid="ai-experience-show-ai-conversations-button"
                   >
-                    {I18n.t('Conversations')}
+                    {I18n.t('View conversations')}
                   </Button>
                 )}
+              </Flex.Item>
+              <Flex.Item>
+                <Button
+                  color="primary"
+                  onClick={handleEdit}
+                  themeOverride={navyButtonTheme}
+                  data-testid="ai-experience-show-edit-button"
+                >
+                  {I18n.t('Edit')}
+                </Button>
               </Flex.Item>
               <Flex.Item>
                 <Menu
@@ -150,24 +164,6 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                     </IconButton>
                   }
                 >
-                  <Menu.Item data-testid="ai-experience-show-edit-menu-item" onSelect={handleEdit}>
-                    {I18n.t('Edit')}
-                  </Menu.Item>
-                  <Menu.Item
-                    data-testid="ai-experience-show-run-chat-simulation-menu-item"
-                    disabled={true}
-                  >
-                    <Flex justifyItems="space-between" gap="small">
-                      <Flex.Item>
-                        <Text>{I18n.t('Run chat simulation')}</Text>
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text size="small" color="secondary">
-                          {I18n.t('Coming soon')}
-                        </Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
                   <Menu.Item
                     data-testid="ai-experience-show-delete-menu-item"
                     onSelect={() => setIsDeleteModalOpen(true)}

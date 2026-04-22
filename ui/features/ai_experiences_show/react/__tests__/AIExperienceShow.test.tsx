@@ -130,35 +130,36 @@ describe('AIExperienceShow', () => {
     expect(menuButton).toBeInTheDocument()
   })
 
-  it('shows menu options when menu button is clicked', async () => {
+  it('shows Delete as the only option in the menu', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     fireEvent.click(menuButton!)
 
     await waitFor(() => {
-      expect(screen.getByText('Edit')).toBeInTheDocument()
-      expect(screen.getByText('Run chat simulation')).toBeInTheDocument()
-      expect(screen.getByText('Coming soon')).toBeInTheDocument()
       expect(screen.getByText('Delete')).toBeInTheDocument()
+      expect(screen.queryByText('Run chat simulation')).not.toBeInTheDocument()
     })
   })
 
-  it('navigates to edit page when Edit is clicked', async () => {
-    // Skip test that modifies window.location in test environment
-    // Navigation is tested in integration tests
-  })
-
-  it('Run chat simulation option is disabled', async () => {
+  it('renders standalone Edit button', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
+    expect(screen.getByTestId('ai-experience-show-edit-button')).toBeInTheDocument()
+  })
 
-    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
-    fireEvent.click(menuButton!)
+  it('renders View conversations button', () => {
+    render(<AIExperienceShow aiExperience={mockAiExperience} />)
+    expect(screen.getByTestId('ai-experience-show-ai-conversations-button')).toHaveTextContent(
+      'View conversations',
+    )
+  })
 
-    await waitFor(() => {
-      const runSimulationItem = screen.getByText('Run chat simulation').closest('[role="menuitem"]')
-      expect(runSimulationItem).toHaveAttribute('aria-disabled', 'true')
-    })
+  it('does not render Edit button or View conversations button when can_manage is false', () => {
+    render(<AIExperienceShow aiExperience={{...mockAiExperience, can_manage: false}} />)
+    expect(screen.queryByTestId('ai-experience-show-edit-button')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('ai-experience-show-ai-conversations-button'),
+    ).not.toBeInTheDocument()
   })
 
   it('opens delete confirmation modal when Delete is clicked', async () => {

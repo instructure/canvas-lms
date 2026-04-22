@@ -124,6 +124,7 @@ const MessageFeedback = ({
       } else {
         await postFeedback('liked')
       }
+      setUiState('idle')
     } catch {
       // error state already set in postFeedback/removeFeedback
     }
