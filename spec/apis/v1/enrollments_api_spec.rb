@@ -4107,5 +4107,78 @@ describe EnrollmentsApiController, type: :request do
       body = JSON.parse(response.body)
       expect(body["errors"]).to eq "The specified type must match the base type for the role"
     end
+
+    it "applies start_at and end_at to every created enrollment" do
+      user1 = user_with_pseudonym(name: "User One")
+      user2 = user_with_pseudonym(name: "User Two")
+      @course2 = @course.root_account.courses.create!(name: "course2", workflow_state: "available")
+      start_at = "2026-05-01T00:00:00Z"
+      end_at = "2026-12-01T00:00:00Z"
+
+      api_call_as_user account_admin_user(active_all: true),
+                       :post,
+                       @path,
+                       @path_options,
+                       {
+                         user_ids: [user1.id, user2.id],
+                         course_ids: [@course.id, @course2.id],
+                         start_at:,
+                         end_at:
+                       }
+
+      run_jobs
+
+      expect(response).to be_successful
+      enrollments = Enrollment.where(user: [user1, user2], course: [@course, @course2])
+      expect(enrollments.count).to eq(4)
+      enrollments.each do |e|
+        expect(e.start_at).to be_within(1.second).of(Time.zone.parse(start_at))
+        expect(e.end_at).to be_within(1.second).of(Time.zone.parse(end_at))
+      end
+    end
+
+    it "applies only start_at when end_at is omitted" do
+      user1 = user_with_pseudonym(name: "User One")
+      start_at = "2026-05-01T00:00:00Z"
+
+      api_call_as_user account_admin_user(active_all: true),
+                       :post,
+                       @path,
+                       @path_options,
+                       {
+                         user_ids: [user1.id],
+                         course_ids: [@course.id],
+                         start_at:
+                       }
+
+      run_jobs
+
+      expect(response).to be_successful
+      enrollment = Enrollment.find_by!(user: user1, course: @course)
+      expect(enrollment.start_at).to be_within(1.second).of(Time.zone.parse(start_at))
+      expect(enrollment.end_at).to be_nil
+    end
+
+    it "applies only end_at when start_at is omitted" do
+      user1 = user_with_pseudonym(name: "User One")
+      end_at = "2026-12-01T00:00:00Z"
+
+      api_call_as_user account_admin_user(active_all: true),
+                       :post,
+                       @path,
+                       @path_options,
+                       {
+                         user_ids: [user1.id],
+                         course_ids: [@course.id],
+                         end_at:
+                       }
+
+      run_jobs
+
+      expect(response).to be_successful
+      enrollment = Enrollment.find_by!(user: user1, course: @course)
+      expect(enrollment.start_at).to be_nil
+      expect(enrollment.end_at).to be_within(1.second).of(Time.zone.parse(end_at))
+    end
   end
 end
