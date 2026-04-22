@@ -29,13 +29,6 @@ developer_key_user_agent_alert:
       state: allowed_on
     ci:
       state: allowed_on
-disable_graphql_authentication:
-  state: hidden
-  display_name: Disable authentication for GraphQL
-  description: |-
-    If enabled, GraphQL queries will not require
-    users to be signed in or use an access token.
-  applies_to: SiteAdmin
 disable_oembed_retrieve:
   state: hidden
   applies_to: RootAccount

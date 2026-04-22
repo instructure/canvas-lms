@@ -4857,7 +4857,7 @@ class Course < ApplicationRecord
     if grants_right?(user, session, :read_as_admin)
       return root_account.feature_enabled?(:modules_page_rewrite)
     elsif feature_enabled?(:modules_page_rewrite_student_view)
-      return user || Account.site_admin.feature_enabled?(:disable_graphql_authentication) || root_account.feature_enabled?(:graphql_persisted_queries)
+      return user || root_account.feature_enabled?(:graphql_persisted_queries)
     end
 
     false
