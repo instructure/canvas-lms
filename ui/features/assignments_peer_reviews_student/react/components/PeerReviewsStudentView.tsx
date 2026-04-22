@@ -317,7 +317,23 @@ const PeerReviewsStudentView: React.FC<PeerReviewsStudentViewProps> = ({
         {showSubmissionTab && (
           <Tabs.Panel
             id="submission"
-            renderTitle={isMobile ? I18n.t('Peer Review') : I18n.t('Submission')}
+            renderTitle={
+              isMobile
+                ? I18n.t(
+                    'peer_review_submission_tab_mobile',
+                    {one: 'Submission', other: 'Submissions'},
+                    {
+                      count: data?.assignment?.peerReviews?.count || 0,
+                    },
+                  )
+                : I18n.t(
+                    'peer_review_submission_tab_desktop',
+                    {one: 'Submission to Review', other: 'Submissions to Review'},
+                    {
+                      count: data?.assignment?.peerReviews?.count || 0,
+                    },
+                  )
+            }
             isSelected={selectedTab === 'submission'}
             padding="0"
             data-testid="submission-tab"
