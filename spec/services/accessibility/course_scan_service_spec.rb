@@ -184,8 +184,8 @@ describe Accessibility::CourseScanService do
         expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: classic_quiz_assignment)
       end
 
-      it "does not scan the external tool assignment" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:new).with(resource: external_tool_assignment)
+      it "scans the external tool assignment" do
+        expect(Accessibility::ResourceScannerService).to have_received(:new).with(resource: external_tool_assignment)
       end
     end
 

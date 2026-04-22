@@ -25,6 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Root} from 'react-dom/client'
+import {rerender} from '@canvas/react'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
 import {checkForTitleConflict} from '@canvas/wiki/utils/titleConflicts'
 import {debounce} from '@instructure/debounce'
@@ -179,6 +180,6 @@ export default function renderWikiPageIndexEditModal(
   props: WikiPageIndexEditModalProps,
 ) {
   const titleComponent = <WikiPageIndexEditModal {...props} />
-  root.render(titleComponent)
+  rerender(root, titleComponent)
   return titleComponent
 }

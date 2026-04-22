@@ -270,7 +270,8 @@ module Types
           type: :implicit,
           require_sis: false,
           root_account: context[:domain_root_account],
-          in_region: true
+          in_region: true,
+          current_user:
         )
         pseudonym&.unique_id
       end
@@ -693,11 +694,12 @@ module Types
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
       argument :observed_user_id, ID, required: false, description: "ID of the observed user"
       argument :only_current_grading_period, Boolean, required: false, default_value: true, description: "Only include missing submissions from current grading period (default: true)"
+      argument :only_graded_or_with_feedback, Boolean, required: false, description: "Show only graded submissions or submissions with instructor feedback"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
       argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, only_graded_or_with_feedback: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
       return [] unless object == current_user
 
       # Get active course enrollments using the same filtering as dashboard
@@ -727,6 +729,8 @@ module Types
       # Start with submissions for the user
       user_for_submissions = observed_user_id.present? ? User.find_by(id: observed_user_id) : object
       return [] unless user_for_submissions
+
+      return user_for_submissions.recent_feedback(course_ids: active_course_ids) if only_graded_or_with_feedback
 
       submissions_query = Submission
                           .joins(assignment: :course)
@@ -1026,6 +1030,18 @@ module Types
       context.scoped_set!(:only_active_courses, only_active_courses)
       context.scoped_set!(:context_type, "User")
       object
+    end
+
+    field :institutional_tags_connection,
+          Types::InstitutionalTagType.connection_type,
+          null: true do
+      argument :account_id,
+               ID,
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+    end
+    def institutional_tags_connection(account_id:)
+      Loaders::UserLoaders::InstitutionalTagsLoader.for(current_user, session, account_id).load(object.id)
     end
   end
 end

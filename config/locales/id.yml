@@ -363,6 +363,7 @@ id:
   a_template_name_is_required_8568babf: "Nama templat harus ada"
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Timeout terjadi, menghubungi layanan autentikasi eksternal"
   a_title_is_required_71222850: "Judul dibutuhkan"
+  a_url_to_help_users_who_are_having_trouble_logging_e7490244: "URL untuk membantu pengguna yang mengalami kesulitan masuk. Jika diatur, tautan 'Mengalami kesulitan masuk?' akan muncul di halaman masuk."
   a_user_could_not_be_found_65d13b84: "Pengguna tidak dapat ditemukan."
   a_user_who_can_delete_differentiation_tags_has_the_194875b9: "Pengguna yang dapat menghapus tag diferensiasi memiliki kemampuan untuk menghapus pengguna dari tugas dengan menghapus tag yang ditetapkan pada tugas."
   a_user_with_this_permission_has_the_ability_to_rem_82d8b0a6: "Pengguna dengan izin ini memiliki kemampuan untuk menghapus pengguna dari tugas dengan menghapus varian tag yang ditetapkan pada tugas."
@@ -483,6 +484,7 @@ id:
     default_term_name: "Durasi Akademis Default"
     errors: 
       invalid_discovery_url: "URL penemuan ini tidak valid"
+      invalid_login_help_url: "URL bantuan masuk tidak valid"
     feedback_coach: "Kunjungi Komunitas"
     feedback_coach_sub: "Jelajahi panduan, pembaruan, blog, forum, dan sumber daya untuk membantu Anda menemukan jawaban."
     feedback_feature_request_sub: "Mulai ide untuk meningkatkan Canvas?"
@@ -715,6 +717,7 @@ id:
         consortium_autocreate_web_of_trust: "Secara otomatis membuat jaring kepercayaan saat membuat akun baru"
         consortium_can_create_own_accounts: "Admin konsorsium bisa membuat akun root baru"
         consortium_parent_account: "Akun induk konsorsium"
+        enforce_access_consent: "Memerlukan persetujuan administrator sekolah untuk akses karyawan Instructure"
         shard_per_account: "Buat shard baru untuk setiap akun root baru"
       new_account_domain_title: "Domain Akun Baru"
     additional_settings_right_side: 
@@ -1947,6 +1950,7 @@ id:
   act_as_user_name_5581cdbb: "Bertindak sebagai %{user_name}"
   act_as_users_de7ee378: "Bertindak sebagai pengguna"
   action_db315788: Tindakan
+  action_enforcement_62c15f41: "%{action} (%{enforcement})"
   action_level_f064ffe6: "Level Tindakan"
   action_required_we_strongly_encourage_you_to_enabl_526b6847: "*Tindakan yang Diperlukan:* Kami sangat menganjurkan Anda untuk mengaktifkan dan menguji UI Masuk Canvas Baru *sekarang*. Harap uji perubahan di lingkungan *Beta* Anda terlebih dahulu untuk menerapkan penyesuaian tema yang diperlukan sebelum batas waktu."
   action_required_we_strongly_encourage_you_to_enabl_db338af4: "Tindakan yang Diperlukan: Kami sangat menganjurkan Anda untuk mengaktifkan dan menguji UI Masuk Canvas Baru sekarang. Harap uji perubahan di lingkungan Beta Anda terlebih dahulu untuk menerapkan penyesuaian tema yang diperlukan sebelum batas waktu."
@@ -2301,6 +2305,7 @@ id:
   advanced_content_organization_features_in_the_asse_b91a23ab: "Fitur pengorganisasian konten tingkat lanjut di Layanan Manajemen Penilaian (AMS). Ini dapat berubah atau rusak kapan saja dan tidak ditujukan untuk sebagian besar akun."
   advanced_peer_review_configurations_83ab5948: "Konfigurasi Tinjauan Sejawat Lanjutan"
   advanced_turnitin_settings_9ee84a38: "Pengaturan Tingkat Lanjut"
+  advanced_vericite_settings_4f2afd5b: "Pengaturan VeriCite Tingkat Lanjut"
   affected_fields_59549e21: "Bidang yang Terpengaruh"
   afghanistan_93_ab06805: "Afganistan (+93)"
   afrikaans_da0fe6ee: Afrikaan
@@ -2313,6 +2318,7 @@ id:
   after_last_attempt_c9168da2: "Setelah Upaya Terakhir"
   after_logging_out_of_canvas_instruct_identity_prov_dc853c9a: "Setelah logout dari Canvas, instruksikan penyedia identitas mengautentikasi ulang pengguna pada upaya login selanjutnya. Ini bisa mencegah loop login tidak terduga."
   after_the_assignment_is_graded_53754607: "Setelah tugas dinilai"
+  after_the_due_date_b7ac51f4: "Setelah Batas Waktu"
   after_the_due_date_eee89c9c: "Setelah tanggal batas"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Setelah upaya pertama, Anda tidak bisa meninggalkan komentar hingga Anda menyerahkan tugas."
   after_this_change_the_toolname_tool_deployment_id__245d0a01: "Setelah perubahan ini, alat %{toolName} (Deployment ID: %{deploymentId}) akan dihapus dari kursus %{courseName}."
@@ -2346,16 +2352,20 @@ id:
   ai_experiences_68bc22ad: "Pengalaman AI"
   ai_experiences_evaluation_e2a240ab: "Evaluasi Pengalaman AI"
   ai_experiences_student_view_13bab5d9: "Tinggalkan Siswa Pengalaman AI"
+  ai_experiences_v2_authentication_2941a4b9: "Autentikasi AI Experiences V2"
   ai_feedback_summary_bdbd1121: "Ringkasan Umpan Balik AI"
   ai_generated_rubrics_42964825: "Rubrik yang Dibuat AI"
   ai_genreated_rubrics_889d7e0b: "Rubrik yang Dihasilkan AI."
+  ai_information_455bbb89: "Informasi AI"
   ai_nutrition_facts_c55a0fe0: "Fakta Nutrisi AI"
   ai_powered_features_without_data_retention_3c26e814: "Fitur Bertenaga AI Tanpa Retensi Data"
   ai_powered_features_without_data_training_44cb5559: "Fitur Bertenaga AI Tanpa Pelatihan Data"
+  ai_privacy_notice_a8f5983e: "Pemberitahuan Privasi AI"
   ai_quiz_generation_b4088599: "Pembuatan Kuis AI\\"
   ai_settings_control_b113d39a: "Kontrol Pengaturan AI"
   ai_text_tools_77911fa4: "Alat Teks AI"
   ai_translation_controls_for_courses_currently_limi_deebebb6: "Kontrol terjemahan AI untuk kursus, saat ini dibatasi untuk diskusi dan pengumuman."
+  ai_translation_feedback_e75479fd: "Umpan Balik Terjemahan AI"
   ai_translation_for_lti_apps_discover_page_4c74f324: "Penerjemahan AI untuk Halaman Discover Aplikasi LTI"
   ai_translation_improvements_c33e1cc3: "Perbaikan Terjemahan AI"
   ajax_errors: 
@@ -2492,6 +2502,7 @@ id:
   all_modules_20c9a1c8: "Semua Modul"
   all_my_files_a0213441: "Semua File Saya"
   all_new_and_existing_users_in_the_sub_account_will_7ec9ca8d: "Semua pengguna baru dan lama di sub-akun akan berlangganan otomatis ke kalender yang dipilih."
+  all_notifications_6f482e61: "Semua notifikasi"
   all_on_time_submissions_1c4bae93: "Semua penyerahan tepat waktu"
   all_outcomes_9f338636: "Semua Capaian"
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Semua capaian dari %{groupTitle} telah berhasil ditambahkan ke kursus ini."
@@ -2542,6 +2553,7 @@ id:
   allow_access_to_discussion_insights_ad50085d: "Izinkan akses insight diskusi"
   allow_account_administrators_to_manage_api_rate_li_1ded6de: "Izinkan administrator akun mengelola batas kecepatan API untuk alat dan integrasi eksternal menggunakan UTID."
   allow_administrative_actions_in_courses_20c33fed: "Izinkan tindakan administratif dalam kursus"
+  allow_administrators_to_edit_lti_tool_configuratio_2c973645: "Izinkan administrator untuk mengedit konfigurasi alat LTI sebagai JSON"
   allow_administrators_to_set_a_default_grading_sche_9b928f00: "Izinkan administrator untuk menetapkan skema penilaian default untuk akun. Skema penilaian ini akan menjadi default untuk semua kursus di dalam akun itu, tetapi masing-masing kursus dapat menimpanya dengan default miliknya sendiri."
   allow_attachment_association_creation_5ed99e74: "Izinkan Pembuatan Asosiasi Lampiran"
   allow_attachment_associations_creation_for_any_att_28bc623f: "Izinkan pembuatan asosiasi lampiran untuk semua lampiran pada aset Canvas"
@@ -2587,6 +2599,7 @@ id:
   allow_opt_out_of_inbox: "Izinkan pengguna untuk tidak ikut di dalam Kotak Masuk Percakapan. Ini akan menyebabkan semua pesan percakapan dan notifikasi akan dikirim sebagai notifikasi ASAP (Secepat Mungkin) ke email utama pengguna, menyembunyikan lencana pesan Percakapan yang belum di baca di dalam Kotak Masuk, dan menyembunyikan preferensi notifikasi Percakapan."
   allow_outcome_extra_credit_57c1e84e: "Izinkan Kredit Ekstra Capaian"
   allow_participants_to_comment_2380a686: "Izinkan Peserta Berkomentar"
+  allow_participants_to_comment_eed89382: "Izinkan peserta untuk berkomentar"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Izinkan penerimaan pasif terhadap Ketentuan Layanan"
   allow_peer_reviews_across_sections_fb72345b: "Izinkan tinjauan sejawat lintas bagian"
   allow_peer_reviews_to_be_assigned_across_course_se_ac101b02: "Izinkan tinjauan sejawat ditugaskan di seluruh bagian kursus"
@@ -2613,6 +2626,7 @@ id:
   allow_users_to_access_files_associated_with_a_conv_c069804e: "Izinkan pengguna mengakses file yang terkait dengan percakapan saat melihat pesan percakapan (ini melakukan apa yang file_association_access lakukan, perbedaannya adalah hanya berlaku untuk pesan percakapan)"
   allow_users_to_access_files_associated_with_a_cour_43f01878: "Izinkan pengguna mengakses file terkait dengan suatu kursus"
   allow_users_to_comment_45b8f753: "Izinkan pengguna berkomentar"
+  allow_users_to_provide_thumbs_up_down_feedback_on__96a96e30: "Izinkan pengguna untuk memberikan umpan balik jempol ke atas/ke bawah pada terjemahan yang dihasilkan AI dalam diskusi dan pengumuman."
   allow_users_to_remediate_certain_accessibility_iss_d0fb935b: "Izinkan pengguna untuk memperbaiki masalah aksesibilitas tertentu dengan AI melalui Pemeriksa Aksesibilitas Kursus."
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Izinkan pengguna menyerahkan email tambahan saat mendaftar."
   allowed_19727e83: Diizinkan
@@ -2774,6 +2788,7 @@ id:
   allows_user_to_create_and_manage_groups_allows_use_562e0013: "Mengizinkan pengguna membuat dan mengelola Grup. Mengizinkan pengguna mengelola sumber daya bersama di akun itu."
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "Mengizinkan pengguna membuat dan mengubah skema penilaian."
   allows_user_to_create_and_update_other_user_s_acce_fe779eec: "Memungkinkan pengguna untuk membuat dan memperbarui token akses pengguna lain."
+  allows_user_to_create_automation_rules_on_the_acco_737d4e5a: "Memungkinkan pengguna untuk membuat aturan otomasi pada akun."
   allows_user_to_create_blackout_dates_f6970f37: "Mengizinkan pengguna membuat tanggal blackout."
   allows_user_to_create_collaborations_b4f214bf: "Mengizinkan pengguna membuat kolaborasi."
   allows_user_to_create_content_migrations_67527a6b: "Mengizinkan pengguna membuat migrasi konten."
@@ -2805,6 +2820,7 @@ id:
   allows_user_to_delete_account_or_course_groups_3078d0c5: "Mengizinkan pengguna menghapus grup akun atau kursus."
   allows_user_to_delete_assignment_groups_in_a_cours_88c89c76: "Mengizinkan pengguna menghapus grup di suatu kursus."
   allows_user_to_delete_assignments_in_a_course_b0f220c4: "Mengizinkan pengguna menghapus tugas di suatu kursus."
+  allows_user_to_delete_automation_rules_on_the_acco_865f96f3: "Memungkinkan pengguna untuk menghapus aturan otomasi pada akun."
   allows_user_to_delete_course_files_and_folders_34a7793c: "Mengizinkan pengguna menghapus file dan folder kursus."
   allows_user_to_delete_course_groups_5ce7382e: "Mengizinkan pengguna menghapus grup kursus."
   allows_user_to_delete_course_pages_dfaf4fb7: "Mengizinkan pengguna menghapus halaman kursus."
@@ -2825,6 +2841,7 @@ id:
   allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Mengizinkan pengguna mengedit dan menerbitkan pace kursus melalui Course Pacing."
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: "Mengizinkan pengguna mengedit dan menerbitkan/membatalkan penerbitan tugas."
   allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Mengizinkan pengguna mengedit dan menerbitkan/membatalkan penerbitan kuis."
+  allows_user_to_edit_automation_rules_on_the_accoun_b36372d0: "Memungkinkan pengguna untuk mengedit aturan otomasi pada akun."
   allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Mengizinkan pengguna mengedit pengaturan kunci konten Cetak Biru pada masing-masing pengaturan jika pengguna terdaftar dalam suatu kursus master Cetak Biru."
   allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Mengizinkan pengguna mengedit pengaturan kunci konten Cetak Biru pada masing-masing diskusi."
   allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Mengizinkan pengguna mengedit pengaturan kunci Kursus Cetak Biru di halaman indeks Halaman dan untuk masing-masing halaman di suatu kursus master Cetak Biru."
@@ -3021,6 +3038,7 @@ id:
   allows_user_to_view_student_quiz_logs_e1c4491: "Mengizinkan pengguna melihat catatan kuis siswa."
   allows_user_to_view_student_results_view_quiz_stat_7d77640a: "Mengizinkan pengguna melihat hasil siswa, melihat statistik kuis, dan mengakses kuis di SpeedGrader."
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Mengizinkan pengguna melihat data spesifik siswa di Analytics."
+  allows_user_to_view_the_account_s_automation_rules_b72dcc1d: "Memungkinkan pengguna untuk melihat aturan otomasi akun."
   allows_user_to_view_the_announcements_link_in_cour_b3522273: "Mengizinkan pengguna melihat tautan Pengumuman di Navigasi Kursus."
   allows_user_to_view_the_clone_group_set_button_for_d68aab98: "Mengizinkan pengguna melihat tombol Atur Grup Klon untuk suatu grup akun atau kursus."
   allows_user_to_view_the_clone_group_set_button_for_f975352: "Mengizinkan pengguna melihat tombol Atur Grup Klon untuk suatu grup kursus."
@@ -3298,6 +3316,7 @@ id:
   an_unexpected_error_occurred_please_try_again_late_19f6d055: "Terjadi kesalahan yang tidak terduga. Silakan coba lagi nanti."
   an_unexpected_error_occurred_please_try_again_late_c58da3e4: "Kesalahan tidak terduga terjadi, silakan coba lagi nanti"
   an_unexpected_error_occurred_while_grading_570e2035: "Terjadi kesalahan yang tidak terduga saat menilai."
+  an_unexpected_error_occurred_while_submitting_feed_8c0b31ed: "Terjadi kesalahan yang tidak terduga saat menyerahkan umpan balik."
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Terjadi kesalahan tak terduga. Verifikasi file CSV atau coba lagi nanti."
   an_unknown_error_occurred_1ddc9525: "Terjadi kesalahan yang tidak diketahui."
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
@@ -3357,6 +3376,8 @@ id:
   annotation_teacher_notification_c5e4db1f: "Notifikasi Guru Anotasi"
   announcement: 
     no_title: "Tanpa Judul"
+  announcement_created_in_count_course_f90d55bb: "Pengumuman di buat di %{count} kursus."
+  announcement_creation_f9db51ec: "Pembuatan Pengumuman"
   announcement_creation_failed_f7d227f5: "Pembuatan pengumuman gagal"
   announcement_e37d6dbd: pengumuman
   announcement_ends_at_4ccc2a7e: "Pengumuman berakhir pada"
@@ -3386,6 +3407,7 @@ id:
   announcements_a4b8ed4a: Pengumuman
   announcements_account_4e9df626: "Pengumuman (Akun)"
   announcements_cannot_be_duplicated_2de8824c: "pengumuman tidak dapat diduplikasi"
+  announcements_created_in_count_courses_42919b8e: "Pengumuman di buat di %{count} kursus."
   announcements_deleted_successfully_7d77e9e1: "Pengumuman berhasil dihapus"
   announcements_from_the_past_four_months_cefbc99c: "Pengumuman dari empat bulan lalu"
   announcements_list_c75fc413: "Daftar Pengumuman"
@@ -3659,6 +3681,7 @@ id:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Anda yakin mau menghapus periode penilaian ini?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Anda yakin mau menghapus skema penilaian ini?"
   are_you_sure_you_want_to_delete_this_knowledge_cha_e574ed72: "Apakah Anda yakin ingin menghapus Obrolan Pengetahuan ini? Tindakan ini tidak bisa diurungkan."
+  are_you_sure_you_want_to_delete_this_link_f3ee1c29: "Anda yakin mau menghapus tautan ini?"
   are_you_sure_you_want_to_delete_this_page_2185844: "Anda yakin mau menghapus halaman ini?"
   are_you_sure_you_want_to_delete_this_planner_item_b71e330c: "Anda yakin mau menghapus Item planner ini?"
   are_you_sure_you_want_to_delete_this_rate_limit_se_19fbc6b: "Yakin ingin menghapus pengaturan batas nilai ini?"
@@ -3744,8 +3767,12 @@ id:
   assessee_name_must_not_be_reviewed_by_assessor_nam_503d86f9: "%{assessee_name} tidak boleh ditinjau oleh %{assessor_name}"
   assessee_name_should_be_reviewed_by_assessor_name_7cf7aff8: "%{assessee_name} harus ditinjau oleh %{assessor_name}"
   assessee_name_should_not_be_reviewed_by_assessor_n_58559fcf: "%{assessee_name} tidak boleh ditinjau oleh %{assessor_name}"
+  assessee_name_will_be_reviewed_by_assessor_name_31eb4a9b: "%{assessee_name} akan ditinjau oleh %{assessor_name}"
+  assessee_name_will_not_be_reviewed_by_assessor_nam_3a78f35b: "%{assessee_name} tidak akan ditinjau oleh %{assessor_name}"
   assessee_should_be_reviewed_by_assessor_e77029d5: "%{assessee} harus ditinjau oleh %{assessor}"
   assessee_should_not_be_reviewed_by_assessor_9568e3c4: "%{assessee} tidak boleh ditinjau oleh %{assessor}"
+  assessee_will_be_reviewed_by_assessor_b8a02a5d: "%{assessee} akan ditinjau oleh %{assessor}"
+  assessee_will_not_be_reviewed_by_assessor_ec87bdaf: "%{assessee} tidak akan ditinjau oleh %{assessor}"
   assessment_audit_d4a76709: "Audit penilaian"
   assessment_audit_events_for_creatorname_56e84e8: "Acara audit penilaian untuk %{creatorName}"
   assessment_audit_tray_5dd11721: "Tray audit penilaian"
@@ -3774,8 +3801,12 @@ id:
   assessor_name_must_review_assessee_name_df2c3c74: "%{assessor_name} harus meninjau %{assessee_name}"
   assessor_name_should_not_review_assessee_name_2aea0c46: "%{assessor_name} tidak boleh meninjau %{assessee_name}"
   assessor_name_should_review_assessee_name_eb90b62b: "%{assessor_name} harus meninjau %{assessee_name}"
+  assessor_name_will_not_review_assessee_name_28442b6f: "%{assessor_name} tidak akan ditinjau %{assessee_name}"
+  assessor_name_will_review_assessee_name_64a450d7: "%{assessor_name} akan meninjau %{assessee_name}"
   assessor_should_not_review_assessee_a5643872: "%{assessor} tidak boleh meninjau %{assessee}"
   assessor_should_review_assessee_942eeec7: "%{assessor} harus meninjau %{assessee}"
+  assessor_will_not_review_assessee_cf484ebd: "%{assessor} tidak akan ditinjau %{assessee}"
+  assessor_will_review_assessee_fe1a3b01: "%{assessor} akan meninjau %{assessee}"
   asset_category_b7ae28d6: "Kategori Aset"
   asset_code_ef611162: "Kode Aset"
   asset_group_code_d476ed05: "Kode Grup Aset"
@@ -4515,6 +4546,7 @@ id:
   at_791460b3: di
   at_least_one_assessee_is_required_69e26fce: "Diperlukan setidaknya satu orang yang dinilai"
   at_least_one_assessor_is_required_72a115d7: "Diperlukan setidaknya satu penilai"
+  at_least_one_course_is_required_c2d2538d: "Minimal satu kursus diperlukan"
   at_least_one_person_should_be_selected_9083f62e: "Setidaknya satu orang harus dipilih"
   at_least_one_required_cd667070: "Setidaknya satu diperlukan"
   at_least_one_scope_must_be_selected_97d6fce9: "Setidaknya satu cakupan harus dipilih"
@@ -4733,6 +4765,11 @@ id:
   automatically_show_closed_captions_in_the_user_s_c_f290a22f: |-
       Secara otomatis tampilkan closed captions di bahasa pengguna
       saat ini (jika tersedia) saat memutar media canvas.
+  automation_rules_52b4ef9c: "Aturan Otomasi"
+  automation_rules_add_4cb5c7c2: "Aturan Otomasi - tambah"
+  automation_rules_delete_10816b7e: "Aturan Otomasi - hapus"
+  automation_rules_edit_6f0b35e7: "Aturan Otomasi - edit"
+  automation_rules_view_10c34073: "Aturan Otomasi - lihat"
   availability_8942cde6: Ketersediaan
   availability_and_exceptions_98b8cb30: "Ketersediaan dan Pengecualian"
   availability_dates_438d71e0: "Tanggal Ketersediaan"
@@ -4787,6 +4824,7 @@ id:
   avg_alignments_per_outcome_4daf75cd: "Rata-rata Keselarasan per Capaian"
   avi_2d8cc99f: AVI
   avoid_using_common_passwords_like_password123_c9f945fb: "Hindari penggunaan kata sandi umum seperti “password123.”"
+  award_points_for_both_corrected_and_previously_cor_319c28da: "Beri poin untuk jawaban yang diperbaiki atau benar sebelumnya (skor tidak akan dikurangi)"
   azerbaijani_54820a18: Azerbaijan
   back_2900f52a: Kembali
   back_to_accessibility_checker_55123ea4: "Kembali ke pemeriksa aksesabilitas"
@@ -4878,6 +4916,7 @@ id:
   between_parentheses_e_g_d09087_28c4448c: "Antara tanda kurung, mis., (D09087)"
   between_square_brackets_e_g_principal_64797b64: "Antara kurung persegi, mis., [Principal]"
   between_two_assessments_the_most_recent_assessment_9f616a5d: "Antara dua penilaian, penilaian terbaru mendapat bobot %{calculation_int}, dan yang pertama mendapat %{remainder}. Untuk setiap penilaian tambahan, jumlah kalkulasi skor sebelumnya pengurangannya bertambah sebesar %{remainder}. Jika hanya ada satu hasil, skor tunggal akan diberikan."
+  bibliographic_material_42d9ed3c: "Bahan Daftar Pustaka"
   big_blue_button_conference: 
     create_time: "Buat Waktu"
     recording_setting: Merekam
@@ -5603,6 +5642,8 @@ id:
   can_view_the_content_of_a_page_the_tool_is_launche_61ba993b: "Dapat melihat konten suatu halaman tempat asal alat dijalankan."
   can_view_the_content_of_a_page_the_tool_is_launche_94cb9745: "Dapat melihat konten suatu halaman tempat asal alat dijalankan."
   can_you_please_explain_why_you_disagree_with_the_e_5c22b101: "Bisakah Anda menjelaskan mengapa Anda tidak setuju dengan evaluasi tersebut?"
+  can_you_please_explain_why_you_disapprove_of_the_s_3c5a971f: "Bisakah Anda menjelaskan mengapa Anda tidak setuju dengan rangkuman tersebut?"
+  can_you_please_explain_why_you_disapprove_of_the_t_33dbb022: "Bisakah Anda menjelaskan mengapa Anda tidak setuju dengan terjemahan tersebut?"
   canada_1_921df67a: "Kanada (+1)"
   cancel_attempt_attempt_aab8c2a9: "Batalkan Upaya %{attempt}"
   cancel_caeb1e68: Batal
@@ -5635,12 +5676,14 @@ id:
   cannot_be_changed_at_this_time_grading_error_88f5a96b: "tidak dapat diubah saat ini: %{grading_error}"
   cannot_be_changed_because_this_assignment_is_due_i_a529873f: "tidak dapat diubah karena tugas ini masuk batas waktu dalam periode penilaian tertutup"
   cannot_be_disabled_for_assignments_with_graded_pee_6d84494e: "tidak dapat dinonaktifkan untuk tugas dengan tinjauan sejawat yang dinilai dalam mode lama"
+  cannot_be_disabled_for_assignments_with_graded_pee_beec836: "tidak dapat dinonaktifkan untuk tugas dengan tinjauan sejawat yang dinilai ketika siswa telah menyerahkan tinjauan"
   cannot_be_disabled_when_students_have_already_subm_cf0c73c6: "tidak dapat dinonaktifkan ketika siswa telah mengirimkan tinjauan"
   cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: "Tidak dapat diedit untuk tugas dalam periode penilaian tertutup"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "tidak boleh kosong saat account_id kosong"
   cannot_be_nil_when_course_id_is_nil_f539388: "tidak boleh kosong saat course_id kosong"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "tidak boleh ada saat account_id ada"
   cannot_be_present_when_course_id_is_present_785e6a59: "tidak boleh ada saat course_id ada"
+  cannot_be_published_cc8a13af: "tidak dapat dipublikasikan"
   cannot_be_the_same_as_the_assessor_c426c7ac: "tidak boleh sama dengan penilai"
   cannot_be_true_for_sub_assignments_66a9ba5f: "tidak boleh true untuk subtugas"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Tidak dapat mengubah batas waktu override ke suatu tanggal di dalam periode penilaian tertutup"
@@ -5795,6 +5838,7 @@ id:
   canvas_career_role_dashboards_18a4c7d: "Canvas Career: Dasbor Peran"
   canvas_career_roles_permissions_f8acf32a: "Canvas Career: Peran & Izin"
   canvas_career_root_account_experience_485e496f: "Canvas Career: Pengalaman Akun Root"
+  canvas_career_rule_based_automations_6310ad9c: "Canvas Career: Otomasi Berbasis Aturan"
   canvas_career_skill_management_a0bc3dd6: "Canvas Career: Manajemen Keahlian"
   canvas_career_study_tools_b4805897: "Canvas Career: Alat Studi"
   canvas_career_sub_account_b1da8954: "Sub-Akun Canvas Career"
@@ -5874,6 +5918,7 @@ id:
   caption_1cf95987: Caption
   caption_added_8d73b023: "Caption ditambahkan"
   caption_cannot_be_empty_67f12e96: "Keterangan tidak boleh kosong."
+  caption_generated_caption_66670d3: "Caption yang dihasilkan: %{caption}"
   caption_sorted_by_sortby_in_direction_order_7e98ca69: "%{caption}: disortir oleh %{sortBy} dalam urutan %{direction}"
   captions_99c57b5c: Caption
   captions_are_being_generated_for_this_media_5b177dc7: "Captions sedang dibuat untuk media ini."
@@ -6078,6 +6123,7 @@ id:
   choose_a_peer_review_available_to_date_and_time_ef9ab31b: "Pilih waktu dan tanggal hingga tinjauan sejawat yang tersedia"
   choose_a_peer_review_due_date_and_time_b913e700: "Pilih waktu dan tanggal batas tinjauan sejawat"
   choose_a_quiz_engine_8820d521: "Pilih Mesin Kuis"
+  choose_a_regrade_option_for_students_who_have_alre_2878244f: "Pilih opsi penilaian ulang untuk siswa yang sudah mengerjakan kuis. Canvas akan menilai ulang semua penyerahan Anda setelah Anda menyimpan kuis (skor siswa DAPAT terpengaruh)."
   choose_a_reply_to_topic_due_date_and_time_b908fd6: "Pilih balasan untuk waktu dan tanggal batas topik"
   choose_a_self_sign_up_deadline_date_and_time_19b311e1: "Pilih batas tanggal dan waktu pendaftaran mandiri"
   choose_a_sticker_aa45291e: "Pilih stiker"
@@ -6096,11 +6142,13 @@ id:
   choose_assignment_path_8ea55f3a: "Pilih Jalur tugas"
   choose_assignment_set_415f1b3: "Pilih Set Tugas"
   choose_attribute_to_add_866e128d: "Pilih atribut untuk ditambahkan"
+  choose_categories_fc1b361d: "Pilih kategori…"
   choose_complimentary_font_pairings_for_your_h1_h2__2a6189c6: |-
       Pilih pasangan font pelengkap untuk teks h1, h2, dan paragraf Anda, atau pilih sendiri
                 nanti.
   choose_course_home_page_d8642f9e: "Pilih Halaman Awal Kursus"
   choose_file_8d89ccab: "Pilih File"
+  choose_from_canvas_files_5002f495: "Pilih dari file Canvas"
   choose_home_page_80cef4ee: "Pilih Halaman Awal"
   choose_image_242f727e: "Pilih gambar"
   choose_image_e5ee5d7a: "Pilih Gambar"
@@ -6136,6 +6184,7 @@ id:
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Opsi Kuis Klasik untuk Kuis Berwaktu tanpa Penyerahan"
   classic_quizzes_use_quiz_client_ip_d554d652: "Kuis Klasik Gunakan quiz_client_ip"
   classic_view_33f29576: "Tampilan Klasik"
+  claude_3_haiku_cff9d753: "Claude 3 Haiku"
   clear_1_filter_4991e472: "Hapus 1 filter"
   clear_2084585f: Kosongkan
   clear_all_da755751: "Kosongkan semua"
@@ -6244,6 +6293,7 @@ id:
   click_to_sort_by_email_descending_72801b54: "Klik untuk menyortir turun berdasarkan email"
   click_to_sort_by_issue_count_ascending_34196a78: "Klik untuk menyortir naik jumlah masalah"
   click_to_sort_by_issue_count_descending_9721026e: "Klik untuk menyortir turun jumlah masalah"
+  click_to_sort_by_label_order_49f357cb: "Klik untuk menyortir menurut %{label} %{order}."
   click_to_sort_by_last_login_ascending_eafcbee4: "Klik untuk menyortir naik berdasarkan login terakhir"
   click_to_sort_by_last_login_descending_61fdadc: "Klik untuk menyortir turun berdasarkan login terakhir"
   click_to_sort_by_name_ascending_739c011e: "Klik untuk menyortir naik berdasarkan nama"
@@ -6556,6 +6606,7 @@ id:
     one: "Lihat file terlampir"
     other: "Lihat file terlampir"
   comment_input_box_b8c7e58b: "Kotak input komentar"
+  comment_is_required_c7c546b7: "Komentar harus ada."
   comment_library_84735835: "Pustaka Komentar"
   comment_library_suggestions_disabled_ae04eb77: "Pustaka Komentar (Saran Dinonaktifkan)"
   comment_or_file_required_to_save_921da797: "Komentar atau file yang perlu disimpan"
@@ -6655,7 +6706,7 @@ id:
     admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
     admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
     admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
-    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq: "https://community.instructure.com/en/discussion/261826/using-zoom-with-canvas-faq/p1"
     admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
     admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
     admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
@@ -6672,7 +6723,7 @@ id:
     basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
     basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
     basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
-    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    canvas_for_elementary: "https://community.instructure.com/en/kb/articles/663780-what-is-canvas-for-elementary"
     contingency_30_minute_quickstart: "https://community.instructure.com/en/kb/articles/660621-instructor-getting-started-resources"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.instructure.com/en/kb/articles/662747-what-are-conferences"
@@ -6763,6 +6814,7 @@ id:
     releases_beta_test_schedule: "https://community.instructure.com/en/kb/articles/664262-what-are-the-release-schedules-for-beta-production-and-test-environments"
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
+  compare_against_d7a750ce: "Bandingkan Dengan"
   compiling_c29a644f: Mengompilasi
   compiling_progress_968a3ebb: "Mengompilasi (%{progress}%)"
   complete_1_item_f840fb10: "Lengkapi 1 item"
@@ -6909,6 +6961,7 @@ id:
   configuration_changes_17b1fa7a: "Perubahan Konfigurasi"
   configuration_e186200: Konfigurasi
   configuration_error_906691a5: "Kesalahan konfigurasi"
+  configuration_has_been_saved_successfully_a839ffd8: "Konfigurasi berhasil disimpan."
   configuration_json_cannot_be_empty_f3664d30: "Konfigurasi JSON tidak boleh kosong."
   configuration_location_ee0f6592: "Lokasi Konfigurasi"
   configuration_type_25a084a4: "Jenis Konfigurasi"
@@ -7004,6 +7057,7 @@ id:
   content_changed_exceptions_e8bff81e: "Konten mengubah pengecualian:"
   content_choice_51f4ca0f: "Pilihan Konten"
   content_dbfd19d7: konten
+  content_exceeds_the_16_mb_size_limit_43734c91: "Ukuran konten melebihi 16 MB"
   content_export_files_cannot_be_downloaded_after_da_2872b0e4: "File ekspor konten tidak dapat diunduh setelah %{days} hari."
   content_exports: 
     buttons: 
@@ -7244,6 +7298,7 @@ id:
   content_name_fe0424ba: "Nama Konten"
   content_not_available_7b2e004: "Konten tidak tersedia"
   content_on_this_page_violates_the_security_policy__25685d8a: "Konten pada halaman ini melanggar kebijakan keamanan, hubungi admin Anda untuk mendapat bantuan."
+  content_quality_753a703a: "Kualitas Konten"
   content_security_policy_3bb8d922: "Kebijakan Keamanan Konten"
   content_security_policy_settings_3e87fcb2: "Pengaturan Kebijakan Keamanan Konten"
   content_selection_4aad6732: "Pemilihan Konten"
@@ -7784,6 +7839,7 @@ id:
   correct_answers_will_be_available_on_date_48137: "Jawaban benar akan tersedia pada %{date}."
   correct_check_icon_617da6c3: "ikon centang benar"
   costa_rica_506_d63d2ea1: "Kosta Rika (+506)"
+  could_not_be_published_b5bcf4dd: "tidak dapat dipublikasikan"
   could_not_convert_course_to_canvas_career_please_t_cbca96dd: "Tidak dapat mengonversi kursus ke Canvas Career. Silakan coba lagi."
   could_not_duplicate_discussion_953ed67f: "Tidak dapat menduplikasi diskusi"
   could_not_find_a_resource_with_that_id_96d6d7ac: "Tidak dapat menemukan %{resource} dengan ID itu."
@@ -7845,6 +7901,8 @@ id:
     one: "%{count} penyelarasan"
     other: "%{count} penyelarasan"
     zero: "Tidak ada penyelarasan"
+  count_announcement_failed_to_post_please_check_you_f6e1dba1: "%{count} pengumuman gagal diposting. Silakan periksa izin Anda dan coba lagi."
+  count_announcements_failed_to_post_please_check_yo_f44faf3c: "%{count} pengumuman gagal diposting. Silakan periksa izin Anda dan coba lagi."
   count_announcements_found_b7b055b3: "%{count} pengumuman ditemukan."
   count_apps_found_f4d86860: "%{count} app ditemukan"
   count_assessable_artifacts_ed4369fa: 
@@ -7986,6 +8044,7 @@ id:
     one: "1 Tugas Tidak Ada"
     other: "%{count} Tugas Tidak Ada"
   count_more_beba6428: "%{count} lagi"
+  count_more_type_to_filter_fbbeddd7: "%{count} lainnya — jenis untuk difilter"
   count_must_be_0_4abb84b3: "JUMLAH harus > 0"
   count_must_be_limit_8536ff23: "JUMLAH harus <= %{limit}"
   count_not_decided_b5f21e29: "%{count} Tidak diputuskan"
@@ -8082,6 +8141,7 @@ id:
     one: "1 hasil"
     other: "%{count} hasil"
     zero: "Tidak ada hasil"
+  count_results_available_601bdfc2: "%{count} hasil tersedia"
   count_results_for_searchterm_a70b872d: 
     one: "1 hasil untuk \"%{searchTerm}\""
     other: "%{count} hasil untuk \"%{searchTerm}\""
@@ -8223,6 +8283,7 @@ id:
   course_8dcfb195: kursus
   course_access_report_52da1e9f: "Laporan Akses Kursus"
   course_accessibility_checker_f00c451: "Pemeriksa Aksesabilitas Kursus"
+  course_accessibility_report_fc9a1bae: "Laporan Aksesibilitas Kursus"
   course_activities_21c83bd3: "Aktivitas Kursus"
   course_activity_bfe11267: "Aktivitas Kursus"
   course_activity_form_f30ea720: "Formulir Aktivitas Kursus"
@@ -9058,6 +9119,7 @@ id:
   create_an_eportfolio_1841e34a: "Buat ePortofolio"
   create_and_edit_line_items_cacad0fa: "Buat dan Edit Item Baris"
   create_and_edit_scores_4177662c: "Buat dan Edit Skor"
+  create_announcement_668ed3bd: "Buat Pengumuman"
   create_announcement_7ebf0845: "Buat Pengumuman"
   create_announcements_above_1c36202b: "Buat pengumuman di atas"
   create_anonymous_discussion_topics_d573e88e: "Buat topik diskusi anonim"
@@ -9754,6 +9816,7 @@ id:
   delete_current_message_5da0221a: "Hapus Pesan Saat Ini"
   delete_current_module_item_21fefc54: "Hapus Modul/Item Saat Ini"
   delete_current_module_or_module_item_e854eab1: "Hapus modul atau item modul saat ini"
+  delete_custom_link_d2b8ae8: "Hapus Tautan Kustom"
   delete_custom_status_b20e5195: "Hapus Status Khusus"
   delete_deployment_e7161f3b: "Hapus Penyebaran"
   delete_deployment_for_context_name_497b6642: "Hapus Penyebaran untuk *%{context_name}*"
@@ -9788,6 +9851,7 @@ id:
   delete_items_a1d2c64: "Hapus Item"
   delete_key_developername_be80e695: "Hapus kunci %{developerName}"
   delete_knowledge_chat_ae9c7cdc: "Hapus Obrolan Pengetahuan"
+  delete_linklabel_ae8b52e8: "Hapus %{linkLabel}"
   delete_live_events_subscriptions_b15bc9a6: "Hapus Langganan Siaran Langsung"
   delete_lti_1d1cef27: "Hapus LTI"
   delete_lti_developer_key_4d027ad9: "Hapus Kunci Pengembang LTI"
@@ -10069,6 +10133,7 @@ id:
   discover_what_you_can_create_using_the_block_conte_65cfdebe: "Temukan apa yang dapat Anda buat menggunakan Editor Konten Blok."
   discovery_custom_message_fff0e0b0: "Pesan Kustom Penemuan"
   discovery_page_8a9270cb: "Halaman Penemuan"
+  discovery_page_preview_928c04df: "Pratinjau Halaman Penemuan"
   discovery_pages_90948d00: "Halaman Penemuan"
   discovery_screen_1515d989: "Layar Penemuan"
   discovery_service_url_ca13d3f4: "URL Layanan Pemulihan"
@@ -10377,11 +10442,14 @@ id:
   dislike_summary_deselected_3f686ce9: "Tidak sukai rangkuman, hapus pilihan"
   dislike_summary_selected_5527b968: "Tidak sukai rangkuman, dipilih"
   dislike_this_response_b29a28a6: "Tidak menyukai respons ini"
+  dislike_translation_640db1df: "Tidak sukai terjemahan"
+  dislike_translation_selected_15771ce6: "Tidak sukai rangkuman, dipilih"
   dismiss_account_level_notification_information_d0d75748: "Abaikan informasi notifikasi tingkat akun"
   dismiss_course_level_notification_information_504364d: "Abaikan informasi notifikasi tingkat kursus"
   dismiss_dacdb625: Singkirkan
   dismiss_error_message_44c51c35: "Abaikan pesan kesalahan"
   dismiss_itemtitle_c5020a4c: "Singkirkan %{itemTitle}"
+  dismiss_name_c9e24598: "Singkirkan %{name}"
   dismiss_notification_schedule_information_651aef59: "Abaikan informasi jadwal notifikasi"
   dismiss_opportunityname_4fb10e11: "Singkirkan %{opportunityName}"
   dismissed_8b0b1fc9: Disingkirkan
@@ -10435,6 +10503,7 @@ id:
   divide_into_equal_time_slots_in_minutes_234312fa: "Bagi menjadi slot waktu yang sama (dalam menit)"
   divider_fe08b810: Pembagi
   division_cutoff_cutoff_value_e938bc9d: "Cutoff divisi %{cutoff_value}"
+  do_not_consider_84d7b395: "Jangan Pertimbangkan"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Jangan perhitungkan tugas ini untuk nilai final"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Jangan tampilkan di gradebook atau halaman nilai siswa"
   do_not_include_validation_context_and_errors_claim_d9e43fe6: "Tidak termasuk validation_context dan klaim kesalahan pada Peluncuran LTI"
@@ -10544,6 +10613,7 @@ id:
   download_filename_b9d62bf1: "Unduh %{fileName}"
   download_group_category_roster_csv_6050a420: "Unduh Daftar Kategori Grup CSV"
   download_item_analysis_report_statuslabel_8c9387ec: "Unduh laporan analisis item %{statusLabel}"
+  download_name_de443d96: "Unduh %{name}"
   download_page_views_csv_974f36e1: "Unduh CSV Tampilan Halaman"
   download_report_70ba4a54: "Unduh Laporan"
   download_report_77164f62: "Unduh Laporan"
@@ -10750,6 +10820,7 @@ id:
   edit_and_delete_their_own_replies_e5b9d793: "Edit dan hapus balasannya sendiri"
   edit_announcement_title_cce0b4e: "Edit pengumuman %{title}"
   edit_app_b0cc1c17: "Edit App"
+  edit_as_json_f9778876: "Edit sebagai JSON"
   edit_assignment_dates_6f8c72b: "Edit Tanggal Tugas"
   edit_assignment_ebf22a72: "Edit Tugas"
   edit_assignment_group_c04c4af0: "Edit Grup Tugas"
@@ -10763,6 +10834,7 @@ id:
   edit_block_content_28c62e36: "Edit konten blok"
   edit_block_e77d6159: "Edit blok"
   edit_c5fbea07: Edit
+  edit_categories_count_selected_cf24b55b: "Edit kategori (%{count} dipilih)"
   edit_collaboration_b014c18b: "Edit Kolaborasi"
   edit_comment_comment_a584d187: "Edit komentar: {{comment}}"
   edit_comment_comment_c1ce8c10: "Edit komentar: %{comment}"
@@ -10988,6 +11060,7 @@ id:
   enable_file_access_with_api_tokens_ad08912a: "Aktifkan Akses File dengan Token API"
   enable_gradebook_status_icons_ed6a01a2: "Aktifkan Ikon Status Buku Nilai"
   enable_gravatar_8a865b41: "Aktifkan Gravatar"
+  enable_identity_service_discovery_page_for_the_new_cdbeb0b7: "Aktifkan Halaman Penemuan Layanan Identitas untuk UI Login/Registrasi Canvas yang baru di level akun root."
   enable_identity_service_discovery_page_for_the_new_fac0e431: "Aktifkan Halaman Penemuan Layanan Identitas untuk UI Login/Registrasi Canvas yang baru."
   enable_igniteai_question_authoring_for_quizzes_fea_d7a403a6: "Aktifkan fitur Penulisan Pertanyaan IgniteAI untuk Kuis"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Aktifkan jalur pembelajaran individu untuk siswa berdasarkan penilaian"
@@ -11106,6 +11179,7 @@ id:
       digabungkan untuk membentuk nilai diskusi final.
   enables_context_file_upload_for_ai_experiences_req_e3b9f28f: "Mengaktifkan unggahan file konteks untuk Pengalaman AI. Membutuhkan fitur Pengalaman AI untuk diaktifkan."
   enables_courses_to_leverage_canvas_career_features_22bf68c7: "Memungkinkan kursus untuk memanfaatkan fitur Canvas Career secara native."
+  enables_creating_running_rule_based_automations_in_9b20fd3d: "Memungkinkan pembuatan & menjalankan otomasi berbasis aturan di Canvas Career."
   enables_dark_theme_in_learning_provider_ebe48699: "Aktifkan tema gelap di Penyedia Pembelajaran."
   enables_dashboards_for_admins_in_canvas_career_f34966b: "Mengaktifkan dashboard untuk admin di Canvas Career."
   enables_dashboards_for_leaders_in_canvas_career_4ce72c91: "Mengaktifkan dashboard untuk pemimpin di Canvas Career."
@@ -11117,6 +11191,11 @@ id:
       Termasuk UI untuk melihat riwayat versi dan kembali ke versi sebelumnya.
   enables_hris_integrations_in_canvas_career_8f3b771d: "Mengaktifkan integrasi HRIS di Canvas Career."
   enables_igniteai_agent_feature_for_teachers_ignite_57c67fec: "Mengaktifkan fitur IgniteAI Agent untuk Guru. IgniteAI Agent adalah pendamping AI bagi admin dan pengajar untuk membantu dalam tugas sehari-hari di Canvas LMS."
+  enables_igniteai_study_tools_for_courses_when_enab_f0ef6a2f: |-
+      Mengaktifkan Bantuan Belajar IgniteAI untuk kursus. Saat diaktifkan, siswa dapat
+      mengakses alat belajar bertenaga AI di dalam kursus mereka. 
+      Administrator akun root harus mengaktifkan fitur ini sebelum subakun atau kursus
+      dapat menggunakannya.
   enables_importing_metadata_in_bulk_in_canvas_caree_2db97d50: "Mengaktifkan impor metadata secara massal di Canvas Career."
   enables_integration_with_the_assessment_management_7ebf2fdc: "Mengaktifkan integrasi dengan Management Service (AMS) untuk akun dan kursus."
   enables_learning_library_microlearning_features_in_d5294aa2: "Mengaktifkan fitur pembelajaran mikro Learning Library di Canvas Career."
@@ -11137,6 +11216,7 @@ id:
   enables_sending_metrics_when_the_comment_bank_item_310e4575: "Mengaktifkan metrik pengiriman saat `comment_bank_items_count` resolver digunakan pada user_type.comment_bank_items_connection."
   enables_sending_metrics_when_the_limit_argument_is_a4c63beb: "Mengaktifkan metrik pengiriman saat argumen `limit` digunakan pada user_type.comment_bank_items_connection."
   enables_skill_management_in_canvas_career_f88a6a76: "Mengaktifkan Manajemen Keterampilan di Canvas Career."
+  enables_stronger_authentication_practice_for_commu_4b5c8f06: "Memungkinkan praktik autentikasi yang lebih kuat untuk komunikasi dengan Layanan Percakapan LLM."
   enables_student_reporting_features_in_the_learning_eb826385: "Aktifkan fitur pelaporan siswa di Buku Nilai Penguasaan Pembelajaran."
   enables_study_assist_for_courses_when_enabled_stud_c4fe55fe: |-
       Mengaktifkan Bantuan Belajar untuk mata kuliah. Saat diaktifkan, siswa dapat mengakses
@@ -11162,6 +11242,9 @@ id:
       Ini adalah pengganti fungsi Alat Pengalihan.
   enables_the_crm_integration_settings_in_canvas_car_9ff4faeb: "Mengaktifkan pengaturan integrasi CRM di Canvas Career."
   enables_the_evaluation_feature_for_ai_experiences__c63b4eb7: "Mengaktifkan fitur evaluasi untuk percakapan Pengalaman AI."
+  enables_the_flashcards_tool_in_igniteai_study_tool_58e87614: |-
+      Mengaktifkan alat Flashcards di IgniteAI Study Tools.
+      Saat dinonaktifkan, siswa tidak akan melihat opsi Flashcards.
   enables_the_help_navigation_menu_in_canvas_career_5d8a6466: "Mengaktifkan menu navigasi kursus di Canvas Career."
   enables_the_horizon_setting_in_the_course_settings_c4d3e03d: "Mengaktifkan pengaturan Horizon pada halaman pengaturan kursus."
   enables_the_ignite_agent_feature_for_a_single_user_1dce6ba4: "Mengaktifkan fitur Agen Ignite untuk satu pengguna."
@@ -11183,9 +11266,15 @@ id:
       Mengaktifkan fungsi penataan ulang blok baru di bilah alat Editor Konten Blok.
       Saat diaktifkan, pengguna dapat mengakses popover baru untuk menyeret dan menata ulang blok di dalam editor.
   enables_the_optimized_root_account_experience_in_c_974cfdcc: "Mengaktifkan pengalaman akun root yang dioptimalkan di Canvas Career."
+  enables_the_quiz_me_tool_in_igniteai_study_tools_w_1c2edcae: |-
+      Mengaktifkan alat Quiz Me di IgniteAI Study Tools.
+      Saat dinonaktifkan, siswa tidak akan melihat opsi Quiz Me.
   enables_the_redesigned_syncable_objects_interface__a50346e4: "Aktifkan antarmuka objek yang dapat disinkronkan yang didesain ulang di Canvas Career."
   enables_the_refreshed_user_profile_page_in_canvas__42c5e6f6: "Mengaktifkan halaman profil pengguna yang diperbarui di Canvas Career."
   enables_the_student_view_for_ai_experiences_5198d079: "Mengaktifkan tampilan siswa untuk Pengalaman AI."
+  enables_the_summarize_tool_in_igniteai_study_tools_ee7ae23: |-
+      Mengaktifkan alat Summarize di IgniteAI Study Tools.
+      Saat dinonaktifkan, siswa tidak akan melihat opsi Summarize.
   enables_top_navigation_lti_placement_lti_1_3_only_f46e894: "Mengaktifkan top_navigation penempatan LTI (Khusus LTI 1.3)"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Mengaktifkan fitur antarmuka untuk mengelola Penyerahan “diperpanjang”."
   enables_updated_roles_permissions_ui_in_canvas_car_c2c95830: "Mengaktifkan UI Peran & Izin yang diperbarui di Canvas Career."
@@ -11208,6 +11297,7 @@ id:
   end_at_f483e40b: "Berakhir pada"
   end_course_set_up_tutorial_f358b85d: "Akhiri Tutorial Penyiapan Kursus"
   end_date_403b91e9: "Tanggal akhir"
+  end_date_and_time_66d858de: "Tanggal dan waktu akhir"
   end_date_cannot_be_before_start_date_eb62ed6d: "Tanggal akhir tidak boleh sebelum tanggal mulai"
   end_date_e0093ed7: "Tanggal Akhir"
   end_date_for_conference_eaff0807: "Tanggal Akhir untuk Konferensi"
@@ -11216,6 +11306,7 @@ id:
     other: "Tanggal Akhir untuk %{count} pengguna"
   end_date_for_enroll_2a879a36: "Tanggal Akhir untuk %{enroll}"
   end_date_from_cdd9d90: "Tanggal Akhir Dari:"
+  end_date_must_be_after_start_date_26faf9e2: "Tanggal akhir harus setelah tanggal mulai."
   end_date_must_be_after_start_date_2fea5383: "Tanggal akhir harus setelah tanggal mulai"
   end_date_must_be_after_the_start_date_cebb0582: "Tanggal akhir harus setelah tanggal mulai."
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "Tanggal/Waktu Akhir harus setelah Tanggal/Waktu Mulai"
@@ -11246,6 +11337,7 @@ id:
       pengguna Admin Situs tanpa izin mengubah Kunci
       Pengguna global.
   enforce_the_onetimeuse_condition_in_saml_assertion_c73e16d: "Terapkan kondisi OneTimeUse dalam pernyataan SAML untuk mencegah serangan pemutaran ulang. Anda dapat memeriksa apakah ada pelanggaran yang terlihat di halaman penyedia autentikasi."
+  enforcement_2136c4f: Pelaksanaan
   engagement_report_986e9621: "Laporan Keterlibatan"
   english_australia_dc405d82: "Inggris (Australia)"
   english_c60612e2: Inggris
@@ -12075,6 +12167,8 @@ id:
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Terkecuali data apa pun yang belum diperbarui sejak tanggal yang diberikan"
   exclude_deleted_and_expired_access_tokens_e9ca9a44: "Kecualikan token akses yang dihapus dan kedaluwarsa"
   exclude_deleted_lti_2_0_similarity_check_tools_on__1bf13f30: "Kecualikan alat pemeriksa kesamaan LTI 2.0 yang dihapus pada ekspor tugas"
+  exclude_quoted_material_165d68c3: "Kecualikan Bahan Kutipan"
+  exclude_self_plagiarism_f313288c: "Kecualikan Plagiarisme Mandiri"
   excuse_this_assignment_for_the_selected_student_af04e132: "Bolehkan Tugas Ini untuk Siswa yang Dipilih"
   excused_3aab77: dibolehkan
   excused_5877183c: Dibolehkan!
@@ -12393,8 +12487,10 @@ id:
   failed_to_load_course_settings_74168426: "Gagal memuat pengaturan kursus"
   failed_to_load_course_work_data_please_try_again_61ebc206: "Gagal memuat data tugas kursus. Silakan coba lagi."
   failed_to_load_course_work_please_try_again_5c97c7c0: "Gagal memuat data tugas kursus. Silakan coba lagi."
+  failed_to_load_courses_d28a656a: "Gagal memuat kursus"
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Gagal memuat kursus. Muat ulang halaman untuk mencoba lagi."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Gagal memuat informasi CSP, coba muat ulang halaman."
+  failed_to_load_discovery_page_configuration_please_fea58cbd: "Gagal memuat konfigurasi halaman penemuan. Silakan tutup dan coba lagi."
   failed_to_load_document_processing_apps_errormsg_6014a1f6: "Gagal memuat aplikasi pemrosesan dokumen: %{errorMsg}"
   failed_to_load_eportfolio_pages_fd6eb835: "Gagal menghapus halaman ePortfolio"
   failed_to_load_eportfolio_sections_45b98e4: "Gagal memuat bagian ePortfolio"
@@ -12474,6 +12570,7 @@ id:
   failed_to_save_configuration_8cf99186: "Gagal menyimpan konfigurasi"
   failed_to_save_configuration_please_try_again_dfef17b2: "Gagal menyimpan konfigurasi. Silakan coba lagi."
   failed_to_save_dashboard_selection_32e71c72: "Gagal menyimpan pemilihan dashboard"
+  failed_to_save_discovery_page_configuration_please_e67607c2: "Gagal menyimpan konfigurasi halaman penemuan. Silakan coba lagi."
   failed_to_save_feedback_please_try_again_9645ea: "Gagal menyimpan umpan balik. Silakan coba lagi."
   failed_to_save_knowledge_chat_error_e2b2b87d: "Gagal menyimpan Obrolan Pengetahuan: %{error}"
   failed_to_save_outcome_order_e233ecb0: "Gagal menyimpan urutan capaian"
@@ -12589,10 +12686,12 @@ id:
   feedback_noted_c8396ffb: "Umpan Balik Dicatat"
   feedback_received_391283b7: "Umpan Balik Diterima"
   feedback_submitted_f0d9031f: "Umpan balik terkirim."
+  feedback_submitted_thank_you_7b25fa6d: "Umpan balik diserahkan. Terima kasih!"
   feeds_9f1c5c76: Umpan
   fetch_unified_tool_id_from_lp_and_update_it_3db0d1bb: "Ambil Unified Tool ID dai LP dan perbarui"
   fetching_categories_b5a5bae5: "Mengambil Kategori..."
   fetching_graph_data_b47b5a80: "Mengambil data grafik"
+  fewer_than_2622757: "Kurang dari"
   field_9ec0ec01: Bidang
   field_cannot_be_blank_afb5b332: "Bidang tidak boleh kosong"
   field_must_be_either_active_or_deleted_329a42a: "\"“%{field}\" harus \"%{active}\" atau \"%{deleted}”\""
@@ -12617,6 +12716,7 @@ id:
   file_has_not_finished_uploading_cfba3b2f: "File belum selesai diunggah"
   file_info_ba4cc190: "Info File"
   file_information_6e6f6fc1: "Informasi File"
+  file_is_in_a_hidden_folder_c2dfa872: "file berada di folder tersembunyi"
   file_list_350d08df: "Daftar File"
   file_list_updated_38e2a5ad: "Daftar file diperbarui"
   file_menu_cc0ca54: "Menu File"
@@ -12887,6 +12987,8 @@ id:
   flash_ab3ad95e: menyoroti
   flash_file_cbcadc71: "File Flash"
   flask_323388e4: tabung
+  flexible_11554c07: fleksibel
+  flexible_e8232e51: Fleksibel
   fluid_c84f4b06: Cairan
   flv_15e62834: FLV
   focus_mode_a1f65110: "Mode Fokus"
@@ -13001,6 +13103,7 @@ id:
   from_the_discussions_page_the_tool_can_be_launched_b0f80135: "Dari halaman diskusi, alat ini dapat diluncurkan dari menu dropdown di bagian atas halaman. Dapat dilihat oleh siswa."
   from_the_edit_page_of_an_assignment_this_placement_53195eaf: "Dari halaman edit tugas, penempatan ini tersedia ketika Jenis Pengajuan diatur ke Alat Eksternal dengan mengklik tombol Temukan."
   from_the_gradebook_when_you_click_on_a_student_s_n_76867ddc: "Dari buku nilai, ketika Anda mengklik nama siswa, alat ini dapat diluncurkan dari kartu."
+  from_the_gradebook_when_you_click_the_actions_butt_17359765: "Dari buku nilai, ketika Anda mengklik tombol tindakan, ini menyediakan opsi untuk menyinkronkan nilai ke alat. Tidak ditampilkan: saat diaktifkan pada alat yang tersedia di akun utama, pengaturan ekspor nilai SIS di halaman Pengaturan Akun di bawah tab Pengaturan diaktifkan."
   from_the_gradebook_when_you_click_the_actions_butt_91da16e6: "Dari buku nilai, ketika Anda mengklik tombol tindakan, ini menyediakan opsi untuk menyinkronkan nilai ke alat."
   from_the_modules_page_when_the_plus_icon_is_select_a512ecf: "Dari halaman Modul, ketika ikon plus dipilih dari header modul dan Alat Eksternal dipilih, alat ini dapat diluncurkan."
   from_the_settings_apps_manage_apps_page_on_the_lev_cb4da8b6: "Dari halaman pengaturan > Aplikasi > Kelola Aplikasi di tingkat tempat alat ini diinstal, ini menyediakan tombol \"Konfigurasi\" dari ikon roda gigi di samping alat."
@@ -13050,6 +13153,7 @@ id:
   generated_e71c6622: Dibuat
   generated_f26ee56b: "Dibuat:"
   generated_icon_d004f211: "Ikon yang Dibuat"
+  generated_study_content_may_be_inaccurate_or_incom_ed3d0dff: "Konten studi yang dihasilkan mungkin tidak akurat atau tidak lengkap."
   generated_summary_63857c79: "Rangkuman yang Dibuat"
   generating_5b5e20f8: "Membuat:"
   generating_alt_text_a8819f13: "Membuat teks alt..."
@@ -13060,6 +13164,7 @@ id:
   generating_pairing_code_251b7fc8: "Membuat kode pairing..."
   generating_pairing_code_d480ccf4: "Membuat kode pairing"
   generating_preview_45b53be0: "Membuat pratinjau..."
+  generating_the_report_title_failed_421d7e27: "Pembuatan laporan, %{title}, gagal."
   generating_token_42c29663: "Membuat Token..."
   generating_token_failed_a25c3627: "Gagal Meregenerasi token."
   georgian_94cc6fcc: Georgia
@@ -13084,6 +13189,7 @@ id:
   give_all_students_the_same_grade_for_596ae9d0: "Berikan semua siswa nilai yang sama untuk"
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Beri semua siswa nilai yang sama untuk *%{assignment.name}* dengan memasukkan dan menyerahkan nilai di bawah ini:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Beri semua siswa nilai *persen* yang sama untuk **%{assignment.name}** dengan memasukkan dan menyerahkan nilai di bawah ini:"
+  give_everyone_full_credit_for_this_question_3ad3266c: "Beri semua orang angka penuh untuk pertanyaan ini"
   give_feedback_8f20278a: "Beri Umpan Balik"
   give_rubric_creators_the_option_to_generate_rubric_a59be8bf: "Berikan pembuat rubrik opsi untuk membuat kriteria rubrik secara otomatis berdasarkan deskripsi tugas melalui model bahasa besar (LLM)."
   give_rubric_creators_the_options_to_generate_rubri_8ee10700: "Berikan pembuat rubrik opsi untuk membuat kriteria rubrik secara otomatis berdasarkan deskripsi tugas melalui model bahasa besar (LLM)."
@@ -13450,6 +13556,7 @@ id:
       renamed_file: "mengubah nama dari %{filename}"
       submissions_upload: "Unggahan Penyerahan %{assignment}"
   graded_25cd3fcd: Dinilai
+  graded_assignments_1c8879b4: "Tugas dinilai"
   graded_count_days_ago_f7a42c9e: 
     one: "Dinilai 1 hari lalu"
     other: "Dinilai %{count} hari lalu"
@@ -13531,6 +13638,7 @@ id:
   grading_assistance_is_disabled_for_file_uploads_37648c97: "Bantuan penilaian dinonaktifkan untuk unggahan file."
   grading_assistance_is_not_available_right_now_311ff55a: "Bantuan penilaian tidak tersedia saat ini."
   grading_assistance_is_not_available_right_now_810b15c1: "Bantuan Penilaian tidak tersedia saat ini."
+  grading_assistance_is_not_enabled_for_this_course_23fdb8d7: "Bantuan Penilaian tidak diaktifkan untuk kursus ini."
   grading_category_aligned_with_sis_f8f64792: "Kategori penilaian diselaraskan dengan SIS"
   grading_cell: 
     grade_complete: Lengkap
@@ -13965,6 +14073,7 @@ id:
   handler_7912052f: Handler
   handles_switching_between_canvas_academic_and_care_92d79681: "Menangani peralihan antara Canvas Akademik dan Karier di Kursus."
   hang_tight_f391c843: "Tunggu sebentar!"
+  hang_tight_scanning_might_take_a_few_seconds_or_up_2044766f: "Tunggu sebentar! Pemindaian mungkin membutuhkan waktu beberapa detik hingga beberapa menit, bergantung pada berapa banyak konten yang ada di dalam kursus Anda."
   has_assessment_d67224c3: "Memiliki Penilaian"
   has_attachments_922bf3ba: "Memiliki Lampiran"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "telah secara otomatis dipilih berdasarkan tempat instans akun Canvas ini berada. Dalam beberapa kasus, setiap wilayah berbeda-beda."
@@ -14653,6 +14762,8 @@ id:
   if_not_selected_this_item_will_be_imported_as_one__f6313092: "Jika tidak dipilih, item ini akan diimpor sebagai satu item modul."
   if_one_is_configured_c010e411: ", jika dikonfigurasi."
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Jika satu atau semua izin dinonaktifkan, pengguna masih dapat melihat dan mengunduh file ke dalam file zip."
+  if_only_excluded_submissions_are_available_another_e649deda: "Jika hanya penyerahan yang dikecualikan yang tersedia, penyerahan lain akan diganti."
+  if_only_excluded_submissions_are_available_the_stu_70ce2e9: "Jika hanya penyerahan yang dikecualikan yang tersedia, siswa akan diblokir untuk menyelesaikan tugas."
   if_provided_this_name_will_be_used_in_preference_t_4079100a: "Jika tersedia, nama ini akan digunakan sebagai preferensi untuk nama kursus sebenarnya di dashboard dan di notifikasi."
   if_restrict_quantitative_data_is_enabled_checkpoin_cd95933d: "Jika Restrict Quantitative Data/RQD diaktifkan, checkpoint tidak dapat dibuat"
   if_restrict_view_of_quantitative_data_is_enabled_t_29613e6f: "Jika \"Batasi tampilan data kuantitatif\" diaktifkan, kursus harus memiliki skema penilaian default diaktifkan."
@@ -14672,6 +14783,8 @@ id:
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Jika Statistik - lihat atau Pengguna - kelola detail login diaktifkan, pengguna akan dapat membuat aktivitas login/logout di Alat Admin. Untuk menyembunyikan opsi aktivitas login/Logout di Alat Admin, kedua izin ini harus dinonaktifkan."
   if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Jika opsi fitur Skala Penguasaan Hasil Tingkat Akun dan Kursus diaktifkan, tab Kelola menampilkan antarmuka yang diperbarui. Selain itu, halaman Capaian akan menampilkan dua tab tambahan yang memisahkan skala penguasaan dan kalkulasi kemahiran dari manajemen capaian."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Jika izin tambahan diaktifkan, tetapi izin ini tidak diaktifkan, pengaturan kunci dapat diedit pada diskusi individu."
+  if_the_allocated_submission_is_not_available_anoth_3da44807: "Jika penyerahan yang dialokasikan tidak tersedia, penyerahan lain akan disubstitusikan."
+  if_the_allocated_submission_is_not_available_the_s_f52c4cd: "Jika penyerahan yang dialokasikan tidak tersedia, siswa akan diblokir untuk menyelesaikan tugas."
   if_the_canvas_was_copied_from_a_template_instance__917bb965: "Jika Canvas telah disalin dari instans templat, maka ini normal!"
   if_the_course_content_permission_enabled_and_web_c_85f91e32: "Jika izin Konten Kursus diaktifkan dan Konferensi Web - buat dinonaktifkan, pengguna masih dapat mengelola konferensi."
   if_the_email_attribute_is_not_set_to_autoconfirm_u_f0322e42: "Jika atribut email tidak diatur ke konfirmasi otomatis, pengguna akan dikirimi email untuk mengonfirmasi kepemilikan alamat emailnya. Ini hanya akan diaktifkan jika Anda yakin bahwa penyedia autentikasi Anda menyediakan alamat email yang valid dan tidak diberikan oleh pengguna (atau yang sudah mengonfirmasi kepemilikannya)."
@@ -14714,6 +14827,7 @@ id:
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Jika Anda mengubah poin tugas yang memungkinkan, Anda harus menilai ulang tugas tersebut."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Jika Anda mengubah poin tugas yang memungkinkan, Anda harus menilai ulang penyerahan apa pun."
   if_you_changed_anything_since_the_last_scan_you_ne_b3941e3d: "Jika Anda mengubah apa pun sejak pemindaian terakhir, Anda perlu memindai lagi untuk mendapatkan daftar yang diperbarui."
+  if_you_delete_this_appointment_all_course_teachers_ae859482: "Jika Anda menghapus janji temu ini, semua pengajar mata kuliah akan kehilangan akses, dan semua pendaftaran siswa akan dihapus secara permanen."
   if_you_delete_this_appointment_group_all_course_te_9f7dd252: "Jika Anda menghapus grup janji temu ini, semua pengajar mata kuliah akan kehilangan akses, dan semua pendaftaran siswa akan dihapus secara permanen."
   if_you_did_not_try_to_log_into_canvas_please_disre_d2bbfb: "Jika Anda tidak mencoba login ke Canvas, silakan abaikan pesan ini."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Jika Anda tidak memilih hak penggunaan sekarang, file ini tidak akan diterbitkan setelah diunggah."
@@ -14772,6 +14886,10 @@ id:
   igniteai_search_is_in_feature_preview_feedback_can_bdc40afe: "Pencarian IgniteAI ada di pratinjau fitur. Umpan balik dapat diberikan melalui peringkat hasil dan ruang Canvas Community untuk Pencarian IgniteAI Beta. Ruang komunitas Canvas dapat ditemukan di sini: "
   igniteai_search_is_in_progress_fa0d36ed: "Pencarian IgniteAI sedang berlangsung"
   igniteai_search_results_loaded_c6a14af5: "Hasil Pencarian IgniteAI dimuat."
+  igniteai_study_tools_47cfbd2d: "Alat Studi IgniteAI"
+  igniteai_study_tools_flashcards_3cfa48c7: "Alat Studi IgniteAI - Flashcard"
+  igniteai_study_tools_quiz_me_3fe084fb: "Alat Studi IgniteAI - Quiz Me"
+  igniteai_study_tools_summarize_fde3aa4b: "Alat Studi IgniteAI - Summarize"
   igniteai_summaries_for_discussions_63b8c8eb: "Ringkasan IgniteAI untuk Diskusi"
   igniteai_translations_for_discussions_announcement_c3be6962: "Terjemahan IgniteAI untuk Diskusi & Pengumuman"
   igniteai_translations_for_inbox_5c3ee598: "Terjemahan IgniteAI untuk Kotak Masuk"
@@ -14975,6 +15093,7 @@ id:
   include_deleted_objects_4b75ef93: "Sertakan objek yang dihapus"
   include_deleted_users_in_search_results_51c1ec4: "Sertakan pengguna yang dihapus dalam hasil pencarian"
   include_group_categories_when_copying_group_assign_d9290dbc: "Sertakan kategori grup saat menyalin tugas grup dalam saluran kursus atau sinkronisasi cetak biru"
+  include_in_repository_6102bd95: "Termasuk dalam Repositori"
   include_instructure_identity_pseudonyms_from_apis_89ad5584: "Sertakan Nama Samaran Identitas Instruktur dari API"
   include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Sertakan ID Integrasi di ekspor gradebook"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Sertakan ID Integrasi di ekspor gradebook."
@@ -15283,6 +15402,7 @@ id:
   international_sms_9edb9868: "SMS Internasional"
   international_text_messaging_rates_may_apply_d4b4a97a: "Biaya pengiriman teks internasional dapat berlaku."
   internet2_254c6ca6: Internet2
+  internet_database_3d61286a: "Database Internet"
   interop_8899_this_is_a_low_risk_change_because_too_43e25e8f: "INTEROP-8899. Ini adalah perubahan berisiko rendah, karena alat tidak perlu bergantung pada pesan kesalahan yang berasal dari validator skema json."
   interval_must_be_0_e7b8eb5: "INTERVAL harus > 0"
   introduces_ai_experiences_a_new_canvas_learning_ob_9ac91af7: "Memperkenalkan Pengalaman AI - Objek Pembelajaran Canvas baru."
@@ -15349,6 +15469,7 @@ id:
   invalid_input_d7957821: "Input tidak valid"
   invalid_json_7d2eebce: "JSON tidak valid"
   invalid_json_format_for_widget_dashboard_layout_6b9f3f94: "Format JSON tidak valid untuk tata letak dasbor widget"
+  invalid_json_syntax_d8759541: "Sintaks JSON tidak valid"
   invalid_jwk_f8d46234: "JWK tidak valid"
   invalid_jwt_audience_audience_961899c6: "Audiens JWT Tidak Valid %{audience}"
   invalid_jwt_issuer_issuer_3a20d9b9: "Penerbit JWT tidak valid: %{issuer}"
@@ -15479,6 +15600,7 @@ id:
   items_items_selected_5b55e566: "%{items} item dipilih"
   items_last_accessed_before_date_may_not_be_shown_be840349: "Item yang terakhir diakses sebelum %{date} mungkin tidak diperlihatkan."
   items_selected_have_different_usage_rights_52b325cc: "Item yang dipilih memiliki hak penggunaan berbeda."
+  items_with_student_submissions_or_other_restrictio_e49fb99b: "Item dengan penyerahan siswa atau pembatasan lain tidak dapat dihapus publikasinya."
   itemtitle_reply_to_topic_df6a63a0: "%{itemTitle} Balas ke Topik"
   itemtitle_required_replies_num_66397950: "%{itemTitle} Balasan Harus Ada (%{num})"
   j_5226008a: j
@@ -15577,6 +15699,7 @@ id:
   joined_group_group_name_e3802c04: "Gabung di Grup %{group_name}"
   joining_81f8b6c9: Bergabung
   joplin_assignment_submission_a4cf7899: "Penyerahan Tugas Joplin"
+  journals_periodicals_and_publications_ca24673: "Jurnal, Periodikal, dan Penerbitan"
   jpg_903bacff: JPG
   jquery: 
     module_sequence_footer: 
@@ -15589,6 +15712,7 @@ id:
       play_comment: "Putar Komentar Media"
   json_b96e53d2: JSON
   json_code_67d7aa0a: "Kode JSON"
+  json_configuration_cfd53a85: "Konfigurasi JSON"
   json_configuration_copied_7c260f5f: "Konfigurasi JSON disalin"
   json_data_bd3169f1: "Data JSON"
   json_is_not_valid_please_submit_properly_formatted_e3b2f88f: "Json tidak valid. Silakan serahkan json berformat benar."
@@ -15933,6 +16057,7 @@ id:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} notifikasi ditemukan"
   length_results_found_3afd01e5: "%{length} hasil ditemukan"
+  less_than_25ea97f: "Kurang dari"
   less_than_a_minute_ago_9f45e2a5: "kurang dari satu menit lalu"
   less_than_a_minute_f938af3a: "kurang dari satu menit"
   let_instructors_tag_enrolled_users_and_assign_cour_90131b01: "Biarkan instruktur menandai pengguna yang terdaftar dan menetapkan konten kursus berdasarkan tag tersebut, yang mendukung pengalaman belajar yang lebih personal."
@@ -16058,6 +16183,8 @@ id:
   like_the_current_message_41b56198: "Seperti Pesan Saat Ini"
   like_this_entry_60da41a5: "Sukai Entri ini"
   like_this_response_fdfc3917: "Sukai respons ini"
+  like_translation_e49dad16: "Sukai terjemahan"
+  like_translation_selected_10a8b538: "Sukai terjemahan, dipilih"
   likes_8cffe724: 
     one: Suka
     other: Suka
@@ -16233,6 +16360,7 @@ id:
   loading_comments_32366acf: "Memuat komentar"
   loading_completion_b62ca82f: "Memuat penyelesaian"
   loading_compose_modal_f6da0e8b: "Memuat Buat Modal"
+  loading_configuration_78278eab: "Memuat konfigurasi ..."
   loading_configuration_a0f96cd3: "Memuat konfigurasi"
   loading_content_for_import_4ed89a17: "Memuat konten untuk impor."
   loading_contributing_scores_5f68330f: "Memuat skor kontribusi"
@@ -16524,6 +16652,7 @@ id:
   login_handle_is_required_90ab7fe0: "%{login_handle} harus ada"
   login_has_been_denied_for_security_reasons_please__66869692: "Login ditolak karena alasan keamanan. Silakan coba lagi nanti atau hubungi administrator sistem Anda."
   login_help_for_canvas_5571f9b1: "Bantuan Login untuk %{canvas}"
+  login_help_url_19c952cb: "URL Bantuan Login"
   login_id_12109693: "ID Login"
   login_id_bc943b97: "ID Login:"
   login_ids_b394c2a3: "ID Login"
@@ -16606,6 +16735,7 @@ id:
   lti_apps_page_improved_history_c22dd69b: "Riwayat Peningkatan Halaman Aplikasi LTI"
   lti_apps_usage_data_147aa4af: "App LTI - Data Penggunaan"
   lti_asset_processor_turnitin_migration_bc484419: "Migrasi Turnitin Pemroses Alat LTI"
+  lti_config_edit_as_json_43c3adf8: "Edit Konfig LTI sebagai JSON"
   lti_context_id_d6a24cfc: "ID Konteks Lti"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id harus unik"
   lti_contextcontrols_91b76c7a: "LTI ContextControls"
@@ -18268,6 +18398,30 @@ id:
         subject: "Pendaftaran Canvas Selesai"
       twitter: 
         body: "Peringatan Canvas - Anda telah terdaftar untuk suatu akun Canvas di %{account}!  "
+    pseudonym_suspended_after_failed_login: 
+      email: 
+        body: "Login Anda di %{account_name} telah ditangguhkan karena terlalu banyak upaya login yang gagal. Silakan hubungi administrasi institusi Anda."
+        html: 
+          body: "Login Anda di %{account_name} telah ditangguhkan karena terlalu banyak upaya login yang gagal. Silakan hubungi administrasi institusi Anda."
+          subject: "Login Ditangguhkan"
+        subject: "Login Ditangguhkan"
+      sms: 
+        body: "Login Anda di %{account_name} telah ditangguhkan karena terlalu banyak upaya login yang gagal. Silakan hubungi administrasi institusi Anda."
+      summary: 
+        body: "Login Anda di %{account_name} telah ditangguhkan karena terlalu banyak upaya login yang gagal. Silakan hubungi administrasi institusi Anda."
+        subject: "Login Ditangguhkan"
+    pseudonym_suspended_by_admin: 
+      email: 
+        body: "Pengguna %{user_name} di %{account_name} telah ditangguhkan. Silakan hubungi administrasi institusi Anda."
+        html: 
+          body: "Pengguna %{user_name} di %{account_name} telah ditangguhkan. Silakan hubungi administrasi institusi Anda."
+          subject: "Pengguna Ditangguhkan"
+        subject: "Pengguna Ditangguhkan"
+      sms: 
+        body: "Pengguna %{user_name} di %{account_name} telah ditangguhkan. Silakan hubungi administrasi institusi Anda."
+      summary: 
+        body: "Pengguna %{user_name} di %{account_name} telah ditangguhkan. Silakan hubungi administrasi institusi Anda."
+        subject: "Pengguna Ditangguhkan"
     quiz_locked: "Kuis ini saat ini dikunci."
     quiz_locked_at: "Kuis ini terkunci %{at}."
     quiz_locked_module: "Kuis ini adalah bagian dari modul *%{module}* dan belum dibuka."
@@ -18645,7 +18799,10 @@ id:
     assignment_group_type: "Grup Tugas"
     assignment_type: Tugas
     calendar_event_type: "Acara Kalender"
+    custom_link_import_failed: "Tautan Kustom tidak dapat diimpor: %{link_label}"
+    custom_link_invalid_url: "Tautan yang diberi label %{link_label} tidak disalin karena sumber daya yang ditautkannya tidak ditemukan di kursus baru. Untuk menautkan ke sumber daya ini, tambahkan secara manual dari tab navigasi di Pengaturan Kursus."
     custom_link_type: "Tautan Kustom"
+    custom_link_validation_error: "Tautan Kustom tidak dapat diimpor: %{link_label} (URL: %{url}) - %{validation_errors}"
     discussion_topic_type: "Topik Diskusi"
     ecollege: 
       course_not_found: "Kursus ECollege tidak ditemukan."
@@ -19162,6 +19319,7 @@ id:
   name_3806192d: "Nama:"
   name_added_6257decb: "%{name} ditambahkan"
   name_already_has_enough_must_review_allocations_to_319b3007: "%{name} sudah memiliki cukup alokasi “harus meninjau” untuk memenuhi tinjauan sejawat. Alokasi tambahan akan mengikuti penyerahan dan preseden yang tersedia."
+  name_already_has_enough_strict_allocations_to_meet_f307c06f: "%{name} sudah memiliki cukup alokasi untuk memenuhi tinjauan sejawat yang dibutuhkan. Alokasi tambahan akan mengikuti penyerahan dan preseden yang tersedia."
   name_app_has_been_deleted_fb2d9426: "App %{name} telah dihapus"
   name_badfe525: nama
   name_cannot_exceed_num_characters_2250bf22: "Nama tidak dapat melebihi %{num} karakter."
@@ -19173,6 +19331,7 @@ id:
   name_e790ff1f: Nama...
   name_ea82c4df: "\"%{name}\""
   name_error_fee4236: "Kesalahan Nama"
+  name_failed_58b59384: "%{name} gagal"
   name_has_already_completed_the_required_peer_revie_cdd4ab5c: "%{name} sudah menyelesaikan tinjauan sejawat yang dibutuhkan."
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*nama* berhasil diinstal tetapi belum diaktifkan."
   name_is_currently_locked_and_unavailable_to_view_6e579cea: "%{name} saat ini terkunci dan tidak dapat dilihat."
@@ -19211,6 +19370,7 @@ id:
   name_successfully_moved_to_foldername_90eec95f: "%{name} berhasil dipindahkan ke %{folderName}."
   name_template_8bfc30ec: "Templat %{name}"
   name_toggle_module_visibility_f948faf8: "%{name} mengalihkan visibilitas modul"
+  name_uploading_309284d0: "%{name} mengunggah"
   name_user_e44eebed: "%{name} Pengguna"
   name_was_successfully_duplicated_6e48347b: "%{name} berhasil diduplikasi."
   name_was_successfully_removed_31398997: "%{name} berhasil dihapus."
@@ -19228,6 +19388,14 @@ id:
   nav_icon_ca3fef59: "Ikon Nav"
   nav_logo_4b255c91: "Logo Nav"
   nav_logo_background_ba33fb7f: "Latar Belakang Logo Nav"
+  nav_menu_link: 
+    nav_menu_link: 
+      errors: 
+        course_context_nav_only: "tautan konteks kursus hanya dapat mengaktifkan navigasi kursus"
+        nav_type_required: "setidaknya satu jenis nav harus diaktifkan"
+        url_html_tags: "Bukan URL yang valid (tidak boleh berisi tag HTML)"
+        url_invalid: "bukan URL yang valid"
+        url_relative_invalid: "Bukan URL yang valid (tautan yang diawali dengan garis miring harus memiliki jalur dan tidak ada host atau skema)"
   nav_menu_links_3ada377a: "Tautan Menu Navigasi"
   nav_text_94206145: "Teks Nav"
   nav_text_active_a924ae88: "Teks Nav Aktif"
@@ -19361,6 +19529,7 @@ id:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migrasi Kuis Baru diaktifkan secara default"
   new_quizzes_migration_required_7854aa1a: "Migrasi Kuis Baru harus ada"
   new_quizzes_native_experience_6d4e340a: "Kuis Baru Pengalaman Asli"
+  new_quizzes_native_experience_api_gateway_f6791c2f: "Gateway API Pengalaman Native Kuis Baru"
   new_quizzes_native_experience_respondus_b96bbd98: "Kuis Baru Pengalaman Asli Respondus"
   new_quizzes_native_experience_sessionless_launch_d40baa23: "Kuis Baru Pengalaman Asli Peluncuran Tanpa Sesi"
   new_quizzes_navigation_updates_42713009: "Pembaruan Navigasi Kuis Baru"
@@ -19598,6 +19767,7 @@ id:
   no_matches_6ae28640: "Tidak ada kecocokan"
   no_matches_found_please_insert_a_valid_recipient_4cef9d47: "Kecocokan tidak ditemukan. Silakan masukkan penerima yang valid."
   no_matches_to_your_search_16d3d3b1: "Tidak ada kecocokan untuk pencarian Anda"
+  no_matching_courses_7401988: "Tidak ada kursus yang cocok"
   no_matching_external_tool_found_ffc3abc3: "Kecocokan alat eksternal tidak ditemukan"
   no_matching_options_found_b26c0aa9: "Opsi kecocokan tidak ditemukan"
   no_matching_results_where_found_for_searchterm_1efa586e: "Tidak ada hasil yang cocok untuk \"%{searchTerm}\""
@@ -19652,6 +19822,7 @@ id:
   no_result_35ffe52a: "Tidak ada hasil"
   no_result_found_3d3fc3e3: "Hasil tidak ditemukan"
   no_results_3cda4e72: "Tidak Ada Hasil"
+  no_results_available_abe5f888: "Tidak ada hasil yang tersedia"
   no_results_f36777ee: "Tidak ada hasil"
   no_results_found_2ace1494: "Hasil Tidak Ditemukan"
   no_results_found_58717065: "Hasil tidak ditemukan"
@@ -19678,6 +19849,7 @@ id:
   no_students_have_taken_the_quiz_yet_e667644b: "Belum ada Siswa yang mengambil kuis"
   no_students_have_taken_the_survey_yet_d378cd35: "Belum ada Siswa yang mengisi survei"
   no_students_with_that_name_found_f6004da2: "Siswa dengan nama itu tidak ditemukan"
+  no_study_tools_are_currently_available_dd837cbe: "Saat ini tidak ada alat bantu belajar yang tersedia."
   no_subject_58b7941c: "Tanpa Subjek"
   no_subject_970aad80: "Tanpa subjek"
   no_subject_a8b6ceeb: "(Tanpa subjek)"
@@ -20106,6 +20278,8 @@ id:
       new_user: "Pengguna Baru"
       pseudonym_registration: "Pendaftaran Nama Samaran"
       pseudonym_registration_done: "Pendaftaran Nama Samaran Selesai"
+      pseudonym_suspended_after_failed_login: "Nama Samaran Ditangguhkan Setelah Login Gagal"
+      pseudonym_suspended_by_admin: "Nama Samaran Ditangguhkan Oleh Admin"
       report_generated: "Laporan Dibuat"
       report_generation_failed: "Pembuatan Laporan Gagal"
       rubric_assessment_invitation: "Undangan Penilaian Rubrik"
@@ -20156,6 +20330,7 @@ id:
     submission_comment_display: "Komentar Penyerahan"
     web_conference_recording_ready: "Rekaman konferensi siap"
     web_conference_recording_ready_legend: "Rekaman konferensi siap"
+  notification_categories_1460dd20: "Kategori notifikasi"
   notification_not_found_54f78db0: "Notifikasi tidak ditemukan"
   notification_policies_requires_the_communication_c_2e7ded08: "Kebijakan notifikasi mengharuskan id channel komunikasi, kategori notifikasi, dan frekuensi pembaruan"
   notification_preferences_cf47083d: "Preferensi Notifikasi"
@@ -20264,6 +20439,7 @@ id:
   number_of_students_per_group_8abe7189: "Jumlah siswa per grup"
   number_of_times_5a52c6c0: "Jumlah Frekuensi"
   number_of_times_calc_int_6d1f8687: "Jumlah Frekuensi (%{calc_int})"
+  number_of_words_f73919c4: "Jumlah kata"
   numeric_ad248ca9: Numerik
   numerical_answer_ec7120bf: "Jawaban numerik"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} dari %{numGroup} Dikuasai"
@@ -20291,6 +20467,7 @@ id:
       details: 
         allow_application: "Izinkan %{app_name} mengakses akun Canvas Anda."
       page_title: "Login App"
+      please_wait: "Silakan tunggu..."
       remember_auth: "Ingat otorisasi"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Jenis Objek"
@@ -20325,6 +20502,7 @@ id:
   october_6b2bf82: Oktober
   of_grade_984aa550: "% dari Nilai"
   of_students_5d1af0d2: "# dari siswa"
+  of_the_document_57dac576: "% dari dokumen"
   of_times_1018baab: "# kali"
   of_total_c02b5afe: "dari %{total}"
   off_5385ef3f: Mati
@@ -20420,6 +20598,7 @@ id:
   only_allowedcount_of_totalcount_files_were_uploade_3d965ed: "Hanya %{allowedCount} dari %{totalCount} file diunggah supaya tetap dalam batas %{maxFiles} file."
   only_available_to_students_with_link_107e2468: "Hanya tersedia untuk siswa dengan tautan"
   only_available_with_link_5ffb9492: "Hanya tersedia dengan tautan"
+  only_award_points_for_the_correct_answer_some_stud_ca9a7a20: "Hanya beri poin untuk jawaban yang benar (beberapa skor siswa mungkin dikurangi)"
   only_collect_grades_that_have_been_graded_since_th_96baed94: "Hanya kumpulkan nilai yang telah dinilai sejak start_at kali."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Hanya pengumuman dan diskusi kursus dapat spesifik bagian"
   only_csv_files_are_supported_e1ad5270: "Hanya mendukung file CSV"
@@ -20518,6 +20697,7 @@ id:
   opportunities_popup_f6703842: "grup peluang"
   optimized_grading_rubrics_b529d7c2: "Rubrik Penilaian yang Dioptimalkan"
   optimized_load_enrollments_for_courses_index_b7429773: "Pemuatan Pendaftaran yang Dioptimalkan untuk Indeks Kursus"
+  optimized_needs_grading_count_5b82bca9: "Jumlah Kebutuhan Penilaian yang Dioptimalkan"
   optimized_the_visibility_services_used_by_selectiv_d8abb7be: "Mengoptimalkan layanan visibilitas yang digunakan oleh Rilis Selektif."
   optimizes_the_loading_of_enrollments_for_the_cours_fd4b0016: |
       Mengoptimalkan pemuatan pendaftaran untuk halaman indeks kursus dengan memuat 
@@ -20597,8 +20777,10 @@ id:
   other_ddacb37d: lainnya
   other_incorrect_match_options_c1418af5: "Opsi Kecocokan Salah Lainnya:"
   other_resources_fee3ddda: "SUMBER DAYA LAINNYA"
+  other_student_papers_bf318f4c: "Makalah Siswa Lainnya"
   other_tool_configurations_use_this_domain_includin_c669be8f: "Konfigurasi alat lain menggunakan domain ini termasuk *%{first}* dan **%{second}**. Untuk menghindari konflik, pastikan pengaturan ketersediaan tidak tumpang tindih."
   other_tool_configurations_use_this_domain_includin_ef4d1741: "Konfigurasi alat lain menggunakan domain ini termasuk *%{first}*, **%{second}**, dan ***%{third}***. Untuk menghindari konflik, pastikan pengaturan ketersediaan tidak tumpang tindih."
+  other_ways_to_log_in_9d9d2600: "Cara lain untuk masuk"
   otherwise_please_follow_the_support_link_at_the_bo_ee7856a0: "Jika tidak, silakan ikuti tautan dukungan di bagian bawah halaman ini."
   our_new_reports_page_adds_dynamic_report_progress__31b2b409: "Halaman Laporan baru kami menambahkan progres dan riwayat laporan dinamis."
   our_smart_search_feature_relies_on_an_ai_adjacent__e48733be: "Fitur Smart Search kami bergantung pada teknologi AI-adjacent bernama “embeddings.” Teknologi ini “membaca” konten kursus dan membuat suatu representasi matematis kompleks dari setiap potongan konten. Ketika Anda melakukan pencarian, teknologi ini “membaca” kueri Anda dan mengubahnya menjadi suatu representasi matematis kompleks. Alat tersebut kemudian membandingkan representasi matematis dari penelusuran dan konten kursus Anda untuk memberi hasil yang relevan."
@@ -20828,6 +21010,7 @@ id:
   page_comments: 
     errors: 
       create_failed: "Pembuatan komentar gagal"
+  page_content_is_sent_to_the_model_to_generate_stud_354ea807: "Konten halaman dikirim ke model untuk menghasilkan materi belajar."
   page_duration_7b562e65: "Durasi Halaman"
   page_editor_9023aaa1: "Editor Halaman"
   page_highlight_10d1fc2b: "Sorotan halaman"
@@ -20927,6 +21110,7 @@ id:
     view_more_link: "Lihat Lainnya"
   paginated_view: 
     loading_more_results: "Memuat hasil lain"
+  pagination_40e3280b: Paginasi
   pair_4d942a74: Pasangkan
   pair_with_observer_b1541895: "Pasangkan dengan Pengamat"
   pair_with_student_6f76e69a: "Pasangkan dengan siswa"
@@ -21122,12 +21306,14 @@ id:
   percent_complete_3a7edc20: "%{percent} selesai"
   percent_complete_a7f6d403: "Persen selesai"
   percent_complete_e46b6148: "%{percent}% selesai"
+  percent_complete_total_total_19c15249: "%{percent}% selesai (%{total} total)"
   percent_of_points_possible_93cd8127: "%{percent} poin memungkinkan"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Persen responden yang memilih jawaban ini"
   percent_of_students_scored_score_53d2c4d5: "%{percent} dari siswa mendapat skor %{score}"
   percent_relevance_b375fbdc: "%{percent}% Relevansi "
   percent_size_9bcff8be: "Ukuran persen"
   percentage_34ab7c2c: Persentase
+  percentage_of_document_643b900b: "Persentase dokumen"
   percentages_and_points_can_t_be_edited_because_it__3639dd1b: "Persentase dan poin tidak dapat diedit karena merupakan skema penilaian level akun."
   percentages_and_points_can_t_be_edited_because_it__806d51e8: "Persentase dan poin tidak dapat diedit karena sedang digunakan."
   percentages_and_points_can_t_be_edited_because_it__fa156ee5: "Persentase dan poin tidak dapat diedit karena digunakan sebagai skema penilaian default."
@@ -21264,6 +21450,7 @@ id:
   pii_fd320e46: PII
   pii_in_course_content_may_be_indexed_but_no_pii_is_eada8fc7: "PII dalam konten kursus dapat diindekskan, tetapi tidak ada PII yang sengaja dikirim ke model"
   pii_in_discussion_replies_may_be_sent_to_the_model_4462b79c: "PII dalam balasan diskusi dapat dikirim ke model, tetapi tidak ada PII yang sengaja dikirim ke model."
+  pii_in_page_content_may_be_included_but_no_pii_is__475896ef: "PII di konten halaman dapat disertakan, tetapi tidak ada PII yang sengaja dikirim ke model."
   pin_cdbc9f8f: Pin
   pin_discussion_title_67c84658: "Pin diskusi %{title}"
   pin_of_discussion_title_failed_6c2c32a5: "Pin diskusi %{title} gagal"
@@ -21342,6 +21529,7 @@ id:
   please_check_your_system_s_microphone_settings_bd2bc7f2: "Silakan periksa pengaturan mikrofon sistem Anda."
   please_choose_a_file_c2449cc: "Silakan pilih file"
   please_choose_a_language_for_the_caption_b14115d5: "Silakan pilih bahasa untuk teks."
+  please_choose_an_authentication_provider_674fdbd6: "Silakan pilih penyedia autentikasi."
   please_choose_an_editor_569f139e: "Silakan pilih editor"
   please_click_above_to_launch_the_tool_and_select_a_641da0df: "Silakan klik di atas untuk meluncurkan alat dan memilih sumber daya."
   please_click_below_to_launch_the_tool_and_select_a_f66e14d: "Silakan klik di bawah ini untuk meluncurkan alat dan memilih sumber daya."
@@ -21355,6 +21543,7 @@ id:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Silakan masukkan tanggal batas pada atau setelah %{earliestDate}"
   please_enter_a_file_name_f159edc1: "Silakan masukkan nama file"
   please_enter_a_grading_scheme_name_b2233cfc: "Silakan masukkan nama skema penilaian"
+  please_enter_a_label_7f5fa751: "Silakan masukkan label."
   please_enter_a_larger_number_7d18cabd: "Silakan masukkan angka lebih besar"
   please_enter_a_name_c4a6ca65: "Masukkan nama."
   please_enter_a_name_for_this_link_318f01a4: "Silakan masukkan nama untuk tautan ini."
@@ -22292,6 +22481,7 @@ id:
         save_skype_name: "Simpan Nama Skype"
         select_image: "Pilih Gambar"
         update_settings: "Perbarui Pengaturan"
+      cookie_consent_settings: "Pengaturan Persetujuan"
       diigo_description: "Diigo adalah alat bookmark sosial yang dibuat secara spesifik untuk riset dan pendidikan. Rich Content Editor Canvas memungkinkan Anda mencari tag Diigo untuk memudahkan penautan dari dalam Canvas ke sumber daya lain yang menurut Anda bermanfaat."
       error_loading_token_details: "Kesalahan Memuat Detail Token"
       full_token_warning: |-
@@ -23835,6 +24025,7 @@ id:
   quotas_account_settings_22c12b8d: "Kuota (Pengaturan Akun)"
   quote_ae4462ad: Kutipan
   quote_reply_e56ad360: "Kutip Balasan"
+  quoted_material_ffaea62b: "Bahan Kutipan"
   radio_button_option_1_a8ec51f9: "Opsi tombol radio 1"
   radio_button_option_2_31e50043: "Opsi tombol radio 2"
   range_56b2f310: Rentang
@@ -24156,6 +24347,10 @@ id:
   registration_screens_724e0d82: "Layar Pendaftaran"
   registration_update_wizard_error_da5adb50: "Kesalahan Panduan Pembaruan Registrasi"
   registration_url_60e0eaaa: "URL Pendaftaran"
+  regrade_options_4d463c7c: "Opsi penilaian ulang"
+  regrade_options_82fb05e0: "Opsi Nilai Ulang"
+  regrade_options_modal_45fb6da1: "Opsi nilai ulang modal"
+  regrading_is_not_allowed_on_this_question_because__2ac314cb: "Penilaian ulang tidak diizinkan pada pertanyaan ini karena jawaban dihapus atau jenis pertanyaan diubah setelah siswa menyelesaikan penyerahan."
   regular_and_substantive_interaction_e49d7016: "Interaksi Reguler dan Substantif"
   regular_and_substantive_interaction_insights_is_pa_8f874ac6: "Wawasan Interaksi Reguler dan Substantif adalah bagian dari peningkatan Intelligent Insights di Canvas."
   regular_lato_font_7f3cf24c: "Font Lato Reguler"
@@ -24182,6 +24377,7 @@ id:
   relinking_paces_fb1a0047: "Menautkan pace..."
   reload_results_6e4870a: "Muat ulang hasil"
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Muat ulang halaman atau navigasi ke halaman baru supaya perubahan ini diterapkan."
+  remaining_8a623700: Tersisa
   remediation_closed_1257cd0e: "Remediasi ditutup."
   remediation_closed_successfully_5e4d1550: "Remediasi berhasil ditutup"
   remediation_feccc1fd: Remediasi
@@ -24189,6 +24385,7 @@ id:
   remember_me_bd780b4: "Ingat saya"
   remember_my_choice_d74e8f60: "Ingat pilihan saya"
   remember_my_choice_for_this_course_5a3b7206: "Ingat pilihan saya untuk kursus ini"
+  remember_to_save_your_settings_for_this_change_to__75ddda3b: "Ingat untuk menyimpan pengaturan Anda agar perubahan ini diterapkan."
   reminder_date_f701f92f: "Pengingat: %{date}"
   reminder_time_for_due_dates_bea56d24: "Waktu Pengingat untuk Tanggal Batas"
   reminder_time_for_grading_ea0dd44d: "Waktu Pengingat untuk Penilaian"
@@ -24370,6 +24567,8 @@ id:
   reopening_remediation_please_wait_631e0801: "Membuka kembali remediasi, harap tunggu..."
   reorder_672cf4f2: "Atur Ulang"
   reorder_blocks_4014c1a7: "Atur ulang blok"
+  reorder_criterionname_criterion_c7255556: "Urutkan Ulang Kriteria %{criterionName}"
+  reorder_ratingname_rating_2ee31ccf: "Urutkan Ulang Peringkat %{ratingName}"
   reorder_widgetname_cfe53293: "Minta ulang %{widgetName}"
   reorders_some_menu_options_for_more_consistency_an_90efff07: "Memesan ulang beberapa opsi menu untuk konsistensi lebih baik dan menambah tautan ke SpeedGrader."
   repeat_every_e653d6d0: "Ulangi setiap:"
@@ -24442,6 +24641,7 @@ id:
   report_history_d7b6cbb2: "Riwayat Laporan"
   report_inappropriate_picture_af4eefeb: "Laporkan gambar yang tidak pantas"
   report_is_already_being_generated_873dd2aa: "Laporan sedang dibuat."
+  report_is_ready_dd2a548b: "Laporan siap"
   report_issue_b5f1db0e: "Laporkan Masalah"
   report_profile_picture_8f1d7535: "Laporkan Foto Profil"
   report_progress_61367f06: "Kemajuan laporan"
@@ -24669,6 +24869,7 @@ id:
   revert_sub_account_fa7ae3f2: "Kembalikan Sub-Akun"
   revert_to_actual_score_f665eea9: "Kembalikan ke Skor Aktual"
   review_7197fba3: "Tinjau "
+  review_action_7bcca971: "Tinjau Tindakan"
   review_and_fix_e31364ca: "Tinjau dan perbaiki"
   review_due_date_a4a08771: "Tanggal Batas Peninjauan"
   review_e5be5adc: Tinjau
@@ -24676,6 +24877,8 @@ id:
   review_feedback_4b4abb38: "Umpan Balik Tinjauan"
   review_issues_for_name_e89a1246: "Tinjau masalah untuk %{name}"
   review_now_318a6a3e: "Tinjau Sekarang"
+  review_partner_1_ffd770f5: "Mitra Tinjauan 1"
+  review_partner_2_66de214f: "Mitra Tinjauan 2"
   review_requirement_622655d4: "Persyaratan Peninjauan"
   review_settings_7c265fa5: "Pengaturan Tinjauan"
   review_updates_818e58a2: "Tinjau Pembaruan"
@@ -25045,6 +25248,7 @@ id:
   saving_associations_started_8ac85360: "Menyimpan asosiasi dimulai"
   saving_blackout_dates_be03e6ee: "Menyimpan tanggal blackout"
   saving_configuration_1463971f: "Menyimpan konfigurasi"
+  saving_configuration_7c5a63b5: "Menyimpan konfigurasi ..."
   saving_custom_status_name_e1b66f6e: "Menyimpan status khusus %{name}"
   saving_d55dd90e: Menyimpan...
   saving_discussion_topic_a3cb589e: "Menyimpan Topik Diskusi"
@@ -25262,6 +25466,7 @@ id:
   search_by_99d1ba5f: "Cari menurut"
   search_by_app_name_company_name_8ea86de: "Cari menurut nama aplikasi & nama perusahaan"
   search_by_app_or_company_name_ad468715: "Cari menurut nama aplikasi atau perusahaan"
+  search_by_course_name_or_id_49a95c96: "Cari menurut nama atau ID kursus"
   search_by_course_or_assignment_id_78c9553c: "Cari berdasarkan ID Kursus atau Tugas"
   search_by_course_title_sis_id_d557bb77: "Cari berdasarkan judul mata kuliah, ID SIS..."
   search_by_extension_name_company_name_345e690c: "Cari menurut nama ekstensi & nama perusahaan"
@@ -25620,6 +25825,7 @@ id:
   select_course_color_cad8e62b: "Pilih Warna Kursus"
   select_course_colour_e3627dc2: "Pilih warna kursus"
   select_d70f31da: Pilih
+  select_date_57ab4079: "Pilih tanggal"
   select_date_f799ef47: "Pilih Tanggal"
   select_dates_to_remove_be55b14c: "Pilih tanggal untuk dihapus"
   select_discussion_threaded_option_6f1f7c1f: "Pilih opsi diskusi berutas"
@@ -25705,6 +25911,7 @@ id:
   select_the_quiz_engine_use_the_arrow_keys_to_navig_a259dda0: "Pilih mesin kuis. Gunakan tombol panah untuk menavigasi opsi, lalu tekan Enter untuk mengonfirmasi."
   select_the_score_that_you_would_like_to_apply_to_u_5a281baa: "Pilih skor yang Anda ingin terapkan ke artefak yang belum dinilai pada %{groupName}. Setelah diterapkan, tindakan ini tidak dapat diurungkan."
   select_the_score_that_you_would_like_to_apply_to_u_a445c726: "Pilih skor yang Anda ingin terapkan ke artefak yang belum dinilai. Setelah diterapkan, tindakan ini tidak dapat diurungkan."
+  select_time_92a1ef46: "Pilih waktu"
   select_title_741f7ef0: "pilih %{title}"
   select_title_for_deletion_45b08247: "Pilih %{title} untuk dihapus"
   select_translation_language_58cb57d4: "Pilih Bahasa Terjemahan"
@@ -25887,6 +26094,7 @@ id:
   send_usage_metrics_cecc7a7d: "Kirim metrik penggunaan"
   send_user_avatar_to_bigbluebutton_17cda2f6: "Kirim avatar pengguna ke BigBlueButton"
   sending_bf324366: "Sedang mengirim..."
+  sending_feedback_e6d728f9: "Kirim umpan balik"
   sending_file_858ca8e9: "Sedang mengirim %{file}"
   sending_message_75923692: "Mengirim Pesan"
   sending_message_8ac5bc90: "Mengirim Pesan..."
@@ -26097,6 +26305,7 @@ id:
         download_submissions: "Unduh semua penyerahan"
     current_enrollment: 
       checking: Memeriksa
+      favorited_past_tooltip: "%{course_name} ada di menu kursus."
       favorited_tooltip: "Klik untuk menghapus %{course_name} dari menu kursus."
       issue_count: 
         one: "%{count} masalah"
@@ -26848,6 +27057,7 @@ id:
   slovak_69f48e1b: Slovak
   slovenian_30ae5208: Slovenia
   small_b070434a: Kecil
+  small_matches_581ab241: "Kecocokan Kecil"
   small_text_contrast_29d0171f: "Kontras teks kecil"
   small_text_should_have_sufficient_contrast_60bc23dd: "Teks kecil harus memiliki kontras yang memadai."
   smaller_numbers_mean_higher_priority_c69f4d0a: "Angka yang lebih kecil berarti prioritas yang lebih tinggi"
@@ -26877,7 +27087,9 @@ id:
   some_items_are_hidden_from_gradebook_view_ce9cb5e2: "* Beberapa item tersembunyi dari tampilan gradebook."
   some_items_are_hidden_from_grades_view_for_more_in_588020f4: "* Beberapa item tersembunyi dari tampilan nilai. Untuk informasi selengkapnya, hubungi guru Anda."
   some_items_could_not_be_added_errors_a549215b: "Beberapa item tidak dapat ditambahkan: %{errors}"
+  some_module_items_could_not_be_published_c8774997: "Beberapa item modul tidak dapat diterbitkan:"
   some_module_items_could_not_be_published_e4be3c0: "Beberapa item modul tidak dapat diterbitkan"
+  some_module_items_could_not_be_unpublished_c2b9cc77: "Beberapa item modul tidak dapat batalkan penerbitannya."
   some_of_the_custom_variables_used_a_controller_ins_944376df: |-
       Beberapa variabel kustom menggunakan instans pengontrol untuk substitusi.
       Itu tidak tersedia dalam pekerjaan latar belakang, jadi dalam pemberitahuan PNS dan migrasi konten.
@@ -27006,6 +27218,7 @@ id:
   spanish_de9de5d6: Spanyol
   spanish_mexico_ec27e8d4: "Spanyol (Meksiko)"
   spanish_spain_8e3620ae: "Spanyol (Spanyol)"
+  specific_categories_only_f5f81f68: "Khusus kategori spesifik"
   specific_sections_a38d8b0d: "Bagian Spesifik"
   specify_a_set_of_ip_address_filters_that_teachers__a37cdb2f: |-
       Tentukan serangkaian filter alamat IP yang dapat digunakan guru untuk melindungi akses ke kuis.
@@ -27151,6 +27364,7 @@ id:
   start_auto_refresh_e2feafb2: "Mulai pemuatan otomatis"
   start_creating_1b8a6134: "Mulai Berkreasi"
   start_date_490511b4: "Tanggal mulai"
+  start_date_and_time_da9a7a4e: "Tanggal dan waktu mulai"
   start_date_e937be8a: "Tanggal Mulai"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_for_conference_1936e809: "Tanggal Mulai untuk Konferensi"
@@ -27188,6 +27402,7 @@ id:
   start_tls_26e4b0dc: "Mulai TLS"
   start_tour_29787099: "Mulai Tour"
   start_typing_fdfc5600: "Mulai mengetik..."
+  start_typing_to_search_6c8bbc26: "Mulailah mengetik untuk mencari"
   start_typing_to_search_c64c71bf: "Mulailah mengetik untuk mencari..."
   start_typing_to_search_results_will_update_automat_2f91bfeb: "Mulailah mengetik untuk mencari. Hasil akan diperbarui secara otomatis setelah 3 karakter."
   startdate_to_enddate_8811cf2b: "%{startDate} hingga %{endDate}"
@@ -27252,6 +27467,7 @@ id:
   storage_quotas_manage_6ca14bbb: "Kuota Penyimpanan - kelola"
   storage_used_in_mb_c75fbd9c: "penyimpanan digunakan dalam MB"
   store_and_share_course_assets_82a9967c: "Simpan dan bagikan aset kursus"
+  store_submissions_in_institutional_index_7868dbcc: "Simpan penyerahan di Indeks Kelembagaan"
   strand_955969b1: Strand
   strand_name_has_no_next_in_strand_db0992db: "Strand “%{name}” tidak memiliki next_in_strand."
   strand_or_singleton_is_blocked_by_the_shard_migrat_58f8d7b1: "Strand atau singleton diblokir oleh migrator shard"
@@ -27259,6 +27475,8 @@ id:
   strands_b086013b: Strand
   stream_items_api: 
     assessment_request_title: "Tinjauan Sejawat untuk %{title}"
+  strict_33535620: Ketat
+  strict_34ff5316: ketat
   stride_context_module_progress_cab7c1cd: "Kemajuan Modul Konteks Stride"
   strikethrough_6e45cdfe: Strikethrough
   strip_domain_from_login_attribute_value_bb6daa88: "Keluarkan Domain dari Nilai Atribut Login"
@@ -27389,6 +27607,7 @@ id:
   students_1b8cd07b: Siswa
   students_access_report_5637cbfb: "Laporan Akses Siswa"
   students_add_4e988446: "Siswa - tambah"
+  students_are_able_to_efficiently_study_course_mate_9f98eb04: "Siswa dapat mempelajari materi kursus secara efisien melalui ringkasan, kuis, dan kartu flash yang dihasilkan AI."
   students_are_able_to_quickly_find_answers_to_quest_9e025ab1: "Siswa dapat dengan cepat menemukan jawaban atas pertanyaan, dan instruktur dapat dengan cepat menavigasi kursus siswa."
   students_are_attempting_to_access_unpublished_cont_be329862: "Siswa berusaha mengakses konten yang belum diterbitkan, %{bad_link}, di %{asset_link}."
   students_are_clicking_on_bad_link_to_content_that__d9c51d0d: "Siswa mengeklik %{bad_link} ke konten yang sudah dihapus di %{asset_link}."
@@ -27398,6 +27617,7 @@ id:
   students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Siswa dapat mengedit dan melihat riwayat halaman jika diizinkan di opsi untuk setiap halaman."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Siswa hanya dapat berpartisipasi di dalam kursus di antara tanggal-tanggal ini"
   students_can_see_originality_score_797fe634: "Siswa dapat melihat skor originalitas"
+  students_can_see_the_originality_report_f246beb0: "Siswa Dapat Melihat Laporan Originalitas"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Siswa tidak bisa melihat respons kuis setelah kursus rampung"
   students_enrolled_babf3cb8: "Siswa Terdaftar"
   students_enrolled_in_this_course_859fa7a2: "Siswa yang terdaftar di kursus ini."
@@ -27455,6 +27675,7 @@ id:
   studio_capture_a88ec4e: "Tangkapan Studio"
   study_assist_aac2d50b: "Bantuan Belajar"
   study_tools_617c3972: "Alat belajar"
+  study_tools_a0bd1676: "Alat Studi"
   style_f6881133: Gaya
   sub_account_c213944c: Sub-akun
   sub_account_daeadd0: Sub-Akun
@@ -27839,10 +28060,15 @@ id:
   support_all_lti_postmessages_from_within_active_rc_8954bc83: "Dukung semua postMessages LTI dari dalam RCE aktif"
   support_exporting_new_quizzes_in_qti_format_ba09b465: "Dukung pengeksporan Kuis Baru dalam format QTI"
   support_inherited_apps_in_lti_apps_page_e2efee20: "Aplikasi Dukungan yang Diwariskan di Halaman Aplikasi LTI"
+  support_privacy_access_84820425: "Akses Privasi Dukungan"
   support_sharing_settings_4ad422d8: "Dukungan Pengaturan Bersama"
   supported_file_types_srt_or_webvtt_7d827ed: "Jenis file yang didukung: SRT atau WebVTT"
   supported_file_types_vtt_srt_8cb75c13: "Jenis file yang didukung: .vtt, .srt"
   supported_format_txt_759fea2a: "Format yang didukung: TXT"
+  suppress_notifications_d49be310: "Tekan Notifikasi"
+  suppress_notifications_from_being_created_and_sent_c2aa1e7f: "Tekan pembuatan dan pengiriman notifikasi"
+  suppress_specific_notification_categories_23f1130f: "Tekan kategori notifikasi spesifik"
+  suppression_scope_2dd5d1ea: "Cakupan penekanan"
   surfaces_the_block_editor_templates_edit_permissio_8db1b33: |-
       Permukaan izin "Block Editor Templates - edit" pada UI izin.
       Pengguna dengan izin ini dapat membuat dan mengedit templat blok.
@@ -28076,9 +28302,12 @@ id:
   templates_4ca13d07: Templat
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Daftaran seorang pengguna ke dalam kursus secara temporer. Pendaftaran temporer ini dipasangkan dengan pendaftaran lain di dalam kursus."
   temporary_9c54e959: "Temporer:"
+  temporary_active_94fbe167: "sementara - aktif"
+  temporary_completed_983c2f4b: "sementara - selesai"
   temporary_enrollment_enrollmenttype_for_username_a5410ed7: "Pendaftaran Sementara %{enrollmentType} untuk %{userName}"
   temporary_enrollment_option_links_eb9b8b2e: "Tautan opsi pendaftaran temporer"
   temporary_enrollment_pairings_56f35f5c: "Pairing Pendaftaran Temporer"
+  temporary_enrollment_status_5df96f90: "Status Pendaftaran Temporer"
   temporary_enrollment_was_successfully_created_78b48a7a: "Pendaftaran temporer berhasil dibuat."
   temporary_enrollment_was_successfully_updated_9ea3705a: "Pendaftaran temporer berhasil diperbarui."
   temporary_enrollments_add_373181b7: "Pendaftaran Temporer - tambah"
@@ -28086,6 +28315,8 @@ id:
   temporary_enrollments_edit_67c01325: "Pendaftaran Temporer - edit"
   temporary_enrollments_f0937c5a: "Pendaftaran Temporer"
   temporary_enrollments_were_successfully_created_7e0f3178: "Pendaftaran temporer berhasil dibuat."
+  temporary_future_170e2ced: "sementara - masa depan"
+  temporary_inactive_3ff93d03: "sementara - tidak aktif"
   temporary_rolename_c67d0df4: "Temporer: %{roleName}"
   tenant_d2a41f78: Tenant
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenant tidak ada atau sinkronisasi dinonaktifkan. Periksa pengaturan integrasi sinkronisasi Microsoft untuk kursus dan akun."
@@ -28883,6 +29114,7 @@ id:
   there_was_an_unexpected_error_while_deleting_the_r_7df6ebe0: "Ada kesalahan tak terduga saat menghapus balasan."
   there_was_an_unexpected_error_while_disabling_the__6ce0fd46: "Ada kesalahan tak terduga saat menonaktifkan rangkuman diskusi."
   there_was_an_unexpected_error_while_marking_replie_f1372937: "Terjadi kesalahan tak terduga saat menandai balasan sebagai telah dibaca."
+  there_was_an_unexpected_error_while_submitting_fee_a37e770c: "Ada kesalahan tak terduga saat menyerahkan umpan balik."
   there_was_an_unexpected_error_while_submitting_the_87e56bf1: "Ada kesalahan tak terduga saat menyerahkan umpan balik rangkuman diskusi."
   there_was_an_unexpected_error_while_updating_the_r_412e6e54: "Ada kesalahan tak terduga saat memperbarui balasan."
   there_was_an_unexpected_error_while_updating_the_r_a7ab5183: "Ada kesalahan tak terduga saat memperbarui balasan."
@@ -28901,6 +29133,7 @@ id:
   these_features_and_the_tech_behind_them_belong_to__77f1746e: "Fitur-fitur ini (dan teknologi di baliknya) adalah milik Instructure. Anda hanya akan memiliki akses untuk penggunaan internal. Dilarang berbagi atau menjual kembali."
   these_options_are_hidden_until_a_user_expands_the__e37e94af: "Opsi-opsi ini disembunyikan hingga pengguna memperluas bagian “Opsi masuk lainnya” di halaman login."
   these_permissions_control_the_ability_to_create_ed_d4d043b7: "Izin ini mengontrol kemampuan untuk membuat, mengedit, dan menghapus tag diferensiasi."
+  these_permissions_control_the_ability_to_manage_au_ca7062: "Izin ini mengontrol kemampuan untuk mengelola aturan otomatisasi pada akun."
   these_permissions_control_the_ability_to_view_crea_45a186b6: "Izin-izin ini mengontrol kemampuan untuk melihat, membuat, dan mengedit tag institusional."
   these_permissions_do_not_manage_discussions_discus_79defb66: "Izin ini tidak mengelola Diskusi. Diskusi dikelola melalui izin Diskusi individual."
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "Kata ganti ini akan tersedia untuk dipilih oleh pengguna Canvas di akun Anda."
@@ -28921,6 +29154,7 @@ id:
   this_allows_the_tool_to_provide_content_in_an_ifra_7651e8db: "Ini memungkinkan alat untuk menyediakan konten dalam iframe di halaman edit tugas."
   this_and_all_following_events_4b4b283: "Ini dan semua peristiwa berikutnya"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Pengumuman ini tidak akan terlihat sampai %{delayedPostAt}."
+  this_app_can_only_be_installed_once_and_is_already_bcae3a7f: "Aplikasi ini hanya dapat diinstal sekali dan sudah aktif di akun Anda."
   this_app_has_been_locked_by_an_administrator_and_i_4d239b21: "Aplikasi ini telah dikunci oleh administrator dan tidak tersedia untuk instalasi."
   this_app_has_no_permissions_configured_f58796f8: "Aplikasi ini tidak memiliki izin yang dikonfigurasi."
   this_app_is_locked_on_and_cannot_be_deleted_dc508f75: "Aplikasi ini terkunci, dan tidak dapat dihapus."
@@ -29316,6 +29550,7 @@ id:
   this_rubric_removes_criterions_that_have_learning__46a402bc: "Rubrik ini menghapus kriteria yang memiliki hasil capaian pembelajaran"
   this_rule_conflicts_with_completed_peer_review_ass_e40e8c9a: "Aturan ini bertentangan dengan tinjauan sejawat yang telah selesai. %{assessor_name} sudah ditinjau %{assessee_name}"
   this_rule_conflicts_with_rule_rule_text_32c948b4: "Aturan ini bertentangan dengan aturan \"%{rule_text}\""
+  this_rule_conflicts_with_rule_rule_text_enforcemen_22db46ad: "Aturan ini bertentangan dengan aturan “%{rule_text}” (%{enforcement})"
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Halaman sampel ini menyertakan elemen UI umum di Canvas untuk membantu Anda membangun branding khusus. Setelah Anda mulai membuat perubahan pada nilai warna dan gambar, Anda akan melihat tombol *Pratinjau Perubahan Anda*. Klik untuk menyegarkan halaman ini dan melihat seperti apa perubahan Anda."
   this_setting_allows_the_admin_to_brand_or_label_al_978c6710: "Pengaturan ini memungkinkan Admin member brand atau label pada semua teks 'Dari' pada semua notifikasi yang dikirim dari Canvas untuk Admin ini."
   this_setting_defines_the_initial_sort_order_studen_1d20b5b0: "Pengaturan ini menentukan urutan sortir awal. Siswa dapat mengatur preferensi mereka. Setelah mereka mengubahnya, pembaruan default mendatang tidak akan mengubah pengaturan mereka kecuali terkunci."
@@ -29395,6 +29630,7 @@ id:
   this_will_remove_the_uuid_from_the_response_of_the_e1f2fa45: "Ini akan menghapus UUID dari respons API file. Ini adalah bidang internal saja, dan tidak mengirimnya melalui kabel akan menjadi pengoptimalan jaringan."
   this_will_replace_all_other_branding_sent_in_canva_3aed2632: "Ini akan mengganti semua branding lain yang dikirim di notifikasi Canvas."
   this_will_set_next_in_strand_on_the_appropriate_nu_42be1d07: "Ini akan mengatur next_in_strand pada jumlah pekerjaan yang sesuai untuk membuka blokir utas atau singleton."
+  this_will_suppress_all_notifications_from_being_cr_86ebb38f: "Ini akan menekan semua notifikasi agar tidak dibuat dan dikirim untuk akun ini. Anda yakin?"
   this_will_terminate_all_user_sessions_for_username_5595ae6c: "Ini akan mengakhiri semua sesi pengguna untuk *%{userName}*. Ini termasuk semua sesi berbasis browser dan semua token akses, termasuk yang dibuat secara manual dan aplikasi seluler Canvas."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Ini akan memperbarui semua rubrik tingkat akun dan kursus yang terkait dengan skala penguasaan tingkat akun dan belum dinilai."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Hal ini akan memperbarui semua rubrik yang disesuaikan dengan hasil kursus ini yang belum dinilai."
@@ -29974,6 +30210,7 @@ id:
   today_b7202098: "hari ini"
   today_s_course_work_2871965c: "Tugas kursus hari ini"
   todo_date_d76c9cc: "Tanggal Tugas"
+  todo_list_e32006ae: "Daftar Todo"
   toggle_alignment_details_for_title_944f605: "Alihkan detail penyelarasan untuk %{title}"
   toggle_captions_off_27256008: "Alihkan Caption Non-Aktif"
   toggle_captions_on_43f76145: "Alihkan Caption Aktif"
@@ -30287,6 +30524,7 @@ id:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Kirim ulang"
+  turnitin_repository_9f865357: "Repositori Turnitin"
   turnitin_settings: 
     originality_report_never: "Tidak Pernah"
     originality_report_visible_after_due_date: "Setelah Batas Waktu"
@@ -30296,6 +30534,7 @@ id:
   type_72aae036: "Ketikkan: "
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: "Ketikkan tanggal atau gunakan tombol panah untuk bernavigasi di pemilih tanggal."
   type_a_few_letters_to_start_searching_3334657b: "Ketikkan beberapa huruf untuk mulai mencari"
+  type_at_least_2_characters_to_start_searching_4041e397: "Ketik minimal 2 karakter untuk mulai mencari"
   type_at_least_number_characters_to_search_5ff908c9: "Ketikkan setidaknya %{number} karakter untuk mencari"
   type_c8106334: Ketikkan
   type_enter_to_edit_rich_text_cbaa1df: "ketik <Enter> untuk mengedit rich text"
@@ -30322,6 +30561,7 @@ id:
   type_to_search_for_allocation_rules_66aca034: "Ketik untuk mencari aturan alokasi"
   type_to_search_for_tools_or_use_arrow_keys_to_navi_e62666d3: "Ketik untuk mencari alat atau gunakan tombol panah untuk menavigasikan opsi"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Ketik untuk mencari, gunakan tombol panah untuk menavigasikan opsi."
+  type_to_start_searching_6878df10: "Ketik untuk mulai mencari"
   type_your_message_here_3551e252: "Ketik pesan Anda di sini..."
   uagc_all_discussion_entries_report_12bc50be: "Laporan Semua Entri Diskusi UAGC"
   uagc_all_submission_attachments_report_71ef378b: "Laporan Semua Lampiran Penyerahan UAGC"
@@ -30643,6 +30883,7 @@ id:
   up_c553575d: Naik
   up_to_36c838b8: hingga
   up_to_date_f60135ee: Terbaru
+  up_to_maxfiles_file_sources_maximum_of_maxsize_mb_366e4fc3: "Hingga %{maxFiles} sumber file (Maksimum %{maxSize}MB)"
   upcoming_available_work_ecf478a2: "Tugas yang akan datang tersedia"
   upcoming_due_date_assignment_name_course_name_ac1766c1: "Tanggal Batas Mendatang - %{assignment_name}, %{course_name}"
   update_4d8ee62: Pembaruan
@@ -30670,6 +30911,7 @@ id:
   update_pages_c91d7ba: "Perbarui halaman"
   update_password_4bc5cb1f: "Perbarui Kata Sandi"
   update_public_jwk_9f25f520: "Perbarui JWK Publik"
+  update_question_without_regrading_47c9904a: "Perbarui perbarui tanpa menilai ulang"
   update_quota_81381226: "Perbarui Kuota"
   update_rating_6d29c2ef: "Perbarui Peringkat"
   update_report_7623967f: "Perbarui laporan"
@@ -30740,6 +30982,7 @@ id:
   upload_files_a228f20f: "Unggah File"
   upload_files_to_provide_context_for_this_ai_experi_5daba794: "Unggah file untuk memberikan konteks bagi Pengalaman AI ini. Format yang didukung: DOCX, XLSX, XLS, PPTX, PDF, TXT, HTML."
   upload_forbidden_words_terms_list_a4a2d14e: "Unggah Daftar Kata/Istilah Terlarang"
+  upload_from_computer_3eea7cab: "Unggah dari komputer"
   upload_from_computer_c79c1efd: "Unggah Dari Komputer"
   upload_gradebook_386a46c8: "Unggah Gradebook"
   upload_image_6120b609: "Unggah Gambar"
@@ -30795,9 +31038,11 @@ id:
   url_submission_f76327e3: "Penyerahan URL"
   url_type_3ece27d2: "Tipe URL"
   uruguay_598_866a5ef3: "Uruguay (+598)"
+  us_6734262f: AS
   us_canada_emea_apac_latam_ce0402ba: "AS, Kanada, EMEA, APAC, LATAM"
   usage_15def729: Penggunaan
   usage_right_ff96f3e2: "Hak Penggunaan:"
+  usage_rights_are_required_1d481ae8: "hak penggunaan harus ada"
   usage_rights_f0960ad6: "Hak Penggunaan"
   usage_rights_f73a0fe0: "Hak Penggunaan"
   usage_rights_have_been_set_d1b433c7: "Hak penggunaan telah ditetapkan."
@@ -30882,6 +31127,7 @@ id:
   use_sms_6ca0b993: "Gunakan SMS"
   use_the_following_keyboard_shortcuts_to_navigate_m_203b00d6: "Gunakan pintasan keyboard berikut untuk menavigasi modul dan item:"
   use_the_import_content_tool_to_migrate_course_mate_41716290: "Gunakan alat Impor Konten untuk memigrasikan bahan kursus dari sumber lain ke kursus ini."
+  use_the_json_editor_for_advanced_configurations_mo_462f5c79: "Gunakan editor JSON untuk konfigurasi lanjutan. Sebagian besar aplikasi harus dikelola di halaman pengaturan standar. Hanya lakukan perubahan di sini jika Anda terbiasa dengan format JSON."
   use_the_new_assignments_teacher_page_8add7e46: "Gunakan halaman guru tugas baru"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Gunakan alat eksternal Kolaborasi baru yang mengaktifkan opsi lain untuk alat untuk digunakan berkolaborasi"
   use_the_rce_873ca281: "Gunakan RCE"
@@ -31393,6 +31639,10 @@ id:
   users_with_this_permission_may_be_able_to_use_the__838a780f: "Pengguna dengan izin ini mungkin mampu menggunakan Act sebagai fitur untuk mengelola pengaturan akun, melihat dan menyesuaikan nilai, mengakses informasi pengguna, dll."
   users_with_this_permission_may_be_able_to_use_the__84394072: "Pengguna yang memiliki izin ini dapat menggunakan fitur Bertindak sebagai untuk mengelola pengaturan akun, melihat dan menyesuaikan nilai, mengakses informasi pengguna, dll. Izin ini juga mengizinkan admin yang ditunjuk ke suatu sub-akun untuk mengakses pengaturan Akun dan informasi di luar sub-akunnya."
   uses_batch_processing_orchestrator_when_account_le_580b00a4: "Menggunakan orkestrasi pemrosesan batch ketika hasil tingkat akun diperbarui untuk menghitung ulang rollup untuk kursus yang terdampak."
+  uses_bulk_sql_group_by_instead_of_per_assignment_r_a1bcff53: |
+      Menggunakan SQL massal (GROUP BY) alih-alih panggilan Redis per tugas
+      needs_grading_count. Menghilangkan perjalanan bolak-balik Redis N+1 selama serialisasi
+      daftar kursus.
   uses_cedar_for_translations_7bfb6b44: "Menggunakan Cedar untuk terjemahan"
   uses_optimized_implementation_for_grading_rubrics__f9a18a27: |
       Menggunakan implementasi yang dioptimalkan untuk titik akhir rubrik penilaian dengan perbaikan kueri N+1
@@ -31471,6 +31721,7 @@ id:
   video_player_for_label_6a5fdb03: "Video player untuk %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: Vietnam
+  view_add_edit_delete_41d4b23c: "lihat / tambah / edit / hapus"
   view_all_course_grades_a5df657b: "Lihat semua nilai kursus"
   view_all_courses_1b4ea3e4: "Lihat semua mata kuliah"
   view_all_grades_3f8bba2d: "Lihat semua nilai"
@@ -31529,15 +31780,18 @@ id:
   view_important_dates_173c7e1b: "Lihat Tanggal Penting"
   view_in_canvas_apps_156f9f2e: "Lihat di Aplikasi Canvas"
   view_inline_ffb3928b: "Lihat Inline"
+  view_installation_b532aaf1: "Lihat Pemasangan"
   view_instructure_identity_information_fea4c5c2: "Lihat Informasi Identitas Instructure"
   view_issues_6da5b0ff: "Lihat Masalah"
   view_key_details_38208652: "Lihat detail kunci"
   view_locate_the_outcome_and_click_the_dd0ae03c: "lihat, temukan capaian, dan klik"
   view_login_ids_for_users_142bbe7a: "Lihat id login untuk pengguna"
   view_longer_description_6b762087: "lihat deskripsi lebih panjang"
+  view_lti_configuration_documentation_248e5f64: "Lihat Dokumentasi Konfigurasi LTI"
   view_lti_key_name_in_canvas_apps_9ef69151: "Lihat kunci LTI LTI %{name} di Aplikasi Canvas"
   view_mastery_report_7b7c9bc7: "Lihat Laporan Penguasaan"
   view_missing_missing_items_for_course_coursename_e7509012: "Lihat %{missing} item yang tidak ada untuk kursus %{courseName}"
+  view_mode_9149135e: "Lihat Mode"
   view_module_name_assign_to_e2a705eb: "Lihat %{module_name}Tetapkan Kepada"
   view_name_app_62a2ad8e: "Lihat app %{name}"
   view_name_user_tags_6e8306e3: "Lihat grup pengguna %{name}"
@@ -31644,6 +31898,7 @@ id:
       periodic_message: "Instalasi Canvas ini hanya untuk testing dan *akan diatur ulang secara berkala.*"
       title: "Instalasi Tes Canvas"
   was_not_selected_30d63a10: dipilih
+  was_this_translation_helpful_61874489: "Apakah terjemahan ini bermanfaat?"
   watermark_c93fae0d: Watermark
   watermark_opacity_ce3d3097: "Tingkat Kegelapan Watermark"
   watermarks_other_images_e970fc6a: "Watermark & Gambar Lain"
@@ -31912,6 +32167,7 @@ id:
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Jika diaktifkan, ketentuan Kuis Baru akan menggunakan Pengguna Layanan Admin
       Situs khusus dan DeveloperKey untuk menghasilkan token akses dan penyegaran
+  when_enabled_new_quizzes_requests_are_routed_throu_605bdb0b: "Saat diaktifkan, permintaan Kuis Baru dialihkan melalui API Gateway."
   when_enabled_prevents_marking_downstream_changes_o_fcebe666: "Saat diaktifkan, mencegah penandaan perubahan hilir pada modul saat menyinkronkan penghapusan kursus cetak biru"
   when_enabled_provides_a_specific_error_message_whe_27da5d92: |-
       Saat diaktifkan, akan memberikan pesan kesalahan khusus ketika pengguna mencoba membuat atau menyalin
@@ -32068,6 +32324,7 @@ id:
   who_can_create_new_courses_7a6c1338: "Siapa Bisa Membuat Kursus Baru"
   whoops_looks_like_nothing_is_here_f5c7dd44: "Ups... Sepertinya tidak ada apa-apa di sini!"
   why_can_t_i_create_an_access_token_11291d42: "Mengapa saya tidak dapat membuat token akses?"
+  why_is_self_assessment_disabled_6b84f827: "Mengapa penilaian mandiri dinonaktifkan?"
   why_it_matters_f2677514: "Mengapa ini penting"
   why_was_this_result_received_cfcd7cbd: "Kenapa hasil ini tercapai?"
   widget: 
@@ -32220,11 +32477,17 @@ id:
   will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
       Akan mengizinkan penyimpanan rancangan saat siswa mengetik balasannya ke topik diskusi
       dalam desain ulang diskusi
+  will_be_reviewed_by_7906a4c3: "Akan ditinjau oleh"
+  will_be_reviewed_by_subject_d928bb29: "akan ditinjau oleh %{subject}"
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Apakah kredensial yang dikeluarkan oleh kunci ini akan ditampilkan ke Canvas atau ke layanan rekan (mis., Data Canvas)?"
   will_display_the_version_history_for_edited_discus_bbb7dfa: "Akan menampilkan riwayat versi untuk entri diskusi yang diedit dalam Antarmuka Desain Ulang"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Akan menyimpan rata-rata semua skor Anda"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Akan menyimpan skor tertinggi dari semua skor Anda"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Akan menyimpan semua skor Anda yang terbaru"
+  will_not_be_reviewed_by_c7e17966: "Tidak akan ditinjau oleh"
+  will_not_be_reviewed_by_subject_6719ee41: "tidak akan ditinjau oleh %{subject}"
+  will_not_review_58178fdf: "Tidak akan meninjau"
+  will_not_review_subject_f2ee951e: "tidak akan meninjau %{subject}"
   will_paginate: 
     container_aria_label: Paginasi
     next_aria_label: "Halaman baru"
@@ -32245,6 +32508,8 @@ id:
     previous_aria_label: "Halaman sebelumnya"
     previous_label: "&#8592; Sebelumnya"
   will_publish_on_publish_date_8b42e1ec: "Akan diterbitkan pada %{publish_date}"
+  will_review_85cb0f6a: "Akan meninjau"
+  will_review_subject_9873ce7c: "akan meninjau %{subject}"
   will_translate_inbound_messages_and_allow_users_to_e1d4704c: "Akan menerjemahkan pesan masuk, dan memungkinkan pengguna menyertakan versi terjemahan pesan keluar mereka"
   will_unlock_966c3e43: "Akan membuka"
   wimba_conference: 
@@ -32268,6 +32533,7 @@ id:
   wmv_1119d032: WMV
   wolof_2cd9048f: Wolof
   word_count_c77fe3a6: "Jumlah Kata"
+  words_758998d1: kata
   work_and_create_together_c65f358b: "Kerjakan dan buat bersama"
   workflow_state_3a5c99d2: workflow_state
   workflow_state_allow_is_only_valid_for_site_admin__71dd26e2: "workflow_state 'izinkan' hanya valid untuk pendaftaran Admin Situs"
@@ -32330,6 +32596,7 @@ id:
     one: "Anda akan menghapus 1 diskusi. Anda yakin?"
     other: "Anda akan menghapus %{count} diskusi. Anda yakin?"
   you_are_about_to_delete_keyname_5e4ea92e: "Anda akan menghapus “%{keyName}”."
+  you_are_about_to_delete_label_a8cf8e7e: "Anda akan menghapus “%{label}”."
   you_are_about_to_delete_name_226610bb: "Anda akan menghapus \"%{name}\""
   you_are_about_to_exit_the_rubric_editor_any_unsave_aadd69dc: "Anda akan keluar dari editor rubrik. Perubahan yang belum disimpan akan hilang."
   you_are_about_to_import_sis_data_as_a_site_admin_i_a9baebe4: "Anda akan mengimpor data SIS sebagai admin situs ke akun yang tidak Anda kelola secara langsung."

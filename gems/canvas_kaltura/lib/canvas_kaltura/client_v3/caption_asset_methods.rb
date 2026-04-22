@@ -37,15 +37,15 @@ module CanvasKaltura
       # Creates a new caption asset for a media entry.
       #
       # @param media_entry_id [String] The Kaltura media entry ID
-      # @param language_code [String] The language code (e.g., "en", "es")
+      # @param language_code [String, nil] The language code (e.g., "en", "es").
       # @return [Hash] Hash representing the created caption asset
       # @return [nil] If the request fails
-      def create_caption_asset(media_entry_id, language_code)
+      def create_caption_asset(media_entry_id, language_code = nil)
         result = getRequest(:captionAsset,
                             :add,
                             ks: @ks,
                             entryId: media_entry_id,
-                            "captionAsset[languageCode]": language_code)
+                            **{ "captionAsset[languageCode]": language_code }.compact)
         return nil unless result
 
         node_to_hash(result)

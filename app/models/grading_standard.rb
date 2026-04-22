@@ -378,6 +378,12 @@ class GradingStandard < ApplicationRecord
     data.map { |name, value| { name:, value:, calculated_value: (value * scaling_factor).round(2) } }
   end
 
+  # Returns a correctly-cased key that matches the lookup key (ignoring case), or nil if no match is found
+  def matching_scheme_key(lookup_key)
+    matching_key, = ordered_scheme.find { |scheme_key, _| keys_match?(scheme_key, lookup_key) }
+    matching_key&.to_s
+  end
+
   private
 
   def scale_score(score)
@@ -393,6 +399,10 @@ class GradingStandard < ApplicationRecord
   end
 
   def index_of_key(key)
-    ordered_scheme.index { |scheme_key, _| scheme_key.to_s.casecmp?(key) }
+    ordered_scheme.index { |scheme_key, _| keys_match?(scheme_key, key) }
+  end
+
+  def keys_match?(key1, key2)
+    key1.to_s.casecmp?(key2.to_s)
   end
 end

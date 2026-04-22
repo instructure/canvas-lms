@@ -197,6 +197,7 @@ tr:
     track_uploaded_successfully: "İzleme başarıyla yüklendi; lütfen tarayıcınızı yenileyin."
     upload: Yükle
     uploading: Yükleniyor...
+  _23978503: "."
   _2d4c0d31: …
   _5a374287: "..."
   __376f89ea: "--"
@@ -12208,6 +12209,7 @@ tr:
   edit_rule_modal_9d4969c5: "Kural Düzenleme Penceresi"
   edit_section_name_558cc89: "\"%{name}\" ders bölümünü düzenle"
   edit_sections_7d0e4e34: "Bölümleri Düzenle"
+  edit_settings_b3ddad69: "Ayarları Düzenle"
   edit_settings_for_title_fb55e398: "%{title} için ayarları düzenle"
   edit_status_612572db: "Durumu düzenle"
   edit_status_dialog_for_editbuttonlabel_7e829fbd: "%{editButtonLabel} için Durum Düzenleme İletişim Kutusu"
@@ -22084,6 +22086,7 @@ tr:
   not_yet_graded_40475341: "Henüz Notlandırılmadı"
   not_yet_graded_8b655a7: "henüz notlandırılmadı"
   not_yet_submitted_2d2b7328: "Henüz Gönderilmedi"
+  note_2b416137: not
   note_8b73ce09: Not
   note_acbd8169: "Not, "
   note_associated_tools_are_only_listed_once_even_if_ab95c5f8: |-

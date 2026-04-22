@@ -29,8 +29,6 @@ import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('discovery_page')
 
-const UNSAFE_LABEL_PATTERN = /[<>"]/
-
 export function AuthProvider({
   card,
   isEditing,
@@ -75,14 +73,14 @@ export function AuthProvider({
   const handleDone = () => {
     const newErrors: CardFormErrors = {}
 
+    // label sanitization (HTML stripping, entity encoding) is handled
+    // server-side by Sanitize.clean (only check for presence here)
     if (!draftLabel.trim()) {
-      newErrors.label = I18n.t('Label is required')
-    } else if (UNSAFE_LABEL_PATTERN.test(draftLabel)) {
-      newErrors.label = I18n.t('Label must not contain <, >, or " characters')
+      newErrors.label = I18n.t('Please enter a label.')
     }
 
     if (draftProviderId === null) {
-      newErrors.providerId = I18n.t('Authentication provider is required')
+      newErrors.providerId = I18n.t('Please choose an authentication provider.')
     }
 
     if (Object.keys(newErrors).length > 0) {

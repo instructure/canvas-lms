@@ -292,7 +292,8 @@ module Api::V1::User
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup
     only = only.without(:course_section_id) if excludes.include?("course_section_id")
-    unless enrollment.course.root_account.feature_enabled?(:temporary_enrollments)
+    temp_enrollments_enabled = enrollment.course.root_account.feature_enabled?(:temporary_enrollments)
+    unless temp_enrollments_enabled
       only = only.without(:temporary_enrollment_source_user_id, :temporary_enrollment_pairing_id)
     end
     api_json(enrollment, user, session, only:).tap do |json|
@@ -351,6 +352,9 @@ module Api::V1::User
       if includes.include?("temporary_enrollment_providers") && enrollment.temporary_enrollment_source_user_id
         provider = api_find(User, enrollment.temporary_enrollment_source_user_id)
         json[:temporary_enrollment_provider] = user_json(provider, user, session, user_includes) unless provider.deleted?
+      end
+      if enrollment.temporary_enrollment? && temp_enrollments_enabled
+        json[:temporary_enrollment_display_state] = enrollment.temporary_enrollment_display_state
       end
     end
   end

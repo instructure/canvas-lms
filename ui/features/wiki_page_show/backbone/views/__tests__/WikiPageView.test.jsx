@@ -21,7 +21,7 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageView from '../WikiPageView'
-import ReactDOM from 'react-dom'
+import * as canvasReact from '@canvas/react'
 import $ from 'jquery'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.simulate'
@@ -154,7 +154,7 @@ describe('WikiPageView', () => {
     beforeEach(() => {
       $('<div id="direct-share-mount-point">').appendTo('#fixtures')
       fakeENV.setup({DIRECT_SHARE_ENABLED: true})
-      vi.spyOn(ReactDOM, 'render').mockImplementation(() => {})
+      vi.spyOn(canvasReact, 'legacyRender').mockImplementation(() => {})
     })
 
     afterEach(() => {
@@ -174,13 +174,13 @@ describe('WikiPageView', () => {
       view.$('.al-trigger').simulate('click')
       view.$('.direct-share-send-to-menu-item').simulate('click')
 
-      const props = ReactDOM.render.mock.calls[0][0].props
+      const props = canvasReact.legacyRender.mock.calls[0][0].props
       expect(props.open).toBe(true)
       expect(props.sourceCourseId).toBe('123')
       expect(props.contentShare).toEqual({content_type: 'page', content_id: '42'})
       props.onDismiss()
 
-      expect(ReactDOM.render.mock.lastCall[0].props.open).toBe(false)
+      expect(canvasReact.legacyRender.mock.lastCall[0].props.open).toBe(false)
     })
 
     test.skip('opens and closes copy to tray', () => {
@@ -193,13 +193,13 @@ describe('WikiPageView', () => {
       view.$('.al-trigger').simulate('click')
       view.$('.direct-share-copy-to-menu-item').simulate('click')
 
-      const props = ReactDOM.render.mock.calls[0][0].props
+      const props = canvasReact.legacyRender.mock.calls[0][0].props
       expect(props.open).toBe(true)
       expect(props.sourceCourseId).toBe('123')
       expect(props.contentSelection).toEqual({pages: ['42']})
       props.onDismiss()
 
-      expect(ReactDOM.render.mock.lastCall[0].props.open).toBe(false)
+      expect(canvasReact.legacyRender.mock.lastCall[0].props.open).toBe(false)
     })
   })
 

@@ -156,7 +156,8 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
                Mutations::UpdateWidgetDashboardConfig,
                Mutations::UpdateWidgetDashboardLayout,
                Mutations::AcceptEnrollmentInvitation,
-               Mutations::RejectEnrollmentInvitation].include? mutation
+               Mutations::RejectEnrollmentInvitation,
+               Mutations::SubmitAutoGradeFeedback].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 

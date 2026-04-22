@@ -19,6 +19,7 @@
 #
 
 class Mutations::UpdateWidgetDashboardLayout < Mutations::BaseMutation
+  argument :dashboard_type, Types::WidgetDashboardTypeEnum, required: false
   argument :layout, String, required: true
 
   field :layout, String, null: true
@@ -34,12 +35,24 @@ class Mutations::UpdateWidgetDashboardLayout < Mutations::BaseMutation
       end
     end
 
-    config = current_user.get_preference(:widget_dashboard_config) || {}
+    pref_key = educator_dashboard?(input) ? :educator_dashboard_config : :widget_dashboard_config
+    config = current_user.get_preference(pref_key) || {}
     config["layout"] = layout_value
-    current_user.set_preference(:widget_dashboard_config, config)
+    current_user.set_preference(pref_key, config)
 
     { layout: layout_value&.to_json }
   rescue JSON::ParserError
     validation_error(I18n.t("Invalid JSON format for widget dashboard layout"))
+  end
+
+  private
+
+  # TODO: Remove this entire helper method once platform-ui passes dashboard_type (EGG-2539)
+  # The resolver should directly use input[:dashboard_type] after that.
+  def educator_dashboard?(input)
+    return input[:dashboard_type] == "educator" if input[:dashboard_type].present?
+
+    context[:domain_root_account]&.feature_enabled?(:educator_dashboard) &&
+      current_user.educator_dashboard_user?
   end
 end

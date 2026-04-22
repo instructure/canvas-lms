@@ -348,6 +348,10 @@ module WidgetDashboardPage
     "[data-testid='todo-checkbox-#{item_id}']"
   end
 
+  def todo_checkbox_icon_selector(item_id)
+    "#{todo_checkbox_selector(item_id)} svg[name]"
+  end
+
   def todo_item_course_link_selector(item_id)
     "[data-testid='todo-item-course-link-#{item_id}']"
   end

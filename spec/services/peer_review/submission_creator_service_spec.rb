@@ -22,6 +22,7 @@ RSpec.describe PeerReview::SubmissionCreatorService do
   let(:assessor) { user_model(name: "Assessor User") }
   let(:student1) { user_model(name: "Student 1") }
   let(:student2) { user_model(name: "Student 2") }
+  let(:student3) { user_model(name: "Student 3") }
 
   let(:parent_assignment) do
     assignment_model(
@@ -39,6 +40,7 @@ RSpec.describe PeerReview::SubmissionCreatorService do
 
   let(:earliest_time) { 3.hours.ago }
   let(:later_time) { 1.hour.ago }
+  let(:latest_time) { 30.minutes.ago }
 
   let(:service) { described_class.new(parent_assignment:, assessor:) }
 
@@ -47,25 +49,33 @@ RSpec.describe PeerReview::SubmissionCreatorService do
     create_enrollment(course, assessor, enrollment_state: "active")
     create_enrollment(course, student1, enrollment_state: "active")
     create_enrollment(course, student2, enrollment_state: "active")
+    create_enrollment(course, student3, enrollment_state: "active")
   end
 
-  def create_assessment_request(user:, submission:, assessor:, workflow_state: "completed")
+  def create_assessment_request(user:, submission:, assessor:, workflow_state: "assigned", peer_review_sub_assignment_id: nil)
     AssessmentRequest.create!(
       user:,
       asset: submission,
       assessor_asset: submission_model(assignment: parent_assignment, user: assessor),
       assessor:,
-      workflow_state:
+      workflow_state:,
+      peer_review_sub_assignment_id: peer_review_sub_assignment_id || ((workflow_state == "assigned") ? peer_review_sub_assignment.id : nil)
     )
   end
 
-  def create_submission_comment(submission:, author:, created_at:, comment: "Test comment")
-    SubmissionComment.create!(
-      submission:,
-      author:,
-      comment:,
-      created_at:
-    )
+  def assessor_peer_review_submission
+    peer_review_sub_assignment.submissions.find_by(user_id: assessor.id)
+  end
+
+  def submit_peer_review_comment(student:, assessment_request:, at: Time.zone.now)
+    Timecop.freeze(at) do
+      parent_assignment.add_submission_comment(
+        student,
+        comment: "Peer review feedback for #{student.name}",
+        author: assessor,
+        assessment_request:
+      )
+    end
   end
 
   def create_rubric_assessment(rubric:, user:, assessor:, artifact:, created_at:)
@@ -79,7 +89,7 @@ RSpec.describe PeerReview::SubmissionCreatorService do
     )
   end
 
-  def setup_basic_assessment_requests
+  def setup_basic_assessment_requests_assigned
     @submission1 = submission_model(assignment: parent_assignment, user: student1)
     @submission2 = submission_model(assignment: parent_assignment, user: student2)
 
@@ -92,6 +102,24 @@ RSpec.describe PeerReview::SubmissionCreatorService do
       user: student2,
       submission: @submission2,
       assessor:
+    )
+  end
+
+  def setup_basic_assessment_requests_completed
+    @submission1 = submission_model(assignment: parent_assignment, user: student1)
+    @submission2 = submission_model(assignment: parent_assignment, user: student2)
+
+    @assessment_request1 = create_assessment_request(
+      user: student1,
+      submission: @submission1,
+      assessor:,
+      workflow_state: "completed"
+    )
+    @assessment_request2 = create_assessment_request(
+      user: student2,
+      submission: @submission2,
+      assessor:,
+      workflow_state: "completed"
     )
   end
 
@@ -118,26 +146,6 @@ RSpec.describe PeerReview::SubmissionCreatorService do
     @assessment_request2.update!(rubric_assessment: @rubric_assessment2)
   end
 
-  def setup_submission_comments(first_create_time: earliest_time, second_create_time: later_time)
-    parent_assignment.update!(rubric: nil)
-
-    @comment1 = create_submission_comment(
-      submission: @submission1,
-      author: assessor,
-      comment: "Good work!",
-      created_at: first_create_time
-    )
-    @comment2 = create_submission_comment(
-      submission: @submission2,
-      author: assessor,
-      comment: "Needs improvement",
-      created_at: second_create_time
-    )
-
-    @assessment_request1.submission_comments << @comment1
-    @assessment_request2.submission_comments << @comment2
-  end
-
   describe "#initialize" do
     it "inherits from SubmissionCommonService" do
       expect(described_class.superclass).to eq(PeerReview::SubmissionCommonService)
@@ -162,7 +170,7 @@ RSpec.describe PeerReview::SubmissionCreatorService do
     context "when all conditions are met" do
       before do
         peer_review_sub_assignment
-        setup_basic_assessment_requests
+        setup_basic_assessment_requests_completed
       end
 
       it "creates a peer review submission" do
@@ -182,10 +190,24 @@ RSpec.describe PeerReview::SubmissionCreatorService do
           setup_rubric_assessments
         end
 
-        it "uses the earliest rubric assessment time" do
+        it "uses the rubric assessment time that meets the required peer reviews count" do
+          submission3 = submission_model(assignment: parent_assignment, user: student3)
+          assessment_request3 = create_assessment_request(user: student3, submission: submission3, assessor:, workflow_state: "completed")
+          extra_assessment = create_rubric_assessment(
+            rubric: @rubric,
+            user: student3,
+            assessor:,
+            artifact: submission3,
+            created_at: latest_time
+          )
+          assessment_request3.update!(rubric_assessment: extra_assessment)
+          # create_assessment_request calls submission_model internally which resets
+          # the in-memory rubric association on parent_assignment — restore it
+          parent_assignment.update!(rubric: @rubric)
+
           result = service.call
           expect(result.submitted_at).not_to be_nil
-          expect(result.submitted_at).to eq earliest_time
+          expect(result.submitted_at).to eq later_time
         end
 
         it "ignores deleted rubric assessments" do
@@ -196,38 +218,47 @@ RSpec.describe PeerReview::SubmissionCreatorService do
           expect(result.submitted_at).to eq later_time
         end
       end
+    end
 
-      context "with submission comments" do
-        before do
-          setup_submission_comments
-        end
-
-        it "uses the earliest submission comment time" do
-          result = service.call
-
-          expect(result.submitted_at).not_to be_nil
-          expect(result.submitted_at).to eq earliest_time
-        end
-
-        it "ignores deleted submission comments" do
-          @comment1.destroy
-
-          result = service.call
-          expect(result.submitted_at).not_to be_nil
-          expect(result.submitted_at).to eq later_time
-        end
+    context "with submission comments via production flow" do
+      before do
+        peer_review_sub_assignment
+        parent_assignment.update!(rubric: nil)
+        setup_basic_assessment_requests_assigned
       end
 
-      context "when legacy mode is enabled" do
-        before do
-          setup_submission_comments
-          course.disable_feature!(:peer_review_allocation_and_grading)
-        end
+      it "uses the submission comment time that meets the required peer reviews count" do
+        submission3 = submission_model(assignment: parent_assignment, user: student3)
+        ar3 = create_assessment_request(user: student3, submission: submission3, assessor:)
 
-        it "sets submitted_at correctly" do
-          result = service.call
-          expect(result.submitted_at).to eq(earliest_time)
-        end
+        submit_peer_review_comment(student: student1, assessment_request: @assessment_request1, at: earliest_time)
+        submit_peer_review_comment(student: student2, assessment_request: @assessment_request2, at: later_time)
+        submit_peer_review_comment(student: student3, assessment_request: ar3, at: latest_time)
+
+        pr_submission = assessor_peer_review_submission
+        expect(pr_submission.submitted_at).not_to be_nil
+        expect(pr_submission.submitted_at).to be_within(1.second).of(later_time)
+      end
+    end
+
+    context "when legacy mode is enabled" do
+      before do
+        peer_review_sub_assignment
+        parent_assignment.update!(rubric: nil)
+        setup_basic_assessment_requests_assigned
+        course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "sets submitted_at correctly" do
+        submission3 = submission_model(assignment: parent_assignment, user: student3)
+        ar3 = create_assessment_request(user: student3, submission: submission3, assessor:)
+
+        submit_peer_review_comment(student: student1, assessment_request: @assessment_request1, at: earliest_time)
+        submit_peer_review_comment(student: student2, assessment_request: @assessment_request2, at: later_time)
+        submit_peer_review_comment(student: student3, assessment_request: ar3, at: latest_time)
+
+        pr_submission = assessor_peer_review_submission
+        expect(pr_submission.submitted_at).to be_within(1.second).of(later_time)
       end
     end
 
@@ -263,7 +294,7 @@ RSpec.describe PeerReview::SubmissionCreatorService do
 
       it "creates submission if peer_review_sub_assignment exists even when feature is disabled" do
         peer_review_sub_assignment
-        setup_basic_assessment_requests
+        setup_basic_assessment_requests_completed
 
         course.disable_feature!(:peer_review_allocation_and_grading)
 
@@ -298,13 +329,66 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         create_assessment_request(
           user: student1,
           submission: submission1,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
       end
 
       it "returns nil" do
         expect(service.call).to be_nil
       end
+    end
+  end
+
+  describe "integration: submitted_at via add_submission_comment" do
+    before do
+      peer_review_sub_assignment
+      parent_assignment.update!(rubric: nil)
+      setup_basic_assessment_requests_assigned
+    end
+
+    it "sets submitted_at to the time of the last required comment, not the first" do
+      submission3 = submission_model(assignment: parent_assignment, user: student3)
+      ar3 = create_assessment_request(user: student3, submission: submission3, assessor:)
+
+      submit_peer_review_comment(student: student1, assessment_request: @assessment_request1, at: earliest_time)
+      submit_peer_review_comment(student: student2, assessment_request: @assessment_request2, at: later_time)
+      submit_peer_review_comment(student: student3, assessment_request: ar3, at: latest_time)
+
+      pr_submission = assessor_peer_review_submission
+      expect(pr_submission).not_to be_nil
+      expect(pr_submission.workflow_state).to eq("submitted")
+      expect(pr_submission.submitted_at).to be_within(1.second).of(later_time)
+    end
+  end
+
+  describe "peer_reviews_submitted_at with multiple comments per assessment request" do
+    before do
+      peer_review_sub_assignment
+      parent_assignment.update!(rubric: nil)
+      setup_basic_assessment_requests_assigned
+    end
+
+    it "uses the earliest comment per assessment request, then picks the Nth required" do
+      submission3 = submission_model(assignment: parent_assignment, user: student3)
+      ar3 = create_assessment_request(user: student3, submission: submission3, assessor:)
+
+      submit_peer_review_comment(student: student1, assessment_request: @assessment_request1, at: 4.hours.ago)
+
+      Timecop.freeze(3.hours.ago) do
+        @submission1.add_comment(
+          comment: "Follow-up on review 1",
+          author: assessor,
+          assessment_request: @assessment_request1
+        )
+      end
+
+      submit_peer_review_comment(student: student2, assessment_request: @assessment_request2, at: 1.hour.ago)
+      submit_peer_review_comment(student: student3, assessment_request: ar3, at: 30.minutes.ago)
+
+      pr_submission = assessor_peer_review_submission
+      expect(pr_submission).not_to be_nil
+      expect(pr_submission.submitted_at).to be_within(1.second).of(1.hour.ago)
     end
   end
 
@@ -476,12 +560,14 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         assessment_request1 = create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
         assessment_request2 = create_assessment_request(
           user: student2,
           submission: @submission2,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
 
         result = service.send(:completed_assessment_requests)
@@ -492,8 +578,7 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor:,
-          workflow_state: "assigned"
+          assessor:
         )
 
         result = service.send(:completed_assessment_requests)
@@ -505,7 +590,8 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor: other_assessor
+          assessor: other_assessor,
+          workflow_state: "completed"
         )
 
         result = service.send(:completed_assessment_requests)
@@ -545,12 +631,14 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
         create_assessment_request(
           user: student2,
           submission: @submission2,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
 
         expect(service.send(:required_peer_reviews_met?)).to be true
@@ -560,7 +648,8 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
 
         expect(service.send(:required_peer_reviews_met?)).to be false
@@ -582,17 +671,20 @@ RSpec.describe PeerReview::SubmissionCreatorService do
         create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
         create_assessment_request(
           user: student2,
           submission: @submission2,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
         create_assessment_request(
           user: student3,
           submission: submission3,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
 
         expect(service.send(:required_peer_reviews_met?)).to be true
@@ -601,17 +693,20 @@ RSpec.describe PeerReview::SubmissionCreatorService do
 
     describe "#peer_reviews_submitted_at" do
       before do
+        peer_review_sub_assignment
         @submission1 = submission_model(assignment: parent_assignment, user: student1)
         @submission2 = submission_model(assignment: parent_assignment, user: student2)
         @assessment_request1 = create_assessment_request(
           user: student1,
           submission: @submission1,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
         @assessment_request2 = create_assessment_request(
           user: student2,
           submission: @submission2,
-          assessor:
+          assessor:,
+          workflow_state: "completed"
         )
       end
 
@@ -644,9 +739,9 @@ RSpec.describe PeerReview::SubmissionCreatorService do
           @assessment_request2.update!(rubric_assessment: @rubric_assessment2)
         end
 
-        it "returns the earliest rubric assessment creation time" do
+        it "returns the creation time of the rubric assessment that meets the required peer reviews count" do
           result = service.send(:peer_reviews_submitted_at)
-          expect(result).to eq(@rubric_assessment1.created_at)
+          expect(result).to eq(@rubric_assessment2.created_at)
         end
 
         it "ignores deleted rubric assessments" do
@@ -656,40 +751,125 @@ RSpec.describe PeerReview::SubmissionCreatorService do
           expect(result).not_to be_nil
           expect(result).to eq(@rubric_assessment2.created_at)
         end
+
+        it "ignores extra rubric assessments beyond required count" do
+          submission3 = submission_model(assignment: parent_assignment, user: student3)
+          assessment_request3 = create_assessment_request(user: student3, submission: submission3, assessor:, workflow_state: "completed")
+          extra_assessment = create_rubric_assessment(
+            rubric: @rubric,
+            user: student3,
+            assessor:,
+            artifact: submission3,
+            created_at: 30.minutes.from_now
+          )
+
+          assessment_request3.update!(rubric_assessment: extra_assessment)
+          # create_assessment_request calls submission_model internally which resets
+          # the in-memory rubric association on parent_assignment — restore it
+          parent_assignment.update!(rubric: @rubric)
+
+          result = service.send(:peer_reviews_submitted_at)
+          expect(result).to eq(@rubric_assessment2.created_at)
+        end
       end
 
       context "with submission comments" do
         before do
           parent_assignment.update!(rubric: nil)
-
-          @comment1 = create_submission_comment(
-            submission: @submission1,
-            author: assessor,
-            comment: "Good work!",
-            created_at: earliest_time
-          )
-          @comment2 = create_submission_comment(
-            submission: @submission2,
-            author: assessor,
-            comment: "Needs improvement",
-            created_at: later_time
-          )
-
-          @assessment_request1.submission_comments << @comment1
-          @assessment_request2.submission_comments << @comment2
         end
 
-        it "returns the earliest submission comment creation time" do
+        it "returns the creation time of the submission comment that meets the required peer reviews count" do
+          comment1 = SubmissionComment.create!(
+            submission: @submission1, author: assessor, comment: "Good work!", created_at: earliest_time
+          )
+          comment2 = SubmissionComment.create!(
+            submission: @submission2, author: assessor, comment: "Needs improvement", created_at: later_time
+          )
+          @assessment_request1.submission_comments << comment1
+          @assessment_request2.submission_comments << comment2
+
           result = service.send(:peer_reviews_submitted_at)
-          expect(result).to eq(@comment1.created_at)
+          expect(result).to eq(comment2.created_at)
         end
 
         it "ignores deleted submission comments" do
-          @comment1.destroy
+          comment1 = SubmissionComment.create!(
+            submission: @submission1, author: assessor, comment: "Good work!", created_at: earliest_time
+          )
+          comment2 = SubmissionComment.create!(
+            submission: @submission2, author: assessor, comment: "Needs improvement", created_at: later_time
+          )
+          @assessment_request1.submission_comments << comment1
+          @assessment_request2.submission_comments << comment2
+
+          comment1.destroy
 
           result = service.send(:peer_reviews_submitted_at)
           expect(result).not_to be_nil
-          expect(result).to eq(@comment2.created_at)
+          expect(result).to eq(comment2.created_at)
+        end
+
+        it "ignores extra submission comments beyond required count" do
+          comment1 = SubmissionComment.create!(
+            submission: @submission1, author: assessor, comment: "Good work!", created_at: earliest_time
+          )
+          comment2 = SubmissionComment.create!(
+            submission: @submission2, author: assessor, comment: "Needs improvement", created_at: later_time
+          )
+          @assessment_request1.submission_comments << comment1
+          @assessment_request2.submission_comments << comment2
+
+          submission3 = submission_model(assignment: parent_assignment, user: student3)
+          assessment_request3 = create_assessment_request(user: student3, submission: submission3, assessor:, workflow_state: "completed")
+          extra_comment = SubmissionComment.create!(
+            submission: submission3, author: assessor, comment: "Extra review", created_at: 30.minutes.from_now
+          )
+          assessment_request3.submission_comments << extra_comment
+
+          result = service.send(:peer_reviews_submitted_at)
+          expect(result).to eq(comment2.created_at)
+        end
+      end
+
+      context "when peer_review_count is 0" do
+        context "with rubric assessments" do
+          before do
+            peer_review_sub_assignment.update!(peer_review_count: 0)
+            @rubric = rubric_model(context: course)
+            parent_assignment.update!(rubric: @rubric)
+
+            @rubric_assessment1 = create_rubric_assessment(
+              rubric: @rubric,
+              user: student1,
+              assessor:,
+              artifact: @submission1,
+              created_at: earliest_time
+            )
+
+            @assessment_request1.update!(rubric_assessment: @rubric_assessment1)
+          end
+
+          it "returns nil when required count is 0" do
+            result = service.send(:peer_reviews_submitted_at)
+            expect(result).to be_nil
+          end
+        end
+
+        context "with submission comments" do
+          before do
+            peer_review_sub_assignment.update!(peer_review_count: 0)
+            parent_assignment.update!(rubric: nil)
+
+            comment1 = SubmissionComment.create!(
+              submission: @submission1, author: assessor, comment: "Good work!", created_at: earliest_time
+            )
+            @assessment_request1.submission_comments << comment1
+          end
+
+          it "returns nil when required count is 0" do
+            result = service.send(:peer_reviews_submitted_at)
+            expect(result).to be_nil
+          end
         end
       end
     end

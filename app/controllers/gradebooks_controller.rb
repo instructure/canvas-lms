@@ -73,7 +73,6 @@ class GradebooksController < ApplicationController
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
              custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false),
-             consolidated_media_player: Account.site_admin.feature_enabled?(:consolidated_media_player),
            })
     return render :grade_summary_list unless @presenter.student
 
@@ -833,6 +832,7 @@ class GradebooksController < ApplicationController
                context_url: named_context_url(@context, :context_url),
                ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
                OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
+               LMGB_STUDENT_REPORTING: @context.feature_enabled?(:lmgb_student_reporting),
                outcome_proficiency:,
                message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
                permissions: {

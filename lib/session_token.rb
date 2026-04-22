@@ -19,14 +19,15 @@
 #
 
 class SessionToken
-  attr_accessor :pseudonym_id, :created_at, :current_user_id, :used_remember_me_token
+  attr_accessor :pseudonym_id, :created_at, :current_user_id, :used_remember_me_token, :consent_from_mobile
   attr_writer :signature
 
-  def initialize(pseudonym_id, current_user_id: nil, used_remember_me_token: nil)
+  def initialize(pseudonym_id, current_user_id: nil, used_remember_me_token: nil, consent_from_mobile: nil)
     self.created_at = Time.now.utc
     self.pseudonym_id = pseudonym_id
     self.current_user_id = current_user_id
     self.used_remember_me_token = used_remember_me_token
+    self.consent_from_mobile = consent_from_mobile
     self.signature = nil
   end
 
@@ -40,6 +41,7 @@ class SessionToken
       result["pseudonym_id"].is_a?(Integer) &&
       (result["current_user_id"].nil? || result["current_user_id"].is_a?(Integer)) &&
       [nil, true, false].include?(result["used_remember_me_token"]) &&
+      [nil, true, false].include?(result["consent_from_mobile"]) &&
       result["signature"].is_a?(String)
 
     # reconstruct token (validation of values for created_at and signature will
@@ -67,6 +69,7 @@ class SessionToken
       pseudonym_id: pseudonym_id.to_i,
       current_user_id: current_user_id&.to_i,
       used_remember_me_token: used_remember_me_token.nil? ? nil : !!used_remember_me_token,
+      consent_from_mobile: consent_from_mobile.nil? ? nil : !!consent_from_mobile,
       signature: signature.to_s
     }
   end
@@ -81,7 +84,8 @@ class SessionToken
     [created_at.to_i.to_s,
      pseudonym_id.to_s,
      current_user_id.to_s,
-     used_remember_me_token.to_s]
+     used_remember_me_token.to_s,
+     consent_from_mobile].compact
   end
 
   def signature_string

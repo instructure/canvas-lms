@@ -124,6 +124,20 @@ describe Types::UserType do
         expect(user_type_as_admin.resolve("loginId", current_user: @other_student)).to be_nil
       end
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      tester = GraphQLTypeTester.new(
+        @student,
+        current_user: admin,
+        domain_root_account: @course.account.root_account,
+        course: @course,
+        request: ActionDispatch::TestRequest.create
+      )
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: admin)).and_call_original
+      tester.resolve("loginId")
+    end
   end
 
   context "shortName" do
@@ -1515,6 +1529,64 @@ describe Types::UserType do
         .and_return(loader_instance)
 
       resolve_user_type
+    end
+  end
+
+  context "institutional_tags_connection" do
+    def resolve_institutional_tags(account_id = @root_account.id, tester: nil)
+      tester ||= user_type
+      tester.resolve(%|institutionalTagsConnection(accountId: "#{account_id}") { nodes { _id } }|)
+    end
+
+    before(:once) do
+      @root_account = Account.default
+      @root_account.enable_feature!(:institutional_tags)
+      @admin = account_admin_user(account: @root_account)
+      @category = institutional_tag_category_model(account: @root_account)
+      @tag1 = institutional_tag_model(account: @root_account, category: @category, name: "Alumni")
+      @tag2 = institutional_tag_model(account: @root_account, category: @category, name: "Staff")
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag1, user: @student)
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag2, user: @student)
+    end
+
+    let(:admin_tester) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @admin,
+        domain_root_account: @root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "calls InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "passes correct arguments to InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .with(@admin, anything, @root_account.id.to_s)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "returns institutional tags for the user" do
+      result = resolve_institutional_tags(tester: admin_tester)
+      expect(result).to match_array([@tag1.id.to_s, @tag2.id.to_s])
+    end
+
+    it "returns nil when the current_user lacks permission" do
+      # @teacher is not an account admin so lacks manage_institutional_tags_view
+      expect(resolve_institutional_tags).to be_nil
     end
   end
 
@@ -3044,6 +3116,38 @@ describe Types::UserType do
         expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
         expect(titles).not_to include("Concluded Course Announcement")
       end
+
+      it "excludes announcements from courses where student has only an invited enrollment" do
+        invited_course = course_factory(active_all: true)
+        invited_course.enroll_student(@student_user, enrollment_state: "invited")
+        invited_announcement = invited_course.announcements.create!(
+          title: "Invited Course Announcement",
+          message: "Should not appear"
+        )
+        @student_user.discussion_topic_participants.find_or_create_by!(discussion_topic: invited_announcement)
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Invited Course Announcement")
+      end
+
+      it "returns each announcement exactly once when student has multiple enrollments in same course" do
+        section_b = @course1.course_sections.create!(name: "Section B")
+        @course1.enroll_student(
+          @student_user,
+          section: section_b,
+          enrollment_state: "active",
+          allow_multiple_enrollments: true
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles.count("Course 1 Announcement")).to eq(1)
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+      end
     end
   end
 
@@ -3297,6 +3401,101 @@ describe Types::UserType do
 
         result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
         expect(result).to include("Excused Assignment")
+      end
+    end
+
+    context "onlyGradedOrWithFeedback filter" do
+      before(:once) do
+        Timecop.freeze(@frozen_time) do
+          @graded_assignment = @course.assignments.create!(
+            title: "Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @graded_submission = @graded_assignment.submissions.find_or_create_by(user: @student)
+          @graded_submission.update!(
+            workflow_state: "graded",
+            score: 85,
+            grade: "B",
+            submitted_at: @frozen_time - 1.week,
+            posted_at: @frozen_time - 1.week,
+            grader_id: @teacher.id
+          )
+
+          @feedback_only_assignment = @course.assignments.create!(
+            title: "Feedback Only Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @feedback_only_submission = @feedback_only_assignment.submissions.find_or_create_by(user: @student)
+          @feedback_only_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 2.weeks,
+            posted_at: @frozen_time - 2.weeks
+          )
+          @feedback_only_submission.update_column(:last_comment_at, @frozen_time - 2.weeks)
+
+          @no_feedback_assignment = @course.assignments.create!(
+            title: "Submitted No Feedback Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @no_feedback_submission = @no_feedback_assignment.submissions.find_or_create_by(user: @student)
+          @no_feedback_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 1.week
+          )
+        end
+      end
+
+      it "returns graded submissions" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Graded Assignment")
+        end
+      end
+
+      it "returns submissions with recent instructor feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Feedback Only Assignment")
+        end
+      end
+
+      it "does not return submitted submissions without a grade or feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Submitted No Feedback Assignment")
+        end
+      end
+
+      it "does not return unsubmitted assignments" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Test Assignment")
+        end
+      end
+
+      it "does not return graded submissions older than 4 weeks" do
+        Timecop.freeze(@frozen_time) do
+          old_assignment = @course.assignments.create!(
+            title: "Old Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          old_submission = old_assignment.submissions.find_or_create_by(user: @student)
+          old_submission.update!(
+            workflow_state: "graded",
+            score: 90,
+            submitted_at: @frozen_time - 5.weeks,
+            posted_at: @frozen_time - 5.weeks,
+            grader_id: @teacher.id
+          )
+          old_submission.update_column(:created_at, @frozen_time - 5.weeks)
+
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Old Graded Assignment")
+        end
       end
     end
 

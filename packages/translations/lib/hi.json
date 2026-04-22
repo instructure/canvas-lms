@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "बंद करें"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "कुंजीपटल शॉर्टकट मोडल बंद करें"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "बंद कैप्शन फ़ाइल { maxKb } kb से कम होनी चाहिए"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "कृपया समर्थित प्लेटफ़ॉर्म से मान्य वीडियो URL दर्ज करें।"
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "कृपया अपलोड करने से पहले कोई फ़ाइल चुनें।"
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "कृपया समर्थित प्रकार की फ़ाइल चुनें"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "लिंक विकल्प दिखाएं"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "रोलिंग ट्रांसक्रिप्ट दिखाएं"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "रोलिंग ट्रांसक्रिप्ट दिखाएं"

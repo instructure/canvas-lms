@@ -51,11 +51,3 @@ module ActiveModel
     end
   end
 end
-
-require_relative "../app/serializers/canvas/api_serialization"
-require_relative "../app/serializers/canvas/api_serializer"
-require_relative "../app/serializers/canvas/api_array_serializer"
-
-Dir[File.expand_path(File.dirname(__FILE__) + "/../app/serializers/*.rb")].each do |file|
-  require file
-end

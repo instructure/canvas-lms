@@ -43,46 +43,6 @@ const defaultProps = () => ({
 })
 
 describe('AuthProvider label validation', () => {
-  it('shows error when label contains script tags', async () => {
-    const user = userEvent.setup()
-    const props = defaultProps()
-    props.card = makeCard({label: '<script>alert(1)</script>'})
-    render(<AuthProvider {...props} />)
-    await user.click(screen.getByTestId('auth-provider-done-button'))
-    expect(screen.getByText(/must not contain/)).toBeInTheDocument()
-    expect(props.onEditDone).not.toHaveBeenCalled()
-  })
-
-  it('shows error when label contains img tag with event handler', async () => {
-    const user = userEvent.setup()
-    const props = defaultProps()
-    props.card = makeCard({label: '<img src=x onerror=alert(1)>'})
-    render(<AuthProvider {...props} />)
-    await user.click(screen.getByTestId('auth-provider-done-button'))
-    expect(screen.getByText(/must not contain/)).toBeInTheDocument()
-    expect(props.onEditDone).not.toHaveBeenCalled()
-  })
-
-  it('shows error when label contains double-quote attribute injection', async () => {
-    const user = userEvent.setup()
-    const props = defaultProps()
-    props.card = makeCard({label: '" onclick="alert(\'xss\')"'})
-    render(<AuthProvider {...props} />)
-    await user.click(screen.getByTestId('auth-provider-done-button'))
-    expect(screen.getByText(/must not contain/)).toBeInTheDocument()
-    expect(props.onEditDone).not.toHaveBeenCalled()
-  })
-
-  it('shows error when label contains angle brackets without full tags', async () => {
-    const user = userEvent.setup()
-    const props = defaultProps()
-    props.card = makeCard({label: 'Click > here < now'})
-    render(<AuthProvider {...props} />)
-    await user.click(screen.getByTestId('auth-provider-done-button'))
-    expect(screen.getByText(/must not contain/)).toBeInTheDocument()
-    expect(props.onEditDone).not.toHaveBeenCalled()
-  })
-
   it('accepts plain text label', async () => {
     const user = userEvent.setup()
     const props = defaultProps()
@@ -114,13 +74,35 @@ describe('AuthProvider label validation', () => {
     )
   })
 
+  it('accepts label with angle brackets in non-tag context', async () => {
+    const user = userEvent.setup()
+    const props = defaultProps()
+    props.card = makeCard({label: 'Student <-> Teacher'})
+    render(<AuthProvider {...props} />)
+    await user.click(screen.getByTestId('auth-provider-done-button'))
+    expect(props.onEditDone).toHaveBeenCalledWith(
+      expect.objectContaining({label: 'Student <-> Teacher'}),
+    )
+  })
+
+  it('passes labels with HTML to server for sanitization', async () => {
+    const user = userEvent.setup()
+    const props = defaultProps()
+    props.card = makeCard({label: '<script>alert(1)</script>'})
+    render(<AuthProvider {...props} />)
+    await user.click(screen.getByTestId('auth-provider-done-button'))
+    expect(props.onEditDone).toHaveBeenCalledWith(
+      expect.objectContaining({label: '<script>alert(1)</script>'}),
+    )
+  })
+
   it('shows error when label is empty', async () => {
     const user = userEvent.setup()
     const props = defaultProps()
     props.card = makeCard({label: ''})
     render(<AuthProvider {...props} />)
     await user.click(screen.getByTestId('auth-provider-done-button'))
-    expect(screen.getByText('Label is required')).toBeInTheDocument()
+    expect(screen.getByText('Please enter a label.')).toBeInTheDocument()
     expect(props.onEditDone).not.toHaveBeenCalled()
   })
 })
@@ -129,7 +111,7 @@ describe('AuthProviderForm maxLength', () => {
   it('sets maxLength on the login label input', () => {
     const props = defaultProps()
     render(<AuthProvider {...props} />)
-    const input = screen.getByLabelText('Login Button Text')
+    const input = screen.getByPlaceholderText('User login')
     expect(input).toHaveAttribute('maxLength', '255')
   })
 })

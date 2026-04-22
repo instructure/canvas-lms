@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "allowJs": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "react",
-    "lib": ["dom", "es2020", "esnext"],
+    "lib": ["dom", "dom.iterable", "es2020", "esnext"],
     "module": "ES2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "declaration": true,
     "declarationDir": "es",
     "emitDeclarationOnly": true,

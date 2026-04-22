@@ -187,7 +187,7 @@ class AbstractAssignment < ApplicationRecord
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
   scope :not_excluded_from_accessibility_scan, lambda {
-    where.not(submission_types: ["online_quiz", "external_tool"])
+    where.not(submission_types: "online_quiz")
          .where.not(id: type_quiz_lti)
   }
 
@@ -1707,12 +1707,12 @@ class AbstractAssignment < ApplicationRecord
     overridden_users
   end
 
-  def students_with_visibility(scope = nil, user_ids = nil)
+  def students_with_visibility(scope = nil, user_ids = nil, include_concluded: true)
     scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
     return scope unless differentiated_assignments_applies?
 
     context.shard.activate do
-      scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids)
+      scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids, include_concluded:)
     end
   end
 
@@ -1780,7 +1780,7 @@ class AbstractAssignment < ApplicationRecord
                    if score == 0
                      "complete"
                    elsif score < 0
-                     given_grade
+                     grading_standard_or_default.matching_scheme_key(given_grade) || given_grade
                    else
                      # show a perfect grade when positive / 0
                      grading_standard_or_default.score_to_grade(100)
@@ -1789,7 +1789,7 @@ class AbstractAssignment < ApplicationRecord
                    # the score for a zero-point letter_grade assignment could be considered
                    # to be *any* grade, so look at what the current given grade is
                    # instead of trying to calculate it
-                   given_grade
+                   grading_standard_or_default.matching_scheme_key(given_grade) || given_grade
                  end
       else
         # there's not really any reasonable value we can set here -- if the
@@ -2191,6 +2191,10 @@ class AbstractAssignment < ApplicationRecord
     final_grader_id.blank? || context.grants_right?(user, :select_final_grade)
   end
 
+  def can_manage_rubrics?(user, session = nil)
+    grants_right?(user, session, :update)
+  end
+
   def user_can_read_grades?(user, session = nil)
     RequestCache.cache("user_can_read_grades", self, user, session) do
       context.grants_right?(user, session, :view_all_grades) ||
@@ -2214,7 +2218,7 @@ class AbstractAssignment < ApplicationRecord
   def participants_with_visibility(opts = {})
     users = context.participating_admins
 
-    student_scope = students_with_visibility(context.participating_students_by_date)
+    student_scope = students_with_visibility(context.participating_students_by_date, include_concluded: false)
     student_scope = student_scope.where.not(id: opts[:excluded_user_ids]) if opts[:excluded_user_ids]
     applicable_students = student_scope.to_a
     users += applicable_students
@@ -2629,9 +2633,15 @@ class AbstractAssignment < ApplicationRecord
       submissions: []
     }
 
+    # Complete the assessment request before creating the comment because
+    # submission.add_comment calls comment_added which sets workflow_state
+    # in memory — the workflow gem's complete event is only available from
+    # the assigned state
+    should_call_peer_review_submission_service = false
     if opts[:comment] && opts[:assessment_request] && !opts[:assessment_request].active_rubric_association?
       # if there is no rubric the peer review is complete with just a comment
       opts[:assessment_request].complete
+      should_call_peer_review_submission_service = opts[:assessment_request].peer_review_sub_assignment.present?
     end
 
     # commenting on a student submission results in a teacher occupying a
@@ -2649,6 +2659,16 @@ class AbstractAssignment < ApplicationRecord
         res[:submissions] << submission
       end
     end
+
+    # Call after comments are persisted because the service uses comment
+    # timestamps to determine the PR sub assignment submission timestamp
+    if should_call_peer_review_submission_service
+      PeerReview::SubmissionCreatorService.new(
+        parent_assignment: self,
+        assessor: opts[:assessment_request].assessor
+      ).call
+    end
+
     res
   end
   private :update_submission_runner
@@ -3879,7 +3899,7 @@ class AbstractAssignment < ApplicationRecord
   end
 
   def needs_grading_count
-    Assignments::NeedsGradingCountQuery.new(self).manual_count
+    Assignments::NeedsGradingCountQuery.new([self]).manual_count[global_id]
   end
 
   def can_publish?
@@ -4337,6 +4357,7 @@ class AbstractAssignment < ApplicationRecord
         submission.grade_posting_in_progress = true
         submission.broadcast_notifications
         submission.grade_posting_in_progress = false
+        submission.create_alert_on_post if submission.graded?
       end
     end
 
@@ -4398,7 +4419,6 @@ class AbstractAssignment < ApplicationRecord
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
     return false if quiz? || discussion_topic? || wiki_page? || quiz_lti?
-    return false if external_tool? && !Account.site_admin.feature_enabled?(:external_tools_for_a2)
 
     true
   end

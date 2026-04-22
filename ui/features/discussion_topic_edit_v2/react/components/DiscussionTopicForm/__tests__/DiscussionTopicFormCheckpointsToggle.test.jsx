@@ -62,8 +62,15 @@ describe('DiscussionTopicForm Checkpoints Toggle', () => {
     )
     // 2nd graded click will render checkpoints, notice its unchecked.
     await user.click(getByLabelText('Graded'))
-    // Wait for the checkpoints checkbox to reappear
-    const recheckCheckbox = await findByTestId('checkpoints-checkbox')
-    expect(recheckCheckbox.querySelector('input').checked).toBe(false)
+    // Wait for the checkpoints checkbox to reappear and confirm it's unchecked.
+    // Use waitFor to avoid a stale-state race in CI: the checkbox may appear
+    // before React finishes updating the checked state.
+    await waitFor(
+      async () => {
+        const recheckCheckbox = await findByTestId('checkpoints-checkbox')
+        expect(recheckCheckbox.querySelector('input').checked).toBe(false)
+      },
+      {timeout: 10000},
+    )
   }, 60000)
 })

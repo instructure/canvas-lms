@@ -21,14 +21,13 @@ import './jquery/index'
 import '@canvas/user-sortable-name'
 import './jquery/communication_channels'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import FeatureFlags from '@canvas/feature-flags'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 import AvatarModal from '@canvas/avatar-dialog-view/react/AvatarModal'
 
-let avatarRoot = null
 ready(() => {
   const hiddenFlags = []
   if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
@@ -39,14 +38,12 @@ ready(() => {
 
   const featureFlagContainer = document.querySelector('.feature-flag-wrapper') // there is only one of these
   if (featureFlagContainer) {
-    const ffRoot = createRoot(featureFlagContainer)
-    ffRoot.render(<FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />)
+    render(<FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />, featureFlagContainer, {sync: true})
   }
 
   const pairingCodeContainer = document.querySelector('#pairing-code')
   if (pairingCodeContainer) {
-    const pcRoot = createRoot(pairingCodeContainer)
-    pcRoot.render(<GeneratePairingCode userId={ENV.current_user.id} />)
+    render(<GeneratePairingCode userId={ENV.current_user.id} />, pairingCodeContainer, {sync: true})
   }
 
   const avatarModalMount = document.getElementById('avatar-modal-mount')
@@ -54,10 +51,12 @@ ready(() => {
   if (profilePicLink && avatarModalMount) {
     profilePicLink.addEventListener('click', event => {
       event.preventDefault()
-      if (avatarRoot === null) {
-        avatarRoot = createRoot(avatarModalMount)
-      }
-      avatarRoot.render(<AvatarModal onClose={() => avatarRoot.render(null)} />)
+      let root
+      root = render(
+        <AvatarModal onClose={() => root.unmount()} />,
+        avatarModalMount,
+        {sync: true},
+      )
     })
   }
 })

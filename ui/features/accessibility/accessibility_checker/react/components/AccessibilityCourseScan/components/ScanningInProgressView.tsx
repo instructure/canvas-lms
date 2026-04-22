@@ -21,6 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScanHandler} from './ScanHandler'
 import {ScanInProgressViewProps} from '../types'
@@ -30,6 +31,14 @@ const I18n = createI18nScope('accessibility_scan')
 export const ScanningInProgressView: React.FC<ScanInProgressViewProps> = ({buttonLabel}) => {
   return (
     <ScanHandler scanButtonDisabled={true} buttonLabel={buttonLabel}>
+      <ScreenReaderContent
+        tabIndex={-1}
+        elementRef={(el: Element | null) => (el as HTMLElement | null)?.focus()}
+      >
+        {I18n.t(
+          'Hang tight! Scanning might take a few seconds or up to several minutes, depending on how much content your course contains.',
+        )}
+      </ScreenReaderContent>
       <Flex justifyItems="center" margin="xx-large 0 small 0">
         <Flex.Item>
           <Spinner renderTitle={() => I18n.t('Scanning in progress')} size="small" />

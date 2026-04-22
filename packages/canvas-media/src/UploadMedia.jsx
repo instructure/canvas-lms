@@ -30,10 +30,7 @@ import ReactDOM from 'react-dom'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import formatMessage from './format-message'
 import getTranslations from './getTranslations'
-import saveMediaRecording, {
-  saveClosedCaptions,
-  saveClosedCaptionsForAttachment,
-} from './saveMediaRecording'
+import saveMediaRecording, {saveClosedCaptionsForAttachment} from './saveMediaRecording'
 import {CC_FILE_MAX_BYTES, mediaExtension} from './shared/constants'
 import LoadingIndicator from './shared/LoadingIndicator'
 import translationShape from './translationShape'
@@ -99,7 +96,6 @@ export class UploadMediaModal extends React.Component {
     // for testing
     computerFile: instanceOf(File),
     userLocale: string,
-    useStudioPlayer: bool,
   }
 
   static defaultProps = {
@@ -129,6 +125,11 @@ export class UploadMediaModal extends React.Component {
 
     this.modalBodyRef = React.createRef()
     this.computerPanelRef = React.createRef()
+  }
+
+  onRecordingSave = file => {
+    if (this.state.uploading) return
+    this.setState({recordedFile: file}, this.handleSubmit)
   }
 
   inferSelectedPanel = tabs => {
@@ -196,6 +197,7 @@ export class UploadMediaModal extends React.Component {
   saveMediaCallback = async (err, data) => {
     const {onUploadComplete, onDismiss, rcsConfig} = this.props
     const {selectedPanel, subtitles} = this.state
+    this.setState({uploading: false})
     if (err) {
       onUploadComplete?.(err, data)
     } else {
@@ -314,7 +316,6 @@ export class UploadMediaModal extends React.Component {
                 }}
                 bounds={this.state.modalBodySize}
                 mountNode={this.props.mountNode}
-                useStudioPlayer={this.props.useStudioPlayer}
               />
             </Suspense>
           </Tabs.Panel>
@@ -329,7 +330,7 @@ export class UploadMediaModal extends React.Component {
               <MediaRecorder
                 MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
                 errorMessage={MEDIA_RECORD_NOT_AVAILABLE}
-                onSave={file => this.setState({recordedFile: file}, this.handleSubmit)}
+                onSave={this.onRecordingSave}
               />
             </Suspense>
           </Tabs.Panel>

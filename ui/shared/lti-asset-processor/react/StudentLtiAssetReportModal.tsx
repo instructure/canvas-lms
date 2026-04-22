@@ -25,6 +25,7 @@ import {LtiAssetReportForStudent} from '../model/LtiAssetReport'
 export interface StudentLtiAssetReportModalProps {
   assetProcessors: LtiAssetProcessor[]
   assignmentName: string
+  hasNextPage?: boolean
   onClose?: () => void
   reports: LtiAssetReportForStudent[]
   submissionType: AssetReportCompatibleSubmissionType
@@ -49,6 +50,7 @@ function attachmentsFromReports(
 export default function StudentLtiAssetReportModal({
   assetProcessors,
   assignmentName,
+  hasNextPage,
   onClose,
   reports,
   submissionType,
@@ -67,6 +69,7 @@ export default function StudentLtiAssetReportModal({
       modalTitle={modalTitle}
       attachments={attachments}
       attempt={attempt}
+      hasNextPage={hasNextPage}
       mainTitle={mainTitle}
       onClose={onClose}
       reports={reports}

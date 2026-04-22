@@ -115,8 +115,8 @@ class GradeService
           "rating" => (criterion_data[:criterion_use_range] && result.points) ? result.points : matched_rating[:points],
           "reasoning" => result.reasoning
         },
-        # NEW: inline guidance from gradeEssay
-        "comments" => result.guidance
+        "comments" => result.guidance,
+        "responseId" => result.response_id
       }
     end
   end

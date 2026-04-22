@@ -55,6 +55,12 @@ const profileTabs = [
     html_url: '/accounts/1/external_tools/1?display=borderless',
     type: 'external',
   },
+  {
+    id: 'nav_menu_link_42',
+    label: 'Custom Link',
+    html_url: 'https://example.com',
+    type: 'external',
+  },
 ]
 
 describe('ProfileTray', () => {
@@ -89,6 +95,31 @@ describe('ProfileTray', () => {
     const {getByText} = render(<ProfileTray />)
     const toolLink = getByText('External Tool').closest('a')
     expect(toolLink).toHaveAttribute('target', '_blank')
+  })
+
+  describe('nav_menu_link tabs', () => {
+    it('opens in new tab', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const link = getByText('Custom Link').closest('a')
+      expect(link).toHaveAttribute('target', '_blank')
+    })
+
+    it('shows external link icon', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const link = getByText('Custom Link').closest('a')
+      const icon = link?.querySelector("svg[name='IconExternalLink']")
+      expect(icon).toBeInTheDocument()
+    })
+
+    it('does not show external link icon for LTI external tools', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const link = getByText('External Tool').closest('a')
+      const icon = link?.querySelector("svg[name='IconExternalLink']")
+      expect(icon).not.toBeInTheDocument()
+    })
   })
 
   it('renders the avatar', () => {

@@ -23,7 +23,8 @@ import EducatorDashboardContainer from './react/EducatorDashboardContainer'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {
   WidgetDashboardProvider,
@@ -213,6 +214,8 @@ const WidgetDashboardApp = () => {
       errorComponent={
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorCategory={I18n.t('Widget Dashboard Error Page')}
         />
       }

@@ -20,7 +20,7 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {StudentOutcomeScore} from '../grid/StudentOutcomeScore'
 
 export interface ContributingScoreCellContentProps {

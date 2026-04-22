@@ -196,15 +196,15 @@ class Notification < Switchman::UnshardedRecord
   #
   def create_message(asset, to_list, options = {})
     if asset.respond_to?(:account)
-      return if asset.account&.root_account&.suppress_notifications?
+      return if asset.account&.root_account&.suppress_notification?(self)
     end
 
     if asset.respond_to?(:context) && asset.context.respond_to?(:root_account)
-      return if asset.context&.root_account&.suppress_notifications?
+      return if asset.context&.root_account&.suppress_notification?(self)
     end
 
     if asset.respond_to?(:context) && asset.context.respond_to?(:account)
-      return if asset.context.account&.root_account&.suppress_notifications?
+      return if asset.context.account&.root_account&.suppress_notification?(self)
     end
 
     preload_asset_roles_if_needed(asset)
@@ -421,6 +421,8 @@ class Notification < Switchman::UnshardedRecord
     t "names.new_user", "New User"
     t "names.pseudonym_registration", "Pseudonym Registration"
     t "names.pseudonym_registration_done", "Pseudonym Registration Done"
+    t "names.pseudonym_suspended_after_failed_login", "Pseudonym Suspended After Failed Login"
+    t "names.pseudonym_suspended_by_admin", "Pseudonym Suspended By Admin"
     t "names.report_generated", "Report Generated"
     t "names.report_generation_failed", "Report Generation Failed"
     t "names.rubric_assessment_invitation", "Rubric Assessment Invitation"

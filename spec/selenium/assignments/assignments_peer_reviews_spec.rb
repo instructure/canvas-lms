@@ -230,6 +230,7 @@ describe "assignments" do
                                        automatic_peer_reviews: false,
                                        peer_review_count: 2
                                      })
+      peer_review_model(parent_assignment: @assignment)
 
       submission1 = @assignment.find_or_create_submission(@student1)
       submission1.submission_type = "online_text_entry"
@@ -640,26 +641,26 @@ describe "assignments" do
       user_session(@teacher)
     end
 
-    it "allows editing peer review settings in graded mode", priority: "1" do
+    it "allows editing peer review settings when feature flag is enabled", priority: "1" do
       @course.enable_feature!(:peer_review_allocation_and_grading)
 
       get "/courses/#{@course.id}/assignments/#{@legacy_assignment.id}/edit"
       wait_for_ajaximations
 
-      wait_for(method: nil, timeout: 10) do
-        element_exists?("#peer_reviews_allocation_and_grading_details")
-      end
-
-      peer_reviews_checkbox = f("#assignment_peer_reviews_checkbox")
+      peer_reviews_checkbox = f("#assignment_peer_reviews")
       expect(peer_reviews_checkbox).not_to be_disabled
+      expect(peer_reviews_checkbox).to be_selected
 
       expect(f("#content")).not_to include_text(
         "Peer review settings cannot be changed for this assignment because it was created with graded peer reviews"
       )
 
-      reviews_required_input = f("#assignment_peer_reviews_count")
-      expect(reviews_required_input).not_to be_disabled
-      expect(reviews_required_input.attribute("value")).to eq("1")
+      expect(element_exists?("#peer_reviews_details")).to be true
+      expect(f("#peer_reviews_details")).to be_displayed
+
+      peer_review_count_input = f("#assignment_peer_review_count")
+      expect(peer_review_count_input).not_to be_disabled
+      expect(peer_review_count_input.attribute("value")).to eq("1")
     end
 
     it "allows editing peer review settings in legacy mode", priority: "1" do

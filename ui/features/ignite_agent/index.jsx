@@ -19,7 +19,8 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {render} from '@canvas/react'
 import {captureException} from '@sentry/browser'
-import {getCurrentTheme} from '@instructure/theme-registry'
+import {canvas, canvasHighContrast} from '@instructure/ui-themes'
+import {getTypography} from '@canvas/instui-bindings'
 import {Portal} from '@instructure/ui-portal'
 import ready from '@instructure/ready'
 import {FallbackChatOverlay} from './FallbackChatOverlay'
@@ -68,7 +69,24 @@ function IgniteAgent() {
         return
       }
 
-      const props = {hostTheme: getCurrentTheme()}
+      const isHighContrast = Boolean(window.ENV?.use_high_contrast)
+      const baseTheme = isHighContrast ? canvasHighContrast : canvas
+      // Do not spread brand vars in HC mode — brand colors would override HC colors (a11y regression)
+      const brandVars = isHighContrast ? {} : (window.CANVAS_ACTIVE_BRAND_VARIABLES ?? {})
+      const props = {
+        hostTheme: {
+          ...baseTheme,
+          ...brandVars,
+          typography: {
+            ...baseTheme.typography,
+            ...getTypography(
+              Boolean(ENV.K5_USER),
+              Boolean(ENV.USE_CLASSIC_FONT),
+              Boolean(ENV.use_dyslexic_font),
+            ),
+          },
+        },
+      }
       renderToMountPoint(module, 'oak-mount-point', props)
       renderToMountPoint(module, 'oak-mobile-mount-point', props)
     } catch (loadError) {

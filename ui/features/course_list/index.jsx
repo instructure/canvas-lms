@@ -51,6 +51,7 @@ ready(() => {
         target.attr('title', notfavoritable_tooltip)
         target.data('ui-tooltip-title', notfavoritable_tooltip)
         target.children('.screenreader-only').text(notfavoritable_tooltip)
+        target.hide()
         return
       }
 

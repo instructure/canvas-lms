@@ -429,6 +429,8 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   rescue Api::Html::UnparsableContentError => e
     rescue_unparsable_content(e)
   end
@@ -447,6 +449,8 @@ class WikiPagesApiController < ApplicationController
       log_asset_access(@page, "wiki", @wiki)
       render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   end
 
   # @API Update/create page
@@ -522,6 +526,8 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   rescue Api::Html::UnparsableContentError => e
     rescue_unparsable_content(e)
   end
@@ -930,32 +936,24 @@ class WikiPagesApiController < ApplicationController
     render json: @page&.errors || {}, status: :bad_request
   end
 
-  def create_external_content_ref
-    if @context.account.horizon_block_content_editor?
-      response = ContentServiceClient.create_content(
-        root_account_uuid: @context.root_account.uuid,
-        user_uuid: @current_user.uuid,
-        context_type: "WikiPage",
-        context_id: @page.id,
-        data: @block_editor_data
-      )
+  def rescue_content_service_error(error)
+    error_report = ErrorReport.log_error(
+      "content_service_client_error",
+      { message: error.message, service_errors: error.service_errors }
+    )
+    render json: { error: error.message, error_report_id: error_report.id }, status: :service_unavailable
+  end
 
-      @page.create_external_content_reference(content_id: response.external_content_id)
-    end
+  def create_external_content_ref
+    return unless @context.account.horizon_block_content_editor?
+
+    @page.create_block_editor_data(user_uuid: @current_user.uuid, data: @block_editor_data)
   end
 
   def update_external_content_ref
-    if @context.account.horizon_block_content_editor?
-      external_ref = @page.external_content_reference
-      if external_ref
-        ContentServiceClient.update_content(
-          root_account_uuid: @context.root_account.uuid,
-          user_uuid: @current_user.uuid,
-          external_content_id: external_ref.content_id,
-          data: @block_editor_data
-        )
-      end
-    end
+    return unless @context.account.horizon_block_content_editor?
+
+    @page.update_block_editor_data(user_uuid: @current_user.uuid, data: @block_editor_data)
   end
 
   def extract_block_editor_data

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {AddLinkModal} from '../AddLinkModal'
 
@@ -84,7 +84,7 @@ describe('AddLinkModal', () => {
     await clickAdd()
 
     expect(mockProps.onAdd).not.toHaveBeenCalled()
-    expect(textInput).toHaveFocus()
+    await waitFor(() => expect(textInput).toHaveFocus())
     expect(
       await screen.findByText('Please enter text between 1 and 50 characters long'),
     ).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('AddLinkModal', () => {
     await clickAdd()
 
     expect(mockProps.onAdd).not.toHaveBeenCalled()
-    expect(linkInput).toHaveFocus()
+    await waitFor(() => expect(linkInput).toHaveFocus())
     expect(
       await screen.findByText('Please enter a valid URL beginning with https:// or http://'),
     ).toBeInTheDocument()
@@ -181,8 +181,10 @@ describe('AddLinkModal', () => {
       fireEvent.change(textIn, {target: {value: 'My Link'}})
       fireEvent.change(linkIn, {target: {value: 'https://example.com'}})
 
-      // course_nav is pre-checked; also check account_nav
+      // No placements are pre-checked; select course_nav and account_nav
+      const courseCheckbox = screen.getByRole('checkbox', {name: 'Course Navigation'})
       const accountCheckbox = screen.getByRole('checkbox', {name: 'Account Navigation'})
+      await user.click(courseCheckbox)
       await user.click(accountCheckbox)
 
       await user.click(screen.getAllByRole('button', {name: 'Add'}).at(-1)!)

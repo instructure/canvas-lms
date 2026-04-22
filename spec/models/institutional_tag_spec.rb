@@ -112,13 +112,63 @@ describe InstitutionalTag do
       expect(tag.institutional_tag_associations).to include(assoc)
     end
 
-    it "restricts deletion when associations exist" do
+    it "raises FK error on hard-delete when associations exist" do
       tag = InstitutionalTag.create!(valid_params)
-      InstitutionalTagAssociation.create!(
-        institutional_tag: tag,
-        context: user
-      )
-      expect { tag.destroy_permanently! }.to raise_error(ActiveRecord::DeleteRestrictionError)
+      InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      expect { tag.destroy_permanently! }.to raise_error(ActiveRecord::InvalidForeignKey)
+    end
+
+    it "cascade-archives active associations on soft-delete" do
+      tag = InstitutionalTag.create!(valid_params)
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      tag.destroy
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "does not touch already-deleted associations on soft-delete" do
+      tag = InstitutionalTag.create!(valid_params)
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      assoc.destroy
+      tag.destroy
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations when workflow_state is set directly" do
+      tag = InstitutionalTag.create!(valid_params)
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      tag.update!(workflow_state: "deleted")
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+  end
+
+  describe ".cascade_archive_associations_for" do
+    it "bulk soft-deletes associations for given tag IDs" do
+      tag1 = InstitutionalTag.create!(valid_params)
+      tag2 = InstitutionalTag.create!(valid_params.merge(name: "Tag 2"))
+      user2 = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user2)
+
+      InstitutionalTag.cascade_archive_associations_for([tag1.id, tag2.id])
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+    end
+
+    it "does not touch associations for other tags" do
+      tag1 = InstitutionalTag.create!(valid_params)
+      tag2 = InstitutionalTag.create!(valid_params.merge(name: "Tag 2"))
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user)
+      InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user_model)
+
+      InstitutionalTag.cascade_archive_associations_for([tag1.id])
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(tag2.institutional_tag_associations.active.count).to eq 1
+    end
+
+    it "is a no-op for empty tag IDs" do
+      expect { InstitutionalTag.cascade_archive_associations_for([]) }.not_to raise_error
     end
   end
 

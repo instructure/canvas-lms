@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {executeQuery} from '@canvas/graphql'
+import {platformExecuteQuery} from '@canvas/graphql'
 import {queryClient} from '@canvas/query'
 import {PlatformUiProvider} from '@instructure/platform-provider'
 import {TranslationsProvider} from '@instructure/platform-widget-dashboard'
@@ -134,10 +134,10 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
   failedToLoadProgressOverview: () => I18n.t('Failed to load progress overview. Please try again.'),
   loadingProgressOverview: () => I18n.t('Loading progress overview...'),
   progressOverviewPagination: () => I18n.t('Progress overview pagination'),
-  gradedCourseWork: () => I18n.t('Graded course work'),
-  ungradedCourseWork: () => I18n.t('Ungraded course work'),
-  missingCourseWork: () => I18n.t('Missing course work'),
-  upcomingAvailableWork: () => I18n.t('Upcoming available work'),
+  gradedAssignments: () => I18n.t('Graded assignments'),
+  remaining: () => I18n.t('Remaining'),
+  courseProgressCompletion: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{percent}% complete (%{total} total)', {percent: opts.percent, total: opts.total}),
 
   people: () => I18n.t('People'),
   noPeople: () => I18n.t('No people'),
@@ -215,6 +215,59 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
   moveDirectionToRightBottom: () => I18n.t('to right bottom'),
   moveDirectionToRightTop: () => I18n.t('to right top'),
   widget: () => I18n.t('Widget'),
+
+  // Educator Announcement Creation Widget
+  loadingCourses: () => I18n.t('Loading courses'),
+  failedToLoadCourses: () => I18n.t('Failed to load courses'),
+  coursesPublished: () => I18n.t('Courses'),
+  createAnnouncement: () => I18n.t('Create announcement'),
+  searchByCourseNameOrCode: () => I18n.t('Search by course name or ID'),
+  typeToSearchArrowKeys: () => I18n.t('Type to search, use arrow keys to navigate options.'),
+  noMatchingCourses: () => I18n.t('No matching courses'),
+  noResultsAvailable: () => I18n.t('No results available'),
+  resultsAvailable: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{count} results available', {count: opts.count}),
+  moreTypeToFilter: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{count} more — type to filter', {count: opts.count}),
+
+  // Educator Announcement Creation Modal
+  announcementTitle: () => I18n.t('Title'),
+  announcementTitleRequired: () => I18n.t('Title must not be empty.'),
+  announcementTitleMaxLength: () => I18n.t('Title must be less than 255 characters.'),
+  announcementContent: () => I18n.t('Content'),
+  announcementContentTooLarge: () => I18n.t('Content exceeds the 16 MB size limit'),
+  announcementCoursesRequired: () => I18n.t('At least one course is required'),
+  announcementStartDate: () => I18n.t('Start date'),
+  announcementStartTime: () => I18n.t('Start time'),
+  announcementEndDate: () => I18n.t('End date'),
+  announcementEndTime: () => I18n.t('End time'),
+  announcementStartDateAndTime: () => I18n.t('Start date and time'),
+  announcementEndDateAndTime: () => I18n.t('End date and time'),
+  announcementSelectDate: () => I18n.t('Select date'),
+  announcementSelectTime: () => I18n.t('Select time'),
+  announcementInvalidDate: () => I18n.t('Invalid date'),
+  announcementEndDateBeforeStart: () => I18n.t('End date must be after start date.'),
+  announcementAllowComments: () => I18n.t('Allow participants to comment'),
+  announcementEnablePodcast: () => I18n.t('Enable podcast feed'),
+  announcementAllowLiking: () => I18n.t('Allow liking'),
+  announcementOptions: () => I18n.t('Options'),
+  announcementSend: () => I18n.t('Send'),
+  announcementSending: () => I18n.t('Sending...'),
+  removeCourse: (opts: Record<string, unknown> = {}) => I18n.t('Remove %{name}', {name: opts.name}),
+
+  // Announcement creation notifications
+  announcementCreatedOne: (opts: Record<string, unknown> = {}) =>
+    I18n.t('Announcement created in %{count} course.', {count: opts.count}),
+  announcementsCreatedMany: (opts: Record<string, unknown> = {}) =>
+    I18n.t('Announcements created in %{count} courses.', {count: opts.count}),
+  announcementFailedOne: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{count} announcement failed to post. Please check your permissions and try again.', {
+      count: opts.count,
+    }),
+  announcementsFailedMany: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{count} announcements failed to post. Please check your permissions and try again.', {
+      count: opts.count,
+    }),
 }
 
 const translations = new Proxy({} as WidgetDashboardTranslations, {
@@ -231,7 +284,7 @@ function translate(key: string, options?: Record<string, unknown>): string {
 export function PlatformBridge({children}: {children: React.ReactNode}) {
   return (
     <PlatformUiProvider
-      executeQuery={executeQuery}
+      executeQuery={platformExecuteQuery}
       currentUserId={ENV.current_user?.id ?? ''}
       locale={ENV.LOCALE}
       timezone={ENV.TIMEZONE}

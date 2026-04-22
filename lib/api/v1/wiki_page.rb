@@ -71,13 +71,7 @@ module Api::V1::WikiPage
     locked_json(hash, wiki_page, current_user, "page", deep_check_if_needed:)
     if include_body && !hash["locked_for_user"] && !hash["lock_info"]
       if use_block_editor && @context.account.horizon_block_content_editor? && wiki_page.external_content_reference
-        content = ContentServiceClient.get_content(
-          root_account_uuid: @context.root_account.uuid,
-          user_uuid: @current_user.uuid,
-          external_content_id: wiki_page.external_content_reference.content_id
-        )
-
-        hash["block_editor_data"] = content.data
+        hash["block_editor_data"] = wiki_page.get_block_editor_data(user_uuid: @current_user.uuid)
       elsif @context.try(:block_content_editor_enabled?) && wiki_page.block_editor
         hash["block_editor_attributes"] = {
           id: wiki_page.block_editor.id,

@@ -170,6 +170,7 @@ fa:
     track_uploaded_successfully: "شیار با موفقیت بارگذاری شد؛ لطفا مرورگر خود را تازه سازی کنید."
     upload: بارگذاری
     uploading: "در حال بارگذاری..."
+  _23978503: "."
   _2d4c0d31: "..."
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "در پایین"
@@ -9654,6 +9655,7 @@ fa:
   edit_rubric_title_104d6fd2: "ویرایش دستورالعمل ارزیابی : %{title}"
   edit_section_name_558cc89: "ویرایش بخش \"%{name}\""
   edit_sections_7d0e4e34: "ویرایش بخش ها"
+  edit_settings_b3ddad69: "ویرایش تنظیمات"
   edit_status_612572db: "وضعیت ویرایش"
   edit_submission_status_from_speedgrader_5e1b1cd4: "ویرایش وضعیت ارسال از اسپیدگرید"
   edit_survey_b0d6890d: "ویرایش نظرسنجی"
@@ -16790,6 +16792,7 @@ fa:
   not_yet_completed_345a0bca: "هنوز تکمیل نشده است"
   not_yet_graded_40475341: "هنوز نمره گذاری نشده"
   not_yet_graded_8b655a7: "هنوز نمره گذاری نشده"
+  note_2b416137: "یاد داشت"
   note_8b73ce09: نکته
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
       توجه: ابزارهای مرتبط فقط یک بار فهرست می شوند ، حتی اگر داشته باشند

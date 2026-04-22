@@ -44,7 +44,7 @@ module UserSearch
 
       context.shard.activate do
         users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :section_ids))
-        users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope, searcher)}) AS users")
+        users_scope = users_scope.from("(#{conditions_statement(search_term, context, users_scope, searcher)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
         users_scope = roles_scope(users_scope, context, options.slice(:enrollment_type,
                                                                       :enrollment_role,
@@ -52,16 +52,6 @@ module UserSearch
                                                                       :exclude_groups))
         differentiation_tag_scope(users_scope, context, searcher, options.slice(:differentiation_tag_id))
       end
-    end
-
-    def conditions_statement(search_term, root_account, users_scope, searcher)
-      pattern = like_string_for(search_term)
-      params = { pattern:,
-                 account: root_account,
-                 path_type: CommunicationChannel::TYPE_EMAIL,
-                 db_id: search_term,
-                 searcher: }
-      complex_sql(users_scope, params)
     end
 
     def like_string_for(search_term)
@@ -95,9 +85,7 @@ module UserSearch
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
       case context
       when Account
-        users = User.of_account(context).active
-        users = users.union(context.pseudonym_users) if @include_deleted_users
-        users
+        account_scope(context, include_deleted_users: @include_deleted_users)
       when Course
         context.users_visible_to(searcher,
                                  include_priors: include_prior_enrollments,
@@ -107,6 +95,26 @@ module UserSearch
       else
         context.users_visible_to(searcher, include_inactive: include_inactive_enrollments).distinct
       end
+    end
+
+    def account_scope(account, include_deleted_users:)
+      uaa_user_ids = UserAccountAssociation.select(:user_id).where(account:).to_sql
+      pseudonym_user_ids = Pseudonym.select(:user_id).where(account:).to_sql
+
+      user_ids = include_deleted_users ? "#{uaa_user_ids} UNION #{pseudonym_user_ids}" : uaa_user_ids
+      user_filter = include_deleted_users ? { delete_me_frd: true } : { workflow_state: "deleted" }
+
+      User
+        .with(user_scope: Arel.sql(
+          <<~SQL.squish
+            WITH inner_user_scope AS MATERIALIZED (
+              #{user_ids}
+            )
+            SELECT user_id FROM inner_user_scope
+          SQL
+        ))
+        .joins("INNER JOIN user_scope ON users.id = user_scope.user_id")
+        .where.not(users: user_filter)
     end
 
     def order_scope(users_scope, context, options = {})
@@ -350,6 +358,22 @@ module UserSearch
 
     private
 
+    def conditions_statement(search_term, context, users_scope, searcher)
+      pattern = like_string_for(search_term)
+      params = { pattern:,
+                 account: context.root_account,
+                 path_type: CommunicationChannel::TYPE_EMAIL,
+                 db_id: search_term,
+                 searcher: }
+
+      if context.is_a?(Account)
+        # if the context is an Account, the scope is determined by the outer CTE
+        complex_sql(User.shard(context.shard).joins("INNER JOIN user_scope ON users.id = user_scope.user_id"), params)
+      else
+        complex_sql(users_scope, params)
+      end
+    end
+
     def value_to_boolean(value)
       Canvas::Plugin.value_to_boolean(value)
     end
@@ -372,8 +396,6 @@ module UserSearch
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
                  .where(id: params[:db_id])
-                 .shard(Shard.current)
-                 .group(:id)
     end
 
     def ids_sql(users_scope, params)
@@ -393,11 +415,12 @@ module UserSearch
     end
 
     def name_sql(users_scope, params)
+      name_condition = ActiveRecord::Base.coalesced_wildcard("users.name", "users.short_name", params[:db_id])
       users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
-                 .where(like_condition("users.name"), pattern: params[:pattern])
+                 .where(name_condition)
     end
 
     def login_sql(users_scope, params)

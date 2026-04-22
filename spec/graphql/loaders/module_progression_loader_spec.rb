@@ -19,7 +19,6 @@
 #
 
 require_relative "../graphql_spec_helper"
-require_relative "../../../app/graphql/types/module_type"
 
 describe ModuleProgressionLoader do
   let_once(:course) do

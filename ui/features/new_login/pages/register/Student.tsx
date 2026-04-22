@@ -30,6 +30,7 @@ import {createStudentAccount} from '../../services'
 import {SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
+import {ROUTES} from '../../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -329,7 +330,7 @@ const Student = () => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = useSafeBackNavigation()
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')

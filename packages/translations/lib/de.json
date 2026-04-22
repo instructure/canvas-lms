@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Schließen"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Tastenkombination-Modal schließen"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Die Untertiteldatei muss kleiner als { maxKb } KB sein."
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Bitte geben Sie eine gültige Video-URL von einer unterstützten Plattform ein."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Bitte wählen Sie eine Datei vor dem Hochladen aus"
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Bitte wählen Sie eine Datei mit einem unterstützten Typ"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Link-Optionen anzeigen"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Laufendes Transkript anzeigen"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Laufendes Transkript anzeigen"

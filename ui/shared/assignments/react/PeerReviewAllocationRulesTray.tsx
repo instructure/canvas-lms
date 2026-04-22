@@ -22,8 +22,6 @@ import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
 import {formatFullRuleDescription} from './utils/formatRuleDescription'
 import {Alert} from '@instructure/ui-alerts'
 import {useAllocationRules} from '../graphql/hooks/useAllocationRules'
-import {useAllocationConversion} from '../graphql/hooks/useAllocationConversion'
-import AllocationConverterMessage from './AllocationConverterMessage'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -116,14 +114,12 @@ interface DeleteFocusInfo {
 }
 
 const PeerReviewAllocationRulesTray = ({
-  courseId,
   assignmentId,
   requiredPeerReviewsCount: requiredPeerReviewsCountProp,
   isTrayOpen,
   closeTray,
   canEdit = false,
 }: {
-  courseId: string
   assignmentId: string
   requiredPeerReviewsCount?: number
   isTrayOpen: boolean
@@ -156,18 +152,6 @@ const PeerReviewAllocationRulesTray = ({
     refetch,
     requiredPeerReviewsCount: fetchedRequiredPeerReviewsCount,
   } = useAllocationRules(assignmentId, currentPage, itemsPerPage, searchTerm)
-
-  const {
-    hasLegacyAllocations,
-    loading: conversionCheckLoading,
-    launchConversion,
-    launchDeletion,
-    conversionAction,
-    conversionJobState,
-    conversionJobError,
-    isConversionInProgress,
-    isConversionComplete,
-  } = useAllocationConversion(courseId, assignmentId, isTrayOpen)
 
   const requiredPeerReviewsCount = requiredPeerReviewsCountProp ?? fetchedRequiredPeerReviewsCount
 
@@ -472,19 +456,6 @@ const PeerReviewAllocationRulesTray = ({
   ])
 
   useEffect(() => {
-    if (isConversionComplete) {
-      showFlashAlert({
-        type: 'success',
-        message:
-          conversionAction === 'delete'
-            ? I18n.t('Allocations have been deleted successfully.')
-            : I18n.t('Allocations have been converted successfully.'),
-      })
-      setShouldRefetch(true)
-    }
-  }, [isConversionComplete])
-
-  useEffect(() => {
     return () => {
       if (containerRef.current) {
         const observer = (containerRef.current as any)._resizeObserver
@@ -533,7 +504,7 @@ const PeerReviewAllocationRulesTray = ({
   }
 
   const renderContent = () => {
-    if (loading || conversionCheckLoading) return <LoadingState />
+    if (loading) return <LoadingState />
 
     if (error) {
       return (
@@ -626,21 +597,19 @@ const PeerReviewAllocationRulesTray = ({
                 .
               </Text>
             </Flex.Item>
-            {canEdit &&
-              (!hasLegacyAllocations || isConversionComplete) &&
-              !conversionCheckLoading && (
-                <Flex.Item as="div" padding="x-small medium">
-                  <Button
-                    color="primary"
-                    onClick={() => setIsCreateModalOpen(true)}
-                    data-testid="add-rule-button"
-                    elementRef={ref => (createRuleButtonRef.current = ref as HTMLButtonElement)}
-                  >
-                    {I18n.t('+ Rule')}
-                  </Button>
-                </Flex.Item>
-              )}
-            {!conversionCheckLoading && (rules.length > 0 || searchInputValue) && (
+            {canEdit && (
+              <Flex.Item as="div" padding="x-small medium">
+                <Button
+                  color="primary"
+                  onClick={() => setIsCreateModalOpen(true)}
+                  data-testid="add-rule-button"
+                  elementRef={ref => (createRuleButtonRef.current = ref as HTMLButtonElement)}
+                >
+                  {I18n.t('+ Rule')}
+                </Button>
+              </Flex.Item>
+            )}
+            {(rules.length > 0 || searchInputValue) && (
               <Flex.Item as="div" padding="x-small medium">
                 <TextInput
                   renderLabel={
@@ -674,15 +643,6 @@ const PeerReviewAllocationRulesTray = ({
                 </Alert>
               </Flex.Item>
             )}
-            <AllocationConverterMessage
-              hasLegacyAllocations={hasLegacyAllocations}
-              conversionJobState={conversionJobState}
-              conversionJobError={conversionJobError}
-              conversionAction={conversionAction}
-              isConversionInProgress={isConversionInProgress}
-              launchConversion={launchConversion}
-              launchDeletion={launchDeletion}
-            />
           </Flex.Item>
           <Flex.Item size={`${CARD_HEIGHT}px`} shouldGrow shouldShrink>
             {renderContent()}

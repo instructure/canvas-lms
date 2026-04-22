@@ -151,6 +151,7 @@ uk:
     track_uploaded_successfully: "Трек успішно завантажений; будь ласка, оновіть ваш браузер."
     upload: Завантажити
     uploading: Завантаження...
+  _23978503: "."
   _2d4c0d31: …
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- Знизу --"
@@ -7103,6 +7104,7 @@ uk:
   edit_rubric_7d4d139d: "Редагувати категорію"
   edit_section_name_558cc89: "Редагувати Розділ \"%{name}\""
   edit_sections_7d0e4e34: "Редагувати розділи"
+  edit_settings_b3ddad69: "Редагувати налаштування"
   edit_survey_b0d6890d: "Редагувати огляд"
   edit_term_name_29a8a322: "Редагувати термін %{name}"
   edit_text_27d8aa3d: "Редагувати %{text}"

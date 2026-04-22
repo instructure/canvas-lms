@@ -1384,12 +1384,16 @@ describe Course do
       course_factory
     end
 
-    it "calls NavMenuLinkImporter when feature is enabled" do
-      @course.root_account.enable_feature!(:nav_menu_links)
+    it "calls NavMenuLinkImporter" do
       migration = @course.content_migrations.create!(
         migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
       )
       data = {
+        :course => {
+          tab_configuration: [
+            { "id" => "nav_menu_link_1", "hidden" => true },
+          ]
+        },
         "nav_menu_links" => [{ "migration_id" => "link_1", "label" => "L", "url" => "https://x.com" }]
       }
       expect { Importers::CourseContentImporter.import_content(@course, data, nil, migration) }

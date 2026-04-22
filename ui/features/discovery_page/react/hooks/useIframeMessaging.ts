@@ -16,21 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useMemo} from 'react'
+import {useCallback, useEffect, useMemo, useRef} from 'react'
 import {debounce} from '@instructure/debounce'
 import type {CardConfig, UseIframeMessagingOptions} from '../types'
 import {fetchPreviewToken, toApiConfig} from '../api'
 
 const DISCOVERY_PAGE_PREVIEW = 'DISCOVERY_PAGE_PREVIEW'
+const DISCOVERY_PAGE_READY = 'DISCOVERY_PAGE_READY'
 const DEBOUNCE_MS = 500
 
 // hook to send a signed JWT preview token to an iframe via postMessage
 // de-bounces API calls (~500ms) so rapid edits don’t hammer the token endpoint
+// also responds immediately when the iframe signals DISCOVERY_PAGE_READY
 export function useIframeMessaging({
   iframeRef,
   config,
   previewUrl,
 }: UseIframeMessagingOptions): void {
+  const configRef = useRef(config)
+  useEffect(() => {
+    configRef.current = config
+  })
+
+  const isReadyRef = useRef(false)
   const targetOrigin = useMemo(() => {
     if (!previewUrl) return null
 
@@ -41,30 +49,61 @@ export function useIframeMessaging({
     }
   }, [previewUrl])
 
-  const sendToken = useMemo(
-    () =>
-      debounce(async (cfg: CardConfig) => {
-        if (!iframeRef.current?.contentWindow || !targetOrigin) return
+  const doSend = useCallback(
+    async (cfg: CardConfig) => {
+      if (!iframeRef.current?.contentWindow || !targetOrigin) return
 
-        try {
-          const token = await fetchPreviewToken(toApiConfig(cfg))
-          iframeRef.current.contentWindow.postMessage(
-            {type: DISCOVERY_PAGE_PREVIEW, token},
-            targetOrigin,
-          )
-        } catch (err) {
-          console.error('Failed to send preview token:', err)
-        }
-      }, DEBOUNCE_MS),
+      try {
+        const token = await fetchPreviewToken(toApiConfig(cfg))
+        iframeRef.current.contentWindow.postMessage(
+          {type: DISCOVERY_PAGE_PREVIEW, token},
+          targetOrigin,
+        )
+      } catch (err) {
+        console.error('Failed to send preview token:', err)
+      }
+    },
     [iframeRef, targetOrigin],
   )
 
+  const sendToken = useMemo(() => debounce(doSend, DEBOUNCE_MS), [doSend])
+
+  // send on config changes (debounced), but only after the iframe has signalled ready
   useEffect(() => {
-    sendToken(config)
+    if (isReadyRef.current) {
+      sendToken(config)
+    }
   }, [config, sendToken])
 
-  // cancel pending debounce on unmount
+  // wait for the iframe’s READY signal before sending anything
+  // reset isReady and cancel pending sends whenever targetOrigin changes
+  // so a newly-mounted iframe always goes through the handshake
   useEffect(() => {
-    return () => sendToken.cancel()
-  }, [sendToken])
+    if (!targetOrigin) {
+      isReadyRef.current = true
+      return
+    }
+
+    isReadyRef.current = false
+    // the config-change effect runs before this one (effects fire in declaration
+    // order), so it may have queued a send with the new sendToken before we had
+    // a chance to reset isReadyRef; cancel it here so the first send is always
+    // the immediate one triggered by DISCOVERY_PAGE_READY
+    sendToken.cancel()
+
+    const handleReady = (event: MessageEvent) => {
+      if (event.origin !== targetOrigin) return
+      if (event.data?.type !== DISCOVERY_PAGE_READY) return
+
+      isReadyRef.current = true
+      void doSend(configRef.current)
+    }
+
+    window.addEventListener('message', handleReady)
+    return () => {
+      window.removeEventListener('message', handleReady)
+      isReadyRef.current = false
+      sendToken.cancel()
+    }
+  }, [targetOrigin, doSend, sendToken])
 }

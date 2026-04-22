@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentInformation from '../index'
 import type {AssignmentInformationComponentProps} from '../index'
+import type {SubmissionConnection} from '../../../../types'
 import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
 
 describe('Assignment Information Tests', () => {
@@ -143,6 +144,62 @@ describe('Assignment Information Tests', () => {
     }
     const {getByTestId} = renderAssignmentInformation(props)
     expect(getByTestId('curve-grades-button')).toBeEnabled()
+  })
+
+  describe('assignment score details table', () => {
+    const makeSubmission = (overrides: {
+      id: string
+      score: number | null
+      userId: string
+    }): SubmissionConnection => ({
+      assignmentId: '1',
+      redoRequest: false,
+      submittedAt: null,
+      state: 'graded',
+      ...overrides,
+    })
+
+    it('shows "No graded submissions" for High and Low Score when all submissions are ungraded', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        submissions: [
+          makeSubmission({id: '1', score: null, userId: '1'}),
+          makeSubmission({id: '2', score: null, userId: '2'}),
+        ],
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('assignment-max')).toHaveTextContent('No graded submissions')
+      expect(getByTestId('assignment-min')).toHaveTextContent('No graded submissions')
+    })
+
+    it('excludes null scores and uses only numeric scores for High, Low, and Average', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        submissions: [
+          makeSubmission({id: '1', score: 8, userId: '1'}),
+          makeSubmission({id: '2', score: null, userId: '2'}),
+          makeSubmission({id: '3', score: 5, userId: '3'}),
+        ],
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('assignment-max')).toHaveTextContent('8')
+      expect(getByTestId('assignment-min')).toHaveTextContent('5')
+      expect(getByTestId('assignment-average')).toHaveTextContent('6.5')
+    })
+
+    it('includes a score of 0 in High and Low Score calculations', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        submissions: [
+          makeSubmission({id: '1', score: 10, userId: '1'}),
+          makeSubmission({id: '2', score: 0, userId: '2'}),
+          makeSubmission({id: '3', score: null, userId: '3'}),
+        ],
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('assignment-max')).toHaveTextContent('10')
+      expect(getByTestId('assignment-min')).toHaveTextContent('0')
+    })
   })
 
   describe('assignment in closed grading period', () => {

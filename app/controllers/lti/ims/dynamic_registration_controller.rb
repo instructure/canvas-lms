@@ -64,7 +64,7 @@ module Lti
       def registration_token
         uuid = SecureRandom.uuid
         current_time = Time.zone.now.iso8601
-        user_id = @current_user.id
+        user_id = @current_user.global_id
         root_account_global_id = account_context.global_id
         root_account_domain = account_context.domain(request.host)
         unified_tool_id = params[:unified_tool_id].presence
@@ -80,7 +80,7 @@ module Lti
             root_account_global_id:,
             root_account_domain:,
             registration_url:,
-            existing_registration: existing_registration&.id
+            existing_registration: existing_registration&.global_id
           }.compact,
           REGISTRATION_TOKEN_EXPIRATION.from_now
         )
@@ -191,8 +191,10 @@ module Lti
           return render status: :forbidden, json: { errorMessage: "You are not authorized to access this registration" }
         end
 
-        root_deployment = ContextExternalTool.find_by(account: ims_registration.root_account, lti_registration: ims_registration.lti_registration_id)
-        render_registration(ims_registration, ims_registration.developer_key, root_deployment)
+        ims_registration.lti_registration.account.shard.activate do
+          root_deployment = ContextExternalTool.find_by(account: ims_registration.root_account, lti_registration: ims_registration.lti_registration_id)
+          render_registration(ims_registration, ims_registration.developer_key, root_deployment)
+        end
       end
 
       def oidc_configuration_url(registration_token)
@@ -266,33 +268,37 @@ module Lti
         return render status: :unprocessable_content, json: { errors: } if errors.present?
 
         if jwt["existing_registration"].present?
-          registration = Lti::Registration.find(jwt["existing_registration"])
-          if registration.present?
-            # Create an LTI RegistrationUpdateRequest
-            # to update the existing registration
-            registration_update_request = Lti::RegistrationUpdateRequest.new(
-              root_account_id: registration.root_account.id,
-              lti_registration_id: registration.id,
-              uuid: jwt["uuid"],
-              lti_ims_registration: registration_attrs,
-              created_by_id: jwt["user_id"],
-              accepted_at: nil,
-              rejected_at: nil
-            )
+          root_account.shard.activate do
+            registration = Lti::Registration.find(jwt["existing_registration"])
+            if registration.present?
+              created_by_user = User.find(jwt["user_id"]) if jwt["user_id"].present?
 
-            # Auto-accept if the registration attributes match
-            if registration_attrs_match?(registration.ims_registration, registration_attrs)
-              Lti::ApplyRegistrationUpdateRequestService.call(
-                registration_update_request:,
-                applied_by: @current_user
+              # Create an LTI RegistrationUpdateRequest
+              # to update the existing registration
+              registration_update_request = Lti::RegistrationUpdateRequest.new(
+                root_account_id: registration.root_account.id,
+                lti_registration_id: registration.id,
+                uuid: jwt["uuid"],
+                lti_ims_registration: registration_attrs,
+                created_by: created_by_user,
+                accepted_at: nil,
+                rejected_at: nil
               )
+
+              # Auto-accept if the registration attributes match
+              if registration_attrs_match?(registration.ims_registration, registration_attrs)
+                Lti::ApplyRegistrationUpdateRequestService.call(
+                  registration_update_request:,
+                  applied_by: @current_user
+                )
+              end
+
+              root_deployment = ContextExternalTool.find_by(account: root_account, lti_registration: registration)
+
+              render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
             end
-
-            root_deployment = ContextExternalTool.find_by(account: root_account, lti_registration: registration)
-
-            render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
-            return
           end
+          return
         end
 
         registration_url = jwt["registration_url"]
@@ -380,29 +386,31 @@ module Lti
         return render status: :unprocessable_content, json: { errors: } if errors.present?
 
         if registration.present?
-          # Create an LTI RegistrationUpdateRequest
-          # to update the existing registration
-          registration_update_request = Lti::RegistrationUpdateRequest.new(
-            root_account_id: registration.root_account.id,
-            lti_registration_id: registration.id,
-            uuid: nil,
-            lti_ims_registration: registration_attrs,
-            created_by_id: nil,
-            accepted_at: nil,
-            rejected_at: nil
-          )
-
-          # Auto-accept if the registration attributes match
-          if registration_attrs_match?(ims_registration, registration_attrs)
-            Lti::ApplyRegistrationUpdateRequestService.call(
-              registration_update_request:,
-              applied_by: @current_user
+          registration.account.shard.activate do
+            # Create an LTI RegistrationUpdateRequest
+            # to update the existing registration
+            registration_update_request = Lti::RegistrationUpdateRequest.new(
+              root_account_id: registration.root_account.id,
+              lti_registration_id: registration.id,
+              uuid: nil,
+              lti_ims_registration: registration_attrs,
+              created_by_id: nil,
+              accepted_at: nil,
+              rejected_at: nil
             )
+
+            # Auto-accept if the registration attributes match
+            if registration_attrs_match?(ims_registration, registration_attrs)
+              Lti::ApplyRegistrationUpdateRequestService.call(
+                registration_update_request:,
+                applied_by: @current_user
+              )
+            end
+
+            root_deployment = ContextExternalTool.find_by(account: registration.root_account, developer_key: registration.developer_key)
+
+            render_registration(ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
           end
-
-          root_deployment = ContextExternalTool.find_by(account: registration.root_account, developer_key: registration.developer_key)
-
-          render_registration(ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
         end
       end
 
@@ -423,7 +431,7 @@ module Lti
                  }
           return
         end
-        if jwt["user_id"] != @current_user.id
+        if jwt["user_id"] != @current_user.global_id
           render status: :unauthorized,
                  json: {
                    errorMessage: "registration_token was created for a different user"

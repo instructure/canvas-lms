@@ -39,12 +39,18 @@ export const WIDGET_TYPES = {
   RECENT_GRADES: 'recent_grades',
   PROGRESS_OVERVIEW: 'progress_overview',
   INBOX: 'inbox',
+  EDUCATOR_ANNOUNCEMENT_CREATION: 'educator_announcement_creation',
+  EDUCATOR_TODO_LIST: 'educator_todo_list',
+  EDUCATOR_CONTENT_QUALITY: 'educator_content_quality',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
 
 export const LEFT_COLUMN = 1
 export const RIGHT_COLUMN = 2
+
+export const EDUCATOR_WIDGET_ROLE = 'educator' as const
+export const EDUCATOR_CANVAS_ROLES = ['teacher', 'designer'] as const
 
 export const DEFAULT_WIDGET_CONFIG = {
   columns: 2,

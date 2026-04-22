@@ -181,6 +181,9 @@
                 <i class="icon-student-view"></i> <%= student_view_text %>
               <% end %>
             <% end %>
+            <% if @show_study_assist %>
+              <div id="study_assist_mount_point"></div>
+            <% end %>
             <% if show_immersive_reader? %>
               <div id="immersive_reader_mount_point"></div>
             <% end %>

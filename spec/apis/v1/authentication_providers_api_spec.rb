@@ -576,6 +576,47 @@ describe "AuthenticationProviders API", type: :request do
       expect(@account.reload.auth_discovery_url).to eq("https://www.discover.com")
     end
 
+    it "sets login_help_url" do
+      payload = {
+        "sso_settings" => {
+          "login_help_url" => "https://example.com/login-help"
+        }
+      }
+      update_settings(payload, 200)
+      expect(@account.reload.login_help_url).to eq("https://example.com/login-help")
+    end
+
+    it "rejects an invalid login_help_url" do
+      payload = {
+        "sso_settings" => {
+          "login_help_url" => "not a url at all"
+        }
+      }
+      update_settings(payload, 422)
+    end
+
+    it "clears login_help_url with a blank value" do
+      @account.login_help_url = "https://example.com/faq"
+      @account.save!
+      payload = {
+        "sso_settings" => {
+          "login_help_url" => ""
+        }
+      }
+      update_settings(payload, 200)
+      expect(@account.reload.login_help_url).to be_nil
+    end
+
+    it "normalizes login_help_url without a scheme" do
+      payload = {
+        "sso_settings" => {
+          "login_help_url" => "example.com/login-help"
+        }
+      }
+      update_settings(payload, 200)
+      expect(@account.reload.login_help_url).to eq("http://example.com/login-help")
+    end
+
     it "ignores settings that don't exist" do
       payload = {
         "sso_settings" => {

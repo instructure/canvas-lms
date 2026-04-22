@@ -341,7 +341,8 @@ describe "as a teacher" do
         rule_cards = TeacherViewPageV2.allocation_rule_cards
         expect(rule_cards.length).to eq(1)
         expect(rule_cards.first.text).to include(@student1.name)
-        expect(rule_cards.first.text).to include("Must review")
+        expect(rule_cards.first.text).to include("will review")
+        expect(rule_cards.first.text).to include("(flexible)")
       end
 
       it "creates a rule with reviewee target type" do
@@ -359,14 +360,15 @@ describe "as a teacher" do
         rule_cards = TeacherViewPageV2.allocation_rule_cards
         expect(rule_cards.length).to eq(1)
         expect(rule_cards.first.text).to include(@student2.name)
-        expect(rule_cards.first.text).to include("Must be reviewed by")
+        expect(rule_cards.first.text).to include("will be reviewed by")
+        expect(rule_cards.first.text).to include("(flexible)")
       end
 
-      it "creates a rule with different review types" do
+      it "creates a rule with will not review type" do
         TeacherViewPageV2.add_rule_button.click
         wait_for_ajaximations
 
-        TeacherViewPageV2.review_type_should_not_review_radio.click
+        TeacherViewPageV2.review_type_will_not_review_radio.click
 
         select_student(TeacherViewPageV2.target_select_input, @student1.name)
         select_student(TeacherViewPageV2.subject_select_input, @student2.name)
@@ -376,7 +378,8 @@ describe "as a teacher" do
 
         rule_cards = TeacherViewPageV2.allocation_rule_cards
         expect(rule_cards.length).to eq(1)
-        expect(rule_cards.first.text).to include("Should not review")
+        expect(rule_cards.first.text).to include("will not review")
+        expect(rule_cards.first.text).to include("(flexible)")
       end
 
       it "creates a reciprocal review rule" do
@@ -621,7 +624,7 @@ describe "as a teacher" do
 
         expect(TeacherViewPageV2.edit_rule_modal).to be_displayed
         expect(f("input[data-testid='target-type-reviewer']")).to be_checked
-        expect(f("input[data-testid='review-type-must-review']")).to be_checked
+        expect(f("input[data-testid='review-type-will-review']")).to be_checked
       end
 
       it "edits an existing allocation rule" do
@@ -629,13 +632,14 @@ describe "as a teacher" do
         TeacherViewPageV2.edit_rule_button(rule_cards.first).click
         wait_for_ajaximations
 
-        TeacherViewPageV2.review_type_should_review_radio.click
+        TeacherViewPageV2.enforcement_type_flexible_radio.click
 
         TeacherViewPageV2.modal_save_button.click
         wait_for_ajaximations
 
         rule_cards = TeacherViewPageV2.allocation_rule_cards
-        expect(rule_cards.first.text).to include("Should review")
+        expect(rule_cards.first.text).to include("will review")
+        expect(rule_cards.first.text).to include("(flexible)")
       end
 
       it "focuses on edited rule's edit button after save" do
@@ -643,7 +647,7 @@ describe "as a teacher" do
         TeacherViewPageV2.edit_rule_button(rule_cards.first).click
         wait_for_ajaximations
 
-        TeacherViewPageV2.review_type_should_review_radio.click
+        TeacherViewPageV2.enforcement_type_flexible_radio.click
 
         TeacherViewPageV2.modal_save_button.click
         wait_for_ajaximations
@@ -664,7 +668,7 @@ describe "as a teacher" do
         TeacherViewPageV2.edit_rule_button(rule_cards.first).click
         wait_for_ajaximations
 
-        TeacherViewPageV2.review_type_should_review_radio.click
+        TeacherViewPageV2.enforcement_type_flexible_radio.click
 
         TeacherViewPageV2.modal_save_button.click
         wait_for_ajaximations
@@ -955,15 +959,21 @@ describe "as a teacher" do
           )
         end
 
-        it "shows hint text when selecting reviewer with enough must review allocations" do
+        it "shows hint text when selecting reviewer with enough strict allocations" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           select_student(TeacherViewPageV2.target_select_input, @student1.name)
 
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
           expect(TeacherViewPageV2.peer_review_status_hint.text).to include("#{@student1.name} already has enough")
-          expect(TeacherViewPageV2.peer_review_status_hint.text).to include("must review")
+          expect(TeacherViewPageV2.peer_review_status_hint.text).to include("strict")
         end
 
         it "shows hint text when selecting additional subject in reviewee mode" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           TeacherViewPageV2.target_type_reviewee_radio.click
           wait_for_ajaximations
 
@@ -978,11 +988,11 @@ describe "as a teacher" do
           hints = TeacherViewPageV2.peer_review_status_hints
           expect(hints.length).to eq(1)
           expect(hints.first.text).to include("#{@student1.name} already has enough")
-          expect(hints.first.text).to include("must review")
+          expect(hints.first.text).to include("strict")
         end
 
         it "does not show hint when must review type is not selected" do
-          TeacherViewPageV2.review_type_should_review_radio.click
+          TeacherViewPageV2.enforcement_type_flexible_radio.click
           wait_for_ajaximations
 
           select_student(TeacherViewPageV2.target_select_input, @student1.name)
@@ -1024,14 +1034,20 @@ describe "as a teacher" do
         end
 
         it "shows hint text when selecting reviewer with combined count" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           select_student(TeacherViewPageV2.target_select_input, @student1.name)
 
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
           expect(TeacherViewPageV2.peer_review_status_hint.text).to include("#{@student1.name} already has enough")
-          expect(TeacherViewPageV2.peer_review_status_hint.text).to include("must review")
+          expect(TeacherViewPageV2.peer_review_status_hint.text).to include("strict")
         end
 
         it "shows hint text in reciprocal review mode" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           TeacherViewPageV2.target_type_reciprocal_radio.click
           wait_for_ajaximations
 
@@ -1039,7 +1055,7 @@ describe "as a teacher" do
 
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
           expect(TeacherViewPageV2.peer_review_status_hint.text).to include("#{@student1.name} already has enough")
-          expect(TeacherViewPageV2.peer_review_status_hint.text).to include("must review")
+          expect(TeacherViewPageV2.peer_review_status_hint.text).to include("strict")
         end
       end
 
@@ -1065,32 +1081,41 @@ describe "as a teacher" do
           )
         end
 
-        it "shows hint when must review is selected" do
+        it "shows hint when strict is selected" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           select_student(TeacherViewPageV2.target_select_input, @student1.name)
 
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
         end
 
-        it "hides hint when switching to should review" do
+        it "hides hint when switching to flexible" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           select_student(TeacherViewPageV2.target_select_input, @student1.name)
 
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
 
-          TeacherViewPageV2.review_type_should_review_radio.click
+          TeacherViewPageV2.enforcement_type_flexible_radio.click
           wait_for_ajaximations
 
           expect(element_exists?("div[data-testid='peer-review-status-hint']")).to be_falsey
         end
 
-        it "shows hint again when switching back to must review" do
+        it "shows hint again when switching back to strict" do
+          TeacherViewPageV2.enforcement_type_strict_radio.click
+          wait_for_ajaximations
+
           select_student(TeacherViewPageV2.target_select_input, @student1.name)
 
-          TeacherViewPageV2.review_type_should_review_radio.click
+          TeacherViewPageV2.enforcement_type_flexible_radio.click
           wait_for_ajaximations
 
           expect(element_exists?("div[data-testid='peer-review-status-hint']")).to be_falsey
 
-          TeacherViewPageV2.review_type_must_review_radio.click
+          TeacherViewPageV2.enforcement_type_strict_radio.click
           wait_for_ajaximations
 
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
@@ -1143,7 +1168,7 @@ describe "as a teacher" do
           TeacherViewPageV2.edit_rule_button(rule_cards.first).click
           wait_for_ajaximations
 
-          TeacherViewPageV2.review_type_should_review_radio.click
+          TeacherViewPageV2.enforcement_type_flexible_radio.click
 
           TeacherViewPageV2.modal_save_button.click
           wait_for_ajaximations

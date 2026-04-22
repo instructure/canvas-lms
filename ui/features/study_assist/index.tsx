@@ -20,11 +20,11 @@ import React, {useState} from 'react'
 import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {PlatformUiProvider} from '@instructure/platform-provider'
-import {executeQuery} from '@canvas/graphql'
+import {platformExecuteQuery} from '@canvas/graphql'
 import type {AssistRequest, AssistResponse} from '@instructure/platform-study-assist'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconAiSolid} from '@instructure/ui-icons'
 import StudyAssistTray from './components/StudyAssistTray'
 
@@ -83,9 +83,14 @@ function StudyAssistApp() {
 
   return (
     <>
-      <Button renderIcon={<IconAiSolid />} onClick={() => setOpen(true)}>
-        {I18n.t('Study tools')}
-      </Button>
+      <IconButton
+        screenReaderLabel={I18n.t('Study tools')}
+        shape="circle"
+        color="ai-primary"
+        onClick={() => setOpen(true)}
+      >
+        <IconAiSolid />
+      </IconButton>
       <StudyAssistTray
         open={open}
         onDismiss={() => setOpen(false)}
@@ -95,21 +100,25 @@ function StudyAssistApp() {
   )
 }
 
+const MOUNT_IDS = ['study_assist_mount_point', 'study_assist_mobile_mount_point']
+
 ready(() => {
   if (!window.ENV.FEATURES.study_assist) return
 
-  const mount = document.getElementById('study_assist_mount_point')
-  if (!mount) return
+  MOUNT_IDS.forEach(id => {
+    const mount = document.getElementById(id)
+    if (!mount) return
 
-  render(
-    <PlatformUiProvider
-      executeQuery={executeQuery}
-      locale={window.ENV.LOCALE ?? 'en'}
-      timezone={window.ENV.TIMEZONE ?? 'UTC'}
-      currentUserId={window.ENV.current_user_id ?? undefined}
-    >
-      <StudyAssistApp />
-    </PlatformUiProvider>,
-    mount,
-  )
+    render(
+      <PlatformUiProvider
+        executeQuery={platformExecuteQuery}
+        locale={window.ENV.LOCALE ?? 'en'}
+        timezone={window.ENV.TIMEZONE ?? 'UTC'}
+        currentUserId={window.ENV.current_user_id ?? undefined}
+      >
+        <StudyAssistApp />
+      </PlatformUiProvider>,
+      mount,
+    )
+  })
 })

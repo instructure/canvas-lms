@@ -275,17 +275,13 @@ describe Lti::IMS::NamesAndRolesSerializer do
       context "variables expansion" do
         include_context "course and tool for variable substitution"
 
-        before do
-          Account.site_admin.disable_feature!(:custom_variables_booleans_as_strings)
-        end
-
         it "expand course-related variables from the tool settings" do
           json = serialize
 
           received_custom_claim = json[:members][0][:message].first["https://purl.imsglobal.org/spec/lti/claim/custom"]
           expect(received_custom_claim["canvas_course_endat"]).to eq course.end_at.utc.iso8601
           expect(received_custom_claim["canvas_course_gradepassbacksetting"]).to eq course.grade_passback_setting
-          expect(received_custom_claim["canvas_course_hidedistributiongraphs"]).to eq course.hide_distribution_graphs?
+          expect(received_custom_claim["canvas_course_hidedistributiongraphs"]).to eq course.hide_distribution_graphs?.to_s
           expect(received_custom_claim["canvas_course_id"]).to eq course.id.to_s
           expect(received_custom_claim["canvas_course_name"]).to eq course.name
 
@@ -294,7 +290,7 @@ describe Lti::IMS::NamesAndRolesSerializer do
           expect(received_custom_claim["canvas_course_previouscontextids_recursive"]).to eq lti_helper.recursively_fetch_previous_lti_context_ids
           expect(received_custom_claim["canvas_course_previouscourseids"]).to eq lti_helper.previous_course_ids
           expect(received_custom_claim["canvas_course_sectionids"]).to eq lti_helper.section_ids
-          expect(received_custom_claim["canvas_course_sectionrestricted"]).to eq lti_helper.section_restricted
+          expect(received_custom_claim["canvas_course_sectionrestricted"]).to eq lti_helper.section_restricted.to_s
           expect(received_custom_claim["canvas_course_sectionsissourceids"]).to eq lti_helper.section_sis_ids
 
           expect(received_custom_claim["canvas_course_sissourceid"]).to eq "$Canvas.course.sisSourceId"

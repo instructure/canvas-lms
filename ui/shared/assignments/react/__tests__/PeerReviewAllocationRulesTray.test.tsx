@@ -126,7 +126,6 @@ const mockAllocationRules: AllocationRuleType[] = [
 
 describe('PeerReviewAllocationRulesTray', () => {
   const defaultProps = {
-    courseId: '1',
     assignmentId: '456',
     requiredPeerReviewsCount: 2,
     isTrayOpen: true,
@@ -618,12 +617,12 @@ describe('PeerReviewAllocationRulesTray', () => {
         )
       })
 
-      expect(screen.getByLabelText('John Smith must review Jane Doe')).toBeInTheDocument()
+      expect(screen.getByLabelText('John Smith will review Jane Doe (strict)')).toBeInTheDocument()
       expect(
-        screen.getByLabelText('Alice Brown should be reviewed by Bob Johnson'),
+        screen.getByLabelText('Alice Brown will be reviewed by Bob Johnson (flexible)'),
       ).toBeInTheDocument()
       expect(
-        screen.getByLabelText('Charlie Wilson must not review Diana Prince'),
+        screen.getByLabelText('Charlie Wilson will not review Diana Prince (strict)'),
       ).toBeInTheDocument()
     })
   })

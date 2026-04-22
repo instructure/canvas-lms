@@ -73,6 +73,12 @@
   <% else %>
     <div class="mobile-header-space"></div>
   <% end %>
+  <% if @show_study_assist %>
+    <div id="study_assist_mobile_mount_point"></div>
+  <% end %>
+  <% if @show_learning_agent %>
+    <div id="learning_agent_mobile_mount_point"></div>
+  <% end %>
   <% if !!@domain_root_account&.feature_enabled?(:top_navigation_placement) %>
     <div id="mobile-top-nav-tools-mount-point"></div>
   <% end %>

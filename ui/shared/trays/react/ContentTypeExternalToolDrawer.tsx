@@ -30,7 +30,6 @@ import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import useGlobalNavWidth from './hooks/useGlobalNavWidth'
@@ -200,7 +199,6 @@ export default function ContentTypeExternalToolDrawer({
                   ref={iframeRef}
                   src={iframeUrl}
                   title={toolTitle}
-                  allow={iframeAllowances()}
                 />
               )}
             </Flex.Item>

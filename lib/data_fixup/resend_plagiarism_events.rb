@@ -69,10 +69,10 @@ module DataFixup
     end
 
     def self.missing_report_scope(scope)
-      "(#{scope.joins(:attachment_associations)
+      "(#{scope.where.not(submission_type: "online_text_entry")
+      .joins(:attachment_associations)
       .joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
               AS ors ON submissions.id = ors.submission_id
-                    AND submissions.submitted_at = ors.submission_time
                     AND attachment_associations.attachment_id = ors.attachment_id")
       .where("ors.id IS NULL OR ors.workflow_state = 'pending'").to_sql})
       UNION
@@ -85,10 +85,10 @@ module DataFixup
     end
 
     def self.errors_report_scope(scope)
-      "(#{scope.joins(:attachment_associations)
+      "(#{scope.where.not(submission_type: "online_text_entry")
+      .joins(:attachment_associations)
       .joins("INNER JOIN #{OriginalityReport.quoted_table_name}
               AS ors ON submissions.id = ors.submission_id
-                    AND submissions.submitted_at = ors.submission_time
                     AND attachment_associations.attachment_id = ors.attachment_id
                     AND ors.workflow_state = 'error'").to_sql})
       UNION

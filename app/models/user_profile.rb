@@ -103,6 +103,7 @@ class UserProfile < ApplicationRecord
         insert_observer_tabs(tabs, user)
         insert_qr_mobile_login_tab(tabs, user, opts)
         insert_past_global_announcements(tabs, user, opts)
+        insert_nav_menu_link_tabs(tabs, opts)
         tabs
       end
   end
@@ -199,6 +200,13 @@ class UserProfile < ApplicationRecord
           no_args: { include_past: true }
         }
     end
+  end
+
+  def insert_nav_menu_link_tabs(tabs, opts)
+    root_account = opts[:root_account]
+    return unless root_account&.feature_enabled?(:nav_menu_links)
+
+    tabs.concat(NavMenuLinkTabs.user_tabs(root_account))
   end
 end
 

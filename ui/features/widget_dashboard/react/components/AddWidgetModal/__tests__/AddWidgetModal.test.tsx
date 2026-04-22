@@ -289,6 +289,66 @@ describe('AddWidgetModal', () => {
     })
   })
 
+  describe('educator role filtering', () => {
+    it('shows only educator widgets for teachers', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['teacher'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-educator_announcement_creation')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_todo_list')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_content_quality')).toBeInTheDocument()
+
+      expect(screen.queryByTestId('widget-card-course_work_combined')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows only educator widgets for designers', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['designer'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-educator_announcement_creation')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_todo_list')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_content_quality')).toBeInTheDocument()
+
+      expect(screen.queryByTestId('widget-card-course_work_combined')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows educator widgets for multi-role users (teacher + student)', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['teacher', 'student'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-educator_announcement_creation')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_todo_list')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_content_quality')).toBeInTheDocument()
+
+      expect(screen.queryByTestId('widget-card-course_work_combined')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows only learner widgets for non-educator roles', () => {
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(
+        screen.queryByTestId('widget-card-educator_announcement_creation'),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-educator_todo_list')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-educator_content_quality')).not.toBeInTheDocument()
+
+      expect(screen.getByTestId('widget-card-course_work_combined')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-inbox')).toBeInTheDocument()
+    })
+  })
+
   describe('responsive layout', () => {
     it('uses single-column layout on mobile viewports', () => {
       render(

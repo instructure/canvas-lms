@@ -2714,7 +2714,6 @@ class Attachment < ApplicationRecord
   def eligible_for_pine_indexing?
     return false unless context.is_a?(Course)
     return false unless context.horizon_course?
-    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
     return false unless PineClient.enabled?
     return false unless PineClient.allowed_attachment_content_types.include?(content_type)
 

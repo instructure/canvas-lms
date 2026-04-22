@@ -130,6 +130,27 @@ describe SIS::UserImporter do
       end
     end
 
+    context "when the user has attribute changes" do
+      let(:existing_user) do
+        user_with_pseudonym(account:, sis_user_id: user_sis_id, name: "Old Name")
+      end
+
+      before { existing_user }
+
+      it "records the user for sync when user attributes change" do
+        user_row = SIS::Models::User.new(
+          user_id: user_sis_id,
+          login_id: existing_user.pseudonyms.first.unique_id,
+          status: "active",
+          full_name: "New Name",
+          email: existing_user.pseudonyms.first.unique_id
+        )
+        user_importer.add_user(user_row)
+        user_importer.process_batch
+        expect(user_importer.users_to_sync).to include(existing_user.id)
+      end
+    end
+
     context "when no matching login exists" do
       context "when there is a user found in an implementation of the other_user hook" do
         let(:other_user) { user_model }

@@ -307,6 +307,45 @@ describe('ExpandedGradeView', () => {
     })
   })
 
+  // Pre-submission comments appear in recentCommentsConnection but are not counted in
+  // allCommentsConnection, so the "View all inline feedback" link is not shown.
+  it('does not show inline feedback link when allCommentsConnection totalCount is 0', async () => {
+    server.use(
+      http.post('/api/graphql', () => {
+        return HttpResponse.json({
+          data: {
+            legacyNode: {
+              _id: 'sub1',
+              rubricAssessmentsConnection: {nodes: []},
+              recentCommentsConnection: {
+                nodes: [
+                  {
+                    _id: 'pre-comment1',
+                    comment: 'Pre-submission feedback',
+                    htmlComment: '<p>Pre-submission feedback</p>',
+                    author: {_id: 'teacher1', name: 'Mr. Smith'},
+                    createdAt: '2025-11-27T10:00:00Z',
+                  },
+                ],
+              },
+              allCommentsConnection: {
+                pageInfo: {totalCount: 0},
+              },
+            },
+          },
+        })
+      }),
+    )
+
+    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('submission-details-loading-sub1')).not.toBeInTheDocument()
+    })
+
+    expect(screen.queryByTestId('view-inline-feedback-link-sub1')).not.toBeInTheDocument()
+  })
+
   it('renders the open assignment link with assignment name', () => {
     renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
     const link = screen.getByTestId('open-assignment-link-sub1')

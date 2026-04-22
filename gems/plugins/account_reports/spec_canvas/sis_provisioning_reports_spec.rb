@@ -1981,6 +1981,40 @@ describe "Default Account Reports" do
                                           nil,
                                           "false"]]
         end
+
+        context "when temporary enrollment with deleted ending enrollment state and include_deleted" do
+          before(:once) do
+            @enrollment.destroy
+            @report_params = {
+              "enrollments" => true,
+              "include_deleted" => true,
+              "enrollment_filter" => "TeacherEnrollment"
+            }
+          end
+
+          it "includes deleted temporary enrollment in provisioning report" do
+            parsed = read_report("provisioning_csv", { params: @report_params, order: [1, 0] })
+
+            deleted_enrollment_row = parsed.find { |row| row[2] == @user2.id.to_s && row[14] == @enrollment.id.to_s }
+            expect(deleted_enrollment_row).not_to be_nil
+            expect(deleted_enrollment_row[8]).to eq "deleted"
+          end
+
+          it "excludes deleted temporary enrollment from SIS export" do
+            parsed = read_report("sis_export_csv", { params: @report_params, order: [1, 0] })
+
+            deleted_enrollment_row = parsed.find { |row| row[1] == @user2.pseudonyms.first.sis_user_id }
+            expect(deleted_enrollment_row).to be_nil
+          end
+
+          it "excludes deleted temporary enrollment when feature flag is disabled" do
+            @account.disable_feature!(:temporary_enrollments)
+            parsed = read_report("provisioning_csv", { params: @report_params, order: [1, 0] })
+
+            deleted_enrollment_row = parsed.find { |row| row[2] == @user2.id.to_s && row[14] == @enrollment.id.to_s }
+            expect(deleted_enrollment_row).to be_nil
+          end
+        end
       end
 
       describe "sharding" do

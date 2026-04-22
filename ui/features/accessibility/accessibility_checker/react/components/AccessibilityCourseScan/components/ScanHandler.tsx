@@ -118,6 +118,7 @@ interface CourseScanWrapperProps {
   lastChecked?: string | null
   scanButtonDisabled?: boolean
   handleCourseScan?: () => void
+  buttonRef?: React.RefObject<HTMLElement | null>
 }
 
 export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
@@ -126,6 +127,7 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
   handleCourseScan,
   buttonLabel,
   lastChecked,
+  buttonRef,
 }) => {
   const formatScanDate = useDateTimeFormat('date.formats.full')
   const formattedDate = lastChecked ? formatScanDate(lastChecked) : undefined
@@ -176,6 +178,12 @@ export const ScanHandler: React.FC<CourseScanWrapperProps> = ({
                     onClick={handleCourseScan}
                     display={props.buttonDisplay}
                     width={props.buttonWidth}
+                    elementRef={el => {
+                      if (buttonRef) {
+                        ;(buttonRef as React.MutableRefObject<HTMLElement | null>).current =
+                          el as HTMLElement | null
+                      }
+                    }}
                   >
                     {buttonLabel}
                   </Button>

@@ -221,6 +221,11 @@ module UserContent
       html.gsub(@toplevel_regex) { |url| replacement(url) }
     end
 
+    # For places we have URLs outside of HTML content
+    def translate_url(url)
+      url&.gsub(@toplevel_regex) { |matched_url| replacement(matched_url) }
+    end
+
     def add_lazy_loading(parsed_html)
       parsed_html.css("img, iframe").each do |e|
         if e.attributes["src"]&.value&.match?(@toplevel_regex)
@@ -274,7 +279,6 @@ module UserContent
       type, obj_id, rest = matched.values_at(6, 7, 8)
       home_link = url.match(%r{(/courses/#{Api::SHARDID_REGEX}/?(?=\b|[^/\w]|$))}o)
       url = url.sub(%r{/$}, "") if home_link
-      host = matched[1]
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
       return url if context_type == "users" && type == "external_tools"
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && !FILES_LOCATIONS_PREFIXES.include?(context_type)

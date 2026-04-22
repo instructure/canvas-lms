@@ -183,6 +183,8 @@ export const rceWrapperPropTypes = {
   menu: menuPropType,
   instRecordDisabled: PropTypes.bool,
   highContrastCSS: PropTypes.arrayOf(PropTypes.string),
+  useHighContrast: PropTypes.bool,
+  fontFamily: PropTypes.string,
   maxInitRenderedRCEs: PropTypes.number,
   use_rce_icon_maker: PropTypes.bool,
   features: PropTypes.objectOf(PropTypes.bool),

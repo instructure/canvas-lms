@@ -50,11 +50,8 @@ import {
   MIN_HEIGHT_STUDIO_PLAYER,
   MIN_PERCENTAGE,
   MIN_WIDTH_STUDIO_PLAYER,
-  MIN_WIDTH_VIDEO,
-  scaleToSize,
   scaleVideoSize,
   studioPlayerSizes,
-  videoSizes,
 } from '../../instructure_image/ImageEmbedOptions'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {StoreProvider} from '../../shared/StoreContext'
@@ -88,7 +85,6 @@ export default function VideoOptionsTray({
   onCaptionsModified = null,
   isLoading = false,
 }) {
-  const isConsolidatedMediaPlayer = RCEGlobals.getFeatures()?.consolidated_media_player
   const isEmbedImprovements = RCEGlobals.getFeatures()?.rce_studio_embed_improvements
   const isAsrCaptioningImprovements = RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
   const {naturalHeight, naturalWidth} = videoOptions
@@ -108,20 +104,11 @@ export default function VideoOptionsTray({
   const [videoHeight, setVideoHeight] = useState(currentHeight)
   const [videoWidth, setVideoWidth] = useState(currentWidth)
   const [subtitles, setSubtitles] = useState(videoOptions.tracks || [])
-  const [minWidth] = useState(() => {
-    if (isAsrCaptioningImprovements) {
-      return playerLayoutDimensions[SMALL].width
-    }
-    return isConsolidatedMediaPlayer ? MIN_WIDTH_STUDIO_PLAYER : MIN_WIDTH_VIDEO
-  })
-  const [minHeight] = useState(() => {
-    if (isAsrCaptioningImprovements) {
-      return playerLayoutDimensions[SMALL].height
-    }
-    return isConsolidatedMediaPlayer
-      ? MIN_HEIGHT_STUDIO_PLAYER
-      : Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO)
-  })
+
+  const {width: minWidth, height: minHeight} = isAsrCaptioningImprovements
+    ? playerLayoutDimensions[SMALL]
+    : {width: MIN_WIDTH_STUDIO_PLAYER, height: MIN_HEIGHT_STUDIO_PLAYER}
+
   const [minPercentage] = useState(MIN_PERCENTAGE)
   const [editLocked, setEditLocked] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -163,11 +150,7 @@ export default function VideoOptionsTray({
       : {},
   )
   const api = new RceApiSource(trayProps)
-  const videoSizeOptions = isConsolidatedMediaPlayer
-    ? isAsrCaptioningImprovements
-      ? getPlayerLayoutSizes()
-      : studioPlayerSizes
-    : videoSizes
+  const videoSizeOptions = isAsrCaptioningImprovements ? getPlayerLayoutSizes() : studioPlayerSizes
 
   useEffect(() => {
     if (videoOptions.attachmentId) {
@@ -221,9 +204,7 @@ export default function VideoOptionsTray({
       setVideoHeight(height)
       setVideoWidth(width)
     } else {
-      const {height, width} = isConsolidatedMediaPlayer
-        ? scaleVideoSize(selectedOption.value, naturalWidth, naturalHeight)
-        : scaleToSize(selectedOption.value, naturalWidth, naturalHeight)
+      const {height, width} = scaleVideoSize(selectedOption.value, naturalWidth, naturalHeight)
 
       setVideoHeight(height)
       setVideoWidth(width)
@@ -464,6 +445,14 @@ export default function VideoOptionsTray({
                               variant="toggle"
                               label={formatMessage('Show Rolling Transcript')}
                               value="show_rolling_transcript"
+                              messages={[
+                                {
+                                  text: formatMessage(
+                                    'Transcript panel is available at widths above 720px.',
+                                  ),
+                                  type: 'screenreader-only',
+                                },
+                              ]}
                             />
                           </CheckboxGroup>
                         </Flex.Item>

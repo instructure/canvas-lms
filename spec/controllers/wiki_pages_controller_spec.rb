@@ -226,19 +226,50 @@ describe WikiPagesController do
         context "when enabled" do
           before { @course.enable_feature!(:study_assist) }
 
-          it "sets study_assist in FEATURES" do
-            get "show", params: { course_id: @course.id, id: @page.url }
-            expect(assigns[:js_env][:FEATURES][:study_assist]).to be true
+          context "as a student" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+            end
+
+            it "sets study_assist in FEATURES" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:FEATURES][:study_assist]).to be true
+            end
+
+            it "sets WIKI_PAGE_ID to the page url" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:WIKI_PAGE_ID]).to eq @page.url
+            end
+
+            it "sets JOURNEY_URL from CanvasCareer config" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+            end
+
+            it "sets STUDY_ASSIST_TOOLS with all tools enabled by default" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Summarize", "Quiz me", "Flashcards"]
+            end
+
+            it "excludes tools when their feature flag is disabled" do
+              @course.disable_feature!(:study_assist_summarize)
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Quiz me", "Flashcards"]
+            end
+
+            it "returns empty array when all tool flags are disabled" do
+              @course.disable_feature!(:study_assist_summarize)
+              @course.disable_feature!(:study_assist_quiz_me)
+              @course.disable_feature!(:study_assist_flashcards)
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq []
+            end
           end
 
-          it "sets WIKI_PAGE_ID to the page url" do
+          it "does not set study_assist for teachers" do
             get "show", params: { course_id: @course.id, id: @page.url }
-            expect(assigns[:js_env][:WIKI_PAGE_ID]).to eq @page.url
-          end
-
-          it "sets JOURNEY_URL from CanvasCareer config" do
-            get "show", params: { course_id: @course.id, id: @page.url }
-            expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+            expect(assigns[:js_env][:FEATURES]).not_to have_key(:study_assist)
           end
         end
 
@@ -251,6 +282,11 @@ describe WikiPagesController do
           it "does not set JOURNEY_URL" do
             get "show", params: { course_id: @course.id, id: @page.url }
             expect(assigns[:js_env]).not_to have_key :JOURNEY_URL
+          end
+
+          it "does not set STUDY_ASSIST_TOOLS" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :STUDY_ASSIST_TOOLS
           end
         end
       end

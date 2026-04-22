@@ -51,9 +51,7 @@ describe "peer review override dates", :ignore_js_errors do
     assignment_due: "03/01/2026",
     assignment_unlock: nil,
     assignment_lock: nil,
-    peer_review_due: nil,
-    peer_review_unlock: nil,
-    peer_review_lock: nil
+    peer_review_due: nil
   )
     comboboxes = ff("input[role='combobox']")
 
@@ -62,13 +60,12 @@ describe "peer review override dates", :ignore_js_errors do
     wait_for_ajaximations
 
     # Refresh comboboxes after assignment due date is set
+    # New order: due(1) → peer_review_due(3) → unlock(5) → lock(7)
     comboboxes = ff("input[role='combobox']")
 
-    set_date_field(comboboxes, 3, assignment_unlock)
-    set_date_field(comboboxes, 5, assignment_lock)
-    set_date_field(comboboxes, 7, peer_review_due)
-    set_date_field(comboboxes, 9, peer_review_unlock)
-    set_date_field(comboboxes, 11, peer_review_lock)
+    set_date_field(comboboxes, 3, peer_review_due)
+    set_date_field(comboboxes, 5, assignment_unlock)
+    set_date_field(comboboxes, 7, assignment_lock)
   end
 
   def verify_assignment_created_and_dates_persisted(
@@ -76,9 +73,7 @@ describe "peer review override dates", :ignore_js_errors do
     assignment_due:,
     assignment_unlock: nil,
     assignment_lock: nil,
-    peer_review_due: nil,
-    peer_review_unlock: nil,
-    peer_review_lock: nil
+    peer_review_due: nil
   )
     # Verify assignment was created
     assignment = @pr_course.assignments.last
@@ -89,14 +84,13 @@ describe "peer review override dates", :ignore_js_errors do
     edit_assignment(assignment.id)
 
     # Verify dates persisted
+    # New order: due(1) → peer_review_due(3) → unlock(5) → lock(7)
     comboboxes_after = ff("input[role='combobox']")
 
     expect(comboboxes_after[1].attribute("value")).to include(assignment_due)
-    expect(comboboxes_after[3].attribute("value")).to include(assignment_unlock) if assignment_unlock
-    expect(comboboxes_after[5].attribute("value")).to include(assignment_lock) if assignment_lock
-    expect(comboboxes_after[7].attribute("value")).to include(peer_review_due) if peer_review_due
-    expect(comboboxes_after[9].attribute("value")).to include(peer_review_unlock) if peer_review_unlock
-    expect(comboboxes_after[11].attribute("value")).to include(peer_review_lock) if peer_review_lock
+    expect(comboboxes_after[3].attribute("value")).to include(peer_review_due) if peer_review_due
+    expect(comboboxes_after[5].attribute("value")).to include(assignment_unlock) if assignment_unlock
+    expect(comboboxes_after[7].attribute("value")).to include(assignment_lock) if assignment_lock
   end
 
   def change_override_assignee(assignee_name)
@@ -123,18 +117,15 @@ describe "peer review override dates", :ignore_js_errors do
     assignment_due: nil,
     assignment_unlock: nil,
     assignment_lock: nil,
-    peer_review_due: nil,
-    peer_review_unlock: nil,
-    peer_review_lock: nil
+    peer_review_due: nil
   )
+    # New order: due(1) → peer_review_due(3) → unlock(5) → lock(7)
     comboboxes = ff("input[role='combobox']")
 
     update_date_field(comboboxes, 1, assignment_due)
-    update_date_field(comboboxes, 3, assignment_unlock)
-    update_date_field(comboboxes, 5, assignment_lock)
-    update_date_field(comboboxes, 7, peer_review_due)
-    update_date_field(comboboxes, 9, peer_review_unlock)
-    update_date_field(comboboxes, 11, peer_review_lock)
+    update_date_field(comboboxes, 3, peer_review_due)
+    update_date_field(comboboxes, 5, assignment_unlock)
+    update_date_field(comboboxes, 7, assignment_lock)
   end
 
   def enter_assignment_name(name)
@@ -180,9 +171,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "03/01/2026",
         assignment_unlock: "02/01/2026",
         assignment_lock: "03/20/2026",
-        peer_review_due: "03/15/2026",
-        peer_review_unlock: "03/05/2026",
-        peer_review_lock: "03/18/2026"
+        peer_review_due: "03/15/2026"
       )
 
       save_assignment
@@ -192,9 +181,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 1",
         assignment_unlock: "Feb 1",
         assignment_lock: "Mar 20",
-        peer_review_due: "Mar 15",
-        peer_review_unlock: "Mar 5",
-        peer_review_lock: "Mar 18"
+        peer_review_due: "Mar 15"
       )
     end
 
@@ -209,9 +196,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "03/06/2026",
         assignment_unlock: "02/06/2026",
         assignment_lock: "03/25/2026",
-        peer_review_due: "03/20/2026",
-        peer_review_unlock: "03/10/2026",
-        peer_review_lock: "03/23/2026"
+        peer_review_due: "03/20/2026"
       )
 
       save_assignment
@@ -221,18 +206,14 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 6",
         assignment_unlock: "Feb 6",
         assignment_lock: "Mar 25",
-        peer_review_due: "Mar 20",
-        peer_review_unlock: "Mar 10",
-        peer_review_lock: "Mar 23"
+        peer_review_due: "Mar 20"
       )
 
       update_override_dates(
         assignment_due: "03/11/2026",
         assignment_unlock: "02/11/2026",
         assignment_lock: "03/30/2026",
-        peer_review_due: "03/25/2026",
-        peer_review_unlock: "03/15/2026",
-        peer_review_lock: "03/28/2026"
+        peer_review_due: "03/25/2026"
       )
 
       save_assignment
@@ -242,9 +223,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 11",
         assignment_unlock: "Feb 11",
         assignment_lock: "Mar 30",
-        peer_review_due: "Mar 25",
-        peer_review_unlock: "Mar 15",
-        peer_review_lock: "Mar 28"
+        peer_review_due: "Mar 25"
       )
     end
 
@@ -261,9 +240,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "03/16/2026",
         assignment_unlock: "02/16/2026",
         assignment_lock: "04/04/2026",
-        peer_review_due: "03/30/2026",
-        peer_review_unlock: "03/20/2026",
-        peer_review_lock: "04/02/2026"
+        peer_review_due: "03/30/2026"
       )
 
       save_assignment(with_modal: true)
@@ -273,9 +250,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 16",
         assignment_unlock: "Feb 16",
         assignment_lock: "Apr 4",
-        peer_review_due: "Mar 30",
-        peer_review_unlock: "Mar 20",
-        peer_review_lock: "Apr 2"
+        peer_review_due: "Mar 30"
       )
     end
 
@@ -292,9 +267,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "03/21/2026",
         assignment_unlock: "02/21/2026",
         assignment_lock: "04/09/2026",
-        peer_review_due: "04/04/2026",
-        peer_review_unlock: "03/25/2026",
-        peer_review_lock: "04/07/2026"
+        peer_review_due: "04/04/2026"
       )
 
       save_assignment(with_modal: true)
@@ -304,18 +277,14 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 21",
         assignment_unlock: "Feb 21",
         assignment_lock: "Apr 9",
-        peer_review_due: "Apr 4",
-        peer_review_unlock: "Mar 25",
-        peer_review_lock: "Apr 7"
+        peer_review_due: "Apr 4"
       )
 
       update_override_dates(
         assignment_due: "03/26/2026",
         assignment_unlock: "02/26/2026",
         assignment_lock: "04/14/2026",
-        peer_review_due: "04/09/2026",
-        peer_review_unlock: "03/30/2026",
-        peer_review_lock: "04/12/2026"
+        peer_review_due: "04/09/2026"
       )
 
       save_assignment(with_modal: true)
@@ -325,9 +294,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 26",
         assignment_unlock: "Feb 26",
         assignment_lock: "Apr 14",
-        peer_review_due: "Apr 9",
-        peer_review_unlock: "Mar 30",
-        peer_review_lock: "Apr 12"
+        peer_review_due: "Apr 9"
       )
     end
 
@@ -344,9 +311,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "03/31/2026",
         assignment_unlock: "03/03/2026",
         assignment_lock: "04/19/2026",
-        peer_review_due: "04/14/2026",
-        peer_review_unlock: "04/04/2026",
-        peer_review_lock: "04/17/2026"
+        peer_review_due: "04/14/2026"
       )
 
       save_assignment(with_modal: true)
@@ -356,9 +321,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Mar 31",
         assignment_unlock: "Mar 3",
         assignment_lock: "Apr 19",
-        peer_review_due: "Apr 14",
-        peer_review_unlock: "Apr 4",
-        peer_review_lock: "Apr 17"
+        peer_review_due: "Apr 14"
       )
     end
 
@@ -375,9 +338,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "04/05/2026",
         assignment_unlock: "03/08/2026",
         assignment_lock: "04/24/2026",
-        peer_review_due: "04/19/2026",
-        peer_review_unlock: "04/09/2026",
-        peer_review_lock: "04/22/2026"
+        peer_review_due: "04/19/2026"
       )
 
       save_assignment(with_modal: true)
@@ -387,18 +348,14 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Apr 5",
         assignment_unlock: "Mar 8",
         assignment_lock: "Apr 24",
-        peer_review_due: "Apr 19",
-        peer_review_unlock: "Apr 9",
-        peer_review_lock: "Apr 22"
+        peer_review_due: "Apr 19"
       )
 
       update_override_dates(
         assignment_due: "04/10/2026",
         assignment_unlock: "03/13/2026",
         assignment_lock: "04/29/2026",
-        peer_review_due: "04/24/2026",
-        peer_review_unlock: "04/14/2026",
-        peer_review_lock: "04/27/2026"
+        peer_review_due: "04/24/2026"
       )
 
       save_assignment(with_modal: true)
@@ -408,9 +365,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Apr 10",
         assignment_unlock: "Mar 13",
         assignment_lock: "Apr 29",
-        peer_review_due: "Apr 24",
-        peer_review_unlock: "Apr 14",
-        peer_review_lock: "Apr 27"
+        peer_review_due: "Apr 24"
       )
     end
 
@@ -427,9 +382,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "04/15/2026",
         assignment_unlock: "03/18/2026",
         assignment_lock: "05/04/2026",
-        peer_review_due: "04/29/2026",
-        peer_review_unlock: "04/19/2026",
-        peer_review_lock: "05/02/2026"
+        peer_review_due: "04/29/2026"
       )
 
       save_assignment(with_modal: true)
@@ -439,9 +392,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Apr 15",
         assignment_unlock: "Mar 18",
         assignment_lock: "May 4",
-        peer_review_due: "Apr 29",
-        peer_review_unlock: "Apr 19",
-        peer_review_lock: "May 2"
+        peer_review_due: "Apr 29"
       )
     end
 
@@ -458,9 +409,7 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "04/20/2026",
         assignment_unlock: "03/23/2026",
         assignment_lock: "05/09/2026",
-        peer_review_due: "05/04/2026",
-        peer_review_unlock: "04/24/2026",
-        peer_review_lock: "05/07/2026"
+        peer_review_due: "05/04/2026"
       )
 
       save_assignment(with_modal: true)
@@ -470,18 +419,14 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Apr 20",
         assignment_unlock: "Mar 23",
         assignment_lock: "May 9",
-        peer_review_due: "May 4",
-        peer_review_unlock: "Apr 24",
-        peer_review_lock: "May 7"
+        peer_review_due: "May 4"
       )
 
       update_override_dates(
         assignment_due: "04/25/2026",
         assignment_unlock: "03/28/2026",
         assignment_lock: "05/14/2026",
-        peer_review_due: "05/09/2026",
-        peer_review_unlock: "04/29/2026",
-        peer_review_lock: "05/12/2026"
+        peer_review_due: "05/09/2026"
       )
 
       save_assignment(with_modal: true)
@@ -491,10 +436,91 @@ describe "peer review override dates", :ignore_js_errors do
         assignment_due: "Apr 25",
         assignment_unlock: "Mar 28",
         assignment_lock: "May 14",
-        peer_review_due: "May 9",
-        peer_review_unlock: "Apr 29",
-        peer_review_lock: "May 12"
+        peer_review_due: "May 9"
       )
+    end
+  end
+
+  context "as instructor clearing peer review dates" do
+    it "clears peer review due date when assignment due date is cleared" do
+      create_new_assignment
+
+      enter_assignment_name("Assignment for Clearing Due Date Test")
+
+      enable_peer_reviews
+
+      set_override_dates(
+        assignment_due: "03/01/2026",
+        assignment_unlock: "02/01/2026",
+        assignment_lock: "03/20/2026",
+        peer_review_due: "03/15/2026"
+      )
+
+      save_assignment
+
+      assignment = @pr_course.assignments.last
+      peer_review_sub = assignment.peer_review_sub_assignment
+      expect(peer_review_sub.due_at).not_to be_nil
+
+      # Reopen and clear the assignment due date
+      edit_assignment(assignment.id)
+
+      comboboxes = ff("input[role='combobox']")
+      comboboxes[1].click
+      comboboxes[1].send_keys([:control, "a"], :backspace)
+      comboboxes[1].send_keys(:tab)
+      wait_for_ajaximations
+
+      save_assignment
+
+      # Verify peer review due date was cleared
+      assignment.reload
+      peer_review_sub.reload
+      expect(assignment.due_at).to be_nil
+      expect(peer_review_sub.due_at).to be_nil
+      expect(peer_review_sub.unlock_at).to be_nil
+    end
+
+    it "clears peer review due date independently" do
+      create_new_assignment
+
+      enter_assignment_name("Assignment for Clearing PR Due Date Test")
+
+      enable_peer_reviews
+
+      set_override_dates(
+        assignment_due: "03/01/2026",
+        assignment_unlock: "02/01/2026",
+        assignment_lock: "03/20/2026",
+        peer_review_due: "03/15/2026"
+      )
+
+      save_assignment
+
+      assignment = @pr_course.assignments.last
+      peer_review_sub = assignment.peer_review_sub_assignment
+      expect(peer_review_sub.due_at).not_to be_nil
+
+      # Reopen and clear only the peer review due date
+      edit_assignment(assignment.id)
+
+      comboboxes = ff("input[role='combobox']")
+      comboboxes[3].click
+      comboboxes[3].send_keys([:control, "a"], :backspace)
+      comboboxes[3].send_keys(:tab)
+      wait_for_ajaximations
+
+      save_assignment
+
+      # Assignment due date should still be set
+      assignment.reload
+      peer_review_sub.reload
+      expect(assignment.due_at).not_to be_nil
+      # Peer review due date should be cleared
+      expect(peer_review_sub.due_at).to be_nil
+      # Peer review unlock/lock should still match assignment dates
+      expect(peer_review_sub.unlock_at).not_to be_nil
+      expect(peer_review_sub.lock_at).not_to be_nil
     end
   end
 end

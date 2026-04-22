@@ -41,6 +41,7 @@ interface NewLoginDataContextType {
   invalidLoginFaqUrl?: string
   helpLink?: HelpLink
   requireAup?: boolean
+  discoveryEnabled?: boolean
   customMessageLogin?: string
   customMessageRegistration?: string
   customMessageRegistrationParent?: string
@@ -76,6 +77,7 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     invalidLoginFaqUrl,
     helpLink,
     requireAup,
+    discoveryEnabled,
     customMessageLogin,
     customMessageRegistration,
     customMessageRegistrationParent,
@@ -103,6 +105,7 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     invalidLoginFaqUrl,
     helpLink,
     requireAup,
+    discoveryEnabled,
     customMessageLogin,
     customMessageRegistration,
     customMessageRegistrationParent,

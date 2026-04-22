@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import {Children} from '@instructure/ui-prop-types'
+import PropTypes from 'prop-types'
 import {Pill} from '@instructure/ui-pill'
 import buildStyle from './style'
 
@@ -49,5 +49,5 @@ export default class BadgeList extends Component {
 
 // @ts-expect-error TS2339 (typescriptify)
 BadgeList.propTypes = {
-  children: Children.oneOf([Pill]),
+  children: PropTypes.node,
 }

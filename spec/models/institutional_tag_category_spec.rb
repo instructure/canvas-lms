@@ -76,14 +76,89 @@ describe InstitutionalTagCategory do
       expect(category.institutional_tags).to include(tag)
     end
 
-    it "restricts deletion when tags exist" do
+    it "raises FK error on hard-delete when tags exist" do
       category = InstitutionalTagCategory.create!(valid_params)
-      InstitutionalTag.create!(
-        name: "Tag",
-        description: "desc",
-        category:
-      )
-      expect { category.destroy_permanently! }.to raise_error(ActiveRecord::DeleteRestrictionError)
+      InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      expect { category.destroy_permanently! }.to raise_error(ActiveRecord::InvalidForeignKey)
+    end
+
+    it "cascade-archives active tags on soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives active associations on soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      category.destroy
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives via InstitutionalTag.cascade_archive_associations_for" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+
+      expect(InstitutionalTag).to receive(:cascade_archive_associations_for).with([tag.id]).and_call_original
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations via cascade_archive_associations_for on category soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag1 = InstitutionalTag.create!(name: "Tag 1", description: "desc", category:)
+      tag2 = InstitutionalTag.create!(name: "Tag 2", description: "desc", category:)
+      user = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user)
+
+      expect(InstitutionalTag).to receive(:cascade_archive_associations_for)
+        .with(match_array([tag1.id, tag2.id]))
+        .and_call_original
+      category.destroy
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations across multiple tags on category soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag1 = InstitutionalTag.create!(name: "Tag 1", description: "desc", category:)
+      tag2 = InstitutionalTag.create!(name: "Tag 2", description: "desc", category:)
+      user1 = user_model
+      user2 = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user1)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user2)
+      assoc3 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user1)
+
+      category.destroy
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+      expect(assoc3.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives tags when workflow_state is set directly" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      category.update!(workflow_state: "deleted")
+      expect(tag.reload.workflow_state).to eq "deleted"
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "does not touch already-deleted tags on soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      tag.destroy
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
     end
   end
 
@@ -100,6 +175,33 @@ describe InstitutionalTagCategory do
       sub_account = account_model(parent_account: root_account)
       category = InstitutionalTagCategory.create!(valid_params.merge(account: sub_account))
       expect(category.root_account_id).to eq(root_account.id)
+    end
+  end
+
+  describe "sanitization" do
+    it "strips disallowed tags and their content from name" do
+      category = InstitutionalTagCategory.create!(valid_params.merge(name: "Safe <script>alert(1)</script>Name"))
+      expect(category.name).not_to include("<script>")
+      expect(category.name).not_to include("alert(1)")
+    end
+
+    it "strips disallowed tags and their content from description" do
+      category = InstitutionalTagCategory.create!(valid_params.merge(description: "<script>alert(1)</script>desc"))
+      expect(category.description).not_to include("<script>")
+      expect(category.description).not_to include("alert(1)")
+      expect(category.description).to eq "desc"
+    end
+
+    it "preserves allowed tags in description" do
+      category = InstitutionalTagCategory.create!(valid_params.merge(description: "<b>bold</b> text"))
+      expect(category.description).to include("<b>bold</b>")
+    end
+
+    it "re-sanitizes name on update" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      category.update!(name: "Updated <script>evil()</script>Name")
+      expect(category.name).not_to include("<script>")
+      expect(category.name).not_to include("evil()")
     end
   end
 end

@@ -36,10 +36,25 @@ module Types
           null: true,
           description: "Total number of items in the connection, ignoring pagination."
 
+    field :total_nr_of_pages,
+          Integer,
+          null: true,
+          description: "Total number of pages given the current page size."
+
     # Calculate the total count efficiently while preserving query intent
     def total_count
       # Memoize to avoid multiple database calls for the same PageInfo object
       @total_count ||= calculate_total_count
+    end
+
+    def total_nr_of_pages
+      count = total_count
+      return nil if count.nil?
+
+      page_size = object.first || object.context.schema.default_page_size
+      return nil if page_size.nil? || page_size <= 0
+
+      (count.to_f / page_size).ceil
     end
 
     private

@@ -31,9 +31,11 @@ import {gql} from '@apollo/client'
 export const LTI_ASSET_PROCESSORS_AND_REPORTS_FOR_STUDENT_QUERY = gql`
   query LtiAssetReportsForStudent($submissionId: ID!) {
     submission(id: $submissionId) {
-      attempt
-      ltiAssetReportsConnection {
+      ltiAssetReportsConnection(first: 100) {
         nodes { ...LtiAssetReportForStudent }
+        pageInfo {
+          hasNextPage
+        }
       }
       assignment {
         name
@@ -49,11 +51,12 @@ export const LTI_ASSET_PROCESSORS_AND_REPORTS_FOR_STUDENT_QUERY = gql`
 
 export const ZGetLtiAssetProcessorsAndReportsForStudentResult = zGqlObj('Query', {
   submission: zNullishGqlObj('Submission', {
-    attempt: z.number(),
-    ltiAssetReportsConnection: zGqlConnection(
-      'LtiAssetReportConnection',
-      ZLtiAssetReportForStudent,
-    ),
+    ltiAssetReportsConnection: zNullishGqlObj('LtiAssetReportConnection', {
+      nodes: z.array(ZLtiAssetReportForStudent.nullable()).nullish(),
+      pageInfo: zGqlObj('PageInfo', {
+        hasNextPage: z.boolean(),
+      }),
+    }),
     assignment: zGqlObj('Assignment', {
       name: z.string().nullish(),
       ltiAssetProcessorsConnection: zGqlConnection(

@@ -56,8 +56,9 @@ module Api::V1::DeveloperKey
         hash["allow_includes"] = key.allow_includes
       end
 
-      if account_binding.present?
-        hash["developer_key_account_binding"] = DeveloperKeyAccountBindingSerializer.new(account_binding, context)
+      hash["developer_key_account_binding"] = DeveloperKeyAccountBindingSerializer.new(account_binding, context) if account_binding.present?
+      if context.root_account.feature_enabled?(:lti_deactivate_registrations) && key.is_lti_key
+        hash["lti_registration_workflow_state"] = key.lti_registration&.workflow_state
       end
 
       if inherited

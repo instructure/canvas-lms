@@ -442,17 +442,17 @@ describe('ToolConfigurationEdit', () => {
     ]
 
     beforeEach(() => {
-      // Ensure window.ENV exists
-      if (!window.ENV) {
-        ;(window as any).ENV = {}
-      }
-      if (!window.ENV.FEATURES) {
-        window.ENV.FEATURES = {}
-      }
+      fakeENV.setup({
+        FEATURES: {},
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
     })
 
     it('should render EULA settings for manual registrations when feature flag is enabled', () => {
-      window.ENV.FEATURES.lti_asset_processor = true
+      window.ENV.FEATURES!.lti_asset_processor = true
 
       const {getByText, getByLabelText} = renderApp({
         n: 'Test App',

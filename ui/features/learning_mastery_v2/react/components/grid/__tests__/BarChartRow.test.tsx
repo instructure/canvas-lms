@@ -23,11 +23,11 @@ import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../__fixtures__/rollups'
 import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
 import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
 import {
-  COLUMN_WIDTH,
   COLUMN_PADDING,
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
 } from '@canvas/outcomes/react/utils/constants'
+import {COLUMN_WIDTH} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 const MOCK_OUTCOME_DISTRIBUTIONS: Record<string, OutcomeDistribution> = {

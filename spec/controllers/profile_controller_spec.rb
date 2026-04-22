@@ -542,7 +542,6 @@ describe ProfileController do
 
         it "should be 'false' if the user does not have permission to update tokens" do
           @user.account.change_root_account_setting!(:limit_personal_access_tokens, true)
-          @user.account.enable_feature!(:admin_manage_access_tokens)
           user_session(@user)
           get "settings"
 

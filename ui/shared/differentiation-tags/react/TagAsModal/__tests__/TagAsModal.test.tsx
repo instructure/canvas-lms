@@ -61,6 +61,7 @@ const defaultProps: TagAsModalProps = {
 }
 
 let queryClient: QueryClient
+let user: ReturnType<typeof userEvent.setup>
 
 const renderComponent = (props: Partial<TagAsModalProps> = {}) =>
   render(
@@ -70,12 +71,11 @@ const renderComponent = (props: Partial<TagAsModalProps> = {}) =>
   )
 
 describe('TagAsModal', () => {
-  const user = userEvent.setup({delay: 0})
-
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
     vi.clearAllMocks()
+    user = userEvent.setup({delay: 0})
     queryClient = new QueryClient({
       defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
     })
@@ -167,8 +167,7 @@ describe('TagAsModal', () => {
 
     it('renders multi-variant categories as grouped options', async () => {
       renderComponent({categories: [multipleTagsCategoryTyped]})
-      const selector = screen.getByTestId('existing-tag-selector')
-      fireEvent.click(selector)
+      await user.click(screen.getByTestId('existing-tag-selector'))
       // SimpleSelect renders options asynchronously after click
       expect(await screen.findByText('Reading Groups', {}, {timeout: 3000})).toBeInTheDocument()
       expect(
@@ -189,8 +188,8 @@ describe('TagAsModal', () => {
       )
 
       renderComponent({categories: [singleTagCategoryTyped]})
-      fireEvent.click(screen.getByTestId('existing-tag-selector'))
-      fireEvent.click(await screen.findByRole('option', {name: 'Honors'}, {timeout: 3000}))
+      await user.click(screen.getByTestId('existing-tag-selector'))
+      await user.click(await screen.findByRole('option', {name: 'Honors'}, {timeout: 3000}))
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(
@@ -212,8 +211,8 @@ describe('TagAsModal', () => {
       )
 
       renderComponent({categories: [multipleTagsCategoryTyped]})
-      fireEvent.click(screen.getByTestId('existing-tag-selector'))
-      fireEvent.click(await screen.findByRole('option', {name: 'Variant A'}, {timeout: 3000}))
+      await user.click(screen.getByTestId('existing-tag-selector'))
+      await user.click(await screen.findByRole('option', {name: 'Variant A'}, {timeout: 3000}))
       await user.click(screen.getByTestId('submit-button'))
 
       await waitFor(

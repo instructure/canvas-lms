@@ -143,21 +143,11 @@ ready(function () {
     const quizIPFilters = document.getElementById('account_settings_quiz_ip_filters')
     if (quizIPFilters) result = result && quizIPFilters.__performValidation()
 
-    if (!result) event.preventDefault()
-  })
+    // Check for suppress notifications confirmation
+    const suppressMount = document.getElementById('suppress-notifications-mount')
+    if (suppressMount?.__performValidation) result = result && suppressMount.__performValidation()
 
-  $('#account_settings_suppress_notifications').click(event => {
-    if (event.target.checked) {
-      const result = window.confirm(
-        I18n.t(
-          'suppress_notifications_warning',
-          "You have 'Suppress notifications from being created and sent out' checked, are you sure you want to continue?",
-        ),
-      )
-      if (!result) {
-        $('#account_settings_suppress_notifications').prop('checked', false)
-      }
-    }
+    if (!result) event.preventDefault()
   })
 
   renderDatetimeField($('.datetime_field'), {

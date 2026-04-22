@@ -1295,6 +1295,85 @@ describe FilesController do
     end
   end
 
+  describe "GET 'show' study_assist feature" do
+    before :once do
+      course_file
+    end
+
+    before do
+      user_session(@student)
+      config = instance_double(CanvasCareer::Config)
+      allow(CanvasCareer::Config).to receive(:new).and_return(config)
+      allow(config).to receive(:public_app_config).and_return({ "hosts" => { "journey" => "http://journey.test" } })
+    end
+
+    context "when enabled" do
+      before { @course.enable_feature!(:study_assist) }
+
+      it "sets study_assist in FEATURES" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:FEATURES][:study_assist]).to be true
+      end
+
+      it "sets FILE_ID to the attachment id" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:FILE_ID]).to eq @file.id.to_s
+      end
+
+      it "sets COURSE_ID to the course id" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:COURSE_ID]).to eq @course.id.to_s
+      end
+
+      it "sets JOURNEY_URL from CanvasCareer config" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+      end
+
+      it "sets STUDY_ASSIST_TOOLS with all tools enabled by default" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Summarize", "Quiz me", "Flashcards"]
+      end
+
+      it "excludes tools when their feature flag is disabled" do
+        @course.disable_feature!(:study_assist_quiz_me)
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq %w[Summarize Flashcards]
+      end
+
+      it "returns empty array when all tool flags are disabled" do
+        @course.disable_feature!(:study_assist_summarize)
+        @course.disable_feature!(:study_assist_quiz_me)
+        @course.disable_feature!(:study_assist_flashcards)
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq []
+      end
+
+      it "does not set study_assist for teachers" do
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h.dig(:FEATURES, :study_assist)).to be_nil
+      end
+    end
+
+    context "when disabled" do
+      it "does not set FILE_ID" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h).not_to have_key :FILE_ID
+      end
+
+      it "does not set JOURNEY_URL" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h).not_to have_key :JOURNEY_URL
+      end
+
+      it "does not set STUDY_ASSIST_TOOLS" do
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(assigns[:js_env].to_h).not_to have_key :STUDY_ASSIST_TOOLS
+      end
+    end
+  end
+
   describe "GET 'api_create_success'" do
     before do
       category = group_category
@@ -2902,6 +2981,88 @@ describe FilesController do
 
         expect(response).to have_http_status(:not_found)
       end
+    end
+  end
+
+  describe "cross-domain file access monitoring" do
+    before :once do
+      course_with_student
+      @file = @course.attachments.create!(uploaded_data: io)
+      @root_account = @course.root_account
+      domain = @root_account.account_domains.build(host: "test.host")
+      domain.save!(validate: false)
+      other_account = Account.create!
+      other_domain = other_account.account_domains.build(host: "canvas.other.edu")
+      other_domain.save!(validate: false)
+    end
+
+    before do
+      user_session(@student)
+    end
+
+    it "detects cross-domain referrer correctly" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed with UUID verifier",
+        anything,
+        hash_including(
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      )
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed from different Canvas domain",
+        anything,
+        hash_including(
+          type: "cross_domain_file_access",
+          alert_type: :warning
+        )
+      )
+      request.env["HTTP_REFERER"] = "https://canvas.other.edu/path"
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+
+    it "ignores same-domain referrers" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed with UUID verifier",
+        anything,
+        hash_including(
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      )
+      expect(InstStatsd::Statsd).not_to receive(:event).with(
+        "File accessed from different Canvas domain",
+        anything,
+        anything
+      )
+
+      request.env["HTTP_REFERER"] = "http://test.host/courses/1"
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+
+    it "handles missing referrer" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "File accessed with UUID verifier",
+        anything,
+        hash_including(
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      )
+      expect(InstStatsd::Statsd).not_to receive(:event).with(
+        "File accessed from different Canvas domain",
+        anything,
+        anything
+      )
+
+      get :show, params: { id: @file.id, verifier: @file.uuid }
+    end
+
+    it "handles malformed referrer URIs gracefully" do
+      expect(InstStatsd::Statsd).not_to receive(:event)
+
+      request.env["HTTP_REFERER"] = "not a valid uri"
+      get :show, params: { id: @file.id, verifier: @file.uuid }
     end
   end
 end

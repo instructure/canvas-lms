@@ -183,6 +183,7 @@ const StudentSelect = ({
         id={inputId}
         isRequired={true}
         renderLabel={label}
+        placeholder={I18n.t('Start typing to search')}
         inputRef={ref => handleInputRef(ref)}
         inputValue={inputValue}
         isShowingOptions={error ? false : showOptions}

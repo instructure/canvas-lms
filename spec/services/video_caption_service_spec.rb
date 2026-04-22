@@ -17,17 +17,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe VideoCaptionService, type: :service do
+  subject(:service) do
+    lambda do
+      VideoCaptionService.new(media_object).call
+      run_jobs
+    end
+  end
+
   let(:media_object) { media_object_model }
-  let(:service) { VideoCaptionService.new(media_object, skip_polling: true) }
+  let(:kaltura_client) { instance_double(CanvasKaltura::ClientV3) }
+
+  before do
+    allow(kaltura_client).to receive_messages(
+      # when_loaded: kaltura_client,
+      startSession: nil,
+      mediaGet: { status: "2" },
+      create_caption_asset: { id: "c-123" },
+      caption_asset: { status: "2", languageCode: "en" },
+      caption_asset_contents: "Caption Body"
+    )
+
+    allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client)
+    stub_const("VideoCaptionService::MAX_RETRY_ATTEMPTS", 1)
+  end
 
   describe "#call" do
     context "when media type is nil" do
       it "handles the request gracefully and sets status to failed_initial_validation" do
         media_object.update!(media_type: nil)
-        allow(service).to receive_messages(
-          config: { "app-host" => "https://example.com" },
-          auth_token: "token"
-        )
 
         expect { service.call }.to change {
           media_object.reload.auto_caption_status
@@ -36,18 +53,6 @@ RSpec.describe VideoCaptionService, type: :service do
     end
 
     context "when media type is video and media id is present" do
-      before do
-        allow(service).to receive_messages(
-          url: "https://example.com/video.mp4",
-          handoff_video_for_processing: "1234",
-          request_caption: instance_double(HTTParty::Response, code: 200),
-          media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
-          grab_captions: "Captions for the video",
-          config: { "app-host" => "https://example.com" },
-          auth_token: "token"
-        )
-      end
-
       it "creates a media track with captions" do
         expect { service.call }.to change { MediaTrack.count }.by(1)
       end
@@ -58,13 +63,11 @@ RSpec.describe VideoCaptionService, type: :service do
       end
 
       it "sets auto_caption_status to complete" do
-        service.call
-        expect(media_object.auto_caption_status).to eq("complete")
+        expect { service.call }.to change { media_object.reload.auto_caption_status }.from(nil).to("complete")
       end
 
       it "sets auto_caption_media_id" do
-        service.call
-        expect(media_object.auto_caption_media_id).to eq("1234")
+        expect { service.call }.to change { media_object.reload.auto_caption_media_id }.from(nil).to("1234")
       end
     end
 
@@ -79,7 +82,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_initial_validation" do
         service.call
-        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
+        expect(media_object.reload.auto_caption_status).to eq("failed_initial_validation")
       end
     end
 
@@ -98,52 +101,11 @@ RSpec.describe VideoCaptionService, type: :service do
       end
     end
 
-    context "when URL is not available" do
-      before do
-        allow(service).to receive(:url).and_return(nil)
-      end
-
-      it "does not create a media track" do
-        expect { service.call }.not_to change { MediaTrack.count }
-      end
-
-      it "sets auto_caption_status to failed_initial_validation" do
-        service.call
-        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
-      end
-    end
-
-    context "when handoff request fails" do
-      before do
-        allow(service).to receive_messages(
-          url: "https://example.com/video.mp4",
-          handoff_video_for_processing: nil,
-          config: { "app-host" => "https://example.com" },
-          auth_token: "token"
-        )
-        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
-      end
-
-      it "does not create a media track" do
-        expect { service.call }.not_to change { MediaTrack.count }
-      end
-
-      it "sets auto_caption_status to failed_handoff" do
-        service.call
-        expect(media_object.auto_caption_status).to eq("failed_handoff")
-      end
-    end
-
     context "when caption request fails" do
       before do
-        allow(service).to receive_messages(
-          url: "https://example.com/video.mp4",
-          handoff_video_for_processing: "1234",
-          request_caption: instance_double(HTTParty::Response, code: 500),
-          config: { "app-host" => "https://example.com" },
-          auth_token: "token"
+        allow(kaltura_client).to receive_messages(
+          create_caption_asset: nil
         )
-        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
@@ -151,22 +113,15 @@ RSpec.describe VideoCaptionService, type: :service do
       end
 
       it "sets auto_caption_status to failed_request" do
-        service.call
-        expect(media_object.auto_caption_status).to eq("failed_request")
+        expect { service.call }.to change { media_object.reload.auto_caption_status }.to("failed_request")
       end
     end
 
     context "when captions are not ready" do
       before do
-        allow(service).to receive_messages(
-          url: "https://example.com/video.mp4",
-          handoff_video_for_processing: "1234",
-          request_caption: instance_double(HTTParty::Response, code: 200),
-          media: { "media" => { "captions" => [{ "status" => "in_progress" }] } },
-          config: { "app-host" => "https://example.com" },
-          auth_token: "token"
+        allow(kaltura_client).to receive_messages(
+          caption_asset: { status: "0", languageCode: "" }
         )
-        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
@@ -174,23 +129,15 @@ RSpec.describe VideoCaptionService, type: :service do
       end
 
       it "sets auto_caption_status to failed_captions" do
-        service.call
-        expect(media_object.auto_caption_status).to eq("failed_captions")
+        expect { service.call }.to change { media_object.reload.auto_caption_status }.to("failed_captions")
       end
     end
 
     context "when captions cannot be pulled" do
       before do
-        allow(service).to receive_messages(
-          url: "https://example.com/video.mp4",
-          handoff_video_for_processing: "1234",
-          request_caption: instance_double(HTTParty::Response, code: 200),
-          media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
-          grab_captions: nil,
-          config: { "app-host" => "https://example.com" },
-          auth_token: "token"
+        allow(kaltura_client).to receive_messages(
+          caption_asset_contents: nil
         )
-        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
@@ -198,8 +145,7 @@ RSpec.describe VideoCaptionService, type: :service do
       end
 
       it "sets auto_caption_status to failed_to_pull" do
-        service.call
-        expect(media_object.auto_caption_status).to eq("failed_to_pull")
+        expect { service.call }.to change { media_object.reload.auto_caption_status }.to("failed_to_pull")
       end
     end
   end

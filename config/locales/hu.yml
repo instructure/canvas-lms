@@ -168,6 +168,7 @@ hu:
     track_uploaded_successfully: "A hangfájl feltöltése sikeres, kérjük, frissítse a böngészőjét."
     upload: Feltöltés
     uploading: Feltöltés...
+  _23978503: "."
   _2d4c0d31: "..."
   _5a374287: "..."
   __376f89ea: "--"
@@ -9896,6 +9897,7 @@ hu:
   edit_rubric_title_104d6fd2: "%{title}értékelőtábla szerkesztése"
   edit_section_name_558cc89: "%{name}szekció szerkesztése"
   edit_sections_7d0e4e34: "Szekciók szerkesztése"
+  edit_settings_b3ddad69: "Beállítások szerkesztése"
   edit_status_612572db: "Státusz szerkesztése"
   edit_status_dialog_for_editbuttonlabel_7e829fbd: "A %{editButtonLabel} szerkesztési állapot párbeszédpanelje"
   edit_submission_status_from_speedgrader_5e1b1cd4: "A Gyorsértékelőből származó beadási státusz szerkesztése"

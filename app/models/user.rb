@@ -382,8 +382,8 @@ class User < ApplicationRecord
   scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'") }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id, user_ids = nil|
-    visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:).map(&:user_id)
+  scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id, user_ids = nil, include_concluded: true|
+    visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:, include_concluded:).map(&:user_id)
     if visible_user_id.any?
       where(id: visible_user_id)
     else
@@ -2529,6 +2529,22 @@ class User < ApplicationRecord
     @_non_student_enrollment = Rails.cache.fetch_with_batched_keys(["has_non_student_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
       enrollments.shard(in_region_associated_shards).where.not(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
                  .where.not(workflow_state: %w[rejected inactive deleted]).exists?
+    end
+  end
+
+  # TODO: Optimize caching strategies (EGG-2540)
+  def educator_dashboard_user?
+    Rails.cache.fetch_with_batched_keys(
+      "should_show_educator_dashboard",
+      batch_object: self,
+      batched_keys: :enrollments,
+      expires_in: 1.hour
+    ) do
+      enrollments
+        .shard(in_region_associated_shards)
+        .of_content_admins
+        .active_or_pending
+        .exists?
     end
   end
 

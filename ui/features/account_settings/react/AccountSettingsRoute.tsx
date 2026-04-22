@@ -23,6 +23,7 @@ import NotificationSettings from './notification_settings'
 import FeatureFlags from '@canvas/feature-flags'
 import AlertList, {calculateUIMetadata} from '@canvas/student-alerts/react/AlertList'
 import QuizIPFilters, {type IPFilterSpec} from './components/QuizIPFilters'
+import SuppressNotifications, {type NotificationCategory} from './suppress_notifications'
 
 type PortalMount = {
   mountPoint: HTMLElement
@@ -105,12 +106,29 @@ function alertsTab(portals: PortalMount[], accountId?: string): void {
   })
 }
 
+// Suppress Notifications on Settings tab
+function suppressNotifications(portals: PortalMount[]): void {
+  const mountPoint = document.getElementById('suppress-notifications-mount')
+  if (!mountPoint) return
+  const data = JSON.parse(mountPoint.dataset.values ?? '{}')
+  portals.push({
+    mountPoint,
+    component: (
+      <SuppressNotifications
+        suppressNotifications={data.suppressNotifications}
+        notificationCategories={data.notificationCategories as NotificationCategory[]}
+      />
+    ),
+  })
+}
+
 export function Component(): JSX.Element | null {
   const params = useParams()
   const portals: Array<PortalMount> = []
 
   notificationsTab(portals, params.accountId)
   quizIPFilters(portals)
+  suppressNotifications(portals)
   featureFlagsTab(portals)
   alertsTab(portals, params.accountId)
 

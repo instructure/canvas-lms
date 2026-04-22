@@ -352,6 +352,21 @@ class Enrollment < ApplicationRecord
 
   scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
 
+  # SQL condition that excludes temporary enrollments that are not currently
+  # active by date. Course admin temp enrollments get 'inactive' state when
+  # future (not view_restrictable?), while student/observer ones get
+  # 'pending_active', so we check for state = 'active' to cover all types.
+  def self.pending_temporary_enrollment_exclusion_sql
+    "enrollments.temporary_enrollment_source_user_id IS NULL OR EXISTS (" \
+      "SELECT 1 FROM #{EnrollmentState.quoted_table_name} " \
+      "WHERE enrollment_states.enrollment_id = enrollments.id " \
+      "AND enrollment_states.state = 'active')"
+  end
+
+  scope :excluding_pending_temporary_enrollments, lambda {
+    where(pending_temporary_enrollment_exclusion_sql)
+  }
+
   scope :temporary_enrollment_recipients_for_provider, lambda { |user|
     active.joins(:course).where(temporary_enrollment_source_user_id: user,
                                 courses: { workflow_state: %w[available claimed created] })
@@ -1308,6 +1323,26 @@ class Enrollment < ApplicationRecord
     temporary_enrollment_source_user_id.present?
   end
 
+  def temporary_enrollment_display_state
+    return nil unless temporary_enrollment?
+
+    es = enrollment_state
+    case es.state
+    when "pending_active", "pending_invited"
+      "future"
+    when "active", "invited"
+      "active"
+    when "completed"
+      "completed"
+    when "inactive"
+      # Future admin-type enrollments get "inactive" with state_valid_until
+      # set to the start date; truly inactive enrollments do not
+      es.state_valid_until.present? ? "future" : "inactive"
+    else
+      es.state
+    end
+  end
+
   def temporary_enrollment_source_user
     return nil unless temporary_enrollment?
 
@@ -1405,8 +1440,14 @@ class Enrollment < ApplicationRecord
                                        joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                                .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
                                      }
+  scope :invited_or_pending_by_date_ignoring_access, lambda {
+                                                       joins(:enrollment_state)
+                                                         .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
+                                                     }
   scope :completed_by_date,
         -> { joins(:enrollment_state).where(enrollment_states: { restricted_access: false, state: "completed" }) }
+  scope :completed_by_date_ignoring_access,
+        -> { joins(:enrollment_state).where(enrollment_states: { state: "completed" }) }
   scope :not_inactive_by_date, lambda {
                                  joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                          .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")

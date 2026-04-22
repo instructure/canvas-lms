@@ -274,9 +274,13 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/by_utid/:utid'
+- verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/check_domain_duplicates'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/install_status/:client_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/outcome_group_links'
 - verb: GET
@@ -551,6 +555,10 @@
   path: '/api/v1/career/switch_experience'
 - verb: POST
   path: '/api/v1/career/switch_role'
+- verb: DELETE
+  path: '/api/v1/career/user_experiences'
+- verb: POST
+  path: '/api/v1/career/user_experiences'
 - verb: GET
   path: '/api/v1/collaborations/:id/members'
 - verb: GET
@@ -673,12 +681,6 @@
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
-- verb: GET
-  path: '/api/v1/courses/:course_id/assignments/:assignment_id/check_allocation_conversion'
-- verb: PUT
-  path: '/api/v1/courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations'
-- verb: GET
-  path: /api/v1/courses/:course_id/assignments/:assignment_id/convert_peer_review_allocations/status
 - verb: GET
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/date_details'
 - verb: PUT

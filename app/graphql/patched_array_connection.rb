@@ -32,8 +32,18 @@ class PatchedArrayConnection < GraphQL::Pagination::ArrayConnection
     encode(idx.to_s)
   end
 
+  def cursor_for_quiz_submission_node(quiz_submission)
+    # Use object identity (not AR `==` which compares by id) since all items
+    # in the array share the same quiz_submission id but represent different
+    # attempts via simply_versioned deserialization.
+    quiz_submission_idx = items.find_index { |i| i.equal?(quiz_submission) }
+    idx = quiz_submission_idx + 1
+    encode(idx.to_s)
+  end
+
   def cursor_for(item)
     return cursor_for_submission_node(item) if item.instance_of?(Submission)
+    return cursor_for_quiz_submission_node(item) if item.instance_of?(Quizzes::QuizSubmission)
 
     super
   end

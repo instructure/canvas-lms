@@ -57,21 +57,6 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
     submission_model(assignment: parent_assignment, user:)
   end
 
-  def create_peer_review_comment_for(assessment_request:, submission:, assessor: nil, created_at: Time.zone.now)
-    assessor ||= self.assessor
-    SubmissionComment.create!(
-      submission:,
-      author: assessor,
-      comment: "peer review feedback",
-      created_at:,
-      draft: false,
-      workflow_state: "active",
-      assessment_request_id: assessment_request.id
-    )
-    assessment_request.comment_added
-    assessment_request.save!
-  end
-
   def create_assessment_request(user:, submission:, assessor: nil)
     assessor ||= self.assessor
     assessor_asset = parent_assignment.submissions.find_by(user_id: assessor.id) ||
@@ -84,6 +69,17 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
       assessor:,
       peer_review_sub_assignment_id: peer_review_sub_assignment.id
     )
+  end
+
+  def submit_peer_review_comment(student:, assessment_request:, at: Time.zone.now)
+    Timecop.freeze(at) do
+      parent_assignment.add_submission_comment(
+        student,
+        comment: "Peer review feedback for #{student.name}",
+        author: assessor,
+        assessment_request:
+      )
+    end
   end
 
   def completed_assessment_requests(assignment: parent_assignment)
@@ -99,7 +95,6 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
     required_count = assignment.peer_review_count
     existing_completed = completed_assessment_requests(assignment:)
 
-    # Create additional assessment requests to meet the threshold
     (required_count - existing_completed).times do |i|
       student = user_model(name: "Review Student #{existing_completed + i + 1}")
       create_enrollment(course, student, enrollment_state: "active")
@@ -110,9 +105,9 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
         submission:
       )
 
-      create_peer_review_comment_for(
-        assessment_request:,
-        submission:
+      submit_peer_review_comment(
+        student:,
+        assessment_request:
       )
     end
 
@@ -308,19 +303,19 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
 
       let(:request1) do
         req = create_assessment_request(user: student1, submission: submission1)
-        create_peer_review_comment_for(assessment_request: req, submission: submission1, created_at: 3.days.ago)
+        submit_peer_review_comment(student: student1, assessment_request: req, at: 3.days.ago)
         req
       end
 
       let(:request2) do
         req = create_assessment_request(user: student2, submission: submission2)
-        create_peer_review_comment_for(assessment_request: req, submission: submission2, created_at: 2.days.ago)
+        submit_peer_review_comment(student: student2, assessment_request: req, at: 2.days.ago)
         req
       end
 
       let(:request3) do
         req = create_assessment_request(user: student3, submission: submission3)
-        create_peer_review_comment_for(assessment_request: req, submission: submission3, created_at: 1.day.ago)
+        submit_peer_review_comment(student: student3, assessment_request: req, at: 1.day.ago)
         req
       end
 
@@ -347,7 +342,7 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
 
         peer_review_submission.reload
         expect(peer_review_submission.workflow_state).to eq("submitted")
-        expect(peer_review_submission.submitted_at).to be_within(1.second).of(2.days.ago)
+        expect(peer_review_submission.submitted_at).to be_within(1.second).of(1.day.ago)
       end
     end
 
@@ -358,7 +353,7 @@ RSpec.describe PeerReview::SubmissionUpdaterService do
         expect(peer_review_submission.workflow_state).to eq("submitted")
 
         original_submitted_at = peer_review_submission.submitted_at
-        expect(original_submitted_at).to be_within(1.second).of(3.days.ago)
+        expect(original_submitted_at).to be_within(1.second).of(2.days.ago)
 
         request3.destroy
 

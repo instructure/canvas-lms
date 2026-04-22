@@ -20,34 +20,34 @@ import React from 'react'
 import {legacyRender} from '@canvas/react'
 
 import K5Dashboard from './react/K5Dashboard'
-import {registerK5Theme} from '@canvas/k5/react/k5-theme'
+import {K5ThemeProvider} from '@canvas/k5/react/K5ThemeProvider'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import ready from '@instructure/ready'
-
-registerK5Theme()
 
 ready(() => {
   const dashboardContainer = document.getElementById('dashboard-app-container')
   if (dashboardContainer) {
     legacyRender(
-      <QueryClientProvider client={queryClient}>
-        <K5Dashboard
-          currentUser={ENV.current_user}
-          currentUserRoles={ENV.current_user_roles}
-          plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
-          timeZone={ENV.TIMEZONE}
-          hideGradesTabForStudents={ENV.HIDE_K5_DASHBOARD_GRADES_TAB}
-          createPermission={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
-          restrictCourseCreation={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
-          selectedContextCodes={ENV.SELECTED_CONTEXT_CODES}
-          selectedContextsLimit={ENV.SELECTED_CONTEXTS_LIMIT}
-          observedUsersList={ENV.OBSERVED_USERS_LIST}
-          canAddObservee={ENV.CAN_ADD_OBSERVEE}
-          openTodosInNewTab={ENV.OPEN_TEACHER_TODOS_IN_NEW_TAB}
-          accountCalendarContexts={ENV.ACCOUNT_CALENDAR_CONTEXTS}
-        />
-      </QueryClientProvider>,
+      <K5ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <K5Dashboard
+            currentUser={ENV.current_user}
+            currentUserRoles={ENV.current_user_roles}
+            plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
+            timeZone={ENV.TIMEZONE}
+            hideGradesTabForStudents={ENV.HIDE_K5_DASHBOARD_GRADES_TAB}
+            createPermission={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
+            restrictCourseCreation={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
+            selectedContextCodes={ENV.SELECTED_CONTEXT_CODES}
+            selectedContextsLimit={ENV.SELECTED_CONTEXTS_LIMIT}
+            observedUsersList={ENV.OBSERVED_USERS_LIST}
+            canAddObservee={ENV.CAN_ADD_OBSERVEE}
+            openTodosInNewTab={ENV.OPEN_TEACHER_TODOS_IN_NEW_TAB}
+            accountCalendarContexts={ENV.ACCOUNT_CALENDAR_CONTEXTS}
+          />
+        </QueryClientProvider>
+      </K5ThemeProvider>,
       dashboardContainer,
     )
   }

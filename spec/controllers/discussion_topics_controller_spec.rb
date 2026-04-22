@@ -1407,6 +1407,22 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:PEER_REVIEWS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/peer_reviews"
       end
 
+      it "sets manage_rubrics to true for user with only manage_assignments_edit" do
+        custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+        @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+        @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+        custom_teacher = course_with_user("TeacherEnrollment", {
+                                            active_all: true,
+                                            course: @course,
+                                            role: custom_role
+                                          }).user
+        user_session(custom_teacher)
+
+        get "show", params: { course_id: @course.id, id: @topic.id }
+
+        expect(assigns[:js_env][:PERMISSIONS]).to include manage_rubrics: true
+      end
+
       context "enhanced rubrics js_env variables" do
         before do
           Account.site_admin.enable_feature! :enhanced_rubrics_assignments

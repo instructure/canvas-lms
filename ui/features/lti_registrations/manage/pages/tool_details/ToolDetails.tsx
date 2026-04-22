@@ -18,8 +18,13 @@
 
 import {useAppendBreadcrumb} from '@canvas/breadcrumbs/useAppendBreadcrumb'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
+import {GenericErrorPage, NotFoundPage} from '@instructure/platform-generic-error-page'
+import {
+  reportError,
+  canvasErrorPageTranslations,
+  canvasNotFoundTranslations,
+} from '@canvas/error-page-utils'
+import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
@@ -51,7 +56,7 @@ import type {LtiRegistrationWithAllInformation} from '../../model/LtiRegistratio
 import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {InlineList} from '@instructure/ui-list'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import theme from '@instructure/canvas-theme'
@@ -72,6 +77,8 @@ export const ToolDetails = (props: {accountId: AccountId}) => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('LTI Registrations listing error')}
         errorMessage={JSON.stringify(parsed.errors)}
       />
@@ -98,12 +105,20 @@ export const ToolDetailsRequest = ({
     const is404 = result.error instanceof FetchApiError && result.error.response.status === 404
 
     if (is404) {
-      return <NotFoundArtwork />
+      return (
+        <NotFoundPage
+          artwork={<SVGWrapper url="/images/not_found_page/empty-planet.svg" />}
+          title={canvasNotFoundTranslations.title()}
+          description={canvasNotFoundTranslations.description()}
+        />
+      )
     }
 
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('LTI Tool details fetch error')}
         errorMessage={result.error.message}
       />
@@ -395,14 +410,14 @@ export const ToolDetailsInner = ({
               <Pill>v1.3</Pill>
               {window.ENV.FEATURES?.lock_lti_registrations &&
                 (registration.lock_deploying ? (
-                  <Pill color="success">
+                  <Pill color="info">
                     <Flex direction="row" gap="xx-small">
                       <IconLockLine />
                       {I18n.t('App is locked')}
                     </Flex>
                   </Pill>
                 ) : (
-                  <Pill color="danger">
+                  <Pill color="info">
                     <Flex direction="row" gap="xx-small">
                       <IconUnlockLine />
                       {I18n.t('App is unlocked')}

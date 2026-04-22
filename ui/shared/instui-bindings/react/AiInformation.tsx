@@ -40,6 +40,8 @@ interface Props {
   intendedOutcomes: string
   permissionsLevel: number
   triggerButton: React.ReactNode
+  title?: string
+  privacyNoticeText?: string
 }
 
 // a template for AI nutrition facts
@@ -104,7 +106,7 @@ export default function CanvasAiInformation(props: Props) {
   const data = [
     {
       featureName: props.featureName,
-      privacyNoticeText: I18n.t('Privacy Notice'),
+      privacyNoticeText: props.privacyNoticeText ?? I18n.t('Privacy Notice'),
       privacyNoticeUrl: 'https://www.instructure.com/policies/privacy',
       permissionLevelText: I18n.t('Permission Level'),
       permissionLevel: permissionLevel.level,
@@ -215,7 +217,7 @@ export default function CanvasAiInformation(props: Props) {
   const closeText = I18n.t('Close')
   return (
     <AiInformation
-      title={I18n.t('About this AI Feature')}
+      title={props.title ?? I18n.t('About this AI Feature')}
       data={data}
       trigger={props.triggerButton}
       dataPermissionLevelsTitle={I18n.t('Data Permission Levels')}

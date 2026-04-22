@@ -58,7 +58,6 @@ describe LearnPlatform::GlobalApi do
       {
         service_name: "interop",
         service_secret: "test_secret",
-        learn_platform_basic_token: "basic_auth_token"
       }.with_indifferent_access
     end
 
@@ -68,31 +67,15 @@ describe LearnPlatform::GlobalApi do
       allow(Rails.application.credentials).to receive(:learn_platform_creds).and_return(fake_secrets)
     end
 
-    context "when use_jwt_auth_for_utid_sync feature flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:use_jwt_auth_for_utid_sync)
-      end
+    it "returns JWT bearer token in Authorization header" do
+      headers = subject
+      expect(headers[:Authorization]).to match(/^Bearer /)
 
-      it "returns JWT bearer token in Authorization header" do
-        headers = subject
-        expect(headers[:Authorization]).to match(/^Bearer /)
-
-        # Verify it's a valid JWT
-        token = headers[:Authorization].sub(/^Bearer /, "")
-        decoded = JSON::JWT.decode(token, "test_secret")
-        expect(decoded[:iss]).to eq("interop")
-        expect(decoded[:exp]).to be_within(5).of(Time.now.to_i + 300)
-      end
-    end
-
-    context "when use_jwt_auth_for_utid_sync feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:use_jwt_auth_for_utid_sync)
-      end
-
-      it "returns Basic auth token in Authorization header" do
-        expect(subject).to eq({ Authorization: "Basic basic_auth_token" })
-      end
+      # Verify it's a valid JWT
+      token = headers[:Authorization].sub(/^Bearer /, "")
+      decoded = JSON::JWT.decode(token, "test_secret")
+      expect(decoded[:iss]).to eq("interop")
+      expect(decoded[:exp]).to be_within(5).of(Time.now.to_i + 300)
     end
   end
 

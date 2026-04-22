@@ -578,7 +578,8 @@ RSpec.describe ApplicationController do
           "encrypted-media *",
           "autoplay *",
           "clipboard-write *",
-          "display-capture *"
+          "display-capture *",
+          "fullscreen *"
         ]
       end
 
@@ -817,14 +818,22 @@ RSpec.describe ApplicationController do
           request.host = "trusty.instructure.com"
         end
 
-        def mock_dynamic_settings_for_pendo_cc(pendo_app_id = nil, domain_id = nil, vanity_domain_id = nil)
+        def mock_dynamic_settings_for_pendo_cc(pendo_app_id = nil, domain_id = nil, vanity_domain_id = nil, beta_domain_id = nil)
           allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
           allow(DynamicSettings).to receive(:find).with("onetrust-cookie-consent").and_return(
-            DynamicSettings::FallbackProxy.new({ domain_id:, vanity_domain_id: })
+            DynamicSettings::FallbackProxy.new({ domain_id:, vanity_domain_id:, beta_domain_id: })
           )
           allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(
             DynamicSettings::FallbackProxy.new({ pendo_app_id: })
           )
+        end
+
+        def mock_session_for_webview(mobile_cookie_consent: false)
+          allow(controller).to receive(:session).and_return({
+                                                              session_id: "slartibartfast",
+                                                              is_mobile_webview: true,
+                                                              mobile_cookie_consent:
+                                                            })
         end
 
         describe "PENDO_APP_ID" do
@@ -847,6 +856,44 @@ RSpec.describe ApplicationController do
           end
         end
 
+        describe "PRE_COOKIE_CONSENT" do
+          before do
+            Account.default.enable_feature!(:send_usage_metrics)
+            mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!")
+          end
+
+          it "is implied ''true'' if cookie consent is not necessary" do
+            mock_session_for_webview(mobile_cookie_consent: true)
+            Account.default.disable_feature!(:cookie_consent_necessary)
+            expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
+          end
+
+          context "when cookie consent is necessary" do
+            before do
+              Account.default.enable_feature!(:cookie_consent_necessary)
+            end
+
+            it "is ''null'' when it's not a mobile webview request" do
+              allow(controller).to receive(:session).and_return({
+                                                                  session_id: "slartibartfast"
+                                                                })
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("null")
+            end
+
+            context "when the request comes from a mobile webview" do
+              it "is ''true'' when consent was given in the mobile client" do
+                mock_session_for_webview(mobile_cookie_consent: true)
+                expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
+              end
+
+              it "is ''false'' when consent was not given in the mobile client" do
+                mock_session_for_webview(mobile_cookie_consent: false)
+                expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("false")
+              end
+            end
+          end
+        end
+
         describe "ONETRUST_CONSENT_DOMAIN_ID" do
           describe "when both SUM and CCN are enabled and settings exist" do
             it "is included in js_env" do
@@ -856,12 +903,28 @@ RSpec.describe ApplicationController do
               expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "cookie!"
             end
 
+            it "is not included in js_env if in a mobile webview" do
+              Account.default.enable_feature!(:send_usage_metrics)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!")
+              mock_session_for_webview(mobile_cookie_consent: true)
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
             it "is included with the vanity domain ID if used from a vanity domain" do
               Account.default.enable_feature!(:send_usage_metrics)
               Account.default.enable_feature!(:cookie_consent_necessary)
               mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!", "vanity_cookie!")
               request.host = "its.a.vanity.domain.com"
               expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "vanity_cookie!"
+            end
+
+            it "is included with the beta domain ID if used from a beta domain" do
+              Account.default.enable_feature!(:send_usage_metrics)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc("pendos!", "cookie!", "vanity_cookie!", "beta_cookie!")
+              request.host = "rare.beta.instructure.com"
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "beta_cookie!"
             end
           end
 
@@ -2513,6 +2576,49 @@ RSpec.describe ApplicationController do
     it "detects Word 2011 for mac" do
       controller.request.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X) Word/14.57.0"
       expect(controller.send(:ms_office?)).to be true
+    end
+  end
+
+  describe "#initiate_session_from_token" do
+    describe "mobile webview session keys" do
+      let(:user) { user_factory }
+      let(:pseudonym) { user.pseudonyms.create!(unique_id: "testuser") }
+      let(:token_true) { SessionToken.new(pseudonym.global_id, consent_from_mobile: true).to_s }
+      let(:token_false) { SessionToken.new(pseudonym.global_id, consent_from_mobile: false).to_s }
+      let(:token_nil) { SessionToken.new(pseudonym.global_id).to_s }
+
+      before do
+        allow_any_instantiation_of(pseudonym).to receive(:works_for_account?).and_return(true)
+        allow(controller).to receive(:redirect_to).and_return(true)
+      end
+
+      it "has a session that contains the mobile webview keys for a consented webview" do
+        controller.params[:session_token] = token_true
+        controller.instance_variable_set(:@current_pseudonym, pseudonym)
+        controller.send(:initiate_session_from_token)
+        expect(session).to have_key(:is_mobile_webview)
+        expect(session).to have_key(:mobile_cookie_consent)
+        expect(session[:is_mobile_webview]).to be true
+        expect(session[:mobile_cookie_consent]).to be true
+      end
+
+      it "has a session that contains the mobile webview keys for an unconsented webview" do
+        controller.params[:session_token] = token_false
+        controller.instance_variable_set(:@current_pseudonym, pseudonym)
+        controller.send(:initiate_session_from_token)
+        expect(session).to have_key(:is_mobile_webview)
+        expect(session).to have_key(:mobile_cookie_consent)
+        expect(session[:is_mobile_webview]).to be true
+        expect(session[:mobile_cookie_consent]).to be false
+      end
+
+      it "has a session that does not contain the mobile webview keys for a non-webview session token" do
+        controller.params[:session_token] = token_nil
+        controller.instance_variable_set(:@current_pseudonym, pseudonym)
+        controller.send(:initiate_session_from_token)
+        expect(session).not_to have_key(:is_mobile_webview)
+        expect(session).not_to have_key(:mobile_cookie_consent)
+      end
     end
   end
 

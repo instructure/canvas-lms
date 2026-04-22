@@ -16,10 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import clickCallback, {ICONS_TRAY_CONTAINER_ID} from '../clickCallback'
 import FakeEditor from '../../../__tests__/FakeEditor'
 import {waitFor} from '@testing-library/dom'
 import {act} from '@testing-library/react'
+
+jest.mock('../components/IconMakerTray', () => ({
+  IconMakerTray: () => <div data-testid="icon-name" />,
+}))
+
+jest.mock('../../shared/StoreContext', () => ({
+  StoreProvider: ({children}) => children({}),
+}))
+
+jest.mock('../../../../bridge', () => ({
+  __esModule: true,
+  default: {
+    trayProps: {get: () => ({})},
+    canvasOrigin: 'http://localhost',
+  },
+}))
 
 describe('clickCallback()', () => {
   const subject = type => clickCallback(new FakeEditor(), document, type)
@@ -29,7 +46,7 @@ describe('clickCallback()', () => {
 
     it('creates the container', async () => {
       await act(async () => {
-        subject('create_icon_maker_icon')
+        await subject('create_icon_maker_icon')
       })
 
       await waitFor(() => {
@@ -39,7 +56,7 @@ describe('clickCallback()', () => {
 
     it('mounts the component', async () => {
       await act(async () => {
-        subject('create_icon_maker_icon')
+        await subject('create_icon_maker_icon')
       })
 
       await waitFor(() => {
@@ -51,7 +68,7 @@ describe('clickCallback()', () => {
   describe('when the container exists', () => {
     beforeEach(async () => {
       await act(async () => {
-        subject('edit_icon_maker_icon')
+        await subject('edit_icon_maker_icon')
       })
 
       await waitFor(() => {
@@ -61,7 +78,7 @@ describe('clickCallback()', () => {
 
     it('re-mounts the component', async () => {
       await act(async () => {
-        subject('create_icon_maker_icon')
+        await subject('create_icon_maker_icon')
       })
 
       await waitFor(() => {

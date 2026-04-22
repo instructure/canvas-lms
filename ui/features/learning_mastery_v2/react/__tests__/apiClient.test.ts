@@ -24,16 +24,15 @@ import {
   loadCourseUsers,
   saveOutcomeOrder,
 } from '../apiClient'
+import {DEFAULT_STUDENTS_PER_PAGE, SortBy} from '@canvas/outcomes/react/utils/constants'
 import {
-  DEFAULT_STUDENTS_PER_PAGE,
+  NameDisplayFormat,
   SortOrder,
-  SortBy,
   DisplayFilter,
   SecondaryInfoDisplay,
-  NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {type Mocked} from 'vitest'
 
 vi.mock('@canvas/axios')

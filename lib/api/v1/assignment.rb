@@ -291,11 +291,14 @@ module Api::V1::Assignment
 
     include_needs_grading_count = opts[:exclude_response_fields].exclude?("needs_grading_count")
     if include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
-      query = Assignments::NeedsGradingCountQuery.new(assignment, user, opts[:needs_grading_course_proxy])
+      # Results are served from RequestCache when the caller pre-warmed the
+      # batch (e.g. assignments_api_controller, assignment_group_json).
+      # Falls back to a per-assignment computation when called without prior warming.
+      query = Assignments::NeedsGradingCountQuery.new([assignment], user)
       if opts[:needs_grading_count_by_section]
-        hash["needs_grading_count_by_section"] = query.count_by_section
+        hash["needs_grading_count_by_section"] = query.count_by_section[assignment.global_id]
       end
-      hash["needs_grading_count"] = query.count
+      hash["needs_grading_count"] = query.count[assignment.global_id]
     end
 
     if assignment.context.grants_any_right?(user, :read_sis, :manage_sis)
@@ -773,17 +776,19 @@ module Api::V1::Assignment
             peer_review_result = true
 
             if has_peer_reviews
-              peer_review_result = if prepared_update[:assignment].peer_review_sub_assignment.present?
-                                     update_api_peer_review_sub_assignment(
-                                       prepared_update[:assignment],
-                                       assignment_params[:peer_review]
-                                     )
-                                   else
-                                     create_api_peer_review_sub_assignment(
-                                       prepared_update[:assignment],
-                                       assignment_params[:peer_review]
-                                     )
-                                   end
+              if prepared_update[:assignment].peer_review_sub_assignment.present?
+                peer_review_result = update_api_peer_review_sub_assignment(
+                  prepared_update[:assignment],
+                  assignment_params[:peer_review]
+                )
+              # Do not create peer review sub assignment for assignments with legacy peer reviews
+              # Only create when peer_reviews is being newly enabled (old_assignment had peer_reviews=false)
+              elsif prepared_update[:old_assignment].nil? || !prepared_update[:old_assignment].peer_reviews
+                peer_review_result = create_api_peer_review_sub_assignment(
+                  prepared_update[:assignment],
+                  assignment_params[:peer_review]
+                )
+              end
 
               if peer_review_result.is_a?(Hash)
                 peer_review_overrides_affected = peer_review_result[:overrides_affected] || 0

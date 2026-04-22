@@ -33,7 +33,7 @@ import {
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import Confetti from '@canvas/confetti/react/Confetti'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {assignLocation} from '@canvas/util/globalUtils'

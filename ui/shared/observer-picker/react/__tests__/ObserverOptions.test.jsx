@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, act, fireEvent} from '@testing-library/react'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 import ObserverOptions from '../ObserverOptions'
 import {OBSERVER_COOKIE_PREFIX} from '../../ObserverGetObservee'

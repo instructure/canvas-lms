@@ -25,7 +25,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('canvas_modal')
@@ -79,6 +80,8 @@ function CanvasModal({
             errorComponent={
               <GenericErrorPage
                 imageUrl={errorImageUrl}
+                onReportError={reportError}
+                translations={canvasErrorPageTranslations}
                 errorSubject={errorSubject}
                 errorCategory={errorCategory}
               />

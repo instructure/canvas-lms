@@ -235,14 +235,6 @@ describe TokensController do
         expect(assigns[:token]).to be_active
       end
 
-      it "does not allow creating an access token while masquerading" do
-        Account.site_admin.account_users.create!(user: @user)
-        session[:become_user_id] = user_with_pseudonym(active_all: true).id
-
-        post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "jun 1 2011" } }
-        assert_status(401)
-      end
-
       it "does not allow explicitly setting the token value" do
         post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "jun 1 2011", token: "mytoken" } }
         expect(response).to be_successful
@@ -272,14 +264,15 @@ describe TokensController do
       context "with student_access_token_management disabled" do
         before { Account.site_admin.disable_feature!(:student_access_token_management) }
 
-        it "does not allow deleting an access token while masquerading" do
+        it "allows an admin to delete an access token while masquerading" do
           Account.site_admin.account_users.create!(user: @user)
           session[:become_user_id] = user_with_pseudonym(active_all: true).id
           token = @user.access_tokens.create!(purpose: "test")
           expect(token.user_id).to eq @user.id
 
           delete "destroy", params: { user_id: "self", id: token.id }
-          assert_status(401)
+          assert_status(200)
+          expect(token.reload).to be_deleted
         end
       end
 
@@ -360,19 +353,6 @@ describe TokensController do
         expect(assigns[:token]).to be_active
       end
 
-      it "does not allow regenerating a token while masquerading" do
-        Account.site_admin.account_users.create!(user: @user)
-        session[:become_user_id] = user_with_pseudonym(active_all: true).id
-        token = @user.access_tokens.new
-        token.developer_key = DeveloperKey.default
-        token.purpose = "test"
-        token.save!
-        expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to be true
-        put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-        assert_status(401)
-      end
-
       it "does not allow regenerating a non-manually-generated token" do
         key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}")
         token = @user.access_tokens.create!(developer_key: key)
@@ -429,66 +409,83 @@ describe TokensController do
         assert_status(400)
       end
 
-      it "does not allow activating a pending token while masquerading" do
-        Account.site_admin.account_users.create!(user: @user)
-        session[:become_user_id] = user_with_pseudonym(active_all: true).id
-        token = @user.access_tokens.new(workflow_state: "pending")
-        token.developer_key = DeveloperKey.default
-        token.purpose = "test"
-        token.save!
-        expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to be true
-        put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-        assert_status(401)
-      end
+      context "with limit_personal_access_tokens setting on" do
+        before(:once) do
+          Account.default.change_root_account_setting!(:limit_personal_access_tokens, true)
+          Account.site_admin.disable_feature!(:student_access_token_management)
+        end
 
-      context "with admin manage access tokens feature flag on" do
-        before(:once) { Account.default.root_account.enable_feature!(:admin_manage_access_tokens) }
-
-        context "with limit_personal_access_tokens setting on" do
-          before(:once) do
-            Account.default.change_root_account_setting!(:limit_personal_access_tokens, true)
-            Account.site_admin.disable_feature!(:student_access_token_management)
+        context "as non-admin" do
+          it "does not allow creating an access token" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            assert_status(401)
           end
 
-          context "as non-admin" do
-            it "does not allow creating an access token" do
-              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-              assert_status(401)
-            end
+          it "does not allow updating an access token" do
+            token = @user.access_tokens.create!(purpose: "test")
+            put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+            assert_status(401)
+          end
+        end
 
-            it "does not allow updating an access token" do
-              token = @user.access_tokens.create!(purpose: "test")
-              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-              assert_status(401)
-            end
+        context "as admin" do
+          before(:once) { @admin = account_admin_user }
+
+          before { user_session(@admin) }
+
+          it "allows creating an access token" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            assert_status(200)
+            expect(assigns[:token]).to be_active
           end
 
-          context "as admin" do
-            before(:once) { @admin = account_admin_user }
+          it "allows updating an access token" do
+            token = @admin.access_tokens.create!(purpose: "test")
+            put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+            assert_status(200)
+            expect(assigns[:token]).to be_active
+          end
 
-            before { user_session(@admin) }
+          context "for another user" do
+            before(:once) do
+              @other_user = user_with_pseudonym(active_all: true)
+            end
 
             it "allows creating an access token" do
-              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-              assert_status(200)
-              expect(assigns[:token]).to be_active
+              post "create", params: { user_id: @other_user.id, token: { purpose: "test", expires_at: "jun 1 2011" } }
+              expect(response).to be_successful
+              expect(assigns[:token]).not_to be_nil
+              expect(assigns[:token].developer_key).to eq DeveloperKey.default
+              expect(assigns[:token].purpose).to eq "test"
+              expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
+              expect(assigns[:token].user).to eq @other_user
+              expect(assigns[:token]).to be_pending
+            end
+
+            it "does not allow creating an access token without proper permissions" do
+              account_with_role_changes(role_changes: { create_access_tokens: false })
+              session[:become_user_id] = user_with_pseudonym(active_all: true).id
+
+              post "create", params: { user_id: @other_user.id, token: { purpose: "test", expires_at: "jun 1 2011" } }
+              assert_status(401)
             end
 
             it "allows updating an access token" do
-              token = @admin.access_tokens.create!(purpose: "test")
-              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+              token = @other_user.access_tokens.create!(purpose: "test")
+              expect(token).to be_active
+              put "update", params: { user_id: @other_user.id, id: token.id, token: { regenerate: "1" } }
+
               assert_status(200)
-              expect(assigns[:token]).to be_active
+              expect(assigns[:token]).to be_pending
             end
 
-            context "for another user" do
-              before(:once) do
-                @other_user = user_with_pseudonym(active_all: true)
+            context "while masquerading" do
+              before do
+                session[:become_user_id] = @other_user.id
               end
 
               it "allows creating an access token" do
-                post "create", params: { user_id: @other_user.id, token: { purpose: "test", expires_at: "jun 1 2011" } }
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "jun 1 2011" } }
                 expect(response).to be_successful
                 expect(assigns[:token]).not_to be_nil
                 expect(assigns[:token].developer_key).to eq DeveloperKey.default
@@ -500,103 +497,148 @@ describe TokensController do
 
               it "does not allow creating an access token without proper permissions" do
                 account_with_role_changes(role_changes: { create_access_tokens: false })
-                session[:become_user_id] = user_with_pseudonym(active_all: true).id
 
-                post "create", params: { user_id: @other_user.id, token: { purpose: "test", expires_at: "jun 1 2011" } }
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "jun 1 2011" } }
                 assert_status(401)
               end
 
               it "allows updating an access token" do
                 token = @other_user.access_tokens.create!(purpose: "test")
                 expect(token).to be_active
-                put "update", params: { user_id: @other_user.id, id: token.id, token: { regenerate: "1" } }
+                put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
 
                 assert_status(200)
                 expect(assigns[:token]).to be_pending
               end
-
-              context "while masquerading" do
-                before do
-                  session[:become_user_id] = @other_user.id
-                end
-
-                it "allows creating an access token" do
-                  post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "jun 1 2011" } }
-                  expect(response).to be_successful
-                  expect(assigns[:token]).not_to be_nil
-                  expect(assigns[:token].developer_key).to eq DeveloperKey.default
-                  expect(assigns[:token].purpose).to eq "test"
-                  expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
-                  expect(assigns[:token].user).to eq @other_user
-                  expect(assigns[:token]).to be_pending
-                end
-
-                it "does not allow creating an access token without proper permissions" do
-                  account_with_role_changes(role_changes: { create_access_tokens: false })
-
-                  post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "jun 1 2011" } }
-                  assert_status(401)
-                end
-
-                it "allows updating an access token" do
-                  token = @other_user.access_tokens.create!(purpose: "test")
-                  expect(token).to be_active
-                  put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-
-                  assert_status(200)
-                  expect(assigns[:token]).to be_pending
-                end
-              end
             end
           end
         end
+      end
 
-        context "with restrict_personal_access_tokens_from_students setting on" do
-          before(:once) do
-            Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true)
-            Account.site_admin.disable_feature!(:student_access_token_management)
+      context "with restrict_personal_access_tokens_from_students setting on" do
+        before(:once) do
+          Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true)
+          Account.site_admin.disable_feature!(:student_access_token_management)
+        end
+
+        shared_examples_for "access token creation and update denied" do
+          it "does not allow creating an access token" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            assert_status(401)
           end
 
-          shared_examples_for "access token creation and update denied" do
-            it "does not allow creating an access token" do
+          it "does not allow updating an access token" do
+            token = @user.access_tokens.create!(purpose: "test")
+            put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+            assert_status(401)
+          end
+        end
+
+        context "as a 'nobody'" do
+          it_behaves_like "access token creation and update denied"
+        end
+
+        context "as a student" do
+          before do
+            course_with_student(active_all: true, user: @user)
+          end
+
+          it_behaves_like "access token creation and update denied"
+        end
+
+        context "as an observer" do
+          before do
+            course_with_observer(active_all: true, user: @user)
+          end
+
+          it_behaves_like "access token creation and update denied"
+        end
+
+        context "as both a student and an observer" do
+          before do
+            course_with_student(active_all: true, user: @user)
+            course_with_observer(active_all: true, user: @user)
+          end
+
+          it_behaves_like "access token creation and update denied"
+        end
+
+        context "as a teacher" do
+          before do
+            course_with_teacher(active_all: true, user: @user)
+          end
+
+          it "does allow creating an access token" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            assert_status(200)
+          end
+
+          it "does allow updating an access token" do
+            token = @user.access_tokens.create!(purpose: "test")
+            put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+            assert_status(200)
+          end
+        end
+
+        context "as both a student and a teacher" do
+          before do
+            course_with_student(active_all: true, user: @user)
+            course_with_teacher(active_all: true, user: @user)
+          end
+
+          it "does allow creating an access token" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            assert_status(200)
+          end
+
+          it "does allow updating an access token" do
+            token = @user.access_tokens.create!(purpose: "test")
+            put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+            assert_status(200)
+          end
+        end
+      end
+
+      context "with both limit_personal_access_tokens and restrict_personal_access_tokens_from_students setting off" do
+        before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, false) }
+
+        context "as non-admin" do
+          it "allows creating an access token" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            assert_status(200)
+          end
+
+          it "allows updating an access token" do
+            token = @user.access_tokens.create!(purpose: "test")
+            put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+            assert_status(200)
+          end
+        end
+      end
+
+      context "with student_access_token_management flag" do
+        context "when flag is off" do
+          before(:once) { Account.site_admin.disable_feature!(:student_access_token_management) }
+
+          it "doesn't enforce expiry for any user" do
+            post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+            expect(response).to be_successful
+            expect(assigns[:token].permanent_expires_at).to be_nil
+          end
+        end
+
+        context "when flag is on" do
+          before(:once) { Account.site_admin.enable_feature!(:student_access_token_management) }
+
+          context "as an admin" do
+            before(:once) { @admin = account_admin_user }
+            before { user_session(@admin) }
+
+            it "doesn't enforce expiry for an admin" do
               post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-              assert_status(401)
+              expect(response).to be_successful
+              expect(assigns[:token].permanent_expires_at).to be_nil
             end
-
-            it "does not allow updating an access token" do
-              token = @user.access_tokens.create!(purpose: "test")
-              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-              assert_status(401)
-            end
-          end
-
-          context "as a 'nobody'" do
-            it_behaves_like "access token creation and update denied"
-          end
-
-          context "as a student" do
-            before do
-              course_with_student(active_all: true, user: @user)
-            end
-
-            it_behaves_like "access token creation and update denied"
-          end
-
-          context "as an observer" do
-            before do
-              course_with_observer(active_all: true, user: @user)
-            end
-
-            it_behaves_like "access token creation and update denied"
-          end
-
-          context "as both a student and an observer" do
-            before do
-              course_with_student(active_all: true, user: @user)
-              course_with_observer(active_all: true, user: @user)
-            end
-
-            it_behaves_like "access token creation and update denied"
           end
 
           context "as a teacher" do
@@ -604,126 +646,47 @@ describe TokensController do
               course_with_teacher(active_all: true, user: @user)
             end
 
-            it "does allow creating an access token" do
-              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-              assert_status(200)
-            end
-
-            it "does allow updating an access token" do
-              token = @user.access_tokens.create!(purpose: "test")
-              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-              assert_status(200)
-            end
-          end
-
-          context "as both a student and a teacher" do
-            before do
-              course_with_student(active_all: true, user: @user)
-              course_with_teacher(active_all: true, user: @user)
-            end
-
-            it "does allow creating an access token" do
-              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-              assert_status(200)
-            end
-
-            it "does allow updating an access token" do
-              token = @user.access_tokens.create!(purpose: "test")
-              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-              assert_status(200)
-            end
-          end
-        end
-
-        context "with both limit_personal_access_tokens and restrict_personal_access_tokens_from_students setting off" do
-          before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, false) }
-
-          context "as non-admin" do
-            it "allows creating an access token" do
-              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-              assert_status(200)
-            end
-
-            it "allows updating an access token" do
-              token = @user.access_tokens.create!(purpose: "test")
-              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
-              assert_status(200)
-            end
-          end
-        end
-
-        context "with student_access_token_management flag" do
-          context "when flag is off" do
-            before(:once) { Account.site_admin.disable_feature!(:student_access_token_management) }
-
-            it "doesn't enforce expiry for any user" do
+            it "doesn't enforce expiry for a teacher" do
               post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
               expect(response).to be_successful
               expect(assigns[:token].permanent_expires_at).to be_nil
             end
           end
 
-          context "when flag is on" do
-            before(:once) { Account.site_admin.enable_feature!(:student_access_token_management) }
-
-            context "as an admin" do
-              before(:once) { @admin = account_admin_user }
-              before { user_session(@admin) }
-
-              it "doesn't enforce expiry for an admin" do
-                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-                expect(response).to be_successful
-                expect(assigns[:token].permanent_expires_at).to be_nil
-              end
+          context "as a teacher with student enrollments" do
+            before do
+              course_with_teacher(active_all: true, user: @user)
+              course_with_student(active_all: true, user: @user)
             end
 
-            context "as a teacher" do
-              before do
-                course_with_teacher(active_all: true, user: @user)
-              end
+            it "doesn't enforce expiry for a teacher with some student enrollments" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              expect(response).to be_successful
+              expect(assigns[:token].permanent_expires_at).to be_nil
+            end
+          end
 
-              it "doesn't enforce expiry for a teacher" do
-                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-                expect(response).to be_successful
-                expect(assigns[:token].permanent_expires_at).to be_nil
-              end
+          context "as a user with only student enrollments" do
+            before do
+              course_with_student(active_all: true, user: @user)
             end
 
-            context "as a teacher with student enrollments" do
-              before do
-                course_with_teacher(active_all: true, user: @user)
-                course_with_student(active_all: true, user: @user)
-              end
-
-              it "doesn't enforce expiry for a teacher with some student enrollments" do
-                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-                expect(response).to be_successful
-                expect(assigns[:token].permanent_expires_at).to be_nil
-              end
+            it "rejects tokens without expiry" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              # expect response to not be successful
+              expect(response).not_to be_successful
             end
 
-            context "as a user with only student enrollments" do
-              before do
-                course_with_student(active_all: true, user: @user)
-              end
+            it "rejects tokens with an expiry past the maximum" do
+              expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION + 1.day).from_now
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
+              expect(response).not_to be_successful
+            end
 
-              it "rejects tokens without expiry" do
-                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
-                # expect response to not be successful
-                expect(response).not_to be_successful
-              end
-
-              it "rejects tokens with an expiry past the maximum" do
-                expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION + 1.day).from_now
-                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
-                expect(response).not_to be_successful
-              end
-
-              it "allows tokens with an expiry" do
-                expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION - 1.day).from_now
-                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
-                expect(response).to be_successful
-              end
+            it "allows tokens with an expiry" do
+              expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION - 1.day).from_now
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
+              expect(response).to be_successful
             end
           end
         end

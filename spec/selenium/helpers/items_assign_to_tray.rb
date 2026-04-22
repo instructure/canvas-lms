@@ -106,7 +106,7 @@ module ItemsAssignToTray
   end
 
   def loading_spinner_selector
-    "[data-testid='module-item-edit-tray'] [title='Loading']"
+    "[data-testid='cards-loading']"
   end
 
   def module_item_assignee_selector

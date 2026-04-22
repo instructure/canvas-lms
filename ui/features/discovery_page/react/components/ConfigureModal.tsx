@@ -21,7 +21,8 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {fetchDiscoveryConfig, saveDiscoveryConfig, toApiConfig, toCardConfig} from '../api'
 import type {CardConfig, ConfigureModalProps, DiscoverySection, ModalError} from '../types'
@@ -76,8 +77,11 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const isLoading = isLoadingConfig || isSaving
   const isActionsDisabled = isLoading || isEditingAnyCard
+  // withheld while loading so the iframe can’t fire READY before config is fetched,
+  // and so useIframeMessaging resets its ready state on each open
+  const activePreviewUrl = isLoadingConfig ? undefined : previewUrl
 
-  useIframeMessaging({iframeRef, config, previewUrl})
+  useIframeMessaging({iframeRef, config, previewUrl: activePreviewUrl})
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -119,10 +123,12 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
           setConfig(cardConfig)
           hasLoaded.current = true
         } catch (err) {
-          console.error('Failed to load discovery configuration:', err)
+          console.error('Failed to load discovery page configuration:', err)
 
           setError({
-            message: I18n.t('Failed to load configuration. Please close and try again.'),
+            message: I18n.t(
+              'Failed to load discovery page configuration. Please close and try again.',
+            ),
             code: 'LOAD_ERROR',
           })
         } finally {
@@ -143,12 +149,21 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
       setIsDirty(false)
       // keep modal open after save
     } catch (err) {
-      console.error('Failed to save discovery configuration:', err)
+      console.error('Failed to save discovery page configuration:', err)
 
-      showFlashAlert({
-        message: I18n.t('Failed to save configuration. Please try again.'),
-        type: 'error',
-      })
+      const fallback = I18n.t('Failed to save discovery page configuration. Please try again.')
+      let message = fallback
+
+      if (err instanceof FetchApiError && err.response.status === 422) {
+        const body = await err.response.json().catch(() => null)
+        message =
+          (body?.errors ?? [])
+            .map((e: {message?: string}) => e.message)
+            .filter(Boolean)
+            .join(', ') || fallback
+      }
+
+      showFlashAlert({message, type: 'error'})
     } finally {
       setIsSaving(false)
     }
@@ -263,7 +278,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
               mountNode={() => modalBodyRef.current}
             />
 
-            <PreviewAndSidebar previewUrl={previewUrl} iframeRef={iframeRef}>
+            <PreviewAndSidebar previewUrl={activePreviewUrl} iframeRef={iframeRef}>
               <Heading level="h3" margin="0 0 medium 0">
                 {I18n.t('Configure sign in options')}
               </Heading>

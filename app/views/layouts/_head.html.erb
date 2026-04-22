@@ -34,15 +34,22 @@
   <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Italic.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= stylesheet_link_tag(css_url_for('fonts')) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
-  <% if @js_env && @js_env[:ONETRUST_CONSENT_SCRIPT_ID].present? %>
-  <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_SCRIPT_ID] %>" ></script>
+  <% if @js_env %>
   <script type="text/javascript">
-    window.OT_CONSENT_STATE = null;
+    window.CANVAS_COOKIE_CONSENT_STATE = <%= @js_env[:PRE_COOKIE_CONSENT] %>;
+  </script>
+  <% end %>
+  <% if @js_env && @js_env[:ONETRUST_CONSENT_DOMAIN_ID].present? %>
+  <script src="https://cdn.cookielaw.org/consent/<%= @js_env[:ONETRUST_CONSENT_DOMAIN_ID] %>/otSDKStub.js" data-document-language="true" type="text/javascript" charset="UTF-8" data-domain-script="<%= @js_env[:ONETRUST_CONSENT_DOMAIN_ID] %>" ></script>
+  <script type="text/javascript">
+    if (window.ENV && window.ENV['RAILS_ENVIRONMENT'] === 'development') {
+      console.warn("OneTrust will initialize.");
+    }
     window.addEventListener('OneTrustGroupsUpdated', e => {
       if (e.detail.includes('C0002')) {
-        window.OT_CONSENT_STATE = true;
+        window.CANVAS_COOKIE_CONSENT_STATE = true;
       } else {
-        window.OT_CONSENT_STATE = false;
+        window.CANVAS_COOKIE_CONSENT_STATE = false;
       }
     });
   function OptanonWrapper() {

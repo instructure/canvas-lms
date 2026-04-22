@@ -192,8 +192,7 @@ module Lti::IMS::Concerns
 
       def developer_key_errors
         account = @context.respond_to?(:account) ? @context.account : @context
-        errors.add(:developer_key, "Developer key inactive in context") unless developer_key.binding_on_in_account?(account)
-        errors.add(:developer_key, "Developer key inactive") unless developer_key.workflow_state == "active"
+        errors.add(:developer_key, "Developer key inactive in context") unless developer_key.usable_in_context?(account)
       end
 
       def client_id

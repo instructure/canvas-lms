@@ -32,7 +32,6 @@ module Canvas::OAuth
       # @return [Boolean] Returns true if PKCE params present and supported, false otherwise.
       def use_pkce_in_authorization?(options)
         return false if options.blank?
-        return false unless Account.site_admin.feature_enabled? :pkce
 
         params_present = options.keys & REQUIRED_PARAMS == REQUIRED_PARAMS
         params_present && valid_code_verifier_method?(options[:code_challenge_method])
@@ -45,7 +44,6 @@ module Canvas::OAuth
       # @return [Boolean] Returns true if PKCE should be used, false otherwise.
       def use_pkce_in_token?(options)
         return false if options.blank?
-        return false unless Account.site_admin.feature_enabled? :pkce
 
         options.include? :code_verifier
       end

@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -28,10 +28,6 @@ import * as apiClient from './apiClient'
 
 const I18n = createI18nScope('OutcomesImporter')
 
-const unmount = root => () => {
-  root.unmount()
-}
-
 export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
   return apiClient
     .queryImportStatus(props.contextUrlRoot, 'latest')
@@ -39,14 +35,14 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
       if (response.status === 200 && response.data.workflow_state === 'importing') {
         const importId = response.data.id
         const invokedImport = userId === response.data.user.id
-        const root = createRoot(mount)
-        root.render(
+        const root = render(
           <OutcomesImporter
             {...props}
-            hide={unmount(root)}
+            hide={() => root.unmount()}
             importId={importId}
             invokedImport={invokedImport}
           />,
+          mount,
         )
       }
     })
@@ -54,8 +50,10 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
 }
 
 export function showOutcomesImporter({mount, ...props}) {
-  const root = createRoot(mount)
-  root.render(<OutcomesImporter {...props} hide={unmount(root)} invokedImport={true} />)
+  const root = render(
+    <OutcomesImporter {...props} hide={() => root.unmount()} invokedImport={true} />,
+    mount,
+  )
 }
 
 export default class OutcomesImporter extends Component {

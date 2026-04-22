@@ -121,6 +121,12 @@ export default class RosterUserView extends View {
     json.isStudent = this.model.hasEnrollmentType('StudentEnrollment')
     json.isPending = this.model.pending(this.model.currentRole)
     json.isInactive = this.model.inactive()
+    const tempBadge = this.model.temporaryEnrollmentBadge()
+    json.temporaryEnrollmentLabel = tempBadge.label
+    json.temporaryEnrollmentLabelClass = tempBadge.labelClass
+    if (json.temporaryEnrollmentLabel) {
+      json.isInactive = false
+    }
     if (!json.isInactive) {
       json.enrollments = reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
     }

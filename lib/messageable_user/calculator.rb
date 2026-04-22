@@ -626,7 +626,11 @@ class MessageableUser
       state_clauses.compact!
       return nil if state_clauses.empty?
 
-      "(#{state_clauses.join(" OR ")}) AND enrollments.type != 'StudentViewEnrollment'"
+      conditions = "(#{state_clauses.join(" OR ")}) AND enrollments.type != 'StudentViewEnrollment'"
+      if options[:exclude_pending_temporary_enrollments]
+        conditions += " AND (#{Enrollment.pending_temporary_enrollment_exclusion_sql})"
+      end
+      conditions
     end
 
     def base_scope(options = {})
@@ -653,7 +657,8 @@ class MessageableUser
     def enrollment_scope(options = {})
       options = {
         common_course_column: "enrollments.course_id",
-        common_role_column: "enrollments.type"
+        common_role_column: "enrollments.type",
+        exclude_pending_temporary_enrollments: temporary_enrollments_enabled?
       }.merge(options)
       scope = base_scope(options)
       scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
@@ -878,7 +883,9 @@ class MessageableUser
                               .where("groups.workflow_state<>'deleted'")
                               .where(MessageableUser::AVAILABLE_CONDITIONS)
                               .where(groups: { context_type: "Course" })
-                              .where(self.class.enrollment_conditions)
+                              .where(self.class.enrollment_conditions(
+                                       exclude_pending_temporary_enrollments: temporary_enrollments_enabled?
+                                     ))
                               .where(enrollments: { course_section_id: visible_section_ids_in_courses(recent_section_visible_courses) })
 
       if student_courses.present?
@@ -1078,6 +1085,10 @@ class MessageableUser
 
     def section_visible_group_ids
       section_visible_group_ids_by_shard[Shard.current] || []
+    end
+
+    def temporary_enrollments_enabled?
+      !!Account.current_domain_root_account&.feature_enabled?(:temporary_enrollments)
     end
 
     def marshal_dump

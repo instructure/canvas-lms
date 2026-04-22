@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import type {OrganizationProduct, Product, ToolsByDisplayGroup} from '../models/Product'
 import {stringify} from 'qs'
 import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
@@ -160,7 +160,7 @@ async function fetchResponse(method: string, url: string, errorText: string): Pr
   const response = await fetch(url, {
     method,
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'content-Type': 'application/json',
     },
   })

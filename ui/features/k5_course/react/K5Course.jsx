@@ -22,7 +22,6 @@ import React, {forwardRef, useEffect, useLayoutEffect, useRef, useState} from 'r
 import {Provider, connect} from 'react-redux'
 
 import {store} from '@canvas/planner'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -55,7 +54,6 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
 import {
   DEFAULT_COURSE_COLOR,
   MOBILE_NAV_BREAKPOINT_PX,
@@ -745,12 +743,8 @@ K5Course.propTypes = {
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)
 
-const k5Theme = getK5ThemeOverrides()
-
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides: k5Theme}}>
-    <Provider store={store}>
-      <WrappedK5Course {...props} />
-    </Provider>
-  </InstUISettingsProvider>
+  <Provider store={store}>
+    <WrappedK5Course {...props} />
+  </Provider>
 )

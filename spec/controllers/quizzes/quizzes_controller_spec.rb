@@ -614,6 +614,41 @@ describe Quizzes::QuizzesController do
       expect(assigns[:stored_params]).not_to be_nil
     end
 
+    it "sets manage_rubrics to true for user with only manage_assignments_edit" do
+      @quiz = @course.quizzes.create!(quiz_type: "assignment", workflow_state: "available")
+      custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+      custom_teacher = course_with_user("TeacherEnrollment", {
+                                          active_all: true,
+                                          course: @course,
+                                          role: custom_role
+                                        }).user
+      user_session(custom_teacher)
+
+      get "show", params: { course_id: @course.id, id: @quiz.id }
+
+      expect(assigns[:js_env][:PERMISSIONS]).to include manage_rubrics: true
+    end
+
+    it "sets manage_rubrics to true via render_ams_service for user with only manage_assignments_edit" do
+      @course.root_account.enable_feature!(:ams_root_account_integration)
+      @course.enable_feature!(:ams_course_integration)
+      custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+      custom_teacher = course_with_user("TeacherEnrollment", {
+                                          active_all: true,
+                                          course: @course,
+                                          role: custom_role
+                                        }).user
+      user_session(custom_teacher)
+
+      get "index", params: { course_id: @course.id }
+
+      expect(assigns[:js_env][:PERMISSIONS]).to include manage_rubrics: true
+    end
+
     it "sets the submission count variables" do
       @section = @course.course_sections.create!(name: "section 2")
       @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")

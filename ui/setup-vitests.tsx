@@ -289,6 +289,7 @@ const ignoredErrors = [
   /Warning: ReactDOM.render is no longer supported in React 18/,
   /Warning: ReactDOMTestUtils is deprecated/,
   /Warning: %s: Support for defaultProps will be removed/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
 ]
 const ignoredWarnings = [
   /JQMIGRATE:/,

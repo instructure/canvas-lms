@@ -106,42 +106,47 @@ describe "student dashboard todo widget", :ignore_js_errors do
     end
 
     it "marking item complete removes it from Incomplete filter" do
-      skip "2026-02-11 Unskip after fix bug LX-3764"
       go_to_dashboard
 
       expect(todo_item(@missing_assignment.id)).to be_displayed
       expect(todo_checkbox(@missing_assignment.id)).to be_displayed
       todo_checkbox(@missing_assignment.id).click
+      wait_for_ajaximations
       expect(element_exists?(todo_item_selector(@missing_assignment.id))).to be_falsey
 
       expect(todo_item(@incomplete_discussion.id)).to be_displayed
       expect(todo_checkbox(@incomplete_discussion.id)).to be_displayed
       todo_checkbox(@incomplete_discussion.id).click
+      wait_for_ajaximations
       expect(element_exists?(todo_item_selector(@incomplete_discussion.id))).to be_falsey
 
       expect(todo_item(@incomplete_quiz.id)).to be_displayed
       expect(todo_checkbox(@incomplete_quiz.id)).to be_displayed
       todo_checkbox(@incomplete_quiz.id).click
+      wait_for_ajaximations
       expect(element_exists?(todo_item_selector(@incomplete_quiz.id))).to be_falsey
     end
 
     it "marking item incomplete removes it from Complete filter" do
-      skip "2026-02-11 Unskip after fix bug LX-3764"
       go_to_dashboard
 
+      filter_todos_by("Complete")
       expect(todo_item(@graded_assignment.id)).to be_displayed
       expect(todo_checkbox(@graded_assignment.id)).to be_displayed
       todo_checkbox(@graded_assignment.id).click
+      wait_for_ajaximations
       expect(element_exists?(todo_item_selector(@graded_assignment.id))).to be_falsey
 
       expect(todo_item(@completed_discussion1.id)).to be_displayed
       expect(todo_checkbox(@completed_discussion1.id)).to be_displayed
       todo_checkbox(@completed_discussion1.id).click
+      wait_for_ajaximations
       expect(element_exists?(todo_item_selector(@completed_discussion1.id))).to be_falsey
 
       expect(todo_item(@graded_quiz.id)).to be_displayed
       expect(todo_checkbox(@graded_quiz.id)).to be_displayed
       todo_checkbox(@graded_quiz.id).click
+      wait_for_ajaximations
       expect(element_exists?(todo_item_selector(@graded_quiz.id))).to be_falsey
     end
   end
@@ -168,6 +173,27 @@ describe "student dashboard todo widget", :ignore_js_errors do
 
       filter_todos_by("All")
       expect(all_todo_items.size).to be >= 1
+    end
+
+    it "can mark todos complete and incomplete across pages" do
+      go_to_dashboard
+
+      filter_todos_by("All")
+      expect(widget_pagination_button("To-do list", 2)).to be_displayed
+      widget_pagination_button("To-do list", 2).click
+      wait_for_ajaximations
+
+      target_todo_id = all_todo_items[2].attribute("data-testid").split("-").last
+      svg_element = f(todo_checkbox_icon_selector(target_todo_id))
+      todo_status = svg_element.attribute("name")
+
+      expect(todo_status).to eq("IconCheckPlus")
+      todo_checkbox(target_todo_id).click
+      wait_for_ajaximations
+
+      changed_svg_element = f(todo_checkbox_icon_selector(target_todo_id))
+      changed_todo_status = changed_svg_element.attribute("name")
+      expect(changed_todo_status).to eq("IconCheck")
     end
   end
 

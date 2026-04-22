@@ -25,6 +25,7 @@ import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 import getRCSProps from '../getRCSProps'
 import EditorConfig from '../tinymce.config'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
+import {getTypography} from '@canvas/instui-bindings'
 import tinymce, {Editor} from 'tinymce'
 import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
 
@@ -115,6 +116,14 @@ const CanvasRce = forwardRef(function CanvasRce(
         window.ENV?.url_for_high_contrast_tinymce_editor_css
           ? window.ENV?.url_for_high_contrast_tinymce_editor_css
           : []
+      }
+      useHighContrast={window.ENV?.use_high_contrast ?? false}
+      fontFamily={
+        getTypography(
+          Boolean(ENV.K5_USER),
+          Boolean(ENV.USE_CLASSIC_FONT),
+          Boolean(ENV.use_dyslexic_font),
+        ).fontFamily
       }
       instRecordDisabled={window.ENV?.RICH_CONTENT_INST_RECORD_TAB_DISABLED}
       language={window.ENV?.LOCALES?.[0] || 'en'}

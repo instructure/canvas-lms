@@ -22,7 +22,6 @@ import {render} from '@canvas/react'
 import {Navigate, RouterProvider, createBrowserRouter} from 'react-router-dom'
 import {DiscoverRoute} from './discover'
 import {ProductConfigureButton} from './discover/ProductConfigureButton'
-import {isLtiRegistrationsDiscoverEnabled} from './discover/utils'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {ManageRoutes} from './manage'
 import {
@@ -56,6 +55,7 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
+import {ToolConfigurationJsonEditor} from './manage/pages/tool_details/configuration/ToolConfigurationJsonEditor'
 import {
   deleteContextControl,
   fetchControlsByDeployment,
@@ -72,9 +72,7 @@ const accountId = getAccountId()
 const getLayoutChildren = (accountId: AccountId) => {
   const layoutRoutes = [...ManageRoutes]
 
-  if (isLtiRegistrationsDiscoverEnabled()) {
-    layoutRoutes.push(DiscoverRoute)
-  }
+  layoutRoutes.push(DiscoverRoute)
 
   if (isLtiRegistrationsUsageEnabled()) {
     layoutRoutes.push(MonitorRoute(accountId))
@@ -101,12 +99,19 @@ const router = createBrowserRouter(
           path: 'product_detail/:id',
           element: (
             <ProductDetail
-              renderConfigureButton={(buttonWidth, product) => {
+              renderConfigureButton={(
+                buttonWidth,
+                product,
+                installStatus,
+                installStatusLoading,
+              ) => {
                 return (
                   <ProductConfigureButton
                     accountId={accountId}
                     buttonWidth={buttonWidth}
                     product={product}
+                    installStatus={installStatus}
+                    installStatusLoading={installStatusLoading}
                   />
                 )
               }}
@@ -136,6 +141,10 @@ const router = createBrowserRouter(
             {
               path: 'configuration/edit',
               element: <ToolConfigurationEdit />,
+            },
+            {
+              path: 'configuration/edit-json',
+              element: <ToolConfigurationJsonEditor />,
             },
             ...(isLtiRegistrationsUsageEnabled()
               ? [

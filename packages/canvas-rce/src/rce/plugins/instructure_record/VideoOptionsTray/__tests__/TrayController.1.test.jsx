@@ -23,7 +23,6 @@ import TrayController, {
   CONTAINER_ID,
   videoDefaultSize,
   STUDIO_PLAYER_VIDEO_SIZE_DEFAULT,
-  VIDEO_SIZE_DEFAULT,
 } from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
@@ -204,6 +203,13 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(getTray()).toBeNull()
     })
 
+    it('sets isOpen to false immediately without waiting for the exit animation', () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController._isOpen = true
+      trayController.hideTrayForEditor(editors[0])
+      expect(trayController.isOpen).toBe(false)
+    })
+
     describe('with skipFocusOnExit parameter', () => {
       it('does not select video container when skipFocusOnExit is true', async () => {
         const selectSpy = jest.spyOn(editors[0].selection, 'select')
@@ -233,16 +239,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 })
 
 describe('#videoDefaultSize', () => {
-  describe('when the consolidated media player feature is enabled', () => {
-    it('returns the STUDIO_PLAYER_VIDEO_SIZE_DEFAULT', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: true})
-      expect(videoDefaultSize()).toEqual(STUDIO_PLAYER_VIDEO_SIZE_DEFAULT)
-    })
-  })
-  describe('when the consolidated media player feature is disabled', () => {
-    it('returns the VIDEO_SIZE_DEFAULT', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: false})
-      expect(videoDefaultSize()).toEqual(VIDEO_SIZE_DEFAULT)
-    })
+  it('returns the STUDIO_PLAYER_VIDEO_SIZE_DEFAULT', () => {
+    expect(videoDefaultSize()).toEqual(STUDIO_PLAYER_VIDEO_SIZE_DEFAULT)
   })
 })

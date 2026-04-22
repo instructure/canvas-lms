@@ -22,7 +22,6 @@ import PropTypes from 'prop-types'
 import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@canvas/util/xhr'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
@@ -38,15 +37,6 @@ class AssignmentExternalTools extends React.Component {
 
   UNSAFE_componentWillMount() {
     this.getTools()
-  }
-
-  componentDidMount() {
-    if (this.state.tools) {
-      for (let i = 0; i < this.state.tools.length; i++) {
-        const tool = this.state.tools[i]
-        this[`tool_iframe_${tool.definition_id}`].setAttribute('allow', iframeAllowances())
-      }
-    }
   }
 
   getMaxIFrameWidth = () => {

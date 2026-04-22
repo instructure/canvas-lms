@@ -75,43 +75,50 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   def create_or_update
     # To simplify use of this internal API we allow creating or updating via
     # this endpoint.
-    binding = nil
-    if lti_registration.present?
-      Lti::AccountBindingService.call(account:,
-                                      user: @current_user,
-                                      registration: lti_registration,
-                                      workflow_state: workflow_state_param[:workflow_state]) => { developer_key_account_binding: binding }
-    else
-      binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
-      binding.assign_attributes workflow_state_param
-      binding.save!
-    end
+    dkab = if lti_registration.present?
+             if lti_registration&.account == account
+               bind_lti_key
+             else
+               bind_inherited_lti_key
+             end
+           else
+             bind_api_key
+           end
 
-    render json: DeveloperKeyAccountBindingSerializer.new(binding, @context),
-           status: binding.previously_new_record? ? :ok : :created
+    render json: DeveloperKeyAccountBindingSerializer.new(dkab, @context),
+           status: dkab.previously_new_record? ? :ok : :created
+  rescue ArgumentError => e
+    render json: { errors: e.message }, status: :unprocessable_content
   end
 
   private
 
+  def bind_lti_key
+    result = Lti::AccountBindingService.call(account:, user: @current_user, registration: lti_registration, workflow_state:)
+    result[:developer_key_account_binding]
+  end
+
+  def bind_inherited_lti_key
+    result = Lti::InstallTemplateRegistrationService.call(template: lti_registration, user: @current_user, account:, binding_state: workflow_state)
+    result.dig(:bindings, :developer_key_account_binding)
+  end
+
+  def bind_api_key
+    account_binding = existing_binding || DeveloperKeyAccountBinding.new(account:, developer_key:, workflow_state:)
+    account_binding.workflow_state = workflow_state
+    account_binding.save!
+
+    account_binding
+  end
+
   def existing_binding
-    @_existing_binding ||= account.developer_key_account_bindings.find_by(
+    account.developer_key_account_bindings.find_by(
       developer_key_id: params[:developer_key_id]
     )
   end
 
-  def create_params
-    workflow_state_param.merge(
-      {
-        account:,
-        developer_key:
-      }
-    )
-  end
-
-  def workflow_state_param
-    params.require(:developer_key_account_binding).permit(
-      :workflow_state
-    )
+  def workflow_state
+    params.expect(developer_key_account_binding: :workflow_state).fetch(:workflow_state)
   end
 
   def account
@@ -119,7 +126,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   end
 
   def lti_registration
-    @_registration ||= developer_key.lti_registration
+    @_lti_registration ||= developer_key.lti_registration
   end
 
   def developer_key

@@ -25,6 +25,7 @@ import type {
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 import type {RubricFormProps, AssociationType} from '../types/RubricForm'
 import {isEqual} from 'es-toolkit/compat'
+import Big from 'big.js'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
@@ -119,7 +120,7 @@ export const autoGeneratePoints = (ratings: RubricRating[], points: number) => {
     newPts = Math.max(0, newPts)
     lastPts = newPts
 
-    ratingList[i].points = newPts
+    ratingList[i].points = Big(newPts).round(2, 0).toNumber()
   }
 
   return ratingList

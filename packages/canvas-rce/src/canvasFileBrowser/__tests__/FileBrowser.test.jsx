@@ -169,6 +169,8 @@ describe('FileBrowser', () => {
       const {getByText} = subject(defaultProps())
       const folder = await waitFor(() => getByText('My files'))
       fireEvent.click(folder)
+      // Wait for files to fully load before each icon test runs
+      await waitFor(() => getByText('its-working-its-working.jpg'))
     })
 
     it('is an img thumbnail if the file is an image and has a thumbnailUrl', async () => {

@@ -632,6 +632,42 @@ describe GradingStandard do
     end
   end
 
+  describe "#matching_scheme_key" do
+    before do
+      @gs = GradingStandard.new
+      @gs.data = [["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["C", 0.70], ["F", 0.0]]
+    end
+
+    it "returns the correctly-cased key for an exact match" do
+      expect(@gs.matching_scheme_key("A")).to eq("A")
+      expect(@gs.matching_scheme_key("B+")).to eq("B+")
+    end
+
+    it "returns the correctly-cased key for a case-insensitive match" do
+      expect(@gs.matching_scheme_key("a")).to eq("A")
+      expect(@gs.matching_scheme_key("b+")).to eq("B+")
+    end
+
+    it "returns nil when no match is found" do
+      expect(@gs.matching_scheme_key("Z")).to be_nil
+    end
+
+    it "handles numeric keys" do
+      @gs.data = [["4.0", 0.94], ["3.7", 0.90], ["3.0", 0.84], ["0", 0.0]]
+      expect(@gs.matching_scheme_key("3.7")).to eq("3.7")
+    end
+
+    it "handles mixed case keys" do
+      @gs.data = [["PaSs", 0.70], ["fAiL", 0.0]]
+      expect(@gs.matching_scheme_key("pass")).to eq("PaSs")
+      expect(@gs.matching_scheme_key("FAIL")).to eq("fAiL")
+    end
+
+    it "returns nil for nil input" do
+      expect(@gs.matching_scheme_key(nil)).to be_nil
+    end
+  end
+
   describe "root account ID" do
     let_once(:root_account) { Account.create! }
     let_once(:subaccount) { Account.create(root_account:) }

@@ -19,16 +19,33 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
 import {GradebookTable} from '../GradebookTable'
-import {
-  SortOrder,
-  SortBy,
-  ScoreDisplayFormat,
-  NameDisplayFormat,
-  DEFAULT_GRADEBOOK_SETTINGS,
-} from '@canvas/outcomes/react/utils/constants'
+import {SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
 import {MOCK_STUDENTS, MOCK_OUTCOMES, MOCK_ROLLUPS} from '../../__fixtures__/rollups'
 import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {
+  NameDisplayFormat,
+  SortOrder,
+  ScoreDisplayFormat,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+
+vi.mock('../grid/StudentCellPopover', () => ({
+  StudentCellPopover: ({
+    studentName,
+    studentGradesUrl,
+  }: {
+    studentName: string
+    studentGradesUrl: string
+  }) => (
+    <>
+      <span>{studentName}</span>
+      <a href={studentGradesUrl} data-testid="student-grades-link">
+        View Mastery Report
+      </a>
+    </>
+  ),
+}))
 
 vi.mock('../charts/BarChart', () => ({
   BarChart: () => null,
@@ -267,6 +284,31 @@ describe('GradebookTable', () => {
 
       renderWithQueryClient(<GradebookTable {...props} />)
       expect(screen.getAllByText('outcome 1')[0]).toBeInTheDocument()
+    })
+  })
+
+  describe('student grades URL', () => {
+    const renderWithContext = (lmgbStudentReportingFF: boolean) => {
+      const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})
+      return render(
+        <QueryClientProvider client={queryClient}>
+          <LMGBContext.Provider value={{env: {lmgbStudentReportingFF}}}>
+            <GradebookTable {...defaultProps} />
+          </LMGBContext.Provider>
+        </QueryClientProvider>,
+      )
+    }
+
+    it('links to grades page when flag is off', () => {
+      renderWithContext(false)
+      const links = screen.getAllByTestId('student-grades-link')
+      expect(links[0]).toHaveAttribute('href', '/courses/1/grades/1#tab-outcomes')
+    })
+
+    it('links to outcomes reporting page when flag is on', () => {
+      renderWithContext(true)
+      const links = screen.getAllByTestId('student-grades-link')
+      expect(links[0]).toHaveAttribute('href', '/courses/1/outcomes?student_id=1#reporting')
     })
   })
 

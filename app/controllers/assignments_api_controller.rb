@@ -780,8 +780,6 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::Quiz
   include Api::V1::Progress
   include Api::V1::AccessibilityResourceScan
-  include Api::V1::AssessmentRequest
-  include Api::V1::AllocationRule
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -1002,7 +1000,8 @@ class AssignmentsApiController < ApplicationController
                                        .eager_load(:assignment_group)
                                        .preload(:rubric_association, :rubric)
                                        .reorder("assignment_groups.position, assignments.position, assignments.id")
-      scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
+      assignment_search_min_length = 1
+      scope = Assignment.search_by_attribute(scope, :title, params[:search_term], min_length: assignment_search_min_length)
       include_params = Array(params[:include])
 
       if params[:bucket]
@@ -1118,14 +1117,21 @@ class AssignmentsApiController < ApplicationController
         Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
       end
 
+      # Prewarm the request cache for needs_grading_count so that assignment_json
+      # can read results without triggering per-assignment queries.
+      # Permission check must match the condition in assignment_json:
+      #   include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
+      # exclude_response_fields is not passed from this action so needs_grading_count
+      # is never excluded here — manage_grades is the only effective condition.
+      if @context.grants_right?(user, session, :manage_grades)
+        grading_query = Assignments::NeedsGradingCountQuery.new(assignments, user)
+        grading_query.count
+        grading_query.count_by_section if needs_grading_count_by_section
+      end
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        needs_grading_course_proxy = if @context.grants_right?(user, session, :manage_grades)
-                                       Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user)
-                                     else
-                                       nil
-                                     end
 
         assignment_json(assignment,
                         user,
@@ -1135,7 +1141,6 @@ class AssignmentsApiController < ApplicationController
                         include_visibility:,
                         assignment_visibilities: visibility_array,
                         needs_grading_count_by_section:,
-                        needs_grading_course_proxy:,
                         include_all_dates:,
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
@@ -1784,35 +1789,6 @@ class AssignmentsApiController < ApplicationController
     @assignment = api_find(@context.active_assignments, params[:assignment_id])
     scan = Accessibility::ResourceScannerService.new(resource: @assignment).call
     render json: accessibility_resource_scan_json(scan)
-  end
-
-  # @API Check allocation conversion
-  # Returns a list of objects that would be converted when toggling the
-  # peer_review_allocation_and_grading feature flag.
-  #
-  # @returns [AssessmentRequest] or [AllocationRule]
-  def check_allocation_conversion
-    @assignment = api_find(@context.active_assignments, params[:assignment_id])
-    return render_unauthorized_action unless @assignment.grants_right?(@current_user, session, :update)
-
-    if @context.feature_enabled?(:peer_review_allocation_and_grading)
-      # FF enabled: Check for legacy assessment requests to convert
-      assessment_requests = AssessmentRequest.for_assignment(@assignment.id).incomplete
-
-      # This timestamp comparison identifies assessment requests created with the legacy peer reviews flow
-      if @assignment.peer_review_sub_assignment
-        assessment_requests = assessment_requests.where(
-          assessment_requests: { created_at: ...@assignment.peer_review_sub_assignment.created_at }
-        )
-      end
-
-      render json: assessment_requests_json(assessment_requests, @current_user, session)
-    else
-      # FF disabled: Check for allocation rules
-      allocation_rules = @assignment.allocation_rules.active
-
-      render json: allocation_rules_json(allocation_rules, @current_user, session)
-    end
   end
 
   private

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "webmock/rspec"
-require_relative "../../lib/llm_conversation"
-require_relative "../../lib/llm_conversation/errors"
 
 describe LLMConversationClient do
   let(:user) { user_model }

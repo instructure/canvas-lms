@@ -40,7 +40,10 @@ const I18n = createI18nScope('accessibility_course_statistics')
 interface CoursesTableRowProps {
   course: Course
   showSISIds: boolean
+  isMobile?: boolean
 }
+
+type WithHeader = {header?: React.ReactNode}
 
 const getStatusDisplay = (workflowState: Course['workflow_state']) => {
   switch (workflowState) {
@@ -65,11 +68,14 @@ const getStatusDisplay = (workflowState: Course['workflow_state']) => {
   }
 }
 
-const StatusCell: React.FC<{workflowState: Course['workflow_state']}> = ({workflowState}) => {
+const StatusCell: React.FC<
+  {workflowState: Course['workflow_state']; isMobile: boolean} & WithHeader
+> = ({workflowState, isMobile, header}) => {
   const {tooltip, classname, icon} = getStatusDisplay(workflowState)
 
   return (
-    <Table.RowHeader textAlign="center">
+    <Table.RowHeader data-testid="status-cell" textAlign={isMobile ? 'start' : 'center'}>
+      {header && <>{header}: </>}
       <span className={`published-status ${classname}`}>
         <Tooltip renderTip={tooltip}>
           {icon}
@@ -80,32 +86,43 @@ const StatusCell: React.FC<{workflowState: Course['workflow_state']}> = ({workfl
   )
 }
 
-const CourseNameCell: React.FC<{courseId: string; courseName: string}> = ({
+const CourseNameCell: React.FC<{courseId: string; courseName: string} & WithHeader> = ({
   courseId,
   courseName,
+  header,
 }) => (
-  <Table.Cell>
+  <Table.Cell data-testid="course-name-cell" header={header}>
     <Link href={`/courses/${courseId}`} isWithinText={false}>
       {courseName}
     </Link>
   </Table.Cell>
 )
 
-const SISIdCell: React.FC<{sisId?: string}> = ({sisId}) => (
-  <Table.Cell data-testid="sis-id-cell">{sisId || ''}</Table.Cell>
+const SISIdCell: React.FC<{sisId?: string} & WithHeader> = ({sisId, header}) => (
+  <Table.Cell data-testid="sis-id-cell" header={header}>
+    {sisId || <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>}
+  </Table.Cell>
 )
 
-const TermCell: React.FC<{termName?: string}> = ({termName}) => (
-  <Table.Cell data-testid="term-cell">{termName || ''}</Table.Cell>
+const TermCell: React.FC<{termName?: string} & WithHeader> = ({termName, header}) => (
+  <Table.Cell data-testid="term-cell" header={header}>
+    {termName || <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>}
+  </Table.Cell>
 )
 
-const TeachersCell: React.FC<{teachers?: Course['teachers']}> = ({teachers}) => {
+const TeachersCell: React.FC<{teachers?: Course['teachers']} & WithHeader> = ({
+  teachers,
+  header,
+}) => {
   const [showAll, setShowAll] = useState(false)
   const nonNullTeachers = teachers ?? []
   const teachersToShow = showAll ? nonNullTeachers : nonNullTeachers.slice(0, 2)
 
   return (
-    <Table.Cell data-testid="teachers-cell">
+    <Table.Cell data-testid="teachers-cell" header={header}>
+      {nonNullTeachers.length === 0 && (
+        <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>
+      )}
       {teachersToShow.map(teacher => (
         <div key={teacher.id}>
           <Link href={teacher.html_url} isWithinText={false}>
@@ -129,23 +146,27 @@ const TeachersCell: React.FC<{teachers?: Course['teachers']}> = ({teachers}) => 
   )
 }
 
-const SubaccountCell: React.FC<{
-  subaccountId?: string
-  subaccountName?: string
-}> = ({subaccountId, subaccountName}) => (
-  <Table.Cell data-testid="subaccount-cell">
+const SubaccountCell: React.FC<
+  {
+    subaccountId?: string
+    subaccountName?: string
+  } & WithHeader
+> = ({subaccountId, subaccountName, header}) => (
+  <Table.Cell data-testid="subaccount-cell" header={header}>
     {subaccountName && subaccountId ? (
       <Link href={`/accounts/${subaccountId}/accessibility`} isWithinText={false}>
         {subaccountName}
       </Link>
     ) : (
-      ''
+      <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>
     )}
   </Table.Cell>
 )
 
-const StudentCountCell: React.FC<{count?: number}> = ({count}) => (
-  <Table.Cell data-testid="student-count-cell">{count ?? 0}</Table.Cell>
+const StudentCountCell: React.FC<{count?: number} & WithHeader> = ({count, header}) => (
+  <Table.Cell data-testid="student-count-cell" header={header}>
+    {count ?? 0}
+  </Table.Cell>
 )
 
 const NoReportContent: React.FC = () => <>{I18n.t('No report')}</>
@@ -176,9 +197,9 @@ const FailedContent: React.FC = () => (
   </Flex>
 )
 
-const ActiveIssuesCell: React.FC<{statistic?: Course['accessibility_course_statistic']}> = ({
-  statistic,
-}) => {
+const ActiveIssuesCell: React.FC<
+  {statistic?: Course['accessibility_course_statistic']} & WithHeader
+> = ({statistic, header}) => {
   const renderContent = () => {
     if (!statistic) {
       return <NoReportContent />
@@ -205,24 +226,36 @@ const ActiveIssuesCell: React.FC<{statistic?: Course['accessibility_course_stati
     }
   }
 
-  return <Table.Cell data-testid="issues-cell">{renderContent()}</Table.Cell>
-}
-
-const ResolvedIssuesCell: React.FC<{statistic?: Course['accessibility_course_statistic']}> = ({
-  statistic,
-}) => {
-  const issueCount = statistic?.resolved_issue_count ?? 0
   return (
-    <Table.Cell data-testid="resolved-issues-cell">
-      {issueCount === 0 ? null : <IssuesBadgeContent variant="success" count={issueCount} />}
+    <Table.Cell data-testid="issues-cell" header={header}>
+      {renderContent()}
     </Table.Cell>
   )
 }
 
-export const CoursesTableRow: React.FC<CoursesTableRowProps> = ({course, showSISIds}) => {
+const ResolvedIssuesCell: React.FC<
+  {statistic?: Course['accessibility_course_statistic']} & WithHeader
+> = ({statistic, header}) => {
+  const issueCount = statistic?.resolved_issue_count ?? 0
+  return (
+    <Table.Cell data-testid="resolved-issues-cell" header={header}>
+      {issueCount === 0 ? (
+        <ScreenReaderContent>{I18n.t('No data')}</ScreenReaderContent>
+      ) : (
+        <IssuesBadgeContent variant="success" count={issueCount} />
+      )}
+    </Table.Cell>
+  )
+}
+
+export const CoursesTableRow: React.FC<CoursesTableRowProps> = ({
+  course,
+  showSISIds,
+  isMobile = false,
+}) => {
   return (
     <Table.Row key={course.id}>
-      <StatusCell workflowState={course.workflow_state} />
+      <StatusCell workflowState={course.workflow_state} isMobile={isMobile} />
       <CourseNameCell courseId={course.id} courseName={course.name} />
       <ActiveIssuesCell statistic={course.accessibility_course_statistic} />
       <ResolvedIssuesCell statistic={course.accessibility_course_statistic} />

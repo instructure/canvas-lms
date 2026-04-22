@@ -106,9 +106,18 @@ export const RatingRowFullWidth = ({
                       cursor="pointer"
                       margin="xx-small 0 0 0"
                     >
-                      <div className="drag-handle" {...provided.dragHandleProps}>
-                        <IconDragHandleLine />
-                      </div>
+                      <View
+                        as="div"
+                        role="button"
+                        aria-label={I18n.t('Reorder %{ratingName} Rating', {
+                          ratingName: rating.description,
+                        })}
+                        className="drag-handle"
+                        data-testid="rubric-criterion-rating-row-drag-handle"
+                        {...provided.dragHandleProps}
+                      >
+                        <IconDragHandleLine aria-hidden="true" />
+                      </View>
                     </View>
                   </Flex.Item>
                   <Flex.Item align="start">

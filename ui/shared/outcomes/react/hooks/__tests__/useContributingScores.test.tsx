@@ -29,7 +29,7 @@ import {
   NameDisplayFormat,
   ScoreDisplayFormat,
   OutcomeArrangement,
-} from '@canvas/outcomes/react/utils/constants'
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 const server = setupServer()
 

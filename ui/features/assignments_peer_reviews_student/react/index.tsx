@@ -21,7 +21,8 @@ import {render} from '@canvas/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import PeerReviewsStudentViewWithBreakpoints from './components/PeerReviewsStudentView'
 
 const queryClient = new QueryClient({
@@ -49,6 +50,8 @@ export default function renderStudentPeerReview(elt: HTMLElement | null) {
         errorComponent={({error}: {error: Error}) => (
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorSubject={error.message}
             errorCategory="Peer Reviews Student Error Page"
             errorMessage={error.message}

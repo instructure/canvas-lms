@@ -1983,6 +1983,58 @@ describe PlannerController do
           expect(peer_review_item["html_url"]).to match "/courses/#{@course.id}/assignments/#{@parent_assignment.id}/peer_reviews"
         end
       end
+
+      context "inactive enrollment filtering" do
+        before :once do
+          @inactive_course = course_factory(active_all: true)
+          @inactive_enrollment = @inactive_course.enroll_student(@student, enrollment_state: "active")
+          @inactive_assignment = @inactive_course.assignments.create!(
+            title: "Inactive Course Assignment",
+            due_at: 1.week.from_now
+          )
+        end
+
+        it "excludes assignments from courses where enrollment is deactivated" do
+          @inactive_enrollment.deactivate
+          @student.reload
+
+          get :index, params: { start_date: Time.zone.now.iso8601, end_date: 2.weeks.from_now.iso8601 }
+          response_json = json_parse(response.body)
+          assignment_ids = response_json.select { |i| i["plannable_type"] == "assignment" }.pluck("plannable_id")
+
+          expect(assignment_ids).not_to include(@inactive_assignment.id)
+        end
+      end
+
+      context "ADHOC override due date" do
+        it "uses cachedDueDate from ADHOC override as the plannable_date" do
+          base_due = 30.days.from_now
+          override_due = 45.days.from_now
+
+          assignment = @course.assignments.create!(
+            title: "Override Due Date Assignment",
+            due_at: base_due,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          override = assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            due_at: override_due,
+            due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          SubmissionLifecycleManager.recompute_course(@course, assignments: [assignment.id], run_immediately: true)
+
+          get :index, params: { start_date: 25.days.from_now.iso8601, end_date: 50.days.from_now.iso8601 }
+          response_json = json_parse(response.body)
+          item = response_json.find { |i| i["plannable_id"] == assignment.id }
+
+          expect(item).not_to be_nil
+          cached_due = @student.submissions.find_by(assignment_id: assignment.id).cached_due_date
+          expect(item["plannable_date"]).to eq(cached_due.iso8601)
+        end
+      end
     end
   end
 

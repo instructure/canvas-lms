@@ -1385,6 +1385,16 @@ describe SIS::CSV::EnrollmentImporter do
         expect(errors).to eq ["A temporary enrollment provider and recipient are the same (temporary_source_user_id: provider, user: provider)"]
       end
 
+      it "does not create enrollment if source user does not exist" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,nonexistent_user"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["An enrollment referenced a non-existent temporary enrollment provider nonexistent_user"]
+      end
+
       it "does not create enrollment if source is not enrolled in the course" do
         importer = process_csv_data(
           "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",

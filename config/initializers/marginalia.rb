@@ -27,7 +27,8 @@ if config[:components].present?
       hostname: -> { Socket.gethostname },
 
       context_id: -> { RequestContext::Generator.request_id },
-      job_tag: -> { Delayed::Worker.current_job&.[]("tag") }
+      job_tag: -> { Delayed::Worker.current_job&.[]("tag") },
+      operation_name: ->(context) { context[:controller].try(:graphql_operation_name) }
     )
   end
 

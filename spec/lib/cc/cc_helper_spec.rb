@@ -324,6 +324,13 @@ describe CC::CCHelper do
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
     end
 
+    it "interprets urls to the home page as normal course page" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
+      url = "/courses/#{@course.id}"
+      translated = @exporter.translate_url(url)
+      expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
+    end
+
     it "prepends the domain to links outside the course" do
       allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)

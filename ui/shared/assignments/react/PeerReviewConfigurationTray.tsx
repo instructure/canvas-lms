@@ -51,8 +51,8 @@ export const PeerReviewConfigurationTray = ({
         <Flex.Item width="10rem">
           <Text weight="bold">{label}</Text>
         </Flex.Item>
-        <Flex.Item>
-          <Text>{value}</Text>
+        <Flex.Item width="7rem">
+          <Text wrap="break-word">{value}</Text>
         </Flex.Item>
       </Flex>
     </List.Item>

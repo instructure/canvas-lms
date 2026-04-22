@@ -19,9 +19,10 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {getTagIcon} from '@canvas/outcomes/react/utils/icons'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {findRating} from '@canvas/outcomes/react/utils/ratings'
 import {ScoreCellContent} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ScoreCellContent'
+import {IconExpandStartLine} from '@instructure/ui-icons'
 import type {ViewProps} from '@instructure/ui-view'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
@@ -55,6 +56,7 @@ const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
       label={rating?.description || I18n.t('Unassessed')}
       background={background}
       onAction={onAction}
+      actionIcon={<IconExpandStartLine />}
       focus={focus}
     />
   )

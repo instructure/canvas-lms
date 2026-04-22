@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import FileRenameForm from '@canvas/files/react/components/FileRenameForm'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 const I18n = createI18nScope('react_files')
 
@@ -35,8 +35,7 @@ function moveItem(item, destinationFolder, options = {}) {
         // file already exists: prompt and retry
 
         const container = $('<div>').appendTo('body')[0]
-        const root = createRoot(container)
-        root.render(
+        const root = render(
           <FileRenameForm
             onClose={() => {
               root.unmount()
@@ -64,6 +63,7 @@ function moveItem(item, destinationFolder, options = {}) {
               )
             }
           />,
+          container,
         )
       } else {
         // some other error: fail

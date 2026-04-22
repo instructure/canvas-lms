@@ -24,7 +24,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import getAccounts from '@canvas/api/accounts/getAccounts'
 import {IconSettingsLine} from '@instructure/ui-icons'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -37,6 +38,8 @@ const ErrorPage = ({error}: {error?: unknown}) => {
   return (
     <GenericErrorPage
       imageUrl={errorShipUrl}
+      onReportError={reportError}
+      translations={canvasErrorPageTranslations}
       errorSubject={I18n.t('Accounts initial query error')}
       errorCategory={I18n.t('Accounts Error Page')}
       errorMessage={error instanceof Error ? error?.message : ''}

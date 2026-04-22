@@ -236,6 +236,7 @@ export const AccessibilityIssuesTable = () => {
               <Pagination
                 data-testid={`accessibility-issues-table-pagination`}
                 as="nav"
+                aria-label={I18n.t('Pagination')}
                 variant="compact"
                 labelNext={I18n.t('Next Page')}
                 labelPrev={I18n.t('Previous Page')}

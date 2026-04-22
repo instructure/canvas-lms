@@ -332,6 +332,22 @@ module GraphQLNodeLoader
 
         record
       end
+    when "InstitutionalTag"
+      Loaders::IDLoader.for(InstitutionalTag).load(id).then do |tag|
+        next nil unless ctx[:domain_root_account]&.feature_enabled?(:institutional_tags)
+        next nil unless ctx[:domain_root_account]&.grants_right?(ctx[:current_user], ctx[:session], :manage_institutional_tags_view)
+
+        tag
+      end
+    when "InstitutionalTagAssociation"
+      Loaders::IDLoader.for(InstitutionalTagAssociation).load(id).then(check_read_permission)
+    when "InstitutionalTagCategory"
+      Loaders::IDLoader.for(InstitutionalTagCategory).load(id).then do |category|
+        next nil unless ctx[:domain_root_account]&.feature_enabled?(:institutional_tags)
+        next nil unless ctx[:domain_root_account]&.grants_right?(ctx[:current_user], ctx[:session], :manage_institutional_tags_view)
+
+        category
+      end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"
     end

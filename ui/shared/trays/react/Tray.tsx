@@ -26,7 +26,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('tray')
@@ -111,7 +112,9 @@ export default function CanvasTray({
       <ErrorBoundary
         errorComponent={
           <GenericErrorPage
-            imageUrl={errorImageUrl}
+            imageUrl={errorImageUrl || errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorSubject={errorSubject}
             errorCategory={errorCategory}
           />

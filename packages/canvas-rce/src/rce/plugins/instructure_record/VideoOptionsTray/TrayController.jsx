@@ -19,6 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import {AUDIO_PLAYER_SIZE as CANVAS_AUDIO_PLAYER_SIZE} from '@instructure/canvas-media'
+
 import bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../RCEGlobals'
@@ -35,16 +37,14 @@ import VideoOptionsTray from '.'
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 export const ANNOUNCER_ID = 'instructure-video-options-tray-announcer'
 
-export const VIDEO_SIZE_DEFAULT = {height: '225px', width: '400px'} // AKA "LARGE"
 export const STUDIO_PLAYER_VIDEO_SIZE_DEFAULT = {height: '300px', width: '480px'}
-export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
+export const AUDIO_PLAYER_SIZE = {
+  width: `${CANVAS_AUDIO_PLAYER_SIZE.width}px`,
+  height: `${CANVAS_AUDIO_PLAYER_SIZE.height}px`,
+}
 
 export const videoDefaultSize = () => {
-  if (RCEGlobals.getFeatures().consolidated_media_player) {
-    return STUDIO_PLAYER_VIDEO_SIZE_DEFAULT
-  }
-
-  return VIDEO_SIZE_DEFAULT
+  return STUDIO_PLAYER_VIDEO_SIZE_DEFAULT
 }
 
 function onStudioEmbedOptionChanged(editor, videoContainer) {
@@ -277,6 +277,7 @@ export default class TrayController {
       this._editor?.selection?.select(this.$videoContainer)
     }
     this._shouldOpen = false
+    this._isOpen = false
     this._renderTray()
     this._editor = null
     this._iframeLoadingListener?.abort()

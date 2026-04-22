@@ -67,6 +67,30 @@ describe GraphQLController do
       expect(response.parsed_body["data"]).not_to be_blank
     end
 
+    describe "#graphql_operation_name" do
+      it "returns the operationName param" do
+        post :execute,
+             params: { query: '{ course(id: "1") { id } }', operationName: "GetCourse" },
+             format: :json
+        expect(controller.graphql_operation_name).to eq("GetCourse")
+      end
+
+      it "returns nil when no operationName is provided" do
+        post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
+        expect(controller.graphql_operation_name).to be_nil
+      end
+
+      it "is used by the marginalia operation_name tagging" do
+        tagging = ActiveRecord::QueryLogs.taggings[:operation_name]
+        skip "marginalia not configured" unless tagging
+
+        post :execute,
+             params: { query: '{ course(id: "1") { id } }', operationName: "MyOperation" },
+             format: :json
+        expect(tagging.call({ controller: })).to eq("MyOperation")
+      end
+    end
+
     context "CreateSubmission" do
       before do
         Setting.set("enable_page_views", "db")

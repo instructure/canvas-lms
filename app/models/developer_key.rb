@@ -162,6 +162,10 @@ class DeveloperKey < ApplicationRecord
   end
 
   def usable_in_context?(context)
+    if is_lti_key && context.try(:root_account)&.feature_enabled?(:lti_deactivate_registrations)
+      return usable? && !!lti_registration&.active?
+    end
+
     account_binding_for(context.try(:account) || context)&.on? && usable?
   end
 
@@ -318,7 +322,7 @@ class DeveloperKey < ApplicationRecord
   end
 
   def authorized_for_account?(target_account)
-    return false unless binding_on_in_account?(target_account)
+    return false unless usable_in_context?(target_account)
     return true if account_id.blank?
     return true if target_account.id == account_id
 
@@ -394,10 +398,6 @@ class DeveloperKey < ApplicationRecord
 
   def owner_account
     account || Account.site_admin
-  end
-
-  def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.on?
   end
 
   def disable_external_tools!(binding_account)

@@ -58,6 +58,22 @@ describe('CriterionModal Ratings Tests', () => {
     }
   }
 
+  it('renders drag handles with aria-label for each rating row', () => {
+    const criterion = getCriterion({
+      ratings: [
+        {id: '1', description: 'Excellent', points: 10, longDescription: ''},
+        {id: '2', description: 'Poor', points: 0, longDescription: ''},
+      ],
+    })
+    const {queryAllByTestId} = renderComponent({criterion})
+
+    const dragHandles = queryAllByTestId('rubric-criterion-rating-row-drag-handle')
+    expect(dragHandles).toHaveLength(criterion.ratings.length)
+    expect(dragHandles[0]).toHaveAttribute('aria-label', 'Reorder Excellent Rating')
+    expect(dragHandles[0]).toHaveAttribute('role', 'button')
+    expect(dragHandles[1]).toHaveAttribute('aria-label', 'Reorder Poor Rating')
+  })
+
   it('should render the default ratings', () => {
     const {queryAllByTestId} = renderComponent()
 

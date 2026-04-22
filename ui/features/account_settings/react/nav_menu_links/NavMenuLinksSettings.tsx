@@ -19,9 +19,9 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconMoreSolid, IconLinkLine, IconTrashLine} from '@instructure/ui-icons'
-import {Menu} from '@instructure/ui-menu'
+import {IconExternalLinkLine, IconLinkLine, IconTrashLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {
   useNavMenuLinksStore,
@@ -31,6 +31,7 @@ import {
 import {useState} from 'react'
 import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
 import {Tag} from '@instructure/ui-tag'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 
 const I18n = createI18nScope('account_settings')
 
@@ -59,8 +60,27 @@ export default function NavMenuLinksSettings(): JSX.Element {
           <NavMenuLink
             key={index}
             label={link.label}
+            url={link.url}
             placements={link.placements}
-            onDelete={() => deleteLink(index)}
+            onDeleteRequest={async () => {
+              if (
+                await confirmDanger({
+                  title: I18n.t('Delete Custom Link'),
+                  heading: I18n.t('You are about to delete "%{label}".', {label: link.label}),
+                  message: (
+                    <>
+                      <Text as="p">{I18n.t('Are you sure you want to delete this link?')}</Text>
+                      <Text as="p" size="small" color="secondary">
+                        {I18n.t('Remember to save your settings for this change to take effect.')}
+                      </Text>
+                    </>
+                  ),
+                  confirmButtonLabel: I18n.t('Delete'),
+                })
+              ) {
+                deleteLink(index)
+              }
+            }}
           />
         ))}
       </ul>
@@ -73,7 +93,7 @@ export default function NavMenuLinksSettings(): JSX.Element {
             <AddLinkModal
               onDismiss={() => setIsAddLinkModalOpen(false)}
               onAdd={appendLink}
-              availablePlacements={['course_nav', 'account_nav']}
+              availablePlacements={['course_nav', 'account_nav', 'user_nav']}
             />
           )}
         </View>
@@ -95,11 +115,12 @@ const PLACEMENT_LABELS: Record<NavMenuPlacementKey, () => string> = {
 
 type NavMenuLinkProps = {
   label: string
+  url: string
   placements: NavMenuPlacements
-  onDelete: () => void
+  onDeleteRequest: () => void
 }
 
-function NavMenuLink({label, placements, onDelete}: NavMenuLinkProps): JSX.Element {
+function NavMenuLink({label, url, placements, onDeleteRequest}: NavMenuLinkProps): JSX.Element {
   return (
     <li className="ic-Sortable-item">
       <div className="ic-Sortable-item__Text">
@@ -109,6 +130,25 @@ function NavMenuLink({label, placements, onDelete}: NavMenuLinkProps): JSX.Eleme
           </Flex.Item>
           <Flex.Item margin="0 xx-small 0 xxx-small" shouldGrow shouldShrink size="0">
             <Text wrap="break-word">{label}</Text>
+            {url && (
+              <Text as="div" size="x-small" color="secondary" wrap="break-word">
+                <Link
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  isWithinText={false}
+                  aria-label={I18n.t('%{url} (opens in new tab)', {url})}
+                  elementRef={el => {
+                    // as of Apr 2026, external_links.js adds icons inconsistently (not to newly rendered links), so we add it manually
+                    el?.classList.add('exclude_external_icon')
+                  }}
+                  renderIcon={IconExternalLinkLine}
+                  iconPlacement="end"
+                >
+                  {url}
+                </Link>
+              </Text>
+            )}
           </Flex.Item>
           {ALL_PLACEMENTS.map(
             p =>
@@ -122,26 +162,15 @@ function NavMenuLink({label, placements, onDelete}: NavMenuLinkProps): JSX.Eleme
       </div>
       {ENV.PERMISSIONS?.manage_nav_menu_links && (
         <div className="ic-Sortable-item__Actions">
-          <Menu
-            trigger={
-              <IconButton
-                screenReaderLabel={I18n.t('Settings for %{linkLabel}', {linkLabel: label})}
-                size="small"
-                withBackground={false}
-                withBorder={false}
-                renderIcon={IconMoreSolid}
-              />
-            }
-          >
-            <Menu.Item data-pendo="navigation-menu-delete" onClick={onDelete} type="button">
-              <Flex>
-                <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
-                  <IconTrashLine />
-                </Flex.Item>
-                <Flex.Item>{I18n.t('Delete')}</Flex.Item>
-              </Flex>
-            </Menu.Item>
-          </Menu>
+          <IconButton
+            screenReaderLabel={I18n.t('Delete %{linkLabel}', {linkLabel: label})}
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            renderIcon={IconTrashLine}
+            data-pendo="navigation-menu-delete"
+            onClick={onDeleteRequest}
+          />
         </div>
       )}
     </li>

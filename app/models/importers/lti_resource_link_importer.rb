@@ -39,7 +39,7 @@ module Importers
       lti_resource_links.each do |lti_resource_link|
         updated = update_custom_for_resource_link_from_assignment_context(resource_links_by_lookup_uuid, assignments_by_migration_id, lti_resource_link)
 
-        next if updated
+        next if updated || lti_resource_link["assignment_migration_id"]
 
         create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
       end

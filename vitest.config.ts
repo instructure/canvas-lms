@@ -225,7 +225,30 @@ export default defineConfig({
         find: '@jest/globals',
         replacement: resolve(__dirname, 'ui/shared/test-utils/jest-globals-shim.ts'),
       },
+      // Mock ui-icons SVG imports (Vite can't resolve directory import without index.js)
+      {
+        find: '@instructure/ui-icons/es/svg',
+        replacement: resolve(__dirname, 'packages/canvas-rce/src/rce/__tests__/_mockIcons.js'),
+      },
     ],
   },
-  plugins: [jestMockHoistPlugin, handlebarsPlugin(), svgPlugin(), graphqlPlugin, cssPlugin],
+  plugins: [
+    jestMockHoistPlugin,
+    handlebarsPlugin(),
+    svgPlugin(),
+    graphqlPlugin,
+    cssPlugin,
+    // Mock for newquizzes/appInjector module federation remote (not available in test env)
+    {
+      name: 'mock-newquizzes-app-injector',
+      resolveId(id: string) {
+        if (id === 'newquizzes/appInjector') return '\0newquizzes/appInjector'
+      },
+      load(id: string) {
+        if (id === '\0newquizzes/appInjector') {
+          return 'export const render = () => {}; export const unmount = () => {}'
+        }
+      },
+    },
+  ],
 })

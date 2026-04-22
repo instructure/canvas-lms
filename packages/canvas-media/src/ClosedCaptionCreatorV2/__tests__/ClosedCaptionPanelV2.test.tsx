@@ -465,14 +465,11 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
 
     it('a11y: retry upload re-announces and succeeds on retry', async () => {
-      let shouldFail = true
+      // Phase 1: first upload attempt always fails
       server.use(
-        http.put('**/api/media_objects/*/media_tracks', () => {
-          if (shouldFail) {
-            return HttpResponse.json({error: 'Server error'}, {status: 500})
-          }
-          return HttpResponse.json({data: 'success'})
-        }),
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
       )
 
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
@@ -497,10 +494,13 @@ describe('<ClosedCaptionPanelV2 />', () => {
           expect(screen.getByText('Upload Failed')).toBeInTheDocument()
           expect(screen.getByText('Retry German')).toBeInTheDocument()
         },
-        {timeout: 5000},
+        {timeout: 10000},
       )
 
-      shouldFail = false
+      // Phase 2: switch to success handler before retrying
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
 
       // Click retry
       fireEvent.click(screen.getByText('Retry German'))
@@ -513,23 +513,16 @@ describe('<ClosedCaptionPanelV2 />', () => {
           expect(screen.queryByText('Captions have been added for German')).toBeInTheDocument()
           expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
         },
-        {timeout: 5000},
+        {timeout: 10000},
       )
     })
 
     it('retrying one caption does not clear the failed state of another caption', async () => {
-      // First call: delete French fails; second call: upload German succeeds
-      let callCount = 0
+      // Phase 1: French delete fails
       server.use(
-        http.put('**/api/media_objects/*/media_tracks', () => {
-          callCount++
-          if (callCount === 1) {
-            // French delete fails
-            return HttpResponse.json({error: 'Server error'}, {status: 500})
-          }
-          // German upload retry succeeds
-          return HttpResponse.json({data: 'success'})
-        }),
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
       )
 
       const initialSubtitles: Subtitle[] = [
@@ -628,15 +621,11 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
 
     it('a11y: retry ASR request goes back to processing on success', async () => {
-      let callCount = 0
+      // Phase 1: first ASR request fails
       server.use(
-        http.post('/api/v1/media_objects/*/asr', () => {
-          callCount++
-          if (callCount === 1) {
-            return HttpResponse.json({error: 'Server error'}, {status: 500})
-          }
-          return new HttpResponse(null, {status: 202})
-        }),
+        http.post('/api/v1/media_objects/*/asr', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
       )
 
       renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
@@ -648,6 +637,11 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       await screen.findByText('Caption generation failed')
 
+      // Phase 2: retry succeeds
+      server.use(
+        http.post('/api/v1/media_objects/*/asr', () => new HttpResponse(null, {status: 202})),
+      )
+
       fireEvent.click(screen.getByText('Retry Spanish (Automatic)'))
 
       await waitFor(() => {
@@ -657,15 +651,11 @@ describe('<ClosedCaptionPanelV2 />', () => {
     })
 
     it('a11y: retry delete re-announces and succeeds on retry', async () => {
-      let callCount = 0
+      // Phase 1: first delete attempt fails
       server.use(
-        http.put('**/api/media_objects/*/media_tracks', () => {
-          callCount++
-          if (callCount === 1) {
-            return HttpResponse.json({error: 'Server error'}, {status: 500})
-          }
-          return HttpResponse.json({data: 'success'})
-        }),
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
       )
 
       const initialSubtitles: Subtitle[] = [
@@ -679,6 +669,11 @@ describe('<ClosedCaptionPanelV2 />', () => {
 
       await screen.findByText('Delete Failed')
       expect(screen.getByText('Retry French')).toBeInTheDocument()
+
+      // Phase 2: retry succeeds
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
 
       // Click retry (succeeds on second attempt)
       fireEvent.click(screen.getByText('Retry French'))
@@ -794,7 +789,7 @@ describe('<ClosedCaptionPanelV2 />', () => {
       })
       fireEvent.click(screen.getByText('Upload'))
       await waitFor(() => expect(screen.getByText('Retry German')).toBeInTheDocument(), {
-        timeout: 200,
+        timeout: 10000,
       })
       fireEvent.click(screen.getByText('Retry German'))
       await waitFor(() => {

@@ -35,7 +35,7 @@ import {isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {
   useResetLtiRegistration,
   fetchLtiRegistrationWithLegacyConfig,
@@ -116,6 +116,15 @@ export const ToolConfigurationView = () => {
   const isManualRegistration = registration.manual_configuration_id !== null
   const isInherited = registration.inherited ?? false
   const canRestoreDefault = !isInherited && !isManualRegistration
+
+  // Edit as JSON should only be available for manual LTI Registrations,
+  // not Lti::IMS::Registration, and not Lti::Registrations that have a template_registration_id
+  const canEditAsJson =
+    window.ENV.LTI_EDIT_JSON &&
+    isManualRegistration &&
+    registration.ims_registration_id === null &&
+    !registration.template_registration_id &&
+    !isInherited
 
   const handleRestoreDefault = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
@@ -333,31 +342,51 @@ export const ToolConfigurationView = () => {
               ) : null}
             </Flex>
           </Flex.Item>
+
           <Flex.Item>
-            <Tooltip
-              renderTip={I18n.t(
-                "This account does not own this app and therefore can't edit its configuration.",
-              )}
-              isShowingContent={editTooltipShowing}
-              onShowContent={() => {
-                // The tooltip should only be shown if they *can't* click the edit button
-                setEditTooltipShowing(isInherited)
-              }}
-              onHideContent={() => {
-                setEditTooltipShowing(false)
-              }}
-            >
-              <Button
-                data-pendo="lti-registrations-edit-config"
-                color="primary"
-                interaction={isInherited ? 'disabled' : 'enabled'}
-                onClick={_ => {
-                  navigate(`/manage/${registration.id}/configuration/edit`)
-                }}
-              >
-                {I18n.t('Edit')}
-              </Button>
-            </Tooltip>
+            <Flex gap="small">
+              <Flex.Item>
+                {canEditAsJson && (
+                  <Flex.Item>
+                    <Button
+                      data-pendo="lti-registrations-edit-json"
+                      color="secondary"
+                      onClick={_ => {
+                        navigate(`/manage/${registration.id}/configuration/edit-json`)
+                      }}
+                    >
+                      {I18n.t('Edit as JSON')}
+                    </Button>
+                  </Flex.Item>
+                )}
+              </Flex.Item>
+              <Flex.Item>
+                <Tooltip
+                  renderTip={I18n.t(
+                    "This account does not own this app and therefore can't edit its configuration.",
+                  )}
+                  isShowingContent={editTooltipShowing}
+                  onShowContent={() => {
+                    // The tooltip should only be shown if they *can't* click the edit button
+                    setEditTooltipShowing(isInherited)
+                  }}
+                  onHideContent={() => {
+                    setEditTooltipShowing(false)
+                  }}
+                >
+                  <Button
+                    data-pendo="lti-registrations-edit-config"
+                    color="primary"
+                    interaction={isInherited ? 'disabled' : 'enabled'}
+                    onClick={_ => {
+                      navigate(`/manage/${registration.id}/configuration/edit`)
+                    }}
+                  >
+                    {I18n.t('Edit')}
+                  </Button>
+                </Tooltip>
+              </Flex.Item>
+            </Flex>
           </Flex.Item>
         </Flex>
       </ToolConfigurationFooter>

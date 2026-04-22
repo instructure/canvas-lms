@@ -223,11 +223,11 @@ module AssignmentVisibility
                          AND p.assignment_id IS NOT NULL
                  ), all_tags AS (
                      ( SELECT * FROM assignment_tags)
-                     UNION
+                     UNION ALL
                      ( SELECT * FROM quiz_tags)
-                     UNION
+                     UNION ALL
                      ( SELECT * FROM discussion_topic_tags)
-                     UNION
+                     UNION ALL
                      ( SELECT * FROM wiki_pages_tags)
                  )
           SQL

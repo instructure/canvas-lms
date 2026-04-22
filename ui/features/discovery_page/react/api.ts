@@ -18,6 +18,7 @@
 
 import type {AuthProviderCard, AuthProviderConfig, CardConfig, DiscoveryConfig} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {htmlDecode} from '@canvas/util/TextHelper'
 
 // ---------------------------------------------------------------------------
 // converters: api <-> internal card format
@@ -26,6 +27,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 export function toCardConfig(api: DiscoveryConfig): CardConfig {
   const toCard = (provider: AuthProviderConfig): AuthProviderCard => ({
     ...provider,
+    label: htmlDecode(provider.label),
     id: crypto.randomUUID(),
   })
 

@@ -17,9 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../lib/llm_conversation"
-require_relative "../../lib/llm_conversation/errors"
-
 describe AiConversationsController do
   before :once do
     course_with_teacher(active_all: true)

@@ -44,9 +44,9 @@ export function AuthProviderForm({
   onLabelRef,
   onProviderRef,
 }: AuthProviderFormProps) {
-  const labelMessages = errors?.label ? [{type: 'error' as const, text: errors.label}] : []
+  const labelMessages = errors?.label ? [{type: 'newError' as const, text: errors.label}] : []
   const providerMessages = errors?.providerId
-    ? [{type: 'error' as const, text: errors.providerId}]
+    ? [{type: 'newError' as const, text: errors.providerId}]
     : [
         {
           type: 'hint' as const,
@@ -67,6 +67,7 @@ export function AuthProviderForm({
           maxLength={255}
           messages={labelMessages}
           inputRef={onLabelRef}
+          isRequired
         />
 
         <SimpleSelect
@@ -79,6 +80,7 @@ export function AuthProviderForm({
           value={selectedProviderId}
           messages={providerMessages}
           inputRef={onProviderRef as (el: Element | null) => void}
+          isRequired
         >
           <SimpleSelect.Option id="provider-none" value="">
             {I18n.t('Select a provider...')}

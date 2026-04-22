@@ -380,6 +380,9 @@
     "close_d634289d": {
         "message": "Sluiten"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Modaliteit Toetsenbordsneltoetsen sluiten"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Ondertitelingsbestand moet kleiner zijn dan { maxKb } kb"
     },
@@ -1928,6 +1931,9 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Voer een geldige video-URL in van een ondersteund platform."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Selecteer een bestand voordat je begint met uploaden."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Selecteer een bestand van een ondersteund type"
     },
@@ -2287,6 +2293,9 @@
     },
     "show_link_options_545338fd": {
         "message": "Linkopties weergeven"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Doorlopend transcript weergeven"
     },
     "show_rolling_transcript_d353aca4": {
         "message": "Doorlopend transcript weergeven"

@@ -755,5 +755,13 @@ PERMISSION_GROUPS = {
       { title: -> { I18n.t("UTID Integration") },
         description: -> { I18n.t("This feature supports UTID (Unified Tool ID) based rate limiting for partner tools and products.") } }
     ]
+  },
+  manage_rules: {
+    label: -> { I18n.t("Automation Rules") },
+    subtitle: -> { I18n.t("view / add / edit / delete") },
+    account_details: [
+      { title: -> { I18n.t("Overview") },
+        description: -> { I18n.t("These permissions control the ability to manage automation rules on the account.") } }
+    ]
   }
 }.freeze

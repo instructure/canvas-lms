@@ -25,14 +25,11 @@ import {
   RatingDistribution,
 } from '@canvas/outcomes/react/types/mastery_distribution'
 import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
-import {
-  BAR_CHART_HEIGHT,
-  COLUMN_PADDING,
-  COLUMN_WIDTH,
-} from '@canvas/outcomes/react/utils/constants'
+import {BAR_CHART_HEIGHT, COLUMN_PADDING} from '@canvas/outcomes/react/utils/constants'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {OutcomeDistributionPopover} from '../popovers/OutcomeDistributionPopover'
+import {COLUMN_WIDTH} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 

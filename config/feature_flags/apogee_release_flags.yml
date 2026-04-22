@@ -267,16 +267,6 @@ default_account_grading_scheme:
       state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
-external_tools_for_a2:
-  state: hidden
-  display_name: External tools in Assignment Enhancements
-  description: Allow for Assignment Enhancements to be used for external LTI tools
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on # enable for automated testing builds and local testing
-    development:
-      state: allowed_on # enable for local development
 archived_grading_schemes:
   state: hidden
   applies_to: SiteAdmin
@@ -528,6 +518,19 @@ optimized_grading_rubrics:
   description: |
     Uses optimized implementation for grading rubrics endpoint with N+1 query fixes
     and context filtering. Improves performance for users with many course enrollments.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+optimized_needs_grading_count:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Optimized Needs Grading Count
+  description: |
+    Uses bulk SQL (GROUP BY) instead of per-assignment Redis calls for
+    needs_grading_count. Eliminates N+1 Redis round trips during course
+    list serialization.
   environments:
     ci:
       state: allowed_on

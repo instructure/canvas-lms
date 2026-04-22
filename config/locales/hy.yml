@@ -148,6 +148,7 @@ hy:
     track_uploaded_successfully: "Ձայնագրությունը հաջողությամբ բեռնվել է, խնդրում ենք թարմացնել ձեր բրաուզերը:"
     upload: Բեռնել
     uploading: "Բեռնում է..."
+  _23978503: "."
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- Ներքևում--"
   _section_not_synced_yet_cd07d0dd: "Բաժինը դեռևս չի սինխրոնացվել"
@@ -6518,6 +6519,7 @@ hy:
       find_existing_rubric: "Գտնել գոյություն ունեցող ռուբրիկը"
   edit_rubric_7d4d139d: "Խմբագրել ռուբրիկը"
   edit_sections_7d0e4e34: "Խմբագրել բաժինները"
+  edit_settings_b3ddad69: "Խմբագրել կարգավորումները"
   edit_survey_b0d6890d: "Խմբագրել հարցումը"
   edit_this_key_1ee53473: "Խմբագրել այս բանալին"
   edit_toolname_app_23cfbb8: "Խմբագրել %{toolName}  հավելվածը"

@@ -326,6 +326,95 @@ describe Lti::IMS::NamesAndRolesController do
           expect(json).to be_lti_advantage_error_response_body("bad_request", "Requested ResourceLink was not found")
         end
       end
+
+      context "when the rlid param specifies a non-assignment resource link created with a different installation of the same registration" do
+        let(:course_tool) do
+          ContextExternalTool.create!(
+            context: course,
+            consumer_key: "key2",
+            shared_secret: "secret",
+            name: "test tool (course-level)",
+            url: "http://www.tool.com/launch",
+            developer_key:,
+            lti_version: "1.3",
+            workflow_state: "public"
+          )
+        end
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context: course,
+            context_external_tool: course_tool,
+            url: "http://www.tool.com/launch"
+          )
+        end
+        let(:course_module) { ContextModule.create!(context: course) }
+        let(:rlid_param) { resource_link.resource_link_uuid }
+
+        before do
+          course_module.content_tags.create!(
+            context: course,
+            context_module: course_module,
+            tag_type: "context_module",
+            content_type: "ContextExternalTool",
+            title: "Test Title",
+            url: course_tool.url,
+            content: course_tool,
+            associated_asset: resource_link
+          )
+        end
+
+        it "allows the account-level tool installation to access the resource link" do
+          send_request
+          expect_single_member(enrollment)
+        end
+      end
+
+      context "when the rlid param specifies a non-assignment resource link created with an unrelated tool" do
+        let(:other_developer_key) do
+          dk = lti_developer_key_model(account: root_account)
+          dk.developer_key_account_bindings.first.update!(workflow_state: "on")
+          dk
+        end
+        let(:other_tool) do
+          ContextExternalTool.create!(
+            context: root_account,
+            consumer_key: "other_key",
+            shared_secret: "secret",
+            name: "other tool",
+            url: "http://www.other-tool.com/launch",
+            developer_key: other_developer_key,
+            lti_version: "1.3",
+            workflow_state: "public"
+          )
+        end
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context: course,
+            context_external_tool: other_tool,
+            url: "http://www.other-tool.com/launch"
+          )
+        end
+        let(:course_module) { ContextModule.create!(context: course) }
+        let(:rlid_param) { resource_link.resource_link_uuid }
+
+        before do
+          course_module.content_tags.create!(
+            context: course,
+            context_module: course_module,
+            tag_type: "context_module",
+            content_type: "ContextExternalTool",
+            title: "Test Title",
+            url: other_tool.url,
+            content: other_tool,
+            associated_asset: resource_link
+          )
+        end
+
+        it "returns an error" do
+          send_request
+          expect(json).to be_lti_advantage_error_response_body("bad_request", "Tool does not have access to rlid or rlid does not exist")
+        end
+      end
     end
 
     context "when the rlid param does not specify the course context LTI ID" do

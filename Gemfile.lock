@@ -11,7 +11,7 @@ GIT
 
 GIT
   remote: https://github.com/instructure/rspecq.git
-  revision: 2017a6e745790ee25decf74511a08607e8b2b56b
+  revision: 0c85a8dfb128c26786312c02017f2b1af921b86b
   specs:
     rspecq (0.7.1)
       redis (>= 4.0, < 6.0)
@@ -907,7 +907,7 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.6)
-    rack-session (2.1.1)
+    rack-session (2.1.2)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
@@ -955,7 +955,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
-    rbs (4.0.1)
+    rbs (4.0.2)
       logger
       prism (>= 1.6.0)
       tsort
@@ -1076,7 +1076,7 @@ GEM
       activesupport (>= 3.0.0)
       i18n
       iso8601
-    ruby-lsp (0.26.8)
+    ruby-lsp (0.26.9)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)

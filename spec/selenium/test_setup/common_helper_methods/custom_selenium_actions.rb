@@ -721,12 +721,9 @@ module CustomSeleniumActions
 
   def dismiss_flash_messages
     ff(flash_message_close_selector).each(&:click)
-  end
-
-  def dismiss_flash_messages_if_present
-    unless find_all_with_jquery(flash_message_selector).empty?
-      find_all_with_jquery(flash_message_close_selector).each(&:click)
-    end
+  # sometimes flash messages are removed from the DOM before we can click the close button especially when running individual tests in local
+  rescue Selenium::WebDriver::Error::NoSuchElementError # rubocop:disable Specs/NoNoSuchElementError
+    nil
   end
 
   # Scroll To Element (without executing Javascript)

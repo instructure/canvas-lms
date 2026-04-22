@@ -45,19 +45,33 @@ module Lti
     # @returns { registrations: [Lti::Registration], preloaded_associations: { registration_id: { account_binding: Lti::RegistrationAccountBinding | nil, overlay: Lti::Overlay | nil } } }
     def call
       GuardRail.activate(:secondary) do
-        registrations = account_registrations
-        unless account.site_admin?
-          forced_on = forced_on_in_site_admin
-          inherited_on = inherited_on_registrations(registrations, forced_on)
-          registrations += forced_on +
-                           inherited_on +
-                           consortia_registrations(forced_on, inherited_on)
+        if templates_enabled?
+          # Only queries local account registrations - no consortia or inherited registrations
+          # (CMC consortia registrations will become local copies when fully rolled out)
+          registrations = account_registrations(apply_filters: true, apply_sort: true)
+        else
+          registrations = account_registrations
+
+          unless account.site_admin?
+            # Without templates, use bindings to find inherited Site Admin registrations
+            forced_on = forced_on_in_site_admin
+            inherited_on = inherited_on_registrations(registrations, forced_on)
+            registrations += forced_on +
+                             inherited_on +
+                             consortia_registrations(forced_on, inherited_on)
+          end
+
+          registrations = filter_registrations_by_search_query(registrations) if search_terms
         end
 
         if preload_overlays
           overlays = preloaded_overlays(registrations)
         end
         account_bindings = preloaded_account_bindings(registrations)
+
+        unless templates_enabled?
+          registrations = sort_registrations(registrations, account_bindings)
+        end
         pending_updates = preloaded_pending_updates(registrations)
         preloaded_associations = registrations.index_by(&:global_id).transform_values do |reg|
           acc = { account_binding: account_bindings[reg.global_id] }
@@ -67,9 +81,6 @@ module Lti
           acc.compact
         end
 
-        registrations = filter_registrations_by_search_query(registrations) if search_terms
-        registrations = sort_registrations(registrations, account_bindings)
-
         { registrations:, preloaded_associations: }
       end
     end
@@ -77,19 +88,21 @@ module Lti
     private
 
     def preloaded_overlays(registrations)
-      overlays = Lti::Overlay.where(account:, registration: registrations).preload(:updated_by) +
-                 Lti::Overlay.find_all_in_site_admin(registrations)
+      overlays = Lti::Overlay.where(account:, registration: registrations).preload(:updated_by, :registration)
+      # Only query site admin overlays when templates are disabled (inherited registrations exist)
+      overlays += Lti::Overlay.find_all_in_site_admin(registrations) unless templates_enabled?
       overlays.group_by(&:global_registration_id).transform_values(&:first)
     end
 
     def preloaded_account_bindings(registrations)
-      account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations).preload(:created_by, :updated_by) +
-                         Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations)
+      account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations).preload(:created_by, :updated_by)
+      # Only query site admin bindings when templates are disabled (inherited registrations exist)
+      account_bindings += Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations) unless templates_enabled?
       account_bindings.group_by(&:global_registration_id).transform_values(&:first)
     end
 
     def preloaded_pending_updates(registrations)
-      return {} unless Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+      return {} unless account.root_account.feature_enabled?(:lti_dr_registrations_update)
 
       # Get the most recent update request per registration, regardless of status
       all_latest = Lti::RegistrationUpdateRequest.where(lti_registration: registrations)
@@ -102,8 +115,16 @@ module Lti
     end
 
     # Get all registrations on this account, regardless of their bindings
-    def account_registrations
-      base_query.where(account:)
+    def account_registrations(apply_filters: false, apply_sort: false)
+      query = base_query.where(account:)
+      # When templates are disabled, exclude local copies - they shouldn't be visible
+      # When templates are enabled, include them - they'll be shown instead of Site Admin registrations
+      query = query.where(template_registration_id: nil) unless templates_enabled?
+
+      query = apply_search_filters(query) if apply_filters && search_terms.present?
+      query = apply_database_sort(query) if apply_sort
+
+      query
     end
 
     # Get all registration account bindings that are bound to the site admin account and that are "on,"
@@ -164,6 +185,99 @@ module Lti
       Lti::Registration.active.preload(PRELOAD_MODELS)
     end
 
+    def apply_search_filters(query)
+      # Each search term must match at least one of the three fields
+      # Use Canvas's wildcard helper for case-insensitive ILIKE
+      search_terms.each do |term|
+        condition = Lti::Registration.wildcard(
+          "lti_registrations.name",
+          "lti_registrations.admin_nickname",
+          "lti_registrations.vendor",
+          term
+        )
+        query = query.where(condition)
+      end
+      query
+    end
+
+    def apply_database_sort(query)
+      # For user joins, we need to alias the tables to avoid conflicts
+      # when joining both created_by and updated_by
+      if sort_field == :installed_by
+        query = query.joins(
+          "LEFT OUTER JOIN #{User.quoted_table_name} AS created_by_users " \
+          "ON created_by_users.id = lti_registrations.created_by_id"
+        )
+      end
+
+      if sort_field == :updated_by
+        query = query.joins(
+          "LEFT OUTER JOIN #{User.quoted_table_name} AS updated_by_users " \
+          "ON updated_by_users.id = lti_registrations.updated_by_id"
+        )
+      end
+
+      # For status sorting, join pending update requests
+      if sort_field == :status && Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
+
+        # Join a subquery that gets the most recent update request per registration (regardless of status)
+        # Using DISTINCT ON to get only the latest request per registration
+        pending_updates_subquery = <<~SQL.squish
+          LEFT OUTER JOIN (
+            SELECT DISTINCT ON (lti_registration_id)
+              lti_registration_id,
+              id,
+              accepted_at,
+              rejected_at
+            FROM #{Lti::RegistrationUpdateRequest.quoted_table_name}
+            ORDER BY lti_registration_id, created_at DESC
+          ) AS pending_updates
+          ON pending_updates.lti_registration_id = lti_registrations.id
+        SQL
+
+        query = query.joins(pending_updates_subquery)
+
+        # Sort by whether the most recent update request is pending
+        # A request is pending if both accepted_at and rejected_at are NULL
+        # 0 = up to date (no request or request is accepted/rejected)
+        # 1 = pending (has most recent request that is still pending)
+        order_dir = (sort_direction == :desc) ? "DESC" : "ASC"
+        return query.order(
+          Arel.sql("CASE WHEN pending_updates.id IS NOT NULL AND pending_updates.accepted_at IS NULL AND pending_updates.rejected_at IS NULL THEN 1 ELSE 0 END #{order_dir}")
+        )
+      end
+
+      order_clause = case sort_field
+                     when :name
+                       "LOWER(lti_registrations.name)"
+                     when :nickname
+                       "LOWER(COALESCE(lti_registrations.admin_nickname, ''))"
+                     when :updated
+                       "lti_registrations.updated_at"
+                     when :installed_by
+                       # Use NULLS FIRST to ensure nulls sort before non-nulls in ascending order
+                       order_dir = (sort_direction == :desc) ? "DESC" : "ASC"
+                       return query.order(Arel.sql("LOWER(created_by_users.name) #{order_dir} NULLS FIRST"))
+                     when :updated_by
+                       # Use NULLS FIRST to ensure nulls sort before non-nulls in ascending order
+                       order_dir = (sort_direction == :desc) ? "DESC" : "ASC"
+                       return query.order(Arel.sql("LOWER(updated_by_users.name) #{order_dir} NULLS FIRST"))
+                     when :on
+                       # Sort by registration workflow_state
+                       "lti_registrations.workflow_state"
+                     when :lti_version
+                       # lti_version is a method that returns a constant, cannot sort at DB level
+                       # Fall back to in-memory sort
+                       return query
+                     else
+                       # Default sort for :installed and unknown sort fields
+                       "lti_registrations.created_at"
+                     end
+
+      direction = (sort_direction == :desc) ? "DESC" : "ASC"
+      query.order(Arel.sql(Lti::Registration.sanitize_sql_for_order("#{order_clause} #{direction}")))
+    end
+
     def filter_registrations_by_search_query(registrations)
       # all search terms must appear, but each can be in either the name,
       # admin_nickname, or vendor name. Remove the search terms from the list
@@ -220,6 +334,25 @@ module Lti
       return @check_registration_workflow_state if defined?(@check_registration_workflow_state)
 
       @check_registration_workflow_state = account.root_account.feature_enabled?(:lti_deactivate_registrations)
+    end
+
+    def templates_enabled?
+      return @templates_enabled if defined?(@templates_enabled)
+
+      @templates_enabled = account.root_account.feature_enabled?(:lti_registrations_templates)
+    end
+
+    # Get all registrations from consortium parent account when templates are enabled.
+    # Only queries registrations directly, not bindings.
+    def consortia_registrations_with_templates
+      if account.root_account.primary_settings_root_account?
+        return []
+      end
+
+      consortium_parent = account.root_account.consortium_parent_account
+      base_query
+        .shard(consortium_parent.shard)
+        .where(account: consortium_parent)
     end
   end
 end

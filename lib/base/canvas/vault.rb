@@ -64,7 +64,7 @@ module Canvas::Vault
     rescue => e
       # autoloading probably isn't set up yet; load Canvas::Errors explicitly so that we
       # don't mask the original error
-      require_dependency "canvas/errors"
+      require "canvas/errors"
       Canvas::Errors.capture_exception(:vault, e)
       stale_value = LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
       return stale_value if stale_value.present?

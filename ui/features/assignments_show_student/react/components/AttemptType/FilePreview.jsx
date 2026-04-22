@@ -44,7 +44,8 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
   const showDocumentProcessorsColumn = useShouldShowLtiAssetReportsForStudent({
     submissionId: submission._id,
     submissionType: submission.submissionType,
-    ifLastAttemptIsNumber: submission.attempt,
+    attempt: submission.attempt,
+    attachmentIds: submission.attachments?.map(f => f._id) ?? [],
   })
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                   <LtiAssetReportsForStudentSubmission
                     submissionId={submission._id}
                     submissionType={submission.submissionType}
+                    attempt={submission.attempt}
                     attachmentId={file._id}
                   />
                 </Table.Cell>

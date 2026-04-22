@@ -797,7 +797,6 @@ class WikiPage < ApplicationRecord
   def eligible_for_pine_indexing?
     return false unless context.is_a?(Course)
     return false unless context.horizon_course?
-    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
     return false unless PineClient.enabled?
 
     true
@@ -838,5 +837,52 @@ class WikiPage < ApplicationRecord
     # We need to run the scan on title and workflow_state change as well otherwise AccessibilityResourceScan will be out of date
     # TODO: RCX-4463 remove title and workflow_state
     %i[title body workflow_state]
+  end
+
+  def create_block_editor_data(user_uuid:, data:)
+    response = Canvas.retriable(tries: content_service_max_retries) do
+      ContentServiceClient.create_content(
+        root_account_uuid: context.root_account.uuid,
+        user_uuid:,
+        context_type: "WikiPage",
+        context_id: id,
+        data:
+      )
+    end
+    create_external_content_reference(content_id: response.external_content_id)
+  end
+
+  def update_block_editor_data(user_uuid:, data:)
+    ref = external_content_reference
+    return unless ref
+
+    Canvas.retriable(tries: content_service_max_retries) do
+      ContentServiceClient.update_content(
+        root_account_uuid: context.root_account.uuid,
+        user_uuid:,
+        external_content_id: ref.content_id,
+        data:
+      )
+    end
+  end
+
+  def get_block_editor_data(user_uuid:)
+    ref = external_content_reference
+    return unless ref
+
+    content = Canvas.retriable(tries: content_service_max_retries) do
+      ContentServiceClient.get_content(
+        root_account_uuid: context.root_account.uuid,
+        user_uuid:,
+        external_content_id: ref.content_id
+      )
+    end
+    content.data
+  end
+
+  private
+
+  def content_service_max_retries
+    Setting.get("content_service_client_max_retries", "3").to_i
   end
 end

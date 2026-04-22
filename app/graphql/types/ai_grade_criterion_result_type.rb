@@ -26,5 +26,6 @@ module Types
     field :description, String, null: false, hash_key: "description"
     field :id, ID, null: false, hash_key: "id"
     field :rating, AiGradeRatingType, null: false, hash_key: "rating"
+    field :response_id, String, null: true, hash_key: "responseId"
   end
 end

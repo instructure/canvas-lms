@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "ostruct"
-
 describe Quizzes::QuizQuestion::AnswerParsers::AnswerParser do
   describe "#parse" do
     let(:answer_parser) { Quizzes::QuizQuestion::AnswerParsers::AnswerParser.new([]) }
