@@ -41,4 +41,32 @@ describe "educator dashboard", :ignore_js_errors, custom_timeout: 30 do
     expect(widget_container("educator-todo-list")).to be_displayed
     expect(widget_container("educator-content-quality")).to be_displayed
   end
+
+  it "does not render student widget types saved in educator_dashboard_config" do
+    @teacher.set_preference(:educator_dashboard_config, {
+                              "layout" => {
+                                "columns" => 2,
+                                "widgets" => [
+                                  { "id" => "educator-announcement-creation-widget",
+                                    "type" => "educator_announcement_creation",
+                                    "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+                                    "title" => "Announcement creation" },
+                                  { "id" => "course-work-combined-widget",
+                                    "type" => "course_work_combined",
+                                    "position" => { "col" => 2, "row" => 1, "relative" => 2 },
+                                    "title" => "Course work" },
+                                  { "id" => "course-grades-widget",
+                                    "type" => "course_grades",
+                                    "position" => { "col" => 1, "row" => 2, "relative" => 3 },
+                                    "title" => "Course grades" }
+                                ]
+                              }
+                            })
+
+    go_to_dashboard
+
+    expect(widget_container("educator-announcement-creation")).to be_displayed
+    expect(element_exists?(widget_container_selector("course-work-combined"))).to be_falsey
+    expect(element_exists?(widget_container_selector("course-grades"))).to be_falsey
+  end
 end
