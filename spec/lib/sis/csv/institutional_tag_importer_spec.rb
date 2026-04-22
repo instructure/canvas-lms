@@ -175,4 +175,20 @@ describe SIS::CSV::InstitutionalTagImporter do
     batch3.restore_states_for_batch
     expect(InstitutionalTag.find_by(sis_source_id: "TAG001").workflow_state).to eq "deleted"
   end
+
+  context "when the institutional_tags feature flag is disabled" do
+    before { @account.disable_feature!(:institutional_tags) }
+
+    it "does not process the CSV and records one dispatcher-level error" do
+      importer = process_csv_data(
+        "institutional_tag_id,category_id,name,description,status",
+        "TAG001,CAT001,Tag One,First tag,active",
+        "TAG002,CAT001,Tag Two,Second tag,active"
+      )
+      expect(importer.errors.map(&:last)).to contain_exactly(
+        "Couldn't find Canvas CSV import headers"
+      )
+      expect(InstitutionalTag.where(sis_source_id: %w[TAG001 TAG002])).to be_empty
+    end
+  end
 end

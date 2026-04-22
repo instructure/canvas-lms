@@ -2081,7 +2081,8 @@ class AccountsController < ApplicationController
       is_site_admin = Account.site_admin.grants_right?(@current_user, :read) &&
                       !@account.account_users.active.where(user_id: @current_user).exists?
       js_env({
-               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin
+               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin,
+               INSTITUTIONAL_TAGS_ENABLED: @account.root_account.feature_enabled?(:institutional_tags)
              })
 
       @current_batch = @account.current_sis_batch

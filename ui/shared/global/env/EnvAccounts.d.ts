@@ -60,4 +60,5 @@ export interface EnvAccountsAdminTools {
  */
 export interface EnvAccountsSisImport {
   SHOW_SITE_ADMIN_CONFIRMATION: boolean
+  INSTITUTIONAL_TAGS_ENABLED: boolean
 }

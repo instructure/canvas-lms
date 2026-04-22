@@ -40,8 +40,6 @@ module SIS
       end
 
       def add_institutional_tag(tag_id, category_id, name, description, status)
-        raise ImportError, "Institutional tags are not enabled for this account" unless @root_account.feature_enabled?(:institutional_tags)
-
         raise ImportError, "No institutional_tag_id given for an institutional tag" if tag_id.blank?
         raise ImportError, "No category_id given for institutional tag #{tag_id}" if category_id.blank?
         raise ImportError, "No name given for institutional tag #{tag_id}" if name.blank?
