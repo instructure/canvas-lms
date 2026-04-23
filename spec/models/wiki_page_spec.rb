@@ -2012,16 +2012,34 @@ describe WikiPage do
       context "when the page has no ExternalContentReference" do
         let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
 
-        it "does not call ContentServiceClient" do
+        before do
+          allow(ContentServiceClient).to receive(:create_content)
+            .and_return(double(external_content_id:))
+        end
+
+        it "does not call ContentServiceClient.update_content" do
           page_without_ref.update_block_editor_data(user_uuid:, data:)
 
           expect(ContentServiceClient).not_to have_received(:update_content)
         end
 
-        it "returns nil" do
-          result = page_without_ref.update_block_editor_data(user_uuid:, data:)
+        it "falls back to create_block_editor_data" do
+          page_without_ref.update_block_editor_data(user_uuid:, data:)
 
-          expect(result).to be_nil
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            root_account_uuid: page_without_ref.context.root_account.uuid,
+            user_uuid:,
+            context_type: "WikiPage",
+            context_id: page_without_ref.id,
+            data:
+          )
+        end
+
+        it "creates an ExternalContentReference" do
+          page_without_ref.update_block_editor_data(user_uuid:, data:)
+
+          expect(page_without_ref.external_content_reference).to be_present
+          expect(page_without_ref.external_content_reference.content_id).to eql external_content_id
         end
       end
     end
