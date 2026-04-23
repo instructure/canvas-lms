@@ -854,15 +854,17 @@ class WikiPage < ApplicationRecord
 
   def update_block_editor_data(user_uuid:, data:)
     ref = external_content_reference
-    return unless ref
-
-    Canvas.retriable(tries: content_service_max_retries) do
-      ContentServiceClient.update_content(
-        root_account_uuid: context.root_account.uuid,
-        user_uuid:,
-        external_content_id: ref.content_id,
-        data:
-      )
+    if ref
+      Canvas.retriable(tries: content_service_max_retries) do
+        ContentServiceClient.update_content(
+          root_account_uuid: context.root_account.uuid,
+          user_uuid:,
+          external_content_id: ref.content_id,
+          data:
+        )
+      end
+    else
+      create_block_editor_data(user_uuid:, data:)
     end
   end
 
