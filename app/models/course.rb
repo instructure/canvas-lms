@@ -3499,6 +3499,7 @@ class Course < ApplicationRecord
   TAB_ITEM_BANKS = 23
   TAB_YOUTUBE_MIGRATION = 24
   TAB_AI_EXPERIENCES = 25
+  TAB_NOTEBOOK = 26
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3739,6 +3740,16 @@ class Course < ApplicationRecord
                           })
     end
 
+    if account.feature_enabled?(:notebook)
+      default_tabs << {
+        id: TAB_NOTEBOOK,
+        label: t("#tabs.notebook", "Notebook"),
+        css_class: "notebook",
+        href: :course_notebook_path,
+        visibility: "members"
+      }
+    end
+
     # Remove already cached tabs for Horizon courses
     if horizon_course?
       default_tabs.delete_if do |tab|
@@ -3943,6 +3954,7 @@ class Course < ApplicationRecord
 
         delete_unless.call([TAB_PEOPLE], :read_roster)
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
+        delete_unless.call([TAB_NOTEBOOK], :participate_as_student)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
