@@ -47,12 +47,12 @@ export function showFilePreview(
   }
 
   let url = `/api/v1/files/${file_id}?include[]=enhanced_preview_url`
-  if (verifier) {
+  if (location) {
+    url += `&location=${encodeURIComponent(location)}`
+  } else if (verifier) {
     url += `&verifier=${verifier}`
   } else if (access_token && instfs_id) {
     url += `&access_token=${access_token}&instfs_id=${instfs_id}`
-  } else if (location) {
-    url += `&location=${encodeURIComponent(location)}`
   }
 
   asJson(fetch(url, defaultFetchOptions()))
