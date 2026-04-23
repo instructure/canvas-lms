@@ -575,27 +575,43 @@ describe FeatureFlags::Hooks do
   end
 
   describe "oak_visible_on_hook" do
-    let(:context) { instance_double(Account) }
+    let(:context) { account_model }
     let(:database_server) { instance_double(DatabaseServer, config: { region: "us-east-1" }) }
-    let(:current_shard) { instance_double(Shard, database_server:) }
     let(:oak_predicate) { instance_double(FeatureFlags::OakPredicate) }
 
     before do
-      allow(Shard).to receive(:current).and_return(current_shard)
+      allow(context.shard).to receive(:database_server).and_return(database_server)
       allow(FeatureFlags::OakPredicate).to receive(:new).and_return(oak_predicate)
       allow(oak_predicate).to receive(:call)
     end
 
-    it "creates a new OakPredicate with context and region" do
-      expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
+    context "when tier_2_visible_on_hook returns false" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(false)
+      end
 
-      FeatureFlags::Hooks.oak_visible_on_hook(context)
+      it "returns false without calling OakPredicate" do
+        expect(FeatureFlags::OakPredicate).not_to receive(:new)
+        expect(FeatureFlags::Hooks.oak_visible_on_hook(context)).to be false
+      end
     end
 
-    it "calls .call on the OakPredicate instance" do
-      expect(oak_predicate).to receive(:call)
+    context "when tier_2_visible_on_hook returns true" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
+      end
 
-      FeatureFlags::Hooks.oak_visible_on_hook(context)
+      it "creates a new OakPredicate with context and region" do
+        expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
+
+        FeatureFlags::Hooks.oak_visible_on_hook(context)
+      end
+
+      it "calls .call on the OakPredicate instance" do
+        expect(oak_predicate).to receive(:call)
+
+        FeatureFlags::Hooks.oak_visible_on_hook(context)
+      end
     end
   end
 

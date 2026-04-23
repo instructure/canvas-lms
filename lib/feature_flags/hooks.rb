@@ -208,12 +208,15 @@ module FeatureFlags
     end
 
     def self.oak_visible_on_hook(context)
+      return false unless tier_2_visible_on_hook(context)
+
       OakPredicate.new(context, Shard.current.database_server.config[:region]).call
     end
 
     def self.oak_for_users_visible_on_hook(context)
       return false unless context.is_a?(User)
-      return false unless oak_visible_on_hook(context)
+      return false unless Account.current_domain_root_account
+      return false unless oak_visible_on_hook(Account.current_domain_root_account)
 
       Oak::PermissionChecker.user_permitted?(context, Account.current_domain_root_account)
     end
