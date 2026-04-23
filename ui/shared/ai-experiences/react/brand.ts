@@ -52,6 +52,21 @@ export const publishedButtonTheme = {
   primaryBorderColor: GREEN,
 }
 
+// Light blue — used for secondary action buttons (e.g. "Choose from Canvas files", "Cancel")
+export const LIGHT_BLUE = '#90CDF4'
+export const LIGHT_BLUE_HOVER = '#63B3ED'
+export const LIGHT_BLUE_ACTIVE = '#4299E1'
+
+// Reusable InstUI themeOverride: light blue filled button (dark text, 12:1 contrast ratio)
+export const lightBlueButtonTheme = {
+  borderRadius: RADIUS_SM,
+  primaryBackground: LIGHT_BLUE,
+  primaryHoverBackground: LIGHT_BLUE_HOVER,
+  primaryActiveBackground: LIGHT_BLUE_ACTIVE,
+  primaryBorderColor: LIGHT_BLUE,
+  primaryColor: '#2D3B45',
+}
+
 // Reusable InstUI themeOverride: navy filled button
 export const navyButtonTheme = {
   borderRadius: RADIUS_SM,

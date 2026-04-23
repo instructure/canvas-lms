@@ -77,10 +77,9 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
 
       const method = isEdit ? 'PUT' : 'POST'
 
-      // Set workflow_state to unpublished for draft
       const dataToSubmit = {
         ...formData,
-        workflow_state: 'unpublished',
+        ...(isEdit ? {} : {workflow_state: 'unpublished'}),
       }
 
       const {json} = await doFetchApi({
