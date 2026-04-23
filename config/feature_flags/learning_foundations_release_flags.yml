@@ -304,6 +304,7 @@ study_assist:
   state: hidden
   root_opt_in: true
   applies_to: Course
+  visible_on: tier_1_visible_on_hook
   display_name: IgniteAI Study Tools
   description: |-
     Enables IgniteAI Study Tools for courses. When enabled, students can
