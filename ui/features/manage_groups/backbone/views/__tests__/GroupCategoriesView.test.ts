@@ -39,6 +39,7 @@ describe('GroupCategoriesView', () => {
     // @ts-expect-error - Legacy Backbone typing
     ENV.permissions = {can_add_groups: true}
 
+    // @ts-expect-error TS7 migration
     categories = new GroupCategoryCollection([
       {
         id: 1,
@@ -49,8 +50,10 @@ describe('GroupCategoriesView', () => {
         name: 'group set 2',
       },
     ])
+    // @ts-expect-error TS7 migration
     vi.spyOn(categories, 'fetch').mockReturnValue([])
 
+    // @ts-expect-error TS7 migration
     view = new GroupCategoriesView({collection: categories})
     view.render()
 
@@ -84,6 +87,7 @@ describe('GroupCategoriesView', () => {
   it('adds new GroupCategory and displays new tab and panel', () => {
     // @ts-expect-error - Legacy Backbone typing
     categories.add(
+      // @ts-expect-error TS7 migration
       new GroupCategory({
         id: 3,
         name: 'Newly Added',

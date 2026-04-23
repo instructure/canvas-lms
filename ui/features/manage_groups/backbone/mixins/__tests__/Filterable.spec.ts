@@ -28,6 +28,7 @@ let view = null
 describe('Filterable', () => {
   beforeEach(() => {
     fakeENV.setup()
+    // @ts-expect-error TS7 migration
     class MyCollectionView extends CollectionView {
       static initClass() {
         // @ts-expect-error - Backbone View property
@@ -52,10 +53,12 @@ describe('Filterable', () => {
         name: 'joe',
       },
     ])
+    // @ts-expect-error TS7 migration
     view = new MyCollectionView({
       collection,
       itemView: View,
     })
+    // @ts-expect-error TS7 migration
     view.render()
   })
 

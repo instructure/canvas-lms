@@ -278,6 +278,7 @@ export function createPlannerApp() {
     store
       // @ts-expect-error TS7005 (typescriptify)
       .dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+      // @ts-expect-error TS7 migration
       .then(() => {
         store.dispatch(getInitialOpportunities())
       })
@@ -285,6 +286,7 @@ export function createPlannerApp() {
     store
       // @ts-expect-error TS7005 (typescriptify)
       .dispatch(getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+      // @ts-expect-error TS7 migration
       .then(() => {
         store.dispatch(startLoadingAllOpportunities())
       })

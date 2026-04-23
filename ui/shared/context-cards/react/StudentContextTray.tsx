@@ -319,9 +319,9 @@ export default class StudentContextTray extends React.Component {
                       {user.short_name ? (
                         <div className="StudentContextTray-Header__Name">
                           <Heading level="h3" as="h2">
-                            {/* @ts-expect-error TS2769 (typescriptify) */}
                             <Link
                               data-testid="student-name-link"
+                              // @ts-expect-error TS7 migration
                               size="large"
                               // @ts-expect-error TS2339 (typescriptify)
                               href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
@@ -332,6 +332,7 @@ export default class StudentContextTray extends React.Component {
                                     ? `${decodedShortName} ${user.pronouns}`
                                     : decodedShortName,
                               })}
+                              // @ts-expect-error TS7 migration
                               themeOverride={{largePadding: '0', largeHeight: 'normal'}}
                               display="block"
                               textAlign="start"
