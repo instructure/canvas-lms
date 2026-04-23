@@ -510,6 +510,21 @@ export default class Calendar {
       return
     }
 
+    if (
+      ['assignment', 'assignment_override'].includes(event.eventType) &&
+      event.assignment?.peer_review_sub_assignment_enabled
+    ) {
+      revertFunc()
+      showFlashAlert({
+        message: I18n.t(
+          'Assignments with graded peer reviews are not draggable. You can update their due dates by editing the assignment.',
+        ),
+        err: null,
+        type: 'error',
+      })
+      return
+    }
+
     if (this.currentView === 'week' && allDay && event.eventType === 'assignment') {
       revertFunc()
       return
