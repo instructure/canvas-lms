@@ -219,8 +219,10 @@ module Types
       load_association(:quiz_submission).then do |quiz_submission|
         next nil unless quiz_submission
 
+        # Load all versions for this quiz submission
         Loaders::AssociationLoader.for(Quizzes::QuizSubmission, :versions).load(quiz_submission).then do |versions|
-          quiz_submission.quiz_submission_histories(versions:)
+          # Map each version to its model representation
+          versions.map(&:model)
         end
       end
     end
