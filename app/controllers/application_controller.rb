@@ -1898,6 +1898,10 @@ class ApplicationController < ActionController::Base
 
         # do one final redirect to get the token out of the URL
         redirect_to remove_query_params(request.original_url, "session_token")
+      elsif token.nil?
+        SessionToken.report_error(reason: :parsing_error)
+      else
+        SessionToken.report_error(reason: :token_invalid)
       end
     end
   end
