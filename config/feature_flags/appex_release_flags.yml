@@ -103,3 +103,17 @@ new_login_ui_identity_discovery_page_root_account:
       state: hidden
     production:
       state: hidden
+log_session_token_failures:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Log Session Token Failures
+  description: |-
+    If enabled, session token parsing and validation will emit events to DataDog
+    when validation or parsing fails
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
