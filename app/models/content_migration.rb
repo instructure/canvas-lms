@@ -1218,7 +1218,7 @@ class ContentMigration < ApplicationRecord
   end
 
   def add_association_for_migration?(html, attachment)
-    context == attachment.context || user_file_link_matches_uuid?(html, attachment)
+    context == attachment.context || context.shard.activate { user_file_link_matches_uuid?(html, attachment) }
   end
 
   def convert_block_editor_blocks(blocks_json, migration_id, context)
