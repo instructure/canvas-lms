@@ -639,10 +639,6 @@ class Quizzes::QuizSubmission < ApplicationRecord
     attempts.version_models
   end
 
-  def quiz_submission_histories(versions:)
-    Quizzes::QuizSubmissionHistory.from_preloaded_versions(self, versions)
-  end
-
   def latest_submitted_attempt
     if completed?
       self

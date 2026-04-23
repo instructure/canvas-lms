@@ -9564,7 +9564,6 @@ type QuizSubmission implements LegacyIDInterface & Timestamped {
   score: Float
   startedAt: DateTime
   updatedAt: DateTime
-  versionNumber: Int
   workflowState: String!
 }
 
