@@ -179,5 +179,21 @@ module Services
         end
       end
     end
+
+    describe ".config" do
+      it "loads via Canvas.load_config_file_or_consul with failsafe_cache" do
+        expect(Canvas).to receive(:load_config_file_or_consul)
+          .with("notification_service", failsafe_cache: true)
+          .and_return({ "region" => "us-east-1", "notification_service_queue_name" => "q" })
+
+        expect(NotificationService.send(:config)).to include("region" => "us-east-1")
+      end
+
+      it "returns {} when no source has it" do
+        allow(Canvas).to receive(:load_config_file_or_consul).and_return(nil)
+
+        expect(NotificationService.send(:config)).to eq({})
+      end
+    end
   end
 end
