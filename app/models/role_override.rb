@@ -112,6 +112,11 @@ class RoleOverride < ApplicationRecord
     add_designer_to_course
     add_observer_to_course
   ].freeze
+  GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS = %i[
+    edit_discussion_options
+    edit_discussion_views
+    edit_discussion_anonymity
+  ].freeze
 
   ACCESS_TOKEN_SCOPE_PREFIX = "https://api.instructure.com/auth/canvas"
 

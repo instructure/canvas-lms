@@ -31,7 +31,7 @@ import {
   getCourseGrades,
   transformGrades,
 } from '@canvas/k5/react/utils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import GradesSummary from './GradesSummary'
 import GradingPeriodSelect, {ALL_PERIODS_OPTION} from './GradingPeriodSelect'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'

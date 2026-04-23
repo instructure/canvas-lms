@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
 import MessageBus from '@canvas/util/MessageBus'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {
   AllRolesOption,

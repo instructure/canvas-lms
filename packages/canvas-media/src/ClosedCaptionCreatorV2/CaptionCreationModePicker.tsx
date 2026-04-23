@@ -25,6 +25,7 @@ import type {CaptionCreationMode} from './types'
 export interface CaptionCreationModePickerProps {
   onSelect: (mode: CaptionCreationMode) => void
   showAutoOption?: boolean
+  addNewButtonRef?: (el: Element | null) => void
 }
 
 /**
@@ -33,6 +34,7 @@ export interface CaptionCreationModePickerProps {
 export function CaptionCreationModePicker({
   onSelect,
   showAutoOption = true,
+  addNewButtonRef,
 }: CaptionCreationModePickerProps) {
   return (
     <Flex gap="small">
@@ -41,6 +43,7 @@ export function CaptionCreationModePicker({
         onClick={() => onSelect('manual')}
         renderIcon={<IconAddLine />}
         textAlign="center"
+        elementRef={addNewButtonRef}
       >
         {formatMessage('Add New')}
       </Button>

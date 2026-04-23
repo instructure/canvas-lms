@@ -25,19 +25,12 @@ class AddSuspensionNotifications < ActiveRecord::Migration[8.0]
                                                   category: "Registration",
                                                   priority: true
                                                 })
-      Canvas::MessageHelper.create_notification({
-                                                  name: "Pseudonym Suspended By Admin",
-                                                  delay_for: 0,
-                                                  category: "Registration",
-                                                  priority: true
-                                                })
     end
   end
 
   def down
     if Shard.current.default?
       Notification.where(name: "Pseudonym Suspended After Failed Login").delete_all
-      Notification.where(name: "Pseudonym Suspended By Admin").delete_all
     end
   end
 end

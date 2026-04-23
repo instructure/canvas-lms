@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import elideString from '../../helpers/elideString'
 import {arrayOf, bool, func, number, shape, string, object} from 'prop-types'

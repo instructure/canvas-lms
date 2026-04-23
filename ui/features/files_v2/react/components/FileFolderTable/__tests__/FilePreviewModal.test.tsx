@@ -19,13 +19,13 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {FilePreviewModal, FilePreviewModalProps} from '../FilePreviewModal'
 import {FAKE_FILES} from '../../../../fixtures/fakeData'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 
 const server = setupServer()
 

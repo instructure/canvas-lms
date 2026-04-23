@@ -96,7 +96,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate, readOnly = false
       <Flex gap="small" alignItems="center">
         <Flex.Item shouldGrow shouldShrink>
           <Flex direction="column" gap="x-small">
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Text size="small" color="secondary">
                 {typeLabel}
               </Text>
@@ -140,7 +140,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate, readOnly = false
               </Flex.Item>
             )}
 
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Text size="small">
                 {dateText && (
                   <Text size="small" color={isItemOverdue ? 'danger' : 'secondary'}>

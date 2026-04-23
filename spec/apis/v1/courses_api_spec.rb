@@ -4632,6 +4632,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus" do
+      @course1.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
       should_translate_user_content(@course1) do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
@@ -4644,7 +4645,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus without verifiers" do
-      should_translate_user_content(@course1, include_verifiers: false) do |content|
+      should_translate_user_content(@course1, location: "course_syllabus_#{@course1.id}") do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
         @course1.save!
@@ -4655,8 +4656,26 @@ describe CoursesController, type: :request do
       end
     end
 
+    context "with disable_file_verifiers_in_public_syllabus enabled" do
+      before do
+        @course1.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      end
+
+      it "returns the course syllabus with location tags and without verifiers" do
+        attachment = @course1.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
+        @course1.syllabus_body = "<img src='/courses/#{@course1.id}/files/#{attachment.id}'/>"
+        @course1.updating_user = @me
+        @course1.save!
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_body",
+                        { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_body"] })
+        expect(json["syllabus_body"]).to include("location=course_syllabus_#{@course1.id}")
+        expect(json["syllabus_body"]).not_to include("verifier=")
+      end
+    end
+
     it "does not return syllabus_versions when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @course1.account.disable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4668,7 +4687,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions when feature flag is enabled and param is present" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4683,7 +4702,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when param is not present" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       json = api_call(:get,
                       "/api/v1/courses/#{@course1.id}.json",
                       { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
@@ -4691,7 +4710,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when user lacks manage_course_content_edit permission" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       student_in_course(active_all: true, course: @course1)
       SimplyVersioned::Version.create!(
         versionable: @course1,
@@ -4708,7 +4727,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions when blank child receives syllabus from master" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4731,7 +4750,7 @@ describe CoursesController, type: :request do
     end
 
     it "protects downstream syllabus changes from being overwritten by blueprint sync" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4758,7 +4777,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not create syllabus versions during blueprint sync when flag is disabled" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @course1.account.disable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4778,7 +4797,7 @@ describe CoursesController, type: :request do
     end
 
     it "creates syllabus versions during blueprint sync when flag is enabled" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4798,7 +4817,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions after blueprint association is removed" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4821,7 +4840,7 @@ describe CoursesController, type: :request do
     end
 
     it "includes edited_by user information in syllabus_versions when saving_user is set" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       @course1.saving_user = @me
       @course1.update(syllabus_body: "Version with user")
 
@@ -4835,7 +4854,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not include edited_by when saving_user is not set" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       @course1.update(syllabus_body: "Version without user")
 
       json = api_call(:get,
@@ -4847,7 +4866,7 @@ describe CoursesController, type: :request do
 
     describe "#restore_version" do
       before do
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        @course1.account.enable_feature!(:syllabus_versioning)
         @course1.update!(syllabus_body: "Previous content")
         @version = @course1.versions.last
         @course1.update!(syllabus_body: "Current content")
@@ -4892,7 +4911,7 @@ describe CoursesController, type: :request do
       end
 
       it "requires feature flag to be enabled" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        @course1.account.disable_feature!(:syllabus_versioning)
         api_call(:post,
                  "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
                  { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" },
@@ -5329,7 +5348,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "23:59:59",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
         end
 
@@ -5410,7 +5431,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "09:00:00",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
           @course.reload
           expect(@course.allow_final_grade_override?).to be true
@@ -5553,7 +5576,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "23:59:59",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
         end
 
@@ -5565,6 +5590,33 @@ describe CoursesController, type: :request do
                    {},
                    expected_status: 403)
           expect(@course.reload.allow_student_discussion_topics).to be true
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before :once do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "allows teacher with manage_course_details even when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/settings",
+                   { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
+                   { lock_all_announcements: true })
+          expect(response).to be_successful
+          expect(@course.reload.lock_all_announcements).to be true
+        end
+
+        it "denies update when manage_course_details is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/settings",
+                   { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
+                   { lock_all_announcements: true },
+                   {},
+                   expected_status: 403)
+          expect(@course.reload.lock_all_announcements).to be false
         end
       end
     end

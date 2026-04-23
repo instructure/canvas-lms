@@ -31,9 +31,13 @@ import {
   defaultTreeGroupMocks,
 } from './FindOutcomesModalTestUtils'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/progress/resolve_progress')
 
@@ -81,9 +85,7 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
     expect(getByText('Group 200')).toBeInTheDocument()
   })
 
-  it(
-    'replaces Add buttons of individual outcomes with loading spinner during group import or a parent group',
-    async () => {
+  it('replaces Add buttons of individual outcomes with loading spinner during group import or a parent group', async () => {
     const doResolveProgress = delayImportOutcomesProgress()
 
     const {getByText, getAllByText, queryByText} = render(
@@ -126,7 +128,5 @@ describe('FindOutcomesModal - Group Import Tree Navigation Tests', () => {
 
     // disables Add All Outcomes button for the group
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
-    },
-    30000,
-  )
+  }, 30000)
 })

@@ -21,7 +21,7 @@ import {OutcomeSearch} from '../OutcomeSearch'
 import * as useOutcomesHook from '../../../hooks/useOutcomes'
 
 vi.mock('../../../hooks/useOutcomes')
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 interface OutcomeEdge {
   canUnlink: boolean

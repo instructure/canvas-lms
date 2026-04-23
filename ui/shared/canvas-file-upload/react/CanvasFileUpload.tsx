@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -29,7 +29,7 @@ import FileList from './FileList'
 import {useFileUpload} from './hooks/useFileUpload'
 import CanvasFilesBrowser from './components/CanvasFilesBrowser/CanvasFilesBrowser'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('canvas_file_upload')
 
@@ -40,6 +40,7 @@ interface CanvasFileUploadProps {
   allowedFileTypes?: string[]
   maxFileSizeMB?: number // Maximum file size in MB, undefined = unlimited
   maxFiles?: number // Maximum number of files, undefined = unlimited
+  initialFailedFileNames?: string[] // Pine indexing failures from the API
 }
 
 const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
@@ -49,6 +50,7 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
   allowedFileTypes,
   maxFileSizeMB,
   maxFiles,
+  initialFailedFileNames,
 }) => {
   const {uploadingFileNames, failedFileNames, clearFailedFile, handleDrop, isUploading} =
     useFileUpload({
@@ -63,11 +65,35 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const isSelectingRef = useRef(false)
   const [showBrowserModal, setShowBrowserModal] = useState(false)
+  // Track Pine-failed names the user has explicitly dismissed this session
+  const [dismissedPineFailed, setDismissedPineFailed] = useState<Set<string>>(new Set())
+
+  // Derive active Pine failures from the prop minus anything dismissed
+  const pineFailed = useMemo(
+    () => new Set((initialFailedFileNames ?? []).filter(n => !dismissedPineFailed.has(n))),
+    [initialFailedFileNames, dismissedPineFailed],
+  )
 
   const handleRemoveFile = (fileId: string) => {
     const updatedFiles = files.filter(file => file.id !== fileId)
     onFilesChange(updatedFiles)
   }
+
+  const allFailedFileNames = new Set([...failedFileNames, ...pineFailed])
+
+  const handleClearFailedFile = (name: string) => {
+    if (pineFailed.has(name)) {
+      // Pine indexing failure — remove file from list and clear the failed indicator
+      const file = files.find(f => f.display_name === name)
+      if (file) handleRemoveFile(file.id)
+      setDismissedPineFailed(prev => new Set([...prev, name]))
+    } else {
+      // Upload failure — just clear the failed indicator
+      clearFailedFile(name)
+    }
+  }
+
+  const visibleFiles = files.filter(f => !pineFailed.has(f.display_name))
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -133,13 +159,13 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
           })}
         </Text>
       </View>
-      {(files.length > 0 || uploadingFileNames.size > 0 || failedFileNames.size > 0) && (
+      {(files.length > 0 || uploadingFileNames.size > 0 || allFailedFileNames.size > 0) && (
         <FileList
-          files={files}
+          files={visibleFiles}
           uploadingFileNames={uploadingFileNames}
-          failedFileNames={failedFileNames}
+          failedFileNames={allFailedFileNames}
           onRemoveFile={handleRemoveFile}
-          onClearFailedFile={clearFailedFile}
+          onClearFailedFile={handleClearFailedFile}
         />
       )}
 

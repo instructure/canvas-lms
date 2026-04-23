@@ -28,7 +28,8 @@
 # Resource Links can be associated with Assignments, Module Items,
 # Collaborations, and Rich Content embeddings.
 #
-# Use of this API requires the `manage_lti_add` and `manage_assignments_add` permissions.
+# List and Show endpoints require the `manage_assignments_add` permission.
+# Create, Update, and Delete endpoints additionally require `manage_lti_add`.
 #
 # <b>Caution!</b> Resource Links are usually managed by the tool that created them via LTI Deep Linking,
 # and using this API to create or modify links may result in errors when launching the link.
@@ -148,7 +149,8 @@
 #     }
 class Lti::ResourceLinksController < ApplicationController
   before_action :require_context_instrumented
-  before_action :require_permissions
+  before_action :require_manage_assignments_add_permission
+  before_action :require_manage_lti_add_permission, except: [:index, :show]
   before_action :validate_custom, only: [:create, :update]
   before_action :validate_url, only: [:create, :update]
   before_action :validate_tool, only: [:update]
@@ -528,9 +530,12 @@ class Lti::ResourceLinksController < ApplicationController
     raise e
   end
 
-  def require_permissions
-    require_context_with_permission(@context, :manage_lti_add)
+  def require_manage_assignments_add_permission
     require_context_with_permission(@context, :manage_assignments_add)
+  end
+
+  def require_manage_lti_add_permission
+    require_context_with_permission(@context, :manage_lti_add)
   end
 
   def render_error(code, message, status: :unprocessable_entity)

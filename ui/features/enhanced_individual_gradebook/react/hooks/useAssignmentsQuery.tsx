@@ -17,7 +17,7 @@
  */
 
 import {useMemo} from 'react'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {fetchAssignments, getNextAssignmentsPage} from '../../queries/Queries'
 import {groupBy} from 'es-toolkit/compat'
 import type {InfiniteData} from '@tanstack/react-query'

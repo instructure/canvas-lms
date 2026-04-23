@@ -78,6 +78,11 @@ module CustomValidators
     end
   end
 
+  def wait_for_instui_flash_message(message = nil)
+    text = ":contains(#{message.inspect})" if message
+    keep_trying_until { disable_implicit_wait { expect(f("#flashalert_message_holder")).to contain_jqcss(text) } }
+  end
+
   def expect_instui_flash_message(message = nil)
     text = ":contains(#{message.inspect})" if message
     expect(f("#flashalert_message_holder")).to contain_jqcss(text)

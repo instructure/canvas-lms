@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {GroupContext, SPLIT, API_STATE, stateToContext} from './context'
 
 import {GroupSetName} from './GroupSetName'

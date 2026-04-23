@@ -94,6 +94,19 @@ describe DiscoveryPagesApiController do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
+      it "returns 422 when total items exceed the maximum of 10" do
+        providers = Array.new(11) { account.authentication_providers.create!(auth_type: "saml") }
+        over_limit_page = {
+          primary: providers.first(6).map { |p| { authentication_provider_id: p.id, label: "Provider" } },
+          secondary: providers.last(5).map { |p| { authentication_provider_id: p.id, label: "Provider" } }
+        }
+        put :upsert, params: { discovery_page: over_limit_page }
+        expect(response).to have_http_status(:unprocessable_content)
+        json = json_parse(response.body)
+        expect(json["errors"].pluck("message"))
+          .to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
       it "returns 422 when icon is not a valid enum value" do
         invalid_page = {
           primary: [
@@ -308,6 +321,21 @@ describe DiscoveryPagesApiController do
           expect(response).to be_successful
           json = json_parse(response.body)
           expect(json["discovery_page"]).to eq({ "primary" => [], "secondary" => [], "active" => false })
+        end
+      end
+
+      context "when discovery_page has more than 10 items (legacy over-limit config)" do
+        it "returns the full config without error so the admin can reduce it" do
+          providers = Array.new(11) { account.authentication_providers.create!(auth_type: "saml") }
+          account.settings[:discovery_page] = {
+            primary: providers.map { |p| { authentication_provider_id: p.id, label: "Provider" } },
+            secondary: []
+          }
+          account.save(validate: false)
+          get :show
+          expect(response).to be_successful
+          json = json_parse(response.body)
+          expect(json["discovery_page"]["primary"].length).to eq(11)
         end
       end
     end

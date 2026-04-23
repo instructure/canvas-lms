@@ -26,7 +26,7 @@ import MessageStudentsWhoDialog, {
   MSWLaunchContext,
 } from '../MessageStudentsWhoDialog'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import type {CamelizedAssignment} from '@canvas/grading/grading'
 import fakeENV from '@canvas/test-utils/fakeENV'
 const students: Student[] = [
@@ -235,14 +235,15 @@ describe('MessageStudentsWhoDialog', () => {
   it('includes the total number of observers selected in the checkbox label', async () => {
     makeMocks()
 
-    students.forEach(student => {
-      student.submittedAt = null
-      student.workflowState = 'unsubmitted'
-    })
+    const unsubmittedStudents = students.map(s => ({
+      ...s,
+      submittedAt: null,
+      workflowState: 'unsubmitted',
+    }))
 
     const {findByRole} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <MessageStudentsWhoDialog {...makeProps()} />
+        <MessageStudentsWhoDialog {...makeProps({students: unsubmittedStudents})} />
       </MockedQueryClientProvider>,
     )
     const checkbox = await findByRole('checkbox', {name: /Observers/})

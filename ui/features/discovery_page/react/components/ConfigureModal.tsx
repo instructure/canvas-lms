@@ -21,13 +21,15 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
+import {Text} from '@instructure/ui-text'
+import {IconWarningSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '@instructure/platform-alerts'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {fetchDiscoveryConfig, saveDiscoveryConfig, toApiConfig, toCardConfig} from '../api'
 import type {CardConfig, ConfigureModalProps, DiscoverySection, ModalError} from '../types'
 import {LoadingSaveOverlay} from './LoadingSaveOverlay'
-import {useExitConfirmation} from '../hooks/useExitConfirmation'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {useIframeMessaging} from '../hooks/useIframeMessaging'
 import {useCardEditing} from '../hooks/useCardEditing'
 import {Flex} from '@instructure/ui-flex'
@@ -35,8 +37,11 @@ import {PreviewAndSidebar} from './PreviewAndSidebar'
 import {SignInOptionsHeader} from './SignInOptionsHeader'
 import {useDiscoveryConfig} from '../hooks/useDiscoveryConfig'
 import {AuthProvider} from './AuthProvider'
+import {DiscoveryPageStatus} from './DiscoveryPageStatus'
 
 const I18n = createI18nScope('discovery_page')
+
+const MAX_DISCOVERY_PAGE_ITEMS = 10
 
 const EMPTY_CONFIG: CardConfig = {
   discovery_page: {primary: [], secondary: []},
@@ -70,7 +75,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     handleEditCancel,
     resetEditing,
   } = useCardEditing({config, handleAddCard, handleUpdateCard, handleDeleteCard, setIsDirty})
-  const handleConfirmedClose = useExitConfirmation(isDirty)
+  const closeButtonRef = useRef<HTMLElement | null>(null)
   const modalBodyRef = useRef<HTMLElement | null>(null)
   const hasLoaded = useRef(false)
   const prevOpen = useRef(false)
@@ -80,8 +85,36 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   // withheld while loading so the iframe can’t fire READY before config is fetched,
   // and so useIframeMessaging resets its ready state on each open
   const activePreviewUrl = isLoadingConfig ? undefined : previewUrl
-
   useIframeMessaging({iframeRef, config, previewUrl: activePreviewUrl})
+
+  const committedCards = [
+    ...config.discovery_page.primary,
+    ...config.discovery_page.secondary,
+  ].filter(c => c.authentication_provider_id !== null)
+  const totalItemCount = committedCards.length
+  const isOverItemLimit = totalItemCount > MAX_DISCOVERY_PAGE_ITEMS
+  const isAtOrOverItemLimit = totalItemCount >= MAX_DISCOVERY_PAGE_ITEMS
+
+  let itemCountLabel: string
+  if (isOverItemLimit) {
+    itemCountLabel = I18n.t(
+      'Sign-in options limit exceeded (%{count}/%{max}). Please remove options to save.',
+      {
+        count: totalItemCount,
+        max: MAX_DISCOVERY_PAGE_ITEMS,
+      },
+    )
+  } else if (isAtOrOverItemLimit) {
+    itemCountLabel = I18n.t('Sign-in options limit reached (%{count}/%{max}).', {
+      count: totalItemCount,
+      max: MAX_DISCOVERY_PAGE_ITEMS,
+    })
+  } else {
+    itemCountLabel = I18n.t('%{count}/%{max} sign-in options added.', {
+      count: totalItemCount,
+      max: MAX_DISCOVERY_PAGE_ITEMS,
+    })
+  }
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -101,8 +134,17 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     onClose()
   }
 
-  const handleCloseModal = () => {
-    handleConfirmedClose(resetAndClose)
+  const handleCloseModal = async () => {
+    if (isDirty) {
+      const confirmed = await confirm({
+        title: I18n.t('Unsaved Changes'),
+        message: I18n.t('You have unsaved changes. Are you sure you want to close?'),
+        confirmButtonLabel: I18n.t('Close'),
+        cancelButtonLabel: I18n.t('Cancel'),
+      })
+      if (!confirmed) return
+    }
+    resetAndClose()
   }
 
   if (open && !prevOpen.current) {
@@ -141,6 +183,18 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   }, [open, setConfig])
 
   const handleSave = async () => {
+    if (config.discovery_page.active) {
+      const confirmed = await confirm({
+        title: I18n.t('Save Discovery Page'),
+        message: I18n.t(
+          'The discovery page is currently live. Saving will immediately update the page visible to users.',
+        ),
+        confirmButtonLabel: I18n.t('Save'),
+        cancelButtonLabel: I18n.t('Cancel'),
+      })
+      if (!confirmed) return
+    }
+
     setError(null)
     setIsSaving(true)
 
@@ -173,6 +227,9 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
     return (
       <CloseButton
         disabled={isActionsDisabled}
+        elementRef={el => {
+          closeButtonRef.current = el instanceof HTMLElement ? el : null
+        }}
         offset="small"
         onClick={handleCloseModal}
         placement="end"
@@ -191,7 +248,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
         title={title}
         description={description}
         onAddClick={() => handleAddAndEdit(section)}
-        disabled={isActionsDisabled}
+        disabled={isActionsDisabled || isAtOrOverItemLimit}
       />
 
       <Flex as="div" gap="x-small" direction="column">
@@ -246,6 +303,7 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
   return (
     <Modal
       data-testid="configure-modal"
+      defaultFocusElement={() => closeButtonRef.current}
       label={I18n.t('Configure Discovery Page')}
       onClose={handleCloseModal}
       onDismiss={handleCloseModal}
@@ -255,7 +313,11 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
       <Modal.Header spacing="compact">
         {renderCloseButton()}
 
-        <Heading>{I18n.t('Configure Discovery Page')}</Heading>
+        <Flex direction="row" gap="small" alignItems="center" wrap="wrap">
+          <Heading>{I18n.t('Configure Discovery Page')}</Heading>
+
+          <DiscoveryPageStatus active={config.discovery_page.active} viewUrl={previewUrl} />
+        </Flex>
       </Modal.Header>
 
       <Modal.Body
@@ -280,17 +342,17 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
 
             <PreviewAndSidebar previewUrl={activePreviewUrl} iframeRef={iframeRef}>
               <Heading level="h3" margin="0 0 medium 0">
-                {I18n.t('Configure sign in options')}
+                {I18n.t('Configure sign-in options')}
               </Heading>
 
               <Flex as="div" gap="medium" direction="column">
-                {renderAuthProviderSection('primary', I18n.t('Main sign in options'))}
+                {renderAuthProviderSection('primary', I18n.t('Main sign-in options'))}
 
                 {renderAuthProviderSection(
                   'secondary',
-                  I18n.t('More sign in options'),
+                  I18n.t('More sign-in options'),
                   I18n.t(
-                    'These options are hidden until a user expands the “More sign in options” section on the login page.',
+                    'These options are hidden until a user expands the “More sign-in options” section on the discovery page.',
                   ),
                 )}
               </Flex>
@@ -300,23 +362,41 @@ export function ConfigureModal({open, onClose}: ConfigureModalProps) {
       </Modal.Body>
 
       <Modal.Footer>
-        <Flex direction="row" gap="small">
-          <Button
-            onClick={handleCloseModal}
-            disabled={isActionsDisabled}
-            data-testid="close-button"
-          >
-            {I18n.t('Close')}
-          </Button>
+        <Flex direction="row" gap="small" alignItems="center">
+          <Flex.Item shouldGrow shouldShrink data-testid="item-limit-counter">
+            <Flex gap="x-small" alignItems="center">
+              {totalItemCount >= MAX_DISCOVERY_PAGE_ITEMS && (
+                <IconWarningSolid color={isOverItemLimit ? 'error' : 'warning'} />
+              )}
+              <Text
+                color={isOverItemLimit ? 'danger' : isAtOrOverItemLimit ? 'warning' : 'success'}
+                size="small"
+              >
+                {itemCountLabel}
+              </Text>
+            </Flex>
+          </Flex.Item>
 
-          <Button
-            color="primary"
-            data-testid="save-button"
-            disabled={isActionsDisabled || !isDirty}
-            onClick={handleSave}
-          >
-            {isSaving ? I18n.t('Saving...') : I18n.t('Save')}
-          </Button>
+          <Flex.Item>
+            <Flex direction="row" gap="mediumSmall">
+              <Button
+                onClick={handleCloseModal}
+                disabled={isActionsDisabled}
+                data-testid="close-button"
+              >
+                {I18n.t('Close')}
+              </Button>
+
+              <Button
+                color="primary"
+                data-testid="save-button"
+                disabled={isActionsDisabled || !isDirty || isOverItemLimit}
+                onClick={handleSave}
+              >
+                {isSaving ? I18n.t('Saving …') : I18n.t('Save')}
+              </Button>
+            </Flex>
+          </Flex.Item>
         </Flex>
       </Modal.Footer>
     </Modal>

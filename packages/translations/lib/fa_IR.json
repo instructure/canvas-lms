@@ -146,9 +146,6 @@
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
     },
-    "copy_9748f9f": {
-        "message": "کپی کردن"
-    },
     "copyright_holder_66ee111": {
         "message": "دارنده حق نشر:"
     },
@@ -205,9 +202,6 @@
     },
     "details_98a31b68": {
         "message": "اطلاعات"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "ابعاد"
     },
     "discussion_6719c51d": {
         "message": "بحث"
@@ -625,9 +619,6 @@
     },
     "reset_95a81614": {
         "message": "بازنشانی"
-    },
-    "retry_ebd5f8ba": {
-        "message": "تلاش دوباره"
     },
     "rich_content_editor_2708ef21": {
         "message": "ویرایشگر محتوای غنی"

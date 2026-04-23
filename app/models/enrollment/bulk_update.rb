@@ -30,7 +30,7 @@ class Enrollment::BulkUpdate
     @current_user = user
   end
 
-  def bulk_enrollment(progress = nil, user_ids:, course_ids:, enrollment_type: "StudentEnrollment", role_id: nil)
+  def bulk_enrollment(progress = nil, user_ids:, course_ids:, enrollment_type: "StudentEnrollment", role_id: nil, start_at: nil, end_at: nil)
     progress&.calculate_completion!(0, user_ids.size * course_ids.size)
     errors = {}
     users = api_find_all(User, user_ids, account: @context)
@@ -47,6 +47,8 @@ class Enrollment::BulkUpdate
           role = course.account.get_role_by_id(role_id)
           options[:role] = role if role
         end
+        options[:start_at] = start_at if start_at
+        options[:end_at] = end_at if end_at
 
         SubmissionLifecycleManager.with_executing_user(@current_user) do
           @enrollment = course.enroll_user(user, enrollment_type, options)

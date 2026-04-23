@@ -1108,15 +1108,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           assignments_with_visibilities
         end
 
-        it "preloads override data for assignments to optimize performance" do
-          # Test that DatesOverridable.preload_override_data_for_objects is called
-          expect(DatesOverridable).to receive(:preload_override_data_for_objects)
-            .with([assignment, assignment_only_visible_to_overrides])
-            .and_call_original
-
-          assignments_with_visibilities
-        end
-
         it "works correctly with preloaded override data" do
           # Manually preload the data first
           assignments = [assignment, assignment_only_visible_to_overrides]

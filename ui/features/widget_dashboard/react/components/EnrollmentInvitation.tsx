@@ -24,7 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {executeQuery} from '@canvas/graphql'
 import {
   ACCEPT_ENROLLMENT_INVITATION,

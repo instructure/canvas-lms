@@ -23,7 +23,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {AIExperience, AIExperienceFormData} from '../../../types'
 import DeleteConfirmationModal from './DeleteConfirmationModal'
 import FormHeader from './FormHeader'
@@ -180,6 +180,20 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
   return (
     <View as="div" maxWidth="1000px" margin="0 auto" padding="medium">
+      {aiExperience?.failed_context_file_names?.length && (
+        <Alert
+          variant="error"
+          renderCloseButtonLabel={false}
+          margin="0 0 medium 0"
+          data-testid="ai-experience-edit-index-failed-notice"
+        >
+          {I18n.t(
+            "Activity couldn't be loaded. A source file has an issue. To try again, remove %{names} from your configurations.",
+            {names: aiExperience.failed_context_file_names.join(', ')},
+          )}
+        </Alert>
+      )}
+
       {showErrorBanner && showErrors && Object.keys(errors).length > 0 && (
         <Alert
           variant="error"
@@ -226,6 +240,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           contextFiles={contextFiles}
           onContextFilesChange={handleContextFilesChange}
           courseId={((window as any).ENV?.COURSE_ID || '').toString()}
+          initialFailedFileNames={aiExperience?.failed_context_file_names}
         />
 
         <FormActions isLoading={isLoading} onCancel={handleCancel} />

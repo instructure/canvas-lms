@@ -18,7 +18,7 @@
 
 import {render, screen} from '@testing-library/react'
 import PreviewUserMerge, {type PreviewMergeProps} from '../PreviewUserMerge'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {createUserToMergeQueryKey} from '../common'
 import userEvent from '@testing-library/user-event'
 import {sourceUser, destinationUser} from './test-data'

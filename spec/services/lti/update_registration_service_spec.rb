@@ -27,23 +27,18 @@ describe Lti::UpdateRegistrationService do
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params:,
       comment:
     )
   end
 
   let(:account) { account_model }
-  let(:registration) { developer_key.lti_registration }
-  let(:developer_key) do
-    lti_developer_key_model(account:).tap do |dk|
-      lti_tool_configuration_model(developer_key: dk, lti_registration: dk.lti_registration)
-    end
-  end
+  let(:registration) { lti_registration_with_tool(account:) }
+  let(:developer_key) { registration.developer_key }
   let(:updated_by) { user_model }
   let(:registration_params) { {} }
   let(:configuration_params) { {} }
   let(:overlay_params) { {} }
-  let(:binding_params) { {} }
+  let(:workflow_state) { nil }
   let(:comment) { nil }
 
   context "with valid registration_params" do
@@ -52,6 +47,7 @@ describe Lti::UpdateRegistrationService do
         name: "new name",
         admin_nickname: "new nickname",
         vendor: "new vendor",
+        workflow_state:
       }
     end
 
@@ -69,6 +65,7 @@ describe Lti::UpdateRegistrationService do
     end
 
     it "tracks the changes" do
+      registration # create first
       expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
 
       entry = Lti::RegistrationHistoryEntry.last
@@ -81,6 +78,62 @@ describe Lti::UpdateRegistrationService do
                         ])
       expect(entry.diff["developer_key"])
         .to match_array([["~", ["name"], developer_key.name, registration_params[:name]]])
+    end
+  end
+
+  it "does not change registrationworkflow_state" do
+    expect { subject }.not_to change { registration.reload.workflow_state }
+  end
+
+  it "does not change binding workflow_state" do
+    expect { subject }.not_to change { Lti::RegistrationAccountBinding.find_by(registration:, account:).workflow_state }
+  end
+
+  context "when registration is inactive and workflow_state is not provided" do
+    let(:registration_params) { { name: "new name" } }
+
+    before { registration.update!(workflow_state: "inactive") }
+
+    it "does not change registration workflow_state to active" do
+      expect { subject }.not_to change { registration.reload.workflow_state }
+    end
+
+    it "does not change binding workflow_state" do
+      expect { subject }.not_to change { Lti::RegistrationAccountBinding.find_by(registration:, account:).workflow_state }
+    end
+  end
+
+  context "with workflow_state in registration_params" do
+    context "when workflow_state is inactive" do
+      let(:registration_params) { { workflow_state: "inactive" } }
+
+      it "sets the registration workflow_state to inactive" do
+        expect { subject }.to change { registration.reload.workflow_state }.to("inactive")
+      end
+
+      it "updates the account binding" do
+        subject
+        account_binding = Lti::RegistrationAccountBinding.find_by(registration:, account:)
+        expect(account_binding.workflow_state).to eq("off")
+        expect(account_binding.updated_by).to eq(updated_by)
+      end
+    end
+
+    context "when workflow_state is active" do
+      let(:registration_params) { { workflow_state: "active" } }
+
+      before { registration.update!(workflow_state: "inactive") }
+
+      it "sets the registration workflow_state to active" do
+        expect { subject }.to change { registration.reload.workflow_state }.to("active")
+      end
+
+      it "updates the account binding" do
+        subject
+        account_binding = Lti::RegistrationAccountBinding.find_by(registration:, account:)
+        expect(account_binding.workflow_state).to eq("on")
+        expect(account_binding.updated_by).to eq(updated_by)
+      end
     end
   end
 
@@ -274,26 +327,6 @@ describe Lti::UpdateRegistrationService do
             ["~", ["title"], "LTI 1.3 Tool", "new title"]
           ]
         )
-    end
-  end
-
-  context "with invalid binding_params" do
-    let(:binding_params) { { uh: :oh } }
-
-    it "does not error" do
-      expect { subject }.not_to raise_error
-    end
-  end
-
-  context "with valid binding_params" do
-    let(:binding_params) { { workflow_state: "on" } }
-
-    it "updates the account binding" do
-      subject
-      account_binding = Lti::RegistrationAccountBinding.find_by(registration:, account:)
-      expect(account_binding.workflow_state).to eq("on")
-      expect(account_binding.updated_by).to eq(updated_by)
-      expect(account_binding.created_by).to eq(updated_by)
     end
   end
 

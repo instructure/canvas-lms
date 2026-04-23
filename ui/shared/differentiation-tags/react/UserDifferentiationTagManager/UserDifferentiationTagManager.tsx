@@ -28,7 +28,7 @@ import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationT
 import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
 import {useAddTagMembership} from '../hooks/useAddTagMembership'
 import MessageBus from '@canvas/util/MessageBus'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {bulkDeleteGroupMemberships, bulkFetchUserTags, getCommonTagIds} from '../util/diffTagUtils'
 
 const I18n = createI18nScope('differentiation_tags')

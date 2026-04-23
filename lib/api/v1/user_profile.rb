@@ -47,7 +47,8 @@ module Api::V1::UserProfile
     pseudo = SisPseudonym.for(user,
                               context.respond_to?(:root_account) ? context : nil,
                               type: :implicit,
-                              require_sis: false)
+                              require_sis: false,
+                              current_user:)
     json[:login_id] ||= pseudo&.unique_id
     json[:sis_user_id] ||= pseudo&.sis_user_id if user.grants_right?(current_user, :read_sis)
     json[:integration_id] ||= pseudo&.integration_id

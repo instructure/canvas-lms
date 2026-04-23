@@ -3307,6 +3307,65 @@ describe Course do
           expect(tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
         end
 
+        context "for K5 subject courses" do
+          before do
+            toggle_k5_setting(@course.account)
+            @course.tab_configuration = [
+              { "id" => "nav_menu_link_#{link.id}", "hidden" => true }
+            ]
+            @course.save!
+          end
+
+          context "course_subject_tabs sidebar" do
+            it "shows hidden tab to admins" do
+              tabs = @course.tabs_available(@teacher, course_subject_tabs: true, include_external: true)
+              nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+              expect(nav_link_tab).to be_present
+              expect(nav_link_tab[:hidden]).to be true
+            end
+
+            it "hides hidden tab from students" do
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, course_subject_tabs: true, include_external: true)
+              expect(student_tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+            end
+
+            it "shows visible tab to students" do
+              @course.tab_configuration = []
+              @course.save!
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, course_subject_tabs: true, include_external: true)
+              expect(student_tabs.pluck(:id)).to include("nav_menu_link_#{link.id}")
+            end
+          end
+
+          context "regular left-nav settings page" do
+            # include_external: true is required here (unlike non-K5 tests)
+            # because the K5 code path starts from tabs=[] and nav_menu_link
+            # tabs only reach the list via the external_tabs append.
+            it "shows hidden tab to admins" do
+              tabs = @course.tabs_available(@teacher, include_external: true)
+              nav_link_tab = tabs.find { |t| t[:id] == "nav_menu_link_#{link.id}" }
+              expect(nav_link_tab).to be_present
+              expect(nav_link_tab[:hidden]).to be true
+            end
+
+            it "hides hidden tab from students" do
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, include_external: true)
+              expect(student_tabs.pluck(:id)).not_to include("nav_menu_link_#{link.id}")
+            end
+
+            it "shows visible tab to students" do
+              @course.tab_configuration = []
+              @course.save!
+              student_in_course(active_all: true)
+              student_tabs = @course.tabs_available(@student, include_external: true)
+              expect(student_tabs.pluck(:id)).to include("nav_menu_link_#{link.id}")
+            end
+          end
+        end
+
         it "includes link_context_type in tab_configuration" do
           l2 = NavMenuLink.create!(context: @course.account, course_nav: true, url: "https://example.com", label: "l2")
           @course.tab_configuration = [
@@ -3404,6 +3463,23 @@ describe Course do
           tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
           expect(tabs).to include("Item Banks")
+        end
+
+        context "and the new_quizzes_native_experience is enabled" do
+          before do
+            @course.enable_feature!(:new_quizzes_native_experience)
+          end
+
+          it "hides item banks tab for students" do
+            student_in_course(active_all: true)
+            tab_ids = @course.tabs_available(@student, include_external: true).pluck(:id)
+            expect(tab_ids).not_to include(Course::TAB_ITEM_BANKS)
+          end
+
+          it "shows item banks tab for teachers" do
+            available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+            expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
+          end
         end
 
         context "and the ams_root_account_integration is enabled" do
@@ -6830,6 +6906,39 @@ describe Course do
         expect(@course.grants_right?(@teacher, :direct_share)).to be(true)
       end
     end
+
+    describe "update_course_details" do
+      context "when course_navigation_and_feature_options_permissions is disabled" do
+        it "grants :update_course_details when teacher has :manage_course_content_edit" do
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(true)
+        end
+
+        it "does not grant :update_course_details when :manage_course_content_edit is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(false)
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "grants :update_course_details via :manage_course_details even when :manage_course_content_edit is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(true)
+        end
+
+        it "does not grant :update_course_details when :manage_course_details is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_details", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(false)
+        end
+      end
+    end
   end
 
   context "sharding" do
@@ -8209,6 +8318,71 @@ describe Course do
         expect(course.can_stop_being_template?).to be false
         course.template = false
         expect(course).not_to be_valid
+      end
+    end
+
+    describe "#snapshot_account_default_discussion_settings" do
+      let(:account) { Account.default }
+      let(:template_defaults) do
+        {
+          anonymous_state: "full_anonymity",
+          require_initial_post: false,
+          allow_rating: false,
+          sort_order: "desc"
+        }
+      end
+      let(:template_course) do
+        Course.create!(template: true).tap do |c|
+          c.default_discussion_settings = template_defaults
+          c.save!
+        end
+      end
+
+      before do
+        account.enable_feature!(:default_discussion_options)
+        account.update!(course_template: template_course)
+      end
+
+      it "snapshots template default discussion settings onto new course" do
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to include(
+          anonymous_state: "full_anonymity",
+          require_initial_post: false,
+          allow_rating: false,
+          sort_order: "desc"
+        )
+      end
+
+      it "snapshots use_default_discussion_settings from template when true" do
+        template_course.use_default_discussion_settings = true
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.use_default_discussion_settings).to be true
+      end
+
+      it "snapshots use_default_discussion_settings from template when false" do
+        template_course.use_default_discussion_settings = false
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.use_default_discussion_settings).to be false
+      end
+
+      it "does not snapshot when template has no default_discussion_settings" do
+        template_course.default_discussion_settings = nil
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to be_nil
+      end
+
+      it "does not snapshot when account has no course template" do
+        account.update!(course_template_id: 0)
+
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to be_nil
+        expect(course.use_default_discussion_settings).to be false
       end
     end
 
@@ -10127,7 +10301,7 @@ describe Course do
     let(:course) { Course.create!(name: "Test Course") }
 
     context "when syllabus_versioning feature flag is enabled" do
-      before { Account.site_admin.enable_feature!(:syllabus_versioning) }
+      before { course.account.enable_feature!(:syllabus_versioning) }
 
       it "creates version when syllabus_body changes and excludes specified fields" do
         expect do
@@ -10145,12 +10319,12 @@ describe Course do
       end
 
       it "saves original version when editing existing syllabus for the first time" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.account.disable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: "Original syllabus content")
         course.reload
         expect(course.versions.count).to eq(0)
 
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.account.enable_feature!(:syllabus_versioning)
         expect do
           course.update!(syllabus_body: "Updated syllabus content")
         end.to change { course.versions.count }.by(2)
@@ -10165,11 +10339,11 @@ describe Course do
       end
 
       it "does not save original version if syllabus was blank" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.account.disable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: nil)
         expect(course.versions.count).to eq(0)
 
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.account.enable_feature!(:syllabus_versioning)
         expect do
           course.update!(syllabus_body: "New syllabus content")
         end.to change { course.versions.count }.by(1)
@@ -10180,12 +10354,12 @@ describe Course do
       end
 
       it "does not save duplicate original version on subsequent edits" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        course.account.disable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: "Original syllabus content")
         course.reload
         expect(course.versions.count).to eq(0)
 
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        course.account.enable_feature!(:syllabus_versioning)
         course.update!(syllabus_body: "First edit")
         expect(course.versions.count).to eq(2)
 
@@ -10198,7 +10372,7 @@ describe Course do
     end
 
     context "when syllabus_versioning feature flag is disabled" do
-      before { Account.site_admin.disable_feature!(:syllabus_versioning) }
+      before { course.account.disable_feature!(:syllabus_versioning) }
 
       it "does not create versions when syllabus_body changes" do
         expect do

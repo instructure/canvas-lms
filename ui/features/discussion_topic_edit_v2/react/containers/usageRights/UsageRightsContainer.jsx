@@ -19,7 +19,7 @@
 import React, {useState, useEffect, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {UsageRights} from '../../components/DiscussionOptions/UsageRights'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {defaultUsageRights} from '../../util/usageRightsConstants'
 
 export const UsageRightsContainer = ({

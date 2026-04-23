@@ -1029,6 +1029,7 @@ describe DiscussionTopicsController do
         end
 
         it "teacher can summarize when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_summary
 
           user_session(@teacher)
@@ -1037,6 +1038,7 @@ describe DiscussionTopicsController do
         end
 
         it "student cannot summarize when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_summary
 
           user_session(@student)
@@ -1067,6 +1069,7 @@ describe DiscussionTopicsController do
         end
 
         it "teacher can access insights when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_insights
 
           user_session(@teacher)
@@ -1075,6 +1078,7 @@ describe DiscussionTopicsController do
         end
 
         it "student cannot access insights when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_insights
 
           user_session(@student)
@@ -2373,6 +2377,7 @@ describe DiscussionTopicsController do
 
     context "when the feature flag is enabled" do
       before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
         @course.root_account.enable_feature!(:discussion_insights)
       end
 
@@ -2629,6 +2634,7 @@ describe DiscussionTopicsController do
       let(:topic) { assigns[:topic] }
 
       before do
+        Account.default.disable_feature!(:default_discussion_options)
         user_session(@student)
         post "create", params: topic_params(@course), format: :json
       end
@@ -3411,6 +3417,329 @@ describe DiscussionTopicsController do
             },
             format: "json"
         expect(response).to be_successful
+      end
+    end
+  end
+
+  describe "granular discussion permissions" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      Account.default.enable_feature!(:default_discussion_options)
+      @course.default_discussion_settings = {
+        anonymous_state: "partial_anonymity",
+        disallow_threaded_replies: true,
+        require_initial_post: true,
+        podcast_enabled: true,
+        podcast_has_student_posts: true,
+        allow_rating: true,
+        only_graders_can_rate: true,
+        expanded: true,
+        expanded_locked: true,
+        sort_order: "asc",
+        sort_order_locked: true
+      }
+      @course.use_default_discussion_settings = true
+      @course.save!
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context "when user has all permissions" do
+      it "allows saving discussion settings on create" do
+        post_params = topic_params(@course, {
+                                     discussion_type: "not_threaded",
+                                     require_initial_post: false,
+                                     podcast_enabled: false,
+                                     allow_rating: false,
+                                     expanded: true,
+                                     sort_order: "desc"
+                                   })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.discussion_type).to eq("not_threaded")
+        expect(topic.require_initial_post).to be false
+        expect(topic.podcast_enabled).to be false
+        expect(topic.allow_rating).to be false
+        expect(topic.expanded).to be true
+        expect(topic.sort_order).to eq("desc")
+      end
+    end
+
+    context "when user lacks edit_discussion_options permission" do
+      before do
+        @course.account.role_overrides.create!(
+          permission: "edit_discussion_options",
+          role: teacher_role,
+          enabled: false
+        )
+      end
+
+      it "ignores options settings on create" do
+        post_params = topic_params(@course, {
+                                     discussion_type: "not_threaded",
+                                     require_initial_post: true,
+                                     podcast_enabled: true,
+                                     allow_rating: true
+                                   })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.discussion_type).not_to eq("not_threaded")
+        expect(topic.require_initial_post).to be_falsey
+        expect(topic.podcast_enabled).to be_falsey
+        expect(topic.allow_rating).to be_falsey
+      end
+
+      it "ignores options settings on update" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          discussion_type: "threaded",
+          require_initial_post: false,
+          podcast_enabled: false,
+          allow_rating: false,
+          expanded: true
+        )
+
+        original_discussion_type = topic.discussion_type
+        original_require_initial_post = topic.require_initial_post
+        original_podcast_enabled = topic.podcast_enabled
+        original_allow_rating = topic.allow_rating
+        original_expanded = topic.expanded
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              title: "Updated Title",
+              discussion_type: "not_threaded",
+              require_initial_post: true,
+              podcast_enabled: true,
+              allow_rating: true,
+              expanded: false,
+              expanded_locked: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+
+        expect(topic.title).to eq("Updated Title")
+        expect(topic.discussion_type).to eq(original_discussion_type)
+        expect(topic.require_initial_post).to eq(original_require_initial_post)
+        expect(topic.podcast_enabled).to eq(original_podcast_enabled)
+        expect(topic.allow_rating).to eq(original_allow_rating)
+        expect(topic.expanded).to eq(original_expanded)
+      end
+
+      it "still allows updating view settings when only options are restricted" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          sort_order: "desc"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              sort_order: "asc"
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.sort_order).to eq("asc")
+      end
+    end
+
+    context "when user lacks edit_discussion_views permission" do
+      before do
+        @course.account.role_overrides.create!(
+          permission: "edit_discussion_views",
+          role: teacher_role,
+          enabled: false
+        )
+      end
+
+      it "ignores view settings on create" do
+        post_params = topic_params(@course, { sort_order: "asc", sort_order_locked: true })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.sort_order).not_to eq("asc")
+      end
+
+      it "ignores view settings on update" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          sort_order: "desc"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              sort_order: "asc",
+              sort_order_locked: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.sort_order).to eq("desc")
+      end
+
+      it "still allows updating options settings when only views are restricted" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          allow_rating: false
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              allow_rating: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.allow_rating).to be true
+      end
+    end
+
+    context "when user lacks edit_discussion_anonymity permission" do
+      before do
+        @course.account.role_overrides.create!(
+          permission: "edit_discussion_anonymity",
+          role: teacher_role,
+          enabled: false
+        )
+      end
+
+      it "ignores anonymous_state on create" do
+        post_params = topic_params(@course, { anonymous_state: "full_anonymity" })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.anonymous_state).to be_nil
+      end
+
+      it "ignores anonymous_state on update" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              anonymous_state: "full_anonymity"
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.anonymous_state).to be_nil
+      end
+    end
+
+    context "when user lacks all discussion permissions" do
+      before do
+        %w[edit_discussion_anonymity edit_discussion_options edit_discussion_views].each do |perm|
+          @course.account.role_overrides.create!(
+            permission: perm,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+      end
+
+      it "ignores all discussion settings on create" do
+        post_params = topic_params(@course, {
+                                     discussion_type: "not_threaded",
+                                     require_initial_post: true,
+                                     podcast_enabled: true,
+                                     allow_rating: true,
+                                     sort_order: "asc",
+                                     anonymous_state: "full_anonymity"
+                                   })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.discussion_type).not_to eq("not_threaded")
+        expect(topic.require_initial_post).to be_falsey
+        expect(topic.podcast_enabled).to be_falsey
+        expect(topic.allow_rating).to be_falsey
+        expect(topic.anonymous_state).to be_nil
+      end
+
+      it "still allows updating other non-protected settings" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original message"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              title: "Updated Title",
+              message: "Updated message",
+              pinned: true,
+              require_initial_post: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+
+        expect(topic.title).to eq("Updated Title")
+        expect(topic.message).to eq("Updated message")
+        expect(topic.pinned).to be true
+        expect(topic.require_initial_post).to be false
+      end
+    end
+
+    context "when course has a default_discussion_settings snapshot" do
+      before do
+        # Simulate a course that was created when account had different defaults
+        @course.default_discussion_settings = {
+          allow_rating: false,
+          sort_order: "desc"
+        }
+        @course.save!
+      end
+
+      it "uses course-level snapshot instead of current account settings on create" do
+        # Account default has sort_order: "asc" and allow_rating: true
+        # Course snapshot has sort_order: "desc" and allow_rating: false
+        post_params = topic_params(@course)
+        user_session(@teacher)
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.sort_order).to eq "desc"
+        expect(topic.allow_rating).to be false
       end
     end
   end

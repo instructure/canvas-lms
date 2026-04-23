@@ -30,7 +30,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEndLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {DiscussionSummaryUsagePill} from './DiscussionSummaryUsagePill'
 
 interface DiscussionSummary {

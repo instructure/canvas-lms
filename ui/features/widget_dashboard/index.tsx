@@ -145,6 +145,8 @@ const WidgetDashboardApp = () => {
     let styleEl: HTMLStyleElement | null = null
     if (isDark) {
       content.style.backgroundColor = darkColors.pageBackground
+      document.body.style.backgroundColor = darkColors.pageBackground
+      document.documentElement.style.backgroundColor = darkColors.pageBackground
       styleEl = document.createElement('style')
       styleEl.id = 'widget-dashboard-dark-mode'
       styleEl.textContent = `
@@ -197,6 +199,8 @@ const WidgetDashboardApp = () => {
       document.head.appendChild(styleEl)
     } else {
       content.style.backgroundColor = ''
+      document.body.style.backgroundColor = ''
+      document.documentElement.style.backgroundColor = ''
       const existing = document.getElementById('widget-dashboard-dark-mode')
       if (existing) existing.remove()
     }
@@ -204,6 +208,8 @@ const WidgetDashboardApp = () => {
       if (content) {
         content.style.backgroundColor = ''
       }
+      document.body.style.backgroundColor = ''
+      document.documentElement.style.backgroundColor = ''
       const existing = document.getElementById('widget-dashboard-dark-mode')
       if (existing) existing.remove()
     }

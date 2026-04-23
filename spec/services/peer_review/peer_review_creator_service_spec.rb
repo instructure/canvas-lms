@@ -101,18 +101,9 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect(result.grading_type).to eq(peer_review_grading_type)
       end
 
-      it "sets submission_types to 'peer_review'" do
+      it "always sets submission_types to 'peer_review'" do
         result = service.call
         expect(result.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-      end
-
-      it "sets submission_types to 'not_graded' when grading_type is 'not_graded'" do
-        not_graded_service = described_class.new(
-          parent_assignment:,
-          grading_type: "not_graded"
-        )
-        result = not_graded_service.call
-        expect(result.submission_types).to eq("not_graded")
       end
 
       it "inherits context from parent assignment" do
@@ -280,6 +271,18 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         )
       end
 
+      it "raises error when grading_type is not_graded" do
+        invalid_service = described_class.new(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+
+        expect { invalid_service.call }.to raise_error(
+          PeerReview::InvalidGradingTypeError,
+          "Peer review sub assignments cannot have a not_graded grading type"
+        )
+      end
+
       it "raises error when feature is disabled" do
         course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(
@@ -366,7 +369,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review unlock date cannot be before assignment due date/
+            /Peer review available from date cannot be before assignment due date/
           )
         end
 
@@ -378,7 +381,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review due date cannot be before assignment unlock date/
+            /Peer review due date cannot be before assignment available from date/
           )
         end
 
@@ -390,7 +393,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review due date cannot be after assignment lock date/
+            /Peer review due date cannot be after assignment until date/
           )
         end
 
@@ -402,7 +405,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review lock date cannot be after assignment lock date/
+            /Peer review until date cannot be after assignment until date/
           )
         end
 
@@ -415,7 +418,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Due date cannot be before unlock date/
+            /Due date cannot be before available from date/
           )
         end
 
@@ -428,7 +431,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Due date cannot be after lock date/
+            /Due date cannot be after until date/
           )
         end
 
@@ -441,7 +444,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Unlock date cannot be after lock date/
+            /Available from date cannot be after until date/
           )
         end
       end
@@ -454,6 +457,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       expect(service).to receive(:validate_assignment_submission_types).ordered
       expect(service).to receive(:validate_feature_enabled).ordered
       expect(service).to receive(:validate_peer_review_sub_assignment_not_exist).ordered
+      expect(service).to receive(:validate_dates).ordered
 
       service.send(:run_validations)
     end
@@ -560,6 +564,28 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
 
     it "handles the case when there are no existing assessment requests" do
       expect { service.send(:link_existing_assessment_requests, peer_review_sub_assignment) }.not_to raise_error
+    end
+  end
+
+  describe "validation skip flags" do
+    context "when skip_date_validation is true" do
+      it "creates a peer review sub assignment even when dates would fail validation" do
+        parent_with_dates = assignment_model(
+          course:,
+          title: "Parent with Dates",
+          due_at: 1.week.from_now,
+          lock_at: 2.weeks.from_now,
+          peer_reviews: true
+        )
+        result = described_class.call(
+          parent_assignment: parent_with_dates,
+          points_possible: 10,
+          due_at: parent_with_dates.due_at - 1.day,
+          skip_date_validation: true
+        )
+        expect(result).to be_a(PeerReviewSubAssignment)
+        expect(result).to be_persisted
+      end
     end
   end
 

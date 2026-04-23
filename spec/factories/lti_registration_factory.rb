@@ -29,10 +29,10 @@ module Factories
     name: "Test Registration",
     admin_nickname: "Test Admin",
     description: "A test LTI registration",
-    vendor: "Test Vendor"
+    vendor: "Test Vendor",
+    lock_deploying: false
   }.with_indifferent_access.freeze
   DEFAULT_OVERLAY_PARAMS = {}.with_indifferent_access.freeze
-  DEFAULT_BINDING_PARAMS = { workflow_state: "on" }.with_indifferent_access.freeze
 
   def lti_registration_model(**params)
     params ||= {}
@@ -57,8 +57,7 @@ module Factories
                                  developer_key_params: {},
                                  registration_params: {},
                                  configuration_params: {},
-                                 overlay_params: {},
-                                 binding_params: {})
+                                 overlay_params: {})
     account ||= account_model
     created_by ||= user_model
 
@@ -67,7 +66,6 @@ module Factories
     configuration_params = Factories::LTI_TOOL_CONFIGURATION_BASE_ATTRS.with_indifferent_access
                                                                        .deep_merge(configuration_params)
     overlay_params = DEFAULT_OVERLAY_PARAMS.deep_merge(overlay_params)
-    binding_params = DEFAULT_BINDING_PARAMS.deep_merge(binding_params)
 
     registration = Lti::CreateRegistrationService.call(
       account:,
@@ -75,7 +73,6 @@ module Factories
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params:,
       developer_key_params:
     )
 

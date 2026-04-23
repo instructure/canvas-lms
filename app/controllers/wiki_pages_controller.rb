@@ -127,7 +127,7 @@ class WikiPagesController < ApplicationController
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
-        if @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
+        if @context.is_a?(Course) && @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
           @show_study_assist = true
           js_env[:FEATURES][:study_assist] = true
           js_env({
@@ -136,6 +136,16 @@ class WikiPagesController < ApplicationController
                    STUDY_ASSIST_TOOLS: study_assist_enabled_tools
                  })
           js_bundle :study_assist
+        end
+        if @context.is_a?(Course) && @context.account.feature_enabled?(:notebook) && @context.user_is_student?(@current_user)
+          @show_notebook = true
+          js_env[:FEATURES][:notebook] = true
+          js_env({
+                   WIKI_PAGE_ID: @page.url,
+                   WIKI_PAGE_UPDATED_AT: @page.updated_at.iso8601,
+                   JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
+                 })
+          js_bundle :notebook
         end
       end
 

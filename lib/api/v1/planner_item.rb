@@ -280,8 +280,14 @@ module Api::V1::PlannerItem
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
+      # For announcements: marking done in planner always clears new activity,
+      # regardless of unread counts (announcements have no replies to read).
+      return false if item.is_a?(Announcement) && item.planner_override_for(user)&.marked_complete?
+
       unread_count, read_state = opts.dig(:topics_status, topic.id)
-      return read_state == "unread" || unread_count > 0 if unread_count && read_state
+      if unread_count && read_state
+        return read_state == "unread" || unread_count > 0
+      end
       return topic.unread?(user) || topic.unread_count(user) > 0 if topic
     end
     if item.is_a?(SubAssignment)

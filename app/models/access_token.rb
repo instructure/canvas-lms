@@ -88,6 +88,8 @@ class AccessToken < ApplicationRecord
       # This block is only for checking if the user can manage their own tokens
       next false unless user.id == user_id
 
+      next false unless self.class.can_manage_own_access_tokens?(user)
+
       # if the session wasn't set up correctly, just ignore the additional restrictions
       next true unless (root_account = session&.dig(:root_account))
 
@@ -109,6 +111,8 @@ class AccessToken < ApplicationRecord
     can :read and can :delete
 
     given do |user|
+      next false if user.id == user_id && !self.class.can_manage_own_access_tokens?(user)
+
       self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
@@ -218,7 +222,17 @@ class AccessToken < ApplicationRecord
 
   def set_permanent_expiration
     expires_in = developer_key.tokens_expire_in
-    self.permanent_expires_at = Time.now.utc + expires_in if expires_in
+    # failsafe 1 week
+    if Account.site_admin.feature_enabled?(:site_admin_access_token_expiration) &&
+       Account.site_admin.grants_right?(user, :read) &&
+       (site_admin_expires_in = DynamicSettings.find(tree: :private)["site_admin_access_token_expires_in", failsafe: 604_800]&.seconds || 1.week)
+      expires_in = [expires_in, site_admin_expires_in].compact.min
+    end
+    if expires_in
+      expires_at = Time.now.utc + expires_in
+      expires_at = [permanent_expires_at, expires_at].compact.min if new_record?
+      self.permanent_expires_at = expires_at
+    end
   end
 
   def usable?(token_key = :crypted_token)
@@ -438,6 +452,17 @@ class AccessToken < ApplicationRecord
       # the developer key's shard, avoiding the background job overhead while
       # still remaining contention-safe at the DB level.
       DeveloperKey.increment_counter(:access_token_count, developer_key.id)
+    end
+  end
+
+  class << self
+    def can_manage_own_access_tokens?(user)
+      if Account.site_admin.grants_right?(user, :read) &&
+         !Account.site_admin.grants_right?(user, :site_admin_self_token_create)
+        return false
+      end
+
+      true
     end
   end
 end

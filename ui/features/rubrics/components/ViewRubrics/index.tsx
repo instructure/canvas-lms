@@ -18,7 +18,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {queryClient, useAllPages} from '@canvas/query'
+import {queryClient, useAllPages} from '@instructure/platform-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
@@ -45,7 +45,7 @@ import {
   downloadRubrics,
 } from '../../queries/ViewRubricQueries'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 import {ImportRubric} from './ImportRubric'
 import {colors} from '@instructure/canvas-theme'

@@ -18,7 +18,7 @@
 
 import HelpDialog from '@canvas/help-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
 import {IconButton} from '@instructure/ui-buttons'
@@ -84,7 +84,7 @@ export default function MobileGlobalMenu(props: Props) {
     queryFn: getExternalApps,
     staleTime: 2 * 60 * 1000, // two minutes,
     enabled: true,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
   const processedTools = useMemo(
     () => filterAndProcessTools(externalToolsData || []),
@@ -96,14 +96,14 @@ export default function MobileGlobalMenu(props: Props) {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const {data: hasCareerEnrollment} = useQuery({
     queryKey: ['experience_summary'],
     queryFn: experienceSummaryQuery,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     select: (data: ExperienceSummary) => {
       const {available_apps} = data
       return (

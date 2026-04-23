@@ -136,23 +136,27 @@ class AiExperiencesController < ApplicationController
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
     add_crumb @ai_experience.title
-    if @context.feature_enabled?(:ai_experiences_context_file_upload) &&
-       @ai_experience.llm_conversation_context_id.present?
-      LLMConversationContextManager.sync_index_status(ai_experience: @ai_experience)
-    end
 
     respond_to do |format|
       format.html do
         @page_title = @ai_experience.title
         js_bundle :ai_experiences_show
-        js_env({ AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:) })
+        js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: @ai_experience.id })
         js_env[:FEATURES] ||= {}
         js_env[:FEATURES][:ai_experiences_context_file_upload] =
           @context.feature_enabled?(:ai_experiences_context_file_upload)
         render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
                layout: true
       end
-      format.json { render json: ai_experience_json(@experience, @current_user, session, can_manage:) }
+      format.json do
+        failed_file_names = []
+        if @context.feature_enabled?(:ai_experiences_context_file_upload) &&
+           @ai_experience.llm_conversation_context_id.present?
+          result = AiExperiences::ConversationContextDocumentsService.new.sync_index_status(ai_experience: @ai_experience)
+          failed_file_names = result&.dig(:failed_file_names) || []
+        end
+        render json: ai_experience_json(@ai_experience, @current_user, session, can_manage:, failed_context_file_names: failed_file_names)
+      end
     end
   end
 
@@ -374,21 +378,10 @@ class AiExperiencesController < ApplicationController
       return render json: { error: "Conversation not found" }, status: :not_found
     end
 
-    # Initialize LLM client to fetch message history from the llm-conversation service.
-    # We use the student's user context to ensure proper authorization and conversation continuity.
-    # The client handles communication with the external LLM service that stores the actual messages.
-    client = LLMConversationClient.new(
-      current_user: @conversation.user,
-      requesting_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
+    messages_and_progress = AiExperiences::ConversationMessagesService.new.fetch_with_progress(
+      conversation_id: @conversation.llm_conversation_id,
+      requesting_user: @current_user
     )
-
-    messages_and_progress = client.messages_with_conversation_progress
 
     render json: ai_conversation_json(
       @conversation,
@@ -486,8 +479,11 @@ class AiExperiencesController < ApplicationController
         exp.context_index_status == "in_progress"
     end
 
+    return if experiences_to_sync.empty?
+
+    service = AiExperiences::ConversationContextDocumentsService.new
     experiences_to_sync.each do |experience|
-      LLMConversationContextManager.sync_index_status(ai_experience: experience)
+      service.sync_index_status(ai_experience: experience)
     end
   end
 

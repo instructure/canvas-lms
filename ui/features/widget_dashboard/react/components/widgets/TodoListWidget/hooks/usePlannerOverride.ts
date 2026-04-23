@@ -21,7 +21,7 @@ import {createPlannerOverride, updatePlannerOverride} from '../api'
 import type {PlannerItem, PlannerOverride} from '../types'
 import {PLANNER_ITEMS_QUERY_KEY} from './usePlannerItems'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('widget_dashboard')
 

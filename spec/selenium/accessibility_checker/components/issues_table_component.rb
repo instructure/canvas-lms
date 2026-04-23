@@ -177,6 +177,11 @@ class IssuesTableComponent
       wait_for_ajaximations
     end
 
+    def click_resource_name_link
+      f("[data-pendo='navigate-to-resource-url']", @row).click
+      wait_for_ajaximations
+    end
+
     def resource_name
       f("td", @row).text
     end

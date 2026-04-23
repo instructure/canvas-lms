@@ -18,7 +18,7 @@
 
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
+import {List} from '@instructure/ui-list'
 import formatMessage from 'format-message'
 import {useMemo} from 'react'
 import {sortedAsrLanguageList} from '../asrClosedCaptionLanguages'
@@ -30,6 +30,7 @@ import {CaptionRow} from './CaptionRow'
 import {doAsrRequest} from './hooks/doAsrRequest'
 import {useClosedCaptionState} from './hooks/useClosedCaptionState'
 import {useClosedCaptionUpload} from './hooks/useClosedCaptionUpload'
+import {useFocusManagement} from './hooks/useFocusManagement'
 import {useLanguageFiltering} from './hooks/useLanguageFiltering'
 import {ManualCaptionCreator} from './ManualCaptionCreator'
 import type {CaptionUploadConfig, LanguageOption, Subtitle} from './types'
@@ -93,6 +94,9 @@ export function ClosedCaptionPanelV2({
     subtitles: state.subtitles,
   })
 
+  const {setAddNewButtonRef, setCreationFormRef, setDeleteButtonRef, queueFocus} =
+    useFocusManagement()
+
   // Always use immediate upload hook (this component always uploads immediately)
   const upload = useClosedCaptionUpload({
     uploadConfig,
@@ -111,6 +115,15 @@ export function ClosedCaptionPanelV2({
       state.handleCaptionUploadFailed(locale, 'upload')
     },
     onDeleteSuccess: locale => {
+      const currentSubtitles = state.subtitles
+      const deletedIndex = currentSubtitles.findIndex(s => s.locale === locale)
+      const remaining = currentSubtitles.filter(s => s.locale !== locale)
+      if (remaining.length > 0) {
+        const targetIndex = Math.min(deletedIndex, remaining.length - 1)
+        queueFocus({type: 'afterDelete', targetLocale: remaining[targetIndex].locale})
+      } else {
+        queueFocus({type: 'addNew'})
+      }
       state.handleDeleteRow(locale)
       onCaptionDeleted?.(locale)
     },
@@ -170,50 +183,57 @@ export function ClosedCaptionPanelV2({
 
       {/* Existing captions */}
       {state.subtitles.length > 0 && (
-        <View>
+        <List isUnstyled aria-label={formatMessage('Captions')} margin="0">
           {state.subtitles.map(subtitle => {
             const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
+            const captionName = getCaptionName(subtitle, language)
             const deleteHandler = () => {
               trackPendoEvent('canvas_caption_item_action', {
                 action: 'delete',
                 caption_source: subtitle.asr ? 'automatic' : 'uploaded',
                 language: subtitle.locale,
               })
+              state.setAnnouncement(formatMessage('Deleting {captionName}', {captionName}))
               upload.deleteCaption(subtitle.locale)
             }
             // Client-side failures (failedOperation is set) get retry only.
             // Server-side failures (no failedOperation) get delete only.
             const showDelete = subtitle.workflow_state !== 'failed' || !subtitle.failedOperation
             return (
-              <CaptionRow
-                url={subtitle.url}
-                filename={subtitle.filename}
-                key={subtitle.locale}
-                workflow_state={subtitle.workflow_state ?? 'ready'}
-                captionName={getCaptionName(subtitle, language)}
-                errorMessage={subtitle.errorMessage}
-                onRetry={getRetryHandler(subtitle)}
-                isInherited={subtitle.inherited}
-                onDelete={showDelete ? deleteHandler : undefined}
-              />
+              <List.Item key={subtitle.locale}>
+                <CaptionRow
+                  url={subtitle.url}
+                  filename={subtitle.filename}
+                  workflow_state={subtitle.workflow_state ?? 'ready'}
+                  captionName={getCaptionName(subtitle, language)}
+                  errorMessage={subtitle.errorMessage}
+                  onRetry={getRetryHandler(subtitle)}
+                  isInherited={subtitle.inherited}
+                  onDelete={showDelete ? deleteHandler : undefined}
+                  deleteButtonRef={setDeleteButtonRef(subtitle.locale)}
+                />
+              </List.Item>
             )
           })}
-        </View>
+        </List>
       )}
 
       {state.creationMode === null && (
         <CaptionCreationModePicker
           onSelect={state.handleCreationModeSelect}
           showAutoOption={!hasAutoCaptionAlready}
+          addNewButtonRef={setAddNewButtonRef}
         />
       )}
 
       {state.creationMode === 'manual' && (
         <ManualCaptionCreator
+          elementRef={setCreationFormRef}
           languages={availableManualLanguages}
           liveRegion={liveRegion}
           mountNode={mountNode}
           onCancel={() => {
+            queueFocus({type: 'addNew'})
             state.handleCancelCreation()
             onDirtyStateChanged?.(false)
           }}
@@ -224,6 +244,10 @@ export function ClosedCaptionPanelV2({
                 flow_type: 'upload_file',
                 language: languageId,
               })
+              queueFocus({type: 'addNew'})
+              state.setAnnouncement(
+                formatMessage('Uploading {lang} caption', {lang: language.label}),
+              )
               state.handleCaptionProcessing({locale: languageId, file})
               upload.uploadCaption(languageId, file)
             }
@@ -235,7 +259,9 @@ export function ClosedCaptionPanelV2({
 
       {state.creationMode === 'auto' && (
         <AutoCaptioning
+          elementRef={setCreationFormRef}
           onCancel={() => {
+            queueFocus({type: 'addNew'})
             state.handleCancelCreation()
             onDirtyStateChanged?.(false)
           }}
@@ -249,6 +275,10 @@ export function ClosedCaptionPanelV2({
                 flow_type: 'request_auto',
                 language: languageId,
               })
+              queueFocus({type: 'addNew'})
+              state.setAnnouncement(
+                formatMessage('Requesting {lang} caption', {lang: language.label}),
+              )
               state.handleCaptionProcessing({locale: languageId, isAsr: true})
               doAsrRequest(uploadConfig, languageId).catch(() => {
                 trackPendoEvent('canvas_caption_result', {

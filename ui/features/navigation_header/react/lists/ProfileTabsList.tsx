@@ -26,7 +26,7 @@ import HighContrastModeToggle from '../trays/HighContrastModeToggle'
 import {ActiveText} from './utils'
 import profileQuery from '../queries/profileQuery'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('CoursesTray')
 
@@ -34,7 +34,7 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['profile'],
     queryFn: profileQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   return (

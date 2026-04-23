@@ -21,7 +21,7 @@ import type {Root} from 'react-dom/client'
 import {render} from '@canvas/react'
 import {Module as ModuleType} from '@canvas/context-modules/differentiated-modules/react/types'
 import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-modules/react/DifferentiatedModulesTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {InfiniteData} from '@tanstack/react-query'
 import type {
   HTMLElementWithRoot,
@@ -30,7 +30,7 @@ import type {
   PaginatedNavigationResponse,
 } from '../utils/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
 import EditItemModal from '../componentsTeacher/EditItemModal'
 

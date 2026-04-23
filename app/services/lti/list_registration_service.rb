@@ -173,10 +173,17 @@ module Lti
     end
 
     def inherited_on_registration_ids(account_registrations, forced_on_registrations)
-      Lti::RegistrationAccountBinding
-        .where(workflow_state: "on")
-        .where(account:)
-        .where.not(registration_id: (account_registrations.map(&:id) + forced_on_registrations.map(&:id)).uniq)
+      scope = Lti::RegistrationAccountBinding
+              .where(account:)
+              .where.not(registration_id: (account_registrations.map(&:id) + forced_on_registrations.map(&:id)).uniq)
+
+      scope = if account.root_account.feature_enabled?(:lti_deactivate_registrations)
+                scope.where.not(workflow_state: :deleted)
+              else
+                scope.where(workflow_state: :on)
+              end
+
+      scope
         .pluck(:registration_id)
         .uniq
     end

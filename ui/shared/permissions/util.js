@@ -150,6 +150,8 @@ export function groupGranularPermissionsInRole(role) {
           explicit: [],
           locked: [],
           readonly: [],
+          applies_to_self: [],
+          applies_to_descendants: [],
           granular_permissions: [],
         }
       }
@@ -165,6 +167,8 @@ export function groupGranularPermissionsInRole(role) {
         groups[group_name].explicit.push(permission.explicit)
         groups[group_name].locked.push(permission.locked)
         groups[group_name].readonly.push(permission.readonly)
+        groups[group_name].applies_to_self.push(permission.applies_to_self)
+        groups[group_name].applies_to_descendants.push(permission.applies_to_descendants)
         groups[group_name].granular_permissions.push(permission)
       }
     }
@@ -175,6 +179,8 @@ export function groupGranularPermissionsInRole(role) {
       built_from_granular_permissions: true,
       enabled: groupPermissionEnabled(group.enabled),
       explicit: group.explicit.some(bool => bool),
+      applies_to_self: group.applies_to_self.every(x => x !== false),
+      applies_to_descendants: group.applies_to_descendants.every(x => x !== false),
       locked: group.locked.every(bool => bool),
       readonly: group.readonly.some(bool => bool),
     }

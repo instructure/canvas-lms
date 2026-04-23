@@ -34,7 +34,7 @@ import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {
   useResetLtiRegistration,
@@ -48,6 +48,8 @@ import {launchTypeSpecificSettingsLabels} from '../../../registration_wizard_for
 import {Section, SubSection} from '../../../components/Section'
 import {LaunchSettingsReadOnlyView} from '../../../components/LaunchSettingsReadOnlyView'
 import {IconUrlsReadOnlyView} from '../../../components/IconUrlsReadOnlyView'
+import {extractSubstitutionVariables} from '../../../lib/extractSubstitutionVariables'
+import {CustomVariablesList} from '../../../components/CustomVariablesList'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -91,7 +93,6 @@ export const ToolConfigurationView = () => {
   const mutation = useResetLtiRegistration()
   const navigate = useNavigate()
 
-  const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
   const enabledPlacements = filterPlacementObjectsByFeatureFlags(
     registration.overlaid_configuration.placements.filter(p => {
@@ -212,9 +213,14 @@ export const ToolConfigurationView = () => {
       </Section>
 
       <Section title={I18n.t('Data Sharing')}>
-        {i18nLtiPrivacyLevel(
-          registration.overlaid_configuration.privacy_level || DefaultLtiPrivacyLevel,
-        )}
+        <SubSection title={I18n.t('Privacy Level')}>
+          <Text>
+            {i18nLtiPrivacyLevel(
+              registration.overlaid_configuration.privacy_level || DefaultLtiPrivacyLevel,
+            )}
+          </Text>
+        </SubSection>
+        <CustomVariablesList internalConfiguration={registration.overlaid_configuration} />
       </Section>
 
       <Section title={I18n.t('Placements')}>

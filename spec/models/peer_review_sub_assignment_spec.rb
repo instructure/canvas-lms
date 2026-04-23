@@ -247,27 +247,40 @@ RSpec.describe PeerReviewSubAssignment do
       end
     end
 
-    describe "#sync_submission_types_with_grading_type" do
-      it "sets submission_types to 'peer_review' when grading_type is 'points'" do
-        peer_review_sub_assignment = PeerReviewSubAssignment.new(
-          parent_assignment:,
-          grading_type: "points"
-        )
-        # .valid? triggers the before_validation callback without persisting to database
-        peer_review_sub_assignment.valid?
-        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-      end
-
-      it "sets submission_types to 'not_graded' when grading_type is 'not_graded'" do
+    describe "grading_type validation" do
+      it "rejects not_graded grading_type on creation" do
         peer_review_sub_assignment = PeerReviewSubAssignment.new(
           parent_assignment:,
           grading_type: "not_graded"
         )
-        peer_review_sub_assignment.valid?
-        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
+        expect(peer_review_sub_assignment).not_to be_valid
+        expect(peer_review_sub_assignment.errors[:grading_type]).to include("cannot be not_graded for peer review sub assignments")
       end
 
-      it "auto-corrects invalid submission_types to 'peer_review' based on grading_type" do
+      it "rejects not_graded grading_type on update" do
+        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment:,
+          grading_type: "points"
+        )
+        peer_review_sub_assignment.grading_type = "not_graded"
+        expect(peer_review_sub_assignment).not_to be_valid
+        expect(peer_review_sub_assignment.errors[:grading_type]).to include("cannot be not_graded for peer review sub assignments")
+      end
+    end
+
+    describe "#set_submission_types" do
+      it "always sets submission_types to peer_review regardless of grading_type" do
+        %w[points percent letter_grade gpa_scale pass_fail].each do |grading_type|
+          peer_review_sub_assignment = PeerReviewSubAssignment.new(
+            parent_assignment:,
+            grading_type:
+          )
+          peer_review_sub_assignment.valid?
+          expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
+        end
+      end
+
+      it "always overrides any manually set submission_types to 'peer_review'" do
         peer_review_sub_assignment = PeerReviewSubAssignment.new(
           parent_assignment:,
           submission_types: "online_text_entry",
@@ -277,65 +290,10 @@ RSpec.describe PeerReviewSubAssignment do
         expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
       end
 
-      it "auto-corrects invalid submission_types to 'not_graded' based on grading_type" do
-        peer_review_sub_assignment = PeerReviewSubAssignment.new(
-          parent_assignment:,
-          submission_types: "online_upload",
-          grading_type: "not_graded"
-        )
-        peer_review_sub_assignment.valid?
-        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
-      end
-
-      it "updates submission_types when grading_type changes to 'not_graded'" do
-        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
-          parent_assignment:,
-          grading_type: "points"
-        )
-        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-
-        peer_review_sub_assignment.grading_type = "not_graded"
-        peer_review_sub_assignment.valid?
-        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
-      end
-
-      it "updates submission_types when grading_type changes from 'not_graded' to 'points'" do
-        peer_review_sub_assignment = PeerReviewSubAssignment.create!(
-          parent_assignment:,
-          grading_type: "not_graded"
-        )
-        expect(peer_review_sub_assignment.submission_types).to eq("not_graded")
-
-        peer_review_sub_assignment.grading_type = "points"
-        peer_review_sub_assignment.valid?
-        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-      end
-
       it "defaults to 'peer_review' when grading_type is not specified" do
         peer_review_sub_assignment = PeerReviewSubAssignment.new(parent_assignment:)
         peer_review_sub_assignment.valid?
         expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-      end
-
-      it "overrides manually set submission_types with value based on grading_type" do
-        peer_review_sub_assignment = PeerReviewSubAssignment.new(
-          parent_assignment:,
-          submission_types: "external_tool",
-          grading_type: "points"
-        )
-        peer_review_sub_assignment.valid?
-        expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-      end
-
-      it "handles all grading types correctly" do
-        %w[points percent letter_grade gpa_scale pass_fail].each do |grading_type|
-          peer_review_sub_assignment = PeerReviewSubAssignment.new(
-            parent_assignment:,
-            grading_type:
-          )
-          peer_review_sub_assignment.valid?
-          expect(peer_review_sub_assignment.submission_types).to eq(PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE)
-        end
       end
     end
   end
@@ -627,6 +585,28 @@ RSpec.describe PeerReviewSubAssignment do
       # other_teacher has not ignored it
       result = PeerReviewSubAssignment.not_ignored_by(other_teacher, "grading")
       expect(result).to include(peer_review_sub_assignment1)
+    end
+  end
+
+  describe ".generate_title" do
+    let(:assignment) { instance_double(Assignment, title: "My Assignment") }
+
+    it "includes the peer review count in the title when count is greater than 0" do
+      allow(assignment).to receive(:peer_review_count).and_return(3)
+      expected = I18n.t("%{title} Peer Review (%{count})", title: "My Assignment", count: 3)
+      expect(PeerReviewSubAssignment.generate_title(assignment)).to eq(expected)
+    end
+
+    it "omits the count from the title when peer_review_count is nil" do
+      allow(assignment).to receive(:peer_review_count).and_return(nil)
+      expected = I18n.t("%{title} Peer Review", title: "My Assignment")
+      expect(PeerReviewSubAssignment.generate_title(assignment)).to eq(expected)
+    end
+
+    it "omits the count from the title when peer_review_count is 0" do
+      allow(assignment).to receive(:peer_review_count).and_return(0)
+      expected = I18n.t("%{title} Peer Review", title: "My Assignment")
+      expect(PeerReviewSubAssignment.generate_title(assignment)).to eq(expected)
     end
   end
 

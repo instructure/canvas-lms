@@ -24,7 +24,7 @@ import {
   ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES,
 } from '../../../graphql/Queries'
 import {useQuery} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {decodeHTMLShortName} from '../../../util/utils'
 

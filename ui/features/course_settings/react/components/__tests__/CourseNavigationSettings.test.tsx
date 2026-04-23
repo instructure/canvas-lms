@@ -75,7 +75,7 @@ const triggerMockDragEnd = (result: any) => {
   }
 }
 
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CourseNavigationSettings from '../CourseNavigationSettings'
 import {NavigationTab, useTabListsStore} from '../../store/useTabListsStore'
@@ -159,8 +159,10 @@ beforeEach(() => {
   fakeENV.setup({
     COURSE_SETTINGS_NAVIGATION_TABS: [...defaultEnabledTabs, ...defaultDisabledTabs],
     K5_SUBJECT_COURSE: false,
+    FEATURES: {nav_menu_links: true},
     PERMISSIONS: {
       manage_nav_menu_links: true,
+      manage_course_navigation: true,
     },
   })
 
@@ -202,6 +204,60 @@ describe('CourseNavigationSettings', () => {
     expect(
       screen.getByText('Drag and drop items to reorder them in the course navigation.'),
     ).toBeInTheDocument()
+  })
+
+  describe('manage_course_navigation permission', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        ...ENV,
+        PERMISSIONS: {
+          manage_nav_menu_links: true,
+          manage_course_navigation: false,
+        },
+      })
+    })
+
+    it('hides drag handles when manage_course_navigation is false', () => {
+      const {container} = render(<CourseNavigationSettings {...defaultProps} />)
+      const dragHandles = container.querySelectorAll('[name="IconDragHandle"]')
+      expect(dragHandles).toHaveLength(0)
+    })
+
+    it('hides settings menus for all tabs when manage_course_navigation is false', () => {
+      render(<CourseNavigationSettings {...defaultProps} />)
+      const settingsButtons = screen.queryAllByLabelText('Settings for')
+      expect(settingsButtons).toHaveLength(0)
+    })
+
+    it('hides Add Link button when manage_course_navigation is true, but manage_nav_menu_links is false', () => {
+      fakeENV.setup({
+        ...ENV,
+        FEATURES: {nav_menu_links: true},
+        PERMISSIONS: {manage_nav_menu_links: false, manage_course_navigation: true},
+      })
+      render(<CourseNavigationSettings {...defaultProps} />)
+      expect(() => screen.getByText('Add a Link')).toThrow(
+        /Unable to find an element with the text:/,
+      )
+    })
+
+    it('Does not display the reorder text when the permission is disabled', () => {
+      fakeENV.setup({
+        ...ENV,
+        PERMISSIONS: {manage_nav_menu_links: true, manage_course_navigation: false},
+      })
+      render(<CourseNavigationSettings {...defaultProps} />)
+      expect(() =>
+        screen.getByText('Drag and drop items to reorder them in the course navigation.'),
+      ).toThrow(/Unable to find an element with the text:/)
+    })
+
+    it('still renders tab labels in read-only mode', () => {
+      render(<CourseNavigationSettings {...defaultProps} />)
+      expect(screen.getByText('Home')).toBeInTheDocument()
+      expect(screen.getByText('Assignments')).toBeInTheDocument()
+      expect(screen.getByText('Grades')).toBeInTheDocument()
+    })
   })
 
   it('handles drag and drop operations correctly', () => {
@@ -315,6 +371,56 @@ describe('CourseNavigationSettings', () => {
       'button[aria-label*="Settings"]',
     )
     expect(discussionsSettingsButton).not.toBeInTheDocument()
+  })
+
+  it('shows url as external link for enabled link tab', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const link = screen.getByRole('link', {name: /https:\/\/example\.com/})
+    expect(link).toHaveAttribute('href', 'https://example.com')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('shows url as external link for disabled link tab', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const link = screen.getByRole('link', {name: /https:\/\/disabled\.com/})
+    expect(link).toHaveAttribute('href', 'https://disabled.com')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('shows url as external link for new link tabs', () => {
+    useTabListsStore.setState({
+      enabledTabs: [
+        ...defaultEnabledTabs,
+        {
+          type: 'newLink',
+          internalId: 'new-1',
+          label: 'My New Link',
+          href: 'nav_menu_link_url',
+          args: ['https://newlink.example.com'],
+        },
+      ],
+      disabledTabs: defaultDisabledTabs,
+    })
+
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const link = screen.getByRole('link', {name: /https:\/\/newlink\.example\.com/})
+    expect(link).toHaveAttribute('href', 'https://newlink.example.com')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('does not show url for non-link tabs', () => {
+    render(<CourseNavigationSettings {...defaultProps} />)
+
+    const assignmentsTab = screen
+      .getByText('Assignments')
+      .closest('[id^="nav_edit_tab_id_"]') as HTMLElement
+    expect(within(assignmentsTab).queryByRole('link')).not.toBeInTheDocument()
   })
 
   it('shows link icon only for items with linkUrl', () => {

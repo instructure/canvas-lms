@@ -2133,6 +2133,92 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    context "when duplicating an assignment with a peer review sub assignment" do
+      let(:assignment_with_peer_review) do
+        a = assignment_model(
+          course: @course,
+          title: "PR Assignment",
+          points_possible: 10,
+          peer_review_count: 2,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment: a)
+        a.reload
+      end
+      let(:original_peer_review_sub) { assignment_with_peer_review.peer_review_sub_assignment }
+      let(:new_assignment) { Assignment.find_by!(duplicate_of: assignment_with_peer_review.id) }
+
+      context "when the feature flag is enabled" do
+        before do
+          api_call_as_user(
+            @teacher,
+            :post,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment_with_peer_review.id}/duplicate.json",
+            {
+              controller: "assignments_api",
+              action: "duplicate",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: assignment_with_peer_review.id.to_s
+            },
+            {},
+            {},
+            { expected_status: 200 }
+          )
+        end
+
+        it "duplicates the peer review sub assignment" do
+          expect(new_assignment.peer_review_sub_assignment).to be_present
+        end
+
+        it "links the duplicated sub assignment to the new assignment" do
+          expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).to eq(new_assignment.id)
+        end
+
+        it "preserves peer_review_count on the duplicated assignment" do
+          expect(new_assignment.peer_review_count).to eq(assignment_with_peer_review.peer_review_count)
+        end
+
+        it "preserves due_at, unlock_at, and lock_at on the duplicated peer review sub assignment" do
+          new_peer_review_sub = new_assignment.peer_review_sub_assignment
+          expect(new_peer_review_sub.due_at).to eq(original_peer_review_sub.due_at)
+          expect(new_peer_review_sub.unlock_at).to eq(original_peer_review_sub.unlock_at)
+          expect(new_peer_review_sub.lock_at).to eq(original_peer_review_sub.lock_at)
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          assignment_with_peer_review # force evaluation while flag is enabled by peer_review_model factory
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+          api_call_as_user(
+            @teacher,
+            :post,
+            "/api/v1/courses/#{@course.id}/assignments/#{assignment_with_peer_review.id}/duplicate.json",
+            {
+              controller: "assignments_api",
+              action: "duplicate",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: assignment_with_peer_review.id.to_s
+            },
+            {},
+            {},
+            { expected_status: 200 }
+          )
+        end
+
+        it "does not duplicate the peer review sub assignment" do
+          expect(new_assignment.peer_review_sub_assignment).to be_nil
+        end
+
+        it "does not cause regression for the duplicated assignment" do
+          expect(new_assignment.peer_review_count).to eq(0)
+        end
+      end
+    end
+
     context "when the assignment is duplicated in context" do
       subject do
         api_call_as_user(
@@ -6313,7 +6399,7 @@ describe AssignmentsApiController, type: :request do
             points_possible: 50,
             peer_review_overrides: [{ course_section_id: 1, due_at: "invalid" }]
           }
-          error_message = "Unlock date cannot be after lock date"
+          error_message = "Available from date cannot be after until date"
 
           peer_review_sub_assignment = instance_double(PeerReviewSubAssignment)
           allow(PeerReview::PeerReviewUpdaterService).to receive(:call).and_return(peer_review_sub_assignment)

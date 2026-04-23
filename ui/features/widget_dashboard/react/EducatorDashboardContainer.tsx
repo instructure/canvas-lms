@@ -36,12 +36,11 @@ import {EDUCATOR_DASHBOARD_THEME} from './educatorDashboardTheme'
 const I18n = createI18nScope('widget_dashboard')
 
 const EducatorDashboardContainer = () => {
-  const {currentUser, dashboardFeatures} = useWidgetDashboard()
+  const {currentUser} = useWidgetDashboard()
   const {isMobile} = useResponsiveContext()
   const {isEditMode, isDirty, isSaving, saveError, enterEditMode, exitEditMode, clearError} =
     useWidgetDashboardEdit()
   const {resetConfig, saveLayout} = useWidgetLayout()
-  const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
   const customizeButtonRef = useRef<Element | null>(null)
   const wasEditModeRef = useRef(isEditMode)
 
@@ -103,40 +102,44 @@ const EducatorDashboardContainer = () => {
               {greeting}
             </Heading>
           </Flex.Item>
-          {isCustomizationEnabled &&
-            (isEditMode ? (
-              <>
-                <Flex.Item>
-                  <Button onClick={handleCancel} data-testid="cancel-customize-button">
-                    {I18n.t('Cancel')}
-                  </Button>
-                </Flex.Item>
-                <Flex.Item>
-                  <Button
-                    color="primary"
-                    onClick={handleSave}
-                    interaction={isSaving ? 'disabled' : 'enabled'}
-                    data-testid="save-customize-button"
-                  >
-                    {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
-                  </Button>
-                </Flex.Item>
-              </>
-            ) : (
+          {isEditMode ? (
+            <>
               <Flex.Item>
-                <Button
-                  elementRef={el => {
-                    customizeButtonRef.current = el
-                  }}
-                  onClick={enterEditMode}
-                  renderIcon={<IconSettingsLine />}
-                  color="primary"
-                  data-testid="customize-dashboard-button"
-                >
-                  {I18n.t('Customize')}
+                <Button onClick={handleCancel} data-testid="cancel-customize-button">
+                  {I18n.t('Cancel')}
                 </Button>
               </Flex.Item>
-            ))}
+              <Flex.Item>
+                <Button
+                  color="primary"
+                  onClick={handleSave}
+                  interaction={isSaving ? 'disabled' : 'enabled'}
+                  data-testid="save-customize-button"
+                >
+                  {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
+                </Button>
+              </Flex.Item>
+            </>
+          ) : (
+            <Flex.Item>
+              <Button
+                elementRef={el => {
+                  customizeButtonRef.current = el
+                }}
+                onClick={enterEditMode}
+                renderIcon={<IconSettingsLine />}
+                color="primary"
+                data-testid="customize-dashboard-button"
+              >
+                {I18n.t('Customize')}
+              </Button>
+            </Flex.Item>
+          )}
+          {ENV.add_oak_mount_point && (
+            <Flex.Item>
+              <div id="oak-mount-point"></div>
+            </Flex.Item>
+          )}
         </Flex>
         <DashboardTabs />
       </View>

@@ -63,6 +63,18 @@ module FeatureFlags
       false
     end
 
+    def self.tier_1_visible_on_hook(_context)
+      true
+    end
+
+    def self.tier_2_visible_on_hook(_context)
+      true
+    end
+
+    def self.tier_3_visible_on_hook(_context)
+      true
+    end
+
     def self.quizzes_next_visible_on_hook(context)
       root_account = context.root_account
       # assume all Quizzes.Next provisions so far have been done through uuid_provisioner
@@ -136,6 +148,15 @@ module FeatureFlags
                                   new_state == "on"
                                 )
       end
+    end
+
+    def self.provision_ai_experience_after_change_hook(_user, context, _old_state, _new_state)
+      AiExperiences::Jobs::AiExperienceProvisionJob.delay(
+        run_at: 10.seconds.from_now,
+        singleton: "ai_experience_provision:#{context.uuid}",
+        on_conflict: :overwrite, # Ensures that job launches 10 seconds after final feature flag flip
+        max_attempts: 3
+      ).provision_account_for_ai_experiences(context)
     end
 
     def self.assignment_enhancements_prereq_for_stickers_hook(_user, context, _old_state, new_state)

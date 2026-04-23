@@ -149,6 +149,32 @@ describe('HistoryActions', () => {
     expect(pointsPossibleCurrent).toBe('–')
   })
 
+  test('fetchHistorySuccess returns "0" pointsPossibleAfter when an assignment has zero points possible', () => {
+    const response = {
+      data: {
+        events: [{points_possible_after: 0, links: {}}],
+        linked: {assignments: []},
+      },
+      headers: {},
+    }
+    const {pointsPossibleAfter} = fetchHistorySuccess(response.data, response.headers).payload
+      .items[0]
+    expect(pointsPossibleAfter).toBe('0')
+  })
+
+  test('fetchHistorySuccess returns "0" pointsPossibleBefore when an assignment had zero points possible', () => {
+    const response = {
+      data: {
+        events: [{points_possible_before: 0, links: {}}],
+        linked: {assignments: []},
+      },
+      headers: {},
+    }
+    const {pointsPossibleBefore} = fetchHistorySuccess(response.data, response.headers).payload
+      .items[0]
+    expect(pointsPossibleBefore).toBe('0')
+  })
+
   test('fetchHistorySuccess returns "–" pointsPossibleAfter when an assignment now has no points possible', () => {
     const response = {
       data: {

@@ -765,8 +765,9 @@ class AccountsController < ApplicationController
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
-  # @argument enrollment_term_id [Integer]
-  #   If set, only includes courses from the specified term.
+  # @argument enrollment_term_id[] [Integer]
+  #   If set, only includes courses from the specified terms. Can be either a single ID or
+  #   an array of enrollment term IDs.
   #
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
@@ -983,8 +984,12 @@ class AccountsController < ApplicationController
     end
 
     if params[:enrollment_term_id]
-      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
-      @courses = @courses.for_term(term)
+      terms = if params[:enrollment_term_id].is_a?(Array)
+                api_find_all(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              else
+                api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              end
+      @courses = @courses.for_term(terms)
     end
 
     if params[:search_term]
@@ -2076,7 +2081,8 @@ class AccountsController < ApplicationController
       is_site_admin = Account.site_admin.grants_right?(@current_user, :read) &&
                       !@account.account_users.active.where(user_id: @current_user).exists?
       js_env({
-               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin
+               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin,
+               INSTITUTIONAL_TAGS_ENABLED: @account.root_account.feature_enabled?(:institutional_tags)
              })
 
       @current_batch = @account.current_sis_batch
@@ -2143,6 +2149,15 @@ class AccountsController < ApplicationController
       can_add_designer: @account.grants_right?(@current_user, session, :add_designer_to_course),
       can_add_observer: @account.grants_right?(@current_user, session, :add_observer_to_course)
     }
+
+    if @account.root_account.feature_enabled?(:institutional_tags)
+      js_permissions[:can_view_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_view)
+      js_permissions[:can_create_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_create)
+      js_permissions[:can_edit_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_edit)
+    end
 
     if @account.root_account.feature_enabled?(:temporary_enrollments)
       js_permissions[:can_add_temporary_enrollments] =
@@ -2418,6 +2433,7 @@ class AccountsController < ApplicationController
                                    :external_notification_warning,
                                    :global_includes,
                                    :google_docs_domain,
+                                   :has_underage_users,
                                    :help_link_icon,
                                    :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,

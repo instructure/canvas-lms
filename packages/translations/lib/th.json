@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "อาฟริกา"
     },
-    "ai_response_9624e8e8": {
-        "message": "การตอบกลับของ AI"
-    },
-    "ai_tools_fda01177": {
-        "message": "เครื่องมือ AI"
-    },
     "albanian_21ed929e": {
         "message": "อัลเบเนีย"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "เกิดข้อผิดพลาดขณะทำคำขอผ่านเครือข่าย"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "เกิดข้อผิดพลาดในการประมวลผลคำขอของคุณ"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "เกิดข้อผิดพลาดขณะอัพโหลดสื่อของคุณ"
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "เลือกไฟล์"
     },
+    "choose_file_required_61f0d716": {
+        "message": "เลือกไฟล์ (บังคับ)"
+    },
     "choose_usage_rights_33683854": {
         "message": "เลือกสิทธิ์การใช้งาน..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "จำนวนเชิงซ้อน"
     },
-    "compose_44c904f4": {
-        "message": "เขียน"
-    },
     "computer_1d7dfa6f": {
         "message": "คอมพิวเตอร์"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproduct"
-    },
-    "copy_9748f9f": {
-        "message": "คัดลอก"
     },
     "copyright_holder_66ee111": {
         "message": "ผู้ถือลิขสิทธิ์:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "กำหนดเอง"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "ความกว้างและความสูงกำหนดเอง (พิกเซล)"
     },
     "cyan_c1d5f68a": {
         "message": "ฟ้า"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "ประเภทขนาด"
     },
-    "dimensions_45ddb7b7": {
-        "message": "ขนาด"
-    },
     "directionality_26ae9e08": {
         "message": "ทิศทาง"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "ยูเนียนที่ไม่เกี่ยวพันกัน"
-    },
-    "dislike_14befc48": {
-        "message": "ไม่ชอบ"
     },
     "display_options_315aba85": {
         "message": "แสดงตัวเลือก"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "กรอกข้อความค้นหา"
     },
-    "enter_text_8b35c65b": {
-        "message": "กรอกข้อความ"
-    },
     "epsilon_54bb8afa": {
         "message": "เอปไซลอน"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "ไม่สามารถสืบค้นเนื้อหาของไฟล์"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "ไม่สามารถคัดลอกคำตอบได้"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "ไม่สามารถเรียกค้นเนื้อหาจากเครื่องมือภายนอก"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "ความสูง"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "สวัสดี กรุณาระบุการปรับแต่งที่คุณต้องการดำเนินการสำหรับผลงานของคุณ"
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "สวัสดี กรุณาระบุการปรับแต่งที่คุณต้องการดำเนินการสำหรับรายการที่คุณเลือก"
-    },
     "hexagon_d8468e0d": {
         "message": "หกเหลี่ยม"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "หน้าหลัก"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "จะแจ้งขอและแก้ไขคำบรรยายได้อย่างไร"
+    },
     "html_code_editor_fd967a44": {
         "message": "โปรแกรมแก้ไขรหัส HTML"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "ฉันถือลิขสิทธิ์"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "ขออภัย แต่เราไม่พบคำตอบจาก AI"
     },
     "icelandic_9d6d35de": {
         "message": "ไอซ์แลนด์"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "เบ็ดเตล็ด"
     },
-    "modify_6b0b13e3": {
-        "message": "แก้ไข"
-    },
     "module_90d9fd32": {
         "message": "หน่วยการเรียน"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "กรุณาเลือกไฟล์"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "กรุณาระบุรายละเอียดสิ่งที่คุณต้องการเขียน"
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "กรุณากรอกชื่อไฟล์"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "ปรับขนาด"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "คัดลอกคำตอบไปยังคลิปบอร์ดแล้ว"
-    },
     "restore_auto_save_deccd84b": {
         "message": "กู้คืนที่บันทึกอัตโนมัติหรือไม่"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "ลองใหม่ { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "ลองใหม่"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverse Turnstile (มีเกิดผลลัพธ์)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "ชอร์ตคัท"
-    },
-    "show_all_967a90f0": {
-        "message": "แสดงทั้งหมด"
     },
     "show_image_options_1e2ecc6b": {
         "message": "แสดงตัวเลือกสำหรับภาพ"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "ข้อจำกัดสำหรับผู้ชม"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "กำลังรอการตอบกลับ"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "เราไม่พบไมโครโฟนที่ใช้การได้ที่เชื่อมต่อกับอุปกรณ์ของคุณ"
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "เวลส์"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "คุณต้องการทำอะไร"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "เมื่อมีการใช้มาร์กอัพที่กำหนดรูปแบบรายการเป็นแสดงรายการแต่ไม่ได้ระบุความสัมพันธ์ในรายการ ผู้ใช้อาจมีปัญหาในการสืบค้นข้อมูล"
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Wreath Product"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "ผู้ช่วยเขียนงาน"
     },
     "xi_149681d0": {
         "message": "Xi"

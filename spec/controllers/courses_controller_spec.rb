@@ -1247,6 +1247,43 @@ describe CoursesController do
       expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be false
     end
 
+    describe "PERMISSIONS[:manage_course_details] in js_env" do
+      context "when course_navigation_and_feature_options_permissions is disabled" do
+        it "is true when teacher has manage_course_content_edit" do
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(true)
+        end
+
+        it "is false when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(false)
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "is true when teacher has manage_course_details even when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(true)
+        end
+
+        it "is false when manage_course_details is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(false)
+        end
+      end
+    end
+
     it "requires authorization" do
       get "settings", params: { course_id: @course.id }
       assert_unauthorized
@@ -3055,6 +3092,26 @@ describe CoursesController do
       put "update", params: { id: @course.id, course: { name: "new course name" } }
       expect(assigns[:course]).not_to be_nil
       expect(assigns[:course]).to eql(@course)
+    end
+
+    context "when course_navigation_and_feature_options_permissions is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+      end
+
+      it "allows update via manage_course_details even when manage_course_content_edit is revoked" do
+        @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "new name" } }
+        expect(response).to be_redirect
+      end
+
+      it "denies update when manage_course_details is revoked" do
+        @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "new name" } }
+        assert_unauthorized
+      end
     end
 
     it "returns a 400 if the start_at date is a unix timestamp" do
@@ -6426,8 +6483,8 @@ describe CoursesController do
   describe "#restore_version" do
     before :once do
       course_with_teacher(active_all: true)
-      Account.site_admin.enable_feature!(:syllabus_versioning)
       @account = @course.account
+      @account.enable_feature!(:syllabus_versioning)
       @account.enable_feature!(:allow_attachment_association_creation)
       @account.enable_feature!(:file_association_access)
     end
@@ -6437,7 +6494,7 @@ describe CoursesController do
     end
 
     it "requires syllabus_versioning feature flag" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @account.disable_feature!(:syllabus_versioning)
       post "restore_version", params: { course_id: @course.id, version_id: 1 }
       expect(response).to have_http_status(:not_found)
     end
@@ -6874,6 +6931,54 @@ describe CoursesController do
         put :update_nav, params: { course_id: @course.id, tabs_json: }
 
         expect(response).to be_redirect
+      end
+    end
+
+    context "the course_navigation_and_feature_options_permissions feature flag is enabled" do
+      before :once do
+        @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        course_with_teacher(active_all: true)
+      end
+
+      it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
+        user_session(@teacher)
+        @course.root_account.role_overrides.create!(permission: :manage_course_navigation, enabled: true, role: teacher_role)
+
+        tabs_json = [
+          { id: "assignments", label: "Assignments" },
+          { id: "announcements", label: "Announcements", hidden: true }
+        ].to_json
+
+        processed_tabs = [
+          { "id" => "assignments", "label" => "Assignments" },
+          { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+        ]
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(
+            course: @course,
+            tabs: [
+              { "id" => "assignments", "label" => "Assignments" },
+              { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+            ],
+            can_manage_links: false,
+            request_host: "test.host",
+            request_port: 80
+          )
+          .and_return(processed_tabs)
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+        @course.reload
+        expect(@course.tab_configuration).to eq(processed_tabs)
+      end
+
+      it "returns a 401 unauthorized when the permission is disabled" do
+        user_session(@teacher)
+        @course.root_account.role_overrides.create!(permission: :manage_course_navigation, enabled: false, role: teacher_role)
+        put :update_nav, params: { course_id: @course.id, tabs_json: {} }
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

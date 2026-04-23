@@ -17,7 +17,7 @@
  */
 
 import {useMemo} from 'react'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {parseAllPagesResponse} from './utils'
 import {
   fetchFolders,

@@ -27,7 +27,7 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {savedObservedId, saveObservedId} from '../ObserverGetObservee'

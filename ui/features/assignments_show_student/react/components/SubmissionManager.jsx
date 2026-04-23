@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useContext, useRef, useMemo} from 'react'
 import {useApolloClient, useMutation} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
   CREATE_SUBMISSION,

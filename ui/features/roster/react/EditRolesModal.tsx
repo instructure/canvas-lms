@@ -28,7 +28,7 @@ import {Enrollment} from 'api'
 import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('link_to_students')
 

@@ -24,7 +24,7 @@ import classnames from 'classnames'
 import produce from 'immer'
 import {get, set} from 'es-toolkit/compat'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'

@@ -31,7 +31,7 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import type {BaseButtonTheme} from '@instructure/shared-types'

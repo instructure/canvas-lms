@@ -127,45 +127,77 @@ module Lti
     include Api::V1::Lti::ContextControl
 
     module ContextControlsBookmarker
-      # Sorts courses before their associated parent accounts. Example:
+      # Orders deployments by context type: root account (0), subaccount (1), course (2).
+      # Uses lti_context_controls.root_account_id to identify the root account without
+      # needing to add the account ID in ruby. Requires eager_load(:deployment).
+      # If this query is changed, make sure the deployment_sort function is changed to
+      # match it.
+      # Sorts courses before their associated parent accounts within a deployment. Example:
       # [a1.a3.a4, a1.a3.c22] becomes [11.13.14, 11.13.022], which when ordered naturally
       # becomes [11.13.022, 11.13.14]
       CONTEXT_ORDERING_SQL = Arel.sql("REPLACE(REPLACE(path, 'a', '1'), 'c', '0')")
-      ORDER_CLAUSE = [:deployment_id, CONTEXT_ORDERING_SQL, :path].freeze
 
-      def self.bookmark_for(context_controls)
+      def self.deployment_context_ordering_sql
+        Arel.sql(<<~SQL.squish)
+          CASE
+            WHEN #{ContextExternalTool.quoted_table_name}.context_type = 'Account'
+              AND #{ContextExternalTool.quoted_table_name}.context_id = #{Lti::ContextControl.quoted_table_name}.root_account_id THEN 0
+            WHEN #{ContextExternalTool.quoted_table_name}.context_type = 'Account' THEN 1
+            ELSE 2
+          END
+        SQL
+      end
+
+      def self.order_clause
+        [deployment_context_ordering_sql, :deployment_id, CONTEXT_ORDERING_SQL, :path].freeze
+      end
+
+      # This function needs to match the logic in DEPLOYMENT_CONTEXT_ORDERING_SQL.
+      # That is, DEPLOYMENT_CONTEXT_ORDERING_SQL should be the SQL version of this
+      # ruby function.
+      def self.deployment_sort(context_control)
+        deployment = context_control.deployment
+        if deployment.context_type == "Account" && deployment.context_id == context_control.root_account_id
+          0
+        elsif deployment.context_type == "Account"
+          1
+        else
+          2
+        end
+      end
+
+      def self.bookmark_for(context_control)
         [
-          context_controls.deployment_id,
-          context_controls.path.tr("c", "0").tr("a", "1"),
+          deployment_sort(context_control),
+          context_control.deployment_id,
+          context_control.path.tr("c", "0").tr("a", "1"),
         ]
       end
 
       def self.validate(bookmark)
-        return false unless bookmark.is_a?(Array) && bookmark.length == 2
+        return false unless bookmark.is_a?(Array) && bookmark.length == 3
 
-        deployment_id, ordered_path = bookmark
+        deployment_sort, deployment_id, ordered_path = bookmark
 
         deployment_id.is_a?(Integer) &&
+          [0, 1, 2].include?(deployment_sort) &&
           ordered_path.is_a?(String)
       end
 
       def self.restrict_scope(scope, pager)
         if pager.current_bookmark
           comparison = (pager.include_bookmark ? ">=" : ">")
-          deployment_id, ordered_path = pager.current_bookmark
+          deployment_sort, deployment_id, ordered_path = pager.current_bookmark
 
           sql = <<~SQL.squish
-            (deployment_id > :deployment_id) OR
-            (deployment_id = :deployment_id AND #{CONTEXT_ORDERING_SQL} #{comparison} :ordered_path)
+            (#{deployment_context_ordering_sql} > :deployment_sort) OR
+            (#{deployment_context_ordering_sql} = :deployment_sort AND deployment_id > :deployment_id) OR
+            (#{deployment_context_ordering_sql} = :deployment_sort AND deployment_id = :deployment_id AND #{CONTEXT_ORDERING_SQL} #{comparison} :ordered_path)
           SQL
 
-          scope = scope.where(
-            sql,
-            deployment_id:,
-            ordered_path:
-          )
+          scope = scope.where(sql, deployment_sort:, deployment_id:, ordered_path:)
         end
-        scope.order(*ORDER_CLAUSE)
+        scope.order(*order_clause)
       end
     end
 
@@ -203,9 +235,10 @@ module Lti
         Lti::ContextControl
                .eager_load(:deployment)
                .active
-               .where(registration:, root_account: @account)
+               .for_registration(registration, @account)
+               .where(root_account: @account)
                .where.not(context_external_tools: { workflow_state: ["deleted"] })
-               .order(*ContextControlsBookmarker::ORDER_CLAUSE)
+               .order(*ContextControlsBookmarker.order_clause)
       )
 
       paginated = Api.paginate(bookmarked,
@@ -280,7 +313,7 @@ module Lti
       end
 
       unique_checks = control_params.slice(*Lti::ContextControlService.unique_check_attrs).compact
-      if registration.context_controls.active.exists?(unique_checks)
+      if Lti::ContextControl.for_registration(registration, @account).active.exists?(unique_checks)
         return render_errors("A context control for this deployment and context already exists.")
       end
 
@@ -345,6 +378,8 @@ module Lti
                                         .calculate_path_for_course_id(course.id, chains[course.account_id])
       end
 
+      app_id = registration.local_copy_for(@account)&.id
+
       controls = create_many_params.map do |control_params|
         key = if control_params[:account_id]
                 "a#{control_params[:account_id]}"
@@ -358,6 +393,7 @@ module Lti
           p[:deployment_id] = p.key?(:deployment_id) ? p[:deployment_id].to_i : root_account_deployment&.id
           p[:available] = true unless p.key?(:available)
           p[:registration_id] = registration.id
+          p[:app_id] = app_id
           p[:workflow_state] = :active
           p[:created_by_id] = @current_user.id
           p[:updated_by_id] = @current_user.id
@@ -528,11 +564,15 @@ module Lti
     end
 
     def root_account_deployment
-      @root_account_deployment ||= ContextExternalTool.active.find_by(context: @account, lti_registration: registration)
+      @root_account_deployment ||= ContextExternalTool.active
+                                                      .for_lti_registration(registration, @account)
+                                                      .find_by(context: @account)
     end
 
     def control
-      @control ||= Lti::ContextControl.active.find_by(id: params[:id], registration:, root_account_id: @account.id)
+      @control ||= Lti::ContextControl.active
+                                      .for_registration(registration, @account)
+                                      .find_by(id: params[:id], root_account_id: @account.id)
       raise ActiveRecord::RecordNotFound unless @control
 
       @control

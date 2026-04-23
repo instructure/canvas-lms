@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document with Two Alt Text Issues</title>
+</head>
+<body>
+  <article>
+    <header>
+      <h2>Understanding Marine Biology</h2>
+      <p class="byline">Course Module 3 - Week 5</p>
+    </header>
+
+    <section>
+      <h3>Introduction to Coral Reefs</h3>
+      <p>Coral reefs are among the most diverse ecosystems on Earth.</p>
+
+      <figure>
+        <img src="https://example.com/images/coral-reef.jpg" width="800" height="600">
+        <figcaption>A coral reef ecosystem</figcaption>
+      </figure>
+
+      <figure>
+        <img src="https://example.com/images/tropical-fish.jpg" alt="This is an extremely detailed description of a tropical fish ecosystem that goes well beyond the recommended two hundred character limit for alt text and should trigger the img-alt-length accessibility rule." width="800" height="600">
+        <figcaption>Tropical fish in their natural habitat</figcaption>
+      </figure>
+    </section>
+  </article>
+</body>
+</html>

@@ -5815,7 +5815,7 @@ type InstitutionalTag implements LegacyIDInterface & Node & Timestamped {
   legacy canvas id
   """
   _id: ID!
-  associationsCount: Int
+  associationsCount: Int!
   category: InstitutionalTagCategory
   createdAt: DateTime
   description: String!
@@ -5843,6 +5843,7 @@ type InstitutionalTag implements LegacyIDInterface & Node & Timestamped {
     Returns the last _n_ elements from the list.
     """
     last: Int
+    sort: InstitutionalTagUsersSortInput
   ): UserConnection
   workflowState: String!
 }
@@ -5864,6 +5865,7 @@ type InstitutionalTagCategory implements LegacyIDInterface & Node & Timestamped 
   legacy canvas id
   """
   _id: ID!
+  associationsCount: Int!
   createdAt: DateTime
   description: String
   id: ID!
@@ -5888,6 +5890,7 @@ type InstitutionalTagCategory implements LegacyIDInterface & Node & Timestamped 
     Returns the last _n_ elements from the list.
     """
     last: Int
+    workflowState: String = "active"
   ): InstitutionalTagConnection
   updatedAt: DateTime
   workflowState: String!
@@ -5955,16 +5958,64 @@ type InstitutionalTagEdge {
   node: InstitutionalTag
 }
 
+"""
+Order direction for results
+"""
+enum InstitutionalTagUsersSortDirection {
+  asc
+  desc
+}
+
+enum InstitutionalTagUsersSortField {
+  email
+  name
+  sis_id
+  username
+}
+
+"""
+Specify sort field and direction for results
+"""
+input InstitutionalTagUsersSortInput {
+  direction: InstitutionalTagUsersSortDirection
+  field: InstitutionalTagUsersSortField!
+}
+
+type InstructorCourseInfo {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  courseCode: String
+  name: String!
+}
+
 type InstructorEnrollmentInfo {
-  course: Course!
+  course: InstructorCourseInfo!
   enrollmentState: String!
   role: EnrollmentRole!
   type: String!
 }
 
+type InstructorUserInfo {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+
+  """
+  The avatar URL for the user
+  """
+  avatarUrl: URL
+  email: String
+  name: String!
+  shortName: String
+  sortableName: String
+}
+
 type InstructorWithEnrollments {
   enrollments: [InstructorEnrollmentInfo!]!
-  user: User!
+  user: InstructorUserInfo!
 }
 
 """
@@ -9880,7 +9931,12 @@ type RubricAssociation implements LegacyIDInterface {
   associationId: String!
   associationType: String!
   hideOutcomeResults: Boolean!
-  hidePoints: Boolean!
+  hidePoints(
+    """
+    used for additional permissions checks if restrict_quantitative_data is enabled
+    """
+    checkExtraPermissions: Boolean = false
+  ): Boolean!
   hideScoreTotal: Boolean!
   savedComments: String
   useForGrading: Boolean!

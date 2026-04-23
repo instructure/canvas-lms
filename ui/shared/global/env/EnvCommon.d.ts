@@ -101,6 +101,7 @@ export interface EnvCommon {
   ASSET_HOST: string
   JOURNEY_URL?: string
   WIKI_PAGE_ID?: string
+  WIKI_PAGE_UPDATED_AT?: string
   FILE_ID?: string
   STUDY_ASSIST_TOOLS?: string[]
   DOMAIN_ROOT_ACCOUNT_SFID: string
@@ -148,6 +149,7 @@ export interface EnvCommon {
   ONETRUST_CONSENT_DOMAIN_ID?: string
   PRE_COOKIE_CONSENT?: string
   PENDO_APP_ID: string
+  PENDO_APP_ENV: string
   ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
   help_link_name: string
@@ -324,7 +326,6 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
-  | 'student_access_token_management'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
@@ -337,7 +338,6 @@ export type RootAccountFeatureId =
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
   | 'ams_advanced_content_organization'
-  | 'api_rate_limits'
   | 'buttons_and_icons_root_account'
   | 'canvas_apps_sub_account_access'
   | 'course_pace_allow_bulk_pace_assign'
@@ -349,8 +349,10 @@ export type RootAccountFeatureId =
   | 'course_pace_weighted_assignments'
   | 'course_paces_skip_selected_days'
   | 'create_course_subaccount_picker'
+  | 'default_discussion_options'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
+  | 'institutional_tags'
   | 'instui_nav'
   | 'login_registration_ui_identity'
   | 'lti_asset_processor'
@@ -379,7 +381,10 @@ export type RootAccountFeatureId =
   | 'rubric_criterion_range'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
+  | 'substitution_variable_display'
+  | 'send_usage_metrics_after_consent'
   | 'top_navigation_placement'
+  | 'course_navigation_and_feature_options_permissions'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES
@@ -401,6 +406,7 @@ export type OtherFeatureId =
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
   | 'peer_review_allocation_and_grading'
+  | 'notebook'
   | 'study_assist'
 
 /**

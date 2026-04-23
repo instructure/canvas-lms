@@ -24,9 +24,13 @@ import {http, HttpResponse} from 'msw'
 import K5Announcement from '../K5Announcement'
 
 // Mock FlashAlert to prevent DOM issues
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 // Ensure document is available in test environment
 beforeAll(() => {

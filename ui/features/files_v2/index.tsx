@@ -22,7 +22,7 @@ import {RouterProvider} from 'react-router-dom'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {router} from './routes/router'
 import {FilesErrorBoundary} from './react/components/FilesErrorBoundary'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 render(
   <React.StrictMode>

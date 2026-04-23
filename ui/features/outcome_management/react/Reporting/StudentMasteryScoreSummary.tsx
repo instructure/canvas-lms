@@ -99,7 +99,13 @@ export const StudentMasteryScoreSummary: React.FC<StudentMasteryScoreSummaryProp
         </Flex.Item>
         {masteryLevel && (
           <Flex.Item>
-            <View shadow="resting" borderRadius="medium" display="inline-block" padding="small">
+            <View
+              shadow="resting"
+              borderRadius="medium"
+              display="inline-block"
+              padding="small"
+              data-testid="student-mastery-score"
+            >
               <Flex direction="row" alignItems="center" gap="space2">
                 <Flex.Item width="4rem">
                   <ResultIcon url={masteryLevel.iconUrl} alt={masteryLevel.text} size="48px" />
@@ -137,11 +143,6 @@ export const StudentMasteryScoreSummary: React.FC<StudentMasteryScoreSummaryProp
                         </Flex>
                       </Flex.Item>
                     )}
-                    <Flex.Item margin="space4 0 0 0">
-                      <Text size="small" color="secondary">
-                        {I18n.t('Traditional Grade Export')}
-                      </Text>
-                    </Flex.Item>
                   </Flex>
                 </Flex.Item>
               </Flex>

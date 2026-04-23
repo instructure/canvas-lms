@@ -28,7 +28,7 @@ import ClosedDiscussionSVG from '../images/ClosedDiscussions.svg'
 import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
 import {Tray} from '@instructure/ui-tray'
 import {Heading} from '@instructure/ui-heading'
-import {bool, func} from 'prop-types'
+import {bool, func, number} from 'prop-types'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -45,6 +45,7 @@ export function TrayContent({
   submission,
   reviewerSubmission,
   isPeerReviewEnabled = false,
+  focusTrigger,
   onSuccessfulPeerReview,
   usePeerReviewModal = true,
   suppressSuccessAlert = false,
@@ -68,6 +69,7 @@ export function TrayContent({
         submission={submission}
         reviewerSubmission={reviewerSubmission}
         isPeerReviewEnabled={isPeerReviewEnabled}
+        focusTrigger={focusTrigger}
         onSuccessfulPeerReview={onSuccessfulPeerReview}
         usePeerReviewModal={usePeerReviewModal}
         suppressSuccessAlert={suppressSuccessAlert}
@@ -81,6 +83,7 @@ TrayContent.propTypes = {
   submission: Submission.shape.isRequired,
   reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool,
+  focusTrigger: number,
   onSuccessfulPeerReview: func,
   usePeerReviewModal: bool,
   suppressSuccessAlert: bool,
@@ -93,6 +96,7 @@ export default function CommentsTray({
   closeTray,
   open,
   isPeerReviewEnabled = false,
+  focusTrigger,
   onSuccessfulPeerReview,
   usePeerReviewModal = true,
   suppressSuccessAlert = false,
@@ -134,6 +138,7 @@ export default function CommentsTray({
               assignment={assignment}
               submission={submission}
               reviewerSubmission={reviewerSubmission}
+              focusTrigger={focusTrigger}
               onSuccessfulPeerReview={onSuccessfulPeerReview}
               usePeerReviewModal={usePeerReviewModal}
               suppressSuccessAlert={suppressSuccessAlert}
@@ -152,6 +157,7 @@ CommentsTray.propTypes = {
   closeTray: func.isRequired,
   open: bool.isRequired,
   isPeerReviewEnabled: bool,
+  focusTrigger: number,
   onSuccessfulPeerReview: func,
   usePeerReviewModal: bool,
   suppressSuccessAlert: bool,

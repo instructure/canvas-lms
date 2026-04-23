@@ -107,12 +107,6 @@ describe TokensController, type: :request do
       end
 
       it_behaves_like "admin successfully deleting access tokens"
-
-      context "with student_access_token_management feature flag" do
-        before { Account.site_admin.enable_feature!(:student_access_token_management) }
-
-        it_behaves_like "admin successfully deleting access tokens"
-      end
     end
   end
 end

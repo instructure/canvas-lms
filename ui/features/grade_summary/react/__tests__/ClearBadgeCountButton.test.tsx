@@ -23,12 +23,16 @@ import userEvent from '@testing-library/user-event'
 import {waitFor} from '@testing-library/dom'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn(() => {})),
-  showFlashSuccess: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn(() => {})),
+    showFlashSuccess: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const server = setupServer()
 

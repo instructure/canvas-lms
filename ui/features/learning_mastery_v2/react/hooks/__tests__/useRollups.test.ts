@@ -120,10 +120,9 @@ describe('useRollups', () => {
       await act(async () => vi.runAllTimers())
       const params = {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'student',
           add_defaults: true,
           sort_order: SortOrder.ASC,
@@ -219,6 +218,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 4,
+              count: undefined,
               rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
             },
           ],
@@ -229,6 +229,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 4,
+              count: undefined,
               rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
             },
           ],
@@ -239,6 +240,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 0,
+              count: undefined,
               rating: {...mockedRatings[2], color: `#${mockedRatings[2].color}`},
             },
           ],
@@ -262,10 +264,9 @@ describe('useRollups', () => {
       await act(async () => vi.runAllTimers())
       const params = {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'student',
           add_defaults: true,
           sort_order: SortOrder.ASC,

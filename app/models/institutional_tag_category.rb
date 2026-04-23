@@ -20,6 +20,9 @@
 class InstitutionalTagCategory < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
+  include StickySisFields
+
+  are_sis_sticky :name, :description
 
   belongs_to :account, optional: false
   belongs_to :sis_batch, optional: true
@@ -40,6 +43,8 @@ class InstitutionalTagCategory < ApplicationRecord
   sanitize_field :description, CanvasSanitize::SANITIZE
   validates :name, uniqueness: { scope: :root_account_id, conditions: -> { active }, case_sensitive: false }
 
+  validate :validate_category_limit_per_account
+
   private
 
   def sanitize_name
@@ -59,5 +64,19 @@ class InstitutionalTagCategory < ApplicationRecord
 
     InstitutionalTag.cascade_archive_associations_for(tag_ids)
     institutional_tags.active.in_batches(of: 10_000).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+  end
+
+  def validate_category_limit_per_account
+    return unless account_id
+    return unless new_record? || (workflow_state_changed? && workflow_state == "active")
+
+    resolved_root_id = account&.resolved_root_account_id
+    return unless resolved_root_id
+
+    limit = (DynamicSettings.find(tree: :private)["institutional_tag_categories_per_account_limit", failsafe: nil] || 50).to_i
+
+    if InstitutionalTagCategory.active.where(root_account_id: resolved_root_id).count >= limit
+      errors.add(:account, t("An account cannot have more than %{limit} tag categories", limit:))
+    end
   end
 end

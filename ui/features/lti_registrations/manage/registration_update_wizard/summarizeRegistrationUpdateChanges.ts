@@ -19,6 +19,10 @@
 import type {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {
+  compareSubstitutionVariables,
+  extractSubstitutionVariables,
+} from '../lib/extractSubstitutionVariables'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -48,7 +52,10 @@ export const summarizeRegistrationUpdateChanges = (
       changes.added.push({
         section: I18n.t('Permissions'),
         detail: I18n.t(
-          {one: 'Added %{count} new scope', other: 'Added %{count} new scopes'},
+          {
+            one: 'Added %{count} new scope',
+            other: 'Added %{count} new scopes',
+          },
           {count: addedScopes.length},
         ),
       })
@@ -75,17 +82,19 @@ export const summarizeRegistrationUpdateChanges = (
 
   if (registration.overlay && registration.overlay.data.privacy_level !== undefined) {
     changes.noChange.push({
-      section: I18n.t('Privacy Level'),
+      section: I18n.t('Data Sharing'),
       detail: '',
     })
   } else if (requestedPrivacy !== currentPrivacy && requestedPrivacy !== undefined) {
     changes.added.push({
-      section: I18n.t('Privacy Level'),
-      detail: I18n.t('Changed to %{level}', {level: requestedPrivacy}),
+      section: I18n.t('Data Sharing'),
+      detail: I18n.t('Changed privacy level to %{level}', {
+        level: requestedPrivacy,
+      }),
     })
   } else {
     changes.noChange.push({
-      section: I18n.t('Privacy Level'),
+      section: I18n.t('Data Sharing'),
       detail: '',
     })
   }
@@ -102,7 +111,10 @@ export const summarizeRegistrationUpdateChanges = (
       changes.added.push({
         section: I18n.t('Placements'),
         detail: I18n.t(
-          {one: 'Added %{count} placement', other: 'Added %{count} placements'},
+          {
+            one: 'Added %{count} placement',
+            other: 'Added %{count} placements',
+          },
           {count: addedPlacements.length},
         ),
       })
@@ -111,7 +123,10 @@ export const summarizeRegistrationUpdateChanges = (
       changes.removed.push({
         section: I18n.t('Placements'),
         detail: I18n.t(
-          {one: 'Removed %{count} placement', other: 'Removed %{count} placements'},
+          {
+            one: 'Removed %{count} placement',
+            other: 'Removed %{count} placements',
+          },
           {count: removedPlacements.length},
         ),
       })
@@ -190,6 +205,44 @@ export const summarizeRegistrationUpdateChanges = (
   } else {
     changes.noChange.push({
       section: I18n.t('Icon'),
+      detail: '',
+    })
+  }
+
+  const {unchanged, added, removed} = compareSubstitutionVariables(
+    registration.configuration,
+    registrationUpdateRequest.internal_lti_configuration,
+  )
+
+  if (added.size > 0 || removed.size > 0) {
+    if (added.size > 0) {
+      changes.added.push({
+        section: I18n.t('Data Sharing'),
+        detail: I18n.t(
+          {
+            one: 'Added %{count} custom data field',
+            other: 'Added %{count} custom data fields',
+          },
+          {count: added.size},
+        ),
+      })
+    }
+    if (removed.size > 0) {
+      changes.removed.push({
+        section: I18n.t('Data Sharing'),
+        detail: I18n.t(
+          {
+            one: 'Removed %{count} custom data field',
+            other: 'Removed %{count} custom data fields',
+          },
+          {count: removed.size},
+        ),
+      })
+    }
+  } else if (unchanged.size > 0) {
+    // Only show "No Changes" if there are actually some variables configured
+    changes.noChange.push({
+      section: I18n.t('Data Sharing'),
       detail: '',
     })
   }

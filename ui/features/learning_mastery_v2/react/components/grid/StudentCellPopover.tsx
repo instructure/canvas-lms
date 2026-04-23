@@ -16,23 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Outcome, StudentRollupData, Student} from '@canvas/outcomes/react/types/rollup'
+import {Outcome, Student, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
 
-import React, {useState} from 'react'
-import {Link} from '@instructure/ui-link'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
-import {Img} from '@instructure/ui-img'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import MessageStudents from '@canvas/message-students-modal'
 import {useStudentMasteryScores} from '@canvas/outcomes/react/hooks/useStudentMasteryScores'
-import {useLmgbUserDetails} from '../../hooks/useLmgbUserDetails'
+import MessageStudentsWhoDialog from '@instructure/outcomes-ui/es/components/Gradebook/dialogs/MessageStudentsWhoDialog'
 import {StudentPopover} from '@instructure/outcomes-ui/es/components/Gradebook/popovers/StudentPopover'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {Img} from '@instructure/ui-img'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import React, {useCallback, useMemo, useState} from 'react'
+import {useLmgbUserDetails} from '../../hooks/useLmgbUserDetails'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 const t = I18n.t.bind(I18n)
+
+type MSWStudent = {
+  id: string
+  name: string
+  sortableName: string
+  submittedAt: null | Date
+  workflowState: string
+}
+
+type SendMessageArgs = {
+  attachmentIds?: string[]
+  recipientsIds: string[]
+  subject: string
+  body: string
+  mediaFile?: {id: string; type: string}
+}
 
 export interface StudentCellPopoverProps {
   student: Student
@@ -71,6 +89,35 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
     outcomes: outcomes || [],
     rollups: rollups || [],
   })
+
+  const mswStudents = useMemo<MSWStudent[]>(
+    () => [
+      {
+        id: student.id,
+        name: studentName,
+        sortableName: student.sortable_name,
+        submittedAt: null,
+        workflowState: 'graded',
+      },
+    ],
+    [student.id, studentName, student.sortable_name],
+  )
+
+  const handleSendMessage = useCallback(
+    ({recipientsIds, subject, body, mediaFile, attachmentIds}: SendMessageArgs) => {
+      MessageStudentsWhoHelper.sendMessageStudentsWho(
+        recipientsIds,
+        subject,
+        body,
+        `course_${courseId}`,
+        mediaFile,
+        attachmentIds,
+      )
+        .then(() => showFlashSuccess(t('Message sent successfully'))())
+        .catch(() => showFlashError(t('Failed to send message'))())
+    },
+    [courseId],
+  )
 
   const renderLastLogin = () => {
     let dateText: string = t('Never')
@@ -124,19 +171,11 @@ export const StudentCellPopover: React.FC<StudentCellPopoverProps> = ({
   const actionsOverride = (
     <>
       {isMessageModalOpen && (
-        <MessageStudents
-          contextCode={`course_${courseId}`}
-          onRequestClose={() => setIsMessageModalOpen(false)}
-          open={isMessageModalOpen}
-          bulkMessage={false}
-          groupConversation={false}
-          recipients={[
-            {
-              id: student.id,
-              displayName: studentName,
-            },
-          ]}
-          title={t('Send a message')}
+        <MessageStudentsWhoDialog
+          onClose={() => setIsMessageModalOpen(false)}
+          students={mswStudents}
+          onSend={handleSendMessage}
+          userId={ENV.current_user_id ?? ''}
         />
       )}
       <Flex direction="row" justifyItems="center">

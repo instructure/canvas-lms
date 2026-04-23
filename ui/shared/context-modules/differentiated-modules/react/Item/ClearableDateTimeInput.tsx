@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {WithBreakpoints, Breakpoints} from '@instructure/platform-with-breakpoints'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('differentiated_modules')
 

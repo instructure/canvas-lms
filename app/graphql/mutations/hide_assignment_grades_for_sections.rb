@@ -30,7 +30,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
 
   def resolve(input:)
     begin
-      assignment = Assignment.find(input[:assignment_id])
+      assignment = AbstractAssignment.find_assignment_or_peer_review(input[:assignment_id])
       course = assignment.context
       sections = course.course_sections.where(id: input[:section_ids])
     rescue ActiveRecord::RecordNotFound

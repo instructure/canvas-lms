@@ -17,7 +17,7 @@
  */
 
 import {useMutation} from '@apollo/client'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'

@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('add_student_modal')
 

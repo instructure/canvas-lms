@@ -457,6 +457,7 @@ module Canvas::LiveEvents
       folder_id: attachment.global_folder_id,
       unlock_at: attachment.unlock_at,
       lock_at: attachment.lock_at,
+      locked: attachment.locked,
       updated_at: attachment.updated_at
     }
   end
@@ -629,6 +630,30 @@ module Canvas::LiveEvents
                              wiki_page_id: page.global_id,
                              title: LiveEvents.truncate(page.title)
                            })
+  end
+
+  def self.get_lti_resource_link_data(resource_link)
+    {
+      resource_link_id: resource_link.global_id,
+      resource_link_uuid: resource_link.resource_link_uuid,
+      lookup_uuid: resource_link.lookup_uuid,
+      context_id: resource_link.global_context_id,
+      context_type: resource_link.context_type,
+      context_external_tool_id: resource_link.original_context_external_tool&.global_id,
+      url: resource_link.url,
+      title: resource_link.title,
+      workflow_state: resource_link.workflow_state
+    }
+  end
+
+  def self.lti_resource_link_created(resource_link)
+    post_event_stringified("lti_resource_link_created",
+                           get_lti_resource_link_data(resource_link))
+  end
+
+  def self.lti_resource_link_updated(resource_link)
+    post_event_stringified("lti_resource_link_updated",
+                           get_lti_resource_link_data(resource_link))
   end
 
   def self.attachment_created(attachment)

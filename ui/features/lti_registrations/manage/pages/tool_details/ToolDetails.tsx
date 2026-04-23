@@ -41,6 +41,8 @@ import {
   IconRefreshLine,
   IconLockLine,
   IconUnlockLine,
+  IconNoLine,
+  IconCompleteLine,
 } from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
@@ -49,13 +51,17 @@ import {
   useRegistrationWithAllInfo,
   useDeleteRegistration,
   useUpdateRegistration,
+  bindGlobalLtiRegistration,
+  unbindGlobalLtiRegistration,
+  refreshRegistrationWithAllInfo,
 } from '../../api/registrations'
+import {isForcedOn} from '../../model/LtiRegistration'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {AccountId} from '../../model/AccountId'
 import type {LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
 import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {InlineList} from '@instructure/ui-list'
 import {InstUISettingsProvider} from '@instructure/emotion'
@@ -231,8 +237,101 @@ export const ToolDetailsInner = ({
   const outletContext: ToolDetailsOutletContext = {registration}
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const [lockTooltipShowing, setLockTooltipShowing] = React.useState(false)
-  const canDelete = !registration.inherited
+  const [toggleTooltipShowing, setToggleTooltipShowing] = React.useState(false)
+  const canDelete = !registration.inherited || !!registration.template_registration_id
+  const toggleDisabled = !registration.template_registration_id && !!isForcedOn(registration)
+  const isSiteAdmin = window.ENV.ACCOUNT_IS_SITE_ADMIN
   const [tiiMigrationModalShowing, setTiiMigrationModalShowing] = React.useState(false)
+
+  const isActive = React.useMemo(() => {
+    if (registration.inherited && !registration.template_registration_id) {
+      return registration.account_binding?.workflow_state === 'on'
+    }
+
+    return registration.workflow_state === 'active'
+  }, [registration])
+
+  const pillState = React.useMemo(() => {
+    const on = I18n.t('App is On')
+    const off = I18n.t('App is Off')
+
+    if (isSiteAdmin) {
+      const state = registration.account_binding?.workflow_state
+      if (state === 'allow') {
+        return {
+          color: 'success',
+          icon: <IconCompleteLine />,
+          label: I18n.t('App is Allowed'),
+        } as const
+      }
+      if (state === 'on') {
+        return {color: 'warning', icon: <IconCompleteLine />, label: on} as const
+      }
+      return {color: 'danger', icon: <IconNoLine />, label: off} as const
+    }
+
+    return isActive
+      ? ({color: 'success', icon: <IconCompleteLine />, label: on} as const)
+      : ({color: 'danger', icon: <IconNoLine />, label: off} as const)
+  }, [isSiteAdmin, registration.account_binding?.workflow_state, isActive])
+
+  const handleToggle = React.useCallback(
+    async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+      e.preventDefault()
+      const confirmed = await showConfirmationDialog({
+        body: isActive
+          ? I18n.t(
+              'This app will no longer be available in your account. You can turn it back on from this page at any time.',
+            )
+          : I18n.t('This app will now be available in your account.'),
+        confirmColor: isActive ? 'danger' : 'primary',
+        confirmText: isActive ? I18n.t('Turn Off') : I18n.t('Turn On'),
+        label: isActive ? I18n.t('Turn App Off') : I18n.t('Turn App On'),
+        size: 'small',
+      })
+
+      if (!confirmed) {
+        return
+      }
+
+      try {
+        if (registration.inherited && !registration.template_registration_id) {
+          // inherited and not a local copy means that active state is stored only on the binding
+          if (isActive) {
+            const result = await unbindGlobalLtiRegistration(accountId, registration.id)
+            if (result._type !== 'Success') {
+              throw new Error('Deactivating app failed')
+            }
+          } else {
+            const result = await bindGlobalLtiRegistration(accountId, registration.id)
+            if (result._type !== 'Success') {
+              throw new Error('Activating app failed')
+            }
+          }
+          refreshRegistrationWithAllInfo(registration.id, accountId)
+        } else {
+          const newState = isActive ? 'inactive' : 'active'
+          await updateRegistration.mutateAsync({
+            accountId,
+            registrationId: registration.id,
+            workflowState: newState,
+          })
+        }
+        showFlashAlert({
+          type: 'success',
+          message: isActive ? I18n.t('App turned off.') : I18n.t('App turned on.'),
+        })
+      } catch {
+        showFlashAlert({
+          type: 'error',
+          message: isActive
+            ? I18n.t('There was an error when attempting to turn off the app.')
+            : I18n.t('There was an error when attempting to turn on the app.'),
+        })
+      }
+    },
+    [registration, updateRegistration, isActive, accountId],
+  )
 
   const handleCopyClientId = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
@@ -424,9 +523,17 @@ export const ToolDetailsInner = ({
                     </Flex>
                   </Pill>
                 ))}
+              {window.ENV.FEATURES.lti_deactivate_registrations ? (
+                <Pill color={pillState.color}>
+                  <Flex direction="row" gap="xx-small">
+                    {pillState.icon}
+                    {pillState.label}
+                  </Flex>
+                </Pill>
+              ) : null}
             </Flex>
             <Flex direction="column">
-              <Flex gap="small" margin="0">
+              <Flex gap="small" margin="0" wrap="wrap">
                 <Button
                   data-pendo="lti-registrations-copy-client-id"
                   color="secondary"
@@ -490,6 +597,32 @@ export const ToolDetailsInner = ({
                     </Button>
                   </Tooltip>
                 )}
+                {window.ENV.FEATURES.lti_deactivate_registrations ? (
+                  <Tooltip
+                    renderTip={I18n.t(
+                      'This app is locked on by Instructure, and cannot be turned off.',
+                    )}
+                    isShowingContent={toggleTooltipShowing}
+                    onShowContent={() => {
+                      setToggleTooltipShowing(toggleDisabled)
+                    }}
+                    onHideContent={() => {
+                      setToggleTooltipShowing(false)
+                    }}
+                  >
+                    <Button
+                      data-pendo="lti-registrations-toggle-app"
+                      data-testid="toggle-app"
+                      color="secondary"
+                      margin="0"
+                      renderIcon={isActive ? <IconNoLine /> : <IconCompleteLine />}
+                      onClick={handleToggle}
+                      interaction={toggleDisabled ? 'disabled' : 'enabled'}
+                    >
+                      {isActive ? I18n.t('Turn App Off') : I18n.t('Turn App On')}
+                    </Button>
+                  </Tooltip>
+                ) : null}
 
                 {window.ENV.LTI_DR_REGISTRATIONS_UPDATE && pendingUpdate ? (
                   <Button

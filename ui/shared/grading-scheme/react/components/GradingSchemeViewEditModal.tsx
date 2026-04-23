@@ -21,7 +21,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 import {GradingSchemeView} from './view/GradingSchemeView'
 import {useGradingSchemeUpdate} from '../hooks/useGradingSchemeUpdate'

@@ -24,7 +24,7 @@ import AssignmentFooter from './components/AssignmentFooter'
 import AssignmentTabs from './components/AssignmentTabs'
 import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 import {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentTypes'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import getModuleItemId from './utils/getModuleItemId'
 

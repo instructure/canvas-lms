@@ -29,7 +29,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jqueryui/tabs'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import RegisterCommunication from '../react/RegisterCommunication'
 import ConfirmCommunicationChannel from '../react/ConfirmCommunicationChannel'
 import ConfirmEmailAddress from '../react/ConfirmEmailAddress'

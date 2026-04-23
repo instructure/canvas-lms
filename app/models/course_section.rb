@@ -296,6 +296,7 @@ class CourseSection < ApplicationRecord
 
     if enrollment_ids.any?
       all_enrollments.update_all all_attrs
+      CourseSection.delay_if_production.carry_over_course_favorites(user_ids, old_course.id, course.id)
       Enrollment.delay_if_production.batch_add_to_favorites(enrollment_ids)
     end
 
@@ -326,6 +327,19 @@ class CourseSection < ApplicationRecord
 
   def ensure_enrollments_in_correct_section
     enrollments.where.not(course_id:).each { |e| e.update_attribute(:course_id, course_id) }
+  end
+
+  # If affected users had favorited the old course, carry that favoriting over to the
+  # new course; otherwise they'd lose their favorite since the old course is no longer
+  # accessible via the moved section. Favorites live on the user's shard, which may
+  # differ from the course's shard for cross-shard users.
+  def self.carry_over_course_favorites(user_ids, old_course_id, new_course_id)
+    new_course = Course.find(new_course_id)
+    Shard.partition_by_shard(user_ids) do |sharded_user_ids|
+      Favorite.where(user_id: sharded_user_ids, context_type: "Course", context_id: old_course_id).find_each do |fav|
+        Favorite.create_or_find_by(user: fav.user, context: new_course)
+      end
+    end
   end
 
   def crosslist_to_course(course, **)

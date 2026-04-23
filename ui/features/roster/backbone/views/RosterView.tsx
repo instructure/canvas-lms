@@ -30,11 +30,11 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import PeopleFilter from '@canvas/differentiation-tags/react/PeopleFilter/PeopleFilter'
 import MessageBus from '@canvas/util/MessageBus'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {union} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('RosterView')

@@ -116,8 +116,17 @@ module AvatarHelper
             default_avatar
           end
 
+    # When a user's avatar was set on a different domain for the same account,
+    # the stored URL points to that domain. Convert it to a relative path so
+    # the browser loads it from the current domain, avoiding cross-domain
+    # requests that can trigger silent re-auth and break masquerade sessions.
+    avatar_host, avatar_path = url&.match(%r{\Ahttps?://([^/]+)(/images/thumbnails/.+)})&.captures
+    if avatar_host && Account.find_by_domain(avatar_host)&.id == root_account&.id
+      url = avatar_path
+    end
+
     if url.present? && !url.match(%r{\Ahttps?://})
-      # make sure that the url is not just a path
+      # Prepend the request domain so that the URL is reliable for both browsers and API consumers (LTI tools, mobile apps).
       url = "#{request.base_url}#{url}"
     end
 

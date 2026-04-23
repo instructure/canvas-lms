@@ -729,6 +729,14 @@
               <xs:element name="points_possible" type="optional_float" minOccurs="0"/>
               <xs:element name="hide_score_total" type="xs:boolean" minOccurs="0"/>
               <xs:element name="free_form_criterion_comments" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="rating_order" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="ascending"/>
+                    <xs:enumeration value="descending"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
               <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
 
               <xs:element name="criteria">

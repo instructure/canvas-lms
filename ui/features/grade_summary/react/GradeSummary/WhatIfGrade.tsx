@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useContext, useEffect} from 'react'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useMutation} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

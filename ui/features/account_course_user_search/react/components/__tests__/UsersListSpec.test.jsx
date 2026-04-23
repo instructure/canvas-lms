@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import UsersList from '../UsersList'
 import {setupServer} from 'msw/node'

@@ -32,7 +32,7 @@ module Canvas
         @config ||= begin
           config = ActiveSupport::OrderedOptions.new
           config.enabled = false
-          yml = ConfigFile.load("canvas_cdn")
+          yml = Canvas.load_config_file_or_consul("canvas_cdn", failsafe_cache: true)
           creds = Rails.application.credentials.canvas_cdn_creds
           config.merge!(yml.symbolize_keys) if yml
           config.merge!(creds) if creds

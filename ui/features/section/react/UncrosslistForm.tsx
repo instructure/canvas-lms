@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {IconOffLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {addFlashNoticeForNextPage} from '@canvas/rails-flash-notifications'
 
 const I18n = createI18nScope('section')

@@ -45,6 +45,7 @@ interface ConfigurationSectionProps {
   contextFiles: ContextFile[]
   onContextFilesChange: (files: ContextFile[]) => void
   courseId: string
+  initialFailedFileNames?: string[]
 }
 
 const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
@@ -55,6 +56,7 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
   contextFiles,
   onContextFilesChange,
   courseId,
+  initialFailedFileNames,
 }) => {
   return (
     <View as="div" margin="large 0 0 0">
@@ -174,6 +176,7 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
                 allowedFileTypes={['.docx', '.xlsx', '.xls', '.pptx', '.pdf', '.txt', '.html']}
                 maxFileSizeMB={ENV?.CONTEXT_FILE_MAX_SIZE_MB ?? 300}
                 maxFiles={10}
+                initialFailedFileNames={initialFailedFileNames}
               />
             </View>
           )}

@@ -52,10 +52,9 @@ describe('apiClient', () => {
 
       expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/courses/123/outcome_rollups', {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: SortBy.SortableName,
           sort_order: SortOrder.ASC,
           page: 1,
@@ -68,10 +67,9 @@ describe('apiClient', () => {
 
       expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/courses/456/outcome_rollups', {
         params: {
-          rating_percents: true,
           per_page: 50,
           exclude: ['filter1', 'filter2'],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'custom_sort',
           sort_order: SortOrder.DESC,
           page: 2,
@@ -111,10 +109,9 @@ describe('apiClient', () => {
 
       expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/courses/123/outcome_rollups', {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: SortBy.SortableName,
           sort_order: SortOrder.ASC,
           page: 1,

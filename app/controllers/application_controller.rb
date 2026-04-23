@@ -349,9 +349,31 @@ class ApplicationController < ActionController::Base
 
         @js_env[:PRE_COOKIE_CONSENT] = "null"
 
-        if load_usage_metrics?
+        classic_usage_metrics = load_usage_metrics?
+        consented_usage_metrics = load_consented_usage_metrics?
+        cookie_consent_necessary = cached_features[:cookie_consent_necessary]
+        potentially_underage = potentially_underage_user?
+
+        @js_env[:EXPECTED_USAGE_METRICS_BEHAVIOR] = should_track_usage(
+          classic_usage_metrics:,
+          consented_usage_metrics:,
+          cookie_consent_necessary:,
+          potentially_underage:
+        )
+
+        if potentially_underage
+          @js_env[:PRE_COOKIE_CONSENT] = "false"
+        end
+
+        if classic_usage_metrics
           @js_env[:PENDO_APP_ID] = usage_metrics_api_key
-          if cached_features[:cookie_consent_necessary]
+          @js_env[:PENDO_APP_ENV] = "io"
+          @js_env[:PRE_COOKIE_CONSENT] = (!potentially_underage).to_s
+        elsif consented_usage_metrics
+          @js_env[:PENDO_APP_ID] = usage_metrics_regional_api_key
+          @js_env[:PENDO_APP_ENV] = usage_metrics_regional_api_env
+
+          if cookie_consent_necessary && !potentially_underage
             mobile_webview = session&.dig(:is_mobile_webview)
             mobile_consent = session&.dig(:mobile_cookie_consent)
 
@@ -373,7 +395,7 @@ class ApplicationController < ActionController::Base
               # @current_user.custom_data.where(namespace: "MOBILE_CANVAS_COOKIE_CONSENT").first
             end
           else
-            @js_env[:PRE_COOKIE_CONSENT] = "true"
+            @js_env[:PRE_COOKIE_CONSENT] = (!potentially_underage).to_s
           end
         end
 
@@ -550,7 +572,6 @@ class ApplicationController < ActionController::Base
     render_both_to_do_lists
     scheduled_feedback_releases
     speedgrader_studio_media_capture
-    student_access_token_management
     validate_call_to_action
     block_content_editor_ai_alt_text
     ux_list_concluded_courses_in_bp
@@ -560,7 +581,6 @@ class ApplicationController < ActionController::Base
     account_level_mastery_scales
     ams_root_account_integration
     ams_advanced_content_organization
-    api_rate_limits
     buttons_and_icons_root_account
     canvas_apps_sub_account_access
     cookie_consent_necessary
@@ -576,6 +596,7 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
+    institutional_tags
     instui_nav
     login_registration_ui_identity
     lock_lti_registrations
@@ -591,6 +612,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_usage_data_low_usage
     lti_registrations_usage_tab
     lti_toggle_placements
+    substitution_variable_display
     mobile_offline_mode
     modules_requirements_allow_percentage
     nav_menu_links
@@ -605,10 +627,13 @@ class ApplicationController < ActionController::Base
     rubric_criterion_range
     scheduled_page_publication
     send_usage_metrics
+    send_usage_metrics_after_consent
     top_navigation_placement
     youtube_migration
     educator_dashboard
     widget_dashboard
+    default_discussion_options
+    course_navigation_and_feature_options_permissions
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
@@ -728,7 +753,6 @@ class ApplicationController < ActionController::Base
     end
     account = Context.get_account(@context)
     rce_env_hash[:RICH_CONTENT_INST_RECORD_TAB_DISABLED] = account ? account.disable_rce_media_uploads? : false
-    rce_env_hash[:RICH_CONTENT_AI_TEXT_TOOLS] = account ? account.feature_enabled?(:ai_text_tools) : false
     js_env(rce_env_hash, overwrite: true) # Allow overriding in case this gets called more than once
   end
   helper_method :rce_js_env
@@ -3648,6 +3672,25 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_user?(check_disabled:)
   end
   helper_method :k5_user?
+
+  def potentially_underage_user?
+    @current_user&.underage? || k12? || @domain_root_account&.settings&.dig(:has_underage_users) || k5_user?
+  end
+
+  def should_track_usage(classic_usage_metrics: nil, consented_usage_metrics: nil, cookie_consent_necessary: nil, potentially_underage: nil)
+    classic_usage_metrics ||= @domain_root_account&.feature_enabled?(:send_usage_metrics) && usage_metrics_api_key.present?
+    consented_usage_metrics ||= @domain_root_account&.feature_enabled?(:send_usage_metrics_after_consent) && usage_metrics_regional_api_key.present? && usage_metrics_regional_api_env.present?
+    cookie_consent_necessary ||= @domain_root_account&.feature_enabled?(:cookie_consent_necessary)
+    potentially_underage ||= potentially_underage_user?
+
+    if !@current_user || potentially_underage || (!consented_usage_metrics && !classic_usage_metrics)
+      "no_track_usage"
+    elsif classic_usage_metrics || (consented_usage_metrics && !cookie_consent_necessary)
+      "track_usage"
+    elsif consented_usage_metrics && cookie_consent_necessary
+      "ask_for_consent"
+    end
+  end
 
   def widget_dashboard_eligible?
     return false unless @current_user

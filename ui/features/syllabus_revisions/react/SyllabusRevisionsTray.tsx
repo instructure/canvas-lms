@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'

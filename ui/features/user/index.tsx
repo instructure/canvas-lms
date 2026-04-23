@@ -27,7 +27,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconExportLine} from '@instructure/ui-icons'
 import {AccessTokensSection} from '@canvas/access-tokens/AccessTokensSection'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import TerminateSessions from '@canvas/terminate-sessions/react'
 import type {UserId} from '@canvas/access-tokens/UserId'
 
@@ -101,10 +101,7 @@ ready(() => {
     }
   }
 
-  if (
-    ENV.FEATURES.student_access_token_management &&
-    ENV.PERMISSIONS?.can_view_user_generated_access_tokens
-  ) {
+  if (ENV.PERMISSIONS?.can_view_user_generated_access_tokens) {
     const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
     render(
       <QueryClientProvider client={queryClient}>

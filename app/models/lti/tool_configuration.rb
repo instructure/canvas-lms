@@ -19,6 +19,8 @@
 
 module Lti
   class ToolConfiguration < ApplicationRecord
+    include Canvas::SoftDeletable
+
     VISIBLE_TO_ADMINS = "admins"
     VISIBLE_TO_MEMBERS = "members"
     PUBLIC = "public"
@@ -33,6 +35,7 @@ module Lti
     after_commit :update_unified_tool_id, if: :update_unified_tool_id?
 
     validates :developer_key_id, uniqueness: { scope: :lti_registration_id }, allow_nil: true
+    validates :workflow_state, presence: true, inclusion: { in: %w[active deleted] }
     validate :require_developer_key_or_lti_registration
     validate :validate_configuration
     validate :validate_placements
@@ -69,7 +72,7 @@ module Lti
         redirect_uris:,
         launch_settings:,
         placements:,
-      }
+      }.with_indifferent_access
     end
 
     def effective_developer_key

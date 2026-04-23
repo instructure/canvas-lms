@@ -31,8 +31,10 @@ import {
   IconTroubleLine,
   IconLockSolid,
   IconOvalHalfSolid,
+  IconRemoveLinkSolid,
+  IconDeactivateUserSolid,
 } from '@instructure/ui-icons'
-import type {ReduxState, RolePermission, PermissionModifyAction} from './types'
+import type {ReduxState, RolePermission, PermissionModifyAction, PermissionUpdate} from './types'
 import {EnabledState} from './types'
 
 const I18n = createI18nScope('permission_button')
@@ -49,6 +51,8 @@ enum MenuId {
   ENABLED = 'enabled',
   DISABLED = 'disabled',
   LOCKED = 'locked',
+  APPLIES_TO_SELF = 'applies_to_self',
+  APPLIES_TO_DESCENDANTS = 'applies_to_descendants',
 }
 
 const ENABLED_STATE_TO_MENU_ID: Record<EnabledState, MenuId> = {
@@ -72,6 +76,7 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
   const [showMenu, setShowMenu] = useStateWithCallback<boolean>(false)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
 
+  const isSiteAdmin: boolean = useSelector((s: ReduxState) => s.isSiteAdmin)
   const apiBusy: boolean = useSelector((s: ReduxState) =>
     s.apiBusy.some(elt => elt.id === roleId && elt.name === permissionName),
   )
@@ -102,22 +107,28 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
   }, [setFocus, cleanFocus])
 
   function renderAllyScreenReaderTag(): string {
-    const {enabled, locked} = permission
+    const {enabled, locked, applies_to_self, applies_to_descendants} = permission
     let status: string = ''
-    if (enabled === EnabledState.ALL && !locked) {
-      status = I18n.t('Enabled')
-    } else if (enabled === EnabledState.ALL && locked) {
-      status = I18n.t('Enabled and Locked')
-    } else if (enabled === EnabledState.PARTIAL && !locked) {
-      status = I18n.t('Partially enabled')
-    } else if (enabled === EnabledState.PARTIAL && locked) {
+    if (enabled === EnabledState.ALL && !locked) status = I18n.t('Enabled')
+    else if (enabled === EnabledState.ALL && locked) status = I18n.t('Enabled and Locked')
+    else if (enabled === EnabledState.PARTIAL && !locked) status = I18n.t('Partially enabled')
+    else if (enabled === EnabledState.PARTIAL && locked)
       status = I18n.t('Partially enabled and Locked')
-    } else if (enabled === EnabledState.NONE && !locked) {
-      status = I18n.t('Disabled')
-    } else {
-      status = I18n.t('Disabled and Locked')
+    else if (enabled === EnabledState.NONE && !locked) status = I18n.t('Disabled')
+    else status = I18n.t('Disabled and Locked')
+
+    if (isSiteAdmin) {
+      if (applies_to_self && !applies_to_descendants)
+        status += `, ${I18n.t('applies only to self')}`
+      else if (!applies_to_self && applies_to_descendants)
+        status += `, ${I18n.t('applies only to descendants')}`
     }
-    return `${status} ${permissionLabel} ${roleLabel}`
+
+    return I18n.t('Status of permission %{permission}, for role %{role}: %{status}', {
+      permission: permissionLabel,
+      role: roleLabel,
+      status,
+    })
   }
 
   function closeMenu(): void {
@@ -139,8 +150,19 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
     return checked
   }
 
+  function appliesToSelection({applies_to_self, applies_to_descendants}: RolePermission): MenuId[] {
+    const result: MenuId[] = []
+    // We want to be careful here to only include items that are explicitly false,
+    // since the absence of these fields in the API response should be treated as
+    // true (i.e. applies to both by default). Effectively, a missing field is treated
+    // as a true value i.e. the item is checked.
+    if (applies_to_self !== false) result.push(MenuId.APPLIES_TO_SELF)
+    if (applies_to_descendants !== false) result.push(MenuId.APPLIES_TO_DESCENDANTS)
+    return result
+  }
+
   function renderButton(): JSX.Element {
-    const {enabled} = permission
+    const {enabled, readonly} = permission
 
     function stateIcon() {
       if (enabled === EnabledState.NONE) return IconTroubleLine
@@ -159,11 +181,12 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
         }}
         onClick={toggleMenu}
         onFocus={props.onFocus}
-        interaction={permission.readonly ? 'disabled' : 'enabled'}
+        interaction={readonly ? 'disabled' : 'enabled'}
         size="large"
         withBackground={false}
         withBorder={false}
         color={stateColor}
+        data-color={stateColor}
         margin={inTray ? '0' : 'small 0 0 0'}
         screenReaderLabel={renderAllyScreenReaderTag()}
       >
@@ -172,9 +195,28 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
     )
   }
 
-  function renderLockOrSpinner(): JSX.Element {
-    const {locked, explicit} = permission
+  function renderSideIcons(): JSX.Element {
+    const {locked, explicit, applies_to_descendants, applies_to_self} = permission
     const flexWidth = inTray ? '22px' : '18px'
+
+    let lowerIcon: JSX.Element | null = null
+    if (apiBusy)
+      lowerIcon = (
+        <Spinner delay={0} size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
+      )
+    else if (isSiteAdmin && applies_to_descendants === false)
+      lowerIcon = (
+        <Text color="primary">
+          <IconRemoveLinkSolid data-testid="permission-button-no-descendants" />
+        </Text>
+      )
+    else if (isSiteAdmin && applies_to_self === false)
+      lowerIcon = (
+        <Text color="primary">
+          <IconDeactivateUserSolid data-testid="permission-button-no-self" />
+        </Text>
+      )
+
     return (
       <Flex direction="column" margin="none none none xx-small" width={flexWidth}>
         <Flex.Item size="24px">
@@ -184,15 +226,7 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
             </Text>
           )}
         </Flex.Item>
-        <Flex.Item size="24px">
-          {apiBusy && (
-            <Spinner
-              delay={0}
-              size="x-small"
-              renderTitle={I18n.t('Waiting for request to complete')}
-            />
-          )}
-        </Flex.Item>
+        <Flex.Item size="24px">{lowerIcon}</Flex.Item>
       </Flex>
     )
   }
@@ -201,16 +235,8 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
     const closeMenuIfInTray = inTray ? () => {} : closeMenu
     const selected = checkedSelection(permission)
 
-    function adjustPermissions({
-      enabled,
-      locked,
-      explicit,
-    }: {
-      enabled?: boolean
-      locked?: boolean
-      explicit: boolean
-    }): void {
-      handleClick({name: permissionName, id: roleId, inTray, enabled, locked, explicit})
+    function adjustPermissions(update: PermissionUpdate): void {
+      handleClick({name: permissionName, id: roleId, inTray, ...update})
     }
 
     // Since the enum enabled values exist only here on the front end and
@@ -248,6 +274,33 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
       }
     }
 
+    const appliesToSelected = appliesToSelection(permission)
+
+    function appliesToChange(_e: unknown, updated: Array<string | number | undefined>): void {
+      const currentSelf = appliesToSelected.includes(MenuId.APPLIES_TO_SELF)
+      const currentDesc = appliesToSelected.includes(MenuId.APPLIES_TO_DESCENDANTS)
+
+      let newSelf: boolean
+      let newDesc: boolean
+
+      if (updated.length === 0) {
+        // at least one must be chosen... if the user attempts to uncheck both,
+        // just toggle both so it flips to the other
+        newSelf = !currentSelf
+        newDesc = !currentDesc
+      } else {
+        newSelf = updated.includes(MenuId.APPLIES_TO_SELF)
+        newDesc = updated.includes(MenuId.APPLIES_TO_DESCENDANTS)
+      }
+
+      adjustPermissions({
+        enabled: permission.enabled !== EnabledState.NONE,
+        explicit: true,
+        applies_to_self: newSelf,
+        applies_to_descendants: newDesc,
+      })
+    }
+
     return (
       <Menu
         placement="bottom center"
@@ -281,6 +334,28 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
             <Text>{I18n.t('Use Default')}</Text>
           </Menu.Item>
         </Menu.Group>
+        {isSiteAdmin && (
+          <Menu.Group
+            label={I18n.t('Apply to...')}
+            allowMultiple={true}
+            disabled={permission.enabled === EnabledState.NONE}
+            selected={appliesToSelected}
+            onSelect={appliesToChange}
+          >
+            <Menu.Item
+              id="permission_table_applies_to_self_menu_item"
+              value={MenuId.APPLIES_TO_SELF}
+            >
+              <Text>{I18n.t('Self')}</Text>
+            </Menu.Item>
+            <Menu.Item
+              id="permission_table_applies_to_descendants_menu_item"
+              value={MenuId.APPLIES_TO_DESCENDANTS}
+            >
+              <Text>{I18n.t('Descendants')}</Text>
+            </Menu.Item>
+          </Menu.Group>
+        )}
       </Menu>
     )
   }
@@ -298,8 +373,8 @@ function PermissionButton(props: PermissionButtonProps): JSX.Element {
       id={`${props.permissionName}_${props.roleId}`}
       className="ic-permissions__permission-button-container"
     >
-      <div>{inTray || showMenu ? renderMenu(button) : button}</div>
-      {renderLockOrSpinner()}
+      {inTray || showMenu ? renderMenu(button) : button}
+      {renderSideIcons()}
     </div>
   )
 }

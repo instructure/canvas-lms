@@ -19,7 +19,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import SectionList from '../SectionList'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 describe('SectionList', () => {
   const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: 'path/to/profile'}

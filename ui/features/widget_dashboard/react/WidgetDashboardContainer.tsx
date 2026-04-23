@@ -43,14 +43,12 @@ import {useWidgetTheme} from './theme/WidgetThemeContext'
 const I18n = createI18nScope('widget_dashboard')
 
 const WidgetDashboardContainer: React.FC = () => {
-  const {observedUsersList, canAddObservee, currentUser, currentUserRoles, dashboardFeatures} =
-    useWidgetDashboard()
+  const {observedUsersList, canAddObservee, currentUser, currentUserRoles} = useWidgetDashboard()
   const {isDark} = useWidgetTheme()
   const {isMobile} = useResponsiveContext()
   const {isEditMode, isDirty, isSaving, saveError, enterEditMode, exitEditMode, clearError} =
     useWidgetDashboardEdit()
   const {config, resetConfig, saveLayout} = useWidgetLayout()
-  const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
   const [switchingDashboard, setSwitchingDashboard] = useState(false)
   const customizeButtonRef = useRef<Element | null>(null)
   const wasEditModeRef = useRef(isEditMode)
@@ -110,7 +108,7 @@ const WidgetDashboardContainer: React.FC = () => {
       )}
       <Flex direction="column" gap="small" margin="0 0 medium">
         <Flex.Item>
-          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center">
+          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center" wrap="wrap">
             <Flex.Item shouldGrow>
               <Heading
                 level="h1"
@@ -139,41 +137,37 @@ const WidgetDashboardContainer: React.FC = () => {
                 <DarkModeToggle />
               </Flex.Item>
             )}
-            {isCustomizationEnabled && (
+            {isEditMode ? (
               <>
-                {isEditMode ? (
-                  <>
-                    <Flex.Item>
-                      <Button onClick={handleCancel} data-testid="cancel-customize-button">
-                        {I18n.t('Cancel')}
-                      </Button>
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Button
-                        color="primary"
-                        onClick={handleSave}
-                        interaction={isSaving ? 'disabled' : 'enabled'}
-                        data-testid="save-customize-button"
-                      >
-                        {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
-                      </Button>
-                    </Flex.Item>
-                  </>
-                ) : (
-                  <Flex.Item>
-                    <Button
-                      elementRef={el => {
-                        customizeButtonRef.current = el
-                      }}
-                      onClick={enterEditMode}
-                      renderIcon={<IconConfigureLine />}
-                      data-testid="customize-dashboard-button"
-                    >
-                      {I18n.t('Customize dashboard')}
-                    </Button>
-                  </Flex.Item>
-                )}
+                <Flex.Item>
+                  <Button onClick={handleCancel} data-testid="cancel-customize-button">
+                    {I18n.t('Cancel')}
+                  </Button>
+                </Flex.Item>
+                <Flex.Item>
+                  <Button
+                    color="primary"
+                    onClick={handleSave}
+                    interaction={isSaving ? 'disabled' : 'enabled'}
+                    data-testid="save-customize-button"
+                  >
+                    {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
+                  </Button>
+                </Flex.Item>
               </>
+            ) : (
+              <Flex.Item>
+                <Button
+                  elementRef={el => {
+                    customizeButtonRef.current = el
+                  }}
+                  onClick={enterEditMode}
+                  renderIcon={<IconConfigureLine />}
+                  data-testid="customize-dashboard-button"
+                >
+                  {I18n.t('Customize dashboard')}
+                </Button>
+              </Flex.Item>
             )}
             {ENV.add_oak_mount_point && (
               <Flex.Item>

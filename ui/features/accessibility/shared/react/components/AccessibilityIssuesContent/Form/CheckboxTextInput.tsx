@@ -25,13 +25,13 @@ import {Flex} from '@instructure/ui-flex'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {FormMessage} from '@instructure/ui-form-field'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentHandle, FormComponentProps} from './index'
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {useShallow} from 'zustand/react/shallow'
-import {useScreenReaderAlert} from '../../../hooks/useScreenReaderAlert'
 import {GenerateButton, ButtonLabelByState} from '../GenerateButton'
 import {altTextGenerationErrorMessage} from '../../../utils/altTextErrors'
 
@@ -89,7 +89,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
       const [generationError, setGenerationError] = useState<string | null>(null)
-      const setAlertMessage = useScreenReaderAlert()
+      const [srAnnouncement, setSrAnnouncement] = useState('')
       const [isAiAltTextGenerationEnabled, selectedItem] = useAccessibilityScansStore(
         useShallow(state => [state.isAiAltTextGenerationEnabled, state.selectedScan]),
       )
@@ -98,7 +98,6 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
         const {isValid, errorMessage} = validateAltText(value, checked, issue.form.inputMaxLength)
         onChangeValue(value)
         onValidationChange?.(isValid, errorMessage)
-        if (!isValid && errorMessage) setAlertMessage(errorMessage)
       }
 
       const handleCheckboxValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,6 +157,11 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
           .then(resultJson => {
             const generatedAltText = resultJson?.value || ''
             updateField(generatedAltText, isChecked)
+            if (generatedAltText) {
+              setSrAnnouncement(
+                I18n.t('Alt text generated: %{altText}', {altText: generatedAltText}),
+              )
+            }
           })
           .catch(error => {
             console.error('Error generating text input:', error)
@@ -207,6 +211,12 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               required
               messages={formMessages}
             />
+
+            {isAiAltTextGenerationEnabled && srAnnouncement && (
+              <Alert liveRegion={getLiveRegion} isLiveRegionAtomic screenReaderOnly>
+                {srAnnouncement}
+              </Alert>
+            )}
 
             {isAiAltTextGenerationEnabled && issue.form.canGenerateFix && !isDisabled && (
               <Flex as="div" gap="x-small" direction="column" alignItems="start">

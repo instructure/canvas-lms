@@ -20,5 +20,9 @@
 module LlmConversation
   module Errors
     class ConversationError < StandardError; end
+
+    # Raised on HTTP 409 Conflict. Retrying a conflict
+    # (e.g. account already provisioned) would not resolve it.
+    class ConflictError < StandardError; end
   end
 end

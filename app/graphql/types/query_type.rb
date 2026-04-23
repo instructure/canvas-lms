@@ -191,9 +191,6 @@ module Types
                   end&.map(&:course)
     end
 
-    InstructorWithEnrollments = Struct.new(:user, :enrollments)
-    InstructorEnrollmentInfo = Struct.new(:course, :type, :role, :state)
-
     field :course_instructors_connection, InstructorWithEnrollmentsType.connection_type, null: true do
       description "Paginated instructors with their enrollments across multiple courses"
       argument :course_ids,
@@ -213,7 +210,7 @@ module Types
 
                           current_user.cached_course_ids_for_observed_user(observed_user).map(&:to_s)
                         else
-                          current_user.enrollments.active_by_date.pluck(:course_id).uniq.map(&:to_s)
+                          current_user.participating_course_ids.map(&:to_s)
                         end
 
       course_ids = if course_ids.blank?
@@ -231,7 +228,8 @@ module Types
 
       deduplicated_ids_subquery = Enrollment
                                   .joins(:enrollment_state)
-                                  .current
+                                  .where(workflow_state: "active")
+                                  .joins(:course)
                                   .where(course_id: course_ids)
                                   .where(type: types_to_filter)
                                   .where(enrollment_states: { restricted_access: false, state: "active" })
@@ -245,45 +243,7 @@ module Types
                                     Arel.sql("enrollments.id")
                                   )
 
-      grouped_results = Enrollment
-                        .joins(:user, :course, :role)
-                        .where(id: deduplicated_ids_subquery)
-                        .group("users.id, users.sortable_name")
-                        .order("users.sortable_name ASC")
-                        .pluck(
-                          Arel.sql("users.id"),
-                          Arel.sql("json_agg(json_build_object(
-                            'course_id', courses.id,
-                            'type', enrollments.type,
-                            'role_id', roles.id,
-                            'state', enrollments.workflow_state
-                          ) ORDER BY courses.name)")
-                        )
-
-      return [] if grouped_results.empty?
-
-      user_ids = grouped_results.map(&:first)
-      all_enrollment_data = grouped_results.flat_map { |_, json| json }
-      course_ids_needed = all_enrollment_data.pluck("course_id").uniq
-      role_ids_needed = all_enrollment_data.pluck("role_id").uniq
-
-      users_by_id = User.where(id: user_ids).index_by(&:id)
-      courses_by_id = Course.where(id: course_ids_needed).index_by(&:id)
-      roles_by_id = Role.where(id: role_ids_needed).index_by(&:id)
-
-      grouped_results.map do |user_id, enrollments_data|
-        InstructorWithEnrollments.new(
-          user: users_by_id[user_id],
-          enrollments: enrollments_data.map do |e|
-            InstructorEnrollmentInfo.new(
-              course: courses_by_id[e["course_id"]],
-              type: e["type"],
-              role: roles_by_id[e["role_id"]],
-              state: e["state"]
-            )
-          end
-        )
-      end
+      InstructorQuery.new(deduplicated_ids_subquery)
     end
 
     field :courses,

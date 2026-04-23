@@ -168,8 +168,7 @@
             submission = assignment_presenter.submission
             assignment = assignment_presenter.assignment
           %>
-
-          <% unless @context.root_account.suppress_assignments? && assignment.suppress_assignment %>
+          <% unless @context.root_account.suppress_assignments? && (assignment.suppress_assignment || assignment.parent_assignment&.suppress_assignment) %>
             <tr class="<%= assignment_presenter.classes %>"
                 data-muted="<%= assignment_presenter.hide_grade_from_student? %>"
                 data-pending_quiz="<%= assignment_presenter.quiz_pending_review? %>"

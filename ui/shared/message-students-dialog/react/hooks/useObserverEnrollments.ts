@@ -17,7 +17,7 @@
  */
 
 import {useMemo} from 'react'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import type {Student} from '../types'
 import {executeQuery} from '@canvas/graphql'
 import {

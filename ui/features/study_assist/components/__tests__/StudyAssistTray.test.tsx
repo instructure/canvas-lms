@@ -20,11 +20,13 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import StudyAssistTray from '../StudyAssistTray'
+import * as PendoModule from '@canvas/pendo'
 
 const mockAssistContent = vi.fn((_props: object) => <div data-testid="assist-content" />)
 const mockAssistFlashCardsInteraction = vi.fn((_props: object) => <div />)
 const mockResetChat = vi.fn()
 const mockUseAssistContext = vi.fn(() => ({showBackButton: false, resetChat: mockResetChat}))
+const mockTrack = vi.fn()
 
 vi.mock('@canvas/instui-bindings/react/AiInformation', () => ({
   default: ({triggerButton}: {triggerButton: React.ReactNode}) => (
@@ -69,11 +71,17 @@ describe('StudyAssistTray', () => {
       WIKI_PAGE_ID: 'test-page',
       STUDY_ASSIST_TOOLS: ['Summarize', 'Quiz me', 'Flashcards'],
     } as any
+    vi.spyOn(PendoModule, 'initializePendo').mockResolvedValue({track: mockTrack})
     onDismiss.mockReset()
     mockAssistContent.mockClear()
     mockAssistFlashCardsInteraction.mockClear()
+    mockTrack.mockClear()
     mockResetChat.mockReset()
     mockUseAssistContext.mockReturnValue({showBackButton: false, resetChat: mockResetChat})
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('renders the AI information button', () => {
@@ -234,6 +242,90 @@ describe('StudyAssistTray', () => {
         cardHeight: '60vh',
       }),
     )
+  })
+
+  describe('analytics events', () => {
+    it('passes handleAnalyticsEvent to AssistContent', () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const {onAnalyticsEvent} = mockAssistContent.mock.calls[0][0] as {
+        onAnalyticsEvent: (event: string) => void
+      }
+      expect(typeof onAnalyticsEvent).toBe('function')
+    })
+
+    it('tracks thumbs up event with correct Pendo event name', async () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const {onAnalyticsEvent} = mockAssistContent.mock.calls[0][0] as {
+        onAnalyticsEvent: (event: string) => void
+      }
+      onAnalyticsEvent('chat-good-response')
+      await vi.waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('study_assist_chat-good-response', {type: 'track'})
+      })
+    })
+
+    it('tracks thumbs down event with correct Pendo event name', async () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const {onAnalyticsEvent} = mockAssistContent.mock.calls[0][0] as {
+        onAnalyticsEvent: (event: string) => void
+      }
+      onAnalyticsEvent('chat-bad-response')
+      await vi.waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('study_assist_chat-bad-response', {type: 'track'})
+      })
+    })
+
+    it('tracks prompt click events with correct Pendo event name', async () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const {onAnalyticsEvent} = mockAssistContent.mock.calls[0][0] as {
+        onAnalyticsEvent: (event: string) => void
+      }
+      onAnalyticsEvent('prompt-summarize')
+      await vi.waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('study_assist_prompt-summarize', {type: 'track'})
+      })
+    })
+
+    it('tracks citation link click events with correct Pendo event name', async () => {
+      render(
+        <StudyAssistTray
+          open={true}
+          onDismiss={onDismiss}
+          fetchAssistResponse={fetchAssistResponse}
+        />,
+      )
+      const {onAnalyticsEvent} = mockAssistContent.mock.calls[0][0] as {
+        onAnalyticsEvent: (event: string) => void
+      }
+      onAnalyticsEvent('citation-link-page')
+      await vi.waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('study_assist_citation-link-page', {type: 'track'})
+      })
+    })
   })
 
   describe('back button', () => {

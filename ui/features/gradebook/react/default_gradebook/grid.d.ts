@@ -157,6 +157,7 @@ export type GridDisplaySettings = {
   }
   viewUngradedAsZero: boolean
   showUnpublishedAssignments: boolean
+  showSuppressedAssignments: boolean
   showSeparateFirstLastNames: boolean
   hideAssignmentGroupTotals: boolean
   viewHiddenGradesIndicator: boolean

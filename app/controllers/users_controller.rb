@@ -417,6 +417,20 @@ class UsersController < ApplicationController
         educator_config = @current_user.get_preference(:educator_dashboard_config) || {}
         educator_config["layout"] ||= WidgetDashboardLayoutValidator.default_educator_layout
 
+        # Widget composes announcement text across multiple courses. Scope the
+        # RCE JWT to the user (no single course/account @context is available)
+        # and pin heavy features off so the RCE runs in a lite, text-only mode.
+        js_env(rce_js_env_base(user: @current_user, context: @current_user))
+        js_env({
+                 RICH_CONTENT_CAN_UPLOAD_FILES: false,
+                 RICH_CONTENT_CAN_EDIT_FILES: false,
+                 RICH_CONTENT_FILES_TAB_DISABLED: true,
+                 RICH_CONTENT_INST_RECORD_TAB_DISABLED: true,
+                 RICH_CONTENT_AI_TEXT_TOOLS: false
+               },
+               overwrite: true)
+        js_env({ context_asset_string: @current_user.asset_string })
+
         js_env({
                  PREFERENCES: {
                    dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -426,7 +440,6 @@ class UsersController < ApplicationController
                    widget_dashboard_config: educator_config
                  },
                  DASHBOARD_FEATURES: {
-                   widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
                    platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard),
                    educator_dashboard: true
                  }
@@ -453,8 +466,7 @@ class UsersController < ApplicationController
                  SHARED_COURSE_DATA: course_data_with_grades,
                  WIDGET_DASHBOARD_DARK_MODE: !!@current_user&.preferences&.dig(:widget_dashboard_dark_mode),
                  DASHBOARD_FEATURES: {
-                   widget_dashboard_customization: Account.site_admin.feature_enabled?(:widget_dashboard_customization),
-                   widget_dashboard_dark_mode: Account.site_admin.feature_enabled?(:widget_dashboard_dark_mode),
+                   widget_dashboard_dark_mode: @domain_root_account.feature_enabled?(:widget_dashboard_dark_mode),
                    platform_ui_unified_widgets_dashboard: Account.site_admin.feature_enabled?(:platform_ui_unified_widgets_dashboard),
                    educator_dashboard: false
                  }
@@ -573,6 +585,7 @@ class UsersController < ApplicationController
 
     if stale?(etag: @stream_items)
       @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? && !i.course.grants_right?(@user, :read_as_admin) }
+      @stream_items = @stream_items.reject { |i| i.asset_type == "Conversation" } if @is_observing_student
       render partial: "shared/recent_activity", layout: false
     end
   end
@@ -1457,7 +1470,8 @@ class UsersController < ApplicationController
             @domain_root_account,
             type: :implicit,
             require_sis: false,
-            include_all_pseudonyms: true
+            include_all_pseudonyms: true,
+            current_user: @current_user
           )
         @user.last_login = pseudonyms&.filter_map(&:current_login_at)&.max
       end
@@ -1794,7 +1808,16 @@ class UsersController < ApplicationController
     when request.get?
       return unless authorized_action(user, @current_user, :read)
 
-      render json: BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
+      results = BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
+
+      if params.key?(:include) && params[:include].include?("mobile_settings")
+        results[:pendo_mobile_teacher_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_teacher, failsafe: nil]
+        results[:pendo_mobile_parent_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_parent, failsafe: nil]
+        results[:pendo_mobile_student_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_student, failsafe: nil]
+        results[:usage_metrics] = should_track_usage
+      end
+
+      render json: results
     when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
 

@@ -1044,7 +1044,11 @@ module ApplicationHelper
     #
     # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
     # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
-    directives = "frame-src 'self' blob: #{allow_list_domains(include_tools: true)}; "
+    #
+    # rldb: is a custom URI scheme used by Respondus LockDown Browser to trigger the native app
+    # via a hidden iframe. It does not load external web content, so we are allowing it as a
+    # frame-src in the same way we allow blob: URIs.
+    directives = "frame-src 'self' blob: rldb: #{allow_list_domains(include_tools: true)}; "
     directives += default_csp_logging_directives
 
     apply_csp_header(directives)
@@ -1071,7 +1075,7 @@ module ApplicationHelper
       object_domains = "'self' " + allow_list_domains
       script_domains = "'self' 'unsafe-eval' 'unsafe-inline' " + allow_list_domains
     end
-    "frame-src #{frame_domains} blob:; script-src #{script_domains}; object-src #{object_domains}; "
+    "frame-src #{frame_domains} blob: rldb:; script-src #{script_domains}; object-src #{object_domains}; "
   end
 
   # Returns true if the current_path starts with the given value

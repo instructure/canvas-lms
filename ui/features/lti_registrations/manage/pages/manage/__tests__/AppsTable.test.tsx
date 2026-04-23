@@ -24,12 +24,12 @@ import {BrowserRouter} from 'react-router-dom'
 import {ZAccountId} from '../../../model/AccountId'
 import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ZLtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
 import {ZLtiRegistrationId} from '../../../model/LtiRegistrationId'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const mockFlash = showFlashAlert as MockedFunction<typeof showFlashAlert>
 

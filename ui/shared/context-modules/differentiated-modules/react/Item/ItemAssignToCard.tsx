@@ -52,7 +52,7 @@ import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
 import {Text} from '@instructure/ui-text'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import type {ItemType} from '../types'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import PeerReviewSelector from './peer-review/PeerReviewSelector'
 
 const I18n = createI18nScope('differentiated_modules')
@@ -375,6 +375,23 @@ export default forwardRef(function ItemAssignToCard(
       } else if (unparsedFieldKeys.size > 0) {
         key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
       }
+      // When the unlock_at field has an error because it is after another date,
+      // focus the date that needs to move later instead of the unlock_at field.
+      if (key === 'unlock_at' && validationErrors['unlock_at']) {
+        const unlockAt = availableFromDate ? new Date(availableFromDate).getTime() : null
+        const datesToCheck: Array<[string, string | null]> = [
+          ['required_replies_due_at', requiredRepliesDueDate],
+          ['reply_to_topic_due_at', replyToTopicDueDate],
+          ['due_at', dueDate],
+          ['lock_at', availableToDate],
+        ]
+        for (const [dateKey, dateValue] of datesToCheck) {
+          if (dateValue && unlockAt !== null && unlockAt > new Date(dateValue).getTime()) {
+            key = dateKey
+            break
+          }
+        }
+      }
       if (key) {
         dateInputRefs.current[key]?.focus()
         return dateInputRefs.current[key]
@@ -459,7 +476,7 @@ export default forwardRef(function ItemAssignToCard(
     dateValidator.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
 
   return (
-    <AlertManager breakpoints={{}}>
+    <AlertManager>
       <View as="div" {...wrapperProps}>
         <View
           data-testid="item-assign-to-card"

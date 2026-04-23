@@ -22,13 +22,17 @@ import useGroupCreate from '../useGroupCreate'
 import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/client/testing'
 import {createOutcomeGroupMocks} from '../../../mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 vi.useFakeTimers()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('useGroupCreate', () => {
   let cache

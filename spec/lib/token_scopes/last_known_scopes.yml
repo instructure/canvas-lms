@@ -2147,8 +2147,6 @@
   path: '/api/v1/release_notes/latest'
 - verb: GET
   path: '/api/v1/release_notes/unread_count'
-- verb: POST
-  path: '/api/v1/rich_content/generate'
 - verb: GET
   path: '/api/v1/rubrics/upload_template'
 - verb: GET
@@ -2391,6 +2389,10 @@
   path: '/api/v1/users/:user_id/custom_data(/*scope)'
 - verb: PUT
   path: '/api/v1/users/:user_id/custom_data(/*scope)'
+- verb: POST
+  path: '/api/v1/users/:user_id/educator_accessibility_course_scan'
+- verb: GET
+  path: '/api/v1/users/:user_id/educator_accessibility_course_statistics'
 - verb: GET
   path: '/api/v1/users/:user_id/enrollments'
 - verb: GET

@@ -466,6 +466,7 @@ class Account < ApplicationRecord
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
   add_setting :onetrust_consent_domain_id, root_only: true
+  add_setting :has_underage_users, boolean: true, root_only: true, default: false
 
   # suppress_notifications can be:
   #   true          - suppress all notifications (backward compatible)
@@ -1929,12 +1930,23 @@ class Account < ApplicationRecord
       sub: user.global_id.to_s,
       org: uuid,
       primary: build_links.call(config[:primary]),
-      secondary: build_links.call(config[:secondary])
+      secondary: build_links.call(config[:secondary]),
+      customMessageDiscovery: discovery_page_custom_message
     }
   end
 
   def discovery_page_link_for(provider, entry)
     { label: Sanitize.clean(entry[:label].to_s), icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
+  end
+
+  def discovery_page_custom_message
+    return nil unless Account.site_admin.feature_enabled?(:new_login_ui_custom_labels)
+    return nil unless discovery_page_allowed?
+
+    value = brand_config&.get_value("ic-brand-Discovery-custom-message").presence
+    return nil if value.nil?
+
+    value.gsub(/[\r\n]+/, " ").strip
   end
 
   def validate_auth_discovery_url
@@ -2048,12 +2060,26 @@ class Account < ApplicationRecord
       RUBY
     end
 
+    def define_special_account_exists(key)
+      special_account_list << key
+      instance_eval <<~RUBY, __FILE__, __LINE__ + 1
+        # def site_admin_exists?
+        #   special_account_exists?(:site_admin)
+        # end
+        def self.#{key}_exists?
+          special_account_exists?(:#{key})
+        end
+      RUBY
+    end
+
     def all_special_accounts
       special_account_list.map { |key| send(key) }
     end
   end
   define_special_account(:default, "Default Account") # Account.default
   define_special_account(:site_admin) # Account.site_admin
+  define_special_account_exists(:default) # Account.default_exists?
+  define_special_account_exists(:site_admin) # Account.site_admin_exists?
 
   def clear_special_account_cache_if_special
     if shard == Shard.birth && Account.special_account_ids.values.map(&:to_i).include?(id)
@@ -2083,6 +2109,14 @@ class Account < ApplicationRecord
         account
       end
     end
+  end
+
+  # We can't just call get_special_account.present? because in non-production
+  # environments, that actually creates the account, which we want to avoid!
+  def self.special_account_exists?(special_account_type)
+    special_accounts[special_account_type].present? ||
+      special_account_ids[special_account_type] ||
+      Setting.get("#{special_account_type}_account_id", nil).present?
   end
 
   def self.get_special_account(special_account_type, default_account_name, force_create: false)
@@ -2299,7 +2333,7 @@ class Account < ApplicationRecord
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
       tabs << { id: TAB_PLUGINS, label: t("#account.tab_plugins", "Plugins"), css_class: "plugins", href: :plugins_path, no_args: true } if root_account? && grants_right?(user, :manage_site_settings)
       tabs << { id: TAB_RELEASE_NOTES, label: t("Release Notes"), css_class: "release_notes", href: :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && grants_right?(user, :manage_release_notes)
-      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && feature_enabled?(:api_rate_limits) && grants_right?(user, :manage_rate_limiting)
+      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && grants_right?(user, :manage_rate_limiting)
       tabs << { id: TAB_JOBS, label: t("#account.tab_jobs", "Jobs"), css_class: "jobs", href: :jobs_path, no_args: true } if root_account? && grants_right?(user, :view_jobs)
     else
       tabs << { id: TAB_COURSES, label: t("#account.tab_courses", "Courses"), css_class: "courses", href: :account_path } if user && grants_right?(user, :read_course_list)
@@ -2326,7 +2360,7 @@ class Account < ApplicationRecord
       tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
-      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && feature_enabled?(:api_rate_limits) && grants_right?(user, :manage_rate_limiting)
+      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && grants_right?(user, :manage_rate_limiting)
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
         tabs << { id: TAB_SIS_IMPORT,
                   label: t("#account.tab_sis_import", "SIS Import"),

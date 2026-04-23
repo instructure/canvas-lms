@@ -772,6 +772,9 @@
 #     }
 #
 class AssignmentsApiController < ApplicationController
+  include HorizonMode
+
+  allow_public_horizon_access :index, :show
   before_action :require_context
   before_action :require_user_visibility, only: [:user_index]
   include Api::V1::Assignment
@@ -1423,7 +1426,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
-  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading peer reviews.
   #  Defaults to "points" if this field is omitted.
   #
@@ -1667,7 +1670,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
-  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading peer reviews.
   #  Defaults to "points" if this field is omitted.
   #

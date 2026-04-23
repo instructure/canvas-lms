@@ -1364,6 +1364,21 @@ describe AccountsController do
     end
   end
 
+  describe "institutional tags permissions in course_user_search" do
+    before do
+      account_with_admin_logged_in
+      @account.enable_feature!(:institutional_tags)
+    end
+
+    it "includes institutional tags permissions in PERMISSIONS js_env" do
+      get "show", params: { id: @account.id }
+      permissions = assigns[:js_env][:PERMISSIONS]
+      expect(permissions[:can_view_institutional_tags]).to be true
+      expect(permissions[:can_create_institutional_tags]).to be true
+      expect(permissions[:can_edit_institutional_tags]).to be true
+    end
+  end
+
   describe "#acceptable_use_policy" do
     before do
       @account = Account.create!
@@ -1875,6 +1890,22 @@ describe AccountsController do
       expect(response).to be_successful
       expect(response.body).to match(/#{@c1.id}/)
       expect(response.body).to match(/#{@c2.id}/)
+    end
+
+    it "accepts array of enrollment terms and correctly filters courses" do
+      admin_logged_in(@account)
+      term1 = @account.root_account.enrollment_terms.create!(name: "Term A")
+      term2 = @account.root_account.enrollment_terms.create!(name: "Term B")
+      term3 = @account.root_account.enrollment_terms.create!(name: "Term C")
+
+      course1 = course_model(account: @account, enrollment_term: term1)
+      course_model(account: @account, enrollment_term: term2)
+      course3 = course_model(account: @account, enrollment_term: term3)
+
+      get "courses_api", params: { account_id: @account.id, enrollment_term_id: [term1.id, term3.id] }, format: :json
+      expect(response).to be_successful
+      data = response.parsed_body
+      expect(data.pluck("id")).to contain_exactly(course1.id, course3.id)
     end
 
     context "post_manually" do

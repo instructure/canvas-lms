@@ -55,8 +55,8 @@ import {
 } from './utils'
 import {getSettingAsync, setSetting} from '@canvas/settings-query/react/settingsQuery'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import {sessionStoragePersister} from '@canvas/query'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {sessionStoragePersister} from '@instructure/platform-query'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 const I18n = createI18nScope('sidenav')
 
@@ -165,7 +165,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSettingAsync,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const {data: unreadContentSharesCount} = useQuery({
@@ -174,7 +174,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
     refetchOnWindowFocus: true,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   useBroadcastQuery({
@@ -186,7 +186,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     refetchOnWindowFocus: true,
   })
 
@@ -199,7 +199,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryFn: getUnreadCount,
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   useLayoutEffect(() => {

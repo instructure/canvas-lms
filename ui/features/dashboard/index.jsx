@@ -20,7 +20,7 @@ import React from 'react'
 import {legacyRender} from '@canvas/react'
 import $ from 'jquery'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 import ready from '@instructure/ready'
 

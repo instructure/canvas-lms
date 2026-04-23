@@ -59,7 +59,7 @@ export default function LockedPeerReview({
       data-testid="locked-peer-review"
     >
       <Flex.Item>
-        <Img alt={I18n.t('Assignment locked until future date')} src={lockedSVG} width="380px" />
+        <Img alt="" src={lockedSVG} width="380px" />
       </Flex.Item>
       <Flex.Item>
         <Flex margin="small" direction="column" alignItems="center">

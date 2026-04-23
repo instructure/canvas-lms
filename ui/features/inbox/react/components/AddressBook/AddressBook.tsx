@@ -47,7 +47,7 @@ import React, {useEffect, useMemo, useState, useRef, useCallback, useContext} fr
 import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from '@apollo/client'
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('conversations_2')
 

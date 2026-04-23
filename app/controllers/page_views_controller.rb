@@ -547,6 +547,18 @@ class PageViewsController < ApplicationController
   #
   # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
   #
+  # @hint info
+  #   **Disclaimer**: The data is a best effort attempt, and is not guaranteed
+  #   to be complete or wholly accurate. This data is meant to be used for
+  #   rollups and analysis in the aggregate, not in isolation for auditing,
+  #   or other high-stakes analysis involving examining single users or
+  #   small samples. Page Views data is generated from the Canvas logs files,
+  #   not a transactional database, there are many places along the way
+  #   data can be lost and/or duplicated (though uncommon). Additionally,
+  #   given the size of this data, our processes ensure that errors can be
+  #   rectified at any point in time, with corrections integrated as soon as
+  #   they are identified and processed.
+  #
   # @argument query_id [String]
   #   The UUID of the completed query to retrieve results for
   #
@@ -794,6 +806,18 @@ class PageViewsController < ApplicationController
   # be compressed with gzip encoding.
   #
   # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @hint info
+  #   **Disclaimer**: The data is a best effort attempt, and is not guaranteed
+  #   to be complete or wholly accurate. This data is meant to be used for
+  #   rollups and analysis in the aggregate, not in isolation for auditing,
+  #   or other high-stakes analysis involving examining single users or
+  #   small samples. Page Views data is generated from the Canvas logs files,
+  #   not a transactional database, there are many places along the way
+  #   data can be lost and/or duplicated (though uncommon). Additionally,
+  #   given the size of this data, our processes ensure that errors can be
+  #   rectified at any point in time, with corrections integrated as soon as
+  #   they are identified and processed.
   #
   # @argument query_id [String]
   #   The UUID of the completed query to retrieve results for

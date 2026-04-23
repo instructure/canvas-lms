@@ -2014,15 +2014,23 @@ describe ContentMigration do
       expect(aq2.attachments.pluck(:display_name)).to match_array(%w[cn_image.jpg instructure.png test_image.jpg])
     end
 
-    it "creates attachment_associations during content migration for user attachments with matching UUIDs" do
-      other_user = user_factory
-      @copy_to = @cm.context
-      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
-      user_att1 = other_user.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
-      user_att2 = other_user.attachments.create(id: 100_000_000_005, uploaded_data: fixture_file_upload("292.mp3"), uuid: "sekret")
-      run_import(mig_att.id)
-      page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
-      expect(page2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id, user_att2.id])
+    context "with sharding" do
+      specs_require_sharding
+
+      it "creates attachment_associations during content migration for user attachments with matching UUIDs" do
+        other_user = user_factory
+        @copy_to = @cm.context
+        mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+        user_att1 = other_user.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+        @shard1.update(id: 5)
+        @shard1.activate do
+          second_shard_user = user_factory
+          @user_att2 = second_shard_user.attachments.create(id: 50_000_000_000_005, uploaded_data: fixture_file_upload("292.mp3"), uuid: "sekret")
+        end
+        run_import(mig_att.id)
+        page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+        expect(page2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id, @user_att2.id])
+      end
     end
 
     it "does not create attachment_associations during content migration for user attachments without matching UUIDs" do

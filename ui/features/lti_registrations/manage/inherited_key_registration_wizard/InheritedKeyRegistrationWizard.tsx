@@ -32,7 +32,7 @@ import {InheritedKeyRegistrationReview} from './InheritedKeyRegistrationReview'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {formatApiResultError, UnsuccessfulApiResult} from '../../common/lib/apiResult/ApiResult'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Footer} from '../registration_wizard_forms/Footer'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
@@ -232,6 +232,7 @@ const renderCustomizationBody = (
         <PrivacyConfirmationWrapper
           overlayStore={state.overlayStore}
           internalConfig={state.registration.overlaid_configuration}
+          originalConfig={state.registration.overlaid_configuration}
         />
       )
 

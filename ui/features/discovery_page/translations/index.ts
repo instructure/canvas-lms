@@ -23,6 +23,6 @@ const I18n = createI18nScope('discovery_page')
 export default function discoveryPageTranslations() {
   return {
     selectLoginMethod: I18n.t('Select a login method'),
-    moreSignInOptions: I18n.t('More sign in options'),
+    moreSignInOptions: I18n.t('More sign-in options'),
   }
 }

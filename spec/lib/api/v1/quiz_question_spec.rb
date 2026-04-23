@@ -184,41 +184,6 @@ describe Api::V1::QuizQuestion do
         end
       end
     end
-
-    describe "when verifiers and asset location should be set" do
-      let(:account) { Account.create! }
-      let(:user) { User.create }
-      let(:course) { Course.create!(account:) }
-      let(:context) { course }
-
-      before do
-        allow_any_instance_of(UserContent::FilesHandler::ProcessedUrl).to receive(:in_app).and_return(false)
-        TestableApiQuizQuestion.instance_variable_set(:@context, course)
-        attachment_model(context: course)
-        question_data = {
-          "answers" => answers,
-          "question_type" => "text_only_questions",
-          "question_text" => "<img src='/courses/#{course.id}/files/#{@attachment.id}' >",
-        }
-        @question = Quizzes::QuizQuestion.new(question_data:)
-        TestableApiQuizQuestion.instance_variable_set(:@domain_root_account, @attachment.root_account)
-      end
-
-      context "with a file attachment and double testing verifiers" do
-        double_testing_with_disable_adding_uuid_verifier_in_api_ff do
-          it "checks verifier string on attachment urls" do
-            subject = TestableApiQuizQuestion.question_json(
-              @question, user, session, context:, includes:, censored:, quiz_data:, shuffle_answers:
-            )
-            if disable_adding_uuid_verifier_in_api
-              expect(subject["question_text"]).not_to include("verifier=#{@attachment.uuid}")
-            else
-              expect(subject["question_text"]).to include("verifier=#{@attachment.uuid}")
-            end
-          end
-        end
-      end
-    end
   end
 
   describe "as a student" do

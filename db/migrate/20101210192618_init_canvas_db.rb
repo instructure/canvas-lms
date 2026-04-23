@@ -529,15 +529,31 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index
     end
 
+    create_table :ai_conversations do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :account, foreign_key: { to_table: :accounts }, null: false
+      t.references :course, null: false, foreign_key: true
+      t.references :user, null: false, foreign_key: true
+      t.references :ai_experience, null: false, foreign_key: true
+      t.string :llm_conversation_id, null: false, limit: 255
+      t.string :workflow_state, null: false, default: "active", limit: 255
+      t.timestamps
+
+      t.check_constraint "workflow_state IN ('active', 'completed', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+      t.index :llm_conversation_id, unique: true
+    end
+
     create_table :ai_experiences do |t|
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.references :account, foreign_key: { to_table: :accounts }, null: false
       t.references :course, null: false, foreign_key: true, index: false
       t.string :title, null: false, limit: 255
       t.text :description, limit: 65_536
-      t.text :facts, null: false, limit: 65_536
-      t.text :learning_objective, limit: 65_536
-      t.text :scenario, limit: 65_536
+      t.text :facts, limit: 65_536
+      t.text :learning_objective, null: false, limit: 65_536
+      t.text :pedagogical_guidance, null: false, limit: 65_536
       t.string :workflow_state, null: false, default: "unpublished", limit: 255
       t.timestamps
 
@@ -682,6 +698,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index [:assessor_asset_id, :assessor_asset_type], name: "aa_id_and_aa_type"
       t.index [:asset_id, :asset_type]
+      t.index [:workflow_state, :asset_id],
+              name: "index_assessment_requests_on_workflow_state_and_asset_id"
     end
 
     create_table :asset_user_accesses do |t|
@@ -827,6 +845,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :has_sub_assignments, null: false, default: false
       t.boolean :rubric_self_assessment_enabled, null: false, default: false
       t.boolean :suppress_assignment, default: false, null: false
+      t.boolean :peer_review_submission_required, null: false, default: true
+      t.boolean :peer_review_across_sections, null: false, default: true
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -839,6 +859,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               unique: true,
               where: "type = 'PeerReviewSubAssignment' AND workflow_state != 'deleted'",
               name: "index_assignments_on_parent_assignment_peer_review_unique"
+      t.index :type,
+              where: "type = 'SubAssignment' AND parent_assignment_id IS NULL AND workflow_state != 'deleted'",
+              name: "index_assignments_on_null_parent_for_subassignments"
     end
 
     create_table :assignment_configuration_tool_lookups do |t|
@@ -2078,30 +2101,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_discussion_entries_active_on_user_id_and_topic"
     end
 
-    create_table :discussion_entry_drafts do |t|
-      t.references :discussion_topic, null: false, foreign_key: true
-      t.references :discussion_entry, foreign_key: true, index: false
-      t.references :root_entry, foreign_key: { to_table: :discussion_entries }
-      t.references :parent, foreign_key: { to_table: :discussion_entries }
-      t.references :attachment, foreign_key: true
-      t.references :user, null: false, foreign_key: true
-      t.text :message
-      t.boolean :include_reply_preview, null: false, default: false
-      t.timestamps precision: 6
-
-      t.index %i[discussion_topic_id user_id],
-              name: "unique_index_on_topic_and_user",
-              where: "discussion_entry_id IS NULL AND root_entry_id IS NULL",
-              unique: true
-      t.index %i[root_entry_id user_id],
-              name: "unique_index_on_root_entry_and_user",
-              where: "discussion_entry_id IS NULL",
-              unique: true
-      t.index %i[discussion_entry_id user_id],
-              name: "unique_index_on_entry_and_user",
-              unique: true
-    end
-
     create_table :discussion_entry_participants do |t|
       t.references :discussion_entry, null: false, foreign_key: true, index: false
       t.references :user, null: false, foreign_key: true
@@ -2466,7 +2465,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :subject
       t.string :request_context_id, limit: 255
       t.references :account, index: false
-      t.bigint :zendesk_ticket_id, index: true
+      t.bigint :zendesk_ticket_id
       t.text :data
       t.string :category, limit: 255, index: true
 
@@ -2833,7 +2832,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :vendor_guid_2, limit: 255, index: true
       t.string :migration_id_2, limit: 255
       t.references :outcome_import, index: false
-      t.bigint :root_account_ids, array: true, index: { using: :gin }
+      t.bigint :root_account_ids, array: true
       t.references :copied_from_outcome, index: { where: "copied_from_outcome_id IS NOT NULL" }
       t.timestamp :archived_at, precision: 6, default: nil
 
@@ -2855,7 +2854,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :vendor_guid, limit: 255, index: true
       t.string :low_grade, limit: 255
       t.string :high_grade, limit: 255
-      t.string :vendor_guid_2, limit: 255, index: true
+      t.string :vendor_guid_2, limit: 255
       t.string :migration_id_2, limit: 255
       t.references :outcome_import, index: false
       t.references :root_account, foreign_key: { to_table: :accounts }
@@ -2870,7 +2869,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :learning_outcome_question_results do |t|
       t.references :learning_outcome_result, index: { name: "index_LOQR_on_learning_outcome_result_id" }
-      t.references :learning_outcome
+      t.references :learning_outcome, index: false
       t.bigint :associated_asset_id
       t.string :associated_asset_type, limit: 255
       t.float :score
@@ -3232,7 +3231,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :vendor_email, limit: 255
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }
       t.timestamps precision: nil
-      t.references :developer_key
+      t.references :developer_key, index: false
 
       t.index %i[product_code vendor_code root_account_id developer_key_id],
               unique: true,
@@ -3281,6 +3280,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :update_type, null: false
       t.text :comment
       t.timestamps
+      t.jsonb :old_configuration
+      t.jsonb :new_configuration
+      t.jsonb :old_context_controls
+      t.jsonb :new_context_controls
 
       t.replica_identity_index
     end
@@ -3425,6 +3428,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :update_payload
       t.text :registration_url
       t.string :subscription_id
+      t.references :migrated_to_context_external_tool,
+                   foreign_key: { to_table: :context_external_tools, on_delete: :nullify },
+                   index: {
+                     where: "migrated_to_context_external_tool_id IS NOT NULL"
+                   }
     end
 
     create_table :lti_tool_proxy_bindings do |t|
@@ -3795,7 +3803,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, default: "active", null: false
       t.timestamps
 
-      t.check_constraint "type IN ('product', 'client_id', 'lti_advantage', 'service_user_key', 'token', 'user', 'tool', 'session', 'ip')", name: "chk_type_enum"
+      t.check_constraint "type IN ('custom', 'product', 'client_id', 'lti_advantage', 'service_user_key', 'token', 'user', 'tool', 'session', 'ip')", name: "chk_type_enum"
       t.check_constraint "workflow_state IN ('active', 'deleted')", name: "chk_workflow_state_enum"
 
       t.index %i[type identifier], name: "index_on_client_identifier"
@@ -3819,7 +3827,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: false,
                    index: { name: "index_notification_policy_overrides_on_context" }
       t.references :communication_channel, null: false, foreign_key: true
-      t.references :notification
+      t.references :notification, index: false
       t.string :workflow_state, default: "active", null: false
       t.string :frequency
       t.timestamps precision: nil
@@ -3863,7 +3871,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :observer_alert_threshold, null: false, foreign_key: true
       t.references :context, polymorphic: true, index: { name: "index_observer_alerts_on_context_type_and_context_id" }
       t.string :alert_type, null: false
-      t.string :workflow_state, default: "unread", null: false, index: true
+      t.string :workflow_state, default: "unread", null: false
       t.timestamp :action_date, null: false
       t.string :title, null: false
       t.timestamps precision: nil
@@ -3891,12 +3899,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :originality_reports do |t|
       t.references :attachment
       t.float :originality_score
-      t.references :originality_report_attachment
+      t.references :originality_report_attachment, index: false
       t.text :originality_report_url
       t.text :originality_report_lti_url
       t.timestamps precision: nil
       t.references :submission, null: false, foreign_key: true
-      t.string :workflow_state, null: false, default: "pending", index: true
+      t.string :workflow_state, null: false, default: "pending"
       t.text :link_id
       t.text :error_message
       t.timestamp :submission_time, index: true
@@ -3938,7 +3946,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :ended_at
       t.timestamps precision: nil
       t.json :data
-      t.references :learning_outcome_group
+      t.references :learning_outcome_group, index: false
 
       t.index %i[context_type context_id]
     end
@@ -4158,6 +4166,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :results
 
       t.index [:context_id, :context_type]
+      t.index :delayed_job_id,
+              where: "workflow_state='queued'",
+              name: "index_queued_progresses_on_delayed_job_id"
     end
 
     create_table :pseudonyms do |t|
@@ -4197,6 +4208,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index :account_id
       t.index "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
       t.index "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
+      t.index "lower(integration_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_integration_id", using: :gin
       t.index [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true
       t.index [:integration_id, :account_id],
               unique: true,
@@ -4354,7 +4366,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :quiz_migration_alerts do |t|
-      t.references :migration, polymorphic: true, index: { name: "index_quiz_migration_alerts_on_migration_type_and_migration_id" }
+      t.references :migration, polymorphic: true, index: false
       t.references :user, null: false, foreign_key: true
       t.references :course, null: false, foreign_key: true
       t.timestamps precision: 6
@@ -4644,6 +4656,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps
 
       t.replica_identity_index
+      t.index [:post_comments_at, :post_comments_ran_at], name: "index_scheduled_posts_on_pending_comments"
+      t.index [:post_grades_at, :post_grades_ran_at], name: "index_scheduled_posts_on_pending_grades"
     end
 
     create_table :scheduled_smart_alerts do |t|
@@ -4705,14 +4719,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.float :lower_q
       t.float :median
       t.float :upper_q
-    end
-
-    create_table :sessions do |t|
-      t.string :session_id, null: false, limit: 255, index: true
-      t.text :data
-      t.timestamps precision: nil
-
-      t.index :updated_at
     end
 
     create_table :session_persistence_tokens do |t|
@@ -4805,6 +4811,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index %i[user_id hidden id stream_item_id], name: "index_stream_item_instances_global"
       t.index [:stream_item_id, :user_id], unique: true
+      t.index [:user_id, :context_id],
+              name: "index_stream_item_instances_on_user_and_context",
+              where: "NOT hidden"
     end
 
     create_table :submissions do |t|
@@ -4847,7 +4856,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :last_comment_at
       t.integer :extra_attempts
       t.timestamp :posted_at
-      t.boolean :cached_quiz_lti, default: false, null: false, index: true
+      t.boolean :cached_quiz_lti, default: false, null: false
       t.string :cached_tardiness, limit: 16
       t.references :course, foreign_key: true, index: false, null: false
       t.references :root_account, foreign_key: { to_table: :accounts }

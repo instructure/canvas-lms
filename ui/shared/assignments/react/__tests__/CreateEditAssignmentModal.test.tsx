@@ -530,7 +530,7 @@ describe('CreateEditAssignmentModal', () => {
         // Try to save
         fireEvent.click(getByTestId('save-button'))
 
-        expect(getAllByText('Due date cannot be after lock date')[0]).toBeInTheDocument()
+        expect(getAllByText('Due date cannot be after until date')[0]).toBeInTheDocument()
         expect(datePicker).toHaveFocus()
       })
 
@@ -548,7 +548,7 @@ describe('CreateEditAssignmentModal', () => {
         // Try to save
         fireEvent.click(getByTestId('save-button'))
 
-        expect(getAllByText('Due date cannot be before unlock date')[0]).toBeInTheDocument()
+        expect(getAllByText('Due date cannot be before available from date')[0]).toBeInTheDocument()
         expect(datePicker).toHaveFocus()
       })
 

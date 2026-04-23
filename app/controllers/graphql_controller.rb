@@ -103,11 +103,8 @@ class GraphQLController < ApplicationController
   end
 
   def require_auth?
-    if action_name == "execute"
-      return false if ::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
-      if persisted_query
-        return !persisted_query["anonymous_access_allowed"]
-      end
+    if (action_name == "execute") && persisted_query
+      return !persisted_query["anonymous_access_allowed"]
     end
 
     true

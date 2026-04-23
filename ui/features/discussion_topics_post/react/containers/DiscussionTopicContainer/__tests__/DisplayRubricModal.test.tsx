@@ -20,10 +20,10 @@ import {render, fireEvent} from '@testing-library/react'
 import {DisplayRubricModal} from '../DisplayRubricModal'
 import type {AssignmentRubric} from '@canvas/rubrics/react/RubricAssignment/queries'
 import type {RubricAssociation} from '@canvas/rubrics/react/types/rubric'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =

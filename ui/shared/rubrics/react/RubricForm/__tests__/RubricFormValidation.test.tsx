@@ -21,7 +21,6 @@ describe.skip('RubricForm Title Validation Tests', () => {
   it.skip('placeholder', () => {})
 })
 
- 
 // @ts-nocheck
 export {}
 
@@ -32,8 +31,8 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
-import {queryClient} from '@canvas/query'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
+import {queryClient} from '@instructure/platform-query'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 
 vi.mock('../queries/RubricFormQueries', async () => ({

@@ -48,6 +48,9 @@ export interface EnvAccountsAdminTools {
         }
     restore_course: boolean
     view_messages: boolean
+    can_view_institutional_tags: boolean
+    can_create_institutional_tags: boolean
+    can_edit_institutional_tags: boolean
   }
   BOUNCED_EMAILS_ADMIN_TOOL: boolean
 }
@@ -57,4 +60,5 @@ export interface EnvAccountsAdminTools {
  */
 export interface EnvAccountsSisImport {
   SHOW_SITE_ADMIN_CONFIRMATION: boolean
+  INSTITUTIONAL_TAGS_ENABLED: boolean
 }

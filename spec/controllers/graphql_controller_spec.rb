@@ -397,17 +397,6 @@ describe GraphQLController do
     end
   end
 
-  context "with feature flag disable_graphql_authentication enabled" do
-    context "graphql, without a session" do
-      it "works" do
-        Account.site_admin.enable_feature!(:disable_graphql_authentication)
-        post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-        expect(response.parsed_body["data"]).not_to be_blank
-      end
-    end
-  end
-
   describe "#execute error handling" do
     before do
       # Mock the schema execution to return custom error results

@@ -19,7 +19,7 @@
  */
 
 import $ from 'jquery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import CommentsTrayBody from '../CommentsTrayBody'
 import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/Mutations'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'

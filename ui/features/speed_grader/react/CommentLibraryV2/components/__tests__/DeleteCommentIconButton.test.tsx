@@ -22,10 +22,10 @@ import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import DeleteCommentIconButton from '../DeleteCommentIconButton'
 import {SpeedGraderLegacy_DeleteCommentBankItem} from '../../graphql/mutations'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {type MockInstance} from 'vitest'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 describe('DeleteCommentIconButton', () => {
   const defaultProps = {

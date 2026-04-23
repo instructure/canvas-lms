@@ -10,7 +10,7 @@ GEM
   specs:
     csv (3.3.5)
     diff-lcs (1.6.2)
-    rake (13.3.1)
+    rake (13.4.2)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -24,10 +24,10 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
-    sqlite3 (2.9.2-aarch64-linux-gnu)
-    sqlite3 (2.9.2-arm64-darwin)
-    sqlite3 (2.9.2-x86_64-darwin)
-    sqlite3 (2.9.2-x86_64-linux-gnu)
+    sqlite3 (2.9.3-aarch64-linux-gnu)
+    sqlite3 (2.9.3-arm64-darwin)
+    sqlite3 (2.9.3-x86_64-darwin)
+    sqlite3 (2.9.3-x86_64-linux-gnu)
 
 PLATFORMS
   aarch64-linux

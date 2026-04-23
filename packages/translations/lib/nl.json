@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "AI-reactie"
-    },
-    "ai_tools_fda01177": {
-        "message": "AI-tools"
-    },
     "albanian_21ed929e": {
         "message": "Albanees"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Er is een fout opgetreden bij het maken van een netwerkaanvraag"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Er is een fout opgetreden bij het verwerken van je aanvraag "
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Er is een fout opgetreden bij het uploaden van je media."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Bestand kiezen"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Kies een bestand (vereist)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Gebruiksrechten kiezen..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Complexe getallen"
     },
-    "compose_44c904f4": {
-        "message": "Samenstellen"
-    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproduct"
-    },
-    "copy_9748f9f": {
-        "message": "Kopiëren"
     },
     "copyright_holder_66ee111": {
         "message": "Houder van auteursrecht:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Aangepast"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Aangepaste breedte en hoogte (in pixels)"
     },
     "cyan_c1d5f68a": {
         "message": "Cyaan"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Afmetingstype"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Afmetingen"
-    },
     "directionality_26ae9e08": {
         "message": "richting"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Disjuncte verbinding"
-    },
-    "dislike_14befc48": {
-        "message": "Afkeuren"
     },
     "display_options_315aba85": {
         "message": "Weergaveopties"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "voer zoektekst in"
     },
-    "enter_text_8b35c65b": {
-        "message": "Tekst invoeren"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kan geen bestandsinhoud ophalen"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Kopiëren van reactie mislukt"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kan geen inhoud ophalen uit externe tool"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Hoogte"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hallo. Beschrijf de wijzigingen die je aan je compositie wilt aanbrengen."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hallo. Beschrijf de wijzigingen die je aan je selectie wilt aanbrengen."
-    },
     "hexagon_d8468e0d": {
         "message": "Zeshoek"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Startpagina"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Hoe kun je om ondertiteling vragen en deze bewerken?"
+    },
     "html_code_editor_fd967a44": {
         "message": "HTML-code-editor"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ik heb het auteursrecht"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Het spijt me maar ik kan het antwoord van de AI niet vinden"
     },
     "icelandic_9d6d35de": {
         "message": "IJslands"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Diversen"
     },
-    "modify_6b0b13e3": {
-        "message": "Wijzigen"
-    },
     "module_90d9fd32": {
         "message": "Module"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Kies een bestand"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Beschrijf wat je wilt opstellen."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Voer een bestandsnaam in"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Grootte wijzigen"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Reactie gekopieerd naar klembord"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Automatisch opslaan herstellen?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "{ captionName } opnieuw proberen"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Opnieuw proberen"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Inverse tourniquet (conclusie volgt)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Snelkoppeling"
-    },
-    "show_all_967a90f0": {
-        "message": "Alles tonen"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Afbeeldingsopties weergeven"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Kijkersrestricties"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Wachten op antwoord"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "We kunnen geen werkende microfoon detecteren die op je apparaat is aangesloten."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Welsh"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Wat wil je doen?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Wanneer een markering is gebruikt die items visueel opmaakt als een lijst maar de lijstrelatie niet aangeeft, kan het voor gebruikers moeilijk zijn om door de informatie te navigeren."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Kransproduct"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Schrijfassistent"
     },
     "xi_149681d0": {
         "message": "Xi"

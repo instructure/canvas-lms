@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ProgressCircle} from '@instructure/ui-progress'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {func, string} from 'prop-types'
 
 const I18n = createI18nScope('groups')

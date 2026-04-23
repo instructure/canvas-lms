@@ -196,6 +196,17 @@ describe NewQuizzesHelper do
         expect(item_banks_index).to eq(1)
       end
 
+      it "returns the overridden tab" do
+        result = NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+
+        expect(result[:id]).to eq(Course::TAB_ITEM_BANKS)
+        expect(result[:href]).to eq(:course_new_quizzes_banks_path)
+      end
+
       it "uses account path for account context" do
         account = Account.default
         NewQuizzesHelper.override_item_banks_tab(
@@ -225,6 +236,15 @@ describe NewQuizzesHelper do
           context: course
         )
         expect(tabs_without_item_banks).to eq(original_tabs)
+      end
+
+      it "returns nil" do
+        result = NewQuizzesHelper.override_item_banks_tab(
+          tabs: tabs_without_item_banks,
+          href: :course_new_quizzes_banks_path,
+          context: course
+        )
+        expect(result).to be_nil
       end
     end
   end

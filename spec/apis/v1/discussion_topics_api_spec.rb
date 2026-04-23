@@ -694,7 +694,7 @@ describe DiscussionTopicsController, type: :request do
 
   context "when file_association_access feature flag is enabled" do
     before do
-      @attachment = create_attachment(@course)
+      @attachment = create_attachment(@user)
       @attachment.root_account.enable_feature!(:file_association_access)
       @topic = create_topic(@course, title: "Topic 1", message: "/users/#{@user.id}/files/#{@attachment.id}", attachment: @attachment)
     end

@@ -639,25 +639,17 @@ RSpec.describe Lti::Registration do
     let(:registration) { lti_registration_model(account: context) }
     let(:context) { account_model }
 
-    context "when flag is disabled" do
-      before do
-        context.disable_feature! :lti_registrations_templates
-      end
+    context "when account matches registration account" do
+      let(:account) { context }
 
-      context "when account matches registration account" do
-        let(:account) { context }
-
-        it { is_expected.to be false }
-      end
-
-      context "when account does not match registration account" do
-        let(:account) { account_model }
-
-        it { is_expected.to be true }
-      end
+      it { is_expected.to be false }
     end
 
-    it { is_expected.to be false }
+    context "when account does not match registration account" do
+      let(:account) { account_model }
+
+      it { is_expected.to be true }
+    end
 
     context "when template registration is present" do
       let(:template_registration) { lti_registration_model(account: Account.site_admin) }
@@ -669,13 +661,74 @@ RSpec.describe Lti::Registration do
       end
 
       it { is_expected.to be true }
+    end
+  end
 
-      context "and flag is disabled" do
-        before do
-          context.disable_feature! :lti_registrations_templates
+  describe "#local_copy_for" do
+    subject { registration.local_copy_for(target_account) }
+
+    specs_require_sharding
+
+    let_once(:sa_registration) do
+      Shard.default.activate { lti_registration_with_tool(account: Account.site_admin) }
+    end
+    let_once(:shard2_account) { @shard2.activate { account_model } }
+    let_once(:shard2_admin) { @shard2.activate { account_admin_user(account: shard2_account) } }
+
+    let(:registration) { sa_registration }
+    let(:target_account) { shard2_account }
+
+    context "when the registration belongs to the target account" do
+      let_once(:local_reg) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account: shard2_account, user: shard2_admin, template: sa_registration
+          )[:local_copy]
         end
+      end
+      let(:registration) { local_reg }
+      let(:target_account) { shard2_account }
 
-        it { is_expected.to be false }
+      it "returns self" do
+        @shard2.activate { expect(subject).to be(local_reg) }
+      end
+    end
+
+    context "when a local copy exists for the target account" do
+      let_once(:local_copy) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account: shard2_account, user: shard2_admin, template: sa_registration
+          )[:local_copy]
+        end
+      end
+
+      before { local_copy }
+
+      it "returns the local copy" do
+        @shard2.activate { expect(subject).to eql(local_copy) }
+      end
+    end
+
+    context "when no local copy exists" do
+      context "when :lti_registrations_templates feature is enabled" do
+        before { @shard2.activate { shard2_account.enable_feature!(:lti_registrations_templates) } }
+
+        it "raises Lti::LocalAppNotFound" do
+          @shard2.activate { expect { subject }.to raise_error(Lti::LocalAppNotFound) }
+        end
+      end
+
+      context "when :lti_registrations_templates feature is disabled" do
+        before { @shard2.activate { shard2_account.disable_feature!(:lti_registrations_templates) } }
+
+        it "returns nil and captures the exception" do
+          allow(Canvas::Errors).to receive(:capture_exception).with(
+            Lti::LocalAppNotFound,
+            include("No local copy found")
+          )
+          @shard2.activate { expect(subject).to be_nil }
+        end
       end
     end
   end

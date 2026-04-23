@@ -22,14 +22,13 @@ import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherQuery from './TeacherQuery'
 import {createClient} from '@canvas/apollo-v3'
 import type {InMemoryCache} from '@apollo/client'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 
 export default function renderAssignmentsApp(elt: HTMLElement | null) {
   const client: ApolloClient<InMemoryCache> = createClient()
   if (ENV.ASSIGNMENT_ID && elt) {
     render(
       <ApolloProvider client={client}>
-        {/* @ts-expect-error */}
         <AlertManager>
           <TeacherQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
         </AlertManager>

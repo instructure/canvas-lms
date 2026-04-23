@@ -27,14 +27,21 @@ class Types::InstitutionalTagCategoryType < Types::ApplicationObjectType
 
   connection_type_class Types::TotalCountConnection
   global_id_field :id
-  field :description,    String, null: true
-  field :name,           String, null: false
-  field :workflow_state, String, null: false
+  field :associations_count, Integer, null: false
+  field :description,        String,  null: true
+  field :name,               String,  null: false
+  field :workflow_state,     String,  null: false
 
-  field :tags_connection, Types::InstitutionalTagType.connection_type, null: true
-  def tags_connection
+  def associations_count
+    Loaders::InstitutionalTagCategoryAssociationsCountLoader.load(object)
+  end
+
+  field :tags_connection, Types::InstitutionalTagType.connection_type, null: true do
+    argument :workflow_state, String, required: false, default_value: "active"
+  end
+  def tags_connection(workflow_state: "active")
     load_association(:institutional_tags).then do |tags|
-      tags.where(workflow_state: "active")
+      tags.where(workflow_state:)
     end
   end
 end

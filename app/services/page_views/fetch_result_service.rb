@@ -28,7 +28,7 @@ module PageViews
         handle_generic_errors(response) unless response.code.to_i == 200
         response.decode_content = false # Prevent automatic decompression
         format = determine_result_format(response)
-        filename = determine_filename(response)
+        filename = determine_filename(response).delete_suffix(".gz")
         compressed = response_compressed?(response)
         return Common::DownloadableResult.new(format:, filename:, content: response.body, compressed?: compressed)
       end

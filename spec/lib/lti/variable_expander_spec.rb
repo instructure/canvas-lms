@@ -1109,6 +1109,8 @@ module Lti
         end
 
         it "has a substitution for Canvas.course.aiQuizGeneration" do
+          course.account.settings[:root_account_tier] = "1"
+          course.account.save!
           course.save!
           course.enable_feature!(:new_quizzes_ai_quiz_generation)
           expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
@@ -1142,6 +1144,8 @@ module Lti
         let(:subst_name) { "$Canvas.course.aiQuizGeneration" }
 
         it "returns true when the feature flag is enabled for the course" do
+          course.account.settings[:root_account_tier] = "1"
+          course.account.save!
           course.save!
           course.enable_feature!(:new_quizzes_ai_quiz_generation)
 

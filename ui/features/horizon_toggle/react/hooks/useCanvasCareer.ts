@@ -18,7 +18,7 @@
 
 import {useState, useEffect, useMemo, useCallback} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {CanvasCareerValidationResponse, CompletionProgressResponse} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

@@ -20,7 +20,7 @@ import React, {useEffect, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import webConferenceType from '../proptypes/webConferenceType'
 
 const I18n = createI18nScope('conferences')

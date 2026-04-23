@@ -617,7 +617,13 @@ class Rubric < ApplicationRecord
       h = criteria.compact_blank.stringify_keys
       h.delete("title") if h["title"] == h["description"]
       h.each do |k, v|
-        h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)
+        h[k] = if v.is_a?(Hash) || v.is_a?(Array)
+                 Rubric.normalize(v)
+               elsif k == "long_description" && v.is_a?(String)
+                 v.gsub("\r\n", "\n")
+               else
+                 v
+               end
       end
       h
     else

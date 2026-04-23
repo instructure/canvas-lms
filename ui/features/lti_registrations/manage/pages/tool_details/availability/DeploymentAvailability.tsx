@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {Button, IconButton} from '@instructure/ui-buttons'

@@ -32,9 +32,13 @@ import {
 import {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 // Mock dependencies
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const server = setupServer()
 

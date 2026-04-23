@@ -1,0 +1,57 @@
+{
+  "name": "lti_resource_link_created",
+  "definition": "The event is emitted any time a new resource link is created during LTI 1.3 Deep Linking.",
+  "trigger": "Triggered when a new LTI resource link is created.",
+  "schema": {
+    "context_id": "The global Canvas id of the context.",
+    "context_type": "The type of the context, either Course or Assignment.",
+    "resource_link_id": "The global Canvas id of the resource link.",
+    "resource_link_uuid": "The LTI uuid of the resource link.",
+    "lookup_uuid": "Used to track resource links across content migrations.",
+    "context_external_tool_id": "The global Canvas id of the LTI 1.3 deployment that owns this resource link.",
+    "url": "The LTI launch URL for this resource link.",
+    "workflow_state": "The workflow state of the resource link."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_role": "TeacherEnrollment",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "event_name": "lti_resource_link_created",
+          "event_time": "2019-11-01T19:11:01.676Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "PUT",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/565/modules",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/Chicago",
+          "url": "https://oxana.instructure.com/api/v1/courses/565/modules/14/items/19587",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "resource_link_id": "21070000000001230",
+          "resource_link_uuid": "c38a6baf-4d77-43ac-99f8-4be37483c9d9",
+          "lookup_uuid": "e51c95d8-d609-44bc-9f05-70e0e688d204",
+          "context_id": "21070000000000001",
+          "context_type": "Course",
+          "context_external_tool_id": "21070000000000001",
+          "url": "https://example.com/lti/deep_link/12345",
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}

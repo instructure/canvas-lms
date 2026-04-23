@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {useRows} from '../../contexts/RowsContext'
 import {
@@ -31,7 +31,7 @@ import {
   UnauthorizedError,
 } from '../../../utils/apiUtils'
 import {getCookie} from '@instructure/platform-get-cookie'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation} from '@tanstack/react-query'

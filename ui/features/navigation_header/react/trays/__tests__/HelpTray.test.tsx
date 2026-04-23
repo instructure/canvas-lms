@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as testingLibraryRender, screen} from '@testing-library/react'
 import HelpTray from '../HelpTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'

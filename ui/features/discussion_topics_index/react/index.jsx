@@ -20,7 +20,7 @@ import React from 'react'
 import {render as canvasRender, rerender} from '@canvas/react'
 import {Provider} from 'react-redux'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 
 import {subscribeFlashNotifications} from '@canvas/notifications/redux/actions'
 import {ConnectedDiscussionsIndex} from './components/DiscussionsIndex'

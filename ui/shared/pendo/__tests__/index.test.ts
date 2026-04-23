@@ -32,6 +32,7 @@ describe('pendo/index', () => {
   const baseEnv = {
     RAILS_ENVIRONMENT: 'development',
     PENDO_APP_ID: 'test-app-id',
+    PENDO_APP_ENV: 'io',
     current_user_usage_metrics_id: 'user-123',
     current_user_roles: ['student'],
     LOCALE: 'en',

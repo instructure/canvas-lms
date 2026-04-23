@@ -27,10 +27,9 @@ class PageView
     class Pv4TooManyRequests < StandardError; end
     class Pv4Unauthorized < StandardError; end
 
-    def initialize(uri, access_token = nil, requestor_user: nil, **)
+    def initialize(uri, requestor_user: nil, **)
       uri = URI.parse(uri) if uri.is_a?(String)
       @uri = uri
-      @access_token = access_token
       @requestor_user = requestor_user
     end
 
@@ -113,7 +112,7 @@ class PageView
                             end_time: newest,
                             last_page_view_id:,
                             limit: pager.per_page))
-        pager.has_more! unless pager.empty?
+        pager.has_more! if pager.size >= pager.per_page
         pager
       end
     end
@@ -129,12 +128,10 @@ class PageView
     end
 
     def generate_auth_token
-      raise ArgumentError, "Either requestor_user or access_token must be provided" unless @requestor_user || @access_token
-      return @access_token unless @requestor_user
+      raise ArgumentError, "requestor_user must be provided" unless @requestor_user
 
-      domain = @uri.host
       CanvasSecurity::ServicesJwt.for_user(
-        domain,
+        HostUrl.default_host,
         @requestor_user,
         encrypt: false,
         base64: false

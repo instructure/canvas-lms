@@ -129,6 +129,7 @@ interface ViewOptionsTabPanelProps {
   hideTotal: CheckboxSetting
   showNotes: CheckboxSetting
   showUnpublishedAssignments: CheckboxSetting
+  showSuppressedAssignments: CheckboxSetting & {allowed: boolean}
   showSeparateFirstLastNames: CheckboxSetting & {allowed: boolean}
   statusColors: {
     currentValues: StatusColors
@@ -147,6 +148,7 @@ export default function ViewOptionsTabPanel({
   hideTotal,
   showNotes,
   showUnpublishedAssignments,
+  showSuppressedAssignments,
   showSeparateFirstLastNames,
   statusColors,
   viewUngradedAsZero,
@@ -193,6 +195,12 @@ export default function ViewOptionsTabPanel({
 
         <View as="div" margin="large 0 large">
           <FormFieldGroup description={I18n.t('Show')} layout="stacked" rowSpacing="small">
+            {showSuppressedAssignments.allowed &&
+              renderCheckbox(
+                showSuppressedAssignments,
+                I18n.t('All Hidden Assignments'),
+                'showSuppressedAssignments',
+              )}
             {renderCheckbox(showNotes, I18n.t('Notes'), 'showNotes')}
             {renderCheckbox(
               showUnpublishedAssignments,
@@ -272,6 +280,11 @@ ViewOptionsTabPanel.propTypes = {
     onChange: func.isRequired,
   }).isRequired,
   showUnpublishedAssignments: shape({
+    checked: bool.isRequired,
+    onChange: func.isRequired,
+  }).isRequired,
+  showSuppressedAssignments: shape({
+    allowed: bool.isRequired,
     checked: bool.isRequired,
     onChange: func.isRequired,
   }).isRequired,

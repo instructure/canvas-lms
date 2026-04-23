@@ -19,13 +19,68 @@
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {AddLinkModal} from '../AddLinkModal'
+// eslint-disable-next-line import/no-nodejs-modules
+import fs from 'fs'
+// eslint-disable-next-line import/no-nodejs-modules
+import path from 'path'
+import {AddLinkModal, validateUrl} from '../AddLinkModal'
+import {expect} from 'vitest'
+
+const cases = JSON.parse(
+  fs.readFileSync(
+    path.join(__dirname, '../../../../../../spec/fixtures/url_validation/nav_menu_link_cases.json'),
+    'utf8',
+  ),
+) as {invalid: string[]; normalizable: Record<string, string>; valid: string[]}
 
 const mockProps = {
   isOpen: true,
   onDismiss: jest.fn(),
   onAdd: jest.fn(),
 }
+
+describe('validateUrl', () => {
+  // Test cases shared with Ruby spec — see spec/fixtures/url_validation/nav_menu_link_cases.json
+  it('rejects invalid URLs', () => {
+    for (const url of cases.invalid) {
+      const result = validateUrl(url)
+      expect.soft('error' in result, `expected "${url}" to be invalid`).toBe(true)
+    }
+  })
+
+  it('accepts valid URLs', () => {
+    for (const url of cases.valid) {
+      const result = validateUrl(url)
+      expect.soft('normalized' in result, `expected "${url}" to be valid`).toBe(true)
+    }
+  })
+
+  it('normalizes normalizable URLs to their canonical form', () => {
+    for (const [input, expected] of Object.entries(cases.normalizable)) {
+      const result = validateUrl(input)
+      expect
+        .soft('normalized' in result, `expected "${input}" to produce a normalized URL`)
+        .toBe(true)
+      if ('normalized' in result) {
+        expect
+          .soft(result.normalized, `expected "${input}" to normalize to "${expected}"`)
+          .toBe(expected)
+      }
+    }
+  })
+
+  it('discards extra https//', () => {
+    const result = validateUrl('https://https://example.com/')
+    expect(result).toEqual({normalized: 'https://example.com/'})
+  })
+
+  it('rejects URLs that exceed 2048 characters after URL encoding', () => {
+    // 200 ant emojis: new URL() encodes each to %F0%9F%90%9C (12 chars), making the URL 2420 chars
+    const url = 'https://example.com/' + '🐜'.repeat(200)
+    const result = validateUrl(url)
+    expect('error' in result).toBe(true)
+  })
+})
 
 describe('AddLinkModal', () => {
   let user: ReturnType<typeof userEvent.setup>
@@ -68,7 +123,7 @@ describe('AddLinkModal', () => {
 
     expect(mockProps.onAdd).toHaveBeenCalledWith({
       label: 'TestLink',
-      url: 'https://example.com',
+      url: 'https://example.com/',
       placements: {course_nav: true, account_nav: false, user_nav: false},
     })
   })
@@ -148,7 +203,11 @@ describe('AddLinkModal', () => {
     expect(
       screen.queryByText('Please enter a valid URL beginning with https:// or http://'),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('This can be an external link or a Canvas URL.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'This can be an external link or a Canvas URL. This link will open in a new tab.',
+      ),
+    ).toBeInTheDocument()
 
     await user.clear(linkInput)
     await user.type(linkInput, 'https://example.com')
@@ -156,7 +215,11 @@ describe('AddLinkModal', () => {
     expect(
       screen.queryByText('Please enter a valid URL beginning with https:// or http://'),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('This can be an external link or a Canvas URL.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'This can be an external link or a Canvas URL. This link will open in a new tab.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('shows required indicators on both fields', () => {
@@ -191,7 +254,7 @@ describe('AddLinkModal', () => {
 
       expect(onAdd).toHaveBeenCalledWith({
         label: 'My Link',
-        url: 'https://example.com',
+        url: 'https://example.com/',
         placements: {course_nav: true, account_nav: true, user_nav: false},
       })
     })

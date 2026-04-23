@@ -25,7 +25,7 @@ import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import CoursePeopleContext, {getCoursePeopleContext} from './contexts/CoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('course_people')
 

@@ -519,8 +519,8 @@ describe Account do
   end
 
   def account_with_admin_and_restricted_user(account, restricted_role)
-    admin = User.create
-    user = User.create
+    admin = User.create(impersonated: false)
+    user = User.create(impersonated: false)
     account.account_users.create!(user: admin, role: admin_role)
     account.account_users.create!(user:, role: restricted_role)
     [admin, user]
@@ -581,6 +581,7 @@ describe Account do
       admin_privileges = full_access + common_siteadmin_privileges
 
       user_privileges = limited_access + common_siteadmin_privileges
+      user_privileges += [:site_admin_self_token_create]
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array user_privileges
     end
@@ -631,7 +632,7 @@ describe Account do
       account = v[:account]
       admin_privileges = full_access.clone
       admin_privileges += [:read_global_outcomes] if k == :site_admin
-      user_array = some_access + [:reset_any_mfa] +
+      user_array = some_access + [:reset_any_mfa, :site_admin_self_token_create] +
                    ((k == :site_admin) ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array
@@ -2673,6 +2674,69 @@ describe Account do
       claims = account.discovery_page_claims_for(user, { primary: nil, secondary: nil })
       expect(claims[:primary]).to eq([])
       expect(claims[:secondary]).to eq([])
+    end
+
+    it "includes customMessageDiscovery delegated from discovery_page_custom_message" do
+      Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+      allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello world" })
+      account.update!(brand_config: bc)
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:customMessageDiscovery]).to eq("Hello world")
+    end
+  end
+
+  describe "#discovery_page_custom_message" do
+    let(:account) { Account.default }
+
+    context "when new_login_ui_custom_labels is disabled" do
+      it "returns nil even when a custom message is set" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+    end
+
+    context "when new_login_ui_custom_labels is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+        allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      end
+
+      it "returns nil when there is no brand config" do
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+
+      it "returns nil when the variable is not set" do
+        bc = BrandConfig.create!(variables: { "ic-brand-primary" => "#fff" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+
+      it "returns the value with newlines collapsed" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "line one\nline two" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to eq("line one line two")
+      end
+
+      it "strips leading and trailing whitespace" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "  hello  " })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to eq("hello")
+      end
+    end
+
+    context "when discovery_page_allowed? is false" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello" })
+        account.update!(brand_config: bc)
+      end
+
+      it "returns nil" do
+        allow(account).to receive(:discovery_page_allowed?).and_return(false)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
     end
   end
 

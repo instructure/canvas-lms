@@ -104,48 +104,23 @@ describe('AIExperienceShow', () => {
     expect(screen.getByText('A customer calls about incorrect billing')).toBeInTheDocument()
   })
 
-  it('renders Activity section heading', () => {
-    render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    expect(screen.getByText('Activity')).toBeInTheDocument()
-  })
-
   it('renders preview in collapsed state by default', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
     expect(
       screen.getByText('Here, you can have a chat with the AI just like a student would.'),
     ).toBeInTheDocument()
-    expect(screen.queryByText('Restart')).not.toBeInTheDocument()
+    expect(screen.queryByText('Reset')).not.toBeInTheDocument()
   })
 
   it('expands preview when clicked', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    fireEvent.click(previewCard!)
+    const startButton = screen.getByTestId('llm-conversation-start-button')
+    fireEvent.click(startButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Restart')).toBeInTheDocument()
-    })
-  })
-
-  it('collapses preview when close button is clicked', async () => {
-    render(<AIExperienceShow aiExperience={mockAiExperience} />)
-
-    // Expand first
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    fireEvent.click(previewCard!)
-
-    await waitFor(() => {
-      expect(screen.getByText('Restart')).toBeInTheDocument()
-    })
-
-    // Then collapse - find the close button by its screen reader label text
-    const closeButton = screen.getAllByText('Close preview')[0].closest('button')
-    fireEvent.click(closeButton!)
-
-    await waitFor(() => {
-      expect(screen.queryByText('Restart')).not.toBeInTheDocument()
+      expect(screen.getByText('Reset')).toBeInTheDocument()
     })
   })
 
@@ -155,35 +130,36 @@ describe('AIExperienceShow', () => {
     expect(menuButton).toBeInTheDocument()
   })
 
-  it('shows menu options when menu button is clicked', async () => {
+  it('shows Delete as the only option in the menu', async () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
 
     const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
     fireEvent.click(menuButton!)
 
     await waitFor(() => {
-      expect(screen.getByText('Edit')).toBeInTheDocument()
-      expect(screen.getByText('Run chat simulation')).toBeInTheDocument()
-      expect(screen.getByText('Coming soon')).toBeInTheDocument()
       expect(screen.getByText('Delete')).toBeInTheDocument()
+      expect(screen.queryByText('Run chat simulation')).not.toBeInTheDocument()
     })
   })
 
-  it('navigates to edit page when Edit is clicked', async () => {
-    // Skip test that modifies window.location in test environment
-    // Navigation is tested in integration tests
-  })
-
-  it('Run chat simulation option is disabled', async () => {
+  it('renders standalone Edit button', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
+    expect(screen.getByTestId('ai-experience-show-edit-button')).toBeInTheDocument()
+  })
 
-    const menuButton = screen.getAllByText('Knowledge Chat settings')[0].closest('button')
-    fireEvent.click(menuButton!)
+  it('renders View conversations button', () => {
+    render(<AIExperienceShow aiExperience={mockAiExperience} />)
+    expect(screen.getByTestId('ai-experience-show-ai-conversations-button')).toHaveTextContent(
+      'View conversations',
+    )
+  })
 
-    await waitFor(() => {
-      const runSimulationItem = screen.getByText('Run chat simulation').closest('[role="menuitem"]')
-      expect(runSimulationItem).toHaveAttribute('aria-disabled', 'true')
-    })
+  it('does not render Edit button or View conversations button when can_manage is false', () => {
+    render(<AIExperienceShow aiExperience={{...mockAiExperience, can_manage: false}} />)
+    expect(screen.queryByTestId('ai-experience-show-edit-button')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('ai-experience-show-ai-conversations-button'),
+    ).not.toBeInTheDocument()
   })
 
   it('opens delete confirmation modal when Delete is clicked', async () => {
@@ -275,10 +251,9 @@ describe('AIExperienceShow', () => {
 
   it('passes returnFocusRef to LLMConversationView', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    // The preview card should be rendered and accessible
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    expect(previewCard).toBeInTheDocument()
-    expect(previewCard).toHaveAttribute('tabindex', '0')
+    // The start button should be rendered and focusable
+    const startButton = screen.getByTestId('llm-conversation-start-button')
+    expect(startButton).toBeInTheDocument()
   })
 
   it('renders kebab menu when can_manage is true', () => {
@@ -297,7 +272,12 @@ describe('AIExperienceShow', () => {
     it('shows indexing notice instead of preview when context_ready is false and can_manage', () => {
       render(
         <AIExperienceShow
-          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'in_progress',
+            can_manage: true,
+          }}
         />,
       )
       expect(screen.getByTestId('ai-experience-show-indexing-notice')).toBeInTheDocument()
@@ -313,7 +293,12 @@ describe('AIExperienceShow', () => {
     it('disables AI Conversations button when context_ready is false', () => {
       render(
         <AIExperienceShow
-          aiExperience={{...mockAiExperience, context_ready: false, can_manage: true}}
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'in_progress',
+            can_manage: true,
+          }}
         />,
       )
       const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
@@ -336,7 +321,7 @@ describe('AIExperienceShow', () => {
         />,
       )
       // LLMConversationView is shown
-      expect(screen.getByText('Preview')).toBeInTheDocument()
+      expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
       // AI Conversations button is enabled (has href, not disabled)
       const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
       expect(aiConversationsButton).not.toHaveAttribute('disabled')
@@ -349,12 +334,111 @@ describe('AIExperienceShow', () => {
     it('students always see the preview even when context_ready is false', () => {
       render(
         <AIExperienceShow
-          aiExperience={{...mockAiExperience, context_ready: false, can_manage: false}}
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'in_progress',
+            can_manage: false,
+          }}
         />,
       )
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
       // Students see the conversation view (not the teacher's "Preview" panel)
-      expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
+      expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
+    })
+  })
+
+  describe('index failed notice', () => {
+    it('shows failed notice with edit button when context_index_status is failed and can_manage', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: true,
+          }}
+        />,
+      )
+      expect(screen.getByTestId('ai-experience-show-index-failed-notice')).toBeInTheDocument()
+      const editLink = screen.getByTestId('ai-experience-show-index-failed-edit-button')
+      expect(editLink).toHaveAttribute(
+        'href',
+        `/courses/${mockAiExperience.course_id}/ai_experiences/${mockAiExperience.id}/edit`,
+      )
+    })
+
+    it('does not show processing notice when context_index_status is failed', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: true,
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+    })
+
+    it('disables AI Conversations button with failed tooltip when context_index_status is failed', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: true,
+          }}
+        />,
+      )
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).toHaveAttribute('disabled')
+    })
+
+    it('does not show failed notice for students', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_ready: false,
+            context_index_status: 'failed',
+            can_manage: false,
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-index-failed-notice')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('not_started index status', () => {
+    it('shows preview instead of processing notice when context_index_status is not_started', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_index_status: 'not_started',
+            can_manage: true,
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
+      expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
+    })
+
+    it('enables AI Conversations button when context_index_status is not_started', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_index_status: 'not_started',
+            can_manage: true,
+          }}
+        />,
+      )
+      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
+      expect(aiConversationsButton).not.toHaveAttribute('disabled')
     })
   })
 
@@ -421,6 +505,48 @@ describe('AIExperienceShow', () => {
       fakeENV.setup({FEATURES: {ai_experiences_context_file_upload: false}})
       render(<AIExperienceShow aiExperience={{...mockAiExperience, context_files: mockFiles}} />)
       expect(screen.queryByText('File sources')).not.toBeInTheDocument()
+    })
+
+    it('renders failed file as a warning pill (failed text) in file sources section', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_files: mockFiles,
+            failed_context_file_names: ['lecture-notes.pdf'],
+          }}
+        />,
+      )
+      expect(screen.getByText('lecture-notes.pdf failed')).toBeInTheDocument()
+    })
+
+    it('does not render failed file as a normal pill when it is in failed_context_file_names', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_files: mockFiles,
+            failed_context_file_names: ['lecture-notes.pdf'],
+          }}
+        />,
+      )
+      // The file should appear once as a warning ("lecture-notes.pdf failed") not as a normal download pill
+      expect(screen.queryByTestId('download-file-f1')).not.toBeInTheDocument()
+      // Non-failed file still renders normally
+      expect(screen.getByTestId('download-file-f2')).toBeInTheDocument()
+    })
+
+    it('does not render a dismiss button for failed files on the show page', () => {
+      render(
+        <AIExperienceShow
+          aiExperience={{
+            ...mockAiExperience,
+            context_files: mockFiles,
+            failed_context_file_names: ['lecture-notes.pdf'],
+          }}
+        />,
+      )
+      expect(screen.queryByTestId('dismiss-failed-lecture-notes.pdf')).not.toBeInTheDocument()
     })
   })
 })

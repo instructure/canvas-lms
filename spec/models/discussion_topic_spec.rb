@@ -2293,6 +2293,29 @@ describe DiscussionTopic do
       check_read_state_scopes read: true, user: @student
     end
 
+    context "for announcements" do
+      before(:once) do
+        @announcement = @course.announcements.create!(title: "announcement", message: "msg", user: @teacher)
+        # Simulate a stale participant with unread_entry_count > 0 (legacy data)
+        @participant = @announcement.update_or_create_participant(current_user: @student, new_state: "unread", new_count: 1)
+      end
+
+      it "resets unread_entry_count to 0 when marking as read" do
+        @announcement.change_read_state("read", @student)
+        participant = @announcement.discussion_topic_participants.find_by(user: @student)
+        expect(participant.unread_entry_count).to eq(0)
+        expect(participant.workflow_state).to eq("read")
+      end
+
+      it "does not reset unread_entry_count for regular discussion topics" do
+        @topic.update_or_create_participant(current_user: @student, new_state: "unread", new_count: 2)
+        @topic.change_read_state("read", @student)
+        participant = @topic.discussion_topic_participants.find_by(user: @student)
+        # Regular topics keep their unread_entry_count (controlled by reply reads)
+        expect(participant.workflow_state).to eq("read")
+      end
+    end
+
     it "uses unique_constaint_retry when updating read state" do
       expect(DiscussionTopic).to receive(:unique_constraint_retry).once
       @topic.change_read_state("read", @student)
@@ -3872,6 +3895,7 @@ describe DiscussionTopic do
     end
 
     it "allows instructors and read admins to summarize if the feature is enabled" do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       @course.enable_feature!(:discussion_summary)
 
       expect(@topic.user_can_summarize?(@teacher)).to be true
@@ -3926,6 +3950,7 @@ describe DiscussionTopic do
     end
 
     it "allows instructors and read admins to access insights if the feature is enabled" do
+      allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
       @course.enable_feature!(:discussion_insights)
 
       expect(@topic.user_can_access_insights?(@teacher)).to be true

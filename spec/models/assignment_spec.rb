@@ -1899,6 +1899,141 @@ describe Assignment do
       expect(new_assignment.peer_review_across_sections).to be false
     end
 
+    context "with a peer review sub assignment" do
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_review_count: 2,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment: a)
+        a.reload
+      end
+
+      let(:peer_review_sub) { assignment.peer_review_sub_assignment }
+      let(:new_assignment) do
+        duped = assignment.duplicate
+        duped.save!
+        duped.reload
+      end
+
+      it "creates exactly one new PeerReviewSubAssignment" do
+        peer_review_sub # force evaluation so the original peer review sub assignment exists before counting
+        expect { assignment.duplicate }.to change(PeerReviewSubAssignment, :count).by(1)
+      end
+
+      it "duplicates the peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment).to be_present
+      end
+
+      it "links the duplicated peer review sub assignment to the new assignment, not the original" do
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).to eq(new_assignment.id)
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).not_to eq(assignment.id)
+      end
+
+      it "preserves peer_review_count on the duplicated assignment" do
+        expect(new_assignment.peer_review_count).to eq(assignment.peer_review_count)
+      end
+
+      it "preserves points_possible on the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.points_possible).to eq(peer_review_sub.points_possible)
+      end
+
+      it "preserves grading_type on the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.grading_type).to eq(peer_review_sub.grading_type)
+      end
+
+      it "preserves dates on the duplicated peer review sub assignment" do
+        new_peer_review_sub = new_assignment.peer_review_sub_assignment
+        expect(new_peer_review_sub.due_at).to be_within(1.second).of(peer_review_sub.due_at)
+        expect(new_peer_review_sub.unlock_at).to be_within(1.second).of(peer_review_sub.unlock_at)
+        expect(new_peer_review_sub.lock_at).to be_within(1.second).of(peer_review_sub.lock_at)
+      end
+
+      it "generates the peer review sub assignment title from the new assignment's title" do
+        new_peer_review_sub = new_assignment.peer_review_sub_assignment
+        expect(new_peer_review_sub.title).to include(new_assignment.title)
+        expect(new_peer_review_sub.title).not_to eq(peer_review_sub.title)
+      end
+
+      it "does not copy assessment_requests to the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.assessment_requests).to be_empty
+      end
+
+      it "sets duplicate_of on the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.duplicate_of).to eq(peer_review_sub)
+      end
+
+      it "resets peer_reviews_assigned to false on the new assignment" do
+        expect(new_assignment.peer_reviews_assigned).to be false
+      end
+
+      it "does not duplicate the peer review sub assignment when the feature flag is disabled" do
+        assignment # force evaluation while flag is enabled by peer_review_model factory
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        duplicated = assignment.reload.duplicate
+        duplicated.save!
+        duplicated.reload
+        expect(duplicated.peer_review_sub_assignment).to be_nil
+      end
+
+      it "resets peer_review_count to 0 when the feature flag is disabled" do
+        assignment # force evaluation while flag is enabled by peer_review_model factory
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        duplicated = assignment.reload.duplicate
+        duplicated.save!
+        duplicated.reload
+        expect(duplicated.peer_review_count).to eq(0)
+      end
+
+      it "raises if peer review sub assignment creation fails" do
+        allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_raise(ActiveRecord::RecordInvalid)
+        expect { assignment.duplicate }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "does not persist the duplicated assignment if the peer review sub assignment creation fails" do
+        peer_review_sub # force evaluation so the original assignment exists before counting
+        allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_raise(ActiveRecord::RecordInvalid)
+        expect do
+          assignment.duplicate
+        rescue ActiveRecord::RecordInvalid
+          nil
+        end.not_to change(Assignment, :count)
+      end
+
+      it "does not persist the duplicated assignment if result.save! fails inside the transaction" do
+        assignment # force evaluation so the original assignment exists before counting
+        allow(assignment).to receive(:clone).and_wrap_original do |original|
+          result = original.call
+          allow(result).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
+          result
+        end
+        expect do
+          assignment.duplicate
+        rescue ActiveRecord::RecordInvalid
+          nil
+        end.not_to change(Assignment, :count)
+      end
+    end
+
+    context "without a peer review sub assignment" do
+      it "resets peer_review_count to 0" do
+        assignment = assignment_model(
+          course: @course,
+          title: "no peer reviews",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 3
+        )
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.peer_review_count).to eq(0)
+      end
+    end
+
     context "with an assignment that can't be duplicated" do
       let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
 
@@ -9138,6 +9273,85 @@ describe Assignment do
       assignment.restore
       expect(comment_bank_item.reload.workflow_state).to eq "active"
     end
+
+    context "with peer review sub assignment" do
+      let(:peer_review_assignment) do
+        @course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 1
+        )
+      end
+      let(:peer_review_sub) do
+        PeerReviewSubAssignment.create!(
+          parent_assignment: peer_review_assignment,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+      end
+
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        [peer_review_assignment, peer_review_sub]
+        peer_review_assignment.destroy
+      end
+
+      it "restores the peer review sub assignment when feature flag is enabled" do
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+
+        peer_review_assignment.reload.restore
+        expect(peer_review_sub.reload.workflow_state).not_to eq "deleted"
+      end
+
+      it "triggers peer review attributes sync after restoring" do
+        expect(PeerReview::PeerReviewUpdaterService).to receive(:call)
+          .with(parent_assignment: peer_review_assignment)
+          .at_least(:once)
+        peer_review_assignment.reload.restore
+      end
+
+      it "restores only the assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        peer_review_assignment.reload.restore
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "does not sync sub assignment when FF is disabled at restore then re-enabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        peer_review_assignment.reload.restore
+
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        expect(PeerReview::PeerReviewUpdaterService).not_to receive(:call)
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "restores only the assignment when no peer review sub assignment exists (legacy)" do
+        legacy_assignment = @course.assignments.create!(
+          title: "Legacy Peer Review",
+          peer_reviews: true
+        )
+        legacy_assignment.destroy
+
+        expect { legacy_assignment.restore }.not_to raise_error
+        expect(legacy_assignment.reload.workflow_state).not_to eq "deleted"
+      end
+
+      it "restores the most recently created sub assignment when multiple deleted ones exist" do
+        # peer_review_sub is the older deleted sub (already deleted by the before block).
+        # Simulate a newer sub created after a second enable/disable cycle,
+        # also deleted. The restore should pick the most recent one (highest id).
+        newer_sub = PeerReviewSubAssignment.create!(
+          parent_assignment: peer_review_assignment,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        newer_sub.update_columns(workflow_state: "deleted")
+
+        peer_review_assignment.reload.restore
+
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+        expect(newer_sub.reload.workflow_state).not_to eq "deleted"
+      end
+    end
   end
 
   describe "#readable_submission_type" do
@@ -14582,6 +14796,32 @@ describe Assignment do
     it "returns false for a student" do
       student = course_with_student(active_all: true, course: @course).user
       expect(@assignment.can_manage_rubrics?(student, nil)).to be false
+    end
+  end
+
+  describe ".find_assignment_or_peer_review" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      assignment_model(course: @course)
+    end
+
+    it "returns the assignment for a regular assignment id" do
+      expect(AbstractAssignment.find_assignment_or_peer_review(@assignment.id)).to eq @assignment
+    end
+
+    it "returns the peer review sub assignment when the feature flag is enabled" do
+      peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      expect(AbstractAssignment.find_assignment_or_peer_review(peer_review_sub_assignment.id)).to eq peer_review_sub_assignment
+    end
+
+    it "raises ActiveRecord::RecordNotFound for a peer review sub assignment when the feature flag is disabled" do
+      peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect { AbstractAssignment.find_assignment_or_peer_review(peer_review_sub_assignment.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "raises ActiveRecord::RecordNotFound for an unknown id" do
+      expect { AbstractAssignment.find_assignment_or_peer_review(0) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

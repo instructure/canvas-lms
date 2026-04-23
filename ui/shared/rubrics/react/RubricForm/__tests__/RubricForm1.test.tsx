@@ -24,7 +24,7 @@ import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {WarningModal} from '../components/WarningModal'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 import {reorderRatingsAtIndex} from '../../utils'
 
 vi.mock('../queries/RubricFormQueries', async importOriginal => {

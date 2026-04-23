@@ -66,7 +66,9 @@ const ErrorMessage = () => (
 )
 
 ready(() => {
-  const canEditContent = ENV.PERMISSIONS?.manage_course_content_edit !== false
+  const canEditContent = ENV.FEATURES?.course_navigation_and_feature_options_permissions
+    ? ENV.PERMISSIONS?.manage_course_details === true
+    : ENV.PERMISSIONS?.manage_course_content_edit !== false
 
   const blueprint = document.getElementById('blueprint_menu')
   if (blueprint) {

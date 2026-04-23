@@ -31,9 +31,9 @@ const transformOutcomeData = (
   if (!studentRollup) return []
 
   return outcomesList.map(outcome => {
-    const score = studentRollup.outcomeRollups.find(o => o.outcomeId === outcome.id)?.score
-    const assessedAlignmentsCount =
-      studentRollup.outcomeRollups.filter(o => o.outcomeId === outcome.id).length || 0
+    const outcomeRollup = studentRollup.outcomeRollups.find(o => o.outcomeId === outcome.id)
+    const score = outcomeRollup?.score
+    const assessedAlignmentsCount = outcomeRollup?.count ?? 0
     const totalAlignmentsCount = outcome.alignments?.length || 0
     const masteryScore = score ?? null
 

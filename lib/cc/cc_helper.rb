@@ -292,9 +292,7 @@ module CC
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id
-            lookup = if Account.site_admin.feature_enabled?(:permanent_page_links)
-                       @course.wiki_page_lookups.where(slug: url_or_title.to_url).first
-                     end
+            lookup = find_wiki_page_lookup(url_or_title)
             page = if lookup
                      @course.wiki_pages.deleted_last.where(id: lookup.wiki_page_id).first
                    else
@@ -342,6 +340,17 @@ module CC
         port = ConfigFile.load("domain").try(:[], :domain).try(:split, ":").try(:[], 1)
         @url_prefix = "#{protocol}://#{host}"
         @url_prefix += ":#{port}" if !host&.include?(":") && port.present?
+      end
+
+      def decode_url_slug(url_slug)
+        Rack::Utils.unescape_path(url_slug).to_url
+      end
+
+      def find_wiki_page_lookup(url_or_title)
+        return nil unless Account.site_admin.feature_enabled?(:permanent_page_links)
+
+        @course.wiki_page_lookups.where(slug: url_or_title.to_url).first ||
+          @course.wiki_page_lookups.where(slug: decode_url_slug(url_or_title)).first
       end
 
       def translate_module_item_query(query)

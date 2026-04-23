@@ -797,7 +797,7 @@ class GroupCategoriesController < ApplicationController
                        root_account_id: @context.root_account_id,
                        sis_pseudonym_id: user.sis_pseudonym_id,
                        course_id: @context.id)
-    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account, current_user: @current_user)
     row << p&.sis_user_id if include_sis_id
     row << p&.unique_id
     row << section_names.values_at(*user.course_section_ids).map(&:name).to_sentence
@@ -843,7 +843,7 @@ class GroupCategoriesController < ApplicationController
                        root_account_id: @context.root_account_id,
                        sis_pseudonym_id: user.sis_pseudonym_id,
                        course_id: @context.id)
-    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account, current_user: @current_user)
     row << p&.sis_user_id if include_sis_id
     row << p&.unique_id
 

@@ -22,7 +22,7 @@ import {
   resubmitDiscussionNoticesPath,
   resubmitDiscussionNoticesSuccessMessage,
 } from '@canvas/lti-asset-processor/shared-with-sg/replicated/mutations/resubmitDiscussionNotices'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {useMutation, UseMutationResult} from '@tanstack/react-query'

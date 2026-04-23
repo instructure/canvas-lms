@@ -19,7 +19,7 @@
 import React from 'react'
 import {legacyRender} from '@canvas/react'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import EnhancedIndividualGradebookWrapper from './react/components/EnhancedIndividualGradebookWrapper'
 

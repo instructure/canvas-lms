@@ -21,7 +21,7 @@ import {render, cleanup, waitFor, act} from '@testing-library/react'
 import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImporter'
 import * as apiClient from '../apiClient'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 // Mock the apiClient module since MSW doesn't intercept axios in Node.js
 vi.mock('../apiClient')

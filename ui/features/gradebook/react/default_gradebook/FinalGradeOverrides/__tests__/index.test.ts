@@ -22,14 +22,18 @@ import {waitFor} from '@testing-library/react'
 
 import GradeOverride from '@canvas/grading/GradeOverride'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrides from '../index'
 
 // Mock the external dependencies
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/grading/FinalGradeOverrideApi', () => ({
   updateFinalGradeOverride: vi.fn(),
@@ -172,8 +176,7 @@ describe('Gradebook FinalGradeOverrides', () => {
   })
 
   describe('#updateGrade()', () => {
-    const mockUpdateFinalGradeOverride =
-      FinalGradeOverrideApi.updateFinalGradeOverride as any
+    const mockUpdateFinalGradeOverride = FinalGradeOverrideApi.updateFinalGradeOverride as any
     const mockShowFlashAlert = FlashAlert.showFlashAlert as any
 
     beforeEach(() => {

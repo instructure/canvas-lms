@@ -47,7 +47,7 @@ import {useMutation, useQuery} from '@tanstack/react-query'
 import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {getAccountId} from '../../common/lib/getAccountId'
 import {ZPaginatedList} from './PaginatedList'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {diffHistoryEntries, LtiHistoryEntryWithDiff} from '../pages/tool_details/history/differ'
 import {ZLtiRegistrationAccountBinding} from '../model/LtiRegistrationAccountBinding'
 
@@ -329,7 +329,7 @@ export const createRegistration: CreateRegistration = (
         configuration: internalConfig,
         overlay,
         unified_tool_id: unifiedToolId,
-        workflow_state: 'on',
+        workflow_state: 'active',
       }),
     }),
   )
@@ -340,7 +340,7 @@ type UpdateRegistrationParams = {
   internalConfig?: InternalLtiConfiguration
   overlay?: LtiConfigurationOverlay
   adminNickname?: string
-  workflowState?: 'on' | 'off' | 'allow'
+  workflowState?: 'active' | 'inactive'
   lock_deploying?: boolean
 }
 

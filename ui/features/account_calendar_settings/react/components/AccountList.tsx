@@ -23,7 +23,7 @@ import {Img} from '@instructure/ui-img'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import SpacePandaUrl from '@instructure/platform-images/assets/SpacePanda.svg'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useFetchApi from '@canvas/use-fetch-api-hook'

@@ -785,11 +785,14 @@ class Enrollment < ApplicationRecord
   end
 
   def add_to_favorites
-    # this method was written by Alan Smithee
     user.shard.activate do
-      if user.favorites.where(context_type: "Course").exists? # only add a favorite if they've ever favorited anything even if it's no longer in effect
-        Favorite.create_or_find_by(user:, context: course)
-      end
+      # Only auto-favorite if the user still has at least one accessible favorite course,
+      # otherwise stale favorites (for concluded/deleted/inactive enrollments) would make
+      # auto-favoriting permanent with no way for the user to opt out.
+      favorite_course_ids = user.favorites.where(context_type: "Course").select(:context_id)
+      return unless user.enrollments.current_and_invited.where(course_id: favorite_course_ids).exists?
+
+      Favorite.create_or_find_by(user:, context: course)
     end
   end
 

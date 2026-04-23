@@ -30,7 +30,7 @@ import {
   responsiviser,
 } from '@canvas/planner'
 import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import DashboardOptionsMenu from './DashboardOptionsMenu'
 import {CardDashboardLoader} from '@canvas/dashboard-card'
@@ -360,16 +360,17 @@ class DashboardHeader extends React.Component {
                   style={{display: this.state.currentDashboard === 'planner' ? 'block' : 'none'}}
                 />
               )}
-              {ENV.widget_dashboard_overridable === false && (
-                <Button
-                  onClick={this.handleSwitchToNewDashboard}
-                  margin="0 small 0 0"
-                  disabled={this.state.switchingDashboard}
-                  data-testid="switch-to-new-dashboard-button"
-                >
-                  {I18n.t('Switch to new dashboard view')}
-                </Button>
-              )}
+              {ENV.widget_dashboard_overridable === false &&
+                this.state.selectedObserveeId !== ENV.current_user_id && (
+                  <Button
+                    onClick={this.handleSwitchToNewDashboard}
+                    margin="0 small 0 0"
+                    disabled={this.state.switchingDashboard}
+                    data-testid="switch-to-new-dashboard-button"
+                  >
+                    {I18n.t('Switch to new dashboard view')}
+                  </Button>
+                )}
               <div id="DashboardOptionsMenu_Container">
                 <DashboardOptionsMenu
                   view={this.state.currentDashboard}
@@ -435,18 +436,19 @@ class DashboardHeader extends React.Component {
                   />
                 </Flex.Item>
               )}
-              {ENV.widget_dashboard_overridable === false && (
-                <Flex.Item overflowY="visible">
-                  <Button
-                    display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
-                    onClick={this.handleSwitchToNewDashboard}
-                    disabled={this.state.switchingDashboard}
-                    data-testid="switch-to-new-dashboard-button"
-                  >
-                    {I18n.t('Switch to new dashboard view')}
-                  </Button>
-                </Flex.Item>
-              )}
+              {ENV.widget_dashboard_overridable === false &&
+                this.state.selectedObserveeId !== ENV.current_user_id && (
+                  <Flex.Item overflowY="visible">
+                    <Button
+                      display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
+                      onClick={this.handleSwitchToNewDashboard}
+                      disabled={this.state.switchingDashboard}
+                      data-testid="switch-to-new-dashboard-button"
+                    >
+                      {I18n.t('Switch to new dashboard view')}
+                    </Button>
+                  </Flex.Item>
+                )}
               <Flex.Item overflowY="visible">
                 <div id="DashboardOptionsMenu_Container">
                   <DashboardOptionsMenu

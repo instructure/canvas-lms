@@ -32,8 +32,8 @@ import {ToolAvailability} from '../ToolAvailability'
 import {mockContextControl, mockDeployment} from './helpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {createDeployment} from '../../../../api/deployments'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+import {showFlashAlert} from '@instructure/platform-alerts'
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
   showFlashSuccess: vi.fn(() => vi.fn()),
   showFlashError: vi.fn(() => vi.fn()),

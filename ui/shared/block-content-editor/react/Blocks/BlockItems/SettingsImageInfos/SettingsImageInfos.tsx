@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {ChangeEvent} from 'react'
 import {SettingsImageProps} from './types'
 import {useGenerateAiAltText} from '../../../hooks/useGenerateAiAltText'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {showScreenReaderAlert} from '../../../utilities/accessibility'
 import {useAppSelector} from '../../../store'
 

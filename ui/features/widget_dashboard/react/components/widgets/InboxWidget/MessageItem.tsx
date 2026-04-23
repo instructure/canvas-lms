@@ -94,13 +94,13 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
                   </Flex>
                 </Flex.Item>
 
-                <Flex.Item>
+                <Flex.Item overflowY="visible">
                   <Text weight="bold" size="small" wrap="normal" color="primary">
                     <TruncatedText maxLength={60}>{message.subject}</TruncatedText>
                   </Text>
                 </Flex.Item>
 
-                <Flex.Item>
+                <Flex.Item overflowY="visible">
                   <Text size="x-small" color="secondary">
                     <TruncatedText maxLength={80}>{message.messagePreview}</TruncatedText>
                   </Text>

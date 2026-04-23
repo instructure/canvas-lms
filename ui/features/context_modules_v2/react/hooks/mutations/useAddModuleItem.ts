@@ -25,9 +25,9 @@ import type {ContentItem} from '../queries/useModuleItemContent'
 import {useModules} from '../queries/useModules'
 import {ExternalToolUrl, ExternalUrl, FormState, NewItem} from '../../utils/types'
 import {navigateToLastPage} from '../../utils/pageNavigation'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../../utils/constants'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_v2')

@@ -29,6 +29,7 @@ import formatMessage from 'format-message'
  */
 interface BaseCaptionRowProps {
   captionName: string
+  deleteButtonRef?: (el: Element | null) => void
 }
 
 /**
@@ -129,6 +130,7 @@ export function CaptionRow(props: CaptionRowProps) {
                   size="small"
                   withBackground={false}
                   withBorder={false}
+                  elementRef={props.deleteButtonRef}
                 >
                   <IconTrashLine />
                 </IconButton>
@@ -163,6 +165,7 @@ export function CaptionRow(props: CaptionRowProps) {
                 withBackground={false}
                 withBorder={false}
                 interaction={props.isInherited ? 'disabled' : 'enabled'}
+                elementRef={props.deleteButtonRef}
               >
                 <IconTrashLine />
               </IconButton>

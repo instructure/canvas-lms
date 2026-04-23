@@ -40,7 +40,7 @@ import {
 import {useContextModule} from '../../hooks/useModuleContext'
 import {ExternalToolUrl, ExternalUrl} from '../../utils/types'
 import {TYPES_WITH_TABS, NAMELESS_TYPES, NEW_ITEM_FIELDS, ITEM_TYPE} from '../../utils/constants'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   getItemTypeLabel,
   getWarningLabel,

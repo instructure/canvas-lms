@@ -551,4 +551,66 @@ describe('CreateEditAllocationRuleModal', () => {
       })
     })
   })
+
+  describe('Peer review status warning', () => {
+    const studentWithFullAllocations: CourseStudent = {
+      _id: '10',
+      name: 'Bulbasaur',
+      peerReviewStatus: {mustReviewCount: 2, completedReviewsCount: 0},
+    }
+
+    const willReviewRule: AllocationRuleType = {
+      _id: '5',
+      assessor: studentWithFullAllocations,
+      assessee: {
+        _id: '11',
+        name: 'Charmander',
+        peerReviewStatus: {mustReviewCount: 0, completedReviewsCount: 0},
+      },
+      mustReview: true,
+      reviewPermitted: true,
+      appliesToAssessor: true,
+    }
+
+    const willNotReviewRule: AllocationRuleType = {
+      ...willReviewRule,
+      reviewPermitted: false,
+    }
+
+    beforeEach(() => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          assignedStudents: {
+            nodes: [studentWithFullAllocations],
+          },
+        },
+      })
+    })
+
+    it('shows warning when will review (strict) is selected and reviewer has enough allocations', async () => {
+      renderWithProviders({isEdit: true, rule: willReviewRule})
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Bulbasaur already has enough strict allocations to meet required peer reviews. Additional allocations will follow available submissions and precedence.',
+          ),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('does not show warning when will not review (strict) is selected', async () => {
+      renderWithProviders({isEdit: true, rule: willNotReviewRule})
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Bulbasaur')).toBeInTheDocument()
+      })
+
+      expect(
+        screen.queryByText(
+          'Bulbasaur already has enough strict allocations to meet required peer reviews. Additional allocations will follow available submissions and precedence.',
+        ),
+      ).not.toBeInTheDocument()
+    })
+  })
 })

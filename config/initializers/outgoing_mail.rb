@@ -25,10 +25,22 @@
 config = {
   domain: "unknowndomain.example.com",
   delivery_method: :smtp,
-}.merge((ConfigFile.load("outgoing_mail").dup || {}).symbolize_keys)
+}
+
+if (local = ConfigFile.load("outgoing_mail")).present?
+  config.merge!(local.symbolize_keys)
+else
+  settings = Canvas.load_consul_subtree("outgoing_mail",
+                                        keys: %w[smtp.yml reply_to delivery_method reply_to_disabled])
+  config.merge!(settings[:smtp].to_h.symbolize_keys)
+  config[:reply_to_addresses] = Array(settings[:reply_to]) if settings[:reply_to]
+  config[:delivery_method] = settings[:delivery_method] if settings[:delivery_method]
+  config[:perform_deliveries] = false if settings[:delivery_method] == "test"
+  config[:reply_to_disabled] = settings[:reply_to_disabled]
+end
 
 [:authentication, :delivery_method].each do |key|
-  config[key] = config[key].to_sym if config.key?(key)
+  config[key] = config[key].to_sym if config.key?(key) && !config[key].is_a?(Symbol)
 end
 
 Rails.configuration.to_prepare do

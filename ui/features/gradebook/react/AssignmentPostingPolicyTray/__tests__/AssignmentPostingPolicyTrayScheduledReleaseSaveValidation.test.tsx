@@ -20,9 +20,9 @@ import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import * as Api from '../Api'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   MockContext,
   createDefaultContext,
@@ -34,7 +34,7 @@ import {
   enterNewDateTime,
 } from './AssignmentPostingPolicyTrayTestUtils'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.mock('../Api')
 
 describe('AssignmentPostingPolicyTray ScheduledRelease - Save Validation', () => {

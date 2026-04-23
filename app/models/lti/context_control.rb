@@ -29,7 +29,39 @@ class Lti::ContextControl < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :deployment, class_name: "ContextExternalTool", inverse_of: :context_controls, optional: false
+  # Points to a cross-shard registration, is slowly being phased out for app
   belongs_to :registration, class_name: "Lti::Registration", inverse_of: :context_controls, optional: false
+  alias_method :old_registration, :registration
+  alias_attribute :old_registration_id, :registration_id
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
+
+  def registration
+    if deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+      app
+    else
+      old_registration
+    end
+  end
+
+  def registration_id
+    if deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+      app_id
+    else
+      old_registration_id
+    end
+  end
+
+  def registration=(value)
+    super
+    sync_app_id
+  end
+
+  def registration_id=(value)
+    super
+    sync_app_id
+  end
+
   belongs_to :created_by, class_name: "User"
   belongs_to :updated_by, class_name: "User"
 
@@ -43,12 +75,19 @@ class Lti::ContextControl < ApplicationRecord
 
   validate :context_belongs_to_deployment
 
-  before_validation :set_registration_id
+  before_validation :set_registration_id, :sync_app_id
   before_create :set_path
   before_destroy :prevent_primary_deletion
   after_destroy :soft_delete_child_controls
 
   scope :active, -> { where.not(workflow_state: [:deleted, :deleted_with_context]) }
+  scope :for_registration, lambda { |registration, root_account|
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      where(app: registration)
+    else
+      where(registration:)
+    end
+  }
 
   # This model has a special "deleted_with_context" workflow state, so its
   # states need to be defined manually instead of just by including
@@ -207,7 +246,10 @@ class Lti::ContextControl < ApplicationRecord
     def query_by_paths(context:, registration: nil, deployment: nil)
       paths = self_and_all_parent_paths(context)
       query = active.where(path: paths)
-      query = query.where(registration:) if registration.present?
+      if registration.present?
+        use_local = deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+        query = use_local ? query.where(app: registration) : query.where(registration:)
+      end
       query = query.where(deployment:) if deployment.present?
       # Because all ancestors will have the same prefix path, we can safely order by path length instead
       # of splitting on segments and worrying about that.
@@ -261,10 +303,13 @@ class Lti::ContextControl < ApplicationRecord
   private
 
   def soft_delete_child_controls
+    use_real = deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+    reg_condition = use_real ? { app_id: } : { registration_id: }
     Lti::ContextControl
       .active
       .where("path LIKE ?", "#{path}%")
-      .where(deployment_id:, registration_id:)
+      .where(deployment_id:)
+      .where(reg_condition)
       .where.not(id:)
       .in_batches do |batch|
       batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
@@ -290,7 +335,43 @@ class Lti::ContextControl < ApplicationRecord
   end
 
   def set_registration_id
-    self.registration_id ||= deployment.lti_registration_id
+    # Use raw column reads to bypass getter overrides, so that
+    # registration_id always stores the original cross-shard FK value
+    # (not the resolved local-copy app_id).
+    raw = self[:registration_id] || deployment.read_attribute(:lti_registration_id)
+    self[:registration_id] = raw
+  end
+
+  def sync_app_id
+    return if old_registration_id.blank?
+    return unless old_registration_id_changed?
+    return if app_id_changed? && !app_id.nil?
+
+    resolved_root_account = deployment&.root_account
+    cross_shard = shard != Shard.shard_for(old_registration_id)
+    same_shard_inherited = !cross_shard &&
+                           resolved_root_account != Account.site_admin &&
+                           shard == Account.site_admin.shard &&
+                           old_registration&.root_account == Account.site_admin
+
+    if cross_shard || same_shard_inherited
+      local = Lti::Registration.active.find_by(
+        template_registration_id: old_registration_id,
+        account: resolved_root_account
+      )
+      if local
+        self.app_id = local.id
+      else
+        msg = "No local App/Lti::Registration found for registration_id=#{old_registration_id}"
+        if resolved_root_account&.feature_enabled?(:lti_registrations_templates)
+          raise Lti::LocalAppNotFound, msg
+        else
+          Canvas::Errors.capture_exception(:lti_registration_sync, msg, :warn)
+        end
+      end
+    else
+      self.app_id = old_registration_id
+    end
   end
 
   def context_belongs_to_deployment

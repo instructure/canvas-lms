@@ -83,6 +83,7 @@ CanvasRails::Application.routes.draw do
 
   get "mr/:id" => "info#message_redirect", :as => :message_redirect
   get "help_links" => "info#help_links"
+  get "ada_chat_popup" => "ada_chat_popup#show"
 
   # This is a debug route that makes working on error pages easier
   get "test_error" => "info#test_error" unless Rails.env.production?
@@ -1938,6 +1939,19 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/accessibility_issue_summary", action: :accessibility_issue_summary, as: "account_accessibility_issue_summary"
     end
 
+    scope(controller: :accessibility_course_statistics) do
+      # This endpoint was created during experimentation phase for Educator Dashboard
+      # At this time the endpoint only pulls courses that the user is enrolled as an educator
+      # i.e. TeacherEnrollment or DesignerEnrollment
+      # This this feature goes to GA, it will be idea to update the endpoint to remove educator
+      # as the indicator.
+      get "users/:user_id/educator_accessibility_course_statistics", action: :index, as: "user_educator_accessibility_course_statistics"
+    end
+
+    scope(controller: :accessibility_course_scans) do
+      post "users/:user_id/educator_accessibility_course_scan", action: :create, as: "user_educator_accessibility_course_scan"
+    end
+
     scope(controller: :sub_accounts) do
       post "accounts/:account_id/sub_accounts", action: :create
       delete "accounts/:account_id/sub_accounts/:id", action: :destroy
@@ -3008,10 +3022,6 @@ CanvasRails::Application.routes.draw do
       get "plugins/:id", action: :show
     end
 
-    scope(controller: :rich_content_api) do
-      post "rich_content/generate", action: :generate
-    end
-
     scope(controller: :block_editor_templates_api) do
       get "courses/:course_id/block_editor_templates", action: :index
       post "courses/:course_id/block_editor_templates", action: :create
@@ -3255,7 +3265,6 @@ CanvasRails::Application.routes.draw do
       get "/accounts/:account_id/data_services/:id", action: :show, as: :data_services_show
       put "/accounts/:account_id/data_services/:id", action: :update, as: :data_services_update
       get "/accounts/:account_id/data_services", action: :index, as: :data_services_index
-      get "/accounts/:account_id/event_types", action: :event_types_index, as: :data_services_event_types
       delete "/accounts/:account_id/data_services/:id", action: :destroy, as: :data_services_destroy
     end
 

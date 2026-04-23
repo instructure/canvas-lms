@@ -23,6 +23,15 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import PropTypes from 'prop-types'
 
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 vi.mock('@canvas/k5/react/utils', () => ({
   transformGrades: vi.fn(data => data),
   fetchGradesForGradingPeriod: vi.fn(),
@@ -266,7 +275,7 @@ describe('GradesPage', () => {
           return HttpResponse.json(defaultCourses)
         }
         return HttpResponse.json([])
-      })
+      }),
     )
   })
 
@@ -287,18 +296,13 @@ describe('GradesPage', () => {
   it('displays an error message if there was an error fetching grades', async () => {
     server.use(
       http.get('/api/v1/users/self/courses', () => {
-        return HttpResponse.json(
-          {errors: [{message: 'oh no!'}]},
-          {status: 500}
-        )
-      })
+        return HttpResponse.json({errors: [{message: 'oh no!'}]}, {status: 500})
+      }),
     )
-    const {getAllByText} = render(<GradesPage {...defaultProps} />)
-    // showFlashError appears to create both a regular and a screen-reader only alert on the page
-    await waitFor(() => getAllByText('Failed to load the grades tab'))
-    expect(getAllByText('Failed to load the grades tab')[0]).toBeInTheDocument()
-    // doFetchApi displays the HTTP status error message
-    expect(getAllByText(/doFetchApi received a bad response/)[0]).toBeInTheDocument()
+    render(<GradesPage {...defaultProps} />)
+    await waitFor(() =>
+      expect(showFlashError).toHaveBeenCalledWith('Failed to load the grades tab'),
+    )
   })
 
   it('renders fetched non-homeroom courses', async () => {
@@ -339,7 +343,7 @@ describe('GradesPage', () => {
             ],
           },
         ])
-      })
+      }),
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
     await waitFor(() => getByText('For Teachers Only'))
@@ -394,7 +398,7 @@ describe('GradesPage', () => {
     server.use(
       http.get('/api/v1/users/self/courses', () => {
         return HttpResponse.json([courseWithoutGrades])
-      })
+      }),
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
 
@@ -412,12 +416,14 @@ describe('GradesPage', () => {
       server.use(
         http.get('/api/v1/users/self/courses', ({request}) => {
           const url = new URL(request.url)
-          const includesObservedUsers = url.searchParams.getAll('include[]').includes('observed_users')
+          const includesObservedUsers = url.searchParams
+            .getAll('include[]')
+            .includes('observed_users')
           if (includesObservedUsers) {
             return HttpResponse.json(defaultCourses)
           }
           return HttpResponse.json(defaultCourses)
-        })
+        }),
       )
       utils.getCourseGrades.mockImplementation(c => c)
     })

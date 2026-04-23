@@ -26,7 +26,7 @@ import type {
   FinalGradeOverride,
 } from '@canvas/grading/grading.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {

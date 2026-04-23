@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "afrikanščina"
     },
-    "ai_response_9624e8e8": {
-        "message": "Odziv UI"
-    },
-    "ai_tools_fda01177": {
-        "message": "Orodja UI"
-    },
     "albanian_21ed929e": {
         "message": "albanščina"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Med podajanjem omrežne zahteve je prišlo do napake."
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Pri obdelavi vaše zahteve je prišlo do napake"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Pri nalaganju medija je prišlo do napake."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Izberi datoteko"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Izberite datoteko (zahtevano)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Izberi pravice uporabe ..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Kompleksna števila"
     },
-    "compose_44c904f4": {
-        "message": "Sestavi"
-    },
     "computer_1d7dfa6f": {
         "message": "Računalnik"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Koprodukt"
-    },
-    "copy_9748f9f": {
-        "message": "Kopiraj"
     },
     "copyright_holder_66ee111": {
         "message": "Lastnik avtorskih pravic:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Po meri"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Širina in višina po meri (slikovne pike)"
     },
     "cyan_c1d5f68a": {
         "message": "Cijan"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Vrsta mere"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Mere"
-    },
     "directionality_26ae9e08": {
         "message": "Usmerjenost"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Nepovezan spoj"
-    },
-    "dislike_14befc48": {
-        "message": "Ni mi všeč"
     },
     "display_options_315aba85": {
         "message": "Prikaz možnosti"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "vnesite besedilo za iskanje"
     },
-    "enter_text_8b35c65b": {
-        "message": "Vnos besedila"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Pridobivanje vsebine datoteke ni uspelo"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Kopiranje odgovora ni uspelo"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Vsebine iz zunanjega orodja ni bilo mogoče pridobiti"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Višina"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Pozdravljeni. Prosimo, opišite spremembe, ki bi jih želeli vnesti v svojo kompozicijo."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Pozdravljeni. Prosimo, opišite spremembe, ki bi jih želeli vnesti v svoj izbor."
-    },
     "hexagon_d8468e0d": {
         "message": "Šesterokotnik"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Glavna stran"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Kako zahtevati in urejati napise?"
+    },
     "html_code_editor_fd967a44": {
         "message": "urejevalnik kode html"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Imam avtorske pravice."
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Žal mi je, vendar ne morem najti odgovora umetne inteligence"
     },
     "icelandic_9d6d35de": {
         "message": "islandščina"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Drugo"
     },
-    "modify_6b0b13e3": {
-        "message": "Spremeni"
-    },
     "module_90d9fd32": {
         "message": "Modul"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Izberite datoteko"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Prosimo, opišite, kaj želite sestaviti."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Vnesite ime datoteke"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Spremeni velikost"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Odgovor kopiran v odložišče"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Obnovim samodejno shranjeno vsebino?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Ponovno poskusi { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Ponovno poskusi"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverzni vrtilni križ (ni odnosa)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Bližnjica"
-    },
-    "show_all_967a90f0": {
-        "message": "Prikaži vse"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Prikaži možnosti slike"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Omejitve ogledovalcev"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Čakanje na odgovor"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Delujočega mikrofona, priključenega na napravo, ni bilo mogoče zaznati."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "valižanščina"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Kaj želite storiti?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Če je uporabljeno označevanje, ki vizualno oblikuje elemente kot seznam, ne kaže pa razmerja seznama, imajo lahko uporabniki težave pri navigiranju po informacijah."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Venčni produkt"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Pomočnik za pisanje"
     },
     "xi_149681d0": {
         "message": "Ksi"

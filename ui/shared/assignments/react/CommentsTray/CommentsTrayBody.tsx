@@ -31,7 +31,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {bool, func} from 'prop-types'
+import {bool, func, number} from 'prop-types'
 import React, {useContext, useState} from 'react'
 import ClosedDiscussionSVG from '@canvas/assignments/react/images/ClosedDiscussions.svg'
 import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
@@ -193,6 +193,7 @@ export default function CommentsTrayBody(props) {
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
                 isPeerReviewEnabled={props.isPeerReviewEnabled}
+                focusTrigger={props.focusTrigger}
                 onSendCommentSuccess={() => {
                   if (props.isPeerReviewEnabled && !props.assignment.rubric) {
                     handlePeerReviewPromptModal()
@@ -229,6 +230,7 @@ CommentsTrayBody.propTypes = {
   submission: Submission.shape.isRequired,
   reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool,
+  focusTrigger: number,
   onSuccessfulPeerReview: func,
   usePeerReviewModal: bool,
   suppressSuccessAlert: bool,

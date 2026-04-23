@@ -25,7 +25,7 @@ import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 

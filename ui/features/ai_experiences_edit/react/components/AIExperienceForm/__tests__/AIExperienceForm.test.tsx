@@ -381,6 +381,50 @@ describe('AIExperienceForm', () => {
     })
   })
 
+  describe('failed context files alert', () => {
+    it('shows an error alert naming the failed file', () => {
+      render(
+        <AIExperienceForm
+          aiExperience={{
+            ...mockAiExperience,
+            failed_context_file_names: ['poison.pdf'],
+          }}
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+        />,
+      )
+      expect(screen.getByTestId('ai-experience-edit-index-failed-notice')).toBeInTheDocument()
+      expect(screen.getByText(/Activity couldn't be loaded/)).toBeInTheDocument()
+      expect(screen.getByText(/poison\.pdf/)).toBeInTheDocument()
+    })
+
+    it('lists all failed file names in the alert', () => {
+      render(
+        <AIExperienceForm
+          aiExperience={{
+            ...mockAiExperience,
+            failed_context_file_names: ['poison.pdf', 'corrupt.docx'],
+          }}
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+        />,
+      )
+      expect(screen.getByTestId('ai-experience-edit-index-failed-notice')).toBeInTheDocument()
+      expect(screen.getByText(/poison\.pdf, corrupt\.docx/)).toBeInTheDocument()
+    })
+
+    it('does not show the alert when failed_context_file_names is absent', () => {
+      render(
+        <AIExperienceForm
+          aiExperience={mockAiExperience}
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+        />,
+      )
+      expect(screen.queryByTestId('ai-experience-edit-index-failed-notice')).not.toBeInTheDocument()
+    })
+  })
+
   describe('delete functionality', () => {
     it('renders three-dot menu button', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)

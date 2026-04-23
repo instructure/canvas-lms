@@ -239,6 +239,35 @@ describe Api::V1::AiExperience do
         expect(json).not_to have_key(:context_files)
       end
     end
+
+    describe "failed_context_file_names" do
+      it "includes failed_context_file_names when can_manage and value is present" do
+        json = api.ai_experience_json(@ai_experience,
+                                      @teacher,
+                                      session,
+                                      can_manage: true,
+                                      failed_context_file_names: ["poison.pdf"])
+        expect(json["failed_context_file_names"]).to eq(["poison.pdf"])
+      end
+
+      it "omits failed_context_file_names when the value is empty" do
+        json = api.ai_experience_json(@ai_experience,
+                                      @teacher,
+                                      session,
+                                      can_manage: true,
+                                      failed_context_file_names: [])
+        expect(json).not_to have_key("failed_context_file_names")
+      end
+
+      it "omits failed_context_file_names when can_manage is false" do
+        json = api.ai_experience_json(@ai_experience,
+                                      @teacher,
+                                      session,
+                                      can_manage: false,
+                                      failed_context_file_names: ["poison.pdf"])
+        expect(json).not_to have_key("failed_context_file_names")
+      end
+    end
   end
 
   describe "ai_experiences_json" do

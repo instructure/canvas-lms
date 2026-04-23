@@ -23,7 +23,7 @@ import SubmissionModal from '../SubmissionModal'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {generatePageListKey} from '../utils'
 
 vi.mock('@canvas/util/globalUtils', async () => {

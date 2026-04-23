@@ -21,7 +21,7 @@ import {
   SearchContext,
   DiscussionManagerUtilityContext,
 } from '../../utils/constants'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'

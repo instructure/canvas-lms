@@ -36,7 +36,7 @@ import {
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {windowConfirm} from '@canvas/util/globalUtils'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('OutcomeManagement')
 

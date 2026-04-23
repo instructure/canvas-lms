@@ -157,7 +157,7 @@ module AttachmentHelper
   def access_allowed(attachment:, user:, access_type:, no_error_on_failure: false)
     return true if sf_verifier_match?(attachment, access_type) || jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
 
-    if params[:verifier]
+    if params[:verifier] && !params[:location]
       verifier_checker = Attachments::Verification.new(attachment)
       return true if verifier_checker.valid_verifier_for_permission?(
         params[:verifier],

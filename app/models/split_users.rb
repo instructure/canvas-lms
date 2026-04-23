@@ -210,6 +210,7 @@ class SplitUsers
     Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
       AccountUser.where(id: shard_account_user_ids).where.not(user_id: restored_user).update_all(user_id: restored_user.id)
     end
+    restore_institutional_tag_associations(records.where(context_type: "InstitutionalTagAssociation", previous_user_id: restored_user))
     restore_workflow_states_from_records(records)
   end
 
@@ -495,6 +496,33 @@ class SplitUsers
     else
       # don't go through the swap rigamarole if we don't have to
       model.where(id: ids_to_restored_user).update_all(user_id: restored_user.id)
+    end
+  end
+
+  def restore_institutional_tag_associations(records)
+    association_ids = records.pluck(:context_id)
+    return if association_ids.empty?
+
+    Shard.partition_by_shard(association_ids) do |shard_ids|
+      # Restore moved associations (currently live on source_user)
+      moved_scope = InstitutionalTagAssociation.where(id: shard_ids, user_id: source_user)
+
+      # Guard against unique index violation: skip tags restored_user already has active
+      # (e.g. added via SIS import between merge and split)
+      existing_tag_ids = InstitutionalTagAssociation
+                         .active
+                         .where(user_id: restored_user)
+                         .where(institutional_tag_id: moved_scope.select(:institutional_tag_id))
+                         .pluck(:institutional_tag_id)
+
+      movable = moved_scope.where.not(institutional_tag_id: existing_tag_ids)
+      movable.update_all(user_id: restored_user.id, updated_at: Time.now.utc)
+
+      # Reactivate soft-deleted conflict associations (belong to restored_user but were deleted during merge)
+      InstitutionalTagAssociation
+        .where(id: shard_ids, user_id: restored_user)
+        .where.not(workflow_state: "active")
+        .update_all(workflow_state: "active", updated_at: Time.now.utc)
     end
   end
 

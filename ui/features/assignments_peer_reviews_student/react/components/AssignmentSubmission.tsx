@@ -37,10 +37,12 @@ import {calculateMasqueradeHeight} from '@canvas/context-modules/differentiated-
 import UrlSubmissionDisplay from '@canvas/assignments/react/UrlSubmissionDisplay'
 import FileSubmissionPreview from '@canvas/assignments/react/FileSubmissionPreview'
 import StudentAnnotationPreview from '@canvas/assignments/react/StudentAnnotationPreview'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useRubricAssessment} from '../hooks/useRubricAssessment'
 import {RubricPanel} from './RubricPanel'
+import type {RubricPanelHandle} from './RubricPanel'
 import {CommentsPanel} from './CommentsPanel'
+import type {CommentsPanelHandle} from './CommentsPanel'
 import {MediaRecordingSubmissionDisplay} from './MediaRecordingSubmissionDisplay'
 
 const I18n = createI18nScope('peer_reviews_student')
@@ -78,8 +80,10 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   submissionUserId,
 }) => {
   const [viewMode, setViewMode] = useState<'paper' | 'plain_text'>('paper')
-  const [showComments, setShowComments] = useState(true)
-  const [showRubric, setShowRubric] = useState(false)
+  const [showComments, setShowComments] = useState(!assignment.rubric)
+  const [showRubric, setShowRubric] = useState(!!assignment.rubric)
+  const [rubricFocusTrigger, setRubricFocusTrigger] = useState(0)
+  const [commentFocusTrigger, setCommentFocusTrigger] = useState(0)
   const [peerReviewCommentCompleted, setPeerReviewCommentCompleted] =
     useState(isPeerReviewCompleted)
   const [initialIsPeerReviewCompleted, setInitialIsPeerReviewCompleted] =
@@ -88,12 +92,29 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
   const commentsButtonRef = useRef<HTMLButtonElement | null>(null)
   const rubricButtonRef = useRef<HTMLButtonElement | null>(null)
   const pendingFocusPanel = useRef<'comments' | 'rubric' | null>(null)
+  const pendingFocusAfterSubmit = useRef(false)
+  const commentsPanelRef = useRef<CommentsPanelHandle | null>(null)
+  const rubricPanelRef = useRef<RubricPanelHandle | null>(null)
 
   useEffect(() => {
     if (submission._id !== previousSubmissionIdRef.current) {
       // reset initialIsPeerReviewCompleted value
       setInitialIsPeerReviewCompleted(isPeerReviewCompleted)
       previousSubmissionIdRef.current = submission._id
+      if (pendingFocusAfterSubmit.current) {
+        pendingFocusAfterSubmit.current = false
+        pendingFocusPanel.current = null
+        if (commentsPanelRef.current || rubricPanelRef.current) {
+          commentsPanelRef.current?.focusCloseButton()
+          rubricPanelRef.current?.focusCloseButton()
+        } else if (assignment.rubric) {
+          pendingFocusPanel.current = 'rubric'
+          setShowRubric(true)
+        } else {
+          pendingFocusPanel.current = 'comments'
+          setShowComments(true)
+        }
+      }
     }
   }, [submission._id, isPeerReviewCompleted])
 
@@ -150,6 +171,12 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         message: I18n.t('You must fill out the rubric in order to submit your peer review.'),
         type: 'error',
       })
+      if (!showRubric) {
+        pendingFocusPanel.current = null
+        setShowComments(false)
+        setShowRubric(true)
+      }
+      setRubricFocusTrigger(t => t + 1)
       return
     }
 
@@ -160,10 +187,16 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
         ),
         type: 'error',
       })
+      if (!showComments) {
+        pendingFocusPanel.current = null
+        setShowComments(true)
+      }
+      setCommentFocusTrigger(t => t + 1)
       return
     }
 
     // reset the values
+    pendingFocusAfterSubmit.current = true
     setPeerReviewCommentCompleted(false)
     resetRubricAssessment()
     handleNextPeerReview()
@@ -292,11 +325,12 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
       overflowY="hidden"
     >
       <Flex as="div" height="100%" alignItems="start">
-        <Flex.Item as="div" height="100%" shouldGrow>
+        <Flex.Item as="div" height="100%" shouldGrow shouldShrink overflowX="hidden">
           {renderSubmissionType()}
         </Flex.Item>
         {showRubric && assignment.rubric && (
           <RubricPanel
+            ref={rubricPanelRef}
             assignment={assignment}
             rubricAssessmentData={rubricAssessmentData}
             rubricViewMode={rubricViewMode}
@@ -307,11 +341,13 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             onViewModeChange={setRubricViewMode}
             isReadOnly={isReadOnly}
             autoFocusCloseButton={pendingFocusPanel.current === 'rubric'}
+            triggerValidationAndFocus={rubricFocusTrigger}
             isMobile={isMobile}
           />
         )}
         {showComments && (
           <CommentsPanel
+            ref={commentsPanelRef}
             submission={submission}
             assignment={assignment}
             reviewerSubmission={reviewerSubmission}
@@ -325,6 +361,7 @@ const AssignmentSubmission: React.FC<AssignmentSubmissionProps> = ({
             isReadOnly={isReadOnly}
             suppressSuccessAlert={true}
             autoFocusCloseButton={pendingFocusPanel.current === 'comments'}
+            focusCommentInputTrigger={commentFocusTrigger}
           />
         )}
       </Flex>

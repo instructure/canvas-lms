@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ColorPicker, {PREDEFINED_COLORS} from '../index'
 import {isValidHex, getColorName} from '../utils'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 
 describe('ColorPicker', () => {
   function renderColorPicker(props) {

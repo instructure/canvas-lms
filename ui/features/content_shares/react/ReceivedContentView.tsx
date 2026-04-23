@@ -29,7 +29,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {Links} from '@canvas/parse-link-header/parseLinkHeader'
 import type {ContentShare, ReadState} from '../types'
 

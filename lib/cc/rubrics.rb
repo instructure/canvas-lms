@@ -65,7 +65,8 @@ module CC
                       public
                       points_possible
                       hide_score_total
-                      free_form_criterion_comments]
+                      free_form_criterion_comments
+                      rating_order]
             if rubric.context != @course
               r_node.external_identifier rubric.id
             end

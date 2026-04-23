@@ -122,6 +122,7 @@ new_quizzes_ai_quiz_generation:
   environments:
     production:
       state: hidden
+  visible_on: tier_1_visible_on_hook
 new_quizzes_scanning_youtube_links:
   display_name: Scanning Youtube links in New Quizzes
   description: Enabling the YouTube Migration - New Quizzes feature adds the scanning ability and the convert option on Youtube embeddings in New Quizzes.

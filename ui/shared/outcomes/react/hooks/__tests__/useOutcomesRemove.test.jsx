@@ -27,14 +27,18 @@ import useOutcomesRemove, {
 import {createCache} from '@canvas/apollo-v3'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {deleteOutcomeMocks} from '../../../mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {MockedProvider} from '@apollo/client/testing'
 
 vi.useFakeTimers()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, title = '') =>
   new Array(count).fill(0).reduce(

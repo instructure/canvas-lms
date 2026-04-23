@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "Resposta d’IA"
-    },
-    "ai_tools_fda01177": {
-        "message": "Eines d’IA"
-    },
     "albanian_21ed929e": {
         "message": "Albanès"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "S''ha produït un error en realitzar una sol·licitud de xarxa"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "S''ha produït un error en processar la vostra sol·licitud"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "S''ha produït un error en carregar l''element multimèdia."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Trieu un fitxer"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Trieu un fitxer (obligatori)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Tria els drets d''ús..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Números complexos"
     },
-    "compose_44c904f4": {
-        "message": "Redacta"
-    },
     "computer_1d7dfa6f": {
         "message": "Ordinador"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproducte"
-    },
-    "copy_9748f9f": {
-        "message": "Copia"
     },
     "copyright_holder_66ee111": {
         "message": "Titular del copyright:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Personalitzat"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Amplada i altura personalitzades (píxels)"
     },
     "cyan_c1d5f68a": {
         "message": "Cian"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Tipus de dimensió"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Mides"
-    },
     "directionality_26ae9e08": {
         "message": "Direccionalitat"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Unió desarticulada"
-    },
-    "dislike_14befc48": {
-        "message": "No m’agrada"
     },
     "display_options_315aba85": {
         "message": "Mostra les opcions"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "introdueix el text de cerca"
     },
-    "enter_text_8b35c65b": {
-        "message": "Introdueix el text"
-    },
     "epsilon_54bb8afa": {
         "message": "Èpsilon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "No s''ha pogut obtenir el contingut del fitxer"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "No s''ha pogut copiar la resposta"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "No s’ha pogut recuperant el contingut de l''eina externa"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Altura"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hola. Descriviu les modificacions que voldríeu fer a la vostra redacció."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hola. Descriviu les modificacions que voldríeu fer a la vostra selecció."
-    },
     "hexagon_d8468e0d": {
         "message": "Hexàgon"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Inici"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Com se sol·liciten i s’editen els subtítols?"
+    },
     "html_code_editor_fd967a44": {
         "message": "Editor de codi HTML"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Soc el titular dels drets d''autor"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Ho sento, però no puc trobar la resposta d’IA"
     },
     "icelandic_9d6d35de": {
         "message": "Islandès"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Diversos"
     },
-    "modify_6b0b13e3": {
-        "message": "Modifica"
-    },
     "module_90d9fd32": {
         "message": "Contingut"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Trieu un fitxer"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Descriviu què voldríeu redactar."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Introduïu un nom de fitxer"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Canvia la mida"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "S’ha copiat la resposta al porta-retalls."
-    },
     "restore_auto_save_deccd84b": {
         "message": "Voleu restaurar el contingut desat automàticament?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Torneu a provar { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Torna-ho a provar"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Trinquet invers (no produeix)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Drecera"
-    },
-    "show_all_967a90f0": {
-        "message": "Mostra-ho tot"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Mostra les opcions d''imatge"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Restriccions del visualitzador"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "S''està esperant una resposta"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "No hem pogut detectar cap micròfon actiu connectat al vostre dispositiu."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Gal·lès"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Què voldríeu fer?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Quan s’utilitza un marcatge que formata visualment els elements com una llista, però no indica la relació de la llista, és possible que els usuaris tinguin dificultats per navegar a través de la informació."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Producte en espiral"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Assistent de redacció"
     },
     "xi_149681d0": {
         "message": "Ksi"

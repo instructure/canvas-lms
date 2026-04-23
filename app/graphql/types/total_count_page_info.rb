@@ -65,9 +65,16 @@ module Types
 
       begin
         if items.respond_to?(:unscope)
-          # Remove only pagination scopes, preserve all business logic
-          # This keeps WHERE, GROUP BY, HAVING, JOIN, DISTINCT, etc.
-          items.unscope(:limit, :offset, :order).count
+          # Remove pagination and display scopes; preserve all business logic
+          # (WHERE, GROUP BY, HAVING, JOIN, DISTINCT, etc.).
+          #
+          # :select must be unscoped because UserSearch.order_scope adds
+          # extra SELECT columns for sorting (e.g. "users.*, collation_key(sortable_name)")
+          # which cause .count to generate invalid SQL like COUNT(users.*, varchar_col).
+          # Dropping SELECT is safe here: it only contained sort-display columns,
+          # DISTINCT is a separate scope and is preserved, and :order (which
+          # depended on those columns) is already unscoped above.
+          items.unscope(:limit, :offset, :order, :select).count
         elsif items.respond_to?(:count)
           # For regular collections (arrays, etc.)
           items.count

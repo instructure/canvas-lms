@@ -920,22 +920,22 @@ class OutcomeResultsController < ApplicationController
 
     content_tag_id = alignment_id_param.split("_").last.to_i
 
-    canvas_results = LearningOutcomeResult.active.with_active_link
-                                          .where(
-                                            context_code: @context.asset_string,
-                                            user_id: @all_users.map(&:id),
-                                            content_tag_id:
-                                          )
-
+    all_canvas_results = LearningOutcomeResult.active.with_active_link
+                                              .where(
+                                                context_code: @context.asset_string,
+                                                user_id: @all_users.map(&:id),
+                                                hidden: false
+                                              )
     unless @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
-      canvas_results = canvas_results.exclude_muted_associations
+      all_canvas_results = all_canvas_results.exclude_muted_associations
     end
-    canvas_results = canvas_results.where(hidden: false)
+    all_canvas_results = all_canvas_results.to_a
+    canvas_results = all_canvas_results.select { |r| r.content_tag_id == content_tag_id }
 
     os_results = fetch_and_convert_os_results(all_users: true)
     os_results_for_alignment = os_results&.select { |r| r.content_tag_id == content_tag_id } || []
 
-    all_alignment_results = canvas_results.to_a + os_results_for_alignment
+    all_alignment_results = canvas_results + os_results_for_alignment
     results_by_user = all_alignment_results.index_by(&:user_id)
 
     @all_users.sort_by! do |user|
@@ -944,6 +944,16 @@ class OutcomeResultsController < ApplicationController
       [score || missing_score_sort, Canvas::ICU.collation_key(user.sortable_name)]
     end
     @all_users.reverse! if params[:sort_order] == "desc"
+
+    # When missing_user_rollups is excluded, filter @all_users to only students
+    # with any outcome results before paginating, so the pagination count and
+    # page count are consistent with the "Students with no results = OFF" setting.
+    if Api.value_to_array(params[:exclude]).include?("missing_user_rollups")
+      canvas_user_ids_with_results = all_canvas_results.map(&:user_id).uniq
+      os_user_ids_with_results = os_results&.map(&:user_id)&.uniq || []
+      user_ids_with_results = canvas_user_ids_with_results | os_user_ids_with_results
+      @all_users = @all_users.select { |u| user_ids_with_results.include?(u.id) }
+    end
 
     @users = @all_users
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))

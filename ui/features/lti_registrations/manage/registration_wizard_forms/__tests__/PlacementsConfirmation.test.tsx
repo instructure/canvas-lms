@@ -69,6 +69,7 @@ const mockExistingRegistration = (
   ims_registration_id: null,
   manual_configuration_id: null,
   lock_deploying: false,
+  template_registration_id: null,
   configuration: mockInternalConfig(placements),
 })
 

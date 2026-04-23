@@ -24,7 +24,7 @@ import CommentReadView from '../CommentReadView'
 import * as shave from '@canvas/shave'
 
 vi.mock('@canvas/shave')
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 describe('CommentReadView', () => {
   afterEach(() => {

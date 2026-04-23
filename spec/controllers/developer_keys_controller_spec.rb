@@ -509,12 +509,11 @@ describe DeveloperKeysController do
         end
         let(:tool_config) { lti_registration.manual_configuration }
 
-        it "hard deletes the tool configuration and soft deletes the registration" do
-          # Ensure config is initialized before it's hard deleted
+        it "soft deletes the tool configuration and the registration" do
           tool_config
           delete :destroy, params: { id: dk.id, account_id: account.id }
           expect(lti_registration.reload).to be_deleted
-          expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+          expect(tool_config.reload).to be_deleted
         end
 
         context "tools were installed from that config" do
@@ -527,11 +526,10 @@ describe DeveloperKeysController do
           end
 
           it "deletes the tools in a job" do
-            # Ensure config is initialized before it's hard deleted
             tool_config
             expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
               .to change { lti_registration.reload.workflow_state }.to "deleted"
-            expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+            expect(tool_config.reload).to be_deleted
             expect(dk.reload).to be_deleted
             run_jobs
             expect(tool.reload).to be_deleted

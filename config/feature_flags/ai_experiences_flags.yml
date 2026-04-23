@@ -42,6 +42,7 @@ ai_experiences_v2_auth:
   display_name: AI Experiences V2 Authentication
   description: Enables stronger authentication practice for communication with LLM Conversation Service
   touch_context: true
+  after_state_change_proc: provision_ai_experience_after_change_hook
   environments:
     ci:
       state: allowed

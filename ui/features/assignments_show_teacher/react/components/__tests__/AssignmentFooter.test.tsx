@@ -39,7 +39,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentFooter from '../AssignmentFooter'
 import {MODULE_SEQUENCE_QUERY} from '@canvas/assignments/graphql/common/Queries'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const mockModuleSequence = (overrides = {}) => {
   return {

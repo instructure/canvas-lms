@@ -18,7 +18,7 @@
 
 import {Portal} from '@instructure/ui-portal'
 import MergeUsers from './MergeUsers'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export function Component() {

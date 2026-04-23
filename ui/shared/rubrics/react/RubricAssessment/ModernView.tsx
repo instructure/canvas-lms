@@ -246,6 +246,7 @@ export const CriterionRow = ({
       return (
         <HorizontalButtonDisplay
           buttonDisplay={buttonDisplay}
+          criterionId={criterion.id}
           hidePoints={hidePoints}
           isPreviewMode={isPreviewMode}
           isSelfAssessment={isSelfAssessment}
@@ -265,6 +266,7 @@ export const CriterionRow = ({
     return (
       <VerticalButtonDisplay
         buttonDisplay={buttonDisplay}
+        criterionId={criterion.id}
         hidePoints={hidePoints}
         isPreviewMode={isPreviewMode}
         isSelfAssessment={isSelfAssessment}
@@ -334,6 +336,7 @@ export const CriterionRow = ({
                   placeholder="--"
                   width="3.375rem"
                   height="2.375rem"
+                  data-criterion-score-id={criterion.id}
                   data-testid={`criterion-score-${criterion.id}`}
                   value={pointsInputValue}
                   onChange={e => setPointsInput(e.target.value)}
@@ -433,6 +436,7 @@ export const CriterionRow = ({
               ) : (
                 <TextArea
                   label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
+                  data-criterion-comment-id={criterion.id}
                   data-testid={`free-form-comment-area-${criterion.id}`}
                   width="100%"
                   height="38px"

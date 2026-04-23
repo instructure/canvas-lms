@@ -52,58 +52,58 @@ const DATE_RANGE_ERRORS = {
   unlock_at: {
     start_range: {
       get section() {
-        return I18n.t('Unlock date cannot be before section start')
+        return I18n.t('Available from date cannot be before section start')
       },
       get course() {
-        return I18n.t('Unlock date cannot be before course start')
+        return I18n.t('Available from date cannot be before course start')
       },
       get term() {
-        return I18n.t('Unlock date cannot be before term start')
+        return I18n.t('Available from date cannot be before term start')
       },
     },
     end_range: {
       get due() {
-        return I18n.t('Unlock date cannot be after due date')
+        return I18n.t('Available from date cannot be after due date')
       },
       get replyToTopicDue() {
-        return I18n.t('Unlock date cannot be after reply to topic due date')
+        return I18n.t('Available from date cannot be after reply to topic due date')
       },
       get replyToEntryDue() {
-        return I18n.t('Unlock date cannot be after required replies due date')
+        return I18n.t('Available from date cannot be after required replies due date')
       },
       get lock() {
-        return I18n.t('Unlock date cannot be after lock date')
+        return I18n.t('Available from date cannot be after until date')
       },
     },
   },
   lock_at: {
     start_range: {
       get due() {
-        return I18n.t('Lock date cannot be before due date')
+        return I18n.t('Until date cannot be before due date')
       },
       get replyToTopicDue() {
-        return I18n.t('Lock date cannot be before reply to topic due date')
+        return I18n.t('Until date cannot be before reply to topic due date')
       },
       get replyToEntryDue() {
-        return I18n.t('Lock date cannot be before required replies due date')
+        return I18n.t('Until date cannot be before required replies due date')
       },
     },
     end_range: {
       get section() {
-        return I18n.t('Lock date cannot be after section end')
+        return I18n.t('Until date cannot be after section end')
       },
       get course() {
-        return I18n.t('Lock date cannot be after course end')
+        return I18n.t('Until date cannot be after course end')
       },
       get term() {
-        return I18n.t('Lock date cannot be after term end')
+        return I18n.t('Until date cannot be after term end')
       },
     },
   },
   peer_review_due_at: {
     start_range: {
       get unlock() {
-        return I18n.t('Due date cannot be before assignment unlock date')
+        return I18n.t('Due date cannot be before assignment available from date')
       },
       get due() {
         return I18n.t('Due date cannot be before assignment due date')
@@ -111,7 +111,7 @@ const DATE_RANGE_ERRORS = {
     },
     end_range: {
       get lock() {
-        return I18n.t('Due date cannot be after assignment lock date')
+        return I18n.t('Due date cannot be after assignment until date')
       },
     },
   },

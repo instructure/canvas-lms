@@ -17,10 +17,9 @@
  */
 
 import {subscribeFlashNotifications, notificationActions, reduceNotifications} from '../actions'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
-vi.spyOn(FlashAlert, 'showFlashAlert').mockImplementation(() => {})
-vi.spyOn(FlashAlert, 'destroyContainer').mockImplementation(() => {})
+vi.mock('@instructure/platform-alerts')
 
 const createMockStore = state => ({
   subs: [],

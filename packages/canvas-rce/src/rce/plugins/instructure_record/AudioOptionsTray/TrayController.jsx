@@ -20,6 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
+import {showFlashAlert} from '../../../../common/FlashAlert'
+import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../RCEGlobals'
 import {asAudioElement} from '../../shared/ContentSelection'
 import {findMediaPlayerIframe} from '../../shared/iframeUtils'
@@ -226,6 +228,9 @@ export default class TrayController {
         onSave={options => {
           this._applyAudioOptions(options)
           this._dismissTray()
+          setTimeout(() => {
+            showFlashAlert({message: formatMessage('Media options saved.'), type: 'success'})
+          }, 0)
         }}
         onDismiss={() => this._dismissTray()}
         onCaptionsModified={() => {

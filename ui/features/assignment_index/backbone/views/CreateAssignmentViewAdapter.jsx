@@ -22,7 +22,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('CreateEditAssignmentModalAdapter')
 

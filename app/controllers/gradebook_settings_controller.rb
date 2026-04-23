@@ -35,46 +35,47 @@ class GradebookSettingsController < ApplicationController
   private
 
   def gradebook_settings_params
-    gradebook_settings_params = params.require(:gradebook_settings).permit(
-      {
-        filter_columns_by: [
-          :context_module_id,
-          { context_module_ids: [] },
-          :grading_period_id,
-          :assignment_group_id,
-          { assignment_group_ids: [] },
-          :submissions,
-          { submission_filters: [] },
-          :start_date,
-          :end_date
-        ],
-        filter_rows_by: [
-          :section_id,
-          { section_ids: [] },
-          :student_group_id,
-          { student_group_ids: [] }
-        ],
-        selected_view_options_filters: []
-      },
-      :enter_grades_as,
-      :hide_assignment_group_totals,
-      :hide_total,
-      :show_concluded_enrollments,
-      :show_inactive_enrollments,
-      :show_unpublished_assignments,
-      :show_separate_first_last_names,
-      :student_column_display_as,
-      :student_column_secondary_info,
-      :sort_rows_by_column_id,
-      :sort_rows_by_setting_key,
-      :sort_rows_by_direction,
-      :view_ungraded_as_zero,
-      :view_hidden_grades_indicator,
-      :view_status_for_colorblindness,
-      { colors: %i[late missing resubmitted dropped excused extended] }
+    params.expect(
+      gradebook_settings: [
+        {
+          filter_columns_by: [
+            :context_module_id,
+            { context_module_ids: [] },
+            :grading_period_id,
+            :assignment_group_id,
+            { assignment_group_ids: [] },
+            :submissions,
+            { submission_filters: [] },
+            :start_date,
+            :end_date
+          ],
+          filter_rows_by: [
+            :section_id,
+            { section_ids: [] },
+            :student_group_id,
+            { student_group_ids: [] }
+          ],
+          selected_view_options_filters: []
+        },
+        { enter_grades_as: {} },
+        :hide_assignment_group_totals,
+        :hide_total,
+        :show_concluded_enrollments,
+        :show_inactive_enrollments,
+        :show_unpublished_assignments,
+        :show_suppressed_assignments,
+        :show_separate_first_last_names,
+        :student_column_display_as,
+        :student_column_secondary_info,
+        :sort_rows_by_column_id,
+        :sort_rows_by_setting_key,
+        :sort_rows_by_direction,
+        :view_ungraded_as_zero,
+        :view_hidden_grades_indicator,
+        :view_status_for_colorblindness,
+        { colors: %i[late missing resubmitted dropped excused extended] }
+      ]
     )
-    gradebook_settings_params[:enter_grades_as] = params[:gradebook_settings][:enter_grades_as]
-    gradebook_settings_params.permit!
   end
 
   def valid_colors(color_params)

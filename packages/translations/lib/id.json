@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaan"
     },
-    "ai_response_9624e8e8": {
-        "message": "Respons AI"
-    },
-    "ai_tools_fda01177": {
-        "message": "Alat AI"
-    },
     "albanian_21ed929e": {
         "message": "Albania"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Kesalahan terjadi saat membuat permintaan jaringan"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Terjadi kesalahan saat memproses permintaan Anda"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Terjadi kesalahan saat mengunggah media Anda."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Pilih File"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Pilih File (harus diisi)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Pilih hak penggunaan..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Bilangan Kompleks"
     },
-    "compose_44c904f4": {
-        "message": "Tulis"
-    },
     "computer_1d7dfa6f": {
         "message": "Komputer"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Produk bersama"
-    },
-    "copy_9748f9f": {
-        "message": "Salin"
     },
     "copyright_holder_66ee111": {
         "message": "Pemegang Hak Cipta:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Khusus"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Lebar dan tinggi kustom (Piksel)"
     },
     "cyan_c1d5f68a": {
         "message": "Sian"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Jenis Dimensi"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensi"
-    },
     "directionality_26ae9e08": {
         "message": "Direksionalitas"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Disjoint Union"
-    },
-    "dislike_14befc48": {
-        "message": "Tidak Sukai"
     },
     "display_options_315aba85": {
         "message": "Opsi Tampilan"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "mauskkan teks pencarian"
     },
-    "enter_text_8b35c65b": {
-        "message": "Masukkan teks"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Gagal mengambil konten file"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Gagal menyalin respons"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Gagal mengambil konten dari alat eksternal"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Tinggi"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Halo. Silakan jelaskan modifikasi yang Anda inginkan untuk membuat komposisi Anda."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Halo. Silakan jelaskan modifikasi yang Anda inginkan untuk membuat pilihan Anda."
-    },
     "hexagon_d8468e0d": {
         "message": "Heksagon"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Beranda"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Bagaimana cara meminta dan mengedit caption?"
+    },
     "html_code_editor_fd967a44": {
         "message": "editor kode html"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Saya memiliki hak cipta"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Maaf, saya tidak dapat menemukan jawaban AI"
     },
     "icelandic_9d6d35de": {
         "message": "Islandia"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Lain-Lain"
     },
-    "modify_6b0b13e3": {
-        "message": "Modifikasi"
-    },
     "module_90d9fd32": {
         "message": "Modul"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Silakan pilih file"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Silakan jelaskan apa yang Anda ingin buat."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Silakan masukkan nama file"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Ubah Ukuran"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Respons disalin ke clipboard"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Pulihkan simpan otomatis?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Coba lagi { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Coba lagi"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Kembalikan Turnstile (Tidak Menghasilkan)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Pintasan"
-    },
-    "show_all_967a90f0": {
-        "message": "Tampilkan semua"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Tampilkan opsi gambar"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Pembatasan Pemirsa"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Menunggu respons"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Kami tidak dapat mendeteksi mikrofon yang berfungsi yang tersambung ke perangkat Anda."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Wales"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Apa yang Anda ingin lakukan?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Saat markup digunakan yang secara visual memformat item sebagai daftar tetapi tidak mengindikasikan hubungan daftar, pengguna dapat kesulitan dalam menavigasikan informasi."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Produk Wreath"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Asisten Penulisan"
     },
     "xi_149681d0": {
         "message": "Xi"

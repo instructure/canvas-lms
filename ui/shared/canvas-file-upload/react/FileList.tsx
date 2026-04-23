@@ -33,8 +33,8 @@ interface FileListProps {
   files: ContextFile[]
   uploadingFileNames: Set<string>
   failedFileNames: Set<string>
-  onRemoveFile: (fileId: string) => void
-  onClearFailedFile: (name: string) => void
+  onRemoveFile?: (fileId: string) => void
+  onClearFailedFile?: (name: string) => void
 }
 
 const FileList: React.FC<FileListProps> = ({
@@ -83,18 +83,20 @@ const FileList: React.FC<FileListProps> = ({
               <Flex.Item>
                 <Text size="small">{I18n.t('%{name} failed', {name: fileName})}</Text>
               </Flex.Item>
-              <Flex.Item>
-                <IconButton
-                  data-testid={`dismiss-failed-${fileName}`}
-                  screenReaderLabel={I18n.t('Dismiss %{name}', {name: fileName})}
-                  onClick={() => onClearFailedFile(fileName)}
-                  withBackground={false}
-                  withBorder={false}
-                  size="small"
-                >
-                  <IconXSolid />
-                </IconButton>
-              </Flex.Item>
+              {onClearFailedFile && (
+                <Flex.Item>
+                  <IconButton
+                    data-testid={`dismiss-failed-${fileName}`}
+                    screenReaderLabel={I18n.t('Dismiss %{name}', {name: fileName})}
+                    onClick={() => onClearFailedFile(fileName)}
+                    withBackground={false}
+                    withBorder={false}
+                    size="small"
+                  >
+                    <IconXSolid />
+                  </IconButton>
+                </Flex.Item>
+              )}
             </Flex>
           </View>
         </Flex.Item>

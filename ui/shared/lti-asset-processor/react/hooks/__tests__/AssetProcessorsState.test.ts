@@ -26,10 +26,14 @@ import {AssetProcessorContentItem} from '@canvas/deep-linking/models/AssetProces
 import {ContentItem} from '@canvas/deep-linking/models/ContentItem'
 
 // Mock the flash alert functions
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-  showFlashError: vi.fn(() => () => {}),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+    showFlashError: vi.fn(() => () => {}),
+  }
+})
 
 // Mock the confirm dialog
 vi.mock('@canvas/instui-bindings/react/Confirm', () => ({

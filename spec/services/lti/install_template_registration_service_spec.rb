@@ -92,14 +92,14 @@ describe Lti::InstallTemplateRegistrationService do
       end.to raise_error(ArgumentError, "root account must be provided")
     end
 
-    it "raises an error if user is nil" do
+    it "does not raise an error if user is nil" do
       expect do
         Lti::InstallTemplateRegistrationService.new(
           account:,
           user: nil,
           template:
         )
-      end.to raise_error(ArgumentError, "user must be provided")
+      end.not_to raise_error
     end
 
     it "raises an error if registration is a dynamic registration" do
@@ -200,6 +200,54 @@ describe Lti::InstallTemplateRegistrationService do
 
     queried_rab = Lti::RegistrationAccountBinding.find_by(account:, registration: template)
     expect(queried_rab).to eq(rab)
+  end
+
+  context "when user is nil" do
+    it "creates registration and overlay with nil created_by/updated_by" do
+      Lti::InstallTemplateRegistrationService.call(
+        account:,
+        user: nil,
+        template:
+      ) => { local_copy: }
+
+      expect(local_copy).to be_persisted
+      expect(local_copy.created_by).to be_nil
+      expect(local_copy.updated_by).to be_nil
+
+      overlay = local_copy.overlay_for(account)
+      expect(overlay).to be_present
+      expect(overlay.updated_by).to be_nil
+    end
+  end
+
+  context "when create_tool is false" do
+    it "does not create a ContextExternalTool" do
+      template # force eager evaluation before baseline count
+
+      expect do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user:,
+          template:,
+          create_tool: false
+        )
+      end.not_to change { ContextExternalTool.count }
+    end
+  end
+
+  context "when create_tool is true" do
+    it "creates a ContextExternalTool" do
+      template # force eager evaluation before baseline count
+
+      expect do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user:,
+          template:,
+          create_tool: true
+        )
+      end.to change { ContextExternalTool.count }.by(1)
+    end
   end
 
   context "when binding_state is off" do

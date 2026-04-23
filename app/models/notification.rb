@@ -422,7 +422,6 @@ class Notification < Switchman::UnshardedRecord
     t "names.pseudonym_registration", "Pseudonym Registration"
     t "names.pseudonym_registration_done", "Pseudonym Registration Done"
     t "names.pseudonym_suspended_after_failed_login", "Pseudonym Suspended After Failed Login"
-    t "names.pseudonym_suspended_by_admin", "Pseudonym Suspended By Admin"
     t "names.report_generated", "Report Generated"
     t "names.report_generation_failed", "Report Generation Failed"
     t "names.rubric_assessment_invitation", "Rubric Assessment Invitation"

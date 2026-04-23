@@ -22,7 +22,7 @@ import {setupServer} from 'msw/node'
 import {act, render, waitFor} from '@testing-library/react'
 
 import FilterCalendarsModal from '../FilterCalendarsModal'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import {IMPORTANT_DATES_CONTEXTS} from '@canvas/k5/react/__tests__/fixtures'
 
 // Track requests for assertions

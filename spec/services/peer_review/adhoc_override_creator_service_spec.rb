@@ -257,7 +257,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         end
 
         it "raises InvalidDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be before unlock date")
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be before available from date")
         end
       end
 
@@ -272,7 +272,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         end
 
         it "raises InvalidDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be after lock date")
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Due date cannot be after until date")
         end
       end
 
@@ -287,7 +287,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         end
 
         it "raises InvalidDatesError" do
-          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Unlock date cannot be after lock date")
+          expect { service.call }.to raise_error(PeerReview::InvalidDatesError, "Available from date cannot be after until date")
         end
       end
     end
@@ -349,7 +349,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         it "raises InvalidDatesError" do
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
       end
@@ -380,7 +380,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         it "raises InvalidDatesError" do
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override due date cannot be after parent override lock date/
+            /Peer review override due date cannot be after parent override until date/
           )
         end
       end
@@ -411,7 +411,7 @@ RSpec.describe PeerReview::AdhocOverrideCreatorService do
         it "raises InvalidDatesError" do
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override lock date cannot be after parent override lock date/
+            /Peer review override until date cannot be after parent override until date/
           )
         end
       end

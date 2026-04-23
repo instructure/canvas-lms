@@ -97,6 +97,7 @@ export const TraditionalViewCriterionRatings: FC<TraditionalViewCriterionRatings
         borderRadius="medium"
       >
         <Flex
+          data-criterion-id={criterion.id}
           data-testid="traditional-view-criterion-ratings"
           data-direction={flexDirection}
           as="div"

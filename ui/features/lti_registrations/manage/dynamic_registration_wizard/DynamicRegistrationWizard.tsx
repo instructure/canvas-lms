@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -323,6 +323,7 @@ const renderStepContent = (
         <PrivacyConfirmationWrapper
           overlayStore={state.overlayStore}
           internalConfig={state.registration.configuration}
+          originalConfig={state.registration.configuration}
         />
       )
     case 'PlacementsConfirmation':

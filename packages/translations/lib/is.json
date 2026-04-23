@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "Gervigreindarsvörun"
-    },
-    "ai_tools_fda01177": {
-        "message": "Gervigreindarverkfæri"
-    },
     "albanian_21ed929e": {
         "message": "Albanska"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Villa kom upp við netbeiðni"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Villa kom upp við að vinna úr beiðni þinni"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Villa kom upp við að hlaða upp margmiðlunarefninu."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Velja skrá"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Velja skrá (áskilið)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Velja notkunarréttindi..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Tvinntölur"
     },
-    "compose_44c904f4": {
-        "message": "Semja"
-    },
     "computer_1d7dfa6f": {
         "message": "Tölva"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Hjámargfeldi"
-    },
-    "copy_9748f9f": {
-        "message": "Afrita"
     },
     "copyright_holder_66ee111": {
         "message": "Handhafi útgáfuréttar:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Sérsníða"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Sérsniðin breidd og hæð (punktar)"
     },
     "cyan_c1d5f68a": {
         "message": "Blágrænn"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Máltegund"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Mál"
-    },
     "directionality_26ae9e08": {
         "message": "Lestrarátt"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Ósamræmt samband"
-    },
-    "dislike_14befc48": {
-        "message": "Líka ekki"
     },
     "display_options_315aba85": {
         "message": "Sýningar valkostir"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "færðu inn leitartexta"
     },
-    "enter_text_8b35c65b": {
-        "message": "Settu inn texta"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsílon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Gat ekki sótt skráarinnihald"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Ekki tókst að afrita svar"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Mistókst að sækja efni frá ytra verkfæri"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Hæð"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Halló. Vinsamlegast lýstu breytingunum sem þú vilt gera á samsetningu þinni."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Halló. Vinsamlegast lýstu breytingunum sem þú vilt gera á vali þínu."
-    },
     "hexagon_d8468e0d": {
         "message": "Sexhyrningur"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Heim"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Hvernig á að óska eftir og breyta skjátextum?"
+    },
     "html_code_editor_fd967a44": {
         "message": "html kóðaritill"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ég hef höfundarréttinn"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Því miður finn ég ekki svar gervigreindar"
     },
     "icelandic_9d6d35de": {
         "message": "Íslenska"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Ýmislegt"
     },
-    "modify_6b0b13e3": {
-        "message": "Breyta"
-    },
     "module_90d9fd32": {
         "message": "Eining"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Veldu skrá"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Lýstu því sem þú vilt semja."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Settu inn skráarheiti"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Breyta stærð"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Svar afritað á klemmuspjald"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Endurheimta sjálfvirka vistun?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Reyna aftur { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Reyna aftur"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Afturkross (gefur ekki af sér)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Flýtileið"
-    },
-    "show_all_967a90f0": {
-        "message": "Sýna allt"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Sýna valkosti myndar"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Takmarkanir áhorfenda"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Bíður eftir svari"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Ekki greindist tengdur og virkur hljóðnemi í tækinu þínu."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Velska"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Hvað viltu gera?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Þegar merkingar eru notaðar sem sníða atriði sjónrænt sem lista en sýna ekki lista-sambandið, gætu notendur átt í erfiðleikum við að átta sig á upplýsingunum."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Sveigfeldi"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Ritráðgjafi"
     },
     "xi_149681d0": {
         "message": "Xi"

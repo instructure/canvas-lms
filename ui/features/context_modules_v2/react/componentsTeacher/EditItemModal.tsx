@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import IndentSelector from './AddItemModalComponents/IndentSelector'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {submiEditItem, prepareItemData} from '../handlers/editItemHandlers'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ModuleItemMasterCourseRestrictionType} from '../utils/types'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
 

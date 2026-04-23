@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Affricaneg"
     },
-    "ai_response_9624e8e8": {
-        "message": "Ymateb AI"
-    },
-    "ai_tools_fda01177": {
-        "message": "Adnoddau AI"
-    },
     "albanian_21ed929e": {
         "message": "Albaneg"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Gwall wrth wneud cais ar gyfer y rhwydwaith"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Gwall wrth brosesu eich cais"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Gwall wrth lwytho eich cyfryngau i fyny."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Dewis Ffeil"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Dewiswch Ffeil (gofynnol)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Dewiswch hawliau defnyddio..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Rhifau Cymhleth"
     },
-    "compose_44c904f4": {
-        "message": "Creu"
-    },
     "computer_1d7dfa6f": {
         "message": "Cyfrifiadur"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Cyd-gynnyrch"
-    },
-    "copy_9748f9f": {
-        "message": "Copïo"
     },
     "copyright_holder_66ee111": {
         "message": "Perchennog yr Hawlfraint:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Personol"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Lled ac uchder personol (Picseli)"
     },
     "cyan_c1d5f68a": {
         "message": "Cyan"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Math o Ddimensiwn"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensiynau"
-    },
     "directionality_26ae9e08": {
         "message": "Cyfeirioldeb"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Uniad Arwahan"
-    },
-    "dislike_14befc48": {
-        "message": "Dad-hoffi"
     },
     "display_options_315aba85": {
         "message": "Dangos Opsiynau"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "rhowch destun chwilio"
     },
-    "enter_text_8b35c65b": {
-        "message": "Rhoi testun"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Wedi methu cael cynnwys ffeil"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Wedi methu copïo ymateb"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Wedi methu nôl cynnwys o adnodd allanol"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Uchder"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Helo. Disgrifiwch yr addasiadau yr hoffech chi eu gwneud i’ch cyfansoddiad."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Helo. Disgrifiwch yr addasiadau yr hoffech chi eu gwneud i’ch dewis."
-    },
     "hexagon_d8468e0d": {
         "message": "Hecsagon"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Hafan"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Sut mae gofyn am gapsiynau a’u golygu?"
+    },
     "html_code_editor_fd967a44": {
         "message": "golygydd cod html"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Fi sydd biau’r hawlfraint"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Yn anffodus, alla i ddim dod o hyd i’r ateb AI"
     },
     "icelandic_9d6d35de": {
         "message": "Islandeg"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Amrywiol"
     },
-    "modify_6b0b13e3": {
-        "message": "Addasu"
-    },
     "module_90d9fd32": {
         "message": "Modiwl"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Dewiswch ffeil"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Disgrifiwch beth yr hoffech chi ei gyfansoddi."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Rhowch enw ffeil"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Ailfeintio"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Ymateb wedi''i gopïo i''r clipfwrdd."
-    },
     "restore_auto_save_deccd84b": {
         "message": "Adfer cadw’n awtomatig?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Ailgynnig { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Ailgynnig"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Giât Dro yn ôl (Ddim yn rhoi)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Llwybr byr"
-    },
-    "show_all_967a90f0": {
-        "message": "Dangos pob un"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Dangos opsiynau delwedd"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Cyfyngiadau Gwyliwr"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Yn aros yn ymateb"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Does dim microffon sy’n gweithio’n gysylltiedig â’ch dyfais."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Cymraeg"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Beth ydych chi am ei wneud?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Pan fydd marcio’n cael ei ddefnyddio, sy’n fformatio eitemau’n weledol ar ffurf rhestr ond sydd ddim yn nodi perthynas y rhestr, mae’n bosib y bydd defnyddwyr yn cael trafferth i ddod o hyd i’r wybodaeth."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Lluoswm Torch"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Cynorthwyydd Ysgrifennu"
     },
     "xi_149681d0": {
         "message": "Xi"

@@ -50,7 +50,7 @@ GEM
     diff-lcs (1.6.2)
     docile (1.4.1)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
@@ -61,7 +61,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     logger (1.7.0)
-    minitest (6.0.2)
+    minitest (6.0.5)
       drb (~> 2.0)
       prism (~> 1.5)
     nokogiri (1.19.2-aarch64-linux-gnu)
@@ -80,7 +80,7 @@ GEM
       date
       stringio
     racc (1.8.1)
-    rake (13.3.1)
+    rake (13.4.2)
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)

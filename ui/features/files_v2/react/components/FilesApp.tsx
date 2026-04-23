@@ -22,7 +22,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-themes'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {getFilesEnv} from '../../utils/filesEnvUtils'
 import {FileManagementProvider} from '../contexts/FileManagementContext'

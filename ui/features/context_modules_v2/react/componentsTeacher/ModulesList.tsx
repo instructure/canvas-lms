@@ -34,7 +34,7 @@ import {useReorderModuleItemsGQL} from '../hooks/mutations/useReorderModuleItems
 import {useReorderModules} from '../hooks/mutations/useReorderModules'
 import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {useContextModule} from '../hooks/useModuleContext'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleAction, ModuleItem} from '../utils/types'
@@ -42,7 +42,7 @@ import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../u
 import ModuleFilterHeader from './ModuleFilterHeader'
 import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
 import {
   TEACHER,

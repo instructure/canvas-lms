@@ -18,8 +18,9 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {platformExecuteQuery} from '@canvas/graphql'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {PlatformUiProvider} from '@instructure/platform-provider'
 import {TranslationsProvider} from '@instructure/platform-widget-dashboard'
 import type {WidgetDashboardTranslations} from '@instructure/platform-widget-dashboard'
@@ -231,10 +232,12 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
     I18n.t('%{count} more — type to filter', {count: opts.count}),
 
   // Educator Announcement Creation Modal
+  required: () => I18n.t('Required'),
   announcementTitle: () => I18n.t('Title'),
   announcementTitleRequired: () => I18n.t('Title must not be empty.'),
   announcementTitleMaxLength: () => I18n.t('Title must be less than 255 characters.'),
   announcementContent: () => I18n.t('Content'),
+  announcementContentRequired: () => I18n.t('Content must not be empty.'),
   announcementContentTooLarge: () => I18n.t('Content exceeds the 16 MB size limit'),
   announcementCoursesRequired: () => I18n.t('At least one course is required'),
   announcementStartDate: () => I18n.t('Start date'),
@@ -258,13 +261,13 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
   // Announcement creation notifications
   announcementCreatedOne: (opts: Record<string, unknown> = {}) =>
     I18n.t('Announcement created in %{count} course.', {count: opts.count}),
-  announcementsCreatedMany: (opts: Record<string, unknown> = {}) =>
+  announcementCreatedMany: (opts: Record<string, unknown> = {}) =>
     I18n.t('Announcements created in %{count} courses.', {count: opts.count}),
   announcementFailedOne: (opts: Record<string, unknown> = {}) =>
     I18n.t('%{count} announcement failed to post. Please check your permissions and try again.', {
       count: opts.count,
     }),
-  announcementsFailedMany: (opts: Record<string, unknown> = {}) =>
+  announcementFailedMany: (opts: Record<string, unknown> = {}) =>
     I18n.t('%{count} announcements failed to post. Please check your permissions and try again.', {
       count: opts.count,
     }),
@@ -289,6 +292,7 @@ export function PlatformBridge({children}: {children: React.ReactNode}) {
       locale={ENV.LOCALE}
       timezone={ENV.TIMEZONE}
       queryClient={queryClient}
+      notify={({type, message}) => showFlashAlert({type, message})}
     >
       <TranslationsProvider
         translations={translations}

@@ -20,15 +20,19 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import RateLimitingSettingsApp from '../RateLimitingSettingsApp'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the flash alert
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const server = setupServer()
 

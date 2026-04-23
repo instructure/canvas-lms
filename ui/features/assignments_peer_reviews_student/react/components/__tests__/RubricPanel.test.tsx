@@ -22,35 +22,126 @@ import userEvent from '@testing-library/user-event'
 import {RubricPanel} from '../RubricPanel'
 import type {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 
-vi.mock('@canvas/rubrics/react/RubricAssessment', () => ({
-  RubricAssessmentContainerWrapper: (props: any) => (
-    <div data-testid="mocked-rubric-assessment" data-props={JSON.stringify(props)}>
-      Mocked Rubric Assessment
-      <button
-        data-testid="mocked-rubric-submit"
-        onClick={() =>
-          props.onSubmit([
-            {
-              id: 'rating-1',
-              points: 4,
-              criterionId: '1',
-              comments: 'Test',
-              commentsEnabled: true,
-              description: 'Excellent',
-            },
-          ])
-        }
+vi.mock('@canvas/rubrics/react/RubricAssessment', () => {
+  const {useEffect, useRef} = require('react')
+
+  const RubricAssessmentContainerWrapper = (props: any) => {
+    const criteria = props.criteria || []
+    const assessmentData = props.rubricAssessmentData || []
+    const hidePoints = props.hidePoints || false
+    const isFreeForm = props.isFreeFormCriterionComments || false
+    const containerRef = useRef(null)
+    const submitButtonRef = useRef(null)
+
+    useEffect(() => {
+      if (!props.triggerValidationAndFocus) return
+      if (!containerRef.current) return
+
+      const container = containerRef.current as HTMLDivElement
+
+      const firstIncomplete = criteria.find((criterion: any) => {
+        const assessment = assessmentData.find((d: any) => d.criterionId === criterion.id)
+        if (!hidePoints) return !assessment?.points && assessment?.points !== 0
+        if (isFreeForm) return !assessment?.comments
+        return !assessment
+      })
+
+      if (!firstIncomplete) {
+        ;(submitButtonRef.current as HTMLButtonElement | null)?.focus()
+        return
+      }
+
+      if (!hidePoints) {
+        const input = container.querySelector(
+          `[data-criterion-score-id="${firstIncomplete.id}"]`,
+        ) as HTMLInputElement | null
+        input?.focus()
+      } else if (isFreeForm) {
+        const commentArea = container.querySelector(
+          `[data-criterion-comment-id="${firstIncomplete.id}"]`,
+        ) as HTMLTextAreaElement | null
+        commentArea?.focus()
+      } else {
+        const ratingContainer = container.querySelector(
+          `[data-criterion-id="${firstIncomplete.id}"]`,
+        ) as Element | null
+        const firstButton = ratingContainer?.querySelector('button') as HTMLButtonElement | null
+        firstButton?.focus()
+      }
+    }, [props.triggerValidationAndFocus])
+
+    const renderCriterionInput = (criterion: any) => {
+      const assessment = assessmentData.find((d: any) => d.criterionId === criterion.id)
+      if (!hidePoints) {
+        return (
+          <input
+            key={criterion.id}
+            data-criterion-score-id={criterion.id}
+            data-testid={`criterion-score-${criterion.id}`}
+            defaultValue={assessment?.points?.toString() ?? ''}
+          />
+        )
+      } else if (isFreeForm) {
+        return (
+          <textarea
+            key={criterion.id}
+            data-criterion-comment-id={criterion.id}
+            data-testid={`free-form-comment-area-${criterion.id}`}
+            defaultValue={assessment?.comments ?? ''}
+          />
+        )
+      } else {
+        const isSelected = !!assessment
+        return (
+          <div key={criterion.id} data-criterion-id={criterion.id}>
+            <button data-testid={`rate-criterion-${criterion.id}`}>Rate</button>
+            {isSelected && <div data-testid="rubric-rating-button-selected" />}
+          </div>
+        )
+      }
+    }
+
+    return (
+      <div
+        ref={containerRef}
+        data-testid="mocked-rubric-assessment"
+        data-props={JSON.stringify(props)}
       >
-        Submit
-      </button>
-    </div>
-  ),
-  RubricAssessmentTray: (props: any) => (
-    <div data-testid="mocked-rubric-assessment-tray" data-props={JSON.stringify(props)}>
-      Mocked Rubric Assessment Tray
-    </div>
-  ),
-}))
+        {criteria.map(renderCriterionInput)}
+        Mocked Rubric Assessment
+        <button
+          data-testid="mocked-rubric-submit"
+          onClick={() =>
+            props.onSubmit([
+              {
+                id: 'rating-1',
+                points: 4,
+                criterionId: '1',
+                comments: 'Test',
+                commentsEnabled: true,
+                description: 'Excellent',
+              },
+            ])
+          }
+        >
+          Submit
+        </button>
+        <button ref={submitButtonRef} data-testid="save-rubric-assessment-button">
+          Submit Assessment
+        </button>
+      </div>
+    )
+  }
+
+  return {
+    RubricAssessmentContainerWrapper,
+    RubricAssessmentTray: (props: any) => (
+      <div data-testid="mocked-rubric-assessment-tray" data-props={JSON.stringify(props)}>
+        Mocked Rubric Assessment Tray
+      </div>
+    ),
+  }
+})
 
 describe('RubricPanel', () => {
   const createRubric = (overrides = {}) => ({
@@ -594,6 +685,183 @@ describe('RubricPanel', () => {
       const props = JSON.parse(rubricAssessment.getAttribute('data-props') || '{}')
 
       expect(props.isPreviewMode).toBe(true)
+    })
+  })
+
+  describe('triggerValidationAndFocus', () => {
+    const twoCriteriaRubric = (extraRubricProps = {}) =>
+      createRubric({
+        criteria: [
+          {
+            _id: '1',
+            description: 'Quality',
+            longDescription: '',
+            points: 4,
+            criterionUseRange: false,
+            ratings: [],
+            ignoreForScoring: false,
+          },
+          {
+            _id: '2',
+            description: 'Effort',
+            longDescription: '',
+            points: 4,
+            criterionUseRange: false,
+            ratings: [],
+            ignoreForScoring: false,
+          },
+        ],
+        ...extraRubricProps,
+      })
+
+    const criterion1Data: RubricAssessmentData = {
+      id: 'rating-1',
+      points: 4,
+      criterionId: '1',
+      comments: 'Great work',
+      commentsEnabled: true,
+      description: 'Excellent',
+    }
+
+    describe('Scale type and Unscored', () => {
+      const assignment = () =>
+        createAssignment({rubricAssociation: createRubricAssociation({hidePoints: true})})
+
+      it('focuses first incomplete criterion rating button when triggered', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({assignment: assignment(), triggerValidationAndFocus: 1})}
+          />,
+        )
+        expect(screen.getByTestId('rate-criterion-1')).toHaveFocus()
+      })
+
+      it('skips completed criteria and focuses first incomplete one', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({
+              assignment: createAssignment({
+                rubric: twoCriteriaRubric(),
+                rubricAssociation: createRubricAssociation({hidePoints: true}),
+              }),
+              rubricAssessmentData: [criterion1Data],
+              triggerValidationAndFocus: 1,
+            })}
+          />,
+        )
+        expect(screen.getByTestId('rate-criterion-2')).toHaveFocus()
+      })
+
+      it('focuses Submit Assessment button when all criteria have ratings', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({
+              assignment: assignment(),
+              rubricAssessmentData: [criterion1Data],
+              triggerValidationAndFocus: 1,
+            })}
+          />,
+        )
+        expect(screen.getByTestId('save-rubric-assessment-button')).toHaveFocus()
+      })
+    })
+
+    describe('Written feedback type and Unscored', () => {
+      const assignment = () =>
+        createAssignment({
+          rubric: createRubric({freeFormCriterionComments: true}),
+          rubricAssociation: createRubricAssociation({hidePoints: true}),
+        })
+
+      it('focuses first criterion free-form comment area when triggered', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({assignment: assignment(), triggerValidationAndFocus: 1})}
+          />,
+        )
+        expect(screen.getByTestId('free-form-comment-area-1')).toHaveFocus()
+      })
+
+      it('skips completed criteria and focuses first incomplete one', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({
+              assignment: createAssignment({
+                rubric: twoCriteriaRubric({freeFormCriterionComments: true}),
+                rubricAssociation: createRubricAssociation({hidePoints: true}),
+              }),
+              rubricAssessmentData: [criterion1Data],
+              triggerValidationAndFocus: 1,
+            })}
+          />,
+        )
+        expect(screen.getByTestId('free-form-comment-area-2')).toHaveFocus()
+      })
+
+      it('focuses Submit Assessment button when all criteria have comments', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({
+              assignment: assignment(),
+              rubricAssessmentData: [criterion1Data],
+              triggerValidationAndFocus: 1,
+            })}
+          />,
+        )
+        expect(screen.getByTestId('save-rubric-assessment-button')).toHaveFocus()
+      })
+    })
+
+    describe('Scored', () => {
+      const assignment = () =>
+        createAssignment({rubricAssociation: createRubricAssociation({hidePoints: false})})
+
+      it('focuses first criterion score input when triggered', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({assignment: assignment(), triggerValidationAndFocus: 1})}
+          />,
+        )
+        expect(screen.getByTestId('criterion-score-1')).toHaveFocus()
+      })
+
+      it('skips completed criteria and focuses first incomplete one', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({
+              assignment: createAssignment({
+                rubric: twoCriteriaRubric(),
+                rubricAssociation: createRubricAssociation({hidePoints: false}),
+              }),
+              rubricAssessmentData: [criterion1Data],
+              triggerValidationAndFocus: 1,
+            })}
+          />,
+        )
+        expect(screen.getByTestId('criterion-score-2')).toHaveFocus()
+      })
+
+      it('focuses Submit Assessment button when all criteria have scores', () => {
+        render(
+          <RubricPanel
+            {...createDefaultProps({
+              assignment: assignment(),
+              rubricAssessmentData: [criterion1Data],
+              triggerValidationAndFocus: 1,
+            })}
+          />,
+        )
+        expect(screen.getByTestId('save-rubric-assessment-button')).toHaveFocus()
+      })
+    })
+
+    it('does not focus anything when trigger is 0', () => {
+      const assignment = createAssignment({
+        rubricAssociation: createRubricAssociation({hidePoints: true}),
+      })
+      render(<RubricPanel {...createDefaultProps({assignment, triggerValidationAndFocus: 0})} />)
+      expect(screen.getByTestId('rate-criterion-1')).not.toHaveFocus()
+      expect(screen.getByTestId('save-rubric-assessment-button')).not.toHaveFocus()
     })
   })
 

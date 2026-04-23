@@ -326,6 +326,13 @@ describe Types::UserType do
         end
       end
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: @admin)).and_call_original
+      @resolver.resolve("sisId", current_user: @admin)
+    end
   end
 
   context "integrationId" do
@@ -454,6 +461,13 @@ describe Types::UserType do
           expect(@resolver.resolve("integrationId", current_user: @other_student)).to be_nil
         end
       end
+    end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: @admin)).and_call_original
+      @resolver.resolve("integrationId", current_user: @admin)
     end
   end
 

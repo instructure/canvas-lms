@@ -162,7 +162,7 @@ module Lti::Messages
 
     def add_roles_claims!
       @message.roles = if @expander.present?
-                         expand_variable("$com.instructure.User.allRoles").split ","
+                         expand_variable("$com.instructure.User.allRoles")&.split ","
                        else
                          Lti::SubstitutionsHelper.new(@context, @context.root_account, @user, @tool).all_roles("lti1_3").split ","
                        end
@@ -295,7 +295,16 @@ module Lti::Messages
     end
 
     def expand_variable(variable)
-      @expander.expand_variables!({ value: variable })[:value]
+      expanded = @expander.expand_variables!({ value: variable })[:value]
+
+      # For convenience, we use variable expansions for the values of some
+      # claims. We don't want to return the variable name (e.g.
+      # $Person.sourcedId) if they don't resolve.
+      if expanded == variable && @tool.root_account.feature_enabled?(:lti_suppress_unresolved_variable_names_in_claims)
+        return nil
+      end
+
+      expanded
     end
 
     def current_observee_list

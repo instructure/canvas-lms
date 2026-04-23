@@ -340,6 +340,7 @@ class Course < ApplicationRecord
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
+  before_create :snapshot_account_default_discussion_settings
 
   before_save :assign_uuid
   before_validation :assert_defaults
@@ -398,7 +399,7 @@ class Course < ApplicationRecord
   def check_if_should_save_original_syllabus_version
     @should_save_original_syllabus_version = syllabus_body_changed? &&
                                              syllabus_body_was.present? &&
-                                             Account.site_admin&.feature_enabled?(:syllabus_versioning) &&
+                                             account&.feature_enabled?(:syllabus_versioning) &&
                                              unversioned?
   rescue
     @should_save_original_syllabus_version = false
@@ -419,7 +420,7 @@ class Course < ApplicationRecord
                      return false unless course.syllabus_body_changed?
 
                      begin
-                       !!Account.site_admin&.feature_enabled?(:syllabus_versioning)
+                       !!course.account&.feature_enabled?(:syllabus_versioning)
                      rescue => e
                        Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
                        false
@@ -2149,7 +2150,6 @@ class Course < ApplicationRecord
       update
       read_outcomes
       view_unpublished_items
-      manage_feature_flags
       view_feature_flags
       read_rubrics
       use_student_view
@@ -2238,7 +2238,6 @@ class Course < ApplicationRecord
       manage
       update
       use_student_view
-      manage_feature_flags
       view_feature_flags
       set_grading_scheme
       manage_grading_schemes
@@ -2275,6 +2274,30 @@ class Course < ApplicationRecord
         (grants_right?(user, :manage) && !root_account.settings[:prevent_course_availability_editing_by_teachers])
     end
     can :edit_course_availability
+
+    given do |user|
+      # manage_feature_flags was extracted from the arrays where the :manage permission was granted.
+      # When the Feature flag is disabled and the user has the :manage permission, this means they also have the :manage_feature_flags permission
+      # Otherwise, also require the new permission
+      grants_right?(user, :manage) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_feature_options))
+    end
+    can :manage_feature_flags # match the permission name in the Account model (both models use the same controller)
+
+    given do |user|
+      grants_right?(user, :update) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_navigation))
+    end
+    can :update_nav
+
+    given do |user|
+      if account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions)
+        grants_right?(user, :manage_course_details)
+      else
+        grants_right?(user, :manage_course_content_edit)
+      end
+    end
+    can :update_course_details
   end
 
   def allows_gradebook_uploads?
@@ -3727,7 +3750,9 @@ class Course < ApplicationRecord
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
-      tabs = (elementary_subject_course? && !course_subject_tabs) ? [] : tab_configuration.compact
+
+      start_from_tab_config = !elementary_subject_course? || course_subject_tabs
+      tabs = start_from_tab_config ? tab_configuration.compact : []
       home_tab = default_tabs.find { |t| t[:id] == TAB_HOME }
       settings_tab = default_tabs.find { |t| t[:id] == TAB_SETTINGS }
       external_tool_tabs = if opts[:include_external]
@@ -3796,12 +3821,12 @@ class Course < ApplicationRecord
                                 end
 
       if item_bank_href_override
-        NewQuizzesHelper.override_item_banks_tab(
+        item_banks_tab = NewQuizzesHelper.override_item_banks_tab(
           tabs:,
           href: item_bank_href_override,
           context: self,
           css_class: is_ams ? "item_banks" : nil
-        )
+        ) || item_banks_tab
       end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
@@ -3892,14 +3917,24 @@ class Course < ApplicationRecord
         admin_only_tabs = tabs.select { |t| t[:visibility] == "admins" }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
+        # For K5 subject courses on the settings page (left-nav), tabs start
+        # as [] so tab_configuration is never consulted during the mapping
+        # loop above. We have to mark hidden nav_menu_link tabs explicitly.
+        unless start_from_tab_config
+          hidden_tab_ids = tab_configuration.filter_map { |t| t[:id] if t[:hidden] }.to_set
+          tabs.each do |tab|
+            if NavMenuLinkTabs.nav_menu_link_tab_id?(tab[:id]) && hidden_tab_ids.include?(tab[:id])
+              tab[:hidden] = true
+            end
+          end
+        end
+
         hidden_external_tabs = tabs.select do |t|
-          next false unless t[:external]
           # Hidden tools do not show for admins. Hidden Nav Menu Links are
           # shown with "crossed-out eye" icon like other tabs.
-          next false if NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id])
-
-          elementary_enabled = elementary_subject_course? && !course_subject_tabs
-          (t[:hidden] && !elementary_enabled) || (elementary_enabled && tab_hidden?(t[:id]))
+          t[:external] &&
+            !NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id]) &&
+            (start_from_tab_config ? t[:hidden] : hidden_tab_ids.include?(t[:id]))
         end
         tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
@@ -4038,6 +4073,8 @@ class Course < ApplicationRecord
   add_setting :allow_student_forum_attachments, boolean: true, default: true
   add_setting :allow_student_discussion_reporting, boolean: true, default: true
   add_setting :allow_student_anonymous_discussion_topics, boolean: true, default: false
+  add_setting :use_default_discussion_settings, boolean: true, default: false
+  add_setting :default_discussion_settings, arbitrary: true
   add_setting :show_total_grade_as_points, boolean: true, default: false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :default_student_gradebook_view, boolean: true, default: false
@@ -4845,7 +4882,7 @@ class Course < ApplicationRecord
     if grants_right?(user, session, :read_as_admin)
       return root_account.feature_enabled?(:modules_page_rewrite)
     elsif feature_enabled?(:modules_page_rewrite_student_view)
-      return user || Account.site_admin.feature_enabled?(:disable_graphql_authentication) || root_account.feature_enabled?(:graphql_persisted_queries)
+      return user || root_account.feature_enabled?(:graphql_persisted_queries)
     end
 
     false
@@ -4920,6 +4957,18 @@ class Course < ApplicationRecord
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true
     end
+  end
+
+  def snapshot_account_default_discussion_settings
+    return unless account&.root_account&.feature_enabled?(:default_discussion_options)
+    # When a course is created, snapshot the course template's default
+    # discussion settings so that discussions use the defaults active at
+    # creation time.
+    return unless (template = account&.effective_course_template)
+
+    self.use_default_discussion_settings = template.use_default_discussion_settings?
+    defaults = template.default_discussion_settings
+    self.default_discussion_settings = defaults if defaults.present?
   end
 
   def log_create_to_publish_time

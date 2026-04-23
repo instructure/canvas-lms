@@ -20,6 +20,10 @@
     "baseUrl": "./ui",
     "paths": {
       "@canvas/*": ["shared/*"],
+      "@instructure/platform-query/broadcast": ["../node_modules/@instructure/platform-query/dist/broadcast.d.ts"],
+      "@instructure/platform-query/queryify": ["../node_modules/@instructure/platform-query/dist/queryify.d.ts"],
+      "@instructure/outcomes-ui/lib/*": ["../node_modules/@instructure/outcomes-ui/lib/*"],
+      "@instructure/outcomes-ui/es/*": ["../node_modules/@instructure/outcomes-ui/lib/*"],
       "@instructure/*": ["../packages/*"]
     },
     "plugins": [

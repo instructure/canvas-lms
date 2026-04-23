@@ -556,7 +556,7 @@ class SubmissionsApiController < ApplicationController
 
         hash = { user_id: student.id, section_id: enrollment.course_section_id, submissions: [] }
 
-        pseudonym = SisPseudonym.for(student, enrollment)
+        pseudonym = SisPseudonym.for(student, enrollment, current_user: @current_user)
         if pseudonym && show_sis_info
           hash[:integration_id] = pseudonym.integration_id
           hash[:sis_user_id] = pseudonym.sis_user_id

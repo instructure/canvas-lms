@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'

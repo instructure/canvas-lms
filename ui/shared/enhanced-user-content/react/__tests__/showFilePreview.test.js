@@ -25,9 +25,13 @@ import $ from 'jquery'
 import '@canvas/files/mockFilesENV'
 
 // Mock the FlashAlert module to prevent the console error about onDismiss
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 // Mock jQuery's flashError function
 $.flashError = vi.fn()

@@ -50,12 +50,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "AI Response"
-    },
-    "ai_tools_fda01177": {
-        "message": "AI Tools"
-    },
     "albanian_21ed929e": {
         "message": "Albanian"
     },
@@ -100,9 +94,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "An error occurred making a network request"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "An error occurred processing your request"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "An error occurred uploading your media."
@@ -341,6 +332,9 @@
     "choose_file_8d89ccab": {
         "message": "Choose File"
     },
+    "choose_file_required_61f0d716": {
+        "message": "Choose File (required)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Choose usage rights..."
     },
@@ -428,9 +422,6 @@
     "complex_numbers_a543d004": {
         "message": "Complex Numbers"
     },
-    "compose_44c904f4": {
-        "message": "Compose"
-    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -460,9 +451,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproduct"
-    },
-    "copy_9748f9f": {
-        "message": "Copy"
     },
     "copyright_holder_66ee111": {
         "message": "Copyright Holder:"
@@ -535,9 +523,6 @@
     },
     "custom_6979cd81": {
         "message": "Custom"
-    },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Custom width and height (Pixels)"
     },
     "cyan_c1d5f68a": {
         "message": "Cyan"
@@ -623,9 +608,6 @@
     "dimension_type_f5fa9170": {
         "message": "Dimension Type"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensions"
-    },
     "directionality_26ae9e08": {
         "message": "Directionality"
     },
@@ -646,9 +628,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Disjoint Union"
-    },
-    "dislike_14befc48": {
-        "message": "Dislike"
     },
     "display_options_315aba85": {
         "message": "Display Options"
@@ -806,9 +785,6 @@
     "enter_search_text_26cb4459": {
         "message": "enter search text"
     },
-    "enter_text_8b35c65b": {
-        "message": "Enter text"
-    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -880,9 +856,6 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Failed getting file contents"
-    },
-    "failed_to_copy_response_d3def551": {
-        "message": "Failed to copy response"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Failed to retrieve content from external tool"
@@ -1103,12 +1076,6 @@
     "height_69b03e15": {
         "message": "Height"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hello. Please describe the modifications you would like to make to your composition."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hello. Please describe the modifications you would like to make to your selection."
-    },
     "hexagon_d8468e0d": {
         "message": "Hexagon"
     },
@@ -1127,6 +1094,9 @@
     "home_351838cd": {
         "message": "Home"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "How to request and edit captions?"
+    },
     "html_code_editor_fd967a44": {
         "message": "html code editor"
     },
@@ -1141,9 +1111,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "I hold the copyright"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "I''m sorry, but I cannot find the AI''s answer"
     },
     "icelandic_9d6d35de": {
         "message": "Icelandic"
@@ -1592,9 +1559,6 @@
     "miscellaneous_e9818229": {
         "message": "Miscellaneous"
     },
-    "modify_6b0b13e3": {
-        "message": "Modify"
-    },
     "module_90d9fd32": {
         "message": "Module"
     },
@@ -1922,9 +1886,6 @@
     "please_choose_a_file_c2449cc": {
         "message": "Please choose a file"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Please decribe what you would like to compose."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Please enter a file name"
     },
@@ -2108,9 +2069,6 @@
     "resize_ec83d538": {
         "message": "Resize"
     },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Response copied to clipboard"
-    },
     "restore_auto_save_deccd84b": {
         "message": "Restore auto-save?"
     },
@@ -2119,9 +2077,6 @@
     },
     "retry_captionname_5ed0a12f": {
         "message": "Retry { captionName }"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Retry"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverse Turnstile (Does Not Yield)"
@@ -2284,9 +2239,6 @@
     },
     "shortcut_911d6255": {
         "message": "Shortcut"
-    },
-    "show_all_967a90f0": {
-        "message": "Show all"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Show image options"
@@ -2879,9 +2831,6 @@
     "viewer_restrictions_e14274c9": {
         "message": "Viewer Restrictions"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Waiting for response"
-    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "We couldn’t detect a working microphone connected to your device."
     },
@@ -2902,9 +2851,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Welsh"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "What would you like to do?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information."
@@ -2935,9 +2881,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Wreath Product"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Writing Assistant"
     },
     "xi_149681d0": {
         "message": "Xi"

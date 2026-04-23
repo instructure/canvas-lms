@@ -223,10 +223,6 @@ class Pseudonym < ApplicationRecord
     p.dispatch :pseudonym_suspended_after_failed_login
     p.to { communication_channel || user.communication_channel }
     p.whenever { @send_failed_login_notification }
-
-    p.dispatch :pseudonym_suspended_by_admin
-    p.to { communication_channel || user.communication_channel }
-    p.whenever { @send_suspension_notification }
   end
 
   def update_account_associations_if_account_changed
@@ -241,22 +237,12 @@ class Pseudonym < ApplicationRecord
     end
   end
 
-  def suspend_with_notification!(from_failed_login: false)
+  def suspend_with_notification!
     self.workflow_state = "suspended"
-
-    if from_failed_login
-      @send_failed_login_notification = true
-    else
-      @send_suspension_notification = true
-    end
-
+    @send_failed_login_notification = true
     save!
   ensure
-    if from_failed_login
-      @send_failed_login_notification = false
-    else
-      @send_suspension_notification = false
-    end
+    @send_failed_login_notification = false
   end
 
   def must_be_root_account

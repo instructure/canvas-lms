@@ -242,7 +242,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def require_tool_configuration
-    return if developer_key.tool_configuration.present?
+    return if developer_key.tool_configuration&.active?
 
     head :not_found
   end

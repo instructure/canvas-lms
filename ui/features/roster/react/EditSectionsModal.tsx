@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import SectionSelector, {ExistingSectionEnrollment} from './SectionSelector'
 import {Modal} from '@instructure/ui-modal'
@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useState} from 'react'
 
 const I18n = createI18nScope('edit_section_view')

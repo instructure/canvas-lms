@@ -19,11 +19,15 @@
 import React from 'react'
 import {render, fireEvent, waitFor, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const defaultProps = (props = {}) => ({
   update: () => Promise.resolve(),

@@ -19,6 +19,7 @@
 #
 
 require "active_support/core_ext/module"
+require "inst_statsd"
 require "json/jwt"
 require "dynamic_settings"
 require "canvas_errors"
@@ -282,8 +283,6 @@ module CanvasSecurity
   # Raises CanvasSecurity::TokenExpired if the token has expired, and
   # CanvasSecurity::InvalidToken if the token is otherwise invalid.
   def self.decode_jwt(token, keys = [], ignore_expiration: false)
-    # TODO: remove the first line a deploy cycle or two after the separate JWT key goes out (allow all in flight jwts to be validated successfully)
-    keys += encryption_keys
     keys += jwt_encryption_keys
 
     keys.each do |key|
@@ -293,12 +292,15 @@ module CanvasSecurity
     rescue JSON::JWS::VerificationFailed
       # Keep looping, to try all the keys. If none succeed,
       # we raise below.
-    rescue CanvasSecurity::TokenExpired
+    rescue CanvasSecurity::TokenExpired => e
+      InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: e.class.name })
       raise
     rescue => e
+      InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: e.class.name })
       raise CanvasSecurity::InvalidToken, e
     end
 
+    InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: JSON::JWS::VerificationFailed.name })
     raise CanvasSecurity::InvalidToken
   end
 

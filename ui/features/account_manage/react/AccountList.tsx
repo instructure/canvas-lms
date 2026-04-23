@@ -30,7 +30,7 @@ import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('account_manage')
 
@@ -53,7 +53,7 @@ export function AccountList() {
   const {data, error, isLoading, isError} = useQuery({
     queryKey: ['accounts', {pageIndex}],
     queryFn: getAccounts,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const last = parseInt(String(data?.link?.last?.page || ''), 10)

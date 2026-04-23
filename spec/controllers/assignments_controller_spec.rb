@@ -2316,11 +2316,11 @@ describe AssignmentsController do
 
         it "adds location tags to file URLs instead of verifiers" do
           get "syllabus", params: { course_id: @course.id }
-          expect(assigns[:syllabus_body]).to eql(<<~HTML)
-            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
-            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
-            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
-          HTML
+          body = assigns[:syllabus_body]
+          expect(body).to include("src=\"/courses/#{@course.id}/files/#{@image.id}/preview?location=course_syllabus_#{@course.id}\"")
+          expect(body).to include("src=\"/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}\"")
+          expect(body).to include("href=\"/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1\"")
+          expect(body).not_to include("verifier=")
         end
 
         context "sharding" do
@@ -2341,16 +2341,16 @@ describe AssignmentsController do
               <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@doc1.id)}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
             HTML
 
-            @course.saving_user = @user
+            @course.updating_user = @user
             @course.update!(syllabus_body:)
 
             get "syllabus", params: { course_id: @course.id }
 
-            expect(assigns[:syllabus_body]).to eql(<<~HTML)
-              <p><img id="#{@image1.global_id}" src="/users/#{@user.global_id}/files/#{@image1.global_id}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
-              <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video1.global_id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video1.media_entry_id}"></iframe></p>
-              <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{@user.global_id}/files/#{@doc1.global_id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
-            HTML
+            body = assigns[:syllabus_body]
+            expect(body).to include("src=\"/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@image1.global_id)}/preview?location=course_syllabus_#{@course.id}\"")
+            expect(body).to include("src=\"/media_attachments_iframe/#{Shard.short_id_for(@video1.global_id)}?location=course_syllabus_#{@course.id}\"")
+            expect(body).to include("href=\"/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@doc1.global_id)}?location=course_syllabus_#{@course.id}&amp;wrap=1\"")
+            expect(body).not_to include("verifier=")
           end
         end
       end
@@ -2362,25 +2362,38 @@ describe AssignmentsController do
           user_session(@student)
 
           get "syllabus", params: { course_id: @course.id }
-          expect(assigns[:syllabus_body]).to eql(<<~HTML)
-            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" loading="lazy"></p>
-            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
-            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
-          HTML
+          body = assigns[:syllabus_body]
+          expect(body).to include("src=\"/courses/#{@course.id}/files/#{@image.id}/preview?location=course_syllabus_#{@course.id}\"")
+          expect(body).to include("src=\"/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}\"")
+          expect(body).to include("href=\"/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1\"")
+          expect(body).not_to include("verifier=")
         end
       end
 
-      context "when context does not grant :read permission to current_user" do
+      context "when no user is logged in" do
         it_behaves_like "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled"
 
         it "does make files publicly available with public syllabus when user does not have access" do
           @image.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
           get "syllabus", params: { course_id: @course.id }
-          expect(assigns[:syllabus_body]).to eql(<<~HTML)
-            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{@image.uuid}" alt="test-1.jpg" loading="lazy"></p>
-            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?verifier=#{@video.uuid}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
-            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?verifier=#{@doc.uuid}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          body = assigns[:syllabus_body]
+          expect(body).to include("src=\"/courses/#{@course.id}/files/#{@image.id}/preview?location=course_syllabus_#{@course.id}\"")
+          expect(body).to include("src=\"/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}\"")
+          expect(body).to include("href=\"/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1\"")
+          expect(body).not_to include("verifier=")
+        end
+
+        it "preserves existing UUIDs in saved HTML when flag is enabled" do
+          existing_uuid = @image.uuid
+          @course.syllabus_body = <<~HTML
+            <p><img src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{existing_uuid}" alt="test.jpg" /></p>
           HTML
+          @course.save!
+
+          get "syllabus", params: { course_id: @course.id }
+          body = assigns[:syllabus_body]
+          expect(body).to include("verifier=#{existing_uuid}")
+          expect(body).to include("location=course_syllabus_#{@course.id}")
         end
       end
     end

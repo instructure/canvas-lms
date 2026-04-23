@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {AttachmentButton} from './AttachmentButton'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Responsive} from '@instructure/ui-responsive'
 import {UploadButton} from './UploadButton'
 import {uploadFile} from '@canvas/upload-file'

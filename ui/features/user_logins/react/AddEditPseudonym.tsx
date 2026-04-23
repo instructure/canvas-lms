@@ -30,7 +30,7 @@ import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import PseudonymModel from '@canvas/pseudonyms/backbone/models/Pseudonym'
 
 const I18n = createI18nScope('add_edit_pseudonym')

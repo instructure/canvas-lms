@@ -17,13 +17,15 @@
  */
 
 import React, {useState, useRef} from 'react'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconMoreLine, IconClockLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconClockLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 declare const ENV: GlobalEnv & {
@@ -33,11 +35,16 @@ import {Menu} from '@instructure/ui-menu'
 import {Modal} from '@instructure/ui-modal'
 import {Tooltip} from '@instructure/ui-tooltip'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {AIExperience} from '../../types'
-import ContextFilePill from '@canvas/canvas-file-upload/react/ContextFilePill'
+import {FileList} from '@canvas/canvas-file-upload/react/FileList'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 import AIExperiencePublishButton from './AIExperiencePublishButton'
+import {
+  navyButtonTheme,
+  roundedTheme,
+  buttonTheme,
+} from '../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_show')
 
@@ -47,7 +54,9 @@ interface AIExperienceShowProps {
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const canManage = aiExperience.can_manage
-  const isIndexing = !(aiExperience.context_ready ?? true)
+  const indexStatus = aiExperience.context_index_status
+  const isIndexing = indexStatus === 'in_progress'
+  const isIndexFailed = indexStatus === 'failed'
   const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
     const params = new URLSearchParams(window.location.search)
@@ -100,32 +109,47 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   isPublished={workflowState === 'published'}
                   canUnpublish={aiExperience.can_unpublish ?? true}
                   contextReady={aiExperience.context_ready ?? true}
+                  indexFailed={isIndexFailed}
                   onPublishChange={setWorkflowState}
                 />
               </Flex.Item>
               <Flex.Item>
-                {isIndexing ? (
+                {isIndexing || isIndexFailed ? (
                   <Tooltip
-                    renderTip={I18n.t('Source files are still being processed')}
+                    renderTip={
+                      isIndexFailed
+                        ? I18n.t('A source file failed to process')
+                        : I18n.t('Source files are still being processed')
+                    }
                     on={['hover', 'focus']}
                   >
                     <Button
-                      color="primary"
                       interaction="disabled"
+                      themeOverride={buttonTheme}
                       data-testid="ai-experience-show-ai-conversations-button"
                     >
-                      {I18n.t('Conversations')}
+                      {I18n.t('View conversations')}
                     </Button>
                   </Tooltip>
                 ) : (
                   <Button
-                    color="primary"
                     href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
+                    themeOverride={buttonTheme}
                     data-testid="ai-experience-show-ai-conversations-button"
                   >
-                    {I18n.t('Conversations')}
+                    {I18n.t('View conversations')}
                   </Button>
                 )}
+              </Flex.Item>
+              <Flex.Item>
+                <Button
+                  color="primary"
+                  onClick={handleEdit}
+                  themeOverride={navyButtonTheme}
+                  data-testid="ai-experience-show-edit-button"
+                >
+                  {I18n.t('Edit')}
+                </Button>
               </Flex.Item>
               <Flex.Item>
                 <Menu
@@ -140,24 +164,6 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                     </IconButton>
                   }
                 >
-                  <Menu.Item data-testid="ai-experience-show-edit-menu-item" onSelect={handleEdit}>
-                    {I18n.t('Edit')}
-                  </Menu.Item>
-                  <Menu.Item
-                    data-testid="ai-experience-show-run-chat-simulation-menu-item"
-                    disabled={true}
-                  >
-                    <Flex justifyItems="space-between" gap="small">
-                      <Flex.Item>
-                        <Text>{I18n.t('Run chat simulation')}</Text>
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text size="small" color="secondary">
-                          {I18n.t('Coming soon')}
-                        </Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
                   <Menu.Item
                     data-testid="ai-experience-show-delete-menu-item"
                     onSelect={() => setIsDeleteModalOpen(true)}
@@ -198,11 +204,29 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         </View>
       )}
 
-      <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Activity')}
-      </Heading>
-
-      {canManage && isIndexing ? (
+      {canManage && isIndexFailed ? (
+        <Alert
+          variant="error"
+          renderCloseButtonLabel={false}
+          data-testid="ai-experience-show-index-failed-notice"
+        >
+          {I18n.t(
+            "Activity couldn't be loaded. A source file has an issue. To try again, remove %{names} from ",
+            {
+              names: aiExperience.failed_context_file_names?.length
+                ? aiExperience.failed_context_file_names.join(', ')
+                : I18n.t('the file'),
+            },
+          )}
+          <a
+            href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`}
+            data-testid="ai-experience-show-index-failed-edit-button"
+          >
+            {I18n.t('your configurations')}
+          </a>
+          {I18n.t('.')}
+        </Alert>
+      ) : canManage && isIndexing ? (
         <View
           as="div"
           padding="large"
@@ -247,48 +271,26 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
 
       {canManage && (
         <>
-          <Heading level="h2" margin="large 0 0 0">
-            {I18n.t('Configurations')}
-          </Heading>
-
-          <div
-            style={{
-              margin: '0.75rem 0 0 0',
-              borderRadius: '0.5rem',
-              overflow: 'hidden',
-              border: '3px solid transparent',
-              backgroundImage:
-                'linear-gradient(white, white), linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-              backgroundOrigin: 'border-box',
-              backgroundClip: 'padding-box, border-box',
-            }}
-          >
-            <div
-              style={{
-                padding: '1rem',
-                background: 'linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-              }}
+          <InstUISettingsProvider theme={roundedTheme}>
+            <View
+              as="div"
+              margin="large 0 0 0"
+              borderWidth="small"
+              borderRadius="medium"
+              background="primary"
+              padding="medium"
             >
-              <Flex gap="small" alignItems="start">
-                <Flex.Item>
-                  <IconAiLine color="primary-inverse" size="small" />
-                </Flex.Item>
-                <Flex.Item shouldGrow shouldShrink>
-                  <View>
-                    <Text color="primary-inverse" weight="bold" size="large">
-                      {I18n.t('Learning Design')}
-                    </Text>
-                    <View as="div" margin="xx-small 0 0 0">
-                      <Text color="primary-inverse" size="small">
-                        {I18n.t('What should students know and how should the AI behave?')}
-                      </Text>
-                    </View>
-                  </View>
-                </Flex.Item>
-              </Flex>
-            </div>
+              <View as="div" margin="0 0 medium 0">
+                <Heading level="h2" margin="0 0 xx-small 0">
+                  {I18n.t('Configurations')}
+                </Heading>
+                <Text size="small" color="secondary">
+                  {I18n.t(
+                    'The completion rules, pedagogical guidance, and sources of the large language model (LLM).',
+                  )}
+                </Text>
+              </View>
 
-            <View as="div" padding="medium" background="primary">
               {aiExperience.learning_objective && (
                 <View as="div" margin="0 0 medium 0">
                   <Heading level="h3" margin="0 0 small 0">
@@ -330,17 +332,17 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                     <Heading level="h3" margin="0 0 small 0">
                       {I18n.t('File sources')}
                     </Heading>
-                    <Flex wrap="wrap" gap="x-small">
-                      {aiExperience.context_files!.map(file => (
-                        <Flex.Item key={file.id} data-testid={`context-file-row-${file.id}`}>
-                          <ContextFilePill file={file} />
-                        </Flex.Item>
-                      ))}
-                    </Flex>
+                    <FileList
+                      files={aiExperience.context_files!.filter(
+                        f => !aiExperience.failed_context_file_names?.includes(f.display_name),
+                      )}
+                      uploadingFileNames={new Set()}
+                      failedFileNames={new Set(aiExperience.failed_context_file_names ?? [])}
+                    />
                   </View>
                 )}
             </View>
-          </div>
+          </InstUISettingsProvider>
         </>
       )}
 

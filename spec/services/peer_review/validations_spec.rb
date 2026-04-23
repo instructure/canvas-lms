@@ -141,6 +141,21 @@ RSpec.describe PeerReview::Validations do
     end
   end
 
+  describe "#validate_grading_type" do
+    it "does not raise an error for valid grading types" do
+      %w[points percent letter_grade gpa_scale pass_fail].each do |grading_type|
+        expect { service.validate_grading_type(grading_type) }.not_to raise_error
+      end
+    end
+
+    it "raises an error when grading_type is not_graded" do
+      expect { service.validate_grading_type("not_graded") }.to raise_error(
+        PeerReview::InvalidGradingTypeError,
+        "Peer review sub assignments cannot have a not_graded grading type"
+      )
+    end
+  end
+
   describe "#validate_assignment_submission_types" do
     it "does not raise an error for non-external tool assignments" do
       expect { service.validate_assignment_submission_types(parent_assignment) }.not_to raise_error
@@ -286,7 +301,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_peer_review_dates(peer_review_dates) }.to raise_error(
           PeerReview::InvalidDatesError,
-          "Due date cannot be before unlock date"
+          "Due date cannot be before available from date"
         )
       end
 
@@ -297,7 +312,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_peer_review_dates(peer_review_dates) }.to raise_error(
           PeerReview::InvalidDatesError,
-          "Due date cannot be after lock date"
+          "Due date cannot be after until date"
         )
       end
 
@@ -308,7 +323,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_peer_review_dates(peer_review_dates) }.to raise_error(
           PeerReview::InvalidDatesError,
-          "Unlock date cannot be after lock date"
+          "Available from date cannot be after until date"
         )
       end
 
@@ -320,7 +335,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_peer_review_dates(peer_review_dates) }.to raise_error(
           PeerReview::InvalidDatesError,
-          "Due date cannot be before unlock date"
+          "Due date cannot be before available from date"
         )
       end
     end
@@ -369,7 +384,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_peer_review_dates(peer_review_dates) }.to raise_error(
           PeerReview::InvalidDatesError,
-          "Due date cannot be before unlock date"
+          "Due date cannot be before available from date"
         )
       end
 
@@ -538,7 +553,7 @@ RSpec.describe PeerReview::Validations do
         due_at: 1.day.from_now,
         unlock_at: 2.days.from_now
       }
-      expect(I18n).to receive(:t).with("Due date cannot be before unlock date").and_call_original
+      expect(I18n).to receive(:t).with("Due date cannot be before available from date").and_call_original
 
       expect { service.validate_peer_review_dates(peer_review_dates) }.to raise_error(
         PeerReview::InvalidDatesError
@@ -1240,7 +1255,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError,
-          /Peer review override unlock date cannot be before parent override unlock date/
+          /Peer review override available from date cannot be before parent override available from date/
         )
       end
 
@@ -1252,7 +1267,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError,
-          /Peer review override due date cannot be before parent override unlock date/
+          /Peer review override due date cannot be before parent override available from date/
         )
       end
 
@@ -1264,7 +1279,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError,
-          /Peer review override due date cannot be after parent override lock date/
+          /Peer review override due date cannot be after parent override until date/
         )
       end
 
@@ -1276,7 +1291,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError,
-          /Peer review override lock date cannot be after parent override lock date/
+          /Peer review override until date cannot be after parent override until date/
         )
       end
     end
@@ -1311,7 +1326,7 @@ RSpec.describe PeerReview::Validations do
         }
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_dates) }.to raise_error(
           PeerReview::InvalidDatesError,
-          /Peer review override unlock date cannot be before parent override unlock date/
+          /Peer review override available from date cannot be before parent override available from date/
         )
       end
 
@@ -1389,7 +1404,7 @@ RSpec.describe PeerReview::Validations do
           due_at: 1.week.from_now,
           lock_at: 10.days.from_now
         }
-        expect(I18n).to receive(:t).with("Peer review override unlock date cannot be before parent override unlock date").and_call_original
+        expect(I18n).to receive(:t).with("Peer review override available from date cannot be before parent override available from date").and_call_original
 
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError
@@ -1402,7 +1417,7 @@ RSpec.describe PeerReview::Validations do
           due_at: 1.hour.from_now,
           lock_at: 10.days.from_now
         }
-        expect(I18n).to receive(:t).with("Peer review override due date cannot be before parent override unlock date").and_call_original
+        expect(I18n).to receive(:t).with("Peer review override due date cannot be before parent override available from date").and_call_original
 
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError
@@ -1415,7 +1430,7 @@ RSpec.describe PeerReview::Validations do
           due_at: 3.weeks.from_now,
           lock_at: 4.weeks.from_now
         }
-        expect(I18n).to receive(:t).with("Peer review override due date cannot be after parent override lock date").and_call_original
+        expect(I18n).to receive(:t).with("Peer review override due date cannot be after parent override until date").and_call_original
 
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError
@@ -1428,7 +1443,7 @@ RSpec.describe PeerReview::Validations do
           due_at: 1.week.from_now,
           lock_at: 3.weeks.from_now
         }
-        expect(I18n).to receive(:t).with("Peer review override lock date cannot be after parent override lock date").and_call_original
+        expect(I18n).to receive(:t).with("Peer review override until date cannot be after parent override until date").and_call_original
 
         expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override) }.to raise_error(
           PeerReview::InvalidDatesError
@@ -1517,7 +1532,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_time) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
 
@@ -1529,7 +1544,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_time) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
 
@@ -1541,7 +1556,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_time) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
       end
@@ -1596,7 +1611,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_late_unlock) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
       end
@@ -1641,7 +1656,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_time) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override lock date cannot be after parent override lock date/
+            /Peer review override until date cannot be after parent override until date/
           )
         end
 
@@ -1653,7 +1668,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_time) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override lock date cannot be after parent override lock date/
+            /Peer review override until date cannot be after parent override until date/
           )
         end
 
@@ -1676,7 +1691,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_late) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override lock date cannot be after parent override lock date/
+            /Peer review override until date cannot be after parent override until date/
           )
         end
       end
@@ -1721,7 +1736,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_time) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override due date cannot be after parent override lock date/
+            /Peer review override due date cannot be after parent override until date/
           )
         end
       end
@@ -1812,7 +1827,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_flag_false) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override due date cannot be after parent override lock date/
+            /Peer review override due date cannot be after parent override until date/
           )
         end
       end
@@ -1876,7 +1891,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_flag_false) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
       end
@@ -2027,7 +2042,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_dates) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
 
@@ -2039,7 +2054,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_dates) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override lock date cannot be after parent override lock date/
+            /Peer review override until date cannot be after parent override until date/
           )
         end
 
@@ -2051,7 +2066,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_dates) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override due date cannot be after parent override lock date/
+            /Peer review override due date cannot be after parent override until date/
           )
         end
       end
@@ -2074,7 +2089,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_dates) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override unlock date cannot be before parent override unlock date/
+            /Peer review override available from date cannot be before parent override available from date/
           )
         end
 
@@ -2086,7 +2101,7 @@ RSpec.describe PeerReview::Validations do
           }
           expect { service.validate_override_dates_against_parent_override(peer_review_override, parent_override_with_dates) }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review override lock date cannot be after parent override lock date/
+            /Peer review override until date cannot be after parent override until date/
           )
         end
       end
@@ -2181,7 +2196,7 @@ RSpec.describe PeerReview::Validations do
                                                                               parent_override_with_due_at)
         end.to raise_error(
           PeerReview::InvalidDatesError,
-          "Peer review override unlock date cannot be before parent override due date"
+          "Peer review override available from date cannot be before parent override due date"
         )
       end
 
@@ -2334,7 +2349,7 @@ RSpec.describe PeerReview::Validations do
                                                                                      parent_with_invalid_dates)
           end.to raise_error(
             PeerReview::InvalidDatesError,
-            "Assignment due date cannot be before assignment unlock date"
+            "Assignment due date cannot be before assignment available from date"
           )
         end
 
@@ -2349,7 +2364,7 @@ RSpec.describe PeerReview::Validations do
                                                                                      parent_assignment_with_due_at)
           end.to raise_error(
             PeerReview::InvalidDatesError,
-            "Peer review unlock date cannot be before assignment due date"
+            "Peer review available from date cannot be before assignment due date"
           )
         end
 
@@ -2394,7 +2409,7 @@ RSpec.describe PeerReview::Validations do
                                                                                      parent_with_invalid_dates)
           end.to raise_error(
             PeerReview::InvalidDatesError,
-            "Assignment due date cannot be before assignment unlock date"
+            "Assignment due date cannot be before assignment available from date"
           )
         end
       end
@@ -2433,7 +2448,7 @@ RSpec.describe PeerReview::Validations do
                                                                                      parent_assignment_with_due_at)
           end.to raise_error(
             PeerReview::InvalidDatesError,
-            "Peer review unlock date cannot be before assignment due date"
+            "Peer review available from date cannot be before assignment due date"
           )
         end
       end
@@ -2472,7 +2487,7 @@ RSpec.describe PeerReview::Validations do
                                                                                      parent_assignment_with_due_at)
           end.to raise_error(
             PeerReview::InvalidDatesError,
-            "Peer review unlock date cannot be before assignment due date"
+            "Peer review available from date cannot be before assignment due date"
           )
         end
 
@@ -2508,7 +2523,7 @@ RSpec.describe PeerReview::Validations do
             due_at: base_time + 12.days,
             lock_at: base_time + 13.days
           }
-          expect(I18n).to receive(:t).with("Assignment due date cannot be before assignment unlock date").and_call_original
+          expect(I18n).to receive(:t).with("Assignment due date cannot be before assignment available from date").and_call_original
 
           expect do
             service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
@@ -2522,7 +2537,7 @@ RSpec.describe PeerReview::Validations do
             due_at: base_time + 12.days,
             lock_at: base_time + 13.days
           }
-          expect(I18n).to receive(:t).with("Peer review unlock date cannot be before assignment due date").and_call_original
+          expect(I18n).to receive(:t).with("Peer review available from date cannot be before assignment due date").and_call_original
 
           expect do
             service_with_due_at.validate_peer_review_dates_against_parent_assignment(peer_review_dates,
@@ -2575,6 +2590,7 @@ RSpec.describe PeerReview::Validations do
       expect(service).to respond_to(:validate_group_parent_override_exists)
       expect(service).to respond_to(:validate_section_parent_override_exists)
       expect(service).to respond_to(:validate_override_dates_against_parent_override)
+      expect(service).to respond_to(:validate_grading_type)
     end
 
     it "properly accesses instance variables set in the including class" do

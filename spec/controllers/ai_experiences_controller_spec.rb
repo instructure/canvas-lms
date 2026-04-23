@@ -134,8 +134,9 @@ describe AiExperiencesController do
           end
 
           it "syncs index status for in_progress experiences" do
-            expect(LLMConversationContextManager).to receive(:sync_index_status)
-              .with(ai_experience: @ai_experience)
+            service_double = instance_double(AiExperiences::ConversationContextDocumentsService)
+            allow(AiExperiences::ConversationContextDocumentsService).to receive(:new).and_return(service_double)
+            expect(service_double).to receive(:sync_index_status).with(ai_experience: @ai_experience)
             get :index, params: { course_id: @course.id }, format: :json
           end
         end
@@ -149,7 +150,7 @@ describe AiExperiencesController do
           end
 
           it "does not sync index status for completed experiences" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :index, params: { course_id: @course.id }, format: :json
           end
         end
@@ -163,7 +164,7 @@ describe AiExperiencesController do
           end
 
           it "does not sync index status for failed experiences" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :index, params: { course_id: @course.id }, format: :json
           end
         end
@@ -177,7 +178,7 @@ describe AiExperiencesController do
           end
 
           it "does not sync index status for not_started experiences" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :index, params: { course_id: @course.id }, format: :json
           end
         end
@@ -192,7 +193,7 @@ describe AiExperiencesController do
           end
 
           it "does not sync index status" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :index, params: { course_id: @course.id }, format: :json
           end
         end
@@ -206,7 +207,7 @@ describe AiExperiencesController do
           end
 
           it "does not sync index status" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :index, params: { course_id: @course.id }, format: :json
           end
         end
@@ -525,7 +526,9 @@ describe AiExperiencesController do
           end
 
           it "calls sync_index_status before rendering" do
-            expect(LLMConversationContextManager).to receive(:sync_index_status).with(ai_experience: @ai_experience)
+            service_double = instance_double(AiExperiences::ConversationContextDocumentsService)
+            allow(AiExperiences::ConversationContextDocumentsService).to receive(:new).and_return(service_double)
+            expect(service_double).to receive(:sync_index_status).with(ai_experience: @ai_experience)
             get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
           end
         end
@@ -537,7 +540,7 @@ describe AiExperiencesController do
           end
 
           it "does not call sync_index_status" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
           end
         end
@@ -549,7 +552,7 @@ describe AiExperiencesController do
           end
 
           it "does not call sync_index_status" do
-            expect(LLMConversationContextManager).not_to receive(:sync_index_status)
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
             get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
           end
         end
@@ -1409,14 +1412,15 @@ describe AiExperiencesController do
     context "as teacher" do
       before do
         user_session(@teacher)
-        # Mock the LLM client
-        allow_any_instance_of(LLMConversationClient).to receive(:messages_with_conversation_progress).and_return({
-                                                                                                                   messages: [
-                                                                                                                     { role: "assistant", content: "Hello!" },
-                                                                                                                     { role: "user", content: "Hi there!" }
-                                                                                                                   ],
-                                                                                                                   progress: { status: "in_progress" }
-                                                                                                                 })
+        mock_service = instance_double(AiExperiences::ConversationMessagesService)
+        allow(AiExperiences::ConversationMessagesService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:fetch_with_progress).and_return({
+                                                                          messages: [
+                                                                            { role: "assistant", content: "Hello!" },
+                                                                            { role: "user", content: "Hi there!" }
+                                                                          ],
+                                                                          progress: { status: "in_progress" }
+                                                                        })
       end
 
       it "returns conversation with messages" do
@@ -1462,7 +1466,9 @@ describe AiExperiencesController do
       end
 
       it "returns service unavailable when LLM service fails" do
-        allow_any_instance_of(LLMConversationClient).to receive(:messages_with_conversation_progress)
+        mock_service = instance_double(AiExperiences::ConversationMessagesService)
+        allow(AiExperiences::ConversationMessagesService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:fetch_with_progress)
           .and_raise(LlmConversation::Errors::ConversationError.new("Service unavailable"))
 
         get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json

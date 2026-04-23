@@ -38,7 +38,7 @@ import {ContextSearchOption} from './ContextSearchOption'
 import {Spinner} from '@instructure/ui-spinner'
 import {ContextBrowse} from './ContextBrowse'
 import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('lti_registrations')

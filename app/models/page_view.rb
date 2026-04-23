@@ -197,11 +197,8 @@ class PageView < ApplicationRecord
   scope :for_users, ->(users) { where(user_id: users) }
 
   def self.pv4_client(**)
-    ConfigFile.cache_object("pv4") do |config|
-      creds = Rails.application.credentials.pv4_creds
-
-      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token), **)
-    end
+    config = ConfigFile.load("pv5")
+    config && Pv4Client.new("#{config["uri"].chomp("/")}/api/v5/", **)
   end
 
   # returns a collection with very limited functionality

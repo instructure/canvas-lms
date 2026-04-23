@@ -35,7 +35,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 import MessageBus from '@canvas/util/MessageBus'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {createSectionEnrollments, deleteExistingSectionEnrollments} from '../../react/api'
 
 const I18n = createI18nScope('RosterUserView')

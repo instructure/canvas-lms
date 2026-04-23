@@ -30,7 +30,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {computeShortAndSortableNamesFromName} from '@canvas/user-sortable-name/react'
 
 const I18n = createI18nScope('user_name')

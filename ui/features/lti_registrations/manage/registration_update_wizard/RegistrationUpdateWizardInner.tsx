@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import {Flex} from '@instructure/ui-flex'
@@ -97,10 +97,9 @@ export const RegistrationUpdateWizardInner = ({
         })
 
         showFlashAlert({
-          message: I18n.t(`Configuration updates applied to *%{appName}*`, {
+          message: I18n.t(`Configuration updates applied to %{appName}`, {
             appName,
-            wrappers: ['<b>$1</b>'],
-          }),
+          }).toString(),
           type: 'success',
         })
         onSuccess()
@@ -180,6 +179,7 @@ export const RegistrationUpdateWizardInner = ({
             internalConfig={registrationUpdateRequest.internal_lti_configuration}
             overlayStore={overlayStore}
             registrationUpdateRequest={registrationUpdateRequest}
+            originalConfig={registration.configuration}
           />
         )
       case 'PlacementsConfirmation':

@@ -17,10 +17,10 @@
  */
 
 import axios from '@canvas/axios'
-import {AxiosResponse} from 'axios'
-import {DEFAULT_STUDENTS_PER_PAGE, SortBy} from './utils/constants'
-import {MasteryDistributionResponse} from './types/mastery_distribution'
 import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+import {AxiosResponse} from 'axios'
+import {MasteryDistributionResponse} from './types/mastery_distribution'
+import {DEFAULT_STUDENTS_PER_PAGE, SortBy} from './utils/constants'
 
 export function createImport(contextRoot: string, file: File, learningOutcomeGroupId?: string) {
   const data = new FormData()
@@ -43,7 +43,7 @@ export function queryImportCreatedGroupIds(contextRoot: string, outcomeImportId:
  * Parameters for outcome rollups API
  */
 interface RollupParams {
-  rating_percents: boolean
+  rating_percents?: boolean
   per_page: number
   exclude: string[]
   include: string[]
@@ -87,10 +87,9 @@ export const loadRollups = (
 ): Promise<AxiosResponse> => {
   const params: {params: RollupParams} = {
     params: {
-      rating_percents: true,
       per_page: perPage,
       exclude: gradebookFilters,
-      include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+      include: ['outcomes', 'users'],
       sort_by: sortBy,
       sort_order: sortOrder,
       page,

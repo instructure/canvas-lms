@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import CanvasInbox from './containers/CanvasInbox'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'

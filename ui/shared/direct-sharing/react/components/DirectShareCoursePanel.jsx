@@ -24,12 +24,12 @@ import {Alert} from '@instructure/ui-alerts'
 import './DirectShareCoursePanel.css'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import contentSelectionShape from '../proptypes/contentSelection'
 import ConfirmActionButtonBar from './ConfirmActionButtonBar'
 import CourseAndModulePicker from './CourseAndModulePicker'
 import DirectShareOperationStatus from './DirectShareOperationStatus'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('direct_share_course_panel')
 

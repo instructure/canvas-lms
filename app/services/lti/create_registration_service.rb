@@ -26,13 +26,15 @@ module Lti
   #
   # @param unified_tool_id [String | nil] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
   #
-  # @param registration_params [Hash] Attributes for the new Lti::Registration.
+  # @param registration_params [Hash] Attributes for the new Lti::Registration. Valid values for "workflow_state"
+  # temporarily include the binding state values "on"|"off"|"allow" which will resolve to the appropriate workflow state.
   # ```
   # {
   #   name: "string",
   #   admin_nickname: "string",
   #   description: "string",
   #   vendor: "string",
+  #   workflow_state: "active" | "inactive" (| "on" | "off" | "allow"),
   # }
   # ```
   #
@@ -42,17 +44,13 @@ module Lti
   # @param overlay_params [Hash] A Schemas::Lti::Overlay object, stored as `data` in the Lti::Overlay
   # for this Registration and Account. If an invalid hash is provided, an ArgumentError will be raised.
   #
-  # @param binding_params [Hash] Attributes for creating the the Lti::RegistrationAccountBinding.
-  # ```
-  # { workflow_state: "string" }
-  # ```
   # @param developer_key_params [Hash] Attributes for creating the DeveloperKey. These take
   # precedence over any inferred attributes from `configuration_params`.
   #
   # @return [Lti::Registration] the newly created registration
   class CreateRegistrationService < ApplicationService
     ALLOWED_DEVELOPER_KEY_PARAMS = %i[name email notes test_cluster_only client_credentials_audience scopes].freeze
-    ALLOWED_REGISTRATION_PARAMS = %i[name admin_nickname description vendor lock_deploying].freeze
+    ALLOWED_REGISTRATION_PARAMS = %i[name admin_nickname description vendor lock_deploying workflow_state].freeze
 
     attr_reader :account,
                 :created_by,
@@ -61,7 +59,7 @@ module Lti
                 :configuration_params,
                 :overlay_params,
                 :developer_key_params,
-                :binding_params
+                :binding_workflow_state
 
     def initialize(account:,
                    created_by:,
@@ -69,7 +67,6 @@ module Lti
                    configuration_params:,
                    unified_tool_id: nil,
                    overlay_params: {},
-                   binding_params: {},
                    developer_key_params: {})
       unless account.is_a?(Account) && created_by.is_a?(User)
         raise ArgumentError, "Please provide a valid account and user"
@@ -84,17 +81,26 @@ module Lti
       @registration_params = registration_params.slice(*ALLOWED_REGISTRATION_PARAMS)
       @configuration_params = configuration_params.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)
       @overlay_params = overlay_params&.slice(*Schemas::Lti::Overlay.allowed_base_properties)
-      @binding_params = binding_params&.slice(:workflow_state)
       @developer_key_params = developer_key_params&.slice(*ALLOWED_DEVELOPER_KEY_PARAMS)
+
+      @binding_workflow_state = "on"
+      resolved = Lti::AccountBindingService.resolve_workflow_state(@registration_params[:workflow_state])
+      if resolved
+        @binding_workflow_state = resolved[:binding]
+        @registration_params[:workflow_state] = resolved[:registration]
+      end
+      @binding_workflow_state = "allow" if account.site_admin? && @binding_workflow_state == "on"
+
+      @registration_params[:workflow_state] ||= "active"
       super()
     end
 
     def call
       Lti::Registration.transaction do
         registration = Lti::Registration.create!(
+          lock_deploying: true,
           **registration_params,
           account:,
-          workflow_state: "active",
           created_by:,
           updated_by: created_by
         )
@@ -144,18 +150,14 @@ module Lti
           **final_config
         )
 
-        binding = Lti::AccountBindingService.call(account:,
-                                                  registration:,
-                                                  user: created_by,
-                                                  overwrite_created_by: true,
-                                                  **binding_params.deep_symbolize_keys)
+        Lti::AccountBindingService.call(account:,
+                                        registration:,
+                                        user: created_by,
+                                        overwrite_created_by: true,
+                                        workflow_state: binding_workflow_state)
 
         if account.feature_enabled?(:lti_registrations_next)
-          # If the account binding is "off," make the tool unavailable. Any other binding
-          # state (on/allow/etc.) should make the tool available.
-          # In this case, the tool default's to the registration's current privacy level.
-          enabled = binding[:lti_registration_account_binding].workflow_state != "off"
-          registration.new_external_tool(account, current_user: created_by, available: false, enabled:)
+          registration.new_external_tool(account, current_user: created_by, available: false, enabled: registration.active?)
         end
 
         registration

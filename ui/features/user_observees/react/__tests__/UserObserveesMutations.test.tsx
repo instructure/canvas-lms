@@ -17,7 +17,7 @@
  */
 
 import {assignLocation} from '@canvas/util/globalUtils'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {act, render, screen, waitFor, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -49,10 +49,14 @@ vi.mock('@instructure/ui-overlays', () => ({
 }))
 
 // Mock flash alerts to prevent async DOM operations that can leak between tests
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-  showFlashSuccess: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+    showFlashSuccess: vi.fn(() => vi.fn()),
+  }
+})
 
 const mockShowFlashSuccess = vi.mocked(showFlashSuccess)
 const mockShowFlashError = vi.mocked(showFlashError)

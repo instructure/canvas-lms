@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CreateFolderModal from './CreateFolderModal'
 import {createPortal} from 'react-dom'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('files_v2')
 

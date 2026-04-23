@@ -769,6 +769,20 @@ module Lti
                   subject
                   expect(assigns.dig(:js_env, :deep_link_response, :moduleCreated)).to be true
                 end
+
+                it "names the module with the default name when no module_name claim is given" do
+                  subject
+                  expect(course.context_modules.last.name).to eq("New Content From App")
+                end
+
+                context "when module_name claim is provided" do
+                  let(:module_name) { "My Custom Module" }
+
+                  it "creates a module with the provided name" do
+                    subject
+                    expect(course.context_modules.last.name).to eq("My Custom Module")
+                  end
+                end
               end
 
               context "multiple items" do

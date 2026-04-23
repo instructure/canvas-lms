@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {AIExperienceShowProps} from '../types'
-import AIExperienceShow from './components/AIExperienceShow'
+import AIExperienceShowManager from './AIExperienceShowManager'
 
 const I18n = createI18nScope('ai_experiences_show')
 
-export const AIExperiencesShow: React.FC<AIExperienceShowProps> = props => {
+export const AIExperiencesShow: React.FC = () => {
   return (
     <ErrorBoundary
       errorComponent={
@@ -40,8 +39,8 @@ export const AIExperiencesShow: React.FC<AIExperienceShowProps> = props => {
         />
       }
     >
-      <AlertManager breakpoints={{}}>
-        <AIExperienceShow aiExperience={props.aiExperience} />
+      <AlertManager>
+        <AIExperienceShowManager />
       </AlertManager>
     </ErrorBoundary>
   )

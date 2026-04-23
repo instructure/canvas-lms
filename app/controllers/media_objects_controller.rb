@@ -181,7 +181,12 @@ class MediaObjectsController < ApplicationController
   # @returns MediaObject
   def show
     if @attachment
-      render json: media_attachment_api_json(@attachment, @media_object, @current_user, session)
+      # @media_object may be nil if the attachment was just uploaded and the
+      # MediaObject hasn't been created yet (still processing). Fall back to
+      # MediaObject.new so the serializer returns a well-formed response with
+      # empty media_sources, allowing the frontend's retry mechanism to keep
+      # polling until the media is ready.
+      render json: media_attachment_api_json(@attachment, @media_object || MediaObject.new, @current_user, session)
     else
       render json: media_object_api_json(@media_object, @current_user, session)
     end

@@ -25,7 +25,7 @@ import actions from './actions/developerKeysActions'
 import storeCreator from './store/store'
 import {RegistrationSettings} from './RegistrationSettings/RegistrationSettings'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const store = storeCreator()
 

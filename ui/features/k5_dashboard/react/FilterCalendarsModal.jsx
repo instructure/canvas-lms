@@ -31,7 +31,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {Modal} from '@instructure/ui-modal'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {DEFAULT_COURSE_COLOR, saveSelectedContexts} from '@canvas/k5/react/utils'
 
 const I18n = createI18nScope('filter_calendars_modal')

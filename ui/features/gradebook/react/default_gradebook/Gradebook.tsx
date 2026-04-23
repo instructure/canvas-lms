@@ -131,6 +131,7 @@ import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper
 import UserSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {Link} from '@instructure/ui-link'
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
@@ -174,7 +175,7 @@ import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
 import ScoreToUngradedManager from '../shared/ScoreToUngradedManager'
@@ -258,7 +259,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {RubricAssessmentImport} from './RubricAssessmentImport'
 import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
 import PostGradesFrameModal from './components/PostGradesFrameModal'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('gradebook')
@@ -334,6 +335,7 @@ type GradebookState = {
   modules: Module[]
   sections: Section[]
   settingsTrayOpen: boolean
+  settingsModalDefaultTab?: string
   isStatusesModalOpen: boolean
   exportState?: {
     completion?: number
@@ -507,6 +509,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       modules: [],
       sections: this.options.sections.length > 1 ? this.options.sections : [],
       settingsTrayOpen: false,
+      settingsModalDefaultTab: undefined,
       isStatusesModalOpen: false,
       exportState: undefined,
       exportManager: undefined,
@@ -818,17 +821,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         assignment.due_at = tz.parse(assignment.due_at)
         this.updateAssignmentEffectiveDueDates(assignment)
 
-        if (window.ENV.SETTINGS.suppress_assignments) {
-          if (assignment.suppress_assignment) {
-            // If suppressed, then has_suppressed_assignments is true
-            this.has_suppressed_assignments = true
-          } else {
-            // If not suppressed, then add the column for the assignment
-            this.addAssignmentColumnDefinition(assignment)
-          }
-        } else {
-          this.addAssignmentColumnDefinition(assignment)
+        if (window.ENV.SETTINGS?.suppress_assignments && assignment.suppress_assignment) {
+          this.has_suppressed_assignments = true
         }
+
+        this.addAssignmentColumnDefinition(assignment)
         this.assignments[assignment.id] = assignment
         if (!group.assignments.some(a => a.id === assignment.id)) {
           group.assignments.push(assignment)
@@ -847,13 +844,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             parent_assignment: assignment,
           } as Assignment
 
-          if (window.ENV.SETTINGS.suppress_assignments) {
-            if (!assignment.suppress_assignment) {
-              this.addAssignmentColumnDefinition(peerReview)
-            }
-          } else {
-            this.addAssignmentColumnDefinition(peerReview)
-          }
+          this.addAssignmentColumnDefinition(peerReview)
 
           this.assignments[peerReview.id] = peerReview
           if (!group.assignments.some(a => a.id === peerReview.id)) {
@@ -1179,6 +1170,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.filterAssignmentBySearchInput,
       this.filterAssignmentBySubmissionTypes,
       this.filterAssignmentByPublishedStatus,
+      this.filterAssignmentBySuppressStatus,
       this.filterAssignmentByAssignmentGroup,
       this.filterAssignmentByGradingPeriod,
       this.filterAssignmentByModule,
@@ -1215,6 +1207,21 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   filterAssignmentByPublishedStatus = (assignment: Pick<Assignment, 'published'>) => {
     return assignment.published || this.gridDisplaySettings.showUnpublishedAssignments
+  }
+
+  filterAssignmentBySuppressStatus = (
+    assignment: Pick<Assignment, 'suppress_assignment'> & {parent_assignment?: Assignment},
+  ) => {
+    if (!window.ENV.SETTINGS?.suppress_assignments) {
+      return true
+    }
+    const isSuppressed =
+      assignment.suppress_assignment || assignment.parent_assignment?.suppress_assignment
+
+    // Show assignments if either:
+    // 1. The assignment is not suppressed, OR
+    // 2. The user has toggled "Show Suppressed Assignments" on
+    return !isSuppressed || this.gridDisplaySettings.showSuppressedAssignments
   }
 
   filterAssignmentByAssignmentGroup = (assignment: Pick<Assignment, 'assignment_group_id'>) => {
@@ -2284,7 +2291,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       locale: this.props.locale,
       gradebookIsEditable: this.options.gradebook_is_editable,
       onRequestClose: () => {
-        this.setState({settingsTrayOpen: false}, this.renderGradebookSettingsModal)
+        this.setState(
+          {settingsTrayOpen: false, settingsModalDefaultTab: undefined},
+          this.renderGradebookSettingsModal,
+        )
       },
       onAfterClose: () => this.gradebookSettingsModalButton.current?.focus(),
       onCourseSettingsUpdated: (settings: {allowFinalGradeOverride: boolean}) =>
@@ -2293,6 +2303,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       open: this.state.settingsTrayOpen,
       postPolicies: this.postPolicies,
       customGradeStatuses: this.options?.custom_grade_statuses,
+      defaultTab: this.state.settingsModalDefaultTab,
     }
 
     if (this.options.enhanced_gradebook_filters) {
@@ -2308,12 +2319,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return {
       allowSortingByModules: modulesEnabled,
       allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
+      allowShowSuppressedAssignments: !!window.ENV.SETTINGS?.suppress_assignments,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero,
       loadCurrentViewOptions: (): GradebookViewOptions => {
         const {criterion, direction} = this.getColumnSortSettingsViewOptionsMenuProps()
         const {
           viewUngradedAsZero,
           showUnpublishedAssignments,
+          showSuppressedAssignments,
           showSeparateFirstLastNames,
           hideAssignmentGroupTotals,
           hideTotal,
@@ -2327,6 +2340,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           showNotes: this.isTeacherNotesColumnShown(),
           showSeparateFirstLastNames,
           showUnpublishedAssignments,
+          showSuppressedAssignments,
           hideAssignmentGroupTotals,
           statusColors: this.state.gridColors,
           viewUngradedAsZero,
@@ -2347,6 +2361,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     hideTotal,
     showNotes,
     showUnpublishedAssignments,
+    showSuppressedAssignments,
     showSeparateFirstLastNames,
     statusColors: colors,
     viewUngradedAsZero,
@@ -2358,6 +2373,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     hideTotal?: boolean
     showNotes: boolean
     showUnpublishedAssignments?: boolean
+    showSuppressedAssignments?: boolean
     showSeparateFirstLastNames?: boolean
     statusColors?: StatusColors
     viewUngradedAsZero?: boolean
@@ -2389,6 +2405,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       hideAssignmentGroupTotals: oldHideAssignmentGroupTotals,
       hideTotal: oldHideTotal,
       showUnpublishedAssignments: oldShowUnpublished,
+      showSuppressedAssignments: oldShowSuppressed,
       showSeparateFirstLastNames: oldShowSeparateFirstLastNames,
       viewUngradedAsZero: oldViewUngradedAsZero,
       viewHiddenGradesIndicator: oldViewHiddenGradesIndicator,
@@ -2398,6 +2415,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const viewUngradedAsZeroChanged =
       this.courseFeatures.allowViewUngradedAsZero && oldViewUngradedAsZero !== viewUngradedAsZero
     const showUnpublishedChanged = oldShowUnpublished !== showUnpublishedAssignments
+    const showSuppressedChanged = oldShowSuppressed !== showSuppressedAssignments
     const showSeparateFirstLastNamesChanged =
       oldShowSeparateFirstLastNames !== showSeparateFirstLastNames
     const colorsChanged = !isEqual(this.state.gridColors, colors)
@@ -2414,6 +2432,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       hideAssignmentGroupTotalsChanged ||
       hideTotalChanged ||
       showUnpublishedChanged ||
+      showSuppressedChanged ||
       viewUngradedAsZeroChanged ||
       showSeparateFirstLastNamesChanged ||
       viewHiddenGradesIndicatorChanged ||
@@ -2426,6 +2445,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           : undefined,
         hideTotal: hideTotalChanged ? hideTotal : undefined,
         showUnpublishedAssignments: showUnpublishedChanged ? showUnpublishedAssignments : undefined,
+        showSuppressedAssignments: showSuppressedChanged ? showSuppressedAssignments : undefined,
         showSeparateFirstLastNames: showSeparateFirstLastNamesChanged
           ? showSeparateFirstLastNames
           : undefined,
@@ -2481,6 +2501,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     hideAssignmentGroupTotals,
     hideTotal,
     showUnpublishedAssignments,
+    showSuppressedAssignments,
     viewUngradedAsZero,
     showSeparateFirstLastNames,
     viewHiddenGradesIndicator,
@@ -2490,6 +2511,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     hideAssignmentGroupTotals?: boolean
     hideTotal?: boolean
     showUnpublishedAssignments?: boolean
+    showSuppressedAssignments?: boolean
     viewUngradedAsZero?: boolean
     showSeparateFirstLastNames?: boolean
     viewHiddenGradesIndicator?: boolean
@@ -2500,6 +2522,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       hideAssignmentGroupTotals,
       hideTotal,
       showUnpublishedAssignments,
+      showSuppressedAssignments,
       showSeparateFirstLastNames,
       viewUngradedAsZero,
       viewHiddenGradesIndicator,
@@ -2526,6 +2549,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
       if (showUnpublishedAssignments !== undefined) {
         this.gridDisplaySettings.showUnpublishedAssignments = showUnpublishedAssignments
+      }
+
+      if (showSuppressedAssignments !== undefined) {
+        this.gridDisplaySettings.showSuppressedAssignments = showSuppressedAssignments
       }
 
       if (viewUngradedAsZero !== undefined) {
@@ -3076,6 +3103,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showConcludedEnrollments = this.getEnrollmentFilters().concluded,
     showInactiveEnrollments = this.getEnrollmentFilters().inactive,
     showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
+    showSuppressedAssignments = this.gridDisplaySettings.showSuppressedAssignments,
     showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
     studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
     studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
@@ -3108,6 +3136,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       show_concluded_enrollments: showConcludedEnrollments ? 'true' : 'false',
       show_inactive_enrollments: showInactiveEnrollments ? 'true' : 'false',
       show_unpublished_assignments: showUnpublishedAssignments ? 'true' : 'false',
+      show_suppressed_assignments: showSuppressedAssignments ? 'true' : 'false',
       show_separate_first_last_names: showSeparateFirstLastNames ? 'true' : 'false',
       student_column_display_as: studentColumnDisplayAs,
       student_column_secondary_info: studentColumnSecondaryInfo,
@@ -5423,7 +5452,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           {this.props.flashAlerts.map(alert => (
             <div key={alert.key} id={alert.key} className="Gradebook__FlashMessage">
               {}
-              <FlashAlert.default
+              <FlashAlert.FlashAlert
                 message={alert.message}
                 onClose={() => document.getElementById(alert.key)?.remove()}
                 timeout={5000}
@@ -5567,11 +5596,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             )}
         </div>
 
-        {window.ENV.SETTINGS.suppress_assignments && this.has_suppressed_assignments && (
-          <div>
-            <p>{I18n.t('* Some items are hidden from gradebook view.')}</p>
-          </div>
-        )}
+        {window.ENV.SETTINGS.suppress_assignments &&
+          this.has_suppressed_assignments &&
+          !this.gridDisplaySettings.showSuppressedAssignments && (
+            <div>
+              <p>
+                {I18n.t('* Some items are hidden from gradebook view.')}{' '}
+                <Link
+                  as="button"
+                  onClick={() => {
+                    this.setState(
+                      {settingsTrayOpen: true, settingsModalDefaultTab: 'tab-panel-view-options'},
+                      this.renderGradebookSettingsModal,
+                    )
+                  }}
+                >
+                  {I18n.t('Edit Settings')}
+                </Link>
+              </p>
+            </div>
+          )}
         {this.state.isGridLoaded &&
           !this.props.isSubmissionDataLoaded &&
           Object.keys(this.props.assignmentMap).length * this.props.totalStudentsToLoad > 200 && (

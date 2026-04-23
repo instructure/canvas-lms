@@ -347,6 +347,25 @@ describe ConferencesController do
       expect(body["user_ids"]).to include(@student.id)
     end
 
+    it "persists manually added attendees when editing" do
+      user_session(@teacher)
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher)
+      @conference.add_initiator(@teacher)
+      new_student = user_with_pseudonym(active_all: true)
+      @course.enroll_student(new_student, enrollment_state: "active")
+
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: { title: "Something else" },
+        "user[#{new_student.id}]": "1",
+        "user[#{@teacher.id}]": "1",
+      }
+      post :update, params:, format: :json
+      body = response.parsed_body
+      expect(body["user_ids"]).to include(new_student.id)
+    end
+
     it "deletes calendar event when calendar_event is not set" do
       user_session(@teacher)
       allow(WebConference).to receive(:plugins).and_return(

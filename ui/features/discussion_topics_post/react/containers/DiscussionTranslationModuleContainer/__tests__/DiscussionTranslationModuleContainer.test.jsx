@@ -24,9 +24,9 @@ import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {MockedProvider} from '@apollo/client/testing'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {ObserverContext} from '../../../utils/ObserverContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@instructure/platform-alerts')
 
 const mockContextValue = {
   setTranslateTargetLanguage: vi.fn(),

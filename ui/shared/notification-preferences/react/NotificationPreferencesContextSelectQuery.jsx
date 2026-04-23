@@ -22,7 +22,7 @@ import {func, string, object} from 'prop-types'
 import {useQuery} from '@apollo/client'
 import NotificationPreferencesContextSelect from './NotificationPreferencesContextSelect'
 import {NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY} from '../graphql/Queries'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('courses')
 

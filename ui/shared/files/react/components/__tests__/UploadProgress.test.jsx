@@ -20,9 +20,9 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import UploadProgress from '../UploadProgress'
 import FileUploader from '../../modules/FileUploader'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 function makeUploader(name) {
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})

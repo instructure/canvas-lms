@@ -21,7 +21,7 @@ import ExternalToolTrayLauncher from './ExternalToolTrayLauncher'
 import ExternalToolModalLauncherWrapper from './ExternalToolModalLauncher'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {useModules} from '../hooks/queries/useModules'
 import {Menu} from '@instructure/ui-menu'
 import {

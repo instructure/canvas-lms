@@ -25,7 +25,7 @@ import {
   IconCalendarClockSolid,
   IconCalendarReservedSolid,
 } from '@instructure/ui-icons'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {EnrollmentType, Role, TemporaryEnrollmentStatus} from './types'
 import {MODULE_NAME, PROVIDER, RECIPIENT, TOOLTIP_MAX_WIDTH} from './types'

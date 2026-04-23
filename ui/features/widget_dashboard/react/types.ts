@@ -81,6 +81,7 @@ export interface WidgetRenderer {
   displayName: string
   description: string
   roles?: string[]
+  props?: Record<string, unknown>
 }
 
 export type WidgetRegistry = Record<string, WidgetRenderer>

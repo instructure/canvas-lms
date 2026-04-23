@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import Gradebook from '../Gradebook'
@@ -39,11 +39,15 @@ vi.mock('@canvas/user-settings', () => ({
 }))
 
 // Mock the FlashAlert module
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(),
-  showFlashSuccess: vi.fn(),
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(),
+    showFlashSuccess: vi.fn(),
+    showFlashAlert: vi.fn(),
+  }
+})
 
 // Define a global beforeEach to set window.ENV for all tests
 beforeEach(() => {
@@ -293,6 +297,7 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         hideTotal: false,
         showUnpublishedAssignments: false,
         showSeparateFirstLastNames: false,
+        showSuppressedAssignments: false,
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
         viewHiddenGradesIndicator: false,

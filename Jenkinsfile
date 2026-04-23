@@ -348,15 +348,38 @@ pipeline {
 
     stage('Locales Only Changes') {
       when {
-        expression { !configuration.isChangeMerged() }
-        environment name: 'GERRIT_PROJECT', value: 'canvas-lms'
-        expression {
-          sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0
+        allOf {
+          expression { !configuration.isChangeMerged() }
+          environment name: 'GERRIT_PROJECT', value: 'canvas-lms'
         }
       }
       steps {
         script {
-          submitGerritReview('--label Lint-Review=-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
+          def changedFiles = sh(
+            script: "git show --pretty='' --name-only $env.GERRIT_PATCHSET_REVISION",
+            returnStdout: true
+          ).trim().split('\n').findAll { it }
+
+          // Any file outside config/locales/ means the commit is fine
+          if (!changedFiles || !changedFiles.every { it.startsWith('config/locales/') }) {
+            return
+          }
+
+          // Remove 'safe' files allowed to be the only change
+          def unsafeFiles = changedFiles - ['config/locales/locales.yml', 'config/locales/community.csv']
+
+          if (!unsafeFiles) {
+            // Only safe files changed
+            return
+          }
+
+          if (unsafeFiles.every { it.endsWith('.yml') }) {
+            // All concerning files are auto-generated *.yml — strong signal something is wrong
+            submitGerritReview('--label Lint-Review=-2', 'This commit contains only auto-generated config/locales/*.yml changes without other source changes. These files should not be modified directly.')
+          } else {
+            // Mix of yml + non-yml, or only non-yml (e.g. .rb) — warn but could be intentional
+            submitGerritReview('--label Lint-Review=-1', 'Warning: this commit contains only changes to config/locales/ without other source changes. Please verify this is intentional.')
+          }
         }
       }
     }

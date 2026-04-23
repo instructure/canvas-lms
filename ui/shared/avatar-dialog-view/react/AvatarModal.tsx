@@ -27,7 +27,7 @@ import UploadFileView from '../backbone/views/UploadFileView'
 import GravatarView from '../backbone/views/GravatarView'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {handleUpdatingProfilePicture, updateAvatarInDom, getImage, preflightRequest} from './util'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 

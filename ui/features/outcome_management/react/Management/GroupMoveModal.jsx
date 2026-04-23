@@ -24,7 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TargetGroupSelector from '../shared/TargetGroupSelector'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from '@apollo/client'
 

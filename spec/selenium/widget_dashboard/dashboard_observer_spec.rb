@@ -333,4 +333,22 @@ describe "Student dashboard as observer", :ignore_js_errors do
       expect(driver.current_url).to include("/courses/#{@course1.id}/discussion_topics/#{discussion_topic.id}")
     end
   end
+
+  context "progress overview widget as observer" do
+    before :once do
+      add_widget_to_dashboard(@observer, :progress_overview, 1)
+    end
+
+    it "shows progress overview for observed student" do
+      go_to_dashboard
+      select_observed_student(@student.name)
+
+      expect(progress_overview_course_progress_text(@course1.id).text).to match("2 Graded1 Submitted4 Remaining")
+      expect(element_exists?(progress_overview_course_selector(@course2.id))).to be_falsey
+
+      select_observed_student(@student2.name)
+      expect(progress_overview_course_progress_text(@course2.id).text).to match("1 Graded1 Submitted2 Remaining")
+      expect(element_exists?(progress_overview_course_selector(@course1.id))).to be_falsey
+    end
+  end
 end

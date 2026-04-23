@@ -24,9 +24,10 @@ import {Flex} from '@instructure/ui-flex'
 import {Popover} from '@instructure/ui-popover'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {getRubricSelfAssessmentSettings, setRubricSelfAssessment} from '../queries'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('enhanced-rubrics-self-assessments')

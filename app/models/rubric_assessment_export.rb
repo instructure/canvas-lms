@@ -66,7 +66,7 @@ class RubricAssessmentExport
   def row_with_assessment(student, assessment)
     row = []
     row << student.id
-    row << student.name
+    row << student.sortable_name
 
     ratings = assessment.data.to_h do |r|
       [r[:criterion_id], { rating_id: r[:id] }.merge(r.slice(:comments, :points, :description))]
@@ -86,7 +86,7 @@ class RubricAssessmentExport
   def empty_row(student)
     row = []
     row << student.id
-    row << student.name
+    row << student.sortable_name
 
     rubric.rubric_criteria.count.times do
       row << "" if rating_visible?

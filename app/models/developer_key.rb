@@ -104,8 +104,8 @@ class DeveloperKey < ApplicationRecord
   attr_reader :private_jwk
   attr_accessor :skip_lti_sync, :current_user
 
-  scope :nondeleted, -> { where("workflow_state<>'deleted'") }
-  scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
+  scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :not_active, -> { where.not(workflow_state: "active") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
   scope :site_admin, -> { where(account_id: nil) } # site_admin keys have a nil account_id
   scope :site_admin_lti, lambda { |key_ids|

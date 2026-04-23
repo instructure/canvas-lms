@@ -18,7 +18,7 @@
 
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   MODULE_ITEM_TITLES,
@@ -45,7 +45,7 @@ interface ModuleItemTitlesGraphQLResult {
   }
   errors?: Array<{message: string}>
 }
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {handleOpeningModuleUpdateTray, handleOpeningEditItemModal} from './modulePageActionHandlers'
 import {handleDelete} from './moduleActionHandlers'
 import {InfiniteData} from '@tanstack/react-query'

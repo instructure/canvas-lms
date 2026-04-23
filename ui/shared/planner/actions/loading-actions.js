@@ -30,7 +30,7 @@ import {alert} from '../utilities/alertUtils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {itemsToDays} from '../utilities/daysUtils'
 import {processDashboardCards} from '@canvas/dashboard-card/util/dashboardUtils'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {fetchDashboardCardsAsync} from '@canvas/dashboard-card/dashboardCardQueries'
 
 const I18n = createI18nScope('planner')

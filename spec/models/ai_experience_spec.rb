@@ -295,7 +295,7 @@ describe AiExperience do
         it "calls remove_documents when a file is removed" do
           AiExperienceContextFile.create!(ai_experience: experience, attachment:)
 
-          expect(LLMConversationContextManager).to receive(:remove_documents)
+          expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:remove_documents)
             .with(ai_experience: experience, context_files: array_including(have_attributes(attachment_id: attachment.id)))
 
           experience.update!(context_file_ids: [])
@@ -305,7 +305,7 @@ describe AiExperience do
           attachment2 = attachment_model(context: course)
           AiExperienceContextFile.create!(ai_experience: experience, attachment:)
 
-          expect(LLMConversationContextManager).not_to receive(:remove_documents)
+          expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:remove_documents)
 
           experience.update!(context_file_ids: [attachment.id.to_s, attachment2.id.to_s])
         end
@@ -314,7 +314,7 @@ describe AiExperience do
           attachment2 = attachment_model(context: course)
           existing_context_file = AiExperienceContextFile.create!(ai_experience: experience, attachment:)
 
-          expect(LLMConversationContextManager).to receive(:trigger_indexing) do |ai_experience:, context_file_ids:|
+          expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:trigger_indexing) do |_service, ai_experience:, context_file_ids:|
             new_context_file = AiExperienceContextFile.find_by(ai_experience:, attachment: attachment2)
             expect(context_file_ids).to eq([new_context_file.id])
             expect(context_file_ids).not_to include(existing_context_file.id)
@@ -328,7 +328,7 @@ describe AiExperience do
           attachment2 = attachment_model(context: course)
           AiExperienceContextFile.create!(ai_experience: experience, attachment: attachment2)
 
-          expect(LLMConversationContextManager).not_to receive(:trigger_indexing)
+          expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:trigger_indexing)
 
           experience.update!(context_file_ids: [attachment.id.to_s])
         end
@@ -484,9 +484,9 @@ describe AiExperience do
     let(:attachment_c) { attachment_model(context: course, filename: "c.pdf") }
 
     before do
-      allow(LLMConversationContextManager).to receive(:update_context)
-      allow(LLMConversationContextManager).to receive(:trigger_indexing)
-      allow(LLMConversationContextManager).to receive(:remove_documents)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:update)
+      allow_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:trigger_indexing)
+      allow_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:remove_documents)
     end
 
     it "adds files when given new context_file_ids" do
@@ -685,9 +685,9 @@ describe AiExperience do
     let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "unpublished")) }
 
     before do
-      allow(LLMConversationContextManager).to receive(:create_context)
-      allow(LLMConversationContextManager).to receive(:update_context)
-      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:create)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:update)
+      allow_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:trigger_indexing)
     end
 
     context "when feature flag is disabled" do
@@ -752,9 +752,9 @@ describe AiExperience do
     let(:student) { user_factory(active_all: true) }
 
     before do
-      allow(LLMConversationContextManager).to receive(:create_context)
-      allow(LLMConversationContextManager).to receive(:update_context)
-      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:create)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:update)
+      allow_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:trigger_indexing)
       course.enroll_student(student, enrollment_state: "active")
     end
 
@@ -805,9 +805,9 @@ describe AiExperience do
     let(:experience) { AiExperience.create!(valid_attributes.merge(workflow_state: "unpublished")) }
 
     before do
-      allow(LLMConversationContextManager).to receive(:create_context)
-      allow(LLMConversationContextManager).to receive(:update_context)
-      allow(LLMConversationContextManager).to receive(:trigger_indexing)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:create)
+      allow_any_instance_of(AiExperiences::ConversationContextService).to receive(:update)
+      allow_any_instance_of(AiExperiences::ConversationContextDocumentsService).to receive(:trigger_indexing)
     end
 
     context "when publishing while indexing is in_progress" do

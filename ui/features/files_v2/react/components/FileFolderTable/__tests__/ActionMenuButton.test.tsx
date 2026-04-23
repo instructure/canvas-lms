@@ -30,7 +30,7 @@ import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {mockRowFocusContext, mockRowsContext} from './testUtils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
@@ -39,9 +39,13 @@ import {downloadZip} from '../../../../utils/downloadUtils'
 
 const server = setupServer()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn().mockReturnValue(() => {}),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(() => {}),
+  }
+})
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),

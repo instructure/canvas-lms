@@ -225,12 +225,12 @@ const CreateEditAssignmentModal = ({
     // So we will proritize accordingly
     if (errors.unlock_at) {
       setDueDateInputMessage([
-        {text: I18n.t('Due date cannot be before unlock date'), type: 'newError'},
+        {text: I18n.t('Due date cannot be before available from date'), type: 'newError'},
       ])
     }
     if (errors.lock_at) {
       setDueDateInputMessage([
-        {text: I18n.t('Due date cannot be after lock date'), type: 'newError'},
+        {text: I18n.t('Due date cannot be after until date'), type: 'newError'},
       ])
     }
     if (errors.due_at) {

@@ -116,9 +116,6 @@
     "content_type_2cf90d95": {
         "message": "Тип вмісту"
     },
-    "copy_9748f9f": {
-        "message": "Копіювати"
-    },
     "copyright_holder_66ee111": {
         "message": "Правовласник:"
     },
@@ -163,9 +160,6 @@
     },
     "details_98a31b68": {
         "message": "Подробиці"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Розміри"
     },
     "discussion_6719c51d": {
         "message": "Обговорення"
@@ -430,9 +424,6 @@
     },
     "reset_95a81614": {
         "message": "Скинути"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Спробувати ще раз"
     },
     "rich_content_editor_2708ef21": {
         "message": "Редактор збагаченого контенту"

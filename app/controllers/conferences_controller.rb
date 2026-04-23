@@ -387,6 +387,9 @@ class ConferencesController < ApplicationController
         params[:web_conference].try(:delete, :conference_type)
         calendar_event_param = params[:web_conference].try(:delete, :calendar_event)
         if @conference.update(conference_params)
+          user_ids = member_ids
+          (user_ids.count > WebConference.max_invitees_sync_size) ? @conference.delay.invite_users_from_context(user_ids) : @conference.invite_users_from_context(user_ids)
+
           if value_to_boolean(calendar_event_param)
             calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
             calendar_event&.save

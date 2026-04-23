@@ -43,7 +43,7 @@ GEM
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
     logger (1.7.0)
-    minitest (6.0.2)
+    minitest (6.0.5)
       drb (~> 2.0)
       prism (~> 1.5)
     nokogiri (1.19.2-aarch64-linux-gnu)

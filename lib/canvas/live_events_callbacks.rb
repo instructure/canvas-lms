@@ -46,6 +46,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.group_membership_created(obj)
     when WikiPage
       Canvas::LiveEvents.wiki_page_created(obj)
+    when Lti::ResourceLink
+      Canvas::LiveEvents.lti_resource_link_created(obj)
     when Assignment
       Canvas::LiveEvents.assignment_created(obj)
     when AssignmentGroup
@@ -135,6 +137,8 @@ module Canvas::LiveEventsCallbacks
                                              changes["title"]&.first,
                                              changes["body"]&.first)
       end
+    when Lti::ResourceLink
+      Canvas::LiveEvents.lti_resource_link_updated(obj)
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
     when AssignmentGroup
@@ -143,7 +147,7 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_override_updated(obj)
     when Attachment
       if attachment_eligible?(obj)
-        if %w[display_name lock_at unlock_at folder_id].any? { |field| changes[field] }
+        if %w[display_name lock_at unlock_at folder_id locked].any? { |field| changes[field] }
           Canvas::LiveEvents.attachment_updated(obj, changes["display_name"]&.first)
         elsif changes["file_state"] && obj.file_state == "deleted"
           # Attachments are often soft deleted rather than destroyed
