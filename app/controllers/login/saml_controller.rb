@@ -29,7 +29,14 @@ class Login::SamlController < ApplicationController
   before_action :parse_response, only: :create
   skip_before_action :require_user, only: %i[new create destroy metadata observee_validation]
 
-  attr_reader :saml_response, :relay_state, :issuer
+  attr_reader :relay_state, :issuer
+
+  # Backed by a non-`@saml_response` ivar because the `saml2` gem's
+  # `saml2/http_post` template treats `@saml_response` as the outgoing
+  # message to forward — collisions break the proxy SAML flow.
+  def saml_response
+    @saml_login_response
+  end
 
   def new
     aac
@@ -423,7 +430,7 @@ class Login::SamlController < ApplicationController
   protected
 
   def parse_response
-    @saml_response, @relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
+    @saml_login_response, @relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
     unless saml_response.is_a?(SAML2::Response)
       # something confusing and wrong has happened
       logger.error "[SAML] Attempted invalid SAML operation via login endpoint... #{saml_response.class.name}"
