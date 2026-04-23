@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "page_objects/widget_dashboard_page"
-require_relative "../helpers/student_dashboard_common"
+require_relative "../../helpers/student_dashboard_common"
 
 describe "student dashboard announcements widget", :ignore_js_errors do
   include_context "in-process server selenium tests"

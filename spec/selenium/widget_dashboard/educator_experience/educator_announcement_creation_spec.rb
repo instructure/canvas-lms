@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "page_objects/widget_dashboard_page"
+require_relative "page_objects/educator_dashboard_page"
 
 describe "educator announcement creation", :ignore_js_errors, custom_timeout: 30 do
   include_context "in-process server selenium tests"
-  include WidgetDashboardPage
+  include EducatorDashboardPage
 
   before :once do
     Account.default.enable_feature!(:educator_dashboard)
