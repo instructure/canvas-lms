@@ -43,7 +43,7 @@ import AIExperiencePublishButton from './AIExperiencePublishButton'
 import {
   navyButtonTheme,
   roundedTheme,
-  buttonTheme,
+  lightBlueButtonTheme,
 } from '../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_show')
@@ -125,7 +125,8 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                   >
                     <Button
                       interaction="disabled"
-                      themeOverride={buttonTheme}
+                      color="primary"
+                      themeOverride={lightBlueButtonTheme}
                       data-testid="ai-experience-show-ai-conversations-button"
                     >
                       {I18n.t('View conversations')}
@@ -134,7 +135,8 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                 ) : (
                   <Button
                     href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
-                    themeOverride={buttonTheme}
+                    color="primary"
+                    themeOverride={lightBlueButtonTheme}
                     data-testid="ai-experience-show-ai-conversations-button"
                   >
                     {I18n.t('View conversations')}

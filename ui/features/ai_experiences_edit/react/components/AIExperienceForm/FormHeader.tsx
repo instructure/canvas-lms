@@ -18,22 +18,26 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {IconMoreLine, IconPublishSolid} from '@instructure/ui-icons'
-import {Menu} from '@instructure/ui-menu'
+import {IconPublishSolid} from '@instructure/ui-icons'
+import {
+  navyButtonTheme,
+  lightBlueButtonTheme,
+} from '../../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_edit')
 
 interface FormHeaderProps {
   isEdit: boolean
   title?: string
-  onDeleteClick: () => void
+  onCancel: () => void
+  isLoading: boolean
 }
 
-const FormHeader: React.FC<FormHeaderProps> = ({isEdit, title, onDeleteClick}) => {
+const FormHeader: React.FC<FormHeaderProps> = ({isEdit, title, onCancel, isLoading}) => {
   const getHeading = () => {
     if (!isEdit) {
       return I18n.t('New Knowledge Chat')
@@ -52,34 +56,33 @@ const FormHeader: React.FC<FormHeaderProps> = ({isEdit, title, onDeleteClick}) =
         </Heading>
       </Flex.Item>
       <Flex.Item>
-        <Flex alignItems="center">
-          <Flex.Item padding="0 x-small 0 0">
+        <Flex alignItems="center" gap="x-small">
+          <Flex.Item>
             <IconPublishSolid color="secondary" />
           </Flex.Item>
-          <Flex.Item padding="0 x-small 0 0">
+          <Flex.Item>
             <Text color="secondary">{I18n.t('Not published')}</Text>
           </Flex.Item>
           <Flex.Item>
-            <Menu
-              placement="bottom end"
-              trigger={
-                <IconButton
-                  screenReaderLabel={I18n.t('More options')}
-                  withBackground={false}
-                  withBorder={false}
-                >
-                  <IconMoreLine />
-                </IconButton>
-              }
+            <Button
+              data-testid="ai-experience-edit-cancel-button"
+              color="primary"
+              themeOverride={lightBlueButtonTheme}
+              onClick={onCancel}
             >
-              <Menu.Item
-                data-testid="ai-experience-edit-delete-menu-item"
-                onClick={onDeleteClick}
-                disabled={!isEdit}
-              >
-                {I18n.t('Delete')}
-              </Menu.Item>
-            </Menu>
+              {I18n.t('Cancel')}
+            </Button>
+          </Flex.Item>
+          <Flex.Item>
+            <Button
+              data-testid="ai-experience-save-as-draft-item"
+              type="submit"
+              color="primary"
+              themeOverride={navyButtonTheme}
+              interaction={isLoading ? 'disabled' : 'enabled'}
+            >
+              {isLoading ? I18n.t('Saving...') : I18n.t('Save')}
+            </Button>
           </Flex.Item>
         </Flex>
       </Flex.Item>

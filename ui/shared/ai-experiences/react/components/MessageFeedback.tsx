@@ -27,7 +27,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {FeedbackItem} from '../../types'
-import {navyButtonTheme, navyPillButtonTheme, RADIUS_PILL} from '../brand'
+import {navyButtonTheme, navyPillButtonTheme, lightBlueButtonTheme, RADIUS_PILL} from '../brand'
 
 const I18n = createI18nScope('ai_experiences')
 
@@ -248,6 +248,8 @@ const MessageFeedback = ({
             <Flex.Item>
               <Flex gap="small">
                 <Button
+                  color="primary"
+                  themeOverride={lightBlueButtonTheme}
                   interaction={buttonInteraction}
                   onClick={handleSkip}
                   data-testid="message-feedback-skip"

@@ -74,7 +74,7 @@ describe('AIExperienceManager', () => {
 
       render(<AIExperienceManager aiExperience={mockAiExperience} />)
 
-      fireEvent.click(screen.getByText('Save to preview'))
+      fireEvent.click(screen.getByTestId('ai-experience-save-as-draft-item'))
 
       await waitFor(() => {
         expect(showFlashError).toHaveBeenCalledWith(
@@ -92,7 +92,7 @@ describe('AIExperienceManager', () => {
 
       render(<AIExperienceManager aiExperience={mockAiExperience} />)
 
-      fireEvent.click(screen.getByText('Save to preview'))
+      fireEvent.click(screen.getByTestId('ai-experience-save-as-draft-item'))
 
       await waitFor(() => {
         expect(showFlashError).toHaveBeenCalledWith(
