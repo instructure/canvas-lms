@@ -26,6 +26,7 @@ interface RosterUserCollectionOptions extends Record<string, unknown> {
   params?: Record<string, unknown>
 }
 
+// @ts-expect-error TS7 migration
 export default class RosterUserCollection extends PaginatedCollection {
   selectedUserIds: string[]
   masterSelected: boolean

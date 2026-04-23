@@ -174,7 +174,6 @@ const ConversationListContainer = ({
     <span id="inbox-conversation-holder">
       <Responsive
         match="media"
-        // @ts-expect-error TS2769 (typescriptify)
         query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
         props={{
           mobile: {

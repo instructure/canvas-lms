@@ -48,7 +48,7 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}: DiscriminationIndexP
     <section className="discrimination-index-section">
       <div>
         <SightedUserContent>
-          <em className={classSet(className)}>
+          <em className={classSet(className) as string}>
             <span className="sign">{sign}</span>
             {formatNumber(Math.abs(di))}
           </em>

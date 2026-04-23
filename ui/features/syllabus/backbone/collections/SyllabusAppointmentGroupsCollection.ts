@@ -20,6 +20,7 @@ import {each} from 'es-toolkit/compat'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import type {SyllabusEventApi, SyllabusFetchOptions} from '../types'
 
+// @ts-expect-error TS7 migration
 export default class SyllabusAppointmentGroupsCollection extends PaginatedCollection {
   declare context_codes: string[]
   declare scope: string

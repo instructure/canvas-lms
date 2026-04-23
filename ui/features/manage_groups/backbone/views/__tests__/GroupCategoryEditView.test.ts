@@ -43,12 +43,12 @@ document.body.appendChild(selfSignupEndDateContainer)
 describe('GroupCategoryEditView', () => {
   beforeEach(() => {
     fakeENV.setup({allow_self_signup: true})
+    // @ts-expect-error TS7 migration
     groupCategory = new GroupCategory()
+    // @ts-expect-error TS7 migration
     view = new GroupCategoryEditView({model: groupCategory})
-    // @ts-expect-error - Backbone View property
     view.render()
     $fixtures = $('#fixtures')
-    // @ts-expect-error - Backbone View property
     view.$el.appendTo($('#fixtures'))
   })
 
@@ -104,15 +104,12 @@ describe('GroupCategoryEditView', () => {
     fakeENV.setup({allow_self_signup: true, self_signup_deadline_enabled: true})
     // @ts-expect-error - Legacy Backbone typing
     view = new GroupCategoryEditView({model: groupCategory})
-    // @ts-expect-error - Backbone View property
     view.render()
 
     const descriptionWithDeadline =
       'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.'
-    // @ts-expect-error - Backbone View property
     expect(view.$('.icon-question').attr('title').trim()).toEqual(descriptionWithDeadline)
 
-    // @ts-expect-error - Backbone View property
     view.remove()
     // @ts-expect-error - Legacy Backbone typing
     document.getElementById('fixtures').innerHTML = ''
@@ -121,12 +118,10 @@ describe('GroupCategoryEditView', () => {
     fakeENV.setup({allow_self_signup: true, self_signup_deadline_enabled: false})
     // @ts-expect-error - Legacy Backbone typing
     view = new GroupCategoryEditView({model: groupCategory})
-    // @ts-expect-error - Backbone View property
     view.render()
 
     const descriptionWithoutDeadline =
       'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. With this option enabled, students can move themselves from one group to another. Note that as long as this option is enabled, students can move themselves from one group to another.'
-    // @ts-expect-error - Backbone View property
     expect(view.$('.icon-question').attr('title').trim()).toEqual(descriptionWithoutDeadline)
 
     fakeENV.teardown()

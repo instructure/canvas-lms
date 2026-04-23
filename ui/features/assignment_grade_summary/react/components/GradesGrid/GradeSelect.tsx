@@ -299,7 +299,6 @@ export default function GradeSelect(props) {
   const readOnly = !props.onSelect || props.selectProvisionalGradeStatus === STARTED
 
   return (
-    // @ts-expect-error
     <Select
       renderLabel={
         <ScreenReaderContent>
@@ -319,7 +318,9 @@ export default function GradeSelect(props) {
       isShowingOptions={state.expanded}
       onRequestShowOptions={handleShowOptions}
       onRequestHideOptions={handleHideOptions}
+      // @ts-expect-error TS7 migration
       onRequestHighlightOption={handleHighlight}
+      // @ts-expect-error TS7 migration
       onRequestSelectOption={handleSelect}
     >
       {renderOptions()}

@@ -763,11 +763,12 @@ const CanvasInbox = ({breakpoints}) => {
   const renderSettingsButton = () => {
     return (
       <Tooltip key="settings-button" renderTip={I18n.t('Inbox settings')} placement="top">
-        {/* @ts-expect-error TS2769 (typescriptify) */}
         <Button
           color="secondary"
           onClick={() => setInboxSettingsModal(true)}
+          // @ts-expect-error TS7 migration
           renderIcon={IconSettingsLine}
+          // @ts-expect-error TS7 migration
           display={getResponsiveStyles().buttonsDisplay}
           key="settings-button"
         >
@@ -780,10 +781,10 @@ const CanvasInbox = ({breakpoints}) => {
   const renderComposeButton = () => {
     return (
       <Tooltip key="compose-button" renderTip={I18n.t('Compose a new message')} placement="top">
-        {/* @ts-expect-error TS2769 (typescriptify) */}
         <Button
           color="primary"
           margin="none"
+          // @ts-expect-error TS7 migration
           renderIcon={IconComposeLine}
           onClick={() => {
             if (/#filter=type=submission_comments/.test(window.location.hash))
@@ -791,6 +792,7 @@ const CanvasInbox = ({breakpoints}) => {
             setComposeModal(true)
           }}
           testid="compose"
+          // @ts-expect-error TS7 migration
           display={getResponsiveStyles().buttonsDisplay}
           ariaLabel={I18n.t('Compose a new message')}
         >

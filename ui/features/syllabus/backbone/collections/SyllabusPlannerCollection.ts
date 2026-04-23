@@ -28,6 +28,7 @@ interface PlannerNote {
   plannable_type: string
 }
 
+// @ts-expect-error TS7 migration
 export default class SyllabusPlannerCollection extends PaginatedCollection {
   declare context_codes: string[]
   declare url: string
