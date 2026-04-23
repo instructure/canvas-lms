@@ -859,7 +859,7 @@ class EnrollmentsApiController < ApplicationController
   #     -F 'user_ids[]=1' \
   #     -F 'user_ids[]=2' \
   #     -F 'course_ids[]=10' \
-  #     -F 'course_ids[]=11' \
+  #     -F 'course_ids[]=11'
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/bulk_enrollment \
@@ -869,6 +869,8 @@ class EnrollmentsApiController < ApplicationController
   #     -F 'course_ids[]=11' \
   #     -F 'course_ids[]=12' \
   #     -F 'enrollment_type=TeacherEnrollment' \
+  #     -F 'start_at=2026-03-01T07:00:00Z' \
+  #     -F 'end_at=2026-06-05T07:00:00Z'
   #
   # @returns Progress
   def bulk_enrollment
