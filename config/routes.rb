@@ -596,6 +596,8 @@ CanvasRails::Application.routes.draw do
       get "ai_conversations", to: "ai_conversations#index", as: :ai_conversations
     end
     resources :ai_experiences, only: %i[index show new edit]
+
+    get "notebook" => "notebook#index", :as => :notebook
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"

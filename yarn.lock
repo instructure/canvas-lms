@@ -2924,10 +2924,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/platform-loading-indicator/-/platform-loading-indicator-0.2.0.tgz#6e345adee0316dedc07a266bfa34d6b8d42e8bb0"
   integrity sha512-FMkWqvW6TJHYAdqLKMgLZsBsfAZrmBsMTAkT5TX9Adp7KjuiQVvM29kRkh4jkuaDfzSe5SK0i9oRtHtOQTgc9A==
 
-"@instructure/platform-notebook@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@instructure/platform-notebook/-/platform-notebook-0.4.1.tgz#7b17e4eada475f7fc95454dd75bb3cd6427dfb8d"
-  integrity sha512-sGlGX3vuCp/Q6Fxrk8TVEp34mfJrWXuBx7cQQwPpnXLYI/yfnjXGJcBfi+J4xajBCvp81MGsogpzd+2FZcZAwQ==
+"@instructure/platform-notebook@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@instructure/platform-notebook/-/platform-notebook-0.5.0.tgz#39c69ae6d2da8c576490d156078303e7fae23071"
+  integrity sha512-qCu4XeRUEmyQKowoQC0tQbjtwC8vVG8ylwdVENl1/Wf9B5G9AX/nhwL/tXJJQlKnS9gEE/jgmgwfvRDXk9V7Yg==
   dependencies:
     diff-match-patch "^1.0.5"
     zod "^3.25.76"

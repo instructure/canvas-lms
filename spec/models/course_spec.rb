@@ -3119,6 +3119,62 @@ describe Course do
         end
       end
 
+      describe "TAB_NOTEBOOK" do
+        let(:student) do
+          user_factory(active_all: true).tap do |s|
+            @course.enroll_student(s, enrollment_state: "active")
+          end
+        end
+
+        before do
+          @course.account.enable_feature!(:notebook)
+        end
+
+        after do
+          @course.account.disable_feature!(:notebook)
+        end
+
+        it "includes Notebook tab for students when feature flag is enabled" do
+          tabs = @course.tabs_available(student)
+          notebook_tab = tabs.find { |t| t[:id] == Course::TAB_NOTEBOOK }
+
+          expect(notebook_tab).not_to be_nil
+        end
+
+        it "does not include Notebook tab when feature flag is disabled" do
+          @course.account.disable_feature!(:notebook)
+
+          tabs = @course.tabs_available(student)
+          expect(tabs.find { |t| t[:id] == Course::TAB_NOTEBOOK }).to be_nil
+        end
+
+        it "does not include Notebook tab for teachers" do
+          tabs = @course.tabs_available(@user)
+          expect(tabs.find { |t| t[:id] == Course::TAB_NOTEBOOK }).to be_nil
+        end
+
+        it "respects a custom tab position when reordered" do
+          @course.tab_configuration = [
+            { id: Course::TAB_NOTEBOOK },
+            { id: Course::TAB_ANNOUNCEMENTS },
+            { id: Course::TAB_ASSIGNMENTS },
+            { id: Course::TAB_DISCUSSIONS },
+            { id: Course::TAB_GRADES },
+            { id: Course::TAB_PAGES },
+            { id: Course::TAB_FILES },
+            { id: Course::TAB_SYLLABUS },
+            { id: Course::TAB_OUTCOMES },
+            { id: Course::TAB_QUIZZES },
+            { id: Course::TAB_MODULES }
+          ]
+          @course.save!
+
+          tab_ids = @course.tabs_available(student).pluck(:id)
+          expect(tab_ids[0]).to eq(Course::TAB_HOME)
+          expect(tab_ids[1]).to eq(Course::TAB_NOTEBOOK)
+        end
+      end
+
       describe "TAB_SEARCH" do
         before do
           allow(SmartSearch).to receive(:bedrock_client).and_return(double)
