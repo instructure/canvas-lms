@@ -260,6 +260,10 @@ module Api
 
         it "includes absolute Canvas URLs" do
           allow(HostUrl).to receive(:default_host).and_return("canvas.example.com")
+          ad = Account.default.account_domains.find_or_initialize_by(host: "canvas.example.com")
+          ad.save(validate: false) if ad.new_record?
+          AccountDomain.reload
+          MultiCache.delete(AccountDomain.domain_lookup_cache_key("canvas.example.com", force_current_test_cluster: false))
 
           string = <<~HTML
             <html>
