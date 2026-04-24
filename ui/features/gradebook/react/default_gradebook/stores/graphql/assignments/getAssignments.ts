@@ -56,6 +56,7 @@ export const ZSubmissionType = z.enum([
   'online_text_entry',
   'online_upload',
   'online_url',
+  'peer_review',
   'student_annotation',
   'wiki_page',
 ])
@@ -74,66 +75,72 @@ const ZAssignmentState = z.enum([
   'unpublished',
 ])
 
+const assignmentBaseShape = {
+  _id: z.string(),
+  allowedAttempts: z.number().nullable(),
+  allowedExtensions: z.array(z.string()).nullable(),
+  anonymizeStudents: z.boolean().nullable(),
+  anonymousGrading: z.boolean().nullable(),
+  anonymousInstructorAnnotations: z.boolean().nullable(),
+  assignmentGroupId: z.string().nullable(),
+  assignmentVisibility: z.array(z.string()).nullable(),
+  checkpoints: z.array(ZCheckpoint).nullable(),
+  courseId: z.string().nullable(),
+  createdAt: z.string().nullable(),
+  dueAt: z.string().nullable(),
+  dueDateRequired: z.boolean().nullable(),
+  gradedSubmissionsExist: z.boolean().nullable(),
+  gradeGroupStudentsIndividually: z.boolean().nullable(),
+  gradesPublished: z.boolean().nullable(),
+  gradingStandardId: z.string().nullable(),
+  gradingType: ZGradingType.nullable(),
+  groupCategoryId: z.number().nullable(),
+  hasRubric: z.boolean(),
+  hasSubAssignments: z.boolean(),
+  hasSubmittedSubmissions: z.boolean().nullable(),
+  htmlUrl: z.string().nullable(),
+  importantDates: z.boolean().nullable(),
+  lockAt: z.string().nullable(),
+  moderatedGradingEnabled: z.boolean().nullable(),
+  moduleItems: z
+    .array(z.object({position: z.number(), module: z.object({_id: z.string()}).strict()}).strict())
+    .nullable(),
+  muted: z.boolean().nullable(),
+  name: z.string().nullable(),
+  newQuizzesAnonymousParticipants: z.boolean().nullable(),
+  omitFromFinalGrade: z.boolean().nullable(),
+  onlyVisibleToOverrides: z.boolean(),
+  peerReviews: z
+    .object({
+      anonymousReviews: z.boolean().nullable(),
+      automaticReviews: z.boolean().nullable(),
+      enabled: z.boolean().nullable(),
+      intraReviews: z.boolean().nullable(),
+    })
+    .strict()
+    .nullable(),
+  pointsPossible: z.number().nullable(),
+  position: z.number().nullable(),
+  postManually: z.boolean().nullable(),
+  postToSis: z.boolean().nullable(),
+  published: z.boolean().nullable(),
+  state: ZAssignmentState,
+  submissionTypes: ZSubmissionType.array().nullable(),
+  unlockAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+  visibleToEveryone: z.boolean(),
+}
+
+const ZPeerReviewSubAssignment = z.object(assignmentBaseShape).strict()
+
 const ZAssignment = z
   .object({
-    _id: z.string(),
-    allowedAttempts: z.number().nullable(),
-    allowedExtensions: z.array(z.string()).nullable(),
-    anonymizeStudents: z.boolean().nullable(),
-    anonymousGrading: z.boolean().nullable(),
-    anonymousInstructorAnnotations: z.boolean().nullable(),
-    assignmentGroupId: z.string().nullable(),
-    assignmentVisibility: z.array(z.string()).nullable(),
-    checkpoints: z.array(ZCheckpoint).nullable(),
-    courseId: z.string().nullable(),
-    createdAt: z.string().nullable(),
-    dueAt: z.string().nullable(),
-    dueDateRequired: z.boolean().nullable(),
-    gradedSubmissionsExist: z.boolean().nullable(),
-    gradeGroupStudentsIndividually: z.boolean().nullable(),
-    gradesPublished: z.boolean().nullable(),
-    gradingStandardId: z.string().nullable(),
-    gradingType: ZGradingType,
-    groupCategoryId: z.number().nullable(),
-    hasRubric: z.boolean(),
-    hasSubAssignments: z.boolean(),
-    hasSubmittedSubmissions: z.boolean().nullable(),
-    htmlUrl: z.string().nullable(),
-    importantDates: z.boolean().nullable(),
-    lockAt: z.string().nullable(),
-    moderatedGradingEnabled: z.boolean().nullable(),
-    moduleItems: z
-      .array(
-        z.object({position: z.number(), module: z.object({_id: z.string()}).strict()}).strict(),
-      )
-      .nullable(),
-    muted: z.boolean().nullable(),
-    name: z.string().nullable(),
-    newQuizzesAnonymousParticipants: z.boolean().nullable(),
-    omitFromFinalGrade: z.boolean().nullable(),
-    onlyVisibleToOverrides: z.boolean(),
-    peerReviews: z
-      .object({
-        anonymousReviews: z.boolean().nullable(),
-        automaticReviews: z.boolean().nullable(),
-        enabled: z.boolean().nullable(),
-        intraReviews: z.boolean().nullable(),
-      })
-      .strict()
-      .nullable(),
-    pointsPossible: z.number().nullable(),
-    position: z.number().nullable(),
-    postManually: z.boolean().nullable(),
-    postToSis: z.boolean().nullable(),
-    published: z.boolean().nullable(),
-    state: ZAssignmentState,
-    submissionTypes: ZSubmissionType.array().nullable(),
-    unlockAt: z.string().nullable(),
-    updatedAt: z.string().nullable(),
-    visibleToEveryone: z.boolean(),
+    ...assignmentBaseShape,
+    peerReviewSubAssignment: ZPeerReviewSubAssignment.nullable(),
   })
   .strict()
 export type Assignment = z.infer<typeof ZAssignment>
+export type PeerReviewSubAssignmentData = z.infer<typeof ZPeerReviewSubAssignment>
 
 const ZGetAssignmentsResult = z
   .object({
