@@ -235,7 +235,7 @@ describe('TurnitinAPMigrationModal Render', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          /We are replacing LTI 2.0 \(CPF\) with LTI 1.3 \(Asset\/Document Processor\)/,
+          /We’re replacing LTI 2.0 \(CPF\) with LTI 1.3 \(Asset\/Document Processor\)/,
         ),
       ).toBeInTheDocument()
     })
@@ -256,7 +256,7 @@ describe('TurnitinAPMigrationModal Render', () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          /Once you click the button to start the migration, reports will not be visible in SpeedGrader until they have been migrated/,
+          /After you select the button to start, reports won’t be visible in SpeedGrader until the migration is finished/,
         ),
       ).toBeInTheDocument()
     })
