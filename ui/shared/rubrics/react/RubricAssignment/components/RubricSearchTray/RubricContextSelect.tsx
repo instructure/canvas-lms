@@ -32,14 +32,16 @@ const I18n = createI18nScope('enhanced-rubrics-assignment-search')
 type RubricContextSelectProps = {
   courseId: string
   selectedContext?: string
-  handleChangeContext: (context: string) => void
+  handleChangeContext: (context: string, rubricsCount: number) => void
   setSelectedContext: (context: string) => void
+  setSelectedRubricCount: (count: number) => void
 }
 export const RubricContextSelect = ({
   courseId,
   selectedContext,
   handleChangeContext,
   setSelectedContext,
+  setSelectedRubricCount,
 }: RubricContextSelectProps) => {
   const {
     data: rubricContexts = [],
@@ -58,11 +60,13 @@ export const RubricContextSelect = ({
 
       if (matchingCourseContext) {
         setSelectedContext(matchingCourseContext.context_code)
+        setSelectedRubricCount(matchingCourseContext.rubrics || 0)
       } else {
         setSelectedContext(rubricContexts[0]?.context_code)
+        setSelectedRubricCount(rubricContexts[0]?.rubrics || 0)
       }
     }
-  }, [rubricContexts, courseId, setSelectedContext])
+  }, [rubricContexts, courseId, setSelectedContext, setSelectedRubricCount])
 
   const contextPrefix = (contextCode: string) => {
     if (contextCode.startsWith('account_')) {
@@ -94,7 +98,10 @@ export const RubricContextSelect = ({
     <SimpleSelect
       renderLabel={<ScreenReaderContent>{I18n.t('select account or course')}</ScreenReaderContent>}
       value={selectedContext}
-      onChange={(_, {value}) => handleChangeContext(value as string)}
+      onChange={(_, {value}) => {
+        const selected = rubricContexts.find(context => context.context_code === value)
+        handleChangeContext(value as string, selected?.rubrics || 0)
+      }}
       data-testid="rubric-context-select"
     >
       {rubricContexts.map(context => (
