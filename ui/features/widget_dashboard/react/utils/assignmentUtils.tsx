@@ -22,12 +22,13 @@ import {
   IconQuizLine,
   IconDiscussionLine,
   IconDocumentLine,
+  IconPeerReviewLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('widget_dashboard')
 
-export type AssignmentType = 'assignment' | 'quiz' | 'discussion'
+export type AssignmentType = 'assignment' | 'quiz' | 'discussion' | 'peer_review'
 
 export interface AssignmentData {
   submissionTypes?: string[]
@@ -36,6 +37,9 @@ export interface AssignmentData {
 }
 
 export function determineItemType(assignment: AssignmentData): AssignmentType {
+  if (assignment.submissionTypes?.length === 1 && assignment.submissionTypes[0] === 'peer_review') {
+    return 'peer_review'
+  }
   if (assignment.quiz) return 'quiz'
   if (assignment.discussion) return 'discussion'
   if (assignment.submissionTypes?.includes('online_quiz')) return 'quiz'
@@ -62,6 +66,14 @@ export function getTypeIcon(type: AssignmentType, isMobile: boolean = false) {
           title={I18n.t('Discussion')}
           size={iconSize}
           data-testid="discussion-icon"
+        />
+      )
+    case 'peer_review':
+      return (
+        <IconPeerReviewLine
+          title={I18n.t('Peer Review')}
+          size={iconSize}
+          data-testid="peer-review-icon"
         />
       )
     default:
