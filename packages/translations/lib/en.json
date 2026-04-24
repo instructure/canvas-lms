@@ -581,6 +581,9 @@
   "delete_failed_6529e336": {
     "message": "Delete Failed"
   },
+  "deleting_captionname_f175b906": {
+    "message": "Deleting { captionName }"
+  },
   "delimiters_4db4840d": {
     "message": "Delimiters"
   },
@@ -2070,6 +2073,9 @@
   "request_d1129f7d": {
     "message": "Request"
   },
+  "requesting_lang_caption_1e04346a": {
+    "message": "Requesting { lang } caption"
+  },
   "reset_95a81614": {
     "message": "Reset"
   },
@@ -2687,6 +2693,9 @@
   },
   "uploading_19e8a4e7": {
     "message": "Uploading"
+  },
+  "uploading_lang_caption_925b9d32": {
+    "message": "Uploading { lang } caption"
   },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "uppercase alphabetic ordered list"
