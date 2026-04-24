@@ -39,6 +39,10 @@ module Types
     description "A card on the course dashboard"
     alias_method :course, :object
 
+    def preload_course_permissions
+      Loaders::CoursePermissionsPreloader.for(current_user:).load(course)
+    end
+
     field :long_name, String, null: true
     def long_name
       "#{course.name} - #{course.short_name}"
@@ -124,12 +128,12 @@ module Types
 
     field :can_manage, Boolean, null: true
     def can_manage
-      course.grants_right?(current_user, :manage_course_content_edit)
+      preload_course_permissions.then { course.grants_right?(current_user, :manage_course_content_edit) }
     end
 
     field :can_read_announcements, Boolean, null: true
     def can_read_announcements
-      course.grants_right?(current_user, :read_announcements)
+      preload_course_permissions.then { course.grants_right?(current_user, :read_announcements) }
     end
 
     field :image, UrlType, null: true
@@ -170,7 +174,7 @@ module Types
 
     field :can_change_course_publish_state, Boolean, null: true
     def can_change_course_publish_state
-      course.grants_right?(current_user, :manage_courses_publish)
+      preload_course_permissions.then { course.grants_right?(current_user, :manage_courses_publish) }
     end
 
     field :default_view, String, null: true
