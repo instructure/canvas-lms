@@ -28,33 +28,19 @@ import {
   useUpdateNote,
   useDeleteNote,
   REACTION_TYPE,
-  type HighlightTheme,
-  type NoteCardTheme,
 } from '@instructure/platform-notebook'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {
+  CanvasNotebookApi,
+  notebookTranslations,
+  notebookTranslate,
+  HIGHLIGHT_THEME,
+  CARD_THEME,
+} from '@canvas/notebook'
 import {Button} from '@instructure/ui-buttons'
 import {IconNoteLine} from '@instructure/ui-icons'
-import {canvas} from '@instructure/ui-themes'
-import {CanvasNotebookApi} from '../api/CanvasNotebookApi'
-import {notebookTranslations, notebookTranslate} from './notebookTranslations'
 
 const I18n = createI18nScope('notebook')
-
-const HIGHLIGHT_THEME: HighlightTheme = {
-  colors: {
-    importantBackground: canvas.colors.contrasts.blue1212,
-    confusingBackground: canvas.colors.contrasts.red1212,
-    importantUnderline: canvas.colors.contrasts.blue4570,
-    confusingUnderline: canvas.colors.contrasts.red4570,
-  },
-  borderWidthSmall: '0.0625rem',
-  underlineOffset: '0.125rem',
-}
-
-const CARD_THEME: NoteCardTheme = {
-  importantBorderColor: canvas.colors.contrasts.blue4570,
-  confusingBorderColor: canvas.colors.contrasts.red4570,
-}
 
 const queryClient = new QueryClient({
   defaultOptions: {
