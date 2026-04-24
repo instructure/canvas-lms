@@ -352,6 +352,7 @@ export type RootAccountFeatureId =
   | 'default_discussion_options'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
+  | 'grading_rubrics_pagination'
   | 'institutional_tags'
   | 'instui_nav'
   | 'login_registration_ui_identity'

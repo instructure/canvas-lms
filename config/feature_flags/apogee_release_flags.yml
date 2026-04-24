@@ -537,3 +537,15 @@ optimized_needs_grading_count:
       state: allowed_on
     development:
       state: allowed_on
+grading_rubrics_pagination:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Grading Rubrics Pagination
+  description: |
+    Enables pagination for grading rubrics api endpoint when context code is provided to improve 
+    performance when dealing with a large number of rubrics.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
