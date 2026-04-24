@@ -27,6 +27,9 @@ import {
 } from '../../utils'
 import type {QueryOptions} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+export const RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT = 100
 
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
@@ -121,41 +124,52 @@ export const getGradingRubricContexts = async ({
   return (await contexts.json()) as GradingRubricContext[]
 }
 
-type GradingRubricForContextResponse = {
+export type GradingRubricForContextResponse = {
   rubricAssociation: RubricAssociation
   rubric: Rubric
 }
+export type GradingRubricsForContextResult = {
+  rubrics: GradingRubricForContextResponse[]
+  totalPages: number
+}
 export const getGradingRubricsForContext = async ({
   queryKey,
-}: QueryOptions): Promise<GradingRubricForContextResponse[]> => {
+}: QueryOptions): Promise<GradingRubricsForContextResult> => {
   if (!queryKey) {
     throw Error('Query key is required')
   }
 
-  const [_, courseId, contextCode] = queryKey
+  const [_, courseId, contextCode, page, searchTerm] = queryKey
 
   if (!contextCode) {
     throw Error('Context code is required')
   }
 
-  const contexts = await fetch(`/courses/${courseId}/grading_rubrics?context_code=${contextCode}`, {
-    headers: {
-      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
-    },
-  })
+  const params: Record<string, string | number> = {
+    context_code: contextCode as string,
+  }
+  if (page) {
+    params.page = page as number
+    params.per_page = RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT
 
-  if (!contexts.ok) {
-    throw new Error('Failed to get grading rubric contexts')
+    if (searchTerm) {
+      params.search_term = searchTerm as string
+    }
   }
 
-  const results = await contexts.json()
-
-  return results.map((result: {rubric_association: any}) => {
-    return {
-      rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(result.rubric_association),
-      rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
-    }
+  const {json, link} = await doFetchApi<{rubric_association: any}[]>({
+    path: `/courses/${courseId}/grading_rubrics`,
+    params,
   })
+
+  const totalPages = link?.last?.page ? parseInt(link.last.page, 10) : 1
+
+  const rubrics = (json ?? []).map((result: {rubric_association: any}) => ({
+    rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(result.rubric_association),
+    rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
+  }))
+
+  return {rubrics, totalPages}
 }
 
 const SET_RUBRIC_SELF_ASSESSMENT = gql`

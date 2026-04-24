@@ -43,12 +43,13 @@ vi.mock('../queries', () => ({
   removeRubricFromAssignment: vi.fn(),
   addRubricToAssignment: vi.fn(),
   getGradingRubricContexts: vi.fn().mockResolvedValue([]),
-  getGradingRubricsForContext: vi.fn().mockResolvedValue([]),
+  getGradingRubricsForContext: vi.fn().mockResolvedValue({rubrics: [], totalPages: 1}),
   getRubricSelfAssessmentSettings: vi.fn().mockResolvedValue({
     canUpdateRubricSelfAssessment: true,
     rubricSelfAssessmentEnabled: true,
   }),
   setRubricSelfAssessment: vi.fn().mockResolvedValue({}),
+  RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT: 20,
 }))
 
 describe('RubricAssignmentContainer Tests', () => {
@@ -62,10 +63,10 @@ describe('RubricAssignmentContainer Tests', () => {
     )
 
     queryClient.setQueryData(['fetchGradingRubricContexts', '1'], RUBRIC_CONTEXTS)
-    queryClient.setQueryData(
-      ['fetchGradingRubricsForContext', '1', 'course_2'],
-      RUBRICS_FOR_CONTEXT,
-    )
+    queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2'], {
+      rubrics: RUBRICS_FOR_CONTEXT,
+      totalPages: 1,
+    })
 
     const rubricSelfAssessmentSettings = {
       canUpdateRubricSelfAssessment: true,
@@ -85,6 +86,7 @@ describe('RubricAssignmentContainer Tests', () => {
     queryClient.setDefaultOptions({
       queries: {
         retry: false,
+        staleTime: Infinity,
       },
     })
   })
@@ -539,6 +541,115 @@ describe('RubricAssignmentContainer Tests', () => {
 
       fireEvent.click(rubricPreviewButtons[0])
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
+    })
+
+    describe('search debounce', () => {
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
+
+      afterEach(() => {
+        vi.useRealTimers()
+      })
+
+      it('does not filter rubrics immediately on keystroke', () => {
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        const searchInput = getByTestId('rubric-search-input')
+        fireEvent.change(searchInput, {target: {value: 'Rubric 1'}})
+
+        // Before debounce fires, both rubrics should still be visible
+        expect(queryAllByTestId('rubric-search-row-title')).toHaveLength(2)
+      })
+
+      it('filters rubrics client-side after debounce delay when pagination is disabled', async () => {
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        const searchInput = getByTestId('rubric-search-input')
+        fireEvent.change(searchInput, {target: {value: 'Rubric 1'}})
+
+        await vi.advanceTimersByTimeAsync(300)
+
+        const titles = queryAllByTestId('rubric-search-row-title')
+        expect(titles).toHaveLength(1)
+        expect(titles[0]).toHaveTextContent('Rubric 1')
+      })
+    })
+
+    describe('pagination', () => {
+      const PAGINATED_CONTEXTS = [
+        ...RUBRIC_CONTEXTS.slice(0, 2),
+        {rubrics: 25, context_code: 'course_2', name: 'Course 2'},
+      ]
+
+      it('shows pagination controls when paginationEnabled and totalPages > 1', async () => {
+        queryClient.setQueryData(['fetchGradingRubricContexts', '1'], PAGINATED_CONTEXTS)
+        queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2', 1, ''], {
+          rubrics: RUBRICS_FOR_CONTEXT,
+          totalPages: 2,
+        })
+        fakeENV.setup({FEATURES: {grading_rubrics_pagination: true}})
+
+        const {getByTestId, getByText} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        await waitFor(() => {
+          expect(
+            document.querySelector('[data-testid="rubric-search-pagination"]'),
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('does not show pagination controls when totalPages is 1', async () => {
+        queryClient.setQueryData(['fetchGradingRubricContexts', '1'], PAGINATED_CONTEXTS)
+        queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2', 1, ''], {
+          rubrics: RUBRICS_FOR_CONTEXT,
+          totalPages: 1,
+        })
+        fakeENV.setup({FEATURES: {grading_rubrics_pagination: true}})
+
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        await waitFor(() => {
+          expect(queryAllByTestId('rubric-search-row-title')).toHaveLength(2)
+        })
+        expect(
+          document.querySelector('[data-testid="rubric-search-pagination"]'),
+        ).not.toBeInTheDocument()
+      })
+
+      it('does not paginate when grading_rubrics_pagination flag is off', async () => {
+        queryClient.setQueryData(['fetchGradingRubricContexts', '1'], PAGINATED_CONTEXTS)
+        // Non-paginated key (no page/search in key)
+        queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2'], {
+          rubrics: RUBRICS_FOR_CONTEXT,
+          totalPages: 1,
+        })
+        fakeENV.setup({FEATURES: {grading_rubrics_pagination: false}})
+
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        await waitFor(() => {
+          expect(queryAllByTestId('rubric-search-row-title')).toHaveLength(2)
+        })
+        expect(
+          document.querySelector('[data-testid="rubric-search-pagination"]'),
+        ).not.toBeInTheDocument()
+      })
     })
   })
 })
