@@ -59,8 +59,12 @@ vi.mock('@instructure/platform-notebook', () => ({
   REACTION_TYPE: {IMPORTANT: 'Important', CONFUSING: 'Confusing'},
 }))
 
-vi.mock('../../api/CanvasNotebookApi', () => ({
+vi.mock('@canvas/notebook', () => ({
   CanvasNotebookApi: vi.fn(),
+  notebookTranslations: {},
+  notebookTranslate: vi.fn((key: string) => key),
+  HIGHLIGHT_THEME: {},
+  CARD_THEME: {},
 }))
 
 describe('NotebookApp', () => {
