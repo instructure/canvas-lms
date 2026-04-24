@@ -2311,17 +2311,52 @@ class Course < ApplicationRecord
     !large_roster?
   end
 
+  UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment].freeze
+
   def active_enrollment_allows(user, permission, allow_future: true)
     return false unless user && permission && !deleted?
 
     is_unpublished = created? || claimed?
     active_enrollments = fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
       scope = enrollments.for_user(user).active_or_pending_by_date.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
-      scope = scope.where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]) if is_unpublished
+      scope = scope.where(type: UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES) if is_unpublished
       scope.to_a.each(&:clear_association_cache)
     end
     active_enrollments.each { |e| e.course = self } # set association so we don't requery
     active_enrollments.any? { |e| (allow_future || e.date_based_state_in_db == "active") && e.has_permission_to?(permission) }
+  end
+
+  def self.preload_active_enrollments_for_permissions(user, courses)
+    return unless user && courses.present?
+
+    Array(courses).group_by(&:shard).each do |shard, shard_courses|
+      shard.activate do
+        bulk_rows_by_course = nil
+        load_bulk = lambda do
+          bulk_rows_by_course ||= begin
+            rows = Enrollment
+                   .where(course_id: shard_courses.map(&:id))
+                   .where.not(workflow_state: "deleted")
+                   .for_user(user)
+                   .active_or_pending_by_date
+                   .select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+                   .to_a
+            rows.each(&:clear_association_cache)
+            rows.group_by(&:course_id)
+          end
+        end
+
+        shard_courses.each do |course|
+          is_unpublished = course.created? || course.claimed?
+          course.fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
+            load_bulk.call
+            for_course = bulk_rows_by_course[course.id] || []
+            for_course = for_course.select { |e| UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES.include?(e.type) } if is_unpublished
+            for_course
+          end
+        end
+      end
+    end
   end
 
   def self.find_all_by_context_code(codes)
