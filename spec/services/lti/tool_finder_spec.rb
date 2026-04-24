@@ -110,7 +110,7 @@ describe Lti::ToolFinder do
     subject { Lti::ToolFinder.from_context(@course, scope:) }
 
     let(:scope) { ContextExternalTool.where(consumer_key:) }
-    let(:tool) { external_tool_1_3_model(context: @course) }
+    let(:tool) { external_tool_model(context: @course) }
     let(:consumer_key) { "test" }
 
     before do
@@ -132,10 +132,51 @@ describe Lti::ToolFinder do
     end
 
     context "when tool is installed up the context chain" do
-      let(:tool) { external_tool_1_3_model(context: @course.account) }
+      let(:tool) { external_tool_model(context: @course.account) }
 
       it "returns the tool" do
         expect(subject).to eq tool
+      end
+    end
+
+    context "for 1.3 tools with context controls" do
+      subject { Lti::ToolFinder.from_context(@course, scope: ContextExternalTool.active.where(developer_key_id: registration.developer_key.id)) }
+
+      let!(:registration) { lti_registration_with_tool(account: @root_account) }
+      let(:deployment) { registration.deployments.first }
+
+      it "returns the tool when available" do
+        expect(subject).to eq deployment
+      end
+
+      it "returns nil when the tool is unavailable in the course context" do
+        deployment.primary_context_control.update!(available: false)
+        expect(subject).to be_nil
+      end
+
+      it "returns nil when the tool is unavailable due to a parent account context control" do
+        deployment.context_controls.update_all(available: false)
+        expect(subject).to be_nil
+      end
+
+      context "when an LTI 1.1 tool matches the scope" do
+        subject do
+          Lti::ToolFinder.from_context(
+            @course,
+            scope: ContextExternalTool.active.where(id: [deployment.id, lti_1_1_tool.id])
+          )
+        end
+
+        let(:lti_1_1_tool) { external_tool_model(context: @course) }
+
+        before do
+          deployment.primary_context_control.update!(available: false)
+        end
+
+        it "still returns the LTI 1.1 tool even when the 1.3 tool is unavailable" do
+          lti_1_1_tool
+          expect(subject).to eq lti_1_1_tool
+        end
       end
     end
   end

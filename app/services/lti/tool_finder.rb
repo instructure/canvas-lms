@@ -82,11 +82,15 @@ module Lti
       #
       # @return [ContextExternalTool] The first tool that matches the given scope
       def from_context(context, scope:)
+        scope = Lti::ToolFinderUtils.filter_by_unavailable_context_controls(scope, context)
         scope.find_by(context: Lti::ToolFinderUtils.contexts_to_search(context))
       end
 
       # Returns the ContextExternalTool for this id, given that it is
       # available in the given context.
+      #
+      # TODO: availability is not yet implemented (we'd need the context passed
+      # in here) -- fix, or migrate usages of this method to use from_id
       #
       # Use instead of Rails' find_by to respect admin tool availability decisions.
       #
@@ -103,6 +107,9 @@ module Lti
       # available in the given context.
       #
       # Use instead of Rails' find to respect admin tool availability decisions.
+      #
+      # TODO: availability is not yet implemented (we'd need the context passed
+      # in here) -- fix, or migrate usages of this method to use from_id,
       #
       # @param id [Integer] The id of the ContextExternalTool
       # @param scope [ActiveRecord::Relation] Optionally, a ContextExternalTool query to narrow the search
