@@ -140,11 +140,11 @@ describe('NewStudentGroupModal', () => {
       target: {value: 'name'},
     })
     fireEvent.click(getByRole('combobox', {name: 'Invite Students'}))
-    // Wait for loading state to finish
+    // Wait for the student option to be rendered (avoids race between isLoading=false and the
+    // subsequent useEffect that calls setStudents, which triggers a second render)
     await waitFor(() => {
-      expect(screen.queryByRole('option', {name: 'Loading'})).not.toBeInTheDocument()
+      expect(getByRole('option', {name: 'Student'})).toBeInTheDocument()
     })
-    // Now click the student option
     fireEvent.click(getByRole('option', {name: 'Student'}))
     fireEvent.click(getByText('Submit'))
     expect(getAllByText(/Saving group/i)).toBeTruthy()
