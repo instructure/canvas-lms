@@ -638,6 +638,52 @@ describe DeveloperKey do
         end
       end
 
+      context "logging old settings when propagating site admin changes" do
+        before do
+          Account.site_admin.shard.activate { tool_configuration.update!(privacy_level: "anonymous") }
+          developer_key.update!(account: nil)
+        end
+
+        context "when lti_registrations_templates is disabled" do
+          before do
+            shard_1_account.disable_feature!(:lti_registrations_templates)
+            shard_2_account.disable_feature!(:lti_registrations_templates)
+          end
+
+          it "logs old settings for each tool before replacing with site admin configuration" do
+            old_shard_1_settings = shard_1_tool.reload.settings.to_json
+            old_shard_2_settings = shard_2_tool.reload.settings.to_json
+            log_messages = []
+            allow(Rails.logger).to receive(:info) { |msg| log_messages << msg }
+
+            update_external_tools
+            run_jobs
+
+            expect(log_messages).to include(
+              a_string_including(shard_1_tool.global_id.to_s, old_shard_1_settings),
+              a_string_including(shard_2_tool.global_id.to_s, old_shard_2_settings)
+            )
+          end
+        end
+
+        context "when lti_registrations_templates is enabled" do
+          before do
+            shard_1_account.enable_feature!(:lti_registrations_templates)
+            shard_2_account.enable_feature!(:lti_registrations_templates)
+          end
+
+          it "does not log old tool settings" do
+            log_messages = []
+            allow(Rails.logger).to receive(:info) { |msg| log_messages << msg }
+
+            update_external_tools
+            run_jobs
+
+            expect(log_messages).not_to include(a_string_including("Old settings:"))
+          end
+        end
+      end
+
       describe "when there are broken tools with no context" do
         before do
           developer_key
@@ -699,6 +745,38 @@ describe DeveloperKey do
 
           expect(template_tool.reload.name).to eq("Updated Template Title")
           expect(local_copy_tool.reload.name).to eq(original_title)
+        end
+
+        it "logs local copy's settings before overwriting with site admin configuration when flag is disabled" do
+          # Ensure local_copy exists so sync_app_id can resolve it for inherited_tool
+          local_copy
+
+          # Deploy a tool for the subaccount directly from the template, as would
+          # exist before the templates flag was introduced
+          inherited_tool = template.new_external_tool(subaccount)
+
+          # Simulate modifications the account made while the local copy was in use
+          inherited_tool.settings["selection_width"] = 900
+          inherited_tool.save!
+
+          old_settings = inherited_tool.reload.settings.to_json
+
+          # Disable the templates flag at both levels, reverting to legacy inheritance behavior.
+          # Site admin flag must also be disabled since the before block enables it "on",
+          # which would otherwise propagate down and make feature_enabled? still return true.
+          Account.site_admin.disable_feature!(:lti_registrations_templates)
+          subaccount.disable_feature!(:lti_registrations_templates)
+
+          log_messages = []
+          allow(Rails.logger).to receive(:info) { |msg| log_messages << msg }
+
+          template.manual_configuration.update!(title: "Updated Site Admin Title")
+          template_developer_key.update_external_tools!
+          run_jobs
+
+          expect(log_messages).to include(
+            a_string_including(inherited_tool.global_id.to_s, old_settings)
+          )
         end
       end
     end
