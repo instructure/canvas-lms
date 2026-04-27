@@ -138,9 +138,9 @@ module Types
     field :institutional_tag_categories_connection,
           Types::InstitutionalTagCategoryType.connection_type,
           null: true do
-      argument :has_tags_in_state, String, required: false
+      argument :has_tags_in_state, Types::InstitutionalTagWorkflowStateType, required: false
       argument :search_term, String, required: false
-      argument :workflow_state, String, required: false, default_value: "active"
+      argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
     end
     def institutional_tag_categories_connection(search_term: nil, workflow_state: "active", has_tags_in_state: nil)
       root_account = account.root_account? ? account : nil
@@ -176,7 +176,7 @@ module Types
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InstitutionalTagCategory")
       argument :search_term, String, required: false
-      argument :workflow_state, String, required: false, default_value: "active"
+      argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
     end
     def institutional_tags_connection(category_id: nil, search_term: nil, workflow_state: "active")
       root_account = account.root_account? ? account : nil
