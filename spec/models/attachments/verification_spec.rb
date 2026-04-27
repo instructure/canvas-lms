@@ -295,4 +295,52 @@ describe Attachments::Verification do
       end
     end
   end
+
+  describe "#monitor_uuid_verifier_usage" do
+    let(:referer) { "https://other.canvas.example/files/1" }
+    let(:request_url) { "https://this.canvas.example/files/2" }
+    let(:request) do
+      instance_double(ActionDispatch::Request, referer:, url: request_url)
+    end
+
+    before do
+      allow(InstStatsd::Statsd).to receive(:event)
+    end
+
+    context "when the feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:log_uuid_verifier_usage)
+        v.monitor_uuid_verifier_usage(request)
+      end
+
+      it "does not emit a stats event" do
+        expect(InstStatsd::Statsd).not_to have_received(:event)
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:log_uuid_verifier_usage)
+      end
+
+      it "emits a uuid_verifier_usage event" do
+        v.monitor_uuid_verifier_usage(request)
+        expect(InstStatsd::Statsd).to have_received(:event).with(
+          "File accessed with UUID verifier",
+          "Referrer: https://other.canvas.example/files/1, Request URL: https://this.canvas.example/files/2",
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      end
+
+      context "when the referer URI is invalid" do
+        let(:referer) { "http://[bad" }
+
+        it "does not emit a stats event" do
+          v.monitor_uuid_verifier_usage(request)
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+    end
+  end
 end
