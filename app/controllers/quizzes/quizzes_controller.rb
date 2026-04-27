@@ -801,7 +801,9 @@ class Quizzes::QuizzesController < ApplicationController
           @version_number = params[:version].to_i
           @unversioned_submission = @submission
           @submission = @versions.detect { |s| s.version_number >= @version_number }
-          @submission ||= @unversioned_submission.versions.get(params[:version]).model
+          @submission ||= @unversioned_submission.versions.get(params[:version])&.model
+          raise ActiveRecord::RecordNotFound unless @submission
+
           @current_version = (@current_submission.version_number == @submission.version_number)
           @version_number = "current" if @current_version
         end

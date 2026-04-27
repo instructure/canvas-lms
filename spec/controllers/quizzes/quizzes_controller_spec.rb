@@ -1744,6 +1744,16 @@ describe Quizzes::QuizzesController do
       end
     end
 
+    it "returns 404 when ?version param does not match any version" do
+      user_session(@student)
+      submission = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(submission).grade_submission
+
+      get "history", params: { course_id: @course.id, quiz_id: @quiz.id, version: 999 }
+
+      expect(response).to be_not_found
+    end
+
     it "allows a student to view their own history if the submission is posted" do
       user_session(@student)
       quiz_submission = @quiz.generate_submission(@student)
