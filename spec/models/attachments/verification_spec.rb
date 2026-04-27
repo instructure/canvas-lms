@@ -195,6 +195,8 @@ describe Attachments::Verification do
     end
     let(:files_domain) { false }
     let(:referrer_is_canvas_domain) { false }
+    let(:referrer_account) { referrer_is_canvas_domain ? instance_double(Account, id: 2) : nil }
+    let(:request_account) { instance_double(Account, id: 1) }
 
     before do
       allow(InstStatsd::Statsd).to receive(:event)
@@ -205,9 +207,8 @@ describe Attachments::Verification do
 
       before do
         Account.site_admin.disable_feature!(:log_cross_domain_file_access)
-        allow(AccountDomain).to receive(:where)
-          .with(host: "other.canvas.example")
-          .and_return(instance_double(ActiveRecord::Relation, exists?: referrer_is_canvas_domain))
+        allow(LoadAccount).to receive(:from_host).with("other.canvas.example").and_return(referrer_account)
+        allow(LoadAccount).to receive(:from_host).with("this.canvas.example").and_return(request_account)
         v.monitor_cross_domain_access(request, files_domain)
       end
 
@@ -219,9 +220,8 @@ describe Attachments::Verification do
     context "when the feature flag is enabled" do
       before do
         Account.site_admin.enable_feature!(:log_cross_domain_file_access)
-        allow(AccountDomain).to receive(:where)
-          .with(host: "other.canvas.example")
-          .and_return(instance_double(ActiveRecord::Relation, exists?: referrer_is_canvas_domain))
+        allow(LoadAccount).to receive(:from_host).with("other.canvas.example").and_return(referrer_account)
+        allow(LoadAccount).to receive(:from_host).with("this.canvas.example").and_return(request_account)
         v.monitor_cross_domain_access(request, files_domain)
       end
 
@@ -264,7 +264,16 @@ describe Attachments::Verification do
         end
       end
 
-      context "when the referrer is another Canvas domain" do
+      context "when the referrer is another Canvas domain with the same account" do
+        let(:referrer_is_canvas_domain) { true }
+        let(:referrer_account) { instance_double(Account, id: 1) }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer is another Canvas domain with a different account" do
         let(:referrer_is_canvas_domain) { true }
 
         it "emits a cross_domain_file_access event" do
