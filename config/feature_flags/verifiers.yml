@@ -73,3 +73,17 @@ allow_attachment_association_creation:
       state: allowed_on
     ci:
       state: allowed_on
+log_cross_domain_file_access:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Log cross-domain File Access
+  description: |-
+    If enabled, an event will be emitted to DataDog when cross-domain
+    file access occurs
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
