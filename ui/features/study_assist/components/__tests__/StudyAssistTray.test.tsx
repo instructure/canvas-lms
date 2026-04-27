@@ -244,6 +244,35 @@ describe('StudyAssistTray', () => {
     )
   })
 
+  it('renderFlashCards forwards onAnalyticsEvent so flashcard thumbs fire Pendo events', async () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    const {renderFlashCards} = mockAssistContent.mock.calls[0][0] as {
+      renderFlashCards: (
+        cards: object[],
+        isFetching: boolean,
+        isError: boolean,
+        getFlashCards: () => void,
+      ) => React.ReactNode
+    }
+    render(<>{renderFlashCards([{question: 'Q', answer: 'A'}], false, false, vi.fn())}</>)
+
+    const flashCardsProps = mockAssistFlashCardsInteraction.mock.calls[0][0] as {
+      onAnalyticsEvent?: (event: string) => void
+    }
+    expect(typeof flashCardsProps.onAnalyticsEvent).toBe('function')
+
+    flashCardsProps.onAnalyticsEvent?.('chat-good-response')
+    await vi.waitFor(() => {
+      expect(mockTrack).toHaveBeenCalledWith('study_assist_chat-good-response', {type: 'track'})
+    })
+  })
+
   describe('analytics events', () => {
     it('passes handleAnalyticsEvent to AssistContent', () => {
       render(

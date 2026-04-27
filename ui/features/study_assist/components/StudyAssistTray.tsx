@@ -172,10 +172,11 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
           isError={isError}
           getFlashCards={getFlashCards}
           cardHeight="60vh"
+          onAnalyticsEvent={handleAnalyticsEvent}
         />
       </div>
     ),
-    [],
+    [handleAnalyticsEvent],
   )
 
   return (
