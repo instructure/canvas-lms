@@ -304,8 +304,9 @@ export const RubricForm = ({
   }
 
   const isAssignmentPointsDifferent =
-    !!assignmentPointsPossible &&
-    !!rubricForm.pointsPossible &&
+    hasAssignment &&
+    assignmentPointsPossible != null &&
+    rubricForm.pointsPossible != null &&
     !rubricForm.hidePoints &&
     rubricForm.useForGrading &&
     rubricForm.pointsPossible !== assignmentPointsPossible
@@ -522,7 +523,7 @@ export const RubricForm = ({
               handlePreviewRubric={() => setIsPreviewTrayOpen(true)}
               handleSaveAsDraft={handleSaveAsDraft}
               handleSave={() => {
-                if (rubric && hasAssignment && isAssignmentPointsDifferent) {
+                if (isAssignmentPointsDifferent) {
                   setIsAssignmentPointsDifferenceModalOpen(true)
                 } else if (
                   rubric &&

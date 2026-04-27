@@ -444,6 +444,36 @@ describe('RubricAssignmentContainer Tests', () => {
         expect(getByTestId('rubric-points-difference-modal')).toBeInTheDocument()
       })
 
+      it('should show the assignment points mismatch modal when assignmentPointsPossible is 0 and rubric points are non-zero', () => {
+        const {getByTestId} = renderComponent({
+          assignmentPointsPossible: 0,
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: {
+            ...RUBRIC_ASSOCIATION,
+            useForGrading: true,
+          },
+        })
+        fireEvent.click(getByTestId('edit-assignment-rubric-button'))
+        expect(getByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(getByTestId('rubric-points-difference-modal')).toBeInTheDocument()
+      })
+
+      it('should show the assignment points mismatch modal when rubric pointsPossible is 0 and assignment points are non-zero', () => {
+        const {getByTestId} = renderComponent({
+          assignmentPointsPossible: 10,
+          assignmentRubric: {...RUBRIC, pointsPossible: 0},
+          assignmentRubricAssociation: {
+            ...RUBRIC_ASSOCIATION,
+            useForGrading: true,
+          },
+        })
+        fireEvent.click(getByTestId('edit-assignment-rubric-button'))
+        expect(getByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(getByTestId('rubric-points-difference-modal')).toBeInTheDocument()
+      })
+
       it('should not show the assignment points mismatch when useForGrading is false', () => {
         const {queryByTestId} = renderComponent({
           assignmentPointsPossible: 200,
@@ -466,6 +496,22 @@ describe('RubricAssignmentContainer Tests', () => {
             useForGrading: true,
           },
         })
+        expect(queryByTestId('rubric-points-difference-modal')).not.toBeInTheDocument()
+      })
+
+      it('should not show the assignment points mismatch modal when there is no assignment', () => {
+        const {getByTestId, queryByTestId} = renderComponent({
+          assignmentId: '',
+          assignmentPointsPossible: 200,
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: {
+            ...RUBRIC_ASSOCIATION,
+            useForGrading: true,
+          },
+        })
+        fireEvent.click(getByTestId('edit-assignment-rubric-button'))
+        expect(getByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+        fireEvent.click(getByTestId('save-rubric-button'))
         expect(queryByTestId('rubric-points-difference-modal')).not.toBeInTheDocument()
       })
     })
