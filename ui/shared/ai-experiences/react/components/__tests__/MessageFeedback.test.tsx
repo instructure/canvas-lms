@@ -44,6 +44,7 @@ const makeFeedback = (vote: 'liked' | 'disliked', id = 'fb-1'): FeedbackItem => 
 
 const defaultProps = {
   messageId,
+  messageContainerId: `llm-message-${messageId}`,
   initialFeedback: [] as FeedbackItem[],
   courseId,
   aiExperienceId,
