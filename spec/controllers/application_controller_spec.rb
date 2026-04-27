@@ -2620,6 +2620,43 @@ RSpec.describe ApplicationController do
         expect(session).not_to have_key(:mobile_cookie_consent)
       end
     end
+
+    describe "error reporting" do
+      let(:user) { user_factory }
+      let(:pseudonym) { user.pseudonyms.create!(unique_id: "testuser") }
+
+      before do
+        allow(controller).to receive(:redirect_to).and_return(true)
+      end
+
+      context "when the session token string cannot be parsed" do
+        it "calls report_error with :parsing_error" do
+          controller.params[:session_token] = "totally-invalid-token"
+          expect(SessionToken).to receive(:report_error).with(reason: :parsing_error)
+          controller.send(:initiate_session_from_token)
+        end
+      end
+
+      context "when the session token parses but fails validation" do
+        it "calls report_error with :token_invalid" do
+          token = SessionToken.new(pseudonym.global_id)
+          token.created_at -= (SessionToken::VALIDITY_PERIOD + 5).seconds
+          controller.params[:session_token] = token.to_s
+          expect(SessionToken).to receive(:report_error).with(reason: :token_invalid)
+          controller.send(:initiate_session_from_token)
+        end
+      end
+
+      context "when the session token is valid" do
+        it "does not call report_error" do
+          allow_any_instantiation_of(pseudonym).to receive(:works_for_account?).and_return(true)
+          controller.instance_variable_set(:@current_pseudonym, pseudonym)
+          controller.params[:session_token] = SessionToken.new(pseudonym.global_id).to_s
+          expect(SessionToken).not_to receive(:report_error)
+          controller.send(:initiate_session_from_token)
+        end
+      end
+    end
   end
 
   describe "#native_app?" do

@@ -180,4 +180,110 @@ describe Attachments::Verification do
       expect(v2.valid_verifier_for_permission?(token, :download, root_account, mock_session)).to be(true)
     end
   end
+
+  describe "#monitor_cross_domain_access" do
+    let(:referer) { "https://other.canvas.example/files/1" }
+    let(:request_host) { "this.canvas.example" }
+    let(:request_url) { "https://this.canvas.example/files/2" }
+    let(:request) do
+      instance_double(
+        ActionDispatch::Request,
+        referer:,
+        host: request_host,
+        url: request_url
+      )
+    end
+    let(:files_domain) { false }
+    let(:referrer_is_canvas_domain) { false }
+
+    before do
+      allow(InstStatsd::Statsd).to receive(:event)
+    end
+
+    context "when the feature flag is disabled" do
+      let(:referrer_is_canvas_domain) { true }
+
+      before do
+        Account.site_admin.disable_feature!(:log_cross_domain_file_access)
+        allow(AccountDomain).to receive(:where)
+          .with(host: "other.canvas.example")
+          .and_return(instance_double(ActiveRecord::Relation, exists?: referrer_is_canvas_domain))
+        v.monitor_cross_domain_access(request, files_domain)
+      end
+
+      it "does not emit a stats event" do
+        expect(InstStatsd::Statsd).not_to have_received(:event)
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:log_cross_domain_file_access)
+        allow(AccountDomain).to receive(:where)
+          .with(host: "other.canvas.example")
+          .and_return(instance_double(ActiveRecord::Relation, exists?: referrer_is_canvas_domain))
+        v.monitor_cross_domain_access(request, files_domain)
+      end
+
+      context "when the request is nil" do
+        let(:request) { nil }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referer is blank" do
+        let(:referer) { "" }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when files_domain is true" do
+        let(:files_domain) { true }
+        let(:referrer_is_canvas_domain) { true }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer host matches the request host" do
+        let(:referer) { "https://this.canvas.example/somewhere" }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer is not a known Canvas domain" do
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer is another Canvas domain" do
+        let(:referrer_is_canvas_domain) { true }
+
+        it "emits a cross_domain_file_access event" do
+          expect(InstStatsd::Statsd).to have_received(:event).with(
+            "File accessed from different Canvas domain",
+            "Referrer: https://other.canvas.example/files/1, Request URL: https://this.canvas.example/files/2",
+            type: "cross_domain_file_access",
+            alert_type: :warning
+          )
+        end
+      end
+
+      context "when the referer URI is invalid" do
+        let(:referer) { "http://[bad" }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+    end
+  end
 end

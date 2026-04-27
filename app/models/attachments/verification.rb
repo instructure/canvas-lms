@@ -137,6 +137,7 @@ class Attachments::Verification
 
   # TODO: Remove this method once disable_file_verifier_access flag is enabled everywhere
   def monitor_cross_domain_access(request, files_domain)
+    return unless Account.site_admin.feature_enabled? :log_cross_domain_file_access
     return unless request&.referer.present?
     return if files_domain
 
