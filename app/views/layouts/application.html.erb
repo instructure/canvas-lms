@@ -126,6 +126,9 @@
 <%if !@content_only && @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
   <div id="drawer-layout-mount-point"></div>
 <% end %>
+<% if @show_study_assist %>
+  <div id="study_assist_drawer_layout_mount_point"></div>
+<% end %>
 <div id="application" class="ic-app <%= 'content-only' if @content_only %>">
   <%= render(:partial => 'shared/new_nav_header') unless @headers == false || @content_only %>
 

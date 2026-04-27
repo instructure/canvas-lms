@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useMemo, useRef} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, type ReactNode} from 'react'
 import {usePendoTracking} from '@canvas/pendo/react/hooks/usePendoTracking'
 import {useTranslation} from '@canvas/i18next'
-import {Tray} from '@instructure/ui-tray'
+import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -45,6 +45,7 @@ type Props = {
   open: boolean
   onDismiss: () => void
   fetchAssistResponse: (request: AssistRequest) => Promise<AssistResponse>
+  children?: ReactNode
 }
 
 type TrayHeaderProps = {
@@ -142,11 +143,23 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
   )
 }
 
-export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
+export default function StudyAssistTray({open, onDismiss, fetchAssistResponse, children}: Props) {
   const {t} = useTranslation('study_assist')
   const closeButtonRef = useRef<Element | null>(null)
   const allowedPrompts = useMemo(() => window.ENV.STUDY_ASSIST_TOOLS ?? [], [])
   const {trackEvent} = usePendoTracking()
+
+  // DrawerLayout.Tray's built-in ESC handling only fires in overlay mode
+  // (`shouldCloseOnEscape && shouldOverlayTray`); on wide viewports the tray
+  // sits side-by-side and never honors ESC. Add our own listener.
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onDismiss()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, onDismiss])
 
   const handleAnalyticsEvent = useCallback(
     (event: string) => {
@@ -180,50 +193,56 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
   )
 
   return (
-    <Tray
-      label={t('Study tools')}
-      placement="end"
-      size="regular"
-      open={open}
-      onDismiss={onDismiss}
-      defaultFocusElement={() => closeButtonRef.current}
-    >
-      <div
-        style={{
-          background: GRADIENT,
-          color: 'white',
-          minHeight: '100vh',
-          padding: '1rem',
-          boxSizing: 'border-box',
-        }}
-      >
-        <AssistProvider
-          fetchAssistResponse={fetchAssistResponse}
-          courseId={window.ENV.COURSE_ID}
-          pageId={window.ENV.WIKI_PAGE_ID}
-          fileId={window.ENV.FILE_ID}
-          featureSlug="canvas-lms:study-assist"
+    <View as="div" display="block" height="100vh" data-testid="study-assist-drawer-layout">
+      <DrawerLayout minWidth="40rem">
+        <DrawerLayout.Content label={t('Course content')}>{children}</DrawerLayout.Content>
+        <DrawerLayout.Tray
+          label={t('Study tools')}
+          placement="end"
+          open={open}
+          onDismiss={onDismiss}
+          defaultFocusElement={() => closeButtonRef.current}
         >
-          <TrayHeader onDismiss={onDismiss} closeButtonRef={closeButtonRef} />
-          {allowedPrompts.length > 0 ? (
-            <div style={{padding: '0 1rem'}}>
-              <AssistContent
-                chatEnabled={false}
-                showLargePrompts={true}
-                onAnalyticsEvent={handleAnalyticsEvent}
-                allowedPrompts={allowedPrompts}
-                renderFlashCards={renderFlashCards}
-              />
-            </div>
-          ) : (
-            <View as="div" padding="large" textAlign="center">
-              <Text color="primary-inverse" data-testid="study-assist-no-tools">
-                {t('No study tools are currently available.')}
-              </Text>
-            </View>
-          )}
-        </AssistProvider>
-      </div>
-    </Tray>
+          <div
+            data-testid="study-assist-drawer-tray"
+            style={{
+              background: GRADIENT,
+              color: 'white',
+              width: '25rem',
+              minHeight: '100vh',
+              padding: '1rem',
+              boxSizing: 'border-box',
+            }}
+          >
+            <AssistProvider
+              fetchAssistResponse={fetchAssistResponse}
+              courseId={window.ENV.COURSE_ID}
+              pageId={window.ENV.WIKI_PAGE_ID}
+              fileId={window.ENV.FILE_ID}
+              featureSlug="canvas-lms:study-assist"
+            >
+              <TrayHeader onDismiss={onDismiss} closeButtonRef={closeButtonRef} />
+              {allowedPrompts.length > 0 ? (
+                <div style={{padding: '0 1rem'}}>
+                  <AssistContent
+                    chatEnabled={false}
+                    showLargePrompts={true}
+                    onAnalyticsEvent={handleAnalyticsEvent}
+                    allowedPrompts={allowedPrompts}
+                    renderFlashCards={renderFlashCards}
+                  />
+                </div>
+              ) : (
+                <View as="div" padding="large" textAlign="center">
+                  <Text color="primary-inverse" data-testid="study-assist-no-tools">
+                    {t('No study tools are currently available.')}
+                  </Text>
+                </View>
+              )}
+            </AssistProvider>
+          </div>
+        </DrawerLayout.Tray>
+      </DrawerLayout>
+    </View>
   )
 }
