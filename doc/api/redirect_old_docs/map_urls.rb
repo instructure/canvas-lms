@@ -66,9 +66,13 @@ module DocRedirect
             title = Regexp.last_match(1)
             filename = Regexp.last_match(2)
 
+            # Adjust section stack to match page's indentation level
+            page_section_depth = indent_level - 1
+            page_section_stack = section_stack[0...page_section_depth]
+
             # Generate URLs
             old_url = generate_old_url(filename)
-            new_url = generate_new_url(filename, section_stack)
+            new_url = generate_new_url(filename, page_section_stack)
 
             # Add mapping entries
             mappings.concat(create_mapping_entries(old_url, new_url, title, filename))
