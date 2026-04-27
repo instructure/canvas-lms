@@ -37,6 +37,7 @@ const submitButtonTheme = navyButtonTheme
 
 interface MessageFeedbackProps {
   messageId: string
+  messageContainerId: string
   initialFeedback: FeedbackItem[]
   courseId: string | number
   aiExperienceId: string
@@ -51,6 +52,7 @@ interface FeedbackResponse {
 
 const MessageFeedback = ({
   messageId,
+  messageContainerId,
   initialFeedback,
   courseId,
   aiExperienceId,
@@ -176,6 +178,7 @@ const MessageFeedback = ({
           withBorder={true}
           color={isLiked ? 'primary' : 'secondary'}
           screenReaderLabel={I18n.t('Like this response')}
+          aria-describedby={messageContainerId}
           onClick={handleLike}
           interaction={buttonInteraction}
           data-testid="message-feedback-like"
@@ -190,6 +193,7 @@ const MessageFeedback = ({
             withBorder={true}
             color={isDisliked ? 'primary' : 'secondary'}
             screenReaderLabel={I18n.t('Dislike this response')}
+            aria-describedby={messageContainerId}
             onClick={handleDislike}
             interaction={buttonInteraction}
             data-testid="message-feedback-dislike"

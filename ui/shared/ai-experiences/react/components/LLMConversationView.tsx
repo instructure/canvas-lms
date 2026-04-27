@@ -96,7 +96,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   const normalModeBottomRef = useRef<HTMLDivElement | null>(null)
   const focusModeBottomRef = useRef<HTMLDivElement | null>(null)
   const hasInitializedRef = useRef(false)
-  const lastAssistantMessageRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     // Reset on new initialization so instant-scroll applies again after restart
@@ -125,22 +124,13 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isExpanded])
 
-  // Announce new Assistant messages to screen readers and focus text input
+  // Announce new Assistant messages to screen readers
   useEffect(() => {
     if (messages.length === 0) return
 
     const lastMessage = messages[messages.length - 1]
     if (lastMessage?.role === 'Assistant' && !isLoading) {
       setScreenReaderAnnouncement(I18n.t('Assistant: %{message}', {message: lastMessage.text}))
-      // Only move focus if the user isn't already focused on another interactive
-      // element (e.g. the feedback form textarea or a button)
-      const active = document.activeElement
-      const isFocusIdle = !active || active === document.body || active === textAreaRef.current
-      if (isFocusIdle) {
-        // Focus the message bubble so keyboard/SR users can read it and Tab
-        // naturally to the Like/Dislike buttons, then the message input
-        lastAssistantMessageRef.current?.focus({preventScroll: true})
-      }
     }
   }, [messages, isLoading])
 
@@ -209,6 +199,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     setInputValue('')
     setIsLoading(true)
     setError(null)
+    textAreaRef.current?.focus()
 
     try {
       const {json} = await doFetchApi<ConversationResponse>({
@@ -304,8 +295,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           aiExperienceId={aiExperienceId ?? ''}
           isLoading={isLoading}
           isInitializing={isInitializing}
-          lastAssistantMessageRef={lastAssistantMessageRef}
-          bottomRef={normalModeBottomRef}
         />
       </View>
 
@@ -326,7 +315,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                 onKeyDown={handleKeyPress}
                 placeholder={I18n.t('Your answer...')}
                 height="60px"
-                disabled={isLoading || isInitializing}
+                disabled={isInitializing}
                 textareaRef={(el: HTMLTextAreaElement | null) => {
                   ;(textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el
                 }}
@@ -348,6 +337,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           </Flex>
         </div>
       </GradientBorder>
+      <div ref={normalModeBottomRef} />
     </View>
   )
 
@@ -540,7 +530,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                           aiExperienceId={aiExperienceId ?? ''}
                           isLoading={isLoading}
                           isInitializing={isInitializing}
-                          lastAssistantMessageRef={lastAssistantMessageRef}
                           bottomRef={focusModeBottomRef}
                         />
                       </div>
@@ -563,7 +552,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                                 onKeyDown={handleKeyPress}
                                 placeholder={I18n.t('Your answer...')}
                                 height="60px"
-                                disabled={isLoading || isInitializing}
+                                disabled={isInitializing}
                                 textareaRef={(el: HTMLTextAreaElement | null) => {
                                   ;(
                                     textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>
