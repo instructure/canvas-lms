@@ -78,7 +78,7 @@ describe Types::InstitutionalTagCategoryType do
     end
 
     it "returns deleted tags when workflowState is deleted" do
-      ids = category_type.resolve('tagsConnection(workflowState: "deleted") { nodes { _id } }')
+      ids = category_type.resolve("tagsConnection(workflowState: deleted) { nodes { _id } }")
       expect(ids).to eq([@archived_tag.id.to_s])
     end
   end
