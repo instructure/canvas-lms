@@ -35,9 +35,9 @@ describe UsersController, type: :request do
   end
 
   before :once do
-    course_with_teacher(active_all: true, course_name: "Teacher Course", user: user_with_pseudonym(active_all: true))
+    course_with_teacher(active_all: true, course_name: "Teacher Course", course_code: "Teacher_C1", user: user_with_pseudonym(active_all: true))
     @teacher_course = @course
-    @student_course = course_factory(active_course: true, course_name: "Student Course")
+    @student_course = course_factory(active_course: true, course_name: "Student Course", course_code: "Student_C1")
     @student_course.enroll_student(@user).accept!
     # an assignment i need to submit (needs_submitting)
     @a1 = Assignment.create!(context: @student_course, due_at: 6.days.from_now, title: "required work", submission_types: "online_text_entry", points_possible: 10)
@@ -62,6 +62,7 @@ describe UsersController, type: :request do
         "html_url" => "#{course_assignment_url(@a1.context_id, @a1.id)}#submit",
         "context_type" => "Course",
         "context_name" => "Student Course",
+        "context_short_name" => "Student_C1",
         "course_id" => @student_course.id,
       }
     @a2_json =
@@ -74,6 +75,7 @@ describe UsersController, type: :request do
         "html_url" => speed_grader_course_gradebook_url(@a2.context_id, assignment_id: @a2.id),
         "context_type" => "Course",
         "context_name" => "Teacher Course",
+        "context_short_name" => "Teacher_C1",
         "course_id" => @teacher_course.id,
       }
   end

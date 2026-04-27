@@ -26,6 +26,7 @@ module Api::V1::TodoItem
   def todo_item_json(assignment_or_quiz, user, session, todo_type)
     context_data(assignment_or_quiz).merge({
                                              context_name: assignment_or_quiz&.context&.name,
+                                             context_short_name: assignment_or_quiz&.context&.short_name,
                                              type: todo_type,
                                              ignore: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "0"),
                                              ignore_permanently: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "1"),
