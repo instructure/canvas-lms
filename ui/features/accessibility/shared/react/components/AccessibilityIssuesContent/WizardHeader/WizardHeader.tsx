@@ -22,11 +22,26 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {NutritionFacts} from '@canvas/nutrition-facts/react/NutritionFacts'
+import {NutritionFacts} from '@instructure/platform-nutrition-facts'
 import {useAiFeatureInfo} from '../../../hooks/useAiFeatureInfo'
 import {Grid, GridArea} from '../../Grid'
 
 const I18n = createI18nScope('accessibility_checker')
+const NF_I18n = createI18nScope('nutrition_facts')
+
+const nutritionFactsTranslations = () => ({
+  title: '',
+  triggerScreenReaderLabel: NF_I18n.t('Nutrition facts'),
+  dataPermissionLevelsTitle: NF_I18n.t('Data Permission Levels'),
+  dataPermissionLevelsCurrentFeatureText: NF_I18n.t('Current Feature:'),
+  dataPermissionLevelsCloseIconButtonScreenReaderLabel: NF_I18n.t('Close'),
+  dataPermissionLevelsCloseButtonText: NF_I18n.t('Close'),
+  dataPermissionLevelsModalLabel: NF_I18n.t('This is a Data Permission Levels modal'),
+  nutritionFactsModalLabel: NF_I18n.t('This is a modal for AI facts'),
+  nutritionFactsTitle: NF_I18n.t('Nutrition Facts'),
+  nutritionFactsCloseButtonText: NF_I18n.t('Close'),
+  nutritionFactsCloseIconButtonScreenReaderLabel: NF_I18n.t('Close'),
+})
 
 interface WizardProps {
   title: string
@@ -81,17 +96,15 @@ export const WizardHeader: React.FC<WizardProps> = ({title, onDismiss, headingRe
           }}
         >
           <NutritionFacts
-            aiInformation={getFeatureInfo.aiInformation}
-            dataPermissionLevels={getFeatureInfo.dataPermissionLevels}
+            aiInformation={getFeatureInfo.aiInformation.data}
+            dataPermissionLevels={getFeatureInfo.dataPermissionLevels.data}
             nutritionFacts={getFeatureInfo.nutritionFacts}
+            translations={nutritionFactsTranslations()}
             iconSize={18}
-            responsiveProps={{
-              fullscreenModals: false,
-              color: 'primary',
-              buttonColor: 'primary',
-              withBackground: false,
-              domElement: 'inbox_nutrition_facts_container',
-            }}
+            fullscreenModals={false}
+            color="primary"
+            buttonColor="primary"
+            withBackground={false}
           />
         </GridArea>
       )}
