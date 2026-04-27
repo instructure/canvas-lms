@@ -1581,6 +1581,42 @@ describe Course do
       expect(copied_tab_ids).to include("assignments", "discussions")
     end
   end
+
+  describe ".clear_assignment_and_quiz_caches" do
+    it "passes sub_assignments along with parent assignments to SubmissionLifecycleManager so cached_due_date is computed for checkpoints" do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpoint discussion")
+      reply_to_topic = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.week.from_now }],
+        points_possible: 5
+      )
+      reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
+        points_possible: 10,
+        replies_required: 2
+      )
+      parent = topic.assignment
+      parent.needs_update_cached_due_dates = true
+
+      migration = @course.content_migrations.create!
+      migration.add_imported_item(parent)
+
+      passed_assignments = nil
+      allow(SubmissionLifecycleManager).to receive(:recompute_course) do |_course, **opts|
+        passed_assignments = opts[:assignments]
+      end
+
+      Importers::CourseContentImporter.clear_assignment_and_quiz_caches(migration)
+
+      expect(passed_assignments).to include(parent, reply_to_topic, reply_to_entry)
+    end
+  end
 end
 
 def from_file_path(path, course)

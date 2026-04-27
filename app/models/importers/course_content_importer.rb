@@ -459,9 +459,10 @@ module Importers
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
         skip_lpa = !!migration.date_shift_options || migration.should_skip_import?("LatePolicy")
+        sub_assignments = SubAssignment.active.where(parent_assignment_id: assignments.map(&:id)).to_a
         SubmissionLifecycleManager.recompute_course(
           migration.context,
-          assignments:,
+          assignments: assignments + sub_assignments,
           update_grades: true,
           executing_user: migration.user,
           skip_late_policy_applicator: skip_lpa,
